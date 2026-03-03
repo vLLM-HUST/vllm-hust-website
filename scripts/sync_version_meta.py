@@ -19,13 +19,17 @@ README_BLOCK_END = "<!-- END:VERSION_META -->"
 def _fetch_latest_version(package_name: str) -> str:
     url = PYPI_URL.format(package=package_name)
     context = ssl.create_default_context()
-    request = urllib.request.Request(url, headers={"User-Agent": "sagellm-website-version-sync/1.0"})
+    request = urllib.request.Request(
+        url, headers={"User-Agent": "sagellm-website-version-sync/1.0"}
+    )
 
     try:
         with urllib.request.urlopen(request, timeout=20, context=context) as response:
             payload = json.loads(response.read().decode("utf-8"))
     except urllib.error.URLError as error:
-        raise RuntimeError(f"Failed to fetch {package_name} from PyPI: {error}") from error
+        raise RuntimeError(
+            f"Failed to fetch {package_name} from PyPI: {error}"
+        ) from error
 
     version = payload.get("info", {}).get("version")
     if not isinstance(version, str) or not version.strip():
@@ -52,7 +56,9 @@ def _render_readme_block(meta: dict[str, Any]) -> str:
     message = release.get("message_zh", "v0.5 标志着 sageLLM 进入工程可用阶段。")
     quickstart_title = quickstart.get("title_zh", "🚀 Quick Start (v0.5)")
     install_command = quickstart.get("install_command", "pip install isagellm")
-    run_command = quickstart.get("run_command", "sagellm run -p \"Hello AI\" --backend cuda")
+    run_command = quickstart.get(
+        "run_command", 'sagellm run -p "Hello AI" --backend cuda'
+    )
 
     return "\n".join(
         [
@@ -77,7 +83,7 @@ def _render_readme_block(meta: dict[str, Any]) -> str:
             "sagellm hello",
             "",
             "# 运行推理 (CPU 默认)",
-            "sagellm run -p \"Hello, world!\" --max-tokens 32",
+            'sagellm run -p "Hello, world!" --max-tokens 32',
             "",
             "# 运行推理 (Ascend NPU)",
             run_command,

@@ -34,11 +34,17 @@ def _is_allowlisted(line: str, allowlist: list[re.Pattern[str]]) -> bool:
     return any(pattern.search(line) for pattern in allowlist)
 
 
-def _find_stale_references(file_path: Path, allowlist: list[re.Pattern[str]]) -> list[str]:
+def _find_stale_references(
+    file_path: Path, allowlist: list[re.Pattern[str]]
+) -> list[str]:
     violations: list[str] = []
-    for line_no, line in enumerate(file_path.read_text(encoding="utf-8").splitlines(), start=1):
+    for line_no, line in enumerate(
+        file_path.read_text(encoding="utf-8").splitlines(), start=1
+    ):
         if STALE_PATTERN.search(line) and not _is_allowlisted(line, allowlist):
-            violations.append(f"{file_path.relative_to(ROOT_DIR)}:{line_no}: {line.strip()}")
+            violations.append(
+                f"{file_path.relative_to(ROOT_DIR)}:{line_no}: {line.strip()}"
+            )
     return violations
 
 
@@ -49,7 +55,9 @@ def _load_meta() -> dict:
 def _extract_quickstart_minor(title: str) -> str:
     match = QUICKSTART_VERSION_PATTERN.search(title)
     if not match:
-        raise RuntimeError("quickstart.title_zh in version_meta.json must contain 'Quick Start (vX.Y)'")
+        raise RuntimeError(
+            "quickstart.title_zh in version_meta.json must contain 'Quick Start (vX.Y)'"
+        )
     return match.group(1)
 
 
@@ -77,17 +85,23 @@ def _check_consistency(meta: dict) -> list[str]:
     versions_text = VERSIONS_PATH.read_text(encoding="utf-8")
 
     if headline and headline not in readme_text:
-        errors.append("README.md does not include release.headline_zh from version_meta.json")
+        errors.append(
+            "README.md does not include release.headline_zh from version_meta.json"
+        )
     if message and message not in readme_text:
-        errors.append("README.md does not include release.message_zh from version_meta.json")
+        errors.append(
+            "README.md does not include release.message_zh from version_meta.json"
+        )
     if quickstart_title and quickstart_title.replace("🚀 ", "") not in readme_text:
-        errors.append("README.md does not include quickstart.title_zh from version_meta.json")
+        errors.append(
+            "README.md does not include quickstart.title_zh from version_meta.json"
+        )
     if description and "Version Metadata Maintenance" not in readme_text:
         errors.append("README.md is missing version metadata maintenance section")
 
-    if "id=\"release-banner-title\"" not in index_text:
+    if 'id="release-banner-title"' not in index_text:
         errors.append("index.html is missing release banner placeholder")
-    if "id=\"quickstart-title\"" not in index_text:
+    if 'id="quickstart-title"' not in index_text:
         errors.append("index.html is missing quickstart title placeholder")
     if "./assets/version-meta-loader.js" not in index_text:
         errors.append("index.html is missing version-meta-loader.js")

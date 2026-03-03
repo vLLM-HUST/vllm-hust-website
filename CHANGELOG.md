@@ -2,12 +2,13 @@
 
 All notable changes to sagellm-website will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
+adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
 ### Fixed
+
 - **CI/CD pre-commit 错误修复**：
   - 修复 `data/validate_schema.py` 中未使用的 `jsonschema` 导入
   - 修复 `scripts/generate_cast.py` 中的单行多语句问题（E701）
@@ -21,39 +22,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 改进了响应式设计，在移动端和桌面端都能提供良好的浏览体验
 
 ### Added
+
 - **[#14 #15 + sagellm#26 #28] Leaderboard MVP（Schema-first）**
-	- 新增并冻结 MVP 数据契约：`data/schemas/leaderboard_v1.schema.json`（兼容单条 entry 与 entry 列表）
-	- 补齐最小多机展示数据：`data/leaderboard_multi.json`（1 条 multi-node 样例）
-	- 首页 Leaderboard 区块新增数据模型标识，确保展示与 schema 来源一致
+  - 新增并冻结 MVP 数据契约：`data/schemas/leaderboard_v1.schema.json`（兼容单条 entry 与 entry 列表）
+  - 补齐最小多机展示数据：`data/leaderboard_multi.json`（1 条 multi-node 样例）
+  - 首页 Leaderboard 区块新增数据模型标识，确保展示与 schema 来源一致
 
 ### Changed
+
 - `data/validate_schema.py` 升级为可一次校验多个文件，支持 object/array 两种 payload，输出统一 pass/fail 摘要
 - `data/FIELD_SPECIFICATION.md`、`data/VALIDATION_RULES.md` 收敛为 MVP 规范，字段与网站展示列一一对应
 - `data/examples/*.json` 对齐硬件互联字段（补充 `interconnect`），确保示例与 schema 一致
 
 ### Fixed
-- **quickstart.sh**: replace `cp hooks/pre-{commit,push}` with `ln -sf` to avoid "same file" error when `.git/hooks` entries are already symlinks
+
+- **quickstart.sh**: replace `cp hooks/pre-{commit,push}` with `ln -sf` to avoid "same file" error
+  when `.git/hooks` entries are already symlinks
 
 ### Changed
-- **[#14 #15] Leaderboard 内容同步**：基于 `data/results/**/**_leaderboard.json` 重新聚合 `data/leaderboard_single.json` / `data/leaderboard_multi.json`，并刷新 `data/last_updated.json`，确保官网 leaderboard 数据可访问且与当前结果目录一致。
-- **Leaderboard 聚合脚本兼容性修复**：`scripts/aggregate_results.py` 新增字段归一化，自动对齐历史数据中的 `interconnect` / `intra_node_interconnect`，避免 schema 校验失败。
+
+- **[#14 #15] Leaderboard 内容同步**：基于 `data/results/**/**_leaderboard.json` 重新聚合
+  `data/leaderboard_single.json` / `data/leaderboard_multi.json`，并刷新 `data/last_updated.json`，确保官网
+  leaderboard 数据可访问且与当前结果目录一致。
+- **Leaderboard 聚合脚本兼容性修复**：`scripts/aggregate_results.py` 新增字段归一化，自动对齐历史数据中的 `interconnect` /
+  `intra_node_interconnect`，避免 schema 校验失败。
 
 ### Added
+
 - CI 新增 `pytest tests/` 单元测试步骤，补齐 website 仓库的基础测试门禁。
 - 新增 `tests/test_site_structure.py`，校验核心页面文件、首页关键标识和 `data/last_updated.json` 同步标记。
 
 ### Changed
+
 - **[#22] `quickstart.sh` 安装策略统一**：确认网站仓库无 Python 包安装需求，quickstart.sh 专注于 git hooks 安装，符合统一规范
 
-
-
 ### Added
+
 - 新增 `quickstart.sh`，执行后自动安装 `hooks/pre-commit` 与 `hooks/pre-push`
 - 新增 `.github/workflows/ci.yml`，在 PR/Push 上执行 `pre-commit run --all-files`
 - CI 新增 hooks 保护校验：校验 `pre-commit` / `pre-push` 包含 main 分支保护提示
 - Leaderboard 增加 `Last updated` 显示（读取 `data/last_updated.json` / HF metadata）
 - 新增 `data/last_updated.json` 作为 website 数据同步时间标记
-- 新增 workflow 守护校验：`validate-sync-workflow.yml`，防止 `sync-hf-data.yml` 回退到 `self-hosted` 或错误 dispatch type
+- 新增 workflow 守护校验：`validate-sync-workflow.yml`，防止 `sync-hf-data.yml` 回退到 `self-hosted` 或错误 dispatch
+  type
 - Leaderboard 筛选新增 `Version` 下拉，自动拉取 `isagellm` 在 PyPI 上 `>=0.5.0.0` 的全部版本号用于过滤
 - 首页与 README 新增 v0.5 发布意义说明文案（工程可用性）
 - 新增统一版本元数据源 `data/version_meta.json`，集中维护首页发布文案、Quick Start 文案与包版本清单
@@ -65,7 +76,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 新增一致性检查脚本 `scripts/check_stale_versions.py`，校验 `version_meta` 与 `index/README/versions` 的绑定关系
 
 ### Fixed
-- Leaderboard `Component Versions` 的版本对比逻辑调整：历史 benchmark 版本（低于 PyPI latest）显示为 `historical`，仅当 benchmark 版本高于 PyPI latest 时标记 `⚠ mismatch`，避免所有历史结果都被误报不一致
+
+- Leaderboard `Component Versions` 的版本对比逻辑调整：历史 benchmark 版本（低于 PyPI latest）显示为 `historical`，仅当
+  benchmark 版本高于 PyPI latest 时标记 `⚠ mismatch`，避免所有历史结果都被误报不一致
 - Workload 筛选改为 benchmark query 风格（`Q1`~`Q8`）并支持动态补充 legacy workload
 - Leaderboard 筛选恢复 `All` 选项，支持按 `hardware/model/workload/precision` 任意组合过滤
 - `sync-hf-data.yml` 的 `repository_dispatch` 事件类型改为 `benchmark-data-updated`（与 benchmark 发布流程一致）
@@ -77,13 +90,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 前端缓存 key 升级到 `sagellm_hf_leaderboard_cache_v2`，避免旧会话缓存导致看不到 Q1~Q8 / 新数据
 - 前端缓存 key 再升级到 `sagellm_hf_leaderboard_cache_v3`，强制失效已缓存的旧少量数据
 - HF Data Loader 增加 `last_updated` marker 校验：marker 变化时强制刷新数据，避免同步后继续命中旧缓存
-- Leaderboard 主表新增 `Workload` 列，`all workloads` 模式下按 `Workload → Version` 排序，避免同版本多 workload 混在一起难以识别
+- Leaderboard 主表新增 `Workload` 列，`all workloads` 模式下按 `Workload → Version` 排序，避免同版本多 workload
+  混在一起难以识别
 - Leaderboard 主表第一列版本号改为合并显示：连续相同版本仅首行显示版本编号，减少重复视觉噪音
 - Leaderboard 主表移除 `Release Date` 独立列，改为在版本单元格中显示 `vX.Y.Z (release_date)`
 - 趋势对比仅在单 workload 视图下启用；`all workloads` 视图禁用跨 workload 的趋势计算，避免误导
 - `Component Versions` 面板改为显示 `sageLLM + benchmark + 各组件` 完整版本，并标注来源为 `entry.versions`
 - `Component Versions` 面板重构为双源展示：`benchmark metadata` 与 `PyPI latest` 对比，并对不一致版本显式告警
-- HF Data Loader 增加幂等键去重（`version+workload+model+hardware+precision+config`）并保留最新 `submitted_at` 记录，降低重复上传导致的重复行和趋势噪音
+- HF Data Loader 增加幂等键去重（`version+workload+model+hardware+precision+config`）并保留最新 `submitted_at`
+  记录，降低重复上传导致的重复行和趋势噪音
 - 修正命令名称：所有地方统一使用 `sagellm`（无连字符），包括演示动画和页面命令示例
 - 修正架构图层级：KV Cache 从 L2 改为 L1（与 Backend/Comm 同级）
 - 移除首页文案中的“3x 吞吐提升”表述，避免不准确性能宣称。
@@ -98,12 +113,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Leaderboard 颜色语义优化：按指标语义统一趋势色（含高优/低优指标方向一致性）
 
 ### Added
+
 - Ascend NPU engine implementation announcement (0.3.x release).
 - Backend selection examples (`--backend ascend`).
 - Updated demo recording instructions with Ascend NPU examples.
 
 ### Changed
-- Leaderboard 版本展示策略更新：首页默认按聚合版本号（`X.Y.Z.x`）显示（`x` 表示第四位合集），并在同组三位版本下自动选择表现最佳的四位版本结果；新增可展开入口查看该三位版本对应的完整四位版本明细结果。
+
+- Leaderboard 版本展示策略更新：首页默认按聚合版本号（`X.Y.Z.x`）显示（`x`
+  表示第四位合集），并在同组三位版本下自动选择表现最佳的四位版本结果；新增可展开入口查看该三位版本对应的完整四位版本明细结果。
 - Leaderboard 表格版本列样式优化：`Latest`/`Baseline` 标识移动到版本号下方展示，减少横向占用，提升首页首屏完整可见性。
 - 首页移动端适配增强：优化标题/容器/卡片/CTA 按钮在 `<=768px` 与 `<=480px` 的布局与间距，改善首屏可读性与触控可用性。
 - Updated all PyPI package references to 0.3.x.x version.
@@ -115,20 +133,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Leaderboard 增强：新增 Baseline 徽章、`vs Prev`/`vs Base` 双对比指标展示与多行指标排版
 
 ### Removed
+
 - 删除阶段性说明文档：`docs/CHANGES_SUMMARY.md`
 
 ## [0.2.0.0] - 2025-01-15
 
 ### Added
+
 - Initial public website with architecture diagram.
 - Live terminal demo using asciinema player.
 - Multi-language support (English/Chinese).
 - OpenAI-compatible API showcase.
 
 ### Changed
+
 - Improved responsive design for mobile devices.
 
 ## [0.1.0.0] - 2024-12-01
 
 ### Added
+
 - Initial website structure and landing page.

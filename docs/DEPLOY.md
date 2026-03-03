@@ -45,6 +45,6 @@ Settings → Pages → Custom domain:
     sagellm.ai → intellistream.github.io
 ```
 
----
+______________________________________________________________________
 
 **Current Status**: ✅ Local files ready, waiting for GitHub push
