@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Validate leaderboard data against JSON Schema (MVP)."""
+
 import json
 import sys
 from pathlib import Path
 
 try:
-    import jsonschema
     from jsonschema import Draft7Validator
 except ImportError:
     print("❌ Error: jsonschema library not found")
@@ -48,12 +48,14 @@ def main():
         print("Usage: python validate_schema.py <data_file> [data_file ...]")
         print("\nExamples:")
         print("  python validate_schema.py data/examples/single_node_example.json")
-        print("  python validate_schema.py data/leaderboard_single.json data/leaderboard_multi.json")
+        print(
+            "  python validate_schema.py data/leaderboard_single.json data/leaderboard_multi.json"
+        )
         sys.exit(1)
 
     data_files = sys.argv[1:]
 
-    print(f"📦 Loading schema...")
+    print("📦 Loading schema...")
     schema = load_schema()
 
     has_error = False

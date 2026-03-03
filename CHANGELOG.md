@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **CI/CD pre-commit 错误修复**：
+  - 修复 `data/validate_schema.py` 中未使用的 `jsonschema` 导入
+  - 修复 `scripts/generate_cast.py` 中的单行多语句问题（E701）
+  - 在 `.pre-commit-config.yaml` 中排除 `data/examples/*.json`，避免 detect-secrets 误报 git_commit 字段为密钥
+  - 自动修复 f-string 格式问题和代码格式化
+- **Leaderboard 详情展开布局重叠问题**：修复了点击 Details 按钮后，"Full Build Results"表格与"Component Versions"区域重叠的布局缺陷
+  - 将详情展开区域从横向 grid 布局改为纵向 flex 布局，避免水平方向的挤压和重叠
+  - 为 Build Variants 表格添加横向滚动支持（`overflow-x: auto`），确保在小屏幕上正确显示
+  - 优化了细节展示的视觉层次：添加渐变背景、阴影效果、悬停动画等
+  - 为选中的版本行添加了醒目的渐变背景和左侧边框，提升可读性
+  - 改进了响应式设计，在移动端和桌面端都能提供良好的浏览体验
+
 ### Added
 - **[#14 #15 + sagellm#26 #28] Leaderboard MVP（Schema-first）**
 	- 新增并冻结 MVP 数据契约：`data/schemas/leaderboard_v1.schema.json`（兼容单条 entry 与 entry 列表）

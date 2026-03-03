@@ -298,22 +298,31 @@
 }
 
 .details-cell {
-    padding: 24px !important;
-    background: #f7fafc !important;
+    padding: 30px !important;
+    background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%) !important;
     border-left: 4px solid #5a67d8;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .details-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 20px;
 }
 
 .detail-section {
     background: white;
-    padding: 16px;
-    border-radius: 8px;
+    padding: 20px;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.detail-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .detail-section h4 {
@@ -323,6 +332,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    font-weight: 700;
 }
 
 .detail-section p {
@@ -335,6 +345,66 @@
 .detail-section strong {
     color: #2d3748;
     font-weight: 600;
+}
+
+/* Build Variants Table Container */
+.build-variants-table-wrap {
+    overflow-x: auto;
+    margin-top: 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.build-variants-table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+.build-variants-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.build-variants-table th {
+    padding: 14px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.9em;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+.build-variants-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #2d3748;
+    font-size: 0.88em;
+}
+
+.build-variants-table tbody tr {
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.build-variants-table tbody tr:hover {
+    background: #f7fafc;
+}
+
+.build-variants-table tbody tr.selected {
+    background: linear-gradient(90deg, #edf2f7 0%, #e6f2ff 100%);
+    font-weight: 600;
+    border-left: 3px solid #5a67d8;
+}
+
+.build-variants-table tbody tr.selected td {
+    color: #5a67d8;
+}
+
+.build-variants-table tbody tr.selected td:first-child {
+    font-weight: 700;
 }
 
 /* Command Block */
@@ -433,13 +503,27 @@
         padding: 12px 8px;
     }
 
+    .details-cell {
+        padding: 16px !important;
+    }
+
     .details-content {
-        grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .version-cell {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .build-variants-table {
+        font-size: 0.85em;
+        min-width: 650px;
+    }
+
+    .build-variants-table th,
+    .build-variants-table td {
+        padding: 8px 6px;
     }
 }
 
@@ -456,5 +540,14 @@
     .btn-details {
         padding: 6px 12px;
         font-size: 0.85em;
+    }
+
+    .details-cell {
+        padding: 12px !important;
+    }
+
+    .build-variants-table {
+        font-size: 0.8em;
+        min-width: 600px;
     }
 }
