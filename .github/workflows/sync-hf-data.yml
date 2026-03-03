@@ -48,6 +48,16 @@ jobs:
           echo "{\"last_updated\": \"${TS}\"}" > data/last_updated.json
           echo "✓ Updated data/last_updated.json: ${TS}"
 
+      - name: Ensure files have proper line endings
+        run: |
+          # Ensure all JSON files end with a newline
+          for file in data/leaderboard_single.json data/leaderboard_multi.json data/last_updated.json; do
+            if [ -f "$file" ] && [ -n "$(tail -c 1 "$file")" ]; then
+              echo >> "$file"
+              echo "✓ Added newline to $file"
+            fi
+          done
+
       - name: Check for changes
         id: check
         run: |

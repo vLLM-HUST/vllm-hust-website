@@ -20,6 +20,8 @@ jobs:
           python -m pip install pre-commit pytest
       - name: Run pre-commit
         run: pre-commit run --all-files
+        env:
+          SKIP: ${{ github.ref == 'refs/heads/main' && 'no-commit-to-branch' || '' }}
       - name: Run unit tests
         run: pytest tests/ -v
       - name: Verify main-protection hooks

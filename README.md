@@ -43,3 +43,27 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 - Auto sync workflow: `.github/workflows/sync-version-meta.yml`
 - Consistency/stale check: `bash scripts/check_stale_versions.sh`
 - 维护说明：`docs/VERSION_METADATA.md`
+
+## Repository Quickstart
+
+本仓库提供统一的 `quickstart.sh` 模式入口：
+
+- `--standard`：标准模式，依赖优先从 PyPI 安装（稳定/发布导向）
+- `--dev`：开发模式，在 standard 基础上尝试本地 editable 覆盖（使用 `--no-deps`）
+- 安装前会执行同前缀包动态清理（默认前缀：`isagellm-website`）
+
+```bash
+# 查看帮助
+./quickstart.sh --help
+
+# 标准模式
+./quickstart.sh --standard
+
+# 开发模式（默认）
+./quickstart.sh --dev
+
+# 可选：跳过清理或 hooks
+./quickstart.sh --dev --skip-cleanup --skip-hooks
+```
+
+> 注意：脚本不会创建 `venv/.venv`，请使用当前已配置的非-venv Python 环境。
