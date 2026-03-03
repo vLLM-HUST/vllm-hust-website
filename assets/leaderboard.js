@@ -1,6 +1,6 @@
 /**
  * sageLLM Leaderboard - Version Evolution Display
- * 
+ *
  * This script handles:
  * - Loading JSON data (single-node and multi-node)
  * - Tab switching between single/multi configurations

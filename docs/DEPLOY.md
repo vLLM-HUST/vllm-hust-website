@@ -24,7 +24,7 @@ git push -u origin main
 Settings → Pages → Source:
   - Branch: main
   - Folder: / (root)
-  
+
 Save and wait 1-2 minutes.
 ```
 

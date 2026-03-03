@@ -1,6 +1,6 @@
 /**
  * Hugging Face Data Loader for sageLLM Leaderboard
- * 
+ *
  * 从 Hugging Face Datasets Hub 加载 benchmark 结果
  * 支持实时更新，无需后端服务
  */
