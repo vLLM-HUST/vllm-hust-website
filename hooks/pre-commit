@@ -20,6 +20,14 @@ NC='\033[0m'
 
 echo -e "${CYAN}🔍 Running pre-commit checks...${NC}"
 
+# --- Block commits to main branch ---
+CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+if [ "$CURRENT_BRANCH" = "main" ]; then
+    echo -e "${RED}✗ Direct commits to main are forbidden${NC}"
+    echo -e "${YELLOW}  Please commit to main-dev and create a PR to main.${NC}"
+    exit 1
+fi
+
 staged_files=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)
 if [ -z "$staged_files" ]; then
     echo -e "${GREEN}✓ No staged changes${NC}"
