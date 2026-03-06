@@ -30,6 +30,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Leaderboard 前端支持多引擎展示：新增 `Engine` 筛选器，版本聚合/排序/去重改为 engine-aware（`engine + engine_version`），并对非 `sagellm` 引擎显示通用 `Engine Versions` 面板。
+- `data/schemas/leaderboard_v1.schema.json` 扩展可选字段 `engine` / `engine_version`（entry 与 metadata），保持历史 `sagellm_version` 数据兼容。
+
 - `data/validate_schema.py` 升级为可一次校验多个文件，支持 object/array 两种 payload，输出统一 pass/fail 摘要
 - `data/FIELD_SPECIFICATION.md`、`data/VALIDATION_RULES.md` 收敛为 MVP 规范，字段与网站展示列一一对应
 - `data/examples/*.json` 对齐硬件互联字段（补充 `interconnect`），确保示例与 schema 一致

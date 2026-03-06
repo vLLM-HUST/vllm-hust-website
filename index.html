@@ -580,7 +580,7 @@
       <div class="leaderboard-section" id="leaderboard">
         <h2>📊 Performance Leaderboard</h2>
         <p>
-          Track sageLLM's version evolution with real-world performance metrics. Compare different
+          Track multi-engine version evolution with real-world performance metrics. Compare different
           hardware configurations, models, and workloads.
         </p>
         <p style="margin-top: -8px; color: #718096; font-size: 13px">
@@ -615,6 +615,12 @@
 
           <!-- Filters -->
           <div class="filters">
+            <div class="filter-group">
+              <label for="filter-engine">Engine</label>
+              <select id="filter-engine">
+                <option value="all">All</option>
+              </select>
+            </div>
             <div class="filter-group">
               <label for="filter-hardware">Hardware</label>
               <select id="filter-hardware">

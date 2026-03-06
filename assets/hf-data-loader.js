@@ -117,6 +117,34 @@ function normalizeKeyPart(value) {
     return raw.replace(/[^a-z0-9._-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'unknown';
 }
 
+function extractEngine(entry) {
+    const direct = entry?.engine || entry?.metadata?.engine;
+    if (direct && typeof direct === 'string') {
+        const normalized = direct.trim().toLowerCase();
+        if (normalized) {
+            return normalized;
+        }
+    }
+
+    if (entry?.sagellm_version) {
+        return 'sagellm';
+    }
+
+    return 'unknown';
+}
+
+function extractEngineVersion(entry) {
+    const direct = entry?.engine_version || entry?.metadata?.engine_version || entry?.sagellm_version;
+    if (direct && typeof direct === 'string') {
+        const normalized = direct.trim();
+        if (normalized) {
+            return normalized;
+        }
+    }
+
+    return 'unknown';
+}
+
 function extractWorkloadForKey(entry) {
     const direct = entry?.workload?.name || entry?.workload_name || entry?.metadata?.workload;
     if (direct && typeof direct === 'string') {
@@ -138,6 +166,8 @@ function buildIdempotencyKey(entry) {
     }
 
     return [
+        normalizeKeyPart(extractEngine(entry)),
+        normalizeKeyPart(extractEngineVersion(entry)),
         normalizeKeyPart(entry?.sagellm_version),
         normalizeKeyPart(extractWorkloadForKey(entry)),
         normalizeKeyPart(entry?.model?.name),

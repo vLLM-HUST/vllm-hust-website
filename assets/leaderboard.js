@@ -27,6 +27,13 @@
         Other: 'Other',
     };
 
+    const ENGINE_LABELS = {
+        sagellm: 'sageLLM',
+        vllm: 'vLLM',
+        'vllm-ascend': 'vLLM Ascend',
+        sglang: 'SGLang',
+    };
+
     const VERSION_COMPONENTS = [
         { label: 'sageLLM', metadataKey: 'sagellm', pypiPackage: 'isagellm' },
         { label: 'Benchmark', metadataKey: 'benchmark', pypiPackage: 'isagellm-benchmark' },
@@ -56,9 +63,9 @@
         pypiLoaded: false,
         pypiLoadError: false,
         filters: {
-            'single-chip': { hardware: '', model: '', version: '', workload: '', precision: '' },
-            'multi-chip': { hardware: '', model: '', version: '', workload: '', precision: '' },
-            'multi-node': { hardware: '', model: '', version: '', workload: '', precision: '' }
+            'single-chip': { engine: '', hardware: '', model: '', version: '', workload: '', precision: '' },
+            'multi-chip': { engine: '', hardware: '', model: '', version: '', workload: '', precision: '' },
+            'multi-node': { engine: '', hardware: '', model: '', version: '', workload: '', precision: '' }
         },
         expandedRows: new Set()
     };
@@ -216,7 +223,7 @@
 
             // 排序
             [state.singleChipData, state.multiChipData, state.multiNodeData].forEach(data => {
-                data.sort((a, b) => compareVersions(b.sagellm_version, a.sagellm_version));
+                data.sort(compareEntriesByVersionDesc);
             });
 
             // 初始化筛选器默认值
@@ -301,15 +308,72 @@
     }
 
     function normalizeDisplayVersion(version) {
-        const parts = String(version || '').split('.');
-        if (parts.length < 3) {
-            return String(version || '');
+        const text = String(version || '').trim();
+        if (!text) {
+            return '';
         }
-        return `${parts[0]}.${parts[1]}.${parts[2]}.x`;
+        if (/^\d+\.\d+\.\d+\.\d+$/.test(text)) {
+            const parts = text.split('.');
+            return `${parts[0]}.${parts[1]}.${parts[2]}.x`;
+        }
+        return text;
+    }
+
+    function getEngine(entry) {
+        const direct = entry?.engine || entry?.metadata?.engine;
+        if (typeof direct === 'string' && direct.trim()) {
+            return direct.trim().toLowerCase();
+        }
+        if (entry?.sagellm_version) {
+            return 'sagellm';
+        }
+        return 'unknown';
+    }
+
+    function getEngineLabel(engine) {
+        return ENGINE_LABELS[engine] || String(engine || 'unknown');
+    }
+
+    function getEngineVersion(entry) {
+        return String(
+            entry?.engine_version ||
+            entry?.metadata?.engine_version ||
+            entry?.sagellm_version ||
+            ''
+        ).trim();
     }
 
     function getDisplayVersion(entry) {
-        return entry.displayVersion || normalizeDisplayVersion(entry.sagellm_version);
+        return entry.displayVersion || normalizeDisplayVersion(getEngineVersion(entry));
+    }
+
+    function isNumericVersion(version) {
+        return /^\d+(\.\d+){1,3}(\.x)?$/.test(String(version || '').trim());
+    }
+
+    function compareDisplayVersions(a, b) {
+        const normalizedA = String(a || '').replace(/\.x$/, '.0');
+        const normalizedB = String(b || '').replace(/\.x$/, '.0');
+
+        if (isNumericVersion(a) && isNumericVersion(b)) {
+            return compareVersions(normalizedA, normalizedB);
+        }
+
+        return String(a || '').localeCompare(String(b || ''));
+    }
+
+    function compareEntriesByVersionDesc(a, b) {
+        const engineCompare = getEngine(a).localeCompare(getEngine(b));
+        if (engineCompare !== 0) {
+            return engineCompare;
+        }
+
+        const versionCompare = compareDisplayVersions(getDisplayVersion(b), getDisplayVersion(a));
+        if (versionCompare !== 0) {
+            return versionCompare;
+        }
+
+        return compareByReleaseDateDesc(a, b);
     }
 
     function createAggregationKey(entry) {
@@ -321,9 +385,11 @@
         const topology = entry?.cluster?.topology || '';
         const model = entry?.model?.name || '';
         const precision = entry?.model?.precision || '';
-        const baseVersion = normalizeDisplayVersion(entry.sagellm_version);
+        const engine = getEngine(entry);
+        const baseVersion = normalizeDisplayVersion(getEngineVersion(entry));
 
         return [
+            engine,
             workload,
             hardware,
             chipCount,
@@ -400,12 +466,12 @@
                 if (qualityCompare !== 0) {
                     return qualityCompare;
                 }
-                return compareVersions(b.sagellm_version, a.sagellm_version);
+                return compareDisplayVersions(getEngineVersion(b), getEngineVersion(a));
             });
 
             return {
                 ...group.best,
-                displayVersion: normalizeDisplayVersion(group.best.sagellm_version),
+                displayVersion: normalizeDisplayVersion(getEngineVersion(group.best)),
                 versionVariants: sortedVariants,
             };
         });
@@ -421,7 +487,15 @@
                     return workloadCompare;
                 }
 
-                const versionCompare = compareVersions(getDisplayVersion(b), getDisplayVersion(a));
+                const engineCompare = getEngine(a).localeCompare(getEngine(b));
+                if (engineCompare !== 0) {
+                    return engineCompare;
+                }
+
+                const versionCompare = compareDisplayVersions(
+                    getDisplayVersion(b),
+                    getDisplayVersion(a)
+                );
                 if (versionCompare !== 0) {
                     return versionCompare;
                 }
@@ -432,7 +506,7 @@
         }
 
         sorted.sort((a, b) => {
-            const versionCompare = compareVersions(getDisplayVersion(b), getDisplayVersion(a));
+            const versionCompare = compareDisplayVersions(getDisplayVersion(b), getDisplayVersion(a));
             if (versionCompare !== 0) {
                 return versionCompare;
             }
@@ -468,6 +542,7 @@
             if (data.length > 0) {
                 const first = data[0];
                 state.filters[tab] = {
+                    engine: getEngine(first),
                     hardware: first.hardware.chip_model,
                     model: first.model.name,
                     version: 'all',
@@ -489,7 +564,7 @@
         });
 
         // Filter changes
-        ['hardware', 'model', 'version', 'workload', 'precision'].forEach(filterType => {
+        ['engine', 'hardware', 'model', 'version', 'workload', 'precision'].forEach(filterType => {
             const selectEl = document.getElementById(`filter-${filterType}`);
             if (selectEl) {
                 selectEl.addEventListener('change', () => {
@@ -530,6 +605,7 @@
         const filters = state.filters[state.currentTab];
 
         // Extract unique values
+        const engineOptions = getUniqueValues(data, d => getEngine(d));
         const hardwareOptions = getUniqueValues(data, d => d.hardware.chip_model);
         const modelOptions = getUniqueValues(data, d => d.model.name);
         const versionOptions = getVersionOptions(data);
@@ -543,6 +619,7 @@
         const precisionOptions = getUniqueValues(data, d => d.model.precision);
 
         // Update dropdowns
+        updateSelect('filter-engine', ['all', ...engineOptions], filters.engine, getEngineLabel);
         updateSelect('filter-hardware', ['all', ...hardwareOptions], filters.hardware);
         updateSelect('filter-model', ['all', ...modelOptions], filters.model);
         updateSelect('filter-version', ['all', ...versionOptions], filters.version);
@@ -551,13 +628,13 @@
     }
 
     function getVersionOptions(data) {
-        const dataVersions = getUniqueValues(data, d => normalizeDisplayVersion(d.sagellm_version));
+        const dataVersions = getUniqueValues(data, d => normalizeDisplayVersion(getEngineVersion(d)));
         const releaseVersions = (state.sagellmVersionOptions || []).map((version) =>
             normalizeDisplayVersion(version)
         );
         const merged = [...new Set([...releaseVersions, ...dataVersions])]
-            .filter((version) => /^\d+(\.\d+){2}\.x$/.test(version))
-            .sort((a, b) => compareVersions(b, a));
+            .filter((version) => String(version || '').trim())
+            .sort((a, b) => compareDisplayVersions(b, a));
         return merged;
     }
 
@@ -595,9 +672,10 @@
         // Apply filters
         const filtered = data.filter(entry => {
             const workload = getWorkloadId(entry);
-            return (filters.hardware === 'all' || entry.hardware.chip_model === filters.hardware) &&
+            return (filters.engine === 'all' || getEngine(entry) === filters.engine) &&
+                (filters.hardware === 'all' || entry.hardware.chip_model === filters.hardware) &&
                 (filters.model === 'all' || entry.model.name === filters.model) &&
-                (filters.version === 'all' || normalizeDisplayVersion(entry.sagellm_version) === filters.version) &&
+                (filters.version === 'all' || normalizeDisplayVersion(getEngineVersion(entry)) === filters.version) &&
                 (filters.workload === 'all' || workload === filters.workload) &&
                 (filters.precision === 'all' || entry.model.precision === filters.precision);
         });
@@ -679,6 +757,7 @@
         const releaseDate = entry?.metadata?.release_date || '-';
         const displayVersion = getDisplayVersion(entry);
         const buildCount = entry.versionVariants?.length || 1;
+        const engineLabel = getEngineLabel(getEngine(entry));
 
         // 生成配置描述（芯片数/节点数）
         const configText = getConfigText(entry);
@@ -688,7 +767,7 @@
             <tr data-entry-id="${entry.entry_id}">
                 <td>
                     <div class="version-cell">
-                        ${showVersion ? `<div class="version-main">v${displayVersion}<small class="version-date">(${releaseDate})</small></div>` : ''}
+                        ${showVersion ? `<div class="version-main">${engineLabel} v${displayVersion}<small class="version-date">(${releaseDate})</small></div>` : ''}
                         ${showVersion && buildCount > 1 ? '<small class="version-merge-hint">Best 4th-segment result selected</small>' : ''}
                         ${(showVersion && (isLatest || entry.isBaseline))
                             ? `<div class="version-badges">${isLatest ? '<span class="version-badge">Latest</span>' : ''}${entry.isBaseline ? '<span class="version-badge baseline">Baseline</span>' : ''}</div>`
@@ -797,7 +876,22 @@
     }
 
     function renderVersionsSection(entry) {
+        const engine = getEngine(entry);
+        const engineLabel = getEngineLabel(engine);
+        const engineVersion = getEngineVersion(entry) || 'N/A';
         const versions = entry.versions || {};
+
+        if (engine !== 'sagellm') {
+            return `
+                <div class="detail-section">
+                    <h4>📦 Engine Versions</h4>
+                    <p><strong>Engine:</strong> ${engineLabel}</p>
+                    <p><strong>Engine Version:</strong> ${engineVersion}</p>
+                    <p><strong>Benchmark:</strong> ${versions.benchmark || 'N/A'}</p>
+                </div>
+            `;
+        }
+
         const rows = VERSION_COMPONENTS.map((component) => {
             const benchmarkVersion = component.metadataKey === 'sagellm'
                 ? (entry.sagellm_version || versions.sagellm || 'N/A')
@@ -857,7 +951,7 @@
             const selected = variant.entry_id === entry.entry_id ? 'selected' : '';
             return `
                                     <tr class="${selected}">
-                                        <td>v${variant.sagellm_version}${index === 0 ? ' ⭐' : ''}</td>
+                                        <td>${getEngineLabel(getEngine(variant))} v${getEngineVersion(variant)}${index === 0 ? ' ⭐' : ''}</td>
                                         <td>${variant?.metadata?.release_date || '-'}</td>
                                         <td>${formatMetric(vm.ttft_ms)}</td>
                                         <td>${formatMetric(vm.throughput_tps)}</td>
