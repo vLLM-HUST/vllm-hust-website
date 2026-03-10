@@ -53,6 +53,26 @@ if [ "$PUSHING_MAIN_DEV" != true ]; then
     exit 0
 fi
 
+# Architecture guard: fail if serving chain introduces HF generator shortcut
+PARENT_DIR="$(cd "$REPO_DIR/.." && pwd)"
+echo -e "${BLUE}🔍 Running architecture guard (no HF shortcut)...${NC}"
+
+if command -v sagellm-dev >/dev/null 2>&1; then
+    if ! sagellm-dev check --chain --parent-dir "$PARENT_DIR"; then
+        echo -e "${RED}✗ Architecture guard failed. Fix the issues above before push.${NC}"
+        exit 1
+    fi
+elif [ -d "$PARENT_DIR/sagellm-dev-tools/src" ] && command -v python3 >/dev/null 2>&1; then
+    if ! PYTHONPATH="$PARENT_DIR/sagellm-dev-tools/src:${PYTHONPATH:-}" python3 -m sagellm_dev_tools.cli check --chain --parent-dir "$PARENT_DIR"; then
+        echo -e "${RED}✗ Architecture guard failed. Fix the issues above before push.${NC}"
+        exit 1
+    fi
+else
+    echo -e "${RED}✗ sagellm-dev is required for architecture guard but was not found.${NC}"
+    echo -e "${YELLOW}  Install dev tools or ensure $PARENT_DIR/sagellm-dev-tools exists.${NC}"
+    exit 1
+fi
+
 # Safe read: falls back to default if /dev/tty is unavailable (SSH, IDE, etc.)
 safe_read() {
     local varname="$1"
