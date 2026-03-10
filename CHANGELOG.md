@@ -11,6 +11,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `hooks/pre-push` 默认不再因检测到发布凭证而自动发布；只有显式使用 `git push -o sagellm-publish origin main-dev` 或 `SAGELLM_PUBLISH_ON_PUSH=1 git push origin main-dev` 时才会触发发布。
 - `hooks/post-commit` 默认不再在每次提交后自动 bump 版本；普通 `git push` 也不再触发 PyPI 版本冲突检查，只有显式发布时才会处理版本号。
 
+- 同步 2026-03-09 A100 单机 `sagellm vs vllm` live compare 结果到 leaderboard 数据源，新增 `deepseek-ai/DeepSeek-R1-Distill-Qwen-7B` 的 `sagellm` 与 `vllm` 两条单机记录，并刷新 `data/last_updated.json`。
+- 重构 leaderboard 展示布局，新增顶部引擎对比摘要卡片、更聚焦的主表指标，以及“只看同模型同硬件 / 隐藏缺少对比的数据”开关与 coverage 提示，使不同引擎的延迟与吞吐差异更易读。
+- 首页与 leaderboard 动态内容补齐中英双语切换，覆盖摘要卡片、对比提示、详情面板、版本构建表、复制按钮与最近更新时间，确保整页语言切换一致。
+- 精简首页首屏文案，移除发布横幅中的长段说明，并将 Quick Start 引导压缩为一句动作导向提示，减少首屏阅读负担。
+- 进一步收敛首页信息层级：移除首屏 release banner，仅保留简洁 hero 定位语与更短的 Quick Start 辅助文案，减少视觉噪音与重复解释。
+- 将首页前半段重组为更清晰的 launchpad 双栏布局：左侧 live demo，右侧紧凑 quickstart，减少连续大卡片堆叠带来的拥挤感，并继续压缩首屏说明文字。
+- 首页叙事主轴调整为“科学发现大模型 + 国产硬件优先”，并将 benchmark / leaderboard / 引擎对比明确降级为验证与优化方法，而非产品主目标。
+- leaderboard 过滤区新增可点击展开的 Q1-Q8 query 说明菜单，明确每类 workload 的测试意图，避免用户只看到代号而无法理解 benchmark 语义。
+- Q1-Q8 query 说明菜单升级为二级 accordion：点击单个 query 单独展开并自动收起其他项，降低一次性信息展开带来的视觉干扰。
+
 ### Fixed
 
 - **CI/CD pre-commit 错误修复**：

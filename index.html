@@ -12,7 +12,7 @@
       href="https://cdn.jsdelivr.net/npm/asciinema-player@3.8.0/dist/bundle/asciinema-player.css"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&family=Sora:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
 
@@ -27,6 +27,7 @@
       }
 
       body {
+        position: relative;
         font-family:
           "Inter",
           -apple-system,
@@ -35,22 +36,45 @@
           Roboto,
           sans-serif;
         line-height: 1.6;
-        color: #333;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #0f172a;
+        background:
+          radial-gradient(circle at top left, rgba(14, 165, 233, 0.2), transparent 24%),
+          radial-gradient(circle at top right, rgba(16, 185, 129, 0.16), transparent 26%),
+          linear-gradient(180deg, #f8fbff 0%, #eef4ff 52%, #f7fafc 100%);
         min-height: 100vh;
       }
 
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+        background-size: 36px 36px;
+        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.18), transparent 70%);
+      }
+
       .container {
-        max-width: 1200px;
+        max-width: 1320px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 24px;
       }
 
       header {
         text-align: center;
-        padding: 60px 20px 40px;
+        padding: 72px 28px 56px;
         color: white;
         position: relative;
+        overflow: hidden;
+        border-radius: 32px;
+        background:
+          radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 24%),
+          radial-gradient(circle at bottom left, rgba(34, 197, 94, 0.24), transparent 28%),
+          linear-gradient(135deg, #0f172a 0%, #123c86 50%, #0d7a5c 100%);
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.14);
       }
 
       .lang-toggle {
@@ -76,60 +100,279 @@
       }
 
       h1 {
-        font-size: 3.5em;
-        margin-bottom: 10px;
+        font-family: "Sora", "Inter", sans-serif;
+        font-size: 4.2em;
+        margin-bottom: 14px;
         font-weight: 800;
-        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        letter-spacing: -1px;
+        text-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+        letter-spacing: -0.06em;
       }
 
       .subtitle {
-        font-size: 1.4em;
-        opacity: 0.95;
-        margin-bottom: 30px;
+        max-width: 780px;
+        margin: 0 auto 30px;
+        font-size: 1.22em;
+        opacity: 0.92;
         font-weight: 500;
       }
 
       .badges {
-        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 22px;
       }
 
       .badge {
-        display: inline-block;
-        padding: 8px 16px;
-        margin: 5px;
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
-        font-size: 0.9em;
+        display: inline-flex;
+        align-items: center;
+        padding: 9px 14px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        font-size: 0.86em;
         backdrop-filter: blur(10px);
-        font-weight: 500;
+        font-weight: 700;
+      }
+
+      .release-banner {
+        max-width: 920px;
+        margin: 0 auto 24px;
+        padding: 18px 22px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(14px);
+        text-align: left;
+      }
+
+      .hero-install {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 16px;
+        margin-top: 34px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 18px 32px rgba(15, 23, 42, 0.18);
       }
 
       .demo-section {
-        background: white;
-        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f8fbff 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 28px;
         padding: 40px;
         margin: 40px 0;
-        box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 24px 54px rgba(15, 23, 42, 0.1);
       }
 
       .section {
-        background: white;
-        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #fbfdff 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 28px;
         padding: 40px;
         margin: 40px 0;
-        box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 24px 54px rgba(15, 23, 42, 0.1);
       }
 
       .section h2 {
         margin-bottom: 10px;
-        color: #5a67d8;
+        color: #0f172a;
+        font-family: "Sora", "Inter", sans-serif;
+        font-size: 2rem;
+        letter-spacing: -0.04em;
       }
 
       .section p {
         color: #4a5568;
         margin-bottom: 18px;
+      }
+
+      .launchpad-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
+        gap: 24px;
+        margin: 40px 0;
+        align-items: start;
+      }
+
+      .demo-section,
+      .quickstart-section {
+        margin: 0;
+        height: 100%;
+      }
+
+      .section-kicker {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        margin-bottom: 12px;
+        border-radius: 999px;
+        background: #e0f2fe;
+        color: #075985;
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .quickstart-card {
+        display: grid;
+        gap: 18px;
+      }
+
+      .quickstart-steps {
+        display: grid;
+        gap: 14px;
+      }
+
+      .quickstart-step {
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #0f172a 0%, #172554 100%);
+        color: #e2e8f0;
+        box-shadow: 0 16px 34px rgba(15, 23, 42, 0.14);
+      }
+
+      .quickstart-step-title {
+        color: #93c5fd;
+        margin-bottom: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+      }
+
+      .quickstart-command {
+        display: block;
+        font-family: "Fira Code", monospace;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #f8fafc;
+        overflow-x: auto;
+      }
+
+      .quickstart-note {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #eef6ff 0%, #f8fbff 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        color: #475569;
+      }
+
+      .quickstart-note strong {
+        color: #0f172a;
+      }
+
+      .query-explainer {
+        margin: 0 0 18px;
+        border: 1px solid #dbe7f3;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        overflow: hidden;
+      }
+
+      .query-explainer summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .query-explainer summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .query-explainer-copy {
+        display: grid;
+        gap: 4px;
+      }
+
+      .query-explainer-title {
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 0.98rem;
+      }
+
+      .query-explainer-subtitle {
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+
+      .query-explainer-icon {
+        color: #1d4ed8;
+        font-weight: 800;
+        font-size: 1rem;
+        transition: transform 0.2s ease;
+      }
+
+      .query-explainer[open] .query-explainer-icon {
+        transform: rotate(45deg);
+      }
+
+      .query-grid {
+        display: grid;
+        gap: 10px;
+        padding: 0 20px 20px;
+      }
+
+      .query-item {
+        border-radius: 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+      }
+
+      .query-item-button {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .query-item-button strong {
+        display: block;
+        color: #0f172a;
+        font-size: 0.92rem;
+        margin: 0;
+      }
+
+      .query-item-icon {
+        color: #1d4ed8;
+        font-weight: 800;
+        font-size: 1rem;
+        transition: transform 0.2s ease;
+        flex: 0 0 auto;
+      }
+
+      .query-item.open .query-item-icon {
+        transform: rotate(45deg);
+      }
+
+      .query-item-panel {
+        display: none;
+        padding: 0 16px 14px;
+      }
+
+      .query-item.open .query-item-panel {
+        display: block;
+      }
+
+      .query-item-panel p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.88rem;
+        line-height: 1.5;
       }
 
       .arch-flow {
@@ -139,9 +382,224 @@
         margin-top: 16px;
       }
 
+      .arch-diagram {
+        position: relative;
+        padding: 28px;
+        margin: 30px 0;
+        border-radius: 28px;
+        background:
+          radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 24%),
+          radial-gradient(circle at bottom left, rgba(34, 197, 94, 0.12), transparent 26%),
+          linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+      }
+
+      .arch-diagram-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .arch-diagram-kicker {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .arch-diagram-note {
+        color: #475569;
+        font-size: 0.92rem;
+        text-align: right;
+      }
+
+      .arch-stack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .arch-layer {
+        position: relative;
+        padding: 20px 22px;
+        border-radius: 22px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 16px 34px rgba(15, 23, 42, 0.07);
+      }
+
+      .arch-layer-top {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+        color: white;
+      }
+
+      .arch-layer-control {
+        background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+      }
+
+      .arch-layer-core {
+        background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+      }
+
+      .arch-layer-foundation {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: white;
+      }
+
+      .arch-layer-label {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 11px;
+        border-radius: 999px;
+        margin-bottom: 12px;
+        background: rgba(255, 255, 255, 0.16);
+        color: inherit;
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .arch-layer:not(.arch-layer-top):not(.arch-layer-foundation) .arch-layer-label {
+        background: #e2e8f0;
+        color: #334155;
+      }
+
+      .arch-layer h3 {
+        margin: 0;
+        font-family: "Sora", "Inter", sans-serif;
+        font-size: 1.35rem;
+        letter-spacing: -0.03em;
+      }
+
+      .arch-layer p {
+        margin: 8px 0 0;
+        color: inherit;
+        opacity: 0.92;
+      }
+
+      .arch-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 16px;
+      }
+
+      .arch-mini {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      .arch-layer-control .arch-mini,
+      .arch-layer-core .arch-mini {
+        background: rgba(255, 255, 255, 0.84);
+        border-color: rgba(148, 163, 184, 0.18);
+      }
+
+      .arch-mini strong {
+        display: block;
+        color: inherit;
+        font-size: 0.94rem;
+      }
+
+      .arch-mini span {
+        display: block;
+        margin-top: 6px;
+        color: inherit;
+        opacity: 0.84;
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+
+      .arch-arrow {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 28px;
+        color: #1d4ed8;
+        font-size: 1.4rem;
+        font-weight: 800;
+      }
+
+      .arch-fanout {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .arch-fanout-card {
+        padding: 18px 16px;
+        border-radius: 20px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+      }
+
+      .arch-fanout-card strong {
+        display: block;
+        color: #0f172a;
+        font-family: "Sora", "Inter", sans-serif;
+        font-size: 1rem;
+      }
+
+      .arch-fanout-card span {
+        display: block;
+        margin-top: 8px;
+        color: #475569;
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+
+      .arch-footnotes {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .arch-footnote {
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        color: #334155;
+        font-size: 0.9rem;
+      }
+
+      .arch-footnote strong {
+        display: block;
+        margin-bottom: 6px;
+        color: #0f172a;
+      }
+
       @media (max-width: 900px) {
         .arch-flow {
           grid-template-columns: 1fr;
+        }
+
+        .arch-diagram-header,
+        .arch-row,
+        .arch-fanout,
+        .arch-footnotes {
+          grid-template-columns: 1fr;
+        }
+
+        .arch-diagram-header {
+          display: grid;
+        }
+
+        .arch-diagram-note {
+          text-align: left;
         }
       }
 
@@ -200,8 +658,9 @@
 
       .demo-section h2 {
         margin-bottom: 10px;
-        color: #5a67d8;
-        /* Indigo-500 */
+        color: #0f172a;
+        font-family: "Sora", "Inter", sans-serif;
+        font-size: 2rem;
       }
 
       .demo-section p {
@@ -211,9 +670,8 @@
 
       .demo-title-bar {
         padding: 12px 16px;
-        border-bottom: 1px solid #333;
-        background: #1a202c;
-        /* Gray-900 */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        background: linear-gradient(90deg, #020617 0%, #0f172a 100%);
         color: #e2e8f0;
         font-family: "Fira Code", monospace;
         font-size: 0.9em;
@@ -224,28 +682,32 @@
 
       .features {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 25px;
-        margin-top: 40px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 34px;
       }
 
       .feature-card {
-        background: white;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f8fbff 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
         padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-radius: 24px;
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
         transition:
-          transform 0.2s ease,
-          box-shadow 0.2s ease;
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          border-color 0.25s ease;
       }
 
       .feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-6px);
+        box-shadow: 0 26px 50px rgba(15, 23, 42, 0.12);
+        border-color: rgba(14, 165, 233, 0.28);
       }
 
       .feature-card h3 {
-        color: #2d3748;
+        color: #0f172a;
+        font-family: "Sora", "Inter", sans-serif;
         font-size: 1.25em;
         margin-bottom: 15px;
       }
@@ -257,12 +719,19 @@
 
       footer {
         text-align: center;
-        padding: 40px 20px;
-        color: rgba(255, 255, 255, 0.8);
+        padding: 32px 24px;
+        margin: 36px 0 14px;
+        color: #475569;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 24px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
       }
 
       code {
-        background: rgba(0, 0, 0, 0.2);
+        background: rgba(15, 23, 42, 0.08);
+        color: #0f172a;
         padding: 5px 10px;
         border-radius: 6px;
         font-family: "Fira Code", monospace;
@@ -270,11 +739,16 @@
 
       .cta-button {
         display: inline-block;
-        transition: opacity 0.2s;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          opacity 0.2s;
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
       }
 
       .cta-button:hover {
         opacity: 0.9;
+        transform: translateY(-2px);
       }
 
       @media (max-width: 768px) {
@@ -283,12 +757,13 @@
         }
 
         header {
-          padding: 48px 12px 28px;
+          padding: 52px 16px 36px;
+          border-radius: 24px;
         }
 
         h1 {
-          font-size: 2.4em;
-          letter-spacing: -0.5px;
+          font-size: 2.8em;
+          letter-spacing: -0.04em;
         }
 
         .subtitle {
@@ -297,10 +772,17 @@
         }
 
         .demo-section,
-        .section {
+        .section,
+        .quickstart-section {
           padding: 24px 16px;
           margin: 24px 0;
-          border-radius: 12px;
+          border-radius: 20px;
+        }
+
+        .launchpad-grid {
+          grid-template-columns: 1fr;
+          gap: 18px;
+          margin: 24px 0;
         }
 
         .features {
@@ -338,7 +820,7 @@
         }
 
         h1 {
-          font-size: 2em;
+          font-size: 2.25em;
         }
 
         .badge {
@@ -362,285 +844,220 @@
           <span id="langToggleText">中文</span>
         </button>
 
-        <!-- Release Banner -->
-        <div
-          style="
-            background: rgba(255, 215, 0, 0.15);
-            border: 2px solid rgba(255, 215, 0, 0.4);
-            border-radius: 12px;
-            padding: 16px 24px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-          "
-        >
-          <div id="release-banner-title" style="font-size: 1.3em; font-weight: 700; margin-bottom: 8px">
-            🎉 sageLLM 0.5 正式发布
-          </div>
-          <div id="release-banner-message" style="font-size: 1em; opacity: 0.95; font-weight: 500">
-            v0.5 的发布标志着 sageLLM 从“功能可用”进入“工程可用”阶段：命令入口统一、推理链路更完整、安装与依赖管理更稳定、发布与版本治理更可靠。
-          </div>
-        </div>
-
         <div class="badges">
-          <span class="badge" data-i18n="badge_perf">🚀 High Throughput</span>
-          <span class="badge" data-i18n="badge_ascend">🇨🇳 Ascend NPU Native</span>
-          <span class="badge" data-i18n="badge_private">🔒 Data Sovereignty</span>
+          <span class="badge" data-i18n="badge_perf">🔬 Scientific Discovery LLMs</span>
+          <span class="badge" data-i18n="badge_ascend">🇨🇳 Domestic Hardware First</span>
+          <span class="badge" data-i18n="badge_private">📊 Benchmark-Driven Compare</span>
         </div>
         <h1>sageLLM</h1>
         <p class="subtitle" data-i18n="subtitle">
-          Modular Inference Engine for Domestic Computing Ecosystems
+          Built for scientific discovery models, optimized for domestic hardware, and benchmarked against alternative engines.
         </p>
 
-        <div style="margin-top: 30px">
+        <div class="hero-install">
           <code>pip install isagellm</code>
         </div>
       </header>
 
-      <div class="demo-section">
-        <h2 data-i18n="demo_title">⚡ Live Inference Demo</h2>
-        <p data-i18n="demo_desc">
-          Real-time streaming response powered by sageLLM engine (CPU/CUDA/Ascend backends
-          available).
-        </p>
-
-        <div
-          class="demo-container"
-          style="border: 1px solid #333; border-radius: 8px; overflow: hidden; background: #000"
-        >
-          <div class="demo-title-bar">📺 sagellm run --backend ascend</div>
+      <div class="launchpad-grid">
+        <div class="demo-section">
+          <div class="section-kicker" data-i18n="demo_kicker">Live Path</div>
+          <h2 data-i18n="demo_title">⚡ Live Inference Demo</h2>
+          <p data-i18n="demo_desc">
+            Real-time streaming response powered by sageLLM engine (CPU/CUDA/Ascend backends
+            available).
+          </p>
 
           <div
-            id="demo-player"
-            style="
-              width: 100%;
-              min-height: 400px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              background-color: #000;
-            "
+            class="demo-container"
+            style="border: 1px solid #333; border-radius: 8px; overflow: hidden; background: #000"
           >
-            <span style="color: #888; font-family: monospace">Loading terminal demo...</span>
+            <div class="demo-title-bar" id="demo-title-bar">📺 sagellm run --backend ascend</div>
+
+            <div
+              id="demo-player"
+              style="
+                width: 100%;
+                min-height: 400px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #000;
+              "
+            >
+              <span id="demo-loading-placeholder" style="color: #888; font-family: monospace">Loading terminal demo...</span>
+            </div>
           </div>
-        </div>
 
-        <div style="margin-top: 20px; display: grid; gap: 10px">
-          <div style="color: #666; margin-bottom: 5px" data-i18n="start_api">
-            # Start API server
-          </div>
-          <div
-            style="
-              background: #f4f6f8;
-              padding: 12px;
-              border-radius: 4px;
-              font-family: monospace;
-              border: 1px solid #eee;
-            "
-          >
-            <span style="color: #667eea">$</span> sagellm serve --port 8000 --backend ascend
-          </div>
-        </div>
-
-        <div style="margin-top: 40px; text-align: center">
-          <a
-            href="https://github.com/intellistream"
-            class="cta-button"
-            style="
-              text-decoration: none;
-              background: #667eea;
-              color: white;
-              padding: 10px 20px;
-              border-radius: 6px;
-              margin: 0 10px;
-              font-weight: 500;
-            "
-            data-i18n="cta_docs"
-            >📚 Documentation</a
-          >
-          <a
-            href="https://github.com/intellistream"
-            class="cta-button"
-            style="
-              text-decoration: none;
-              background: #333;
-              color: white;
-              padding: 10px 20px;
-              border-radius: 6px;
-              margin: 0 10px;
-              font-weight: 500;
-            "
-            data-i18n="cta_github"
-            >💻 GitHub</a
-          >
-        </div>
-      </div>
-
-      <!-- Quickstart Section -->
-      <div class="section" style="background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%)">
-        <h2 id="quickstart-title" style="color: #667eea">🚀 Quick Start (v0.5)</h2>
-        <p id="quickstart-description" style="color: #4a5568; margin-bottom: 25px">
-          v0.5 标志着 sageLLM 进入工程可用阶段：链路更完整、安装发布更稳定、版本治理更可靠。
-        </p>
-
-        <div style="display: grid; gap: 20px">
-          <!-- Install Package -->
-          <div>
-            <div id="quickstart-step-install" style="color: #718096; margin-bottom: 8px; font-weight: 600">
-              📦 1. Pip Install
+          <div style="margin-top: 20px; display: grid; gap: 10px">
+            <div style="color: #666; margin-bottom: 5px" data-i18n="start_api">
+              # Start API server
             </div>
             <div
               style="
-                background: #1a202c;
-                color: #e2e8f0;
-                padding: 16px 20px;
-                border-radius: 8px;
-                font-family: &quot;Fira Code&quot;, monospace;
-                font-size: 0.95em;
-                overflow-x: auto;
+                background: #f4f6f8;
+                padding: 12px;
+                border-radius: 12px;
+                font-family: monospace;
+                border: 1px solid #e2e8f0;
               "
             >
-              <span style="color: #48bb78">$</span> <span id="quickstart-install-command">pip install isagellm</span>
+              <span style="color: #667eea">$</span> sagellm serve --port 8000 --backend ascend
             </div>
           </div>
 
-          <!-- Setup Backend -->
-          <div>
-            <div id="quickstart-step-setup" style="color: #718096; margin-bottom: 8px; font-weight: 600">
-              🔧 2. Setup Backend
-            </div>
-            <div
+          <div style="margin-top: 28px; text-align: left">
+            <a
+              href="https://github.com/intellistream"
+              class="cta-button"
               style="
-                background: #1a202c;
-                color: #e2e8f0;
-                padding: 16px 20px;
-                border-radius: 8px;
-                font-family: &quot;Fira Code&quot;, monospace;
-                font-size: 0.95em;
-                overflow-x: auto;
+                text-decoration: none;
+                background: #667eea;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 10px;
+                margin: 0 10px 0 0;
+                font-weight: 500;
               "
+              data-i18n="cta_docs"
+              >📚 Documentation</a
             >
-              <span style="color: #718096"
-                ># Install CUDA, Ascend, or CPU backend automatically</span
-              ><br />
-              <span style="color: #48bb78">$</span> <span id="quickstart-setup-command">sagellm install cuda</span>
-              <span style="color: #718096" id="quickstart-setup-hint"># or ascend / cpu</span>
-            </div>
-          </div>
-
-          <!-- Run Inference -->
-          <div>
-            <div id="quickstart-step-run" style="color: #718096; margin-bottom: 8px; font-weight: 600">
-              ⚡ 3. Run Inference
-            </div>
-            <div
+            <a
+              href="https://github.com/intellistream"
+              class="cta-button"
               style="
-                background: #1a202c;
-                color: #e2e8f0;
-                padding: 16px 20px;
-                border-radius: 8px;
-                font-family: &quot;Fira Code&quot;, monospace;
-                font-size: 0.95em;
-                overflow-x: auto;
+                text-decoration: none;
+                background: #0f172a;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 10px;
+                margin: 0;
+                font-weight: 500;
               "
+              data-i18n="cta_github"
+              >💻 GitHub</a
             >
-              <span style="color: #48bb78">$</span> <span id="quickstart-run-command">sagellm run -p "Hello AI" --backend cuda</span>
-            </div>
           </div>
         </div>
 
-        <div
-          style="
-            margin-top: 25px;
-            padding: 16px;
-            background: #edf2f7;
-            border-left: 4px solid #667eea;
-            border-radius: 6px;
-          "
-        >
-          <strong style="color: #2d3748">💡 Smart Detection:</strong>
-          <span id="quickstart-smart-detection" style="color: #4a5568"
-            >v0.5 automatically detects if you're missing dependencies for your hardware and
-            suggests the correct
-            <code
-              style="
-                background: #cbd5e0;
-                padding: 2px 6px;
-                border-radius: 3px;
-                font-family: &quot;Fira Code&quot;, monospace;
-              "
-              "
-              ><span id="quickstart-smart-command">sagellm install</span></code
-            >
-            command.</span
-          >
+        <div class="section quickstart-section">
+          <div class="section-kicker" data-i18n="quickstart_kicker">Launch</div>
+          <h2 id="quickstart-title">🚀 Quick Start (v0.5)</h2>
+          <p id="quickstart-description" style="margin-bottom: 0">
+            Three commands to first token.
+          </p>
+
+          <div class="quickstart-card">
+            <div class="quickstart-steps">
+              <div class="quickstart-step">
+                <div id="quickstart-step-install" class="quickstart-step-title">📦 1. Pip Install</div>
+                <span class="quickstart-command"><span style="color: #48bb78">$</span> <span id="quickstart-install-command">pip install isagellm</span></span>
+              </div>
+
+              <div class="quickstart-step">
+                <div id="quickstart-step-setup" class="quickstart-step-title">🔧 2. Setup Backend</div>
+                <span class="quickstart-command"><span id="quickstart-setup-comment" style="color: #94a3b8"># Install CUDA, Ascend, or CPU backend automatically</span></span>
+                <span class="quickstart-command"><span style="color: #48bb78">$</span> <span id="quickstart-setup-command">sagellm install cuda</span> <span id="quickstart-setup-hint" style="color: #94a3b8"># or ascend / cpu</span></span>
+              </div>
+
+              <div class="quickstart-step">
+                <div id="quickstart-step-run" class="quickstart-step-title">⚡ 3. Run Inference</div>
+                <span class="quickstart-command"><span style="color: #48bb78">$</span> <span id="quickstart-run-command">sagellm run -p "Hello AI" --backend cuda</span></span>
+              </div>
+            </div>
+
+            <div class="quickstart-note">
+              <strong id="quickstart-smart-title">💡 Smart Detection:</strong>
+              <span id="quickstart-smart-detection"
+                >v0.5 automatically detects if you're missing dependencies for your hardware and
+                suggests the correct
+                <code><span id="quickstart-smart-command">sagellm install</span></code>
+                command.</span
+              >
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Leaderboard Section -->
       <div class="leaderboard-section" id="leaderboard">
-        <h2>📊 Performance Leaderboard</h2>
-        <p>
-          Track multi-engine version evolution with real-world performance metrics. Compare different
-          hardware configurations, models, and workloads.
-        </p>
-        <p style="margin-top: -8px; color: #718096; font-size: 13px">
-          Data model: <code style="background: #edf2f7; color: #2d3748">leaderboard_v1.schema.json</code>
-        </p>
+        <div class="leaderboard-heading">
+          <div>
+            <div class="leaderboard-eyebrow" id="leaderboard-eyebrow">Benchmark Atlas</div>
+            <h2 id="leaderboard-title">Performance Leaderboard</h2>
+            <p id="leaderboard-description">
+              Use apples-to-apples comparisons to validate how sageLLM serves scientific discovery models on domestic hardware versus other engines.
+            </p>
+          </div>
+          <div class="leaderboard-schema-pill">
+            <span id="leaderboard-schema-label">Data model</span>
+            <strong id="leaderboard-schema-value">leaderboard_v1.schema.json</strong>
+          </div>
+        </div>
 
         <!-- Tab Navigation -->
         <div class="tab-nav">
-          <button class="tab-button active" data-tab="single-chip">单机单卡</button>
-          <button class="tab-button" data-tab="multi-chip">单机多卡</button>
-          <button class="tab-button" data-tab="multi-node">多机多卡</button>
+          <button id="tab-single-chip" class="tab-button active" data-tab="single-chip">Single Node · Single Accelerator</button>
+          <button id="tab-multi-chip" class="tab-button" data-tab="multi-chip">Single Node · Multi Accelerator</button>
+          <button id="tab-multi-node" class="tab-button" data-tab="multi-node">Multi Node · Multi Accelerator</button>
         </div>
 
         <!-- Loading State -->
         <div id="leaderboard-loading" class="loading-state">
           <div class="spinner"></div>
-          <p>Loading leaderboard data...</p>
+          <p id="leaderboard-loading-text">Loading leaderboard data...</p>
         </div>
 
         <!-- Error State -->
         <div id="leaderboard-error" class="empty-state" style="display: none">
           <div class="empty-state-icon">⚠️</div>
-          <h3>Failed to Load Data</h3>
-          <p>Please refresh the page or check your internet connection.</p>
+          <h3 id="leaderboard-error-title">Failed to Load Data</h3>
+          <p id="leaderboard-error-text">Please refresh the page or check your internet connection.</p>
         </div>
 
         <!-- Main Content -->
         <div id="leaderboard-content" style="display: none">
-          <p id="leaderboard-data-stats" style="margin: 8px 0 12px; color: #4a5568; font-size: 13px">
+          <p id="leaderboard-data-stats" class="leaderboard-meta">
             Loaded 0 entries • Showing 0 entries
+          </p>
+
+          <div id="leaderboard-overview" class="leaderboard-overview">
+            <!-- Populated by JS -->
+          </div>
+
+          <p id="leaderboard-hint" class="leaderboard-hint">
+            Use the filters below to align hardware, model, precision, and workload before judging
+            engine deltas.
           </p>
 
           <!-- Filters -->
           <div class="filters">
             <div class="filter-group">
-              <label for="filter-engine">Engine</label>
+              <label id="filter-engine-label" for="filter-engine">Engine</label>
               <select id="filter-engine">
                 <option value="all">All</option>
               </select>
             </div>
             <div class="filter-group">
-              <label for="filter-hardware">Hardware</label>
+              <label id="filter-hardware-label" for="filter-hardware">Hardware</label>
               <select id="filter-hardware">
                 <option value="all">All</option>
               </select>
             </div>
             <div class="filter-group">
-              <label for="filter-model">Model</label>
+              <label id="filter-model-label" for="filter-model">Model</label>
               <select id="filter-model">
                 <option value="all">All</option>
               </select>
             </div>
             <div class="filter-group">
-              <label for="filter-version">Version</label>
+              <label id="filter-version-label" for="filter-version">Version</label>
               <select id="filter-version">
                 <option value="all">All</option>
               </select>
             </div>
             <div class="filter-group">
-              <label for="filter-workload">Workload</label>
+              <label id="filter-workload-label" for="filter-workload">Workload</label>
               <select id="filter-workload">
                 <option value="all">All</option>
                 <option value="Q1">Q1 – Short QA</option>
@@ -654,11 +1071,112 @@
               </select>
             </div>
             <div class="filter-group">
-              <label for="filter-precision">Precision</label>
+              <label id="filter-precision-label" for="filter-precision">Precision</label>
               <select id="filter-precision">
                 <option value="all">All</option>
               </select>
             </div>
+          </div>
+
+          <details class="query-explainer">
+            <summary>
+              <div class="query-explainer-copy">
+                <span id="query-explainer-title" class="query-explainer-title">What do Q1-Q8 mean?</span>
+                <span id="query-explainer-subtitle" class="query-explainer-subtitle">Expand the benchmark query menu to see what each workload is testing.</span>
+              </div>
+              <span class="query-explainer-icon">+</span>
+            </summary>
+            <div class="query-grid">
+              <div class="query-item open">
+                <button class="query-item-button" type="button" aria-expanded="true">
+                  <strong id="query-q1-title">Q1 · Short QA</strong>
+                  <span class="query-item-icon">+</span>
+                </button>
+                <div class="query-item-panel">
+                  <p id="query-q1-desc">Single-turn short factual prompts used to measure low-latency answer generation.</p>
+                </div>
+              </div>
+              <div class="query-item">
+                <button class="query-item-button" type="button" aria-expanded="false">
+                  <strong id="query-q2-title">Q2 · Long Summarization</strong>
+                  <span class="query-item-icon">+</span>
+                </button>
+                <div class="query-item-panel">
+                  <p id="query-q2-desc">Long-context summarization prompts that stress prefill efficiency and sustained decoding.</p>
+                </div>
+              </div>
+              <div class="query-item">
+                <button class="query-item-button" type="button" aria-expanded="false">
+                  <strong id="query-q3-title">Q3 · Code Generation</strong>
+                  <span class="query-item-icon">+</span>
+                </button>
+                <div class="query-item-panel">
+                  <p id="query-q3-desc">Code and tool-oriented generation prompts that expose structure-following and longer output behavior.</p>
+                </div>
+              </div>
+              <div class="query-item">
+                <button class="query-item-button" type="button" aria-expanded="false">
+                  <strong id="query-q4-title">Q4 · Multi-turn Reasoning</strong>
+                  <span class="query-item-icon">+</span>
+                </button>
+                <div class="query-item-panel">
+                  <p id="query-q4-desc">Dialogue-style reasoning prompts that test stability across multi-turn context accumulation.</p>
+                </div>
+              </div>
+              <div class="query-item">
+                <button class="query-item-button" type="button" aria-expanded="false">
+                  <strong id="query-q5-title">Q5 · Stress: Short Concurrent</strong>
+                  <span class="query-item-icon">+</span>
+                </button>
+                <div class="query-item-panel">
+                  <p id="query-q5-desc">High-concurrency short requests used to reveal scheduler overhead and throughput under pressure.</p>
+                </div>
+              </div>
+              <div class="query-item">
+                <button class="query-item-button" type="button" aria-expanded="false">
+                  <strong id="query-q6-title">Q6 · Stress: Long Concurrent</strong>
+                  <span class="query-item-icon">+</span>
+                </button>
+                <div class="query-item-panel">
+                  <p id="query-q6-desc">High-concurrency long prompts used to stress memory, batching, and long-request fairness.</p>
+                </div>
+              </div>
+              <div class="query-item">
+                <button class="query-item-button" type="button" aria-expanded="false">
+                  <strong id="query-q7-title">Q7 · Chain-of-Thought</strong>
+                  <span class="query-item-icon">+</span>
+                </button>
+                <div class="query-item-panel">
+                  <p id="query-q7-desc">Long-form reasoning prompts that amplify token-by-token latency and deep inference quality tradeoffs.</p>
+                </div>
+              </div>
+              <div class="query-item">
+                <button class="query-item-button" type="button" aria-expanded="false">
+                  <strong id="query-q8-title">Q8 · Mixed Batch</strong>
+                  <span class="query-item-icon">+</span>
+                </button>
+                <div class="query-item-panel">
+                  <p id="query-q8-desc">Mixed-shape request batches used to test how well the engine handles heterogeneous serving traffic.</p>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <div class="compare-controls">
+            <label class="toggle-card" for="toggle-same-scope">
+              <input id="toggle-same-scope" type="checkbox" />
+              <span id="toggle-same-scope-title">Same model + hardware only</span>
+              <small id="toggle-same-scope-desc">Automatically lock onto the most complete apples-to-apples scope under the current filters, including workload, precision, and topology.</small>
+            </label>
+            <label class="toggle-card" for="toggle-hide-incomplete">
+              <input id="toggle-hide-incomplete" type="checkbox" checked />
+              <span id="toggle-hide-incomplete-title">Hide sparse benchmark rows</span>
+              <small id="toggle-hide-incomplete-desc">Show only groups where at least two engines appear together by default, so single-sided results do not dominate the main comparison view.</small>
+            </label>
+          </div>
+
+          <div id="leaderboard-coverage" class="coverage-strip">
+            <!-- Populated by JS -->
           </div>
 
           <!-- Table -->
@@ -666,15 +1184,14 @@
             <table class="leaderboard-table">
               <thead>
                 <tr>
-                  <th>Version</th>
-                  <th>Workload</th>
-                  <th>Config</th>
-                  <th>TTFT (ms) ↓</th>
-                  <th>Tokens/s ↑</th>
-                  <th>Peak Mem (MB) ↓</th>
-                  <th>Error Rate ↓</th>
-                  <th>Hit Rate ↑</th>
-                  <th>Actions</th>
+                  <th id="table-head-engine">Engine / Version</th>
+                  <th id="table-head-workload">Workload</th>
+                  <th id="table-head-hardware">Hardware</th>
+                  <th id="table-head-ttft">TTFT (ms) ↓</th>
+                  <th id="table-head-tbt">TBT (ms) ↓</th>
+                  <th id="table-head-tps">Tokens/s ↑</th>
+                  <th id="table-head-error">Error Rate ↓</th>
+                  <th id="table-head-actions">Actions</th>
                 </tr>
               </thead>
               <tbody id="leaderboard-tbody">
@@ -686,11 +1203,11 @@
           <!-- Empty State -->
           <div id="empty-state" class="empty-state" style="display: none">
             <div class="empty-state-icon">🔍</div>
-            <h3>No Results Found</h3>
-            <p>Try adjusting your filters to see more data.</p>
+            <h3 id="leaderboard-empty-title">No Results Found</h3>
+            <p id="leaderboard-empty-text">Try adjusting your filters to see more data.</p>
           </div>
 
-          <p id="leaderboard-last-updated" style="margin-top: 12px; color: #718096; font-size: 13px">
+          <p id="leaderboard-last-updated" class="leaderboard-meta leaderboard-meta-footer">
             Last updated: -
           </p>
         </div>
@@ -703,271 +1220,123 @@
           optimal performance.
         </p>
 
-        <div style="margin: 30px 0; text-align: center">
-          <svg
-            viewBox="0 0 800 600"
-            style="
-              max-width: 100%;
-              height: auto;
-              background: #f8fafc;
-              border-radius: 12px;
-              padding: 20px;
-            "
-          >
-            <!-- Client -->
-            <rect
-              x="320"
-              y="20"
-              width="160"
-              height="60"
-              rx="8"
-              fill="#667eea"
-              stroke="#5a67d8"
-              stroke-width="2"
-            />
-            <text x="400" y="50" text-anchor="middle" fill="white" font-size="16" font-weight="600">
-              Client / Benchmark
-            </text>
+        <div class="arch-diagram">
+          <div class="arch-diagram-header">
+            <div id="arch-diagram-kicker" class="arch-diagram-kicker">Current Stack</div>
+            <div id="arch-diagram-note" class="arch-diagram-note">
+              Unified entry, routed execution, layered runtime, protocol-first foundation.
+            </div>
+          </div>
 
-            <!-- Arrow -->
-            <path
-              d="M 400 80 L 400 120"
-              stroke="#333"
-              stroke-width="2"
-              marker-end="url(#arrowhead)"
-            />
+          <div class="arch-stack">
+            <div class="arch-layer arch-layer-top">
+              <div id="arch-entry-label" class="arch-layer-label">Entry Layer</div>
+              <h3 id="arch-entry-title">Clients, CLI, Benchmark, and Gateway</h3>
+              <p id="arch-entry-desc">
+                Users can enter through the unified <code>sagellm</code> CLI, OpenAI-compatible
+                REST gateway, SDKs, or benchmark clients.
+              </p>
+              <div class="arch-row">
+                <div class="arch-mini">
+                  <strong id="arch-entry-mini1-title">Unified Entry</strong>
+                  <span id="arch-entry-mini1-desc"><code>sagellm run</code>, <code>sagellm chat</code>, <code>sagellm serve</code></span>
+                </div>
+                <div class="arch-mini">
+                  <strong id="arch-entry-mini2-title">Open Interfaces</strong>
+                  <span id="arch-entry-mini2-desc">OpenAI-compatible HTTP API, streaming responses, benchmark endpoints</span>
+                </div>
+              </div>
+            </div>
 
-            <!-- Gateway -->
-            <rect
-              x="320"
-              y="120"
-              width="160"
-              height="60"
-              rx="8"
-              fill="#48bb78"
-              stroke="#38a169"
-              stroke-width="2"
-            />
-            <text
-              x="400"
-              y="145"
-              text-anchor="middle"
-              fill="white"
-              font-size="14"
-              font-weight="600"
-            >
-              Gateway (L4)
-            </text>
-            <text x="400" y="165" text-anchor="middle" fill="white" font-size="11">
-              OpenAI API + SSE
-            </text>
+            <div class="arch-arrow">↓</div>
 
-            <!-- Arrow -->
-            <path
-              d="M 400 180 L 400 220"
-              stroke="#333"
-              stroke-width="2"
-              marker-end="url(#arrowhead)"
-            />
+            <div class="arch-layer arch-layer-control">
+              <div id="arch-control-label" class="arch-layer-label">Control Layer</div>
+              <h3 id="arch-control-title">Control Plane for Routing, Scheduling, and Lifecycle</h3>
+              <p id="arch-control-desc">
+                The control plane selects engines, applies scheduling policy, tracks health, and
+                keeps multi-engine execution manageable.
+              </p>
+              <div class="arch-row">
+                <div class="arch-mini">
+                  <strong id="arch-control-mini1-title">Routing</strong>
+                  <span id="arch-control-mini1-desc">RequestRouter, engine selection, fail-fast health checks</span>
+                </div>
+                <div class="arch-mini">
+                  <strong id="arch-control-mini2-title">Scheduling</strong>
+                  <span id="arch-control-mini2-desc">FIFO, priority, SLO-aware policy hooks, lifecycle management</span>
+                </div>
+              </div>
+            </div>
 
-            <!-- Control Plane -->
-            <rect
-              x="320"
-              y="220"
-              width="160"
-              height="60"
-              rx="8"
-              fill="#ed8936"
-              stroke="#dd6b20"
-              stroke-width="2"
-            />
-            <text
-              x="400"
-              y="245"
-              text-anchor="middle"
-              fill="white"
-              font-size="14"
-              font-weight="600"
-            >
-              Control Plane (L3)
-            </text>
-            <text x="400" y="265" text-anchor="middle" fill="white" font-size="11">
-              Routing + Scheduling
-            </text>
+            <div class="arch-arrow">↓</div>
 
-            <!-- Arrow -->
-            <path
-              d="M 400 280 L 400 320"
-              stroke="#333"
-              stroke-width="2"
-              marker-end="url(#arrowhead)"
-            />
+            <div class="arch-layer arch-layer-core">
+              <div id="arch-core-label" class="arch-layer-label">Execution Layer</div>
+              <h3 id="arch-core-title">Core Engine Runtime</h3>
+              <p id="arch-core-desc">
+                The core runtime owns model execution, worker orchestration, PD separation, metrics,
+                and the internal execution path for native SageLLM inference.
+              </p>
+              <div class="arch-row">
+                <div class="arch-mini">
+                  <strong id="arch-core-mini1-title">Runtime Units</strong>
+                  <span id="arch-core-mini1-desc">LLMEngine, ModelRunner, Worker, runtime plugins, metrics collection</span>
+                </div>
+                <div class="arch-mini">
+                  <strong id="arch-core-mini2-title">Inference Semantics</strong>
+                  <span id="arch-core-mini2-desc">Prefill/decode split, batch execution, KV-aware generation path</span>
+                </div>
+              </div>
+            </div>
 
-            <!-- Core -->
-            <rect
-              x="320"
-              y="320"
-              width="160"
-              height="60"
-              rx="8"
-              fill="#4299e1"
-              stroke="#3182ce"
-              stroke-width="2"
-            />
-            <text
-              x="400"
-              y="345"
-              text-anchor="middle"
-              fill="white"
-              font-size="14"
-              font-weight="600"
-            >
-              Core Engine (L2)
-            </text>
-            <text x="400" y="365" text-anchor="middle" fill="white" font-size="11">
-              PD Separation + Metrics
-            </text>
+            <div class="arch-arrow">↓</div>
 
-            <!-- Branch to 3 components -->
-            <path d="M 400 380 L 400 400 M 200 400 L 600 400" stroke="#333" stroke-width="2" />
-            <path
-              d="M 200 400 L 200 420"
-              stroke="#333"
-              stroke-width="2"
-              marker-end="url(#arrowhead)"
-            />
-            <path
-              d="M 400 400 L 400 420"
-              stroke="#333"
-              stroke-width="2"
-              marker-end="url(#arrowhead)"
-            />
-            <path
-              d="M 600 400 L 600 420"
-              stroke="#333"
-              stroke-width="2"
-              marker-end="url(#arrowhead)"
-            />
+            <div class="arch-fanout">
+              <div class="arch-fanout-card">
+                <strong id="arch-fanout-backend-title">Backend</strong>
+                <span id="arch-fanout-backend-desc">CPU, CUDA, Ascend device abstraction, memory, stream, and kernel boundary.</span>
+              </div>
+              <div class="arch-fanout-card">
+                <strong id="arch-fanout-comm-title">Comm</strong>
+                <span id="arch-fanout-comm-desc">Distributed transport primitives, topology, collectives, and point-to-point communication.</span>
+              </div>
+              <div class="arch-fanout-card">
+                <strong id="arch-fanout-kv-title">KV Cache</strong>
+                <span id="arch-fanout-kv-desc">Allocation, eviction, migration, and prefix-aware cache management across inference steps.</span>
+              </div>
+              <div class="arch-fanout-card">
+                <strong id="arch-fanout-comp-title">Compression</strong>
+                <span id="arch-fanout-comp-desc">Quantization, sparsity, speculative and acceleration-oriented algorithm modules.</span>
+              </div>
+            </div>
 
-            <!-- Bottom 3 boxes -->
-            <rect
-              x="80"
-              y="420"
-              width="140"
-              height="70"
-              rx="8"
-              fill="#9f7aea"
-              stroke="#805ad5"
-              stroke-width="2"
-            />
-            <text
-              x="150"
-              y="440"
-              text-anchor="middle"
-              fill="white"
-              font-size="13"
-              font-weight="600"
-            >
-              Backend (L1)
-            </text>
-            <text x="150" y="457" text-anchor="middle" fill="white" font-size="10">
-              CPU/CUDA/Ascend
-            </text>
-            <text x="150" y="472" text-anchor="middle" fill="white" font-size="10">
-              Device + Stream
-            </text>
+            <div class="arch-arrow">↓</div>
 
-            <rect
-              x="330"
-              y="420"
-              width="140"
-              height="70"
-              rx="8"
-              fill="#9f7aea"
-              stroke="#805ad5"
-              stroke-width="2"
-            />
-            <text
-              x="400"
-              y="445"
-              text-anchor="middle"
-              fill="white"
-              font-size="13"
-              font-weight="600"
-            >
-              Comm (L1)
-            </text>
-            <text x="400" y="462" text-anchor="middle" fill="white" font-size="10">Topology</text>
-            <text x="400" y="477" text-anchor="middle" fill="white" font-size="10">
-              Collective Ops
-            </text>
+            <div class="arch-layer arch-layer-foundation">
+              <div id="arch-foundation-label" class="arch-layer-label">Protocol Foundation</div>
+              <h3 id="arch-foundation-title">Shared Types, Errors, Metrics, and IDs</h3>
+              <p id="arch-foundation-desc">
+                Protocol-first governance keeps request schemas, error codes, metrics fields, and
+                tracing identifiers consistent across the stack.
+              </p>
+            </div>
+          </div>
 
-            <rect
-              x="580"
-              y="420"
-              width="140"
-              height="70"
-              rx="8"
-              fill="#9f7aea"
-              stroke="#805ad5"
-              stroke-width="2"
-            />
-            <text
-              x="650"
-              y="445"
-              text-anchor="middle"
-              fill="white"
-              font-size="13"
-              font-weight="600"
-            >
-              KV Cache (L1)
-            </text>
-            <text x="650" y="462" text-anchor="middle" fill="white" font-size="10">
-              Pool + Transfer
-            </text>
-            <text x="650" y="477" text-anchor="middle" fill="white" font-size="10">
-              Prefix-Aware
-            </text>
-
-            <!-- Protocol Foundation -->
-            <rect
-              x="200"
-              y="520"
-              width="400"
-              height="50"
-              rx="8"
-              fill="#2d3748"
-              stroke="#1a202c"
-              stroke-width="2"
-            />
-            <text
-              x="400"
-              y="545"
-              text-anchor="middle"
-              fill="white"
-              font-size="14"
-              font-weight="600"
-            >
-              Protocol (L0) - Types, Errors, Metrics
-            </text>
-            <text x="400" y="560" text-anchor="middle" fill="white" font-size="10">
-              trace_id, request_id, engine_id
-            </text>
-
-            <!-- Arrow marker definition -->
-            <defs>
-              <marker
-                id="arrowhead"
-                markerWidth="10"
-                markerHeight="10"
-                refX="9"
-                refY="3"
-                orient="auto"
-              >
-                <polygon points="0 0, 10 3, 0 6" fill="#333" />
-              </marker>
-            </defs>
-          </svg>
+          <div class="arch-footnotes">
+            <div class="arch-footnote">
+              <strong id="arch-footnote1-title">Request Flow</strong>
+              <span id="arch-footnote1-desc">Client → Gateway or CLI → Control Plane → Core Engine → Backend / KV / Comm.</span>
+            </div>
+            <div class="arch-footnote">
+              <strong id="arch-footnote2-title">Design Rule</strong>
+              <span id="arch-footnote2-desc">Lower layers never depend on higher layers; third-party compare logic stays in benchmark, not core runtime.</span>
+            </div>
+            <div class="arch-footnote">
+              <strong id="arch-footnote3-title">Operational Focus</strong>
+              <span id="arch-footnote3-desc">CPU-first defaults, Ascend/CUDA acceleration, observability, and fail-fast behavior.</span>
+            </div>
+          </div>
         </div>
 
         <div
@@ -1028,29 +1397,29 @@
 
       <div class="features">
         <div class="feature-card">
-          <h3 data-i18n="feat_perf_title">🚀 Extreme Performance</h3>
+          <h3 data-i18n="feat_perf_title">🔬 Scientific Discovery Focus</h3>
           <p data-i18n="feat_perf_desc">
-            Custom kernels for Huawei Ascend & NVIDIA GPU. Focused on stable, high-throughput
-            inference on domestic hardware.
+            Built to serve science-facing large models and agent workloads where reasoning quality,
+            long context, and stable iteration matter more than generic demo traffic.
           </p>
         </div>
         <div class="feature-card">
-          <h3 data-i18n="feat_openai_title">🔌 OpenAI Compatible</h3>
+          <h3 data-i18n="feat_openai_title">🇨🇳 Domestic Hardware Native</h3>
           <p>
             <span data-i18n="feat_openai_desc_prefix"
-              >Drop-in replacement for OpenAI API. Fully supports</span
+              >Designed around Ascend and other domestic compute targets first, while keeping</span
             >
             <code>/v1/chat/completions</code>
             <span data-i18n="feat_openai_desc_suffix"
-              >and SSE streaming responses for seamless integration.</span
+              >style interfaces available for integration and evaluation.</span
             >
           </p>
         </div>
         <div class="feature-card">
-          <h3 data-i18n="feat_enterprise_title">🛡️ Enterprise Ready</h3>
+          <h3 data-i18n="feat_enterprise_title">📊 Compare to Improve</h3>
           <p data-i18n="feat_enterprise_desc">
-            Designed for on-premise deployment. Full data sovereignty with no external dependencies.
-            Multi-card pipeline parallelism support.
+            Benchmarking, leaderboard views, and engine-to-engine comparisons exist to measure gaps,
+            guide optimization, and prove progress on real workloads.
           </p>
         </div>
       </div>
@@ -1070,20 +1439,143 @@
       const I18N = {
         en: {
           title: "sageLLM - Modular LLM Inference for Domestic Computing Power",
-          badge_perf: "🚀 High Throughput",
-          badge_ascend: "🇨🇳 Ascend NPU Native",
-          badge_private: "🔒 Data Sovereignty",
-          subtitle: "Modular Inference Engine for Domestic Computing Ecosystems",
+          release_banner_title: "🎉 sageLLM 0.5 is now available",
+          release_banner_message: "",
+          badge_perf: "🔬 Scientific Discovery LLMs",
+          badge_ascend: "🇨🇳 Domestic Hardware First",
+          badge_private: "📊 Benchmark-Driven Compare",
+          subtitle: "Built for scientific discovery models, optimized for domestic hardware, and benchmarked against alternative engines.",
+          demo_kicker: "Live Path",
           demo_title: "⚡ Live Inference Demo",
           demo_desc:
             "Real-time streaming response powered by sageLLM engine (CPU/CUDA/Ascend backends available).",
+          demo_title_bar: "📺 sagellm run --backend ascend",
+          demo_loading_placeholder: "Loading terminal demo...",
           start_api: "# Start API server",
           cta_docs: "📚 Documentation",
           cta_github: "💻 GitHub",
 
+          quickstart_kicker: "Launch",
+          quickstart_title: "🚀 Quick Start (v0.5)",
+          quickstart_description: "Three commands to first token.",
+          quickstart_step_install: "📦 1. Pip Install",
+          quickstart_step_setup: "🔧 2. Setup Backend",
+          quickstart_step_run: "⚡ 3. Run Inference",
+          quickstart_setup_comment: "# Install CUDA, Ascend, or CPU backend automatically",
+          quickstart_setup_hint: "# or ascend / cpu",
+          quickstart_smart_title: "💡 Smart Detection:",
+          quickstart_smart_detection:
+            "If your current machine is missing dependencies, sageLLM points you to the right sagellm install command.",
+
+          leaderboard_eyebrow: "Benchmark Atlas",
+          leaderboard_title: "Performance Leaderboard",
+          leaderboard_description:
+            "Use apples-to-apples comparisons to validate how sageLLM serves scientific discovery models on domestic hardware versus other engines.",
+          leaderboard_schema_label: "Data model",
+          tab_single_chip: "Single Node · Single Accelerator",
+          tab_multi_chip: "Single Node · Multi Accelerator",
+          tab_multi_node: "Multi Node · Multi Accelerator",
+          leaderboard_loading_text: "Loading leaderboard data...",
+          leaderboard_error_title: "Failed to Load Data",
+          leaderboard_error_text: "Please refresh the page or check your internet connection.",
+          leaderboard_hint:
+            "Align hardware, model, precision, and workload first, then compare engine deltas.",
+          query_explainer_title: "What do Q1-Q8 mean?",
+          query_explainer_subtitle: "Expand the benchmark query menu to see what each workload is testing.",
+          query_q1_title: "Q1 · Short QA",
+          query_q1_desc: "Single-turn short factual prompts used to measure low-latency answer generation.",
+          query_q2_title: "Q2 · Long Summarization",
+          query_q2_desc: "Long-context summarization prompts that stress prefill efficiency and sustained decoding.",
+          query_q3_title: "Q3 · Code Generation",
+          query_q3_desc: "Code and tool-oriented generation prompts that expose structure-following and longer output behavior.",
+          query_q4_title: "Q4 · Multi-turn Reasoning",
+          query_q4_desc: "Dialogue-style reasoning prompts that test stability across multi-turn context accumulation.",
+          query_q5_title: "Q5 · Stress: Short Concurrent",
+          query_q5_desc: "High-concurrency short requests used to reveal scheduler overhead and throughput under pressure.",
+          query_q6_title: "Q6 · Stress: Long Concurrent",
+          query_q6_desc: "High-concurrency long prompts used to stress memory, batching, and long-request fairness.",
+          query_q7_title: "Q7 · Chain-of-Thought",
+          query_q7_desc: "Long-form reasoning prompts that amplify token-by-token latency and deep inference quality tradeoffs.",
+          query_q8_title: "Q8 · Mixed Batch",
+          query_q8_desc: "Mixed-shape request batches used to test how well the engine handles heterogeneous serving traffic.",
+          filter_engine_label: "Engine",
+          filter_hardware_label: "Hardware",
+          filter_model_label: "Model",
+          filter_version_label: "Version",
+          filter_workload_label: "Workload",
+          filter_precision_label: "Precision",
+          toggle_same_scope_title: "Only show same model and hardware",
+          toggle_same_scope_desc:
+            "Lock the view to the most complete comparable slice under the current filters, including workload, precision, and config shape.",
+          toggle_hide_incomplete_title: "Hide sparse benchmark rows",
+          toggle_hide_incomplete_desc:
+            "Show only groups where at least two engines exist, so single-sided results do not clutter the main view.",
+          table_head_engine: "Engine / Version",
+          table_head_workload: "Workload",
+          table_head_hardware: "Hardware",
+          table_head_ttft: "TTFT (ms) ↓",
+          table_head_tbt: "TBT (ms) ↓",
+          table_head_tps: "Tokens/s ↑",
+          table_head_error: "Error Rate ↓",
+          table_head_actions: "Actions",
+          leaderboard_empty_title: "No Results Found",
+          leaderboard_empty_text: "Try adjusting your filters to see more data.",
+
           arch_title: "🏗️ System Architecture",
           arch_desc:
             "Layered design with protocol-first approach, CPU-first development, and PD separation for optimal performance.",
+          arch_diagram_kicker: "Current Stack",
+          arch_diagram_note:
+            "Unified entry, routed execution, layered runtime, protocol-first foundation.",
+          arch_entry_label: "Entry Layer",
+          arch_entry_title: "Clients, CLI, Benchmark, and Gateway",
+          arch_entry_desc:
+            "Users can enter through the unified sagellm CLI, OpenAI-compatible REST gateway, SDKs, or benchmark clients.",
+          arch_entry_mini1_title: "Unified Entry",
+          arch_entry_mini1_desc: "sagellm run, sagellm chat, sagellm serve",
+          arch_entry_mini2_title: "Open Interfaces",
+          arch_entry_mini2_desc: "OpenAI-compatible HTTP API, streaming responses, benchmark endpoints",
+          arch_control_label: "Control Layer",
+          arch_control_title: "Control Plane for Routing, Scheduling, and Lifecycle",
+          arch_control_desc:
+            "The control plane selects engines, applies scheduling policy, tracks health, and keeps multi-engine execution manageable.",
+          arch_control_mini1_title: "Routing",
+          arch_control_mini1_desc: "RequestRouter, engine selection, fail-fast health checks",
+          arch_control_mini2_title: "Scheduling",
+          arch_control_mini2_desc: "FIFO, priority, SLO-aware policy hooks, lifecycle management",
+          arch_core_label: "Execution Layer",
+          arch_core_title: "Core Engine Runtime",
+          arch_core_desc:
+            "The core runtime owns model execution, worker orchestration, PD separation, metrics, and the internal path for native SageLLM inference.",
+          arch_core_mini1_title: "Runtime Units",
+          arch_core_mini1_desc: "LLMEngine, ModelRunner, Worker, runtime plugins, metrics collection",
+          arch_core_mini2_title: "Inference Semantics",
+          arch_core_mini2_desc: "Prefill/decode split, batch execution, KV-aware generation path",
+          arch_fanout_backend_title: "Backend",
+          arch_fanout_backend_desc:
+            "CPU, CUDA, Ascend device abstraction, memory, stream, and kernel boundary.",
+          arch_fanout_comm_title: "Comm",
+          arch_fanout_comm_desc:
+            "Distributed transport primitives, topology, collectives, and point-to-point communication.",
+          arch_fanout_kv_title: "KV Cache",
+          arch_fanout_kv_desc:
+            "Allocation, eviction, migration, and prefix-aware cache management across inference steps.",
+          arch_fanout_comp_title: "Compression",
+          arch_fanout_comp_desc:
+            "Quantization, sparsity, speculative and acceleration-oriented algorithm modules.",
+          arch_foundation_label: "Protocol Foundation",
+          arch_foundation_title: "Shared Types, Errors, Metrics, and IDs",
+          arch_foundation_desc:
+            "Protocol-first governance keeps request schemas, error codes, metrics fields, and tracing identifiers consistent across the stack.",
+          arch_footnote1_title: "Request Flow",
+          arch_footnote1_desc:
+            "Client → Gateway or CLI → Control Plane → Core Engine → Backend / KV / Comm.",
+          arch_footnote2_title: "Design Rule",
+          arch_footnote2_desc:
+            "Lower layers never depend on higher layers; third-party compare logic stays in benchmark, not core runtime.",
+          arch_footnote3_title: "Operational Focus",
+          arch_footnote3_desc:
+            "CPU-first defaults, Ascend/CUDA acceleration, observability, and fail-fast behavior.",
 
           arch_pd_title: "✅ PD Separation",
           arch_pd_desc:
@@ -1094,15 +1586,15 @@
           arch_obs_desc:
             "Full metrics tracing with trace_id, request_id, timestamps at every layer",
 
-          feat_perf_title: "🚀 Extreme Performance",
+          feat_perf_title: "🔬 Scientific Discovery Focus",
           feat_perf_desc:
-            "Custom kernels for Huawei Ascend & NVIDIA GPU. Focused on stable, high-throughput inference on domestic hardware.",
-          feat_openai_title: "🔌 OpenAI Compatible",
-          feat_openai_desc_prefix: "Drop-in replacement for OpenAI API. Fully supports",
-          feat_openai_desc_suffix: "and SSE streaming responses for seamless integration.",
-          feat_enterprise_title: "🛡️ Enterprise Ready",
+            "Built to serve science-facing large models and agent workloads where reasoning quality, long context, and stable iteration matter more than generic demo traffic.",
+          feat_openai_title: "🇨🇳 Domestic Hardware Native",
+          feat_openai_desc_prefix: "Designed around Ascend and other domestic compute targets first, while keeping",
+          feat_openai_desc_suffix: "style interfaces available for integration and evaluation.",
+          feat_enterprise_title: "📊 Compare to Improve",
           feat_enterprise_desc:
-            "Designed for on-premise deployment. Full data sovereignty with no external dependencies. Multi-card pipeline parallelism support.",
+            "Benchmarking, leaderboard views, and engine-to-engine comparisons exist to measure gaps, guide optimization, and prove progress on real workloads.",
 
           footer_line1: "sageLLM - Built by IntelliStream Team",
           footer_line2: "Optimized for domestic computing ecosystems 🇨🇳",
@@ -1110,18 +1602,124 @@
         },
         zh: {
           title: "sageLLM - 面向国产算力生态的模块化推理引擎",
-          badge_perf: "🚀 高吞吐",
-          badge_ascend: "🇨🇳 昇腾优化",
-          badge_private: "🔒 数据主权",
-          subtitle: "面向国产算力生态的模块化 LLM 推理引擎",
+          release_banner_title: "🎉 sageLLM 0.5 正式发布",
+          release_banner_message: "",
+          badge_perf: "🔬 面向科学发现大模型",
+          badge_ascend: "🇨🇳 面向国产硬件优先",
+          badge_private: "📊 以对比驱动优化",
+          subtitle: "服务科学发现大模型，优先面向国产硬件，并通过与其他引擎的对比持续验证与优化。",
+          demo_kicker: "实时路径",
           demo_title: "⚡ 实时推理演示",
           demo_desc: "基于 sageLLM 引擎的实时流式输出（支持 CPU/CUDA 后端）。",
+          demo_title_bar: "📺 sagellm run --backend ascend",
+          demo_loading_placeholder: "正在加载终端演示...",
           start_api: "# 启动 API 服务",
           cta_docs: "📚 文档",
           cta_github: "💻 GitHub",
 
+          quickstart_kicker: "启动路径",
+          quickstart_title: "🚀 快速开始 (v0.5)",
+          quickstart_description: "三条命令，直接出首 token。",
+          quickstart_step_install: "📦 1. 安装包",
+          quickstart_step_setup: "🔧 2. 配置后端",
+          quickstart_step_run: "⚡ 3. 启动推理",
+          quickstart_setup_comment: "# 自动安装 CUDA、Ascend 或 CPU 后端",
+          quickstart_setup_hint: "# 或 ascend / cpu",
+          quickstart_smart_title: "💡 智能检测：",
+          quickstart_smart_detection: "如果当前机器缺少依赖，sageLLM 会直接提示合适的 sagellm install 命令。",
+
+          leaderboard_eyebrow: "Benchmark Atlas",
+          leaderboard_title: "性能排行榜",
+          leaderboard_description: "通过严格同条件对比，验证 sageLLM 在国产硬件上服务科学发现大模型时，相比其他引擎的真实表现。",
+          leaderboard_schema_label: "数据模型",
+          tab_single_chip: "单机单卡",
+          tab_multi_chip: "单机多卡",
+          tab_multi_node: "多机多卡",
+          leaderboard_loading_text: "正在加载 leaderboard 数据...",
+          leaderboard_error_title: "数据加载失败",
+          leaderboard_error_text: "请刷新页面或检查网络连接。",
+          leaderboard_hint: "先对齐硬件、模型、精度与 workload，再判断不同引擎之间的差距。",
+          query_explainer_title: "Q1-Q8 分别代表什么？",
+          query_explainer_subtitle: "点击展开 benchmark query 菜单，查看每类 workload 具体在测什么。",
+          query_q1_title: "Q1 · 短问答",
+          query_q1_desc: "单轮、短事实型问题，用来观察低时延回答生成能力。",
+          query_q2_title: "Q2 · 长摘要",
+          query_q2_desc: "长上下文摘要任务，主要考察 prefill 效率和持续解码能力。",
+          query_q3_title: "Q3 · 代码生成",
+          query_q3_desc: "面向代码与工具调用的生成任务，用来暴露结构遵循和长输出行为。",
+          query_q4_title: "Q4 · 多轮推理",
+          query_q4_desc: "对话式推理任务，用于测试多轮上下文累积下的稳定性。",
+          query_q5_title: "Q5 · 压测：短并发",
+          query_q5_desc: "高并发短请求，主要观察调度开销与压力下的吞吐表现。",
+          query_q6_title: "Q6 · 压测：长并发",
+          query_q6_desc: "高并发长请求，主要考察显存、批处理和长请求公平性。",
+          query_q7_title: "Q7 · 思维链",
+          query_q7_desc: "长链路推理任务，会放大逐 token 时延和深度推理质量之间的权衡。",
+          query_q8_title: "Q8 · 混合批次",
+          query_q8_desc: "不同形状请求混合成批，用来测试引擎处理异构服务流量的能力。",
+          filter_engine_label: "引擎",
+          filter_hardware_label: "硬件",
+          filter_model_label: "模型",
+          filter_version_label: "版本",
+          filter_workload_label: "工作负载",
+          filter_precision_label: "精度",
+          toggle_same_scope_title: "只看同模型同硬件",
+          toggle_same_scope_desc: "自动锁定当前筛选下最完整的可比分组，并同时约束 workload、precision 和配置形态。",
+          toggle_hide_incomplete_title: "隐藏缺少对比的数据",
+          toggle_hide_incomplete_desc: "默认只显示至少两个引擎同时存在的分组，避免单边结果把主视图冲乱。",
+          table_head_engine: "引擎 / 版本",
+          table_head_workload: "工作负载",
+          table_head_hardware: "硬件",
+          table_head_ttft: "TTFT (ms) ↓",
+          table_head_tbt: "TBT (ms) ↓",
+          table_head_tps: "Tokens/s ↑",
+          table_head_error: "错误率 ↓",
+          table_head_actions: "操作",
+          leaderboard_empty_title: "没有匹配结果",
+          leaderboard_empty_text: "调整筛选条件后再试。",
+
           arch_title: "🏗️ 系统架构",
           arch_desc: "分层设计，遵循协议优先、CPU 优先、PD 分离原则，实现最优性能。",
+          arch_diagram_kicker: "当前栈",
+          arch_diagram_note: "统一入口、控制平面路由、分层运行时，以及协议优先的底座。",
+          arch_entry_label: "入口层",
+          arch_entry_title: "Clients、CLI、Benchmark 与 Gateway",
+          arch_entry_desc: "用户可以从统一的 sagellm CLI、OpenAI 兼容 REST 网关、SDK 或 benchmark 客户端进入系统。",
+          arch_entry_mini1_title: "统一入口",
+          arch_entry_mini1_desc: "sagellm run、sagellm chat、sagellm serve",
+          arch_entry_mini2_title: "开放接口",
+          arch_entry_mini2_desc: "OpenAI 兼容 HTTP API、流式响应与 benchmark endpoint",
+          arch_control_label: "控制层",
+          arch_control_title: "负责路由、调度与生命周期的 Control Plane",
+          arch_control_desc: "控制平面负责选择引擎、应用调度策略、跟踪健康状态，并管理多引擎执行。",
+          arch_control_mini1_title: "路由",
+          arch_control_mini1_desc: "RequestRouter、引擎选择、fail-fast 健康检查",
+          arch_control_mini2_title: "调度",
+          arch_control_mini2_desc: "FIFO、优先级、SLO-aware 策略钩子与生命周期管理",
+          arch_core_label: "执行层",
+          arch_core_title: "核心推理运行时",
+          arch_core_desc: "核心运行时负责模型执行、worker 编排、PD 分离、指标采集，以及 SageLLM 原生推理路径。",
+          arch_core_mini1_title: "运行单元",
+          arch_core_mini1_desc: "LLMEngine、ModelRunner、Worker、运行时插件与指标采集",
+          arch_core_mini2_title: "推理语义",
+          arch_core_mini2_desc: "Prefill/Decode 分离、批执行与 KV 感知生成路径",
+          arch_fanout_backend_title: "Backend",
+          arch_fanout_backend_desc: "CPU、CUDA、Ascend 的设备抽象、内存、流与 kernel 边界。",
+          arch_fanout_comm_title: "Comm",
+          arch_fanout_comm_desc: "分布式传输原语、拓扑、collective 与点对点通信。",
+          arch_fanout_kv_title: "KV Cache",
+          arch_fanout_kv_desc: "分配、驱逐、迁移，以及跨推理步骤的 prefix-aware cache 管理。",
+          arch_fanout_comp_title: "Compression",
+          arch_fanout_comp_desc: "量化、稀疏、投机与推理加速相关的算法模块。",
+          arch_foundation_label: "协议底座",
+          arch_foundation_title: "共享类型、错误码、指标字段与 ID",
+          arch_foundation_desc: "协议优先保证整条链路中的请求 schema、错误码、指标字段和 tracing 标识保持一致。",
+          arch_footnote1_title: "请求路径",
+          arch_footnote1_desc: "Client → Gateway 或 CLI → Control Plane → Core Engine → Backend / KV / Comm。",
+          arch_footnote2_title: "设计约束",
+          arch_footnote2_desc: "低层不能反向依赖高层；第三方引擎对比逻辑留在 benchmark，不回灌 core runtime。",
+          arch_footnote3_title: "运行重点",
+          arch_footnote3_desc: "CPU-first 默认、Ascend/CUDA 加速、可观测性，以及 fail-fast 行为。",
 
           arch_pd_title: "✅ PD 分离",
           arch_pd_desc: "Prefill 和 Decode 阶段独立运行，实现资源最优利用",
@@ -1130,13 +1728,13 @@
           arch_obs_title: "✅ 可观测",
           arch_obs_desc: "每层都有完整的 metrics 追踪（trace_id、request_id、时间戳）",
 
-          feat_perf_title: "🚀 极致性能",
-          feat_perf_desc: "面向昇腾与 NVIDIA 的定制优化，聚焦稳定高吞吐的推理表现。",
-          feat_openai_title: "🔌 OpenAI 兼容",
-          feat_openai_desc_prefix: "可作为 OpenAI API 的替代实现，支持",
-          feat_openai_desc_suffix: "与 SSE 流式返回。",
-          feat_enterprise_title: "🛡️ 企业可用",
-          feat_enterprise_desc: "支持本地化部署，强调数据主权；支持多卡并行与可观测性落地。",
+          feat_perf_title: "🔬 面向科学发现",
+          feat_perf_desc: "围绕科学发现类大模型与智能体工作负载构建，更关注推理质量、长上下文和稳定迭代，而不是通用演示流量。",
+          feat_openai_title: "🇨🇳 国产硬件原生优先",
+          feat_openai_desc_prefix: "系统优先围绕昇腾等国产算力设计，同时保留",
+          feat_openai_desc_suffix: "风格接口，便于集成与评测。",
+          feat_enterprise_title: "📊 通过对比持续改进",
+          feat_enterprise_desc: "benchmark、leaderboard 与引擎对比不是额外功能，而是用来定位差距、指导优化、验证进展的方法。",
 
           footer_line1: "- IntelliStream 团队",
           footer_line2: "面向国产算力生态优化 🇨🇳",
@@ -1166,12 +1764,158 @@
 
         const toggle = document.getElementById("langToggleText");
         if (toggle) toggle.textContent = dict.toggle_text;
+
+        const idTextMap = {
+          "release-banner-title": dict.release_banner_title,
+          "release-banner-message": dict.release_banner_message,
+          "demo-title-bar": dict.demo_title_bar,
+          "demo-loading-placeholder": dict.demo_loading_placeholder,
+          "quickstart-title": dict.quickstart_title,
+          "quickstart-description": dict.quickstart_description,
+          "quickstart-step-install": dict.quickstart_step_install,
+          "quickstart-step-setup": dict.quickstart_step_setup,
+          "quickstart-step-run": dict.quickstart_step_run,
+          "quickstart-setup-comment": dict.quickstart_setup_comment,
+          "quickstart-setup-hint": dict.quickstart_setup_hint,
+          "quickstart-smart-title": dict.quickstart_smart_title,
+          "quickstart-smart-detection": dict.quickstart_smart_detection,
+          "leaderboard-eyebrow": dict.leaderboard_eyebrow,
+          "leaderboard-title": dict.leaderboard_title,
+          "leaderboard-description": dict.leaderboard_description,
+          "leaderboard-schema-label": dict.leaderboard_schema_label,
+          "tab-single-chip": dict.tab_single_chip,
+          "tab-multi-chip": dict.tab_multi_chip,
+          "tab-multi-node": dict.tab_multi_node,
+          "leaderboard-loading-text": dict.leaderboard_loading_text,
+          "leaderboard-error-title": dict.leaderboard_error_title,
+          "leaderboard-error-text": dict.leaderboard_error_text,
+          "leaderboard-hint": dict.leaderboard_hint,
+          "query-explainer-title": dict.query_explainer_title,
+          "query-explainer-subtitle": dict.query_explainer_subtitle,
+          "query-q1-title": dict.query_q1_title,
+          "query-q1-desc": dict.query_q1_desc,
+          "query-q2-title": dict.query_q2_title,
+          "query-q2-desc": dict.query_q2_desc,
+          "query-q3-title": dict.query_q3_title,
+          "query-q3-desc": dict.query_q3_desc,
+          "query-q4-title": dict.query_q4_title,
+          "query-q4-desc": dict.query_q4_desc,
+          "query-q5-title": dict.query_q5_title,
+          "query-q5-desc": dict.query_q5_desc,
+          "query-q6-title": dict.query_q6_title,
+          "query-q6-desc": dict.query_q6_desc,
+          "query-q7-title": dict.query_q7_title,
+          "query-q7-desc": dict.query_q7_desc,
+          "query-q8-title": dict.query_q8_title,
+          "query-q8-desc": dict.query_q8_desc,
+          "filter-engine-label": dict.filter_engine_label,
+          "filter-hardware-label": dict.filter_hardware_label,
+          "filter-model-label": dict.filter_model_label,
+          "filter-version-label": dict.filter_version_label,
+          "filter-workload-label": dict.filter_workload_label,
+          "filter-precision-label": dict.filter_precision_label,
+          "toggle-same-scope-title": dict.toggle_same_scope_title,
+          "toggle-same-scope-desc": dict.toggle_same_scope_desc,
+          "toggle-hide-incomplete-title": dict.toggle_hide_incomplete_title,
+          "toggle-hide-incomplete-desc": dict.toggle_hide_incomplete_desc,
+          "table-head-engine": dict.table_head_engine,
+          "table-head-workload": dict.table_head_workload,
+          "table-head-hardware": dict.table_head_hardware,
+          "table-head-ttft": dict.table_head_ttft,
+          "table-head-tbt": dict.table_head_tbt,
+          "table-head-tps": dict.table_head_tps,
+          "table-head-error": dict.table_head_error,
+          "table-head-actions": dict.table_head_actions,
+          "leaderboard-empty-title": dict.leaderboard_empty_title,
+          "leaderboard-empty-text": dict.leaderboard_empty_text,
+          "arch-diagram-kicker": dict.arch_diagram_kicker,
+          "arch-diagram-note": dict.arch_diagram_note,
+          "arch-entry-label": dict.arch_entry_label,
+          "arch-entry-title": dict.arch_entry_title,
+          "arch-entry-desc": dict.arch_entry_desc,
+          "arch-entry-mini1-title": dict.arch_entry_mini1_title,
+          "arch-entry-mini1-desc": dict.arch_entry_mini1_desc,
+          "arch-entry-mini2-title": dict.arch_entry_mini2_title,
+          "arch-entry-mini2-desc": dict.arch_entry_mini2_desc,
+          "arch-control-label": dict.arch_control_label,
+          "arch-control-title": dict.arch_control_title,
+          "arch-control-desc": dict.arch_control_desc,
+          "arch-control-mini1-title": dict.arch_control_mini1_title,
+          "arch-control-mini1-desc": dict.arch_control_mini1_desc,
+          "arch-control-mini2-title": dict.arch_control_mini2_title,
+          "arch-control-mini2-desc": dict.arch_control_mini2_desc,
+          "arch-core-label": dict.arch_core_label,
+          "arch-core-title": dict.arch_core_title,
+          "arch-core-desc": dict.arch_core_desc,
+          "arch-core-mini1-title": dict.arch_core_mini1_title,
+          "arch-core-mini1-desc": dict.arch_core_mini1_desc,
+          "arch-core-mini2-title": dict.arch_core_mini2_title,
+          "arch-core-mini2-desc": dict.arch_core_mini2_desc,
+          "arch-fanout-backend-title": dict.arch_fanout_backend_title,
+          "arch-fanout-backend-desc": dict.arch_fanout_backend_desc,
+          "arch-fanout-comm-title": dict.arch_fanout_comm_title,
+          "arch-fanout-comm-desc": dict.arch_fanout_comm_desc,
+          "arch-fanout-kv-title": dict.arch_fanout_kv_title,
+          "arch-fanout-kv-desc": dict.arch_fanout_kv_desc,
+          "arch-fanout-comp-title": dict.arch_fanout_comp_title,
+          "arch-fanout-comp-desc": dict.arch_fanout_comp_desc,
+          "arch-foundation-label": dict.arch_foundation_label,
+          "arch-foundation-title": dict.arch_foundation_title,
+          "arch-foundation-desc": dict.arch_foundation_desc,
+          "arch-footnote1-title": dict.arch_footnote1_title,
+          "arch-footnote1-desc": dict.arch_footnote1_desc,
+          "arch-footnote2-title": dict.arch_footnote2_title,
+          "arch-footnote2-desc": dict.arch_footnote2_desc,
+          "arch-footnote3-title": dict.arch_footnote3_title,
+          "arch-footnote3-desc": dict.arch_footnote3_desc,
+        };
+
+        Object.entries(idTextMap).forEach(([id, text]) => {
+          const node = document.getElementById(id);
+          if (node && typeof text === "string") {
+            node.textContent = text;
+          }
+        });
+
+        const releaseBannerMessage = document.getElementById("release-banner-message");
+        if (releaseBannerMessage) {
+          const hasMessage = Boolean(dict.release_banner_message && dict.release_banner_message.trim());
+          releaseBannerMessage.style.display = hasMessage ? "block" : "none";
+        }
+
+        window.sagellmPageI18n = I18N;
+        window.sagellmCurrentLang = lang;
+        window.dispatchEvent(new CustomEvent("sagellm:langchange", { detail: { lang } }));
         localStorage.setItem("sagellm_lang", lang);
+      }
+
+      function initQueryAccordion() {
+        const root = document.querySelector(".query-explainer .query-grid");
+        if (!root) return;
+
+        root.querySelectorAll(".query-item-button").forEach((button) => {
+          button.addEventListener("click", () => {
+            const item = button.closest(".query-item");
+            const willOpen = !item.classList.contains("open");
+
+            root.querySelectorAll(".query-item").forEach((node) => {
+              node.classList.remove("open");
+              const nodeButton = node.querySelector(".query-item-button");
+              if (nodeButton) nodeButton.setAttribute("aria-expanded", "false");
+            });
+
+            if (willOpen) {
+              item.classList.add("open");
+              button.setAttribute("aria-expanded", "true");
+            }
+          });
+        });
       }
 
       document.addEventListener("DOMContentLoaded", () => {
         const initial = detectDefaultLang();
         setLang(initial);
+        initQueryAccordion();
 
         const btn = document.getElementById("langToggle");
         if (btn) {

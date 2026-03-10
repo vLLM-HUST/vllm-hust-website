@@ -15,23 +15,288 @@
     'use strict';
 
     const WORKLOAD_LABELS = {
-        all: 'All',
-        Q1: 'Q1 – Short QA',
-        Q2: 'Q2 – Long Summarization',
-        Q3: 'Q3 – Code Generation',
-        Q4: 'Q4 – Multi-turn Reasoning',
-        Q5: 'Q5 – Stress: Short Concurrent',
-        Q6: 'Q6 – Stress: Long Concurrent',
-        Q7: 'Q7 – Chain-of-Thought',
-        Q8: 'Q8 – Mixed Batch',
-        Other: 'Other',
+        en: {
+            all: 'All',
+            Q1: 'Q1 – Short QA',
+            Q2: 'Q2 – Long Summarization',
+            Q3: 'Q3 – Code Generation',
+            Q4: 'Q4 – Multi-turn Reasoning',
+            Q5: 'Q5 – Stress: Short Concurrent',
+            Q6: 'Q6 – Stress: Long Concurrent',
+            Q7: 'Q7 – Chain-of-Thought',
+            Q8: 'Q8 – Mixed Batch',
+            Other: 'Other',
+        },
+        zh: {
+            all: '全部',
+            Q1: 'Q1 – 短问答',
+            Q2: 'Q2 – 长摘要',
+            Q3: 'Q3 – 代码生成',
+            Q4: 'Q4 – 多轮推理',
+            Q5: 'Q5 – 压测：短并发',
+            Q6: 'Q6 – 压测：长并发',
+            Q7: 'Q7 – 思维链',
+            Q8: 'Q8 – 混合批次',
+            Other: '其他',
+        },
     };
 
     const ENGINE_LABELS = {
-        sagellm: 'sageLLM',
-        vllm: 'vLLM',
-        'vllm-ascend': 'vLLM Ascend',
-        sglang: 'SGLang',
+        en: {
+            sagellm: 'sageLLM',
+            vllm: 'vLLM',
+            'vllm-ascend': 'vLLM Ascend',
+            sglang: 'SGLang',
+            unknown: 'Unknown',
+        },
+        zh: {
+            sagellm: 'sageLLM',
+            vllm: 'vLLM',
+            'vllm-ascend': 'vLLM Ascend',
+            sglang: 'SGLang',
+            unknown: '未知',
+        },
+    };
+
+    const UI_STRINGS = {
+        en: {
+            statsHidden: 'Hidden',
+            statsSparseSuffix: 'sparse or out-of-scope rows',
+            statsLoaded: 'Loaded',
+            statsMatched: 'Matched',
+            statsBuildEntries: 'build entries',
+            statsShowing: 'Showing',
+            statsComparisonRows: 'comparison rows across',
+            statsCompleteGroups: 'complete groups',
+            quickCompare: 'Quick Compare',
+            lastUpdated: 'Last updated',
+            noComparableTitle: 'No comparable rows in the current view.',
+            noComparableHidden: 'The current filters only expose sparse groups. Turn off "Hide sparse benchmark rows" if you want to inspect single-engine rows.',
+            noComparableRelax: 'Relax one or more filters to bring engines back into the same comparison frame.',
+            rows: 'rows',
+            engines: 'engines',
+            completeCompareGroups: 'complete compare groups',
+            leadsThroughput: 'leads throughput',
+            onlyEngine: 'is the only engine in the current view.',
+            comparingEngines: 'Comparing engines in the current view.',
+            focusedPrefix: 'Focused apples-to-apples slice: ',
+            leadsBy: 'leads the current view by',
+            throughputOver: 'throughput over',
+            sparseHidden: 'sparse groups hidden',
+            completeGroupsLabel: 'Complete groups',
+            sparseGroupsLabel: 'Sparse groups',
+            focusedScopeLabel: 'Focused scope',
+            hiddenRowsLabel: 'Hidden rows',
+            latest: 'Latest',
+            baseline: 'Baseline',
+            bestFourth: 'Best 4th-segment result selected',
+            sparseGroup: 'Sparse group: no peer engine in the same comparison scope',
+            hide: 'Hide',
+            details: 'Details',
+            fourthVersion: '4th Ver.',
+            unknown: 'Unknown',
+            row: 'row',
+            singleNode: 'single-node',
+            nodes: 'nodes',
+            chips: 'chips',
+            vsPrev: 'vs Prev',
+            hardwareConfig: '🔧 Hardware Configuration',
+            hardwareConfiguration: '🔧 Hardware Configuration',
+            chip: 'Chip',
+            totalMemory: 'Total Memory',
+            cuda: 'CUDA',
+            cann: 'CANN',
+            cluster: 'Cluster',
+            engineVersions: '📦 Engine Versions',
+            engine: 'Engine',
+            engineVersion: 'Engine Version',
+            benchmark: 'Benchmark',
+            componentVersions: '📦 Component Versions',
+            versionSourceReady: 'Source: benchmark metadata + PyPI latest reference',
+            versionSourceLoading: 'Source: benchmark metadata (PyPI versions loading...)',
+            sourceHintLoaded: 'Source: benchmark metadata + PyPI latest reference',
+            sourceHintLoading: 'Source: benchmark metadata (PyPI versions loading...)',
+            mismatch: 'mismatch',
+            historical: 'historical',
+            versionMismatchNote: 'Detected version mismatch: some component versions in the benchmark results are higher than the latest PyPI release.',
+            historicalNote: 'Historical result detected: some component versions are lower than the latest PyPI release.',
+            pypiLoadError: 'Failed to load PyPI versions; showing benchmark metadata only.',
+            mismatchDetected: 'Detected version mismatch: some component versions in the benchmark results are higher than the latest PyPI release.',
+            historicalDetected: 'Historical result detected: some component versions are lower than the latest PyPI release.',
+            pypiLoadFailed: 'Failed to load PyPI versions; showing benchmark metadata only.',
+            fullBuildResults: '🧩 Full Build Results',
+            displayedVersion: 'Displayed version:',
+            bestFourthInline: '(the best 4th-segment build under this 3-segment version is shown on the main table)',
+            displayedVersionHint: 'the best 4th-segment build under this 3-segment version is shown on the main table',
+            fullVersion: 'Full Version',
+            releaseDate: 'Release Date',
+            ttft: 'TTFT',
+            tokensPerSecond: 'Tokens/s',
+            peakMem: 'Peak Mem',
+            error: 'Error',
+            hitRate: 'Hit Rate',
+            improvements: '🚀 Improvements',
+            noSpecificImprovements: 'No specific improvements noted.',
+            gitCommit: 'Git Commit',
+            changelog: 'Changelog',
+            view: 'View',
+            reproduceThisResult: '🔁 Reproduce This Result',
+            reproduce: '🔁 Reproduce This Result',
+            copy: 'Copy',
+            copiedBang: 'Copied!',
+            copyCommandFailed: 'Failed to copy command',
+            copied: 'Copied!',
+            copyFailed: 'Failed to copy command',
+            selectedStar: '⭐',
+            throughputLeader: 'Throughput leader',
+            rowCount: 'rows',
+            bestVisibleVersion: 'Best visible version',
+            avgTTFT: 'Avg TTFT',
+            avgTBT: 'Avg TBT',
+            avgThroughput: 'Avg Throughput',
+            errorRate: 'Error Rate',
+            bestVisibleRun: 'Best visible run',
+            parity: 'parity',
+            better: 'better',
+            worse: 'worse',
+            throughputGap: 'Throughput gap',
+            gap: 'gap',
+            ttftGap: 'TTFT gap',
+            tbtGap: 'TBT gap',
+            onlyEngineView: 'is the only engine in the current view.',
+            comparing: 'Comparing',
+            enginesInView: 'engines in the current view.',
+            focusedSlice: 'Focused apples-to-apples slice:',
+            leadsCurrentView: 'leads the current view by',
+            models: 'models',
+            hardwareTargets: 'hardware targets',
+            workloads: 'workloads',
+            sparseGroupsHidden: 'sparse groups hidden',
+            completeGroups: 'Complete groups',
+            sparseGroups: 'Sparse groups',
+            focusedScope: 'Focused scope',
+            hiddenRows: 'Hidden rows',
+            versusShort: 'VS',
+        },
+        zh: {
+            statsHidden: '已隐藏',
+            statsSparseSuffix: '条稀疏或超出范围的数据',
+            statsLoaded: '已加载',
+            statsMatched: '匹配到',
+            statsBuildEntries: '条构建记录',
+            statsShowing: '展示',
+            statsComparisonRows: '条对比记录，覆盖',
+            statsCompleteGroups: '个完整分组',
+            quickCompare: '快速对比',
+            lastUpdated: '最近更新',
+            noComparableTitle: '当前视图没有可直接对比的数据。',
+            noComparableHidden: '当前筛选下只剩稀疏分组。如果你想查看单引擎结果，可以关闭“隐藏缺少对比的数据”。',
+            noComparableRelax: '放宽一个或多个筛选条件，让引擎回到同一对比范围。',
+            rows: '条记录',
+            engines: '个引擎',
+            completeCompareGroups: '个完整对比分组',
+            leadsThroughput: '吞吐领先',
+            onlyEngine: '是当前视图中的唯一引擎。',
+            comparingEngines: '当前视图包含多个引擎。',
+            focusedPrefix: '当前为严格同条件视图：',
+            leadsBy: '当前吞吐领先',
+            throughputOver: '，相对',
+            sparseHidden: '个稀疏分组已隐藏',
+            completeGroupsLabel: '完整分组',
+            sparseGroupsLabel: '稀疏分组',
+            focusedScopeLabel: '锁定范围',
+            hiddenRowsLabel: '隐藏行数',
+            latest: '最新',
+            baseline: '基线',
+            bestFourth: '主表展示该三位版本下表现最好的四段版本',
+            sparseGroup: '稀疏分组：当前比较范围内没有可直接对照的其他引擎',
+            hide: '收起',
+            details: '详情',
+            fourthVersion: '四段版本',
+            unknown: '未知',
+            row: '条记录',
+            singleNode: '单机',
+            nodes: '节点',
+            chips: '卡',
+            vsPrev: '较上一版',
+            hardwareConfig: '🔧 硬件配置',
+            hardwareConfiguration: '🔧 硬件配置',
+            chip: '芯片',
+            totalMemory: '总显存',
+            cuda: 'CUDA',
+            cann: 'CANN',
+            cluster: '集群',
+            engineVersions: '📦 引擎版本',
+            engine: '引擎',
+            engineVersion: '引擎版本',
+            benchmark: 'Benchmark',
+            componentVersions: '📦 组件版本',
+            versionSourceReady: '来源：benchmark metadata + PyPI 最新版本参考',
+            versionSourceLoading: '来源：benchmark metadata（PyPI 版本加载中）',
+            sourceHintLoaded: '来源：benchmark metadata + PyPI 最新版本参考',
+            sourceHintLoading: '来源：benchmark metadata（PyPI 版本加载中）',
+            mismatch: '异常',
+            historical: '历史版本',
+            versionMismatchNote: '检测到版本异常：benchmark 结果中的部分组件版本高于 PyPI 最新发布。',
+            historicalNote: '检测到历史结果：部分组件版本低于 PyPI 最新发布。',
+            pypiLoadError: 'PyPI 版本拉取失败，仅展示 benchmark metadata。',
+            mismatchDetected: '检测到版本异常：benchmark 结果中的部分组件版本高于 PyPI 最新发布。',
+            historicalDetected: '检测到历史结果：部分组件版本低于 PyPI 最新发布。',
+            pypiLoadFailed: 'PyPI 版本拉取失败，仅展示 benchmark metadata。',
+            fullBuildResults: '🧩 完整构建结果',
+            displayedVersion: '当前展示版本：',
+            bestFourthInline: '（主表展示该三位版本下表现最好的四段版本）',
+            displayedVersionHint: '主表展示该三位版本下表现最好的四段版本',
+            fullVersion: '完整版本',
+            releaseDate: '发布日期',
+            ttft: 'TTFT',
+            tokensPerSecond: 'Tokens/s',
+            peakMem: '峰值显存',
+            error: '错误率',
+            hitRate: '命中率',
+            improvements: '🚀 改进说明',
+            noSpecificImprovements: '没有额外改进说明。',
+            gitCommit: 'Git Commit',
+            changelog: '变更记录',
+            view: '查看',
+            reproduceThisResult: '🔁 复现实验结果',
+            reproduce: '🔁 复现实验',
+            copy: '复制',
+            copiedBang: '已复制！',
+            copyCommandFailed: '复制命令失败',
+            copied: '已复制！',
+            copyFailed: '复制命令失败',
+            selectedStar: '⭐',
+            throughputLeader: '吞吐领先',
+            rowCount: '条记录',
+            bestVisibleVersion: '当前最佳可见版本',
+            avgTTFT: '平均 TTFT',
+            avgTBT: '平均 TBT',
+            avgThroughput: '平均吞吐',
+            errorRate: '错误率',
+            bestVisibleRun: '当前最佳样本',
+            parity: '持平',
+            better: '更优',
+            worse: '更差',
+            throughputGap: '吞吐差距',
+            gap: '差距',
+            ttftGap: 'TTFT 差距',
+            tbtGap: 'TBT 差距',
+            onlyEngineView: '是当前视图中的唯一引擎。',
+            comparing: '当前正在比较',
+            enginesInView: '个引擎。',
+            focusedSlice: '当前为严格同条件视图：',
+            leadsCurrentView: '当前吞吐领先',
+            models: '个模型',
+            hardwareTargets: '类硬件目标',
+            workloads: '个工作负载',
+            sparseGroupsHidden: '个稀疏分组已隐藏',
+            completeGroups: '完整分组',
+            sparseGroups: '稀疏分组',
+            focusedScope: '锁定范围',
+            hiddenRows: '隐藏行数',
+            versusShort: '对比',
+        },
     };
 
     const VERSION_COMPONENTS = [
@@ -67,16 +332,28 @@
             'multi-chip': { engine: '', hardware: '', model: '', version: '', workload: '', precision: '' },
             'multi-node': { engine: '', hardware: '', model: '', version: '', workload: '', precision: '' }
         },
+        viewOptions: {
+            'single-chip': { sameScopeOnly: false, hideIncompleteGroups: true },
+            'multi-chip': { sameScopeOnly: false, hideIncompleteGroups: true },
+            'multi-node': { sameScopeOnly: false, hideIncompleteGroups: true }
+        },
         expandedRows: new Set()
     };
 
     // Initialize on DOM ready
     document.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('sagellm:langchange', () => {
+        renderFilters();
+        renderViewControls();
+        renderTable();
+        void renderLastUpdated();
+    });
 
     async function init() {
         await loadData();
         setupEventListeners();
         renderFilters();
+        renderViewControls();
         renderTable();
         await renderLastUpdated();
         void loadPyPIVersions();
@@ -298,7 +575,8 @@
     }
 
     function getWorkloadLabel(workloadId) {
-        return WORKLOAD_LABELS[workloadId] || workloadId;
+        const lang = getCurrentLang();
+        return (WORKLOAD_LABELS[lang] && WORKLOAD_LABELS[lang][workloadId]) || workloadId;
     }
 
     function compareByReleaseDateDesc(a, b) {
@@ -331,7 +609,17 @@
     }
 
     function getEngineLabel(engine) {
-        return ENGINE_LABELS[engine] || String(engine || 'unknown');
+        const lang = getCurrentLang();
+        return (ENGINE_LABELS[lang] && ENGINE_LABELS[lang][engine]) || String(engine || t('unknown'));
+    }
+
+    function getCurrentLang() {
+        return (window.sagellmCurrentLang || document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
+    }
+
+    function t(key) {
+        const lang = getCurrentLang();
+        return (UI_STRINGS[lang] && UI_STRINGS[lang][key]) || UI_STRINGS.en[key] || key;
     }
 
     function getEngineVersion(entry) {
@@ -573,6 +861,22 @@
                 });
             }
         });
+
+        const sameScopeToggle = document.getElementById('toggle-same-scope');
+        if (sameScopeToggle) {
+            sameScopeToggle.addEventListener('change', () => {
+                state.viewOptions[state.currentTab].sameScopeOnly = sameScopeToggle.checked;
+                renderTable();
+            });
+        }
+
+        const hideIncompleteToggle = document.getElementById('toggle-hide-incomplete');
+        if (hideIncompleteToggle) {
+            hideIncompleteToggle.addEventListener('change', () => {
+                state.viewOptions[state.currentTab].hideIncompleteGroups = hideIncompleteToggle.checked;
+                renderTable();
+            });
+        }
     }
 
     // Get data by tab
@@ -596,7 +900,22 @@
         });
 
         renderFilters();
+        renderViewControls();
         renderTable();
+    }
+
+    function renderViewControls() {
+        const viewOptions = state.viewOptions[state.currentTab];
+        const sameScopeToggle = document.getElementById('toggle-same-scope');
+        const hideIncompleteToggle = document.getElementById('toggle-hide-incomplete');
+
+        if (sameScopeToggle) {
+            sameScopeToggle.checked = viewOptions.sameScopeOnly;
+        }
+
+        if (hideIncompleteToggle) {
+            hideIncompleteToggle.checked = viewOptions.hideIncompleteGroups;
+        }
     }
 
     // Render filter dropdowns
@@ -668,6 +987,7 @@
 
         const data = getDataByTab(state.currentTab);
         const filters = state.filters[state.currentTab];
+        const viewOptions = state.viewOptions[state.currentTab];
 
         // Apply filters
         const filtered = data.filter(entry => {
@@ -680,19 +1000,25 @@
                 (filters.precision === 'all' || entry.model.precision === filters.precision);
         });
 
-        const mergedEntries = aggregateVersionBuilds(filtered);
+        const comparisonView = applyComparisonView(filtered, viewOptions);
+        const visibleEntries = comparisonView.visibleEntries;
+        const mergedEntries = aggregateVersionBuilds(visibleEntries);
         const sortedFiltered = sortForDisplay(mergedEntries, filters.workload);
+
+        renderCoverage(comparisonView);
 
         // Show empty state if no data
         if (mergedEntries.length === 0) {
             tbody.innerHTML = '';
             emptyState.style.display = 'block';
-            renderDataStats(data.length, 0, 0);
+            renderDataStats(data.length, filtered.length, visibleEntries.length, 0, comparisonView);
+            renderOverview([], comparisonView, viewOptions);
             return;
         }
 
         emptyState.style.display = 'none';
-        renderDataStats(data.length, filtered.length, mergedEntries.length);
+        renderDataStats(data.length, filtered.length, visibleEntries.length, mergedEntries.length, comparisonView);
+        renderOverview(sortedFiltered, comparisonView, viewOptions);
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
 
@@ -703,9 +1029,10 @@
             const currentVersion = getDisplayVersion(entry);
             const prevVersion = index > 0 ? getDisplayVersion(withTrends[index - 1]) : null;
             const showVersion = index === 0 || currentVersion !== prevVersion;
+            const isSparse = comparisonView.incompleteKeys.has(createCompareScopeKey(entry));
 
             return `
-                ${renderDataRow(entry, isLatest, isExpanded, showVersion)}
+                ${renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse)}
                 ${renderDetailsRow(entry, isExpanded)}
             `;
         }).join('');
@@ -714,13 +1041,55 @@
         attachRowEventListeners();
     }
 
-    function renderDataStats(tabTotal, rawFilteredTotal, mergedTotal) {
+    function renderDataStats(tabTotal, rawFilteredTotal, visibleTotal, mergedTotal, comparisonView) {
         const statsEl = document.getElementById('leaderboard-data-stats');
         if (!statsEl) {
             return;
         }
 
-        statsEl.textContent = `Loaded ${state.totalLoadedEntries} entries • ${state.currentTab}: ${tabTotal} • Matched ${rawFilteredTotal} build entries • Showing ${mergedTotal} merged entries`;
+        const hidden = Math.max(rawFilteredTotal - visibleTotal, 0);
+        const hiddenText = hidden > 0 ? ` • ${t('statsHidden')} ${hidden} ${t('statsSparseSuffix')}` : '';
+        statsEl.textContent = `${t('statsLoaded')} ${state.totalLoadedEntries} • ${state.currentTab}: ${tabTotal} • ${t('statsMatched')} ${rawFilteredTotal} ${t('statsBuildEntries')} • ${t('statsShowing')} ${mergedTotal} ${t('statsComparisonRows')} ${comparisonView.activeCoverage.completeGroupCount} ${t('statsCompleteGroups')}${hiddenText}`;
+    }
+
+    function renderOverview(entries, comparisonView, viewOptions) {
+        const el = document.getElementById('leaderboard-overview');
+        if (!el) {
+            return;
+        }
+
+        if (!entries.length) {
+            const reason = viewOptions.hideIncompleteGroups ? t('noComparableHidden') : t('noComparableRelax');
+            el.innerHTML = `
+                <div class="overview-hero">
+                    <div class="overview-kicker">${t('quickCompare')}</div>
+                    <div class="overview-title">${t('noComparableTitle')}</div>
+                    <div class="overview-subtitle">${reason}</div>
+                </div>
+            `;
+            return;
+        }
+
+        const summaries = summarizeEngines(entries);
+        const leaders = getLeaders(summaries);
+        const title = getOverviewTitle(summaries, leaders, comparisonView);
+        const subtitle = getOverviewSubtitle(entries, summaries.length, comparisonView, viewOptions);
+        const badges = getOverviewBadges(entries, summaries.length, leaders, comparisonView);
+
+        el.innerHTML = `
+            <div class="overview-hero">
+                <div class="overview-kicker">${t('quickCompare')}</div>
+                <div class="overview-title">${title}</div>
+                <div class="overview-subtitle">${subtitle}</div>
+                <div class="overview-badges">
+                    ${badges.map((badge) => `<div class="overview-badge">${badge}</div>`).join('')}
+                </div>
+                ${renderHeadToHead(summaries)}
+            </div>
+            <div class="overview-grid">
+                ${summaries.map((summary) => renderEngineSummaryCard(summary, leaders)).join('')}
+            </div>
+        `;
     }
 
     async function renderLastUpdated() {
@@ -735,25 +1104,24 @@
         }
 
         if (!timestamp) {
-            el.textContent = 'Last updated: -';
+            el.textContent = `${t('lastUpdated')}: -`;
             return;
         }
 
         const date = new Date(timestamp);
         if (Number.isNaN(date.getTime())) {
-            el.textContent = `Last updated: ${timestamp}`;
+            el.textContent = `${t('lastUpdated')}: ${timestamp}`;
             return;
         }
 
         const formatted = date.toISOString().replace('T', ' ').replace('.000Z', ' UTC');
-        el.textContent = `Last updated: ${formatted}`;
+        el.textContent = `${t('lastUpdated')}: ${formatted}`;
     }
 
     // Render data row
-    function renderDataRow(entry, isLatest, isExpanded, showVersion) {
+    function renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse) {
         const m = entry.metrics;
-        const t = entry.trends || {};
-        const bt = entry.baselineTrends || {};
+        const trends = entry.trends || {};
         const releaseDate = entry?.metadata?.release_date || '-';
         const displayVersion = getDisplayVersion(entry);
         const buildCount = entry.versionVariants?.length || 1;
@@ -764,26 +1132,26 @@
         const workloadText = getWorkloadLabel(getWorkloadId(entry));
 
         return `
-            <tr data-entry-id="${entry.entry_id}">
+            <tr data-entry-id="${entry.entry_id}" class="${isSparse ? 'is-sparse' : ''}">
                 <td>
                     <div class="version-cell">
                         ${showVersion ? `<div class="version-main">${engineLabel} v${displayVersion}<small class="version-date">(${releaseDate})</small></div>` : ''}
-                        ${showVersion && buildCount > 1 ? '<small class="version-merge-hint">Best 4th-segment result selected</small>' : ''}
+                        ${showVersion && buildCount > 1 ? `<small class="version-merge-hint">${t('bestFourth')}</small>` : ''}
+                        ${showVersion && isSparse ? `<small class="version-merge-hint sparse">${t('sparseGroup')}</small>` : ''}
                         ${(showVersion && (isLatest || entry.isBaseline))
-                            ? `<div class="version-badges">${isLatest ? '<span class="version-badge">Latest</span>' : ''}${entry.isBaseline ? '<span class="version-badge baseline">Baseline</span>' : ''}</div>`
+                            ? `<div class="version-badges">${isLatest ? `<span class="version-badge">${t('latest')}</span>` : ''}${entry.isBaseline ? `<span class="version-badge baseline">${t('baseline')}</span>` : ''}</div>`
                             : ''}
                     </div>
                 </td>
                 <td class="config-cell">${workloadText}</td>
                 <td class="config-cell">${configText}</td>
-                <td>${renderMetricCell(m.ttft_ms, t.ttft_ms, bt.ttft_ms, false, false, entry.isBaseline)}</td>
-                <td>${renderMetricCell(m.throughput_tps, t.throughput_tps, bt.throughput_tps, true, false, entry.isBaseline)}</td>
-                <td>${renderMetricCell(m.peak_mem_mb, t.peak_mem_mb, bt.peak_mem_mb, false, false, entry.isBaseline)}</td>
-                <td>${renderMetricCell(m.error_rate, t.error_rate, bt.error_rate, false, true, entry.isBaseline)}</td>
-                <td>${renderMetricCell(m.prefix_hit_rate, t.prefix_hit_rate, bt.prefix_hit_rate, true, true, entry.isBaseline)}</td>
+                <td>${renderMetricCell(m.ttft_ms, trends.ttft_ms, false, false, entry.isBaseline)}</td>
+                <td>${renderMetricCell(m.tbt_ms, trends.tbt_ms, false, false, entry.isBaseline)}</td>
+                <td>${renderMetricCell(m.throughput_tps, trends.throughput_tps, true, false, entry.isBaseline)}</td>
+                <td>${renderMetricCell(m.error_rate, trends.error_rate, false, true, entry.isBaseline)}</td>
                 <td class="action-cell">
                     <button class="btn-details" data-entry-id="${entry.entry_id}">
-                        ${isExpanded ? 'Hide' : (buildCount > 1 ? '4th Ver.' : 'Details')}
+                        ${isExpanded ? t('hide') : (buildCount > 1 ? t('fourthVersion') : t('details'))}
                     </button>
                 </td>
             </tr>
@@ -792,6 +1160,10 @@
 
     // 生成配置描述文本
     function getConfigText(entry) {
+        if (!entry || !entry.hardware) {
+            return t('unknown');
+        }
+
         const chipCount = entry.hardware.chip_count;
         const nodeCount = entry.cluster ? entry.cluster.node_count : 1;
 
@@ -805,23 +1177,21 @@
     }
 
     // Render metric cell with trend (双重对比：vs baseline 和 vs 上一版)
-    function renderMetricCell(value, prevTrend, baselineTrend, higherIsBetter, isPercentage = false, isBaseline = false) {
+    function renderMetricCell(value, trend, higherIsBetter, isPercentage = false, isBaseline = false) {
         const formattedValue = isPercentage ?
             (value * 100).toFixed(1) + '%' :
-            typeof value === 'number' ? value.toFixed(1) : value;
+            formatNumber(value);
 
         if (isBaseline) {
             return `<div class="metric-cell"><span class="metric-value">${formattedValue}</span></div>`;
         }
 
-        const prevTrendHtml = prevTrend !== undefined && prevTrend !== null ? formatTrendIndicator(prevTrend, higherIsBetter, 'vs Prev') : '';
-        const baseTrendHtml = baselineTrend !== undefined && baselineTrend !== null ? formatTrendIndicator(baselineTrend, higherIsBetter, 'vs Base') : '';
+        const trendHtml = trend !== undefined && trend !== null ? formatTrendIndicator(trend, higherIsBetter, t('vsPrev')) : '';
 
         return `
             <div class="metric-cell">
                 <span class="metric-value">${formattedValue}</span>
-                ${prevTrendHtml}
-                ${baseTrendHtml}
+                ${trendHtml}
             </div>
         `;
     }
@@ -843,7 +1213,7 @@
     function renderDetailsRow(entry, isExpanded) {
         return `
             <tr class="details-row ${isExpanded ? 'show' : ''}" data-details-for="${entry.entry_id}">
-                <td colspan="9" class="details-cell">
+                <td colspan="8" class="details-cell">
                     <div class="details-content">
                         ${renderHardwareSection(entry)}
                         ${renderBuildVariantsSection(entry)}
@@ -863,13 +1233,13 @@
 
         return `
             <div class="detail-section">
-                <h4>🔧 Hardware Configuration</h4>
-                <p><strong>Chip:</strong> ${hw.chip_model} × ${hw.chip_count}</p>
-                <p><strong>Total Memory:</strong> ${hw.total_memory_gb} GB</p>
+                <h4>${t('hardwareConfig')}</h4>
+                <p><strong>${t('chip')}:</strong> ${hw.chip_model} × ${hw.chip_count}</p>
+                <p><strong>${t('totalMemory')}:</strong> ${hw.total_memory_gb} GB</p>
                 ${env && env.cuda_version ? `<p><strong>CUDA:</strong> ${env.cuda_version}</p>` : ''}
                 ${env && env.cann_version ? `<p><strong>CANN:</strong> ${env.cann_version}</p>` : ''}
                 ${cluster ? `
-                    <p><strong>Cluster:</strong> ${cluster.node_count} nodes, ${cluster.interconnect} (${cluster.topology})</p>
+                    <p><strong>${t('cluster')}:</strong> ${cluster.node_count} ${t('nodes')}, ${cluster.interconnect} (${cluster.topology})</p>
                 ` : ''}
             </div>
         `;
@@ -884,10 +1254,10 @@
         if (engine !== 'sagellm') {
             return `
                 <div class="detail-section">
-                    <h4>📦 Engine Versions</h4>
-                    <p><strong>Engine:</strong> ${engineLabel}</p>
-                    <p><strong>Engine Version:</strong> ${engineVersion}</p>
-                    <p><strong>Benchmark:</strong> ${versions.benchmark || 'N/A'}</p>
+                    <h4>${t('engineVersions')}</h4>
+                    <p><strong>${t('engine')}:</strong> ${engineLabel}</p>
+                    <p><strong>${t('engineVersion')}:</strong> ${engineVersion}</p>
+                    <p><strong>${t('benchmark')}:</strong> ${versions.benchmark || 'N/A'}</p>
                 </div>
             `;
         }
@@ -910,17 +1280,17 @@
         const mismatchCount = rows.filter((row) => row.status === 'ahead').length;
         const historicalCount = rows.filter((row) => row.status === 'behind').length;
         const sourceHint = state.pypiLoaded
-            ? 'Source: benchmark metadata + PyPI latest reference'
-            : 'Source: benchmark metadata (PyPI versions loading...)';
+            ? t('versionSourceReady')
+            : t('versionSourceLoading');
 
         return `
             <div class="detail-section">
-                <h4>📦 Component Versions</h4>
-                ${rows.map((row) => `<p><strong>${row.label}:</strong> ${row.benchmarkVersion} <span style="color:#718096">| PyPI: ${row.pypiVersion}</span>${row.status === 'ahead' ? ' <span style="color:#e53e3e;font-weight:600">⚠ mismatch</span>' : row.status === 'behind' ? ' <span style="color:#718096;font-weight:600">ℹ historical</span>' : ''}</p>`).join('')}
+                <h4>${t('componentVersions')}</h4>
+                ${rows.map((row) => `<p><strong>${row.label}:</strong> ${row.benchmarkVersion} <span style="color:#718096">| PyPI: ${row.pypiVersion}</span>${row.status === 'ahead' ? ` <span style="color:#e53e3e;font-weight:600">${t('mismatch')}</span>` : row.status === 'behind' ? ` <span style="color:#718096;font-weight:600">${t('historical')}</span>` : ''}</p>`).join('')}
                 <p><small style="color:#718096">${sourceHint}</small></p>
-                ${mismatchCount > 0 ? '<p><small style="color:#e53e3e">检测到版本异常：benchmark 结果中的部分组件版本高于 PyPI 最新发布。</small></p>' : ''}
-                ${mismatchCount === 0 && historicalCount > 0 ? '<p><small style="color:#718096">检测到历史结果：部分组件版本低于 PyPI 最新发布。</small></p>' : ''}
-                ${state.pypiLoadError ? '<p><small style="color:#dd6b20">PyPI 版本拉取失败，仅展示 benchmark metadata。</small></p>' : ''}
+                ${mismatchCount > 0 ? `<p><small style="color:#e53e3e">${t('versionMismatchNote')}</small></p>` : ''}
+                ${mismatchCount === 0 && historicalCount > 0 ? `<p><small style="color:#718096">${t('historicalNote')}</small></p>` : ''}
+                ${state.pypiLoadError ? `<p><small style="color:#dd6b20">${t('pypiLoadError')}</small></p>` : ''}
             </div>
         `;
     }
@@ -930,19 +1300,19 @@
 
         return `
             <div class="detail-section">
-                <h4>🧩 Full Build Results</h4>
-                <p><strong>Displayed version:</strong> v${getDisplayVersion(entry)}（首页展示该三位版本下的最佳四位版本）</p>
+                <h4>${t('fullBuildResults')}</h4>
+                <p><strong>${t('displayedVersion')}:</strong> v${getDisplayVersion(entry)} ${t('bestFourthInline')}</p>
                 <div class="build-variants-table-wrap">
                     <table class="build-variants-table">
                         <thead>
                             <tr>
-                                <th>Full Version</th>
-                                <th>Release Date</th>
+                                <th>${t('fullVersion')}</th>
+                                <th>${t('releaseDate')}</th>
                                 <th>TTFT</th>
-                                <th>Tokens/s</th>
-                                <th>Peak Mem</th>
-                                <th>Error</th>
-                                <th>Hit Rate</th>
+                                <th>${t('tokensPerSecond')}</th>
+                                <th>${t('peakMem')}</th>
+                                <th>${t('error')}</th>
+                                <th>${t('hitRate')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -951,7 +1321,7 @@
             const selected = variant.entry_id === entry.entry_id ? 'selected' : '';
             return `
                                     <tr class="${selected}">
-                                        <td>${getEngineLabel(getEngine(variant))} v${getEngineVersion(variant)}${index === 0 ? ' ⭐' : ''}</td>
+                                        <td>${getEngineLabel(getEngine(variant))} v${getEngineVersion(variant)}${index === 0 ? ` ${t('selectedStar')}` : ''}</td>
                                         <td>${variant?.metadata?.release_date || '-'}</td>
                                         <td>${formatMetric(vm.ttft_ms)}</td>
                                         <td>${formatMetric(vm.throughput_tps)}</td>
@@ -1010,10 +1380,10 @@
         const meta = entry.metadata;
         return `
             <div class="detail-section">
-                <h4>🚀 Improvements</h4>
-                <p>${meta.notes || 'No specific improvements noted.'}</p>
-                <p><strong>Git Commit:</strong> <code>${meta.git_commit}</code></p>
-                <p><strong>Changelog:</strong> <a href="${meta.changelog_url}" target="_blank" style="color: #5a67d8;">View</a></p>
+                <h4>${t('improvements')}</h4>
+                <p>${meta.notes || t('noImprovements')}</p>
+                <p><strong>${t('gitCommit')}:</strong> <code>${meta.git_commit}</code></p>
+                <p><strong>${t('changelog')}:</strong> <a href="${meta.changelog_url}" target="_blank" style="color: #5a67d8;">${t('view')}</a></p>
             </div>
         `;
     }
@@ -1022,9 +1392,9 @@
         const cmd = entry.metadata.reproducible_cmd;
         return `
             <div class="detail-section">
-                <h4>🔁 Reproduce This Result</h4>
+                <h4>${t('reproduceThisResult')}</h4>
                 <div class="command-block">
-                    <button class="btn-copy" data-cmd="${encodeURIComponent(cmd)}">Copy</button>
+                    <button class="btn-copy" data-cmd="${encodeURIComponent(cmd)}">${t('copy')}</button>
                     <code>${cmd}</code>
                 </div>
             </div>
@@ -1063,22 +1433,22 @@
     // Copy to clipboard
     function copyToClipboard(text, btnEl) {
         navigator.clipboard.writeText(text).then(() => {
-            btnEl.textContent = 'Copied!';
+            btnEl.textContent = t('copiedBang');
             btnEl.classList.add('copied');
             setTimeout(() => {
-                btnEl.textContent = 'Copy';
+                btnEl.textContent = t('copy');
                 btnEl.classList.remove('copied');
             }, 2000);
         }).catch(err => {
             console.error('Failed to copy:', err);
-            alert('Failed to copy command');
+            alert(t('copyCommandFailed'));
         });
     }
 
     // Calculate trends between two versions
     function calculateTrends(current, previous) {
         const trends = {};
-        const metrics = ['ttft_ms', 'throughput_tps', 'peak_mem_mb', 'error_rate', 'prefix_hit_rate'];
+        const metrics = ['ttft_ms', 'tbt_ms', 'throughput_tps', 'error_rate'];
 
         metrics.forEach(metric => {
             const curr = current.metrics[metric];
@@ -1090,6 +1460,335 @@
         });
 
         return trends;
+    }
+
+    function createCompareScopeKey(entry) {
+        const model = entry?.model?.name || 'unknown-model';
+        const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
+        const precision = entry?.model?.precision || 'unknown-precision';
+        const workload = getWorkloadId(entry) || 'Other';
+        const configType = entry?.config_type || state.currentTab || 'unknown-config';
+        const chipCount = entry?.hardware?.chip_count || 0;
+        const nodeCount = entry?.cluster?.node_count || 1;
+        return [model, hardware, precision, workload, configType, chipCount, nodeCount].join('|');
+    }
+
+    function buildScopeLabel(entry) {
+        const model = entry?.model?.name || 'Unknown model';
+        const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
+        const workload = getWorkloadLabel(getWorkloadId(entry));
+        return `${model} • ${hardware} • ${workload}`;
+    }
+
+    function buildCompareGroups(entries) {
+        const groups = new Map();
+
+        entries.forEach((entry) => {
+            const key = createCompareScopeKey(entry);
+            if (!groups.has(key)) {
+                groups.set(key, {
+                    key,
+                    entries: [],
+                    engines: new Set(),
+                    summaryLabel: buildScopeLabel(entry),
+                });
+            }
+            const group = groups.get(key);
+            group.entries.push(entry);
+            group.engines.add(getEngine(entry));
+        });
+
+        return Array.from(groups.values()).map((group) => ({
+            ...group,
+            engineCount: group.engines.size,
+            isComplete: group.engines.size >= 2,
+        }));
+    }
+
+    function selectFocusGroup(groups) {
+        if (!groups.length) {
+            return null;
+        }
+
+        const candidates = groups.some((group) => group.isComplete)
+            ? groups.filter((group) => group.isComplete)
+            : groups;
+
+        return [...candidates].sort((a, b) => {
+            if (b.engineCount !== a.engineCount) {
+                return b.engineCount - a.engineCount;
+            }
+            if (b.entries.length !== a.entries.length) {
+                return b.entries.length - a.entries.length;
+            }
+
+            const latestA = [...a.entries].sort(compareByReleaseDateDesc)[0];
+            const latestB = [...b.entries].sort(compareByReleaseDateDesc)[0];
+            return compareByReleaseDateDesc(latestB, latestA);
+        })[0] || null;
+    }
+
+    function applyComparisonView(entries, viewOptions) {
+        const totalGroups = buildCompareGroups(entries);
+        let visibleEntries = [...entries];
+        let focusGroup = null;
+
+        if (viewOptions.sameScopeOnly) {
+            focusGroup = selectFocusGroup(totalGroups);
+            visibleEntries = focusGroup ? [...focusGroup.entries] : [];
+        }
+
+        let activeGroups = buildCompareGroups(visibleEntries);
+
+        if (viewOptions.hideIncompleteGroups) {
+            const completeKeys = new Set(activeGroups.filter((group) => group.isComplete).map((group) => group.key));
+            visibleEntries = visibleEntries.filter((entry) => completeKeys.has(createCompareScopeKey(entry)));
+            activeGroups = buildCompareGroups(visibleEntries);
+        }
+
+        const incompleteKeys = new Set(totalGroups.filter((group) => !group.isComplete).map((group) => group.key));
+
+        return {
+            visibleEntries,
+            focusGroup,
+            incompleteKeys,
+            totalIncompleteGroups: totalGroups.filter((group) => !group.isComplete).length,
+            hiddenCount: Math.max(entries.length - visibleEntries.length, 0),
+            activeCoverage: {
+                groupCount: activeGroups.length,
+                completeGroupCount: activeGroups.filter((group) => group.isComplete).length,
+            },
+        };
+    }
+
+    function summarizeEngines(entries) {
+        const grouped = new Map();
+
+        entries.forEach((entry) => {
+            const engine = getEngine(entry);
+            if (!grouped.has(engine)) {
+                grouped.set(engine, []);
+            }
+            grouped.get(engine).push(entry);
+        });
+
+        return Array.from(grouped.entries())
+            .map(([engine, engineEntries]) => {
+                const bestEntry = [...engineEntries].sort((a, b) => compareEntryQuality(b, a))[0];
+                return {
+                    engine,
+                    label: getEngineLabel(engine),
+                    count: engineEntries.length,
+                    avgTTFT: averageMetric(engineEntries, 'ttft_ms'),
+                    avgTBT: averageMetric(engineEntries, 'tbt_ms'),
+                    avgTPS: averageMetric(engineEntries, 'throughput_tps'),
+                    avgError: averageMetric(engineEntries, 'error_rate'),
+                    bestEntry,
+                    version: getEngineVersion(bestEntry) || getDisplayVersion(bestEntry) || 'N/A',
+                };
+            })
+            .sort((a, b) => (b.avgTPS || 0) - (a.avgTPS || 0));
+    }
+
+    function averageMetric(entries, metric) {
+        const values = entries
+            .map((entry) => Number(entry?.metrics?.[metric]))
+            .filter((value) => Number.isFinite(value));
+
+        if (!values.length) {
+            return null;
+        }
+
+        return values.reduce((sum, value) => sum + value, 0) / values.length;
+    }
+
+    function getLeaders(summaries) {
+        if (!summaries.length) {
+            return { throughput: null, ttft: null, tbt: null };
+        }
+
+        return {
+            throughput: [...summaries].filter((item) => item.avgTPS != null).sort((a, b) => b.avgTPS - a.avgTPS)[0] || null,
+            ttft: [...summaries].filter((item) => item.avgTTFT != null).sort((a, b) => a.avgTTFT - b.avgTTFT)[0] || null,
+            tbt: [...summaries].filter((item) => item.avgTBT != null).sort((a, b) => a.avgTBT - b.avgTBT)[0] || null,
+        };
+    }
+
+    function getOverviewTitle(summaries, leaders, comparisonView) {
+        if (summaries.length === 1) {
+            return `${summaries[0].label} ${t('onlyEngineView')}`;
+        }
+
+        const leader = leaders.throughput;
+        const runnerUp = summaries[1];
+        if (!leader || !runnerUp || !Number.isFinite(leader.avgTPS) || !Number.isFinite(runnerUp.avgTPS) || runnerUp.avgTPS === 0) {
+            return `${t('comparing')} ${summaries.length} ${t('enginesInView')}`;
+        }
+
+        const delta = ((leader.avgTPS - runnerUp.avgTPS) / runnerUp.avgTPS) * 100;
+        const scopePrefix = comparisonView.focusGroup ? `${t('focusedSlice')} ` : '';
+        return `${scopePrefix}${leader.label} ${t('leadsCurrentView')} ${delta.toFixed(1)}% ${t('throughputOver')} ${runnerUp.label}.`;
+    }
+
+    function getOverviewSubtitle(entries, engineCount, comparisonView, viewOptions) {
+        const models = getUniqueValues(entries, (entry) => entry?.model?.name);
+        const hardware = getUniqueValues(entries, (entry) => entry?.hardware?.chip_model);
+        const workloads = getUniqueValues(entries, (entry) => getWorkloadId(entry));
+
+        const modelText = models.length === 1 ? models[0] : `${models.length} ${t('models')}`;
+        const hardwareText = hardware.length === 1 ? hardware[0] : `${hardware.length} ${t('hardwareTargets')}`;
+        const workloadText = workloads.length === 1 ? getWorkloadLabel(workloads[0]) : `${workloads.length} ${t('workloads')}`;
+        const scopeText = `${modelText} • ${hardwareText} • ${workloadText}`;
+
+        if (comparisonView.focusGroup) {
+            return scopeText;
+        }
+
+        if (comparisonView.totalIncompleteGroups > 0 && viewOptions.hideIncompleteGroups) {
+            return `${scopeText} • ${comparisonView.totalIncompleteGroups} ${t('sparseGroupsHidden')}`;
+        }
+
+        return scopeText;
+    }
+
+    function getOverviewBadges(entries, engineCount, leaders, comparisonView) {
+        const badges = [`${entries.length} ${t('rows')}`, `${engineCount} ${t('engines')}`];
+
+        if (comparisonView.activeCoverage.completeGroupCount) {
+            badges.push(`${comparisonView.activeCoverage.completeGroupCount} ${t('completeCompareGroups')}`);
+        }
+
+        if (leaders.throughput) {
+            badges.push(`${leaders.throughput.label} ${t('leadsThroughput')}`);
+        }
+
+        return badges.slice(0, 4);
+    }
+
+    function renderCoverage(comparisonView) {
+        const el = document.getElementById('leaderboard-coverage');
+        if (!el) {
+            return;
+        }
+
+        const pills = [];
+        pills.push(`<span class="coverage-pill success">${t('completeGroups')}: ${comparisonView.activeCoverage.completeGroupCount}</span>`);
+
+        if (comparisonView.totalIncompleteGroups > 0) {
+            pills.push(`<span class="coverage-pill warning">${t('sparseGroups')}: ${comparisonView.totalIncompleteGroups}</span>`);
+        }
+
+        if (comparisonView.focusGroup) {
+            pills.push(`<span class="coverage-pill">${t('focusedScope')}: ${comparisonView.focusGroup.summaryLabel}</span>`);
+        }
+
+        if (comparisonView.hiddenCount > 0) {
+            pills.push(`<span class="coverage-pill warning">${t('hiddenRows')}: ${comparisonView.hiddenCount}</span>`);
+        }
+
+        el.innerHTML = pills.join('');
+    }
+
+    function renderHeadToHead(summaries) {
+        if (summaries.length !== 2) {
+            return '';
+        }
+
+        const [left, right] = summaries;
+        const tpsDelta = relativeDelta(left.avgTPS, right.avgTPS, true);
+        const ttftDelta = relativeDelta(left.avgTTFT, right.avgTTFT, false);
+        const tbtDelta = relativeDelta(left.avgTBT, right.avgTBT, false);
+
+        return `
+            <div class="head-to-head">
+                <div class="head-to-head-side">
+                    <strong>${left.label}</strong>
+                    <span>TTFT ${formatNumber(left.avgTTFT)} ms • TBT ${formatNumber(left.avgTBT)} ms • TPS ${formatNumber(left.avgTPS)}</span>
+                </div>
+                <div class="head-to-head-divider">${t('versusShort')}</div>
+                <div class="head-to-head-side">
+                    <strong>${right.label}</strong>
+                    <span>TTFT ${formatNumber(right.avgTTFT)} ms • TBT ${formatNumber(right.avgTBT)} ms • TPS ${formatNumber(right.avgTPS)}</span>
+                </div>
+            </div>
+            <div class="head-to-head-deltas">
+                <div class="head-to-head-delta">${t('throughputGap')}: ${tpsDelta}</div>
+                <div class="head-to-head-delta">TTFT ${t('gap')}: ${ttftDelta}</div>
+                <div class="head-to-head-delta">TBT ${t('gap')}: ${tbtDelta}</div>
+            </div>
+        `;
+    }
+
+    function relativeDelta(left, right, higherIsBetter) {
+        if (!Number.isFinite(left) || !Number.isFinite(right) || right === 0) {
+            return '-';
+        }
+
+        const delta = ((left - right) / Math.abs(right)) * 100;
+        const label = delta === 0 ? t('parity') : `${Math.abs(delta).toFixed(1)}%`;
+
+        if (delta === 0) {
+            return label;
+        }
+
+        const isBetter = higherIsBetter ? delta > 0 : delta < 0;
+        return isBetter ? `${label} ${t('better')}` : `${label} ${t('worse')}`;
+    }
+
+    function renderEngineSummaryCard(summary, leaders) {
+        const bestEntry = summary.bestEntry || {};
+        const isLeader = leaders.throughput && leaders.throughput.engine === summary.engine;
+
+        return `
+            <div class="engine-summary-card ${isLeader ? 'is-leader' : ''}">
+                <div class="engine-summary-head">
+                    <span class="engine-chip">${summary.label}</span>
+                    ${isLeader ? `<span class="leader-mark">${t('throughputLeader')}</span>` : `<span class="leader-mark">${summary.count} ${summary.count > 1 ? t('rows') : t('row')}</span>`}
+                </div>
+                <div class="engine-summary-version">${t('bestVisibleVersion')} ${summary.version}</div>
+                <div class="engine-summary-metrics">
+                    <div class="summary-metric">
+                        <span>${t('avgTTFT')}</span>
+                        <strong>${formatNumber(summary.avgTTFT)} ms</strong>
+                    </div>
+                    <div class="summary-metric">
+                        <span>${t('avgTBT')}</span>
+                        <strong>${formatNumber(summary.avgTBT)} ms</strong>
+                    </div>
+                    <div class="summary-metric">
+                        <span>${t('avgThroughput')}</span>
+                        <strong>${formatNumber(summary.avgTPS)} tok/s</strong>
+                    </div>
+                    <div class="summary-metric">
+                        <span>${t('errorRate')}</span>
+                        <strong>${formatPercent(summary.avgError)}</strong>
+                    </div>
+                </div>
+                <div class="engine-summary-footer">
+                    ${t('bestVisibleRun')}: ${getWorkloadLabel(getWorkloadId(bestEntry))} • ${getConfigText(bestEntry).replace('<br><small>', ' • ').replace('</small>', '')}
+                </div>
+            </div>
+        `;
+    }
+
+    function formatNumber(value) {
+        if (value === null || value === undefined || Number.isNaN(value)) {
+            return '-';
+        }
+
+        if (typeof value === 'number') {
+            return value.toFixed(1);
+        }
+
+        return String(value);
+    }
+
+    function formatPercent(value) {
+        if (value === null || value === undefined || Number.isNaN(value)) {
+            return '-';
+        }
+
+        return `${(value * 100).toFixed(1)}%`;
     }
 
     // Compare semantic versions (e.g., "0.3.2" > "0.3.1")
