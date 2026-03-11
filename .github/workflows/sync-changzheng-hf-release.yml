@@ -1,0 +1,83 @@
+name: Sync Changzheng Release from Hugging Face
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '15 * * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [changzheng-release-updated]
+
+jobs:
+  sync-changzheng-release:
+    runs-on: ubuntu-latest
+    env:
+      HF_REPO: intellistream/sagellm-benchmark-results
+      HF_RELEASE_DIR: changzheng/windows
+
+    steps:
+      - name: Checkout website repo
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download Changzheng release manifest from Hugging Face
+        run: |
+          mkdir -p .tmp/changzheng/windows
+          curl -L "https://huggingface.co/datasets/${HF_REPO}/resolve/main/${HF_RELEASE_DIR}/LATEST.json" \
+               -o .tmp/changzheng/windows/LATEST.json
+          curl -L "https://huggingface.co/datasets/${HF_REPO}/resolve/main/${HF_RELEASE_DIR}/RELEASES.json" \
+               -o .tmp/changzheng/windows/RELEASES.json
+
+      - name: Download Changzheng release artifacts from Hugging Face
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          root = Path('.tmp/changzheng/windows')
+          payload = json.loads((root / 'LATEST.json').read_text(encoding='utf-8-sig'))
+          artifacts = payload.get('artifacts') or []
+          if not artifacts:
+              raise SystemExit('LATEST.json missing artifacts')
+
+          hf_repo = 'intellistream/sagellm-benchmark-results'
+          hf_release_dir = 'changzheng/windows'.strip('/')
+          for artifact in artifacts:
+              file_name = artifact['fileName']
+              for name in (file_name, f"{file_name}.sha256"):
+                  url = f"https://huggingface.co/datasets/{hf_repo}/resolve/main/{hf_release_dir}/{name}"
+                  target = root / name
+                  subprocess.run(['curl', '-L', url, '-o', str(target)], check=True)
+          PY
+
+      - name: Sync downloaded release into website static directory
+        run: |
+          python scripts/sync_changzheng_release.py \
+            --source-dir .tmp/changzheng/windows \
+            --dest-dir downloads/changzheng/windows \
+            --site-data data/changzheng_release.json \
+            --base-url /downloads/changzheng/windows
+
+      - name: Check for changes
+        id: check
+        run: |
+          if git diff --quiet downloads/changzheng/windows data/changzheng_release.json; then
+            echo "No Changzheng release changes detected"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changzheng release changes detected"
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add downloads/changzheng/windows data/changzheng_release.json
+          git commit -m "chore: sync changzheng release from Hugging Face [skip ci]"
+          git push

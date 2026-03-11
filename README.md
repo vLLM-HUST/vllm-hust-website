@@ -67,3 +67,26 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 ```
 
 > 注意：脚本不会创建 `venv/.venv`，请使用当前已配置的非-venv Python 环境。
+
+## Changzheng Public Download Sync
+
+`changzheng-desktop` 在 Windows 构建机完成安装包归档后，会先上传到 Hugging Face dataset，再由 website 定时拉取并发布：
+
+- `release/windows/LATEST.json`
+- `release/windows/RELEASES.json`
+- 版本化 `.msi` / `.exe`
+- 对应 `.sha256`
+
+website 仓库是 public，因此可直接把这些文件同步到站点静态目录：
+
+- Hugging Face 路径：`intellistream/sagellm-benchmark-results/changzheng/windows`
+- 目标目录：`downloads/changzheng/windows/`
+- 首页摘要数据：`data/changzheng_release.json`
+- 本地同步脚本：`scripts/sync_changzheng_release.py`
+- 自动拉取 workflow：`.github/workflows/sync-changzheng-hf-release.yml`
+
+同步完成后：
+
+- 首页长征区块会直接指向公开 `.msi/.exe`
+- 独立下载页位于 `downloads/changzheng/windows/index.html`
+- 下载页会展示全部产物与 SHA256 校验信息
