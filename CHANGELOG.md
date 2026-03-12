@@ -7,6 +7,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- `.gitignore` 现在默认忽略本地 `.env` / `.env.local` / `.env.*` 配置文件，同时保留 `.env.example` / `.env.template` 模板文件可提交，避免网站同步脚本或本地凭证被误提交。
+- 官网首页下载区块的 DOM / i18n 标识已从 `qinglu_*` 统一清理为 `changzheng_*`，避免品牌改名后继续保留旧内部命名。
+- 移除 legacy 的 `downloads/qinglu/windows/` 静态下载页、`data/qinglu_release.json` 与旧同步脚本，统一只保留长征下载链路。
+- Hugging Face 自动拉取 workflow 已重命名为 `sync-changzheng-hf-release.yml`，并改为同步 `changzheng/windows` 发布目录。
+- 长征 Desktop 下载清单与同步脚本中的文档仓库链接已切换到新远程 `intellistream/changzheng-desktop`，避免官网继续指向已改名的旧仓库地址。
+- `hooks/pre-push` 默认不再因检测到发布凭证而自动发布；只有显式使用 `git push -o sagellm-publish origin main-dev` 或 `SAGELLM_PUBLISH_ON_PUSH=1 git push origin main-dev` 时才会触发发布。
+- `hooks/post-commit` 默认不再在每次提交后自动 bump 版本；普通 `git push` 也不再触发 PyPI 版本冲突检查，只有显式发布时才会处理版本号。
+- 青炉下载链路改为“qinglu-desktop 先上传到 Hugging Face dataset，website 再定时拉取到静态目录”，降低 website 对桌面仓库工作区的直接依赖。
+
+- 同步 2026-03-09 A100 单机 `sagellm vs vllm` live compare 结果到 leaderboard 数据源，新增 `deepseek-ai/DeepSeek-R1-Distill-Qwen-7B` 的 `sagellm` 与 `vllm` 两条单机记录，并刷新 `data/last_updated.json`。
+- 重构 leaderboard 展示布局，新增顶部引擎对比摘要卡片、更聚焦的主表指标，以及“只看同模型同硬件 / 隐藏缺少对比的数据”开关与 coverage 提示，使不同引擎的延迟与吞吐差异更易读。
+- 首页与 leaderboard 动态内容补齐中英双语切换，覆盖摘要卡片、对比提示、详情面板、版本构建表、复制按钮与最近更新时间，确保整页语言切换一致。
+- 精简首页首屏文案，移除发布横幅中的长段说明，并将 Quick Start 引导压缩为一句动作导向提示，减少首屏阅读负担。
+- 进一步收敛首页信息层级：移除首屏 release banner，仅保留简洁 hero 定位语与更短的 Quick Start 辅助文案，减少视觉噪音与重复解释。
+- 将首页前半段重组为更清晰的 launchpad 双栏布局：左侧 live demo，右侧紧凑 quickstart，减少连续大卡片堆叠带来的拥挤感，并继续压缩首屏说明文字。
+- 首页叙事主轴调整为“科学发现大模型 + 国产硬件优先”，并将 benchmark / leaderboard / 引擎对比明确降级为验证与优化方法，而非产品主目标。
+- leaderboard 过滤区新增可点击展开的 Q1-Q8 query 说明菜单，明确每类 workload 的测试意图，避免用户只看到代号而无法理解 benchmark 语义。
+- Q1-Q8 query 说明菜单升级为二级 accordion：点击单个 query 单独展开并自动收起其他项，降低一次性信息展开带来的视觉干扰。
+
 ### Fixed
 
 - **CI/CD pre-commit 错误修复**：
@@ -23,12 +43,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- 首页新增 **SageLLM Workstation 动画预览区块**，用于展示已验证的 workstation → gateway → engine 交互形态，适配启动会与官网演示场景
+- 首页新增 **青炉 Desktop 下载区块**，并增加 `data/qinglu_release.json` 作为官网桌面发布入口的数据源
+- 新增 `downloads/qinglu/windows/index.html` 公开下载页，以及 `scripts/sync_qinglu_release.py`，用于把 `qinglu-desktop` 的 Windows 安装包同步到 public website 静态目录
+
+### Changed
+
+- 官网顶部终端演示改为贴近真实 Quick Start 的安装 / 启动 / 健康检查 / 模型列表流程，并将 `scripts/generate_cast.py` 重构为可基于在线服务实时生成 cast 资源
+- workstation 展示区改为更克制的纯产品展示样式，弱化动画感与宣传感，突出界面结构与基础信息布局
+- 青炉下载链路由“官网 + 外部 release”调整为“官网首页摘要 + 官网静态下载页直出安装包”，并在 manifest 中预留真实 `.msi/.exe` / SHA256 列表字段
+
 - **[#14 #15 + sagellm#26 #28] Leaderboard MVP（Schema-first）**
   - 新增并冻结 MVP 数据契约：`data/schemas/leaderboard_v1.schema.json`（兼容单条 entry 与 entry 列表）
   - 补齐最小多机展示数据：`data/leaderboard_multi.json`（1 条 multi-node 样例）
   - 首页 Leaderboard 区块新增数据模型标识，确保展示与 schema 来源一致
 
 ### Changed
+
+- Leaderboard 前端支持多引擎展示：新增 `Engine` 筛选器，版本聚合/排序/去重改为 engine-aware（`engine + engine_version`），并对非 `sagellm` 引擎显示通用 `Engine Versions` 面板。
+- `data/schemas/leaderboard_v1.schema.json` 扩展可选字段 `engine` / `engine_version`（entry 与 metadata），保持历史 `sagellm_version` 数据兼容。
 
 - `data/validate_schema.py` 升级为可一次校验多个文件，支持 object/array 两种 payload，输出统一 pass/fail 摘要
 - `data/FIELD_SPECIFICATION.md`、`data/VALIDATION_RULES.md` 收敛为 MVP 规范，字段与网站展示列一一对应

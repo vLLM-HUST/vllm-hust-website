@@ -36,6 +36,11 @@ Thumbs.db
 *.tmp
 *.bak
 *.log
+.env
+.env.local
+.env.*
+!.env.example
+!.env.template
 
 # =============================================================================
 # Benchmark 数据文件规则

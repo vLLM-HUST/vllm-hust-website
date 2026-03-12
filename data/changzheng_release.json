@@ -1,0 +1,27 @@
+{
+  "title": "长征 Windows 安装包",
+  "description": "面向科学发现大模型的桌面工作台，提供本地 gateway 管理、内嵌 workstation、日志诊断与公开下载链路。",
+  "version": "0.1.0.0",
+  "channel": "Public Preview",
+  "platform": "Windows x64",
+  "distribution": "Public website static hosting",
+  "download_url": "/downloads/changzheng/windows/changzheng-v0.1.0.0-windows-nsis-changzheng_0.1.0_x64-setup.exe",
+  "release_url": "/downloads/changzheng/windows/",
+  "docs_url": "https://github.com/intellistream/changzheng-desktop/blob/main-dev/docs/WINDOWS_RELEASE.md",
+  "note": "官网仓库是 public，因此可以直接托管 .msi/.exe 与 SHA256 文件；首页展示摘要，完整文件列表放在独立下载页。",
+  "published_at": "2026-03-10T22:22:43",
+  "latest_artifact_name": "changzheng-v0.1.0.0-windows-nsis-changzheng_0.1.0_x64-setup.exe",
+  "latest_artifact_url": "/downloads/changzheng/windows/changzheng-v0.1.0.0-windows-nsis-changzheng_0.1.0_x64-setup.exe",
+  "artifacts": [
+    {
+      "file_name": "changzheng-v0.1.0.0-windows-nsis-changzheng_0.1.0_x64-setup.exe",
+      "source_name": "长征_0.1.0_x64-setup.exe",
+      "kind": "exe",
+      "url": "/downloads/changzheng/windows/changzheng-v0.1.0.0-windows-nsis-changzheng_0.1.0_x64-setup.exe",
+      "sha256": "715A346534F997D75B3A4336BEB59B20783A4C4A31E67B802B022E69BA5BE8BA",
+      "sha256_url": "/downloads/changzheng/windows/changzheng-v0.1.0.0-windows-nsis-changzheng_0.1.0_x64-setup.exe.sha256",
+      "size": 1956749,
+      "archived_at": "2026-03-10T22:22:43"
+    }
+  ]
+}

@@ -38,6 +38,12 @@
           "type": "string",
           "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
         },
+        "engine": {
+          "type": "string"
+        },
+        "engine_version": {
+          "type": "string"
+        },
         "sagellm_version": {
           "type": "string",
           "pattern": "^\\d+\\.\\d+\\.\\d+(\\.\\d+)?$"
@@ -203,6 +209,8 @@
             "submitted_at": { "type": "string", "format": "date-time" },
             "submitter": { "type": "string" },
             "data_source": { "type": "string" },
+            "engine": { "type": ["string", "null"] },
+            "engine_version": { "type": ["string", "null"] },
             "reproducible_cmd": { "type": ["string", "null"] },
             "git_commit": { "type": ["string", "null"] },
             "release_date": { "type": ["string", "null"], "format": "date" },
