@@ -23,7 +23,7 @@ jobs:
       - name: Checkout website repo
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: main-dev
 
       - name: Download data from Hugging Face
         run: |
@@ -77,4 +77,4 @@ jobs:
 
           git add data/
           git commit -m "chore: sync benchmark data from Hugging Face [skip ci]"
-          git push
+          git push origin HEAD:main-dev

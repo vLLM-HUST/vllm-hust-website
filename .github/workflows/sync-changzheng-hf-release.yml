@@ -21,7 +21,7 @@ jobs:
       - name: Checkout website repo
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: main-dev
 
       - name: Download Changzheng release manifest from Hugging Face
         run: |
@@ -80,4 +80,4 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add downloads/changzheng/windows data/changzheng_release.json
           git commit -m "chore: sync changzheng release from Hugging Face [skip ci]"
-          git push
+          git push origin HEAD:main-dev

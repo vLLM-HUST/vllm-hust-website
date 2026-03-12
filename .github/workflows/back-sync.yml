@@ -1,55 +1,14 @@
-# Back-sync: main → main-dev (website edition — direct push, no PR)
-#
-# website 的 main 会被定时 bot (sync-hf-data) 直接写入，每小时一次。
-# PR 模式会产生大量噪音 PR，因此对 website 采用直接 merge-push 模式：
-#   - 仅当 patch 级存在差异时才操作
-#   - 无需 code review（均为自动化数据提交）
-#   - 保留完整 merge commit，merge graph 可追溯
+# Deprecated placeholder: main-dev is the only automation write target.
 
-name: Back-Sync main → main-dev
+name: Back-Sync main → main-dev (disabled)
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  back-sync:
-    name: Detect drift and direct-push back-sync
+  back-sync-disabled:
+    name: Back-sync disabled
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Fetch both branches
-        run: git fetch origin main main-dev --prune
-
-      - name: Check patch-level drift
-        id: drift
-        run: |
-          count=$(git cherry origin/main-dev origin/main | grep -c '^+' || echo 0)
-          echo "patch_count=${count}" >> "$GITHUB_OUTPUT"
-          if [ "${count}" -gt 0 ]; then
-            echo "has_drift=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_drift=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Skip — no patch-level drift
-        if: steps.drift.outputs.has_drift == 'false'
-        run: echo "main and main-dev are patch-equivalent. Nothing to do."
-
-      - name: Merge main into main-dev and push
-        if: steps.drift.outputs.has_drift == 'true'
-        run: |
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git checkout main-dev
-          git merge --no-ff origin/main -m "chore: back-sync main into main-dev [auto]"
-          git push origin main-dev
+      - name: Explain disabled workflow
+        run: echo "Back-sync is disabled. Automated content sync must write to main-dev only."
