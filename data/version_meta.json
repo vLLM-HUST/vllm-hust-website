@@ -22,72 +22,72 @@
       "name": "sagellm (umbrella)",
       "repo": "https://github.com/intellistream/sagellm",
       "pypi_name": "isagellm",
-      "version": "0.5.4.59",
+      "version": "0.5.4.23",
       "group": "core"
     },
     {
       "name": "sagellm-protocol",
       "repo": "https://github.com/intellistream/sagellm-protocol",
       "pypi_name": "isagellm-protocol",
-      "version": "0.5.4.13",
+      "version": "0.5.4.7",
       "group": "core"
     },
     {
       "name": "sagellm-backend",
       "repo": "https://github.com/intellistream/sagellm-backend",
       "pypi_name": "isagellm-backend",
-      "version": "0.5.4.16",
+      "version": "0.5.4.8",
       "group": "core"
     },
     {
       "name": "sagellm-core",
       "repo": "https://github.com/intellistream/sagellm-core",
       "pypi_name": "isagellm-core",
-      "version": "0.5.4.25",
+      "version": "0.5.4.5",
       "group": "core"
     },
     {
       "name": "sagellm-control-plane",
       "repo": "https://github.com/intellistream/sagellm-control-plane",
       "pypi_name": "isagellm-control-plane",
-      "version": "0.5.4.12",
+      "version": "0.5.4.7",
       "group": "infrastructure"
     },
     {
       "name": "sagellm-gateway",
       "repo": "https://github.com/intellistream/sagellm-gateway",
       "pypi_name": "isagellm-gateway",
-      "version": "0.5.4.13",
+      "version": "0.5.4.7",
       "group": "infrastructure"
     },
     {
       "name": "sagellm-kv-cache",
       "repo": "https://github.com/intellistream/sagellm-kv-cache",
       "pypi_name": "isagellm-kv-cache",
-      "version": "0.5.4.14",
+      "version": "0.5.4.8",
       "group": "infrastructure"
     },
     {
       "name": "sagellm-comm",
       "repo": "https://github.com/intellistream/sagellm-comm",
       "pypi_name": "isagellm-comm",
-      "version": "0.5.4.13",
+      "version": "0.5.4.9",
       "group": "infrastructure"
     },
     {
       "name": "sagellm-compression",
       "repo": "https://github.com/intellistream/sagellm-compression",
       "pypi_name": "isagellm-compression",
-      "version": "0.5.4.11",
+      "version": "0.5.4.6",
       "group": "infrastructure"
     },
     {
       "name": "sagellm-benchmark",
       "repo": "https://github.com/intellistream/sagellm-benchmark",
       "pypi_name": "isagellm-benchmark",
-      "version": "0.5.4.8",
+      "version": "0.5.4.5",
       "group": "infrastructure"
     }
   ],
-  "updated_at": "2026-03-09"
+  "updated_at": "2026-03-03"
 }

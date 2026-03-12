@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Post-commit hook — auto-bump version after each commit.
+# Post-commit hook — optional version bump after each commit.
 # Supports two version sources:
 #   1) src/**/_version.py: __version__ = "X.Y.Z(.N)"
 #   2) pyproject.toml:     version = "X.Y.Z(.N)"
@@ -11,6 +11,11 @@ if [ -f ".git/SAGE_POST_COMMIT_RUNNING" ]; then
 fi
 
 if [ "${SAGE_SKIP_VERSION_BUMP:-0}" = "1" ]; then
+    exit 0
+fi
+
+# Default-off: frequent version bumps are unnecessary when push no longer auto-publishes.
+if [ "${SAGE_AUTO_BUMP_ON_COMMIT:-0}" != "1" ]; then
     exit 0
 fi
 

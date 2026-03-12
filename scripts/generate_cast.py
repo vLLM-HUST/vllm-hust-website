@@ -1,13 +1,32 @@
+from __future__ import annotations
+
+import argparse
 import json
 import time
-import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
 
 
-def create_cast_file(filename):
-    # Header
-    events = []
+PROMPT = "\u001b[1;32muser@sagellm\u001b[0m:\u001b[1;34m~\u001b[0m$ "
 
-    # Metadata
+
+def _http_get(url: str) -> str:
+    with urllib.request.urlopen(url, timeout=10) as resp:  # noqa: S310
+        return resp.read().decode("utf-8")
+
+
+def _safe_get(url: str) -> str:
+    try:
+        return _http_get(url)
+    except urllib.error.HTTPError as exc:
+        return f"HTTP {exc.code}: {exc.reason}"
+    except Exception as exc:  # noqa: BLE001
+        return f"ERROR: {exc}"
+
+
+def create_cast_file(filename: str, *, base_url: str, model: str, port: int) -> None:
+    events: list[list[object]] = []
     header = {
         "version": 2,
         "width": 100,
@@ -15,119 +34,75 @@ def create_cast_file(filename):
         "timestamp": int(time.time()),
         "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"},
     }
-
-    # Helper to add output event
-    # Format: [time, type, data]
-    # type "o" is stdout
     current_time = 0.0
 
-    def type_command(cmd, speed=0.1):
+    def emit(text: str, *, speed: float = 0.0) -> None:
         nonlocal current_time
-        # Prompt
-        events.append(
-            [
-                current_time,
-                "o",
-                "\u001b[1;32muser@sagellm\u001b[0m:\u001b[1;34m~\u001b[0m$ ",
-            ]
-        )
-        current_time += 0.5
-
-        for char in cmd:
+        if speed <= 0:
+            events.append([current_time, "o", text])
+            current_time += 0.08
+            return
+        for char in text:
             events.append([current_time, "o", char])
             current_time += speed
 
-        events.append([current_time, "o", "\r\n"])
-        current_time += 0.2
+    def newline(lines: str = "") -> None:
+        emit(lines.replace("\n", "\r\n") + "\r\n")
 
-    def print_output(text, speed=0.0):
+    def type_command(cmd: str, *, speed: float = 0.055) -> None:
         nonlocal current_time
-        if speed == 0:
-            events.append([current_time, "o", text + "\r\n"])
-            current_time += 0.05
-        else:
-            for char in text:
-                events.append([current_time, "o", char])
-                current_time += speed
-            events.append([current_time, "o", "\r\n"])
+        emit(PROMPT)
+        current_time += 0.35
+        emit(cmd, speed=speed)
+        emit("\r\n")
+        current_time += 0.25
 
-    def stream_tokens(text, token_speed=0.02):
-        nonlocal current_time
-        # Simulate token generation (words or subwords)
-        import re
+    health_body = _safe_get(f"{base_url}/health").strip()
+    models_body = _safe_get(f"{base_url}/v1/models").strip()
 
-        # Fix: terminal needs \r\n for new line, regular string has only \n
-        text = text.replace("\n", "\r\n")
-        tokens = re.split(r"(\s+)", text)
-        for token in tokens:
-            if not token:
-                continue
-            events.append([current_time, "o", token])
-            current_time += token_speed
+    type_command("pip install isagellm")
+    newline("Requirement already satisfied: isagellm")
+    newline()
 
-    # 1. Type the command
-    type_command('sage-llm run -p "Explain quantum physics" --backend ascend')
+    type_command(f"sagellm serve --backend cpu --model {model} --port {port}")
+    newline("🌐 Starting sageLLM Gateway...")
+    newline(f"📦 Model: {model}")
+    newline("🖥️  Backend: cpu")
+    newline(f"✅ OpenAI-compatible API ready at http://localhost:{port}")
+    newline()
 
-    # 2. Output header (Match real v0.4 output exactly)
-    print_output("\r\n\u001b[1m🚀 sageLLM Inference\u001b[0m\r\n", 0)
-    print_output("  Model: \u001b[36mdeepseek-coder-33b\u001b[0m", 0)
-    print_output("  Backend: ascend", 0)
-    print_output("  Prompt: Explain quantum physics", 0)
-    print_output("", 0)
+    type_command(f"curl http://localhost:{port}/health")
+    newline(health_body)
+    newline()
 
-    # 3. Logs (Simulate real logs - match actual output format)
-    def log(source, msg):
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S,") + "200"
-        print_output(f"{timestamp} - {source} - INFO - {msg}", 0)
+    type_command(f"curl http://localhost:{port}/v1/models")
+    newline(models_body)
+    newline()
 
-    log(
-        "sagellm_core.llm_engine",
-        "LLMEngine created: model=deepseek-coder-33b, backend=ascend, comm=auto",
-    )
-    print_output("Loading model...", 0)
-    current_time += 0.5
-    log("sagellm_core.llm_engine", "Starting LLMEngine with model: deepseek-coder-33b")
-    log(
-        "sagellm_backend.providers.ascend", "AscendBackendProvider initialized on npu:0"
-    )
-    log("sagellm_backend.registry", "Created provider: ascend -> Huawei Ascend 910B")
-    log("sagellm_core.llm_engine", "Backend initialized: ascend (Huawei Ascend 910B)")
-    current_time += 0.3
-    log("sagellm_core.llm_engine", "Loading tokenizer...")
-    current_time += 0.2
-    log("sagellm_core.llm_engine", "Model loaded: deepseek-coder-33b")
-    log("sagellm_core.llm_engine", "LLMEngine started successfully")
-
-    # 4. Output label (match real format: label on one line, content on next)
-    print_output("📝 Output:", 0)
-    current_time += 0.2
-
-    # 5. Streaming Output
-    response_text = "Quantum physics studies matter and energy at the most fundamental, atomic levels. It describes phenomena like superposition, entanglement, and wave-particle duality that govern subatomic particles."
-    stream_tokens(response_text, 0.06)
-
-    events.append([current_time, "o", "\r\n\r\n"])
-    current_time += 0.2
-
-    # 6. Metrics (match real format)
-    print_output("📊 Metrics:", 0)
-    print_output("   TTFT: 45.2 ms", 0)
-    print_output("   Throughput: 80.0 tokens/s", 0)
-
-    current_time += 0.5
-    log("sagellm_core.llm_engine", "Stopping LLMEngine")
-    log("sagellm_core.llm_engine", "LLMEngine stopped")
-
-    # Done
-    events.append([current_time, "o", "\r\n"])
-    current_time += 2.0
-
-    # Write file
-    with open(filename, "w") as f:
-        f.write(json.dumps(header) + "\n")
+    output_path = Path(filename)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", encoding="utf-8") as f:
+        f.write(json.dumps(header, ensure_ascii=False) + "\n")
         for event in events:
-            f.write(json.dumps(event) + "\n")
+            f.write(json.dumps(event, ensure_ascii=False) + "\n")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Generate a website cast from a live SageLLM service"
+    )
+    parser.add_argument("output", nargs="?", default="demos/sagellm-inference.cast")
+    parser.add_argument("--base-url", default="http://localhost:8080")
+    parser.add_argument("--model", default="sshleifer/tiny-gpt2")
+    parser.add_argument("--port", type=int, default=8888)
+    args = parser.parse_args()
+    create_cast_file(
+        args.output,
+        base_url=args.base_url.rstrip("/"),
+        model=args.model,
+        port=args.port,
+    )
 
 
 if __name__ == "__main__":
-    create_cast_file(sys.argv[1] if len(sys.argv) > 1 else "demo.cast")
+    main()
