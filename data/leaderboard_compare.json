@@ -1,6 +1,6 @@
 {
   "schema_version": "leaderboard-compare-snapshot/v1",
-  "generated_at": "2026-03-18T07:08:33.773203+00:00",
+  "generated_at": "2026-03-18T10:24:22.686500+00:00",
   "group_count": 1,
   "preferred_pair_count": 1,
   "groups": [
@@ -20,28 +20,28 @@
         {
           "engine": "sagellm",
           "engine_version": "0.5.4.68",
-          "entry_id": "a8b6508b-e549-42e7-9e45-0a034dfee141",
-          "submitted_at": "2026-03-18T07:08:22.817038+00:00",
+          "entry_id": "0ae7cd99-3b21-40c9-ad63-febc05c37dba",
+          "submitted_at": "2026-03-18T10:24:10.502293+00:00",
           "canonical_path": "canonical/b8581955c424b33d9dae_leaderboard.json",
           "metrics": {
-            "ttft_ms": 3747.254290511288,
-            "tbt_ms": 120.09262160578037,
-            "throughput_tps": 8.467243681637429,
-            "output_throughput_tps": 8.467243681637429,
+            "ttft_ms": 5280.439874186413,
+            "tbt_ms": 118.57829056206963,
+            "throughput_tps": 10.142327425995138,
+            "output_throughput_tps": 10.142327425995138,
             "error_rate": 0.0
           }
         },
         {
-          "engine": "vllm",
+          "engine": "vllm-ascend",
           "engine_version": "0.11.0",
-          "entry_id": "8a8a118a-62e3-4c7a-bee7-b09dfae8c3f9",
-          "submitted_at": "2026-03-18T07:08:33.743997+00:00",
-          "canonical_path": "canonical/f1b6506505ec15a2244c_leaderboard.json",
+          "entry_id": "dfa92aaf-5199-4cac-a753-fac68fdaf3f2",
+          "submitted_at": "2026-03-18T10:24:22.655325+00:00",
+          "canonical_path": "canonical/abf1ad5f906488a091fb_leaderboard.json",
           "metrics": {
-            "ttft_ms": 1452.2968322368495,
-            "tbt_ms": 34.71046432448677,
-            "throughput_tps": 37.33435945188592,
-            "output_throughput_tps": 37.33435945188592,
+            "ttft_ms": 1841.2164540301699,
+            "tbt_ms": 34.98465568742463,
+            "throughput_tps": 37.46066570046597,
+            "output_throughput_tps": 37.46066570046597,
             "error_rate": 0.0
           }
         }
@@ -50,35 +50,35 @@
         "left": {
           "engine": "sagellm",
           "engine_version": "0.5.4.68",
-          "entry_id": "a8b6508b-e549-42e7-9e45-0a034dfee141",
-          "submitted_at": "2026-03-18T07:08:22.817038+00:00",
+          "entry_id": "0ae7cd99-3b21-40c9-ad63-febc05c37dba",
+          "submitted_at": "2026-03-18T10:24:10.502293+00:00",
           "canonical_path": "canonical/b8581955c424b33d9dae_leaderboard.json",
           "metrics": {
-            "ttft_ms": 3747.254290511288,
-            "tbt_ms": 120.09262160578037,
-            "throughput_tps": 8.467243681637429,
-            "output_throughput_tps": 8.467243681637429,
+            "ttft_ms": 5280.439874186413,
+            "tbt_ms": 118.57829056206963,
+            "throughput_tps": 10.142327425995138,
+            "output_throughput_tps": 10.142327425995138,
             "error_rate": 0.0
           }
         },
         "right": {
-          "engine": "vllm",
+          "engine": "vllm-ascend",
           "engine_version": "0.11.0",
-          "entry_id": "8a8a118a-62e3-4c7a-bee7-b09dfae8c3f9",
-          "submitted_at": "2026-03-18T07:08:33.743997+00:00",
-          "canonical_path": "canonical/f1b6506505ec15a2244c_leaderboard.json",
+          "entry_id": "dfa92aaf-5199-4cac-a753-fac68fdaf3f2",
+          "submitted_at": "2026-03-18T10:24:22.655325+00:00",
+          "canonical_path": "canonical/abf1ad5f906488a091fb_leaderboard.json",
           "metrics": {
-            "ttft_ms": 1452.2968322368495,
-            "tbt_ms": 34.71046432448677,
-            "throughput_tps": 37.33435945188592,
-            "output_throughput_tps": 37.33435945188592,
+            "ttft_ms": 1841.2164540301699,
+            "tbt_ms": 34.98465568742463,
+            "throughput_tps": 37.46066570046597,
+            "output_throughput_tps": 37.46066570046597,
             "error_rate": 0.0
           }
         },
         "deltas": {
-          "throughput_pct_left_vs_right": -77.3205,
-          "ttft_pct_left_vs_right": 158.0226,
-          "tbt_pct_left_vs_right": 245.9839
+          "throughput_pct_left_vs_right": -72.9254,
+          "ttft_pct_left_vs_right": 186.7908,
+          "tbt_pct_left_vs_right": 238.9437
         },
         "winners": {
           "throughput": "right",
@@ -105,28 +105,28 @@
         {
           "engine": "sagellm",
           "engine_version": "0.5.4.68",
-          "entry_id": "a8b6508b-e549-42e7-9e45-0a034dfee141",
-          "submitted_at": "2026-03-18T07:08:22.817038+00:00",
+          "entry_id": "0ae7cd99-3b21-40c9-ad63-febc05c37dba",
+          "submitted_at": "2026-03-18T10:24:10.502293+00:00",
           "canonical_path": "canonical/b8581955c424b33d9dae_leaderboard.json",
           "metrics": {
-            "ttft_ms": 3747.254290511288,
-            "tbt_ms": 120.09262160578037,
-            "throughput_tps": 8.467243681637429,
-            "output_throughput_tps": 8.467243681637429,
+            "ttft_ms": 5280.439874186413,
+            "tbt_ms": 118.57829056206963,
+            "throughput_tps": 10.142327425995138,
+            "output_throughput_tps": 10.142327425995138,
             "error_rate": 0.0
           }
         },
         {
-          "engine": "vllm",
+          "engine": "vllm-ascend",
           "engine_version": "0.11.0",
-          "entry_id": "8a8a118a-62e3-4c7a-bee7-b09dfae8c3f9",
-          "submitted_at": "2026-03-18T07:08:33.743997+00:00",
-          "canonical_path": "canonical/f1b6506505ec15a2244c_leaderboard.json",
+          "entry_id": "dfa92aaf-5199-4cac-a753-fac68fdaf3f2",
+          "submitted_at": "2026-03-18T10:24:22.655325+00:00",
+          "canonical_path": "canonical/abf1ad5f906488a091fb_leaderboard.json",
           "metrics": {
-            "ttft_ms": 1452.2968322368495,
-            "tbt_ms": 34.71046432448677,
-            "throughput_tps": 37.33435945188592,
-            "output_throughput_tps": 37.33435945188592,
+            "ttft_ms": 1841.2164540301699,
+            "tbt_ms": 34.98465568742463,
+            "throughput_tps": 37.46066570046597,
+            "output_throughput_tps": 37.46066570046597,
             "error_rate": 0.0
           }
         }
@@ -135,35 +135,35 @@
         "left": {
           "engine": "sagellm",
           "engine_version": "0.5.4.68",
-          "entry_id": "a8b6508b-e549-42e7-9e45-0a034dfee141",
-          "submitted_at": "2026-03-18T07:08:22.817038+00:00",
+          "entry_id": "0ae7cd99-3b21-40c9-ad63-febc05c37dba",
+          "submitted_at": "2026-03-18T10:24:10.502293+00:00",
           "canonical_path": "canonical/b8581955c424b33d9dae_leaderboard.json",
           "metrics": {
-            "ttft_ms": 3747.254290511288,
-            "tbt_ms": 120.09262160578037,
-            "throughput_tps": 8.467243681637429,
-            "output_throughput_tps": 8.467243681637429,
+            "ttft_ms": 5280.439874186413,
+            "tbt_ms": 118.57829056206963,
+            "throughput_tps": 10.142327425995138,
+            "output_throughput_tps": 10.142327425995138,
             "error_rate": 0.0
           }
         },
         "right": {
-          "engine": "vllm",
+          "engine": "vllm-ascend",
           "engine_version": "0.11.0",
-          "entry_id": "8a8a118a-62e3-4c7a-bee7-b09dfae8c3f9",
-          "submitted_at": "2026-03-18T07:08:33.743997+00:00",
-          "canonical_path": "canonical/f1b6506505ec15a2244c_leaderboard.json",
+          "entry_id": "dfa92aaf-5199-4cac-a753-fac68fdaf3f2",
+          "submitted_at": "2026-03-18T10:24:22.655325+00:00",
+          "canonical_path": "canonical/abf1ad5f906488a091fb_leaderboard.json",
           "metrics": {
-            "ttft_ms": 1452.2968322368495,
-            "tbt_ms": 34.71046432448677,
-            "throughput_tps": 37.33435945188592,
-            "output_throughput_tps": 37.33435945188592,
+            "ttft_ms": 1841.2164540301699,
+            "tbt_ms": 34.98465568742463,
+            "throughput_tps": 37.46066570046597,
+            "output_throughput_tps": 37.46066570046597,
             "error_rate": 0.0
           }
         },
         "deltas": {
-          "throughput_pct_left_vs_right": -77.3205,
-          "ttft_pct_left_vs_right": 158.0226,
-          "tbt_pct_left_vs_right": 245.9839
+          "throughput_pct_left_vs_right": -72.9254,
+          "ttft_pct_left_vs_right": 186.7908,
+          "tbt_pct_left_vs_right": 238.9437
         },
         "winners": {
           "throughput": "right",

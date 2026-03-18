@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- 刷新 website leaderboard 到固定 `vllm-ascend v0.11.0` 基线的正式 compare 快照（`formal_compare_20260318_vllm_ascend_0110_fixlog`）：同步 `data/leaderboard_single.json`、`data/leaderboard_compare.json` 与 `data/last_updated.json`。
 - 刷新 website leaderboard 到 `formal_compare_20260316_ascend_slotfix_postprefix` 的 publish-ready 快照：同步 `data/leaderboard_single.json`、`data/leaderboard_compare.json`、`data/leaderboard_multi.json` 与 `data/last_updated.json`，确保页面展示使用本轮 slot-fix 后的正式 compare 数据。
 - 刷新 website leaderboard 快照到最新 Ascend formal compare 产物（`sagellm` vs `vllm`，profile=`vllm_random`）：同步更新 `data/leaderboard_single.json`、`data/leaderboard_compare.json` 与 `data/last_updated.json`，确保官网展示使用最新 publish-ready 数据。
 - Leaderboard 现在优先消费 benchmark 发布的 `leaderboard_compare.json`，在同 scope 下直接展示标准化的 `sageLLM vs vLLM` head-to-head gap；若线上快照尚未刷新到该文件，则前端回退到已有 entry 数据做只读比较，而不是手工修补 website JSON。
