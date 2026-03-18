@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- 刷新 website leaderboard 快照到最新 Ascend formal compare 产物（`sagellm` vs `vllm`，profile=`vllm_random`）：同步更新 `data/leaderboard_single.json`、`data/leaderboard_compare.json` 与 `data/last_updated.json`，确保官网展示使用最新 publish-ready 数据。
 - Leaderboard 现在优先消费 benchmark 发布的 `leaderboard_compare.json`，在同 scope 下直接展示标准化的 `sageLLM vs vLLM` head-to-head gap；若线上快照尚未刷新到该文件，则前端回退到已有 entry 数据做只读比较，而不是手工修补 website JSON。
 - `scripts/aggregate_results.py` 现兼容 benchmark 的 `leaderboard-export-manifest/v2`，并会离线同步生成 `leaderboard_compare.json`，使 website compatibility cache 与 benchmark publish 输出保持一致。
 - 官网首页暂时移除了长征 Windows 下载区块与对应 manifest 拉取逻辑，避免继续暴露当前返回 404 的公开下载入口；SageLLM Workstation 展示区保持不变。
