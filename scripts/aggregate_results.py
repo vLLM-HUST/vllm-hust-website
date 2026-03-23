@@ -81,12 +81,7 @@ def extract_workload_name(entry: dict[str, Any]) -> str:
             value = workload.get(key)
             if isinstance(value, str) and value.strip():
                 return value.strip()
-
-    notes = str((entry.get("metadata") or {}).get("notes") or "")
-    for workload_name in ("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8"):
-        if workload_name in notes.upper():
-            return workload_name
-    return "LEGACY"
+    return "UNKNOWN"
 
 
 def build_compare_scope_key(entry: dict[str, Any]) -> str:
@@ -165,43 +160,28 @@ def metric_winner(
 def select_preferred_pair(
     entries: list[dict[str, Any]],
 ) -> tuple[dict[str, Any], dict[str, Any]] | None:
-    by_engine = {
-        str(
-            entry.get("engine")
-            or (entry.get("metadata") or {}).get("engine")
-            or "unknown"
-        ): entry
-        for entry in entries
-    }
-    for left_engine, right_engine in (
-        ("sagellm", "vllm"),
-        ("sagellm", "vllm-ascend"),
-        ("sagellm", "sglang"),
-        ("sagellm", "lmdeploy"),
-    ):
-        if left_engine in by_engine and right_engine in by_engine:
-            return by_engine[left_engine], by_engine[right_engine]
+    if len(entries) < 2:
+        return None
 
-    if len(entries) >= 2:
-        ordered = sorted(
-            entries,
-            key=lambda item: (
-                {
-                    "sagellm": 0,
-                    "vllm": 1,
-                    "vllm-ascend": 2,
-                    "sglang": 3,
-                    "lmdeploy": 4,
-                }.get(
-                    str(item.get("engine") or "unknown"),
-                    10,
-                ),
-                str(item.get("engine") or "unknown"),
-                str(item.get("engine_version") or ""),
+    ordered = sorted(
+        entries,
+        key=lambda item: (
+            -float((item.get("metrics") or {}).get("throughput_tps") or 0.0),
+            float((item.get("metrics") or {}).get("ttft_ms") or float("inf")),
+            float((item.get("metrics") or {}).get("tbt_ms") or float("inf")),
+            str(
+                item.get("engine")
+                or (item.get("metadata") or {}).get("engine")
+                or "unknown"
             ),
-        )
-        return ordered[0], ordered[1]
-    return None
+            str(
+                item.get("engine_version")
+                or (item.get("metadata") or {}).get("engine_version")
+                or "unknown"
+            ),
+        ),
+    )
+    return ordered[0], ordered[1]
 
 
 def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
@@ -306,11 +286,7 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
             },
         }
         groups_payload.append(payload)
-        if left_summary["engine"] == "sagellm" and right_summary["engine"] in {
-            "vllm",
-            "vllm-ascend",
-        }:
-            preferred_pairs.append(payload)
+        preferred_pairs.append(payload)
 
     groups_payload.sort(key=lambda item: str(item.get("scope_key") or ""))
     preferred_pairs.sort(key=lambda item: str(item.get("scope_key") or ""))

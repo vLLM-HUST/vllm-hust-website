@@ -29,7 +29,7 @@ jobs:
         run: |
           mkdir -p data
 
-          HF_REPO="intellistream/sagellm-benchmark-results"
+          HF_REPO="intellistream/llm-engine-benchmark-results"
 
           echo "📥 Downloading leaderboard_single.json..."
           curl -L "https://huggingface.co/datasets/${HF_REPO}/resolve/main/leaderboard_single.json" \
@@ -39,19 +39,21 @@ jobs:
           curl -L "https://huggingface.co/datasets/${HF_REPO}/resolve/main/leaderboard_multi.json" \
                -o data/leaderboard_multi.json
 
+          echo "📥 Downloading leaderboard_compare.json..."
+          curl -L "https://huggingface.co/datasets/${HF_REPO}/resolve/main/leaderboard_compare.json" \
+            -o data/leaderboard_compare.json
+
+          echo "📥 Downloading last_updated.json..."
+          curl -L "https://huggingface.co/datasets/${HF_REPO}/resolve/main/last_updated.json" \
+            -o data/last_updated.json
+
           echo "✅ Download complete"
           ls -la data/
-
-      - name: Update last_updated marker
-        run: |
-          TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          echo "{\"last_updated\": \"${TS}\"}" > data/last_updated.json
-          echo "✓ Updated data/last_updated.json: ${TS}"
 
       - name: Ensure files have proper line endings
         run: |
           # Ensure all JSON files end with a newline
-          for file in data/leaderboard_single.json data/leaderboard_multi.json data/last_updated.json; do
+          for file in data/leaderboard_single.json data/leaderboard_multi.json data/leaderboard_compare.json data/last_updated.json; do
             if [ -f "$file" ] && [ -n "$(tail -c 1 "$file")" ]; then
               echo >> "$file"
               echo "✓ Added newline to $file"

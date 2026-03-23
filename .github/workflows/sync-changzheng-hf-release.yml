@@ -14,7 +14,7 @@ jobs:
   sync-changzheng-release:
     runs-on: ubuntu-latest
     env:
-      HF_REPO: intellistream/sagellm-benchmark-results
+      HF_REPO: intellistream/llm-engine-benchmark-results
       HF_RELEASE_DIR: changzheng/windows
 
     steps:
@@ -44,7 +44,7 @@ jobs:
           if not artifacts:
               raise SystemExit('LATEST.json missing artifacts')
 
-          hf_repo = 'intellistream/sagellm-benchmark-results'
+          hf_repo = 'intellistream/llm-engine-benchmark-results'
           hf_release_dir = 'changzheng/windows'.strip('/')
           for artifact in artifacts:
               file_name = artifact['fileName']

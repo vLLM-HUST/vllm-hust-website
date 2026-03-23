@@ -1,4 +1,4 @@
-# sageLLM Leaderboard MVP Field Specification
+# LLM Engine Leaderboard MVP Field Specification
 
 This document defines the MVP leaderboard data contract used by the website.
 
@@ -21,7 +21,8 @@ Schema accepts both:
 | Field             | Type         | Notes                                     |
 | ----------------- | ------------ | ----------------------------------------- |
 | `entry_id`        | string(UUID) | unique record id                          |
-| `sagellm_version` | string       | `X.Y.Z` or `X.Y.Z.W`                      |
+| `engine`          | string       | inference engine id (e.g. vllm, sglang)   |
+| `engine_version`  | string       | engine version string                     |
 | `config_type`     | string       | `single_gpu` / `multi_gpu` / `multi_node` |
 | `hardware`        | object       | hardware metadata                         |
 | `model`           | object       | model metadata                            |
@@ -63,9 +64,8 @@ Schema accepts both:
 
 Website render fields must be present in schema and examples:
 
-- version: `sagellm_version`
-- config filters: `hardware.chip_model`, `model.name`, `model.precision`, workload id from
-  `metadata.notes` / workload hints
+- version: `engine_version`
+- config filters: `hardware.chip_model`, `model.name`, `model.precision`, `workload.name`
 - trend metrics: `metrics.ttft_ms`, `metrics.throughput_tps`, `metrics.peak_mem_mb`,
   `metrics.error_rate`, `metrics.prefix_hit_rate`
 
@@ -86,4 +86,4 @@ Each compare group carries:
 - `scope_key`: exact compare scope key used by the website (`model|hardware|precision|workload|config_type|chip_count|node_count`)
 - `scope`: human-readable decomposition of that same compare scope
 - `engines[]`: one preferred row per engine after deduplication
-- `preferred_pair`: the head-to-head pair the website should render first, prioritizing `sagellm vs vllm` and `sagellm vs vllm-ascend`
+- `preferred_pair`: the head-to-head pair the website should render first, selected by score ordering (throughput first, then latency)

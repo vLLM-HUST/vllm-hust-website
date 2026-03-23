@@ -1,5 +1,5 @@
 /**
- * sageLLM Leaderboard - Version Evolution Display
+ * LLM Engine Leaderboard - Version Evolution Display
  *
  * This script handles:
  * - Loading JSON data (single-node and multi-node)
@@ -299,23 +299,6 @@
         },
     };
 
-    const VERSION_COMPONENTS = [
-        { label: 'sageLLM', metadataKey: 'sagellm', pypiPackage: 'isagellm' },
-        { label: 'Benchmark', metadataKey: 'benchmark', pypiPackage: 'isagellm-benchmark' },
-        { label: 'Protocol', metadataKey: 'protocol', pypiPackage: 'isagellm-protocol' },
-        { label: 'Backend', metadataKey: 'backend', pypiPackage: 'isagellm-backend' },
-        { label: 'Core', metadataKey: 'core', pypiPackage: 'isagellm-core' },
-        { label: 'KV Cache', metadataKey: 'kv_cache', pypiPackage: 'isagellm-kv-cache' },
-        { label: 'Control Plane', metadataKey: 'control_plane', pypiPackage: 'isagellm-control-plane' },
-        { label: 'Gateway', metadataKey: 'gateway', pypiPackage: 'isagellm-gateway' },
-        { label: 'Comm', metadataKey: 'comm', pypiPackage: 'isagellm-comm' },
-        { label: 'Compression', metadataKey: 'compression', pypiPackage: 'isagellm-compression' },
-    ];
-
-    const PYPI_CACHE_KEY = 'sagellm_pypi_versions_v1';
-    const PYPI_CACHE_TTL_MS = 10 * 60 * 1000;
-    const FULL_VERSION_REGEX = /^\d+(\.\d+){3}$/;
-
     // State management
     let state = {
         currentTab: 'single-chip', // single-chip, multi-chip, multi-node
@@ -324,10 +307,6 @@
         multiNodeData: [],
         compareSnapshot: null,
         totalLoadedEntries: 0,
-        pypiVersions: {},
-        sagellmVersionOptions: [],
-        pypiLoaded: false,
-        pypiLoadError: false,
         filters: {
             'single-chip': { engine: '', hardware: '', model: '', version: '', workload: '', precision: '' },
             'multi-chip': { engine: '', hardware: '', model: '', version: '', workload: '', precision: '' },
@@ -357,97 +336,6 @@
         renderViewControls();
         renderTable();
         await renderLastUpdated();
-        void loadPyPIVersions();
-    }
-
-    function readPyPICache() {
-        try {
-            const raw = sessionStorage.getItem(PYPI_CACHE_KEY);
-            if (!raw) {
-                return null;
-            }
-            const parsed = JSON.parse(raw);
-            if (!parsed?.savedAt || !parsed?.versions) {
-                return null;
-            }
-            if (Date.now() - parsed.savedAt > PYPI_CACHE_TTL_MS) {
-                return null;
-            }
-            return parsed.versions;
-        } catch (_error) {
-            return null;
-        }
-    }
-
-    function writePyPICache(versions) {
-        try {
-            sessionStorage.setItem(PYPI_CACHE_KEY, JSON.stringify({
-                savedAt: Date.now(),
-                versions,
-            }));
-        } catch (_error) {
-            // ignore cache write failures
-        }
-    }
-
-    async function loadPyPIVersions() {
-        const cached = readPyPICache();
-        if (cached) {
-            state.pypiVersions = cached;
-            if (cached.isagellm_releases_050 && Array.isArray(cached.isagellm_releases_050)) {
-                state.sagellmVersionOptions = cached.isagellm_releases_050;
-            }
-            state.pypiLoaded = true;
-            renderFilters();
-            renderTable();
-            return;
-        }
-
-        try {
-            const requests = VERSION_COMPONENTS.map(async (component) => {
-                const response = await fetch(`https://pypi.org/pypi/${component.pypiPackage}/json`, {
-                    cache: 'no-cache',
-                });
-
-                if (!response.ok) {
-                    throw new Error(`PyPI ${component.pypiPackage}: ${response.status}`);
-                }
-
-                const payload = await response.json();
-                const releases = component.pypiPackage === 'isagellm'
-                    ? Object.keys(payload?.releases || {})
-                        .filter((version) => /^\d+(\.\d+){3}$/.test(version))
-                        .filter((version) => compareVersions(version, '0.5.0.0') >= 0)
-                        .sort((a, b) => compareVersions(b, a))
-                    : null;
-
-                return [component.pypiPackage, payload?.info?.version || 'N/A', releases];
-            });
-
-            const settled = await Promise.allSettled(requests);
-            const versions = {};
-            settled.forEach((item) => {
-                if (item.status === 'fulfilled') {
-                    const [pkg, version, releases] = item.value;
-                    versions[pkg] = version;
-                    if (pkg === 'isagellm' && Array.isArray(releases)) {
-                        versions.isagellm_releases_050 = releases;
-                        state.sagellmVersionOptions = releases;
-                    }
-                }
-            });
-
-            state.pypiVersions = versions;
-            state.pypiLoaded = true;
-            writePyPICache(versions);
-            renderFilters();
-            renderTable();
-        } catch (error) {
-            console.warn('[Leaderboard] Failed to load PyPI versions:', error);
-            state.pypiLoadError = true;
-            state.pypiLoaded = true;
-            renderTable();
-        }
     }
 
     // Load JSON data (支持 HF 和本地两种模式)
@@ -525,16 +413,6 @@
             return normalizedDirect;
         }
 
-        const notes = entry.metadata?.notes || '';
-        const qMatch = notes.match(/\bQ([1-8])\b/i);
-        if (qMatch) {
-            return `Q${qMatch[1]}`;
-        }
-
-        if (notes.includes('short_input')) return 'Q1';
-        if (notes.includes('long_input')) return 'Q2';
-        if (notes.includes('stress_test')) return 'Q5';
-
         return 'Other';
     }
 
@@ -605,9 +483,6 @@
         if (typeof direct === 'string' && direct.trim()) {
             return direct.trim().toLowerCase();
         }
-        if (entry?.sagellm_version) {
-            return 'sagellm';
-        }
         return 'unknown';
     }
 
@@ -629,7 +504,6 @@
         return String(
             entry?.engine_version ||
             entry?.metadata?.engine_version ||
-            entry?.sagellm_version ||
             ''
         ).trim();
     }
@@ -950,11 +824,7 @@
     }
 
     function getVersionOptions(data) {
-        const dataVersions = getUniqueValues(data, d => normalizeDisplayVersion(getEngineVersion(d)));
-        const releaseVersions = (state.sagellmVersionOptions || []).map((version) =>
-            normalizeDisplayVersion(version)
-        );
-        const merged = [...new Set([...releaseVersions, ...dataVersions])]
+        const merged = [...new Set(getUniqueValues(data, d => normalizeDisplayVersion(getEngineVersion(d))))]
             .filter((version) => String(version || '').trim())
             .sort((a, b) => compareDisplayVersions(b, a));
         return merged;
@@ -1258,46 +1128,16 @@
         const engineVersion = getEngineVersion(entry) || 'N/A';
         const versions = entry.versions || {};
 
-        if (engine !== 'sagellm') {
-            return `
-                <div class="detail-section">
-                    <h4>${t('engineVersions')}</h4>
-                    <p><strong>${t('engine')}:</strong> ${engineLabel}</p>
-                    <p><strong>${t('engineVersion')}:</strong> ${engineVersion}</p>
-                    <p><strong>${t('benchmark')}:</strong> ${versions.benchmark || 'N/A'}</p>
-                </div>
-            `;
-        }
-
-        const rows = VERSION_COMPONENTS.map((component) => {
-            const benchmarkVersion = component.metadataKey === 'sagellm'
-                ? (entry.sagellm_version || versions.sagellm || 'N/A')
-                : (versions[component.metadataKey] || 'N/A');
-            const pypiVersion = state.pypiVersions[component.pypiPackage] || (state.pypiLoaded ? 'N/A' : 'Loading...');
-            const status = getVersionComparisonStatus(benchmarkVersion, pypiVersion);
-
-            return {
-                label: component.label,
-                benchmarkVersion,
-                pypiVersion,
-                status,
-            };
-        });
-
-        const mismatchCount = rows.filter((row) => row.status === 'ahead').length;
-        const historicalCount = rows.filter((row) => row.status === 'behind').length;
-        const sourceHint = state.pypiLoaded
-            ? t('versionSourceReady')
-            : t('versionSourceLoading');
+        const versionRows = Object.entries(versions)
+            .filter(([_, value]) => typeof value === 'string' && value.trim())
+            .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
 
         return `
             <div class="detail-section">
-                <h4>${t('componentVersions')}</h4>
-                ${rows.map((row) => `<p><strong>${row.label}:</strong> ${row.benchmarkVersion} <span style="color:#718096">| PyPI: ${row.pypiVersion}</span>${row.status === 'ahead' ? ` <span style="color:#e53e3e;font-weight:600">${t('mismatch')}</span>` : row.status === 'behind' ? ` <span style="color:#718096;font-weight:600">${t('historical')}</span>` : ''}</p>`).join('')}
-                <p><small style="color:#718096">${sourceHint}</small></p>
-                ${mismatchCount > 0 ? `<p><small style="color:#e53e3e">${t('versionMismatchNote')}</small></p>` : ''}
-                ${mismatchCount === 0 && historicalCount > 0 ? `<p><small style="color:#718096">${t('historicalNote')}</small></p>` : ''}
-                ${state.pypiLoadError ? `<p><small style="color:#dd6b20">${t('pypiLoadError')}</small></p>` : ''}
+                <h4>${t('engineVersions')}</h4>
+                <p><strong>${t('engine')}:</strong> ${engineLabel}</p>
+                <p><strong>${t('engineVersion')}:</strong> ${engineVersion}</p>
+                ${versionRows.length ? versionRows.map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`).join('') : ''}
             </div>
         `;
     }
@@ -1359,28 +1199,6 @@
         }
 
         return String(value);
-    }
-
-    function getVersionComparisonStatus(benchmarkVersion, pypiVersion) {
-        if (!isComparableVersion(benchmarkVersion) || !isComparableVersion(pypiVersion)) {
-            return 'unknown';
-        }
-
-        const comparison = compareVersions(benchmarkVersion, pypiVersion);
-        if (comparison > 0) {
-            return 'ahead';
-        }
-        if (comparison < 0) {
-            return 'behind';
-        }
-        return 'match';
-    }
-
-    function isComparableVersion(version) {
-        if (!version || version === 'N/A' || version === 'Loading...') {
-            return false;
-        }
-        return FULL_VERSION_REGEX.test(String(version));
     }
 
     function renderImprovementsSection(entry) {

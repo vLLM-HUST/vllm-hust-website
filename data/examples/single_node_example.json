@@ -1,6 +1,7 @@
 {
     "entry_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "sagellm_version": "0.2.3.3",
+    "engine": "vllm-hust",
+    "engine_version": "0.2.3.3",
     "config_type": "single_gpu",
     "hardware": {
         "vendor": "NVIDIA",
@@ -19,6 +20,7 @@
         "quantization": "None"
     },
     "workload": {
+        "name": "Q1",
         "input_length": 512,
         "output_length": 128,
         "batch_size": 1,

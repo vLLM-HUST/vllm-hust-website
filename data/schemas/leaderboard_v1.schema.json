@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://vllm-hust.sage.org.ai/schemas/leaderboard_v1.schema.json",
-  "title": "sageLLM Leaderboard MVP Schema v1",
+  "title": "LLM Engine Leaderboard Schema v1",
   "description": "MVP schema for leaderboard data used by vllm-hust-website",
   "oneOf": [
     {
@@ -23,7 +23,8 @@
       "type": "object",
       "required": [
         "entry_id",
-        "sagellm_version",
+        "engine",
+        "engine_version",
         "config_type",
         "hardware",
         "model",
@@ -46,10 +47,6 @@
         },
         "canonical_path": {
           "type": "string"
-        },
-        "sagellm_version": {
-          "type": "string",
-          "pattern": "^\\d+\\.\\d+\\.\\d+(\\.\\d+)?$"
         },
         "config_type": {
           "type": "string",
@@ -111,8 +108,9 @@
         },
         "workload": {
           "type": "object",
-          "required": ["input_length", "output_length"],
+          "required": ["name", "input_length", "output_length"],
           "properties": {
+            "name": { "type": "string" },
             "input_length": { "type": "integer", "minimum": 1 },
             "output_length": { "type": "integer", "minimum": 1 },
             "batch_size": { "type": ["integer", "null"], "minimum": 1 },

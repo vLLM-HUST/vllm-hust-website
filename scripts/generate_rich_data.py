@@ -80,9 +80,9 @@ MODELS = [
 ]
 
 WORKLOADS = [
-    {"type": "short_input", "prompt": 128, "output": 128},
-    {"type": "long_input", "prompt": 2048, "output": 512},
-    {"type": "pressure_test", "prompt": 512, "output": 256},
+    {"name": "Q1", "type": "short_input", "prompt": 128, "output": 128},
+    {"name": "Q2", "type": "long_input", "prompt": 2048, "output": 512},
+    {"name": "Q5", "type": "pressure_test", "prompt": 512, "output": 256},
 ]
 
 PRECISIONS = ["FP16", "BF16", "INT8", "INT4"]
@@ -174,7 +174,8 @@ def generate_entry(
 
     entry = {
         "entry_id": entry_id,
-        "sagellm_version": version,
+        "engine": "vllm-hust",
+        "engine_version": version,
         "config_type": "multi_gpu"
         if category == "multi_chip"
         else ("multi_node" if category == "multi_node" else "single_gpu"),
@@ -186,6 +187,7 @@ def generate_entry(
             "quantization": "None" if precision in ["FP16", "BF16"] else precision,
         },
         "workload": {
+            "name": workload["name"],
             "input_length": workload["prompt"],
             "output_length": workload["output"],
             "batch_size": 1,

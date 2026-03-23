@@ -50,16 +50,15 @@ website does not ingest raw compare directories and does not hand-edit benchmark
 
 The only supported leaderboard data chain is:
 
-1. `sagellm-benchmark compare` or `sagellm-benchmark vllm-compare run`
-2. canonical `*.canonical.json`
-3. standard `*_leaderboard.json` + `leaderboard_manifest.json`
-4. benchmark `publish` refreshes HF and website-ready snapshots:
+1. Any benchmark pipeline that exports standard leaderboard artifacts (`leaderboard_manifest.json` + `*_leaderboard.json`)
+2. Snapshot publish to Hugging Face dataset `intellistream/llm-engine-benchmark-results`
+3. Website sync workflow fetches HF snapshot files directly:
 	- `data/leaderboard_single.json`
 	- `data/leaderboard_multi.json`
 	- `data/leaderboard_compare.json`
 	- `data/last_updated.json`
 
-Homepage rendering consumes only those snapshot files, with `leaderboard_compare.json` providing the direct `sageLLM vs vLLM` head-to-head gap view.
+Homepage rendering consumes only those snapshot files, with `leaderboard_compare.json` providing neutral engine-vs-engine head-to-head views.
 
 ## Repository Quickstart
 
@@ -96,7 +95,7 @@ Homepage rendering consumes only those snapshot files, with `leaderboard_compare
 
 website 仓库是 public，因此可直接把这些文件同步到站点静态目录：
 
-- Hugging Face 路径：`intellistream/sagellm-benchmark-results/changzheng/windows`
+- Hugging Face 路径：`intellistream/llm-engine-benchmark-results/changzheng/windows`
 - 目标目录：`downloads/changzheng/windows/`
 - 首页摘要数据：`data/changzheng_release.json`
 - 本地同步脚本：`scripts/sync_changzheng_release.py`

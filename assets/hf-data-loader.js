@@ -1,5 +1,5 @@
 /**
- * Hugging Face Data Loader for sageLLM Leaderboard
+ * Hugging Face Data Loader for LLM Engine Leaderboard
  *
  * 从 Hugging Face Datasets Hub 加载 benchmark 结果
  * 支持实时更新，无需后端服务
@@ -7,7 +7,7 @@
 
 const HF_CONFIG = {
     // Hugging Face 仓库配置
-    repo: 'intellistream/sagellm-benchmark-results',
+    repo: 'intellistream/llm-engine-benchmark-results',
     branch: 'main',
 
     // 数据文件路径（在 HF repo 中的路径）
@@ -29,7 +29,7 @@ const HF_CONFIG = {
     validateWithMarker: true
 };
 
-const CACHE_KEY = 'sagellm_hf_leaderboard_cache_v3';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v1';
 
 function readCacheEnvelope() {
     try {
@@ -123,15 +123,11 @@ function extractEngine(entry) {
         }
     }
 
-    if (entry?.sagellm_version) {
-        return 'sagellm';
-    }
-
     return 'unknown';
 }
 
 function extractEngineVersion(entry) {
-    const direct = entry?.engine_version || entry?.metadata?.engine_version || entry?.sagellm_version;
+    const direct = entry?.engine_version || entry?.metadata?.engine_version;
     if (direct && typeof direct === 'string') {
         const normalized = direct.trim();
         if (normalized) {
@@ -148,13 +144,7 @@ function extractWorkloadForKey(entry) {
         return direct.toUpperCase();
     }
 
-    const notes = entry?.metadata?.notes || '';
-    const qMatch = String(notes).match(/\bQ([1-8])\b/i);
-    if (qMatch) {
-        return `Q${qMatch[1]}`;
-    }
-
-    return 'LEGACY';
+    return 'UNKNOWN';
 }
 
 function buildIdempotencyKey(entry) {
@@ -165,7 +155,6 @@ function buildIdempotencyKey(entry) {
     return [
         normalizeKeyPart(extractEngine(entry)),
         normalizeKeyPart(extractEngineVersion(entry)),
-        normalizeKeyPart(entry?.sagellm_version),
         normalizeKeyPart(extractWorkloadForKey(entry)),
         normalizeKeyPart(entry?.model?.name),
         normalizeKeyPart(entry?.model?.precision),

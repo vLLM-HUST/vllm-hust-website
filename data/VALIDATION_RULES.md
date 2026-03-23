@@ -15,7 +15,7 @@ python data/validate_schema.py \
 1. **Payload shape**
    - accepts entry object or entry array
 1. **Entry required keys**
-   - `entry_id`, `sagellm_version`, `config_type`, `hardware`, `model`, `workload`, `metrics`,
+   - `entry_id`, `engine`, `engine_version`, `config_type`, `hardware`, `model`, `workload`, `metrics`,
      `versions`, `environment`, `metadata`
 1. **Hardware minimum**
    - `vendor`, `chip_model`, `chip_count`

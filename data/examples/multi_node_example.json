@@ -1,6 +1,7 @@
 {
     "entry_id": "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    "sagellm_version": "0.2.3.3",
+    "engine": "vllm-hust",
+    "engine_version": "0.2.3.3",
     "config_type": "multi_node",
     "hardware": {
         "vendor": "Huawei",
@@ -19,6 +20,7 @@
         "quantization": "None"
     },
     "workload": {
+        "name": "Q2",
         "input_length": 2048,
         "output_length": 512,
         "batch_size": 4,
