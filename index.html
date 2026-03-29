@@ -894,6 +894,105 @@
         font-size: 0.92em;
       }
 
+      .workstation-section {
+        margin-top: 28px;
+      }
+
+      .workstation-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .workstation-actions .cta-button {
+        padding: 11px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(14, 165, 233, 0.18);
+        background: linear-gradient(135deg, #0f172a 0%, #123c86 100%);
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .workstation-actions .cta-button.secondary {
+        background: white;
+        color: #0f172a;
+        border-color: rgba(148, 163, 184, 0.4);
+      }
+
+      .workstation-meta {
+        display: grid;
+        gap: 12px;
+      }
+
+      .workstation-meta-item {
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        padding: 14px 16px;
+        border-radius: 14px;
+      }
+
+      .workstation-meta-item strong {
+        display: block;
+        color: #0f172a;
+        margin-bottom: 6px;
+      }
+
+      .workstation-meta-item span {
+        display: block;
+        color: #475569;
+        word-break: break-all;
+        font-family: "Fira Code", monospace;
+        font-size: 0.9em;
+      }
+
+      .workstation-pill[data-state="live"] {
+        background: rgba(34, 197, 94, 0.12);
+        color: #166534;
+      }
+
+      .workstation-pill[data-state="live"]::before {
+        background: #22c55e;
+      }
+
+      .workstation-pill[data-state="pending"] {
+        background: rgba(14, 165, 233, 0.12);
+        color: #0f766e;
+      }
+
+      .workstation-pill[data-state="pending"]::before {
+        background: #0ea5e9;
+      }
+
+      .workstation-embed-shell {
+        position: relative;
+        min-height: 420px;
+        background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+      }
+
+      .workstation-iframe {
+        width: 100%;
+        min-height: 420px;
+        border: 0;
+        background: white;
+        display: block;
+      }
+
+      .workstation-placeholder {
+        min-height: 420px;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        text-align: center;
+        color: #475569;
+        gap: 12px;
+      }
+
+      .workstation-placeholder strong {
+        color: #0f172a;
+        font-size: 1.08em;
+      }
+
       .features {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1366,6 +1465,87 @@
         </div>
       </div>
 
+      <div class="section workstation-section" id="workstation-section">
+        <div class="section-kicker" data-i18n="workstation_kicker">Live Workspace</div>
+        <h2 id="workstation-title">🖥️ AGI4S Serving Console</h2>
+        <p id="workstation-desc">
+          A reference operator view for chat, tool-calling, model status, and serving metrics in one loop.
+        </p>
+
+        <div class="workstation-layout">
+          <div class="workstation-copy">
+            <div class="workstation-note">
+              <span class="workstation-pill" id="workstation-status-chip" data-state="pending">Pending</span>
+              <div style="margin-top: 10px; color: #334155; font-weight: 600" id="workstation-status-detail">
+                Waiting for a public workstation URL.
+              </div>
+            </div>
+
+            <div class="workstation-meta">
+              <div class="workstation-meta-item">
+                <strong data-i18n="workstation_embed_backend_label">A100 Backend</strong>
+                <span id="workstation-backend-value">Not configured</span>
+              </div>
+              <div class="workstation-meta-item">
+                <strong data-i18n="workstation_embed_url_label">Workstation URL</strong>
+                <span id="workstation-target-value">Not configured</span>
+              </div>
+            </div>
+
+            <div class="workstation-actions">
+              <a
+                id="workstation-open-link"
+                class="cta-button"
+                href="#"
+                target="_blank"
+                rel="noreferrer"
+                data-i18n="workstation_open_cta"
+              >Open Workstation</a>
+              <a
+                id="workstation-docs-link"
+                class="cta-button secondary"
+                href="./docs/DEPLOY.md"
+                target="_blank"
+                rel="noreferrer"
+                data-i18n="workstation_docs_cta"
+              >Deployment Guide</a>
+            </div>
+
+            <div class="workstation-note" id="workstation-note">
+              A reference surface for operating vllm-hust in domestic hardware and AGI4S deployment scenarios.
+            </div>
+          </div>
+
+          <div class="workstation-shell">
+            <div class="workstation-window">
+              <div class="workstation-topbar">
+                <div class="workstation-dots"><span></span><span></span><span></span></div>
+                <span id="workstation-topbar-title">A100 Workstation Preview</span>
+                <span class="workstation-pill" id="workstation-embed-mode" data-state="pending">Waiting</span>
+              </div>
+              <div class="workstation-embed-shell">
+                <iframe
+                  id="workstation-embed-frame"
+                  class="workstation-iframe"
+                  title="vllm-hust workstation"
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  hidden
+                ></iframe>
+                <div class="workstation-placeholder" id="workstation-placeholder">
+                  <div>
+                    <strong id="workstation-placeholder-title">Configure a public workstation URL to preview it here.</strong>
+                    <p id="workstation-placeholder-desc" style="margin-top: 10px">
+                      Point the website config to an A100-hosted workstation, or keep link mode if you only want a launch entry.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <footer>
         <p>
           <strong>vllm-hust</strong>
@@ -1453,8 +1633,23 @@
           leaderboard_empty_text: "Try adjusting your filters to see more data.",
 
           workstation_title: "🖥️ AGI4S Serving Console",
+          workstation_kicker: "Live Workspace",
           workstation_desc:
             "A reference operator view for chat, tool-calling, model status, and serving metrics in one loop.",
+          workstation_embed_backend_label: "A100 Backend",
+          workstation_embed_url_label: "Workstation URL",
+          workstation_open_cta: "Open Workstation",
+          workstation_docs_cta: "Deployment Guide",
+          workstation_embed_live: "Live",
+          workstation_embed_pending: "Pending",
+          workstation_embed_mode_embed: "Embed Preview",
+          workstation_embed_mode_link: "Launch Only",
+          workstation_embed_mode_waiting: "Waiting",
+          workstation_status_waiting: "Waiting for a public workstation URL.",
+          workstation_placeholder_title: "Configure a public workstation URL to preview it here.",
+          workstation_placeholder_desc:
+            "Point the website config to an A100-hosted workstation, or keep link mode if you only want a launch entry.",
+          workstation_not_configured: "Not configured",
           workstation_status: "Overview",
           workstation_panel_title: "Serving Metrics Panel",
           workstation_panel_desc: "Scenario status, model selection, and latency-throughput signals in one view",
@@ -1661,8 +1856,23 @@
           leaderboard_empty_text: "调整筛选条件后再试。",
 
           workstation_title: "🖥️ AGI4S 服务控制台",
+          workstation_kicker: "实时工作台",
           workstation_desc:
             "一个面向 AGI4S 服务运维的参考界面，把对话、工具调用、模型状态和服务指标放在同一个闭环里。",
+          workstation_embed_backend_label: "A100 后端",
+          workstation_embed_url_label: "Workstation 地址",
+          workstation_open_cta: "打开 Workstation",
+          workstation_docs_cta: "部署说明",
+          workstation_embed_live: "在线",
+          workstation_embed_pending: "待配置",
+          workstation_embed_mode_embed: "内嵌预览",
+          workstation_embed_mode_link: "仅跳转",
+          workstation_embed_mode_waiting: "等待接入",
+          workstation_status_waiting: "等待公开可访问的 workstation 地址。",
+          workstation_placeholder_title: "配置公开可访问的 workstation 地址后，就能在这里直接预览。",
+          workstation_placeholder_desc:
+            "把 website 配置指向部署在 A100 上的 workstation；如果只想提供入口，也可以保持跳转模式。",
+          workstation_not_configured: "未配置",
           workstation_status: "概览",
           workstation_panel_title: "服务指标面板",
           workstation_panel_desc: "场景状态、模型选择和吞吐时延信号同屏展示",
@@ -1816,6 +2026,13 @@
           "table-head-actions": dict.table_head_actions,
           "leaderboard-empty-title": dict.leaderboard_empty_title,
           "leaderboard-empty-text": dict.leaderboard_empty_text,
+          "workstation-title": dict.workstation_title,
+          "workstation-desc": dict.workstation_desc,
+          "workstation-note": dict.workstation_note,
+          "workstation-open-link": dict.workstation_open_cta,
+          "workstation-docs-link": dict.workstation_docs_cta,
+          "workstation-placeholder-title": dict.workstation_placeholder_title,
+          "workstation-placeholder-desc": dict.workstation_placeholder_desc,
           "arch-diagram-kicker": dict.arch_diagram_kicker,
           "arch-diagram-note": dict.arch_diagram_note,
           "arch-entry-label": dict.arch_entry_label,
@@ -1973,6 +2190,9 @@
 
     <!-- Version Metadata Loader -->
     <script src="./assets/version-meta-loader.js"></script>
+
+    <!-- Workstation Embed Loader -->
+    <script src="./assets/workstation-embed.js"></script>
 
     <!-- Leaderboard Script -->
     <script src="./assets/leaderboard.js"></script>

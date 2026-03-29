@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "mode": "embed",
+  "workstation_url": "",
+  "backend_url": "",
+  "docs_url": "./docs/DEPLOY.md",
+  "label_zh": "A100 Workstation",
+  "label_en": "A100 Workstation"
+}

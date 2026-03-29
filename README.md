@@ -44,6 +44,34 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 - Consistency/stale check: `bash scripts/check_stale_versions.sh`
 - 维护说明：`docs/VERSION_METADATA.md`
 
+## Website Workstation Embed
+
+首页现在支持把远端 `vllm-hust-workstation` 作为一个可配置面板展示出来，适合把部署在 A100 后台上的 workstation 直接呈现到 website 界面。
+
+- 配置文件：`data/workstation_embed.json`
+- 加载脚本：`assets/workstation-embed.js`
+- 展示方式：`embed`（iframe 内嵌）或 `link`（仅提供打开入口）
+
+示例：
+
+```json
+{
+	"enabled": true,
+	"mode": "embed",
+	"workstation_url": "https://a100.example.com/workstation/",
+	"backend_url": "https://a100.example.com:8080",
+	"docs_url": "./docs/DEPLOY.md",
+	"label_zh": "A100 工作站",
+	"label_en": "A100 Workstation"
+}
+```
+
+注意：
+
+- `website` 是静态站点，不代理 workstation API；要展示远端控制台，需要 workstation 自己对外可访问。
+- 若 website 走 HTTPS，则 workstation 也必须走 HTTPS，否则浏览器会阻止 iframe 混合内容。
+- 如果生产环境要限制可嵌入来源，请在 workstation 侧配置 `APP_FRAME_ANCESTORS`。
+
 ## Architecture And Planning Notes
 
 - vLLM 实际运行时架构与 9 个子任务映射：`docs/ARCHITECTURE_TASK_MAPPING.md`
