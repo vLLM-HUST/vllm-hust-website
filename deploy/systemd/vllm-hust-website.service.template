@@ -1,0 +1,16 @@
+[Unit]
+Description=vLLM-HUST Website
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=__REPO_DIR__
+ExecStart=/usr/bin/env bash __REPO_DIR__/scripts/run_website_systemd.sh
+Restart=always
+RestartSec=5
+TimeoutStopSec=15
+KillMode=process
+
+[Install]
+WantedBy=default.target

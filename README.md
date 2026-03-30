@@ -132,6 +132,38 @@ All hard-constraint records must declare `constraints.scenario_source = vllm-ben
 
 > 注意：脚本不会创建 `venv/.venv`，请使用当前已配置的非-venv Python 环境。
 
+## systemd --user 本地常驻
+
+如果要把静态站点在本机以 `systemd --user` 常驻方式挂起来，而不是手动执行 `python3 -m http.server 8000`，仓库现在内置了最小管理脚本：
+
+```bash
+# 一次性安装 / 更新 service
+./scripts/deploy_website_service.sh install-service
+
+# 安装并立即重启到最新配置
+./scripts/deploy_website_service.sh deploy
+
+# 查看状态 / 日志
+./scripts/deploy_website_service.sh status
+./scripts/deploy_website_service.sh logs
+```
+
+默认行为：
+
+- 绑定地址：`127.0.0.1`
+- 端口：`8000`
+- 根目录：当前仓库根目录
+- systemd 服务名：`vllm-hust-website`
+
+可选环境变量：
+
+```bash
+export WEBSITE_HOST=127.0.0.1
+export WEBSITE_PORT=8000
+export WEBSITE_ROOT_DIR=/home/shuhao/vllm-hust-website
+export WEBSITE_SYSTEMD_SERVICE_NAME=vllm-hust-website
+```
+
 ## Changzheng Public Download Sync
 
 `changzheng-desktop` 在 Windows 构建机完成安装包归档后，会先上传到 Hugging Face dataset，再由 website 定时拉取并发布：

@@ -36,6 +36,7 @@ Thumbs.db
 *.tmp
 *.bak
 *.log
+.website-deploy/
 .env
 .env.local
 .env.*
