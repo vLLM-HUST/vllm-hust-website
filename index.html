@@ -681,13 +681,11 @@
       }
 
       .workstation-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1.45fr) minmax(240px, 0.55fr);
-        gap: 24px;
-        align-items: start;
+        display: block;
       }
 
       .workstation-shell {
+        margin-top: 28px;
         background: #eef2f7;
         border-radius: 18px;
         padding: 12px;
@@ -978,21 +976,6 @@
         display: block;
       }
 
-      .workstation-placeholder {
-        min-height: clamp(560px, 72vh, 920px);
-        display: grid;
-        place-items: center;
-        padding: 28px;
-        text-align: center;
-        color: #475569;
-        gap: 12px;
-      }
-
-      .workstation-placeholder strong {
-        color: #0f172a;
-        font-size: 1.08em;
-      }
-
       .features {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1201,7 +1184,6 @@
           text-align: center;
         }
 
-        .workstation-layout,
         .workstation-body,
         .download-grid,
         .download-meta {
@@ -1213,8 +1195,7 @@
         }
 
         .workstation-embed-shell,
-        .workstation-iframe,
-        .workstation-placeholder {
+        .workstation-iframe {
           min-height: 500px;
         }
 
@@ -1525,32 +1506,24 @@
               A reference surface for operating vllm-hust in domestic hardware and AGI4S deployment scenarios.
             </div>
           </div>
+        </div>
 
-          <div class="workstation-shell">
-            <div class="workstation-window">
-              <div class="workstation-topbar">
-                <div class="workstation-dots"><span></span><span></span><span></span></div>
-                <span id="workstation-topbar-title">A100 Workstation Preview</span>
-                <span class="workstation-pill" id="workstation-embed-mode" data-state="pending">Waiting</span>
-              </div>
-              <div class="workstation-embed-shell">
-                <iframe
-                  id="workstation-embed-frame"
-                  class="workstation-iframe"
-                  title="vllm-hust workstation"
-                  loading="lazy"
-                  referrerpolicy="strict-origin-when-cross-origin"
-                  hidden
-                ></iframe>
-                <div class="workstation-placeholder" id="workstation-placeholder">
-                  <div>
-                    <strong id="workstation-placeholder-title">Configure a public workstation URL to preview it here.</strong>
-                    <p id="workstation-placeholder-desc" style="margin-top: 10px">
-                      Point the website config to an A100-hosted workstation, or keep link mode if you only want a launch entry.
-                    </p>
-                  </div>
-                </div>
-              </div>
+        <div class="workstation-shell" id="workstation-preview-shell" hidden>
+          <div class="workstation-window">
+            <div class="workstation-topbar">
+              <div class="workstation-dots"><span></span><span></span><span></span></div>
+              <span id="workstation-topbar-title">A100 Workstation Preview</span>
+              <span class="workstation-pill" id="workstation-embed-mode" data-state="pending">Waiting</span>
+            </div>
+            <div class="workstation-embed-shell">
+              <iframe
+                id="workstation-embed-frame"
+                class="workstation-iframe"
+                title="vllm-hust workstation"
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+                hidden
+              ></iframe>
             </div>
           </div>
         </div>
@@ -1656,9 +1629,6 @@
           workstation_embed_mode_link: "Launch Only",
           workstation_embed_mode_waiting: "Waiting",
           workstation_status_waiting: "Waiting for a public workstation URL.",
-          workstation_placeholder_title: "Configure a public workstation URL to preview it here.",
-          workstation_placeholder_desc:
-            "Point the website config to an A100-hosted workstation, or keep link mode if you only want a launch entry.",
           workstation_not_configured: "Not configured",
           workstation_status: "Overview",
           workstation_panel_title: "Serving Metrics Panel",
@@ -1879,9 +1849,6 @@
           workstation_embed_mode_link: "仅跳转",
           workstation_embed_mode_waiting: "等待接入",
           workstation_status_waiting: "等待公开可访问的 workstation 地址。",
-          workstation_placeholder_title: "配置公开可访问的 workstation 地址后，就能在这里直接预览。",
-          workstation_placeholder_desc:
-            "把 website 配置指向部署在 A100 上的 workstation；如果只想提供入口，也可以保持跳转模式。",
           workstation_not_configured: "未配置",
           workstation_status: "概览",
           workstation_panel_title: "服务指标面板",
@@ -2041,8 +2008,6 @@
           "workstation-note": dict.workstation_note,
           "workstation-open-link": dict.workstation_open_cta,
           "workstation-docs-link": dict.workstation_docs_cta,
-          "workstation-placeholder-title": dict.workstation_placeholder_title,
-          "workstation-placeholder-desc": dict.workstation_placeholder_desc,
           "arch-diagram-kicker": dict.arch_diagram_kicker,
           "arch-diagram-note": dict.arch_diagram_note,
           "arch-entry-label": dict.arch_entry_label,

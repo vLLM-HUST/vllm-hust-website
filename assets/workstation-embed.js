@@ -79,17 +79,19 @@
             modeChip.dataset.state = enabled ? 'live' : 'pending';
         }
 
+        const previewShell = document.getElementById('workstation-preview-shell');
+        if (previewShell) {
+            previewShell.hidden = !embedMode;
+        }
+
         const iframe = document.getElementById('workstation-embed-frame');
-        const placeholder = document.getElementById('workstation-placeholder');
-        if (iframe && placeholder) {
+        if (iframe) {
             if (embedMode) {
                 iframe.hidden = false;
                 iframe.setAttribute('src', workstationUrl);
-                placeholder.hidden = true;
             } else {
                 iframe.hidden = true;
                 iframe.removeAttribute('src');
-                placeholder.hidden = false;
             }
         }
     }
