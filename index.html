@@ -192,7 +192,7 @@
 
       .launchpad-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
+        grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.65fr);
         gap: 24px;
         margin: 40px 0;
         align-items: start;
@@ -682,7 +682,7 @@
 
       .workstation-layout {
         display: grid;
-        grid-template-columns: minmax(280px, 1.15fr) minmax(220px, 0.85fr);
+        grid-template-columns: minmax(0, 1.45fr) minmax(240px, 0.55fr);
         gap: 24px;
         align-items: start;
       }
@@ -699,7 +699,7 @@
         background: #ffffff;
         border-radius: 16px;
         overflow: hidden;
-        min-height: 360px;
+        min-height: 620px;
         border: 1px solid #e2e8f0;
       }
 
@@ -966,20 +966,20 @@
 
       .workstation-embed-shell {
         position: relative;
-        min-height: 420px;
+        min-height: clamp(560px, 72vh, 920px);
         background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
       }
 
       .workstation-iframe {
         width: 100%;
-        min-height: 420px;
+        min-height: clamp(560px, 72vh, 920px);
         border: 0;
         background: white;
         display: block;
       }
 
       .workstation-placeholder {
-        min-height: 420px;
+        min-height: clamp(560px, 72vh, 920px);
         display: grid;
         place-items: center;
         padding: 28px;
@@ -1206,6 +1206,16 @@
         .download-grid,
         .download-meta {
           grid-template-columns: 1fr;
+        }
+
+        .workstation-window {
+          min-height: 520px;
+        }
+
+        .workstation-embed-shell,
+        .workstation-iframe,
+        .workstation-placeholder {
+          min-height: 500px;
         }
 
         .workstation-side {
