@@ -90,6 +90,16 @@
             margin-bottom: 10px;
         }
 
+        .package-meta {
+            font-size: 0.92rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .package-meta strong {
+            color: #2d3748;
+        }
+
         .package-links {
             display: flex;
             gap: 10px;
@@ -138,6 +148,13 @@
             margin-bottom: 20px;
         }
 
+        .install-note {
+            margin-top: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
         pre {
             background: #2d3748;
             color: #e2e8f0;
@@ -163,10 +180,15 @@
         <div class="install-section">
             <h2>📥 Installation Entry</h2>
             <pre><code># Install the default serving stack
-pip install ivllm-hust
+pip install vllm-hust
 
-# Or install the packages you need for your serving path
-pip install ivllm-hust-core ivllm-hust-backend</code></pre>
+# Or install from PyPI with an explicit version
+pip install vllm-hust==<span id="versions-install-version">latest</span></code></pre>
+            <p class="install-note">
+                vllm-hust 是由 HUST 维护的 vLLM fork 发行包。当前页面展示的是实际已发布包版本；
+                对外稳定发布建议采用“上游基线 + HUST 修订号”的规则，例如 0.17.2.post1。
+                这样既能说明它基于哪个上游版本，也能避免与官方同号版本产生等价误解。
+            </p>
         </div>
 
         <div class="version-card">
@@ -184,7 +206,7 @@ pip install ivllm-hust-core ivllm-hust-backend</code></pre>
         <div class="update-info">
             <p>Last Updated: <span id="versions-updated-at">-</span></p>
             <p>Website: <a href="https://vllm-hust.sage.org.ai" style="color: white;">vllm-hust.sage.org.ai</a></p>
-            <p>Maintained by IntelliStream Team for vLLM-compatible serving on domestic hardware</p>
+            <p>Maintained by HUST for vLLM-compatible serving on domestic hardware</p>
         </div>
     </div>
     <script src="./assets/versions-page.js"></script>

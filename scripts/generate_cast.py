@@ -60,8 +60,9 @@ def create_cast_file(filename: str, *, base_url: str, model: str, port: int) -> 
     health_body = _safe_get(f"{base_url}/health").strip()
     models_body = _safe_get(f"{base_url}/v1/models").strip()
 
-    type_command("pip install ivllm-hust")
-    newline("Requirement already satisfied: ivllm-hust")
+    type_command("pip install vllm-hust")
+    newline("Collecting vllm-hust")
+    newline("Successfully installed vllm-hust")
     newline()
 
     type_command(f"vllm-hust serve --backend cpu --model {model} --port {port}")

@@ -17,7 +17,7 @@
 
 ```bash
 # 安装
-pip install ivllm-hust
+pip install vllm-hust
 
 # Hello World
 vllm-hust hello

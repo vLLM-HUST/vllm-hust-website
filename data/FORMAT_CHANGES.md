@@ -133,7 +133,7 @@ ______________________________________________________________________
 ```json
 {
   "submitted_at": "2026-01-28T11:00:00Z",
-  "submitter": "IntelliStream Team",
+  "submitter": "HUST",
   "data_source": "automated-benchmark",        // ← 新增
   "reproducible_cmd": "vllm bench serve ...", // ← 新增（重要！）
   "git_commit": "a1b2c3d4...",

@@ -58,7 +58,7 @@ def _render_readme_block(meta: dict[str, Any]) -> str:
         "vllm-hust 围绕上游 vLLM 展开，聚焦国产算力适配、AGI4S 服务场景和 benchmark 驱动验证。",
     )
     quickstart_title = quickstart.get("title_zh", "🚀 Quick Start")
-    install_command = quickstart.get("install_command", "pip install ivllm-hust")
+    install_command = quickstart.get("install_command", "pip install vllm-hust")
     run_command = quickstart.get(
         "run_command", 'vllm-hust run -p "Hello AI" --backend cuda'
     )
@@ -140,7 +140,11 @@ def sync_version_meta() -> bool:
         if not isinstance(pypi_name, str) or not isinstance(current_version, str):
             continue
 
-        latest_version = _fetch_latest_version(pypi_name)
+        try:
+            latest_version = _fetch_latest_version(pypi_name)
+        except RuntimeError as error:
+            print(f"warning: {error}")
+            continue
         if latest_version != current_version:
             package["version"] = latest_version
             changed = True

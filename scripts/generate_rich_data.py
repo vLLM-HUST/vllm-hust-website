@@ -228,7 +228,7 @@ def generate_entry(
         },
         "metadata": {
             "submitted_at": f"2026-01-{random.randint(15, 28):02d}T10:30:00Z",
-            "submitter": "IntelliStream Team",
+            "submitter": "HUST",
             "data_source": "automated-benchmark",
             "reproducible_cmd": f"vllm bench serve --model {model['name']} --backend {'cuda' if 'NVIDIA' in hardware['chip_model'] else 'ascend'} --precision {precision}",
             "git_commit": f"{'abcdef'[random.randint(0, 5)]}{random.randint(1, 9)}{'xyz'[random.randint(0, 2)]}{random.randint(0, 9)}abcd1234",

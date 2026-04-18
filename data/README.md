@@ -22,7 +22,7 @@
 - Ownership rule: website sync remains a separate offline compatibility workflow and is not part of benchmark `publish`.
 
 > **完成日期:** 2026-01-28\
-> **负责人:** IntelliStream Team (数据模型设计)\
+> **负责人:** HUST (数据模型设计)\
 > **状态:** ✅ 已完成
 
 ______________________________________________________________________
@@ -297,5 +297,5 @@ ______________________________________________________________________
 
 如有疑问，请联系：
 
-- **负责人**: IntelliStream Team
+- **负责人**: HUST
 - **项目文档**: vllm-hust-docs

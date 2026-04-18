@@ -2,11 +2,19 @@
     'use strict';
 
     function packageCard(pkg) {
-        const pypiUrl = `https://pypi.org/project/${pkg.pypi_name}/${pkg.version}/`;
+        const metaLines = [];
+        if (typeof pkg.version_display_label === 'string' && pkg.version_display_label) {
+            metaLines.push(`<div class="package-meta"><strong>Version policy:</strong> ${pkg.version_display_label}</div>`);
+        }
+        if (typeof pkg.version_note_zh === 'string' && pkg.version_note_zh) {
+            metaLines.push(`<div class="package-meta">${pkg.version_note_zh}</div>`);
+        }
+        const pypiUrl = `https://pypi.org/project/${encodeURIComponent(pkg.pypi_name)}/${encodeURIComponent(pkg.version)}/`;
         return `
             <div class="package-item">
                 <div class="package-name">${pkg.name}</div>
                 <div class="package-version">v${pkg.version}</div>
+                ${metaLines.join('')}
                 <div class="package-links">
                     <a href="${pypiUrl}" target="_blank">PyPI</a>
                     <a href="${pkg.repo}" target="_blank">GitHub</a>
@@ -19,6 +27,7 @@
         const coreContainer = document.getElementById('core-packages');
         const infraContainer = document.getElementById('infra-packages');
         const updatedNode = document.getElementById('versions-updated-at');
+        const installVersionNode = document.getElementById('versions-install-version');
         const coreLoading = document.getElementById('core-loading');
         const infraLoading = document.getElementById('infra-loading');
 
@@ -29,9 +38,14 @@
         const packages = Array.isArray(meta.packages) ? meta.packages : [];
         const core = packages.filter((pkg) => pkg.group === 'core');
         const infra = packages.filter((pkg) => pkg.group === 'infrastructure');
+        const rootPackage = packages.find((pkg) => pkg.name === 'vllm-hust');
 
         coreContainer.innerHTML = core.map(packageCard).join('');
         infraContainer.innerHTML = infra.map(packageCard).join('');
+
+        if (installVersionNode) {
+            installVersionNode.textContent = rootPackage?.version || 'latest';
+        }
 
         if (coreLoading) {
             coreLoading.style.display = core.length > 0 ? 'none' : 'block';

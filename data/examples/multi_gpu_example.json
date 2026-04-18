@@ -69,7 +69,7 @@
     },
     "metadata": {
         "submitted_at": "2026-01-28T10:45:00Z",
-        "submitter": "IntelliStream Team",
+        "submitter": "HUST",
         "data_source": "automated-benchmark",
         "reproducible_cmd": "vllm bench serve --model Qwen2-72B --backend cuda --gpus 8 --input-len 1024 --output-len 256 --batch-size 8 --concurrent 4",
         "git_commit": "a1b2c3d4e5f6789012345678901234567890abcd",

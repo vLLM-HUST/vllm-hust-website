@@ -1,6 +1,6 @@
 {"version": 2, "width": 100, "height": 24, "timestamp": 1772978554, "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
-[0.0, "o", "\u001b[1;32muser@vllm-hust\u001b[0m:\u001b[1;34m~\u001b[0m$ pip install ivllm-hust\r\n"]
-[0.9, "o", "Requirement already satisfied: ivllm-hust\r\n\r\n"]
+[0.0, "o", "\u001b[1;32muser@vllm-hust\u001b[0m:\u001b[1;34m~\u001b[0m$ pip install vllm-hust\r\n"]
+[0.9, "o", "Collecting vllm-hust\r\nSuccessfully installed vllm-hust\r\n\r\n"]
 [1.4, "o", "\u001b[1;32muser@vllm-hust\u001b[0m:\u001b[1;34m~\u001b[0m$ vllm-hust serve --backend cpu --model sshleifer/tiny-gpt2 --port 8888\r\n"]
 [2.2, "o", "🌐 Starting vllm-hust Gateway...\r\n📦 Model: sshleifer/tiny-gpt2\r\n🖥️  Backend: cpu\r\n✅ OpenAI-compatible API ready at http://localhost:8888\r\n\r\n"]
 [3.1, "o", "\u001b[1;32muser@vllm-hust\u001b[0m:\u001b[1;34m~\u001b[0m$ curl http://localhost:8888/health\r\n"]

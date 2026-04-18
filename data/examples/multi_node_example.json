@@ -108,7 +108,7 @@
     },
     "metadata": {
         "submitted_at": "2026-01-28T11:00:00Z",
-        "submitter": "IntelliStream Team",
+        "submitter": "HUST",
         "data_source": "automated-benchmark",
         "reproducible_cmd": "vllm bench serve --model Llama-3-70B --backend ascend --multi-node --nodes 2 --tp 4 --pp 2 --input-len 2048 --output-len 512 --batch-size 4 --concurrent 8",
         "git_commit": "a1b2c3d4e5f6789012345678901234567890abcd",
