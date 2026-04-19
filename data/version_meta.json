@@ -22,7 +22,7 @@
       "name": "vllm-hust",
       "repo": "https://github.com/intellistream/vllm-hust",
       "pypi_name": "vllm-hust",
-      "version": "0.17.2rc1.dev98",
+      "version": "0.17.2.post1",
       "version_display_label": "Recommended stable policy: upstream base + HUST revision",
       "version_note_zh": "当前展示为已发布包版本；稳定发布建议采用 upstream.postN 形式（如 0.17.2.post1），既保留上游对应关系，也区分 HUST fork。",
       "group": "core"
@@ -91,5 +91,5 @@
       "group": "infrastructure"
     }
   ],
-  "updated_at": "2026-04-18"
+  "updated_at": "2026-04-19"
 }
