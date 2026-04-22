@@ -7,8 +7,8 @@
         workstation_url: '',
         backend_url: '',
         docs_url: './docs/DEPLOY.md',
-        label_zh: 'A100 Workstation',
-        label_en: 'A100 Workstation'
+        label_zh: 'Workstation',
+        label_en: 'Workstation'
     };
 
     let runtimeConfig = DEFAULT_CONFIG;
@@ -26,8 +26,8 @@
     function getCurrentLabel() {
         const lang = window['vllm-hustCurrentLang'] || 'zh';
         return lang === 'zh'
-            ? normalizeUrl(runtimeConfig.label_zh) || 'A100 Workstation'
-            : normalizeUrl(runtimeConfig.label_en) || normalizeUrl(runtimeConfig.label_zh) || 'A100 Workstation';
+            ? normalizeUrl(runtimeConfig.label_zh) || 'Workstation'
+            : normalizeUrl(runtimeConfig.label_en) || normalizeUrl(runtimeConfig.label_zh) || 'Workstation';
     }
 
     function setText(id, value) {
@@ -63,7 +63,7 @@
                 ? (dict.workstation_embed_mode_embed || 'Embed Preview')
                 : (dict.workstation_embed_mode_link || 'Launch Only'))
             : (dict.workstation_embed_mode_waiting || 'Waiting'));
-        setText('workstation-topbar-title', enabled ? `${label}` : 'A100 Workstation Preview');
+        setText('workstation-topbar-title', enabled ? `${label}` : 'Workstation Preview');
         setText('workstation-backend-value', backendUrl || fallbackText);
         setText('workstation-target-value', workstationUrl || fallbackText);
 

@@ -46,7 +46,7 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 
 ## Website Workstation Embed
 
-首页现在支持把远端 `vllm-hust-workstation` 作为一个可配置面板展示出来，适合把部署在 A100 后台上的 workstation 直接呈现到 website 界面。
+首页现在支持把远端 `vllm-hust-workstation` 作为一个可配置面板展示出来，适合把部署在远端算力节点上的 workstation 直接呈现到 website 界面。
 
 - 配置文件：`data/workstation_embed.json`
 - 加载脚本：`assets/workstation-embed.js`
@@ -61,8 +61,8 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 	"workstation_url": "https://ws.sage.org.ai",
 	"backend_url": "https://api.sage.org.ai",
 	"docs_url": "./docs/CLOUDFLARE_SETUP.md",
-	"label_zh": "Sage A100 工作站",
-	"label_en": "Sage A100 Workstation"
+	"label_zh": "Sage 工作站",
+	"label_en": "Sage Workstation"
 }
 ```
 
@@ -75,8 +75,8 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 推荐的 `sage.org.ai` 域名拆分：
 
 - `vllm-hust.sage.org.ai`：GitHub Pages 静态官网
-- `ws.sage.org.ai`：A100 上的 `vllm-hust-workstation`
-- `api.sage.org.ai`：A100 上的 `vllm-hust` OpenAI 兼容接口
+- `ws.sage.org.ai`：远端节点上的 `vllm-hust-workstation`
+- `api.sage.org.ai`：远端节点上的 `vllm-hust` OpenAI 兼容接口
 
 ## Architecture And Planning Notes
 

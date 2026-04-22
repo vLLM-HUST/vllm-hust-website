@@ -4,6 +4,6 @@
   "workstation_url": "https://ws.sage.org.ai",
   "backend_url": "https://api.sage.org.ai",
   "docs_url": "./docs/CLOUDFLARE_SETUP.md",
-  "label_zh": "Sage A100 Workstation",
-  "label_en": "Sage A100 Workstation"
+  "label_zh": "Sage Workstation",
+  "label_en": "Sage Workstation"
 }
