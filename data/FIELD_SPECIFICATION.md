@@ -18,20 +18,20 @@ Schema accepts both:
 
 ## Required fields per entry
 
-| Field             | Type         | Notes                                     |
-| ----------------- | ------------ | ----------------------------------------- |
-| `entry_id`        | string(UUID) | unique record id                          |
-| `engine`          | string       | inference engine id (e.g. vllm, sglang)   |
-| `engine_version`  | string       | engine version string                     |
-| `config_type`     | string       | `single_gpu` / `multi_gpu` / `multi_node` |
-| `hardware`        | object       | hardware metadata                         |
-| `model`           | object       | model metadata                            |
-| `workload`        | object       | workload shape                            |
-| `metrics`         | object       | benchmark metrics                         |
-| `constraints`     | object       | mandatory hard-constraint context + metrics |
-| `versions`        | object       | component versions                        |
-| `environment`     | object       | runtime env                               |
-| `metadata`        | object       | provenance and reproducibility            |
+| Field            | Type         | Notes                                       |
+| ---------------- | ------------ | ------------------------------------------- |
+| `entry_id`       | string(UUID) | unique record id                            |
+| `engine`         | string       | inference engine id (e.g. vllm, sglang)     |
+| `engine_version` | string       | engine version string                       |
+| `config_type`    | string       | `single_gpu` / `multi_gpu` / `multi_node`   |
+| `hardware`       | object       | hardware metadata                           |
+| `model`          | object       | model metadata                              |
+| `workload`       | object       | workload shape                              |
+| `metrics`        | object       | benchmark metrics                           |
+| `constraints`    | object       | mandatory hard-constraint context + metrics |
+| `versions`       | object       | component versions                          |
+| `environment`    | object       | runtime env                                 |
+| `metadata`       | object       | provenance and reproducibility              |
 
 ## Key nested fields used by website MVP
 
@@ -94,7 +94,9 @@ Website render fields must be present in schema and examples:
 
 ## Derived compare snapshot
 
-`leaderboard_compare.json` is generated from validated leaderboard entries after deduplication. It is not covered by `leaderboard_v1.schema.json` because it is a website-facing derived view, not a primary benchmark result contract.
+`leaderboard_compare.json` is generated from validated leaderboard entries after deduplication. It
+is not covered by `leaderboard_v1.schema.json` because it is a website-facing derived view, not a
+primary benchmark result contract.
 
 Expected top-level fields:
 
@@ -106,7 +108,9 @@ Expected top-level fields:
 
 Each compare group carries:
 
-- `scope_key`: exact compare scope key used by the website (`model|hardware|precision|workload|config_type|chip_count|node_count`)
+- `scope_key`: exact compare scope key used by the website
+  (`model|hardware|precision|workload|config_type|chip_count|node_count`)
 - `scope`: human-readable decomposition of that same compare scope
 - `engines[]`: one preferred row per engine after deduplication
-- `preferred_pair`: the head-to-head pair the website should render first, selected by score ordering (throughput first, then latency)
+- `preferred_pair`: the head-to-head pair the website should render first, selected by score
+  ordering (throughput first, then latency)

@@ -40,7 +40,8 @@ When asked to update package version, change only `_version.py`.
 - ✅ 如果 hooks 检查失败，必须先修复问题再提交，而不是绕过 hooks
 - ✅ 帮助开发者设置 hooks 时，推荐运行 `./quickstart.sh`
 - ✅ 默认 `git push` **不会自动发布**，发布必须显式触发
-- ✅ 如需在推送 `main-dev` 时发布，使用 `git push -o vllm-hust-publish origin main-dev`；若当前 Git 客户端不支持 push option，则使用 `VLLM_HUST_PUBLISH_ON_PUSH=1 git push origin main-dev`
+- ✅ 如需在推送 `main-dev` 时发布，使用 `git push -o vllm-hust-publish origin main-dev`；若当前 Git 客户端不支持 push
+  option，则使用 `VLLM_HUST_PUBLISH_ON_PUSH=1 git push origin main-dev`
 
 ## 🚫 NEVER_CREATE_DOT_VENV_MANDATORY
 

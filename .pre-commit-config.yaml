@@ -52,7 +52,7 @@ repos:
   rev: v1.5.0
   hooks:
   - id: detect-secrets
-    exclude: ^(\.env\.template|tests/fixtures/|data/examples/.*\.json)
+    exclude: ^(\.env\.template|tests/fixtures/|data/examples/.*\.json|data/leaderboard_.*\.json|data/changzheng_release\.json)
 
 - repo: local
   hooks:

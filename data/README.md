@@ -2,24 +2,40 @@
 
 ## Source Of Truth
 
-- Local benchmark outputs: owned by `vllm-hust-benchmark`. The stable publishable interface is `leaderboard_manifest.json` plus per-entry `*_leaderboard.json` files emitted from canonical `execution_result` artifacts.
-- HF dataset: the primary distribution surface for the website. It should publish `leaderboard_single.json`, `leaderboard_multi.json`, `leaderboard_compare.json`, and `last_updated.json` snapshots derived from validated standard leaderboard artifacts.
-- Website `data/`: a compatibility cache for checked-in snapshots and offline development. It should not be edited by hand and should not ingest raw compare directory layouts.
+- Local benchmark outputs: owned by `vllm-hust-benchmark`. The stable publishable interface is
+  `leaderboard_manifest.json` plus per-entry `*_leaderboard.json` files emitted from canonical
+  `execution_result` artifacts.
+- HF dataset: the primary distribution surface for the website. It should publish
+  `leaderboard_single.json`, `leaderboard_multi.json`, `leaderboard_compare.json`, and
+  `last_updated.json` snapshots derived from validated standard leaderboard artifacts.
+- Website `data/`: a compatibility cache for checked-in snapshots and offline development. It should
+  not be edited by hand and should not ingest raw compare directory layouts.
 
 ## Update Policy
 
-- Preferred path: benchmark `publish` validates the standard export boundary and uploads only the canonical HF dataset snapshots. The website consumes those HF snapshot files.
-- Offline compatibility path: run `vllm-hust-benchmark/sync_results_to_website.sh`, which calls `scripts/aggregate_results.py` on benchmark `leaderboard_manifest.json` exports and regenerates the same snapshot files locally, including `leaderboard_compare.json` for direct head-to-head rendering.
-- Fail-fast rule: invalid leaderboard entries or malformed manifests must be fixed at the benchmark export side; do not patch website data by hand.
+- Preferred path: benchmark `publish` validates the standard export boundary and uploads only the
+  canonical HF dataset snapshots. The website consumes those HF snapshot files.
+- Offline compatibility path: run `vllm-hust-benchmark/sync_results_to_website.sh`, which calls
+  `scripts/aggregate_results.py` on benchmark `leaderboard_manifest.json` exports and regenerates
+  the same snapshot files locally, including `leaderboard_compare.json` for direct head-to-head
+  rendering.
+- Fail-fast rule: invalid leaderboard entries or malformed manifests must be fixed at the benchmark
+  export side; do not patch website data by hand.
 
 ## Publish Boundary
 
-- Standard input only: `publish` and `upload-hf` only accept benchmark standard exports rooted at `leaderboard_manifest.json` plus referenced `*_leaderboard.json` files.
-- No raw compare mixing: arbitrary compare scratch files, ad hoc JSON merges, or website-local files are outside the accepted publish input boundary.
-- Standard output only: HF dataset updates are limited to `leaderboard_single.json`, `leaderboard_multi.json`, `leaderboard_compare.json`, and `last_updated.json`, plus canonical per-entry JSON files.
+- Standard input only: `publish` and `upload-hf` only accept benchmark standard exports rooted at
+  `leaderboard_manifest.json` plus referenced `*_leaderboard.json` files.
+- No raw compare mixing: arbitrary compare scratch files, ad hoc JSON merges, or website-local files
+  are outside the accepted publish input boundary.
+- Standard output only: HF dataset updates are limited to `leaderboard_single.json`,
+  `leaderboard_multi.json`, `leaderboard_compare.json`, and `last_updated.json`, plus canonical
+  per-entry JSON files.
 - Idempotent rule: unchanged canonical entries and unchanged snapshots must be skipped on rerun.
-- Snapshot completeness rule: if a remote dataset already exists, the standard snapshot set must be complete; partial remote snapshot state is treated as invalid and must fail fast.
-- Ownership rule: website sync remains a separate offline compatibility workflow and is not part of benchmark `publish`.
+- Snapshot completeness rule: if a remote dataset already exists, the standard snapshot set must be
+  complete; partial remote snapshot state is treated as invalid and must fail fast.
+- Ownership rule: website sync remains a separate offline compatibility workflow and is not part of
+  benchmark `publish`.
 
 > **完成日期:** 2026-01-28\
 > **负责人:** HUST (数据模型设计)\
@@ -77,7 +93,8 @@ ______________________________________________________________________
 
 - `leaderboard_compare.json` is a derived website artifact, not a second benchmark result schema.
 - It is computed only from validated `leaderboard_manifest.json` + `*_leaderboard.json` exports.
-- Its purpose is to let the homepage render direct `vllm-hust vs vLLM` or `vLLM-Ascend` gap cards without hand-written patches.
+- Its purpose is to let the homepage render direct `vllm-hust vs vLLM` or `vLLM-Ascend` gap cards
+  without hand-written patches.
 
 ### 1. Protocol v0.1 对齐
 
@@ -279,7 +296,8 @@ python validate_schema.py data/leaderboard_single.json data/leaderboard_multi.js
 ### 3. 分发数据
 
 - HF 主路径：使用 `vllm-hust-benchmark upload-hf --input /path/to/outputs` 上传标准导出结果并刷新 HF 快照。
-- Website 离线路径：仅在需要本地或离线预览时，运行 `sync_results_to_website.sh` 生成 `data/leaderboard_single.json` / `data/leaderboard_multi.json` / `data/last_updated.json`。
+- Website 离线路径：仅在需要本地或离线预览时，运行 `sync_results_to_website.sh` 生成 `data/leaderboard_single.json` /
+  `data/leaderboard_multi.json` / `data/last_updated.json`。
 
 ### 4. 提交更改
 

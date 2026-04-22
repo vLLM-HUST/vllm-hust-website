@@ -5,17 +5,15 @@
 - All release banner, Quick Start copy, and package versions are managed in
   `data/version_meta.json`.
 - Do not edit release/quickstart copy directly in `README.md` for normal updates.
-- For `vllm-hust`, do not invent a detached `0.5.x.x` website-only version
-  line. The recommended stable public release rule is `upstream.postN`, such as
-  `0.17.2.post1`, so users can see both the upstream base and the HUST fork
-  revision.
-- The default assumption is that `vllm-hust` may eventually upstream some of
-  its optimizations back to official `vllm`. Version copy should therefore
-  preserve upstream mergeability semantics instead of implying a permanent,
-  independently versioned downstream product line.
-- Development or nightly builds may still carry upstream prerelease or dev
-  identifiers, but the public website should explain that stable releases are
-  expected to converge on the `upstream.postN` scheme.
+- For `vllm-hust`, do not invent a detached `0.5.x.x` website-only version line. The recommended
+  stable public release rule is `upstream.postN`, such as `0.17.2.post1`, so users can see both the
+  upstream base and the HUST fork revision.
+- The default assumption is that `vllm-hust` may eventually upstream some of its optimizations back
+  to official `vllm`. Version copy should therefore preserve upstream mergeability semantics instead
+  of implying a permanent, independently versioned downstream product line.
+- Development or nightly builds may still carry upstream prerelease or dev identifiers, but the
+  public website should explain that stable releases are expected to converge on the
+  `upstream.postN` scheme.
 
 ## Update Flow
 

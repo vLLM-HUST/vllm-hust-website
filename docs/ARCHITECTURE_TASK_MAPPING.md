@@ -5,9 +5,11 @@
 This note clarifies two things that should not be mixed together:
 
 1. What the actual serving runtime shape in upstream vLLM looks like.
-2. How the 9 subtasks in the implementation plan map onto real runtime subsystems and extension points.
+1. How the 9 subtasks in the implementation plan map onto real runtime subsystems and extension
+   points.
 
-The 9 subtasks are optimization slices over real runtime subsystems. They are not claims that upstream vLLM already exposes those subtasks as named modules.
+The 9 subtasks are optimization slices over real runtime subsystems. They are not claims that
+upstream vLLM already exposes those subtasks as named modules.
 
 For the execution-oriented follow-up, see `docs/IMPLEMENTATION_PRIORITIES.md`.
 
@@ -16,10 +18,10 @@ For the execution-oriented follow-up, see `docs/IMPLEMENTATION_PRIORITIES.md`.
 The main vLLM V1 serving chain is:
 
 1. API and client entrypoints
-2. Engine core and scheduler
-3. Executor and workers
-4. Model runner, attention backend, kernels, sampler
-5. Cross-cutting systems such as KV cache, multimodal processing, structured output, and metrics
+1. Engine core and scheduler
+1. Executor and workers
+1. Model runner, attention backend, kernels, sampler
+1. Cross-cutting systems such as KV cache, multimodal processing, structured output, and metrics
 
 In code, the most important anchor points are:
 
@@ -69,7 +71,8 @@ For merge-safe fork work, the highest-priority landing zones are:
 
 ### vllm-ascend-hust
 
-These are hardware-plugin landing zones and should usually absorb domestic-hardware-specific logic before shared-path edits are considered:
+These are hardware-plugin landing zones and should usually absorb domestic-hardware-specific logic
+before shared-path edits are considered:
 
 - reference-repos/vllm-ascend-hust/vllm_ascend/platform.py
 - reference-repos/vllm-ascend-hust/vllm_ascend/worker/model_runner_v1.py
@@ -103,7 +106,8 @@ Why:
 Recommended fork-first path:
 
 - Prefer platform-specific executor overrides and worker/model-runner extension points.
-- In Ascend plugin work, start from reference-repos/vllm-ascend-hust/vllm_ascend/platform.py and reference-repos/vllm-ascend-hust/vllm_ascend/patch/platform/patch_multiproc_executor.py.
+- In Ascend plugin work, start from reference-repos/vllm-ascend-hust/vllm_ascend/platform.py and
+  reference-repos/vllm-ascend-hust/vllm_ascend/patch/platform/patch_multiproc_executor.py.
 
 ### 1.2 Dynamic execution and native operator optimization
 
@@ -122,7 +126,8 @@ Ascend-first landing zones:
 
 Why:
 
-- Dynamic shape, fused operators, hardware-native kernels, and graph execution all land near the model runner and attention backend.
+- Dynamic shape, fused operators, hardware-native kernels, and graph execution all land near the
+  model runner and attention backend.
 
 ### 1.3 Speculative decoding and stage-collaboration optimization
 
@@ -170,7 +175,8 @@ Ascend-first landing zones:
 
 Why:
 
-- Any HBM-DRAM-NVMe policy should be modeled as state-management logic, not spread into unrelated scheduling paths.
+- Any HBM-DRAM-NVMe policy should be modeled as state-management logic, not spread into unrelated
+  scheduling paths.
 
 ### 2.3 State transfer and scheduling co-optimization
 
@@ -200,7 +206,7 @@ Primary mapping:
 Ascend-first landing zones:
 
 - reference-repos/vllm-ascend-hust/vllm_ascend/quantization/
-- reference-repos/vllm-ascend-hust/vllm_ascend/_310p/quantization/
+- reference-repos/vllm-ascend-hust/vllm_ascend/\_310p/quantization/
 
 Why:
 
@@ -217,7 +223,7 @@ Primary mapping:
 Ascend-first landing zones:
 
 - reference-repos/vllm-ascend-hust/vllm_ascend/attention/
-- reference-repos/vllm-ascend-hust/vllm_ascend/_310p/attention/
+- reference-repos/vllm-ascend-hust/vllm_ascend/\_310p/attention/
 
 Why:
 
@@ -246,33 +252,35 @@ Why:
 Use this order when deciding where to implement a change:
 
 1. Existing upstream config gates and registries
-2. Platform plugin hooks
-3. Worker or model-runner subclassing
-4. Attention backend or kernel registration
-5. Narrow worker or platform patch
-6. Shared hot-path edits only if none of the above are sufficient
+1. Platform plugin hooks
+1. Worker or model-runner subclassing
+1. Attention backend or kernel registration
+1. Narrow worker or platform patch
+1. Shared hot-path edits only if none of the above are sufficient
 
-For domestic hardware enablement, start from the plugin repository first. Only move into shared vllm-hust paths when the change is truly generic or when the extension point is missing.
+For domestic hardware enablement, start from the plugin repository first. Only move into shared
+vllm-hust paths when the change is truly generic or when the extension point is missing.
 
 ## Validation Expectations
 
 Each subtask should be validated on both code-level and workload-level evidence:
 
 1. Unit or subsystem tests around the touched runtime path
-2. Scenario-level serving checks for long context, tool-calling, structured output, or multimodal flows when relevant
-3. vLLM benchmark artifacts for throughput, TTFT, TPOT, KV reuse, or token cost claims
-4. Clear fallback behavior on unsupported platforms
+1. Scenario-level serving checks for long context, tool-calling, structured output, or multimodal
+   flows when relevant
+1. vLLM benchmark artifacts for throughput, TTFT, TPOT, KV reuse, or token cost claims
+1. Clear fallback behavior on unsupported platforms
 
 ## Practical Reading Order
 
 If a new contributor needs to understand where to work first, use this order:
 
 1. reference-repos/vllm/docs/design/arch_overview.md
-2. reference-repos/vllm/docs/usage/v1_guide.md
-3. vllm-hust:vllm/v1/engine/core.py
-4. vllm-hust:vllm/v1/core/sched/scheduler.py
-5. vllm-hust:vllm/v1/core/kv_cache_manager.py
-6. vllm-hust:vllm/v1/worker/gpu/model_runner.py
-7. reference-repos/vllm-ascend-hust/vllm_ascend/platform.py
-8. reference-repos/vllm-ascend-hust/vllm_ascend/worker/model_runner_v1.py
-9. reference-repos/vllm-ascend-hust/vllm_ascend/worker/v2/model_runner.py
+1. reference-repos/vllm/docs/usage/v1_guide.md
+1. vllm-hust:vllm/v1/engine/core.py
+1. vllm-hust:vllm/v1/core/sched/scheduler.py
+1. vllm-hust:vllm/v1/core/kv_cache_manager.py
+1. vllm-hust:vllm/v1/worker/gpu/model_runner.py
+1. reference-repos/vllm-ascend-hust/vllm_ascend/platform.py
+1. reference-repos/vllm-ascend-hust/vllm_ascend/worker/model_runner_v1.py
+1. reference-repos/vllm-ascend-hust/vllm_ascend/worker/v2/model_runner.py

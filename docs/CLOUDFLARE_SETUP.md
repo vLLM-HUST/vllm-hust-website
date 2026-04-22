@@ -28,7 +28,8 @@ vllm-hust.sage.org.ai -> intellistream.github.io
 
 进入 Cloudflare Zero Trust Dashboard：
 
-`Networks` -> `Tunnels` -> 选择当前这条 A100 主机正在使用的 tunnel -> `Public Hostnames` -> `Add a public hostname`
+`Networks` -> `Tunnels` -> 选择当前这条 A100 主机正在使用的 tunnel -> `Public Hostnames` ->
+`Add a public hostname`
 
 新增：
 
@@ -58,7 +59,8 @@ vllm-hust.sage.org.ai -> intellistream.github.io
 
 ### 5. 若开启了 Access，先放通自己测试
 
-如果 `ws.sage.org.ai` 或 `api.sage.org.ai` 套了 Cloudflare Access，请先添加允许你自己访问的 policy；否则 website iframe 会被登录页拦住。
+如果 `ws.sage.org.ai` 或 `api.sage.org.ai` 套了 Cloudflare Access，请先添加允许你自己访问的 policy；否则 website iframe
+会被登录页拦住。
 
 ## 完成后的验证
 

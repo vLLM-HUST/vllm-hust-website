@@ -50,8 +50,8 @@ Settings → Pages → Custom domain:
 `website` 本身是静态页，推荐把 `vllm-hust-workstation` 独立部署在 A100 机器上，再通过首页的 workstation 面板做 iframe 展示或外链跳转。
 
 1. 在 A100 主机部署 `vllm-hust` OpenAI 兼容服务，例如：`https://a100.example.com:8080`
-2. 在同一主机或同一内网部署 `vllm-hust-workstation`
-3. 为 workstation 配置：
+1. 在同一主机或同一内网部署 `vllm-hust-workstation`
+1. 为 workstation 配置：
 
 ```dotenv
 VLLM_HUST_BASE_URL=http://127.0.0.1:8080

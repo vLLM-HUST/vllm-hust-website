@@ -4,12 +4,13 @@
 
 This note turns the actual vLLM runtime and 9-task mapping into a first-phase execution checklist.
 
-The focus is not to start all 9 subtasks equally. The goal is to pick the smallest set of runtime paths that can:
+The focus is not to start all 9 subtasks equally. The goal is to pick the smallest set of runtime
+paths that can:
 
 1. Improve domestic-hardware viability.
-2. Improve long-context and AGI4S serving behavior.
-3. Stay merge-safe against upstream vLLM.
-4. Produce benchmark evidence early.
+1. Improve long-context and AGI4S serving behavior.
+1. Stay merge-safe against upstream vLLM.
+1. Produce benchmark evidence early.
 
 This document should be read together with `docs/ARCHITECTURE_TASK_MAPPING.md`.
 
@@ -23,7 +24,8 @@ These items should move first because they unlock nearly all later work.
 
 Why first:
 
-- Domestic hardware enablement fails early if the model runner, attention backend, or kernel path is unstable.
+- Domestic hardware enablement fails early if the model runner, attention backend, or kernel path is
+  unstable.
 - This is the narrowest place to recover real performance without rewriting the engine core.
 
 Primary files to start with:
@@ -58,7 +60,8 @@ vllm bench serve \
 
 Why first:
 
-- Prefix reuse is already native to vLLM and gives early wins in long-context and repeated-context workloads.
+- Prefix reuse is already native to vLLM and gives early wins in long-context and repeated-context
+  workloads.
 - It is merge-safe because the core abstractions already exist.
 
 Primary files to start with:
@@ -84,7 +87,8 @@ Suggested benchmark shape:
 Why first:
 
 - Without stable evidence, optimization work becomes anecdotal.
-- This is the control point for deciding whether later kernel and scheduling changes are worth keeping.
+- This is the control point for deciding whether later kernel and scheduling changes are worth
+  keeping.
 
 Primary files to start with:
 
@@ -241,38 +245,40 @@ Minimum validation:
 Why later:
 
 - This can easily become a broad rewrite if started too early.
-- Most benefits can initially be captured by platform hooks, executor overrides, and model-runner adaptation.
+- Most benefits can initially be captured by platform hooks, executor overrides, and model-runner
+  adaptation.
 
 Start only when one of these is true:
 
 1. Existing platform interfaces cannot express the optimization.
-2. Worker or executor duplication becomes unmaintainable.
-3. A generic abstraction can clearly benefit multiple hardware targets.
+1. Worker or executor duplication becomes unmaintainable.
+1. A generic abstraction can clearly benefit multiple hardware targets.
 
 ## AGI4S-First Scenario Coverage
 
 Every priority above should be checked against these real scenarios, not only synthetic throughput:
 
 1. Long context and multi-turn continuation
-2. Tool-calling and structured output
-3. Reasoning-heavy generation
-4. Multimodal request processing when applicable
-5. Streaming latency under concurrency
+1. Tool-calling and structured output
+1. Reasoning-heavy generation
+1. Multimodal request processing when applicable
+1. Streaming latency under concurrency
 
-If a change improves a microbenchmark but regresses any of the above, it should not be treated as a clean win.
+If a change improves a microbenchmark but regresses any of the above, it should not be treated as a
+clean win.
 
 ## Minimal First-Year Sequence
 
 If the team wants one concrete sequence for the first year, use this order:
 
 1. Stabilize dynamic execution and hardware-native kernels
-2. Make prefix caching and KV metrics trustworthy
-3. Harden benchmark and regression evidence
-4. Improve state residency and long-context stability
-5. Add speculative scheduling improvements
-6. Introduce state-aware transfer and routing
-7. Push KV quantization
-8. Expand to mixed-precision and sparse-quantized adaptation
+1. Make prefix caching and KV metrics trustworthy
+1. Harden benchmark and regression evidence
+1. Improve state residency and long-context stability
+1. Add speculative scheduling improvements
+1. Introduce state-aware transfer and routing
+1. Push KV quantization
+1. Expand to mixed-precision and sparse-quantized adaptation
 
 ## Suggested Benchmark Bundle
 
@@ -327,6 +333,6 @@ vllm bench throughput \
 Do not continue broadening a branch if any of these happen:
 
 1. The only gain is from a microbenchmark and not from serving workloads.
-2. The implementation requires large shared-path edits before platform hooks are exhausted.
-3. Validation cannot explain whether the gain came from scheduling, kernels, or caching.
-4. Unsupported hardware fallback behavior becomes ambiguous.
+1. The implementation requires large shared-path edits before platform hooks are exhausted.
+1. Validation cannot explain whether the gain came from scheduling, kernels, or caching.
+1. Unsupported hardware fallback behavior becomes ambiguous.
