@@ -111,7 +111,14 @@ def _valid_entry() -> dict:
             "engine_version": "1.2.3",
             "hardware_family": "cuda",
             "reproducible_cmd": "vllm bench serve --endpoint http://127.0.0.1:8901/v1 --model Qwen/Qwen2.5-0.5B-Instruct",
-            "git_commit": None,
+            "git_commit": "abc123def456",
+            "github_user": "octocat",
+            "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/abc123def456",
+            "github_repository": "vLLM-HUST/vllm-hust",
+            "github_ref": "feature/bench-provenance",
+            "github_event_name": "pull_request",
+            "github_pr_number": 42,
+            "github_pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/42",
             "release_date": "2026-03-14",
             "changelog_url": "https://example.com/changelog",
             "notes": "Benchmark run: short",
@@ -182,6 +189,8 @@ def test_aggregate_results_from_standard_manifest(tmp_path: Path) -> None:
     )
     assert len(single_payload) == 1
     assert single_payload[0]["workload"]["name"] == "short"
+    assert single_payload[0]["metadata"]["github_user"] == "octocat"
+    assert single_payload[0]["metadata"]["git_commit"] == "abc123def456"
 
 
 def test_aggregate_results_fails_on_invalid_schema(tmp_path: Path) -> None:

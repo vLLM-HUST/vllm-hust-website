@@ -709,6 +709,48 @@
                 "null"
               ]
             },
+            "github_user": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "github_commit_url": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "github_repository": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "github_ref": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "github_event_name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "github_pr_number": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "github_pr_url": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
             "release_date": {
               "type": [
                 "string",

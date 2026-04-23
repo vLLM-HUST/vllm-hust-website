@@ -135,7 +135,12 @@
             hitRate: 'Hit Rate',
             improvements: '🚀 Improvements',
             noSpecificImprovements: 'No specific improvements noted.',
+            noImprovements: 'No specific improvements noted.',
             gitCommit: 'Git Commit',
+            githubUser: 'GitHub User',
+            githubPullRequest: 'GitHub PR',
+            githubRepository: 'Repository',
+            gitReference: 'Git Ref',
             changelog: 'Changelog',
             view: 'View',
             reproduceThisResult: '🔁 Reproduce This Result',
@@ -268,7 +273,12 @@
             hitRate: '命中率',
             improvements: '🚀 改进说明',
             noSpecificImprovements: '没有额外改进说明。',
+            noImprovements: '没有额外改进说明。',
             gitCommit: 'Git Commit',
+            githubUser: 'GitHub 用户',
+            githubPullRequest: 'GitHub PR',
+            githubRepository: '仓库',
+            gitReference: 'Git 引用',
             changelog: '变更记录',
             view: '查看',
             reproduceThisResult: '🔁 复现实验结果',
@@ -482,6 +492,53 @@
 
     function getDisplayVersion(entry) {
         return entry.displayVersion || normalizeDisplayVersion(getEngineVersion(entry));
+    }
+
+    function formatGithubUserText(value) {
+        const normalized = String(value || '').trim();
+        if (!normalized) {
+            return '';
+        }
+        return normalized.startsWith('@') ? normalized : `@${normalized}`;
+    }
+
+    function getShortCommit(value) {
+        const normalized = String(value || '').trim();
+        if (!normalized) {
+            return '';
+        }
+        return normalized.replace(/^g/, '').slice(0, 8);
+    }
+
+    function renderExternalLink(url, label, className = 'meta-link') {
+        if (!url || !label) {
+            return '';
+        }
+        return `<a class="${className}" href="${url}" target="_blank" rel="noreferrer">${label}</a>`;
+    }
+
+    function renderProvenanceSummary(entry) {
+        const meta = entry?.metadata || {};
+        const parts = [];
+        const githubUser = formatGithubUserText(meta.github_user);
+        const shortCommit = getShortCommit(meta.git_commit);
+
+        if (githubUser) {
+            parts.push(`<span class="provenance-user">${githubUser}</span>`);
+        }
+        if (shortCommit) {
+            const commitLabel = `<span class="provenance-commit">${shortCommit}</span>`;
+            parts.push(
+                meta.github_commit_url
+                    ? renderExternalLink(meta.github_commit_url, commitLabel, 'provenance-link')
+                    : commitLabel
+            );
+        }
+
+        if (!parts.length) {
+            return '';
+        }
+        return `<small class="version-provenance">${parts.join('<span class="provenance-separator">·</span>')}</small>`;
     }
 
     function isNumericVersion(version) {
@@ -1138,6 +1195,7 @@
         const displayVersion = getDisplayVersion(entry);
         const buildCount = entry.versionVariants?.length || 1;
         const engineLabel = getEngineLabel(getEngine(entry));
+        const provenanceSummary = renderProvenanceSummary(entry);
 
         // 生成配置描述（芯片数/节点数）
         const configText = getConfigText(entry);
@@ -1148,6 +1206,7 @@
                 <td>
                     <div class="version-cell">
                         ${showVersion ? `<div class="version-main">${engineLabel} v${displayVersion}<small class="version-date">(${releaseDate})</small></div>` : ''}
+                        ${showVersion ? provenanceSummary : ''}
                         ${showVersion && buildCount > 1 ? `<small class="version-merge-hint">${t('bestFourth')}</small>` : ''}
                         ${showVersion && isSparse ? `<small class="version-merge-hint sparse">${t('sparseGroup')}</small>` : ''}
                         ${(showVersion && (isLatest || entry.isBaseline))
@@ -1338,12 +1397,25 @@
 
     function renderImprovementsSection(entry) {
         const meta = entry.metadata;
+        const githubUser = formatGithubUserText(meta.github_user);
+        const commitLabel = meta.git_commit ? `<code>${meta.git_commit}</code>` : '';
+        const gitCommit = meta.github_commit_url
+            ? renderExternalLink(meta.github_commit_url, commitLabel || t('view'))
+            : (commitLabel || '-');
+        const githubPullRequest = meta.github_pr_number
+            ? renderExternalLink(meta.github_pr_url, `#${meta.github_pr_number}`) || `#${meta.github_pr_number}`
+            : (meta.github_pr_url ? renderExternalLink(meta.github_pr_url, t('view')) : '');
+        const changelog = meta.changelog_url ? renderExternalLink(meta.changelog_url, t('view')) : '-';
         return `
             <div class="detail-section">
                 <h4>${t('improvements')}</h4>
                 <p>${meta.notes || t('noImprovements')}</p>
-                <p><strong>${t('gitCommit')}:</strong> <code>${meta.git_commit}</code></p>
-                <p><strong>${t('changelog')}:</strong> <a href="${meta.changelog_url}" target="_blank" style="color: #5a67d8;">${t('view')}</a></p>
+                ${githubUser ? `<p><strong>${t('githubUser')}:</strong> ${githubUser}</p>` : ''}
+                ${(meta.git_commit || meta.github_commit_url) ? `<p><strong>${t('gitCommit')}:</strong> ${gitCommit}</p>` : ''}
+                ${githubPullRequest ? `<p><strong>${t('githubPullRequest')}:</strong> ${githubPullRequest}</p>` : ''}
+                ${meta.github_repository ? `<p><strong>${t('githubRepository')}:</strong> ${meta.github_repository}</p>` : ''}
+                ${meta.github_ref ? `<p><strong>${t('gitReference')}:</strong> ${meta.github_ref}</p>` : ''}
+                <p><strong>${t('changelog')}:</strong> ${changelog}</p>
             </div>
         `;
     }

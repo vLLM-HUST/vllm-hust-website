@@ -733,6 +733,41 @@
     line-height: 1.1;
 }
 
+.version-provenance {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    color: #475569;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: 'Sora', 'Inter', sans-serif;
+}
+
+.provenance-user {
+    color: #0f766e;
+}
+
+.provenance-commit {
+    color: #1e3a8a;
+    font-family: 'Fira Code', monospace;
+}
+
+.provenance-link,
+.meta-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.provenance-link:hover,
+.meta-link:hover {
+    text-decoration: underline;
+}
+
+.provenance-separator {
+    color: #94a3b8;
+}
+
 .version-merge-hint {
     color: #64748b;
     font-size: 0.72rem;
@@ -908,6 +943,11 @@
 .detail-section strong {
     color: #2d3748;
     font-weight: 600;
+}
+
+.detail-section code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85em;
 }
 
 /* Build Variants Table Container */

@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- Leaderboard 现在会在主表和详情面板中展示 benchmark entry 关联的 GitHub provenance，包括触发该成绩的 GitHub 用户、commit SHA，以及可选的 PR / 仓库 / ref 链接；对应 benchmark 导出 metadata 也已补齐这些字段。
 - 继续清理内部文档与生成脚本中的历史旧命名和旧 workload 代号：同步更新 `.github` 说明、`LICENSE` 注释、demo 生成脚本、示例数据、README 和部署文档，统一到 `vllm-hust`、vLLM benchmark 与 AGI4S 服务场景口径。
 - 刷新 website leaderboard 到固定 `vllm-ascend v0.11.0` 基线的正式 compare 快照（`formal_compare_20260318_vllm_ascend_0110_fixlog`）：同步 `data/leaderboard_single.json`、`data/leaderboard_compare.json` 与 `data/last_updated.json`。
 - 刷新 website leaderboard 到 `formal_compare_20260316_ascend_slotfix_postprefix` 的 publish-ready 快照：同步 `data/leaderboard_single.json`、`data/leaderboard_compare.json`、`data/leaderboard_multi.json` 与 `data/last_updated.json`，确保页面展示使用本轮 slot-fix 后的正式 compare 数据。
