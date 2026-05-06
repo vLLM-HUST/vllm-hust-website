@@ -52,6 +52,7 @@
             statsShowing: 'Showing',
             statsComparisonRows: 'comparison rows across',
             statsCompleteGroups: 'complete groups',
+            statsSource: 'source',
             quickCompare: 'Quick Compare',
             hardConstraintsTitle: 'Hard Constraints',
             hardConstraintsSubtitle: 'Mandatory targets from benchmark snapshots (current run and regression vs previous submission).',
@@ -190,6 +191,7 @@
             statsShowing: '展示',
             statsComparisonRows: '条对比记录，覆盖',
             statsCompleteGroups: '个完整分组',
+            statsSource: '数据源',
             quickCompare: '快速对比',
             hardConstraintsTitle: '硬约束达成',
             hardConstraintsSubtitle: '基于 benchmark 快照的强制目标判定（展示当前结果及相对上次提交的回归变化）。',
@@ -734,14 +736,13 @@
         ['single-chip', 'multi-chip', 'multi-node'].forEach(tab => {
             const data = getDataByTab(tab);
             if (data.length > 0) {
-                const first = data[0];
                 state.filters[tab] = {
-                    engine: getEngine(first),
-                    hardware: first.hardware.chip_model,
-                    model: first.model.name,
+                    engine: 'all',
+                    hardware: 'all',
+                    model: 'all',
                     version: 'all',
                     workload: 'all',
-                    precision: first.model.precision
+                    precision: 'all'
                 };
             }
         });
@@ -947,7 +948,11 @@
 
         const hidden = Math.max(rawFilteredTotal - visibleTotal, 0);
         const hiddenText = hidden > 0 ? ` • ${t('statsHidden')} ${hidden} ${t('statsSparseSuffix')}` : '';
-        statsEl.textContent = `${t('statsLoaded')} ${state.totalLoadedEntries} • ${state.currentTab}: ${tabTotal} • ${t('statsMatched')} ${rawFilteredTotal} ${t('statsBuildEntries')} • ${t('statsShowing')} ${mergedTotal} ${t('statsComparisonRows')} ${comparisonView.activeCoverage.completeGroupCount} ${t('statsCompleteGroups')}${hiddenText}`;
+        const source = window.HFDataLoader && window.HFDataLoader.getLastLoadedSource
+            ? window.HFDataLoader.getLastLoadedSource()
+            : 'local';
+        const sourceText = source ? ` • ${t('statsSource')}: ${source}` : '';
+        statsEl.textContent = `${t('statsLoaded')} ${state.totalLoadedEntries} • ${state.currentTab}: ${tabTotal} • ${t('statsMatched')} ${rawFilteredTotal} ${t('statsBuildEntries')} • ${t('statsShowing')} ${mergedTotal} ${t('statsComparisonRows')} ${comparisonView.activeCoverage.completeGroupCount} ${t('statsCompleteGroups')}${hiddenText}${sourceText}`;
     }
 
     function renderOverview(entries, comparisonView, viewOptions) {

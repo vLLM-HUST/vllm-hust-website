@@ -26,10 +26,101 @@ const HF_CONFIG = {
     cacheTTLms: 5 * 60 * 1000,
 
     // 启用标记文件一致性校验，避免同步后继续命中旧缓存
-    validateWithMarker: true
+    validateWithMarker: true,
+
+    // 远端优先使用镜像，官方站点作为回退
+    endpoints: [
+        'https://hf-mirror.com',
+        'https://huggingface.co'
+    ],
+
+    // 数据源优先级：github -> hf -> local
+    sources: ['github', 'hf', 'local'],
+
+    // GitHub 仓库配置（用于不依赖 HF 的数据发布方式）
+    github: {
+        repo: 'vLLM-HUST/vllm-hust-benchmark',
+        branch: 'main',
+        dataPath: 'leaderboard-data/snapshots'
+    }
 };
 
 const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v1';
+let lastLoadedSource = null;
+
+function getUniqueEndpoints() {
+    const configured = Array.isArray(HF_CONFIG.endpoints) ? HF_CONFIG.endpoints : [];
+    const fromWindow = typeof window !== 'undefined' && typeof window.VLLM_HF_ENDPOINT === 'string'
+        ? [window.VLLM_HF_ENDPOINT]
+        : [];
+    const fromQuery = typeof window !== 'undefined'
+        ? [new URLSearchParams(window.location.search).get('hfEndpoint')]
+        : [];
+
+    const raw = [...fromQuery, ...fromWindow, ...configured]
+        .map((item) => String(item || '').trim().replace(/\/$/, ''))
+        .filter(Boolean);
+
+    return [...new Set(raw)];
+}
+
+function buildDatasetResolveUrl(endpoint, filename) {
+    return `${endpoint}/datasets/${HF_CONFIG.repo}/resolve/${HF_CONFIG.branch}/${filename}`;
+}
+
+function buildDatasetApiUrl(endpoint) {
+    return `${endpoint}/api/datasets/${HF_CONFIG.repo}`;
+}
+
+function normalizePathPrefix(rawPrefix) {
+    const normalized = String(rawPrefix || '').trim().replace(/^\/+|\/+$/g, '');
+    return normalized ? `${normalized}/` : '';
+}
+
+function getGithubConfig() {
+    const fromWindow = typeof window !== 'undefined' && window.VLLM_GH_DATA_REPO
+        ? String(window.VLLM_GH_DATA_REPO)
+        : '';
+    const query = typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search)
+        : null;
+
+    const repo = (query?.get('ghRepo') || fromWindow || HF_CONFIG.github.repo || '').trim();
+    const branch = (query?.get('ghBranch') || HF_CONFIG.github.branch || 'main').trim();
+    const dataPath = (query?.get('ghPath') || HF_CONFIG.github.dataPath || 'data').trim();
+
+    return {
+        repo,
+        branch,
+        dataPath,
+    };
+}
+
+function buildGitHubRawUrl(filename) {
+    const github = getGithubConfig();
+    const prefix = normalizePathPrefix(github.dataPath);
+    return `https://raw.githubusercontent.com/${github.repo}/${github.branch}/${prefix}${filename}`;
+}
+
+function getSourcePriority() {
+    const query = typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search)
+        : null;
+    const sourceOverride = (query?.get('dataSource') || '').trim().toLowerCase();
+    if (sourceOverride === 'github') {
+        return ['github', 'hf', 'local'];
+    }
+    if (sourceOverride === 'hf') {
+        return ['hf', 'github', 'local'];
+    }
+    if (sourceOverride === 'local') {
+        return ['local', 'github', 'hf'];
+    }
+
+    return Array.isArray(HF_CONFIG.sources) && HF_CONFIG.sources.length
+        ? HF_CONFIG.sources
+        : ['hf', 'local'];
+}
 
 function readCacheEnvelope() {
     try {
@@ -61,6 +152,14 @@ function writeCache(data, marker = null) {
     } catch (_error) {
         // ignore cache write failures
     }
+}
+
+function setLastLoadedSource(source) {
+    lastLoadedSource = source;
+}
+
+function getLastLoadedSource() {
+    return lastLoadedSource;
 }
 
 async function getLatestMarker() {
@@ -244,24 +343,31 @@ function mergeByEntryId(entries) {
  * @returns {Promise<Array>} - 解析后的 JSON 数据
  */
 async function loadFromHuggingFace(filename) {
-    // Hugging Face raw file URL 格式
-    // https://huggingface.co/datasets/{repo}/resolve/{branch}/{path}
-    const url = `https://huggingface.co/datasets/${HF_CONFIG.repo}/resolve/${HF_CONFIG.branch}/${filename}`;
+    const endpoints = getUniqueEndpoints();
+    let lastError = null;
 
-    console.log(`[HF Loader] Fetching: ${url}`);
+    for (const endpoint of endpoints) {
+        const url = buildDatasetResolveUrl(endpoint, filename);
+        console.log(`[HF Loader] Fetching: ${url}`);
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json'
+                },
+                cache: 'no-cache'  // 确保获取最新数据
+            });
 
-    const response = await fetch(url, {
-        headers: {
-            'Accept': 'application/json'
-        },
-        cache: 'no-cache'  // 确保获取最新数据
-    });
-
-    if (!response.ok) {
-        throw new Error(`HF API error: ${response.status} ${response.statusText}`);
+            if (!response.ok) {
+                throw new Error(`HF API error: ${response.status} ${response.statusText}`);
+            }
+            return await response.json();
+        } catch (error) {
+            lastError = error;
+            console.warn(`[HF Loader] Endpoint failed: ${endpoint}`, error?.message || error);
+        }
     }
 
-    return await response.json();
+    throw new Error(lastError?.message || 'All HF endpoints failed');
 }
 
 /**
@@ -276,6 +382,28 @@ async function loadFromLocal(filename) {
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`Local file error: ${response.status}`);
+    }
+    return await response.json();
+}
+
+async function loadFromGitHub(filename) {
+    const github = getGithubConfig();
+    if (!github.repo) {
+        throw new Error('GitHub data repo is not configured');
+    }
+
+    const url = buildGitHubRawUrl(filename);
+    console.log(`[HF Loader] Fetching GitHub raw: ${url}`);
+
+    const response = await fetch(url, {
+        headers: {
+            'Accept': 'application/json'
+        },
+        cache: 'no-cache'
+    });
+
+    if (!response.ok) {
+        throw new Error(`GitHub raw error: ${response.status} ${response.statusText}`);
     }
     return await response.json();
 }
@@ -297,17 +425,20 @@ async function loadLeaderboardData() {
     const cachedEnvelope = readCacheEnvelope();
     if (cachedEnvelope) {
         if (!HF_CONFIG.validateWithMarker) {
+            setLastLoadedSource('cache');
             console.log('[HF Loader] ✅ Loaded from session cache');
             return cachedEnvelope.data;
         }
 
         const latestMarker = await getLatestMarker();
         if (latestMarker && cachedEnvelope.marker && cachedEnvelope.marker === latestMarker) {
+            setLastLoadedSource('cache');
             console.log('[HF Loader] ✅ Loaded from session cache (marker matched)');
             return cachedEnvelope.data;
         }
 
         if (!latestMarker) {
+            setLastLoadedSource('cache');
             console.log('[HF Loader] ⚠️ Marker unavailable, fallback to TTL cache');
             return cachedEnvelope.data;
         }
@@ -317,56 +448,50 @@ async function loadLeaderboardData() {
 
     const result = { single: [], multi: [], compare: null };
 
-    // 尝试从 Hugging Face 加载
-    try {
-        console.log('[HF Loader] Loading from Hugging Face...');
+    const loaders = {
+        github: loadFromGitHub,
+        hf: loadFromHuggingFace,
+        local: loadFromLocal,
+    };
 
-        const marker = await getLatestMarker();
+    const sourcePriority = getSourcePriority();
+    let lastError = null;
 
-        const [singleData, multiData, compareData] = await Promise.all([
-            loadFromHuggingFace(HF_CONFIG.files.single),
-            loadFromHuggingFace(HF_CONFIG.files.multi),
-            loadOptionalJson(loadFromHuggingFace, HF_CONFIG.files.compare)
-        ]);
-
-        result.single = normalizeEntryArray(singleData);
-        result.multi = normalizeEntryArray(multiData);
-        result.compare = compareData && typeof compareData === 'object' ? compareData : null;
-
-        writeCache(result, marker);
-        console.log(`[HF Loader] ✅ Loaded from HF: ${result.single.length} single, ${result.multi.length} multi`);
-        return result;
-
-    } catch (hfError) {
-        console.warn('[HF Loader] ⚠️ HF load failed:', hfError.message);
-
-        // 如果配置允许，尝试本地备用
-        if (HF_CONFIG.fallbackToLocal) {
-            try {
-                console.log('[HF Loader] Trying local fallback...');
-
-                const [singleData, multiData, compareData] = await Promise.all([
-                    loadFromLocal(HF_CONFIG.files.single),
-                    loadFromLocal(HF_CONFIG.files.multi),
-                    loadOptionalJson(loadFromLocal, HF_CONFIG.files.compare)
-                ]);
-
-                result.single = normalizeEntryArray(singleData);
-                result.multi = normalizeEntryArray(multiData);
-                result.compare = compareData && typeof compareData === 'object' ? compareData : null;
-
-                writeCache(result, null);
-                console.log(`[HF Loader] ✅ Loaded from local: ${result.single.length} single, ${result.multi.length} multi`);
-                return result;
-
-            } catch (localError) {
-                console.error('[HF Loader] ❌ Local fallback also failed:', localError.message);
-                throw new Error('Failed to load data from both HF and local');
-            }
+    for (const source of sourcePriority) {
+        const loader = loaders[source];
+        if (!loader) {
+            continue;
+        }
+        if (source === 'local' && !HF_CONFIG.fallbackToLocal) {
+            continue;
         }
 
-        throw hfError;
+        try {
+            console.log(`[HF Loader] Loading from ${source}...`);
+            const marker = await getLatestMarker();
+            const [singleData, multiData, compareData] = await Promise.all([
+                loader(HF_CONFIG.files.single),
+                loader(HF_CONFIG.files.multi),
+                loadOptionalJson(loader, HF_CONFIG.files.compare)
+            ]);
+
+            result.single = normalizeEntryArray(singleData);
+            result.multi = normalizeEntryArray(multiData);
+            result.compare = compareData && typeof compareData === 'object' ? compareData : null;
+
+            writeCache(result, marker);
+            setLastLoadedSource(source);
+            console.log(
+                `[HF Loader] ✅ Loaded from ${source}: ${result.single.length} single, ${result.multi.length} multi`
+            );
+            return result;
+        } catch (error) {
+            lastError = error;
+            console.warn(`[HF Loader] ⚠️ ${source} load failed:`, error?.message || error);
+        }
     }
+
+    throw new Error(lastError?.message || 'Failed to load leaderboard data from all sources');
 }
 
 /**
@@ -374,33 +499,39 @@ async function loadLeaderboardData() {
  * @returns {Promise<string|null>}
  */
 async function getLastUpdated() {
-    try {
-        // Prefer explicit marker file synced by website workflow
-        const marker = await loadFromHuggingFace(HF_CONFIG.files.lastUpdated);
-        if (marker && marker.last_updated) {
-            return marker.last_updated;
-        }
-    } catch (_e) {
-        // ignore and fallback
-    }
+    const loaders = {
+        github: loadFromGitHub,
+        hf: loadFromHuggingFace,
+        local: loadFromLocal,
+    };
 
-    try {
-        const marker = await loadFromLocal(HF_CONFIG.files.lastUpdated);
-        if (marker && marker.last_updated) {
-            return marker.last_updated;
+    for (const source of getSourcePriority()) {
+        const loader = loaders[source];
+        if (!loader) {
+            continue;
         }
-    } catch (_e) {
-        // ignore and fallback
+        if (source === 'local' && !HF_CONFIG.fallbackToLocal) {
+            continue;
+        }
+        try {
+            const marker = await loader(HF_CONFIG.files.lastUpdated);
+            if (marker && marker.last_updated) {
+                return marker.last_updated;
+            }
+        } catch (_e) {
+            // ignore and try next source
+        }
     }
 
     try {
         // Fallback: HF Datasets API repo metadata
-        const url = `https://huggingface.co/api/datasets/${HF_CONFIG.repo}`;
-        const response = await fetch(url);
-
-        if (response.ok) {
-            const info = await response.json();
-            return info.lastModified || null;
+        for (const endpoint of getUniqueEndpoints()) {
+            const url = buildDatasetApiUrl(endpoint);
+            const response = await fetch(url);
+            if (response.ok) {
+                const info = await response.json();
+                return info.lastModified || null;
+            }
         }
     } catch (_e) {
         console.warn('[HF Loader] Could not get last updated time');
@@ -413,5 +544,6 @@ async function getLastUpdated() {
 window.HFDataLoader = {
     loadLeaderboardData,
     getLastUpdated,
+    getLastLoadedSource,
     config: HF_CONFIG
 };
