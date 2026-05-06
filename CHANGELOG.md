@@ -40,6 +40,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- `scripts/aggregate_results.py` 现在会在 `goal_progress` 配对时归一化模型名，避免当前 `vllm-hust` 数据使用裸模型名而官方 baseline artifact 使用 `org/model` 形式时无法命中同一目标基线。
+- Hard Constraints 现在只展示 `vllm-hust` 的约束状态，不再把 `vLLM 0.11.0` 目标基线也渲染成独立的 PASS / FAIL 卡片。
+
 - **CI/CD pre-commit 错误修复**：
   - 修复 `data/validate_schema.py` 中未使用的 `jsonschema` 导入
   - 修复 `scripts/generate_cast.py` 中的单行多语句问题（E701）

@@ -181,6 +181,13 @@
             focusedScope: 'Focused scope',
             hiddenRows: 'Hidden rows',
             versusShort: 'VS',
+            goalProgressKicker: 'Goal Gap',
+            goalBaselineLabel: 'Official Ascend Jan 2026 baseline',
+            goalCurrentLabel: 'Current vllm-hust',
+            goalMet: 'Goal met',
+            goalGapRemaining: 'Remaining gap',
+            goalCompareTitle: 'vllm-hust vs Official Ascend Jan 2026 baseline',
+            goalCompareScope: 'Pinned goal scope',
         },
         zh: {
             statsHidden: '已隐藏',
@@ -320,6 +327,13 @@
             focusedScope: '锁定范围',
             hiddenRows: '隐藏行数',
             versusShort: '对比',
+            goalProgressKicker: '目标差距',
+            goalBaselineLabel: '官方 Ascend 2026 年 1 月基线',
+            goalCurrentLabel: '当前 vllm-hust',
+            goalMet: '已达到目标',
+            goalGapRemaining: '距离目标',
+            goalCompareTitle: 'vllm-hust 对比官方 Ascend 2026 年 1 月基线',
+            goalCompareScope: '目标比较范围',
         },
     };
 
@@ -975,17 +989,25 @@
 
         const summaries = summarizeEngines(entries);
         const leaders = getLeaders(summaries);
-        const title = getOverviewTitle(summaries, leaders, comparisonView);
-        const subtitle = getOverviewSubtitle(entries, summaries.length, comparisonView, viewOptions);
+        const goalPair = findGoalProgressPair(entries, comparisonView);
+        const title = goalPair
+            ? getGoalProgressTitle(goalPair)
+            : getOverviewTitle(summaries, leaders, comparisonView);
+        const subtitle = goalPair
+            ? getGoalProgressSubtitle(goalPair)
+            : getOverviewSubtitle(entries, summaries.length, comparisonView, viewOptions);
         const badges = getOverviewBadges(entries, summaries.length, leaders, comparisonView);
         const compareSnapshotGroup = findCompareSnapshotGroup(entries, comparisonView);
-        const headToHeadHtml = compareSnapshotGroup
-            ? renderHeadToHeadFromSnapshot(compareSnapshotGroup)
-            : renderHeadToHead(summaries);
+        const headToHeadHtml = goalPair
+            ? renderGoalProgressPair(goalPair)
+            : compareSnapshotGroup
+                ? renderHeadToHeadFromSnapshot(compareSnapshotGroup)
+                : renderHeadToHead(summaries);
+        const kicker = goalPair ? t('goalProgressKicker') : t('quickCompare');
 
         el.innerHTML = `
             <div class="overview-hero">
-                <div class="overview-kicker">${t('quickCompare')}</div>
+                <div class="overview-kicker">${kicker}</div>
                 <div class="overview-title">${title}</div>
                 <div class="overview-subtitle">${subtitle}</div>
                 <div class="overview-badges">
@@ -1018,6 +1040,10 @@
         ].join('|');
     }
 
+    function isHardConstraintTrackedEngine(value) {
+        return String(value || '').trim().toLowerCase() === 'vllm-hust';
+    }
+
     function formatSignedDelta(value, suffix = '') {
         if (!Number.isFinite(value)) {
             return '-';
@@ -1036,60 +1062,12 @@
         return '-';
     }
 
-    function renderHardConstraints(entries, comparisonView) {
-        const el = document.getElementById('leaderboard-hard-constraints');
-        if (!el) {
-            return;
-        }
-
-        const snapshot = state.compareSnapshot?.hard_constraints;
-        const scopes = Array.isArray(snapshot?.scopes) ? snapshot.scopes : [];
-        if (!scopes.length) {
-            el.innerHTML = `
-                <div class="hard-constraints-empty">${t('hardConstraintsNoData')}</div>
-            `;
-            return;
-        }
-
-        const sourceEntries = comparisonView?.visibleEntries?.length ? comparisonView.visibleEntries : entries;
-        const scopeKeys = new Set(sourceEntries.map((entry) => buildHardConstraintScopeKey(entry)));
-        const filteredScopes = scopes.filter((scope) => scopeKeys.has(scope.scope_key));
-
-        if (!filteredScopes.length) {
-            el.innerHTML = `
-                <div class="hard-constraints-empty">${t('hardConstraintsNoData')}</div>
-            `;
-            return;
-        }
-
-        const passCount = filteredScopes.filter((scope) => scope?.overall_pass).length;
-        const failCount = Math.max(filteredScopes.length - passCount, 0);
-
-        el.innerHTML = `
-            <div class="hard-constraints-header">
-                <div>
-                    <h3>${t('hardConstraintsTitle')}</h3>
-                    <p>${t('hardConstraintsSubtitle')}</p>
-                </div>
-                <div class="hard-constraints-summary">
-                    <span class="hc-badge pass">${t('pass')}: ${passCount}</span>
-                    <span class="hc-badge fail">${t('fail')}: ${failCount}</span>
-                </div>
-            </div>
-            <div class="hard-constraints-grid">
-                ${filteredScopes.map((scope) => renderHardConstraintScopeCard(scope)).join('')}
-            </div>
-        `;
-    }
-
-    function renderHardConstraintScopeCard(scope) {
+    function buildHardConstraintCheckItems(scope) {
         const latest = scope?.latest || {};
-        const previous = scope?.previous || {};
         const evaluation = latest?.evaluation || {};
         const checks = evaluation?.checks || {};
         const metrics = evaluation?.metrics || {};
         const deltas = scope?.metric_deltas || {};
-        const accountable = latest?.accountable_scope || {};
 
         const c1Current = Number.isFinite(metrics.single_chip_effective_utilization_pct)
             ? `${metrics.single_chip_effective_utilization_pct.toFixed(2)}%`
@@ -1122,32 +1100,144 @@
             `Tenant ${formatBoolean(metrics.multi_tenant_high_utilization)}`,
         ].join(' · ');
 
+        return [
+            {
+                code: 'C1',
+                label: t('constraint1'),
+                passed: checks.effective_utilization_ge_90,
+                currentValue: c1Current,
+                targetValue: '>= 90%',
+                deltaValue: formatSignedDelta(deltas.single_chip_effective_utilization_pct, ' pp'),
+            },
+            {
+                code: 'C2',
+                label: t('constraint2'),
+                passed: checks.typical_scene_ge_2x_and_ttft_tpot_reduction_gt_20,
+                currentValue: c2Current,
+                targetValue: 'TPS >= 2x, TTFT > 20%, TPOT > 20%',
+                deltaValue: [
+                    `TPS ${formatSignedDelta(deltas.typical_throughput_ratio_vs_baseline)}`,
+                    `TTFT ${formatSignedDelta(deltas.typical_ttft_reduction_pct_vs_baseline, ' pp')}`,
+                    `TPOT ${formatSignedDelta(deltas.typical_tpot_reduction_pct_vs_baseline, ' pp')}`,
+                ].join(' · '),
+            },
+            {
+                code: 'C3',
+                label: t('constraint3'),
+                passed: checks.long_context_ge_32k_and_p95_p99_stable,
+                currentValue: c3Current,
+                targetValue: 'CTX >= 32K + stability checks',
+                deltaValue: '-',
+            },
+            {
+                code: 'C4',
+                label: t('constraint4'),
+                passed: checks.single_business_cost_down_ge_30_and_multi_tenant_high_utilization,
+                currentValue: c4Current,
+                targetValue: 'Cost >= 30% + high tenant utilization',
+                deltaValue: `Cost ${formatSignedDelta(deltas.unit_token_cost_reduction_pct, ' pp')}`,
+            },
+        ];
+    }
+
+    function renderHardConstraints(entries, comparisonView) {
+        const el = document.getElementById('leaderboard-hard-constraints');
+        if (!el) {
+            return;
+        }
+
+        const snapshot = state.compareSnapshot?.hard_constraints;
+        const scopes = Array.isArray(snapshot?.scopes) ? snapshot.scopes : [];
+        if (!scopes.length) {
+            el.innerHTML = `
+                <div class="hard-constraints-empty">${t('hardConstraintsNoData')}</div>
+            `;
+            return;
+        }
+
+        const sourceEntries = comparisonView?.visibleEntries?.length ? comparisonView.visibleEntries : entries;
+        const scopeKeys = new Set(
+            sourceEntries
+                .filter((entry) => isHardConstraintTrackedEngine(getEngine(entry)))
+                .map((entry) => buildHardConstraintScopeKey(entry))
+        );
+        const filteredScopes = scopes
+            .filter((scope) => isHardConstraintTrackedEngine(scope?.latest?.engine || scope?.scope?.engine))
+            .filter((scope) => scopeKeys.has(scope.scope_key))
+            .sort((left, right) => {
+                const statusOrder = Number(Boolean(left?.overall_pass)) - Number(Boolean(right?.overall_pass));
+                if (statusOrder !== 0) {
+                    return statusOrder;
+                }
+                return String(left?.scope_key || '').localeCompare(String(right?.scope_key || ''));
+            });
+
+        if (!filteredScopes.length) {
+            el.innerHTML = `
+                <div class="hard-constraints-empty">${t('hardConstraintsNoData')}</div>
+            `;
+            return;
+        }
+
+        const passCount = filteredScopes.filter((scope) => scope?.overall_pass).length;
+        const failCount = Math.max(filteredScopes.length - passCount, 0);
+
+        el.innerHTML = `
+            <div class="hard-constraints-header">
+                <div>
+                    <h3>${t('hardConstraintsTitle')}</h3>
+                    <p>${t('hardConstraintsSubtitle')}</p>
+                </div>
+                <div class="hard-constraints-summary">
+                    <span class="hc-badge pass">${t('pass')}: ${passCount}</span>
+                    <span class="hc-badge fail">${t('fail')}: ${failCount}</span>
+                </div>
+            </div>
+            <div class="hard-constraints-grid">
+                ${filteredScopes.map((scope) => renderHardConstraintScopeCard(scope)).join('')}
+            </div>
+        `;
+    }
+
+    function renderHardConstraintScopeCard(scope) {
+        const latest = scope?.latest || {};
+        const previous = scope?.previous || {};
+        const accountable = latest?.accountable_scope || {};
+        const checkItems = buildHardConstraintCheckItems(scope);
+        const passedCount = checkItems.filter((item) => item.passed === true).length;
+        const failedItems = checkItems.filter((item) => item.passed === false);
         const statusClass = scope?.overall_pass ? 'pass' : 'fail';
+        const summaryBadges = failedItems.length
+            ? failedItems.map((item) => `<span class="hc-check-badge fail">${item.code}</span>`).join('')
+            : `<span class="hc-check-badge pass">4/4</span>`;
 
         return `
-            <article class="hard-constraint-card ${statusClass}">
-                <div class="hard-constraint-card-head">
-                    <strong>${getEngineLabel(latest?.engine || scope?.scope?.engine || 'unknown')}</strong>
-                    <span class="hc-status ${statusClass}">${scope?.overall_pass ? t('pass') : t('fail')}</span>
+            <details class="hard-constraint-card ${statusClass}">
+                <summary class="hard-constraint-summary">
+                    <div class="hard-constraint-summary-main">
+                        <div class="hard-constraint-card-head">
+                            <strong>${getEngineLabel(latest?.engine || scope?.scope?.engine || 'unknown')}</strong>
+                            <span class="hc-status ${statusClass}">${scope?.overall_pass ? t('pass') : t('fail')}</span>
+                        </div>
+                        <p class="hard-constraint-scope">
+                            ${t('scope')}: ${scope?.scope?.model || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}
+                        </p>
+                        <p class="hard-constraint-scope-meta">
+                            scenario=${accountable?.representative_business_scenario || '-'} · baseline=${accountable?.baseline_engine || '-'} · ${passedCount}/4
+                        </p>
+                    </div>
+                    <div class="hard-constraint-summary-side">
+                        <div class="hard-constraint-badges">${summaryBadges}</div>
+                        <span class="hard-constraint-toggle"></span>
+                    </div>
+                </summary>
+                <div class="hard-constraint-details">
+                    <div class="hard-constraint-rows">
+                        ${checkItems.map((item) => renderHardConstraintRow(item.label, item.passed, item.currentValue, item.targetValue, item.deltaValue)).join('')}
+                    </div>
+                    <p class="hard-constraint-commit">${t('current')}: ${latest?.git_commit || latest?.entry_id || '-'} · ${t('previous')}: ${previous?.git_commit || previous?.entry_id || '-'}</p>
                 </div>
-                <p class="hard-constraint-scope">
-                    ${t('scope')}: ${scope?.scope?.model || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}
-                </p>
-                <p class="hard-constraint-scope-meta">
-                    scenario=${accountable?.representative_business_scenario || '-'} · baseline=${accountable?.baseline_engine || '-'}
-                </p>
-                <div class="hard-constraint-rows">
-                    ${renderHardConstraintRow(t('constraint1'), checks.effective_utilization_ge_90, c1Current, '>= 90%', formatSignedDelta(deltas.single_chip_effective_utilization_pct, ' pp'))}
-                    ${renderHardConstraintRow(t('constraint2'), checks.typical_scene_ge_2x_and_ttft_tpot_reduction_gt_20, c2Current, 'TPS >= 2x, TTFT > 20%, TPOT > 20%', [
-                        `TPS ${formatSignedDelta(deltas.typical_throughput_ratio_vs_baseline)}`,
-                        `TTFT ${formatSignedDelta(deltas.typical_ttft_reduction_pct_vs_baseline, ' pp')}`,
-                        `TPOT ${formatSignedDelta(deltas.typical_tpot_reduction_pct_vs_baseline, ' pp')}`,
-                    ].join(' · '))}
-                    ${renderHardConstraintRow(t('constraint3'), checks.long_context_ge_32k_and_p95_p99_stable, c3Current, 'CTX >= 32K + stability checks', '-')}
-                    ${renderHardConstraintRow(t('constraint4'), checks.single_business_cost_down_ge_30_and_multi_tenant_high_utilization, c4Current, 'Cost >= 30% + high tenant utilization', `Cost ${formatSignedDelta(deltas.unit_token_cost_reduction_pct, ' pp')}`)}
-                </div>
-                <p class="hard-constraint-commit">${t('current')}: ${latest?.git_commit || latest?.entry_id || '-'} · ${t('previous')}: ${previous?.git_commit || previous?.entry_id || '-'}</p>
-            </article>
+            </details>
         `;
     }
 
@@ -1752,6 +1842,86 @@
                 <div class="head-to-head-delta">${t('throughputGap')}: ${tpsDelta}</div>
                 <div class="head-to-head-delta">TTFT ${t('gap')}: ${ttftDelta}</div>
                 <div class="head-to-head-delta">TBT ${t('gap')}: ${tbtDelta}</div>
+            </div>
+        `;
+    }
+
+    function findGoalProgressPair(entries, comparisonView) {
+        const goalProgress = state.compareSnapshot?.goal_progress;
+        const pairs = Array.isArray(goalProgress?.pairs) ? goalProgress.pairs : [];
+        if (!pairs.length) {
+            return null;
+        }
+
+        const focusedScopeKey = comparisonView?.focusGroup?.key;
+        if (focusedScopeKey) {
+            return pairs.find((pair) => pair?.scope_key === focusedScopeKey) || null;
+        }
+
+        const visibleEntries = comparisonView?.visibleEntries?.length
+            ? comparisonView.visibleEntries
+            : entries;
+        const scopeKeys = new Set(visibleEntries.map((entry) => createCompareScopeKey(entry)));
+        const matchingPairs = pairs.filter((pair) => scopeKeys.has(pair?.scope_key));
+        if (matchingPairs.length) {
+            return matchingPairs[0];
+        }
+
+        return goalProgress?.headline_pair || null;
+    }
+
+    function getGoalProgressTitle(pair) {
+        const currentVersion = pair?.current?.engine_version || '-';
+        const baselineVersion = pair?.baseline?.engine_version || '-';
+        return `${t('goalCompareTitle')} · v${currentVersion} ${t('versusShort')} v${baselineVersion}`;
+    }
+
+    function getGoalProgressSubtitle(pair) {
+        const scope = pair?.scope || {};
+        const model = scope.model || 'Unknown model';
+        const hardware = scope.hardware || 'Unknown hardware';
+        const workload = getWorkloadLabel(scope.workload || 'Other');
+        return `${t('goalCompareScope')}: ${model} • ${hardware} • ${workload}`;
+    }
+
+    function formatRemainingGap(value) {
+        if (!Number.isFinite(value)) {
+            return '-';
+        }
+        if (value === 0) {
+            return t('goalMet');
+        }
+        return `${value.toFixed(1)}% ${t('goalGapRemaining')}`;
+    }
+
+    function renderGoalProgressPair(pair) {
+        const current = pair?.current;
+        const baseline = pair?.baseline;
+        if (!current || !baseline) {
+            return '';
+        }
+
+        const deltas = pair?.deltas || {};
+        const remainingGap = pair?.remaining_gap_pct || {};
+
+        return `
+            <div class="head-to-head goal-progress-head-to-head">
+                <div class="head-to-head-side">
+                    <span class="goal-compare-label">${t('goalCurrentLabel')}</span>
+                    <strong>${getEngineLabel(current.engine)} v${current.engine_version || '-'}</strong>
+                    <span>TTFT ${formatNumber(current.metrics.ttft_ms)} ms • TBT ${formatNumber(current.metrics.tbt_ms)} ms • TPS ${formatNumber(current.metrics.throughput_tps)}</span>
+                </div>
+                <div class="head-to-head-divider">${t('versusShort')}</div>
+                <div class="head-to-head-side">
+                    <span class="goal-compare-label">${t('goalBaselineLabel')}</span>
+                    <strong>${getEngineLabel(baseline.engine)} v${baseline.engine_version || '-'}</strong>
+                    <span>TTFT ${formatNumber(baseline.metrics.ttft_ms)} ms • TBT ${formatNumber(baseline.metrics.tbt_ms)} ms • TPS ${formatNumber(baseline.metrics.throughput_tps)}</span>
+                </div>
+            </div>
+            <div class="head-to-head-deltas goal-progress-deltas">
+                <div class="head-to-head-delta">${t('throughputGap')}: ${formatSnapshotDelta(deltas.throughput_pct_current_vs_baseline, true)} · ${formatRemainingGap(remainingGap.throughput)}</div>
+                <div class="head-to-head-delta">TTFT ${t('gap')}: ${formatSnapshotDelta(deltas.ttft_pct_current_vs_baseline, false)} · ${formatRemainingGap(remainingGap.ttft)}</div>
+                <div class="head-to-head-delta">TBT ${t('gap')}: ${formatSnapshotDelta(deltas.tbt_pct_current_vs_baseline, false)} · ${formatRemainingGap(remainingGap.tbt)}</div>
             </div>
         `;
     }

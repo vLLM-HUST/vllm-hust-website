@@ -23,6 +23,14 @@ COMPARE_SNAPSHOT_SCHEMA_VERSION = "leaderboard-compare-snapshot/v1"
 
 HARD_CONSTRAINTS_SCHEMA_VERSION = "leaderboard-hard-constraints/v1"
 
+GOAL_BASELINE_TARGET = {
+    "id": "official-ascend-jan-2026-v0.11.0",
+    "label": "Official Ascend Jan 2026",
+    "engine": "vllm",
+    "engine_version_prefix": "0.11.0",
+    "github_repository": "vllm-project/vllm-ascend",
+}
+
 HARD_CONSTRAINT_THRESHOLDS = {
     "single_chip_effective_utilization_pct": 90.0,
     "typical_throughput_ratio_vs_baseline": 2.0,
@@ -95,8 +103,40 @@ def extract_workload_name(entry: dict[str, Any]) -> str:
     return "UNKNOWN"
 
 
+def normalize_model_name(model_name: Any) -> str:
+    raw_name = str(model_name or "unknown-model").strip()
+    if not raw_name:
+        return "unknown-model"
+    if "/" not in raw_name:
+        return raw_name
+    return raw_name.rsplit("/", maxsplit=1)[-1] or raw_name
+
+
 def build_compare_scope_key(entry: dict[str, Any]) -> str:
     model = str((entry.get("model") or {}).get("name") or "unknown-model")
+    hardware = str(
+        (entry.get("hardware") or {}).get("chip_model") or "unknown-hardware"
+    )
+    precision = str((entry.get("model") or {}).get("precision") or "unknown-precision")
+    workload = extract_workload_name(entry)
+    config_type = str(entry.get("config_type") or "unknown-config")
+    chip_count = int((entry.get("hardware") or {}).get("chip_count") or 0)
+    node_count = int((entry.get("cluster") or {}).get("node_count") or 1)
+    return "|".join(
+        [
+            model,
+            hardware,
+            precision,
+            workload,
+            config_type,
+            str(chip_count),
+            str(node_count),
+        ]
+    )
+
+
+def build_goal_scope_key(entry: dict[str, Any]) -> str:
+    model = normalize_model_name((entry.get("model") or {}).get("name"))
     hardware = str(
         (entry.get("hardware") or {}).get("chip_model") or "unknown-hardware"
     )
@@ -129,6 +169,8 @@ def build_compare_engine_summary(entry: dict[str, Any]) -> dict[str, Any]:
         "entry_id": str(entry.get("entry_id") or ""),
         "submitted_at": metadata.get("submitted_at"),
         "canonical_path": entry.get("canonical_path"),
+        "github_repository": metadata.get("github_repository"),
+        "git_commit": metadata.get("git_commit"),
         "metrics": {
             "ttft_ms": float(metrics.get("ttft_ms") or 0.0),
             "tbt_ms": float(metrics.get("tbt_ms") or 0.0),
@@ -315,6 +357,10 @@ def summarize_hard_constraint_entry(entry: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def is_hard_constraint_subject_entry(entry: dict[str, Any]) -> bool:
+    return str(entry.get("engine") or "").strip().lower() == "vllm-hust"
+
+
 def compute_metric_delta(current: float | None, previous: float | None) -> float | None:
     if current is None or previous is None:
         return None
@@ -324,6 +370,8 @@ def compute_metric_delta(current: float | None, previous: float | None) -> float
 def build_hard_constraint_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
     grouped: dict[str, list[dict[str, Any]]] = {}
     for entry in entries:
+        if not is_hard_constraint_subject_entry(entry):
+            continue
         key = build_hard_constraint_scope_key(entry)
         grouped.setdefault(key, []).append(entry)
 
@@ -452,6 +500,157 @@ def select_preferred_pair(
     return ordered[0], ordered[1]
 
 
+def is_goal_baseline_entry(entry: dict[str, Any]) -> bool:
+    metadata = entry.get("metadata") or {}
+    engine = str(
+        entry.get("engine") or metadata.get("engine") or "unknown"
+    ).strip().lower()
+    engine_version = str(
+        entry.get("engine_version") or metadata.get("engine_version") or ""
+    ).strip()
+    github_repository = str(metadata.get("github_repository") or "").strip().lower()
+    return (
+        engine == GOAL_BASELINE_TARGET["engine"]
+        and engine_version.startswith(GOAL_BASELINE_TARGET["engine_version_prefix"])
+        and github_repository == GOAL_BASELINE_TARGET["github_repository"]
+    )
+
+
+def compute_remaining_gap(
+    current_value: float | int | None,
+    baseline_value: float | int | None,
+    *,
+    higher_is_better: bool,
+) -> float | None:
+    if current_value is None or baseline_value in (None, 0):
+        return None
+
+    current = float(current_value)
+    baseline = float(baseline_value)
+    if higher_is_better:
+        if current >= baseline:
+            return 0.0
+        return round(((baseline - current) / abs(baseline)) * 100.0, 4)
+
+    if current <= baseline:
+        return 0.0
+    return round(((current - baseline) / abs(baseline)) * 100.0, 4)
+
+
+def select_goal_pair(
+    entries: list[dict[str, Any]],
+) -> tuple[dict[str, Any], dict[str, Any]] | None:
+    current_candidates = [
+        entry
+        for entry in entries
+        if str(entry.get("engine") or "").strip().lower() == "vllm-hust"
+    ]
+    baseline_candidates = [entry for entry in entries if is_goal_baseline_entry(entry)]
+
+    if not current_candidates or not baseline_candidates:
+        return None
+
+    current_entry = sorted(current_candidates, key=parse_entry_timestamp, reverse=True)[0]
+    baseline_entry = sorted(baseline_candidates, key=parse_entry_timestamp, reverse=True)[0]
+    return current_entry, baseline_entry
+
+
+def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for entry in entries:
+        scope_key = build_goal_scope_key(entry)
+        grouped.setdefault(scope_key, []).append(entry)
+
+    pairs: list[dict[str, Any]] = []
+    for scope_key, scope_entries in grouped.items():
+        goal_pair = select_goal_pair(scope_entries)
+        if goal_pair is None:
+            continue
+
+        current_entry, baseline_entry = goal_pair
+        current_summary = build_compare_engine_summary(current_entry)
+        baseline_summary = build_compare_engine_summary(baseline_entry)
+        payload = {
+            "scope_key": scope_key,
+            "category": "multi"
+            if int((current_entry.get("cluster") or {}).get("node_count") or 1) > 1
+            else "single",
+            "scope": {
+                "model": str(
+                    (current_entry.get("model") or {}).get("name") or "unknown-model"
+                ),
+                "hardware": str(
+                    (current_entry.get("hardware") or {}).get("chip_model")
+                    or "unknown-hardware"
+                ),
+                "precision": str(
+                    (current_entry.get("model") or {}).get("precision")
+                    or "unknown-precision"
+                ),
+                "workload": extract_workload_name(current_entry),
+                "config_type": str(current_entry.get("config_type") or "unknown-config"),
+                "chip_count": int(
+                    (current_entry.get("hardware") or {}).get("chip_count") or 0
+                ),
+                "node_count": int(
+                    (current_entry.get("cluster") or {}).get("node_count") or 1
+                ),
+            },
+            "current": current_summary,
+            "baseline": baseline_summary,
+            "baseline_target": GOAL_BASELINE_TARGET,
+            "deltas": {
+                "throughput_pct_current_vs_baseline": compute_relative_delta(
+                    current_summary["metrics"]["throughput_tps"],
+                    baseline_summary["metrics"]["throughput_tps"],
+                ),
+                "ttft_pct_current_vs_baseline": compute_relative_delta(
+                    current_summary["metrics"]["ttft_ms"],
+                    baseline_summary["metrics"]["ttft_ms"],
+                ),
+                "tbt_pct_current_vs_baseline": compute_relative_delta(
+                    current_summary["metrics"]["tbt_ms"],
+                    baseline_summary["metrics"]["tbt_ms"],
+                ),
+            },
+            "remaining_gap_pct": {
+                "throughput": compute_remaining_gap(
+                    current_summary["metrics"]["throughput_tps"],
+                    baseline_summary["metrics"]["throughput_tps"],
+                    higher_is_better=True,
+                ),
+                "ttft": compute_remaining_gap(
+                    current_summary["metrics"]["ttft_ms"],
+                    baseline_summary["metrics"]["ttft_ms"],
+                    higher_is_better=False,
+                ),
+                "tbt": compute_remaining_gap(
+                    current_summary["metrics"]["tbt_ms"],
+                    baseline_summary["metrics"]["tbt_ms"],
+                    higher_is_better=False,
+                ),
+            },
+        }
+        payload["meets_goal"] = all(
+            gap == 0.0 for gap in payload["remaining_gap_pct"].values() if gap is not None
+        )
+        pairs.append(payload)
+
+    pairs.sort(
+        key=lambda item: (
+            -parse_entry_timestamp({"metadata": {"submitted_at": item["current"].get("submitted_at")}}),
+            str(item.get("scope_key") or ""),
+        )
+    )
+
+    return {
+        "baseline": GOAL_BASELINE_TARGET,
+        "pair_count": len(pairs),
+        "headline_pair": pairs[0] if pairs else None,
+        "pairs": pairs,
+    }
+
+
 def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
     grouped: dict[str, dict[str, Any]] = {}
     for entry in entries:
@@ -559,6 +758,7 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
     groups_payload.sort(key=lambda item: str(item.get("scope_key") or ""))
     preferred_pairs.sort(key=lambda item: str(item.get("scope_key") or ""))
     hard_constraints = build_hard_constraint_snapshot(entries)
+    goal_progress = build_goal_progress_snapshot(entries)
     return {
         "schema_version": COMPARE_SNAPSHOT_SCHEMA_VERSION,
         "generated_at": datetime.now(UTC).isoformat(),
@@ -566,6 +766,7 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
         "preferred_pair_count": len(preferred_pairs),
         "groups": groups_payload,
         "preferred_pairs": preferred_pairs,
+        "goal_progress": goal_progress,
         "hard_constraints": hard_constraints,
     }
 

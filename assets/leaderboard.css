@@ -150,15 +150,15 @@
 
 .hard-constraints-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    grid-template-columns: 1fr;
     gap: 12px;
 }
 
 .hard-constraint-card {
     border-radius: 16px;
-    padding: 12px;
     border: 1px solid #dbe7f3;
     background: #ffffff;
+    overflow: hidden;
 }
 
 .hard-constraint-card.pass {
@@ -174,6 +174,87 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+}
+
+.hard-constraint-summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+}
+
+.hard-constraint-summary::-webkit-details-marker {
+    display: none;
+}
+
+.hard-constraint-summary-main {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.hard-constraint-summary-side {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.hard-constraint-badges {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.hc-check-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+}
+
+.hc-check-badge.pass {
+    color: #166534;
+    background: #ecfdf5;
+    border-color: #86efac;
+}
+
+.hc-check-badge.fail {
+    color: #991b1b;
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.hard-constraint-toggle {
+    width: 12px;
+    height: 12px;
+    border-right: 2px solid #64748b;
+    border-bottom: 2px solid #64748b;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    margin-top: -4px;
+}
+
+.hard-constraint-card[open] .hard-constraint-toggle {
+    transform: rotate(225deg);
+    margin-top: 4px;
+}
+
+.hard-constraint-details {
+    padding: 0 16px 16px;
+    border-top: 1px solid #e2e8f0;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
 }
 
 .hc-status,
@@ -220,6 +301,10 @@
     background: #f8fafc;
 }
 
+.hard-constraint-card[open] .hard-constraint-row {
+    background: #f8fbff;
+}
+
 .hc-row-title {
     font-size: 0.78rem;
     font-weight: 700;
@@ -239,6 +324,21 @@
     color: #64748b;
     font-size: 0.9rem;
     padding: 6px 2px;
+}
+
+@media (max-width: 720px) {
+    .hard-constraint-summary {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hard-constraint-summary-side {
+        justify-content: space-between;
+    }
+
+    .hard-constraint-badges {
+        justify-content: flex-start;
+    }
 }
 
 .leaderboard-overview {
@@ -353,6 +453,25 @@
     margin-top: 6px;
     color: rgba(255, 255, 255, 0.84);
     font-size: 0.92rem;
+}
+
+.goal-compare-label {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.goal-progress-deltas .head-to-head-delta {
+    min-height: 44px;
 }
 
 .head-to-head-divider {

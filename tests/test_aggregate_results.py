@@ -316,3 +316,293 @@ def test_aggregate_results_fails_on_invalid_schema(tmp_path: Path) -> None:
 
     assert result.returncode != 0
     assert "schema validation failed" in (result.stderr + result.stdout)
+
+
+def test_aggregate_results_builds_goal_progress_for_official_baseline(tmp_path: Path) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    current_entry = _valid_entry()
+    current_entry["entry_id"] = "11111111-1111-1111-1111-111111111111"
+    current_entry["engine"] = "vllm-hust"
+    current_entry["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["engine"] = "vllm-hust"
+    current_entry["metadata"]["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["github_repository"] = "vLLM-HUST/vllm-ascend-hust"
+    current_entry["metrics"]["ttft_ms"] = 120.0
+    current_entry["metrics"]["tbt_ms"] = 10.0
+    current_entry["metrics"]["throughput_tps"] = 210.0
+    current_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|0.20.1rc1.dev314|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+
+    baseline_entry = _valid_entry()
+    baseline_entry["entry_id"] = "22222222-2222-2222-2222-222222222222"
+    baseline_entry["engine"] = "vllm"
+    baseline_entry["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["engine"] = "vllm"
+    baseline_entry["metadata"]["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
+    baseline_entry["metadata"]["github_commit_url"] = "https://github.com/vllm-project/vllm-ascend/commit/def456"
+    baseline_entry["metadata"]["git_commit"] = "def456"
+    baseline_entry["metrics"]["ttft_ms"] = 100.0
+    baseline_entry["metrics"]["tbt_ms"] = 8.0
+    baseline_entry["metrics"]["throughput_tps"] = 240.0
+    baseline_entry["metadata"]["idempotency_key"] = (
+        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+
+    other_entry = _valid_entry()
+    other_entry["entry_id"] = "33333333-3333-3333-3333-333333333333"
+    other_entry["engine"] = "sglang"
+    other_entry["engine_version"] = "0.4.0"
+    other_entry["metadata"]["engine"] = "sglang"
+    other_entry["metadata"]["engine_version"] = "0.4.0"
+    other_entry["metadata"]["github_repository"] = "sgl-project/sglang"
+    other_entry["metadata"]["idempotency_key"] = (
+        "sglang|0.4.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+
+    entries = [current_entry, baseline_entry, other_entry]
+    manifest_entries = []
+    for index, entry in enumerate(entries, start=1):
+        artifact_name = f"entry_{index}.json"
+        (source_dir / artifact_name).write_text(
+            json.dumps(entry, indent=2) + "\n", encoding="utf-8"
+        )
+        manifest_entries.append(
+            {
+                "entry_id": entry["entry_id"],
+                "idempotency_key": entry["metadata"]["idempotency_key"],
+                "canonical_path": entry["canonical_path"],
+                "leaderboard_artifact": artifact_name,
+                "canonical_artifact": f"entry_{index}.canonical.json",
+                "engine": entry["engine"],
+                "workload": entry["workload"]["name"],
+                "config_type": entry["config_type"],
+                "category": "single",
+            }
+        )
+
+    (source_dir / "leaderboard_manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "leaderboard-export-manifest/v1",
+                "generated_at": "2026-03-14T12:00:00Z",
+                "entries": manifest_entries,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "website_data"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    compare_payload = json.loads(
+        (output_dir / "leaderboard_compare.json").read_text(encoding="utf-8")
+    )
+    goal_progress = compare_payload["goal_progress"]
+
+    assert goal_progress["pair_count"] == 1
+    assert goal_progress["headline_pair"]["current"]["engine"] == "vllm-hust"
+    assert goal_progress["headline_pair"]["baseline"]["engine"] == "vllm"
+    assert goal_progress["headline_pair"]["baseline_target"]["id"] == "official-ascend-jan-2026-v0.11.0"
+    assert goal_progress["headline_pair"]["remaining_gap_pct"]["throughput"] == 12.5
+
+
+def test_aggregate_results_goal_progress_matches_prefixed_model_names(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    current_entry = _valid_entry()
+    current_entry["entry_id"] = "44444444-4444-4444-4444-444444444444"
+    current_entry["engine"] = "vllm-hust"
+    current_entry["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["model"]["name"] = "Qwen2.5-0.5B-Instruct"
+    current_entry["metadata"]["engine"] = "vllm-hust"
+    current_entry["metadata"]["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["github_repository"] = "vLLM-HUST/vllm-ascend-hust"
+    current_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|0.20.1rc1.dev314|short|qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+
+    baseline_entry = _valid_entry()
+    baseline_entry["entry_id"] = "55555555-5555-5555-5555-555555555555"
+    baseline_entry["engine"] = "vllm"
+    baseline_entry["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["engine"] = "vllm"
+    baseline_entry["metadata"]["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
+    baseline_entry["metrics"]["throughput_tps"] = 90.0
+    baseline_entry["metadata"]["idempotency_key"] = (
+        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+
+    entries = [current_entry, baseline_entry]
+    manifest_entries = []
+    for index, entry in enumerate(entries, start=1):
+        artifact_name = f"prefixed_entry_{index}.json"
+        (source_dir / artifact_name).write_text(
+            json.dumps(entry, indent=2) + "\n", encoding="utf-8"
+        )
+        manifest_entries.append(
+            {
+                "entry_id": entry["entry_id"],
+                "idempotency_key": entry["metadata"]["idempotency_key"],
+                "canonical_path": entry["canonical_path"],
+                "leaderboard_artifact": artifact_name,
+                "canonical_artifact": f"prefixed_entry_{index}.canonical.json",
+                "engine": entry["engine"],
+                "workload": entry["workload"]["name"],
+                "config_type": entry["config_type"],
+                "category": "single",
+            }
+        )
+
+    (source_dir / "leaderboard_manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "leaderboard-export-manifest/v1",
+                "generated_at": "2026-03-14T12:00:00Z",
+                "entries": manifest_entries,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "website_data"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    compare_payload = json.loads(
+        (output_dir / "leaderboard_compare.json").read_text(encoding="utf-8")
+    )
+    goal_progress = compare_payload["goal_progress"]
+
+    assert goal_progress["pair_count"] == 1
+    assert goal_progress["headline_pair"]["current"]["engine"] == "vllm-hust"
+    assert goal_progress["headline_pair"]["baseline"]["engine"] == "vllm"
+
+
+def test_aggregate_results_hard_constraints_only_include_vllm_hust(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    current_entry = _valid_entry()
+    current_entry["entry_id"] = "66666666-6666-6666-6666-666666666666"
+    current_entry["engine"] = "vllm-hust"
+    current_entry["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["engine"] = "vllm-hust"
+    current_entry["metadata"]["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|0.20.1rc1.dev314|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+
+    baseline_entry = _valid_entry()
+    baseline_entry["entry_id"] = "77777777-7777-7777-7777-777777777777"
+    baseline_entry["engine"] = "vllm"
+    baseline_entry["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["engine"] = "vllm"
+    baseline_entry["metadata"]["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["idempotency_key"] = (
+        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+
+    entries = [current_entry, baseline_entry]
+    manifest_entries = []
+    for index, entry in enumerate(entries, start=1):
+        artifact_name = f"hard_constraints_entry_{index}.json"
+        (source_dir / artifact_name).write_text(
+            json.dumps(entry, indent=2) + "\n", encoding="utf-8"
+        )
+        manifest_entries.append(
+            {
+                "entry_id": entry["entry_id"],
+                "idempotency_key": entry["metadata"]["idempotency_key"],
+                "canonical_path": entry["canonical_path"],
+                "leaderboard_artifact": artifact_name,
+                "canonical_artifact": f"hard_constraints_entry_{index}.canonical.json",
+                "engine": entry["engine"],
+                "workload": entry["workload"]["name"],
+                "config_type": entry["config_type"],
+                "category": "single",
+            }
+        )
+
+    (source_dir / "leaderboard_manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "leaderboard-export-manifest/v1",
+                "generated_at": "2026-03-14T12:00:00Z",
+                "entries": manifest_entries,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "website_data"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    compare_payload = json.loads(
+        (output_dir / "leaderboard_compare.json").read_text(encoding="utf-8")
+    )
+    hard_constraints = compare_payload["hard_constraints"]
+
+    assert hard_constraints["scope_count"] == 1
+    assert hard_constraints["fail_count"] == 0
+    assert hard_constraints["scopes"][0]["scope"]["engine"] == "vllm-hust"
+    assert hard_constraints["scopes"][0]["latest"]["engine"] == "vllm-hust"
