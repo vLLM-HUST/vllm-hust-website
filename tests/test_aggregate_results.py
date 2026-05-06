@@ -193,6 +193,78 @@ def test_aggregate_results_from_standard_manifest(tmp_path: Path) -> None:
     assert single_payload[0]["metadata"]["git_commit"] == "abc123def456"
 
 
+def test_aggregate_results_places_multi_gpu_entry_in_multi(tmp_path: Path) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    multi_entry = _valid_entry()
+    multi_entry["entry_id"] = "12345678-1234-1234-1234-1234567890ab"
+    multi_entry["config_type"] = "multi_gpu"
+    multi_entry["hardware"]["chip_count"] = 2
+    multi_entry["hardware"]["chips_per_node"] = 2
+    multi_entry["hardware"]["total_memory_gb"] = 160
+    multi_entry["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|2|1|multi_gpu"
+    )
+
+    artifact = source_dir / "multi_leaderboard.json"
+    artifact.write_text(json.dumps(multi_entry, indent=2) + "\n", encoding="utf-8")
+    manifest = source_dir / "leaderboard_manifest.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "schema_version": "leaderboard-export-manifest/v1",
+                "generated_at": "2026-03-14T12:00:00Z",
+                "entries": [
+                    {
+                        "entry_id": multi_entry["entry_id"],
+                        "idempotency_key": multi_entry["metadata"]["idempotency_key"],
+                        "canonical_path": multi_entry["canonical_path"],
+                        "leaderboard_artifact": "multi_leaderboard.json",
+                        "canonical_artifact": "multi.canonical.json",
+                        "engine": "engine-a",
+                        "workload": "short",
+                        "config_type": "multi_gpu",
+                        "category": "multi",
+                    }
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "website_data"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    multi_payload = json.loads(
+        (output_dir / "leaderboard_multi.json").read_text(encoding="utf-8")
+    )
+
+    assert single_payload == []
+    assert len(multi_payload) == 1
+    assert multi_payload[0]["entry_id"] == "12345678-1234-1234-1234-1234567890ab"
+
+
 def test_aggregate_results_fails_on_invalid_schema(tmp_path: Path) -> None:
     website_root = Path(__file__).resolve().parents[1]
     script = website_root / "scripts" / "aggregate_results.py"

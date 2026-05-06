@@ -636,8 +636,14 @@ def split_entries(
     single: list[dict[str, Any]] = []
     multi: list[dict[str, Any]] = []
     for entry in deduped.values():
+        config_type = str(entry.get("config_type") or "")
+        chip_count = int((entry.get("hardware") or {}).get("chip_count") or 1)
         node_count = int((entry.get("cluster") or {}).get("node_count") or 1)
-        if node_count > 1:
+        if (
+            node_count > 1
+            or chip_count > 1
+            or config_type in {"multi_gpu", "multi_node"}
+        ):
             multi.append(entry)
         else:
             single.append(entry)
