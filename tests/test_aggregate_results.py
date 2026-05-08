@@ -129,6 +129,79 @@ def _valid_entry() -> dict:
     }
 
 
+def _same_spec_payload(spec_id: str, spec_hash: str) -> dict:
+    return {
+        "schema_version": "benchmark-same-spec/v1",
+        "spec_id": spec_id,
+        "resolved_spec_hash": spec_hash,
+        "resolved_server_parameters": {
+            "tensor_parallel_size": 1,
+            "dtype": "float16",
+        },
+        "resolved_client_parameters": {
+            "dataset_name": "random",
+            "random_input_len": 1024,
+            "random_output_len": 256,
+            "request_rate": 1,
+        },
+    }
+
+
+def _write_manifest_entries(source_dir: Path, entries: list[dict]) -> None:
+    manifest_entries = []
+    for index, entry in enumerate(entries, start=1):
+        artifact_name = f"entry_{index}.json"
+        (source_dir / artifact_name).write_text(
+            json.dumps(entry, indent=2) + "\n", encoding="utf-8"
+        )
+        config_type = str(entry.get("config_type") or "single_gpu")
+        manifest_entries.append(
+            {
+                "entry_id": entry["entry_id"],
+                "idempotency_key": entry["metadata"]["idempotency_key"],
+                "canonical_path": entry["canonical_path"],
+                "leaderboard_artifact": artifact_name,
+                "canonical_artifact": f"entry_{index}.canonical.json",
+                "engine": entry["engine"],
+                "workload": entry["workload"]["name"],
+                "config_type": config_type,
+                "category": "multi"
+                if config_type in {"multi_gpu", "multi_node"}
+                else "single",
+            }
+        )
+
+    (source_dir / "leaderboard_manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "leaderboard-export-manifest/v1",
+                "generated_at": "2026-03-14T12:00:00Z",
+                "entries": manifest_entries,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
+def _run_aggregate(script: Path, source_dir: Path, output_dir: Path, *extra_args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(output_dir),
+            *extra_args,
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
 def test_aggregate_results_from_standard_manifest(tmp_path: Path) -> None:
     website_root = Path(__file__).resolve().parents[1]
     script = website_root / "scripts" / "aggregate_results.py"
@@ -193,7 +266,7 @@ def test_aggregate_results_from_standard_manifest(tmp_path: Path) -> None:
     assert single_payload[0]["metadata"]["git_commit"] == "abc123def456"
 
 
-def test_aggregate_results_places_multi_gpu_entry_in_multi(tmp_path: Path) -> None:
+def test_aggregate_results_places_multi_gpu_entry_in_multi_snapshot(tmp_path: Path) -> None:
     website_root = Path(__file__).resolve().parents[1]
     script = website_root / "scripts" / "aggregate_results.py"
     source_dir = tmp_path / "benchmark_outputs"
@@ -238,19 +311,7 @@ def test_aggregate_results_places_multi_gpu_entry_in_multi(tmp_path: Path) -> No
     )
 
     output_dir = tmp_path / "website_data"
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(script),
-            "--source-dir",
-            str(source_dir),
-            "--output-dir",
-            str(output_dir),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = _run_aggregate(script, source_dir, output_dir)
 
     assert result.returncode == 0, result.stderr or result.stdout
     single_payload = json.loads(
@@ -263,6 +324,226 @@ def test_aggregate_results_places_multi_gpu_entry_in_multi(tmp_path: Path) -> No
     assert single_payload == []
     assert len(multi_payload) == 1
     assert multi_payload[0]["entry_id"] == "12345678-1234-1234-1234-1234567890ab"
+
+
+def test_aggregate_results_merge_updates_only_touched_categories(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+    output_dir = tmp_path / "website_data"
+    output_dir.mkdir()
+
+    existing_single = _valid_entry()
+    existing_single["entry_id"] = "11111111-1111-1111-1111-111111111111"
+    existing_single["metadata"]["submitted_at"] = "2026-03-13T12:00:00Z"
+    existing_single["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+
+    existing_multi_chip = _valid_entry()
+    existing_multi_chip["entry_id"] = "22222222-2222-2222-2222-222222222222"
+    existing_multi_chip["config_type"] = "multi_gpu"
+    existing_multi_chip["hardware"]["chip_count"] = 4
+    existing_multi_chip["hardware"]["chips_per_node"] = 4
+    existing_multi_chip["hardware"]["total_memory_gb"] = 320
+    existing_multi_chip["metadata"]["submitted_at"] = "2026-03-13T12:05:00Z"
+    existing_multi_chip["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|4|1|multi_gpu"
+    )
+
+    existing_multi_node = _valid_entry()
+    existing_multi_node["entry_id"] = "33333333-3333-3333-3333-333333333333"
+    existing_multi_node["config_type"] = "multi_node"
+    existing_multi_node["hardware"]["chip_count"] = 8
+    existing_multi_node["hardware"]["chips_per_node"] = 4
+    existing_multi_node["hardware"]["total_memory_gb"] = 640
+    existing_multi_node["cluster"] = {
+        "node_count": 2,
+        "comm_backend": "HCCL",
+        "inter_node_network": "RoCE",
+        "network_bandwidth_gbps": 200,
+        "topology_type": "Ring",
+    }
+    existing_multi_node["metadata"]["submitted_at"] = "2026-03-13T12:10:00Z"
+    existing_multi_node["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|8|2|multi_node"
+    )
+
+    (output_dir / "leaderboard_single.json").write_text(
+        json.dumps([existing_single, existing_multi_chip], indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (output_dir / "leaderboard_multi.json").write_text(
+        json.dumps([existing_multi_node], indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    incoming_single = _valid_entry()
+    incoming_single["entry_id"] = "44444444-4444-4444-4444-444444444444"
+    incoming_single["metadata"]["submitted_at"] = "2026-03-14T12:00:00Z"
+    incoming_single["metadata"]["idempotency_key"] = (
+        "engine-b|9.9.9|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    incoming_single["engine"] = "engine-b"
+    incoming_single["engine_version"] = "9.9.9"
+    incoming_single["metadata"]["engine"] = "engine-b"
+    incoming_single["metadata"]["engine_version"] = "9.9.9"
+
+    _write_manifest_entries(source_dir, [incoming_single])
+    result = _run_aggregate(script, source_dir, output_dir)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    multi_payload = json.loads(
+        (output_dir / "leaderboard_multi.json").read_text(encoding="utf-8")
+    )
+
+    assert {entry["entry_id"] for entry in single_payload} == {
+        "44444444-4444-4444-4444-444444444444",
+        "11111111-1111-1111-1111-111111111111",
+    }
+    assert {entry["entry_id"] for entry in multi_payload} == {
+        "22222222-2222-2222-2222-222222222222",
+        "33333333-3333-3333-3333-333333333333"
+    }
+
+
+def test_aggregate_results_merge_preserves_single_node_data_on_multi_node_update(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+    output_dir = tmp_path / "website_data"
+    output_dir.mkdir()
+
+    existing_single = _valid_entry()
+    existing_single["entry_id"] = "55555555-5555-5555-5555-555555555555"
+    existing_single["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+
+    existing_multi_chip = _valid_entry()
+    existing_multi_chip["entry_id"] = "66666666-6666-6666-6666-666666666666"
+    existing_multi_chip["config_type"] = "multi_gpu"
+    existing_multi_chip["hardware"]["chip_count"] = 2
+    existing_multi_chip["hardware"]["chips_per_node"] = 2
+    existing_multi_chip["hardware"]["total_memory_gb"] = 160
+    existing_multi_chip["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|2|1|multi_gpu"
+    )
+
+    existing_multi_node = _valid_entry()
+    existing_multi_node["entry_id"] = "77777777-7777-7777-7777-777777777777"
+    existing_multi_node["config_type"] = "multi_node"
+    existing_multi_node["hardware"]["chip_count"] = 8
+    existing_multi_node["hardware"]["chips_per_node"] = 4
+    existing_multi_node["hardware"]["total_memory_gb"] = 640
+    existing_multi_node["cluster"] = {
+        "node_count": 2,
+        "comm_backend": "HCCL",
+        "inter_node_network": "RoCE",
+        "network_bandwidth_gbps": 200,
+        "topology_type": "Ring",
+    }
+    existing_multi_node["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|8|2|multi_node"
+    )
+
+    (output_dir / "leaderboard_single.json").write_text(
+        json.dumps([existing_single, existing_multi_chip], indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (output_dir / "leaderboard_multi.json").write_text(
+        json.dumps([existing_multi_node], indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    incoming_multi_node = _valid_entry()
+    incoming_multi_node["entry_id"] = "88888888-8888-8888-8888-888888888888"
+    incoming_multi_node["engine"] = "engine-b"
+    incoming_multi_node["engine_version"] = "9.9.9"
+    incoming_multi_node["metadata"]["engine"] = "engine-b"
+    incoming_multi_node["metadata"]["engine_version"] = "9.9.9"
+    incoming_multi_node["config_type"] = "multi_node"
+    incoming_multi_node["hardware"]["chip_count"] = 16
+    incoming_multi_node["hardware"]["chips_per_node"] = 8
+    incoming_multi_node["hardware"]["total_memory_gb"] = 1280
+    incoming_multi_node["cluster"] = {
+        "node_count": 2,
+        "comm_backend": "HCCL",
+        "inter_node_network": "RoCE",
+        "network_bandwidth_gbps": 400,
+        "topology_type": "Mesh",
+    }
+    incoming_multi_node["metadata"]["idempotency_key"] = (
+        "engine-b|9.9.9|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|16|2|multi_node"
+    )
+
+    _write_manifest_entries(source_dir, [incoming_multi_node])
+    result = _run_aggregate(script, source_dir, output_dir)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    multi_payload = json.loads(
+        (output_dir / "leaderboard_multi.json").read_text(encoding="utf-8")
+    )
+
+    assert {entry["entry_id"] for entry in single_payload} == {
+        "55555555-5555-5555-5555-555555555555",
+    }
+    assert {entry["entry_id"] for entry in multi_payload} == {
+        "66666666-6666-6666-6666-666666666666",
+        "77777777-7777-7777-7777-777777777777",
+        "88888888-8888-8888-8888-888888888888"
+    }
+
+
+def test_aggregate_results_merge_dedupes_reprocessed_entry_by_entry_id(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+    output_dir = tmp_path / "website_data"
+    output_dir.mkdir()
+
+    existing_entry = _valid_entry()
+    existing_entry["entry_id"] = "99999999-9999-9999-9999-999999999999"
+    existing_entry["metadata"]["submitted_at"] = "2026-03-14T12:00:00Z"
+
+    (output_dir / "leaderboard_single.json").write_text(
+        json.dumps([existing_entry], indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (output_dir / "leaderboard_multi.json").write_text(
+        json.dumps([], indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    incoming_entry = _valid_entry()
+    incoming_entry["entry_id"] = "99999999-9999-9999-9999-999999999999"
+    incoming_entry["metadata"]["submitted_at"] = "2026-03-14T12:00:00Z"
+
+    _write_manifest_entries(source_dir, [incoming_entry])
+    result = _run_aggregate(script, source_dir, output_dir)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+
+    assert len(single_payload) == 1
+    assert single_payload[0]["entry_id"] == "99999999-9999-9999-9999-999999999999"
 
 
 def test_aggregate_results_fails_on_invalid_schema(tmp_path: Path) -> None:
@@ -337,6 +618,7 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(tmp_path: 
     current_entry["metadata"]["idempotency_key"] = (
         "vllm-hust|0.20.1rc1.dev314|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
+    current_entry["same_spec"] = _same_spec_payload("spec-1", "hash-1")
 
     baseline_entry = _valid_entry()
     baseline_entry["entry_id"] = "22222222-2222-2222-2222-222222222222"
@@ -353,6 +635,7 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(tmp_path: 
     baseline_entry["metadata"]["idempotency_key"] = (
         "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
+    baseline_entry["same_spec"] = _same_spec_payload("spec-1", "hash-1")
 
     other_entry = _valid_entry()
     other_entry["entry_id"] = "33333333-3333-3333-3333-333333333333"
@@ -446,6 +729,7 @@ def test_aggregate_results_goal_progress_matches_prefixed_model_names(
     current_entry["metadata"]["idempotency_key"] = (
         "vllm-hust|0.20.1rc1.dev314|short|qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
+    current_entry["same_spec"] = _same_spec_payload("spec-2", "hash-2")
 
     baseline_entry = _valid_entry()
     baseline_entry["entry_id"] = "55555555-5555-5555-5555-555555555555"
@@ -458,6 +742,7 @@ def test_aggregate_results_goal_progress_matches_prefixed_model_names(
     baseline_entry["metadata"]["idempotency_key"] = (
         "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
+    baseline_entry["same_spec"] = _same_spec_payload("spec-2", "hash-2")
 
     entries = [current_entry, baseline_entry]
     manifest_entries = []
@@ -606,3 +891,262 @@ def test_aggregate_results_hard_constraints_only_include_vllm_hust(
     assert hard_constraints["fail_count"] == 0
     assert hard_constraints["scopes"][0]["scope"]["engine"] == "vllm-hust"
     assert hard_constraints["scopes"][0]["latest"]["engine"] == "vllm-hust"
+
+
+def test_aggregate_results_fails_on_same_spec_hash_mismatch(tmp_path: Path) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    current_entry = _valid_entry()
+    current_entry["entry_id"] = "88888888-8888-8888-8888-888888888888"
+    current_entry["engine"] = "vllm-hust"
+    current_entry["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["engine"] = "vllm-hust"
+    current_entry["metadata"]["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["github_repository"] = "vLLM-HUST/vllm-ascend-hust"
+    current_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|0.20.1rc1.dev314|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    current_entry["same_spec"] = _same_spec_payload("spec-3", "hash-current")
+
+    baseline_entry = _valid_entry()
+    baseline_entry["entry_id"] = "99999999-9999-9999-9999-999999999999"
+    baseline_entry["engine"] = "vllm"
+    baseline_entry["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["engine"] = "vllm"
+    baseline_entry["metadata"]["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
+    baseline_entry["metadata"]["idempotency_key"] = (
+        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    baseline_entry["same_spec"] = _same_spec_payload("spec-3", "hash-baseline")
+
+    entries = [current_entry, baseline_entry]
+    manifest_entries = []
+    for index, entry in enumerate(entries, start=1):
+        artifact_name = f"mismatch_entry_{index}.json"
+        (source_dir / artifact_name).write_text(
+            json.dumps(entry, indent=2) + "\n", encoding="utf-8"
+        )
+        manifest_entries.append(
+            {
+                "entry_id": entry["entry_id"],
+                "idempotency_key": entry["metadata"]["idempotency_key"],
+                "canonical_path": entry["canonical_path"],
+                "leaderboard_artifact": artifact_name,
+                "canonical_artifact": f"mismatch_entry_{index}.canonical.json",
+                "engine": entry["engine"],
+                "workload": entry["workload"]["name"],
+                "config_type": entry["config_type"],
+                "category": "single",
+            }
+        )
+
+    (source_dir / "leaderboard_manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "leaderboard-export-manifest/v1",
+                "generated_at": "2026-03-14T12:00:00Z",
+                "entries": manifest_entries,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(tmp_path / "website_data"),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "resolved_spec_hash mismatch" in (result.stderr + result.stdout)
+
+
+def test_aggregate_results_fails_on_compare_same_spec_hash_mismatch(tmp_path: Path) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    left_entry = _valid_entry()
+    left_entry["entry_id"] = "10101010-1010-1010-1010-101010101010"
+    left_entry["engine"] = "engine-a"
+    left_entry["metadata"]["engine"] = "engine-a"
+    left_entry["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|compare-hash-a"
+    )
+    left_entry["same_spec"] = _same_spec_payload("spec-compare", "hash-left")
+
+    right_entry = _valid_entry()
+    right_entry["entry_id"] = "20202020-2020-2020-2020-202020202020"
+    right_entry["engine"] = "engine-b"
+    right_entry["metadata"]["engine"] = "engine-b"
+    right_entry["metadata"]["idempotency_key"] = (
+        "engine-b|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|compare-hash-b"
+    )
+    right_entry["same_spec"] = _same_spec_payload("spec-compare", "hash-right")
+
+    entries = [left_entry, right_entry]
+    manifest_entries = []
+    for index, entry in enumerate(entries, start=1):
+        artifact_name = f"compare_mismatch_{index}.json"
+        (source_dir / artifact_name).write_text(
+            json.dumps(entry, indent=2) + "\n", encoding="utf-8"
+        )
+        manifest_entries.append(
+            {
+                "entry_id": entry["entry_id"],
+                "idempotency_key": entry["metadata"]["idempotency_key"],
+                "canonical_path": entry["canonical_path"],
+                "leaderboard_artifact": artifact_name,
+                "canonical_artifact": f"compare_mismatch_{index}.canonical.json",
+                "engine": entry["engine"],
+                "workload": entry["workload"]["name"],
+                "config_type": entry["config_type"],
+                "category": "single",
+            }
+        )
+
+    (source_dir / "leaderboard_manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "leaderboard-export-manifest/v1",
+                "generated_at": "2026-03-14T12:00:00Z",
+                "entries": manifest_entries,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(tmp_path / "website_data"),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "same-spec compare pair resolved_spec_hash mismatch" in (
+        result.stderr + result.stdout
+    )
+
+
+
+def test_compare_snapshot_prefers_matching_same_spec_pair(tmp_path: Path) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    engine_a_newer = _valid_entry()
+    engine_a_newer["entry_id"] = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+    engine_a_newer["engine"] = "engine-a"
+    engine_a_newer["metadata"]["engine"] = "engine-a"
+    engine_a_newer["metadata"]["submitted_at"] = "2026-03-14T12:10:00Z"
+    engine_a_newer["metrics"]["throughput_tps"] = 120.0
+    engine_a_newer["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|hash-a"
+    )
+    engine_a_newer["same_spec"] = _same_spec_payload("spec-4", "hash-a")
+
+    engine_a_matching = _valid_entry()
+    engine_a_matching["entry_id"] = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+    engine_a_matching["engine"] = "engine-a"
+    engine_a_matching["metadata"]["engine"] = "engine-a"
+    engine_a_matching["metadata"]["submitted_at"] = "2026-03-14T12:05:00Z"
+    engine_a_matching["metrics"]["throughput_tps"] = 110.0
+    engine_a_matching["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|hash-shared-a"
+    )
+    engine_a_matching["same_spec"] = _same_spec_payload("spec-4", "hash-shared")
+
+    engine_b_matching = _valid_entry()
+    engine_b_matching["entry_id"] = "cccccccc-cccc-cccc-cccc-cccccccccccc"
+    engine_b_matching["engine"] = "engine-b"
+    engine_b_matching["metadata"]["engine"] = "engine-b"
+    engine_b_matching["metadata"]["submitted_at"] = "2026-03-14T12:08:00Z"
+    engine_b_matching["metrics"]["throughput_tps"] = 105.0
+    engine_b_matching["metadata"]["idempotency_key"] = (
+        "engine-b|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|hash-shared-b"
+    )
+    engine_b_matching["same_spec"] = _same_spec_payload("spec-4", "hash-shared")
+
+    entries = [engine_a_newer, engine_a_matching, engine_b_matching]
+    manifest_entries = []
+    for index, entry in enumerate(entries, start=1):
+        artifact_name = f"compare_pair_{index}.json"
+        (source_dir / artifact_name).write_text(
+            json.dumps(entry, indent=2) + "\n", encoding="utf-8"
+        )
+        manifest_entries.append(
+            {
+                "entry_id": entry["entry_id"],
+                "idempotency_key": entry["metadata"]["idempotency_key"],
+                "canonical_path": entry["canonical_path"],
+                "leaderboard_artifact": artifact_name,
+                "canonical_artifact": f"compare_pair_{index}.canonical.json",
+                "engine": entry["engine"],
+                "workload": entry["workload"]["name"],
+                "config_type": entry["config_type"],
+                "category": "single",
+            }
+        )
+
+    (source_dir / "leaderboard_manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "leaderboard-export-manifest/v1",
+                "generated_at": "2026-03-14T12:00:00Z",
+                "entries": manifest_entries,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "website_data"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    compare_payload = json.loads(
+        (output_dir / "leaderboard_compare.json").read_text(encoding="utf-8")
+    )
+    preferred_pair = compare_payload["preferred_pairs"][0]["preferred_pair"]
+
+    assert preferred_pair["left"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
+    assert preferred_pair["right"]["same_spec"]["resolved_spec_hash"] == "hash-shared"

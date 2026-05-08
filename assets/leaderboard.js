@@ -414,7 +414,7 @@
                 entry.hardware.chip_count === 1 && (!entry.cluster || entry.cluster.node_count === 1)
             );
 
-            state.multiChipData = singleData.filter(entry =>
+            state.multiChipData = multiData.filter(entry =>
                 entry.hardware.chip_count > 1 && (!entry.cluster || entry.cluster.node_count === 1)
             );
 

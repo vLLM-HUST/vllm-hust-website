@@ -8,6 +8,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- `scripts/aggregate_results.py` now updates website snapshots by rendered
+  benchmark category instead of overwriting all categories on every run:
+  single-chip, single-node multi-chip, and multi-node results are merged
+  independently, so running one category no longer clears untouched categories;
+  `--replace-all` remains available for explicit full rebuilds. The generated
+  snapshot files now follow the same contract as the UI: `leaderboard_single.json`
+  carries only single-chip entries, while `leaderboard_multi.json` carries both
+  single-node multi-chip and multi-node entries.
+- `scripts/aggregate_results.py` now treats same-spec metadata as a pre-publish
+  gate for both goal tracking and compare pairing: official/current goal pairs
+  must share the same `resolved_spec_hash`, and compare snapshots prefer the
+  newest matching same-spec pair instead of silently mixing mismatched entries.
+- Added regression coverage for same-spec compare edge cases, including
+  non-goal compare hash mismatches and the case where a newer entry should be
+  ignored in favor of an older but spec-matching pair.
 - Leaderboard 现在会在主表和详情面板中展示 benchmark entry 关联的 GitHub provenance，包括触发该成绩的 GitHub 用户、commit SHA，以及可选的 PR / 仓库 / ref 链接；对应 benchmark 导出 metadata 也已补齐这些字段。
 - 继续清理内部文档与生成脚本中的历史旧命名和旧 workload 代号：同步更新 `.github` 说明、`LICENSE` 注释、demo 生成脚本、示例数据、README 和部署文档，统一到 `vllm-hust`、vLLM benchmark 与 AGI4S 服务场景口径。
 - 刷新 website leaderboard 到固定 `vllm-ascend v0.11.0` 基线的正式 compare 快照（`formal_compare_20260318_vllm_ascend_0110_fixlog`）：同步 `data/leaderboard_single.json`、`data/leaderboard_compare.json` 与 `data/last_updated.json`。

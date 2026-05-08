@@ -20,6 +20,14 @@ SUPPORTED_MANIFEST_SCHEMA_VERSIONS = {
     "leaderboard-export-manifest/v2",
 }
 COMPARE_SNAPSHOT_SCHEMA_VERSION = "leaderboard-compare-snapshot/v1"
+RENDER_CATEGORY_SINGLE_CHIP = "single_chip"
+RENDER_CATEGORY_MULTI_CHIP = "multi_chip"
+RENDER_CATEGORY_MULTI_NODE = "multi_node"
+RENDER_CATEGORIES = (
+    RENDER_CATEGORY_SINGLE_CHIP,
+    RENDER_CATEGORY_MULTI_CHIP,
+    RENDER_CATEGORY_MULTI_NODE,
+)
 
 HARD_CONSTRAINTS_SCHEMA_VERSION = "leaderboard-hard-constraints/v1"
 
@@ -85,6 +93,31 @@ def prefer_newer_entry(
     return current
 
 
+def sort_entries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def sort_key(item: dict[str, Any]) -> tuple[str, str, str, str]:
+        return (
+            str(item.get("engine") or ""),
+            str(item.get("model", {}).get("name") or ""),
+            str(item.get("workload", {}).get("name") or ""),
+            str(item.get("metadata", {}).get("submitted_at") or ""),
+        )
+
+    return sorted(entries, key=sort_key)
+
+
+def dedupe_entries_by_entry_id(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    deduped: dict[str, dict[str, Any]] = {}
+    for entry in entries:
+        entry_id = str(entry.get("entry_id") or "").strip()
+        if not entry_id:
+            raise ValueError("leaderboard entry is missing entry_id")
+        existing = deduped.get(entry_id)
+        deduped[entry_id] = (
+            prefer_newer_entry(existing, entry) if existing is not None else entry
+        )
+    return list(deduped.values())
+
+
 def build_idempotency_key(entry: dict[str, Any]) -> str:
     metadata = entry.get("metadata") or {}
     key = metadata.get("idempotency_key")
@@ -110,6 +143,31 @@ def normalize_model_name(model_name: Any) -> str:
     if "/" not in raw_name:
         return raw_name
     return raw_name.rsplit("/", maxsplit=1)[-1] or raw_name
+
+
+def get_same_spec_payload(entry: dict[str, Any]) -> dict[str, Any]:
+    payload = entry.get("same_spec")
+    return payload if isinstance(payload, dict) else {}
+
+
+def get_same_spec_id(entry: dict[str, Any]) -> str | None:
+    spec_id = str(get_same_spec_payload(entry).get("spec_id") or "").strip()
+    return spec_id or None
+
+
+def get_same_spec_hash(entry: dict[str, Any]) -> str | None:
+    spec_hash = str(
+        get_same_spec_payload(entry).get("resolved_spec_hash") or ""
+    ).strip()
+    return spec_hash or None
+
+
+def same_spec_hashes_match(
+    left_entry: dict[str, Any], right_entry: dict[str, Any]
+) -> bool:
+    left_hash = get_same_spec_hash(left_entry)
+    right_hash = get_same_spec_hash(right_entry)
+    return bool(left_hash and right_hash and left_hash == right_hash)
 
 
 def build_compare_scope_key(entry: dict[str, Any]) -> str:
@@ -171,6 +229,10 @@ def build_compare_engine_summary(entry: dict[str, Any]) -> dict[str, Any]:
         "canonical_path": entry.get("canonical_path"),
         "github_repository": metadata.get("github_repository"),
         "git_commit": metadata.get("git_commit"),
+        "same_spec": {
+            "spec_id": get_same_spec_id(entry),
+            "resolved_spec_hash": get_same_spec_hash(entry),
+        },
         "metrics": {
             "ttft_ms": float(metrics.get("ttft_ms") or 0.0),
             "tbt_ms": float(metrics.get("tbt_ms") or 0.0),
@@ -197,6 +259,84 @@ def parse_entry_timestamp(entry: dict[str, Any]) -> int:
             except ValueError:
                 continue
     return 0
+
+
+def classify_render_category(entry: dict[str, Any]) -> str:
+    config_type = str(entry.get("config_type") or "")
+    chip_count = int((entry.get("hardware") or {}).get("chip_count") or 1)
+    node_count = int((entry.get("cluster") or {}).get("node_count") or 1)
+    if node_count > 1 or config_type == "multi_node":
+        return RENDER_CATEGORY_MULTI_NODE
+    if chip_count > 1 or config_type == "multi_gpu":
+        return RENDER_CATEGORY_MULTI_CHIP
+    return RENDER_CATEGORY_SINGLE_CHIP
+
+
+def bucket_entries_by_render_category(
+    entries: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    bucketed: dict[str, list[dict[str, Any]]] = {
+        category: [] for category in RENDER_CATEGORIES
+    }
+    for entry in dedupe_entries_by_entry_id(entries):
+        bucketed[classify_render_category(entry)].append(entry)
+
+    for category in RENDER_CATEGORIES:
+        bucketed[category] = sort_entries(bucketed[category])
+    return bucketed
+
+
+def load_existing_snapshot_entries(
+    output_dir: Path, validator: Draft7Validator
+) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for file_name in ("leaderboard_single.json", "leaderboard_multi.json"):
+        snapshot_path = output_dir / file_name
+        if not snapshot_path.is_file():
+            continue
+
+        payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, list):
+            raise ValueError(f"{snapshot_path}: snapshot payload must be a list")
+
+        for index, item in enumerate(payload):
+            if not isinstance(item, dict):
+                raise ValueError(
+                    f"{snapshot_path}: entries[{index}] must be a JSON object"
+                )
+            entries.append(validate_entry(item, validator, source=snapshot_path))
+    return entries
+
+
+def merge_snapshot_entries_by_category(
+    existing_entries: list[dict[str, Any]],
+    incoming_entries: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], set[str]]:
+    existing_bucketed = bucket_entries_by_render_category(existing_entries)
+    incoming_bucketed = bucket_entries_by_render_category(incoming_entries)
+    touched_categories = {
+        category
+        for category, category_entries in incoming_bucketed.items()
+        if category_entries
+    }
+
+    merged_bucketed: dict[str, list[dict[str, Any]]] = {}
+    for category in RENDER_CATEGORIES:
+        if category in touched_categories:
+            merged_bucketed[category] = sort_entries(
+                dedupe_entries_by_entry_id(
+                    existing_bucketed[category] + incoming_bucketed[category]
+                )
+            )
+        else:
+            merged_bucketed[category] = existing_bucketed[category]
+
+    single_entries = sort_entries(merged_bucketed[RENDER_CATEGORY_SINGLE_CHIP])
+    multi_entries = sort_entries(
+        merged_bucketed[RENDER_CATEGORY_MULTI_CHIP]
+        + merged_bucketed[RENDER_CATEGORY_MULTI_NODE]
+    )
+    return single_entries, multi_entries, touched_categories
 
 
 def safe_float(value: Any) -> float | None:
@@ -479,6 +619,26 @@ def select_preferred_pair(
     if len(entries) < 2:
         return None
 
+    same_spec_entries = [entry for entry in entries if get_same_spec_hash(entry) is not None]
+    if same_spec_entries:
+        matching_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+        ordered_same_spec = sorted(
+            same_spec_entries,
+            key=lambda item: (
+                parse_entry_timestamp(item),
+                float((item.get("metrics") or {}).get("throughput_tps") or 0.0),
+            ),
+            reverse=True,
+        )
+        for left_index, left_entry in enumerate(ordered_same_spec):
+            for right_entry in ordered_same_spec[left_index + 1 :]:
+                if same_spec_hashes_match(left_entry, right_entry):
+                    matching_pairs.append((left_entry, right_entry))
+        if not matching_pairs:
+            return None
+
+        entries = list(matching_pairs[0])
+
     ordered = sorted(
         entries,
         key=lambda item: (
@@ -550,9 +710,102 @@ def select_goal_pair(
     if not current_candidates or not baseline_candidates:
         return None
 
+    current_with_same_spec = [
+        entry for entry in current_candidates if get_same_spec_hash(entry) is not None
+    ]
+    baseline_by_hash: dict[str, dict[str, Any]] = {}
+    for entry in sorted(baseline_candidates, key=parse_entry_timestamp, reverse=True):
+        spec_hash = get_same_spec_hash(entry)
+        if spec_hash is None or spec_hash in baseline_by_hash:
+            continue
+        baseline_by_hash[spec_hash] = entry
+
+    if current_with_same_spec and baseline_by_hash:
+        for entry in sorted(current_with_same_spec, key=parse_entry_timestamp, reverse=True):
+            spec_hash = get_same_spec_hash(entry)
+            if spec_hash is None:
+                continue
+            baseline_entry = baseline_by_hash.get(spec_hash)
+            if baseline_entry is not None:
+                return entry, baseline_entry
+        return None
+
     current_entry = sorted(current_candidates, key=parse_entry_timestamp, reverse=True)[0]
     baseline_entry = sorted(baseline_candidates, key=parse_entry_timestamp, reverse=True)[0]
     return current_entry, baseline_entry
+
+
+def validate_same_spec_goal_pairs(entries: list[dict[str, Any]]) -> None:
+    grouped: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    for entry in entries:
+        is_current = str(entry.get("engine") or "").strip().lower() == "vllm-hust"
+        is_baseline = is_goal_baseline_entry(entry)
+        if not is_current and not is_baseline:
+            continue
+
+        spec_id = get_same_spec_id(entry)
+        if spec_id is None:
+            continue
+
+        role = "baseline" if is_baseline else "current"
+        grouped.setdefault(spec_id, {}).setdefault(role, []).append(entry)
+
+    for spec_id, role_entries in grouped.items():
+        current_entries = role_entries.get("current") or []
+        baseline_entries = role_entries.get("baseline") or []
+        if not current_entries or not baseline_entries:
+            continue
+
+        current_entry = sorted(current_entries, key=parse_entry_timestamp, reverse=True)[0]
+        baseline_entry = sorted(
+            baseline_entries, key=parse_entry_timestamp, reverse=True
+        )[0]
+        current_hash = get_same_spec_hash(current_entry)
+        baseline_hash = get_same_spec_hash(baseline_entry)
+        if current_hash is None or baseline_hash is None:
+            raise ValueError(
+                "same-spec goal pair is missing resolved_spec_hash: "
+                f"spec_id={spec_id} current_engine={current_entry.get('engine')} "
+                f"baseline_engine={baseline_entry.get('engine')}"
+            )
+        if current_hash != baseline_hash:
+            raise ValueError(
+                "same-spec goal pair resolved_spec_hash mismatch: "
+                f"spec_id={spec_id} current_hash={current_hash} baseline_hash={baseline_hash}"
+            )
+
+
+def validate_same_spec_compare_pairs(entries: list[dict[str, Any]]) -> None:
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for entry in entries:
+        if get_same_spec_hash(entry) is None:
+            continue
+        scope_key = build_compare_scope_key(entry)
+        grouped.setdefault(scope_key, []).append(entry)
+
+    for scope_key, scope_entries in grouped.items():
+        engines = {
+            str(
+                entry.get("engine")
+                or (entry.get("metadata") or {}).get("engine")
+                or "unknown"
+            )
+            for entry in scope_entries
+        }
+        if len(engines) < 2:
+            continue
+        if select_preferred_pair(scope_entries) is None:
+            hashes = sorted(
+                {
+                    get_same_spec_hash(entry)
+                    for entry in scope_entries
+                    if get_same_spec_hash(entry) is not None
+                }
+            )
+            raise ValueError(
+                "same-spec compare pair resolved_spec_hash mismatch: "
+                f"scope_key={scope_key} hashes={hashes}"
+            )
 
 
 def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
@@ -683,9 +936,11 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
                 "category": "multi"
                 if int((entry.get("cluster") or {}).get("node_count") or 1) > 1
                 else "single",
+                "all_entries": [],
                 "entries_by_engine": {},
             },
         )
+        group["all_entries"].append(entry)
         engine = str(
             entry.get("engine")
             or (entry.get("metadata") or {}).get("engine")
@@ -702,7 +957,10 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
         representative_entries = list(group["entries_by_engine"].values())
         if len(representative_entries) < 2:
             continue
-        preferred_pair = select_preferred_pair(representative_entries)
+        preferred_pair_entries = group["all_entries"]
+        if not any(get_same_spec_hash(entry) is not None for entry in preferred_pair_entries):
+            preferred_pair_entries = representative_entries
+        preferred_pair = select_preferred_pair(preferred_pair_entries)
         if preferred_pair is None:
             continue
 
@@ -826,40 +1084,13 @@ def load_manifest_entries(
 def split_entries(
     entries: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    deduped: dict[str, dict[str, Any]] = {}
-    for entry in entries:
-        key = build_idempotency_key(entry)
-        current = deduped.get(key)
-        deduped[key] = (
-            prefer_newer_entry(current, entry) if current is not None else entry
-        )
-
-    single: list[dict[str, Any]] = []
-    multi: list[dict[str, Any]] = []
-    for entry in deduped.values():
-        config_type = str(entry.get("config_type") or "")
-        chip_count = int((entry.get("hardware") or {}).get("chip_count") or 1)
-        node_count = int((entry.get("cluster") or {}).get("node_count") or 1)
-        if (
-            node_count > 1
-            or chip_count > 1
-            or config_type in {"multi_gpu", "multi_node"}
-        ):
-            multi.append(entry)
-        else:
-            single.append(entry)
-
-    def sort_key(item: dict[str, Any]) -> tuple[str, str, str, str]:
-        return (
-            str(item.get("engine") or ""),
-            str(item.get("model", {}).get("name") or ""),
-            str(item.get("workload", {}).get("name") or ""),
-            str(item.get("metadata", {}).get("submitted_at") or ""),
-        )
-
-    single.sort(key=sort_key)
-    multi.sort(key=sort_key)
-    return single, multi
+    bucketed = bucket_entries_by_render_category(entries)
+    single_entries = sort_entries(bucketed[RENDER_CATEGORY_SINGLE_CHIP])
+    multi_entries = sort_entries(
+        bucketed[RENDER_CATEGORY_MULTI_CHIP]
+        + bucketed[RENDER_CATEGORY_MULTI_NODE]
+    )
+    return single_entries, multi_entries
 
 
 def write_outputs(
@@ -907,6 +1138,14 @@ def parse_args() -> argparse.Namespace:
         help="Website data output directory.",
     )
     parser.add_argument(
+        "--replace-all",
+        action="store_true",
+        help=(
+            "Rebuild all website snapshot categories from the current source-dir "
+            "instead of preserving untouched categories from the existing output-dir."
+        ),
+    )
+    parser.add_argument(
         "--schema",
         type=Path,
         default=Path(__file__).resolve().parents[1]
@@ -921,13 +1160,32 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     validator = Draft7Validator(load_schema(args.schema))
-    entries = load_manifest_entries(args.source_dir, validator)
-    single, multi = split_entries(entries)
+    incoming_entries = load_manifest_entries(args.source_dir, validator)
+    existing_entries = []
+    touched_categories: set[str] = set(RENDER_CATEGORIES)
+    if args.replace_all:
+        single, multi = split_entries(incoming_entries)
+    else:
+        existing_entries = load_existing_snapshot_entries(args.output_dir, validator)
+        single, multi, touched_categories = merge_snapshot_entries_by_category(
+            existing_entries, incoming_entries
+        )
+
+    merged_entries = single + multi
+    validate_same_spec_goal_pairs(merged_entries)
+    validate_same_spec_compare_pairs(merged_entries)
     compare = build_compare_snapshot(single + multi)
     write_outputs(args.output_dir, single, multi, compare)
 
     print("✅ Aggregation complete")
     print(f"  source manifests: {args.source_dir}")
+    if args.replace_all:
+        print("  update mode: replace-all")
+    else:
+        print(
+            "  update mode: merge-by-category "
+            f"({', '.join(sorted(touched_categories)) or 'no categories updated'})"
+        )
     print(f"  leaderboard_single.json: {len(single)} entries")
     print(f"  leaderboard_multi.json: {len(multi)} entries")
     print(f"  leaderboard_compare.json: {compare['group_count']} compare groups")
