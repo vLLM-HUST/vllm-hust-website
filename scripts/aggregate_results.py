@@ -619,7 +619,9 @@ def select_preferred_pair(
     if len(entries) < 2:
         return None
 
-    same_spec_entries = [entry for entry in entries if get_same_spec_hash(entry) is not None]
+    same_spec_entries = [
+        entry for entry in entries if get_same_spec_hash(entry) is not None
+    ]
     if same_spec_entries:
         matching_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
         ordered_same_spec = sorted(
@@ -662,9 +664,9 @@ def select_preferred_pair(
 
 def is_goal_baseline_entry(entry: dict[str, Any]) -> bool:
     metadata = entry.get("metadata") or {}
-    engine = str(
-        entry.get("engine") or metadata.get("engine") or "unknown"
-    ).strip().lower()
+    engine = (
+        str(entry.get("engine") or metadata.get("engine") or "unknown").strip().lower()
+    )
     engine_version = str(
         entry.get("engine_version") or metadata.get("engine_version") or ""
     ).strip()
@@ -721,7 +723,9 @@ def select_goal_pair(
         baseline_by_hash[spec_hash] = entry
 
     if current_with_same_spec and baseline_by_hash:
-        for entry in sorted(current_with_same_spec, key=parse_entry_timestamp, reverse=True):
+        for entry in sorted(
+            current_with_same_spec, key=parse_entry_timestamp, reverse=True
+        ):
             spec_hash = get_same_spec_hash(entry)
             if spec_hash is None:
                 continue
@@ -730,8 +734,12 @@ def select_goal_pair(
                 return entry, baseline_entry
         return None
 
-    current_entry = sorted(current_candidates, key=parse_entry_timestamp, reverse=True)[0]
-    baseline_entry = sorted(baseline_candidates, key=parse_entry_timestamp, reverse=True)[0]
+    current_entry = sorted(current_candidates, key=parse_entry_timestamp, reverse=True)[
+        0
+    ]
+    baseline_entry = sorted(
+        baseline_candidates, key=parse_entry_timestamp, reverse=True
+    )[0]
     return current_entry, baseline_entry
 
 
@@ -756,7 +764,9 @@ def validate_same_spec_goal_pairs(entries: list[dict[str, Any]]) -> None:
         if not current_entries or not baseline_entries:
             continue
 
-        current_entry = sorted(current_entries, key=parse_entry_timestamp, reverse=True)[0]
+        current_entry = sorted(
+            current_entries, key=parse_entry_timestamp, reverse=True
+        )[0]
         baseline_entry = sorted(
             baseline_entries, key=parse_entry_timestamp, reverse=True
         )[0]
@@ -841,7 +851,9 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
                     or "unknown-precision"
                 ),
                 "workload": extract_workload_name(current_entry),
-                "config_type": str(current_entry.get("config_type") or "unknown-config"),
+                "config_type": str(
+                    current_entry.get("config_type") or "unknown-config"
+                ),
                 "chip_count": int(
                     (current_entry.get("hardware") or {}).get("chip_count") or 0
                 ),
@@ -885,13 +897,17 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
             },
         }
         payload["meets_goal"] = all(
-            gap == 0.0 for gap in payload["remaining_gap_pct"].values() if gap is not None
+            gap == 0.0
+            for gap in payload["remaining_gap_pct"].values()
+            if gap is not None
         )
         pairs.append(payload)
 
     pairs.sort(
         key=lambda item: (
-            -parse_entry_timestamp({"metadata": {"submitted_at": item["current"].get("submitted_at")}}),
+            -parse_entry_timestamp(
+                {"metadata": {"submitted_at": item["current"].get("submitted_at")}}
+            ),
             str(item.get("scope_key") or ""),
         )
     )
@@ -958,7 +974,9 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
         if len(representative_entries) < 2:
             continue
         preferred_pair_entries = group["all_entries"]
-        if not any(get_same_spec_hash(entry) is not None for entry in preferred_pair_entries):
+        if not any(
+            get_same_spec_hash(entry) is not None for entry in preferred_pair_entries
+        ):
             preferred_pair_entries = representative_entries
         preferred_pair = select_preferred_pair(preferred_pair_entries)
         if preferred_pair is None:
@@ -1087,8 +1105,7 @@ def split_entries(
     bucketed = bucket_entries_by_render_category(entries)
     single_entries = sort_entries(bucketed[RENDER_CATEGORY_SINGLE_CHIP])
     multi_entries = sort_entries(
-        bucketed[RENDER_CATEGORY_MULTI_CHIP]
-        + bucketed[RENDER_CATEGORY_MULTI_NODE]
+        bucketed[RENDER_CATEGORY_MULTI_CHIP] + bucketed[RENDER_CATEGORY_MULTI_NODE]
     )
     return single_entries, multi_entries
 

@@ -111,9 +111,9 @@ def _valid_entry() -> dict:
             "engine_version": "1.2.3",
             "hardware_family": "cuda",
             "reproducible_cmd": "vllm bench serve --endpoint http://127.0.0.1:8901/v1 --model Qwen/Qwen2.5-0.5B-Instruct",
-            "git_commit": "abc123def456",
+            "git_commit": "test-commit-123",
             "github_user": "octocat",
-            "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/abc123def456",
+            "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/test-commit-123",
             "github_repository": "vLLM-HUST/vllm-hust",
             "github_ref": "feature/bench-provenance",
             "github_event_name": "pull_request",
@@ -123,7 +123,7 @@ def _valid_entry() -> dict:
             "changelog_url": "https://example.com/changelog",
             "notes": "Benchmark run: short",
             "verified": True,
-            "idempotency_key": "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu",
+            "idempotency_key": "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu",  # pragma: allowlist secret
         },
         "canonical_path": "canonical/test_leaderboard.json",
     }
@@ -185,7 +185,9 @@ def _write_manifest_entries(source_dir: Path, entries: list[dict]) -> None:
     )
 
 
-def _run_aggregate(script: Path, source_dir: Path, output_dir: Path, *extra_args: str) -> subprocess.CompletedProcess[str]:
+def _run_aggregate(
+    script: Path, source_dir: Path, output_dir: Path, *extra_args: str
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
             sys.executable,
@@ -263,10 +265,12 @@ def test_aggregate_results_from_standard_manifest(tmp_path: Path) -> None:
     assert len(single_payload) == 1
     assert single_payload[0]["workload"]["name"] == "short"
     assert single_payload[0]["metadata"]["github_user"] == "octocat"
-    assert single_payload[0]["metadata"]["git_commit"] == "abc123def456"
+    assert single_payload[0]["metadata"]["git_commit"] == "test-commit-123"
 
 
-def test_aggregate_results_places_multi_gpu_entry_in_multi_snapshot(tmp_path: Path) -> None:
+def test_aggregate_results_places_multi_gpu_entry_in_multi_snapshot(
+    tmp_path: Path,
+) -> None:
     website_root = Path(__file__).resolve().parents[1]
     script = website_root / "scripts" / "aggregate_results.py"
     source_dir = tmp_path / "benchmark_outputs"
@@ -409,7 +413,7 @@ def test_aggregate_results_merge_updates_only_touched_categories(
     }
     assert {entry["entry_id"] for entry in multi_payload} == {
         "22222222-2222-2222-2222-222222222222",
-        "33333333-3333-3333-3333-333333333333"
+        "33333333-3333-3333-3333-333333333333",
     }
 
 
@@ -503,7 +507,7 @@ def test_aggregate_results_merge_preserves_single_node_data_on_multi_node_update
     assert {entry["entry_id"] for entry in multi_payload} == {
         "66666666-6666-6666-6666-666666666666",
         "77777777-7777-7777-7777-777777777777",
-        "88888888-8888-8888-8888-888888888888"
+        "88888888-8888-8888-8888-888888888888",
     }
 
 
@@ -599,7 +603,9 @@ def test_aggregate_results_fails_on_invalid_schema(tmp_path: Path) -> None:
     assert "schema validation failed" in (result.stderr + result.stdout)
 
 
-def test_aggregate_results_builds_goal_progress_for_official_baseline(tmp_path: Path) -> None:
+def test_aggregate_results_builds_goal_progress_for_official_baseline(
+    tmp_path: Path,
+) -> None:
     website_root = Path(__file__).resolve().parents[1]
     script = website_root / "scripts" / "aggregate_results.py"
     source_dir = tmp_path / "benchmark_outputs"
@@ -627,7 +633,9 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(tmp_path: 
     baseline_entry["metadata"]["engine"] = "vllm"
     baseline_entry["metadata"]["engine_version"] = "0.11.0"
     baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
-    baseline_entry["metadata"]["github_commit_url"] = "https://github.com/vllm-project/vllm-ascend/commit/def456"
+    baseline_entry["metadata"]["github_commit_url"] = (
+        "https://github.com/vllm-project/vllm-ascend/commit/def456"
+    )
     baseline_entry["metadata"]["git_commit"] = "def456"
     baseline_entry["metrics"]["ttft_ms"] = 100.0
     baseline_entry["metrics"]["tbt_ms"] = 8.0
@@ -706,7 +714,10 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(tmp_path: 
     assert goal_progress["pair_count"] == 1
     assert goal_progress["headline_pair"]["current"]["engine"] == "vllm-hust"
     assert goal_progress["headline_pair"]["baseline"]["engine"] == "vllm"
-    assert goal_progress["headline_pair"]["baseline_target"]["id"] == "official-ascend-jan-2026-v0.11.0"
+    assert (
+        goal_progress["headline_pair"]["baseline_target"]["id"]
+        == "official-ascend-jan-2026-v0.11.0"
+    )
     assert goal_progress["headline_pair"]["remaining_gap_pct"]["throughput"] == 12.5
 
 
@@ -975,7 +986,9 @@ def test_aggregate_results_fails_on_same_spec_hash_mismatch(tmp_path: Path) -> N
     assert "resolved_spec_hash mismatch" in (result.stderr + result.stdout)
 
 
-def test_aggregate_results_fails_on_compare_same_spec_hash_mismatch(tmp_path: Path) -> None:
+def test_aggregate_results_fails_on_compare_same_spec_hash_mismatch(
+    tmp_path: Path,
+) -> None:
     website_root = Path(__file__).resolve().parents[1]
     script = website_root / "scripts" / "aggregate_results.py"
     source_dir = tmp_path / "benchmark_outputs"
@@ -1051,7 +1064,6 @@ def test_aggregate_results_fails_on_compare_same_spec_hash_mismatch(tmp_path: Pa
     assert "same-spec compare pair resolved_spec_hash mismatch" in (
         result.stderr + result.stdout
     )
-
 
 
 def test_compare_snapshot_prefers_matching_same_spec_pair(tmp_path: Path) -> None:
