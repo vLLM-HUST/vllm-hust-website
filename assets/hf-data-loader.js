@@ -162,23 +162,30 @@ function getLastLoadedSource() {
     return lastLoadedSource;
 }
 
-async function getLatestMarker() {
-    try {
-        const marker = await loadFromHuggingFace(HF_CONFIG.files.lastUpdated);
-        if (marker && marker.last_updated) {
-            return marker.last_updated;
-        }
-    } catch (_e) {
-        // ignore and fallback
-    }
+async function getLatestMarker(sourcePriority = getSourcePriority()) {
+    const loaders = {
+        github: loadFromGitHub,
+        hf: loadFromHuggingFace,
+        local: loadFromLocal,
+    };
 
-    try {
-        const marker = await loadFromLocal(HF_CONFIG.files.lastUpdated);
-        if (marker && marker.last_updated) {
-            return marker.last_updated;
+    for (const source of sourcePriority) {
+        const loader = loaders[source];
+        if (!loader) {
+            continue;
         }
-    } catch (_e) {
-        // ignore and fallback
+        if (source === 'local' && !HF_CONFIG.fallbackToLocal) {
+            continue;
+        }
+
+        try {
+            const marker = await loader(HF_CONFIG.files.lastUpdated);
+            if (marker && marker.last_updated) {
+                return marker.last_updated;
+            }
+        } catch (_error) {
+            // ignore and try the next configured source
+        }
     }
 
     return null;
@@ -468,7 +475,7 @@ async function loadLeaderboardData() {
 
         try {
             console.log(`[HF Loader] Loading from ${source}...`);
-            const marker = await getLatestMarker();
+            const marker = await getLatestMarker([source, ...sourcePriority.filter((item) => item !== source)]);
             const [singleData, multiData, compareData] = await Promise.all([
                 loader(HF_CONFIG.files.single),
                 loader(HF_CONFIG.files.multi),
