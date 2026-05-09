@@ -1145,22 +1145,47 @@
             return null;
         }
 
+        const rankedScopes = [...scopes].sort((left, right) => {
+            const passCompare = Number(Boolean(right?.overall_pass)) - Number(Boolean(left?.overall_pass));
+            if (passCompare !== 0) {
+                return passCompare;
+            }
+            return String(left?.scope_key || '').localeCompare(String(right?.scope_key || ''));
+        });
+
         const trackedEntries = (Array.isArray(sourceEntries) ? sourceEntries : [])
             .filter((entry) => isHardConstraintTrackedEngine(getEngine(entry)));
         if (!trackedEntries.length) {
-            return scopes[0] || null;
+            return rankedScopes[0] || null;
         }
 
-        const bestEntry = [...trackedEntries].sort((left, right) => {
-            const qualityCompare = compareEntryQuality(right, left);
-            if (qualityCompare !== 0) {
-                return qualityCompare;
-            }
-            return String(buildHardConstraintScopeKey(right)).localeCompare(String(buildHardConstraintScopeKey(left)));
-        })[0];
+        const scopeByKey = new Map(scopes.map((scope) => [scope?.scope_key, scope]));
 
-        const bestScopeKey = buildHardConstraintScopeKey(bestEntry);
-        return scopes.find((scope) => scope?.scope_key === bestScopeKey) || scopes[0] || null;
+        const bestCandidate = trackedEntries
+            .map((entry) => {
+                const scopeKey = buildHardConstraintScopeKey(entry);
+                return {
+                    entry,
+                    scopeKey,
+                    scope: scopeByKey.get(scopeKey) || null,
+                };
+            })
+            .filter((candidate) => candidate.scope)
+            .sort((left, right) => {
+                const passCompare = Number(Boolean(right.scope?.overall_pass)) - Number(Boolean(left.scope?.overall_pass));
+                if (passCompare !== 0) {
+                    return passCompare;
+                }
+
+                const qualityCompare = compareEntryQuality(right.entry, left.entry);
+                if (qualityCompare !== 0) {
+                    return qualityCompare;
+                }
+
+                return String(left.scopeKey).localeCompare(String(right.scopeKey));
+            })[0];
+
+        return bestCandidate?.scope || rankedScopes[0] || null;
     }
 
     function renderHardConstraints(entries, comparisonView) {
