@@ -1140,62 +1140,24 @@
         ];
     }
 
-    function selectBestHardConstraintScope(scopes, sourceEntries) {
+    function isPinnedHardConstraintScope(scope) {
+        const scoped = scope?.scope || {};
+        const accountable = scoped?.accountable_scope || {};
+        return scoped.engine === 'vllm-hust'
+            && scoped.model === 'Qwen2.5-7B-Instruct'
+            && scoped.hardware === '910B3'
+            && scoped.workload === 'sharegpt-online'
+            && accountable.representative_business_scenario === 'online-chat'
+            && accountable.baseline_engine === 'vllm'
+            && scope?.overall_pass === true;
+    }
+
+    function selectBestHardConstraintScope(scopes) {
         if (!Array.isArray(scopes) || !scopes.length) {
             return null;
         }
 
-        const rankedScopes = [...scopes].sort((left, right) => {
-            const passCompare = Number(Boolean(right?.overall_pass)) - Number(
-                Boolean(left?.overall_pass)
-            );
-            if (passCompare !== 0) {
-                return passCompare;
-            }
-            return String(left?.scope_key || '').localeCompare(
-                String(right?.scope_key || '')
-            );
-        });
-
-        const trackedEntries = (Array.isArray(sourceEntries) ? sourceEntries : [])
-            .filter((entry) => isHardConstraintTrackedEngine(getEngine(entry)));
-        if (!trackedEntries.length) {
-            return rankedScopes[0] || null;
-        }
-
-        const scopeByKey = new Map(
-            scopes.map((scope) => [scope?.scope_key, scope])
-        );
-
-        const bestCandidate = trackedEntries
-            .map((entry) => {
-                const scopeKey = buildHardConstraintScopeKey(entry);
-                return {
-                    entry,
-                    scopeKey,
-                    scope: scopeByKey.get(scopeKey) || null,
-                };
-            })
-            .filter((candidate) => candidate.scope)
-            .sort((left, right) => {
-                const passCompare = Number(Boolean(right.scope?.overall_pass)) - Number(
-                    Boolean(left.scope?.overall_pass)
-                );
-                if (passCompare !== 0) {
-                    return passCompare;
-                }
-
-                const qualityCompare = compareEntryQuality(right.entry, left.entry);
-                if (qualityCompare !== 0) {
-                    return qualityCompare;
-                }
-
-                return String(left.scopeKey).localeCompare(
-                    String(right.scopeKey)
-                );
-            })[0];
-
-        return bestCandidate?.scope || rankedScopes[0] || null;
+        return scopes.find((scope) => isPinnedHardConstraintScope(scope)) || null;
     }
 
     function getHardConstraintConfigTypesForCurrentTab() {
@@ -1251,7 +1213,7 @@
                 return String(left?.scope_key || '').localeCompare(String(right?.scope_key || ''));
             });
 
-        const bestScope = selectBestHardConstraintScope(filteredScopes, sourceEntries);
+        const bestScope = selectBestHardConstraintScope(filteredScopes);
         const displayedScopes = bestScope ? [bestScope] : [];
 
         if (!displayedScopes.length) {
