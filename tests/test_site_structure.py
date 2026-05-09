@@ -28,3 +28,12 @@ def test_data_directory_has_sync_marker() -> None:
     root = Path(__file__).resolve().parents[1]
     marker = root / "data" / "last_updated.json"
     assert marker.exists(), "data sync marker is required for website freshness"
+
+
+def test_hard_constraints_selection_prefers_passed_scope() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "right.scope?.overall_pass" in text
+    assert "left.scope?.overall_pass" in text
+    assert "return bestCandidate?.scope || rankedScopes[0] || null;" in text
