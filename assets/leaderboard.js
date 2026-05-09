@@ -1146,11 +1146,15 @@
         }
 
         const rankedScopes = [...scopes].sort((left, right) => {
-            const passCompare = Number(Boolean(right?.overall_pass)) - Number(Boolean(left?.overall_pass));
+            const passCompare = Number(Boolean(right?.overall_pass)) - Number(
+                Boolean(left?.overall_pass)
+            );
             if (passCompare !== 0) {
                 return passCompare;
             }
-            return String(left?.scope_key || '').localeCompare(String(right?.scope_key || ''));
+            return String(left?.scope_key || '').localeCompare(
+                String(right?.scope_key || '')
+            );
         });
 
         const trackedEntries = (Array.isArray(sourceEntries) ? sourceEntries : [])
@@ -1159,7 +1163,9 @@
             return rankedScopes[0] || null;
         }
 
-        const scopeByKey = new Map(scopes.map((scope) => [scope?.scope_key, scope]));
+        const scopeByKey = new Map(
+            scopes.map((scope) => [scope?.scope_key, scope])
+        );
 
         const bestCandidate = trackedEntries
             .map((entry) => {
@@ -1172,7 +1178,9 @@
             })
             .filter((candidate) => candidate.scope)
             .sort((left, right) => {
-                const passCompare = Number(Boolean(right.scope?.overall_pass)) - Number(Boolean(left.scope?.overall_pass));
+                const passCompare = Number(Boolean(right.scope?.overall_pass)) - Number(
+                    Boolean(left.scope?.overall_pass)
+                );
                 if (passCompare !== 0) {
                     return passCompare;
                 }
@@ -1182,7 +1190,9 @@
                     return qualityCompare;
                 }
 
-                return String(left.scopeKey).localeCompare(String(right.scopeKey));
+                return String(left.scopeKey).localeCompare(
+                    String(right.scopeKey)
+                );
             })[0];
 
         return bestCandidate?.scope || rankedScopes[0] || null;
