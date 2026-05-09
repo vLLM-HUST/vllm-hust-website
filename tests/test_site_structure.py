@@ -37,3 +37,11 @@ def test_hard_constraints_selection_prefers_passed_scope() -> None:
     assert "right.scope?.overall_pass" in text
     assert "left.scope?.overall_pass" in text
     assert "return bestCandidate?.scope || rankedScopes[0] || null;" in text
+
+
+def test_hard_constraints_selection_uses_tab_dataset_not_visible_rows() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function getHardConstraintConfigTypesForCurrentTab()" in text
+    assert "const sourceEntries = getDataByTab(state.currentTab).filter(" in text

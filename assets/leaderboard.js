@@ -1198,6 +1198,19 @@
         return bestCandidate?.scope || rankedScopes[0] || null;
     }
 
+    function getHardConstraintConfigTypesForCurrentTab() {
+        if (state.currentTab === 'single-chip') {
+            return new Set(['single_gpu']);
+        }
+        if (state.currentTab === 'multi-chip') {
+            return new Set(['multi_gpu']);
+        }
+        if (state.currentTab === 'multi-node') {
+            return new Set(['multi_node']);
+        }
+        return new Set();
+    }
+
     function renderHardConstraints(entries, comparisonView) {
         const el = document.getElementById('leaderboard-hard-constraints');
         if (!el) {
@@ -1213,14 +1226,22 @@
             return;
         }
 
-        const sourceEntries = comparisonView?.visibleEntries?.length ? comparisonView.visibleEntries : entries;
+        const validConfigTypes = getHardConstraintConfigTypesForCurrentTab();
+        const sourceEntries = getDataByTab(state.currentTab).filter(
+            (entry) => isHardConstraintTrackedEngine(getEngine(entry))
+        );
         const scopeKeys = new Set(
             sourceEntries
-                .filter((entry) => isHardConstraintTrackedEngine(getEngine(entry)))
                 .map((entry) => buildHardConstraintScopeKey(entry))
         );
         const filteredScopes = scopes
             .filter((scope) => isHardConstraintTrackedEngine(scope?.latest?.engine || scope?.scope?.engine))
+            .filter((scope) => {
+                if (!validConfigTypes.size) {
+                    return true;
+                }
+                return validConfigTypes.has(String(scope?.scope?.config_type || 'unknown-config'));
+            })
             .filter((scope) => scopeKeys.has(scope.scope_key))
             .sort((left, right) => {
                 const statusOrder = Number(Boolean(left?.overall_pass)) - Number(Boolean(right?.overall_pass));
