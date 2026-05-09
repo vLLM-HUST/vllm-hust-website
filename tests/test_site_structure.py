@@ -40,7 +40,10 @@ def test_hard_constraints_selection_prefers_passed_scope() -> None:
     assert "scoped.workload === 'sharegpt-online'" in text
     assert "accountable.representative_business_scenario === 'online-chat'" in text
     assert "accountable.baseline_engine === 'vllm'" in text
-    assert "return scopes.find((scope) => isPinnedHardConstraintScope(scope)) || null;" in text
+    assert (
+        "return scopes.find((scope) => isPinnedHardConstraintScope(scope)) || null;"
+        in text
+    )
 
 
 def test_hard_constraints_selection_uses_tab_dataset_not_visible_rows() -> None:
