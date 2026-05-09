@@ -941,7 +941,9 @@
             const isExpanded = state.expandedRows.has(entry.entry_id);
             const currentVersion = getDisplayVersion(entry);
             const prevVersion = index > 0 ? getDisplayVersion(withTrends[index - 1]) : null;
-            const showVersion = index === 0 || currentVersion !== prevVersion;
+            const showVersionForEveryRow = typeof window !== 'undefined'
+                && new URLSearchParams(window.location.search).get('showVersionAll') === '1';
+            const showVersion = showVersionForEveryRow || index === 0 || currentVersion !== prevVersion;
             const isSparse = comparisonView.incompleteKeys.has(createCompareScopeKey(entry));
 
             return `
