@@ -1140,6 +1140,29 @@
         ];
     }
 
+    function selectBestHardConstraintScope(scopes, sourceEntries) {
+        if (!Array.isArray(scopes) || !scopes.length) {
+            return null;
+        }
+
+        const trackedEntries = (Array.isArray(sourceEntries) ? sourceEntries : [])
+            .filter((entry) => isHardConstraintTrackedEngine(getEngine(entry)));
+        if (!trackedEntries.length) {
+            return scopes[0] || null;
+        }
+
+        const bestEntry = [...trackedEntries].sort((left, right) => {
+            const qualityCompare = compareEntryQuality(right, left);
+            if (qualityCompare !== 0) {
+                return qualityCompare;
+            }
+            return String(buildHardConstraintScopeKey(right)).localeCompare(String(buildHardConstraintScopeKey(left)));
+        })[0];
+
+        const bestScopeKey = buildHardConstraintScopeKey(bestEntry);
+        return scopes.find((scope) => scope?.scope_key === bestScopeKey) || scopes[0] || null;
+    }
+
     function renderHardConstraints(entries, comparisonView) {
         const el = document.getElementById('leaderboard-hard-constraints');
         if (!el) {
@@ -1172,15 +1195,18 @@
                 return String(left?.scope_key || '').localeCompare(String(right?.scope_key || ''));
             });
 
-        if (!filteredScopes.length) {
+        const bestScope = selectBestHardConstraintScope(filteredScopes, sourceEntries);
+        const displayedScopes = bestScope ? [bestScope] : [];
+
+        if (!displayedScopes.length) {
             el.innerHTML = `
                 <div class="hard-constraints-empty">${t('hardConstraintsNoData')}</div>
             `;
             return;
         }
 
-        const passCount = filteredScopes.filter((scope) => scope?.overall_pass).length;
-        const failCount = Math.max(filteredScopes.length - passCount, 0);
+        const passCount = displayedScopes.filter((scope) => scope?.overall_pass).length;
+        const failCount = Math.max(displayedScopes.length - passCount, 0);
 
         el.innerHTML = `
             <div class="hard-constraints-header">
@@ -1194,7 +1220,7 @@
                 </div>
             </div>
             <div class="hard-constraints-grid">
-                ${filteredScopes.map((scope) => renderHardConstraintScopeCard(scope)).join('')}
+                ${displayedScopes.map((scope) => renderHardConstraintScopeCard(scope)).join('')}
             </div>
         `;
     }
