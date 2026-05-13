@@ -85,6 +85,9 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     assert "Incomplete compare snapshot from ${source}" in text
     assert "return hardConstraintScopes.length === 0;" in text
     assert "assertUsableLeaderboardPayload(result, source);" in text
+    assert "const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v2';" in text
+    assert "function clearCache()" in text
+    assert "Ignoring unusable session cache" in text
 
 
 def test_index_cache_busts_leaderboard_script() -> None:
