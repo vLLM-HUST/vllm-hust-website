@@ -706,7 +706,8 @@ def select_preferred_pair(
         entry for entry in entries if get_same_spec_hash(entry) is not None
     ]
     if same_spec_entries:
-        matching_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+        cross_engine_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+        same_engine_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
         ordered_same_spec = sorted(
             same_spec_entries,
             key=lambda item: (
@@ -718,7 +719,21 @@ def select_preferred_pair(
         for left_index, left_entry in enumerate(ordered_same_spec):
             for right_entry in ordered_same_spec[left_index + 1 :]:
                 if same_spec_hashes_match(left_entry, right_entry):
-                    matching_pairs.append((left_entry, right_entry))
+                    left_engine = str(
+                        left_entry.get("engine")
+                        or (left_entry.get("metadata") or {}).get("engine")
+                        or "unknown"
+                    )
+                    right_engine = str(
+                        right_entry.get("engine")
+                        or (right_entry.get("metadata") or {}).get("engine")
+                        or "unknown"
+                    )
+                    if left_engine != right_engine:
+                        cross_engine_pairs.append((left_entry, right_entry))
+                    else:
+                        same_engine_pairs.append((left_entry, right_entry))
+        matching_pairs = cross_engine_pairs or same_engine_pairs
         if not matching_pairs:
             return None
 

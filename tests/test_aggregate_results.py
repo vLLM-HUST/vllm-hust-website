@@ -1171,3 +1171,122 @@ def test_compare_snapshot_prefers_matching_same_spec_pair(tmp_path: Path) -> Non
 
     assert preferred_pair["left"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
     assert preferred_pair["right"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
+
+
+def test_aggregate_results_prefers_cross_engine_same_spec_pair(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    latest_current_entry = _valid_entry()
+    latest_current_entry["entry_id"] = "aaaa1111-1111-1111-1111-111111111111"
+    latest_current_entry["engine"] = "vllm-hust"
+    latest_current_entry["engine_version"] = "0.20.1rc1.dev314"
+    latest_current_entry["metadata"]["engine"] = "vllm-hust"
+    latest_current_entry["metadata"]["engine_version"] = "0.20.1rc1.dev314"
+    latest_current_entry["metadata"]["github_repository"] = "vLLM-HUST/vllm-hust"
+    latest_current_entry["metadata"]["submitted_at"] = "2026-05-12T13:34:13Z"
+    latest_current_entry["metadata"]["git_commit"] = "latest-current"
+    latest_current_entry["metrics"]["ttft_ms"] = 381.71
+    latest_current_entry["metrics"]["tbt_ms"] = 115.68
+    latest_current_entry["metrics"]["throughput_tps"] = 224.82
+    latest_current_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|latest|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    latest_current_entry["same_spec"] = _same_spec_payload("spec-1", "hash-shared")
+
+    older_current_entry = _valid_entry()
+    older_current_entry["entry_id"] = "bbbb2222-2222-2222-2222-222222222222"
+    older_current_entry["engine"] = "vllm-hust"
+    older_current_entry["engine_version"] = "0.20.1rc1.dev314"
+    older_current_entry["metadata"]["engine"] = "vllm-hust"
+    older_current_entry["metadata"]["engine_version"] = "0.20.1rc1.dev314"
+    older_current_entry["metadata"]["github_repository"] = "vLLM-HUST/vllm-hust"
+    older_current_entry["metadata"]["submitted_at"] = "2026-05-12T10:53:48Z"
+    older_current_entry["metadata"]["git_commit"] = "older-current"
+    older_current_entry["metrics"]["ttft_ms"] = 389.21
+    older_current_entry["metrics"]["tbt_ms"] = 120.80
+    older_current_entry["metrics"]["throughput_tps"] = 223.27
+    older_current_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|older|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    older_current_entry["same_spec"] = _same_spec_payload("spec-1", "hash-shared")
+
+    baseline_entry = _valid_entry()
+    baseline_entry["entry_id"] = "cccc3333-3333-3333-3333-333333333333"
+    baseline_entry["engine"] = "vllm"
+    baseline_entry["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["engine"] = "vllm"
+    baseline_entry["metadata"]["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
+    baseline_entry["metadata"]["submitted_at"] = "2026-05-08T07:28:09Z"
+    baseline_entry["metadata"]["git_commit"] = "baseline"
+    baseline_entry["metrics"]["ttft_ms"] = 271.10
+    baseline_entry["metrics"]["tbt_ms"] = 72.78
+    baseline_entry["metrics"]["throughput_tps"] = 227.14
+    baseline_entry["metadata"]["idempotency_key"] = (
+        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    baseline_entry["same_spec"] = _same_spec_payload("spec-1", "hash-shared")
+
+    entries = [latest_current_entry, older_current_entry, baseline_entry]
+    manifest_entries = []
+    for index, entry in enumerate(entries, start=1):
+        artifact_name = f"cross_engine_pair_{index}.json"
+        (source_dir / artifact_name).write_text(
+            json.dumps(entry, indent=2) + "\n", encoding="utf-8"
+        )
+        manifest_entries.append(
+            {
+                "entry_id": entry["entry_id"],
+                "idempotency_key": entry["metadata"]["idempotency_key"],
+                "canonical_path": entry["canonical_path"],
+                "leaderboard_artifact": artifact_name,
+                "canonical_artifact": f"cross_engine_pair_{index}.canonical.json",
+                "engine": entry["engine"],
+                "workload": entry["workload"]["name"],
+                "config_type": entry["config_type"],
+                "category": "single",
+            }
+        )
+
+    (source_dir / "leaderboard_manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "leaderboard-export-manifest/v1",
+                "generated_at": "2026-03-14T12:00:00Z",
+                "entries": manifest_entries,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "website_data"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    compare_payload = json.loads(
+        (output_dir / "leaderboard_compare.json").read_text(encoding="utf-8")
+    )
+    preferred_pair = compare_payload["preferred_pairs"][0]["preferred_pair"]
+
+    assert preferred_pair["left"]["engine"] == "vllm"
+    assert preferred_pair["right"]["engine"] == "vllm-hust"
+    assert preferred_pair["right"]["entry_id"] == latest_current_entry["entry_id"]
