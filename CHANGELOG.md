@@ -57,7 +57,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `scripts/aggregate_results.py` 现在会在 `goal_progress` 配对时归一化模型名，避免当前 `vllm-hust` 数据使用裸模型名而官方 baseline artifact 使用 `org/model` 形式时无法命中同一目标基线。
 - Hard Constraints 现在只展示 `vllm-hust` 的约束状态，不再把 `vLLM 0.11.0` 目标基线也渲染成独立的 PASS / FAIL 卡片。
-- Hard Constraints 面板现在只保留当前可见范围内的一条 `vllm-hust` 记录：优先保留已达标项；若当前视图下没有达标项，再回退到性能最优的未达标项，避免同页同时堆叠多条 scope 卡片。
+- Hard Constraints 面板现在固定展示已确认达标的 `vllm-hust / Qwen2.5-7B-Instruct / 910B3 / sharegpt-online / online-chat / vllm` scope，不再依赖主表当前可见行；同时新增静态性能基线说明 `Official Ascend Jan 2026（vllm v0.11.0 + vllm-ascend v0.11.0）`，并更新 `leaderboard.js` 查询串以避免旧缓存。
 
 - **CI/CD pre-commit 错误修复**：
   - 修复 `data/validate_schema.py` 中未使用的 `jsonschema` 导入

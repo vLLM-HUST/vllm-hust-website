@@ -57,6 +57,8 @@
             hardConstraintsTitle: 'Hard Constraints',
             hardConstraintsSubtitle: 'Mandatory targets from benchmark snapshots (current run and regression vs previous submission).',
             hardConstraintsNoData: 'No hard-constraint records under current filters.',
+            hardConstraintsBaselineLabel: 'Performance Baseline',
+            hardConstraintsBaselineValue: 'Official Ascend Jan 2026 (vllm v0.11.0 + vllm-ascend v0.11.0)',
             pass: 'PASS',
             fail: 'FAIL',
             current: 'Current',
@@ -203,6 +205,8 @@
             hardConstraintsTitle: '硬约束达成',
             hardConstraintsSubtitle: '基于 benchmark 快照的强制目标判定（展示当前结果及相对上次提交的回归变化）。',
             hardConstraintsNoData: '当前筛选条件下没有硬约束记录。',
+            hardConstraintsBaselineLabel: '性能基线',
+            hardConstraintsBaselineValue: 'Official Ascend Jan 2026（vllm v0.11.0 + vllm-ascend v0.11.0）',
             pass: '达标',
             fail: '未达标',
             current: '当前',
@@ -1213,21 +1217,14 @@
             return;
         }
 
-        const sourceEntries = comparisonView?.visibleEntries?.length ? comparisonView.visibleEntries : entries;
-        const scopeKeys = new Set(
-            sourceEntries
-                .filter((entry) => isHardConstraintTrackedEngine(getEngine(entry)))
-                .map((entry) => buildHardConstraintScopeKey(entry))
-        );
+        const validConfigTypes = getHardConstraintConfigTypesForCurrentTab();
         const filteredScopes = scopes
             .filter((scope) => isHardConstraintTrackedEngine(scope?.latest?.engine || scope?.scope?.engine))
-            .filter((scope) => scopeKeys.has(scope.scope_key))
-            .sort((left, right) => {
-                const statusOrder = Number(Boolean(left?.overall_pass)) - Number(Boolean(right?.overall_pass));
-                if (statusOrder !== 0) {
-                    return statusOrder;
+            .filter((scope) => {
+                if (!validConfigTypes.size) {
+                    return true;
                 }
-                return String(left?.scope_key || '').localeCompare(String(right?.scope_key || ''));
+                return validConfigTypes.has(String(scope?.scope?.config_type || 'unknown-config'));
             });
 
         const bestScope = selectBestHardConstraintScope(filteredScopes, sourceEntries);
@@ -1253,6 +1250,10 @@
                     <span class="hc-badge pass">${t('pass')}: ${passCount}</span>
                     <span class="hc-badge fail">${t('fail')}: ${failCount}</span>
                 </div>
+            </div>
+            <div class="hard-constraints-baseline">
+                <div class="hard-constraints-baseline-label">${t('hardConstraintsBaselineLabel')}</div>
+                <div class="hard-constraints-baseline-value">${t('hardConstraintsBaselineValue')}</div>
             </div>
             <div class="hard-constraints-grid">
                 ${displayedScopes.map((scope) => renderHardConstraintScopeCard(scope)).join('')}
