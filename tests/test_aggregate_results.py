@@ -163,7 +163,9 @@ def _load_compare_payload(script: Path, source_dir: Path, output_dir: Path) -> d
     )
 
     assert result.returncode == 0, result.stderr or result.stdout
-    return json.loads((output_dir / "leaderboard_compare.json").read_text(encoding="utf-8"))
+    return json.loads(
+        (output_dir / "leaderboard_compare.json").read_text(encoding="utf-8")
+    )
 
 
 def _write_manifest_entries(source_dir: Path, entries: list[dict]) -> None:
@@ -1065,7 +1067,9 @@ def test_aggregate_results_separates_compare_groups_by_same_spec_hash(
         encoding="utf-8",
     )
 
-    compare_payload = _load_compare_payload(script, source_dir, tmp_path / "website_data")
+    compare_payload = _load_compare_payload(
+        script, source_dir, tmp_path / "website_data"
+    )
 
     assert compare_payload["group_count"] == 0
     assert compare_payload["preferred_pair_count"] == 0
