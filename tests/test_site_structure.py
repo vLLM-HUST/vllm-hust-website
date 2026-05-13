@@ -77,8 +77,19 @@ def test_hard_constraints_baseline_block_is_rendered() -> None:
     assert ".hard-constraints-baseline {" in css_text
 
 
+def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "hf-data-loader.js").read_text(encoding="utf-8")
+
+    assert "function isCompareSnapshotUsable(compareSnapshot)" in text
+    assert "Incomplete compare snapshot from ${source}" in text
+    assert "return hardConstraintScopes.length === 0;" in text
+    assert "assertUsableLeaderboardPayload(result, source);" in text
+
+
 def test_index_cache_busts_leaderboard_script() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "index.html").read_text(encoding="utf-8")
 
+    assert "./assets/hf-data-loader.js?v=compare-source-guard-20260513" in text
     assert "./assets/leaderboard.js?v=hc-baseline-banner-20260513" in text
