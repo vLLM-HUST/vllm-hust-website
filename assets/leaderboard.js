@@ -1286,7 +1286,9 @@
                 if (statusOrder !== 0) {
                     return statusOrder;
                 }
-                return validConfigTypes.has(String(scope?.scope?.config_type || 'unknown-config'));
+                const leftConfigType = String(left?.scope?.config_type || 'unknown-config');
+                const rightConfigType = String(right?.scope?.config_type || 'unknown-config');
+                return Number(validConfigTypes.has(rightConfigType)) - Number(validConfigTypes.has(leftConfigType));
             });
 
         const bestScope = selectBestHardConstraintScope(filteredScopes);

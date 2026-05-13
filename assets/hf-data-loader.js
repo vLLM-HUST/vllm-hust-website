@@ -563,6 +563,23 @@ async function getLastUpdated() {
         local: loadFromLocal,
     };
 
+    const loadedSource = getLastLoadedSource();
+    if (loadedSource === 'cache') {
+        const cachedEnvelope = readCacheEnvelope();
+        if (cachedEnvelope?.marker) {
+            return cachedEnvelope.marker;
+        }
+    } else if (loadedSource && loaders[loadedSource]) {
+        try {
+            const marker = await loaders[loadedSource](HF_CONFIG.files.lastUpdated);
+            if (marker && marker.last_updated) {
+                return marker.last_updated;
+            }
+        } catch (_e) {
+            // fall back to the configured source priority below
+        }
+    }
+
     for (const source of getSourcePriority()) {
         const loader = loaders[source];
         if (!loader) {
