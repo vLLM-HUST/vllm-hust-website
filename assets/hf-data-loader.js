@@ -45,7 +45,7 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v1';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v2';
 let lastLoadedSource = null;
 
 function getUniqueEndpoints() {
@@ -151,6 +151,14 @@ function writeCache(data, marker = null) {
         }));
     } catch (_error) {
         // ignore cache write failures
+    }
+}
+
+function clearCache() {
+    try {
+        sessionStorage.removeItem(CACHE_KEY);
+    } catch (_error) {
+        // ignore cache clear failures
     }
 }
 
@@ -469,26 +477,29 @@ async function loadOptionalJson(loader, filename) {
 async function loadLeaderboardData() {
     const cachedEnvelope = readCacheEnvelope();
     if (cachedEnvelope) {
-        if (!HF_CONFIG.validateWithMarker) {
+        if (!isCompareSnapshotUsable(cachedEnvelope.data?.compare)) {
+            clearCache();
+            console.warn('[HF Loader] Ignoring unusable session cache');
+        } else if (!HF_CONFIG.validateWithMarker) {
             setLastLoadedSource('cache');
             console.log('[HF Loader] ✅ Loaded from session cache');
             return cachedEnvelope.data;
-        }
+        } else {
+            const latestMarker = await getLatestMarker();
+            if (latestMarker && cachedEnvelope.marker && cachedEnvelope.marker === latestMarker) {
+                setLastLoadedSource('cache');
+                console.log('[HF Loader] ✅ Loaded from session cache (marker matched)');
+                return cachedEnvelope.data;
+            }
 
-        const latestMarker = await getLatestMarker();
-        if (latestMarker && cachedEnvelope.marker && cachedEnvelope.marker === latestMarker) {
-            setLastLoadedSource('cache');
-            console.log('[HF Loader] ✅ Loaded from session cache (marker matched)');
-            return cachedEnvelope.data;
-        }
+            if (!latestMarker) {
+                setLastLoadedSource('cache');
+                console.log('[HF Loader] ⚠️ Marker unavailable, fallback to TTL cache');
+                return cachedEnvelope.data;
+            }
 
-        if (!latestMarker) {
-            setLastLoadedSource('cache');
-            console.log('[HF Loader] ⚠️ Marker unavailable, fallback to TTL cache');
-            return cachedEnvelope.data;
+            console.log('[HF Loader] ♻️ Marker changed, refreshing leaderboard data');
         }
-
-        console.log('[HF Loader] ♻️ Marker changed, refreshing leaderboard data');
     }
 
     const result = { single: [], multi: [], compare: null };
