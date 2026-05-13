@@ -40,6 +40,17 @@ def test_hard_constraints_selection_prefers_passed_scope() -> None:
     assert "scoped.workload === 'sharegpt-online'" in text
     assert "accountable.representative_business_scenario === 'online-chat'" in text
     assert "accountable.baseline_engine === 'vllm'" in text
+    assert "scope?.overall_pass === true" in text
+    assert (
+        "return scopes.find((scope) => isPinnedHardConstraintScope(scope)) || null;"
+        in text
+    )
+    assert "function isPinnedHardConstraintScope(scope)" in text
+    assert "scoped.model === 'Qwen2.5-7B-Instruct'" in text
+    assert "scoped.hardware === '910B3'" in text
+    assert "scoped.workload === 'sharegpt-online'" in text
+    assert "accountable.representative_business_scenario === 'online-chat'" in text
+    assert "accountable.baseline_engine === 'vllm'" in text
     assert (
         "return scopes.find((scope) => isPinnedHardConstraintScope(scope)) || null;"
         in text
@@ -52,3 +63,22 @@ def test_hard_constraints_selection_uses_tab_dataset_not_visible_rows() -> None:
 
     assert "function getHardConstraintConfigTypesForCurrentTab()" in text
     assert "const sourceEntries = getDataByTab(state.currentTab).filter(" in text
+    assert "scopeKeys.has(scope.scope_key)" in text
+
+
+def test_hard_constraints_baseline_block_is_rendered() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
+
+    assert "hardConstraintsBaselineLabel" in js_text
+    assert "hardConstraintsBaselineValue" in js_text
+    assert '<div class="hard-constraints-baseline">' in js_text
+    assert ".hard-constraints-baseline {" in css_text
+
+
+def test_index_cache_busts_leaderboard_script() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "index.html").read_text(encoding="utf-8")
+
+    assert "./assets/leaderboard.js?v=hc-baseline-banner-20260513" in text

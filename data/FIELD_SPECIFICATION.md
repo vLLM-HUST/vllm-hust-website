@@ -113,7 +113,8 @@ Each compare group carries:
 - `scope`: human-readable decomposition of that same compare scope
 - `scope.setting_signature`: stable setting fingerprint, usually sourced from
   `same_spec.resolved_spec_hash`
-- `scope.setting_summary`: readable setting summary such as IO length, TP/PP, dtype, and request rate
+- `scope.setting_summary`: readable setting summary such as IO length, TP/PP, dtype, and request
+  rate
 - `engines[]`: one preferred row per engine after deduplication
 - `preferred_pair`: the head-to-head pair the website should render first, selected by score
   ordering (throughput first, then latency)

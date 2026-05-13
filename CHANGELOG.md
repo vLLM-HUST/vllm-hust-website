@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+
 - `scripts/aggregate_results.py` now updates website snapshots by rendered
   benchmark category instead of overwriting all categories on every run:
   single-chip, single-node multi-chip, and multi-node results are merged
@@ -16,55 +17,89 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   snapshot files now follow the same contract as the UI: `leaderboard_single.json`
   carries only single-chip entries, while `leaderboard_multi.json` carries both
   single-node multi-chip and multi-node entries.
+
 - `scripts/aggregate_results.py` now treats same-spec metadata as a pre-publish
   gate for both goal tracking and compare pairing: official/current goal pairs
   must share the same `resolved_spec_hash`, and compare snapshots prefer the
   newest matching same-spec pair instead of silently mixing mismatched entries.
+
 - Added regression coverage for same-spec compare edge cases, including
   non-goal compare hash mismatches and the case where a newer entry should be
   ignored in favor of an older but spec-matching pair.
+
 - Leaderboard 现在会在主表和详情面板中展示 benchmark entry 关联的 GitHub provenance，包括触发该成绩的 GitHub 用户、commit SHA，以及可选的 PR / 仓库 / ref 链接；对应 benchmark 导出 metadata 也已补齐这些字段。
+
 - 继续清理内部文档与生成脚本中的历史旧命名和旧 workload 代号：同步更新 `.github` 说明、`LICENSE` 注释、demo 生成脚本、示例数据、README 和部署文档，统一到 `vllm-hust`、vLLM benchmark 与 AGI4S 服务场景口径。
+
 - 刷新 website leaderboard 到固定 `vllm-ascend v0.11.0` 基线的正式 compare 快照（`formal_compare_20260318_vllm_ascend_0110_fixlog`）：同步 `data/leaderboard_single.json`、`data/leaderboard_compare.json` 与 `data/last_updated.json`。
+
 - 刷新 website leaderboard 到 `formal_compare_20260316_ascend_slotfix_postprefix` 的 publish-ready 快照：同步 `data/leaderboard_single.json`、`data/leaderboard_compare.json`、`data/leaderboard_multi.json` 与 `data/last_updated.json`，确保页面展示使用本轮 slot-fix 后的正式 compare 数据。
+
 - 刷新 website leaderboard 快照到最新 Ascend formal compare 产物（`vllm-hust` vs `vllm`，profile=`vllm_random`）：同步更新 `data/leaderboard_single.json`、`data/leaderboard_compare.json` 与 `data/last_updated.json`，确保官网展示使用最新 publish-ready 数据。
+
 - Leaderboard 现在优先消费 benchmark 发布的 `leaderboard_compare.json`，在同 scope 下直接展示标准化的 `vllm-hust vs vLLM` head-to-head gap；若线上快照尚未刷新到该文件，则前端回退到已有 entry 数据做只读比较，而不是手工修补 website JSON。
+
 - `scripts/aggregate_results.py` 现兼容 benchmark 的 `leaderboard-export-manifest/v2`，并会离线同步生成 `leaderboard_compare.json`，使 website compatibility cache 与 benchmark publish 输出保持一致。
+
 - 官网首页暂时移除了长征 Windows 下载区块与对应 manifest 拉取逻辑，避免继续暴露当前返回 404 的公开下载入口；vllm-hust Workstation 展示区保持不变。
+
 - Leaderboard 数据流现在明确收口到 HF snapshot 主路径：前端 `assets/hf-data-loader.js` 只读取 `leaderboard_single.json`、`leaderboard_multi.json` 与 `last_updated.json`，不再递归扫描 HF dataset 内部分散的 per-entry 文件。
+
 - `scripts/aggregate_results.py` 现改为离线兼容聚合工具，只消费标准 benchmark 导出的 `leaderboard_manifest.json` + `*_leaderboard.json`，并对每条 entry 执行 website schema 校验；website 不再理解 compare 原始目录结构或 `data/results/**` 历史布局。
+
 - 官网 Hugging Face 数据同步与长征发布同步 workflow 现在只允许写入 `main-dev`，并停用旧的 `main -> main-dev` 自动回灌流程，避免自动任务继续绕过 `main-dev` 直接污染 `main`。
+
 - `.gitignore` 现在默认忽略本地 `.env` / `.env.local` / `.env.*` 配置文件，同时保留 `.env.example` / `.env.template` 模板文件可提交，避免网站同步脚本或本地凭证被误提交。
+
 - 官网首页下载区块的 DOM / i18n 标识已从 `qinglu_*` 统一清理为 `changzheng_*`，避免品牌改名后继续保留旧内部命名。
+
 - 移除 legacy 的 `downloads/qinglu/windows/` 静态下载页、`data/qinglu_release.json` 与旧同步脚本，统一只保留长征下载链路。
+
 - Hugging Face 自动拉取 workflow 已重命名为 `sync-changzheng-hf-release.yml`，并改为同步 `changzheng/windows` 发布目录。
+
 - 长征 Desktop 下载清单与同步脚本中的文档仓库链接已切换到新远程 `intellistream/changzheng-desktop`，避免官网继续指向已改名的旧仓库地址。
+
 - `hooks/pre-push` 默认不再因检测到发布凭证而自动发布；只有显式使用 `git push -o vllm-hust-publish origin main-dev` 或 `VLLM_HUST_PUBLISH_ON_PUSH=1 git push origin main-dev` 时才会触发发布。
+
 - `hooks/post-commit` 默认不再在每次提交后自动 bump 版本；普通 `git push` 也不再触发 PyPI 版本冲突检查，只有显式发布时才会处理版本号。
+
 - 青炉下载链路改为“qinglu-desktop 先上传到 Hugging Face dataset，website 再定时拉取到静态目录”，降低 website 对桌面仓库工作区的直接依赖。
 
 - 同步 2026-03-09 A100 单机 `vllm-hust vs vllm` live compare 结果到 leaderboard 数据源，新增 `deepseek-ai/DeepSeek-R1-Distill-Qwen-7B` 的 `vllm-hust` 与 `vllm` 两条单机记录，并刷新 `data/last_updated.json`。
+
 - 重构 leaderboard 展示布局，新增顶部引擎对比摘要卡片、更聚焦的主表指标，以及“只看同模型同硬件 / 隐藏缺少对比的数据”开关与 coverage 提示，使不同引擎的延迟与吞吐差异更易读。
+
 - 首页与 leaderboard 动态内容补齐中英双语切换，覆盖摘要卡片、对比提示、详情面板、版本构建表、复制按钮与最近更新时间，确保整页语言切换一致。
+
 - 精简首页首屏文案，移除发布横幅中的长段说明，并将 Quick Start 引导压缩为一句动作导向提示，减少首屏阅读负担。
+
 - 进一步收敛首页信息层级：移除首屏 release banner，仅保留简洁 hero 定位语与更短的 Quick Start 辅助文案，减少视觉噪音与重复解释。
+
 - 将首页前半段重组为更清晰的 launchpad 双栏布局：左侧 live demo，右侧紧凑 quickstart，减少连续大卡片堆叠带来的拥挤感，并继续压缩首屏说明文字。
+
 - 首页叙事主轴调整为“科学发现大模型 + 国产硬件优先”，并将 benchmark / leaderboard / 引擎对比明确降级为验证与优化方法，而非产品主目标。
+
 - leaderboard 过滤区曾新增可点击展开的 benchmark workload query 说明菜单，明确每类 workload 的测试意图，避免用户只看到代号而无法理解 benchmark 语义。
+
 - benchmark workload query 说明菜单曾升级为二级 accordion：点击单个 query 单独展开并自动收起其他项，降低一次性信息展开带来的视觉干扰。
 
 ### Fixed
 
 - `scripts/aggregate_results.py` 现在会在 `goal_progress` 配对时归一化模型名，避免当前 `vllm-hust` 数据使用裸模型名而官方 baseline artifact 使用 `org/model` 形式时无法命中同一目标基线。
+
 - Hard Constraints 现在只展示 `vllm-hust` 的约束状态，不再把 `vLLM 0.11.0` 目标基线也渲染成独立的 PASS / FAIL 卡片。
-- Hard Constraints 面板现在临时固定展示已确认达标的 `vllm-hust / Qwen2.5-7B-Instruct / 910B3 / sharegpt-online / online-chat / vllm` scope，避免复杂排序在当前发布节奏下继续选中错误卡片；后续再恢复更通用的性能优选逻辑。
+
+- Hard Constraints 面板现在固定展示已确认达标的 `vllm-hust / Qwen2.5-7B-Instruct / 910B3 / sharegpt-online / online-chat / vllm` scope，不再依赖主表当前可见行；同时新增静态性能基线说明 `Official Ascend Jan 2026（vllm v0.11.0 + vllm-ascend v0.11.0）`，并更新 `leaderboard.js` 查询串以避免旧缓存。
 
 - **CI/CD pre-commit 错误修复**：
+
   - 修复 `data/validate_schema.py` 中未使用的 `jsonschema` 导入
   - 修复 `scripts/generate_cast.py` 中的单行多语句问题（E701）
   - 在 `.pre-commit-config.yaml` 中排除 `data/examples/*.json`，避免 detect-secrets 误报 git_commit 字段为密钥
   - 自动修复 f-string 格式问题和代码格式化
+
 - **Leaderboard 详情展开布局重叠问题**：修复了点击 Details 按钮后，"Full Build Results"表格与"Component Versions"区域重叠的布局缺陷
+
   - 将详情展开区域从横向 grid 布局改为纵向 flex 布局，避免水平方向的挤压和重叠
   - 为 Build Variants 表格添加横向滚动支持（`overflow-x: auto`），确保在小屏幕上正确显示
   - 优化了细节展示的视觉层次：添加渐变背景、阴影效果、悬停动画等
@@ -80,10 +115,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - 官网顶部终端演示改为贴近真实 Quick Start 的安装 / 启动 / 健康检查 / 模型列表流程，并将 `scripts/generate_cast.py` 重构为可基于在线服务实时生成 cast 资源
+
 - workstation 展示区改为更克制的纯产品展示样式，弱化动画感与宣传感，突出界面结构与基础信息布局
+
 - 青炉下载链路由“官网 + 外部 release”调整为“官网首页摘要 + 官网静态下载页直出安装包”，并在 manifest 中预留真实 `.msi/.exe` / SHA256 列表字段
 
 - **[#14 #15 + vllm-hust#26 #28] Leaderboard MVP（Schema-first）**
+
   - 新增并冻结 MVP 数据契约：`data/schemas/leaderboard_v1.schema.json`（兼容单条 entry 与 entry 列表）
   - 补齐最小多机展示数据：`data/leaderboard_multi.json`（1 条 multi-node 样例）
   - 首页 Leaderboard 区块新增数据模型标识，确保展示与 schema 来源一致
@@ -91,10 +129,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Leaderboard 前端支持多引擎展示：新增 `Engine` 筛选器，版本聚合/排序/去重改为 engine-aware（`engine + engine_version`），并对非 `vllm-hust` 引擎显示通用 `Engine Versions` 面板。
+
 - `data/schemas/leaderboard_v1.schema.json` 扩展可选字段 `engine` / `engine_version`（entry 与 metadata），保持历史旧字段数据兼容。
 
 - `data/validate_schema.py` 升级为可一次校验多个文件，支持 object/array 两种 payload，输出统一 pass/fail 摘要
+
 - `data/FIELD_SPECIFICATION.md`、`data/VALIDATION_RULES.md` 收敛为 MVP 规范，字段与网站展示列一一对应
+
 - `data/examples/*.json` 对齐硬件互联字段（补充 `interconnect`），确保示例与 schema 一致
 
 ### Fixed
