@@ -109,8 +109,11 @@ Expected top-level fields:
 Each compare group carries:
 
 - `scope_key`: exact compare scope key used by the website
-  (`model|hardware|precision|workload|config_type|chip_count|node_count`)
+  (`model|hardware|precision|workload|config_type|chip_count|node_count|setting_signature`)
 - `scope`: human-readable decomposition of that same compare scope
+- `scope.setting_signature`: stable setting fingerprint, usually sourced from
+  `same_spec.resolved_spec_hash`
+- `scope.setting_summary`: readable setting summary such as IO length, TP/PP, dtype, and request rate
 - `engines[]`: one preferred row per engine after deduplication
 - `preferred_pair`: the head-to-head pair the website should render first, selected by score
   ordering (throughput first, then latency)

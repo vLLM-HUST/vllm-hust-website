@@ -147,6 +147,25 @@ def _same_spec_payload(spec_id: str, spec_hash: str) -> dict:
     }
 
 
+def _load_compare_payload(script: Path, source_dir: Path, output_dir: Path) -> dict:
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--source-dir",
+            str(source_dir),
+            "--output-dir",
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    return json.loads((output_dir / "leaderboard_compare.json").read_text(encoding="utf-8"))
+
+
 def _write_manifest_entries(source_dir: Path, entries: list[dict]) -> None:
     manifest_entries = []
     for index, entry in enumerate(entries, start=1):
@@ -986,7 +1005,7 @@ def test_aggregate_results_fails_on_same_spec_hash_mismatch(tmp_path: Path) -> N
     assert "resolved_spec_hash mismatch" in (result.stderr + result.stdout)
 
 
-def test_aggregate_results_fails_on_compare_same_spec_hash_mismatch(
+def test_aggregate_results_separates_compare_groups_by_same_spec_hash(
     tmp_path: Path,
 ) -> None:
     website_root = Path(__file__).resolve().parents[1]
@@ -1046,24 +1065,10 @@ def test_aggregate_results_fails_on_compare_same_spec_hash_mismatch(
         encoding="utf-8",
     )
 
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(script),
-            "--source-dir",
-            str(source_dir),
-            "--output-dir",
-            str(tmp_path / "website_data"),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    compare_payload = _load_compare_payload(script, source_dir, tmp_path / "website_data")
 
-    assert result.returncode != 0
-    assert "same-spec compare pair resolved_spec_hash mismatch" in (
-        result.stderr + result.stdout
-    )
+    assert compare_payload["group_count"] == 0
+    assert compare_payload["preferred_pair_count"] == 0
 
 
 def test_compare_snapshot_prefers_matching_same_spec_pair(tmp_path: Path) -> None:

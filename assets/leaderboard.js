@@ -514,6 +514,74 @@
         return entry.displayVersion || normalizeDisplayVersion(getEngineVersion(entry));
     }
 
+    function getSameSpecPayload(entry) {
+        return entry?.same_spec && typeof entry.same_spec === 'object' ? entry.same_spec : {};
+    }
+
+    function getSettingSignature(entry) {
+        const sameSpec = getSameSpecPayload(entry);
+        const sameSpecHash = String(sameSpec?.resolved_spec_hash || '').trim();
+        if (sameSpecHash) {
+            return sameSpecHash;
+        }
+
+        const workload = entry?.workload || {};
+        const server = sameSpec?.resolved_server_parameters || {};
+        const client = sameSpec?.resolved_client_parameters || {};
+        return [
+            workload?.input_length ?? 'unknown-input',
+            workload?.output_length ?? 'unknown-output',
+            server?.tensor_parallel_size ?? 'unknown-tp',
+            server?.pipeline_parallel_size ?? 'unknown-pp',
+            server?.dtype || 'unknown-dtype',
+            client?.request_rate ?? 'unknown-rps',
+        ].join('|');
+    }
+
+    function getSettingSummary(entry) {
+        const sameSpec = getSameSpecPayload(entry);
+        const workload = entry?.workload || {};
+        const server = sameSpec?.resolved_server_parameters || {};
+        const client = sameSpec?.resolved_client_parameters || {};
+        const parts = [];
+
+        if (workload?.input_length != null || workload?.output_length != null) {
+            parts.push(`IO ${workload?.input_length ?? '?'} / ${workload?.output_length ?? '?'}`);
+        }
+
+        const parallel = [];
+        if (server?.tensor_parallel_size != null) {
+            parallel.push(`TP${server.tensor_parallel_size}`);
+        }
+        if (server?.pipeline_parallel_size != null) {
+            parallel.push(`PP${server.pipeline_parallel_size}`);
+        }
+        if (parallel.length) {
+            parts.push(parallel.join(' '));
+        }
+
+        if (server?.dtype) {
+            parts.push(String(server.dtype));
+        }
+        if (client?.request_rate != null) {
+            parts.push(`RPS ${client.request_rate}`);
+        }
+        if (workload?.batch_size != null) {
+            parts.push(`BS ${workload.batch_size}`);
+        }
+        if (workload?.concurrent_requests != null) {
+            parts.push(`CC ${workload.concurrent_requests}`);
+        }
+        if (sameSpec?.spec_id) {
+            parts.push(`spec ${sameSpec.spec_id}`);
+        }
+
+        if (parts.length) {
+            return parts.join(' • ');
+        }
+        return entry?.setting_summary || 'default settings';
+    }
+
     function formatGithubUserText(value) {
         const normalized = String(value || '').trim();
         if (!normalized) {
@@ -601,6 +669,7 @@
         const precision = entry?.model?.precision || '';
         const engine = getEngine(entry);
         const baseVersion = normalizeDisplayVersion(getEngineVersion(entry));
+        const settingSignature = getSettingSignature(entry);
 
         return [
             engine,
@@ -613,6 +682,7 @@
             model,
             precision,
             baseVersion,
+            settingSignature,
         ].join('|');
     }
 
@@ -945,7 +1015,9 @@
             const isExpanded = state.expandedRows.has(entry.entry_id);
             const currentVersion = getDisplayVersion(entry);
             const prevVersion = index > 0 ? getDisplayVersion(withTrends[index - 1]) : null;
-            const showVersion = index === 0 || currentVersion !== prevVersion;
+            const showVersionForEveryRow = typeof window !== 'undefined'
+                && new URLSearchParams(window.location.search).get('showVersionAll') === '1';
+            const showVersion = showVersionForEveryRow || index === 0 || currentVersion !== prevVersion;
             const isSparse = comparisonView.incompleteKeys.has(createCompareScopeKey(entry));
 
             return `
@@ -1144,62 +1216,37 @@
         ];
     }
 
-    function selectBestHardConstraintScope(scopes, sourceEntries) {
+    function isPinnedHardConstraintScope(scope) {
+        const scoped = scope?.scope || {};
+        const accountable = scoped?.accountable_scope || {};
+        return scoped.engine === 'vllm-hust'
+            && scoped.model === 'Qwen2.5-7B-Instruct'
+            && scoped.hardware === '910B3'
+            && scoped.workload === 'sharegpt-online'
+            && accountable.representative_business_scenario === 'online-chat'
+            && accountable.baseline_engine === 'vllm'
+            && scope?.overall_pass === true;
+    }
+
+    function selectBestHardConstraintScope(scopes) {
         if (!Array.isArray(scopes) || !scopes.length) {
             return null;
         }
 
-        const rankedScopes = [...scopes].sort((left, right) => {
-            const passCompare = Number(Boolean(right?.overall_pass)) - Number(
-                Boolean(left?.overall_pass)
-            );
-            if (passCompare !== 0) {
-                return passCompare;
-            }
-            return String(left?.scope_key || '').localeCompare(
-                String(right?.scope_key || '')
-            );
-        });
+        return scopes.find((scope) => isPinnedHardConstraintScope(scope)) || null;
+    }
 
-        const trackedEntries = (Array.isArray(sourceEntries) ? sourceEntries : [])
-            .filter((entry) => isHardConstraintTrackedEngine(getEngine(entry)));
-        if (!trackedEntries.length) {
-            return rankedScopes[0] || null;
+    function getHardConstraintConfigTypesForCurrentTab() {
+        if (state.currentTab === 'single-chip') {
+            return new Set(['single_gpu']);
         }
-
-        const scopeByKey = new Map(
-            scopes.map((scope) => [scope?.scope_key, scope])
-        );
-
-        const bestCandidate = trackedEntries
-            .map((entry) => {
-                const scopeKey = buildHardConstraintScopeKey(entry);
-                return {
-                    entry,
-                    scopeKey,
-                    scope: scopeByKey.get(scopeKey) || null,
-                };
-            })
-            .filter((candidate) => candidate.scope)
-            .sort((left, right) => {
-                const passCompare = Number(Boolean(right.scope?.overall_pass)) - Number(
-                    Boolean(left.scope?.overall_pass)
-                );
-                if (passCompare !== 0) {
-                    return passCompare;
-                }
-
-                const qualityCompare = compareEntryQuality(right.entry, left.entry);
-                if (qualityCompare !== 0) {
-                    return qualityCompare;
-                }
-
-                return String(left.scopeKey).localeCompare(
-                    String(right.scopeKey)
-                );
-            })[0];
-
-        return bestCandidate?.scope || rankedScopes[0] || null;
+        if (state.currentTab === 'multi-chip') {
+            return new Set(['multi_gpu']);
+        }
+        if (state.currentTab === 'multi-node') {
+            return new Set(['multi_node']);
+        }
+        return new Set();
     }
 
     function renderHardConstraints(entries, comparisonView) {
@@ -1218,6 +1265,13 @@
         }
 
         const validConfigTypes = getHardConstraintConfigTypesForCurrentTab();
+        const sourceEntries = getDataByTab(state.currentTab).filter(
+            (entry) => isHardConstraintTrackedEngine(getEngine(entry))
+        );
+        const scopeKeys = new Set(
+            sourceEntries
+                .map((entry) => buildHardConstraintScopeKey(entry))
+        );
         const filteredScopes = scopes
             .filter((scope) => isHardConstraintTrackedEngine(scope?.latest?.engine || scope?.scope?.engine))
             .filter((scope) => {
@@ -1225,9 +1279,17 @@
                     return true;
                 }
                 return validConfigTypes.has(String(scope?.scope?.config_type || 'unknown-config'));
+            })
+            .filter((scope) => scopeKeys.has(scope.scope_key))
+            .sort((left, right) => {
+                const statusOrder = Number(Boolean(left?.overall_pass)) - Number(Boolean(right?.overall_pass));
+                if (statusOrder !== 0) {
+                    return statusOrder;
+                }
+                return validConfigTypes.has(String(scope?.scope?.config_type || 'unknown-config'));
             });
 
-        const bestScope = selectBestHardConstraintScope(filteredScopes, sourceEntries);
+        const bestScope = selectBestHardConstraintScope(filteredScopes);
         const displayedScopes = bestScope ? [bestScope] : [];
 
         if (!displayedScopes.length) {
@@ -1353,6 +1415,7 @@
         const buildCount = entry.versionVariants?.length || 1;
         const engineLabel = getEngineLabel(getEngine(entry));
         const provenanceSummary = renderProvenanceSummary(entry);
+        const settingSummary = getSettingSummary(entry);
 
         // 生成配置描述（芯片数/节点数）
         const configText = getConfigText(entry);
@@ -1364,6 +1427,7 @@
                     <div class="version-cell">
                         ${showVersion ? `<div class="version-main">${engineLabel} v${displayVersion}<small class="version-date">(${releaseDate})</small></div>` : ''}
                         ${showVersion ? provenanceSummary : ''}
+                        ${showVersion ? `<small class="version-merge-hint">${settingSummary}</small>` : ''}
                         ${showVersion && buildCount > 1 ? `<small class="version-merge-hint">${t('bestFourth')}</small>` : ''}
                         ${showVersion && isSparse ? `<small class="version-merge-hint sparse">${t('sparseGroup')}</small>` : ''}
                         ${(showVersion && (isLatest || entry.isBaseline))
@@ -1659,14 +1723,16 @@
         const configType = entry?.config_type || state.currentTab || 'unknown-config';
         const chipCount = entry?.hardware?.chip_count || 0;
         const nodeCount = entry?.cluster?.node_count || 1;
-        return [model, hardware, precision, workload, configType, chipCount, nodeCount].join('|');
+        const settingSignature = getSettingSignature(entry);
+        return [model, hardware, precision, workload, configType, chipCount, nodeCount, settingSignature].join('|');
     }
 
     function buildScopeLabel(entry) {
         const model = entry?.model?.name || 'Unknown model';
         const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
         const workload = getWorkloadLabel(getWorkloadId(entry));
-        return `${model} • ${hardware} • ${workload}`;
+        const settingSummary = entry?.scope?.setting_summary || getSettingSummary(entry);
+        return `${model} • ${hardware} • ${workload} • ${settingSummary}`;
     }
 
     function buildCompareGroups(entries) {
@@ -1943,7 +2009,8 @@
         const model = scope.model || 'Unknown model';
         const hardware = scope.hardware || 'Unknown hardware';
         const workload = getWorkloadLabel(scope.workload || 'Other');
-        return `${t('goalCompareScope')}: ${model} • ${hardware} • ${workload}`;
+        const settingSummary = scope.setting_summary ? ` • ${scope.setting_summary}` : '';
+        return `${t('goalCompareScope')}: ${model} • ${hardware} • ${workload}${settingSummary}`;
     }
 
     function formatRemainingGap(value) {
@@ -2019,6 +2086,9 @@
         const throughputDelta = formatSnapshotDelta(pair?.deltas?.throughput_pct_left_vs_right, true);
         const ttftDelta = formatSnapshotDelta(pair?.deltas?.ttft_pct_left_vs_right, false);
         const tbtDelta = formatSnapshotDelta(pair?.deltas?.tbt_pct_left_vs_right, false);
+        const settingSummary = group?.scope?.setting_summary
+            ? `<div class="head-to-head-delta">${t('focusedScope')}: ${group.scope.setting_summary}</div>`
+            : '';
 
         return `
             <div class="head-to-head">
@@ -2033,6 +2103,7 @@
                 </div>
             </div>
             <div class="head-to-head-deltas">
+                ${settingSummary}
                 <div class="head-to-head-delta">${t('throughputGap')}: ${throughputDelta}</div>
                 <div class="head-to-head-delta">TTFT ${t('gap')}: ${ttftDelta}</div>
                 <div class="head-to-head-delta">TBT ${t('gap')}: ${tbtDelta}</div>

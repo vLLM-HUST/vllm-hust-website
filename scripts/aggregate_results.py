@@ -162,6 +162,85 @@ def get_same_spec_hash(entry: dict[str, Any]) -> str | None:
     return spec_hash or None
 
 
+def build_setting_signature(entry: dict[str, Any]) -> str:
+    same_spec_hash = get_same_spec_hash(entry)
+    if same_spec_hash:
+        return same_spec_hash
+
+    workload = entry.get("workload") or {}
+    same_spec = get_same_spec_payload(entry)
+    server = same_spec.get("resolved_server_parameters") or {}
+    client = same_spec.get("resolved_client_parameters") or {}
+
+    input_length = workload.get("input_length")
+    output_length = workload.get("output_length")
+    tensor_parallel = server.get("tensor_parallel_size")
+    pipeline_parallel = server.get("pipeline_parallel_size")
+    dtype = server.get("dtype")
+    request_rate = client.get("request_rate")
+    return "|".join(
+        [
+            str(input_length if input_length is not None else "unknown-input"),
+            str(output_length if output_length is not None else "unknown-output"),
+            str(tensor_parallel if tensor_parallel is not None else "unknown-tp"),
+            str(pipeline_parallel if pipeline_parallel is not None else "unknown-pp"),
+            str(dtype or "unknown-dtype"),
+            str(request_rate if request_rate is not None else "unknown-rps"),
+        ]
+    )
+
+
+def build_setting_summary(entry: dict[str, Any]) -> str:
+    workload = entry.get("workload") or {}
+    same_spec = get_same_spec_payload(entry)
+    server = same_spec.get("resolved_server_parameters") or {}
+    client = same_spec.get("resolved_client_parameters") or {}
+
+    parts: list[str] = []
+
+    input_length = workload.get("input_length")
+    output_length = workload.get("output_length")
+    if input_length is not None or output_length is not None:
+        parts.append(
+            "IO "
+            f"{input_length if input_length is not None else '?'}"
+            "/"
+            f"{output_length if output_length is not None else '?'}"
+        )
+
+    tensor_parallel = server.get("tensor_parallel_size")
+    pipeline_parallel = server.get("pipeline_parallel_size")
+    parallel_parts: list[str] = []
+    if tensor_parallel is not None:
+        parallel_parts.append(f"TP{tensor_parallel}")
+    if pipeline_parallel is not None:
+        parallel_parts.append(f"PP{pipeline_parallel}")
+    if parallel_parts:
+        parts.append(" ".join(parallel_parts))
+
+    dtype = server.get("dtype")
+    if dtype:
+        parts.append(str(dtype))
+
+    request_rate = client.get("request_rate")
+    if request_rate is not None:
+        parts.append(f"RPS {request_rate}")
+
+    batch_size = workload.get("batch_size")
+    if batch_size not in (None, ""):
+        parts.append(f"BS {batch_size}")
+
+    concurrency = workload.get("concurrent_requests")
+    if concurrency not in (None, ""):
+        parts.append(f"CC {concurrency}")
+
+    spec_id = get_same_spec_id(entry)
+    if spec_id:
+        parts.append(f"spec {spec_id}")
+
+    return " • ".join(parts) if parts else "default settings"
+
+
 def same_spec_hashes_match(
     left_entry: dict[str, Any], right_entry: dict[str, Any]
 ) -> bool:
@@ -180,6 +259,7 @@ def build_compare_scope_key(entry: dict[str, Any]) -> str:
     config_type = str(entry.get("config_type") or "unknown-config")
     chip_count = int((entry.get("hardware") or {}).get("chip_count") or 0)
     node_count = int((entry.get("cluster") or {}).get("node_count") or 1)
+    setting_signature = build_setting_signature(entry)
     return "|".join(
         [
             model,
@@ -189,6 +269,7 @@ def build_compare_scope_key(entry: dict[str, Any]) -> str:
             config_type,
             str(chip_count),
             str(node_count),
+            setting_signature,
         ]
     )
 
@@ -203,6 +284,7 @@ def build_goal_scope_key(entry: dict[str, Any]) -> str:
     config_type = str(entry.get("config_type") or "unknown-config")
     chip_count = int((entry.get("hardware") or {}).get("chip_count") or 0)
     node_count = int((entry.get("cluster") or {}).get("node_count") or 1)
+    setting_signature = build_setting_signature(entry)
     return "|".join(
         [
             model,
@@ -212,6 +294,7 @@ def build_goal_scope_key(entry: dict[str, Any]) -> str:
             config_type,
             str(chip_count),
             str(node_count),
+            setting_signature,
         ]
     )
 
@@ -860,6 +943,8 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
                 "node_count": int(
                     (current_entry.get("cluster") or {}).get("node_count") or 1
                 ),
+                "setting_signature": build_setting_signature(current_entry),
+                "setting_summary": build_setting_summary(current_entry),
             },
             "current": current_summary,
             "baseline": baseline_summary,
@@ -948,6 +1033,8 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
                     "node_count": int(
                         (entry.get("cluster") or {}).get("node_count") or 1
                     ),
+                    "setting_signature": build_setting_signature(entry),
+                    "setting_summary": build_setting_summary(entry),
                 },
                 "category": "multi"
                 if int((entry.get("cluster") or {}).get("node_count") or 1) > 1
