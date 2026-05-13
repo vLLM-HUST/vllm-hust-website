@@ -201,6 +201,44 @@ function normalizeEntryArray(payload) {
     return [];
 }
 
+function isCompareSnapshotUsable(compareSnapshot) {
+    if (!compareSnapshot || typeof compareSnapshot !== 'object') {
+        return true;
+    }
+
+    const groups = Array.isArray(compareSnapshot.groups) ? compareSnapshot.groups : [];
+    const goalPairs = Array.isArray(compareSnapshot?.goal_progress?.pairs)
+        ? compareSnapshot.goal_progress.pairs
+        : [];
+    const hardConstraintScopes = Array.isArray(compareSnapshot?.hard_constraints?.scopes)
+        ? compareSnapshot.hard_constraints.scopes
+        : [];
+
+    if (groups.length > 0 || goalPairs.length > 0) {
+        return true;
+    }
+
+    return hardConstraintScopes.length === 0;
+}
+
+function assertUsableLeaderboardPayload(result, source) {
+    if (isCompareSnapshotUsable(result.compare)) {
+        return;
+    }
+
+    const groups = Array.isArray(result.compare?.groups) ? result.compare.groups.length : 0;
+    const goalPairs = Array.isArray(result.compare?.goal_progress?.pairs)
+        ? result.compare.goal_progress.pairs.length
+        : 0;
+    const scopes = Array.isArray(result.compare?.hard_constraints?.scopes)
+        ? result.compare.hard_constraints.scopes.length
+        : 0;
+
+    throw new Error(
+        `Incomplete compare snapshot from ${source}: groups=${groups}, goal_pairs=${goalPairs}, hard_constraint_scopes=${scopes}`
+    );
+}
+
 function splitSingleAndMulti(entries) {
     const single = [];
     const multi = [];
@@ -485,6 +523,8 @@ async function loadLeaderboardData() {
             result.single = normalizeEntryArray(singleData);
             result.multi = normalizeEntryArray(multiData);
             result.compare = compareData && typeof compareData === 'object' ? compareData : null;
+
+            assertUsableLeaderboardPayload(result, source);
 
             writeCache(result, marker);
             setLastLoadedSource(source);
