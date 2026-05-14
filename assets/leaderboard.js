@@ -1219,12 +1219,13 @@
     function isPinnedHardConstraintScope(scope) {
         const scoped = scope?.scope || {};
         const accountable = scoped?.accountable_scope || {};
+        const baselineEngine = String(accountable.baseline_engine || '').trim().toLowerCase();
         return scoped.engine === 'vllm-hust'
             && scoped.model === 'Qwen2.5-7B-Instruct'
             && scoped.hardware === '910B3'
             && scoped.workload === 'sharegpt-online'
             && accountable.representative_business_scenario === 'online-chat'
-            && accountable.baseline_engine === 'vllm'
+            && (!baselineEngine || baselineEngine === 'vllm')
             && scope?.overall_pass === true;
     }
 
@@ -1233,7 +1234,17 @@
             return null;
         }
 
-        return scopes.find((scope) => isPinnedHardConstraintScope(scope)) || null;
+        const pinnedScope = scopes.find((scope) => isPinnedHardConstraintScope(scope));
+        if (pinnedScope) {
+            return pinnedScope;
+        }
+
+        const passedScope = scopes.find((scope) => scope?.overall_pass === true);
+        if (passedScope) {
+            return passedScope;
+        }
+
+        return scopes[0] || null;
     }
 
     function getHardConstraintConfigTypesForCurrentTab() {
@@ -1282,7 +1293,7 @@
             })
             .filter((scope) => scopeKeys.has(scope.scope_key))
             .sort((left, right) => {
-                const statusOrder = Number(Boolean(left?.overall_pass)) - Number(Boolean(right?.overall_pass));
+                const statusOrder = Number(Boolean(right?.overall_pass)) - Number(Boolean(left?.overall_pass));
                 if (statusOrder !== 0) {
                     return statusOrder;
                 }

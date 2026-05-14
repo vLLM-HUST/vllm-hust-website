@@ -39,22 +39,21 @@ def test_hard_constraints_selection_prefers_passed_scope() -> None:
     assert "scoped.hardware === '910B3'" in text
     assert "scoped.workload === 'sharegpt-online'" in text
     assert "accountable.representative_business_scenario === 'online-chat'" in text
-    assert "accountable.baseline_engine === 'vllm'" in text
+    assert (
+        "const baselineEngine = String(accountable.baseline_engine || '').trim().toLowerCase();"
+        in text
+    )
+    assert "&& (!baselineEngine || baselineEngine === 'vllm')" in text
     assert "scope?.overall_pass === true" in text
     assert (
-        "return scopes.find((scope) => isPinnedHardConstraintScope(scope)) || null;"
+        "const pinnedScope = scopes.find((scope) => isPinnedHardConstraintScope(scope));"
         in text
     )
-    assert "function isPinnedHardConstraintScope(scope)" in text
-    assert "scoped.model === 'Qwen2.5-7B-Instruct'" in text
-    assert "scoped.hardware === '910B3'" in text
-    assert "scoped.workload === 'sharegpt-online'" in text
-    assert "accountable.representative_business_scenario === 'online-chat'" in text
-    assert "accountable.baseline_engine === 'vllm'" in text
     assert (
-        "return scopes.find((scope) => isPinnedHardConstraintScope(scope)) || null;"
+        "const passedScope = scopes.find((scope) => scope?.overall_pass === true);"
         in text
     )
+    assert "return scopes[0] || null;" in text
 
 
 def test_hard_constraints_selection_uses_tab_dataset_not_visible_rows() -> None:
@@ -95,4 +94,4 @@ def test_index_cache_busts_leaderboard_script() -> None:
     text = (root / "index.html").read_text(encoding="utf-8")
 
     assert "./assets/hf-data-loader.js?v=compare-source-guard-20260513" in text
-    assert "./assets/leaderboard.js?v=hc-baseline-banner-20260513" in text
+    assert "./assets/leaderboard.js?v=hc-scope-fallback-20260514" in text
