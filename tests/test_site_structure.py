@@ -34,26 +34,16 @@ def test_hard_constraints_selection_prefers_passed_scope() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
 
-    assert "function isPinnedHardConstraintScope(scope)" in text
-    assert "scoped.model === 'Qwen2.5-7B-Instruct'" in text
-    assert "scoped.hardware === '910B3'" in text
-    assert "scoped.workload === 'sharegpt-online'" in text
-    assert "accountable.representative_business_scenario === 'online-chat'" in text
-    assert (
-        "const baselineEngine = String(accountable.baseline_engine || '').trim().toLowerCase();"
-        in text
-    )
-    assert "&& (!baselineEngine || baselineEngine === 'vllm')" in text
-    assert "scope?.overall_pass === true" in text
-    assert (
-        "const pinnedScope = scopes.find((scope) => isPinnedHardConstraintScope(scope));"
-        in text
-    )
-    assert (
-        "const passedScope = scopes.find((scope) => scope?.overall_pass === true);"
-        in text
-    )
-    assert "return scopes[0] || null;" in text
+    assert "function countPassedHardConstraintChecks(scope)" in text
+    assert "function countKnownHardConstraintSignals(scope)" in text
+    assert "function buildHardConstraintScopeSortKey(scope)" in text
+    assert "function compareHardConstraintScopes(left, right)" in text
+    assert "const leftRank = Number(left?.selection_rank);" in text
+    assert "const rightRank = Number(right?.selection_rank);" in text
+    assert "return [...scopes].sort(compareHardConstraintScopes)[0] || null;" in text
+    assert "metrics.typical_throughput_ratio_vs_baseline" in text
+    assert "metrics.unit_token_cost_reduction_pct" in text
+    assert "Date.parse(scope?.latest?.submitted_at || '') || 0;" in text
 
 
 def test_hard_constraints_selection_uses_tab_dataset_not_visible_rows() -> None:
@@ -94,4 +84,4 @@ def test_index_cache_busts_leaderboard_script() -> None:
     text = (root / "index.html").read_text(encoding="utf-8")
 
     assert "./assets/hf-data-loader.js?v=compare-source-guard-20260513" in text
-    assert "./assets/leaderboard.js?v=hc-scope-fallback-20260514" in text
+    assert "./assets/leaderboard.js?v=hc-best-scope-rank-20260514" in text

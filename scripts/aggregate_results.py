@@ -590,6 +590,92 @@ def compute_metric_delta(current: float | None, previous: float | None) -> float
     return round(current - previous, 4)
 
 
+def count_passed_hard_constraint_checks(evaluation: dict[str, Any]) -> int:
+    checks = evaluation.get("checks") or {}
+    return sum(1 for value in checks.values() if value is True)
+
+
+def count_known_hard_constraint_signals(metrics: dict[str, Any]) -> int:
+    numeric_fields = (
+        "single_chip_effective_utilization_pct",
+        "typical_throughput_ratio_vs_baseline",
+        "typical_ttft_reduction_pct_vs_baseline",
+        "typical_tpot_reduction_pct_vs_baseline",
+        "long_context_length",
+        "unit_token_cost_reduction_pct",
+    )
+    boolean_fields = (
+        "long_context_throughput_stable",
+        "long_context_ttft_p95_stable",
+        "long_context_ttft_p99_stable",
+        "long_context_tpot_p95_stable",
+        "long_context_tpot_p99_stable",
+        "multi_tenant_high_utilization",
+    )
+    numeric_count = sum(1 for field in numeric_fields if metrics.get(field) is not None)
+    boolean_count = sum(
+        1 for field in boolean_fields if isinstance(metrics.get(field), bool)
+    )
+    return numeric_count + boolean_count
+
+
+def _hard_constraint_numeric_sort_value(value: Any) -> float:
+    return float(value) if value is not None else -1.0
+
+
+def _parse_hard_constraint_summary_timestamp(summary: dict[str, Any]) -> int:
+    raw = summary.get("submitted_at")
+    if not isinstance(raw, str) or not raw:
+        return 0
+    try:
+        return int(datetime.fromisoformat(raw.replace("Z", "+00:00")).timestamp())
+    except ValueError:
+        return 0
+
+
+def build_hard_constraint_scope_sort_key(
+    scope_payload: dict[str, Any],
+) -> tuple[Any, ...]:
+    latest = scope_payload.get("latest") or {}
+    evaluation = latest.get("evaluation") or {}
+    metrics = evaluation.get("metrics") or {}
+    stability_score = sum(
+        1
+        for field in (
+            "long_context_throughput_stable",
+            "long_context_ttft_p95_stable",
+            "long_context_ttft_p99_stable",
+            "long_context_tpot_p95_stable",
+            "long_context_tpot_p99_stable",
+        )
+        if metrics.get(field) is True
+    )
+    return (
+        int(bool(scope_payload.get("overall_pass"))),
+        count_passed_hard_constraint_checks(evaluation),
+        count_known_hard_constraint_signals(metrics),
+        _hard_constraint_numeric_sort_value(
+            metrics.get("typical_throughput_ratio_vs_baseline")
+        ),
+        _hard_constraint_numeric_sort_value(
+            metrics.get("typical_ttft_reduction_pct_vs_baseline")
+        ),
+        _hard_constraint_numeric_sort_value(
+            metrics.get("typical_tpot_reduction_pct_vs_baseline")
+        ),
+        _hard_constraint_numeric_sort_value(
+            metrics.get("single_chip_effective_utilization_pct")
+        ),
+        _hard_constraint_numeric_sort_value(
+            metrics.get("unit_token_cost_reduction_pct")
+        ),
+        _hard_constraint_numeric_sort_value(metrics.get("long_context_length")),
+        stability_score,
+        int(metrics.get("multi_tenant_high_utilization") is True),
+        _parse_hard_constraint_summary_timestamp(latest),
+    )
+
+
 def build_hard_constraint_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
     grouped: dict[str, list[dict[str, Any]]] = {}
     for entry in entries:
@@ -658,7 +744,17 @@ def build_hard_constraint_snapshot(entries: list[dict[str, Any]]) -> dict[str, A
             }
         )
 
-    scopes_payload.sort(key=lambda item: str(item.get("scope_key") or ""))
+    scopes_payload = sorted(
+        scopes_payload,
+        key=lambda item: (
+            build_hard_constraint_scope_sort_key(item),
+            str(item.get("scope_key") or ""),
+        ),
+        reverse=True,
+    )
+    for index, item in enumerate(scopes_payload, start=1):
+        item["selection_rank"] = index
+
     total = len(scopes_payload)
     pass_count = sum(1 for item in scopes_payload if item.get("overall_pass"))
     return {
@@ -667,6 +763,7 @@ def build_hard_constraint_snapshot(entries: list[dict[str, Any]]) -> dict[str, A
         "scope_count": total,
         "pass_count": pass_count,
         "fail_count": max(total - pass_count, 0),
+        "best_scope_key": scopes_payload[0]["scope_key"] if scopes_payload else None,
         "scopes": scopes_payload,
     }
 

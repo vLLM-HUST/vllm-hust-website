@@ -921,8 +921,81 @@ def test_aggregate_results_hard_constraints_only_include_vllm_hust(
 
     assert hard_constraints["scope_count"] == 1
     assert hard_constraints["fail_count"] == 0
+    assert (
+        hard_constraints["best_scope_key"] == hard_constraints["scopes"][0]["scope_key"]
+    )
+    assert hard_constraints["scopes"][0]["selection_rank"] == 1
     assert hard_constraints["scopes"][0]["scope"]["engine"] == "vllm-hust"
     assert hard_constraints["scopes"][0]["latest"]["engine"] == "vllm-hust"
+
+
+def test_aggregate_results_hard_constraints_rank_best_scope_first(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    stronger_entry = _valid_entry()
+    stronger_entry["entry_id"] = "10101010-1010-1010-1010-101010101010"
+    stronger_entry["engine"] = "vllm-hust"
+    stronger_entry["engine_version"] = "0.20.1"
+    stronger_entry["metadata"]["engine"] = "vllm-hust"
+    stronger_entry["metadata"]["engine_version"] = "0.20.1"
+    stronger_entry["metadata"]["submitted_at"] = "2026-05-14T09:00:00Z"
+    stronger_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|0.20.1|sharegpt-online|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    stronger_entry["workload"]["name"] = "sharegpt-online"
+    stronger_entry["constraints"]["metrics"].update(
+        {
+            "single_chip_effective_utilization_pct": 95.0,
+            "typical_throughput_ratio_vs_baseline": 2.45,
+            "typical_ttft_reduction_pct_vs_baseline": 28.0,
+            "typical_tpot_reduction_pct_vs_baseline": 27.0,
+            "long_context_length": 65536,
+            "unit_token_cost_reduction_pct": 41.0,
+            "multi_tenant_high_utilization": True,
+        }
+    )
+
+    weaker_entry = _valid_entry()
+    weaker_entry["entry_id"] = "20202020-2020-2020-2020-202020202020"
+    weaker_entry["engine"] = "vllm-hust"
+    weaker_entry["engine_version"] = "0.19.9"
+    weaker_entry["metadata"]["engine"] = "vllm-hust"
+    weaker_entry["metadata"]["engine_version"] = "0.19.9"
+    weaker_entry["metadata"]["submitted_at"] = "2026-05-14T08:00:00Z"
+    weaker_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|0.19.9|random-online|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    weaker_entry["workload"]["name"] = "random-online"
+    weaker_entry["constraints"]["metrics"].update(
+        {
+            "single_chip_effective_utilization_pct": 90.5,
+            "typical_throughput_ratio_vs_baseline": 2.05,
+            "typical_ttft_reduction_pct_vs_baseline": 21.0,
+            "typical_tpot_reduction_pct_vs_baseline": 20.5,
+            "long_context_length": 32768,
+            "unit_token_cost_reduction_pct": 31.0,
+            "multi_tenant_high_utilization": True,
+        }
+    )
+
+    _write_manifest_entries(source_dir, [weaker_entry, stronger_entry])
+    output_dir = tmp_path / "website_data"
+    compare_payload = _load_compare_payload(script, source_dir, output_dir)
+    hard_constraints = compare_payload["hard_constraints"]
+
+    assert hard_constraints["scope_count"] == 2
+    assert (
+        hard_constraints["best_scope_key"] == hard_constraints["scopes"][0]["scope_key"]
+    )
+    assert hard_constraints["scopes"][0]["selection_rank"] == 1
+    assert hard_constraints["scopes"][1]["selection_rank"] == 2
+    assert hard_constraints["scopes"][0]["scope"]["workload"] == "sharegpt-online"
+    assert hard_constraints["scopes"][1]["scope"]["workload"] == "random-online"
 
 
 def test_aggregate_results_fails_on_same_spec_hash_mismatch(tmp_path: Path) -> None:

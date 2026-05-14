@@ -55,7 +55,7 @@
             statsSource: 'source',
             quickCompare: 'Quick Compare',
             hardConstraintsTitle: 'Hard Constraints',
-            hardConstraintsSubtitle: 'Mandatory targets from benchmark snapshots (current run and regression vs previous submission).',
+            hardConstraintsSubtitle: 'Best current hard-constraint result from benchmark snapshots, with regression vs previous submission.',
             hardConstraintsNoData: 'No hard-constraint records under current filters.',
             hardConstraintsBaselineLabel: 'Performance Baseline',
             hardConstraintsBaselineValue: 'Official Ascend Jan 2026 (vllm v0.11.0 + vllm-ascend v0.11.0)',
@@ -203,7 +203,7 @@
             statsSource: '数据源',
             quickCompare: '快速对比',
             hardConstraintsTitle: '硬约束达成',
-            hardConstraintsSubtitle: '基于 benchmark 快照的强制目标判定（展示当前结果及相对上次提交的回归变化）。',
+            hardConstraintsSubtitle: '展示当前 benchmark 中表现最好的硬约束结果，并和上次提交做回归对比。',
             hardConstraintsNoData: '当前筛选条件下没有硬约束记录。',
             hardConstraintsBaselineLabel: '性能基线',
             hardConstraintsBaselineValue: 'Official Ascend Jan 2026（vllm v0.11.0 + vllm-ascend v0.11.0）',
@@ -1216,17 +1216,75 @@
         ];
     }
 
-    function isPinnedHardConstraintScope(scope) {
-        const scoped = scope?.scope || {};
-        const accountable = scoped?.accountable_scope || {};
-        const baselineEngine = String(accountable.baseline_engine || '').trim().toLowerCase();
-        return scoped.engine === 'vllm-hust'
-            && scoped.model === 'Qwen2.5-7B-Instruct'
-            && scoped.hardware === '910B3'
-            && scoped.workload === 'sharegpt-online'
-            && accountable.representative_business_scenario === 'online-chat'
-            && (!baselineEngine || baselineEngine === 'vllm')
-            && scope?.overall_pass === true;
+    function countPassedHardConstraintChecks(scope) {
+        const checks = scope?.latest?.evaluation?.checks || {};
+        return Object.values(checks).filter((value) => value === true).length;
+    }
+
+    function countKnownHardConstraintSignals(scope) {
+        const metrics = scope?.latest?.evaluation?.metrics || {};
+        const numericSignals = [
+            metrics.single_chip_effective_utilization_pct,
+            metrics.typical_throughput_ratio_vs_baseline,
+            metrics.typical_ttft_reduction_pct_vs_baseline,
+            metrics.typical_tpot_reduction_pct_vs_baseline,
+            metrics.long_context_length,
+            metrics.unit_token_cost_reduction_pct,
+        ].filter((value) => Number.isFinite(value)).length;
+        const booleanSignals = [
+            metrics.long_context_throughput_stable,
+            metrics.long_context_ttft_p95_stable,
+            metrics.long_context_ttft_p99_stable,
+            metrics.long_context_tpot_p95_stable,
+            metrics.long_context_tpot_p99_stable,
+            metrics.multi_tenant_high_utilization,
+        ].filter((value) => value === true || value === false).length;
+        return numericSignals + booleanSignals;
+    }
+
+    function buildHardConstraintScopeSortKey(scope) {
+        const metrics = scope?.latest?.evaluation?.metrics || {};
+        const stabilityScore = [
+            metrics.long_context_throughput_stable,
+            metrics.long_context_ttft_p95_stable,
+            metrics.long_context_ttft_p99_stable,
+            metrics.long_context_tpot_p95_stable,
+            metrics.long_context_tpot_p99_stable,
+        ].filter((value) => value === true).length;
+        const submittedAt = Date.parse(scope?.latest?.submitted_at || '') || 0;
+        return [
+            Number(Boolean(scope?.overall_pass)),
+            countPassedHardConstraintChecks(scope),
+            countKnownHardConstraintSignals(scope),
+            Number.isFinite(metrics.typical_throughput_ratio_vs_baseline) ? metrics.typical_throughput_ratio_vs_baseline : -1,
+            Number.isFinite(metrics.typical_ttft_reduction_pct_vs_baseline) ? metrics.typical_ttft_reduction_pct_vs_baseline : -1,
+            Number.isFinite(metrics.typical_tpot_reduction_pct_vs_baseline) ? metrics.typical_tpot_reduction_pct_vs_baseline : -1,
+            Number.isFinite(metrics.single_chip_effective_utilization_pct) ? metrics.single_chip_effective_utilization_pct : -1,
+            Number.isFinite(metrics.unit_token_cost_reduction_pct) ? metrics.unit_token_cost_reduction_pct : -1,
+            Number.isFinite(metrics.long_context_length) ? metrics.long_context_length : -1,
+            stabilityScore,
+            Number(metrics.multi_tenant_high_utilization === true),
+            submittedAt,
+        ];
+    }
+
+    function compareHardConstraintScopes(left, right) {
+        const leftRank = Number(left?.selection_rank);
+        const rightRank = Number(right?.selection_rank);
+        if (Number.isFinite(leftRank) && Number.isFinite(rightRank) && leftRank !== rightRank) {
+            return leftRank - rightRank;
+        }
+
+        const leftKey = buildHardConstraintScopeSortKey(left);
+        const rightKey = buildHardConstraintScopeSortKey(right);
+        const length = Math.max(leftKey.length, rightKey.length);
+        for (let index = 0; index < length; index += 1) {
+            const delta = (rightKey[index] || 0) - (leftKey[index] || 0);
+            if (delta !== 0) {
+                return delta;
+            }
+        }
+        return String(left?.scope_key || '').localeCompare(String(right?.scope_key || ''));
     }
 
     function selectBestHardConstraintScope(scopes) {
@@ -1234,17 +1292,7 @@
             return null;
         }
 
-        const pinnedScope = scopes.find((scope) => isPinnedHardConstraintScope(scope));
-        if (pinnedScope) {
-            return pinnedScope;
-        }
-
-        const passedScope = scopes.find((scope) => scope?.overall_pass === true);
-        if (passedScope) {
-            return passedScope;
-        }
-
-        return scopes[0] || null;
+        return [...scopes].sort(compareHardConstraintScopes)[0] || null;
     }
 
     function getHardConstraintConfigTypesForCurrentTab() {
@@ -1292,15 +1340,7 @@
                 return validConfigTypes.has(String(scope?.scope?.config_type || 'unknown-config'));
             })
             .filter((scope) => scopeKeys.has(scope.scope_key))
-            .sort((left, right) => {
-                const statusOrder = Number(Boolean(right?.overall_pass)) - Number(Boolean(left?.overall_pass));
-                if (statusOrder !== 0) {
-                    return statusOrder;
-                }
-                const leftConfigType = String(left?.scope?.config_type || 'unknown-config');
-                const rightConfigType = String(right?.scope?.config_type || 'unknown-config');
-                return Number(validConfigTypes.has(rightConfigType)) - Number(validConfigTypes.has(leftConfigType));
-            });
+            .sort(compareHardConstraintScopes);
 
         const bestScope = selectBestHardConstraintScope(filteredScopes);
         const displayedScopes = bestScope ? [bestScope] : [];
