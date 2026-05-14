@@ -2218,6 +2218,28 @@
         renderContributorMeta(payload);
       }
 
+      const CONTRIBUTOR_DATA_SOURCES = [
+        "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-org-profile/main/profile/core_contributors.json",
+        "./data/core_contributors.json",
+      ];
+
+      async function fetchContributorPayload() {
+        let lastError = null;
+        for (const source of CONTRIBUTOR_DATA_SOURCES) {
+          try {
+            const response = await fetch(source, { cache: "no-store" });
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status} from ${source}`);
+            }
+            return await response.json();
+          } catch (error) {
+            lastError = error;
+            console.warn("Failed to load contributor data source", source, error);
+          }
+        }
+        throw lastError || new Error("No contributor data source succeeded");
+      }
+
       async function loadContributors() {
         const loading = document.getElementById("contributors-loading");
         const error = document.getElementById("contributors-error");
@@ -2225,11 +2247,7 @@
         if (!loading || !error || !content) return;
 
         try {
-          const response = await fetch("./data/core_contributors.json", { cache: "no-store" });
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          const payload = await response.json();
+          const payload = await fetchContributorPayload();
           window["vllm-hustContributorPayload"] = payload;
           renderContributors(payload);
           loading.style.display = "none";

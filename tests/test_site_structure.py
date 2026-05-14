@@ -85,3 +85,19 @@ def test_index_cache_busts_leaderboard_script() -> None:
 
     assert "./assets/hf-data-loader.js?v=compare-source-guard-20260513" in text
     assert "./assets/leaderboard.js?v=hc-best-scope-rank-20260514" in text
+
+
+def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "index.html").read_text(encoding="utf-8")
+
+    assert "const CONTRIBUTOR_DATA_SOURCES = [" in text
+    assert (
+        "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-org-profile/main/profile/core_contributors.json"
+        in text
+    )
+    assert '"./data/core_contributors.json"' in text
+    assert "async function fetchContributorPayload()" in text
+    assert (
+        'console.warn("Failed to load contributor data source", source, error);' in text
+    )

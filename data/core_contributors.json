@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-30",
+  "updated_at": "2026-05-14",
   "scope_repos": [
     "vllm-hust",
     "vllm-ascend-hust",
@@ -15,9 +15,9 @@
       "name": "Shuhao Zhang",
       "github_login": "ShuhaoZhangTony",
       "github_url": "https://github.com/ShuhaoZhangTony",
-      "changed_lines": 450367,
-      "added": 312721,
-      "deleted": 137646,
+      "changed_lines": 1240204,
+      "added": 1098102,
+      "deleted": 142102,
       "active_repos": 7,
       "repos": [
         "vllm-ascend-hust",
@@ -72,12 +72,27 @@
     },
     {
       "rank": 5,
+      "name": "moonandlife",
+      "github_login": "moonandlife",
+      "github_url": "https://github.com/moonandlife",
+      "changed_lines": 3468,
+      "added": 2926,
+      "deleted": 542,
+      "active_repos": 3,
+      "repos": [
+        "vllm-ascend-hust",
+        "vllm-hust",
+        "vllm-hust-dev-hub"
+      ]
+    },
+    {
+      "rank": 6,
       "name": "iliujunn",
       "github_login": "iliujunn",
       "github_url": "https://github.com/iliujunn",
-      "changed_lines": 2095,
-      "added": 1186,
-      "deleted": 909,
+      "changed_lines": 2006,
+      "added": 1102,
+      "deleted": 904,
       "active_repos": 2,
       "repos": [
         "vllm-ascend-hust",
@@ -85,7 +100,7 @@
       ]
     },
     {
-      "rank": 6,
+      "rank": 7,
       "name": "CubeLander",
       "github_login": "CubeLander",
       "github_url": "https://github.com/CubeLander",
@@ -98,7 +113,7 @@
       ]
     },
     {
-      "rank": 7,
+      "rank": 8,
       "name": "pygone",
       "github_login": "Pygone",
       "github_url": "https://github.com/Pygone",
@@ -108,20 +123,6 @@
       "active_repos": 1,
       "repos": [
         "vllm-hust-website"
-      ]
-    },
-    {
-      "rank": 8,
-      "name": "moonandlife",
-      "github_login": "moonandlife",
-      "github_url": "https://github.com/moonandlife",
-      "changed_lines": 32,
-      "added": 17,
-      "deleted": 15,
-      "active_repos": 2,
-      "repos": [
-        "vllm-hust",
-        "vllm-hust-dev-hub"
       ]
     }
   ]
