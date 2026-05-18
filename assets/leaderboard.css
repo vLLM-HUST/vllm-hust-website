@@ -467,18 +467,6 @@
     margin-top: 16px;
 }
 
-.overview-note {
-    margin-top: 12px;
-    max-width: 840px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.10);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    color: rgba(255, 255, 255, 0.88);
-    font-size: 0.88rem;
-    line-height: 1.45;
-}
-
 .overview-badge {
     display: inline-flex;
     align-items: center;
@@ -941,6 +929,18 @@
     color: #0f766e;
 }
 
+.provenance-submitter {
+    color: #0f766e;
+}
+
+.provenance-repo {
+    color: #334155;
+}
+
+.provenance-source {
+    color: #334155;
+}
+
 .provenance-commit {
     color: #1e3a8a;
     font-family: 'Fira Code', monospace;
@@ -964,6 +964,12 @@
 .version-merge-hint {
     color: #64748b;
     font-size: 0.72rem;
+}
+
+.version-setting-summary {
+    color: #64748b;
+    font-size: 0.72rem;
+    line-height: 1.35;
 }
 
 .version-merge-hint.sparse {

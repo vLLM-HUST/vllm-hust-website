@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,8 @@ HARD_CONSTRAINTS_SCHEMA_VERSION = "leaderboard-hard-constraints/v1"
 BASELINE_STATUS_OFFICIAL_COVERED = "official-covered"
 BASELINE_STATUS_PENDING = "pending-baseline"
 BASELINE_STATUS_NONE = "no-baseline-declared"
+DIRTY_ENGINE_VERSION_MARKERS = ("path string is null",)
+ENGINE_VERSION_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
 VALID_BASELINE_STATUSES = {
     BASELINE_STATUS_OFFICIAL_COVERED,
     BASELINE_STATUS_PENDING,
@@ -70,7 +73,72 @@ def validate_entry(
         raise ValueError(
             f"{source}: schema validation failed: {first.message} @ {list(first.path)}"
         )
+    normalize_entry_engine_version(entry)
     normalize_entry_accountable_scope(entry)
+    return entry
+
+
+def short_commit(value: Any) -> str:
+    normalized = str(value or "").strip()
+    if not normalized:
+        return ""
+    normalized = normalized.removeprefix("g")
+    return normalized[:8]
+
+
+def sanitize_engine_version(value: Any, *, git_commit: Any = None) -> str:
+    raw = str(value or "")
+    saw_multiline = "\n" in raw or "\r" in raw
+    saw_dirty_marker = any(
+        marker in raw.lower() for marker in DIRTY_ENGINE_VERSION_MARKERS
+    )
+
+    candidates: list[str] = []
+    for line in raw.splitlines() or [raw]:
+        normalized = " ".join(str(line).split()).strip()
+        if not normalized:
+            continue
+        if any(marker in normalized.lower() for marker in DIRTY_ENGINE_VERSION_MARKERS):
+            saw_dirty_marker = True
+            continue
+        candidates.append(normalized)
+
+    for candidate in candidates:
+        if any(ch.isdigit() for ch in candidate) and ENGINE_VERSION_PATTERN.match(
+            candidate
+        ):
+            return candidate
+
+    if candidates:
+        primary = candidates[0]
+        if ENGINE_VERSION_PATTERN.match(primary) and not (
+            saw_multiline or saw_dirty_marker
+        ):
+            return primary
+
+    commit_fallback = short_commit(git_commit)
+    if commit_fallback:
+        return f"g{commit_fallback}"
+    return "unknown"
+
+
+def get_entry_engine_version(entry: dict[str, Any]) -> str:
+    metadata = entry.get("metadata") or {}
+    return sanitize_engine_version(
+        entry.get("engine_version") or metadata.get("engine_version") or "",
+        git_commit=metadata.get("git_commit"),
+    )
+
+
+def normalize_entry_engine_version(entry: dict[str, Any]) -> dict[str, Any]:
+    metadata = entry.get("metadata")
+    if not isinstance(metadata, dict):
+        metadata = {}
+        entry["metadata"] = metadata
+
+    normalized = get_entry_engine_version(entry)
+    entry["engine_version"] = normalized
+    metadata["engine_version"] = normalized
     return entry
 
 
@@ -244,6 +312,27 @@ def build_setting_signature(entry: dict[str, Any]) -> str:
     )
 
 
+def format_setting_dtype(value: Any) -> str:
+    normalized = str(value or "").strip()
+    lower = normalized.lower()
+    if lower == "float16":
+        return "FP16"
+    if lower == "bfloat16":
+        return "BF16"
+    return normalized
+
+
+def get_compact_spec_label(spec_id: str | None) -> str:
+    normalized = str(spec_id or "").strip()
+    if not normalized:
+        return ""
+    if normalized.startswith("official-ascend-jan-2026"):
+        return "official spec"
+    if len(normalized) > 32:
+        return f"spec {normalized[:29]}..."
+    return f"spec {normalized}"
+
+
 def build_setting_summary(entry: dict[str, Any]) -> str:
     workload = entry.get("workload") or {}
     same_spec = get_same_spec_payload(entry)
@@ -273,8 +362,9 @@ def build_setting_summary(entry: dict[str, Any]) -> str:
         parts.append(" ".join(parallel_parts))
 
     dtype = server.get("dtype")
-    if dtype:
-        parts.append(str(dtype))
+    dtype_label = format_setting_dtype(dtype)
+    if dtype_label:
+        parts.append(dtype_label)
 
     request_rate = client.get("request_rate")
     if request_rate is not None:
@@ -289,8 +379,9 @@ def build_setting_summary(entry: dict[str, Any]) -> str:
         parts.append(f"CC {concurrency}")
 
     spec_id = get_same_spec_id(entry)
-    if spec_id:
-        parts.append(f"spec {spec_id}")
+    spec_label = get_compact_spec_label(spec_id)
+    if spec_label:
+        parts.append(spec_label)
 
     return " • ".join(parts) if parts else "default settings"
 
@@ -337,9 +428,7 @@ def build_compare_engine_summary(entry: dict[str, Any]) -> dict[str, Any]:
     metadata = entry.get("metadata") or {}
     return {
         "engine": str(entry.get("engine") or metadata.get("engine") or "unknown"),
-        "engine_version": str(
-            entry.get("engine_version") or metadata.get("engine_version") or "unknown"
-        ),
+        "engine_version": get_entry_engine_version(entry),
         "entry_id": str(entry.get("entry_id") or ""),
         "submitted_at": metadata.get("submitted_at"),
         "canonical_path": entry.get("canonical_path"),
@@ -605,9 +694,7 @@ def summarize_hard_constraint_entry(entry: dict[str, Any]) -> dict[str, Any]:
     return {
         "entry_id": str(entry.get("entry_id") or ""),
         "engine": str(entry.get("engine") or metadata.get("engine") or "unknown"),
-        "engine_version": str(
-            entry.get("engine_version") or metadata.get("engine_version") or "unknown"
-        ),
+        "engine_version": get_entry_engine_version(entry),
         "submitted_at": metadata.get("submitted_at"),
         "git_commit": metadata.get("git_commit"),
         "scenario_source": constraints.get("scenario_source"),
@@ -898,9 +985,7 @@ def is_goal_baseline_entry(entry: dict[str, Any]) -> bool:
     engine = (
         str(entry.get("engine") or metadata.get("engine") or "unknown").strip().lower()
     )
-    engine_version = str(
-        entry.get("engine_version") or metadata.get("engine_version") or ""
-    ).strip()
+    engine_version = get_entry_engine_version(entry)
     github_repository = str(metadata.get("github_repository") or "").strip().lower()
     return (
         engine == GOAL_BASELINE_TARGET["engine"]
