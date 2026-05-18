@@ -250,7 +250,7 @@ def same_spec_hashes_match(
 
 
 def build_compare_scope_key(entry: dict[str, Any]) -> str:
-    model = str((entry.get("model") or {}).get("name") or "unknown-model")
+    model = normalize_model_name((entry.get("model") or {}).get("name"))
     hardware = str(
         (entry.get("hardware") or {}).get("chip_model") or "unknown-hardware"
     )
@@ -275,28 +275,7 @@ def build_compare_scope_key(entry: dict[str, Any]) -> str:
 
 
 def build_goal_scope_key(entry: dict[str, Any]) -> str:
-    model = normalize_model_name((entry.get("model") or {}).get("name"))
-    hardware = str(
-        (entry.get("hardware") or {}).get("chip_model") or "unknown-hardware"
-    )
-    precision = str((entry.get("model") or {}).get("precision") or "unknown-precision")
-    workload = extract_workload_name(entry)
-    config_type = str(entry.get("config_type") or "unknown-config")
-    chip_count = int((entry.get("hardware") or {}).get("chip_count") or 0)
-    node_count = int((entry.get("cluster") or {}).get("node_count") or 1)
-    setting_signature = build_setting_signature(entry)
-    return "|".join(
-        [
-            model,
-            hardware,
-            precision,
-            workload,
-            config_type,
-            str(chip_count),
-            str(node_count),
-            setting_signature,
-        ]
-    )
+    return build_compare_scope_key(entry)
 
 
 def build_compare_engine_summary(entry: dict[str, Any]) -> dict[str, Any]:

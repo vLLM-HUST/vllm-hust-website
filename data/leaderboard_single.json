@@ -151,9 +151,9 @@
     }
   },
   {
-    "entry_id": "69c44b80-8ab9-4cfa-8f4e-5547ae393d6b",
+    "entry_id": "1030e12d-908b-4e70-8c27-54ab102ea7ad",
     "engine": "vllm-hust",
-    "engine_version": "0.17.2.post2.dev1076+g383b3c7ac",
+    "engine_version": "dev\npath string is NULLpath string is NULL",
     "config_type": "single_gpu",
     "hardware": {
       "vendor": "Huawei",
@@ -176,9 +176,160 @@
       "dataset": "random"
     },
     "metrics": {
-      "ttft_ms": 281.4642316312529,
-      "tbt_ms": 98.22593903643828,
-      "throughput_tps": 227.6878646357019,
+      "ttft_ms": 0.0,
+      "tbt_ms": null,
+      "throughput_tps": 0.0,
+      "peak_mem_mb": 0.0,
+      "error_rate": 1.0
+    },
+    "constraints": {
+      "scenario_source": "vllm-benchmark",
+      "accountable_scope": {
+        "domestic_chip_class": "Ascend-class",
+        "representative_model_band": "7B-13B",
+        "representative_business_scenario": "online-chat",
+        "baseline_engine": "vllm",
+        "owner_confirmed": null,
+        "notes": null
+      },
+      "metrics": {
+        "single_chip_effective_utilization_pct": null,
+        "typical_throughput_ratio_vs_baseline": null,
+        "typical_ttft_reduction_pct_vs_baseline": null,
+        "typical_tpot_reduction_pct_vs_baseline": null,
+        "long_context_length": null,
+        "long_context_throughput_stable": null,
+        "long_context_ttft_p95_ms": null,
+        "long_context_ttft_p99_ms": null,
+        "long_context_tpot_p95_ms": null,
+        "long_context_tpot_p99_ms": null,
+        "long_context_ttft_p95_stable": null,
+        "long_context_ttft_p99_stable": null,
+        "long_context_tpot_p95_stable": null,
+        "long_context_tpot_p99_stable": null,
+        "unit_token_cost_reduction_pct": null,
+        "multi_tenant_high_utilization": null
+      }
+    },
+    "cluster": null,
+    "versions": {
+      "protocol": "N/A",
+      "backend": "N/A",
+      "core": "N/A",
+      "benchmark": "0.1.0"
+    },
+    "environment": {
+      "os": "Linux-5.10.0-60.18.0.50.oe2203.aarch64-aarch64-with-glibc2.38",
+      "python_version": "3.11.15",
+      "pytorch_version": null,
+      "cuda_version": null,
+      "cann_version": null,
+      "driver_version": null
+    },
+    "metadata": {
+      "submitted_at": "2026-05-12T03:45:28Z",
+      "submitter": "moonandlife",
+      "data_source": "vllm-ascend-hust-ci-same-spec",
+      "engine": "vllm-hust",
+      "engine_version": "dev\npath string is NULLpath string is NULL",
+      "reproducible_cmd": null,
+      "git_commit": "d4a408c4710783113780c21c41e6d76279f37245",
+      "github_user": "moonandlife",
+      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/d4a408c4710783113780c21c41e6d76279f37245",
+      "github_repository": "vLLM-HUST/vllm-hust",
+      "github_ref": "main",
+      "github_event_name": "pull_request",
+      "github_pr_number": 27,
+      "github_pr_url": "https://github.com/vLLM-HUST/vllm-ascend-hust/pull/27",
+      "release_date": null,
+      "changelog_url": null,
+      "notes": null,
+      "verified": null,
+      "idempotency_key": "034fcbb032c2e5ae04d9015fbe80a237e1ae1aa47e1e36eb151b293a7fba73d5",
+      "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
+      "runtime_provenance": {
+        "python": "/home/grunner/miniconda3/envs/vllm-hust-dev/bin/python",
+        "engine": {
+          "repository": "vLLM-HUST/vllm-hust",
+          "ref": "main",
+          "commit": "d4a408c4710783113780c21c41e6d76279f37245"
+        },
+        "plugin": {
+          "engine": "vllm-ascend-hust",
+          "repository": "vLLM-HUST/vllm-ascend-hust",
+          "ref": "27/merge",
+          "commit": "df3c5f40636a242cd9d8d8a0c49fd330f285a17d"
+        }
+      }
+    },
+    "same_spec": {
+      "schema_version": "benchmark-same-spec/v1",
+      "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
+      "spec_label": "Official Ascend Jan 2026 baseline for vllm-hust goal tracking",
+      "spec_source": "/home/grunner/actions-runner/_work/vllm-ascend-hust/vllm-ascend-hust/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0110-random-online-qwen25-14b-910b3.json",
+      "scenario": "random-online",
+      "model": "Qwen/Qwen2.5-14B-Instruct",
+      "model_parameters": "14B",
+      "model_precision": "FP16",
+      "hardware_vendor": "Huawei",
+      "hardware_chip_model": "910B3",
+      "chip_count": 1,
+      "node_count": 1,
+      "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "resolved_server_parameters": {
+        "tensor_parallel_size": 1,
+        "enforce_eager": "",
+        "trust_remote_code": "",
+        "disable_log_stats": "",
+        "disable_log_requests": "",
+        "host": "0.0.0.0",
+        "port": 40713,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "dtype": "float16"
+      },
+      "resolved_client_parameters": {
+        "backend": "vllm",
+        "endpoint": "/v1/completions",
+        "dataset_name": "random",
+        "num_prompts": 200,
+        "request_rate": 1,
+        "host": "127.0.0.1",
+        "port": 40713,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "random_input_len": 1024,
+        "random_output_len": 256
+      }
+    }
+  },
+  {
+    "entry_id": "947255ab-739d-4f36-9533-cb348d0cbffe",
+    "engine": "vllm-hust",
+    "engine_version": "dev\npath string is NULLpath string is NULL",
+    "config_type": "single_gpu",
+    "hardware": {
+      "vendor": "Huawei",
+      "chip_model": "910B3",
+      "chip_count": 1,
+      "interconnect": "unknown"
+    },
+    "model": {
+      "name": "Qwen/Qwen2.5-14B-Instruct",
+      "parameters": "14B",
+      "precision": "FP16",
+      "quantization": null
+    },
+    "workload": {
+      "name": "random-online",
+      "input_length": 1024,
+      "output_length": 256,
+      "batch_size": null,
+      "concurrent_requests": null,
+      "dataset": "random"
+    },
+    "metrics": {
+      "ttft_ms": 394.2572027310962,
+      "tbt_ms": 120.0428432763723,
+      "throughput_tps": 223.47038554688768,
       "peak_mem_mb": 0.0,
       "error_rate": 0.0
     },
@@ -227,38 +378,38 @@
       "driver_version": null
     },
     "metadata": {
-      "submitted_at": "2026-05-08T07:21:32Z",
-      "submitter": "same-spec-current",
-      "data_source": "vllm-hust-benchmark",
+      "submitted_at": "2026-05-12T08:49:16Z",
+      "submitter": "moonandlife",
+      "data_source": "vllm-ascend-hust-ci-same-spec",
       "engine": "vllm-hust",
-      "engine_version": "0.17.2.post2.dev1076+g383b3c7ac",
+      "engine_version": "dev\npath string is NULLpath string is NULL",
       "reproducible_cmd": null,
-      "git_commit": "383b3c7acb08654da445c0048fc3f3eed9c4bb19",
-      "github_user": null,
-      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/383b3c7acb08654da445c0048fc3f3eed9c4bb19",
+      "git_commit": "d4a408c4710783113780c21c41e6d76279f37245",
+      "github_user": "moonandlife",
+      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/d4a408c4710783113780c21c41e6d76279f37245",
       "github_repository": "vLLM-HUST/vllm-hust",
       "github_ref": "main",
-      "github_event_name": null,
-      "github_pr_number": null,
-      "github_pr_url": null,
+      "github_event_name": "pull_request",
+      "github_pr_number": 27,
+      "github_pr_url": "https://github.com/vLLM-HUST/vllm-ascend-hust/pull/27",
       "release_date": null,
       "changelog_url": null,
       "notes": null,
       "verified": null,
-      "idempotency_key": "e5ace390a46054f04bd079d93a944c9b8182afeded14eb53f1fc79747684d2d9",
+      "idempotency_key": "f87bccae187b46854a31209d22127a5d971787d76ac30e3655c143ff682cacdf",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/root/miniconda3/envs/vllm-hust-dev/bin/python",
+        "python": "/home/grunner/miniconda3/envs/vllm-hust-dev/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "main",
-          "commit": "383b3c7acb08654da445c0048fc3f3eed9c4bb19"
+          "commit": "d4a408c4710783113780c21c41e6d76279f37245"
         },
         "plugin": {
           "engine": "vllm-ascend-hust",
           "repository": "vLLM-HUST/vllm-ascend-hust",
-          "ref": "ws/fix/same_spec_current_artifact",
-          "commit": "bb40a17cfc8f9c940675da4da8bc0a6ed4eb040a"
+          "ref": "27/merge",
+          "commit": "17cf013f332caab3642ef48902140c5a93595578"
         }
       }
     },
@@ -266,7 +417,7 @@
       "schema_version": "benchmark-same-spec/v1",
       "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
       "spec_label": "Official Ascend Jan 2026 baseline for vllm-hust goal tracking",
-      "spec_source": "/workspace/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0110-random-online-qwen25-14b-910b3.json",
+      "spec_source": "/home/grunner/actions-runner/_work/vllm-ascend-hust/vllm-ascend-hust/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0110-random-online-qwen25-14b-910b3.json",
       "scenario": "random-online",
       "model": "Qwen/Qwen2.5-14B-Instruct",
       "model_parameters": "14B",
@@ -283,8 +434,8 @@
         "disable_log_stats": "",
         "disable_log_requests": "",
         "host": "0.0.0.0",
-        "port": 8001,
-        "model": "/root/.cache/huggingface/hub/models--Qwen--Qwen2.5-14B-Instruct/snapshots/cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8",
+        "port": 47621,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -294,8 +445,914 @@
         "num_prompts": 200,
         "request_rate": 1,
         "host": "127.0.0.1",
-        "port": 8001,
-        "model": "/root/.cache/huggingface/hub/models--Qwen--Qwen2.5-14B-Instruct/snapshots/cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8",
+        "port": 47621,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "random_input_len": 1024,
+        "random_output_len": 256
+      }
+    }
+  },
+  {
+    "entry_id": "660e18b5-7ffa-4dfb-8a26-a598e75f5aef",
+    "engine": "vllm-hust",
+    "engine_version": "dev\npath string is NULLpath string is NULL",
+    "config_type": "single_gpu",
+    "hardware": {
+      "vendor": "Huawei",
+      "chip_model": "910B3",
+      "chip_count": 1,
+      "interconnect": "unknown"
+    },
+    "model": {
+      "name": "Qwen/Qwen2.5-14B-Instruct",
+      "parameters": "14B",
+      "precision": "FP16",
+      "quantization": null
+    },
+    "workload": {
+      "name": "random-online",
+      "input_length": 1024,
+      "output_length": 256,
+      "batch_size": null,
+      "concurrent_requests": null,
+      "dataset": "random"
+    },
+    "metrics": {
+      "ttft_ms": 387.7096943857032,
+      "tbt_ms": 114.84608513743254,
+      "throughput_tps": 224.3029890268539,
+      "peak_mem_mb": 0.0,
+      "error_rate": 0.0
+    },
+    "constraints": {
+      "scenario_source": "vllm-benchmark",
+      "accountable_scope": {
+        "domestic_chip_class": "Ascend-class",
+        "representative_model_band": "7B-13B",
+        "representative_business_scenario": "online-chat",
+        "baseline_engine": "vllm",
+        "owner_confirmed": null,
+        "notes": null
+      },
+      "metrics": {
+        "single_chip_effective_utilization_pct": null,
+        "typical_throughput_ratio_vs_baseline": null,
+        "typical_ttft_reduction_pct_vs_baseline": null,
+        "typical_tpot_reduction_pct_vs_baseline": null,
+        "long_context_length": null,
+        "long_context_throughput_stable": null,
+        "long_context_ttft_p95_ms": null,
+        "long_context_ttft_p99_ms": null,
+        "long_context_tpot_p95_ms": null,
+        "long_context_tpot_p99_ms": null,
+        "long_context_ttft_p95_stable": null,
+        "long_context_ttft_p99_stable": null,
+        "long_context_tpot_p95_stable": null,
+        "long_context_tpot_p99_stable": null,
+        "unit_token_cost_reduction_pct": null,
+        "multi_tenant_high_utilization": null
+      }
+    },
+    "cluster": null,
+    "versions": {
+      "protocol": "N/A",
+      "backend": "N/A",
+      "core": "N/A",
+      "benchmark": "0.1.0"
+    },
+    "environment": {
+      "os": "Linux-5.10.0-60.18.0.50.oe2203.aarch64-aarch64-with-glibc2.38",
+      "python_version": "3.11.15",
+      "pytorch_version": null,
+      "cuda_version": null,
+      "cann_version": null,
+      "driver_version": null
+    },
+    "metadata": {
+      "submitted_at": "2026-05-12T09:12:53Z",
+      "submitter": "moonandlife",
+      "data_source": "vllm-ascend-hust-ci-same-spec",
+      "engine": "vllm-hust",
+      "engine_version": "dev\npath string is NULLpath string is NULL",
+      "reproducible_cmd": null,
+      "git_commit": "d4a408c4710783113780c21c41e6d76279f37245",
+      "github_user": "moonandlife",
+      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/d4a408c4710783113780c21c41e6d76279f37245",
+      "github_repository": "vLLM-HUST/vllm-hust",
+      "github_ref": "main",
+      "github_event_name": "pull_request",
+      "github_pr_number": 27,
+      "github_pr_url": "https://github.com/vLLM-HUST/vllm-ascend-hust/pull/27",
+      "release_date": null,
+      "changelog_url": null,
+      "notes": null,
+      "verified": null,
+      "idempotency_key": "796aa6922f6e7ac4badb9e3ac13e260b33cedf15c723016022639e4671455960",
+      "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
+      "runtime_provenance": {
+        "python": "/home/grunner/miniconda3/envs/vllm-hust-dev/bin/python",
+        "engine": {
+          "repository": "vLLM-HUST/vllm-hust",
+          "ref": "main",
+          "commit": "d4a408c4710783113780c21c41e6d76279f37245"
+        },
+        "plugin": {
+          "engine": "vllm-ascend-hust",
+          "repository": "vLLM-HUST/vllm-ascend-hust",
+          "ref": "27/merge",
+          "commit": "1162a69004b3bd9fc23796a2340fa342434042d0"
+        }
+      }
+    },
+    "same_spec": {
+      "schema_version": "benchmark-same-spec/v1",
+      "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
+      "spec_label": "Official Ascend Jan 2026 baseline for vllm-hust goal tracking",
+      "spec_source": "/home/grunner/actions-runner/_work/vllm-ascend-hust/vllm-ascend-hust/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0110-random-online-qwen25-14b-910b3.json",
+      "scenario": "random-online",
+      "model": "Qwen/Qwen2.5-14B-Instruct",
+      "model_parameters": "14B",
+      "model_precision": "FP16",
+      "hardware_vendor": "Huawei",
+      "hardware_chip_model": "910B3",
+      "chip_count": 1,
+      "node_count": 1,
+      "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "resolved_server_parameters": {
+        "tensor_parallel_size": 1,
+        "enforce_eager": "",
+        "trust_remote_code": "",
+        "disable_log_stats": "",
+        "disable_log_requests": "",
+        "host": "0.0.0.0",
+        "port": 55457,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "dtype": "float16"
+      },
+      "resolved_client_parameters": {
+        "backend": "vllm",
+        "endpoint": "/v1/completions",
+        "dataset_name": "random",
+        "num_prompts": 200,
+        "request_rate": 1,
+        "host": "127.0.0.1",
+        "port": 55457,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "random_input_len": 1024,
+        "random_output_len": 256
+      }
+    }
+  },
+  {
+    "entry_id": "e133eeb0-e254-4390-9fac-0a8159468d63",
+    "engine": "vllm-hust",
+    "engine_version": "dev\npath string is NULLpath string is NULL",
+    "config_type": "single_gpu",
+    "hardware": {
+      "vendor": "Huawei",
+      "chip_model": "910B3",
+      "chip_count": 1,
+      "interconnect": "unknown"
+    },
+    "model": {
+      "name": "Qwen/Qwen2.5-14B-Instruct",
+      "parameters": "14B",
+      "precision": "FP16",
+      "quantization": null
+    },
+    "workload": {
+      "name": "random-online",
+      "input_length": 1024,
+      "output_length": 256,
+      "batch_size": null,
+      "concurrent_requests": null,
+      "dataset": "random"
+    },
+    "metrics": {
+      "ttft_ms": 382.39468921296066,
+      "tbt_ms": 114.9801671686919,
+      "throughput_tps": 225.8131742912024,
+      "peak_mem_mb": 0.0,
+      "error_rate": 0.0
+    },
+    "constraints": {
+      "scenario_source": "vllm-benchmark",
+      "accountable_scope": {
+        "domestic_chip_class": "Ascend-class",
+        "representative_model_band": "7B-13B",
+        "representative_business_scenario": "online-chat",
+        "baseline_engine": "vllm",
+        "owner_confirmed": null,
+        "notes": null
+      },
+      "metrics": {
+        "single_chip_effective_utilization_pct": null,
+        "typical_throughput_ratio_vs_baseline": null,
+        "typical_ttft_reduction_pct_vs_baseline": null,
+        "typical_tpot_reduction_pct_vs_baseline": null,
+        "long_context_length": null,
+        "long_context_throughput_stable": null,
+        "long_context_ttft_p95_ms": null,
+        "long_context_ttft_p99_ms": null,
+        "long_context_tpot_p95_ms": null,
+        "long_context_tpot_p99_ms": null,
+        "long_context_ttft_p95_stable": null,
+        "long_context_ttft_p99_stable": null,
+        "long_context_tpot_p95_stable": null,
+        "long_context_tpot_p99_stable": null,
+        "unit_token_cost_reduction_pct": null,
+        "multi_tenant_high_utilization": null
+      }
+    },
+    "cluster": null,
+    "versions": {
+      "protocol": "N/A",
+      "backend": "N/A",
+      "core": "N/A",
+      "benchmark": "0.1.0"
+    },
+    "environment": {
+      "os": "Linux-5.10.0-60.18.0.50.oe2203.aarch64-aarch64-with-glibc2.38",
+      "python_version": "3.11.15",
+      "pytorch_version": null,
+      "cuda_version": null,
+      "cann_version": null,
+      "driver_version": null
+    },
+    "metadata": {
+      "submitted_at": "2026-05-12T10:31:50Z",
+      "submitter": "moonandlife",
+      "data_source": "vllm-ascend-hust-ci-same-spec",
+      "engine": "vllm-hust",
+      "engine_version": "dev\npath string is NULLpath string is NULL",
+      "reproducible_cmd": null,
+      "git_commit": "d4a408c4710783113780c21c41e6d76279f37245",
+      "github_user": "moonandlife",
+      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/d4a408c4710783113780c21c41e6d76279f37245",
+      "github_repository": "vLLM-HUST/vllm-hust",
+      "github_ref": "main",
+      "github_event_name": "pull_request",
+      "github_pr_number": 27,
+      "github_pr_url": "https://github.com/vLLM-HUST/vllm-ascend-hust/pull/27",
+      "release_date": null,
+      "changelog_url": null,
+      "notes": null,
+      "verified": null,
+      "idempotency_key": "44e4d1f3e4561adbafeece35d26b2331ff58b5bbf53014eb925af3be4a9bc95e",
+      "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
+      "runtime_provenance": {
+        "python": "/home/grunner/miniconda3/envs/vllm-hust-dev/bin/python",
+        "engine": {
+          "repository": "vLLM-HUST/vllm-hust",
+          "ref": "main",
+          "commit": "d4a408c4710783113780c21c41e6d76279f37245"
+        },
+        "plugin": {
+          "engine": "vllm-ascend-hust",
+          "repository": "vLLM-HUST/vllm-ascend-hust",
+          "ref": "27/merge",
+          "commit": "bc9634de0e1d4fdc889d08190b73709d3c8ec426"
+        }
+      }
+    },
+    "same_spec": {
+      "schema_version": "benchmark-same-spec/v1",
+      "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
+      "spec_label": "Official Ascend Jan 2026 baseline for vllm-hust goal tracking",
+      "spec_source": "/home/grunner/actions-runner/_work/vllm-ascend-hust/vllm-ascend-hust/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0110-random-online-qwen25-14b-910b3.json",
+      "scenario": "random-online",
+      "model": "Qwen/Qwen2.5-14B-Instruct",
+      "model_parameters": "14B",
+      "model_precision": "FP16",
+      "hardware_vendor": "Huawei",
+      "hardware_chip_model": "910B3",
+      "chip_count": 1,
+      "node_count": 1,
+      "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "resolved_server_parameters": {
+        "tensor_parallel_size": 1,
+        "enforce_eager": "",
+        "trust_remote_code": "",
+        "disable_log_stats": "",
+        "disable_log_requests": "",
+        "host": "0.0.0.0",
+        "port": 53515,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "dtype": "float16"
+      },
+      "resolved_client_parameters": {
+        "backend": "vllm",
+        "endpoint": "/v1/completions",
+        "dataset_name": "random",
+        "num_prompts": 200,
+        "request_rate": 1,
+        "host": "127.0.0.1",
+        "port": 53515,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "random_input_len": 1024,
+        "random_output_len": 256
+      }
+    }
+  },
+  {
+    "entry_id": "56a4e4fc-b828-479c-8167-ea2b7b65ac73",
+    "engine": "vllm-hust",
+    "engine_version": "dev\npath string is NULLpath string is NULL",
+    "config_type": "single_gpu",
+    "hardware": {
+      "vendor": "Huawei",
+      "chip_model": "910B3",
+      "chip_count": 1,
+      "interconnect": "unknown"
+    },
+    "model": {
+      "name": "Qwen/Qwen2.5-14B-Instruct",
+      "parameters": "14B",
+      "precision": "FP16",
+      "quantization": null
+    },
+    "workload": {
+      "name": "random-online",
+      "input_length": 1024,
+      "output_length": 256,
+      "batch_size": null,
+      "concurrent_requests": null,
+      "dataset": "random"
+    },
+    "metrics": {
+      "ttft_ms": 398.51455330339377,
+      "tbt_ms": 119.35524846261536,
+      "throughput_tps": 223.69679039810376,
+      "peak_mem_mb": 0.0,
+      "error_rate": 0.0
+    },
+    "constraints": {
+      "scenario_source": "vllm-benchmark",
+      "accountable_scope": {
+        "domestic_chip_class": "Ascend-class",
+        "representative_model_band": "7B-13B",
+        "representative_business_scenario": "online-chat",
+        "baseline_engine": "vllm",
+        "owner_confirmed": null,
+        "notes": null
+      },
+      "metrics": {
+        "single_chip_effective_utilization_pct": null,
+        "typical_throughput_ratio_vs_baseline": null,
+        "typical_ttft_reduction_pct_vs_baseline": null,
+        "typical_tpot_reduction_pct_vs_baseline": null,
+        "long_context_length": null,
+        "long_context_throughput_stable": null,
+        "long_context_ttft_p95_ms": null,
+        "long_context_ttft_p99_ms": null,
+        "long_context_tpot_p95_ms": null,
+        "long_context_tpot_p99_ms": null,
+        "long_context_ttft_p95_stable": null,
+        "long_context_ttft_p99_stable": null,
+        "long_context_tpot_p95_stable": null,
+        "long_context_tpot_p99_stable": null,
+        "unit_token_cost_reduction_pct": null,
+        "multi_tenant_high_utilization": null
+      }
+    },
+    "cluster": null,
+    "versions": {
+      "protocol": "N/A",
+      "backend": "N/A",
+      "core": "N/A",
+      "benchmark": "0.1.0"
+    },
+    "environment": {
+      "os": "Linux-5.10.0-60.18.0.50.oe2203.aarch64-aarch64-with-glibc2.38",
+      "python_version": "3.11.15",
+      "pytorch_version": null,
+      "cuda_version": null,
+      "cann_version": null,
+      "driver_version": null
+    },
+    "metadata": {
+      "submitted_at": "2026-05-12T10:44:08Z",
+      "submitter": "moonandlife",
+      "data_source": "vllm-ascend-hust-ci-same-spec",
+      "engine": "vllm-hust",
+      "engine_version": "dev\npath string is NULLpath string is NULL",
+      "reproducible_cmd": null,
+      "git_commit": "d4a408c4710783113780c21c41e6d76279f37245",
+      "github_user": "moonandlife",
+      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/d4a408c4710783113780c21c41e6d76279f37245",
+      "github_repository": "vLLM-HUST/vllm-hust",
+      "github_ref": "main",
+      "github_event_name": "pull_request",
+      "github_pr_number": 27,
+      "github_pr_url": "https://github.com/vLLM-HUST/vllm-ascend-hust/pull/27",
+      "release_date": null,
+      "changelog_url": null,
+      "notes": null,
+      "verified": null,
+      "idempotency_key": "1c933bd1e9a2d9d05d6c3404b744ff8f26fbb2656aa9ffac6b7bbaf506dfea16",
+      "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
+      "runtime_provenance": {
+        "python": "/home/grunner/miniconda3/envs/vllm-hust-dev/bin/python",
+        "engine": {
+          "repository": "vLLM-HUST/vllm-hust",
+          "ref": "main",
+          "commit": "d4a408c4710783113780c21c41e6d76279f37245"
+        },
+        "plugin": {
+          "engine": "vllm-ascend-hust",
+          "repository": "vLLM-HUST/vllm-ascend-hust",
+          "ref": "27/merge",
+          "commit": "526e0578878a0f6a8c7ec101e15b6b9aea79600b"
+        }
+      }
+    },
+    "same_spec": {
+      "schema_version": "benchmark-same-spec/v1",
+      "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
+      "spec_label": "Official Ascend Jan 2026 baseline for vllm-hust goal tracking",
+      "spec_source": "/home/grunner/actions-runner/_work/vllm-ascend-hust/vllm-ascend-hust/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0110-random-online-qwen25-14b-910b3.json",
+      "scenario": "random-online",
+      "model": "Qwen/Qwen2.5-14B-Instruct",
+      "model_parameters": "14B",
+      "model_precision": "FP16",
+      "hardware_vendor": "Huawei",
+      "hardware_chip_model": "910B3",
+      "chip_count": 1,
+      "node_count": 1,
+      "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "resolved_server_parameters": {
+        "tensor_parallel_size": 1,
+        "enforce_eager": "",
+        "trust_remote_code": "",
+        "disable_log_stats": "",
+        "disable_log_requests": "",
+        "host": "0.0.0.0",
+        "port": 34559,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "dtype": "float16"
+      },
+      "resolved_client_parameters": {
+        "backend": "vllm",
+        "endpoint": "/v1/completions",
+        "dataset_name": "random",
+        "num_prompts": 200,
+        "request_rate": 1,
+        "host": "127.0.0.1",
+        "port": 34559,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "random_input_len": 1024,
+        "random_output_len": 256
+      }
+    }
+  },
+  {
+    "entry_id": "8eda45c4-246b-43bb-bae4-b995383c9de2",
+    "engine": "vllm-hust",
+    "engine_version": "dev\npath string is NULLpath string is NULL",
+    "config_type": "single_gpu",
+    "hardware": {
+      "vendor": "Huawei",
+      "chip_model": "910B3",
+      "chip_count": 1,
+      "interconnect": "unknown"
+    },
+    "model": {
+      "name": "Qwen/Qwen2.5-14B-Instruct",
+      "parameters": "14B",
+      "precision": "FP16",
+      "quantization": null
+    },
+    "workload": {
+      "name": "random-online",
+      "input_length": 1024,
+      "output_length": 256,
+      "batch_size": null,
+      "concurrent_requests": null,
+      "dataset": "random"
+    },
+    "metrics": {
+      "ttft_ms": 389.2115450210986,
+      "tbt_ms": 120.79647763513084,
+      "throughput_tps": 223.27374552003766,
+      "peak_mem_mb": 0.0,
+      "error_rate": 0.0
+    },
+    "constraints": {
+      "scenario_source": "vllm-benchmark",
+      "accountable_scope": {
+        "domestic_chip_class": "Ascend-class",
+        "representative_model_band": "7B-13B",
+        "representative_business_scenario": "online-chat",
+        "baseline_engine": "vllm",
+        "owner_confirmed": null,
+        "notes": null
+      },
+      "metrics": {
+        "single_chip_effective_utilization_pct": null,
+        "typical_throughput_ratio_vs_baseline": null,
+        "typical_ttft_reduction_pct_vs_baseline": null,
+        "typical_tpot_reduction_pct_vs_baseline": null,
+        "long_context_length": null,
+        "long_context_throughput_stable": null,
+        "long_context_ttft_p95_ms": null,
+        "long_context_ttft_p99_ms": null,
+        "long_context_tpot_p95_ms": null,
+        "long_context_tpot_p99_ms": null,
+        "long_context_ttft_p95_stable": null,
+        "long_context_ttft_p99_stable": null,
+        "long_context_tpot_p95_stable": null,
+        "long_context_tpot_p99_stable": null,
+        "unit_token_cost_reduction_pct": null,
+        "multi_tenant_high_utilization": null
+      }
+    },
+    "cluster": null,
+    "versions": {
+      "protocol": "N/A",
+      "backend": "N/A",
+      "core": "N/A",
+      "benchmark": "0.1.0"
+    },
+    "environment": {
+      "os": "Linux-5.10.0-60.18.0.50.oe2203.aarch64-aarch64-with-glibc2.38",
+      "python_version": "3.11.15",
+      "pytorch_version": null,
+      "cuda_version": null,
+      "cann_version": null,
+      "driver_version": null
+    },
+    "metadata": {
+      "submitted_at": "2026-05-12T10:53:48Z",
+      "submitter": "moonandlife",
+      "data_source": "vllm-ascend-hust-ci-same-spec",
+      "engine": "vllm-hust",
+      "engine_version": "dev\npath string is NULLpath string is NULL",
+      "reproducible_cmd": null,
+      "git_commit": "d4a408c4710783113780c21c41e6d76279f37245",
+      "github_user": "moonandlife",
+      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/d4a408c4710783113780c21c41e6d76279f37245",
+      "github_repository": "vLLM-HUST/vllm-hust",
+      "github_ref": "main",
+      "github_event_name": "push",
+      "github_pr_number": null,
+      "github_pr_url": null,
+      "release_date": null,
+      "changelog_url": null,
+      "notes": null,
+      "verified": null,
+      "idempotency_key": "561d82d98ca056c021436fc361b9d3a298152b09c75e1eefb8a72e1f42e16b68",
+      "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
+      "runtime_provenance": {
+        "python": "/home/grunner/miniconda3/envs/vllm-hust-dev/bin/python",
+        "engine": {
+          "repository": "vLLM-HUST/vllm-hust",
+          "ref": "main",
+          "commit": "d4a408c4710783113780c21c41e6d76279f37245"
+        },
+        "plugin": {
+          "engine": "vllm-ascend-hust",
+          "repository": "vLLM-HUST/vllm-ascend-hust",
+          "ref": "main",
+          "commit": "b77286051e20ee0fa89367e1708b8f3a5ee0de58"
+        }
+      }
+    },
+    "same_spec": {
+      "schema_version": "benchmark-same-spec/v1",
+      "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
+      "spec_label": "Official Ascend Jan 2026 baseline for vllm-hust goal tracking",
+      "spec_source": "/home/grunner/actions-runner/_work/vllm-ascend-hust/vllm-ascend-hust/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0110-random-online-qwen25-14b-910b3.json",
+      "scenario": "random-online",
+      "model": "Qwen/Qwen2.5-14B-Instruct",
+      "model_parameters": "14B",
+      "model_precision": "FP16",
+      "hardware_vendor": "Huawei",
+      "hardware_chip_model": "910B3",
+      "chip_count": 1,
+      "node_count": 1,
+      "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "resolved_server_parameters": {
+        "tensor_parallel_size": 1,
+        "enforce_eager": "",
+        "trust_remote_code": "",
+        "disable_log_stats": "",
+        "disable_log_requests": "",
+        "host": "0.0.0.0",
+        "port": 48077,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "dtype": "float16"
+      },
+      "resolved_client_parameters": {
+        "backend": "vllm",
+        "endpoint": "/v1/completions",
+        "dataset_name": "random",
+        "num_prompts": 200,
+        "request_rate": 1,
+        "host": "127.0.0.1",
+        "port": 48077,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "random_input_len": 1024,
+        "random_output_len": 256
+      }
+    }
+  },
+  {
+    "entry_id": "0de997b3-975f-49d0-8f9d-ea17e374183a",
+    "engine": "vllm-hust",
+    "engine_version": "dev\npath string is NULLpath string is NULL",
+    "config_type": "single_gpu",
+    "hardware": {
+      "vendor": "Huawei",
+      "chip_model": "910B3",
+      "chip_count": 1,
+      "interconnect": "unknown"
+    },
+    "model": {
+      "name": "Qwen/Qwen2.5-14B-Instruct",
+      "parameters": "14B",
+      "precision": "FP16",
+      "quantization": null
+    },
+    "workload": {
+      "name": "random-online",
+      "input_length": 1024,
+      "output_length": 256,
+      "batch_size": null,
+      "concurrent_requests": null,
+      "dataset": "random"
+    },
+    "metrics": {
+      "ttft_ms": 381.7109958839137,
+      "tbt_ms": 115.67997999907948,
+      "throughput_tps": 224.82562122249675,
+      "peak_mem_mb": 0.0,
+      "error_rate": 0.0
+    },
+    "constraints": {
+      "scenario_source": "vllm-benchmark",
+      "accountable_scope": {
+        "domestic_chip_class": "Ascend-class",
+        "representative_model_band": "7B-13B",
+        "representative_business_scenario": "online-chat",
+        "baseline_engine": "vllm",
+        "owner_confirmed": null,
+        "notes": null
+      },
+      "metrics": {
+        "single_chip_effective_utilization_pct": null,
+        "typical_throughput_ratio_vs_baseline": null,
+        "typical_ttft_reduction_pct_vs_baseline": null,
+        "typical_tpot_reduction_pct_vs_baseline": null,
+        "long_context_length": null,
+        "long_context_throughput_stable": null,
+        "long_context_ttft_p95_ms": null,
+        "long_context_ttft_p99_ms": null,
+        "long_context_tpot_p95_ms": null,
+        "long_context_tpot_p99_ms": null,
+        "long_context_ttft_p95_stable": null,
+        "long_context_ttft_p99_stable": null,
+        "long_context_tpot_p95_stable": null,
+        "long_context_tpot_p99_stable": null,
+        "unit_token_cost_reduction_pct": null,
+        "multi_tenant_high_utilization": null
+      }
+    },
+    "cluster": null,
+    "versions": {
+      "protocol": "N/A",
+      "backend": "N/A",
+      "core": "N/A",
+      "benchmark": "0.1.0"
+    },
+    "environment": {
+      "os": "Linux-5.10.0-60.18.0.50.oe2203.aarch64-aarch64-with-glibc2.38",
+      "python_version": "3.11.15",
+      "pytorch_version": null,
+      "cuda_version": null,
+      "cann_version": null,
+      "driver_version": null
+    },
+    "metadata": {
+      "submitted_at": "2026-05-12T13:34:13Z",
+      "submitter": "moonandlife",
+      "data_source": "vllm-ascend-hust-ci-same-spec",
+      "engine": "vllm-hust",
+      "engine_version": "dev\npath string is NULLpath string is NULL",
+      "reproducible_cmd": null,
+      "git_commit": "d4a408c4710783113780c21c41e6d76279f37245",
+      "github_user": "moonandlife",
+      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/d4a408c4710783113780c21c41e6d76279f37245",
+      "github_repository": "vLLM-HUST/vllm-hust",
+      "github_ref": "main",
+      "github_event_name": "pull_request",
+      "github_pr_number": 29,
+      "github_pr_url": "https://github.com/vLLM-HUST/vllm-ascend-hust/pull/29",
+      "release_date": null,
+      "changelog_url": null,
+      "notes": null,
+      "verified": null,
+      "idempotency_key": "13d713e3d7f3ec9ead15aeda60c721f2352fb8c7690f43e7d617eedf7ed96b98",
+      "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
+      "runtime_provenance": {
+        "python": "/home/grunner/miniconda3/envs/vllm-hust-dev/bin/python",
+        "engine": {
+          "repository": "vLLM-HUST/vllm-hust",
+          "ref": "main",
+          "commit": "d4a408c4710783113780c21c41e6d76279f37245"
+        },
+        "plugin": {
+          "engine": "vllm-ascend-hust",
+          "repository": "vLLM-HUST/vllm-ascend-hust",
+          "ref": "29/merge",
+          "commit": "51a516f5d318fb2df772d63ea94c68e570f0ca13"
+        }
+      }
+    },
+    "same_spec": {
+      "schema_version": "benchmark-same-spec/v1",
+      "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
+      "spec_label": "Official Ascend Jan 2026 baseline for vllm-hust goal tracking",
+      "spec_source": "/home/grunner/actions-runner/_work/vllm-ascend-hust/vllm-ascend-hust/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0110-random-online-qwen25-14b-910b3.json",
+      "scenario": "random-online",
+      "model": "Qwen/Qwen2.5-14B-Instruct",
+      "model_parameters": "14B",
+      "model_precision": "FP16",
+      "hardware_vendor": "Huawei",
+      "hardware_chip_model": "910B3",
+      "chip_count": 1,
+      "node_count": 1,
+      "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "resolved_server_parameters": {
+        "tensor_parallel_size": 1,
+        "enforce_eager": "",
+        "trust_remote_code": "",
+        "disable_log_stats": "",
+        "disable_log_requests": "",
+        "host": "0.0.0.0",
+        "port": 35603,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "dtype": "float16"
+      },
+      "resolved_client_parameters": {
+        "backend": "vllm",
+        "endpoint": "/v1/completions",
+        "dataset_name": "random",
+        "num_prompts": 200,
+        "request_rate": 1,
+        "host": "127.0.0.1",
+        "port": 35603,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "random_input_len": 1024,
+        "random_output_len": 256
+      }
+    }
+  },
+  {
+    "entry_id": "e1887cc2-91e0-4f1d-a23d-245448ab0b9f",
+    "engine": "vllm-hust",
+    "engine_version": "dev\npath string is NULLpath string is NULL",
+    "config_type": "single_gpu",
+    "hardware": {
+      "vendor": "Huawei",
+      "chip_model": "910B3",
+      "chip_count": 1,
+      "interconnect": "unknown"
+    },
+    "model": {
+      "name": "Qwen/Qwen2.5-14B-Instruct",
+      "parameters": "14B",
+      "precision": "FP16",
+      "quantization": null
+    },
+    "workload": {
+      "name": "random-online",
+      "input_length": 1024,
+      "output_length": 256,
+      "batch_size": null,
+      "concurrent_requests": null,
+      "dataset": "random"
+    },
+    "metrics": {
+      "ttft_ms": 388.60799872665666,
+      "tbt_ms": 117.63307269930489,
+      "throughput_tps": 224.84387764335926,
+      "peak_mem_mb": 0.0,
+      "error_rate": 0.0
+    },
+    "constraints": {
+      "scenario_source": "vllm-benchmark",
+      "accountable_scope": {
+        "domestic_chip_class": "Ascend-class",
+        "representative_model_band": "7B-13B",
+        "representative_business_scenario": "online-chat",
+        "baseline_engine": "vllm",
+        "owner_confirmed": null,
+        "notes": null
+      },
+      "metrics": {
+        "single_chip_effective_utilization_pct": null,
+        "typical_throughput_ratio_vs_baseline": null,
+        "typical_ttft_reduction_pct_vs_baseline": null,
+        "typical_tpot_reduction_pct_vs_baseline": null,
+        "long_context_length": null,
+        "long_context_throughput_stable": null,
+        "long_context_ttft_p95_ms": null,
+        "long_context_ttft_p99_ms": null,
+        "long_context_tpot_p95_ms": null,
+        "long_context_tpot_p99_ms": null,
+        "long_context_ttft_p95_stable": null,
+        "long_context_ttft_p99_stable": null,
+        "long_context_tpot_p95_stable": null,
+        "long_context_tpot_p99_stable": null,
+        "unit_token_cost_reduction_pct": null,
+        "multi_tenant_high_utilization": null
+      }
+    },
+    "cluster": null,
+    "versions": {
+      "protocol": "N/A",
+      "backend": "N/A",
+      "core": "N/A",
+      "benchmark": "0.1.0"
+    },
+    "environment": {
+      "os": "Linux-5.10.0-60.18.0.50.oe2203.aarch64-aarch64-with-glibc2.38",
+      "python_version": "3.11.15",
+      "pytorch_version": null,
+      "cuda_version": null,
+      "cann_version": null,
+      "driver_version": null
+    },
+    "metadata": {
+      "submitted_at": "2026-05-13T02:32:21Z",
+      "submitter": "moonandlife",
+      "data_source": "vllm-ascend-hust-ci-same-spec",
+      "engine": "vllm-hust",
+      "engine_version": "dev\npath string is NULLpath string is NULL",
+      "reproducible_cmd": null,
+      "git_commit": "d4a408c4710783113780c21c41e6d76279f37245",
+      "github_user": "moonandlife",
+      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/d4a408c4710783113780c21c41e6d76279f37245",
+      "github_repository": "vLLM-HUST/vllm-hust",
+      "github_ref": "main",
+      "github_event_name": "push",
+      "github_pr_number": null,
+      "github_pr_url": null,
+      "release_date": null,
+      "changelog_url": null,
+      "notes": null,
+      "verified": null,
+      "idempotency_key": "38253ddb774b0adf3d40a3beea122cab3ca28d805df2cb759d105ce45cefd29a",
+      "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
+      "runtime_provenance": {
+        "python": "/home/grunner/miniconda3/envs/vllm-hust-dev/bin/python",
+        "engine": {
+          "repository": "vLLM-HUST/vllm-hust",
+          "ref": "main",
+          "commit": "d4a408c4710783113780c21c41e6d76279f37245"
+        },
+        "plugin": {
+          "engine": "vllm-ascend-hust",
+          "repository": "vLLM-HUST/vllm-ascend-hust",
+          "ref": "main",
+          "commit": "ea6fbe4dc9c848a0045e463460fd0ff3119540cb"
+        }
+      }
+    },
+    "same_spec": {
+      "schema_version": "benchmark-same-spec/v1",
+      "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
+      "spec_label": "Official Ascend Jan 2026 baseline for vllm-hust goal tracking",
+      "spec_source": "/home/grunner/actions-runner/_work/vllm-ascend-hust/vllm-ascend-hust/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0110-random-online-qwen25-14b-910b3.json",
+      "scenario": "random-online",
+      "model": "Qwen/Qwen2.5-14B-Instruct",
+      "model_parameters": "14B",
+      "model_precision": "FP16",
+      "hardware_vendor": "Huawei",
+      "hardware_chip_model": "910B3",
+      "chip_count": 1,
+      "node_count": 1,
+      "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "resolved_server_parameters": {
+        "tensor_parallel_size": 1,
+        "enforce_eager": "",
+        "trust_remote_code": "",
+        "disable_log_stats": "",
+        "disable_log_requests": "",
+        "host": "0.0.0.0",
+        "port": 35409,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
+        "dtype": "float16"
+      },
+      "resolved_client_parameters": {
+        "backend": "vllm",
+        "endpoint": "/v1/completions",
+        "dataset_name": "random",
+        "num_prompts": 200,
+        "request_rate": 1,
+        "host": "127.0.0.1",
+        "port": 35409,
+        "model": "Qwen/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       }
@@ -339,7 +1396,7 @@
         "domestic_chip_class": "Ascend-class",
         "representative_model_band": "7B-13B",
         "representative_business_scenario": "long-context-chat",
-        "baseline_engine": "vllm",
+        "baseline_engine": "",
         "owner_confirmed": null,
         "notes": null
       },
@@ -385,10 +1442,10 @@
       "engine_version": "0.20.1rc1.dev314+g64ff561c7.d20260505",
       "reproducible_cmd": null,
       "git_commit": "7fa0e3ed4b8166e14f42c97951e33ca9f06e2d2b",
-      "github_user": "ShuhaoZhangTony",
-      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/7fa0e3ed4b8166e14f42c97951e33ca9f06e2d2b",
-      "github_repository": "vLLM-HUST/vllm-hust",
-      "github_ref": "main",
+      "github_user": null,
+      "github_commit_url": null,
+      "github_repository": null,
+      "github_ref": null,
       "github_event_name": null,
       "github_pr_number": null,
       "github_pr_url": null,
@@ -438,7 +1495,7 @@
         "domestic_chip_class": "Ascend-class",
         "representative_model_band": "7B-13B",
         "representative_business_scenario": "latency-slo",
-        "baseline_engine": "vllm",
+        "baseline_engine": "",
         "owner_confirmed": null,
         "notes": null
       },
@@ -484,10 +1541,10 @@
       "engine_version": "0.20.1rc1.dev314+g64ff561c7.d20260505",
       "reproducible_cmd": null,
       "git_commit": "7fa0e3ed4b8166e14f42c97951e33ca9f06e2d2b",
-      "github_user": "ShuhaoZhangTony",
-      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/7fa0e3ed4b8166e14f42c97951e33ca9f06e2d2b",
-      "github_repository": "vLLM-HUST/vllm-hust",
-      "github_ref": "main",
+      "github_user": null,
+      "github_commit_url": null,
+      "github_repository": null,
+      "github_ref": null,
       "github_event_name": null,
       "github_pr_number": null,
       "github_pr_url": null,
@@ -537,7 +1594,7 @@
         "domestic_chip_class": "Ascend-class",
         "representative_model_band": "7B-13B",
         "representative_business_scenario": "online-chat",
-        "baseline_engine": "vllm",
+        "baseline_engine": "",
         "owner_confirmed": null,
         "notes": null
       },
@@ -583,10 +1640,10 @@
       "engine_version": "0.20.1rc1.dev314+g64ff561c7.d20260505",
       "reproducible_cmd": null,
       "git_commit": "7fa0e3ed4b8166e14f42c97951e33ca9f06e2d2b",
-      "github_user": "ShuhaoZhangTony",
-      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/7fa0e3ed4b8166e14f42c97951e33ca9f06e2d2b",
-      "github_repository": "vLLM-HUST/vllm-hust",
-      "github_ref": "main",
+      "github_user": null,
+      "github_commit_url": null,
+      "github_repository": null,
+      "github_ref": null,
       "github_event_name": null,
       "github_pr_number": null,
       "github_pr_url": null,
@@ -636,7 +1693,7 @@
         "domestic_chip_class": "Ascend-class",
         "representative_model_band": "7B-13B",
         "representative_business_scenario": "offline-batch-serving",
-        "baseline_engine": "vllm",
+        "baseline_engine": "",
         "owner_confirmed": null,
         "notes": null
       },
@@ -682,10 +1739,10 @@
       "engine_version": "0.20.1rc1.dev314+g64ff561c7.d20260505",
       "reproducible_cmd": null,
       "git_commit": "7fa0e3ed4b8166e14f42c97951e33ca9f06e2d2b",
-      "github_user": "ShuhaoZhangTony",
-      "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/7fa0e3ed4b8166e14f42c97951e33ca9f06e2d2b",
-      "github_repository": "vLLM-HUST/vllm-hust",
-      "github_ref": "main",
+      "github_user": null,
+      "github_commit_url": null,
+      "github_repository": null,
+      "github_ref": null,
       "github_event_name": null,
       "github_pr_number": null,
       "github_pr_url": null,
@@ -734,7 +1791,7 @@
         "domestic_chip_class": "Ascend-class",
         "representative_model_band": "7B-13B",
         "representative_business_scenario": "online-chat",
-        "baseline_engine": "vllm",
+        "baseline_engine": "",
         "owner_confirmed": null,
         "notes": null
       },
@@ -830,7 +1887,7 @@
         "domestic_chip_class": "Ascend-class",
         "representative_model_band": "7B-13B",
         "representative_business_scenario": "online-chat",
-        "baseline_engine": "vllm",
+        "baseline_engine": "",
         "owner_confirmed": null,
         "notes": null
       },

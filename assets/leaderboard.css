@@ -375,6 +375,36 @@
     margin-bottom: 18px;
 }
 
+.overview-section {
+    display: grid;
+    gap: 10px;
+}
+
+.overview-section-label {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.overview-section-label-inline {
+    margin-right: 10px;
+}
+
+.overview-section-note {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
 .overview-hero {
     position: relative;
     overflow: hidden;
@@ -435,6 +465,18 @@
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 16px;
+}
+
+.overview-note {
+    margin-top: 12px;
+    max-width: 840px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.88rem;
+    line-height: 1.45;
 }
 
 .overview-badge {
@@ -629,6 +671,10 @@
     margin: 0 0 18px;
     color: #64748b;
     font-size: 0.9rem;
+}
+
+.leaderboard-hint-copy {
+    line-height: 1.45;
 }
 
 .compare-controls {

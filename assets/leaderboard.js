@@ -190,6 +190,14 @@
             goalGapRemaining: 'Remaining gap',
             goalCompareTitle: 'vllm-hust vs Official Ascend Jan 2026 baseline',
             goalCompareScope: 'Pinned goal scope',
+            overviewHeroGoalLabel: 'Official Compare',
+            overviewHeroCompareLabel: 'Snapshot Compare',
+            overviewGridLabel: 'Visible Aggregate',
+            overviewGridNote: 'Cards summarize the currently visible table rows by engine.',
+            overviewTableLabel: 'Visible Rows',
+            overviewTableNote: 'The main table shows the currently visible benchmark rows after filters, scope toggles, and version merging.',
+            overviewGoalSnapshotNote: 'Hero deltas use the matched official compare snapshot. Cards below summarize the currently visible table rows.',
+            overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below summarize the currently visible table rows.',
         },
         zh: {
             statsHidden: '已隐藏',
@@ -338,6 +346,14 @@
             goalGapRemaining: '距离目标',
             goalCompareTitle: 'vllm-hust 对比官方 Ascend 2026 年 1 月基线',
             goalCompareScope: '目标比较范围',
+            overviewHeroGoalLabel: '官方对比',
+            overviewHeroCompareLabel: '快照对比',
+            overviewGridLabel: '当前可见聚合',
+            overviewGridNote: '下方卡片按引擎汇总当前主表可见行。',
+            overviewTableLabel: '当前可见明细',
+            overviewTableNote: '主表展示的是当前筛选、scope 开关和版本合并之后的 benchmark 可见行。',
+            overviewGoalSnapshotNote: '顶部 Hero 的差距值来自当前命中的官方 compare snapshot；下方卡片汇总的是当前主表可见行。',
+            overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片汇总的是当前主表可见行。',
         },
     };
 
@@ -580,6 +596,107 @@
             return parts.join(' • ');
         }
         return entry?.setting_summary || 'default settings';
+    }
+
+    function normalizeScopeModelName(value) {
+        const raw = String(value || '').trim();
+        if (!raw) {
+            return 'unknown-model';
+        }
+        if (!raw.includes('/')) {
+            return raw;
+        }
+        return raw.split('/').pop() || raw;
+    }
+
+    function buildComparableScopeFromEntry(entry) {
+        return {
+            model: entry?.model?.name || 'unknown-model',
+            modelNormalized: normalizeScopeModelName(entry?.model?.name),
+            hardware: entry?.hardware?.chip_model || 'unknown-hardware',
+            precision: entry?.model?.precision || 'unknown-precision',
+            workload: getWorkloadId(entry) || 'Other',
+            configType: entry?.config_type || state.currentTab || 'unknown-config',
+            chipCount: Number(entry?.hardware?.chip_count || 0),
+            nodeCount: Number(entry?.cluster?.node_count || 1),
+            settingSignature: getSettingSignature(entry),
+        };
+    }
+
+    function extractSnapshotSettingSignature(snapshotPayload) {
+        const explicitScopeSignature = typeof snapshotPayload?.scope?.setting_signature === 'string'
+            ? snapshotPayload.scope.setting_signature.trim()
+            : '';
+        if (explicitScopeSignature) {
+            return explicitScopeSignature;
+        }
+
+        const candidatePaths = [
+            snapshotPayload?.current,
+            snapshotPayload?.baseline,
+            snapshotPayload?.preferred_pair?.left,
+            snapshotPayload?.preferred_pair?.right,
+        ];
+
+        for (const candidate of candidatePaths) {
+            const sameSpecHash = String(candidate?.same_spec?.resolved_spec_hash || '').trim();
+            if (sameSpecHash) {
+                return sameSpecHash;
+            }
+        }
+
+        return '';
+    }
+
+    function buildComparableScopeFromSnapshot(snapshotPayload) {
+        const scope = snapshotPayload?.scope || {};
+        return {
+            model: scope?.model || 'unknown-model',
+            modelNormalized: normalizeScopeModelName(scope?.model),
+            hardware: scope?.hardware || 'unknown-hardware',
+            precision: scope?.precision || 'unknown-precision',
+            workload: scope?.workload || 'Other',
+            configType: scope?.config_type || 'unknown-config',
+            chipCount: Number(scope?.chip_count || 0),
+            nodeCount: Number(scope?.node_count || 1),
+            settingSignature: extractSnapshotSettingSignature(snapshotPayload),
+        };
+    }
+
+    function scopeDescriptorsMatch(left, right) {
+        if (!left || !right) {
+            return false;
+        }
+
+        const modelMatches = left.model === right.model
+            || left.modelNormalized === right.modelNormalized;
+        if (!modelMatches) {
+            return false;
+        }
+
+        if (left.hardware !== right.hardware
+            || left.precision !== right.precision
+            || left.workload !== right.workload
+            || left.configType !== right.configType
+            || left.chipCount !== right.chipCount
+            || left.nodeCount !== right.nodeCount) {
+            return false;
+        }
+
+        if (left.settingSignature && right.settingSignature) {
+            return left.settingSignature === right.settingSignature;
+        }
+
+        return true;
+    }
+
+    function snapshotScopeMatchesEntries(snapshotPayload, entries) {
+        if (!snapshotPayload || !Array.isArray(entries) || !entries.length) {
+            return false;
+        }
+
+        const snapshotDescriptor = buildComparableScopeFromSnapshot(snapshotPayload);
+        return entries.some((entry) => scopeDescriptorsMatch(snapshotDescriptor, buildComparableScopeFromEntry(entry)));
     }
 
     function formatGithubUserText(value) {
@@ -993,6 +1110,7 @@
 
         renderHardConstraints(visibleEntries, comparisonView);
         renderCoverage(comparisonView);
+        renderTableSectionHint();
 
         // Show empty state if no data
         if (mergedEntries.length === 0) {
@@ -1072,8 +1190,10 @@
         const subtitle = goalPair
             ? getGoalProgressSubtitle(goalPair)
             : getOverviewSubtitle(entries, summaries.length, comparisonView, viewOptions);
-        const badges = getOverviewBadges(entries, summaries.length, leaders, comparisonView);
         const compareSnapshotGroup = findCompareSnapshotGroup(entries, comparisonView);
+        const badges = getOverviewBadges(entries, summaries.length, leaders, comparisonView);
+        const dataSourceNote = getOverviewDataSourceNote(goalPair, compareSnapshotGroup);
+        const heroSectionLabel = getOverviewHeroSectionLabel(goalPair, compareSnapshotGroup);
         const headToHeadHtml = goalPair
             ? renderGoalProgressPair(goalPair)
             : compareSnapshotGroup
@@ -1082,19 +1202,28 @@
         const kicker = goalPair ? t('goalProgressKicker') : t('quickCompare');
 
         el.innerHTML = `
-            <div class="overview-hero">
-                <div class="overview-kicker">${kicker}</div>
-                <div class="overview-title">${title}</div>
-                <div class="overview-subtitle">${subtitle}</div>
-                <div class="overview-badges">
-                    ${badges.map((badge) => `<div class="overview-badge">${badge}</div>`).join('')}
+            <div class="overview-section">
+                <div class="overview-section-label">${heroSectionLabel}</div>
+                <div class="overview-hero">
+                    <div class="overview-kicker">${kicker}</div>
+                    <div class="overview-title">${title}</div>
+                    <div class="overview-subtitle">${subtitle}</div>
+                    <div class="overview-badges">
+                        ${badges.map((badge) => `<div class="overview-badge">${badge}</div>`).join('')}
+                    </div>
+                    ${dataSourceNote ? `<div class="overview-note">${dataSourceNote}</div>` : ''}
+                    ${headToHeadHtml}
                 </div>
-                ${headToHeadHtml}
             </div>
-            <div class="overview-grid">
-                ${summaries.map((summary) => renderEngineSummaryCard(summary, leaders)).join('')}
+            <div class="overview-section">
+                <div class="overview-section-label">${t('overviewGridLabel')}</div>
+                <div class="overview-section-note">${t('overviewGridNote')}</div>
+                <div class="overview-grid">
+                    ${summaries.map((summary) => renderEngineSummaryCard(summary, leaders)).join('')}
+                </div>
             </div>
         `;
+
     }
 
     function buildHardConstraintScopeKey(entry) {
@@ -1769,7 +1898,7 @@
     }
 
     function createCompareScopeKey(entry) {
-        const model = entry?.model?.name || 'unknown-model';
+        const model = normalizeScopeModelName(entry?.model?.name);
         const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
         const precision = entry?.model?.precision || 'unknown-precision';
         const workload = getWorkloadId(entry) || 'Other';
@@ -1973,6 +2102,38 @@
         return badges.slice(0, 4);
     }
 
+    function getOverviewDataSourceNote(goalPair, compareSnapshotGroup) {
+        if (goalPair) {
+            return t('overviewGoalSnapshotNote');
+        }
+        if (compareSnapshotGroup) {
+            return t('overviewCompareSnapshotNote');
+        }
+        return '';
+    }
+
+    function getOverviewHeroSectionLabel(goalPair, compareSnapshotGroup) {
+        if (goalPair) {
+            return t('overviewHeroGoalLabel');
+        }
+        if (compareSnapshotGroup) {
+            return t('overviewHeroCompareLabel');
+        }
+        return t('quickCompare');
+    }
+
+    function renderTableSectionHint() {
+        const hintEl = document.getElementById('leaderboard-hint');
+        if (!hintEl) {
+            return;
+        }
+
+        hintEl.innerHTML = `
+            <span class="overview-section-label overview-section-label-inline">${t('overviewTableLabel')}</span>
+            <span class="leaderboard-hint-copy">${t('overviewTableNote')}</span>
+        `;
+    }
+
     function renderCoverage(comparisonView) {
         const el = document.getElementById('leaderboard-coverage');
         if (!el) {
@@ -2034,16 +2195,20 @@
             return null;
         }
 
-        const focusedScopeKey = comparisonView?.focusGroup?.key;
-        if (focusedScopeKey) {
-            return pairs.find((pair) => pair?.scope_key === focusedScopeKey) || null;
+        const focusedEntries = Array.isArray(comparisonView?.focusGroup?.entries)
+            ? comparisonView.focusGroup.entries
+            : [];
+        if (focusedEntries.length) {
+            const focusedPair = pairs.find((pair) => snapshotScopeMatchesEntries(pair, focusedEntries));
+            if (focusedPair) {
+                return focusedPair;
+            }
         }
 
         const visibleEntries = comparisonView?.visibleEntries?.length
             ? comparisonView.visibleEntries
             : entries;
-        const scopeKeys = new Set(visibleEntries.map((entry) => createCompareScopeKey(entry)));
-        const matchingPairs = pairs.filter((pair) => scopeKeys.has(pair?.scope_key));
+        const matchingPairs = pairs.filter((pair) => snapshotScopeMatchesEntries(pair, visibleEntries));
         if (matchingPairs.length) {
             return matchingPairs[0];
         }
@@ -2114,18 +2279,25 @@
             return null;
         }
 
-        let scopeKey = comparisonView?.focusGroup?.key || null;
-        if (!scopeKey) {
-            const scopedGroups = buildCompareGroups(entries);
-            if (scopedGroups.length === 1) {
-                scopeKey = scopedGroups[0].key;
+        const focusedEntries = Array.isArray(comparisonView?.focusGroup?.entries)
+            ? comparisonView.focusGroup.entries
+            : [];
+        if (focusedEntries.length) {
+            const focusedGroup = groups.find((group) => snapshotScopeMatchesEntries(group, focusedEntries));
+            if (focusedGroup) {
+                return focusedGroup;
             }
         }
-        if (!scopeKey) {
-            return null;
+
+        const scopedEntries = Array.isArray(entries) ? entries : [];
+        if (scopedEntries.length) {
+            const matchedGroup = groups.find((group) => snapshotScopeMatchesEntries(group, scopedEntries));
+            if (matchedGroup) {
+                return matchedGroup;
+            }
         }
 
-        return groups.find((group) => group && group.scope_key === scopeKey) || null;
+        return null;
     }
 
     function renderHeadToHeadFromSnapshot(group) {
