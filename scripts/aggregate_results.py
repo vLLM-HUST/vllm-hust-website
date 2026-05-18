@@ -30,6 +30,14 @@ RENDER_CATEGORIES = (
 )
 
 HARD_CONSTRAINTS_SCHEMA_VERSION = "leaderboard-hard-constraints/v1"
+BASELINE_STATUS_OFFICIAL_COVERED = "official-covered"
+BASELINE_STATUS_PENDING = "pending-baseline"
+BASELINE_STATUS_NONE = "no-baseline-declared"
+VALID_BASELINE_STATUSES = {
+    BASELINE_STATUS_OFFICIAL_COVERED,
+    BASELINE_STATUS_PENDING,
+    BASELINE_STATUS_NONE,
+}
 
 GOAL_BASELINE_TARGET = {
     "id": "official-ascend-jan-2026-v0.11.0",
@@ -62,6 +70,52 @@ def validate_entry(
         raise ValueError(
             f"{source}: schema validation failed: {first.message} @ {list(first.path)}"
         )
+    normalize_entry_accountable_scope(entry)
+    return entry
+
+
+def normalize_baseline_engine(value: Any) -> str:
+    return str(value or "").strip().lower()
+
+
+def normalize_accountable_scope(accountable_scope: dict[str, Any]) -> dict[str, Any]:
+    baseline_engine = normalize_baseline_engine(
+        accountable_scope.get("baseline_engine")
+    )
+    declared_baseline_engine = normalize_baseline_engine(
+        accountable_scope.get("declared_baseline_engine") or baseline_engine
+    )
+    baseline_status = str(accountable_scope.get("baseline_status") or "").strip()
+
+    if baseline_status not in VALID_BASELINE_STATUSES:
+        if baseline_engine:
+            baseline_status = BASELINE_STATUS_OFFICIAL_COVERED
+        elif declared_baseline_engine:
+            baseline_status = BASELINE_STATUS_PENDING
+        else:
+            baseline_status = BASELINE_STATUS_NONE
+
+    if baseline_status == BASELINE_STATUS_OFFICIAL_COVERED:
+        baseline_engine = baseline_engine or declared_baseline_engine
+    else:
+        baseline_engine = ""
+
+    accountable_scope["baseline_engine"] = baseline_engine
+    accountable_scope["declared_baseline_engine"] = declared_baseline_engine
+    accountable_scope["baseline_status"] = baseline_status
+    return accountable_scope
+
+
+def normalize_entry_accountable_scope(entry: dict[str, Any]) -> dict[str, Any]:
+    constraints = entry.get("constraints")
+    if not isinstance(constraints, dict):
+        return entry
+
+    accountable_scope = constraints.get("accountable_scope")
+    if not isinstance(accountable_scope, dict):
+        return entry
+
+    normalize_accountable_scope(accountable_scope)
     return entry
 
 
@@ -419,6 +473,7 @@ def safe_bool(value: Any) -> bool | None:
 def build_hard_constraint_scope_key(entry: dict[str, Any]) -> str:
     constraints = entry.get("constraints") or {}
     accountable_scope = constraints.get("accountable_scope") or {}
+    accountable_scope = normalize_accountable_scope(accountable_scope)
     model = str((entry.get("model") or {}).get("name") or "unknown-model")
     hardware = str(
         (entry.get("hardware") or {}).get("chip_model") or "unknown-hardware"
@@ -430,7 +485,9 @@ def build_hard_constraint_scope_key(entry: dict[str, Any]) -> str:
         or "unknown-business-scenario"
     )
     baseline_engine = str(
-        accountable_scope.get("baseline_engine") or "unknown-baseline"
+        accountable_scope.get("declared_baseline_engine")
+        or accountable_scope.get("baseline_engine")
+        or "unknown-baseline"
     )
     return "|".join(
         [

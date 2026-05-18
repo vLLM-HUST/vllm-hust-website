@@ -59,6 +59,9 @@
             hardConstraintsNoData: 'No hard-constraint records under current filters.',
             hardConstraintsBaselineLabel: 'Performance Baseline',
             hardConstraintsBaselineValue: 'Official Ascend Jan 2026 (vllm v0.11.0 + vllm-ascend v0.11.0)',
+            baselineStateOfficial: 'official',
+            baselineStatePending: 'pending',
+            baselineStateNone: 'not declared',
             pass: 'PASS',
             fail: 'FAIL',
             current: 'Current',
@@ -215,6 +218,9 @@
             hardConstraintsNoData: '当前筛选条件下没有硬约束记录。',
             hardConstraintsBaselineLabel: '性能基线',
             hardConstraintsBaselineValue: 'Official Ascend Jan 2026（vllm v0.11.0 + vllm-ascend v0.11.0）',
+            baselineStateOfficial: '官方覆盖',
+            baselineStatePending: '待补基线',
+            baselineStateNone: '未声明',
             pass: '达标',
             fail: '未达标',
             current: '当前',
@@ -1226,10 +1232,57 @@
 
     }
 
+    function normalizeBaselineEngine(value) {
+        return String(value || '').trim().toLowerCase();
+    }
+
+    function getAccountableBaselineInfo(accountableScope) {
+        const accountable = accountableScope || {};
+        const officialEngine = normalizeBaselineEngine(accountable.baseline_engine);
+        const declaredEngine = normalizeBaselineEngine(
+            accountable.declared_baseline_engine || officialEngine
+        );
+        let status = String(accountable.baseline_status || '').trim();
+
+        if (!status) {
+            if (officialEngine) {
+                status = 'official-covered';
+            } else if (declaredEngine) {
+                status = 'pending-baseline';
+            } else {
+                status = 'no-baseline-declared';
+            }
+        }
+
+        return {
+            officialEngine: status === 'official-covered' ? (officialEngine || declaredEngine) : '',
+            declaredEngine,
+            status,
+            scopeEngine: declaredEngine || officialEngine || 'unknown-baseline',
+        };
+    }
+
+    function formatAccountableBaseline(accountableScope) {
+        const baselineInfo = getAccountableBaselineInfo(accountableScope);
+        const engineValue = baselineInfo.declaredEngine || baselineInfo.officialEngine;
+        if (!engineValue) {
+            return '-';
+        }
+
+        const engineLabel = getEngineLabel(engineValue);
+        if (baselineInfo.status === 'official-covered') {
+            return `${engineLabel} (${t('baselineStateOfficial')})`;
+        }
+        if (baselineInfo.status === 'pending-baseline') {
+            return `${engineLabel} (${t('baselineStatePending')})`;
+        }
+        return `${engineLabel} (${t('baselineStateNone')})`;
+    }
+
     function buildHardConstraintScopeKey(entry) {
         const accountable = entry?.constraints?.accountable_scope || {};
         const representativeBusinessScenario = accountable.representative_business_scenario || 'unknown-business-scenario';
-        const baselineEngine = accountable.baseline_engine || 'unknown-baseline';
+        const baselineEngine = getAccountableBaselineInfo(accountable).scopeEngine;
         const model = entry?.model?.name || 'unknown-model';
         const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
         const workload = getWorkloadId(entry) || 'Other';
@@ -1508,7 +1561,7 @@
     function renderHardConstraintScopeCard(scope) {
         const latest = scope?.latest || {};
         const previous = scope?.previous || {};
-        const accountable = latest?.accountable_scope || {};
+        const accountable = latest?.accountable_scope || scope?.scope?.accountable_scope || {};
         const checkItems = buildHardConstraintCheckItems(scope);
         const passedCount = checkItems.filter((item) => item.passed === true).length;
         const failedItems = checkItems.filter((item) => item.passed === false);
@@ -1529,7 +1582,7 @@
                             ${t('scope')}: ${scope?.scope?.model || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}
                         </p>
                         <p class="hard-constraint-scope-meta">
-                            scenario=${accountable?.representative_business_scenario || '-'} · baseline=${accountable?.baseline_engine || '-'} · ${passedCount}/4
+                            scenario=${accountable?.representative_business_scenario || '-'} · baseline=${formatAccountableBaseline(accountable)} · ${passedCount}/4
                         </p>
                     </div>
                     <div class="hard-constraint-summary-side">
