@@ -42,6 +42,11 @@
         },
     };
 
+    const DIRTY_ENGINE_VERSION_MARKERS = [
+        'path string is null',
+    ];
+    const ENGINE_VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
+
     const UI_STRINGS = {
         en: {
             statsHidden: 'Hidden',
@@ -133,7 +138,7 @@
             bestFourthInline: '(the best 4th-segment build under this 3-segment version is shown on the main table)',
             displayedVersionHint: 'the best 4th-segment build under this 3-segment version is shown on the main table',
             fullVersion: 'Full Version',
-            releaseDate: 'Release Date',
+            releaseDate: 'Result Date',
             ttft: 'TTFT',
             tokensPerSecond: 'Tokens/s',
             peakMem: 'Peak Mem',
@@ -144,6 +149,7 @@
             noImprovements: 'No specific improvements noted.',
             gitCommit: 'Git Commit',
             githubUser: 'GitHub User',
+            provenanceActor: 'Provenance',
             githubPullRequest: 'GitHub PR',
             githubRepository: 'Repository',
             gitReference: 'Git Ref',
@@ -292,7 +298,7 @@
             bestFourthInline: '（主表展示该三位版本下表现最好的四段版本）',
             displayedVersionHint: '主表展示该三位版本下表现最好的四段版本',
             fullVersion: '完整版本',
-            releaseDate: '发布日期',
+            releaseDate: '结果日期',
             ttft: 'TTFT',
             tokensPerSecond: 'Tokens/s',
             peakMem: '峰值显存',
@@ -303,6 +309,7 @@
             noImprovements: '没有额外改进说明。',
             gitCommit: 'Git Commit',
             githubUser: 'GitHub 用户',
+            provenanceActor: '来源身份',
             githubPullRequest: 'GitHub PR',
             githubRepository: '仓库',
             gitReference: 'Git 引用',
@@ -484,10 +491,32 @@
         return (WORKLOAD_LABELS[lang] && WORKLOAD_LABELS[lang][workloadId]) || workloadId;
     }
 
+    function getEntryTimestamp(entry) {
+        const meta = entry?.metadata || {};
+        return Date.parse(meta.release_date || meta.submitted_at || '') || 0;
+    }
+
     function compareByReleaseDateDesc(a, b) {
-        const aDate = Date.parse(a?.metadata?.release_date || '') || 0;
-        const bDate = Date.parse(b?.metadata?.release_date || '') || 0;
+        const aDate = getEntryTimestamp(a);
+        const bDate = getEntryTimestamp(b);
         return bDate - aDate;
+    }
+
+    function formatDateLabel(value) {
+        const raw = String(value || '').trim();
+        if (!raw) {
+            return '';
+        }
+        const timestamp = Date.parse(raw);
+        if (Number.isNaN(timestamp)) {
+            return raw;
+        }
+        return new Date(timestamp).toISOString().slice(0, 10);
+    }
+
+    function getEntryDateLabel(entry) {
+        const meta = entry?.metadata || {};
+        return formatDateLabel(meta.release_date || meta.submitted_at || '');
     }
 
     function normalizeDisplayVersion(version) {
@@ -495,9 +524,12 @@
         if (!text) {
             return '';
         }
-        if (/^\d+\.\d+\.\d+\.\d+$/.test(text)) {
-            const parts = text.split('.');
-            return `${parts[0]}.${parts[1]}.${parts[2]}.x`;
+        const hasLeadingV = /^v/i.test(text);
+        const coreText = hasLeadingV ? text.slice(1) : text;
+        if (/^\d+\.\d+\.\d+\.\d+$/.test(coreText)) {
+            const parts = coreText.split('.');
+            const collapsed = `${parts[0]}.${parts[1]}.${parts[2]}.x`;
+            return hasLeadingV ? `v${collapsed}` : collapsed;
         }
         return text;
     }
@@ -524,16 +556,83 @@
         return (UI_STRINGS[lang] && UI_STRINGS[lang][key]) || UI_STRINGS.en[key] || key;
     }
 
-    function getEngineVersion(entry) {
+    function getEntryGitCommit(entry) {
         return String(
-            entry?.engine_version ||
-            entry?.metadata?.engine_version ||
+            entry?.metadata?.git_commit ||
+            entry?.git_commit ||
+            entry?.metadata?.runtime_provenance?.engine?.commit ||
             ''
         ).trim();
     }
 
+    function sanitizeEngineVersion(version, gitCommit = '') {
+        const raw = String(version || '');
+        const sawMultiline = /[\r\n]/.test(raw);
+        let sawDirtyMarker = DIRTY_ENGINE_VERSION_MARKERS.some((marker) => raw.toLowerCase().includes(marker));
+        const candidates = [];
+
+        raw.split(/\r?\n/).forEach((line) => {
+            const normalized = String(line || '').replace(/\s+/g, ' ').trim();
+            if (!normalized) {
+                return;
+            }
+            if (DIRTY_ENGINE_VERSION_MARKERS.some((marker) => normalized.toLowerCase().includes(marker))) {
+                sawDirtyMarker = true;
+                return;
+            }
+            candidates.push(normalized);
+        });
+
+        for (const candidate of candidates) {
+            if (/\d/.test(candidate) && ENGINE_VERSION_PATTERN.test(candidate)) {
+                return candidate;
+            }
+        }
+
+        if (candidates.length) {
+            const primary = candidates[0];
+            if (ENGINE_VERSION_PATTERN.test(primary) && !(sawMultiline || sawDirtyMarker)) {
+                return primary;
+            }
+        }
+
+        const shortCommit = getShortCommit(gitCommit);
+        return shortCommit ? `g${shortCommit}` : '';
+    }
+
+    function formatVersionText(version) {
+        const normalized = String(version || '').trim();
+        if (!normalized || normalized.toLowerCase() === 'unknown') {
+            return 'N/A';
+        }
+        if (/^v/i.test(normalized) || /^g[0-9a-f]{7,}$/i.test(normalized)) {
+            return normalized;
+        }
+        return `v${normalized}`;
+    }
+
+    function getSnapshotEngineVersion(snapshot) {
+        return sanitizeEngineVersion(snapshot?.engine_version || '', snapshot?.git_commit || '');
+    }
+
+    function formatSnapshotVersion(snapshot) {
+        return formatVersionText(getSnapshotEngineVersion(snapshot));
+    }
+
+    function getEngineVersion(entry) {
+        return sanitizeEngineVersion(
+            entry?.engine_version || entry?.metadata?.engine_version || '',
+            getEntryGitCommit(entry)
+        );
+    }
+
     function getDisplayVersion(entry) {
-        return entry.displayVersion || normalizeDisplayVersion(getEngineVersion(entry));
+        const explicit = sanitizeEngineVersion(entry?.displayVersion || '', getEntryGitCommit(entry));
+        return normalizeDisplayVersion(explicit || getEngineVersion(entry));
+    }
+
+    function formatEntryVersion(entry, { display = false } = {}) {
+        return formatVersionText(display ? getDisplayVersion(entry) : getEngineVersion(entry));
     }
 
     function getSameSpecPayload(entry) {
@@ -560,6 +659,32 @@
         ].join('|');
     }
 
+    function getCompactSpecLabel(specId) {
+        const normalized = String(specId || '').trim();
+        if (!normalized) {
+            return '';
+        }
+        if (normalized.startsWith('official-ascend-jan-2026')) {
+            return 'official spec';
+        }
+        return normalized.length > 32 ? `spec ${normalized.slice(0, 29)}...` : `spec ${normalized}`;
+    }
+
+    function formatSettingDtype(value) {
+        const normalized = String(value || '').trim();
+        if (!normalized) {
+            return '';
+        }
+        const lower = normalized.toLowerCase();
+        if (lower === 'float16') {
+            return 'FP16';
+        }
+        if (lower === 'bfloat16') {
+            return 'BF16';
+        }
+        return normalized;
+    }
+
     function getSettingSummary(entry) {
         const sameSpec = getSameSpecPayload(entry);
         const workload = entry?.workload || {};
@@ -568,7 +693,7 @@
         const parts = [];
 
         if (workload?.input_length != null || workload?.output_length != null) {
-            parts.push(`IO ${workload?.input_length ?? '?'} / ${workload?.output_length ?? '?'}`);
+            parts.push(`IO ${workload?.input_length ?? '?'}/${workload?.output_length ?? '?'}`);
         }
 
         const parallel = [];
@@ -582,8 +707,9 @@
             parts.push(parallel.join(' '));
         }
 
-        if (server?.dtype) {
-            parts.push(String(server.dtype));
+        const dtype = formatSettingDtype(server?.dtype);
+        if (dtype) {
+            parts.push(dtype);
         }
         if (client?.request_rate != null) {
             parts.push(`RPS ${client.request_rate}`);
@@ -594,8 +720,9 @@
         if (workload?.concurrent_requests != null) {
             parts.push(`CC ${workload.concurrent_requests}`);
         }
-        if (sameSpec?.spec_id) {
-            parts.push(`spec ${sameSpec.spec_id}`);
+        const specLabel = getCompactSpecLabel(sameSpec?.spec_id);
+        if (specLabel) {
+            parts.push(specLabel);
         }
 
         if (parts.length) {
@@ -728,14 +855,47 @@
         return `<a class="${className}" href="${url}" target="_blank" rel="noreferrer">${label}</a>`;
     }
 
+    function isGenericSubmitter(value) {
+        const normalized = String(value || '').trim().toLowerCase();
+        return !normalized || ['hust', 'same-spec-current', 'official-ascend-baseline'].includes(normalized);
+    }
+
+    function getProvenanceActor(meta) {
+        const githubUser = formatGithubUserText(meta?.github_user);
+        if (githubUser) {
+            return { label: githubUser, className: 'provenance-user' };
+        }
+
+        const repository = String(meta?.github_repository || '').trim();
+        const ref = String(meta?.github_ref || '').trim();
+        if (repository && ref) {
+            return { label: `${repository}@${ref}`, className: 'provenance-repo' };
+        }
+        if (repository) {
+            return { label: repository, className: 'provenance-repo' };
+        }
+
+        const dataSource = String(meta?.data_source || '').trim();
+        if (dataSource) {
+            return { label: dataSource, className: 'provenance-source' };
+        }
+
+        const submitter = String(meta?.submitter || '').trim();
+        if (!isGenericSubmitter(submitter)) {
+            return { label: submitter, className: 'provenance-submitter' };
+        }
+
+        return null;
+    }
+
     function renderProvenanceSummary(entry) {
         const meta = entry?.metadata || {};
         const parts = [];
-        const githubUser = formatGithubUserText(meta.github_user);
+        const actor = getProvenanceActor(meta);
         const shortCommit = getShortCommit(meta.git_commit);
 
-        if (githubUser) {
-            parts.push(`<span class="provenance-user">${githubUser}</span>`);
+        if (actor) {
+            parts.push(`<span class="${actor.className}">${actor.label}</span>`);
         }
         if (shortCommit) {
             const commitLabel = `<span class="provenance-commit">${shortCommit}</span>`;
@@ -753,12 +913,12 @@
     }
 
     function isNumericVersion(version) {
-        return /^\d+(\.\d+){1,3}(\.x)?$/.test(String(version || '').trim());
+        return /^v?\d+(\.\d+){1,3}(\.x)?$/i.test(String(version || '').trim());
     }
 
     function compareDisplayVersions(a, b) {
-        const normalizedA = String(a || '').replace(/\.x$/, '.0');
-        const normalizedB = String(b || '').replace(/\.x$/, '.0');
+        const normalizedA = String(a || '').trim().replace(/^v/i, '').replace(/\.x$/, '.0');
+        const normalizedB = String(b || '').trim().replace(/^v/i, '').replace(/\.x$/, '.0');
 
         if (isNumericVersion(a) && isNumericVersion(b)) {
             return compareVersions(normalizedA, normalizedB);
@@ -1198,7 +1358,6 @@
             : getOverviewSubtitle(entries, summaries.length, comparisonView, viewOptions);
         const compareSnapshotGroup = findCompareSnapshotGroup(entries, comparisonView);
         const badges = getOverviewBadges(entries, summaries.length, leaders, comparisonView);
-        const dataSourceNote = getOverviewDataSourceNote(goalPair, compareSnapshotGroup);
         const heroSectionLabel = getOverviewHeroSectionLabel(goalPair, compareSnapshotGroup);
         const headToHeadHtml = goalPair
             ? renderGoalProgressPair(goalPair)
@@ -1217,7 +1376,6 @@
                     <div class="overview-badges">
                         ${badges.map((badge) => `<div class="overview-badge">${badge}</div>`).join('')}
                     </div>
-                    ${dataSourceNote ? `<div class="overview-note">${dataSourceNote}</div>` : ''}
                     ${headToHeadHtml}
                 </div>
             </div>
@@ -1645,8 +1803,9 @@
     function renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse) {
         const m = entry.metrics;
         const trends = entry.trends || {};
-        const releaseDate = entry?.metadata?.release_date || '-';
-        const displayVersion = getDisplayVersion(entry);
+        const dateLabel = getEntryDateLabel(entry);
+        const dateBadge = dateLabel ? `<small class="version-date">(${dateLabel})</small>` : '';
+        const displayVersion = formatEntryVersion(entry, { display: true });
         const buildCount = entry.versionVariants?.length || 1;
         const engineLabel = getEngineLabel(getEngine(entry));
         const provenanceSummary = renderProvenanceSummary(entry);
@@ -1660,9 +1819,9 @@
             <tr data-entry-id="${entry.entry_id}" class="${isSparse ? 'is-sparse' : ''}">
                 <td>
                     <div class="version-cell">
-                        ${showVersion ? `<div class="version-main">${engineLabel} v${displayVersion}<small class="version-date">(${releaseDate})</small></div>` : ''}
+                        ${showVersion ? `<div class="version-main">${engineLabel} ${displayVersion}${dateBadge}</div>` : ''}
                         ${showVersion ? provenanceSummary : ''}
-                        ${showVersion ? `<small class="version-merge-hint">${settingSummary}</small>` : ''}
+                        ${showVersion ? `<small class="version-setting-summary">${settingSummary}</small>` : ''}
                         ${showVersion && buildCount > 1 ? `<small class="version-merge-hint">${t('bestFourth')}</small>` : ''}
                         ${showVersion && isSparse ? `<small class="version-merge-hint sparse">${t('sparseGroup')}</small>` : ''}
                         ${(showVersion && (isLatest || entry.isBaseline))
@@ -1775,7 +1934,7 @@
     function renderVersionsSection(entry) {
         const engine = getEngine(entry);
         const engineLabel = getEngineLabel(engine);
-        const engineVersion = getEngineVersion(entry) || 'N/A';
+        const engineVersion = formatEntryVersion(entry);
         const versions = entry.versions || {};
 
         const versionRows = Object.entries(versions)
@@ -1798,7 +1957,7 @@
         return `
             <div class="detail-section">
                 <h4>${t('fullBuildResults')}</h4>
-                <p><strong>${t('displayedVersion')}:</strong> v${getDisplayVersion(entry)} ${t('bestFourthInline')}</p>
+                <p><strong>${t('displayedVersion')}:</strong> ${formatEntryVersion(entry, { display: true })} ${t('bestFourthInline')}</p>
                 <div class="build-variants-table-wrap">
                     <table class="build-variants-table">
                         <thead>
@@ -1818,8 +1977,8 @@
             const selected = variant.entry_id === entry.entry_id ? 'selected' : '';
             return `
                                     <tr class="${selected}">
-                                        <td>${getEngineLabel(getEngine(variant))} v${getEngineVersion(variant)}${index === 0 ? ` ${t('selectedStar')}` : ''}</td>
-                                        <td>${variant?.metadata?.release_date || '-'}</td>
+                                        <td>${getEngineLabel(getEngine(variant))} ${formatEntryVersion(variant)}${index === 0 ? ` ${t('selectedStar')}` : ''}</td>
+                                        <td>${getEntryDateLabel(variant) || '-'}</td>
                                         <td>${formatMetric(vm.ttft_ms)}</td>
                                         <td>${formatMetric(vm.throughput_tps)}</td>
                                         <td>${formatMetric(vm.peak_mem_mb)}</td>
@@ -1853,7 +2012,7 @@
 
     function renderImprovementsSection(entry) {
         const meta = entry.metadata;
-        const githubUser = formatGithubUserText(meta.github_user);
+        const actor = getProvenanceActor(meta);
         const commitLabel = meta.git_commit ? `<code>${meta.git_commit}</code>` : '';
         const gitCommit = meta.github_commit_url
             ? renderExternalLink(meta.github_commit_url, commitLabel || t('view'))
@@ -1866,7 +2025,7 @@
             <div class="detail-section">
                 <h4>${t('improvements')}</h4>
                 <p>${meta.notes || t('noImprovements')}</p>
-                ${githubUser ? `<p><strong>${t('githubUser')}:</strong> ${githubUser}</p>` : ''}
+                ${actor ? `<p><strong>${t('provenanceActor')}:</strong> <span class="${actor.className}">${actor.label}</span></p>` : ''}
                 ${(meta.git_commit || meta.github_commit_url) ? `<p><strong>${t('gitCommit')}:</strong> ${gitCommit}</p>` : ''}
                 ${githubPullRequest ? `<p><strong>${t('githubPullRequest')}:</strong> ${githubPullRequest}</p>` : ''}
                 ${meta.github_repository ? `<p><strong>${t('githubRepository')}:</strong> ${meta.github_repository}</p>` : ''}
@@ -2074,7 +2233,7 @@
                     avgTPS: averageMetric(engineEntries, 'throughput_tps'),
                     avgError: averageMetric(engineEntries, 'error_rate'),
                     bestEntry,
-                    version: getEngineVersion(bestEntry) || getDisplayVersion(bestEntry) || 'N/A',
+                    version: formatEntryVersion(bestEntry, { display: true }),
                 };
             })
             .sort((a, b) => (b.avgTPS || 0) - (a.avgTPS || 0));
@@ -2153,16 +2312,6 @@
         }
 
         return badges.slice(0, 4);
-    }
-
-    function getOverviewDataSourceNote(goalPair, compareSnapshotGroup) {
-        if (goalPair) {
-            return t('overviewGoalSnapshotNote');
-        }
-        if (compareSnapshotGroup) {
-            return t('overviewCompareSnapshotNote');
-        }
-        return '';
     }
 
     function getOverviewHeroSectionLabel(goalPair, compareSnapshotGroup) {
@@ -2270,9 +2419,9 @@
     }
 
     function getGoalProgressTitle(pair) {
-        const currentVersion = pair?.current?.engine_version || '-';
-        const baselineVersion = pair?.baseline?.engine_version || '-';
-        return `${t('goalCompareTitle')} · v${currentVersion} ${t('versusShort')} v${baselineVersion}`;
+        const currentVersion = formatSnapshotVersion(pair?.current);
+        const baselineVersion = formatSnapshotVersion(pair?.baseline);
+        return `${t('goalCompareTitle')} · ${currentVersion} ${t('versusShort')} ${baselineVersion}`;
     }
 
     function getGoalProgressSubtitle(pair) {
@@ -2308,13 +2457,13 @@
             <div class="head-to-head goal-progress-head-to-head">
                 <div class="head-to-head-side">
                     <span class="goal-compare-label">${t('goalCurrentLabel')}</span>
-                    <strong>${getEngineLabel(current.engine)} v${current.engine_version || '-'}</strong>
+                    <strong>${getEngineLabel(current.engine)} ${formatSnapshotVersion(current)}</strong>
                     <span>TTFT ${formatNumber(current.metrics.ttft_ms)} ms • TBT ${formatNumber(current.metrics.tbt_ms)} ms • TPS ${formatNumber(current.metrics.throughput_tps)}</span>
                 </div>
                 <div class="head-to-head-divider">${t('versusShort')}</div>
                 <div class="head-to-head-side">
                     <span class="goal-compare-label">${t('goalBaselineLabel')}</span>
-                    <strong>${getEngineLabel(baseline.engine)} v${baseline.engine_version || '-'}</strong>
+                    <strong>${getEngineLabel(baseline.engine)} ${formatSnapshotVersion(baseline)}</strong>
                     <span>TTFT ${formatNumber(baseline.metrics.ttft_ms)} ms • TBT ${formatNumber(baseline.metrics.tbt_ms)} ms • TPS ${formatNumber(baseline.metrics.throughput_tps)}</span>
                 </div>
             </div>

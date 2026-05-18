@@ -351,6 +351,34 @@ def test_aggregate_results_places_multi_gpu_entry_in_multi_snapshot(
     assert multi_payload[0]["entry_id"] == "12345678-1234-1234-1234-1234567890ab"
 
 
+def test_aggregate_results_sanitizes_dirty_engine_version(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    dirty_entry = _valid_entry()
+    dirty_entry["engine_version"] = "dev\npath string is NULLpath string is NULL"
+    dirty_entry["metadata"]["engine_version"] = dirty_entry["engine_version"]
+    dirty_entry["metadata"]["git_commit"] = "1111111111111111111111111111111111111111"
+
+    artifact = source_dir / "dirty_leaderboard.json"
+    artifact.write_text(json.dumps(dirty_entry, indent=2) + "\n", encoding="utf-8")
+    _write_manifest_entries(source_dir, [dirty_entry])
+
+    output_dir = tmp_path / "website_data"
+    result = _run_aggregate(script, source_dir, output_dir)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    assert single_payload[0]["engine_version"] == "g11111111"
+    assert single_payload[0]["metadata"]["engine_version"] == "g11111111"
+
+
 def test_aggregate_results_merge_updates_only_touched_categories(
     tmp_path: Path,
 ) -> None:
