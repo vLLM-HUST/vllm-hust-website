@@ -1,5 +1,5 @@
 #!/bin/bash
-# Helper script to record clean demos for SAGE
+# Helper script to record clean demos for vLLM-HUST
 # Usage: ./record_helper.sh <output_filename>
 
 OUTPUT_FILE="${1:-demo.cast}"

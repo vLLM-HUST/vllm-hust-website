@@ -9,6 +9,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- 清理官网 workstation 展示区中的历史旧品牌硬编码文字，统一改为 `vLLM-HUST Workstation`，不改动现有公开域名配置。
+
 - `scripts/aggregate_results.py` now updates website snapshots by rendered
   benchmark category instead of overwriting all categories on every run:
   single-chip, single-node multi-chip, and multi-node results are merged

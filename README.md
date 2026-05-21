@@ -55,8 +55,8 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 	"workstation_url": "https://ws.sage.org.ai",
 	"backend_url": "https://api.sage.org.ai",
 	"docs_url": "./docs/CLOUDFLARE_SETUP.md",
-	"label_zh": "Sage 工作站",
-	"label_en": "Sage Workstation"
+	"label_zh": "vLLM-HUST 工作站",
+	"label_en": "vLLM-HUST Workstation"
 }
 ```
 
