@@ -914,6 +914,55 @@
     line-height: 1.1;
 }
 
+.version-main--aligned {
+    width: 100%;
+    gap: 3px;
+    --version-label-width: 9.6rem;
+}
+
+.version-aligned-row {
+    display: grid;
+    grid-template-columns: var(--version-label-width) minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 8px;
+}
+
+.version-engine-label {
+    color: #334155;
+    font-family: 'Sora', 'Inter', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+}
+
+.version-engine-label--hust {
+    color: #0f766e;
+}
+
+.version-engine-label--plugin {
+    color: #1d4ed8;
+}
+
+.version-engine-label--upstream {
+    color: #334155;
+}
+
+.version-engine-label--default {
+    color: #334155;
+}
+
+.version-engine-value {
+    color: #0f172a;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+}
+
 .version-provenance {
     display: inline-flex;
     align-items: center;
@@ -982,6 +1031,18 @@
     margin-top: 2px;
     color: #718096;
     font-weight: 400;
+}
+
+.version-date--aligned {
+    display: block;
+    margin-top: 2px;
+    color: #94a3b8;
+    font-family: 'Sora', 'Inter', sans-serif;
+    font-size: 0.64rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.35;
+    text-align: left;
 }
 
 .version-badges {
@@ -1351,6 +1412,28 @@
         align-items: flex-start;
     }
 
+    .version-main--aligned {
+        --version-label-width: 8.3rem;
+        gap: 3px;
+    }
+
+    .version-aligned-row {
+        column-gap: 6px;
+    }
+
+    .version-engine-label {
+        font-size: 0.7rem;
+    }
+
+    .version-engine-value {
+        font-size: 0.72rem;
+    }
+
+    .version-date--aligned {
+        font-size: 0.62rem;
+        margin-top: 1px;
+    }
+
     .build-variants-table {
         font-size: 0.85em;
         min-width: 650px;
@@ -1363,6 +1446,18 @@
 }
 
 @media (max-width: 480px) {
+    .version-main--aligned {
+        --version-label-width: 7.7rem;
+    }
+
+    .version-engine-label {
+        font-size: 0.66rem;
+    }
+
+    .version-engine-value {
+        font-size: 0.68rem;
+    }
+
     .tab-button {
         padding: 10px 16px;
         font-size: 0.9em;
