@@ -86,6 +86,7 @@ def test_index_cache_busts_leaderboard_script() -> None:
 
     assert re.search(r'\.\/assets\/hf-data-loader\.js\?v=[^"\']+', text)
     assert re.search(r'\.\/assets\/leaderboard\.js\?v=[^"\']+', text)
+    assert re.search(r'\.\/assets\/leaderboard\.css\?v=[^"\']+', text)
 
 
 def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> None:

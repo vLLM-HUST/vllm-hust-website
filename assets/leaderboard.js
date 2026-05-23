@@ -857,7 +857,8 @@
         const hustVersion = hasRenderablePackageVersion(versions.core)
             ? versions.core
             : (canUseEngineVersionForHust ? engineVersion : '');
-        const hustCommit = engineSource.commit
+    const hustCommit = engineSource.commit
+        || (canUseEngineVersionForHust ? getEntryGitCommit(entry) : '')
             || extractCommitFromVersion(versions.core)
             || extractCommitFromVersion(engineVersion);
 
@@ -891,7 +892,8 @@
         const ascendHustVersion = hasRenderablePackageVersion(versions.backend)
             ? versions.backend
             : (canUseEngineVersionForPlugin ? engineVersion : '');
-        const ascendHustCommit = pluginSource.commit
+    const ascendHustCommit = pluginSource.commit
+        || (canUseEngineVersionForPlugin ? getEntryGitCommit(entry) : '')
             || extractCommitFromVersion(versions.backend)
             || extractCommitFromVersion(engineVersion);
 
