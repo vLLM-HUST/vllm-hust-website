@@ -79,7 +79,11 @@ EOF
 
 install_service_unit() {
   mkdir -p "$SYSTEMD_USER_DIR"
-  sed "s|__REPO_DIR__|$REPO_DIR|g" "$SYSTEMD_TEMPLATE" > "$(service_unit_path)"
+  sed \
+    -e "s|__REPO_DIR__|$REPO_DIR|g" \
+    -e "s|__WEBSITE_DEPLOY_HOME__|$(deploy_home)|g" \
+    -e "s|__WEBSITE_SYSTEMD_ENV_FILE__|$(systemd_env_file)|g" \
+    "$SYSTEMD_TEMPLATE" > "$(service_unit_path)"
   systemctl --user daemon-reload
   systemctl --user enable "$(service_name).service" >/dev/null
 }
