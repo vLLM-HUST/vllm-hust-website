@@ -104,13 +104,22 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert 'const bestVisibleRunText =' in text
     assert "currentBestVersionLabel" in text
     assert "baselineVersionLabel" in text
-    assert "const isBaselineCard = !isLeader && cardCount === 2 && cardIndex === 1;" in text
+    assert (
+        "const isBaselineCard = !isLeader && cardCount === 2 && cardIndex === 1;"
+        in text
+    )
     assert 'const versionPrefix = isLeader' in text
     assert '<div class="engine-summary-meta">' in text
     assert '<span class="engine-summary-version-label">${versionPrefix}</span>' in text
     assert '<span class="engine-summary-version-value">${versionText}</span>' in text
-    assert '<span class="engine-summary-footer-label">${t(\'bestVisibleRun\')}:</span>' in text
-    assert '<span class="engine-summary-footer-value">${bestVisibleRunText}</span>' in text
+    assert (
+        '<span class="engine-summary-footer-label">${t(\'bestVisibleRun\')}:</span>'
+        in text
+    )
+    assert (
+        '<span class="engine-summary-footer-value">${bestVisibleRunText}</span>'
+        in text
+    )
     metrics_index = text.index('<div class="engine-summary-metrics">')
     meta_index = text.index('<div class="engine-summary-meta">')
     version_index = text.index('<div class="engine-summary-version">')
