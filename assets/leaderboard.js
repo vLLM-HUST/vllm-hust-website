@@ -166,6 +166,8 @@
             throughputLeader: 'Throughput leader',
             rowCount: 'rows',
             bestVisibleVersion: 'Best visible version',
+            currentBestVersionLabel: 'Current best version: ',
+            baselineVersionLabel: 'Baseline version: ',
             avgTTFT: 'Avg TTFT',
             avgTBT: 'Avg TBT',
             avgThroughput: 'Avg Throughput',
@@ -326,6 +328,8 @@
             throughputLeader: '吞吐领先',
             rowCount: '条记录',
             bestVisibleVersion: '当前最佳可见版本',
+            currentBestVersionLabel: '当前最佳版本：',
+            baselineVersionLabel: '基线版本：',
             avgTTFT: '平均 TTFT',
             avgTBT: '平均 TBT',
             avgThroughput: '平均吞吐',
@@ -857,21 +861,22 @@
         const hustVersion = hasRenderablePackageVersion(versions.core)
             ? versions.core
             : (canUseEngineVersionForHust ? engineVersion : '');
-    const hustCommit = engineSource.commit
-        || (canUseEngineVersionForHust ? getEntryGitCommit(entry) : '')
+        const hustCommit = engineSource.commit
+            || (canUseEngineVersionForHust ? getEntryGitCommit(entry) : '')
             || extractCommitFromVersion(versions.core)
             || extractCommitFromVersion(engineVersion);
+        const hustOverrideVersion = getHistoricalSameSpecVersionOverride(
+            dataSource,
+            'vllm-hust',
+            engineSource.repository
+        );
 
         const hustDisplayVersion = resolveVersionDisplayValue(
             hustVersion,
             hustCommit,
             engineSource.ref,
             {
-                overrideVersion: getHistoricalSameSpecVersionOverride(
-                    dataSource,
-                    'vllm-hust',
-                    engineSource.repository
-                ),
+                overrideVersion: hustOverrideVersion,
                 fallbackToRecordedRevision: hasHustEngineRepository,
                 missingValue: engineName === 'vllm-hust' && hasHustPluginRepository ? 'unrecorded' : '',
             }
@@ -880,6 +885,10 @@
             components.push({
                 label: 'vllm-hust',
                 version: hustDisplayVersion,
+                rawVersion: hustVersion,
+                overrideVersion: hustOverrideVersion,
+                commit: hustCommit,
+                ref: engineSource.ref,
                 visibilityKey: buildComponentVisibilityKey(
                     'vllm-hust',
                     hustDisplayVersion,
@@ -892,21 +901,22 @@
         const ascendHustVersion = hasRenderablePackageVersion(versions.backend)
             ? versions.backend
             : (canUseEngineVersionForPlugin ? engineVersion : '');
-    const ascendHustCommit = pluginSource.commit
-        || (canUseEngineVersionForPlugin ? getEntryGitCommit(entry) : '')
+        const ascendHustCommit = pluginSource.commit
+            || (canUseEngineVersionForPlugin ? getEntryGitCommit(entry) : '')
             || extractCommitFromVersion(versions.backend)
             || extractCommitFromVersion(engineVersion);
+        const ascendHustOverrideVersion = getHistoricalSameSpecVersionOverride(
+            dataSource,
+            'vllm-ascend-hust',
+            pluginSource.repository
+        );
 
         const ascendHustDisplayVersion = resolveVersionDisplayValue(
             ascendHustVersion,
             ascendHustCommit,
             pluginSource.ref,
             {
-                overrideVersion: getHistoricalSameSpecVersionOverride(
-                    dataSource,
-                    'vllm-ascend-hust',
-                    pluginSource.repository
-                ),
+                overrideVersion: ascendHustOverrideVersion,
                 fallbackToRecordedRevision: hasHustPluginRepository,
             }
         );
@@ -914,6 +924,10 @@
             components.push({
                 label: 'vllm-ascend-hust',
                 version: ascendHustDisplayVersion,
+                rawVersion: ascendHustVersion,
+                overrideVersion: ascendHustOverrideVersion,
+                commit: ascendHustCommit,
+                ref: pluginSource.ref,
                 visibilityKey: buildComponentVisibilityKey(
                     'vllm-ascend-hust',
                     ascendHustDisplayVersion,
@@ -938,11 +952,17 @@
             components.push({
                 label: engineName === 'vllm' ? 'vllm' : getEngineLabel(engineName),
                 version: officialVersion,
+                rawVersion: engineVersion || metadata.github_ref || '',
+                commit: sharedSource.commit,
+                ref: sharedSource.ref,
             });
             if (isOfficialAscendStack) {
                 components.push({
                     label: 'vllm-ascend',
                     version: officialVersion,
+                    rawVersion: engineVersion || metadata.github_ref || '',
+                    commit: sharedSource.commit,
+                    ref: sharedSource.ref,
                 });
             }
         }
@@ -969,6 +989,72 @@
                 .join('|');
         }
         return formatEntryVersion(entry, { display: true });
+    }
+
+    function shouldIncludeCommitInOverview(label) {
+        return label === 'vllm-hust' || label === 'vllm-ascend-hust';
+    }
+
+    function formatOverviewComponentVersion(component) {
+        if (!component?.label) {
+            return '';
+        }
+
+        const includeCommit = shouldIncludeCommitInOverview(component.label);
+        const versionCandidates = [component.rawVersion, component.overrideVersion]
+            .map((value) => String(value || '').trim())
+            .filter(Boolean);
+
+        let resolvedVersion = '';
+        for (const candidate of versionCandidates) {
+            resolvedVersion = formatComponentVersion(candidate, component.commit, { includeCommit });
+            if (resolvedVersion) {
+                break;
+            }
+        }
+
+        if (!resolvedVersion) {
+            for (const candidate of versionCandidates) {
+                resolvedVersion = formatComponentVersion(candidate, component.commit, { includeCommit: false });
+                if (resolvedVersion) {
+                    break;
+                }
+            }
+        }
+
+        if (!resolvedVersion) {
+            resolvedVersion = String(component.version || '').trim();
+        }
+
+        if (!resolvedVersion) {
+            return '';
+        }
+
+        return resolvedVersion;
+    }
+
+    function getOverviewSummaryChipText(summary) {
+        const labels = (summary?.overviewComponents || [])
+            .map((component) => String(component?.label || '').trim())
+            .filter(Boolean);
+
+        if (labels.length) {
+            return labels.join(' + ');
+        }
+
+        return summary?.label || '';
+    }
+
+    function getOverviewSummaryVersionText(summary) {
+        const parts = (summary?.overviewComponents || [])
+            .map((component) => formatOverviewComponentVersion(component))
+            .filter(Boolean);
+
+        if (parts.length) {
+            return parts.join(' + ');
+        }
+
+        return summary?.version || '';
     }
 
     function getSameSpecPayload(entry) {
@@ -1720,7 +1806,7 @@
                 <div class="overview-section-label">${t('overviewGridLabel')}</div>
                 <div class="overview-section-note">${t('overviewGridNote')}</div>
                 <div class="overview-grid">
-                    ${summaries.map((summary) => renderEngineSummaryCard(summary, leaders)).join('')}
+                    ${summaries.map((summary, index) => renderEngineSummaryCard(summary, leaders, index, summaries.length)).join('')}
                 </div>
             </div>
         `;
@@ -2601,6 +2687,7 @@
                     avgTPS: averageMetric(engineEntries, 'throughput_tps'),
                     avgError: averageMetric(engineEntries, 'error_rate'),
                     bestEntry,
+                    overviewComponents: buildTableVersionComponents(bestEntry),
                     version: formatEntryVersion(bestEntry, { display: true }),
                 };
             })
@@ -2936,17 +3023,23 @@
         return isBetter ? `${label} ${t('better')}` : `${label} ${t('worse')}`;
     }
 
-    function renderEngineSummaryCard(summary, leaders) {
+    function renderEngineSummaryCard(summary, leaders, cardIndex, cardCount) {
         const bestEntry = summary.bestEntry || {};
         const isLeader = leaders.throughput && leaders.throughput.engine === summary.engine;
+        const isBaselineCard = !isLeader && cardCount === 2 && cardIndex === 1;
+        const chipText = getOverviewSummaryChipText(summary);
+        const versionText = getOverviewSummaryVersionText(summary);
+        const bestVisibleRunText = `${getWorkloadLabel(getWorkloadId(bestEntry))} • ${getConfigText(bestEntry).replace('<br><small>', ' • ').replace('</small>', '')}`;
+        const versionPrefix = isLeader
+            ? t('currentBestVersionLabel')
+            : (isBaselineCard ? t('baselineVersionLabel') : `${t('bestVisibleVersion')} `);
 
         return `
             <div class="engine-summary-card ${isLeader ? 'is-leader' : ''}">
                 <div class="engine-summary-head">
-                    <span class="engine-chip">${summary.label}</span>
+                    <span class="engine-chip">${chipText}</span>
                     ${isLeader ? `<span class="leader-mark">${t('throughputLeader')}</span>` : `<span class="leader-mark">${summary.count} ${summary.count > 1 ? t('rows') : t('row')}</span>`}
                 </div>
-                <div class="engine-summary-version">${t('bestVisibleVersion')} ${summary.version}</div>
                 <div class="engine-summary-metrics">
                     <div class="summary-metric">
                         <span>${t('avgTTFT')}</span>
@@ -2965,8 +3058,15 @@
                         <strong>${formatPercent(summary.avgError)}</strong>
                     </div>
                 </div>
-                <div class="engine-summary-footer">
-                    ${t('bestVisibleRun')}: ${getWorkloadLabel(getWorkloadId(bestEntry))} • ${getConfigText(bestEntry).replace('<br><small>', ' • ').replace('</small>', '')}
+                <div class="engine-summary-meta">
+                    <div class="engine-summary-version">
+                        <span class="engine-summary-version-label">${versionPrefix}</span>
+                        <span class="engine-summary-version-value">${versionText}</span>
+                    </div>
+                    <div class="engine-summary-footer">
+                        <span class="engine-summary-footer-label">${t('bestVisibleRun')}:</span>
+                        <span class="engine-summary-footer-value">${bestVisibleRunText}</span>
+                    </div>
                 </div>
             </div>
         `;
