@@ -6,6 +6,8 @@ Wants=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=__REPO_DIR__
+Environment=WEBSITE_DEPLOY_HOME=__WEBSITE_DEPLOY_HOME__
+Environment=WEBSITE_SYSTEMD_ENV_FILE=__WEBSITE_SYSTEMD_ENV_FILE__
 ExecStart=/usr/bin/env bash __REPO_DIR__/scripts/run_website_systemd.sh
 Restart=always
 RestartSec=5

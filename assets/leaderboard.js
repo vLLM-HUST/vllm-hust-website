@@ -1344,6 +1344,7 @@
                     <div class="overview-subtitle">${reason}</div>
                 </div>
             `;
+            el.firstElementChild?.remove();
             return;
         }
 
@@ -1387,6 +1388,7 @@
                 </div>
             </div>
         `;
+        el.firstElementChild?.remove();
 
     }
 
@@ -1795,8 +1797,36 @@
             return;
         }
 
-        const formatted = date.toISOString().replace('T', ' ').replace('.000Z', ' UTC');
+        const formatted = formatBeijingTimestamp(date);
         el.textContent = `${t('lastUpdated')}: ${formatted}`;
+    }
+
+    function formatBeijingTimestamp(date) {
+        if (typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function') {
+            const formatter = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Shanghai',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+            });
+            const parts = Object.fromEntries(
+                formatter
+                    .formatToParts(date)
+                    .filter((part) => part.type !== 'literal')
+                    .map((part) => [part.type, part.value])
+            );
+
+            if (parts.year && parts.month && parts.day && parts.hour && parts.minute && parts.second) {
+                return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}:${parts.second} UTC+8`;
+            }
+        }
+
+        const beijingDate = new Date(date.getTime() + (8 * 60 * 60 * 1000));
+        return `${beijingDate.toISOString().slice(0, 19).replace('T', ' ')} UTC+8`;
     }
 
     // Render data row
