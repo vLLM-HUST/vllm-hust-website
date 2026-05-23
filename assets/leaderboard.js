@@ -640,6 +640,20 @@
         return normalized && normalized.toLowerCase() !== 'n/a' && normalized.toLowerCase() !== 'unknown';
     }
 
+    function isCommitLikeValue(value) {
+        const normalized = String(value || '').trim();
+        if (!normalized) {
+            return false;
+        }
+
+        const candidate = normalized.replace(/^[vg]/i, '');
+        return /[a-f]/i.test(candidate) && /^[0-9a-f]{7,40}$/i.test(candidate);
+    }
+
+    function hasRenderablePackageVersion(value) {
+        return hasVersionValue(value) && !isCommitLikeValue(value);
+    }
+
     function extractCommitFromVersion(value) {
         const normalized = String(value || '').trim();
         if (!normalized) {
@@ -651,17 +665,19 @@
 
     function normalizePackageVersion(value) {
         const normalized = String(value || '').trim();
-        if (!hasVersionValue(normalized)) {
+        if (!hasRenderablePackageVersion(normalized)) {
             return '';
         }
 
         const withoutLeadingV = normalized.replace(/^v/i, '');
-        return withoutLeadingV
+        const cleaned = withoutLeadingV
             .replace(/-\d+-g[0-9a-f]{7,40}$/i, '')
             .replace(/\+g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '')
             .replace(/\.g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '')
             .replace(/\.dev\d+\b/i, '')
             .replace(/(?:[.+-])d\d{8}$/i, '');
+
+        return isCommitLikeValue(cleaned) ? '' : cleaned;
     }
 
     function formatComponentVersion(version, commit, { includeCommit = true } = {}) {
@@ -710,18 +726,21 @@
         const engineVersion = entry?.engine_version || metadata.engine_version || '';
         const components = [];
 
-        const isHustEngine = engineName === 'vllm-hust'
-            || engineRepository.includes('vllm-hust')
+        const hasHustEngineRepository = engineRepository.includes('vllm-hust')
             || githubRepository.endsWith('/vllm-hust');
-        const isHustPlugin = pluginEngine === 'vllm-ascend-hust'
+        const hasHustPluginRepository = pluginEngine === 'vllm-ascend-hust'
             || pluginRepository.includes('vllm-ascend-hust')
             || githubRepository.includes('vllm-ascend-hust');
+        const canUseEngineVersionForHust = hasHustEngineRepository
+            || (engineName === 'vllm-hust' && !hasHustPluginRepository);
+        const canUseEngineVersionForPlugin = engineName === 'vllm-ascend-hust'
+            || (hasHustPluginRepository && !hasHustEngineRepository);
 
-        const hustVersion = hasVersionValue(versions.core)
+        const hustVersion = hasRenderablePackageVersion(versions.core)
             ? versions.core
-            : (isHustEngine ? engineVersion : '');
+            : (canUseEngineVersionForHust ? engineVersion : '');
         const hustCommit = runtime?.engine?.commit
-            || (isHustEngine ? getEntryGitCommit(entry) : '')
+            || (canUseEngineVersionForHust ? getEntryGitCommit(entry) : '')
             || extractCommitFromVersion(versions.core)
             || extractCommitFromVersion(engineVersion);
 
@@ -733,11 +752,11 @@
             });
         }
 
-        const ascendHustVersion = hasVersionValue(versions.backend)
+        const ascendHustVersion = hasRenderablePackageVersion(versions.backend)
             ? versions.backend
-            : ((isHustPlugin || engineName === 'vllm-ascend-hust') ? engineVersion : '');
+            : (canUseEngineVersionForPlugin ? engineVersion : '');
         const ascendHustCommit = runtime?.plugin?.commit
-            || ((isHustPlugin || engineName === 'vllm-ascend-hust') ? getEntryGitCommit(entry) : '')
+            || (canUseEngineVersionForPlugin ? getEntryGitCommit(entry) : '')
             || extractCommitFromVersion(versions.backend)
             || extractCommitFromVersion(engineVersion);
 

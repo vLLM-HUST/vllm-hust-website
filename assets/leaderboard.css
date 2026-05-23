@@ -969,10 +969,12 @@
 }
 
 .version-provenance {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 6px;
+    max-width: 100%;
+    min-width: 0;
     color: #475569;
     font-size: 0.72rem;
     font-weight: 600;
@@ -998,6 +1000,17 @@
 .provenance-commit {
     color: #1e3a8a;
     font-family: 'Fira Code', monospace;
+}
+
+.version-setting-summary,
+.version-merge-hint,
+.provenance-user,
+.provenance-source,
+.provenance-repo,
+.provenance-commit {
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .provenance-link,
@@ -1353,6 +1366,25 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1100px) {
+    .leaderboard-table th:first-child,
+    .leaderboard-table td:first-child {
+        position: static;
+        left: auto;
+    }
+
+    .version-main--aligned {
+        --version-label-width: 100%;
+        gap: 5px;
+    }
+
+    .version-aligned-row {
+        grid-template-columns: minmax(0, 1fr);
+        column-gap: 0;
+        row-gap: 1px;
+    }
+}
+
 @media (max-width: 768px) {
     .leaderboard-section {
         padding: 24px 16px;
@@ -1417,15 +1449,6 @@
         align-items: flex-start;
     }
 
-    .version-main--aligned {
-        --version-label-width: 8.3rem;
-        gap: 3px;
-    }
-
-    .version-aligned-row {
-        column-gap: 6px;
-    }
-
     .version-engine-label {
         font-size: 0.7rem;
     }
@@ -1451,16 +1474,6 @@
 }
 
 @media (max-width: 480px) {
-    .version-main--aligned {
-        --version-label-width: 100%;
-        gap: 5px;
-    }
-
-    .version-aligned-row {
-        grid-template-columns: minmax(0, 1fr);
-        row-gap: 1px;
-    }
-
     .version-engine-label {
         font-size: 0.66rem;
     }
