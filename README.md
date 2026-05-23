@@ -130,6 +130,26 @@ vLLM benchmark inheritance path as the accountable scenario and dataset source.
 
 > 注意：脚本不会创建 `venv/.venv`，请使用当前已配置的非-venv Python 环境。
 
+## Local Validation
+
+在本地提交前，如果你想尽量一次性对齐 CI 的 `validate` job，直接运行：
+
+```bash
+./scripts/validate-local.sh
+```
+
+这个脚本会依次执行：
+
+- `pre-commit run --all-files`
+- `pytest tests/ -v`
+- hook 模板与 `quickstart.sh` 安装语句校验
+
+要求：
+
+- 需要 `python3.11`
+- 优先使用当前环境里的 `pre-commit` / `pytest`
+- 如果当前环境缺少这些工具，但本机有 `uvx`，脚本会自动使用 `uvx --python 3.11 ...` 兜底
+
 ## systemd --user 本地常驻
 
 如果要把静态站点在本机以 `systemd --user` 常驻方式挂起来，而不是手动执行 `python3 -m http.server 8000`，仓库现在内置了最小管理脚本：
