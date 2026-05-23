@@ -600,6 +600,11 @@
         return shortCommit ? `g${shortCommit}` : '';
     }
 
+    function sanitizeDisplayEngineVersion(version, gitCommit = '') {
+        const sanitized = sanitizeEngineVersion(version, gitCommit);
+        return hasRenderablePackageVersion(sanitized) ? sanitized : '';
+    }
+
     function formatVersionText(version) {
         const normalized = String(version || '').trim();
         if (!normalized || normalized.toLowerCase() === 'unknown') {
@@ -627,8 +632,13 @@
     }
 
     function getDisplayVersion(entry) {
-        const explicit = sanitizeEngineVersion(entry?.displayVersion || '', getEntryGitCommit(entry));
-        return normalizeDisplayVersion(explicit || getEngineVersion(entry));
+        const gitCommit = getEntryGitCommit(entry);
+        const explicit = sanitizeDisplayEngineVersion(entry?.displayVersion || '', gitCommit);
+        const engineVersion = sanitizeDisplayEngineVersion(
+            entry?.engine_version || entry?.metadata?.engine_version || '',
+            gitCommit
+        );
+        return normalizeDisplayVersion(explicit || engineVersion);
     }
 
     function formatEntryVersion(entry, { display = false } = {}) {
@@ -690,6 +700,82 @@
         return includeCommit && shortCommit ? `v${normalizedVersion}.${shortCommit}` : `v${normalizedVersion}`;
     }
 
+    function getRepositoryName(repository) {
+        const normalized = String(repository || '').trim().toLowerCase();
+        if (!normalized) {
+            return '';
+        }
+        const parts = normalized.split('/').filter(Boolean);
+        return parts.length ? parts[parts.length - 1] : normalized;
+    }
+
+    function isHustCoreRepository(repository) {
+        return getRepositoryName(repository) === 'vllm-hust';
+    }
+
+    function isHustPluginRepository(repository) {
+        return getRepositoryName(repository) === 'vllm-ascend-hust';
+    }
+
+    function compactGitRef(ref) {
+        const normalized = String(ref || '').trim();
+        if (!normalized) {
+            return '';
+        }
+        return normalized.length > 24
+            ? `${normalized.slice(0, 14)}...${normalized.slice(-8)}`
+            : normalized;
+    }
+
+    function formatRecordedRevision(ref, commit) {
+        const refLabel = compactGitRef(ref);
+        const shortCommit = getShortCommit(commit);
+        if (refLabel && shortCommit) {
+            return `${refLabel}@${shortCommit}`;
+        }
+        if (shortCommit) {
+            return `commit:${shortCommit}`;
+        }
+        return refLabel;
+    }
+
+    const HISTORICAL_SAME_SPEC_VERSION_OVERRIDES = {
+        'vllm-ascend-hust-ci-same-spec|vllm-hust|vllm-hust': '0.17.2.post1',
+        'vllm-ascend-hust-ci-same-spec|vllm-ascend-hust|vllm-ascend-hust': '0.1',
+        'vllm-hust-ci-same-spec|vllm-hust|vllm-hust': '0.17.2.post1',
+        'vllm-hust-ci-same-spec|vllm-ascend-hust|vllm-ascend-hust': '0.18.0.post1',
+    };
+
+    function getHistoricalSameSpecVersionOverride(dataSource, label, repository) {
+        const key = [
+            String(dataSource || '').trim().toLowerCase(),
+            String(label || '').trim().toLowerCase(),
+            getRepositoryName(repository),
+        ].join('|');
+        return HISTORICAL_SAME_SPEC_VERSION_OVERRIDES[key] || '';
+    }
+
+    function resolveVersionDisplayValue(version, commit, ref, { overrideVersion = '', fallbackToRecordedRevision = false, missingValue = '' } = {}) {
+        const semanticVersion = formatComponentVersion(version, commit, { includeCommit: false });
+        if (semanticVersion) {
+            return semanticVersion;
+        }
+
+        const semanticOverride = formatComponentVersion(overrideVersion, '', { includeCommit: false });
+        if (semanticOverride) {
+            return semanticOverride;
+        }
+
+        if (fallbackToRecordedRevision) {
+            const recordedRevision = formatRecordedRevision(ref, commit);
+            if (recordedRevision) {
+                return recordedRevision;
+            }
+        }
+
+        return missingValue;
+    }
+
     function getVersionLabelTone(label) {
         if (label === 'vllm-hust') {
             return 'hust';
@@ -713,24 +799,56 @@
         `;
     }
 
+    function buildComponentVisibilityKey(label, version, commit, ref) {
+        return [
+            String(label || '').trim(),
+            String(version || '').trim(),
+            String(ref || '').trim(),
+            getShortCommit(commit),
+        ].join('|');
+    }
+
     function buildTableVersionComponents(entry) {
         const metadata = entry?.metadata || {};
         const runtime = metadata.runtime_provenance || {};
         const versions = entry?.versions || {};
-        const githubRepository = String(metadata.github_repository || '').trim().toLowerCase();
-        const engineRepository = String(runtime?.engine?.repository || '').trim().toLowerCase();
-        const pluginRepository = String(runtime?.plugin?.repository || '').trim().toLowerCase();
-        const pluginEngine = String(runtime?.plugin?.engine || '').trim().toLowerCase();
+        const githubRepository = String(metadata.github_repository || '').trim();
+        const sharedSource = {
+            repository: githubRepository,
+            ref: String(metadata.github_ref || '').trim(),
+            commit: String(metadata.git_commit || '').trim(),
+        };
+        const engineSource = {
+            repository: String(runtime?.engine?.repository || '').trim()
+                || (isHustCoreRepository(sharedSource.repository) ? sharedSource.repository : ''),
+            ref: String(runtime?.engine?.ref || '').trim()
+                || (isHustCoreRepository(sharedSource.repository) ? sharedSource.ref : ''),
+            commit: String(runtime?.engine?.commit || '').trim()
+                || (isHustCoreRepository(sharedSource.repository) ? sharedSource.commit : ''),
+        };
+        const pluginSource = {
+            engine: String(runtime?.plugin?.engine || '').trim()
+                || (isHustPluginRepository(sharedSource.repository) ? 'vllm-ascend-hust' : ''),
+            repository: String(runtime?.plugin?.repository || '').trim()
+                || (isHustPluginRepository(sharedSource.repository) ? sharedSource.repository : ''),
+            ref: String(runtime?.plugin?.ref || '').trim()
+                || (isHustPluginRepository(sharedSource.repository) ? sharedSource.ref : ''),
+            commit: String(runtime?.plugin?.commit || '').trim()
+                || (isHustPluginRepository(sharedSource.repository) ? sharedSource.commit : ''),
+        };
+        const engineRepository = engineSource.repository.toLowerCase();
+        const pluginRepository = pluginSource.repository.toLowerCase();
+        const pluginEngine = pluginSource.engine.toLowerCase();
         const dataSource = String(metadata.data_source || '').trim().toLowerCase();
         const engineName = getEngine(entry);
         const engineVersion = entry?.engine_version || metadata.engine_version || '';
         const components = [];
 
         const hasHustEngineRepository = engineRepository.includes('vllm-hust')
-            || githubRepository.endsWith('/vllm-hust');
+            || githubRepository.toLowerCase().endsWith('/vllm-hust');
         const hasHustPluginRepository = pluginEngine === 'vllm-ascend-hust'
             || pluginRepository.includes('vllm-ascend-hust')
-            || githubRepository.includes('vllm-ascend-hust');
+            || githubRepository.toLowerCase().includes('vllm-ascend-hust');
         const canUseEngineVersionForHust = hasHustEngineRepository
             || (engineName === 'vllm-hust' && !hasHustPluginRepository);
         const canUseEngineVersionForPlugin = engineName === 'vllm-ascend-hust'
@@ -739,32 +857,69 @@
         const hustVersion = hasRenderablePackageVersion(versions.core)
             ? versions.core
             : (canUseEngineVersionForHust ? engineVersion : '');
-        const hustCommit = runtime?.engine?.commit
-            || (canUseEngineVersionForHust ? getEntryGitCommit(entry) : '')
+    const hustCommit = engineSource.commit
+        || (canUseEngineVersionForHust ? getEntryGitCommit(entry) : '')
             || extractCommitFromVersion(versions.core)
             || extractCommitFromVersion(engineVersion);
 
-        const hustDisplayVersion = formatComponentVersion(hustVersion, hustCommit, { includeCommit: false });
+        const hustDisplayVersion = resolveVersionDisplayValue(
+            hustVersion,
+            hustCommit,
+            engineSource.ref,
+            {
+                overrideVersion: getHistoricalSameSpecVersionOverride(
+                    dataSource,
+                    'vllm-hust',
+                    engineSource.repository
+                ),
+                fallbackToRecordedRevision: hasHustEngineRepository,
+                missingValue: engineName === 'vllm-hust' && hasHustPluginRepository ? 'unrecorded' : '',
+            }
+        );
         if (hustDisplayVersion) {
             components.push({
                 label: 'vllm-hust',
                 version: hustDisplayVersion,
+                visibilityKey: buildComponentVisibilityKey(
+                    'vllm-hust',
+                    hustDisplayVersion,
+                    hustCommit,
+                    engineSource.ref
+                ),
             });
         }
 
         const ascendHustVersion = hasRenderablePackageVersion(versions.backend)
             ? versions.backend
             : (canUseEngineVersionForPlugin ? engineVersion : '');
-        const ascendHustCommit = runtime?.plugin?.commit
-            || (canUseEngineVersionForPlugin ? getEntryGitCommit(entry) : '')
+    const ascendHustCommit = pluginSource.commit
+        || (canUseEngineVersionForPlugin ? getEntryGitCommit(entry) : '')
             || extractCommitFromVersion(versions.backend)
             || extractCommitFromVersion(engineVersion);
 
-        const ascendHustDisplayVersion = formatComponentVersion(ascendHustVersion, ascendHustCommit, { includeCommit: false });
+        const ascendHustDisplayVersion = resolveVersionDisplayValue(
+            ascendHustVersion,
+            ascendHustCommit,
+            pluginSource.ref,
+            {
+                overrideVersion: getHistoricalSameSpecVersionOverride(
+                    dataSource,
+                    'vllm-ascend-hust',
+                    pluginSource.repository
+                ),
+                fallbackToRecordedRevision: hasHustPluginRepository,
+            }
+        );
         if (ascendHustDisplayVersion) {
             components.push({
                 label: 'vllm-ascend-hust',
                 version: ascendHustDisplayVersion,
+                visibilityKey: buildComponentVisibilityKey(
+                    'vllm-ascend-hust',
+                    ascendHustDisplayVersion,
+                    ascendHustCommit,
+                    pluginSource.ref
+                ),
             });
         }
 
@@ -804,6 +959,16 @@
         const rows = components.map((component) => renderAlignedVersionRow(component)).join('');
         const dateLine = dateLabel ? `<small class="version-date version-date--aligned">${dateLabel}</small>` : '';
         return `${rows}${dateLine}`;
+    }
+
+    function getTableVersionVisibilityKey(entry) {
+        const components = buildTableVersionComponents(entry);
+        if (components.length) {
+            return components
+                .map((component) => component.visibilityKey || `${component.label}:${component.version}`)
+                .join('|');
+        }
+        return formatEntryVersion(entry, { display: true });
     }
 
     function getSameSpecPayload(entry) {
@@ -1468,8 +1633,8 @@
         tbody.innerHTML = withTrends.map((entry, index) => {
             const isLatest = index === 0;
             const isExpanded = state.expandedRows.has(entry.entry_id);
-            const currentVersion = getDisplayVersion(entry);
-            const prevVersion = index > 0 ? getDisplayVersion(withTrends[index - 1]) : null;
+            const currentVersion = getTableVersionVisibilityKey(entry);
+            const prevVersion = index > 0 ? getTableVersionVisibilityKey(withTrends[index - 1]) : null;
             const showVersionForEveryRow = typeof window !== 'undefined'
                 && new URLSearchParams(window.location.search).get('showVersionAll') === '1';
             const showVersion = showVersionForEveryRow || index === 0 || currentVersion !== prevVersion;
