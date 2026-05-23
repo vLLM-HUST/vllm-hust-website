@@ -635,6 +635,158 @@
         return formatVersionText(display ? getDisplayVersion(entry) : getEngineVersion(entry));
     }
 
+    function hasVersionValue(value) {
+        const normalized = String(value || '').trim();
+        return normalized && normalized.toLowerCase() !== 'n/a' && normalized.toLowerCase() !== 'unknown';
+    }
+
+    function extractCommitFromVersion(value) {
+        const normalized = String(value || '').trim();
+        if (!normalized) {
+            return '';
+        }
+        const match = normalized.match(/(?:^|[.+-])g([0-9a-f]{7,40})(?:\.d\d{8})?$/i);
+        return match ? match[1] : '';
+    }
+
+    function normalizePackageVersion(value) {
+        const normalized = String(value || '').trim();
+        if (!hasVersionValue(normalized)) {
+            return '';
+        }
+
+        const withoutLeadingV = normalized.replace(/^v/i, '');
+        return withoutLeadingV
+            .replace(/-\d+-g[0-9a-f]{7,40}$/i, '')
+            .replace(/\+g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '')
+            .replace(/\.g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '')
+            .replace(/\.dev\d+\b/i, '')
+            .replace(/(?:[.+-])d\d{8}$/i, '');
+    }
+
+    function formatComponentVersion(version, commit, { includeCommit = true } = {}) {
+        const normalizedVersion = normalizePackageVersion(version);
+        if (!normalizedVersion) {
+            return '';
+        }
+
+        const shortCommit = getShortCommit(commit || extractCommitFromVersion(version));
+        return includeCommit && shortCommit ? `v${normalizedVersion}.${shortCommit}` : `v${normalizedVersion}`;
+    }
+
+    function getVersionLabelTone(label) {
+        if (label === 'vllm-hust') {
+            return 'hust';
+        }
+        if (label === 'vllm-ascend-hust' || label === 'vllm-ascend') {
+            return 'plugin';
+        }
+        if (label === 'vllm') {
+            return 'upstream';
+        }
+        return 'default';
+    }
+
+    function renderAlignedVersionRow(component) {
+        const tone = getVersionLabelTone(component.label);
+        return `
+            <span class="version-aligned-row">
+                <span class="version-engine-label version-engine-label--${tone}">${component.label}</span>
+                <span class="version-engine-value">${component.version}</span>
+            </span>
+        `;
+    }
+
+    function buildTableVersionComponents(entry) {
+        const metadata = entry?.metadata || {};
+        const runtime = metadata.runtime_provenance || {};
+        const versions = entry?.versions || {};
+        const githubRepository = String(metadata.github_repository || '').trim().toLowerCase();
+        const engineRepository = String(runtime?.engine?.repository || '').trim().toLowerCase();
+        const pluginRepository = String(runtime?.plugin?.repository || '').trim().toLowerCase();
+        const pluginEngine = String(runtime?.plugin?.engine || '').trim().toLowerCase();
+        const dataSource = String(metadata.data_source || '').trim().toLowerCase();
+        const engineName = getEngine(entry);
+        const engineVersion = entry?.engine_version || metadata.engine_version || '';
+        const components = [];
+
+        const isHustEngine = engineName === 'vllm-hust'
+            || engineRepository.includes('vllm-hust')
+            || githubRepository.endsWith('/vllm-hust');
+        const isHustPlugin = pluginEngine === 'vllm-ascend-hust'
+            || pluginRepository.includes('vllm-ascend-hust')
+            || githubRepository.includes('vllm-ascend-hust');
+
+        const hustVersion = hasVersionValue(versions.core)
+            ? versions.core
+            : (isHustEngine ? engineVersion : '');
+        const hustCommit = runtime?.engine?.commit
+            || (isHustEngine ? getEntryGitCommit(entry) : '')
+            || extractCommitFromVersion(versions.core)
+            || extractCommitFromVersion(engineVersion);
+
+        const hustDisplayVersion = formatComponentVersion(hustVersion, hustCommit, { includeCommit: false });
+        if (hustDisplayVersion) {
+            components.push({
+                label: 'vllm-hust',
+                version: hustDisplayVersion,
+            });
+        }
+
+        const ascendHustVersion = hasVersionValue(versions.backend)
+            ? versions.backend
+            : ((isHustPlugin || engineName === 'vllm-ascend-hust') ? engineVersion : '');
+        const ascendHustCommit = runtime?.plugin?.commit
+            || ((isHustPlugin || engineName === 'vllm-ascend-hust') ? getEntryGitCommit(entry) : '')
+            || extractCommitFromVersion(versions.backend)
+            || extractCommitFromVersion(engineVersion);
+
+        const ascendHustDisplayVersion = formatComponentVersion(ascendHustVersion, ascendHustCommit, { includeCommit: false });
+        if (ascendHustDisplayVersion) {
+            components.push({
+                label: 'vllm-ascend-hust',
+                version: ascendHustDisplayVersion,
+            });
+        }
+
+        if (components.length) {
+            return components;
+        }
+
+        const isOfficialAscendStack = engineName === 'vllm'
+            && (
+                githubRepository.includes('vllm-ascend')
+                || pluginRepository.includes('vllm-ascend')
+                || dataSource.includes('vllm-ascend')
+            );
+        const officialVersion = formatComponentVersion(engineVersion || metadata.github_ref || '', '', { includeCommit: false });
+        if (officialVersion) {
+            components.push({
+                label: engineName === 'vllm' ? 'vllm' : getEngineLabel(engineName),
+                version: officialVersion,
+            });
+            if (isOfficialAscendStack) {
+                components.push({
+                    label: 'vllm-ascend',
+                    version: officialVersion,
+                });
+            }
+        }
+
+        return components;
+    }
+
+    function formatTableVersionSummary(entry, dateLabel = '') {
+        const components = buildTableVersionComponents(entry).filter((component) => component?.label && component?.version);
+        if (!components.length) {
+            return '';
+        }
+
+        const rows = components.map((component) => renderAlignedVersionRow(component)).join('');
+        const dateLine = dateLabel ? `<small class="version-date version-date--aligned">${dateLabel}</small>` : '';
+        return `${rows}${dateLine}`;
+    }
+
     function getSameSpecPayload(entry) {
         return entry?.same_spec && typeof entry.same_spec === 'object' ? entry.same_spec : {};
     }
@@ -1834,10 +1986,12 @@
         const m = entry.metrics;
         const trends = entry.trends || {};
         const dateLabel = getEntryDateLabel(entry);
-        const dateBadge = dateLabel ? `<small class="version-date">(${dateLabel})</small>` : '';
         const displayVersion = formatEntryVersion(entry, { display: true });
         const buildCount = entry.versionVariants?.length || 1;
         const engineLabel = getEngineLabel(getEngine(entry));
+        const fallbackDate = dateLabel ? `<small class="version-date version-date--aligned">${dateLabel}</small>` : '';
+        const tableVersionSummary = formatTableVersionSummary(entry, dateLabel);
+        const versionMainText = tableVersionSummary || `${renderAlignedVersionRow({ label: engineLabel, version: displayVersion })}${fallbackDate}`;
         const provenanceSummary = renderProvenanceSummary(entry);
         const settingSummary = getSettingSummary(entry);
 
@@ -1849,7 +2003,7 @@
             <tr data-entry-id="${entry.entry_id}" class="${isSparse ? 'is-sparse' : ''}">
                 <td>
                     <div class="version-cell">
-                        ${showVersion ? `<div class="version-main">${engineLabel} ${displayVersion}${dateBadge}</div>` : ''}
+                        ${showVersion ? `<div class="version-main version-main--aligned">${versionMainText}</div>` : ''}
                         ${showVersion ? provenanceSummary : ''}
                         ${showVersion ? `<small class="version-setting-summary">${settingSummary}</small>` : ''}
                         ${showVersion && buildCount > 1 ? `<small class="version-merge-hint">${t('bestFourth')}</small>` : ''}
