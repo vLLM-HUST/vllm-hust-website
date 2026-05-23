@@ -18,6 +18,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
 HOOKS_DIR="$PROJECT_ROOT/.git/hooks"
 TEMPLATE_DIR="$PROJECT_ROOT/hooks"
+VALIDATION_REQUIREMENTS_FILE="$PROJECT_ROOT/requirements-dev.txt"
 
 INSTALL_MODE="dev"
 SKIP_HOOKS="false"
@@ -183,6 +184,17 @@ install_dev_editable_overlay() {
     echo -e "${YELLOW}⚠️ 当前仓库无可 editable 的 Python 包，dev 模式等同 standard${NC}"
 }
 
+install_validation_dependencies() {
+    if [ ! -f "$VALIDATION_REQUIREMENTS_FILE" ]; then
+        echo -e "${YELLOW}⚠️ 未找到 requirements-dev.txt，跳过本地校验依赖安装${NC}"
+        return 0
+    fi
+
+    echo -e "${BLUE}🧪 安装本地校验依赖（requirements-dev.txt）${NC}"
+    run_with_diagnostics "安装本地校验依赖" "${PIP_CMD[@]}" install -r "$VALIDATION_REQUIREMENTS_FILE"
+    echo -e "${GREEN}✓ 本地校验依赖安装完成${NC}"
+}
+
 install_hooks() {
     if [ -d "$HOOKS_DIR" ]; then
         if [ -f "$TEMPLATE_DIR/pre-commit" ]; then
@@ -224,11 +236,11 @@ main() {
     echo -e "${BLUE}🔧 Install mode: ${NC}${INSTALL_MODE}"
     echo ""
 
-    echo -e "${YELLOW}${BOLD}Step 1/5: Checking environment${NC}"
+    echo -e "${YELLOW}${BOLD}Step 1/6: Checking environment${NC}"
     check_environment
     echo ""
 
-    echo -e "${YELLOW}${BOLD}Step 2/5: Cleaning existing prefixed packages${NC}"
+    echo -e "${YELLOW}${BOLD}Step 2/6: Cleaning existing prefixed packages${NC}"
     if [ "$SKIP_CLEANUP" = "true" ]; then
         echo -e "${YELLOW}⚠️ 已跳过清理（--skip-cleanup）${NC}"
     else
@@ -236,11 +248,15 @@ main() {
     fi
     echo ""
 
-    echo -e "${YELLOW}${BOLD}Step 3/5: Installing PyPI baseline${NC}"
+    echo -e "${YELLOW}${BOLD}Step 3/6: Installing local validation dependencies${NC}"
+    install_validation_dependencies
+    echo ""
+
+    echo -e "${YELLOW}${BOLD}Step 4/6: Installing PyPI baseline${NC}"
     install_from_pypi
     echo ""
 
-    echo -e "${YELLOW}${BOLD}Step 4/5: Installing editable overlay (dev only)${NC}"
+    echo -e "${YELLOW}${BOLD}Step 5/6: Installing editable overlay (dev only)${NC}"
     if [ "$INSTALL_MODE" = "dev" ]; then
         install_dev_editable_overlay
     else
@@ -248,7 +264,7 @@ main() {
     fi
     echo ""
 
-    echo -e "${YELLOW}${BOLD}Step 5/5: Installing Git hooks${NC}"
+    echo -e "${YELLOW}${BOLD}Step 6/6: Installing Git hooks${NC}"
     if [ "$SKIP_HOOKS" = "true" ]; then
         echo -e "${YELLOW}⚠️ 已跳过 hooks 安装（--skip-hooks）${NC}"
     else

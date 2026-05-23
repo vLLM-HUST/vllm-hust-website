@@ -112,6 +112,7 @@ vLLM benchmark inheritance path as the accountable scenario and dataset source.
 
 - `--standard`：标准模式，依赖优先从 PyPI 安装（稳定/发布导向）
 - `--dev`：开发模式，在 standard 基础上尝试本地 editable 覆盖（使用 `--no-deps`）
+- `requirements-dev.txt`：本地校验依赖单一来源，供 quickstart、CI 和 `scripts/validate-local.sh` 统一复用
 - 安装前会执行同前缀包动态清理（默认前缀：`ivllm-hust-website`）
 
 ```bash
@@ -129,6 +130,24 @@ vLLM benchmark inheritance path as the accountable scenario and dataset source.
 ```
 
 > 注意：脚本不会创建 `venv/.venv`，请使用当前已配置的非-venv Python 环境。
+
+## Local Validation
+
+本地校验依赖以 `requirements-dev.txt` 为唯一声明源。首次进入仓库后，执行下面任一方式即可获得和 CI 一致的基础 Python 工具链：
+
+```bash
+# 推荐：同时安装校验依赖并配置 hooks
+./quickstart.sh --dev
+
+# 或者仅安装校验依赖
+python3.11 -m pip install -r requirements-dev.txt
+```
+
+完成后运行：
+
+```bash
+./scripts/validate-local.sh
+```
 
 ## systemd --user 本地常驻
 
