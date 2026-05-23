@@ -595,11 +595,14 @@
     display: inline-flex;
     align-items: center;
     padding: 6px 10px;
+    max-width: 100%;
     border-radius: 999px;
     background: #eff6ff;
     color: #1d4ed8;
     font-size: 0.86rem;
     font-weight: 700;
+    line-height: 1.25;
+    white-space: normal;
 }
 
 .leader-mark {
@@ -614,9 +617,27 @@
 }
 
 .engine-summary-version {
-    color: #475569;
-    font-size: 0.92rem;
-    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: #0f172a;
+    font-size: 0.94rem;
+    font-weight: 600;
+    line-height: 1.45;
+    margin: 0;
+}
+
+.engine-summary-version-label {
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.engine-summary-version-value {
+    color: #0f172a;
+    font-size: 0.94rem;
+    font-weight: 600;
+    line-height: 1.45;
 }
 
 .engine-summary-metrics {
@@ -648,11 +669,43 @@
     line-height: 1.2;
 }
 
-.engine-summary-footer {
+.engine-summary-meta {
     margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%);
+    border: 1px solid #dbe7f3;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.engine-summary-card.is-leader .engine-summary-meta {
+    background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+    border-color: #bfdbfe;
+}
+
+.engine-summary-footer {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     color: #475569;
     font-size: 0.88rem;
     line-height: 1.5;
+}
+
+.engine-summary-footer-label {
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.engine-summary-footer-value {
+    color: #0f172a;
+    font-size: 0.94rem;
+    font-weight: 600;
+    line-height: 1.45;
 }
 
 .leaderboard-hint {

@@ -89,6 +89,42 @@ def test_index_cache_busts_leaderboard_script() -> None:
     assert re.search(r'\.\/assets\/leaderboard\.css\?v=[^"\']+', text)
 
 
+def test_engine_summary_cards_use_composite_version_components() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
+
+    assert "function formatOverviewComponentVersion(component)" in text
+    assert "function getOverviewSummaryChipText(summary)" in text
+    assert "function getOverviewSummaryVersionText(summary)" in text
+    assert 'return resolvedVersion;' in text
+    assert "overviewComponents: buildTableVersionComponents(bestEntry)" in text
+    assert 'const chipText = getOverviewSummaryChipText(summary);' in text
+    assert 'const versionText = getOverviewSummaryVersionText(summary);' in text
+    assert 'const bestVisibleRunText =' in text
+    assert "currentBestVersionLabel" in text
+    assert "baselineVersionLabel" in text
+    assert "const isBaselineCard = !isLeader && cardCount === 2 && cardIndex === 1;" in text
+    assert 'const versionPrefix = isLeader' in text
+    assert '<div class="engine-summary-meta">' in text
+    assert '<span class="engine-summary-version-label">${versionPrefix}</span>' in text
+    assert '<span class="engine-summary-version-value">${versionText}</span>' in text
+    assert '<span class="engine-summary-footer-label">${t(\'bestVisibleRun\')}:</span>' in text
+    assert '<span class="engine-summary-footer-value">${bestVisibleRunText}</span>' in text
+    metrics_index = text.index('<div class="engine-summary-metrics">')
+    meta_index = text.index('<div class="engine-summary-meta">')
+    version_index = text.index('<div class="engine-summary-version">')
+    footer_index = text.index('<div class="engine-summary-footer">')
+    assert metrics_index < meta_index < version_index < footer_index
+    assert '.engine-summary-meta {' in css_text
+    assert '.engine-summary-version-label {' in css_text
+    assert '.engine-summary-version-value {' in css_text
+    assert '.engine-summary-footer-label {' in css_text
+    assert '.engine-summary-footer-value {' in css_text
+    assert 'font-size: 0.94rem;' in css_text
+    assert 'font-weight: 600;' in css_text
+
+
 def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "index.html").read_text(encoding="utf-8")
