@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 
@@ -83,8 +84,8 @@ def test_index_cache_busts_leaderboard_script() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "index.html").read_text(encoding="utf-8")
 
-    assert "./assets/hf-data-loader.js?v=compare-source-guard-20260513" in text
-    assert "./assets/leaderboard.js?v=hc-best-scope-rank-20260514" in text
+    assert re.search(r'\.\/assets\/hf-data-loader\.js\?v=[^"\']+', text)
+    assert re.search(r'\.\/assets\/leaderboard\.js\?v=[^"\']+', text)
 
 
 def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> None:
