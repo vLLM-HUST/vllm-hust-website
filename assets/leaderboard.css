@@ -925,6 +925,7 @@
     grid-template-columns: var(--version-label-width) minmax(0, 1fr);
     align-items: baseline;
     column-gap: 8px;
+    row-gap: 2px;
 }
 
 .version-engine-label {
@@ -934,7 +935,9 @@
     font-weight: 700;
     line-height: 1.3;
     letter-spacing: -0.01em;
-    white-space: nowrap;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .version-engine-label--hust {
@@ -960,7 +963,9 @@
     font-weight: 700;
     line-height: 1.3;
     letter-spacing: -0.01em;
-    white-space: nowrap;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .version-provenance {
@@ -1447,7 +1452,13 @@
 
 @media (max-width: 480px) {
     .version-main--aligned {
-        --version-label-width: 7.7rem;
+        --version-label-width: 100%;
+        gap: 5px;
+    }
+
+    .version-aligned-row {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 1px;
     }
 
     .version-engine-label {
