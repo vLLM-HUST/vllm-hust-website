@@ -87,6 +87,11 @@ PY
 }
 
 resolve_pre_commit_cmd() {
+    if command -v pre-commit >/dev/null 2>&1; then
+        PRE_COMMIT_CMD=(pre-commit)
+        return 0
+    fi
+
     if "$PYTHON_BIN" - <<'PY' >/dev/null 2>&1
 import importlib.util
 import sys
@@ -127,6 +132,7 @@ PY
 
     echo -e "${RED}❌ pytest/jsonschema are not available in the current environment.${NC}"
     echo -e "${YELLOW}👉 Install validation dependencies with $PYTHON_BIN -m pip install -r requirements-dev.txt, or install uv for the fallback path.${NC}"
+
     exit 1
 }
 

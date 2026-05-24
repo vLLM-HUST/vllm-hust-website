@@ -143,11 +143,23 @@ vLLM benchmark inheritance path as the accountable scenario and dataset source.
 python3.11 -m pip install -r requirements-dev.txt
 ```
 
-完成后运行：
+在本地提交前，如果你想尽量一次性对齐 CI 的 `validate` job，直接运行：
 
 ```bash
 ./scripts/validate-local.sh
 ```
+
+这个脚本会依次执行：
+
+- `pre-commit run --all-files`
+- `pytest tests/ -v`
+- hook 模板与 `quickstart.sh` 安装语句校验
+
+要求：
+
+- 需要 `python3.11`
+- 优先使用当前环境里的 `pre-commit` / `pytest`
+- 如果当前环境缺少这些工具，但本机有 `uv`，脚本会自动使用 `uv run --python 3.11 --with-requirements requirements-dev.txt ...` 兜底，继续复用同一份依赖声明
 
 ## systemd --user 本地常驻
 

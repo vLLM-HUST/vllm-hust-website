@@ -107,7 +107,15 @@ def test_validation_dependencies_have_single_source_of_truth() -> None:
     assert "python -m pip install -r requirements-dev.txt" in ci_text
     assert "requirements-dev.txt" in quickstart_text
     assert "--with-requirements \"$DEV_REQUIREMENTS_FILE\"" in validate_text
+    assert 'find_spec("jsonschema")' in validate_text
+    assert "if command -v pytest >/dev/null 2>&1; then" not in validate_text
+    assert "uvx --python 3.11 pytest" not in validate_text
+    assert "uvx --python 3.11 pre-commit" not in validate_text
     assert "python3.11 -m pip install -r requirements-dev.txt" in readme_text
+    assert (
+        "uv run --python 3.11 --with-requirements requirements-dev.txt"
+        in readme_text
+    )
 
 
 def test_engine_summary_cards_use_composite_version_components() -> None:
@@ -169,6 +177,25 @@ def test_detail_sections_reuse_composite_versions_and_memory_fallback() -> None:
     assert '<span class="build-version-summary">${variantVersion}</span>' in text
     assert ".build-version-summary {" in css_text
     assert ".build-version-marker {" in css_text
+
+
+def test_local_validation_script_and_hook_templates_track_ci() -> None:
+    root = Path(__file__).resolve().parents[1]
+    ci_text = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    hook_text = (root / "hooks" / "pre-commit").read_text(encoding="utf-8")
+    script_text = (root / "scripts" / "validate-local.sh").read_text(encoding="utf-8")
+    readme_text = (root / "README.md").read_text(encoding="utf-8")
+
+    assert "pre-commit run --all-files" in ci_text
+    assert "pytest tests/ -v" in ci_text
+    assert '"${PRE_COMMIT_CMD[@]}" run --files "${staged_paths[@]}"' in hook_text
+    assert "resolve_pre_commit_cmd" in hook_text
+    assert "./scripts/validate-local.sh" in hook_text
+    assert "pre-commit run --all-files" in script_text
+    assert '"${PYTEST_CMD[@]}" tests/ -v' in script_text
+    assert "grep -q 'ln -sf \"../../hooks/pre-commit\"' quickstart.sh" in script_text
+    assert "grep -q 'ln -sf \"../../hooks/pre-push\"' quickstart.sh" in script_text
+    assert "./scripts/validate-local.sh" in readme_text
 
 
 def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> None:
