@@ -92,13 +92,9 @@ def test_index_cache_busts_leaderboard_script() -> None:
 def test_validation_dependencies_have_single_source_of_truth() -> None:
     root = Path(__file__).resolve().parents[1]
     requirements_text = (root / "requirements-dev.txt").read_text(encoding="utf-8")
-    ci_text = (root / ".github" / "workflows" / "ci.yml").read_text(
-        encoding="utf-8"
-    )
+    ci_text = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
     quickstart_text = (root / "quickstart.sh").read_text(encoding="utf-8")
-    validate_text = (root / "scripts" / "validate-local.sh").read_text(
-        encoding="utf-8"
-    )
+    validate_text = (root / "scripts" / "validate-local.sh").read_text(encoding="utf-8")
     readme_text = (root / "README.md").read_text(encoding="utf-8")
 
     assert "pre-commit" in requirements_text
@@ -106,15 +102,14 @@ def test_validation_dependencies_have_single_source_of_truth() -> None:
     assert "jsonschema" in requirements_text
     assert "python -m pip install -r requirements-dev.txt" in ci_text
     assert "requirements-dev.txt" in quickstart_text
-    assert "--with-requirements \"$DEV_REQUIREMENTS_FILE\"" in validate_text
+    assert '--with-requirements "$DEV_REQUIREMENTS_FILE"' in validate_text
     assert 'find_spec("jsonschema")' in validate_text
     assert "if command -v pytest >/dev/null 2>&1; then" not in validate_text
     assert "uvx --python 3.11 pytest" not in validate_text
     assert "uvx --python 3.11 pre-commit" not in validate_text
     assert "python3.11 -m pip install -r requirements-dev.txt" in readme_text
     assert (
-        "uv run --python 3.11 --with-requirements requirements-dev.txt"
-        in readme_text
+        "uv run --python 3.11 --with-requirements requirements-dev.txt" in readme_text
     )
 
 

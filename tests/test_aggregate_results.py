@@ -439,10 +439,30 @@ def test_aggregate_results_backfills_missing_910b3_memory_for_existing_and_incom
     )
     payload_by_id = {entry["entry_id"]: entry for entry in multi_payload}
 
-    assert payload_by_id["11111111-1111-1111-1111-111111111111"]["hardware"]["memory_per_chip_gb"] == 64.0
-    assert payload_by_id["11111111-1111-1111-1111-111111111111"]["hardware"]["total_memory_gb"] == 256.0
-    assert payload_by_id["22222222-2222-2222-2222-222222222222"]["hardware"]["memory_per_chip_gb"] == 64.0
-    assert payload_by_id["22222222-2222-2222-2222-222222222222"]["hardware"]["total_memory_gb"] == 128.0
+    assert (
+        payload_by_id["11111111-1111-1111-1111-111111111111"]["hardware"][
+            "memory_per_chip_gb"
+        ]
+        == 64.0
+    )
+    assert (
+        payload_by_id["11111111-1111-1111-1111-111111111111"]["hardware"][
+            "total_memory_gb"
+        ]
+        == 256.0
+    )
+    assert (
+        payload_by_id["22222222-2222-2222-2222-222222222222"]["hardware"][
+            "memory_per_chip_gb"
+        ]
+        == 64.0
+    )
+    assert (
+        payload_by_id["22222222-2222-2222-2222-222222222222"]["hardware"][
+            "total_memory_gb"
+        ]
+        == 128.0
+    )
 
 
 def test_aggregate_results_merge_updates_only_touched_categories(

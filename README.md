@@ -159,7 +159,8 @@ python3.11 -m pip install -r requirements-dev.txt
 
 - 需要 `python3.11`
 - 优先使用当前环境里的 `pre-commit` / `pytest`
-- 如果当前环境缺少这些工具，但本机有 `uv`，脚本会自动使用 `uv run --python 3.11 --with-requirements requirements-dev.txt ...` 兜底，继续复用同一份依赖声明
+- 如果当前环境缺少这些工具，但本机有 `uv`，脚本会自动使用 `uv run --python 3.11 --with-requirements requirements-dev.txt ...`
+  兜底，继续复用同一份依赖声明
 
 ## systemd --user 本地常驻
 
