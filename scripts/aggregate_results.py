@@ -36,6 +36,12 @@ BASELINE_STATUS_PENDING = "pending-baseline"
 BASELINE_STATUS_NONE = "no-baseline-declared"
 DIRTY_ENGINE_VERSION_MARKERS = ("path string is null",)
 ENGINE_VERSION_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
+KNOWN_MEMORY_PER_CHIP_GB = {
+    # Ascend 910B3 cards in the benchmark fleet expose 64 GB HBM.
+    "910b3": 64.0,
+    "ascend-910b3": 64.0,
+    "ascend 910b3": 64.0,
+}
 VALID_BASELINE_STATUSES = {
     BASELINE_STATUS_OFFICIAL_COVERED,
     BASELINE_STATUS_PENDING,
@@ -74,6 +80,7 @@ def validate_entry(
             f"{source}: schema validation failed: {first.message} @ {list(first.path)}"
         )
     normalize_entry_engine_version(entry)
+    normalize_entry_hardware(entry)
     normalize_entry_accountable_scope(entry)
     return entry
 
@@ -139,6 +146,83 @@ def normalize_entry_engine_version(entry: dict[str, Any]) -> dict[str, Any]:
     normalized = get_entry_engine_version(entry)
     entry["engine_version"] = normalized
     metadata["engine_version"] = normalized
+    return entry
+
+
+def normalize_chip_model_key(chip_model: Any) -> str:
+    return str(chip_model or "").strip().lower()
+
+
+def infer_memory_per_chip_gb(
+    chip_model: Any,
+    chip_count: Any,
+    total_memory_gb: Any,
+    memory_per_chip_gb: Any,
+) -> float | None:
+    if memory_per_chip_gb is not None:
+        return float(memory_per_chip_gb)
+
+    try:
+        normalized_chip_count = int(chip_count)
+    except (TypeError, ValueError):
+        normalized_chip_count = 0
+
+    if total_memory_gb is not None and normalized_chip_count > 0:
+        return float(total_memory_gb) / normalized_chip_count
+
+    return KNOWN_MEMORY_PER_CHIP_GB.get(normalize_chip_model_key(chip_model))
+
+
+def infer_total_memory_gb(
+    chip_model: Any,
+    chip_count: Any,
+    total_memory_gb: Any,
+    memory_per_chip_gb: Any,
+) -> float | None:
+    if total_memory_gb is not None:
+        return float(total_memory_gb)
+
+    try:
+        normalized_chip_count = int(chip_count)
+    except (TypeError, ValueError):
+        normalized_chip_count = 0
+
+    resolved_memory_per_chip_gb = infer_memory_per_chip_gb(
+        chip_model,
+        normalized_chip_count,
+        total_memory_gb,
+        memory_per_chip_gb,
+    )
+    if resolved_memory_per_chip_gb is None or normalized_chip_count <= 0:
+        return None
+    return resolved_memory_per_chip_gb * normalized_chip_count
+
+
+def normalize_entry_hardware(entry: dict[str, Any]) -> dict[str, Any]:
+    hardware = entry.get("hardware")
+    if not isinstance(hardware, dict):
+        return entry
+
+    chip_model = hardware.get("chip_model")
+    chip_count = hardware.get("chip_count")
+    memory_per_chip_gb = hardware.get("memory_per_chip_gb")
+    total_memory_gb = hardware.get("total_memory_gb")
+
+    resolved_memory_per_chip_gb = infer_memory_per_chip_gb(
+        chip_model,
+        chip_count,
+        total_memory_gb,
+        memory_per_chip_gb,
+    )
+    resolved_total_memory_gb = infer_total_memory_gb(
+        chip_model,
+        chip_count,
+        total_memory_gb,
+        memory_per_chip_gb,
+    )
+
+    hardware["memory_per_chip_gb"] = resolved_memory_per_chip_gb
+    hardware["total_memory_gb"] = resolved_total_memory_gb
     return entry
 
 

@@ -1057,6 +1057,42 @@
         return summary?.version || '';
     }
 
+    function getEntryCompositeVersionText(entry) {
+        const parts = buildTableVersionComponents(entry)
+            .map((component) => formatOverviewComponentVersion(component))
+            .filter(Boolean);
+
+        if (parts.length) {
+            return parts.join(' + ');
+        }
+
+        return formatEntryVersion(entry, { display: true });
+    }
+
+    function getEntryTotalMemoryGb(entry) {
+        const hardware = entry?.hardware || {};
+        const totalMemoryGb = Number(hardware.total_memory_gb);
+        if (Number.isFinite(totalMemoryGb) && totalMemoryGb >= 0) {
+            return totalMemoryGb;
+        }
+
+        const memoryPerChipGb = Number(hardware.memory_per_chip_gb);
+        const chipCount = Number(hardware.chip_count);
+        if (Number.isFinite(memoryPerChipGb) && Number.isFinite(chipCount) && chipCount > 0) {
+            return memoryPerChipGb * chipCount;
+        }
+
+        return null;
+    }
+
+    function formatMemoryGb(value) {
+        if (!Number.isFinite(value)) {
+            return '-';
+        }
+
+        return Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, '');
+    }
+
     function getSameSpecPayload(entry) {
         return entry?.same_spec && typeof entry.same_spec === 'object' ? entry.same_spec : {};
     }
@@ -2370,12 +2406,13 @@
         const hw = entry.hardware;
         const cluster = entry.cluster;
         const env = entry.environment;
+        const totalMemoryGb = getEntryTotalMemoryGb(entry);
 
         return `
             <div class="detail-section">
                 <h4>${t('hardwareConfig')}</h4>
                 <p><strong>${t('chip')}:</strong> ${hw.chip_model} × ${hw.chip_count}</p>
-                <p><strong>${t('totalMemory')}:</strong> ${hw.total_memory_gb} GB</p>
+                <p><strong>${t('totalMemory')}:</strong> ${formatMemoryGb(totalMemoryGb)} GB</p>
                 ${env && env.cuda_version ? `<p><strong>CUDA:</strong> ${env.cuda_version}</p>` : ''}
                 ${env && env.cann_version ? `<p><strong>CANN:</strong> ${env.cann_version}</p>` : ''}
                 ${cluster ? `
@@ -2388,7 +2425,7 @@
     function renderVersionsSection(entry) {
         const engine = getEngine(entry);
         const engineLabel = getEngineLabel(engine);
-        const engineVersion = formatEntryVersion(entry);
+        const engineVersion = getEntryCompositeVersionText(entry);
         const versions = entry.versions || {};
 
         const versionRows = Object.entries(versions)
@@ -2407,11 +2444,12 @@
 
     function renderBuildVariantsSection(entry) {
         const variants = entry.versionVariants || [entry];
+        const displayedVersion = getEntryCompositeVersionText(entry);
 
         return `
             <div class="detail-section">
                 <h4>${t('fullBuildResults')}</h4>
-                <p><strong>${t('displayedVersion')}:</strong> ${formatEntryVersion(entry, { display: true })} ${t('bestFourthInline')}</p>
+                <p><strong>${t('displayedVersion')}:</strong> ${displayedVersion} ${t('bestFourthInline')}</p>
                 <div class="build-variants-table-wrap">
                     <table class="build-variants-table">
                         <thead>
@@ -2429,9 +2467,10 @@
                             ${variants.map((variant, index) => {
             const vm = variant.metrics || {};
             const selected = variant.entry_id === entry.entry_id ? 'selected' : '';
+            const variantVersion = getEntryCompositeVersionText(variant);
             return `
                                     <tr class="${selected}">
-                                        <td>${getEngineLabel(getEngine(variant))} ${formatEntryVersion(variant)}${index === 0 ? ` ${t('selectedStar')}` : ''}</td>
+                                        <td><span class="build-version-summary">${variantVersion}</span>${index === 0 ? ` <span class="build-version-marker">${t('selectedStar')}</span>` : ''}</td>
                                         <td>${getEntryDateLabel(variant) || '-'}</td>
                                         <td>${formatMetric(vm.ttft_ms)}</td>
                                         <td>${formatMetric(vm.throughput_tps)}</td>

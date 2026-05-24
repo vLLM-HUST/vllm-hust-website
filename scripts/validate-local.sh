@@ -11,6 +11,7 @@ NC='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+DEV_REQUIREMENTS_FILE="$PROJECT_ROOT/requirements-dev.txt"
 
 RUN_PRE_COMMIT=true
 RUN_TESTS=true
@@ -102,13 +103,13 @@ PY
         return 0
     fi
 
-    if command -v uvx >/dev/null 2>&1; then
-        PRE_COMMIT_CMD=(uvx --python 3.11 pre-commit)
+    if command -v uv >/dev/null 2>&1; then
+        PRE_COMMIT_CMD=(uv run --python 3.11 --with-requirements "$DEV_REQUIREMENTS_FILE" pre-commit)
         return 0
     fi
 
     echo -e "${RED}❌ pre-commit is not available.${NC}"
-    echo -e "${YELLOW}👉 Install pre-commit in the current environment, or install uv for uvx fallback.${NC}"
+    echo -e "${YELLOW}👉 Install validation dependencies with $PYTHON_BIN -m pip install -r requirements-dev.txt, or install uv for the fallback path.${NC}"
     exit 1
 }
 
@@ -117,25 +118,21 @@ resolve_pytest_cmd() {
 import importlib.util
 import sys
 
-sys.exit(0 if importlib.util.find_spec("pytest") else 1)
+sys.exit(0 if importlib.util.find_spec("pytest") and importlib.util.find_spec("jsonschema") else 1)
 PY
     then
         PYTEST_CMD=("$PYTHON_BIN" -m pytest)
         return 0
     fi
 
-    if command -v pytest >/dev/null 2>&1; then
-        PYTEST_CMD=(pytest)
+    if command -v uv >/dev/null 2>&1; then
+        PYTEST_CMD=(uv run --python 3.11 --with-requirements "$DEV_REQUIREMENTS_FILE" pytest)
         return 0
     fi
 
-    if command -v uvx >/dev/null 2>&1; then
-        PYTEST_CMD=(uvx --python 3.11 pytest)
-        return 0
-    fi
+    echo -e "${RED}❌ pytest/jsonschema are not available in the current environment.${NC}"
+    echo -e "${YELLOW}👉 Install validation dependencies with $PYTHON_BIN -m pip install -r requirements-dev.txt, or install uv for the fallback path.${NC}"
 
-    echo -e "${RED}❌ pytest is not available.${NC}"
-    echo -e "${YELLOW}👉 Install pytest in the current environment, or install uv for uvx fallback.${NC}"
     exit 1
 }
 

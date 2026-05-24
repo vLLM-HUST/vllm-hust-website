@@ -379,6 +379,92 @@ def test_aggregate_results_sanitizes_dirty_engine_version(
     assert single_payload[0]["metadata"]["engine_version"] == "g11111111"
 
 
+def test_aggregate_results_backfills_missing_910b3_memory_for_existing_and_incoming_entries(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+    output_dir = tmp_path / "website_data"
+    output_dir.mkdir()
+
+    existing_entry = _valid_entry()
+    existing_entry["entry_id"] = "11111111-1111-1111-1111-111111111111"
+    existing_entry["engine"] = "vllm-hust"
+    existing_entry["engine_version"] = "0.20.1"
+    existing_entry["metadata"]["engine"] = "vllm-hust"
+    existing_entry["metadata"]["engine_version"] = "0.20.1"
+    existing_entry["hardware"]["vendor"] = "Huawei"
+    existing_entry["hardware"]["chip_model"] = "910B3"
+    existing_entry["hardware"]["chip_count"] = 4
+    existing_entry["hardware"].pop("memory_per_chip_gb")
+    existing_entry["hardware"].pop("total_memory_gb")
+    existing_entry["metadata"]["idempotency_key"] = (
+        "existing|0.20.1|short|qwen-qwen2.5-0.5b-instruct|fp16|910b3|4|1|multi_gpu"
+    )
+    existing_entry["config_type"] = "multi_gpu"
+
+    (output_dir / "leaderboard_single.json").write_text(
+        "[]\n",
+        encoding="utf-8",
+    )
+    (output_dir / "leaderboard_multi.json").write_text(
+        json.dumps([existing_entry], indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    incoming_entry = _valid_entry()
+    incoming_entry["entry_id"] = "22222222-2222-2222-2222-222222222222"
+    incoming_entry["engine"] = "vllm-hust"
+    incoming_entry["engine_version"] = "0.20.2"
+    incoming_entry["metadata"]["engine"] = "vllm-hust"
+    incoming_entry["metadata"]["engine_version"] = "0.20.2"
+    incoming_entry["hardware"]["vendor"] = "Huawei"
+    incoming_entry["hardware"]["chip_model"] = "910B3"
+    incoming_entry["hardware"]["chip_count"] = 2
+    incoming_entry["hardware"].pop("memory_per_chip_gb")
+    incoming_entry["hardware"].pop("total_memory_gb")
+    incoming_entry["metadata"]["idempotency_key"] = (
+        "incoming|0.20.2|short|qwen-qwen2.5-0.5b-instruct|fp16|910b3|2|1|multi_gpu"
+    )
+    incoming_entry["config_type"] = "multi_gpu"
+
+    _write_manifest_entries(source_dir, [incoming_entry])
+    result = _run_aggregate(script, source_dir, output_dir)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    multi_payload = json.loads(
+        (output_dir / "leaderboard_multi.json").read_text(encoding="utf-8")
+    )
+    payload_by_id = {entry["entry_id"]: entry for entry in multi_payload}
+
+    assert (
+        payload_by_id["11111111-1111-1111-1111-111111111111"]["hardware"][
+            "memory_per_chip_gb"
+        ]
+        == 64.0
+    )
+    assert (
+        payload_by_id["11111111-1111-1111-1111-111111111111"]["hardware"][
+            "total_memory_gb"
+        ]
+        == 256.0
+    )
+    assert (
+        payload_by_id["22222222-2222-2222-2222-222222222222"]["hardware"][
+            "memory_per_chip_gb"
+        ]
+        == 64.0
+    )
+    assert (
+        payload_by_id["22222222-2222-2222-2222-222222222222"]["hardware"][
+            "total_memory_gb"
+        ]
+        == 128.0
+    )
+
+
 def test_aggregate_results_merge_updates_only_touched_categories(
     tmp_path: Path,
 ) -> None:

@@ -89,6 +89,30 @@ def test_index_cache_busts_leaderboard_script() -> None:
     assert re.search(r'\.\/assets\/leaderboard\.css\?v=[^"\']+', text)
 
 
+def test_validation_dependencies_have_single_source_of_truth() -> None:
+    root = Path(__file__).resolve().parents[1]
+    requirements_text = (root / "requirements-dev.txt").read_text(encoding="utf-8")
+    ci_text = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    quickstart_text = (root / "quickstart.sh").read_text(encoding="utf-8")
+    validate_text = (root / "scripts" / "validate-local.sh").read_text(encoding="utf-8")
+    readme_text = (root / "README.md").read_text(encoding="utf-8")
+
+    assert "pre-commit" in requirements_text
+    assert "pytest" in requirements_text
+    assert "jsonschema" in requirements_text
+    assert "python -m pip install -r requirements-dev.txt" in ci_text
+    assert "requirements-dev.txt" in quickstart_text
+    assert '--with-requirements "$DEV_REQUIREMENTS_FILE"' in validate_text
+    assert 'find_spec("jsonschema")' in validate_text
+    assert "if command -v pytest >/dev/null 2>&1; then" not in validate_text
+    assert "uvx --python 3.11 pytest" not in validate_text
+    assert "uvx --python 3.11 pre-commit" not in validate_text
+    assert "python3.11 -m pip install -r requirements-dev.txt" in readme_text
+    assert (
+        "uv run --python 3.11 --with-requirements requirements-dev.txt" in readme_text
+    )
+
+
 def test_engine_summary_cards_use_composite_version_components() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
@@ -131,6 +155,23 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert ".engine-summary-footer-value {" in css_text
     assert "font-size: 0.94rem;" in css_text
     assert "font-weight: 600;" in css_text
+
+
+def test_detail_sections_reuse_composite_versions_and_memory_fallback() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
+
+    assert "function getEntryCompositeVersionText(entry)" in text
+    assert "function getEntryTotalMemoryGb(entry)" in text
+    assert "function formatMemoryGb(value)" in text
+    assert "const totalMemoryGb = getEntryTotalMemoryGb(entry);" in text
+    assert "${formatMemoryGb(totalMemoryGb)} GB" in text
+    assert "const displayedVersion = getEntryCompositeVersionText(entry);" in text
+    assert "const variantVersion = getEntryCompositeVersionText(variant);" in text
+    assert '<span class="build-version-summary">${variantVersion}</span>' in text
+    assert ".build-version-summary {" in css_text
+    assert ".build-version-marker {" in css_text
 
 
 def test_local_validation_script_and_hook_templates_track_ci() -> None:
