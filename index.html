@@ -40,7 +40,7 @@
     />
 
     <!-- Leaderboard Styles: bump ?v whenever leaderboard.css changes to bust browser/GitHub Pages caches -->
-    <link rel="stylesheet" href="./assets/leaderboard.css?v=leaderboard-overview-meta-20260523-1" />
+    <link rel="stylesheet" href="./assets/leaderboard.css?v=leaderboard-sort-pagination-20260525" />
 
     <style>
       * {
@@ -1379,6 +1379,9 @@
                 <option value="all">All</option>
               </select>
             </div>
+            <div class="filter-group filter-group--reset">
+              <button id="btn-reset-filters" class="btn-reset-filters">↺ <span id="btn-reset-filters-label">Reset</span></button>
+            </div>
           </div>
 
           <div class="compare-controls">
@@ -1418,6 +1421,9 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Pagination -->
+          <div id="leaderboard-pagination" class="leaderboard-pagination"></div>
 
           <!-- Empty State -->
           <div id="empty-state" class="empty-state" style="display: none">
@@ -2363,6 +2369,6 @@
     <script src="./assets/workstation-embed.js"></script>
 
     <!-- Leaderboard Script: bump ?v whenever leaderboard.js changes to bust browser/GitHub Pages caches -->
-  <script src="./assets/leaderboard.js?v=leaderboard-overview-meta-20260523-1"></script>
+  <script src="./assets/leaderboard.js?v=leaderboard-sort-pagination-20260525"></script>
   </body>
 </html>
