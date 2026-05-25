@@ -1644,15 +1644,24 @@
             const th = document.getElementById(headId);
             if (!th) return;
             th.classList.add('sortable-header');
-            th.addEventListener('click', () => {
+            th.setAttribute('tabindex', '0');
+            th.setAttribute('role', 'columnheader');
+            th.setAttribute('aria-sort', 'none');
+            function activateSort() {
                 const sortState = state.sort[state.currentTab];
                 if (sortState.column === col) {
-                    // Toggle direction on same column; third click clears sort
-                    if (sortState.direction === 'desc') {
+                    // Three-state cycle per column: firstDir → secondDir → unsorted
+                    // throughput_tps (higher-is-better): desc → asc → unsorted
+                    // others (lower-is-better):           asc  → desc → unsorted
+                    const firstDir = col === 'throughput_tps' ? 'desc' : 'asc';
+                    const secondDir = firstDir === 'desc' ? 'asc' : 'desc';
+                    if (sortState.direction === secondDir) {
+                        // Third click: clear sort
                         sortState.column = null;
                         sortState.direction = 'asc';
                     } else {
-                        sortState.direction = 'desc';
+                        // Second click: flip to opposite direction
+                        sortState.direction = secondDir;
                     }
                 } else {
                     sortState.column = col;
@@ -1661,6 +1670,13 @@
                 }
                 state.pagination[state.currentTab].page = 1;
                 renderTable();
+            }
+            th.addEventListener('click', activateSort);
+            th.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    activateSort();
+                }
             });
         });
 
@@ -1817,6 +1833,7 @@
             emptyState.style.display = 'block';
             renderDataStats(data.length, filtered.length, visibleEntries.length, 0, comparisonView);
             renderOverview([], comparisonView, viewOptions);
+            renderPagination(0, 0); // clear any stale pagination controls
             return;
         }
 
@@ -2673,6 +2690,9 @@
             th.classList.remove('sort-active-asc', 'sort-active-desc');
             if (sortState.column === col) {
                 th.classList.add(sortState.direction === 'asc' ? 'sort-active-asc' : 'sort-active-desc');
+                th.setAttribute('aria-sort', sortState.direction === 'asc' ? 'ascending' : 'descending');
+            } else {
+                th.setAttribute('aria-sort', 'none');
             }
         });
     }
