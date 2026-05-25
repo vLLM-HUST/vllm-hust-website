@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-14",
+  "updated_at": "2026-05-25",
   "scope_repos": [
     "vllm-hust",
     "vllm-ascend-hust",
@@ -7,7 +7,8 @@
     "vllm-hust-dev-hub",
     "vllm-hust-docs",
     "vllm-hust-website",
-    "vllm-hust-workstation"
+    "vllm-hust-workstation",
+    "vllm-ascend-quant-hust"
   ],
   "contributors": [
     {
@@ -15,9 +16,9 @@
       "name": "Shuhao Zhang",
       "github_login": "ShuhaoZhangTony",
       "github_url": "https://github.com/ShuhaoZhangTony",
-      "changed_lines": 1240204,
-      "added": 1098102,
-      "deleted": 142102,
+      "changed_lines": 1243808,
+      "added": 1101246,
+      "deleted": 142562,
       "active_repos": 7,
       "repos": [
         "vllm-ascend-hust",
@@ -58,6 +59,22 @@
     },
     {
       "rank": 4,
+      "name": "moonandlife",
+      "github_login": "moonandlife",
+      "github_url": "https://github.com/moonandlife",
+      "changed_lines": 12130,
+      "added": 10124,
+      "deleted": 2006,
+      "active_repos": 4,
+      "repos": [
+        "vllm-ascend-hust",
+        "vllm-hust",
+        "vllm-hust-dev-hub",
+        "vllm-hust-website"
+      ]
+    },
+    {
+      "rank": 5,
       "name": "KimmoZAG",
       "github_login": "KimmoZAG",
       "github_url": "https://github.com/KimmoZAG",
@@ -71,22 +88,20 @@
       ]
     },
     {
-      "rank": 5,
-      "name": "moonandlife",
-      "github_login": "moonandlife",
-      "github_url": "https://github.com/moonandlife",
-      "changed_lines": 3468,
-      "added": 2926,
-      "deleted": 542,
-      "active_repos": 3,
+      "rank": 6,
+      "name": "machuanhu",
+      "github_login": null,
+      "github_url": null,
+      "changed_lines": 4774,
+      "added": 4773,
+      "deleted": 1,
+      "active_repos": 1,
       "repos": [
-        "vllm-ascend-hust",
-        "vllm-hust",
-        "vllm-hust-dev-hub"
+        "vllm-hust"
       ]
     },
     {
-      "rank": 6,
+      "rank": 7,
       "name": "iliujunn",
       "github_login": "iliujunn",
       "github_url": "https://github.com/iliujunn",
@@ -100,7 +115,20 @@
       ]
     },
     {
-      "rank": 7,
+      "rank": 8,
+      "name": "vllm-hust-quantization",
+      "github_login": null,
+      "github_url": null,
+      "changed_lines": 848,
+      "added": 848,
+      "deleted": 0,
+      "active_repos": 1,
+      "repos": [
+        "vllm-ascend-quant-hust"
+      ]
+    },
+    {
+      "rank": 9,
       "name": "CubeLander",
       "github_login": "CubeLander",
       "github_url": "https://github.com/CubeLander",
@@ -113,7 +141,21 @@
       ]
     },
     {
-      "rank": 8,
+      "rank": 10,
+      "name": "sad-and-bad1231",
+      "github_login": null,
+      "github_url": null,
+      "changed_lines": 491,
+      "added": 448,
+      "deleted": 43,
+      "active_repos": 2,
+      "repos": [
+        "vllm-ascend-hust",
+        "vllm-hust"
+      ]
+    },
+    {
+      "rank": 11,
       "name": "pygone",
       "github_login": "Pygone",
       "github_url": "https://github.com/Pygone",
@@ -123,6 +165,32 @@
       "active_repos": 1,
       "repos": [
         "vllm-hust-website"
+      ]
+    },
+    {
+      "rank": 12,
+      "name": "cybber695",
+      "github_login": null,
+      "github_url": null,
+      "changed_lines": 103,
+      "added": 98,
+      "deleted": 5,
+      "active_repos": 1,
+      "repos": [
+        "vllm-ascend-hust"
+      ]
+    },
+    {
+      "rank": 13,
+      "name": "aly16-k",
+      "github_login": null,
+      "github_url": null,
+      "changed_lines": 33,
+      "added": 31,
+      "deleted": 2,
+      "active_repos": 1,
+      "repos": [
+        "vllm-ascend-hust"
       ]
     }
   ]
