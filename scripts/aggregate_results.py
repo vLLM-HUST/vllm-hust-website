@@ -323,11 +323,14 @@ def infer_repo_id_from_short_name(value: Any) -> str | None:
     return None
 
 
+def format_model_display_name(value: Any) -> str:
+    return normalize_model_name(value)
+
+
 def resolve_model_identity(model_payload: dict[str, Any]) -> dict[str, str]:
     raw_canonical_id = str(model_payload.get("canonical_id") or "").strip()
     raw_repo_id = str(model_payload.get("repo_id") or "").strip()
     raw_short_name = str(model_payload.get("short_name") or "").strip()
-    raw_display_name = str(model_payload.get("display_name") or "").strip()
     raw_name = str(model_payload.get("name") or "").strip()
 
     parsed_canonical = parse_canonical_model_id(raw_canonical_id)
@@ -348,7 +351,7 @@ def resolve_model_identity(model_payload: dict[str, Any]) -> dict[str, str]:
             break
 
     short_name = raw_short_name or normalize_model_name(repo_id or raw_name)
-    display_name = raw_display_name or short_name or "unknown-model"
+    display_name = format_model_display_name(short_name or repo_id or raw_name)
 
     if repo_id:
         canonical_id = (
@@ -1045,6 +1048,10 @@ def build_hard_constraint_snapshot(entries: list[dict[str, Any]]) -> dict[str, A
             "model_canonical_id": str(
                 (latest.get("model") or {}).get("canonical_id") or ""
             ),
+            "model_short_name": str(
+                (latest.get("model") or {}).get("short_name")
+                or normalize_model_name((latest.get("model") or {}).get("name"))
+            ),
             "model_display_name": str(
                 (latest.get("model") or {}).get("display_name")
                 or (latest.get("model") or {}).get("short_name")
@@ -1363,6 +1370,12 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
                 "model_canonical_id": str(
                     (current_entry.get("model") or {}).get("canonical_id") or ""
                 ),
+                "model_short_name": str(
+                    (current_entry.get("model") or {}).get("short_name")
+                    or normalize_model_name(
+                        (current_entry.get("model") or {}).get("name")
+                    )
+                ),
                 "model_display_name": str(
                     (current_entry.get("model") or {}).get("display_name")
                     or (current_entry.get("model") or {}).get("short_name")
@@ -1464,6 +1477,10 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
                     ),
                     "model_canonical_id": str(
                         (entry.get("model") or {}).get("canonical_id") or ""
+                    ),
+                    "model_short_name": str(
+                        (entry.get("model") or {}).get("short_name")
+                        or normalize_model_name((entry.get("model") or {}).get("name"))
                     ),
                     "model_display_name": str(
                         (entry.get("model") or {}).get("display_name")

@@ -966,6 +966,10 @@ def test_aggregate_results_goal_progress_matches_prefixed_model_names(
         goal_progress["headline_pair"]["scope"]["model"] == "Qwen/Qwen2.5-0.5B-Instruct"
     )
     assert (
+        goal_progress["headline_pair"]["scope"]["model_short_name"]
+        == "Qwen2.5-0.5B-Instruct"
+    )
+    assert (
         goal_progress["headline_pair"]["scope"]["model_display_name"]
         == "Qwen2.5-0.5B-Instruct"
     )

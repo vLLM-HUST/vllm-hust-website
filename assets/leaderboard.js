@@ -47,13 +47,6 @@
     ];
     const ENGINE_VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
     const CANONICAL_MODEL_ID_PATTERN = /^(?<registry>[a-z0-9][a-z0-9_-]*):(?<repoId>.+)$/;
-    const HF_CACHE_PATH_PATTERN = /(?:^|\/)models--([^/]+)--([^/]+)\/(?:snapshots|refs)\//i;
-    const LEGACY_MODEL_REPO_PREFIX_RULES = [
-        [/^(Qwen|QwQ)/i, 'Qwen'],
-        [/^(DeepSeek|DeepSeek-R1)/i, 'deepseek-ai'],
-        [/^Mistral/i, 'mistralai'],
-        [/^(Llama|Meta-Llama)/i, 'meta-llama'],
-    ];
 
     const UI_STRINGS = {
         en: {
@@ -1223,18 +1216,6 @@
         };
     }
 
-    function extractRepoIdFromCachePath(value) {
-        const raw = String(value || '').trim();
-        if (!raw) {
-            return '';
-        }
-        const match = raw.match(HF_CACHE_PATH_PATTERN);
-        if (!match) {
-            return '';
-        }
-        return `${match[1]}/${match[2]}`;
-    }
-
     function looksLikeRepoId(value) {
         const raw = String(value || '').trim();
         if (!raw || raw.startsWith('/')) {
@@ -1244,63 +1225,26 @@
         return parts.length === 2;
     }
 
-    function inferRepoIdFromShortName(value) {
-        const raw = String(value || '').trim();
-        if (!raw || raw.includes('/')) {
-            return '';
-        }
-        for (const [pattern, namespace] of LEGACY_MODEL_REPO_PREFIX_RULES) {
-            if (pattern.test(raw)) {
-                return `${namespace}/${raw}`;
-            }
-        }
-        return '';
-    }
-
-    function resolveModelIdentityPayload(modelPayload) {
-        const payload = modelPayload && typeof modelPayload === 'object' ? modelPayload : {};
+    function getEntryModelIdentity(entry) {
+        const payload = entry?.model && typeof entry.model === 'object' ? entry.model : {};
         const rawCanonicalId = String(payload.canonical_id || '').trim();
         const rawRepoId = String(payload.repo_id || '').trim();
         const rawShortName = String(payload.short_name || '').trim();
         const rawDisplayName = String(payload.display_name || '').trim();
         const rawName = String(payload.name || '').trim();
         const parsedCanonical = parseCanonicalModelId(rawCanonicalId);
-        const registry = parsedCanonical?.registry || 'hf';
-        const repoId = [
-            parsedCanonical?.repoId || '',
-            rawRepoId,
-            extractRepoIdFromCachePath(rawName),
-            looksLikeRepoId(rawName) ? rawName : '',
-            inferRepoIdFromShortName(rawName),
-            inferRepoIdFromShortName(rawShortName),
-        ].find(Boolean) || '';
+        const repoId = rawRepoId || parsedCanonical?.repoId || (looksLikeRepoId(rawName) ? rawName : '');
         const shortName = rawShortName || normalizeScopeModelName(repoId || rawName);
-        const displayName = rawDisplayName || shortName || 'Unknown model';
+        const displayName = rawDisplayName || rawShortName || normalizeScopeModelName(repoId || rawName) || 'Unknown model';
 
-        if (repoId) {
-            return {
-                canonicalId: parsedCanonical?.repoId === repoId ? rawCanonicalId : `${registry}:${repoId}`,
-                repoId,
-                shortName,
-                displayName,
-                name: repoId,
-            };
-        }
-
-        const fallback = shortName || normalizeScopeModelName(rawName);
         return {
-            canonicalId: rawCanonicalId || `legacy:${fallback}`,
-            repoId: rawRepoId || fallback,
-            shortName: fallback,
+            canonicalId: rawCanonicalId,
+            repoId,
+            shortName,
             displayName,
-            name: rawName || fallback,
+            name: rawName || repoId || shortName || 'unknown-model',
         };
     }
-
-    function getEntryModelIdentity(entry) {
-        return resolveModelIdentityPayload(entry?.model || {});
-    }
-
     function getEntryModelCanonicalId(entry) {
         return getEntryModelIdentity(entry).canonicalId;
     }
@@ -1318,13 +1262,20 @@
     }
 
     function getScopeModelIdentity(scope) {
-        return resolveModelIdentityPayload({
-            canonical_id: scope?.model_canonical_id,
-            repo_id: scope?.model,
-            short_name: scope?.model_short_name,
-            display_name: scope?.model_display_name,
-            name: scope?.model,
-        });
+        const rawCanonicalId = String(scope?.model_canonical_id || '').trim();
+        const rawRepoId = String(scope?.model || '').trim();
+        const rawShortName = String(scope?.model_short_name || '').trim();
+        const rawDisplayName = String(scope?.model_display_name || '').trim();
+        const shortName = rawShortName || normalizeScopeModelName(rawRepoId);
+        const displayName = rawDisplayName || shortName || 'Unknown model';
+
+        return {
+            canonicalId: rawCanonicalId,
+            repoId: rawRepoId,
+            shortName,
+            displayName,
+            name: rawRepoId || shortName || 'unknown-model',
+        };
     }
 
     function getScopeModelDisplayName(scope) {
@@ -2773,7 +2724,10 @@
     }
 
     function createCompareScopeKey(entry) {
-        const model = getEntryModelCanonicalId(entry) || normalizeScopeModelName(entry?.model?.name);
+        const model = getEntryModelCanonicalId(entry)
+            || getEntryModelRepoId(entry)
+            || getEntryModelShortName(entry)
+            || normalizeScopeModelName(entry?.model?.name);
         const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
         const precision = entry?.model?.precision || 'unknown-precision';
         const workload = getWorkloadId(entry) || 'Other';
