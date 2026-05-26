@@ -55,10 +55,13 @@ Schema accepts both:
     `hf:Qwen/Qwen2.5-14B-Instruct`
   - `repo_id`: upstream repository coordinate, for example `Qwen/Qwen2.5-14B-Instruct`
   - `short_name`: namespace-free alias, for example `Qwen2.5-14B-Instruct`
-  - `display_name`: UI-friendly label, for example `Qwen 2.5 14B Instruct`
+  - `display_name`: final UI label, for example `Qwen2.5-14B-Instruct`
 - Compatibility rule: `model.name` remains in schema v1 and should mirror `model.repo_id` for newly
   exported artifacts
 
+`display_name` is presentation-only. In the current contract it mirrors the industry-standard public
+release string carried by `short_name`, for example `Qwen2.5-14B-Instruct`. Writers may override it
+only through an explicit normalized registry entry, not by frontend heuristics.
 ### `constraints` (Hard constraints)
 
 - Required `scenario_source = "vllm-benchmark"`
@@ -104,9 +107,9 @@ Website render fields must be present in schema and examples:
 - trend metrics: `metrics.ttft_ms`, `metrics.throughput_tps`, `metrics.peak_mem_mb`,
   `metrics.error_rate`, `metrics.prefix_hit_rate`
 
-Normalized exporters may additionally emit `model.canonical_id`, `model.repo_id`,
-`model.short_name`, and `model.display_name`. These fields are intended for future filter and
-grouping migration without breaking schema v1 readers.
+Normalized exporters should emit `model.canonical_id`, `model.repo_id`, `model.short_name`, and
+`model.display_name`. Website filters and grouping logic must treat `canonical_id` as the machine
+identity and `display_name` as presentation-only.
 
 ## Derived compare snapshot
 

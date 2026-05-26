@@ -1,6 +1,6 @@
 {
   "schema_version": "leaderboard-compare-snapshot/v1",
-  "generated_at": "2026-05-26T02:44:38.608156+00:00",
+  "generated_at": "2026-05-26T08:21:10.732273+00:00",
   "group_count": 1,
   "preferred_pair_count": 1,
   "groups": [
@@ -10,6 +10,7 @@
       "scope": {
         "model": "Qwen/Qwen2.5-14B-Instruct",
         "model_canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+        "model_short_name": "Qwen2.5-14B-Instruct",
         "model_display_name": "Qwen2.5-14B-Instruct",
         "hardware": "910B3",
         "precision": "FP16",
@@ -43,21 +44,21 @@
         },
         {
           "engine": "vllm-hust",
-          "engine_version": "a8ddfb0a",
-          "entry_id": "a5761a14-7b1e-4cf0-b389-240d6e3d3dd2",
-          "submitted_at": "2026-05-23T10:22:30Z",
+          "engine_version": "4ca39960",
+          "entry_id": "b56d6636-4f0b-47dd-97d5-770d5f15abc6",
+          "submitted_at": "2026-05-26T05:40:20Z",
           "canonical_path": null,
           "github_repository": "vLLM-HUST/vllm-hust",
-          "git_commit": "a8ddfb0acf1b84ee3b8d9ad87073cf52df2d9497",
+          "git_commit": "4ca39960f5058498cb8097aa65074d572487cc3b",
           "same_spec": {
             "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
             "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9"
           },
           "metrics": {
-            "ttft_ms": 389.0469839377329,
-            "tbt_ms": 117.08338557885429,
-            "throughput_tps": 224.44794933487927,
-            "output_throughput_tps": 224.44794933487927,
+            "ttft_ms": 393.87050387915224,
+            "tbt_ms": 122.16964923965232,
+            "throughput_tps": 222.77980582773804,
+            "output_throughput_tps": 222.77980582773804,
             "error_rate": 0.0
           }
         }
@@ -85,28 +86,28 @@
         },
         "right": {
           "engine": "vllm-hust",
-          "engine_version": "a8ddfb0a",
-          "entry_id": "a5761a14-7b1e-4cf0-b389-240d6e3d3dd2",
-          "submitted_at": "2026-05-23T10:22:30Z",
+          "engine_version": "4ca39960",
+          "entry_id": "b56d6636-4f0b-47dd-97d5-770d5f15abc6",
+          "submitted_at": "2026-05-26T05:40:20Z",
           "canonical_path": null,
           "github_repository": "vLLM-HUST/vllm-hust",
-          "git_commit": "a8ddfb0acf1b84ee3b8d9ad87073cf52df2d9497",
+          "git_commit": "4ca39960f5058498cb8097aa65074d572487cc3b",
           "same_spec": {
             "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
             "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9"
           },
           "metrics": {
-            "ttft_ms": 389.0469839377329,
-            "tbt_ms": 117.08338557885429,
-            "throughput_tps": 224.44794933487927,
-            "output_throughput_tps": 224.44794933487927,
+            "ttft_ms": 393.87050387915224,
+            "tbt_ms": 122.16964923965232,
+            "throughput_tps": 222.77980582773804,
+            "output_throughput_tps": 222.77980582773804,
             "error_rate": 0.0
           }
         },
         "deltas": {
-          "throughput_pct_left_vs_right": 1.1983,
-          "ttft_pct_left_vs_right": -30.3162,
-          "tbt_pct_left_vs_right": -37.838
+          "throughput_pct_left_vs_right": 1.9561,
+          "ttft_pct_left_vs_right": -31.1695,
+          "tbt_pct_left_vs_right": -40.426
         },
         "winners": {
           "throughput": "left",
@@ -123,6 +124,7 @@
       "scope": {
         "model": "Qwen/Qwen2.5-14B-Instruct",
         "model_canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+        "model_short_name": "Qwen2.5-14B-Instruct",
         "model_display_name": "Qwen2.5-14B-Instruct",
         "hardware": "910B3",
         "precision": "FP16",
@@ -156,21 +158,21 @@
         },
         {
           "engine": "vllm-hust",
-          "engine_version": "a8ddfb0a",
-          "entry_id": "a5761a14-7b1e-4cf0-b389-240d6e3d3dd2",
-          "submitted_at": "2026-05-23T10:22:30Z",
+          "engine_version": "4ca39960",
+          "entry_id": "b56d6636-4f0b-47dd-97d5-770d5f15abc6",
+          "submitted_at": "2026-05-26T05:40:20Z",
           "canonical_path": null,
           "github_repository": "vLLM-HUST/vllm-hust",
-          "git_commit": "a8ddfb0acf1b84ee3b8d9ad87073cf52df2d9497",
+          "git_commit": "4ca39960f5058498cb8097aa65074d572487cc3b",
           "same_spec": {
             "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
             "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9"
           },
           "metrics": {
-            "ttft_ms": 389.0469839377329,
-            "tbt_ms": 117.08338557885429,
-            "throughput_tps": 224.44794933487927,
-            "output_throughput_tps": 224.44794933487927,
+            "ttft_ms": 393.87050387915224,
+            "tbt_ms": 122.16964923965232,
+            "throughput_tps": 222.77980582773804,
+            "output_throughput_tps": 222.77980582773804,
             "error_rate": 0.0
           }
         }
@@ -198,28 +200,28 @@
         },
         "right": {
           "engine": "vllm-hust",
-          "engine_version": "a8ddfb0a",
-          "entry_id": "a5761a14-7b1e-4cf0-b389-240d6e3d3dd2",
-          "submitted_at": "2026-05-23T10:22:30Z",
+          "engine_version": "4ca39960",
+          "entry_id": "b56d6636-4f0b-47dd-97d5-770d5f15abc6",
+          "submitted_at": "2026-05-26T05:40:20Z",
           "canonical_path": null,
           "github_repository": "vLLM-HUST/vllm-hust",
-          "git_commit": "a8ddfb0acf1b84ee3b8d9ad87073cf52df2d9497",
+          "git_commit": "4ca39960f5058498cb8097aa65074d572487cc3b",
           "same_spec": {
             "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
             "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9"
           },
           "metrics": {
-            "ttft_ms": 389.0469839377329,
-            "tbt_ms": 117.08338557885429,
-            "throughput_tps": 224.44794933487927,
-            "output_throughput_tps": 224.44794933487927,
+            "ttft_ms": 393.87050387915224,
+            "tbt_ms": 122.16964923965232,
+            "throughput_tps": 222.77980582773804,
+            "output_throughput_tps": 222.77980582773804,
             "error_rate": 0.0
           }
         },
         "deltas": {
-          "throughput_pct_left_vs_right": 1.1983,
-          "ttft_pct_left_vs_right": -30.3162,
-          "tbt_pct_left_vs_right": -37.838
+          "throughput_pct_left_vs_right": 1.9561,
+          "ttft_pct_left_vs_right": -31.1695,
+          "tbt_pct_left_vs_right": -40.426
         },
         "winners": {
           "throughput": "left",
@@ -244,6 +246,7 @@
       "scope": {
         "model": "Qwen/Qwen2.5-14B-Instruct",
         "model_canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+        "model_short_name": "Qwen2.5-14B-Instruct",
         "model_display_name": "Qwen2.5-14B-Instruct",
         "hardware": "910B3",
         "precision": "FP16",
@@ -256,21 +259,21 @@
       },
       "current": {
         "engine": "vllm-hust",
-        "engine_version": "a8ddfb0a",
-        "entry_id": "a5761a14-7b1e-4cf0-b389-240d6e3d3dd2",
-        "submitted_at": "2026-05-23T10:22:30Z",
+        "engine_version": "4ca39960",
+        "entry_id": "b56d6636-4f0b-47dd-97d5-770d5f15abc6",
+        "submitted_at": "2026-05-26T05:40:20Z",
         "canonical_path": null,
         "github_repository": "vLLM-HUST/vllm-hust",
-        "git_commit": "a8ddfb0acf1b84ee3b8d9ad87073cf52df2d9497",
+        "git_commit": "4ca39960f5058498cb8097aa65074d572487cc3b",
         "same_spec": {
           "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
           "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9"
         },
         "metrics": {
-          "ttft_ms": 389.0469839377329,
-          "tbt_ms": 117.08338557885429,
-          "throughput_tps": 224.44794933487927,
-          "output_throughput_tps": 224.44794933487927,
+          "ttft_ms": 393.87050387915224,
+          "tbt_ms": 122.16964923965232,
+          "throughput_tps": 222.77980582773804,
+          "output_throughput_tps": 222.77980582773804,
           "error_rate": 0.0
         }
       },
@@ -302,14 +305,14 @@
         "github_repository": "vllm-project/vllm-ascend"
       },
       "deltas": {
-        "throughput_pct_current_vs_baseline": -1.1841,
-        "ttft_pct_current_vs_baseline": 43.5053,
-        "tbt_pct_current_vs_baseline": 60.8701
+        "throughput_pct_current_vs_baseline": -1.9186,
+        "ttft_pct_current_vs_baseline": 45.2845,
+        "tbt_pct_current_vs_baseline": 67.8585
       },
       "remaining_gap_pct": {
-        "throughput": 1.1841,
-        "ttft": 43.5053,
-        "tbt": 60.8701
+        "throughput": 1.9186,
+        "ttft": 45.2845,
+        "tbt": 67.8585
       },
       "meets_goal": false
     },
@@ -320,6 +323,7 @@
         "scope": {
           "model": "Qwen/Qwen2.5-14B-Instruct",
           "model_canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+          "model_short_name": "Qwen2.5-14B-Instruct",
           "model_display_name": "Qwen2.5-14B-Instruct",
           "hardware": "910B3",
           "precision": "FP16",
@@ -332,21 +336,21 @@
         },
         "current": {
           "engine": "vllm-hust",
-          "engine_version": "a8ddfb0a",
-          "entry_id": "a5761a14-7b1e-4cf0-b389-240d6e3d3dd2",
-          "submitted_at": "2026-05-23T10:22:30Z",
+          "engine_version": "4ca39960",
+          "entry_id": "b56d6636-4f0b-47dd-97d5-770d5f15abc6",
+          "submitted_at": "2026-05-26T05:40:20Z",
           "canonical_path": null,
           "github_repository": "vLLM-HUST/vllm-hust",
-          "git_commit": "a8ddfb0acf1b84ee3b8d9ad87073cf52df2d9497",
+          "git_commit": "4ca39960f5058498cb8097aa65074d572487cc3b",
           "same_spec": {
             "spec_id": "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
             "resolved_spec_hash": "a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9"
           },
           "metrics": {
-            "ttft_ms": 389.0469839377329,
-            "tbt_ms": 117.08338557885429,
-            "throughput_tps": 224.44794933487927,
-            "output_throughput_tps": 224.44794933487927,
+            "ttft_ms": 393.87050387915224,
+            "tbt_ms": 122.16964923965232,
+            "throughput_tps": 222.77980582773804,
+            "output_throughput_tps": 222.77980582773804,
             "error_rate": 0.0
           }
         },
@@ -378,14 +382,14 @@
           "github_repository": "vllm-project/vllm-ascend"
         },
         "deltas": {
-          "throughput_pct_current_vs_baseline": -1.1841,
-          "ttft_pct_current_vs_baseline": 43.5053,
-          "tbt_pct_current_vs_baseline": 60.8701
+          "throughput_pct_current_vs_baseline": -1.9186,
+          "ttft_pct_current_vs_baseline": 45.2845,
+          "tbt_pct_current_vs_baseline": 67.8585
         },
         "remaining_gap_pct": {
-          "throughput": 1.1841,
-          "ttft": 43.5053,
-          "tbt": 60.8701
+          "throughput": 1.9186,
+          "ttft": 45.2845,
+          "tbt": 67.8585
         },
         "meets_goal": false
       }
@@ -393,7 +397,7 @@
   },
   "hard_constraints": {
     "schema_version": "leaderboard-hard-constraints/v1",
-    "generated_at": "2026-05-26T02:44:38.607796+00:00",
+    "generated_at": "2026-05-26T08:21:10.731844+00:00",
     "scope_count": 7,
     "pass_count": 2,
     "fail_count": 5,
@@ -405,6 +409,7 @@
           "engine": "vllm-hust",
           "model": "Qwen/Qwen2.5-7B-Instruct",
           "model_canonical_id": "hf:Qwen/Qwen2.5-7B-Instruct",
+          "model_short_name": "Qwen2.5-7B-Instruct",
           "model_display_name": "Qwen2.5-7B-Instruct",
           "hardware": "910B3",
           "workload": "sharegpt-online",
@@ -490,6 +495,7 @@
           "engine": "vllm-hust",
           "model": "Qwen/Qwen2.5-7B-Instruct",
           "model_canonical_id": "hf:Qwen/Qwen2.5-7B-Instruct",
+          "model_short_name": "Qwen2.5-7B-Instruct",
           "model_display_name": "Qwen2.5-7B-Instruct",
           "hardware": "910B3",
           "workload": "sharegpt-online",
@@ -627,6 +633,7 @@
           "engine": "vllm-hust",
           "model": "Qwen/Qwen2.5-14B-Instruct",
           "model_canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+          "model_short_name": "Qwen2.5-14B-Instruct",
           "model_display_name": "Qwen2.5-14B-Instruct",
           "hardware": "910B3",
           "workload": "random-online",
@@ -643,11 +650,11 @@
           }
         },
         "latest": {
-          "entry_id": "a5761a14-7b1e-4cf0-b389-240d6e3d3dd2",
+          "entry_id": "b56d6636-4f0b-47dd-97d5-770d5f15abc6",
           "engine": "vllm-hust",
-          "engine_version": "a8ddfb0a",
-          "submitted_at": "2026-05-23T10:22:30Z",
-          "git_commit": "a8ddfb0acf1b84ee3b8d9ad87073cf52df2d9497",
+          "engine_version": "4ca39960",
+          "submitted_at": "2026-05-26T05:40:20Z",
+          "git_commit": "4ca39960f5058498cb8097aa65074d572487cc3b",
           "scenario_source": "vllm-benchmark",
           "accountable_scope": {
             "domestic_chip_class": "Ascend-class",
@@ -696,11 +703,11 @@
           }
         },
         "previous": {
-          "entry_id": "9cbc4e2b-15a6-45ea-9124-0c648eba233e",
+          "entry_id": "e3eb6a60-afb7-4bcf-865d-26de6f972efc",
           "engine": "vllm-hust",
-          "engine_version": "a60057da",
-          "submitted_at": "2026-05-23T03:23:59Z",
-          "git_commit": "a60057da7de705a486ecad0ffcbe78cac141c2ef",
+          "engine_version": "d6fe8f2f",
+          "submitted_at": "2026-05-26T03:21:54Z",
+          "git_commit": "d6fe8f2f2cc3b3407f250bebed0c665c8aead440",
           "scenario_source": "vllm-benchmark",
           "accountable_scope": {
             "domestic_chip_class": "Ascend-class",
@@ -764,6 +771,7 @@
           "engine": "vllm-hust",
           "model": "Qwen/Qwen2.5-14B-Instruct",
           "model_canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+          "model_short_name": "Qwen2.5-14B-Instruct",
           "model_display_name": "Qwen2.5-14B-Instruct",
           "hardware": "910B3",
           "workload": "sonnet-throughput",
@@ -901,6 +909,7 @@
           "engine": "vllm-hust",
           "model": "Qwen/Qwen2.5-14B-Instruct",
           "model_canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+          "model_short_name": "Qwen2.5-14B-Instruct",
           "model_display_name": "Qwen2.5-14B-Instruct",
           "hardware": "910B3",
           "workload": "prefix-repetition-online",
@@ -986,6 +995,7 @@
           "engine": "vllm-hust",
           "model": "Qwen/Qwen2.5-14B-Instruct",
           "model_canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+          "model_short_name": "Qwen2.5-14B-Instruct",
           "model_display_name": "Qwen2.5-14B-Instruct",
           "hardware": "910B3",
           "workload": "sonnet-throughput",
@@ -1071,6 +1081,7 @@
           "engine": "vllm-hust",
           "model": "Qwen/Qwen2.5-14B-Instruct",
           "model_canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+          "model_short_name": "Qwen2.5-14B-Instruct",
           "model_display_name": "Qwen2.5-14B-Instruct",
           "hardware": "910B3",
           "workload": "random-latency",

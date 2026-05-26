@@ -19,9 +19,11 @@ python data/validate_schema.py \
      `metrics`, `constraints`, `versions`, `environment`, `metadata`
 1. **Model identity normalization fields**
    - schema v1 continues to require `model.name`, `model.parameters`, and `model.precision`
-   - when present, `model.canonical_id`, `model.repo_id`, `model.short_name`, and
-     `model.display_name` must all be strings
+   - normalized artifacts should carry `model.canonical_id`, `model.repo_id`, `model.short_name`,
+     and `model.display_name`, and all four fields must be strings
    - newly exported normalized artifacts should set `model.name = model.repo_id`
+   - `model.display_name` is a presentation label only: in the current contract it should mirror the
+     normalized `model.short_name`, not be synthesized from legacy raw values in the frontend
 1. **Hardware minimum**
    - `vendor`, `chip_model`, `chip_count`
    - at least one of `interconnect` / `intra_node_interconnect`
