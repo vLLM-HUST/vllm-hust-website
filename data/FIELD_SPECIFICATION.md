@@ -62,6 +62,7 @@ Schema accepts both:
 `display_name` is presentation-only. In the current contract it mirrors the industry-standard public
 release string carried by `short_name`, for example `Qwen2.5-14B-Instruct`. Writers may override it
 only through an explicit normalized registry entry, not by frontend heuristics.
+
 ### `constraints` (Hard constraints)
 
 - Required `scenario_source = "vllm-benchmark"`
