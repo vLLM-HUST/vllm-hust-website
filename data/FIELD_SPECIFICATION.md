@@ -47,6 +47,18 @@ Schema accepts both:
 - Optional: `prefix_hit_rate`, `tbt_ms`, `tpot_ms`, KV/evict metrics
 - Numeric values are non-negative (`error_rate` in `[0,1]`)
 
+### `model`
+
+- Required today: `name`, `parameters`, `precision`
+- Normalized identity fields supported by schema v1:
+  - `canonical_id`: machine identifier in `<registry>:<repo_id>` format, for example
+    `hf:Qwen/Qwen2.5-14B-Instruct`
+  - `repo_id`: upstream repository coordinate, for example `Qwen/Qwen2.5-14B-Instruct`
+  - `short_name`: namespace-free alias, for example `Qwen2.5-14B-Instruct`
+  - `display_name`: UI-friendly label, for example `Qwen 2.5 14B Instruct`
+- Compatibility rule: `model.name` remains in schema v1 and should mirror `model.repo_id` for newly
+  exported artifacts
+
 ### `constraints` (Hard constraints)
 
 - Required `scenario_source = "vllm-benchmark"`
@@ -91,6 +103,10 @@ Website render fields must be present in schema and examples:
 - config filters: `hardware.chip_model`, `model.name`, `model.precision`, `workload.name`
 - trend metrics: `metrics.ttft_ms`, `metrics.throughput_tps`, `metrics.peak_mem_mb`,
   `metrics.error_rate`, `metrics.prefix_hit_rate`
+
+Normalized exporters may additionally emit `model.canonical_id`, `model.repo_id`,
+`model.short_name`, and `model.display_name`. These fields are intended for future filter and
+grouping migration without breaking schema v1 readers.
 
 ## Derived compare snapshot
 

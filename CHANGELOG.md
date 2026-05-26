@@ -9,6 +9,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Leaderboard model identity is now normalized end-to-end across benchmark exports, website aggregation, frontend filters, and checked-in website snapshots: new artifacts carry `model.canonical_id` / `model.display_name`, compare scopes carry `model_canonical_id` / `model_display_name`, and the website filter now de-duplicates models by canonical id while rendering human-friendly display names. Refreshed `data/leaderboard_single.json`, `data/leaderboard_multi.json`, `data/leaderboard_compare.json`, and `data/last_updated.json` accordingly.
+
 - 清理官网 workstation 展示区中的历史旧品牌硬编码文字，统一改为 `vLLM-HUST Workstation`，不改动现有公开域名配置。
 
 - `scripts/aggregate_results.py` now updates website snapshots by rendered

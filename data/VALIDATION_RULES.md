@@ -17,6 +17,11 @@ python data/validate_schema.py \
 1. **Entry required keys**
    - `entry_id`, `engine`, `engine_version`, `config_type`, `hardware`, `model`, `workload`,
      `metrics`, `constraints`, `versions`, `environment`, `metadata`
+1. **Model identity normalization fields**
+   - schema v1 continues to require `model.name`, `model.parameters`, and `model.precision`
+   - when present, `model.canonical_id`, `model.repo_id`, `model.short_name`, and
+     `model.display_name` must all be strings
+   - newly exported normalized artifacts should set `model.name = model.repo_id`
 1. **Hardware minimum**
    - `vendor`, `chip_model`, `chip_count`
    - at least one of `interconnect` / `intra_node_interconnect`
