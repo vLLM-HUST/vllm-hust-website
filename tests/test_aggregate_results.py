@@ -23,6 +23,10 @@ def _valid_entry() -> dict:
             "total_memory_gb": 80,
         },
         "model": {
+            "canonical_id": "hf:Qwen/Qwen2.5-0.5B-Instruct",
+            "repo_id": "Qwen/Qwen2.5-0.5B-Instruct",
+            "short_name": "Qwen2.5-0.5B-Instruct",
+            "display_name": "Qwen2.5-0.5B-Instruct",
             "name": "Qwen/Qwen2.5-0.5B-Instruct",
             "parameters": "unknown",
             "precision": "FP16",
@@ -860,7 +864,7 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(
     assert goal_progress["headline_pair"]["remaining_gap_pct"]["throughput"] == 12.5
 
 
-def test_aggregate_results_goal_progress_matches_prefixed_model_names(
+def test_aggregate_results_rejects_legacy_model_payload_without_normalized_identity(
     tmp_path: Path,
 ) -> None:
     website_root = Path(__file__).resolve().parents[1]
@@ -868,33 +872,15 @@ def test_aggregate_results_goal_progress_matches_prefixed_model_names(
     source_dir = tmp_path / "benchmark_outputs"
     source_dir.mkdir()
 
-    current_entry = _valid_entry()
-    current_entry["entry_id"] = "44444444-4444-4444-4444-444444444444"
-    current_entry["engine"] = "vllm-hust"
-    current_entry["engine_version"] = "0.20.1rc1.dev314"
-    current_entry["model"]["name"] = "Qwen2.5-0.5B-Instruct"
-    current_entry["metadata"]["engine"] = "vllm-hust"
-    current_entry["metadata"]["engine_version"] = "0.20.1rc1.dev314"
-    current_entry["metadata"]["github_repository"] = "vLLM-HUST/vllm-ascend-hust"
-    current_entry["metadata"]["idempotency_key"] = (
-        "vllm-hust|0.20.1rc1.dev314|short|qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
-    )
-    current_entry["same_spec"] = _same_spec_payload("spec-2", "hash-2")
+    legacy_entry = _valid_entry()
+    legacy_entry["model"] = {
+        "name": "Qwen2.5-0.5B-Instruct",
+        "parameters": "unknown",
+        "precision": "FP16",
+        "quantization": "None",
+    }
 
-    baseline_entry = _valid_entry()
-    baseline_entry["entry_id"] = "55555555-5555-5555-5555-555555555555"
-    baseline_entry["engine"] = "vllm"
-    baseline_entry["engine_version"] = "0.11.0"
-    baseline_entry["metadata"]["engine"] = "vllm"
-    baseline_entry["metadata"]["engine_version"] = "0.11.0"
-    baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
-    baseline_entry["metrics"]["throughput_tps"] = 90.0
-    baseline_entry["metadata"]["idempotency_key"] = (
-        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
-    )
-    baseline_entry["same_spec"] = _same_spec_payload("spec-2", "hash-2")
-
-    entries = [current_entry, baseline_entry]
+    entries = [legacy_entry]
     manifest_entries = []
     for index, entry in enumerate(entries, start=1):
         artifact_name = f"prefixed_entry_{index}.json"
@@ -943,40 +929,10 @@ def test_aggregate_results_goal_progress_matches_prefixed_model_names(
         check=False,
     )
 
-    assert result.returncode == 0, result.stderr or result.stdout
-    compare_payload = json.loads(
-        (output_dir / "leaderboard_compare.json").read_text(encoding="utf-8")
-    )
-    goal_progress = compare_payload["goal_progress"]
-
-    single_payload = json.loads(
-        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
-    )
-    payload_by_id = {entry["entry_id"]: entry for entry in single_payload}
-
-    assert (
-        payload_by_id["44444444-4444-4444-4444-444444444444"]["model"]["name"]
-        == "Qwen/Qwen2.5-0.5B-Instruct"
-    )
-    assert (
-        payload_by_id["44444444-4444-4444-4444-444444444444"]["model"]["canonical_id"]
-        == "hf:Qwen/Qwen2.5-0.5B-Instruct"
-    )
-    assert (
-        goal_progress["headline_pair"]["scope"]["model"] == "Qwen/Qwen2.5-0.5B-Instruct"
-    )
-    assert (
-        goal_progress["headline_pair"]["scope"]["model_short_name"]
-        == "Qwen2.5-0.5B-Instruct"
-    )
-    assert (
-        goal_progress["headline_pair"]["scope"]["model_display_name"]
-        == "Qwen2.5-0.5B-Instruct"
-    )
-
-    assert goal_progress["pair_count"] == 1
-    assert goal_progress["headline_pair"]["current"]["engine"] == "vllm-hust"
-    assert goal_progress["headline_pair"]["baseline"]["engine"] == "vllm"
+    assert result.returncode != 0
+    output = result.stderr or result.stdout
+    assert "schema validation failed" in output
+    assert not (output_dir / "leaderboard_single.json").exists()
 
 
 def test_aggregate_results_hard_constraints_only_include_vllm_hust(

@@ -50,16 +50,6 @@ VALID_BASELINE_STATUSES = {
 CANONICAL_MODEL_ID_PATTERN = re.compile(
     r"^(?P<registry>[a-z0-9][a-z0-9_-]*):(?P<repo_id>.+)$"
 )
-HF_CACHE_PATH_PATTERN = re.compile(
-    r"(?:^|/)models--(?P<namespace>[^/]+)--(?P<name>[^/]+)/(?:snapshots|refs)/",
-    re.IGNORECASE,
-)
-LEGACY_MODEL_REPO_PREFIX_RULES = (
-    (re.compile(r"^(Qwen|QwQ)", re.IGNORECASE), "Qwen"),
-    (re.compile(r"^(DeepSeek|DeepSeek-R1)", re.IGNORECASE), "deepseek-ai"),
-    (re.compile(r"^Mistral", re.IGNORECASE), "mistralai"),
-    (re.compile(r"^(Llama|Meta-Llama)", re.IGNORECASE), "meta-llama"),
-)
 
 GOAL_BASELINE_TARGET = {
     "id": "official-ascend-jan-2026-v0.11.0",
@@ -295,84 +285,34 @@ def parse_canonical_model_id(value: Any) -> tuple[str, str] | None:
     return match.group("registry"), match.group("repo_id")
 
 
-def extract_repo_id_from_cache_path(value: Any) -> str | None:
-    normalized = str(value or "").strip()
-    if not normalized:
-        return None
-    match = HF_CACHE_PATH_PATTERN.search(normalized)
-    if not match:
-        return None
-    return f"{match.group('namespace')}/{match.group('name')}"
-
-
-def looks_like_repo_id(value: Any) -> bool:
-    normalized = str(value or "").strip()
-    if not normalized or normalized.startswith("/"):
-        return False
-    parts = normalized.split("/")
-    return len(parts) == 2 and all(part.strip() for part in parts)
-
-
-def infer_repo_id_from_short_name(value: Any) -> str | None:
-    normalized = str(value or "").strip()
-    if not normalized or "/" in normalized:
-        return None
-    for pattern, namespace in LEGACY_MODEL_REPO_PREFIX_RULES:
-        if pattern.match(normalized):
-            return f"{namespace}/{normalized}"
-    return None
-
-
-def format_model_display_name(value: Any) -> str:
-    return normalize_model_name(value)
-
-
 def resolve_model_identity(model_payload: dict[str, Any]) -> dict[str, str]:
-    raw_canonical_id = str(model_payload.get("canonical_id") or "").strip()
-    raw_repo_id = str(model_payload.get("repo_id") or "").strip()
-    raw_short_name = str(model_payload.get("short_name") or "").strip()
-    raw_name = str(model_payload.get("name") or "").strip()
-
-    parsed_canonical = parse_canonical_model_id(raw_canonical_id)
-    registry = parsed_canonical[0] if parsed_canonical is not None else "hf"
-    repo_id = ""
-
-    candidates = [
-        parsed_canonical[1] if parsed_canonical is not None else "",
-        raw_repo_id,
-        extract_repo_id_from_cache_path(raw_name) or "",
-        raw_name if looks_like_repo_id(raw_name) else "",
-        infer_repo_id_from_short_name(raw_name) or "",
-        infer_repo_id_from_short_name(raw_short_name) or "",
-    ]
-    for candidate in candidates:
-        if candidate:
-            repo_id = candidate
-            break
-
-    short_name = raw_short_name or normalize_model_name(repo_id or raw_name)
-    display_name = format_model_display_name(short_name or repo_id or raw_name)
-
-    if repo_id:
-        canonical_id = (
-            raw_canonical_id
-            if parsed_canonical is not None and parsed_canonical[1] == repo_id
-            else f"{registry}:{repo_id}"
-        )
-        name = repo_id
-    else:
-        fallback = short_name or normalize_model_name(raw_name)
-        canonical_id = raw_canonical_id or f"legacy:{fallback}"
-        repo_id = raw_repo_id or fallback
-        name = repo_id
-
-    return {
-        "canonical_id": canonical_id,
-        "repo_id": repo_id,
-        "short_name": short_name,
-        "display_name": display_name,
-        "name": name,
+    resolved = {
+        "canonical_id": str(model_payload.get("canonical_id") or "").strip(),
+        "repo_id": str(model_payload.get("repo_id") or "").strip(),
+        "short_name": str(model_payload.get("short_name") or "").strip(),
+        "display_name": str(model_payload.get("display_name") or "").strip(),
+        "name": str(model_payload.get("name") or "").strip(),
     }
+    missing = [field for field, value in resolved.items() if not value]
+    if missing:
+        raise ValueError(
+            "leaderboard entry model payload missing normalized identity fields: "
+            + ", ".join(missing)
+        )
+
+    parsed_canonical = parse_canonical_model_id(resolved["canonical_id"])
+    if parsed_canonical is None:
+        raise ValueError(
+            "leaderboard entry model.canonical_id must match <registry>:<repo_id>"
+        )
+    if parsed_canonical[1] != resolved["repo_id"]:
+        raise ValueError(
+            "leaderboard entry model.canonical_id must embed model.repo_id"
+        )
+    if resolved["name"] != resolved["repo_id"]:
+        raise ValueError("leaderboard entry model.name must equal model.repo_id")
+
+    return resolved
 
 
 def normalize_entry_model(entry: dict[str, Any]) -> dict[str, Any]:
@@ -453,15 +393,6 @@ def extract_workload_name(entry: dict[str, Any]) -> str:
             if isinstance(value, str) and value.strip():
                 return value.strip()
     return "UNKNOWN"
-
-
-def normalize_model_name(model_name: Any) -> str:
-    raw_name = str(model_name or "unknown-model").strip()
-    if not raw_name:
-        return "unknown-model"
-    if "/" not in raw_name:
-        return raw_name
-    return raw_name.rsplit("/", maxsplit=1)[-1] or raw_name
 
 
 def get_same_spec_payload(entry: dict[str, Any]) -> dict[str, Any]:
@@ -592,7 +523,7 @@ def same_spec_hashes_match(
 
 
 def build_compare_scope_key(entry: dict[str, Any]) -> str:
-    model = normalize_model_name((entry.get("model") or {}).get("name"))
+    model = str((entry.get("model") or {}).get("canonical_id") or "unknown-model")
     hardware = str(
         (entry.get("hardware") or {}).get("chip_model") or "unknown-hardware"
     )
@@ -1049,13 +980,10 @@ def build_hard_constraint_snapshot(entries: list[dict[str, Any]]) -> dict[str, A
                 (latest.get("model") or {}).get("canonical_id") or ""
             ),
             "model_short_name": str(
-                (latest.get("model") or {}).get("short_name")
-                or normalize_model_name((latest.get("model") or {}).get("name"))
+                (latest.get("model") or {}).get("short_name") or ""
             ),
             "model_display_name": str(
-                (latest.get("model") or {}).get("display_name")
-                or (latest.get("model") or {}).get("short_name")
-                or normalize_model_name((latest.get("model") or {}).get("name"))
+                (latest.get("model") or {}).get("display_name") or ""
             ),
             "hardware": str(
                 (latest.get("hardware") or {}).get("chip_model") or "unknown-hardware"
@@ -1371,17 +1299,10 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
                     (current_entry.get("model") or {}).get("canonical_id") or ""
                 ),
                 "model_short_name": str(
-                    (current_entry.get("model") or {}).get("short_name")
-                    or normalize_model_name(
-                        (current_entry.get("model") or {}).get("name")
-                    )
+                    (current_entry.get("model") or {}).get("short_name") or ""
                 ),
                 "model_display_name": str(
-                    (current_entry.get("model") or {}).get("display_name")
-                    or (current_entry.get("model") or {}).get("short_name")
-                    or normalize_model_name(
-                        (current_entry.get("model") or {}).get("name")
-                    )
+                    (current_entry.get("model") or {}).get("display_name") or ""
                 ),
                 "hardware": str(
                     (current_entry.get("hardware") or {}).get("chip_model")
@@ -1479,13 +1400,10 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
                         (entry.get("model") or {}).get("canonical_id") or ""
                     ),
                     "model_short_name": str(
-                        (entry.get("model") or {}).get("short_name")
-                        or normalize_model_name((entry.get("model") or {}).get("name"))
+                        (entry.get("model") or {}).get("short_name") or ""
                     ),
                     "model_display_name": str(
-                        (entry.get("model") or {}).get("display_name")
-                        or (entry.get("model") or {}).get("short_name")
-                        or normalize_model_name((entry.get("model") or {}).get("name"))
+                        (entry.get("model") or {}).get("display_name") or ""
                     ),
                     "hardware": str(
                         (entry.get("hardware") or {}).get("chip_model")

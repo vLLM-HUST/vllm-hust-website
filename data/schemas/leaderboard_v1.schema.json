@@ -131,6 +131,10 @@
         "model": {
           "type": "object",
           "required": [
+            "canonical_id",
+            "repo_id",
+            "short_name",
+            "display_name",
             "name",
             "parameters",
             "precision"

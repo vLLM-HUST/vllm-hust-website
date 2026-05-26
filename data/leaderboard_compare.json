@@ -1,11 +1,11 @@
 {
   "schema_version": "leaderboard-compare-snapshot/v1",
-  "generated_at": "2026-05-26T08:21:10.732273+00:00",
+  "generated_at": "2026-05-26T09:39:28.857933+00:00",
   "group_count": 1,
   "preferred_pair_count": 1,
   "groups": [
     {
-      "scope_key": "Qwen2.5-14B-Instruct|910B3|FP16|random-online|single_gpu|1|1|a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "scope_key": "hf:Qwen/Qwen2.5-14B-Instruct|910B3|FP16|random-online|single_gpu|1|1|a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
       "category": "single",
       "scope": {
         "model": "Qwen/Qwen2.5-14B-Instruct",
@@ -119,7 +119,7 @@
   ],
   "preferred_pairs": [
     {
-      "scope_key": "Qwen2.5-14B-Instruct|910B3|FP16|random-online|single_gpu|1|1|a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "scope_key": "hf:Qwen/Qwen2.5-14B-Instruct|910B3|FP16|random-online|single_gpu|1|1|a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
       "category": "single",
       "scope": {
         "model": "Qwen/Qwen2.5-14B-Instruct",
@@ -241,7 +241,7 @@
     },
     "pair_count": 1,
     "headline_pair": {
-      "scope_key": "Qwen2.5-14B-Instruct|910B3|FP16|random-online|single_gpu|1|1|a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+      "scope_key": "hf:Qwen/Qwen2.5-14B-Instruct|910B3|FP16|random-online|single_gpu|1|1|a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
       "category": "single",
       "scope": {
         "model": "Qwen/Qwen2.5-14B-Instruct",
@@ -318,7 +318,7 @@
     },
     "pairs": [
       {
-        "scope_key": "Qwen2.5-14B-Instruct|910B3|FP16|random-online|single_gpu|1|1|a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
+        "scope_key": "hf:Qwen/Qwen2.5-14B-Instruct|910B3|FP16|random-online|single_gpu|1|1|a31eac56d03eaa3c7c4df6d2aa1ceb82f637f88c94da31b2b63331c18155aae9",
         "category": "single",
         "scope": {
           "model": "Qwen/Qwen2.5-14B-Instruct",
@@ -397,7 +397,7 @@
   },
   "hard_constraints": {
     "schema_version": "leaderboard-hard-constraints/v1",
-    "generated_at": "2026-05-26T08:21:10.731844+00:00",
+    "generated_at": "2026-05-26T09:39:28.857520+00:00",
     "scope_count": 7,
     "pass_count": 2,
     "fail_count": 5,

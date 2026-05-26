@@ -49,15 +49,14 @@ Schema accepts both:
 
 ### `model`
 
-- Required today: `name`, `parameters`, `precision`
-- Normalized identity fields supported by schema v1:
-  - `canonical_id`: machine identifier in `<registry>:<repo_id>` format, for example
-    `hf:Qwen/Qwen2.5-14B-Instruct`
-  - `repo_id`: upstream repository coordinate, for example `Qwen/Qwen2.5-14B-Instruct`
-  - `short_name`: namespace-free alias, for example `Qwen2.5-14B-Instruct`
-  - `display_name`: final UI label, for example `Qwen2.5-14B-Instruct`
-- Compatibility rule: `model.name` remains in schema v1 and should mirror `model.repo_id` for newly
-  exported artifacts
+- Required: `canonical_id`, `repo_id`, `short_name`, `display_name`, `name`, `parameters`,
+  `precision`
+- `canonical_id`: machine identifier in `<registry>:<repo_id>` format, for example
+  `hf:Qwen/Qwen2.5-14B-Instruct`
+- `repo_id`: upstream repository coordinate, for example `Qwen/Qwen2.5-14B-Instruct`
+- `short_name`: namespace-free alias, for example `Qwen2.5-14B-Instruct`
+- `display_name`: final UI label, for example `Qwen2.5-14B-Instruct`
+- Compatibility rule: `model.name` remains in schema v1 and must mirror `model.repo_id`
 
 `display_name` is presentation-only. In the current contract it mirrors the industry-standard public
 release string carried by `short_name`, for example `Qwen2.5-14B-Instruct`. Writers may override it
@@ -104,12 +103,13 @@ only through an explicit normalized registry entry, not by frontend heuristics.
 Website render fields must be present in schema and examples:
 
 - version: `engine_version`
-- config filters: `hardware.chip_model`, `model.name`, `model.precision`, `workload.name`
+- config filters: `hardware.chip_model`, `model.canonical_id`, `model.display_name`,
+  `model.precision`, `workload.name`
 - trend metrics: `metrics.ttft_ms`, `metrics.throughput_tps`, `metrics.peak_mem_mb`,
   `metrics.error_rate`, `metrics.prefix_hit_rate`
 
-Normalized exporters should emit `model.canonical_id`, `model.repo_id`, `model.short_name`, and
-`model.display_name`. Website filters and grouping logic must treat `canonical_id` as the machine
+Normalized exporters must emit `model.canonical_id`, `model.repo_id`, `model.short_name`, and
+`model.display_name`. Website filters and grouping logic treat `canonical_id` as the machine
 identity and `display_name` as presentation-only.
 
 ## Derived compare snapshot
