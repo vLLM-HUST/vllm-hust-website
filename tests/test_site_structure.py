@@ -60,12 +60,14 @@ def test_leaderboard_uses_normalized_model_identity_helpers() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
 
-    assert "function resolveModelIdentityPayload(modelPayload)" in text
+    assert "function getEntryModelIdentity(entry)" in text
     assert "function getEntryModelCanonicalId(entry)" in text
     assert "function getEntryModelDisplayName(entry)" in text
     assert "const modelOptionsMap = new Map();" in text
     assert "getEntryModelCanonicalId(entry) === filters.model" in text
+    assert "function getScopeModelIdentity(scope)" in text
     assert "function getScopeModelDisplayName(scope)" in text
+    assert "function createCompareScopeKey(entry)" in text
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
