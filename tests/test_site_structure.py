@@ -188,6 +188,37 @@ def test_detail_sections_reuse_composite_versions_and_memory_fallback() -> None:
     assert ".build-version-marker {" in css_text
 
 
+def test_version_filter_reuses_aligned_composite_version_summary() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function getEntryFilterVersionParts(entry)" in text
+    assert "function getEntryFilterVersionText(entry)" in text
+    assert "function buildVersionFilterOption(entry)" in text
+    assert "function compareVersionFilterOptions(left, right)" in text
+    assert "function compareEntriesByCompositeVersion(left, right)" in text
+    assert "function matchesVersionFilter(entry, selectedVersion)" in text
+    assert ".map((component) => `${component.label} ${component.version}`)" in text
+    assert "optionMap.set(label, {" in text
+    assert ".sort(compareVersionFilterOptions)" in text
+    assert ".map((option) => option.label);" in text
+    assert "matchesVersionFilter(entry, filters.version)" in text
+    assert (
+        "normalizeDisplayVersion(getEngineVersion(entry)) === normalizedFilter" in text
+    )
+    assert "const baseVersion = getEntryFilterVersionText(entry);" in text
+    assert "return compareEntriesByCompositeVersion(a, b);" in text
+    assert ".replace(/\\.dev\\d+\\b/i, '')" in text
+    assert ".replace(/(?:[.+-])d\\d{8}$/i, '')" in text
+    assert "while (parts.length < 3) {" in text
+    assert "parts.push('0');" in text
+    assert ".replace(/(?:[._-]?(?:a|b|rc|pre|preview)\\d+)\\b/i, '')" not in text
+    assert (
+        "formatComponentVersion(candidate, component.commit, { includeCommit: false })"
+        in text
+    )
+
+
 def test_local_validation_script_and_hook_templates_track_ci() -> None:
     root = Path(__file__).resolve().parents[1]
     ci_text = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")

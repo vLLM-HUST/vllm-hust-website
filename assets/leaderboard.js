@@ -691,7 +691,21 @@
             .replace(/\.dev\d+\b/i, '')
             .replace(/(?:[.+-])d\d{8}$/i, '');
 
-        return isCommitLikeValue(cleaned) ? '' : cleaned;
+        if (isCommitLikeValue(cleaned)) {
+            return '';
+        }
+
+        const match = cleaned.match(/^(?<release>\d+(?:\.\d+){0,2})(?<suffix>.*)$/);
+        if (!match || !match.groups) {
+            return cleaned;
+        }
+
+        const parts = match.groups.release.split('.');
+        while (parts.length < 3) {
+            parts.push('0');
+        }
+
+        return `${parts.join('.')}${match.groups.suffix}`;
     }
 
     function formatComponentVersion(version, commit, { includeCommit = true } = {}) {
@@ -991,34 +1005,20 @@
         return formatEntryVersion(entry, { display: true });
     }
 
-    function shouldIncludeCommitInOverview(label) {
-        return label === 'vllm-hust' || label === 'vllm-ascend-hust';
-    }
-
     function formatOverviewComponentVersion(component) {
         if (!component?.label) {
             return '';
         }
 
-        const includeCommit = shouldIncludeCommitInOverview(component.label);
         const versionCandidates = [component.rawVersion, component.overrideVersion]
             .map((value) => String(value || '').trim())
             .filter(Boolean);
 
         let resolvedVersion = '';
         for (const candidate of versionCandidates) {
-            resolvedVersion = formatComponentVersion(candidate, component.commit, { includeCommit });
+            resolvedVersion = formatComponentVersion(candidate, component.commit, { includeCommit: false });
             if (resolvedVersion) {
                 break;
-            }
-        }
-
-        if (!resolvedVersion) {
-            for (const candidate of versionCandidates) {
-                resolvedVersion = formatComponentVersion(candidate, component.commit, { includeCommit: false });
-                if (resolvedVersion) {
-                    break;
-                }
             }
         }
 
@@ -1067,6 +1067,83 @@
         }
 
         return formatEntryVersion(entry, { display: true });
+    }
+
+    function getEntryFilterVersionParts(entry) {
+        const components = buildTableVersionComponents(entry)
+            .filter((component) => component?.label && component?.version)
+            .map((component) => String(component.version || '').trim())
+            .filter(Boolean);
+
+        if (components.length) {
+            return components;
+        }
+
+        const fallbackVersion = formatEntryVersion(entry, { display: true });
+        return hasVersionValue(fallbackVersion) ? [fallbackVersion] : [];
+    }
+
+    function getEntryFilterVersionText(entry) {
+        const components = buildTableVersionComponents(entry)
+            .filter((component) => component?.label && component?.version);
+
+        if (components.length) {
+            return components
+                .map((component) => `${component.label} ${component.version}`)
+                .join(' + ');
+        }
+
+        const fallbackVersion = formatEntryVersion(entry, { display: true });
+        if (!hasVersionValue(fallbackVersion)) {
+            return '';
+        }
+
+        const engineName = String(getEngine(entry) || '').trim();
+        return engineName && engineName !== 'unknown'
+            ? `${engineName} ${fallbackVersion}`
+            : fallbackVersion;
+    }
+
+    function compareVersionFilterOptions(left, right) {
+        const leftParts = Array.isArray(left?.parts) ? left.parts : [];
+        const rightParts = Array.isArray(right?.parts) ? right.parts : [];
+        const partCount = Math.max(leftParts.length, rightParts.length);
+
+        for (let index = 0; index < partCount; index += 1) {
+            const comparison = compareDisplayVersions(
+                rightParts[index] || '',
+                leftParts[index] || ''
+            );
+            if (comparison !== 0) {
+                return comparison;
+            }
+        }
+
+        return String(left?.label || '').localeCompare(String(right?.label || ''));
+    }
+
+    function buildVersionFilterOption(entry) {
+        return {
+            label: getEntryFilterVersionText(entry),
+            parts: getEntryFilterVersionParts(entry),
+        };
+    }
+
+    function compareEntriesByCompositeVersion(left, right) {
+        return compareVersionFilterOptions(
+            buildVersionFilterOption(left),
+            buildVersionFilterOption(right)
+        );
+    }
+
+    function matchesVersionFilter(entry, selectedVersion) {
+        const normalizedFilter = String(selectedVersion || '').trim();
+        if (!normalizedFilter || normalizedFilter === 'all') {
+            return true;
+        }
+
+        return getEntryFilterVersionText(entry) === normalizedFilter
+            || normalizeDisplayVersion(getEngineVersion(entry)) === normalizedFilter;
     }
 
     function getEntryTotalMemoryGb(entry) {
@@ -1424,7 +1501,7 @@
             return engineCompare;
         }
 
-        const versionCompare = compareDisplayVersions(getDisplayVersion(b), getDisplayVersion(a));
+        const versionCompare = compareEntriesByCompositeVersion(a, b);
         if (versionCompare !== 0) {
             return versionCompare;
         }
@@ -1442,7 +1519,7 @@
         const model = getEntryModelCanonicalId(entry) || '';
         const precision = entry?.model?.precision || '';
         const engine = getEngine(entry);
-        const baseVersion = normalizeDisplayVersion(getEngineVersion(entry));
+        const baseVersion = getEntryFilterVersionText(entry);
         const settingSignature = getSettingSignature(entry);
 
         return [
@@ -1524,7 +1601,7 @@
                 if (qualityCompare !== 0) {
                     return qualityCompare;
                 }
-                return compareDisplayVersions(getEngineVersion(b), getEngineVersion(a));
+                return compareEntriesByCompositeVersion(a, b);
             });
 
             return {
@@ -1550,10 +1627,7 @@
                     return engineCompare;
                 }
 
-                const versionCompare = compareDisplayVersions(
-                    getDisplayVersion(b),
-                    getDisplayVersion(a)
-                );
+                const versionCompare = compareEntriesByCompositeVersion(a, b);
                 if (versionCompare !== 0) {
                     return versionCompare;
                 }
@@ -1564,7 +1638,7 @@
         }
 
         sorted.sort((a, b) => {
-            const versionCompare = compareDisplayVersions(getDisplayVersion(b), getDisplayVersion(a));
+            const versionCompare = compareEntriesByCompositeVersion(a, b);
             if (versionCompare !== 0) {
                 return versionCompare;
             }
@@ -1727,10 +1801,22 @@
     }
 
     function getVersionOptions(data) {
-        const merged = [...new Set(getUniqueValues(data, d => normalizeDisplayVersion(getEngineVersion(d))))]
-            .filter((version) => String(version || '').trim())
-            .sort((a, b) => compareDisplayVersions(b, a));
-        return merged;
+        const optionMap = new Map();
+        data.forEach((entry) => {
+            const label = getEntryFilterVersionText(entry);
+            if (!label || optionMap.has(label)) {
+                return;
+            }
+
+            optionMap.set(label, {
+                label,
+                parts: getEntryFilterVersionParts(entry),
+            });
+        });
+
+        return [...optionMap.values()]
+            .sort(compareVersionFilterOptions)
+            .map((option) => option.label);
     }
 
     function getUniqueValues(data, accessor) {
@@ -1790,7 +1876,7 @@
             return (filters.engine === 'all' || getEngine(entry) === filters.engine) &&
                 (filters.hardware === 'all' || entry.hardware.chip_model === filters.hardware) &&
                 (filters.model === 'all' || getEntryModelCanonicalId(entry) === filters.model) &&
-                (filters.version === 'all' || normalizeDisplayVersion(getEngineVersion(entry)) === filters.version) &&
+                matchesVersionFilter(entry, filters.version) &&
                 (filters.workload === 'all' || workload === filters.workload) &&
                 (filters.precision === 'all' || entry.model.precision === filters.precision);
         });
@@ -2505,7 +2591,10 @@
                 <h4>${t('engineVersions')}</h4>
                 <p><strong>${t('engine')}:</strong> ${engineLabel}</p>
                 <p><strong>${t('engineVersion')}:</strong> ${engineVersion}</p>
-                ${versionRows.length ? versionRows.map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`).join('') : ''}
+                ${versionRows.length ? versionRows.map(([key, value]) => {
+            const formatted = formatComponentVersion(value, '', { includeCommit: false }) || value;
+            return `<p><strong>${key}:</strong> ${formatted}</p>`;
+        }).join('') : ''}
             </div>
         `;
     }
