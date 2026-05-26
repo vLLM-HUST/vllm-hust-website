@@ -136,6 +136,18 @@
             "precision"
           ],
           "properties": {
+            "canonical_id": {
+              "type": "string"
+            },
+            "repo_id": {
+              "type": "string"
+            },
+            "short_name": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
             "name": {
               "type": "string"
             },

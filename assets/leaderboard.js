@@ -46,6 +46,14 @@
         'path string is null',
     ];
     const ENGINE_VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
+    const CANONICAL_MODEL_ID_PATTERN = /^(?<registry>[a-z0-9][a-z0-9_-]*):(?<repoId>.+)$/;
+    const HF_CACHE_PATH_PATTERN = /(?:^|\/)models--([^/]+)--([^/]+)\/(?:snapshots|refs)\//i;
+    const LEGACY_MODEL_REPO_PREFIX_RULES = [
+        [/^(Qwen|QwQ)/i, 'Qwen'],
+        [/^(DeepSeek|DeepSeek-R1)/i, 'deepseek-ai'],
+        [/^Mistral/i, 'mistralai'],
+        [/^(Llama|Meta-Llama)/i, 'meta-llama'],
+    ];
 
     const UI_STRINGS = {
         en: {
@@ -1200,10 +1208,134 @@
         return raw.split('/').pop() || raw;
     }
 
+    function parseCanonicalModelId(value) {
+        const raw = String(value || '').trim();
+        if (!raw) {
+            return null;
+        }
+        const match = raw.match(CANONICAL_MODEL_ID_PATTERN);
+        if (!match || !match.groups) {
+            return null;
+        }
+        return {
+            registry: match.groups.registry,
+            repoId: match.groups.repoId,
+        };
+    }
+
+    function extractRepoIdFromCachePath(value) {
+        const raw = String(value || '').trim();
+        if (!raw) {
+            return '';
+        }
+        const match = raw.match(HF_CACHE_PATH_PATTERN);
+        if (!match) {
+            return '';
+        }
+        return `${match[1]}/${match[2]}`;
+    }
+
+    function looksLikeRepoId(value) {
+        const raw = String(value || '').trim();
+        if (!raw || raw.startsWith('/')) {
+            return false;
+        }
+        const parts = raw.split('/').filter(Boolean);
+        return parts.length === 2;
+    }
+
+    function inferRepoIdFromShortName(value) {
+        const raw = String(value || '').trim();
+        if (!raw || raw.includes('/')) {
+            return '';
+        }
+        for (const [pattern, namespace] of LEGACY_MODEL_REPO_PREFIX_RULES) {
+            if (pattern.test(raw)) {
+                return `${namespace}/${raw}`;
+            }
+        }
+        return '';
+    }
+
+    function resolveModelIdentityPayload(modelPayload) {
+        const payload = modelPayload && typeof modelPayload === 'object' ? modelPayload : {};
+        const rawCanonicalId = String(payload.canonical_id || '').trim();
+        const rawRepoId = String(payload.repo_id || '').trim();
+        const rawShortName = String(payload.short_name || '').trim();
+        const rawDisplayName = String(payload.display_name || '').trim();
+        const rawName = String(payload.name || '').trim();
+        const parsedCanonical = parseCanonicalModelId(rawCanonicalId);
+        const registry = parsedCanonical?.registry || 'hf';
+        const repoId = [
+            parsedCanonical?.repoId || '',
+            rawRepoId,
+            extractRepoIdFromCachePath(rawName),
+            looksLikeRepoId(rawName) ? rawName : '',
+            inferRepoIdFromShortName(rawName),
+            inferRepoIdFromShortName(rawShortName),
+        ].find(Boolean) || '';
+        const shortName = rawShortName || normalizeScopeModelName(repoId || rawName);
+        const displayName = rawDisplayName || shortName || 'Unknown model';
+
+        if (repoId) {
+            return {
+                canonicalId: parsedCanonical?.repoId === repoId ? rawCanonicalId : `${registry}:${repoId}`,
+                repoId,
+                shortName,
+                displayName,
+                name: repoId,
+            };
+        }
+
+        const fallback = shortName || normalizeScopeModelName(rawName);
+        return {
+            canonicalId: rawCanonicalId || `legacy:${fallback}`,
+            repoId: rawRepoId || fallback,
+            shortName: fallback,
+            displayName,
+            name: rawName || fallback,
+        };
+    }
+
+    function getEntryModelIdentity(entry) {
+        return resolveModelIdentityPayload(entry?.model || {});
+    }
+
+    function getEntryModelCanonicalId(entry) {
+        return getEntryModelIdentity(entry).canonicalId;
+    }
+
+    function getEntryModelRepoId(entry) {
+        return getEntryModelIdentity(entry).repoId;
+    }
+
+    function getEntryModelShortName(entry) {
+        return getEntryModelIdentity(entry).shortName;
+    }
+
+    function getEntryModelDisplayName(entry) {
+        return getEntryModelIdentity(entry).displayName;
+    }
+
+    function getScopeModelIdentity(scope) {
+        return resolveModelIdentityPayload({
+            canonical_id: scope?.model_canonical_id,
+            repo_id: scope?.model,
+            short_name: scope?.model_short_name,
+            display_name: scope?.model_display_name,
+            name: scope?.model,
+        });
+    }
+
+    function getScopeModelDisplayName(scope) {
+        return getScopeModelIdentity(scope).displayName;
+    }
+
     function buildComparableScopeFromEntry(entry) {
         return {
-            model: entry?.model?.name || 'unknown-model',
-            modelNormalized: normalizeScopeModelName(entry?.model?.name),
+            model: getEntryModelRepoId(entry) || 'unknown-model',
+            modelCanonical: getEntryModelCanonicalId(entry),
+            modelNormalized: getEntryModelShortName(entry),
             hardware: entry?.hardware?.chip_model || 'unknown-hardware',
             precision: entry?.model?.precision || 'unknown-precision',
             workload: getWorkloadId(entry) || 'Other',
@@ -1241,9 +1373,11 @@
 
     function buildComparableScopeFromSnapshot(snapshotPayload) {
         const scope = snapshotPayload?.scope || {};
+        const scopeModel = getScopeModelIdentity(scope);
         return {
-            model: scope?.model || 'unknown-model',
-            modelNormalized: normalizeScopeModelName(scope?.model),
+            model: scopeModel.repoId || scope?.model || 'unknown-model',
+            modelCanonical: scopeModel.canonicalId,
+            modelNormalized: scopeModel.shortName,
             hardware: scope?.hardware || 'unknown-hardware',
             precision: scope?.precision || 'unknown-precision',
             workload: scope?.workload || 'Other',
@@ -1259,7 +1393,8 @@
             return false;
         }
 
-        const modelMatches = left.model === right.model
+        const modelMatches = (left.modelCanonical && right.modelCanonical && left.modelCanonical === right.modelCanonical)
+            || left.model === right.model
             || left.modelNormalized === right.modelNormalized;
         if (!modelMatches) {
             return false;
@@ -1406,7 +1541,7 @@
         const nodeCount = entry?.cluster?.node_count || 1;
         const interconnect = entry?.cluster?.interconnect || 'single-node';
         const topology = entry?.cluster?.topology || '';
-        const model = entry?.model?.name || '';
+        const model = getEntryModelCanonicalId(entry) || '';
         const precision = entry?.model?.precision || '';
         const engine = getEngine(entry);
         const baseVersion = normalizeDisplayVersion(getEngineVersion(entry));
@@ -1662,7 +1797,18 @@
         // Extract unique values
         const engineOptions = getUniqueValues(data, d => getEngine(d));
         const hardwareOptions = getUniqueValues(data, d => d.hardware.chip_model);
-        const modelOptions = getUniqueValues(data, d => d.model.name);
+        const modelOptionsMap = new Map();
+        data.forEach((entry) => {
+            const value = getEntryModelCanonicalId(entry);
+            if (!value || modelOptionsMap.has(value)) {
+                return;
+            }
+            modelOptionsMap.set(value, {
+                value,
+                label: getEntryModelDisplayName(entry),
+            });
+        });
+        const modelOptions = [...modelOptionsMap.values()].sort((left, right) => left.label.localeCompare(right.label));
         const versionOptions = getVersionOptions(data);
         const dynamicWorkloads = getUniqueValues(data, d => getWorkloadId(d)).sort((a, b) => a.localeCompare(b));
         const workloadOptions = ['all', ...dynamicWorkloads];
@@ -1671,7 +1817,12 @@
         // Update dropdowns
         updateSelect('filter-engine', ['all', ...engineOptions], filters.engine, getEngineLabel);
         updateSelect('filter-hardware', ['all', ...hardwareOptions], filters.hardware);
-        updateSelect('filter-model', ['all', ...modelOptions], filters.model);
+        updateSelect('filter-model', ['all', ...modelOptions], filters.model, (value, option) => {
+            if (value === 'all') {
+                return getWorkloadLabel('all');
+            }
+            return option?.label || value;
+        });
         updateSelect('filter-version', ['all', ...versionOptions], filters.version);
         updateSelect('filter-workload', workloadOptions, filters.workload, getWorkloadLabel);
         updateSelect('filter-precision', ['all', ...precisionOptions], filters.precision);
@@ -1689,17 +1840,36 @@
         return [...new Set(data.map(accessor).filter(Boolean))];
     }
 
+    function normalizeSelectOption(option, labelMapper = null) {
+        if (option && typeof option === 'object' && !Array.isArray(option)) {
+            const value = String(option.value ?? '');
+            const fallbackLabel = String(option.label ?? value);
+            return {
+                value,
+                label: labelMapper ? labelMapper(value, option) : fallbackLabel,
+            };
+        }
+
+        const value = String(option);
+        return {
+            value,
+            label: labelMapper ? labelMapper(value, option) : value,
+        };
+    }
+
     function updateSelect(id, options, selectedValue, labelMapper = null) {
         const select = document.getElementById(id);
         if (!select) return;
 
-        select.innerHTML = options.map(opt =>
-            `<option value="${opt}" ${opt === selectedValue ? 'selected' : ''}>${labelMapper ? labelMapper(opt) : opt}</option>`
+        const normalizedOptions = options.map((option) => normalizeSelectOption(option, labelMapper));
+
+        select.innerHTML = normalizedOptions.map(opt =>
+            `<option value="${opt.value}" ${opt.value === selectedValue ? 'selected' : ''}>${opt.label}</option>`
         ).join('');
 
-        if (selectedValue && options.includes(selectedValue)) {
+        if (selectedValue && normalizedOptions.some((option) => option.value === selectedValue)) {
             select.value = selectedValue;
-        } else if (options.includes('all')) {
+        } else if (normalizedOptions.some((option) => option.value === 'all')) {
             select.value = 'all';
             state.filters[state.currentTab][id.replace('filter-', '')] = 'all';
         }
@@ -1721,7 +1891,7 @@
             const workload = getWorkloadId(entry);
             return (filters.engine === 'all' || getEngine(entry) === filters.engine) &&
                 (filters.hardware === 'all' || entry.hardware.chip_model === filters.hardware) &&
-                (filters.model === 'all' || entry.model.name === filters.model) &&
+                (filters.model === 'all' || getEntryModelCanonicalId(entry) === filters.model) &&
                 (filters.version === 'all' || normalizeDisplayVersion(getEngineVersion(entry)) === filters.version) &&
                 (filters.workload === 'all' || workload === filters.workload) &&
                 (filters.precision === 'all' || entry.model.precision === filters.precision);
@@ -1901,7 +2071,7 @@
         const accountable = entry?.constraints?.accountable_scope || {};
         const representativeBusinessScenario = accountable.representative_business_scenario || 'unknown-business-scenario';
         const baselineEngine = getAccountableBaselineInfo(accountable).scopeEngine;
-        const model = entry?.model?.name || 'unknown-model';
+        const model = getEntryModelRepoId(entry) || 'unknown-model';
         const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
         const workload = getWorkloadId(entry) || 'Other';
         const configType = entry?.config_type || 'unknown-config';
@@ -2197,7 +2367,7 @@
                             <span class="hc-status ${statusClass}">${scope?.overall_pass ? t('pass') : t('fail')}</span>
                         </div>
                         <p class="hard-constraint-scope">
-                            ${t('scope')}: ${scope?.scope?.model || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}
+                            ${t('scope')}: ${getScopeModelDisplayName(scope?.scope) || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}
                         </p>
                         <p class="hard-constraint-scope-meta">
                             scenario=${accountable?.representative_business_scenario || '-'} · baseline=${formatAccountableBaseline(accountable)} · ${passedCount}/4
@@ -2603,7 +2773,7 @@
     }
 
     function createCompareScopeKey(entry) {
-        const model = normalizeScopeModelName(entry?.model?.name);
+        const model = getEntryModelCanonicalId(entry) || normalizeScopeModelName(entry?.model?.name);
         const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
         const precision = entry?.model?.precision || 'unknown-precision';
         const workload = getWorkloadId(entry) || 'Other';
@@ -2615,7 +2785,7 @@
     }
 
     function buildScopeLabel(entry) {
-        const model = entry?.model?.name || 'Unknown model';
+        const model = getEntryModelDisplayName(entry) || 'Unknown model';
         const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
         const workload = getWorkloadLabel(getWorkloadId(entry));
         const settingSummary = entry?.scope?.setting_summary || getSettingSummary(entry);
@@ -2774,7 +2944,7 @@
     }
 
     function getOverviewSubtitle(entries, engineCount, comparisonView, viewOptions) {
-        const models = getUniqueValues(entries, (entry) => entry?.model?.name);
+        const models = getUniqueValues(entries, (entry) => getEntryModelDisplayName(entry));
         const hardware = getUniqueValues(entries, (entry) => entry?.hardware?.chip_model);
         const workloads = getUniqueValues(entries, (entry) => getWorkloadId(entry));
 
@@ -2920,7 +3090,7 @@
 
     function getGoalProgressSubtitle(pair) {
         const scope = pair?.scope || {};
-        const model = scope.model || 'Unknown model';
+        const model = getScopeModelDisplayName(scope) || 'Unknown model';
         const hardware = scope.hardware || 'Unknown hardware';
         const workload = getWorkloadLabel(scope.workload || 'Other');
         const settingSummary = scope.setting_summary ? ` • ${scope.setting_summary}` : '';

@@ -285,6 +285,10 @@ def test_aggregate_results_from_standard_manifest(tmp_path: Path) -> None:
     )
     assert len(single_payload) == 1
     assert single_payload[0]["workload"]["name"] == "short"
+    assert single_payload[0]["model"]["canonical_id"] == "hf:Qwen/Qwen2.5-0.5B-Instruct"
+    assert single_payload[0]["model"]["repo_id"] == "Qwen/Qwen2.5-0.5B-Instruct"
+    assert single_payload[0]["model"]["short_name"] == "Qwen2.5-0.5B-Instruct"
+    assert single_payload[0]["model"]["display_name"] == "Qwen2.5-0.5B-Instruct"
     assert single_payload[0]["metadata"]["github_user"] == "octocat"
     assert single_payload[0]["metadata"]["git_commit"] == "test-commit-123"
 
@@ -944,6 +948,27 @@ def test_aggregate_results_goal_progress_matches_prefixed_model_names(
         (output_dir / "leaderboard_compare.json").read_text(encoding="utf-8")
     )
     goal_progress = compare_payload["goal_progress"]
+
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    payload_by_id = {entry["entry_id"]: entry for entry in single_payload}
+
+    assert (
+        payload_by_id["44444444-4444-4444-4444-444444444444"]["model"]["name"]
+        == "Qwen/Qwen2.5-0.5B-Instruct"
+    )
+    assert (
+        payload_by_id["44444444-4444-4444-4444-444444444444"]["model"]["canonical_id"]
+        == "hf:Qwen/Qwen2.5-0.5B-Instruct"
+    )
+    assert (
+        goal_progress["headline_pair"]["scope"]["model"] == "Qwen/Qwen2.5-0.5B-Instruct"
+    )
+    assert (
+        goal_progress["headline_pair"]["scope"]["model_display_name"]
+        == "Qwen2.5-0.5B-Instruct"
+    )
 
     assert goal_progress["pair_count"] == 1
     assert goal_progress["headline_pair"]["current"]["engine"] == "vllm-hust"
