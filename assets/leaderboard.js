@@ -1834,6 +1834,7 @@
             renderDataStats(data.length, filtered.length, visibleEntries.length, 0, comparisonView);
             renderOverview([], comparisonView, viewOptions);
             renderPagination(0, 0); // clear any stale pagination controls
+            renderSortHeaders();   // clear stale sort indicators on empty tab
             return;
         }
 
