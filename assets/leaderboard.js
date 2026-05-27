@@ -718,6 +718,46 @@
         return includeCommit && shortCommit ? `v${normalizedVersion}.${shortCommit}` : `v${normalizedVersion}`;
     }
 
+    function normalizeDetailedPackageVersion(value) {
+        const normalized = String(value || '').trim();
+        if (!hasRenderablePackageVersion(normalized)) {
+            return '';
+        }
+
+        const withoutLeadingV = normalized.replace(/^v/i, '');
+        const cleaned = withoutLeadingV
+            .replace(/-\d+-g[0-9a-f]{7,40}$/i, '')
+            .replace(/\+g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '')
+            .replace(/\.g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '')
+            .replace(/(?:[.+-])d\d{8}$/i, '');
+
+        if (isCommitLikeValue(cleaned)) {
+            return '';
+        }
+
+        const match = cleaned.match(/^(?<release>\d+(?:\.\d+){0,2})(?<suffix>.*)$/);
+        if (!match || !match.groups) {
+            return cleaned;
+        }
+
+        const parts = match.groups.release.split('.');
+        while (parts.length < 3) {
+            parts.push('0');
+        }
+
+        return `${parts.join('.')}${match.groups.suffix}`;
+    }
+
+    function formatDetailedVersion(version, commit, { includeCommit = true } = {}) {
+        const normalizedVersion = normalizeDetailedPackageVersion(version);
+        if (!normalizedVersion) {
+            return '';
+        }
+
+        const shortCommit = getShortCommit(extractCommitFromVersion(version) || commit);
+        return includeCommit && shortCommit ? `v${normalizedVersion}.${shortCommit}` : `v${normalizedVersion}`;
+    }
+
     function getRepositoryName(repository) {
         const normalized = String(repository || '').trim().toLowerCase();
         if (!normalized) {
@@ -1031,6 +1071,57 @@
         }
 
         return resolvedVersion;
+    }
+
+    function formatDetailComponentVersion(component) {
+        if (!component?.label) {
+            return '';
+        }
+
+        const versionCandidates = [component.rawVersion, component.overrideVersion, component.version]
+            .map((value) => String(value || '').trim())
+            .filter(Boolean);
+
+        for (const candidate of versionCandidates) {
+            const resolvedVersion = formatDetailedVersion(candidate, component.commit);
+            if (resolvedVersion) {
+                return resolvedVersion;
+            }
+        }
+
+        return String(component.version || '').trim();
+    }
+
+    function getEntryDetailedVersionText(entry) {
+        const parts = buildTableVersionComponents(entry)
+            .map((component) => formatDetailComponentVersion(component))
+            .filter(Boolean);
+
+        if (parts.length) {
+            return parts.join(' + ');
+        }
+
+        const fallbackVersion = formatDetailedVersion(
+            entry?.engine_version || entry?.metadata?.engine_version || '',
+            getEntryGitCommit(entry)
+        );
+        return fallbackVersion || formatEntryVersion(entry, { display: true });
+    }
+
+    function getVersionFieldCommit(entry, key) {
+        const normalizedKey = String(key || '').trim().toLowerCase();
+        if (!normalizedKey) {
+            return '';
+        }
+
+        const components = buildTableVersionComponents(entry);
+        if (normalizedKey === 'core') {
+            return components.find((component) => component.label === 'vllm-hust' || component.label === 'vllm')?.commit || '';
+        }
+        if (normalizedKey === 'backend') {
+            return components.find((component) => component.label === 'vllm-ascend-hust' || component.label === 'vllm-ascend')?.commit || '';
+        }
+        return '';
     }
 
     function getOverviewSummaryChipText(summary) {
@@ -1522,6 +1613,30 @@
         const baseVersion = getEntryFilterVersionText(entry);
         const settingSignature = getSettingSignature(entry);
 
+        // Strict aggregation: require both vllm-hust and vllm-ascend-hust to have valid PEP versions
+        const components = buildTableVersionComponents(entry).filter((c) => c?.label && c?.version);
+        const hust = components.find((c) => c.label === 'vllm-hust');
+        const ascend = components.find((c) => c.label === 'vllm-ascend-hust');
+        const isValidPEP = (v) => typeof v === 'string' && /^[0-9]+(\.[0-9]+){0,2}([a-zA-Z0-9._+-]*)?$/.test(v);
+
+        // Only aggregate if both present and both are valid PEP versions
+        if (hust && ascend && isValidPEP(hust.rawVersion) && isValidPEP(ascend.rawVersion)) {
+            return [
+                engine,
+                workload,
+                hardware,
+                chipCount,
+                nodeCount,
+                interconnect,
+                topology,
+                model,
+                precision,
+                hust.rawVersion,
+                ascend.rawVersion,
+                settingSignature,
+            ].join('|');
+        }
+        // Fallback: use a unique key to prevent aggregation if missing/invalid
         return [
             engine,
             workload,
@@ -1532,7 +1647,8 @@
             topology,
             model,
             precision,
-            baseVersion,
+            '__NO_AGGREGATE__',
+            Date.now() + Math.random(), // ensure uniqueness
             settingSignature,
         ].join('|');
     }
@@ -2579,9 +2695,8 @@
     function renderVersionsSection(entry) {
         const engine = getEngine(entry);
         const engineLabel = getEngineLabel(engine);
-        const engineVersion = getEntryCompositeVersionText(entry);
+        const engineVersion = getEntryDetailedVersionText(entry);
         const versions = entry.versions || {};
-
         const versionRows = Object.entries(versions)
             .filter(([_, value]) => typeof value === 'string' && value.trim())
             .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
@@ -2592,7 +2707,7 @@
                 <p><strong>${t('engine')}:</strong> ${engineLabel}</p>
                 <p><strong>${t('engineVersion')}:</strong> ${engineVersion}</p>
                 ${versionRows.length ? versionRows.map(([key, value]) => {
-            const formatted = formatComponentVersion(value, '', { includeCommit: false }) || value;
+            const formatted = formatDetailedVersion(value, getVersionFieldCommit(entry, key)) || value;
             return `<p><strong>${key}:</strong> ${formatted}</p>`;
         }).join('') : ''}
             </div>
@@ -2601,7 +2716,7 @@
 
     function renderBuildVariantsSection(entry) {
         const variants = entry.versionVariants || [entry];
-        const displayedVersion = getEntryCompositeVersionText(entry);
+        const displayedVersion = getEntryDetailedVersionText(entry);
 
         return `
             <div class="detail-section">
@@ -2624,7 +2739,7 @@
                             ${variants.map((variant, index) => {
             const vm = variant.metrics || {};
             const selected = variant.entry_id === entry.entry_id ? 'selected' : '';
-            const variantVersion = getEntryCompositeVersionText(variant);
+            const variantVersion = getEntryDetailedVersionText(variant);
             return `
                                     <tr class="${selected}">
                                         <td><span class="build-version-summary">${variantVersion}</span>${index === 0 ? ` <span class="build-version-marker">${t('selectedStar')}</span>` : ''}</td>

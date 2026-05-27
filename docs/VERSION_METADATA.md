@@ -15,6 +15,24 @@
   public website should explain that stable releases are expected to converge on the
   `upstream.postN` scheme.
 
+## Leaderboard Version Display Contract
+
+- Main leaderboard table version cells are intentionally compact summaries. They should optimize for
+  scanability and keep composite stack versions in a concise, normalized form such as
+  `v0.17.2.post1 + v0.18.0.post1`.
+- Expanded leaderboard details are intentionally more detailed than the table. Detail-only version
+  fields, including the displayed version summary, build variant summary, and component version
+  rows, should preserve richer PEP-style detail whenever provenance is available, such as
+  `v0.17.2.post1.d6fe8f2f + v0.18.0.post1.85927fef` or
+  `v0.20.1rc1.dev314.64ff561c + v0.1.0.dev2792.c56ccf1e`.
+- Only version substrings should change between the compact table view and the detailed panels.
+  Labels, explanatory copy, and other non-version metadata should remain unchanged.
+- Keep the compact table formatter and the detailed detail formatter as separate code paths. Do not
+  reuse the detail formatter in the main table, and do not collapse detail views back to the compact
+  formatter.
+- Any future leaderboard version-rendering change must preserve this contract and update the
+  regression coverage in `tests/test_site_structure.py`.
+
 ## Update Flow
 
 1. Edit `data/version_meta.json` (copy fields under `release` / `quickstart`, package list under
