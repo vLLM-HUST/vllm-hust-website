@@ -95,6 +95,12 @@ The only supported leaderboard data chain is:
 Homepage rendering consumes only those snapshot files, with `leaderboard_compare.json` providing
 neutral engine-vs-engine head-to-head views.
 
+Leaderboard version rendering follows a split UI contract:
+
+- The main table stays compact for scanability.
+- Expanded details stay richer for provenance and reproduction.
+- Design rule and regression anchor: `docs/VERSION_METADATA.md#leaderboard-version-display-contract`
+
 `leaderboard_compare.json` now also carries a mandatory hard-constraint snapshot derived from
 validated entries:
 
