@@ -1580,3 +1580,112 @@
         min-width: 600px;
     }
 }
+
+/* ============================================================
+   Sortable column headers
+   ============================================================ */
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.sortable-header:hover {
+    background: rgba(100, 80, 200, 0.07);
+}
+
+/* Neutral indicator when not sorted */
+.sortable-header::after {
+    content: ' ⇅';
+    opacity: 0.3;
+    font-size: 0.75em;
+    vertical-align: middle;
+}
+
+/* Active sort indicators */
+.sortable-header.sort-active-asc::after {
+    content: ' ↑';
+    opacity: 1;
+    color: #6450c8;
+}
+
+.sortable-header.sort-active-desc::after {
+    content: ' ↓';
+    opacity: 1;
+    color: #6450c8;
+}
+
+/* ============================================================
+   Pagination controls
+   ============================================================ */
+.leaderboard-pagination {
+    margin: 0.75rem 0 0.5rem;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.875rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+}
+
+.pagination-btn {
+    padding: 0.35rem 0.85rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #444;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    font-family: inherit;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #f0ecff;
+    border-color: #6450c8;
+    color: #6450c8;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 0.85rem;
+    color: #666;
+    min-width: 7rem;
+    text-align: center;
+}
+
+/* ============================================================
+   Reset filters button
+   ============================================================ */
+.filter-group--reset {
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 2px;
+}
+
+.btn-reset-filters {
+    padding: 0.38rem 0.85rem;
+    border: 1px solid #d4d4d4;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #666;
+    white-space: nowrap;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    font-family: inherit;
+}
+
+.btn-reset-filters:hover {
+    background: #fff4f4;
+    border-color: #e05050;
+    color: #e05050;
+}

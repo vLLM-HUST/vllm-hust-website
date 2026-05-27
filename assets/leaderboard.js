@@ -209,6 +209,11 @@
             overviewTableNote: 'The main table shows the currently visible benchmark rows after filters, scope toggles, and version merging.',
             overviewGoalSnapshotNote: 'Hero deltas use the matched official compare snapshot. Cards below summarize the currently visible table rows.',
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below summarize the currently visible table rows.',
+            resetFilters: 'Reset',
+            paginationPrev: 'Prev',
+            paginationNext: 'Next',
+            paginationPage: 'Page',
+            paginationRows: 'rows',
         },
         zh: {
             statsHidden: '已隐藏',
@@ -371,6 +376,11 @@
             overviewTableNote: '主表展示的是当前筛选、scope 开关和版本合并之后的 benchmark 可见行。',
             overviewGoalSnapshotNote: '顶部 Hero 的差距值来自当前命中的官方 compare snapshot；下方卡片汇总的是当前主表可见行。',
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片汇总的是当前主表可见行。',
+            resetFilters: '清空筛选',
+            paginationPrev: '上一页',
+            paginationNext: '下一页',
+            paginationPage: '第',
+            paginationRows: '条',
         },
     };
 
@@ -392,7 +402,17 @@
             'multi-chip': { sameScopeOnly: false, hideIncompleteGroups: false },
             'multi-node': { sameScopeOnly: false, hideIncompleteGroups: false }
         },
-        expandedRows: new Set()
+        expandedRows: new Set(),
+        sort: {
+            'single-chip': { column: null, direction: 'asc' },
+            'multi-chip': { column: null, direction: 'asc' },
+            'multi-node': { column: null, direction: 'asc' }
+        },
+        pagination: {
+            'single-chip': { page: 1, pageSize: 20 },
+            'multi-chip': { page: 1, pageSize: 20 },
+            'multi-node': { page: 1, pageSize: 20 }
+        }
     };
 
     // Initialize on DOM ready
@@ -1816,9 +1836,71 @@
             if (selectEl) {
                 selectEl.addEventListener('change', () => {
                     state.filters[state.currentTab][filterType] = selectEl.value;
+                    state.pagination[state.currentTab].page = 1; // Reset to first page on filter change
                     renderTable();
                 });
             }
+        });
+
+        // Reset all filters button
+        const resetBtn = document.getElementById('btn-reset-filters');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                state.filters[state.currentTab] = {
+                    engine: 'all', hardware: 'all', model: 'all',
+                    version: 'all', workload: 'all', precision: 'all'
+                };
+                state.pagination[state.currentTab].page = 1;
+                renderFilters();
+                renderTable();
+            });
+        }
+
+        // Sortable column headers: click to sort, click again to toggle direction
+        const SORTABLE_HEADER_MAP = {
+            'table-head-ttft': 'ttft_ms',
+            'table-head-tbt': 'tbt_ms',
+            'table-head-tps': 'throughput_tps',
+            'table-head-error': 'error_rate',
+        };
+        Object.entries(SORTABLE_HEADER_MAP).forEach(([headId, col]) => {
+            const th = document.getElementById(headId);
+            if (!th) return;
+            th.classList.add('sortable-header');
+            th.setAttribute('tabindex', '0');
+            th.setAttribute('role', 'columnheader');
+            th.setAttribute('aria-sort', 'none');
+            function activateSort() {
+                const sortState = state.sort[state.currentTab];
+                if (sortState.column === col) {
+                    // Three-state cycle per column: firstDir → secondDir → unsorted
+                    // throughput_tps (higher-is-better): desc → asc → unsorted
+                    // others (lower-is-better):           asc  → desc → unsorted
+                    const firstDir = col === 'throughput_tps' ? 'desc' : 'asc';
+                    const secondDir = firstDir === 'desc' ? 'asc' : 'desc';
+                    if (sortState.direction === secondDir) {
+                        // Third click: clear sort
+                        sortState.column = null;
+                        sortState.direction = 'asc';
+                    } else {
+                        // Second click: flip to opposite direction
+                        sortState.direction = secondDir;
+                    }
+                } else {
+                    sortState.column = col;
+                    // Default: lower-is-better → asc first; higher-is-better → desc first
+                    sortState.direction = col === 'throughput_tps' ? 'desc' : 'asc';
+                }
+                state.pagination[state.currentTab].page = 1;
+                renderTable();
+            }
+            th.addEventListener('click', activateSort);
+            th.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    activateSort();
+                }
+            });
         });
 
         const sameScopeToggle = document.getElementById('toggle-same-scope');
@@ -1853,6 +1935,11 @@
         state.currentTab = tab;
         state.expandedRows.clear();
 
+        // Reset pagination and sort when switching tabs
+        state.pagination[tab].page = 1;
+        state.sort[tab].column = null;
+        state.sort[tab].direction = 'asc';
+
         // Update tab buttons
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tab);
@@ -1881,6 +1968,10 @@
     function renderFilters() {
         const data = getDataByTab(state.currentTab);
         const filters = state.filters[state.currentTab];
+
+        // Update reset button label for current language
+        const resetLabel = document.getElementById('btn-reset-filters-label');
+        if (resetLabel) { resetLabel.textContent = t('resetFilters'); }
 
         // Extract unique values
         const engineOptions = getUniqueValues(data, d => getEngine(d));
@@ -2012,6 +2103,8 @@
             emptyState.style.display = 'block';
             renderDataStats(data.length, filtered.length, visibleEntries.length, 0, comparisonView);
             renderOverview([], comparisonView, viewOptions);
+            renderPagination(0, 0); // clear any stale pagination controls
+            renderSortHeaders();   // clear stale sort indicators on empty tab
             return;
         }
 
@@ -2021,14 +2114,31 @@
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
 
+        // Apply column sort if active (after trend computation so arrows are preserved)
+        const sortState = state.sort[state.currentTab];
+        const displayRows = sortState.column
+            ? applyColumnSort(withTrends, sortState)
+            : withTrends;
+
+        // Pagination
+        const pagination = state.pagination[state.currentTab];
+        const totalItems = displayRows.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / pagination.pageSize));
+        if (pagination.page > totalPages) { pagination.page = totalPages; }
+        const startIdx = (pagination.page - 1) * pagination.pageSize;
+        const pageRows = displayRows.slice(startIdx, startIdx + pagination.pageSize);
+
         // Render rows
-        tbody.innerHTML = withTrends.map((entry, index) => {
-            const isLatest = index === 0;
+        const showVersionAllParam = typeof window !== 'undefined'
+            && new URLSearchParams(window.location.search).get('showVersionAll') === '1';
+        tbody.innerHTML = pageRows.map((entry, index) => {
+            // Only the first item of the first page (in default sort) carries the "Latest" badge
+            const isLatest = !sortState.column && pagination.page === 1 && index === 0;
             const isExpanded = state.expandedRows.has(entry.entry_id);
             const currentVersion = getTableVersionVisibilityKey(entry);
-            const prevVersion = index > 0 ? getTableVersionVisibilityKey(withTrends[index - 1]) : null;
-            const showVersionForEveryRow = typeof window !== 'undefined'
-                && new URLSearchParams(window.location.search).get('showVersionAll') === '1';
+            const prevVersion = index > 0 ? getTableVersionVisibilityKey(pageRows[index - 1]) : null;
+            // Force show-version for every row when column sort is active (order is no longer version-grouped)
+            const showVersionForEveryRow = showVersionAllParam || Boolean(sortState.column);
             const showVersion = showVersionForEveryRow || index === 0 || currentVersion !== prevVersion;
             const isSparse = comparisonView.incompleteKeys.has(createCompareScopeKey(entry));
 
@@ -2037,6 +2147,12 @@
                 ${renderDetailsRow(entry, isExpanded)}
             `;
         }).join('');
+
+        // Update sort header indicators
+        renderSortHeaders();
+
+        // Render pagination controls
+        renderPagination(totalItems, totalPages);
 
         // Attach event listeners for buttons
         attachRowEventListeners();
@@ -2811,6 +2927,77 @@
                 </div>
             </div>
         `;
+    }
+
+    // Apply a user-selected column sort on top of the default display order.
+    // Entries with missing/invalid metric values are pushed to the bottom.
+    function applyColumnSort(entries, sortState) {
+        const { column, direction } = sortState;
+        const sorted = [...entries];
+        sorted.sort((a, b) => {
+            const aVal = Number(a.metrics?.[column]);
+            const bVal = Number(b.metrics?.[column]);
+            const aValid = Number.isFinite(aVal);
+            const bValid = Number.isFinite(bVal);
+            if (!aValid && !bValid) return 0;
+            if (!aValid) return 1;
+            if (!bValid) return -1;
+            const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+            return direction === 'asc' ? cmp : -cmp;
+        });
+        return sorted;
+    }
+
+    // Reflect current sort state as CSS classes on sortable column headers
+    function renderSortHeaders() {
+        const sortState = state.sort[state.currentTab];
+        const SORTABLE_HEADER_MAP = {
+            'table-head-ttft': 'ttft_ms',
+            'table-head-tbt': 'tbt_ms',
+            'table-head-tps': 'throughput_tps',
+            'table-head-error': 'error_rate',
+        };
+        Object.entries(SORTABLE_HEADER_MAP).forEach(([headId, col]) => {
+            const th = document.getElementById(headId);
+            if (!th) return;
+            th.classList.remove('sort-active-asc', 'sort-active-desc');
+            if (sortState.column === col) {
+                th.classList.add(sortState.direction === 'asc' ? 'sort-active-asc' : 'sort-active-desc');
+                th.setAttribute('aria-sort', sortState.direction === 'asc' ? 'ascending' : 'descending');
+            } else {
+                th.setAttribute('aria-sort', 'none');
+            }
+        });
+    }
+
+    // Render page prev/next controls below the table
+    function renderPagination(totalItems, totalPages) {
+        const el = document.getElementById('leaderboard-pagination');
+        if (!el) return;
+        const pagination = state.pagination[state.currentTab];
+        if (totalPages <= 1) {
+            el.innerHTML = '';
+            return;
+        }
+        const { page } = pagination;
+        const lang = localStorage.getItem('vllm-hust_lang') || 'en';
+        // Build page indicator text (zh: "第 X / Y 页", en: "Page X / Y")
+        const pageText = lang === 'zh'
+            ? `${t('paginationPage')} <strong>${page}</strong> / ${totalPages} &nbsp;(${totalItems} ${t('paginationRows')})`
+            : `${t('paginationPage')} <strong>${page}</strong> / ${totalPages} &nbsp;(${totalItems} ${t('paginationRows')})`;
+        el.innerHTML = `
+            <div class="pagination-controls">
+                <button class="pagination-btn" id="pagination-prev" ${page <= 1 ? 'disabled' : ''}>← ${t('paginationPrev')}</button>
+                <span class="pagination-info">${pageText}</span>
+                <button class="pagination-btn" id="pagination-next" ${page >= totalPages ? 'disabled' : ''}>→ ${t('paginationNext')}</button>
+            </div>
+        `;
+        document.getElementById('pagination-prev')?.addEventListener('click', () => {
+            if (pagination.page > 1) { pagination.page--; renderTable(); }
+        });
+        document.getElementById('pagination-next')?.addEventListener('click', () => {
+            if (pagination.page < totalPages) { pagination.page++; renderTable(); }
+        });
     }
 
     // Attach event listeners to dynamically created buttons
