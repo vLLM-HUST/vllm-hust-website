@@ -711,7 +711,21 @@
             .replace(/\.dev\d+\b/i, '')
             .replace(/(?:[.+-])d\d{8}$/i, '');
 
-        return isCommitLikeValue(cleaned) ? '' : cleaned;
+        if (isCommitLikeValue(cleaned)) {
+            return '';
+        }
+
+        const match = cleaned.match(/^(?<release>\d+(?:\.\d+){0,2})(?<suffix>.*)$/);
+        if (!match || !match.groups) {
+            return cleaned;
+        }
+
+        const parts = match.groups.release.split('.');
+        while (parts.length < 3) {
+            parts.push('0');
+        }
+
+        return `${parts.join('.')}${match.groups.suffix}`;
     }
 
     function formatComponentVersion(version, commit, { includeCommit = true } = {}) {
@@ -721,6 +735,46 @@
         }
 
         const shortCommit = getShortCommit(commit || extractCommitFromVersion(version));
+        return includeCommit && shortCommit ? `v${normalizedVersion}.${shortCommit}` : `v${normalizedVersion}`;
+    }
+
+    function normalizeDetailedPackageVersion(value) {
+        const normalized = String(value || '').trim();
+        if (!hasRenderablePackageVersion(normalized)) {
+            return '';
+        }
+
+        const withoutLeadingV = normalized.replace(/^v/i, '');
+        const cleaned = withoutLeadingV
+            .replace(/-\d+-g[0-9a-f]{7,40}$/i, '')
+            .replace(/\+g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '')
+            .replace(/\.g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '')
+            .replace(/(?:[.+-])d\d{8}$/i, '');
+
+        if (isCommitLikeValue(cleaned)) {
+            return '';
+        }
+
+        const match = cleaned.match(/^(?<release>\d+(?:\.\d+){0,2})(?<suffix>.*)$/);
+        if (!match || !match.groups) {
+            return cleaned;
+        }
+
+        const parts = match.groups.release.split('.');
+        while (parts.length < 3) {
+            parts.push('0');
+        }
+
+        return `${parts.join('.')}${match.groups.suffix}`;
+    }
+
+    function formatDetailedVersion(version, commit, { includeCommit = true } = {}) {
+        const normalizedVersion = normalizeDetailedPackageVersion(version);
+        if (!normalizedVersion) {
+            return '';
+        }
+
+        const shortCommit = getShortCommit(extractCommitFromVersion(version) || commit);
         return includeCommit && shortCommit ? `v${normalizedVersion}.${shortCommit}` : `v${normalizedVersion}`;
     }
 
@@ -1011,34 +1065,20 @@
         return formatEntryVersion(entry, { display: true });
     }
 
-    function shouldIncludeCommitInOverview(label) {
-        return label === 'vllm-hust' || label === 'vllm-ascend-hust';
-    }
-
     function formatOverviewComponentVersion(component) {
         if (!component?.label) {
             return '';
         }
 
-        const includeCommit = shouldIncludeCommitInOverview(component.label);
         const versionCandidates = [component.rawVersion, component.overrideVersion]
             .map((value) => String(value || '').trim())
             .filter(Boolean);
 
         let resolvedVersion = '';
         for (const candidate of versionCandidates) {
-            resolvedVersion = formatComponentVersion(candidate, component.commit, { includeCommit });
+            resolvedVersion = formatComponentVersion(candidate, component.commit, { includeCommit: false });
             if (resolvedVersion) {
                 break;
-            }
-        }
-
-        if (!resolvedVersion) {
-            for (const candidate of versionCandidates) {
-                resolvedVersion = formatComponentVersion(candidate, component.commit, { includeCommit: false });
-                if (resolvedVersion) {
-                    break;
-                }
             }
         }
 
@@ -1051,6 +1091,57 @@
         }
 
         return resolvedVersion;
+    }
+
+    function formatDetailComponentVersion(component) {
+        if (!component?.label) {
+            return '';
+        }
+
+        const versionCandidates = [component.rawVersion, component.overrideVersion, component.version]
+            .map((value) => String(value || '').trim())
+            .filter(Boolean);
+
+        for (const candidate of versionCandidates) {
+            const resolvedVersion = formatDetailedVersion(candidate, component.commit);
+            if (resolvedVersion) {
+                return resolvedVersion;
+            }
+        }
+
+        return String(component.version || '').trim();
+    }
+
+    function getEntryDetailedVersionText(entry) {
+        const parts = buildTableVersionComponents(entry)
+            .map((component) => formatDetailComponentVersion(component))
+            .filter(Boolean);
+
+        if (parts.length) {
+            return parts.join(' + ');
+        }
+
+        const fallbackVersion = formatDetailedVersion(
+            entry?.engine_version || entry?.metadata?.engine_version || '',
+            getEntryGitCommit(entry)
+        );
+        return fallbackVersion || formatEntryVersion(entry, { display: true });
+    }
+
+    function getVersionFieldCommit(entry, key) {
+        const normalizedKey = String(key || '').trim().toLowerCase();
+        if (!normalizedKey) {
+            return '';
+        }
+
+        const components = buildTableVersionComponents(entry);
+        if (normalizedKey === 'core') {
+            return components.find((component) => component.label === 'vllm-hust' || component.label === 'vllm')?.commit || '';
+        }
+        if (normalizedKey === 'backend') {
+            return components.find((component) => component.label === 'vllm-ascend-hust' || component.label === 'vllm-ascend')?.commit || '';
+        }
+        return '';
     }
 
     function getOverviewSummaryChipText(summary) {
@@ -1087,6 +1178,83 @@
         }
 
         return formatEntryVersion(entry, { display: true });
+    }
+
+    function getEntryFilterVersionParts(entry) {
+        const components = buildTableVersionComponents(entry)
+            .filter((component) => component?.label && component?.version)
+            .map((component) => String(component.version || '').trim())
+            .filter(Boolean);
+
+        if (components.length) {
+            return components;
+        }
+
+        const fallbackVersion = formatEntryVersion(entry, { display: true });
+        return hasVersionValue(fallbackVersion) ? [fallbackVersion] : [];
+    }
+
+    function getEntryFilterVersionText(entry) {
+        const components = buildTableVersionComponents(entry)
+            .filter((component) => component?.label && component?.version);
+
+        if (components.length) {
+            return components
+                .map((component) => `${component.label} ${component.version}`)
+                .join(' + ');
+        }
+
+        const fallbackVersion = formatEntryVersion(entry, { display: true });
+        if (!hasVersionValue(fallbackVersion)) {
+            return '';
+        }
+
+        const engineName = String(getEngine(entry) || '').trim();
+        return engineName && engineName !== 'unknown'
+            ? `${engineName} ${fallbackVersion}`
+            : fallbackVersion;
+    }
+
+    function compareVersionFilterOptions(left, right) {
+        const leftParts = Array.isArray(left?.parts) ? left.parts : [];
+        const rightParts = Array.isArray(right?.parts) ? right.parts : [];
+        const partCount = Math.max(leftParts.length, rightParts.length);
+
+        for (let index = 0; index < partCount; index += 1) {
+            const comparison = compareDisplayVersions(
+                rightParts[index] || '',
+                leftParts[index] || ''
+            );
+            if (comparison !== 0) {
+                return comparison;
+            }
+        }
+
+        return String(left?.label || '').localeCompare(String(right?.label || ''));
+    }
+
+    function buildVersionFilterOption(entry) {
+        return {
+            label: getEntryFilterVersionText(entry),
+            parts: getEntryFilterVersionParts(entry),
+        };
+    }
+
+    function compareEntriesByCompositeVersion(left, right) {
+        return compareVersionFilterOptions(
+            buildVersionFilterOption(left),
+            buildVersionFilterOption(right)
+        );
+    }
+
+    function matchesVersionFilter(entry, selectedVersion) {
+        const normalizedFilter = String(selectedVersion || '').trim();
+        if (!normalizedFilter || normalizedFilter === 'all') {
+            return true;
+        }
+
+        return getEntryFilterVersionText(entry) === normalizedFilter
+            || normalizeDisplayVersion(getEngineVersion(entry)) === normalizedFilter;
     }
 
     function getEntryTotalMemoryGb(entry) {
@@ -1209,21 +1377,51 @@
         return entry?.setting_summary || 'default settings';
     }
 
-    function normalizeScopeModelName(value) {
-        const raw = String(value || '').trim();
-        if (!raw) {
-            return 'unknown-model';
-        }
-        if (!raw.includes('/')) {
-            return raw;
-        }
-        return raw.split('/').pop() || raw;
+    function getEntryModelIdentity(entry) {
+        const payload = entry?.model && typeof entry.model === 'object' ? entry.model : {};
+        return {
+            canonicalId: String(payload.canonical_id || '').trim(),
+            repoId: String(payload.repo_id || '').trim(),
+            shortName: String(payload.short_name || '').trim(),
+            displayName: String(payload.display_name || '').trim(),
+            name: String(payload.name || '').trim(),
+        };
+    }
+    function getEntryModelCanonicalId(entry) {
+        return getEntryModelIdentity(entry).canonicalId;
+    }
+
+    function getEntryModelRepoId(entry) {
+        return getEntryModelIdentity(entry).repoId;
+    }
+
+    function getEntryModelShortName(entry) {
+        return getEntryModelIdentity(entry).shortName;
+    }
+
+    function getEntryModelDisplayName(entry) {
+        return getEntryModelIdentity(entry).displayName || 'Unknown model';
+    }
+
+    function getScopeModelIdentity(scope) {
+        return {
+            canonicalId: String(scope?.model_canonical_id || '').trim(),
+            repoId: String(scope?.model || '').trim(),
+            shortName: String(scope?.model_short_name || '').trim(),
+            displayName: String(scope?.model_display_name || '').trim(),
+            name: String(scope?.model || '').trim(),
+        };
+    }
+
+    function getScopeModelDisplayName(scope) {
+        return getScopeModelIdentity(scope).displayName || 'Unknown model';
     }
 
     function buildComparableScopeFromEntry(entry) {
         return {
-            model: entry?.model?.name || 'unknown-model',
-            modelNormalized: normalizeScopeModelName(entry?.model?.name),
+            model: getEntryModelRepoId(entry) || 'unknown-model',
+            modelCanonical: getEntryModelCanonicalId(entry),
+            modelNormalized: getEntryModelShortName(entry),
             hardware: entry?.hardware?.chip_model || 'unknown-hardware',
             precision: entry?.model?.precision || 'unknown-precision',
             workload: getWorkloadId(entry) || 'Other',
@@ -1261,9 +1459,11 @@
 
     function buildComparableScopeFromSnapshot(snapshotPayload) {
         const scope = snapshotPayload?.scope || {};
+        const scopeModel = getScopeModelIdentity(scope);
         return {
-            model: scope?.model || 'unknown-model',
-            modelNormalized: normalizeScopeModelName(scope?.model),
+            model: scopeModel.repoId || scope?.model || 'unknown-model',
+            modelCanonical: scopeModel.canonicalId,
+            modelNormalized: scopeModel.shortName,
             hardware: scope?.hardware || 'unknown-hardware',
             precision: scope?.precision || 'unknown-precision',
             workload: scope?.workload || 'Other',
@@ -1279,7 +1479,8 @@
             return false;
         }
 
-        const modelMatches = left.model === right.model
+        const modelMatches = (left.modelCanonical && right.modelCanonical && left.modelCanonical === right.modelCanonical)
+            || left.model === right.model
             || left.modelNormalized === right.modelNormalized;
         if (!modelMatches) {
             return false;
@@ -1411,7 +1612,7 @@
             return engineCompare;
         }
 
-        const versionCompare = compareDisplayVersions(getDisplayVersion(b), getDisplayVersion(a));
+        const versionCompare = compareEntriesByCompositeVersion(a, b);
         if (versionCompare !== 0) {
             return versionCompare;
         }
@@ -1426,12 +1627,36 @@
         const nodeCount = entry?.cluster?.node_count || 1;
         const interconnect = entry?.cluster?.interconnect || 'single-node';
         const topology = entry?.cluster?.topology || '';
-        const model = entry?.model?.name || '';
+        const model = getEntryModelCanonicalId(entry) || '';
         const precision = entry?.model?.precision || '';
         const engine = getEngine(entry);
-        const baseVersion = normalizeDisplayVersion(getEngineVersion(entry));
+        const baseVersion = getEntryFilterVersionText(entry);
         const settingSignature = getSettingSignature(entry);
 
+        // Strict aggregation: require both vllm-hust and vllm-ascend-hust to have valid PEP versions
+        const components = buildTableVersionComponents(entry).filter((c) => c?.label && c?.version);
+        const hust = components.find((c) => c.label === 'vllm-hust');
+        const ascend = components.find((c) => c.label === 'vllm-ascend-hust');
+        const isValidPEP = (v) => typeof v === 'string' && /^[0-9]+(\.[0-9]+){0,2}([a-zA-Z0-9._+-]*)?$/.test(v);
+
+        // Only aggregate if both present and both are valid PEP versions
+        if (hust && ascend && isValidPEP(hust.rawVersion) && isValidPEP(ascend.rawVersion)) {
+            return [
+                engine,
+                workload,
+                hardware,
+                chipCount,
+                nodeCount,
+                interconnect,
+                topology,
+                model,
+                precision,
+                hust.rawVersion,
+                ascend.rawVersion,
+                settingSignature,
+            ].join('|');
+        }
+        // Fallback: use a unique key to prevent aggregation if missing/invalid
         return [
             engine,
             workload,
@@ -1442,7 +1667,8 @@
             topology,
             model,
             precision,
-            baseVersion,
+            '__NO_AGGREGATE__',
+            Date.now() + Math.random(), // ensure uniqueness
             settingSignature,
         ].join('|');
     }
@@ -1511,7 +1737,7 @@
                 if (qualityCompare !== 0) {
                     return qualityCompare;
                 }
-                return compareDisplayVersions(getEngineVersion(b), getEngineVersion(a));
+                return compareEntriesByCompositeVersion(a, b);
             });
 
             return {
@@ -1537,10 +1763,7 @@
                     return engineCompare;
                 }
 
-                const versionCompare = compareDisplayVersions(
-                    getDisplayVersion(b),
-                    getDisplayVersion(a)
-                );
+                const versionCompare = compareEntriesByCompositeVersion(a, b);
                 if (versionCompare !== 0) {
                     return versionCompare;
                 }
@@ -1551,7 +1774,7 @@
         }
 
         sorted.sort((a, b) => {
-            const versionCompare = compareDisplayVersions(getDisplayVersion(b), getDisplayVersion(a));
+            const versionCompare = compareEntriesByCompositeVersion(a, b);
             if (versionCompare !== 0) {
                 return versionCompare;
             }
@@ -1753,7 +1976,18 @@
         // Extract unique values
         const engineOptions = getUniqueValues(data, d => getEngine(d));
         const hardwareOptions = getUniqueValues(data, d => d.hardware.chip_model);
-        const modelOptions = getUniqueValues(data, d => d.model.name);
+        const modelOptionsMap = new Map();
+        data.forEach((entry) => {
+            const value = getEntryModelCanonicalId(entry);
+            if (!value || modelOptionsMap.has(value)) {
+                return;
+            }
+            modelOptionsMap.set(value, {
+                value,
+                label: getEntryModelDisplayName(entry),
+            });
+        });
+        const modelOptions = [...modelOptionsMap.values()].sort((left, right) => left.label.localeCompare(right.label));
         const versionOptions = getVersionOptions(data);
         const dynamicWorkloads = getUniqueValues(data, d => getWorkloadId(d)).sort((a, b) => a.localeCompare(b));
         const workloadOptions = ['all', ...dynamicWorkloads];
@@ -1762,17 +1996,34 @@
         // Update dropdowns
         updateSelect('filter-engine', ['all', ...engineOptions], filters.engine, getEngineLabel);
         updateSelect('filter-hardware', ['all', ...hardwareOptions], filters.hardware);
-        updateSelect('filter-model', ['all', ...modelOptions], filters.model);
+        updateSelect('filter-model', ['all', ...modelOptions], filters.model, (value, option) => {
+            if (value === 'all') {
+                return getWorkloadLabel('all');
+            }
+            return option?.label || value;
+        });
         updateSelect('filter-version', ['all', ...versionOptions], filters.version);
         updateSelect('filter-workload', workloadOptions, filters.workload, getWorkloadLabel);
         updateSelect('filter-precision', ['all', ...precisionOptions], filters.precision);
     }
 
     function getVersionOptions(data) {
-        const merged = [...new Set(getUniqueValues(data, d => normalizeDisplayVersion(getEngineVersion(d))))]
-            .filter((version) => String(version || '').trim())
-            .sort((a, b) => compareDisplayVersions(b, a));
-        return merged;
+        const optionMap = new Map();
+        data.forEach((entry) => {
+            const label = getEntryFilterVersionText(entry);
+            if (!label || optionMap.has(label)) {
+                return;
+            }
+
+            optionMap.set(label, {
+                label,
+                parts: getEntryFilterVersionParts(entry),
+            });
+        });
+
+        return [...optionMap.values()]
+            .sort(compareVersionFilterOptions)
+            .map((option) => option.label);
     }
 
     function getUniqueValues(data, accessor) {
@@ -1780,17 +2031,36 @@
         return [...new Set(data.map(accessor).filter(Boolean))];
     }
 
+    function normalizeSelectOption(option, labelMapper = null) {
+        if (option && typeof option === 'object' && !Array.isArray(option)) {
+            const value = String(option.value ?? '');
+            const fallbackLabel = String(option.label ?? value);
+            return {
+                value,
+                label: labelMapper ? labelMapper(value, option) : fallbackLabel,
+            };
+        }
+
+        const value = String(option);
+        return {
+            value,
+            label: labelMapper ? labelMapper(value, option) : value,
+        };
+    }
+
     function updateSelect(id, options, selectedValue, labelMapper = null) {
         const select = document.getElementById(id);
         if (!select) return;
 
-        select.innerHTML = options.map(opt =>
-            `<option value="${opt}" ${opt === selectedValue ? 'selected' : ''}>${labelMapper ? labelMapper(opt) : opt}</option>`
+        const normalizedOptions = options.map((option) => normalizeSelectOption(option, labelMapper));
+
+        select.innerHTML = normalizedOptions.map(opt =>
+            `<option value="${opt.value}" ${opt.value === selectedValue ? 'selected' : ''}>${opt.label}</option>`
         ).join('');
 
-        if (selectedValue && options.includes(selectedValue)) {
+        if (selectedValue && normalizedOptions.some((option) => option.value === selectedValue)) {
             select.value = selectedValue;
-        } else if (options.includes('all')) {
+        } else if (normalizedOptions.some((option) => option.value === 'all')) {
             select.value = 'all';
             state.filters[state.currentTab][id.replace('filter-', '')] = 'all';
         }
@@ -1812,8 +2082,8 @@
             const workload = getWorkloadId(entry);
             return (filters.engine === 'all' || getEngine(entry) === filters.engine) &&
                 (filters.hardware === 'all' || entry.hardware.chip_model === filters.hardware) &&
-                (filters.model === 'all' || entry.model.name === filters.model) &&
-                (filters.version === 'all' || normalizeDisplayVersion(getEngineVersion(entry)) === filters.version) &&
+                (filters.model === 'all' || getEntryModelCanonicalId(entry) === filters.model) &&
+                matchesVersionFilter(entry, filters.version) &&
                 (filters.workload === 'all' || workload === filters.workload) &&
                 (filters.precision === 'all' || entry.model.precision === filters.precision);
         });
@@ -2017,7 +2287,7 @@
         const accountable = entry?.constraints?.accountable_scope || {};
         const representativeBusinessScenario = accountable.representative_business_scenario || 'unknown-business-scenario';
         const baselineEngine = getAccountableBaselineInfo(accountable).scopeEngine;
-        const model = entry?.model?.name || 'unknown-model';
+        const model = getEntryModelRepoId(entry) || 'unknown-model';
         const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
         const workload = getWorkloadId(entry) || 'Other';
         const configType = entry?.config_type || 'unknown-config';
@@ -2313,7 +2583,7 @@
                             <span class="hc-status ${statusClass}">${scope?.overall_pass ? t('pass') : t('fail')}</span>
                         </div>
                         <p class="hard-constraint-scope">
-                            ${t('scope')}: ${scope?.scope?.model || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}
+                            ${t('scope')}: ${getScopeModelDisplayName(scope?.scope) || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}
                         </p>
                         <p class="hard-constraint-scope-meta">
                             scenario=${accountable?.representative_business_scenario || '-'} · baseline=${formatAccountableBaseline(accountable)} · ${passedCount}/4
@@ -2541,9 +2811,8 @@
     function renderVersionsSection(entry) {
         const engine = getEngine(entry);
         const engineLabel = getEngineLabel(engine);
-        const engineVersion = getEntryCompositeVersionText(entry);
+        const engineVersion = getEntryDetailedVersionText(entry);
         const versions = entry.versions || {};
-
         const versionRows = Object.entries(versions)
             .filter(([_, value]) => typeof value === 'string' && value.trim())
             .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
@@ -2553,14 +2822,17 @@
                 <h4>${t('engineVersions')}</h4>
                 <p><strong>${t('engine')}:</strong> ${engineLabel}</p>
                 <p><strong>${t('engineVersion')}:</strong> ${engineVersion}</p>
-                ${versionRows.length ? versionRows.map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`).join('') : ''}
+                ${versionRows.length ? versionRows.map(([key, value]) => {
+            const formatted = formatDetailedVersion(value, getVersionFieldCommit(entry, key)) || value;
+            return `<p><strong>${key}:</strong> ${formatted}</p>`;
+        }).join('') : ''}
             </div>
         `;
     }
 
     function renderBuildVariantsSection(entry) {
         const variants = entry.versionVariants || [entry];
-        const displayedVersion = getEntryCompositeVersionText(entry);
+        const displayedVersion = getEntryDetailedVersionText(entry);
 
         return `
             <div class="detail-section">
@@ -2583,7 +2855,7 @@
                             ${variants.map((variant, index) => {
             const vm = variant.metrics || {};
             const selected = variant.entry_id === entry.entry_id ? 'selected' : '';
-            const variantVersion = getEntryCompositeVersionText(variant);
+            const variantVersion = getEntryDetailedVersionText(variant);
             return `
                                     <tr class="${selected}">
                                         <td><span class="build-version-summary">${variantVersion}</span>${index === 0 ? ` <span class="build-version-marker">${t('selectedStar')}</span>` : ''}</td>
@@ -2790,7 +3062,7 @@
     }
 
     function createCompareScopeKey(entry) {
-        const model = normalizeScopeModelName(entry?.model?.name);
+        const model = getEntryModelCanonicalId(entry) || 'unknown-model';
         const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
         const precision = entry?.model?.precision || 'unknown-precision';
         const workload = getWorkloadId(entry) || 'Other';
@@ -2802,7 +3074,7 @@
     }
 
     function buildScopeLabel(entry) {
-        const model = entry?.model?.name || 'Unknown model';
+        const model = getEntryModelDisplayName(entry) || 'Unknown model';
         const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
         const workload = getWorkloadLabel(getWorkloadId(entry));
         const settingSummary = entry?.scope?.setting_summary || getSettingSummary(entry);
@@ -2961,7 +3233,7 @@
     }
 
     function getOverviewSubtitle(entries, engineCount, comparisonView, viewOptions) {
-        const models = getUniqueValues(entries, (entry) => entry?.model?.name);
+        const models = getUniqueValues(entries, (entry) => getEntryModelDisplayName(entry));
         const hardware = getUniqueValues(entries, (entry) => entry?.hardware?.chip_model);
         const workloads = getUniqueValues(entries, (entry) => getWorkloadId(entry));
 
@@ -3107,7 +3379,7 @@
 
     function getGoalProgressSubtitle(pair) {
         const scope = pair?.scope || {};
-        const model = scope.model || 'Unknown model';
+        const model = getScopeModelDisplayName(scope) || 'Unknown model';
         const hardware = scope.hardware || 'Unknown hardware';
         const workload = getWorkloadLabel(scope.workload || 'Other');
         const settingSummary = scope.setting_summary ? ` • ${scope.setting_summary}` : '';

@@ -13,10 +13,14 @@
       "total_memory_gb": 128.0
     },
     "model": {
-      "name": "Qwen2.5-14B-Instruct",
+      "name": "Qwen/Qwen2.5-14B-Instruct",
       "parameters": "14B",
       "precision": "FP16",
-      "quantization": null
+      "quantization": null,
+      "canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+      "repo_id": "Qwen/Qwen2.5-14B-Instruct",
+      "short_name": "Qwen2.5-14B-Instruct",
+      "display_name": "Qwen2.5-14B-Instruct"
     },
     "workload": {
       "name": "sonnet-throughput",
@@ -116,10 +120,14 @@
       "total_memory_gb": 256.0
     },
     "model": {
-      "name": "Qwen2.5-14B-Instruct",
+      "name": "Qwen/Qwen2.5-14B-Instruct",
       "parameters": "14B",
       "precision": "FP16",
-      "quantization": null
+      "quantization": null,
+      "canonical_id": "hf:Qwen/Qwen2.5-14B-Instruct",
+      "repo_id": "Qwen/Qwen2.5-14B-Instruct",
+      "short_name": "Qwen2.5-14B-Instruct",
+      "display_name": "Qwen2.5-14B-Instruct"
     },
     "workload": {
       "name": "sonnet-throughput",
@@ -219,10 +227,14 @@
       "total_memory_gb": 256.0
     },
     "model": {
-      "name": "Qwen2.5-7B-Instruct",
+      "name": "Qwen/Qwen2.5-7B-Instruct",
       "parameters": "7B",
       "precision": "BF16",
-      "quantization": null
+      "quantization": null,
+      "canonical_id": "hf:Qwen/Qwen2.5-7B-Instruct",
+      "repo_id": "Qwen/Qwen2.5-7B-Instruct",
+      "short_name": "Qwen2.5-7B-Instruct",
+      "display_name": "Qwen2.5-7B-Instruct"
     },
     "workload": {
       "name": "sharegpt-online",
@@ -274,7 +286,7 @@
     "versions": {
       "protocol": "N/A",
       "backend": "N/A",
-      "core": "N/A",
+      "core": "0.17.2rc1.dev450+g289b51ab2.d20260417",
       "benchmark": "0.1.0"
     },
     "environment": {

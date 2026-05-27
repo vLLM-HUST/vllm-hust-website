@@ -131,11 +131,27 @@
         "model": {
           "type": "object",
           "required": [
+            "canonical_id",
+            "repo_id",
+            "short_name",
+            "display_name",
             "name",
             "parameters",
             "precision"
           ],
           "properties": {
+            "canonical_id": {
+              "type": "string"
+            },
+            "repo_id": {
+              "type": "string"
+            },
+            "short_name": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
             "name": {
               "type": "string"
             },

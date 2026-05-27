@@ -56,6 +56,20 @@ def test_hard_constraints_selection_uses_tab_dataset_not_visible_rows() -> None:
     assert "scopeKeys.has(scope.scope_key)" in text
 
 
+def test_leaderboard_uses_normalized_model_identity_helpers() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function getEntryModelIdentity(entry)" in text
+    assert "function getEntryModelCanonicalId(entry)" in text
+    assert "function getEntryModelDisplayName(entry)" in text
+    assert "const modelOptionsMap = new Map();" in text
+    assert "getEntryModelCanonicalId(entry) === filters.model" in text
+    assert "function getScopeModelIdentity(scope)" in text
+    assert "function getScopeModelDisplayName(scope)" in text
+    assert "function createCompareScopeKey(entry)" in text
+
+
 def test_hard_constraints_baseline_block_is_rendered() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
@@ -157,21 +171,132 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "font-weight: 600;" in css_text
 
 
-def test_detail_sections_reuse_composite_versions_and_memory_fallback() -> None:
+def test_detail_sections_use_detail_only_version_formatting_and_memory_fallback() -> (
+    None
+):
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
 
     assert "function getEntryCompositeVersionText(entry)" in text
+    assert "function normalizeDetailedPackageVersion(value)" in text
+    assert (
+        "function formatDetailedVersion(version, commit, { includeCommit = true } = {})"
+        in text
+    )
+    assert "function getEntryDetailedVersionText(entry)" in text
+    assert "function getVersionFieldCommit(entry, key)" in text
     assert "function getEntryTotalMemoryGb(entry)" in text
     assert "function formatMemoryGb(value)" in text
     assert "const totalMemoryGb = getEntryTotalMemoryGb(entry);" in text
     assert "${formatMemoryGb(totalMemoryGb)} GB" in text
-    assert "const displayedVersion = getEntryCompositeVersionText(entry);" in text
-    assert "const variantVersion = getEntryCompositeVersionText(variant);" in text
+    assert "const displayedVersion = getEntryDetailedVersionText(entry);" in text
+    assert "const variantVersion = getEntryDetailedVersionText(variant);" in text
+    assert "const engineVersion = getEntryDetailedVersionText(entry);" in text
+    assert (
+        "formatDetailedVersion(value, getVersionFieldCommit(entry, key)) || value"
+        in text
+    )
+    assert "getShortCommit(extractCommitFromVersion(version) || commit)" in text
     assert '<span class="build-version-summary">${variantVersion}</span>' in text
     assert ".build-version-summary {" in css_text
     assert ".build-version-marker {" in css_text
+
+
+def test_leaderboard_version_display_contract_is_documented_and_split() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    readme_text = (root / "README.md").read_text(encoding="utf-8")
+    docs_text = (root / "docs" / "VERSION_METADATA.md").read_text(encoding="utf-8")
+
+    assert "## Leaderboard Version Display Contract" in docs_text
+    assert (
+        "Main leaderboard table version cells are intentionally compact summaries."
+        in docs_text
+    )
+    assert (
+        "Expanded leaderboard details are intentionally more detailed than the table."
+        in docs_text
+    )
+    assert "Only version substrings should change" in docs_text
+    assert "tests/test_site_structure.py" in docs_text
+    assert "Leaderboard version rendering follows a split UI contract:" in readme_text
+    assert (
+        "docs/VERSION_METADATA.md#leaderboard-version-display-contract" in readme_text
+    )
+
+    render_data_row_start = text.index(
+        "function renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse) {"
+    )
+    render_details_row_start = text.index(
+        "function renderDetailsRow(entry, isExpanded) {"
+    )
+    render_data_row_text = text[render_data_row_start:render_details_row_start]
+    assert (
+        "const tableVersionSummary = formatTableVersionSummary(entry, dateLabel);"
+        in render_data_row_text
+    )
+    assert "const versionMainText = tableVersionSummary" in render_data_row_text
+    assert "getEntryDetailedVersionText" not in render_data_row_text
+    assert "formatDetailedVersion" not in render_data_row_text
+
+    render_versions_start = text.index("function renderVersionsSection(entry) {")
+    render_build_start = text.index("function renderBuildVariantsSection(entry) {")
+    render_versions_text = text[render_versions_start:render_build_start]
+    assert (
+        "const engineVersion = getEntryDetailedVersionText(entry);"
+        in render_versions_text
+    )
+    assert (
+        "formatDetailedVersion(value, getVersionFieldCommit(entry, key)) || value"
+        in render_versions_text
+    )
+    assert "getEntryCompositeVersionText(entry)" not in render_versions_text
+
+    render_build_end = text.index(
+        "function formatMetric(value, isPercentage = false) {"
+    )
+    render_build_text = text[render_build_start:render_build_end]
+    assert (
+        "const displayedVersion = getEntryDetailedVersionText(entry);"
+        in render_build_text
+    )
+    assert (
+        "const variantVersion = getEntryDetailedVersionText(variant);"
+        in render_build_text
+    )
+    assert "getEntryCompositeVersionText(" not in render_build_text
+
+
+def test_version_filter_reuses_aligned_composite_version_summary() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function getEntryFilterVersionParts(entry)" in text
+    assert "function getEntryFilterVersionText(entry)" in text
+    assert "function buildVersionFilterOption(entry)" in text
+    assert "function compareVersionFilterOptions(left, right)" in text
+    assert "function compareEntriesByCompositeVersion(left, right)" in text
+    assert "function matchesVersionFilter(entry, selectedVersion)" in text
+    assert ".map((component) => `${component.label} ${component.version}`)" in text
+    assert "optionMap.set(label, {" in text
+    assert ".sort(compareVersionFilterOptions)" in text
+    assert ".map((option) => option.label);" in text
+    assert "matchesVersionFilter(entry, filters.version)" in text
+    assert (
+        "normalizeDisplayVersion(getEngineVersion(entry)) === normalizedFilter" in text
+    )
+    assert "const baseVersion = getEntryFilterVersionText(entry);" in text
+    assert "return compareEntriesByCompositeVersion(a, b);" in text
+    assert ".replace(/\\.dev\\d+\\b/i, '')" in text
+    assert ".replace(/(?:[.+-])d\\d{8}$/i, '')" in text
+    assert "while (parts.length < 3) {" in text
+    assert "parts.push('0');" in text
+    assert ".replace(/(?:[._-]?(?:a|b|rc|pre|preview)\\d+)\\b/i, '')" not in text
+    assert (
+        "formatComponentVersion(candidate, component.commit, { includeCommit: false })"
+        in text
+    )
 
 
 def test_local_validation_script_and_hook_templates_track_ci() -> None:

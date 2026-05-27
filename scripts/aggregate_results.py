@@ -47,6 +47,9 @@ VALID_BASELINE_STATUSES = {
     BASELINE_STATUS_PENDING,
     BASELINE_STATUS_NONE,
 }
+CANONICAL_MODEL_ID_PATTERN = re.compile(
+    r"^(?P<registry>[a-z0-9][a-z0-9_-]*):(?P<repo_id>.+)$"
+)
 
 GOAL_BASELINE_TARGET = {
     "id": "official-ascend-jan-2026-v0.11.0",
@@ -81,6 +84,7 @@ def validate_entry(
         )
     normalize_entry_engine_version(entry)
     normalize_entry_hardware(entry)
+    normalize_entry_model(entry)
     normalize_entry_accountable_scope(entry)
     return entry
 
@@ -271,6 +275,55 @@ def normalize_entry_accountable_scope(entry: dict[str, Any]) -> dict[str, Any]:
     return entry
 
 
+def parse_canonical_model_id(value: Any) -> tuple[str, str] | None:
+    normalized = str(value or "").strip()
+    if not normalized:
+        return None
+    match = CANONICAL_MODEL_ID_PATTERN.match(normalized)
+    if not match:
+        return None
+    return match.group("registry"), match.group("repo_id")
+
+
+def resolve_model_identity(model_payload: dict[str, Any]) -> dict[str, str]:
+    resolved = {
+        "canonical_id": str(model_payload.get("canonical_id") or "").strip(),
+        "repo_id": str(model_payload.get("repo_id") or "").strip(),
+        "short_name": str(model_payload.get("short_name") or "").strip(),
+        "display_name": str(model_payload.get("display_name") or "").strip(),
+        "name": str(model_payload.get("name") or "").strip(),
+    }
+    missing = [field for field, value in resolved.items() if not value]
+    if missing:
+        raise ValueError(
+            "leaderboard entry model payload missing normalized identity fields: "
+            + ", ".join(missing)
+        )
+
+    parsed_canonical = parse_canonical_model_id(resolved["canonical_id"])
+    if parsed_canonical is None:
+        raise ValueError(
+            "leaderboard entry model.canonical_id must match <registry>:<repo_id>"
+        )
+    if parsed_canonical[1] != resolved["repo_id"]:
+        raise ValueError(
+            "leaderboard entry model.canonical_id must embed model.repo_id"
+        )
+    if resolved["name"] != resolved["repo_id"]:
+        raise ValueError("leaderboard entry model.name must equal model.repo_id")
+
+    return resolved
+
+
+def normalize_entry_model(entry: dict[str, Any]) -> dict[str, Any]:
+    model = entry.get("model")
+    if not isinstance(model, dict):
+        return entry
+
+    model.update(resolve_model_identity(model))
+    return entry
+
+
 def prefer_newer_entry(
     current: dict[str, Any], candidate: dict[str, Any]
 ) -> dict[str, Any]:
@@ -340,15 +393,6 @@ def extract_workload_name(entry: dict[str, Any]) -> str:
             if isinstance(value, str) and value.strip():
                 return value.strip()
     return "UNKNOWN"
-
-
-def normalize_model_name(model_name: Any) -> str:
-    raw_name = str(model_name or "unknown-model").strip()
-    if not raw_name:
-        return "unknown-model"
-    if "/" not in raw_name:
-        return raw_name
-    return raw_name.rsplit("/", maxsplit=1)[-1] or raw_name
 
 
 def get_same_spec_payload(entry: dict[str, Any]) -> dict[str, Any]:
@@ -479,7 +523,7 @@ def same_spec_hashes_match(
 
 
 def build_compare_scope_key(entry: dict[str, Any]) -> str:
-    model = normalize_model_name((entry.get("model") or {}).get("name"))
+    model = str((entry.get("model") or {}).get("canonical_id") or "unknown-model")
     hardware = str(
         (entry.get("hardware") or {}).get("chip_model") or "unknown-hardware"
     )
@@ -932,6 +976,15 @@ def build_hard_constraint_snapshot(entries: list[dict[str, Any]]) -> dict[str, A
         scope = {
             "engine": str(latest.get("engine") or "unknown"),
             "model": str((latest.get("model") or {}).get("name") or "unknown-model"),
+            "model_canonical_id": str(
+                (latest.get("model") or {}).get("canonical_id") or ""
+            ),
+            "model_short_name": str(
+                (latest.get("model") or {}).get("short_name") or ""
+            ),
+            "model_display_name": str(
+                (latest.get("model") or {}).get("display_name") or ""
+            ),
             "hardware": str(
                 (latest.get("hardware") or {}).get("chip_model") or "unknown-hardware"
             ),
@@ -1242,6 +1295,15 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
                 "model": str(
                     (current_entry.get("model") or {}).get("name") or "unknown-model"
                 ),
+                "model_canonical_id": str(
+                    (current_entry.get("model") or {}).get("canonical_id") or ""
+                ),
+                "model_short_name": str(
+                    (current_entry.get("model") or {}).get("short_name") or ""
+                ),
+                "model_display_name": str(
+                    (current_entry.get("model") or {}).get("display_name") or ""
+                ),
                 "hardware": str(
                     (current_entry.get("hardware") or {}).get("chip_model")
                     or "unknown-hardware"
@@ -1333,6 +1395,15 @@ def build_compare_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
                 "scope": {
                     "model": str(
                         (entry.get("model") or {}).get("name") or "unknown-model"
+                    ),
+                    "model_canonical_id": str(
+                        (entry.get("model") or {}).get("canonical_id") or ""
+                    ),
+                    "model_short_name": str(
+                        (entry.get("model") or {}).get("short_name") or ""
+                    ),
+                    "model_display_name": str(
+                        (entry.get("model") or {}).get("display_name") or ""
                     ),
                     "hardware": str(
                         (entry.get("hardware") or {}).get("chip_model")
