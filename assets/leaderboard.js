@@ -922,105 +922,172 @@
         const engineVersion = entry?.engine_version || metadata.engine_version || '';
         const components = [];
 
+        const isOfficialAscendStack = engineName === 'vllm'
+            && (
+                githubRepository.toLowerCase().includes('vllm-ascend')
+                || pluginRepository.includes('vllm-ascend')
+                || dataSource.includes('vllm-ascend')
+            );
+
+        if (isOfficialAscendStack) {
+            const officialCoreVersion = hasRenderablePackageVersion(versions.core)
+                ? versions.core
+                : engineVersion;
+            const officialBackendVersion = hasRenderablePackageVersion(versions.backend)
+                ? versions.backend
+                : engineVersion;
+
+            const officialCoreDisplayVersion = resolveVersionDisplayValue(
+                officialCoreVersion,
+                sharedSource.commit,
+                sharedSource.ref,
+                {
+                    fallbackToRecordedRevision: true,
+                }
+            );
+            if (officialCoreDisplayVersion) {
+                components.push({
+                    label: 'vllm',
+                    version: officialCoreDisplayVersion,
+                    rawVersion: officialCoreVersion,
+                    commit: sharedSource.commit,
+                    ref: sharedSource.ref,
+                    visibilityKey: buildComponentVisibilityKey(
+                        'vllm',
+                        officialCoreDisplayVersion,
+                        sharedSource.commit,
+                        sharedSource.ref
+                    ),
+                });
+            }
+
+            const officialBackendDisplayVersion = resolveVersionDisplayValue(
+                officialBackendVersion,
+                sharedSource.commit,
+                sharedSource.ref,
+                {
+                    fallbackToRecordedRevision: true,
+                }
+            );
+            if (officialBackendDisplayVersion) {
+                components.push({
+                    label: 'vllm-ascend',
+                    version: officialBackendDisplayVersion,
+                    rawVersion: officialBackendVersion,
+                    commit: sharedSource.commit,
+                    ref: sharedSource.ref,
+                    visibilityKey: buildComponentVisibilityKey(
+                        'vllm-ascend',
+                        officialBackendDisplayVersion,
+                        sharedSource.commit,
+                        sharedSource.ref
+                    ),
+                });
+            }
+
+            if (components.length) {
+                return components;
+            }
+        }
+
         const hasHustEngineRepository = engineRepository.includes('vllm-hust')
             || githubRepository.toLowerCase().endsWith('/vllm-hust');
         const hasHustPluginRepository = pluginEngine === 'vllm-ascend-hust'
             || pluginRepository.includes('vllm-ascend-hust')
             || githubRepository.toLowerCase().includes('vllm-ascend-hust');
+        const isHustStack = hasHustEngineRepository
+            || hasHustPluginRepository
+            || engineName === 'vllm-hust'
+            || engineName === 'vllm-ascend-hust';
         const canUseEngineVersionForHust = hasHustEngineRepository
             || (engineName === 'vllm-hust' && !hasHustPluginRepository);
         const canUseEngineVersionForPlugin = engineName === 'vllm-ascend-hust'
             || (hasHustPluginRepository && !hasHustEngineRepository);
-
-        const hustVersion = hasRenderablePackageVersion(versions.core)
-            ? versions.core
-            : (canUseEngineVersionForHust ? engineVersion : '');
-        const hustCommit = engineSource.commit
-            || (canUseEngineVersionForHust ? getEntryGitCommit(entry) : '')
-            || extractCommitFromVersion(versions.core)
-            || extractCommitFromVersion(engineVersion);
-        const hustOverrideVersion = getHistoricalSameSpecVersionOverride(
-            dataSource,
-            'vllm-hust',
-            engineSource.repository
-        );
-
-        const hustDisplayVersion = resolveVersionDisplayValue(
-            hustVersion,
-            hustCommit,
-            engineSource.ref,
-            {
-                overrideVersion: hustOverrideVersion,
-                fallbackToRecordedRevision: hasHustEngineRepository,
-                missingValue: engineName === 'vllm-hust' && hasHustPluginRepository ? 'unrecorded' : '',
-            }
-        );
-        if (hustDisplayVersion) {
-            components.push({
-                label: 'vllm-hust',
-                version: hustDisplayVersion,
-                rawVersion: hustVersion,
-                overrideVersion: hustOverrideVersion,
-                commit: hustCommit,
-                ref: engineSource.ref,
-                visibilityKey: buildComponentVisibilityKey(
-                    'vllm-hust',
-                    hustDisplayVersion,
-                    hustCommit,
-                    engineSource.ref
-                ),
-            });
-        }
-
-        const ascendHustVersion = hasRenderablePackageVersion(versions.backend)
-            ? versions.backend
-            : (canUseEngineVersionForPlugin ? engineVersion : '');
-        const ascendHustCommit = pluginSource.commit
-            || (canUseEngineVersionForPlugin ? getEntryGitCommit(entry) : '')
-            || extractCommitFromVersion(versions.backend)
-            || extractCommitFromVersion(engineVersion);
-        const ascendHustOverrideVersion = getHistoricalSameSpecVersionOverride(
-            dataSource,
-            'vllm-ascend-hust',
-            pluginSource.repository
-        );
-
-        const ascendHustDisplayVersion = resolveVersionDisplayValue(
-            ascendHustVersion,
-            ascendHustCommit,
-            pluginSource.ref,
-            {
-                overrideVersion: ascendHustOverrideVersion,
-                fallbackToRecordedRevision: hasHustPluginRepository,
-            }
-        );
-        if (ascendHustDisplayVersion) {
-            components.push({
-                label: 'vllm-ascend-hust',
-                version: ascendHustDisplayVersion,
-                rawVersion: ascendHustVersion,
-                overrideVersion: ascendHustOverrideVersion,
-                commit: ascendHustCommit,
-                ref: pluginSource.ref,
-                visibilityKey: buildComponentVisibilityKey(
-                    'vllm-ascend-hust',
-                    ascendHustDisplayVersion,
-                    ascendHustCommit,
-                    pluginSource.ref
-                ),
-            });
-        }
-
-        if (components.length) {
-            return components;
-        }
-
-        const isOfficialAscendStack = engineName === 'vllm'
-            && (
-                githubRepository.includes('vllm-ascend')
-                || pluginRepository.includes('vllm-ascend')
-                || dataSource.includes('vllm-ascend')
+        if (isHustStack) {
+            const hustVersion = hasRenderablePackageVersion(versions.core)
+                ? versions.core
+                : (canUseEngineVersionForHust ? engineVersion : '');
+            const hustCommit = engineSource.commit
+                || (canUseEngineVersionForHust ? getEntryGitCommit(entry) : '')
+                || extractCommitFromVersion(versions.core)
+                || extractCommitFromVersion(engineVersion);
+            const hustOverrideVersion = getHistoricalSameSpecVersionOverride(
+                dataSource,
+                'vllm-hust',
+                engineSource.repository
             );
+
+            const hustDisplayVersion = resolveVersionDisplayValue(
+                hustVersion,
+                hustCommit,
+                engineSource.ref,
+                {
+                    overrideVersion: hustOverrideVersion,
+                    fallbackToRecordedRevision: hasHustEngineRepository,
+                    missingValue: engineName === 'vllm-hust' && hasHustPluginRepository ? 'unrecorded' : '',
+                }
+            );
+            if (hustDisplayVersion) {
+                components.push({
+                    label: 'vllm-hust',
+                    version: hustDisplayVersion,
+                    rawVersion: hustVersion,
+                    overrideVersion: hustOverrideVersion,
+                    commit: hustCommit,
+                    ref: engineSource.ref,
+                    visibilityKey: buildComponentVisibilityKey(
+                        'vllm-hust',
+                        hustDisplayVersion,
+                        hustCommit,
+                        engineSource.ref
+                    ),
+                });
+            }
+
+            const ascendHustVersion = hasRenderablePackageVersion(versions.backend)
+                ? versions.backend
+                : (canUseEngineVersionForPlugin ? engineVersion : '');
+            const ascendHustCommit = pluginSource.commit
+                || (canUseEngineVersionForPlugin ? getEntryGitCommit(entry) : '')
+                || extractCommitFromVersion(versions.backend)
+                || extractCommitFromVersion(engineVersion);
+            const ascendHustOverrideVersion = getHistoricalSameSpecVersionOverride(
+                dataSource,
+                'vllm-ascend-hust',
+                pluginSource.repository
+            );
+
+            const ascendHustDisplayVersion = resolveVersionDisplayValue(
+                ascendHustVersion,
+                ascendHustCommit,
+                pluginSource.ref,
+                {
+                    overrideVersion: ascendHustOverrideVersion,
+                    fallbackToRecordedRevision: hasHustPluginRepository,
+                }
+            );
+            if (ascendHustDisplayVersion) {
+                components.push({
+                    label: 'vllm-ascend-hust',
+                    version: ascendHustDisplayVersion,
+                    rawVersion: ascendHustVersion,
+                    overrideVersion: ascendHustOverrideVersion,
+                    commit: ascendHustCommit,
+                    ref: pluginSource.ref,
+                    visibilityKey: buildComponentVisibilityKey(
+                        'vllm-ascend-hust',
+                        ascendHustDisplayVersion,
+                        ascendHustCommit,
+                        pluginSource.ref
+                    ),
+                });
+            }
+
+            if (components.length) {
+                return components;
+            }
+        }
+
         const officialVersion = formatComponentVersion(engineVersion || metadata.github_ref || '', '', { includeCommit: false });
         if (officialVersion) {
             components.push({
