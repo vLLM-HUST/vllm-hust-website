@@ -772,9 +772,9 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(
     baseline_entry = _valid_entry()
     baseline_entry["entry_id"] = "22222222-2222-2222-2222-222222222222"
     baseline_entry["engine"] = "vllm"
-    baseline_entry["engine_version"] = "0.11.0"
+    baseline_entry["engine_version"] = "0.17.2rc0"
     baseline_entry["metadata"]["engine"] = "vllm"
-    baseline_entry["metadata"]["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["engine_version"] = "0.17.2rc0"
     baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
     baseline_entry["metadata"]["github_commit_url"] = (
         "https://github.com/vllm-project/vllm-ascend/commit/def456"
@@ -784,7 +784,7 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(
     baseline_entry["metrics"]["tbt_ms"] = 8.0
     baseline_entry["metrics"]["throughput_tps"] = 240.0
     baseline_entry["metadata"]["idempotency_key"] = (
-        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+        "vllm|0.17.2rc0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
     baseline_entry["same_spec"] = _same_spec_payload("spec-1", "hash-1")
 
@@ -859,7 +859,7 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(
     assert goal_progress["headline_pair"]["baseline"]["engine"] == "vllm"
     assert (
         goal_progress["headline_pair"]["baseline_target"]["id"]
-        == "official-ascend-jan-2026-v0.11.0"
+        == "official-ascend-2026-v0.17.2rc0"
     )
     assert goal_progress["headline_pair"]["remaining_gap_pct"]["throughput"] == 12.5
 
@@ -956,11 +956,11 @@ def test_aggregate_results_hard_constraints_only_include_vllm_hust(
     baseline_entry = _valid_entry()
     baseline_entry["entry_id"] = "77777777-7777-7777-7777-777777777777"
     baseline_entry["engine"] = "vllm"
-    baseline_entry["engine_version"] = "0.11.0"
+    baseline_entry["engine_version"] = "0.17.2rc0"
     baseline_entry["metadata"]["engine"] = "vllm"
-    baseline_entry["metadata"]["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["engine_version"] = "0.17.2rc0"
     baseline_entry["metadata"]["idempotency_key"] = (
-        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+        "vllm|0.17.2rc0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
 
     entries = [current_entry, baseline_entry]
@@ -1118,12 +1118,12 @@ def test_aggregate_results_fails_on_same_spec_hash_mismatch(tmp_path: Path) -> N
     baseline_entry = _valid_entry()
     baseline_entry["entry_id"] = "99999999-9999-9999-9999-999999999999"
     baseline_entry["engine"] = "vllm"
-    baseline_entry["engine_version"] = "0.11.0"
+    baseline_entry["engine_version"] = "0.17.2rc0"
     baseline_entry["metadata"]["engine"] = "vllm"
-    baseline_entry["metadata"]["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["engine_version"] = "0.17.2rc0"
     baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
     baseline_entry["metadata"]["idempotency_key"] = (
-        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+        "vllm|0.17.2rc0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
     baseline_entry["same_spec"] = _same_spec_payload("spec-3", "hash-baseline")
 
@@ -1390,9 +1390,9 @@ def test_aggregate_results_prefers_cross_engine_same_spec_pair(
     baseline_entry = _valid_entry()
     baseline_entry["entry_id"] = "cccc3333-3333-3333-3333-333333333333"
     baseline_entry["engine"] = "vllm"
-    baseline_entry["engine_version"] = "0.11.0"
+    baseline_entry["engine_version"] = "0.17.2rc0"
     baseline_entry["metadata"]["engine"] = "vllm"
-    baseline_entry["metadata"]["engine_version"] = "0.11.0"
+    baseline_entry["metadata"]["engine_version"] = "0.17.2rc0"
     baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
     baseline_entry["metadata"]["submitted_at"] = "2026-05-08T07:28:09Z"
     baseline_entry["metadata"]["git_commit"] = "baseline"
@@ -1400,7 +1400,7 @@ def test_aggregate_results_prefers_cross_engine_same_spec_pair(
     baseline_entry["metrics"]["tbt_ms"] = 72.78
     baseline_entry["metrics"]["throughput_tps"] = 227.14
     baseline_entry["metadata"]["idempotency_key"] = (
-        "vllm|0.11.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+        "vllm|0.17.2rc0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
     baseline_entry["same_spec"] = _same_spec_payload("spec-1", "hash-shared")
 

@@ -52,11 +52,14 @@ CANONICAL_MODEL_ID_PATTERN = re.compile(
 )
 
 GOAL_BASELINE_TARGET = {
-    "id": "official-ascend-jan-2026-v0.11.0",
-    "label": "Official Ascend Jan 2026",
+    "id": "official-ascend-2026-v0.17.2rc0",
+    "label": "Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0",
     "engine": "vllm",
-    "engine_version_prefix": "0.11.0",
+    "engine_version_prefix": "0.17.2",
     "github_repository": "vllm-project/vllm-ascend",
+    "vllm_commit": "54a62a79f70982742a227c845b96148e6401d0e7",
+    "vllm_ascend_ref": "v0.18.0",
+    "vllm_ascend_commit": "e18643f8a4d5bd9990727654318ad069ea0b56e2",
 }
 
 HARD_CONSTRAINT_THRESHOLDS = {
@@ -454,7 +457,7 @@ def get_compact_spec_label(spec_id: str | None) -> str:
     normalized = str(spec_id or "").strip()
     if not normalized:
         return ""
-    if normalized.startswith("official-ascend-jan-2026"):
+    if normalized.startswith("official-ascend"):
         return "official spec"
     if len(normalized) > 32:
         return f"spec {normalized[:29]}..."
