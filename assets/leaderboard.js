@@ -63,7 +63,7 @@
             hardConstraintsSubtitle: 'Best current hard-constraint result from benchmark snapshots, with regression vs previous submission.',
             hardConstraintsNoData: 'No hard-constraint records under current filters.',
             hardConstraintsBaselineLabel: 'Performance Baseline',
-            hardConstraintsBaselineValue: 'Official Ascend Jan 2026 (vllm v0.11.0 + vllm-ascend v0.11.0)',
+            hardConstraintsBaselineValue: 'Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0',
             baselineStateOfficial: 'official',
             baselineStatePending: 'pending',
             baselineStateNone: 'not declared',
@@ -195,11 +195,11 @@
             hiddenRows: 'Hidden rows',
             versusShort: 'VS',
             goalProgressKicker: 'Goal Gap',
-            goalBaselineLabel: 'Official Ascend Jan 2026 baseline',
+            goalBaselineLabel: 'Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0 baseline',
             goalCurrentLabel: 'Current vllm-hust',
             goalMet: 'Goal met',
             goalGapRemaining: 'Remaining gap',
-            goalCompareTitle: 'vllm-hust vs Official Ascend Jan 2026 baseline',
+            goalCompareTitle: 'vllm-hust vs Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0',
             goalCompareScope: 'Pinned goal scope',
             overviewHeroGoalLabel: 'Official Compare',
             overviewHeroCompareLabel: 'Snapshot Compare',
@@ -230,7 +230,7 @@
             hardConstraintsSubtitle: '展示当前 benchmark 中表现最好的硬约束结果，并和上次提交做回归对比。',
             hardConstraintsNoData: '当前筛选条件下没有硬约束记录。',
             hardConstraintsBaselineLabel: '性能基线',
-            hardConstraintsBaselineValue: 'Official Ascend Jan 2026（vllm v0.11.0 + vllm-ascend v0.11.0）',
+            hardConstraintsBaselineValue: 'Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0',
             baselineStateOfficial: '官方覆盖',
             baselineStatePending: '待补基线',
             baselineStateNone: '未声明',
@@ -362,11 +362,11 @@
             hiddenRows: '隐藏行数',
             versusShort: '对比',
             goalProgressKicker: '目标差距',
-            goalBaselineLabel: '官方 Ascend 2026 年 1 月基线',
+            goalBaselineLabel: '官方 vLLM 0.17.2rc0 + vllm-ascend v0.18.0 基线',
             goalCurrentLabel: '当前 vllm-hust',
             goalMet: '已达到目标',
             goalGapRemaining: '距离目标',
-            goalCompareTitle: 'vllm-hust 对比官方 Ascend 2026 年 1 月基线',
+            goalCompareTitle: 'vllm-hust 对比官方 vLLM 0.17.2rc0 + vllm-ascend v0.18.0 基线',
             goalCompareScope: '目标比较范围',
             overviewHeroGoalLabel: '官方对比',
             overviewHeroCompareLabel: '快照对比',
@@ -1377,7 +1377,7 @@
         if (!normalized) {
             return '';
         }
-        if (normalized.startsWith('official-ascend-jan-2026')) {
+        if (normalized.startsWith('official-ascend')) {
             return 'official spec';
         }
         return normalized.length > 32 ? `spec ${normalized.slice(0, 29)}...` : `spec ${normalized}`;
@@ -2295,7 +2295,11 @@
                 <div class="overview-section-label">${t('overviewGridLabel')}</div>
                 <div class="overview-section-note">${t('overviewGridNote')}</div>
                 <div class="overview-grid">
-                    ${summaries.map((summary, index) => renderEngineSummaryCard(summary, leaders, index, summaries.length)).join('')}
+                    ${[...summaries].sort((a, b) => {
+                        const aBaseline = isBaselineEngine(a.engine) ? 0 : 1;
+                        const bBaseline = isBaselineEngine(b.engine) ? 0 : 1;
+                        return aBaseline - bBaseline;
+                    }).map((summary, index) => renderEngineSummaryCard(summary, leaders, index, summaries.length)).join('')}
                 </div>
             </div>
         `;
@@ -3588,16 +3592,20 @@
         return isBetter ? `${label} ${t('better')}` : `${label} ${t('worse')}`;
     }
 
+    function isBaselineEngine(engine) {
+        return engine !== 'vllm-hust';
+    }
+
     function renderEngineSummaryCard(summary, leaders, cardIndex, cardCount) {
         const bestEntry = summary.bestEntry || {};
         const isLeader = leaders.throughput && leaders.throughput.engine === summary.engine;
-        const isBaselineCard = !isLeader && cardCount === 2 && cardIndex === 1;
+        const isBaselineCard = cardCount === 2 && isBaselineEngine(summary.engine);
         const chipText = getOverviewSummaryChipText(summary);
         const versionText = getOverviewSummaryVersionText(summary);
         const bestVisibleRunText = `${getWorkloadLabel(getWorkloadId(bestEntry))} • ${getConfigText(bestEntry).replace('<br><small>', ' • ').replace('</small>', '')}`;
-        const versionPrefix = isLeader
-            ? t('currentBestVersionLabel')
-            : (isBaselineCard ? t('baselineVersionLabel') : `${t('bestVisibleVersion')} `);
+        const versionPrefix = isBaselineCard
+            ? t('baselineVersionLabel')
+            : (cardCount === 2 ? t('currentBestVersionLabel') : (isLeader ? t('currentBestVersionLabel') : `${t('bestVisibleVersion')} `));
 
         return `
             <div class="engine-summary-card ${isLeader ? 'is-leader' : ''}">
