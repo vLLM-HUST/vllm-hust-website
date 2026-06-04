@@ -170,6 +170,7 @@
             throughputLeader: 'Throughput leader',
             rowCount: 'rows',
             bestVisibleVersion: 'Best visible version',
+            visibleVersionLabel: 'Visible version: ',
             currentBestVersionLabel: 'Current best version: ',
             baselineVersionLabel: 'Baseline version: ',
             alignedVersionLabel: 'Aligned compare version: ',
@@ -178,6 +179,7 @@
             avgThroughput: 'Avg Throughput',
             errorRate: 'Error Rate',
             bestVisibleRun: 'Best visible run',
+            visibleScopeLabel: 'Visible scope',
             alignedRunLabel: 'Aligned compare run',
             parity: 'parity',
             better: 'better',
@@ -219,6 +221,7 @@
             overviewGridLabel: 'Visible Aggregate',
             overviewGridNote: 'Cards summarize the currently visible table rows by engine.',
             overviewGridNoteAligned: 'Averages summarize the currently visible rows by engine; version and sample labels are aligned to the active compare scope when available.',
+            overviewGridNoteScopedOnly: 'Multiple complete compare groups are visible, so cards stay in aggregate mode and do not claim a single aligned sample.',
             overviewTableLabel: 'Visible Rows',
             overviewTableNote: 'The main table shows the currently visible benchmark rows after filters, scope toggles, and version merging.',
             overviewGoalSnapshotNote: 'Hero deltas use the matched official compare snapshot. Cards below summarize the currently visible table rows.',
@@ -351,6 +354,7 @@
             throughputLeader: '吞吐领先',
             rowCount: '条记录',
             bestVisibleVersion: '当前最佳可见版本',
+            visibleVersionLabel: '当前可见版本：',
             currentBestVersionLabel: '当前最佳版本：',
             baselineVersionLabel: '基线版本：',
             alignedVersionLabel: '对齐对比版本：',
@@ -359,6 +363,7 @@
             avgThroughput: '平均吞吐',
             errorRate: '错误率',
             bestVisibleRun: '当前最佳样本',
+            visibleScopeLabel: '当前可见范围',
             alignedRunLabel: '对齐对比样本',
             parity: '持平',
             better: '更优',
@@ -400,6 +405,7 @@
             overviewGridLabel: '当前可见聚合',
             overviewGridNote: '下方卡片按引擎汇总当前主表可见行。',
             overviewGridNoteAligned: '均值按当前主表可见行汇总；若存在命中的 compare scope，版本与样本会按同一 scope 对齐展示。',
+            overviewGridNoteScopedOnly: '当前可见结果覆盖多个完整对比分组，所以下方卡片只展示聚合指标，不绑定单一对齐样本。',
             overviewTableLabel: '当前可见明细',
             overviewTableNote: '主表展示的是当前筛选、scope 开关和版本合并之后的 benchmark 可见行。',
             overviewGoalSnapshotNote: '顶部 Hero 的差距值来自当前命中的官方 compare snapshot；下方卡片汇总的是当前主表可见行。',
@@ -2282,6 +2288,25 @@
         statsEl.textContent = `${t('statsLoaded')} ${state.totalLoadedEntries} • ${state.currentTab}: ${tabTotal} • ${t('statsMatched')} ${rawFilteredTotal} ${t('statsBuildEntries')} • ${t('statsShowing')} ${mergedTotal} ${t('statsComparisonRows')} ${comparisonView.activeCoverage.completeGroupCount} ${t('statsCompleteGroups')}${hiddenText}${sourceText}`;
     }
 
+    function shouldLockOverviewScope(comparisonView) {
+        const focusedEntries = Array.isArray(comparisonView?.focusGroup?.entries)
+            ? comparisonView.focusGroup.entries.filter(Boolean)
+            : [];
+        if (focusedEntries.length) {
+            return true;
+        }
+
+        return Number(comparisonView?.activeCoverage?.completeGroupCount || 0) === 1;
+    }
+
+    function getOverviewAggregateScopeText(comparisonView) {
+        const completeGroupCount = Number(comparisonView?.activeCoverage?.completeGroupCount || 0);
+        if (completeGroupCount > 0) {
+            return `${completeGroupCount} ${t('completeCompareGroups')}`;
+        }
+        return t('compareNoData');
+    }
+
     function renderOverview(entries, comparisonView, viewOptions) {
         const el = document.getElementById('leaderboard-overview');
         if (!el) {
@@ -2303,24 +2328,38 @@
 
         const goalPair = findGoalProgressPair(entries, comparisonView);
         const compareSnapshotGroup = findCompareSnapshotGroup(entries, comparisonView);
-        const representativeEntries = getOverviewRepresentativeEntries(entries, comparisonView, goalPair || compareSnapshotGroup);
-        const summaries = summarizeEngines(entries, representativeEntries);
+        const overviewScopeLocked = shouldLockOverviewScope(comparisonView);
+        const alignmentPayload = overviewScopeLocked ? (goalPair || compareSnapshotGroup) : null;
+        const representativeEntries = getOverviewRepresentativeEntries(entries, comparisonView, alignmentPayload);
+        const summaries = summarizeEngines(entries, representativeEntries, {
+            aggregateOnly: !overviewScopeLocked && Number(comparisonView?.activeCoverage?.completeGroupCount || 0) > 1,
+            aggregateScopeText: getOverviewAggregateScopeText(comparisonView),
+        });
         const leaders = getLeaders(summaries);
-        const title = goalPair
+        const title = overviewScopeLocked && goalPair
             ? getGoalProgressTitle(goalPair)
             : getOverviewTitle(summaries, leaders, comparisonView);
-        const subtitle = goalPair
+        const subtitle = overviewScopeLocked && goalPair
             ? getGoalProgressSubtitle(goalPair)
             : getOverviewSubtitle(entries, summaries.length, comparisonView, viewOptions);
         const badges = getOverviewBadges(entries, summaries.length, leaders, comparisonView);
-        const heroSectionLabel = getOverviewHeroSectionLabel(goalPair, compareSnapshotGroup);
-        const overviewGridNote = representativeEntries.length ? t('overviewGridNoteAligned') : t('overviewGridNote');
-        const headToHeadHtml = goalPair
-            ? renderGoalProgressPair(goalPair)
-            : compareSnapshotGroup
-                ? renderHeadToHeadFromSnapshot(compareSnapshotGroup)
-                : renderHeadToHead(summaries);
-        const kicker = goalPair ? t('goalProgressKicker') : t('quickCompare');
+        const heroSectionLabel = getOverviewHeroSectionLabel(
+            overviewScopeLocked ? goalPair : null,
+            overviewScopeLocked ? compareSnapshotGroup : null,
+        );
+        const overviewGridNote = representativeEntries.length
+            ? t('overviewGridNoteAligned')
+            : summaries.some((summary) => summary.aggregateOnly)
+                ? t('overviewGridNoteScopedOnly')
+                : t('overviewGridNote');
+        const headToHeadHtml = overviewScopeLocked
+            ? (goalPair
+                ? renderGoalProgressPair(goalPair)
+                : compareSnapshotGroup
+                    ? renderHeadToHeadFromSnapshot(compareSnapshotGroup)
+                    : renderHeadToHead(summaries))
+            : renderHeadToHead(summaries);
+        const kicker = overviewScopeLocked && goalPair ? t('goalProgressKicker') : t('quickCompare');
 
         el.innerHTML = `
             <div class="overview-section">
@@ -2351,6 +2390,62 @@
 
     }
 
+    function getSnapshotRepresentativeCandidates(snapshotPayload) {
+        const candidates = [];
+        const preferredPair = snapshotPayload?.preferred_pair || {};
+        const pairCandidates = [preferredPair.left, preferredPair.right];
+        pairCandidates.forEach((candidate) => {
+            if (candidate && typeof candidate === 'object') {
+                candidates.push(candidate);
+            }
+        });
+
+        const engines = Array.isArray(snapshotPayload?.engines) ? snapshotPayload.engines : [];
+        engines.forEach((candidate) => {
+            if (candidate && typeof candidate === 'object') {
+                candidates.push(candidate);
+            }
+        });
+
+        return candidates;
+    }
+
+    function getSnapshotRepresentativeEntries(entries, snapshotPayload) {
+        if (!snapshotPayload || !Array.isArray(entries) || !entries.length) {
+            return [];
+        }
+
+        const entryById = new Map();
+        entries.forEach((entry) => {
+            const entryId = String(entry?.entry_id || '').trim();
+            if (entryId) {
+                entryById.set(entryId, entry);
+            }
+        });
+
+        const candidates = getSnapshotRepresentativeCandidates(snapshotPayload);
+        const explicitMatches = [];
+        const seenEngines = new Set();
+
+        candidates.forEach((candidate) => {
+            const entryId = String(candidate?.entry_id || '').trim();
+            const engine = getEngine(candidate);
+            const matchedEntry = entryId ? entryById.get(entryId) : null;
+            if (!matchedEntry || seenEngines.has(engine)) {
+                return;
+            }
+            explicitMatches.push(matchedEntry);
+            seenEngines.add(engine);
+        });
+
+        if (explicitMatches.length) {
+            return explicitMatches;
+        }
+
+        const snapshotDescriptor = buildComparableScopeFromSnapshot(snapshotPayload);
+        return entries.filter((entry) => scopeDescriptorsMatch(snapshotDescriptor, buildComparableScopeFromEntry(entry)));
+    }
+
     function getOverviewRepresentativeEntries(entries, comparisonView, snapshotPayload) {
         const focusedEntries = Array.isArray(comparisonView?.focusGroup?.entries)
             ? comparisonView.focusGroup.entries.filter(Boolean)
@@ -2363,8 +2458,7 @@
             return [];
         }
 
-        const snapshotDescriptor = buildComparableScopeFromSnapshot(snapshotPayload);
-        return entries.filter((entry) => scopeDescriptorsMatch(snapshotDescriptor, buildComparableScopeFromEntry(entry)));
+        return getSnapshotRepresentativeEntries(entries, snapshotPayload);
     }
 
     function normalizeBaselineEngine(value) {
@@ -3606,9 +3700,11 @@
         };
     }
 
-    function summarizeEngines(entries, representativeEntries = []) {
+    function summarizeEngines(entries, representativeEntries = [], options = {}) {
         const grouped = new Map();
         const representativeByEngine = new Map();
+        const aggregateOnly = Boolean(options?.aggregateOnly);
+        const aggregateScopeText = String(options?.aggregateScopeText || '').trim();
 
         representativeEntries.forEach((entry) => {
             const engine = getEngine(entry);
@@ -3639,6 +3735,8 @@
                     avgTPS: averageMetric(engineEntries, 'throughput_tps'),
                     avgError: averageMetric(engineEntries, 'error_rate'),
                     representativeEntry,
+                    aggregateOnly: aggregateOnly && !representativeEntry,
+                    aggregateScopeText,
                     bestEntry,
                     overviewComponents: buildTableVersionComponents(bestEntry),
                     version: formatEntryVersion(bestEntry, { display: true }),
@@ -4044,6 +4142,7 @@
     function renderEngineSummaryCard(summary, leaders, cardIndex, cardCount) {
         const representativeEntry = summary.representativeEntry || null;
         const bestEntry = summary.bestEntry || {};
+        const aggregateOnly = Boolean(summary.aggregateOnly);
         const isLeader = leaders.throughput && leaders.throughput.engine === summary.engine;
         const isBaselineCard = cardCount === 2 && isBaselineEngine(summary.engine);
         const chipText = getOverviewSummaryChipText(summary);
@@ -4051,10 +4150,17 @@
         const bestVisibleRunText = `${getWorkloadLabel(getWorkloadId(bestEntry))} • ${getConfigText(bestEntry).replace('<br><small>', ' • ').replace('</small>', '')}`;
         const versionPrefix = representativeEntry
             ? t('alignedVersionLabel')
+            : aggregateOnly
+                ? t('visibleVersionLabel')
             : isBaselineCard
                 ? t('baselineVersionLabel')
                 : (cardCount === 2 ? t('currentBestVersionLabel') : (isLeader ? t('currentBestVersionLabel') : `${t('bestVisibleVersion')} `));
-        const footerLabel = representativeEntry ? t('alignedRunLabel') : t('bestVisibleRun');
+        const footerLabel = representativeEntry
+            ? t('alignedRunLabel')
+            : aggregateOnly
+                ? t('visibleScopeLabel')
+                : t('bestVisibleRun');
+        const footerValue = aggregateOnly ? (summary.aggregateScopeText || t('compareNoData')) : bestVisibleRunText;
 
         return `
             <div class="engine-summary-card ${isLeader ? 'is-leader' : ''}">
@@ -4087,7 +4193,7 @@
                     </div>
                     <div class="engine-summary-footer">
                         <span class="engine-summary-footer-label">${footerLabel}:</span>
-                        <span class="engine-summary-footer-value">${bestVisibleRunText}</span>
+                        <span class="engine-summary-footer-value">${footerValue}</span>
                     </div>
                 </div>
             </div>
