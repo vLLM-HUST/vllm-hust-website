@@ -769,7 +769,7 @@
         }
 
         const shortCommit = getShortCommit(commit || extractCommitFromVersion(version));
-        return includeCommit && shortCommit ? `v${normalizedVersion}.${shortCommit}` : `v${normalizedVersion}`;
+        return includeCommit && shortCommit ? `v${normalizedVersion}#${shortCommit}` : `v${normalizedVersion}`;
     }
 
     function normalizeDetailedPackageVersion(value) {
@@ -809,7 +809,7 @@
         }
 
         const shortCommit = getShortCommit(extractCommitFromVersion(version) || commit);
-        return includeCommit && shortCommit ? `v${normalizedVersion}.${shortCommit}` : `v${normalizedVersion}`;
+        return includeCommit && shortCommit ? `v${normalizedVersion}#${shortCommit}` : `v${normalizedVersion}`;
     }
 
     function getRepositoryName(repository) {
@@ -821,12 +821,73 @@
         return parts.length ? parts[parts.length - 1] : normalized;
     }
 
+    function getRepositoryOwner(repository) {
+        const normalized = String(repository || '').trim();
+        if (!normalized) {
+            return '';
+        }
+        const parts = normalized.split('/').filter(Boolean);
+        return parts.length > 1 ? parts[0] : '';
+    }
+
     function isHustCoreRepository(repository) {
         return getRepositoryName(repository) === 'vllm-hust';
     }
 
     function isHustPluginRepository(repository) {
         return getRepositoryName(repository) === 'vllm-ascend-hust';
+    }
+
+    function entryMatchesRepositoryCommit(entry, repository, commit) {
+        const normalizedRepository = String(repository || '').trim().toLowerCase();
+        const normalizedCommit = String(commit || '').trim().toLowerCase();
+        if (!normalizedRepository || !normalizedCommit) {
+            return false;
+        }
+
+        const metadata = entry?.metadata || {};
+        const runtime = metadata.runtime_provenance || {};
+        const candidates = [
+            {
+                repository: String(metadata.github_repository || '').trim().toLowerCase(),
+                commit: String(metadata.git_commit || '').trim().toLowerCase(),
+            },
+            {
+                repository: String(runtime?.engine?.repository || '').trim().toLowerCase(),
+                commit: String(runtime?.engine?.commit || '').trim().toLowerCase(),
+            },
+            {
+                repository: String(runtime?.plugin?.repository || '').trim().toLowerCase(),
+                commit: String(runtime?.plugin?.commit || '').trim().toLowerCase(),
+            },
+        ];
+
+        return candidates.some((candidate) => (
+            candidate.repository === normalizedRepository && candidate.commit === normalizedCommit
+        ));
+    }
+
+    function resolveRecordedGithubActor(repository, commit, fallbackActor = '') {
+        const explicitActor = String(fallbackActor || '').trim();
+        if (explicitActor) {
+            return explicitActor;
+        }
+
+        const datasets = [state.singleChipData, state.multiChipData, state.multiNodeData];
+        for (const dataset of datasets) {
+            for (const entry of dataset) {
+                if (!entryMatchesRepositoryCommit(entry, repository, commit)) {
+                    continue;
+                }
+
+                const githubUser = String(entry?.metadata?.github_user || '').trim();
+                if (githubUser) {
+                    return githubUser;
+                }
+            }
+        }
+
+        return getRepositoryOwner(repository);
     }
 
     function compactGitRef(ref) {
@@ -851,6 +912,52 @@
         return refLabel;
     }
 
+    function formatActorRefCommitVersion(actor, ref, commit) {
+        const actorLabel = formatGithubUserText(actor);
+        const refLabel = compactGitRef(ref);
+        const shortCommit = getShortCommit(commit);
+
+        if (actorLabel && refLabel && shortCommit) {
+            return `${actorLabel}/${refLabel}#${shortCommit}`;
+        }
+        if (actorLabel && refLabel) {
+            return `${actorLabel}/${refLabel}`;
+        }
+        if (refLabel && shortCommit) {
+            return `${refLabel}#${shortCommit}`;
+        }
+        if (actorLabel && shortCommit) {
+            return `${actorLabel}#${shortCommit}`;
+        }
+        if (shortCommit) {
+            return `commit#${shortCommit}`;
+        }
+        return actorLabel || refLabel;
+    }
+
+    function formatRefCommitVersion(ref, commit) {
+        const refLabel = compactGitRef(ref);
+        const shortCommit = getShortCommit(commit);
+        if (refLabel && shortCommit) {
+            return `${refLabel}#${shortCommit}`;
+        }
+        if (shortCommit) {
+            return `commit#${shortCommit}`;
+        }
+        return refLabel;
+    }
+
+    function isGitDescribeLikeVersion(version) {
+        const normalized = String(version || '').trim();
+        if (!normalized) {
+            return false;
+        }
+
+        return /(?:^|[-+.])g[0-9a-f]{7,40}(?:\.d\d{8})?$/i.test(normalized)
+            || /\.dev\d+/i.test(normalized)
+            || /-\d+-g[0-9a-f]{7,40}/i.test(normalized);
+    }
+
     const HISTORICAL_SAME_SPEC_VERSION_OVERRIDES = {
         'vllm-ascend-hust-ci-same-spec|vllm-hust|vllm-hust': '0.17.2.post1',
         'vllm-ascend-hust-ci-same-spec|vllm-ascend-hust|vllm-ascend-hust': '0.1',
@@ -867,13 +974,20 @@
         return HISTORICAL_SAME_SPEC_VERSION_OVERRIDES[key] || '';
     }
 
-    function resolveVersionDisplayValue(version, commit, ref, { overrideVersion = '', fallbackToRecordedRevision = false, missingValue = '' } = {}) {
-        const semanticVersion = formatComponentVersion(version, commit, { includeCommit: false });
+    function resolveVersionDisplayValue(version, commit, ref, { overrideVersion = '', fallbackToRecordedRevision = false, preferRecordedRevisionForDevBuild = false, includeCommit = false, missingValue = '' } = {}) {
+        if (!overrideVersion && preferRecordedRevisionForDevBuild && isGitDescribeLikeVersion(version)) {
+            const refCommitVersion = formatRefCommitVersion(ref, commit || extractCommitFromVersion(version));
+            if (refCommitVersion) {
+                return refCommitVersion;
+            }
+        }
+
+        const semanticVersion = formatComponentVersion(version, commit, { includeCommit });
         if (semanticVersion) {
             return semanticVersion;
         }
 
-        const semanticOverride = formatComponentVersion(overrideVersion, '', { includeCommit: false });
+        const semanticOverride = formatComponentVersion(overrideVersion, commit, { includeCommit });
         if (semanticOverride) {
             return semanticOverride;
         }
@@ -1050,14 +1164,25 @@
                 'vllm-hust',
                 engineSource.repository
             );
-
-            const hustDisplayVersion = resolveVersionDisplayValue(
+            const hustActor = resolveRecordedGithubActor(
+                engineSource.repository,
+                hustCommit,
+                metadata.github_user,
+            );
+            const hustIdentityVersion = formatActorRefCommitVersion(
+                hustActor,
+                engineSource.ref,
+                hustCommit,
+            );
+            const hustDisplayVersion = hustIdentityVersion || resolveVersionDisplayValue(
                 hustVersion,
                 hustCommit,
                 engineSource.ref,
                 {
                     overrideVersion: hustOverrideVersion,
                     fallbackToRecordedRevision: hasHustEngineRepository,
+                    preferRecordedRevisionForDevBuild: true,
+                    includeCommit: true,
                     missingValue: engineName === 'vllm-hust' && hasHustPluginRepository ? 'unrecorded' : '',
                 }
             );
@@ -1090,14 +1215,25 @@
                 'vllm-ascend-hust',
                 pluginSource.repository
             );
-
-            const ascendHustDisplayVersion = resolveVersionDisplayValue(
+            const ascendHustActor = resolveRecordedGithubActor(
+                pluginSource.repository,
+                ascendHustCommit,
+                metadata.github_user,
+            );
+            const ascendHustIdentityVersion = formatActorRefCommitVersion(
+                ascendHustActor,
+                pluginSource.ref,
+                ascendHustCommit,
+            );
+            const ascendHustDisplayVersion = ascendHustIdentityVersion || resolveVersionDisplayValue(
                 ascendHustVersion,
                 ascendHustCommit,
                 pluginSource.ref,
                 {
                     overrideVersion: ascendHustOverrideVersion,
                     fallbackToRecordedRevision: hasHustPluginRepository,
+                    preferRecordedRevisionForDevBuild: true,
+                    includeCommit: true,
                 }
             );
             if (ascendHustDisplayVersion) {
@@ -1169,6 +1305,11 @@
     function formatOverviewComponentVersion(component) {
         if (!component?.label) {
             return '';
+        }
+
+        const explicitDisplayVersion = String(component.version || '').trim();
+        if (explicitDisplayVersion) {
+            return explicitDisplayVersion;
         }
 
         const versionCandidates = [component.rawVersion, component.overrideVersion]
