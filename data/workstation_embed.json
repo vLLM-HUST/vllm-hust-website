@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "mode": "embed",
+  "mode": "link",
   "workstation_url": "https://ws.sage.org.ai",
   "backend_url": "https://api.sage.org.ai",
   "docs_url": "./docs/CLOUDFLARE_SETUP.md",
