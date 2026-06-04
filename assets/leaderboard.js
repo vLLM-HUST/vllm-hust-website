@@ -172,11 +172,13 @@
             bestVisibleVersion: 'Best visible version',
             currentBestVersionLabel: 'Current best version: ',
             baselineVersionLabel: 'Baseline version: ',
+            alignedVersionLabel: 'Aligned compare version: ',
             avgTTFT: 'Avg TTFT',
             avgTBT: 'Avg TBT',
             avgThroughput: 'Avg Throughput',
             errorRate: 'Error Rate',
             bestVisibleRun: 'Best visible run',
+            alignedRunLabel: 'Aligned compare run',
             parity: 'parity',
             better: 'better',
             worse: 'worse',
@@ -216,6 +218,7 @@
             overviewHeroCompareLabel: 'Snapshot Compare',
             overviewGridLabel: 'Visible Aggregate',
             overviewGridNote: 'Cards summarize the currently visible table rows by engine.',
+            overviewGridNoteAligned: 'Averages summarize the currently visible rows by engine; version and sample labels are aligned to the active compare scope when available.',
             overviewTableLabel: 'Visible Rows',
             overviewTableNote: 'The main table shows the currently visible benchmark rows after filters, scope toggles, and version merging.',
             overviewGoalSnapshotNote: 'Hero deltas use the matched official compare snapshot. Cards below summarize the currently visible table rows.',
@@ -350,11 +353,13 @@
             bestVisibleVersion: '当前最佳可见版本',
             currentBestVersionLabel: '当前最佳版本：',
             baselineVersionLabel: '基线版本：',
+            alignedVersionLabel: '对齐对比版本：',
             avgTTFT: '平均 TTFT',
             avgTBT: '平均 TBT',
             avgThroughput: '平均吞吐',
             errorRate: '错误率',
             bestVisibleRun: '当前最佳样本',
+            alignedRunLabel: '对齐对比样本',
             parity: '持平',
             better: '更优',
             worse: '更差',
@@ -394,6 +399,7 @@
             overviewHeroCompareLabel: '快照对比',
             overviewGridLabel: '当前可见聚合',
             overviewGridNote: '下方卡片按引擎汇总当前主表可见行。',
+            overviewGridNoteAligned: '均值按当前主表可见行汇总；若存在命中的 compare scope，版本与样本会按同一 scope 对齐展示。',
             overviewTableLabel: '当前可见明细',
             overviewTableNote: '主表展示的是当前筛选、scope 开关和版本合并之后的 benchmark 可见行。',
             overviewGoalSnapshotNote: '顶部 Hero 的差距值来自当前命中的官方 compare snapshot；下方卡片汇总的是当前主表可见行。',
@@ -2295,18 +2301,20 @@
             return;
         }
 
-        const summaries = summarizeEngines(entries);
-        const leaders = getLeaders(summaries);
         const goalPair = findGoalProgressPair(entries, comparisonView);
+        const compareSnapshotGroup = findCompareSnapshotGroup(entries, comparisonView);
+        const representativeEntries = getOverviewRepresentativeEntries(entries, comparisonView, goalPair || compareSnapshotGroup);
+        const summaries = summarizeEngines(entries, representativeEntries);
+        const leaders = getLeaders(summaries);
         const title = goalPair
             ? getGoalProgressTitle(goalPair)
             : getOverviewTitle(summaries, leaders, comparisonView);
         const subtitle = goalPair
             ? getGoalProgressSubtitle(goalPair)
             : getOverviewSubtitle(entries, summaries.length, comparisonView, viewOptions);
-        const compareSnapshotGroup = findCompareSnapshotGroup(entries, comparisonView);
         const badges = getOverviewBadges(entries, summaries.length, leaders, comparisonView);
         const heroSectionLabel = getOverviewHeroSectionLabel(goalPair, compareSnapshotGroup);
+        const overviewGridNote = representativeEntries.length ? t('overviewGridNoteAligned') : t('overviewGridNote');
         const headToHeadHtml = goalPair
             ? renderGoalProgressPair(goalPair)
             : compareSnapshotGroup
@@ -2329,7 +2337,7 @@
             </div>
             <div class="overview-section">
                 <div class="overview-section-label">${t('overviewGridLabel')}</div>
-                <div class="overview-section-note">${t('overviewGridNote')}</div>
+                <div class="overview-section-note">${overviewGridNote}</div>
                 <div class="overview-grid">
                     ${[...summaries].sort((a, b) => {
                         const aBaseline = isBaselineEngine(a.engine) ? 0 : 1;
@@ -2341,6 +2349,22 @@
         `;
         el.firstElementChild?.remove();
 
+    }
+
+    function getOverviewRepresentativeEntries(entries, comparisonView, snapshotPayload) {
+        const focusedEntries = Array.isArray(comparisonView?.focusGroup?.entries)
+            ? comparisonView.focusGroup.entries.filter(Boolean)
+            : [];
+        if (focusedEntries.length) {
+            return focusedEntries;
+        }
+
+        if (!snapshotPayload || !Array.isArray(entries) || !entries.length) {
+            return [];
+        }
+
+        const snapshotDescriptor = buildComparableScopeFromSnapshot(snapshotPayload);
+        return entries.filter((entry) => scopeDescriptorsMatch(snapshotDescriptor, buildComparableScopeFromEntry(entry)));
     }
 
     function normalizeBaselineEngine(value) {
@@ -2436,11 +2460,15 @@
     }
 
     function getHardConstraintScopeMetrics(scope) {
-        return scope?.latest?.evaluation?.metrics || {};
+        return scope?.derived_metrics || scope?.latest?.evaluation?.metrics || {};
     }
 
     function getHardConstraintScopeChecks(scope) {
-        return scope?.latest?.evaluation?.checks || {};
+        return scope?.derived_checks || scope?.latest?.evaluation?.checks || {};
+    }
+
+    function getHardConstraintScopeMetricDeltas(scope) {
+        return scope?.derived_metric_deltas || scope?.metric_deltas || {};
     }
 
     function getHardConstraintSubmittedAt(scope) {
@@ -2463,7 +2491,7 @@
     function buildHardConstraintCheckItem(code, scope, tiedScopes = []) {
         const checks = getHardConstraintScopeChecks(scope);
         const metrics = getHardConstraintScopeMetrics(scope);
-        const deltas = scope?.metric_deltas || {};
+        const deltas = getHardConstraintScopeMetricDeltas(scope);
         const scopeHint = getHardConstraintScopeHint(scope, tiedScopes);
 
         const c1Current = Number.isFinite(metrics.single_chip_effective_utilization_pct)
@@ -2557,12 +2585,12 @@
     }
 
     function countPassedHardConstraintChecks(scope) {
-        const checks = scope?.latest?.evaluation?.checks || {};
+        const checks = getHardConstraintScopeChecks(scope);
         return Object.values(checks).filter((value) => value === true).length;
     }
 
     function countKnownHardConstraintSignals(scope) {
-        const metrics = scope?.latest?.evaluation?.metrics || {};
+        const metrics = getHardConstraintScopeMetrics(scope);
         const numericSignals = [
             metrics.single_chip_effective_utilization_pct,
             metrics.typical_throughput_ratio_vs_baseline,
@@ -2583,7 +2611,7 @@
     }
 
     function buildHardConstraintScopeSortKey(scope) {
-        const metrics = scope?.latest?.evaluation?.metrics || {};
+        const metrics = getHardConstraintScopeMetrics(scope);
         const stabilityScore = [
             metrics.long_context_throughput_stable,
             metrics.long_context_ttft_p95_stable,
@@ -2633,6 +2661,116 @@
         }
 
         return [...scopes].sort(compareHardConstraintScopes)[0] || null;
+    }
+
+    function findHardConstraintCompareGroup(scope) {
+        const groups = Array.isArray(state.compareSnapshot?.groups) ? state.compareSnapshot.groups : [];
+        const scopeModelCanonicalId = String(scope?.scope?.model_canonical_id || '').trim();
+        const scopeModelDisplayName = String(scope?.scope?.model_display_name || '').trim();
+        const scopeWorkload = String(scope?.scope?.workload || '').trim();
+        const scopeHardware = String(scope?.scope?.hardware || '').trim();
+        const scopeConfigType = String(scope?.scope?.config_type || '').trim();
+
+        return groups.find((group) => {
+            const pair = group?.preferred_pair;
+            const left = pair?.left;
+            const right = pair?.right;
+            const groupScope = group?.scope || {};
+            if (!pair || !left || !right) {
+                return false;
+            }
+            if (String(left?.engine || '').trim().toLowerCase() !== 'vllm-hust') {
+                return false;
+            }
+            if (String(groupScope?.workload || '').trim() !== scopeWorkload) {
+                return false;
+            }
+            if (String(groupScope?.hardware || '').trim() !== scopeHardware) {
+                return false;
+            }
+            if (String(groupScope?.config_type || '').trim() !== scopeConfigType) {
+                return false;
+            }
+
+            const groupModelCanonicalId = String(groupScope?.model_canonical_id || '').trim();
+            const groupModelDisplayName = String(groupScope?.model_display_name || '').trim();
+            if (scopeModelCanonicalId && groupModelCanonicalId) {
+                return groupModelCanonicalId === scopeModelCanonicalId;
+            }
+            return groupModelDisplayName === scopeModelDisplayName;
+        }) || null;
+    }
+
+    function deriveC2MetricsFromCompareScope(scope) {
+        const group = findHardConstraintCompareGroup(scope);
+        const pair = group?.preferred_pair;
+        const leftMetrics = pair?.left?.metrics || {};
+        const rightMetrics = pair?.right?.metrics || {};
+        if (!pair || !pair.left || !pair.right) {
+            return null;
+        }
+
+        const throughputCurrent = Number(leftMetrics?.throughput_tps);
+        const throughputBaseline = Number(rightMetrics?.throughput_tps);
+        const throughputRatio = Number.isFinite(throughputCurrent) && Number.isFinite(throughputBaseline) && throughputBaseline > 0
+            ? throughputCurrent / throughputBaseline
+            : null;
+
+        const ttftCurrent = Number(leftMetrics?.ttft_ms);
+        const ttftBaseline = Number(rightMetrics?.ttft_ms);
+        const ttftReduction = Number.isFinite(ttftCurrent) && Number.isFinite(ttftBaseline) && ttftBaseline > 0
+            ? ((ttftBaseline - ttftCurrent) / ttftBaseline) * 100
+            : null;
+
+        const tpotCurrentRaw = leftMetrics?.tpot_ms ?? leftMetrics?.tbt_ms;
+        const tpotBaselineRaw = rightMetrics?.tpot_ms ?? rightMetrics?.tbt_ms;
+        const tpotCurrent = Number(tpotCurrentRaw);
+        const tpotBaseline = Number(tpotBaselineRaw);
+        const tpotReduction = Number.isFinite(tpotCurrent) && Number.isFinite(tpotBaseline) && tpotBaseline > 0
+            ? ((tpotBaseline - tpotCurrent) / tpotBaseline) * 100
+            : null;
+
+        const previousMetrics = getHardConstraintScopeMetrics(scope);
+        const previousChecks = getHardConstraintScopeChecks(scope);
+        return {
+            metrics: {
+                ...previousMetrics,
+                typical_throughput_ratio_vs_baseline: throughputRatio,
+                typical_ttft_reduction_pct_vs_baseline: ttftReduction,
+                typical_tpot_reduction_pct_vs_baseline: tpotReduction,
+            },
+            checks: {
+                ...previousChecks,
+                typical_scene_ge_2x_and_ttft_tpot_reduction_gt_20: (
+                    Number.isFinite(throughputRatio)
+                    && throughputRatio >= 2
+                    && Number.isFinite(ttftReduction)
+                    && ttftReduction > 20
+                    && Number.isFinite(tpotReduction)
+                    && tpotReduction > 20
+                ),
+            },
+            metricDeltas: {
+                ...getHardConstraintScopeMetricDeltas(scope),
+                typical_throughput_ratio_vs_baseline: null,
+                typical_ttft_reduction_pct_vs_baseline: null,
+                typical_tpot_reduction_pct_vs_baseline: null,
+            },
+        };
+    }
+
+    function enrichHardConstraintScope(scope) {
+        const derivedC2 = deriveC2MetricsFromCompareScope(scope);
+        if (!derivedC2) {
+            return scope;
+        }
+
+        return {
+            ...scope,
+            derived_metrics: derivedC2.metrics,
+            derived_checks: derivedC2.checks,
+            derived_metric_deltas: derivedC2.metricDeltas,
+        };
     }
 
     function buildHardConstraintCheckSortKey(scope, code) {
@@ -2823,6 +2961,7 @@
                 return validConfigTypes.has(String(scope?.scope?.config_type || 'unknown-config'));
             })
             .filter((scope) => scopeKeys.has(scope.scope_key))
+            .map((scope) => enrichHardConstraintScope(scope))
             .sort(compareHardConstraintScopes);
 
         const bestScope = buildBestCaseHardConstraintScope(filteredScopes);
@@ -3467,8 +3606,17 @@
         };
     }
 
-    function summarizeEngines(entries) {
+    function summarizeEngines(entries, representativeEntries = []) {
         const grouped = new Map();
+        const representativeByEngine = new Map();
+
+        representativeEntries.forEach((entry) => {
+            const engine = getEngine(entry);
+            const incumbent = representativeByEngine.get(engine);
+            if (!incumbent || compareEntryQuality(entry, incumbent) > 0) {
+                representativeByEngine.set(engine, entry);
+            }
+        });
 
         entries.forEach((entry) => {
             const engine = getEngine(entry);
@@ -3480,7 +3628,8 @@
 
         return Array.from(grouped.entries())
             .map(([engine, engineEntries]) => {
-                const bestEntry = [...engineEntries].sort((a, b) => compareEntryQuality(b, a))[0];
+                const representativeEntry = representativeByEngine.get(engine) || null;
+                const bestEntry = representativeEntry || [...engineEntries].sort((a, b) => compareEntryQuality(b, a))[0];
                 return {
                     engine,
                     label: getEngineLabel(engine),
@@ -3489,6 +3638,7 @@
                     avgTBT: averageMetric(engineEntries, 'tbt_ms'),
                     avgTPS: averageMetric(engineEntries, 'throughput_tps'),
                     avgError: averageMetric(engineEntries, 'error_rate'),
+                    representativeEntry,
                     bestEntry,
                     overviewComponents: buildTableVersionComponents(bestEntry),
                     version: formatEntryVersion(bestEntry, { display: true }),
@@ -3892,15 +4042,19 @@
     }
 
     function renderEngineSummaryCard(summary, leaders, cardIndex, cardCount) {
+        const representativeEntry = summary.representativeEntry || null;
         const bestEntry = summary.bestEntry || {};
         const isLeader = leaders.throughput && leaders.throughput.engine === summary.engine;
         const isBaselineCard = cardCount === 2 && isBaselineEngine(summary.engine);
         const chipText = getOverviewSummaryChipText(summary);
         const versionText = getOverviewSummaryVersionText(summary);
         const bestVisibleRunText = `${getWorkloadLabel(getWorkloadId(bestEntry))} • ${getConfigText(bestEntry).replace('<br><small>', ' • ').replace('</small>', '')}`;
-        const versionPrefix = isBaselineCard
-            ? t('baselineVersionLabel')
-            : (cardCount === 2 ? t('currentBestVersionLabel') : (isLeader ? t('currentBestVersionLabel') : `${t('bestVisibleVersion')} `));
+        const versionPrefix = representativeEntry
+            ? t('alignedVersionLabel')
+            : isBaselineCard
+                ? t('baselineVersionLabel')
+                : (cardCount === 2 ? t('currentBestVersionLabel') : (isLeader ? t('currentBestVersionLabel') : `${t('bestVisibleVersion')} `));
+        const footerLabel = representativeEntry ? t('alignedRunLabel') : t('bestVisibleRun');
 
         return `
             <div class="engine-summary-card ${isLeader ? 'is-leader' : ''}">
@@ -3932,7 +4086,7 @@
                         <span class="engine-summary-version-value">${versionText}</span>
                     </div>
                     <div class="engine-summary-footer">
-                        <span class="engine-summary-footer-label">${t('bestVisibleRun')}:</span>
+                        <span class="engine-summary-footer-label">${footerLabel}:</span>
                         <span class="engine-summary-footer-value">${bestVisibleRunText}</span>
                     </div>
                 </div>
