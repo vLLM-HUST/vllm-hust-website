@@ -136,5 +136,7 @@ Each compare group carries:
 - `scope.setting_summary`: readable setting summary such as IO length, TP/PP, dtype, and request
   rate
 - `engines[]`: one preferred row per engine after deduplication
+- `engines[].constraints`: compare-facing hard-constraint summary copied from the source leaderboard
+  artifact, including utilization, long-context stability, and token-cost fields when available
 - `preferred_pair`: the head-to-head pair the website should render first, selected by score
   ordering (throughput first, then latency)

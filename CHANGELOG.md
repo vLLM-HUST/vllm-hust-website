@@ -9,6 +9,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- leaderboard 硬约束卡片不再要求同一个 workload 同时代表 C1/C2/C3/C4：前端现在会在当前可见范围内，按每个约束分别挑选最有利的 workload 计算并展示，卡片摘要改为“按最有利 workload 取值”，每条约束行也会标明所选 workload，避免把不同 workload 简单压成单一 scope 的口径误解为平均值。
+
+- 修正 leaderboard 默认展示链路中的官方基线口径漂移：`scripts/aggregate_results.py` 的 compare goal baseline 已更新为 `Official vLLM 0.18.0 + vllm-ascend v0.18.0`，`assets/leaderboard.js` 清理了残留的 `0.17.2rc0` fallback 文案，`assets/hf-data-loader.js` 默认改为优先读取实际发布到 Hugging Face 的 `intellistream/llm-engine-benchmark-results`；同步将 clean snapshot 回写到 `vllm-hust-benchmark/leaderboard-data/snapshots`，确保本地 checked-in GitHub-first 快照也收敛到 `16 / 6 / 11`。
+
+- 重新用已验证的 official/current same-spec Ascend benchmark artifact 全量重建 leaderboard 快照，并用 `--replace-all` 清掉此前错误的历史 website 数据：当前 checked-in snapshot 收敛到 `16` 条 single-chip、`6` 条 multi-chip 与 `11` 个 compare groups；multi compare 现正式覆盖 `2` / `4` / `8` 卡 `sonnet-throughput` 对比，`data/leaderboard_single.json`、`data/leaderboard_multi.json`、`data/leaderboard_compare.json` 与 `data/last_updated.json` 已同步刷新到这轮清理后的结果。
+
+- 刷新 website leaderboard 到本轮 official `v0.18.0` vs current same-spec Ascend 8-workload compare 快照，并修正 compare 聚合对 benign same-spec hash 漂移过严的问题：`scripts/aggregate_results.py` 现在优先按稳定的 `same_spec.spec_id` 分组与配对，在缺少 `spec_id` 时才回退到 `resolved_spec_hash`；同步更新 `data/leaderboard_single.json`、`data/leaderboard_multi.json`、`data/leaderboard_compare.json` 与 `data/last_updated.json`，使 website 可正确展示 8 组 official/current 对比结果。
+
 - Leaderboard model identity is now normalized end-to-end across benchmark exports, website aggregation, frontend filters, and checked-in website snapshots: new artifacts carry `model.canonical_id` / `model.display_name`, compare scopes carry `model_canonical_id` / `model_display_name`, and the website filter now de-duplicates models by canonical id while rendering human-friendly display names. Refreshed `data/leaderboard_single.json`, `data/leaderboard_multi.json`, `data/leaderboard_compare.json`, and `data/last_updated.json` accordingly.
 
 - 清理官网 workstation 展示区中的历史旧品牌硬编码文字，统一改为 `vLLM-HUST Workstation`，不改动现有公开域名配置。

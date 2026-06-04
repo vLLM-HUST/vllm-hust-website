@@ -52,12 +52,12 @@ CANONICAL_MODEL_ID_PATTERN = re.compile(
 )
 
 GOAL_BASELINE_TARGET = {
-    "id": "official-ascend-2026-v0.17.2rc0",
-    "label": "Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0",
+    "id": "official-ascend-jan-2026-v0.18.0",
+    "label": "Official vLLM 0.18.0 + vllm-ascend v0.18.0",
     "engine": "vllm",
-    "engine_version_prefix": "0.17.2",
+    "engine_version_prefix": "0.18.0",
     "github_repository": "vllm-project/vllm-ascend",
-    "vllm_commit": "54a62a79f70982742a227c845b96148e6401d0e7",
+    "vllm_commit": "bcf2be96120005e9aea171927f85055a6a5c0cf6",
     "vllm_ascend_ref": "v0.18.0",
     "vllm_ascend_commit": "e18643f8a4d5bd9990727654318ad069ea0b56e2",
 }
@@ -416,6 +416,10 @@ def get_same_spec_hash(entry: dict[str, Any]) -> str | None:
 
 
 def build_setting_signature(entry: dict[str, Any]) -> str:
+    same_spec_id = get_same_spec_id(entry)
+    if same_spec_id:
+        return same_spec_id
+
     same_spec_hash = get_same_spec_hash(entry)
     if same_spec_hash:
         return same_spec_hash
@@ -522,7 +526,12 @@ def same_spec_hashes_match(
 ) -> bool:
     left_hash = get_same_spec_hash(left_entry)
     right_hash = get_same_spec_hash(right_entry)
-    return bool(left_hash and right_hash and left_hash == right_hash)
+    if left_hash and right_hash and left_hash == right_hash:
+        return True
+
+    left_spec_id = get_same_spec_id(left_entry)
+    right_spec_id = get_same_spec_id(right_entry)
+    return bool(left_spec_id and right_spec_id and left_spec_id == right_spec_id)
 
 
 def build_compare_scope_key(entry: dict[str, Any]) -> str:
@@ -556,6 +565,7 @@ def build_goal_scope_key(entry: dict[str, Any]) -> str:
 
 def build_compare_engine_summary(entry: dict[str, Any]) -> dict[str, Any]:
     metrics = entry.get("metrics") or {}
+    constraints = (entry.get("constraints") or {}).get("metrics") or {}
     metadata = entry.get("metadata") or {}
     return {
         "engine": str(entry.get("engine") or metadata.get("engine") or "unknown"),
@@ -579,6 +589,56 @@ def build_compare_engine_summary(entry: dict[str, Any]) -> dict[str, Any]:
                 or 0.0
             ),
             "error_rate": float(metrics.get("error_rate") or 0.0),
+        },
+        "constraints": {
+            "single_chip_effective_utilization_pct": safe_float(
+                constraints.get("single_chip_effective_utilization_pct")
+            ),
+            "typical_throughput_ratio_vs_baseline": safe_float(
+                constraints.get("typical_throughput_ratio_vs_baseline")
+            ),
+            "typical_ttft_reduction_pct_vs_baseline": safe_float(
+                constraints.get("typical_ttft_reduction_pct_vs_baseline")
+            ),
+            "typical_tpot_reduction_pct_vs_baseline": safe_float(
+                constraints.get("typical_tpot_reduction_pct_vs_baseline")
+            ),
+            "long_context_length": safe_float(
+                constraints.get("long_context_length")
+            ),
+            "long_context_throughput_stable": safe_bool(
+                constraints.get("long_context_throughput_stable")
+            ),
+            "long_context_ttft_p95_ms": safe_float(
+                constraints.get("long_context_ttft_p95_ms")
+            ),
+            "long_context_ttft_p99_ms": safe_float(
+                constraints.get("long_context_ttft_p99_ms")
+            ),
+            "long_context_tpot_p95_ms": safe_float(
+                constraints.get("long_context_tpot_p95_ms")
+            ),
+            "long_context_tpot_p99_ms": safe_float(
+                constraints.get("long_context_tpot_p99_ms")
+            ),
+            "long_context_ttft_p95_stable": safe_bool(
+                constraints.get("long_context_ttft_p95_stable")
+            ),
+            "long_context_ttft_p99_stable": safe_bool(
+                constraints.get("long_context_ttft_p99_stable")
+            ),
+            "long_context_tpot_p95_stable": safe_bool(
+                constraints.get("long_context_tpot_p95_stable")
+            ),
+            "long_context_tpot_p99_stable": safe_bool(
+                constraints.get("long_context_tpot_p99_stable")
+            ),
+            "unit_token_cost_reduction_pct": safe_float(
+                constraints.get("unit_token_cost_reduction_pct")
+            ),
+            "multi_tenant_high_utilization": safe_bool(
+                constraints.get("multi_tenant_high_utilization")
+            ),
         },
     }
 
@@ -1226,18 +1286,13 @@ def validate_same_spec_goal_pairs(entries: list[dict[str, Any]]) -> None:
         baseline_entry = sorted(
             baseline_entries, key=parse_entry_timestamp, reverse=True
         )[0]
-        current_hash = get_same_spec_hash(current_entry)
-        baseline_hash = get_same_spec_hash(baseline_entry)
-        if current_hash is None or baseline_hash is None:
+        if not same_spec_hashes_match(current_entry, baseline_entry):
+            current_hash = get_same_spec_hash(current_entry)
+            baseline_hash = get_same_spec_hash(baseline_entry)
             raise ValueError(
-                "same-spec goal pair is missing resolved_spec_hash: "
-                f"spec_id={spec_id} current_engine={current_entry.get('engine')} "
-                f"baseline_engine={baseline_entry.get('engine')}"
-            )
-        if current_hash != baseline_hash:
-            raise ValueError(
-                "same-spec goal pair resolved_spec_hash mismatch: "
-                f"spec_id={spec_id} current_hash={current_hash} baseline_hash={baseline_hash}"
+                "same-spec goal pair signature mismatch: "
+                f"spec_id={spec_id} current_hash={current_hash} "
+                f"baseline_hash={baseline_hash}"
             )
 
 

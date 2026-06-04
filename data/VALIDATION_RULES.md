@@ -38,6 +38,7 @@ python data/validate_schema.py \
    - `constraints.accountable_scope` must include domestic chip class, 7B-13B model band,
      representative business scenario, baseline engine
    - all hard-constraint metric fields are mandatory and must pass type/range checks
+   - baseline-relative reduction fields may be negative when the current run regresses the baseline
 1. **Version rules**
    - required `protocol`, `backend`, `core`
    - semver-like `X.Y.Z(.W)` or `N/A`

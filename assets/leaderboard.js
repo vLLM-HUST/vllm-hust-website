@@ -63,7 +63,10 @@
             hardConstraintsSubtitle: 'Best current hard-constraint result from benchmark snapshots, with regression vs previous submission.',
             hardConstraintsNoData: 'No hard-constraint records under current filters.',
             hardConstraintsBaselineLabel: 'Performance Baseline',
-            hardConstraintsBaselineValue: 'Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0',
+            hardConstraintsBaselineValue: 'Official vLLM 0.18.0 + vllm-ascend v0.18.0',
+            hardConstraintsBestCaseScope: 'Best-case across visible workloads',
+            hardConstraintsMixedWorkloads: 'mixed workloads',
+            hardConstraintsBestWorkloadLabel: 'Best workload',
             baselineStateOfficial: 'official',
             baselineStatePending: 'pending',
             baselineStateNone: 'not declared',
@@ -180,6 +183,13 @@
             gap: 'gap',
             ttftGap: 'TTFT gap',
             tbtGap: 'TBT gap',
+            compareUtilizationLabel: 'Util',
+            compareTokenCostLabel: 'Token cost',
+            compareMultiTenantLabel: 'Multi-tenant',
+            compareLongContextLabel: 'Long ctx',
+            compareNoData: 'n/a',
+            compareStableYes: 'stable',
+            compareStableNo: 'unstable',
             onlyEngineView: 'is the only engine in the current view.',
             comparing: 'Comparing',
             enginesInView: 'engines in the current view.',
@@ -195,11 +205,11 @@
             hiddenRows: 'Hidden rows',
             versusShort: 'VS',
             goalProgressKicker: 'Goal Gap',
-            goalBaselineLabel: 'Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0 baseline',
+            goalBaselineLabel: 'Official vLLM 0.18.0 + vllm-ascend v0.18.0 baseline',
             goalCurrentLabel: 'Current vllm-hust',
             goalMet: 'Goal met',
             goalGapRemaining: 'Remaining gap',
-            goalCompareTitle: 'vllm-hust vs Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0',
+            goalCompareTitle: 'vllm-hust vs Official vLLM 0.18.0 + vllm-ascend v0.18.0',
             goalCompareScope: 'Pinned goal scope',
             overviewHeroGoalLabel: 'Official Compare',
             overviewHeroCompareLabel: 'Snapshot Compare',
@@ -230,7 +240,10 @@
             hardConstraintsSubtitle: '展示当前 benchmark 中表现最好的硬约束结果，并和上次提交做回归对比。',
             hardConstraintsNoData: '当前筛选条件下没有硬约束记录。',
             hardConstraintsBaselineLabel: '性能基线',
-            hardConstraintsBaselineValue: 'Official vLLM 0.17.2rc0 + vllm-ascend v0.18.0',
+            hardConstraintsBaselineValue: 'Official vLLM 0.18.0 + vllm-ascend v0.18.0',
+            hardConstraintsBestCaseScope: '按最有利 workload 取值',
+            hardConstraintsMixedWorkloads: '多 workload 组合',
+            hardConstraintsBestWorkloadLabel: '最优 workload',
             baselineStateOfficial: '官方覆盖',
             baselineStatePending: '待补基线',
             baselineStateNone: '未声明',
@@ -347,6 +360,13 @@
             gap: '差距',
             ttftGap: 'TTFT 差距',
             tbtGap: 'TBT 差距',
+            compareUtilizationLabel: '利用率',
+            compareTokenCostLabel: '单位成本下降',
+            compareMultiTenantLabel: '多租户',
+            compareLongContextLabel: '长上下文',
+            compareNoData: '暂无',
+            compareStableYes: '稳定',
+            compareStableNo: '不稳定',
             onlyEngineView: '是当前视图中的唯一引擎。',
             comparing: '当前正在比较',
             enginesInView: '个引擎。',
@@ -362,11 +382,11 @@
             hiddenRows: '隐藏行数',
             versusShort: '对比',
             goalProgressKicker: '目标差距',
-            goalBaselineLabel: '官方 vLLM 0.17.2rc0 + vllm-ascend v0.18.0 基线',
+            goalBaselineLabel: '官方 vLLM 0.18.0 + vllm-ascend v0.18.0 基线',
             goalCurrentLabel: '当前 vllm-hust',
             goalMet: '已达到目标',
             goalGapRemaining: '距离目标',
-            goalCompareTitle: 'vllm-hust 对比官方 vLLM 0.17.2rc0 + vllm-ascend v0.18.0 基线',
+            goalCompareTitle: 'vllm-hust 对比官方 vLLM 0.18.0 + vllm-ascend v0.18.0 基线',
             goalCompareScope: '目标比较范围',
             overviewHeroGoalLabel: '官方对比',
             overviewHeroCompareLabel: '快照对比',
@@ -1352,8 +1372,17 @@
         return entry?.same_spec && typeof entry.same_spec === 'object' ? entry.same_spec : {};
     }
 
+    function getSameSpecId(entry) {
+        return String(getSameSpecPayload(entry)?.spec_id || '').trim();
+    }
+
     function getSettingSignature(entry) {
         const sameSpec = getSameSpecPayload(entry);
+        const sameSpecId = getSameSpecId(entry);
+        if (sameSpecId) {
+            return sameSpecId;
+        }
+
         const sameSpecHash = String(sameSpec?.resolved_spec_hash || '').trim();
         if (sameSpecHash) {
             return sameSpecHash;
@@ -1515,6 +1544,11 @@
         ];
 
         for (const candidate of candidatePaths) {
+            const sameSpecId = String(candidate?.same_spec?.spec_id || '').trim();
+            if (sameSpecId) {
+                return sameSpecId;
+            }
+
             const sameSpecHash = String(candidate?.same_spec?.resolved_spec_hash || '').trim();
             if (sameSpecHash) {
                 return sameSpecHash;
@@ -2395,12 +2429,34 @@
         return '-';
     }
 
-    function buildHardConstraintCheckItems(scope) {
-        const latest = scope?.latest || {};
-        const evaluation = latest?.evaluation || {};
-        const checks = evaluation?.checks || {};
-        const metrics = evaluation?.metrics || {};
+    function getHardConstraintCheckCodes() {
+        return ['C1', 'C2', 'C3', 'C4'];
+    }
+
+    function getHardConstraintScopeMetrics(scope) {
+        return scope?.latest?.evaluation?.metrics || {};
+    }
+
+    function getHardConstraintScopeChecks(scope) {
+        return scope?.latest?.evaluation?.checks || {};
+    }
+
+    function getHardConstraintSubmittedAt(scope) {
+        return Date.parse(scope?.latest?.submitted_at || '') || 0;
+    }
+
+    function getHardConstraintScopeHint(scope) {
+        const workload = scope?.scope?.workload || '-';
+        const model = getScopeModelDisplayName(scope?.scope) || '-';
+        const hardware = scope?.scope?.hardware || '-';
+        return `${t('hardConstraintsBestWorkloadLabel')}: ${workload} • ${model} • ${hardware}`;
+    }
+
+    function buildHardConstraintCheckItem(code, scope) {
+        const checks = getHardConstraintScopeChecks(scope);
+        const metrics = getHardConstraintScopeMetrics(scope);
         const deltas = scope?.metric_deltas || {};
+        const scopeHint = getHardConstraintScopeHint(scope);
 
         const c1Current = Number.isFinite(metrics.single_chip_effective_utilization_pct)
             ? `${metrics.single_chip_effective_utilization_pct.toFixed(2)}%`
@@ -2433,17 +2489,21 @@
             `Tenant ${formatBoolean(metrics.multi_tenant_high_utilization)}`,
         ].join(' · ');
 
-        return [
-            {
-                code: 'C1',
+        if (code === 'C1') {
+            return {
+                code,
                 label: t('constraint1'),
                 passed: checks.effective_utilization_ge_90,
                 currentValue: c1Current,
                 targetValue: '>= 90%',
                 deltaValue: formatSignedDelta(deltas.single_chip_effective_utilization_pct, ' pp'),
-            },
-            {
-                code: 'C2',
+                scopeHint,
+            };
+        }
+
+        if (code === 'C2') {
+            return {
+                code,
                 label: t('constraint2'),
                 passed: checks.typical_scene_ge_2x_and_ttft_tpot_reduction_gt_20,
                 currentValue: c2Current,
@@ -2453,24 +2513,39 @@
                     `TTFT ${formatSignedDelta(deltas.typical_ttft_reduction_pct_vs_baseline, ' pp')}`,
                     `TPOT ${formatSignedDelta(deltas.typical_tpot_reduction_pct_vs_baseline, ' pp')}`,
                 ].join(' · '),
-            },
-            {
-                code: 'C3',
+                scopeHint,
+            };
+        }
+
+        if (code === 'C3') {
+            return {
+                code,
                 label: t('constraint3'),
                 passed: checks.long_context_ge_32k_and_p95_p99_stable,
                 currentValue: c3Current,
                 targetValue: 'CTX >= 32K + stability checks',
                 deltaValue: '-',
-            },
-            {
-                code: 'C4',
-                label: t('constraint4'),
-                passed: checks.single_business_cost_down_ge_30_and_multi_tenant_high_utilization,
-                currentValue: c4Current,
-                targetValue: 'Cost >= 30% + high tenant utilization',
-                deltaValue: `Cost ${formatSignedDelta(deltas.unit_token_cost_reduction_pct, ' pp')}`,
-            },
-        ];
+                scopeHint,
+            };
+        }
+
+        return {
+            code,
+            label: t('constraint4'),
+            passed: checks.single_business_cost_down_ge_30_and_multi_tenant_high_utilization,
+            currentValue: c4Current,
+            targetValue: 'Cost >= 30% + high tenant utilization',
+            deltaValue: `Cost ${formatSignedDelta(deltas.unit_token_cost_reduction_pct, ' pp')}`,
+            scopeHint,
+        };
+    }
+
+    function buildHardConstraintCheckItems(scope) {
+        if (Array.isArray(scope?.check_items) && scope.check_items.length) {
+            return scope.check_items;
+        }
+
+        return getHardConstraintCheckCodes().map((code) => buildHardConstraintCheckItem(code, scope));
     }
 
     function countPassedHardConstraintChecks(scope) {
@@ -2552,6 +2627,116 @@
         return [...scopes].sort(compareHardConstraintScopes)[0] || null;
     }
 
+    function buildHardConstraintCheckSortKey(scope, code) {
+        const checks = getHardConstraintScopeChecks(scope);
+        const metrics = getHardConstraintScopeMetrics(scope);
+        const submittedAt = getHardConstraintSubmittedAt(scope);
+        const stabilityScore = [
+            metrics.long_context_throughput_stable,
+            metrics.long_context_ttft_p95_stable,
+            metrics.long_context_ttft_p99_stable,
+            metrics.long_context_tpot_p95_stable,
+            metrics.long_context_tpot_p99_stable,
+        ].filter((value) => value === true).length;
+
+        if (code === 'C1') {
+            return [
+                Number(checks.effective_utilization_ge_90 === true),
+                Number.isFinite(metrics.single_chip_effective_utilization_pct) ? metrics.single_chip_effective_utilization_pct : -1,
+                submittedAt,
+            ];
+        }
+
+        if (code === 'C2') {
+            return [
+                Number(checks.typical_scene_ge_2x_and_ttft_tpot_reduction_gt_20 === true),
+                Number.isFinite(metrics.typical_throughput_ratio_vs_baseline) ? metrics.typical_throughput_ratio_vs_baseline : -1,
+                Number.isFinite(metrics.typical_ttft_reduction_pct_vs_baseline) ? metrics.typical_ttft_reduction_pct_vs_baseline : -1,
+                Number.isFinite(metrics.typical_tpot_reduction_pct_vs_baseline) ? metrics.typical_tpot_reduction_pct_vs_baseline : -1,
+                submittedAt,
+            ];
+        }
+
+        if (code === 'C3') {
+            return [
+                Number(checks.long_context_ge_32k_and_p95_p99_stable === true),
+                Number.isFinite(metrics.long_context_length) ? metrics.long_context_length : -1,
+                stabilityScore,
+                submittedAt,
+            ];
+        }
+
+        return [
+            Number(checks.single_business_cost_down_ge_30_and_multi_tenant_high_utilization === true),
+            Number(metrics.multi_tenant_high_utilization === true),
+            Number.isFinite(metrics.unit_token_cost_reduction_pct) ? metrics.unit_token_cost_reduction_pct : -1,
+            submittedAt,
+        ];
+    }
+
+    function compareHardConstraintScopesForCheck(code, left, right) {
+        const leftKey = buildHardConstraintCheckSortKey(left, code);
+        const rightKey = buildHardConstraintCheckSortKey(right, code);
+        const length = Math.max(leftKey.length, rightKey.length);
+        for (let index = 0; index < length; index += 1) {
+            const delta = (rightKey[index] || 0) - (leftKey[index] || 0);
+            if (delta !== 0) {
+                return delta;
+            }
+        }
+        return String(left?.scope_key || '').localeCompare(String(right?.scope_key || ''));
+    }
+
+    function selectBestHardConstraintScopeForCheck(scopes, code) {
+        if (!Array.isArray(scopes) || !scopes.length) {
+            return null;
+        }
+
+        return [...scopes].sort((left, right) => compareHardConstraintScopesForCheck(code, left, right))[0] || null;
+    }
+
+    function buildBestCaseHardConstraintScope(scopes) {
+        if (!Array.isArray(scopes) || !scopes.length) {
+            return null;
+        }
+
+        const selectedScopes = getHardConstraintCheckCodes()
+            .map((code) => ({ code, scope: selectBestHardConstraintScopeForCheck(scopes, code) }))
+            .filter((item) => item.scope);
+        if (!selectedScopes.length) {
+            return null;
+        }
+
+        const checkItems = selectedScopes.map((item) => buildHardConstraintCheckItem(item.code, item.scope));
+        const latestScope = [...selectedScopes]
+            .sort((left, right) => getHardConstraintSubmittedAt(right.scope) - getHardConstraintSubmittedAt(left.scope))[0]?.scope || null;
+        const workloads = [...new Set(selectedScopes.map((item) => item.scope?.scope?.workload).filter(Boolean))];
+        const hardwares = [...new Set(selectedScopes.map((item) => item.scope?.scope?.hardware).filter(Boolean))];
+
+        return {
+            is_best_case_bundle: true,
+            overall_pass: checkItems.every((item) => item.passed === true),
+            summary_counts: {
+                passed: checkItems.filter((item) => item.passed === true).length,
+                failed: checkItems.filter((item) => item.passed !== true).length,
+            },
+            check_items: checkItems,
+            latest: {
+                engine: latestScope?.latest?.engine || 'vllm-hust',
+                accountable_scope: latestScope?.latest?.accountable_scope || {},
+                git_commit: latestScope?.latest?.git_commit || null,
+            },
+            previous: {},
+            scope: {
+                engine: latestScope?.scope?.engine || latestScope?.latest?.engine || 'vllm-hust',
+                model_display_name: t('hardConstraintsBestCaseScope'),
+                hardware: hardwares.join(', ') || '-',
+                workload: workloads.length === 1 ? workloads[0] : t('hardConstraintsMixedWorkloads'),
+            },
+            best_case_workloads: workloads,
+        };
+    }
+
     function getHardConstraintConfigTypesForCurrentTab() {
         if (state.currentTab === 'single-chip') {
             return new Set(['single_gpu']);
@@ -2599,7 +2784,7 @@
             .filter((scope) => scopeKeys.has(scope.scope_key))
             .sort(compareHardConstraintScopes);
 
-        const bestScope = selectBestHardConstraintScope(filteredScopes);
+        const bestScope = buildBestCaseHardConstraintScope(filteredScopes);
         const displayedScopes = bestScope ? [bestScope] : [];
 
         if (!displayedScopes.length) {
@@ -2609,8 +2794,8 @@
             return;
         }
 
-        const passCount = displayedScopes.filter((scope) => scope?.overall_pass).length;
-        const failCount = Math.max(displayedScopes.length - passCount, 0);
+        const passCount = bestScope?.summary_counts?.passed ?? displayedScopes.filter((scope) => scope?.overall_pass).length;
+        const failCount = bestScope?.summary_counts?.failed ?? Math.max(displayedScopes.length - passCount, 0);
 
         el.innerHTML = `
             <div class="hard-constraints-header">
@@ -2644,6 +2829,15 @@
         const summaryBadges = failedItems.length
             ? failedItems.map((item) => `<span class="hc-check-badge fail">${item.code}</span>`).join('')
             : `<span class="hc-check-badge pass">4/4</span>`;
+        const scopeLine = scope?.is_best_case_bundle
+            ? `${t('scope')}: ${t('hardConstraintsBestCaseScope')}`
+            : `${t('scope')}: ${getScopeModelDisplayName(scope?.scope) || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}`;
+        const scopeMeta = scope?.is_best_case_bundle
+            ? `${t('hardConstraintsBestWorkloadLabel')}: ${(scope?.best_case_workloads || []).join(', ') || t('hardConstraintsMixedWorkloads')} · ${passedCount}/4`
+            : `scenario=${accountable?.representative_business_scenario || '-'} · baseline=${formatAccountableBaseline(accountable)} · ${passedCount}/4`;
+        const commitLine = scope?.is_best_case_bundle
+            ? `${t('current')}: ${t('hardConstraintsBestCaseScope')} · ${t('previous')}: -`
+            : `${t('current')}: ${latest?.git_commit || latest?.entry_id || '-'} · ${t('previous')}: ${previous?.git_commit || previous?.entry_id || '-'}`;
 
         return `
             <details class="hard-constraint-card ${statusClass}">
@@ -2653,11 +2847,9 @@
                             <strong>${getEngineLabel(latest?.engine || scope?.scope?.engine || 'unknown')}</strong>
                             <span class="hc-status ${statusClass}">${scope?.overall_pass ? t('pass') : t('fail')}</span>
                         </div>
-                        <p class="hard-constraint-scope">
-                            ${t('scope')}: ${getScopeModelDisplayName(scope?.scope) || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}
-                        </p>
+                        <p class="hard-constraint-scope">${scopeLine}</p>
                         <p class="hard-constraint-scope-meta">
-                            scenario=${accountable?.representative_business_scenario || '-'} · baseline=${formatAccountableBaseline(accountable)} · ${passedCount}/4
+                            ${scopeMeta}
                         </p>
                     </div>
                     <div class="hard-constraint-summary-side">
@@ -2667,15 +2859,15 @@
                 </summary>
                 <div class="hard-constraint-details">
                     <div class="hard-constraint-rows">
-                        ${checkItems.map((item) => renderHardConstraintRow(item.label, item.passed, item.currentValue, item.targetValue, item.deltaValue)).join('')}
+                        ${checkItems.map((item) => renderHardConstraintRow(item.label, item.passed, item.currentValue, item.targetValue, item.deltaValue, item.scopeHint)).join('')}
                     </div>
-                    <p class="hard-constraint-commit">${t('current')}: ${latest?.git_commit || latest?.entry_id || '-'} · ${t('previous')}: ${previous?.git_commit || previous?.entry_id || '-'}</p>
+                    <p class="hard-constraint-commit">${commitLine}</p>
                 </div>
             </details>
         `;
     }
 
-    function renderHardConstraintRow(label, passed, currentValue, targetValue, deltaValue) {
+    function renderHardConstraintRow(label, passed, currentValue, targetValue, deltaValue, scopeHint = '') {
         const statusClass = passed ? 'pass' : 'fail';
         return `
             <div class="hard-constraint-row">
@@ -2684,6 +2876,7 @@
                     <span>${t('current')}: ${currentValue}</span>
                     <span>${t('target')}: ${targetValue}</span>
                     <span>${t('delta')}: ${deltaValue}</span>
+                    ${scopeHint ? `<span>${scopeHint}</span>` : ''}
                     <span class="hc-row-status ${statusClass}">${passed ? t('pass') : t('fail')}</span>
                 </div>
             </div>
@@ -3546,11 +3739,15 @@
                 <div class="head-to-head-side">
                     <strong>${getEngineLabel(left.engine)}</strong>
                     <span>TTFT ${formatNumber(left.metrics.ttft_ms)} ms • TBT ${formatNumber(left.metrics.tbt_ms)} ms • TPS ${formatNumber(left.metrics.throughput_tps)}</span>
+                    <span>${renderSnapshotConstraintHeadline(left.constraints)}</span>
+                    <span>${renderSnapshotLongContextSummary(left.constraints)}</span>
                 </div>
                 <div class="head-to-head-divider">${t('versusShort')}</div>
                 <div class="head-to-head-side">
                     <strong>${getEngineLabel(right.engine)}</strong>
                     <span>TTFT ${formatNumber(right.metrics.ttft_ms)} ms • TBT ${formatNumber(right.metrics.tbt_ms)} ms • TPS ${formatNumber(right.metrics.throughput_tps)}</span>
+                    <span>${renderSnapshotConstraintHeadline(right.constraints)}</span>
+                    <span>${renderSnapshotLongContextSummary(right.constraints)}</span>
                 </div>
             </div>
             <div class="head-to-head-deltas">
@@ -3560,6 +3757,46 @@
                 <div class="head-to-head-delta">TBT ${t('gap')}: ${tbtDelta}</div>
             </div>
         `;
+    }
+
+    function renderSnapshotConstraintHeadline(constraints) {
+        const utilization = formatSnapshotValueWithUnit(
+            constraints?.single_chip_effective_utilization_pct,
+            '%',
+        );
+        const tokenCost = formatSnapshotValueWithUnit(
+            constraints?.unit_token_cost_reduction_pct,
+            '%',
+        );
+        const multiTenant = formatSnapshotBoolean(constraints?.multi_tenant_high_utilization);
+        return `${t('compareUtilizationLabel')} ${utilization} • ${t('compareTokenCostLabel')} ${tokenCost} • ${t('compareMultiTenantLabel')} ${multiTenant}`;
+    }
+
+    function renderSnapshotLongContextSummary(constraints) {
+        const hasLongContext = Number.isFinite(Number(constraints?.long_context_length))
+            || Number.isFinite(Number(constraints?.long_context_ttft_p95_ms))
+            || Number.isFinite(Number(constraints?.long_context_ttft_p99_ms))
+            || Number.isFinite(Number(constraints?.long_context_tpot_p99_ms));
+        if (!hasLongContext) {
+            return `${t('compareLongContextLabel')} ${t('compareNoData')}`;
+        }
+
+        const parts = [];
+        if (Number.isFinite(Number(constraints?.long_context_length))) {
+            parts.push(String(Math.round(Number(constraints.long_context_length))));
+        }
+        if (Number.isFinite(Number(constraints?.long_context_ttft_p95_ms))) {
+            parts.push(`P95 ${formatNumber(Number(constraints.long_context_ttft_p95_ms))} ms`);
+        }
+        if (Number.isFinite(Number(constraints?.long_context_ttft_p99_ms))) {
+            parts.push(`P99 ${formatNumber(Number(constraints.long_context_ttft_p99_ms))} ms`);
+        }
+        if (Number.isFinite(Number(constraints?.long_context_tpot_p99_ms))) {
+            parts.push(`TPOT P99 ${formatNumber(Number(constraints.long_context_tpot_p99_ms))} ms`);
+        }
+
+        const stable = formatSnapshotBoolean(constraints?.long_context_throughput_stable);
+        return `${t('compareLongContextLabel')} ${parts.join(' • ')} • ${stable}`;
     }
 
     function formatSnapshotDelta(value, higherIsBetter) {
@@ -3590,6 +3827,23 @@
 
         const isBetter = higherIsBetter ? delta > 0 : delta < 0;
         return isBetter ? `${label} ${t('better')}` : `${label} ${t('worse')}`;
+    }
+
+    function formatSnapshotBoolean(value) {
+        if (value === true) {
+            return t('compareStableYes');
+        }
+        if (value === false) {
+            return t('compareStableNo');
+        }
+        return t('compareNoData');
+    }
+
+    function formatSnapshotValueWithUnit(value, unit) {
+        if (!Number.isFinite(Number(value))) {
+            return t('compareNoData');
+        }
+        return `${formatNumber(Number(value))}${unit}`;
     }
 
     function isBaselineEngine(engine) {

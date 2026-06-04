@@ -409,15 +409,13 @@
                   "type": [
                     "number",
                     "null"
-                  ],
-                  "minimum": 0
+                  ]
                 },
                 "typical_tpot_reduction_pct_vs_baseline": {
                   "type": [
                     "number",
                     "null"
-                  ],
-                  "minimum": 0
+                  ]
                 },
                 "long_context_length": {
                   "type": [
@@ -488,8 +486,7 @@
                   "type": [
                     "number",
                     "null"
-                  ],
-                  "minimum": 0
+                  ]
                 },
                 "multi_tenant_high_utilization": {
                   "type": [
