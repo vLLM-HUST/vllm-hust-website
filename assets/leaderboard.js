@@ -1847,6 +1847,22 @@
         return `<small class="version-provenance">${parts.join('<span class="provenance-separator">·</span>')}</small>`;
     }
 
+    function shouldHideVersionProvenance(entry) {
+        const components = buildTableVersionComponents(entry);
+        if (!components.length) {
+            return false;
+        }
+
+        return components.some((component) => {
+            const label = String(component?.label || '').trim().toLowerCase();
+            if (label !== 'vllm-hust' && label !== 'vllm-ascend-hust') {
+                return false;
+            }
+
+            return String(component?.version || '').includes('#');
+        });
+    }
+
     function isNumericVersion(version) {
         return /^v?\d+(\.\d+){1,3}(\.x)?$/i.test(String(version || '').trim());
     }
@@ -3363,7 +3379,9 @@
         const fallbackDate = dateLabel ? `<small class="version-date version-date--aligned">${dateLabel}</small>` : '';
         const tableVersionSummary = formatTableVersionSummary(entry, dateLabel);
         const versionMainText = tableVersionSummary || `${renderAlignedVersionRow({ label: engineLabel, version: displayVersion })}${fallbackDate}`;
-        const provenanceSummary = renderProvenanceSummary(entry);
+        const provenanceSummary = shouldHideVersionProvenance(entry)
+            ? ''
+            : renderProvenanceSummary(entry);
         const settingSummary = getSettingSummary(entry);
 
         // 生成配置描述（芯片数/节点数）
