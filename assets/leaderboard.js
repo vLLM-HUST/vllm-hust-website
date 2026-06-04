@@ -67,6 +67,7 @@
             hardConstraintsBestCaseScope: 'Best-case across visible workloads',
             hardConstraintsMixedWorkloads: 'mixed workloads',
             hardConstraintsBestWorkloadLabel: 'Best workload',
+            hardConstraintsTiedWorkloadsLabel: 'Tied workloads',
             baselineStateOfficial: 'official',
             baselineStatePending: 'pending',
             baselineStateNone: 'not declared',
@@ -244,6 +245,7 @@
             hardConstraintsBestCaseScope: '按最有利 workload 取值',
             hardConstraintsMixedWorkloads: '多 workload 组合',
             hardConstraintsBestWorkloadLabel: '最优 workload',
+            hardConstraintsTiedWorkloadsLabel: '并列最优 workload',
             baselineStateOfficial: '官方覆盖',
             baselineStatePending: '待补基线',
             baselineStateNone: '未声明',
@@ -2445,18 +2447,24 @@
         return Date.parse(scope?.latest?.submitted_at || '') || 0;
     }
 
-    function getHardConstraintScopeHint(scope) {
-        const workload = scope?.scope?.workload || '-';
+    function getHardConstraintScopeHint(scope, tiedScopes = []) {
+        const scopes = Array.isArray(tiedScopes) && tiedScopes.length ? tiedScopes : [scope];
+        const workloads = [...new Set(scopes.map((item) => item?.scope?.workload).filter(Boolean))];
+        if (workloads.length > 1) {
+            return `${t('hardConstraintsTiedWorkloadsLabel')}: ${t('hardConstraintsMixedWorkloads')} (${workloads.length})`;
+        }
+
+        const workload = scopes[0]?.scope?.workload || scope?.scope?.workload || '-';
         const model = getScopeModelDisplayName(scope?.scope) || '-';
         const hardware = scope?.scope?.hardware || '-';
         return `${t('hardConstraintsBestWorkloadLabel')}: ${workload} • ${model} • ${hardware}`;
     }
 
-    function buildHardConstraintCheckItem(code, scope) {
+    function buildHardConstraintCheckItem(code, scope, tiedScopes = []) {
         const checks = getHardConstraintScopeChecks(scope);
         const metrics = getHardConstraintScopeMetrics(scope);
         const deltas = scope?.metric_deltas || {};
-        const scopeHint = getHardConstraintScopeHint(scope);
+        const scopeHint = getHardConstraintScopeHint(scope, tiedScopes);
 
         const c1Current = Number.isFinite(metrics.single_chip_effective_utilization_pct)
             ? `${metrics.single_chip_effective_utilization_pct.toFixed(2)}%`
@@ -2687,12 +2695,34 @@
         return String(left?.scope_key || '').localeCompare(String(right?.scope_key || ''));
     }
 
+    function hardConstraintCheckSortKeyEquals(code, left, right) {
+        const leftKey = buildHardConstraintCheckSortKey(left, code);
+        const rightKey = buildHardConstraintCheckSortKey(right, code);
+        const length = Math.max(leftKey.length, rightKey.length);
+        for (let index = 0; index < length; index += 1) {
+            if ((leftKey[index] || 0) !== (rightKey[index] || 0)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     function selectBestHardConstraintScopeForCheck(scopes, code) {
         if (!Array.isArray(scopes) || !scopes.length) {
             return null;
         }
 
-        return [...scopes].sort((left, right) => compareHardConstraintScopesForCheck(code, left, right))[0] || null;
+        const rankedScopes = [...scopes].sort((left, right) => compareHardConstraintScopesForCheck(code, left, right));
+        const primaryScope = rankedScopes[0] || null;
+        if (!primaryScope) {
+            return null;
+        }
+
+        const tiedScopes = rankedScopes.filter((scope) => hardConstraintCheckSortKeyEquals(code, scope, primaryScope));
+        return {
+            primaryScope,
+            tiedScopes,
+        };
     }
 
     function buildBestCaseHardConstraintScope(scopes) {
@@ -2701,17 +2731,27 @@
         }
 
         const selectedScopes = getHardConstraintCheckCodes()
-            .map((code) => ({ code, scope: selectBestHardConstraintScopeForCheck(scopes, code) }))
-            .filter((item) => item.scope);
+            .map((code) => {
+                const selection = selectBestHardConstraintScopeForCheck(scopes, code);
+                return selection
+                    ? {
+                        code,
+                        scope: selection.primaryScope,
+                        tiedScopes: selection.tiedScopes,
+                    }
+                    : null;
+            })
+            .filter(Boolean);
         if (!selectedScopes.length) {
             return null;
         }
 
-        const checkItems = selectedScopes.map((item) => buildHardConstraintCheckItem(item.code, item.scope));
+        const checkItems = selectedScopes.map((item) => buildHardConstraintCheckItem(item.code, item.scope, item.tiedScopes));
         const latestScope = [...selectedScopes]
             .sort((left, right) => getHardConstraintSubmittedAt(right.scope) - getHardConstraintSubmittedAt(left.scope))[0]?.scope || null;
-        const workloads = [...new Set(selectedScopes.map((item) => item.scope?.scope?.workload).filter(Boolean))];
+        const workloads = [...new Set(selectedScopes.flatMap((item) => (item.tiedScopes || [item.scope]).map((scope) => scope?.scope?.workload)).filter(Boolean))];
         const hardwares = [...new Set(selectedScopes.map((item) => item.scope?.scope?.hardware).filter(Boolean))];
+        const hasTiedSelections = selectedScopes.some((item) => Array.isArray(item.tiedScopes) && item.tiedScopes.length > 1);
 
         return {
             is_best_case_bundle: true,
@@ -2731,9 +2771,10 @@
                 engine: latestScope?.scope?.engine || latestScope?.latest?.engine || 'vllm-hust',
                 model_display_name: t('hardConstraintsBestCaseScope'),
                 hardware: hardwares.join(', ') || '-',
-                workload: workloads.length === 1 ? workloads[0] : t('hardConstraintsMixedWorkloads'),
+                workload: workloads.length === 1 && !hasTiedSelections ? workloads[0] : t('hardConstraintsMixedWorkloads'),
             },
             best_case_workloads: workloads,
+            has_tied_selections: hasTiedSelections,
         };
     }
 
@@ -2833,7 +2874,7 @@
             ? `${t('scope')}: ${t('hardConstraintsBestCaseScope')}`
             : `${t('scope')}: ${getScopeModelDisplayName(scope?.scope) || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}`;
         const scopeMeta = scope?.is_best_case_bundle
-            ? `${t('hardConstraintsBestWorkloadLabel')}: ${(scope?.best_case_workloads || []).join(', ') || t('hardConstraintsMixedWorkloads')} · ${passedCount}/4`
+            ? `${scope?.has_tied_selections || (scope?.best_case_workloads || []).length > 1 ? t('hardConstraintsTiedWorkloadsLabel') : t('hardConstraintsBestWorkloadLabel')}: ${scope?.has_tied_selections || (scope?.best_case_workloads || []).length > 1 ? t('hardConstraintsMixedWorkloads') : ((scope?.best_case_workloads || []).join(', ') || t('hardConstraintsMixedWorkloads'))} · ${passedCount}/4`
             : `scenario=${accountable?.representative_business_scenario || '-'} · baseline=${formatAccountableBaseline(accountable)} · ${passedCount}/4`;
         const commitLine = scope?.is_best_case_bundle
             ? `${t('current')}: ${t('hardConstraintsBestCaseScope')} · ${t('previous')}: -`
