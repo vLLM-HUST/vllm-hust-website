@@ -1452,13 +1452,14 @@
       </div>
 
       <div id="contributors-content" style="display: none">
-        <p id="contributors-meta" class="leaderboard-meta">Snapshot: -</p>
-
+        <!-- All Repos section -->
+        <h3 id="contributors-all-title">All Repositories</h3>
+        <p id="contributors-all-meta" class="leaderboard-meta">Snapshot: -</p>
         <div class="table-container">
           <table class="leaderboard-table">
             <thead>
               <tr>
-                <th id="contributors-head-rank">Rank</th>
+                <th>Rank</th>
                 <th id="contributors-head-name">Contributor</th>
                 <th id="contributors-head-commits">Commits</th>
                 <th id="contributors-head-lines">Changed Lines</th>
@@ -1466,7 +1467,26 @@
                 <th id="contributors-head-repos">Active Repos</th>
               </tr>
             </thead>
-            <tbody id="contributors-tbody"></tbody>
+            <tbody id="contributors-all-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Core Repos section -->
+        <h3 id="contributors-core-title" style="margin-top: 2rem">Core Performance Repos</h3>
+        <p id="contributors-core-meta" class="leaderboard-meta">-</p>
+        <div class="table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Contributor</th>
+                <th>Commits</th>
+                <th>Changed Lines</th>
+                <th>Added / Deleted</th>
+                <th>Active Repos</th>
+              </tr>
+            </thead>
+            <tbody id="contributors-core-tbody"></tbody>
           </table>
         </div>
       </div>
@@ -1678,13 +1698,15 @@
         contributors_loading_text: "Loading contributor data...",
         contributors_error_title: "Failed to Load Contributors",
         contributors_error_text: "Please refresh the page or check the published contributor data.",
+        contributors_all_title: "All Repositories",
+        contributors_core_title: "Core Performance Repos",
         contributors_head_rank: "Rank",
         contributors_head_name: "Contributor",
         contributors_head_commits: "Commits",
         contributors_head_lines: "Changed Lines",
         contributors_head_added_deleted: "Added / Deleted",
         contributors_head_repos: "Active Repos",
-        contributors_meta_template: "Snapshot: {date} • {count} contributors",
+        contributors_meta_template: "Snapshot: {date} \u2022 {count} contributors",
 
         workstation_title: "🖥️ AGI4S Serving Console",
         workstation_kicker: "Live Workspace",
@@ -1917,8 +1939,10 @@
         contributors_head_commits: "提交次数",
         contributors_head_lines: "变更行数",
         contributors_head_added_deleted: "新增 / 删除",
+        contributors_all_title: "全部仓库",
+        contributors_core_title: "核心性能仓库",
         contributors_head_repos: "活跃仓库数",
-        contributors_meta_template: "快照时间：{date} • 共 {count} 位贡献者",
+        contributors_meta_template: "快照时间：{date} \u2022 共 {count} 位贡献者",
 
         workstation_title: "🖥️ AGI4S 服务控制台",
         workstation_kicker: "实时工作台",
@@ -2090,6 +2114,8 @@
         "leaderboard-empty-text": dict.leaderboard_empty_text,
         "contributors-title": dict.contributors_title,
         "contributors-description": dict.contributors_description,
+        "contributors-all-title": dict.contributors_all_title,
+        "contributors-core-title": dict.contributors_core_title,
         "contributors-loading-text": dict.contributors_loading_text,
         "contributors-error-title": dict.contributors_error_title,
         "contributors-error-text": dict.contributors_error_text,
@@ -2169,9 +2195,11 @@
       }
     }
 
-    // Resolve contributor array from payload — supports both nested
-    // { all_repos: { contributors: [...] } } and flat { contributors: [...] } formats.
-    function resolveContributors(payload) {
+    // Resolve contributor array from payload for a given scope.
+    function resolveContributors(payload, scope) {
+      if (scope && payload[scope] && Array.isArray(payload[scope].contributors)) {
+        return payload[scope].contributors;
+      }
       if (payload.all_repos && Array.isArray(payload.all_repos.contributors)) {
         return payload.all_repos.contributors;
       }
@@ -2181,25 +2209,26 @@
       return [];
     }
 
-    function formatContributorMetaText(payload) {
+    function formatContributorMetaText(payload, scope) {
       const lang = window["vllm-hustCurrentLang"] || "en";
       const dict = I18N[lang] || I18N.en;
+      const contributors = resolveContributors(payload, scope);
       return dict.contributors_meta_template
         .replace("{date}", payload.updated_at || "-")
-        .replace("{count}", String(resolveContributors(payload).length));
+        .replace("{count}", String(contributors.length));
     }
 
     function renderContributorMeta(payload) {
-      const meta = document.getElementById("contributors-meta");
-      if (!meta) return;
-      meta.textContent = formatContributorMetaText(payload);
+      const allMeta = document.getElementById("contributors-all-meta");
+      const coreMeta = document.getElementById("contributors-core-meta");
+      if (allMeta) allMeta.textContent = formatContributorMetaText(payload, "all_repos");
+      if (coreMeta) coreMeta.textContent = formatContributorMetaText(payload, "core_repos");
     }
 
-    function renderContributors(payload) {
-      const tbody = document.getElementById("contributors-tbody");
+    function renderContributorTable(tbodyId, contributors) {
+      const tbody = document.getElementById(tbodyId);
       if (!tbody) return;
       tbody.innerHTML = "";
-      const contributors = resolveContributors(payload);
       for (const contributor of contributors) {
         const row = document.createElement("tr");
         const nameCell = contributor.github_url
@@ -2215,6 +2244,11 @@
           `;
         tbody.appendChild(row);
       }
+    }
+
+    function renderContributors(payload) {
+      renderContributorTable("contributors-all-tbody", resolveContributors(payload, "all_repos"));
+      renderContributorTable("contributors-core-tbody", resolveContributors(payload, "core_repos"));
       renderContributorMeta(payload);
     }
 
