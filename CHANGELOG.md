@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- 新增 `agent-research-online` workload 场景：基于 EvoScientist 多智能体研究系统的真实请求轨迹（32 轮 LLM 交互，覆盖文献调研、代码生成、数据分析、论文写作等 7 个阶段），可用于评测推理引擎在 AI Agent 长对话场景下的服务性能。workload 数据已集成至 `vllm-hust-benchmark`，leaderboard 后续可展示对应结果。
+
 ### Changed
 
 - leaderboard 硬约束卡片不再要求同一个 workload 同时代表 C1/C2/C3/C4：前端现在会在当前可见范围内，按每个约束分别挑选最有利的 workload 计算并展示，卡片摘要改为“按最有利 workload 取值”，每条约束行也会标明所选 workload，避免把不同 workload 简单压成单一 scope 的口径误解为平均值。
