@@ -1465,6 +1465,7 @@
                 <th id="contributors-head-lines">Changed Lines</th>
                 <th id="contributors-head-added-deleted">Added / Deleted</th>
                 <th id="contributors-head-repos">Active Repos</th>
+                <th id="contributors-head-contributions">Key Contributions</th>
               </tr>
             </thead>
             <tbody id="contributors-all-tbody"></tbody>
@@ -1484,6 +1485,7 @@
                 <th>Changed Lines</th>
                 <th>Added / Deleted</th>
                 <th>Active Repos</th>
+                <th>Key Contributions</th>
               </tr>
             </thead>
             <tbody id="contributors-core-tbody"></tbody>
@@ -1706,6 +1708,7 @@
         contributors_head_lines: "Changed Lines",
         contributors_head_added_deleted: "Added / Deleted",
         contributors_head_repos: "Active Repos",
+        contributors_head_contributions: "Key Contributions",
         contributors_meta_template: "Snapshot: {date} \u2022 {count} contributors",
 
         workstation_title: "🖥️ AGI4S Serving Console",
@@ -1942,6 +1945,7 @@
         contributors_all_title: "全部仓库",
         contributors_core_title: "核心性能仓库",
         contributors_head_repos: "活跃仓库数",
+        contributors_head_contributions: "关键贡献",
         contributors_meta_template: "快照时间：{date} \u2022 共 {count} 位贡献者",
 
         workstation_title: "🖥️ AGI4S 服务控制台",
@@ -2125,6 +2129,7 @@
         "contributors-head-lines": dict.contributors_head_lines,
         "contributors-head-added-deleted": dict.contributors_head_added_deleted,
         "contributors-head-repos": dict.contributors_head_repos,
+        "contributors-head-contributions": dict.contributors_head_contributions,
         "workstation-title": dict.workstation_title,
         "workstation-desc": dict.workstation_desc,
         "workstation-note": dict.workstation_note,
@@ -2241,6 +2246,7 @@
             <td>${Number(contributor.changed_lines).toLocaleString()}</td>
             <td>${Number(contributor.added).toLocaleString()} / ${Number(contributor.deleted).toLocaleString()}</td>
             <td>${contributor.active_repos}</td>
+            <td>${contributor.key_contributions || ""}</td>
           `;
         tbody.appendChild(row);
       }
