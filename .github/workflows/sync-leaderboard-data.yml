@@ -1,0 +1,64 @@
+name: Sync Leaderboard Data
+
+on:
+  repository_dispatch:
+    types: [leaderboard-update]
+  workflow_dispatch:
+  schedule:
+    # Run every 6 hours to catch any missed updates
+    - cron: '0 */6 * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout website repo
+        uses: actions/checkout@v4
+
+      - name: Checkout benchmark repo (snapshots only)
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          path: _benchmark
+          sparse-checkout: leaderboard-data/snapshots
+          sparse-checkout-cone-mode: false
+
+      - name: Sync snapshot files to website data/
+        run: |
+          snapshot_dir="_benchmark/leaderboard-data/snapshots"
+          target_dir="data"
+
+          if [[ ! -d "$snapshot_dir" ]]; then
+            echo "No snapshots directory found in benchmark repo"
+            exit 0
+          fi
+
+          changed=0
+          for f in leaderboard_single.json leaderboard_multi.json leaderboard_compare.json last_updated.json; do
+            if [[ -f "$snapshot_dir/$f" ]]; then
+              if ! diff -q "$snapshot_dir/$f" "$target_dir/$f" >/dev/null 2>&1; then
+                cp "$snapshot_dir/$f" "$target_dir/$f"
+                changed=1
+                echo "Updated: $f"
+              fi
+            fi
+          done
+
+          if [[ "$changed" -eq 0 ]]; then
+            echo "No changes detected"
+          fi
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/sync-leaderboard-data
+          commit-message: 'data: sync leaderboard snapshots from benchmark repo'
+          title: 'data: sync leaderboard snapshots'
+          body: |
+            Automated sync of leaderboard data from `vllm-hust-benchmark/leaderboard-data/snapshots/`.
+
+            This PR updates the website's leaderboard display with the latest benchmark results.
+          delete-branch: true
