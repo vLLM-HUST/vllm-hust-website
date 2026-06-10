@@ -603,9 +603,7 @@ def build_compare_engine_summary(entry: dict[str, Any]) -> dict[str, Any]:
             "typical_tpot_reduction_pct_vs_baseline": safe_float(
                 constraints.get("typical_tpot_reduction_pct_vs_baseline")
             ),
-            "long_context_length": safe_float(
-                constraints.get("long_context_length")
-            ),
+            "long_context_length": safe_float(constraints.get("long_context_length")),
             "long_context_throughput_stable": safe_bool(
                 constraints.get("long_context_throughput_stable")
             ),
