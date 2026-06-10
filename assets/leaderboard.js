@@ -4303,17 +4303,15 @@
         const bestEntry = summary.bestEntry || {};
         const aggregateOnly = Boolean(summary.aggregateOnly);
         const isLeader = leaders.throughput && leaders.throughput.engine === summary.engine;
-        const isBaselineCard = cardCount === 2 && isBaselineEngine(summary.engine);
+        const isBaselineCard = !isLeader && cardCount === 2 && cardIndex === 1;
         const chipText = getOverviewSummaryChipText(summary);
         const versionText = getOverviewSummaryVersionText(summary);
         const bestVisibleRunText = `${getWorkloadLabel(getWorkloadId(bestEntry))} • ${getConfigText(bestEntry).replace('<br><small>', ' • ').replace('</small>', '')}`;
-        const versionPrefix = representativeEntry
-            ? t('alignedVersionLabel')
-            : aggregateOnly
-                ? t('visibleVersionLabel')
+        const versionPrefix = isLeader
+            ? t('currentBestVersionLabel')
             : isBaselineCard
                 ? t('baselineVersionLabel')
-                : (cardCount === 2 ? t('currentBestVersionLabel') : (isLeader ? t('currentBestVersionLabel') : `${t('bestVisibleVersion')} `));
+                : t('bestVisibleVersion');
         const footerLabel = representativeEntry
             ? t('alignedRunLabel')
             : aggregateOnly
@@ -4351,8 +4349,8 @@
                         <span class="engine-summary-version-value">${versionText}</span>
                     </div>
                     <div class="engine-summary-footer">
-                        <span class="engine-summary-footer-label">${footerLabel}:</span>
-                        <span class="engine-summary-footer-value">${footerValue}</span>
+                        <span class="engine-summary-footer-label">${t('bestVisibleRun')}:</span>
+                        <span class="engine-summary-footer-value">${bestVisibleRunText}</span>
                     </div>
                 </div>
             </div>

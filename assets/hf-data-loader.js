@@ -45,7 +45,7 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v3';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v2';
 let lastLoadedSource = null;
 
 function getUniqueEndpoints() {
