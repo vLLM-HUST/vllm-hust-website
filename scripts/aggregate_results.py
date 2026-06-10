@@ -57,9 +57,9 @@ GOAL_BASELINE_TARGET = {
     "engine": "vllm",
     "engine_version_prefix": "0.18.0",
     "github_repository": "vllm-project/vllm-ascend",
-    "vllm_commit": "bcf2be96120005e9aea171927f85055a6a5c0cf6",
+    "vllm_commit": "bcf2be96120005e9aea171927f85055a6a5c0cf6",  # pragma: allowlist secret
     "vllm_ascend_ref": "v0.18.0",
-    "vllm_ascend_commit": "e18643f8a4d5bd9990727654318ad069ea0b56e2",
+    "vllm_ascend_commit": "e18643f8a4d5bd9990727654318ad069ea0b56e2",  # pragma: allowlist secret
 }
 
 HARD_CONSTRAINT_THRESHOLDS = {
