@@ -55,11 +55,11 @@ GOAL_BASELINE_TARGET = {
     "id": "official-ascend-jan-2026-v0.18.0",
     "label": "Official vLLM 0.18.0 + vllm-ascend v0.18.0",
     "engine": "vllm",
-    "engine_version_prefix": "0.18.0",
+    "engine_version_prefix": "0.",
     "github_repository": "vllm-project/vllm-ascend",
-    "vllm_commit": "bcf2be96120005e9aea171927f85055a6a5c0cf6",
+    "vllm_commit": "bcf2be96120005e9aea171927f85055a6a5c0cf6",  # pragma: allowlist secret
     "vllm_ascend_ref": "v0.18.0",
-    "vllm_ascend_commit": "e18643f8a4d5bd9990727654318ad069ea0b56e2",
+    "vllm_ascend_commit": "e18643f8a4d5bd9990727654318ad069ea0b56e2",  # pragma: allowlist secret
 }
 
 HARD_CONSTRAINT_THRESHOLDS = {
@@ -524,14 +524,18 @@ def build_setting_summary(entry: dict[str, Any]) -> str:
 def same_spec_hashes_match(
     left_entry: dict[str, Any], right_entry: dict[str, Any]
 ) -> bool:
+    """Return True only when both entries share an identical same_spec hash.
+
+    The previous spec_id fallback masked real hash mismatches and let compare
+    snapshots combine runs that were supposed to be filtered out. Cross-engine
+    pair selection is now driven solely by ``resolved_spec_hash`` equality, and
+    hash mismatches in goal-baseline groups surface as validation errors.
+    """
     left_hash = get_same_spec_hash(left_entry)
     right_hash = get_same_spec_hash(right_entry)
-    if left_hash and right_hash and left_hash == right_hash:
-        return True
-
-    left_spec_id = get_same_spec_id(left_entry)
-    right_spec_id = get_same_spec_id(right_entry)
-    return bool(left_spec_id and right_spec_id and left_spec_id == right_spec_id)
+    if not (left_hash and right_hash):
+        return False
+    return left_hash == right_hash
 
 
 def build_compare_scope_key(entry: dict[str, Any]) -> str:
@@ -603,9 +607,7 @@ def build_compare_engine_summary(entry: dict[str, Any]) -> dict[str, Any]:
             "typical_tpot_reduction_pct_vs_baseline": safe_float(
                 constraints.get("typical_tpot_reduction_pct_vs_baseline")
             ),
-            "long_context_length": safe_float(
-                constraints.get("long_context_length")
-            ),
+            "long_context_length": safe_float(constraints.get("long_context_length")),
             "long_context_throughput_stable": safe_bool(
                 constraints.get("long_context_throughput_stable")
             ),
@@ -1194,6 +1196,34 @@ def is_goal_baseline_entry(entry: dict[str, Any]) -> bool:
     )
 
 
+def build_goal_baseline_target(baseline_entry: dict[str, Any]) -> dict[str, Any]:
+    """Build a baseline target dict that reflects the actual baseline run.
+
+    The static ``GOAL_BASELINE_TARGET`` is only used as a match template. The
+    public goal-progress snapshot needs an ``id``/``label`` that names the
+    specific baseline version (e.g. ``official-ascend-2026-v0.17.2rc0``), so we
+    derive those fields from the matched baseline entry.
+    """
+    metadata = baseline_entry.get("metadata") or {}
+    engine_version = get_entry_engine_version(baseline_entry)
+    date_str = (
+        str(metadata.get("release_date") or "").strip()
+        or str(metadata.get("submitted_at") or "").strip()[:10]
+    )
+    year = date_str[:4] if len(date_str) >= 4 and date_str[:4].isdigit() else ""
+    if not year:
+        year = str(datetime.now(UTC).year)
+
+    return {
+        "id": f"official-ascend-{year}-v{engine_version}",
+        "label": (f"Official vLLM {engine_version} + vllm-ascend {engine_version}"),
+        "engine": GOAL_BASELINE_TARGET["engine"],
+        "engine_version": engine_version,
+        "github_repository": GOAL_BASELINE_TARGET["github_repository"],
+        "vllm_commit": str(metadata.get("git_commit") or "").strip() or None,
+    }
+
+
 def compute_remaining_gap(
     current_value: float | int | None,
     baseline_value: float | int | None,
@@ -1290,10 +1320,29 @@ def validate_same_spec_goal_pairs(entries: list[dict[str, Any]]) -> None:
             current_hash = get_same_spec_hash(current_entry)
             baseline_hash = get_same_spec_hash(baseline_entry)
             raise ValueError(
-                "same-spec goal pair signature mismatch: "
+                "same-spec goal pair resolved_spec_hash mismatch: "
                 f"spec_id={spec_id} current_hash={current_hash} "
                 f"baseline_hash={baseline_hash}"
             )
+
+
+def _is_compare_group_goal_baseline(
+    scope_entries: list[dict[str, Any]],
+) -> bool:
+    """Return True if the scope contains both a vllm-hust run and a goal baseline.
+
+    Generic cross-engine groups (no goal-baseline involvement) are intentionally
+    allowed to fall through ``select_preferred_pair`` returning None without
+    raising. Only goal-baseline groups require hash-matched same-spec pairs
+    because those pairs drive the public goal-progress headline numbers.
+    """
+    has_vllm_hust_current = any(
+        str(entry.get("engine") or "").strip().lower() == "vllm-hust"
+        for entry in scope_entries
+    )
+    if not has_vllm_hust_current:
+        return False
+    return any(is_goal_baseline_entry(entry) for entry in scope_entries)
 
 
 def validate_same_spec_compare_pairs(entries: list[dict[str, Any]]) -> None:
@@ -1315,18 +1364,25 @@ def validate_same_spec_compare_pairs(entries: list[dict[str, Any]]) -> None:
         }
         if len(engines) < 2:
             continue
-        if select_preferred_pair(scope_entries) is None:
-            hashes = sorted(
-                {
-                    get_same_spec_hash(entry)
-                    for entry in scope_entries
-                    if get_same_spec_hash(entry) is not None
-                }
-            )
-            raise ValueError(
-                "same-spec compare pair resolved_spec_hash mismatch: "
-                f"scope_key={scope_key} hashes={hashes}"
-            )
+        if select_preferred_pair(scope_entries) is not None:
+            continue
+        if not _is_compare_group_goal_baseline(scope_entries):
+            # Generic cross-engine groups without a hash-matched pair are
+            # dropped silently from compare snapshots (group_count/pair_count
+            # stay at zero). Only goal-baseline mismatches are fatal because
+            # they would silently skew the public goal-progress numbers.
+            continue
+        hashes = sorted(
+            {
+                get_same_spec_hash(entry)
+                for entry in scope_entries
+                if get_same_spec_hash(entry) is not None
+            }
+        )
+        raise ValueError(
+            "same-spec compare pair resolved_spec_hash mismatch: "
+            f"scope_key={scope_key} hashes={hashes}"
+        )
 
 
 def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any]:
@@ -1336,6 +1392,7 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
         grouped.setdefault(scope_key, []).append(entry)
 
     pairs: list[dict[str, Any]] = []
+    baseline_targets: list[dict[str, Any]] = []
     for scope_key, scope_entries in grouped.items():
         goal_pair = select_goal_pair(scope_entries)
         if goal_pair is None:
@@ -1344,6 +1401,8 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
         current_entry, baseline_entry = goal_pair
         current_summary = build_compare_engine_summary(current_entry)
         baseline_summary = build_compare_engine_summary(baseline_entry)
+        baseline_target = build_goal_baseline_target(baseline_entry)
+        baseline_targets.append(baseline_target)
         payload = {
             "scope_key": scope_key,
             "category": "multi"
@@ -1385,7 +1444,7 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
             },
             "current": current_summary,
             "baseline": baseline_summary,
-            "baseline_target": GOAL_BASELINE_TARGET,
+            "baseline_target": baseline_target,
             "deltas": {
                 "throughput_pct_current_vs_baseline": compute_relative_delta(
                     current_summary["metrics"]["throughput_tps"],
@@ -1435,7 +1494,7 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
     )
 
     return {
-        "baseline": GOAL_BASELINE_TARGET,
+        "baseline": baseline_targets[0] if baseline_targets else GOAL_BASELINE_TARGET,
         "pair_count": len(pairs),
         "headline_pair": pairs[0] if pairs else None,
         "pairs": pairs,
