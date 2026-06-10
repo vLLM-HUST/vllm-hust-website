@@ -34,8 +34,8 @@ const HF_CONFIG = {
         'https://huggingface.co'
     ],
 
-    // 数据源优先级：hf -> github -> local
-    sources: ['hf', 'github', 'local'],
+    // 数据源优先级：github -> hf -> local
+    sources: ['github', 'hf', 'local'],
 
     // GitHub 仓库配置（用于不依赖 HF 的数据发布方式）
     github: {
