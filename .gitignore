@@ -60,3 +60,8 @@ data/legacy/
 # ✅ 保留: data/examples/（示例数据，用于开发测试）
 # ✅ 保留: data/schemas/（JSON Schema 定义）
 # ✅ 保留: data/*.md（文档说明）
+
+# _benchmark/ is created by the sync-leaderboard-data workflow's checkout step.
+# Directories starting with _ are special to Jekyll and would hang the build.
+# This entry prevents the workflow from accidentally re-committing it.
+_benchmark/
