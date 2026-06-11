@@ -1320,12 +1320,15 @@ def validate_same_spec_goal_pairs(entries: list[dict[str, Any]]) -> None:
             current_hash = get_same_spec_hash(current_entry)
             baseline_hash = get_same_spec_hash(baseline_entry)
             import logging
+
             logging.getLogger(__name__).warning(
                 "same-spec goal pair resolved_spec_hash drift detected: "
                 "spec_id=%s current_hash=%s baseline_hash=%s; "
                 "the spec file was updated after the baseline was created, "
                 "goal-progress comparison will proceed with mismatched hashes",
-                spec_id, current_hash, baseline_hash,
+                spec_id,
+                current_hash,
+                baseline_hash,
             )
 
 
@@ -1383,12 +1386,14 @@ def validate_same_spec_compare_pairs(entries: list[dict[str, Any]]) -> None:
             }
         )
         import logging
+
         logging.getLogger(__name__).warning(
             "same-spec compare pair resolved_spec_hash drift detected: "
             "scope_key=%s hashes=%s; the spec file was updated after the "
             "baseline was created, compare group will be dropped from "
             "cross-engine snapshots but goal-progress tracking continues",
-            scope_key, hashes,
+            scope_key,
+            hashes,
         )
 
 
