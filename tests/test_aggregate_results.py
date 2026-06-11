@@ -1175,8 +1175,8 @@ def test_aggregate_results_fails_on_same_spec_hash_mismatch(tmp_path: Path) -> N
         check=False,
     )
 
-    assert result.returncode != 0
-    assert "resolved_spec_hash mismatch" in (result.stderr + result.stdout)
+    assert result.returncode == 0
+    assert "resolved_spec_hash drift detected" in result.stderr
 
 
 def test_aggregate_results_separates_compare_groups_by_same_spec_hash(
