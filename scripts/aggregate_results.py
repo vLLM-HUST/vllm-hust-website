@@ -37,9 +37,12 @@ BASELINE_STATUS_NONE = "no-baseline-declared"
 DIRTY_ENGINE_VERSION_MARKERS = ("path string is null",)
 ENGINE_VERSION_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
 KNOWN_MEMORY_PER_CHIP_GB = {
-    # Ascend 910B3 cards in the benchmark fleet expose 64 GB HBM.
+    # Ascend 910B series cards in the benchmark fleet expose 64 GB HBM.
+    "910b2": 64.0,
     "910b3": 64.0,
+    "ascend-910b2": 64.0,
     "ascend-910b3": 64.0,
+    "ascend 910b2": 64.0,
     "ascend 910b3": 64.0,
 }
 VALID_BASELINE_STATUSES = {
