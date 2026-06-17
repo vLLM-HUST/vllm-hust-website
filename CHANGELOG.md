@@ -13,6 +13,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- `scripts/aggregate_results.py` now recognizes Ascend 910B2 memory metadata for
+  quantized benchmark entries, keeping website aggregation aligned with the
+  benchmark exporter when W8A8/INT8 Ascend runs publish leaderboard artifacts.
+
 - leaderboard 硬约束卡片不再要求同一个 workload 同时代表 C1/C2/C3/C4：前端现在会在当前可见范围内，按每个约束分别挑选最有利的 workload 计算并展示，卡片摘要改为“按最有利 workload 取值”，每条约束行也会标明所选 workload，避免把不同 workload 简单压成单一 scope 的口径误解为平均值。
 
 - 修正 leaderboard 默认展示链路中的官方基线口径漂移：`scripts/aggregate_results.py` 的 compare goal baseline 已更新为 `Official vLLM 0.18.0 + vllm-ascend v0.18.0`，`assets/leaderboard.js` 清理了残留的 `0.17.2rc0` fallback 文案，`assets/hf-data-loader.js` 默认改为优先读取实际发布到 Hugging Face 的 `intellistream/llm-engine-benchmark-results`；同步将 clean snapshot 回写到 `vllm-hust-benchmark/leaderboard-data/snapshots`，确保本地 checked-in GitHub-first 快照也收敛到 `16 / 6 / 11`。
