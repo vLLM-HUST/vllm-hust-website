@@ -2022,6 +2022,7 @@
 
     function sortForDisplay(entries, selectedWorkload) {
         const sorted = [...entries];
+        console.log('[DEBUG] sortForDisplay called with workload:', selectedWorkload, 'entries:', entries.length);
 
         if (selectedWorkload === 'all') {
             sorted.sort((a, b) => {
@@ -2047,6 +2048,7 @@
 
                 return compareByReleaseDateDesc(a, b);
             });
+            console.log('[DEBUG] Sorted by model first. First 5 models:', sorted.slice(0, 5).map(e => getEntryModelDisplayName(e)));
             return sorted;
         }
 
