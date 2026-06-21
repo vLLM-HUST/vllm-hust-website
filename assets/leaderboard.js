@@ -2025,6 +2025,11 @@
 
         if (selectedWorkload === 'all') {
             sorted.sort((a, b) => {
+                const modelCompare = getEntryModelDisplayName(a).localeCompare(getEntryModelDisplayName(b));
+                if (modelCompare !== 0) {
+                    return modelCompare;
+                }
+
                 const workloadCompare = getWorkloadId(a).localeCompare(getWorkloadId(b));
                 if (workloadCompare !== 0) {
                     return workloadCompare;
