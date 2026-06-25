@@ -3194,7 +3194,7 @@
     }
   },
   {
-    "entry_id": "14bfc1e8-b319-5892-a78f-7dc0f3c851ed",
+    "entry_id": "ce028678-0da9-4aa8-85ac-0f4a71fb1909",
     "engine": "vllm-hust",
     "engine_version": "0.20.1.post1.dev316+g79c65f726",
     "config_type": "single_gpu",
@@ -3232,8 +3232,8 @@
     "metrics": {
       "ttft_ms": 0.0,
       "tbt_ms": null,
-      "throughput_tps": 32.2615,
-      "output_throughput_tps": 32.2615,
+      "throughput_tps": 34.2594,
+      "output_throughput_tps": 34.2594,
       "error_rate": 0.0,
       "peak_mem_mb": null
     },
@@ -3249,7 +3249,7 @@
       },
       "metrics": {
         "single_chip_effective_utilization_pct": null,
-        "typical_throughput_ratio_vs_baseline": 2.5093,
+        "typical_throughput_ratio_vs_baseline": 2.4864,
         "typical_ttft_reduction_pct_vs_baseline": null,
         "typical_tpot_reduction_pct_vs_baseline": null,
         "long_context_length": null,
@@ -3281,23 +3281,10 @@
       "pytorch_version": null,
       "cuda_version": null,
       "cann_version": null,
-      "driver_version": null,
-      "hardware_summary": "Ascend 910B2 x1",
-      "software_summary": "vLLM-HUST 0.20.1.post1.dev316+g79c65f726, PyTorch 2.9.0+cpu",
-      "env_details": {
-        "eagle3_draft_model": "qwen3_8b_eagle3",
-        "num_speculative_tokens": 4,
-        "draft_tensor_parallel_size": 1,
-        "workload": "random-online",
-        "num_prompts": 200,
-        "random_input_len": 1024,
-        "random_output_len": 256,
-        "max_num_seqs": 1,
-        "request_rate": 1
-      }
+      "driver_version": null
     },
     "metadata": {
-      "submitted_at": "2026-06-24T15:20:08.289731+00:00",
+      "submitted_at": "2026-06-23T10:01:05.617099+00:00",
       "submitter": "manual-eagle3-benchmark",
       "data_source": "manual-benchmark",
       "submitted_by": "manual-eagle3-benchmark",
@@ -3332,7 +3319,7 @@
     }
   },
   {
-    "entry_id": "9aaa2491-7148-585d-b4a2-425c3a5e07a6",
+    "entry_id": "2b43df86-d435-4873-8a0a-1dfc0d27d422",
     "engine": "vllm-hust",
     "engine_version": "0.20.1.post1.dev316+g79c65f726",
     "config_type": "single_gpu",
@@ -3370,8 +3357,8 @@
     "metrics": {
       "ttft_ms": 0.0,
       "tbt_ms": null,
-      "throughput_tps": 12.8569,
-      "output_throughput_tps": 12.8569,
+      "throughput_tps": 13.7788,
+      "output_throughput_tps": 13.7788,
       "error_rate": 0.0,
       "peak_mem_mb": null
     },
@@ -3419,21 +3406,10 @@
       "pytorch_version": null,
       "cuda_version": null,
       "cann_version": null,
-      "driver_version": null,
-      "hardware_summary": "Ascend 910B2 x1",
-      "software_summary": "vLLM-HUST 0.20.1.post1.dev316+g79c65f726, PyTorch 2.9.0+cpu",
-      "env_details": {
-        "speculation": "disabled",
-        "workload": "random-online",
-        "num_prompts": 200,
-        "random_input_len": 1024,
-        "random_output_len": 256,
-        "max_num_seqs": 1,
-        "request_rate": 1
-      }
+      "driver_version": null
     },
     "metadata": {
-      "submitted_at": "2026-06-24T15:20:08.289757+00:00",
+      "submitted_at": "2026-06-23T10:01:05.617122+00:00",
       "submitter": "manual-eagle3-benchmark",
       "data_source": "manual-benchmark",
       "submitted_by": "manual-eagle3-benchmark",
