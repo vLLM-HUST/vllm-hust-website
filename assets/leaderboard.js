@@ -3443,7 +3443,7 @@
     // Render metric cell with trend (双重对比：vs baseline 和 vs 上一版)
     function renderMetricCell(value, trend, higherIsBetter, isPercentage = false, isBaseline = false) {
         const formattedValue = isPercentage ?
-            (value * 100).toFixed(1) + '%' :
+            formatPercent(value) :
             formatNumber(value);
 
         if (isBaseline) {
