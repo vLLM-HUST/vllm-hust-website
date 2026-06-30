@@ -236,7 +236,7 @@
           ],
           "properties": {
             "ttft_ms": {
-              "type": "number",
+              "type": ["number", "null"],
               "minimum": 0
             },
             "tbt_ms": {
@@ -254,7 +254,7 @@
               "minimum": 0
             },
             "throughput_tps": {
-              "type": "number",
+              "type": ["number", "null"],
               "minimum": 0
             },
             "peak_mem_mb": {
@@ -265,7 +265,7 @@
               "minimum": 0
             },
             "error_rate": {
-              "type": "number",
+              "type": ["number", "null"],
               "minimum": 0,
               "maximum": 1
             },
