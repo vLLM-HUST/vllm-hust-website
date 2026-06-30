@@ -917,6 +917,18 @@
     background: #edf2f7;
 }
 
+.leaderboard-table td.version-table-cell {
+    background: inherit;
+}
+
+.leaderboard-table tbody tr.is-sparse td.version-table-cell {
+    background: #fffaf0;
+}
+
+.leaderboard-table tbody tr.is-sparse:hover td.version-table-cell {
+    background: #edf2f7;
+}
+
 .leaderboard-table td {
     padding: 16px 12px;
     border-bottom: 1px solid #e2e8f0;
