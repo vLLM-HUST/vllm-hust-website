@@ -2408,22 +2408,20 @@
         // Render rows
         const showVersionAllParam = typeof window !== 'undefined'
             && new URLSearchParams(window.location.search).get('showVersionAll') === '1';
-        const rowSpanInfo = buildVersionRowSpanInfo(pageRows, {
-            showVersionAll: showVersionAllParam,
-            forceEveryRow: Boolean(sortState.column),
-            expandedRows: state.expandedRows,
-        });
-
         tbody.innerHTML = pageRows.map((entry, index) => {
             // Only the first item of the first page (in default sort) carries the "Latest" badge
             const isLatest = !sortState.column && pagination.page === 1 && index === 0;
             const isExpanded = state.expandedRows.has(entry.entry_id);
-            const rowSpan = rowSpanInfo.get(entry.entry_id) || { showVersion: true, span: 1 };
+            const currentVersion = getTableVersionVisibilityKey(entry);
+            const prevVersion = index > 0 ? getTableVersionVisibilityKey(pageRows[index - 1]) : null;
+            // Force show-version for every row when column sort is active (order is no longer version-grouped)
+            const showVersionForEveryRow = showVersionAllParam || Boolean(sortState.column);
+            const showVersion = showVersionForEveryRow || index === 0 || currentVersion !== prevVersion;
             const isSparse = comparisonView.incompleteKeys.has(createCompareScopeKey(entry));
 
             return `
-                ${renderDataRow(entry, isLatest, isExpanded, rowSpan.showVersion, isSparse, rowSpan.span)}
-                ${isExpanded ? renderDetailsRow(entry, isExpanded) : ''}
+                ${renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse)}
+                ${renderDetailsRow(entry, isExpanded)}
             `;
         }).join('');
 
@@ -2435,48 +2433,6 @@
 
         // Attach event listeners for buttons
         attachRowEventListeners();
-    }
-
-    function buildVersionRowSpanInfo(entries, options = {}) {
-        const showVersionForEveryRow = Boolean(options.showVersionAll || options.forceEveryRow);
-        const expandedRows = options.expandedRows instanceof Set ? options.expandedRows : new Set();
-        const info = new Map();
-        let index = 0;
-
-        while (index < entries.length) {
-            const entry = entries[index];
-            const key = getTableVersionVisibilityKey(entry);
-            let span = 1;
-
-            if (!showVersionForEveryRow) {
-                while (
-                    index + span < entries.length
-                    && getTableVersionVisibilityKey(entries[index + span]) === key
-                ) {
-                    span += 1;
-                }
-            }
-
-            const groupHasExpandedRow = entries
-                .slice(index, index + span)
-                .some((groupEntry) => expandedRows.has(groupEntry.entry_id));
-
-            if (groupHasExpandedRow) {
-                for (let offset = 0; offset < span; offset += 1) {
-                    info.set(entries[index + offset].entry_id, { showVersion: true, span: 1 });
-                }
-                index += span;
-                continue;
-            }
-
-            info.set(entry.entry_id, { showVersion: true, span });
-            for (let offset = 1; offset < span; offset += 1) {
-                info.set(entries[index + offset].entry_id, { showVersion: false, span: 0 });
-            }
-            index += span;
-        }
-
-        return info;
     }
 
     function renderDataStats(tabTotal, rawFilteredTotal, visibleTotal, mergedTotal, comparisonView) {
@@ -3418,7 +3374,7 @@
     }
 
     // Render data row
-    function renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse, versionRowSpan = 1) {
+    function renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse) {
         const m = entry.metrics;
         const trends = entry.trends || {};
         const dateLabel = getEntryDateLabel(entry);
@@ -3436,24 +3392,21 @@
         // 生成配置描述（芯片数/节点数）
         const configText = getConfigText(entry);
         const workloadText = getWorkloadLabel(getWorkloadId(entry));
-        const versionCellHtml = showVersion ? `
-                <td class="version-table-cell" rowspan="${Math.max(1, versionRowSpan)}">
+
+        return `
+            <tr data-entry-id="${entry.entry_id}" class="${isSparse ? 'is-sparse' : ''}">
+                <td>
                     <div class="version-cell">
-                        <div class="version-main version-main--aligned">${versionMainText}</div>
-                        ${provenanceSummary}
-                        <small class="version-setting-summary">${settingSummary}</small>
-                        ${buildCount > 1 ? `<small class="version-merge-hint">${t('bestFourth')}</small>` : ''}
-                        ${isSparse ? `<small class="version-merge-hint sparse">${t('sparseGroup')}</small>` : ''}
-                        ${(isLatest || entry.isBaseline)
+                        ${showVersion ? `<div class="version-main version-main--aligned">${versionMainText}</div>` : ''}
+                        ${showVersion ? provenanceSummary : ''}
+                        ${showVersion ? `<small class="version-setting-summary">${settingSummary}</small>` : ''}
+                        ${showVersion && buildCount > 1 ? `<small class="version-merge-hint">${t('bestFourth')}</small>` : ''}
+                        ${showVersion && isSparse ? `<small class="version-merge-hint sparse">${t('sparseGroup')}</small>` : ''}
+                        ${(showVersion && (isLatest || entry.isBaseline))
                             ? `<div class="version-badges">${isLatest ? `<span class="version-badge">${t('latest')}</span>` : ''}${entry.isBaseline ? `<span class="version-badge baseline">${t('baseline')}</span>` : ''}</div>`
                             : ''}
                     </div>
                 </td>
-            ` : '';
-
-        return `
-            <tr data-entry-id="${entry.entry_id}" class="${isSparse ? 'is-sparse' : ''}">
-                ${versionCellHtml}
                 <td class="config-cell">${workloadText}</td>
                 <td class="config-cell">${configText}</td>
                 <td>${renderMetricCell(m.ttft_ms, trends.ttft_ms, false, false, entry.isBaseline)}</td>
