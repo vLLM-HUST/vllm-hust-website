@@ -96,7 +96,10 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     assert "sources: ['github', 'hf', 'local']" in text
     assert "llm_engine_hf_leaderboard_cache_v6" in text
     assert "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-3';" in text
-    assert "const url = `${HF_CONFIG.localPath}${filename}${separator}v=${LOCAL_DATA_CACHE_BUST}`;" in text
+    assert (
+        "const url = `${HF_CONFIG.localPath}${filename}${separator}v=${LOCAL_DATA_CACHE_BUST}`;"
+        in text
+    )
     assert "function clearCache()" in text
     assert "Ignoring unusable session cache" in text
 
@@ -106,10 +109,18 @@ def test_leaderboard_data_excludes_retired_v0110_baselines() -> None:
     single = json.loads((root / "data" / "leaderboard_single.json").read_text())
 
     ids = {entry["entry_id"] for entry in single}
-    assert "36551323-7a0b-4832-b14b-98bf4edfd271" not in ids  # vllm-hust #41, retired v0110 baseline
-    assert "fd20fab5-1733-4bf0-b79b-9c41d09b53db" not in ids  # vllm-hust #45, retired v0110 baseline
-    assert "e851c419-0115-440d-9304-2175859494b8" not in ids  # vllm-hust #46, retired v0110 baseline
-    assert "b78295f6-3ad4-4a56-9c85-175165e5d347" not in ids  # vllm-hust #49, retired v0110 baseline
+    assert (
+        "36551323-7a0b-4832-b14b-98bf4edfd271" not in ids
+    )  # vllm-hust #41, retired v0110 baseline
+    assert (
+        "fd20fab5-1733-4bf0-b79b-9c41d09b53db" not in ids
+    )  # vllm-hust #45, retired v0110 baseline
+    assert (
+        "e851c419-0115-440d-9304-2175859494b8" not in ids
+    )  # vllm-hust #46, retired v0110 baseline
+    assert (
+        "b78295f6-3ad4-4a56-9c85-175165e5d347" not in ids
+    )  # vllm-hust #49, retired v0110 baseline
 
     for entry in single:
         same_spec = entry.get("same_spec") or {}
@@ -143,9 +154,9 @@ def test_leaderboard_data_is_benchmark_snapshot_mirror() -> None:
 
 def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
     root = Path(__file__).resolve().parents[1]
-    workflow = (
-        root / ".github" / "workflows" / "sync-leaderboard-data.yml"
-    ).read_text(encoding="utf-8")
+    workflow = (root / ".github" / "workflows" / "sync-leaderboard-data.yml").read_text(
+        encoding="utf-8"
+    )
     script = (root / "scripts" / "sync_leaderboard_snapshots.py").read_text(
         encoding="utf-8"
     )
@@ -175,7 +186,7 @@ def test_homepage_exposes_multi_page_navigation_and_workstation() -> None:
     assert 'href="./contributors.html"' in text
     assert 'id="workstation-section"' in text
     assert 'id="workstation-embed-frame"' in text
-    assert './assets/workstation-embed.js?v=' in text
+    assert "./assets/workstation-embed.js?v=" in text
 
 
 def test_validation_dependencies_have_single_source_of_truth() -> None:
@@ -211,13 +222,19 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "function getOverviewSummaryChipText(summary)" in text
     assert "function getOverviewSummaryVersionText(summary)" in text
     assert "return resolvedVersion;" in text
-    assert "overviewComponents: buildTableVersionComponents(bestEntry || coverageBestEntry)" in text
+    assert (
+        "overviewComponents: buildTableVersionComponents(bestEntry || coverageBestEntry)"
+        in text
+    )
     assert "const chipText = getOverviewSummaryChipText(summary);" in text
     assert "const versionText = getOverviewSummaryVersionText(summary);" in text
     assert "const bestVisibleRunText =" in text
     assert "function selectOverviewRepresentativeGroup(comparisonView)" in text
     assert "const representativeGroup = overviewScopeLocked" in text
-    assert "representativeGroup?.summaryLabel || getOverviewAggregateScopeText(comparisonView)" in text
+    assert (
+        "representativeGroup?.summaryLabel || getOverviewAggregateScopeText(comparisonView)"
+        in text
+    )
     assert "getBestEntryForEngine(group.entries, 'vllm-hust')" in text
     assert "function getOfficialVllmBaselineEntry(entries)" in text
     assert "function getThroughputImprovementScore(currentEntry, baselineEntry)" in text
@@ -237,13 +254,8 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert '<div class="engine-summary-meta">' in text
     assert '<span class="engine-summary-version-label">${versionPrefix}</span>' in text
     assert '<span class="engine-summary-version-value">${versionText}</span>' in text
-    assert (
-        '<span class="engine-summary-footer-label">${footerLabel}:</span>'
-        in text
-    )
-    assert (
-        '<span class="engine-summary-footer-value">${footerValue}</span>' in text
-    )
+    assert '<span class="engine-summary-footer-label">${footerLabel}:</span>' in text
+    assert '<span class="engine-summary-footer-value">${footerValue}</span>' in text
     metrics_index = text.index('<div class="engine-summary-metrics">')
     meta_index = text.index('<div class="engine-summary-meta">')
     version_index = text.index('<div class="engine-summary-version">')
@@ -269,7 +281,10 @@ def test_leaderboard_overview_compare_scope_includes_precision() -> None:
     )
     assert "activeGroups," in text
     assert "function getSingleCompleteOverviewGroup(comparisonView)" in text
-    assert "const precisions = getUniqueValues(entries, (entry) => entry?.model?.precision);" in text
+    assert (
+        "const precisions = getUniqueValues(entries, (entry) => entry?.model?.precision);"
+        in text
+    )
     assert (
         "const precisionText = precisions.length === 1 ? precisions[0] : `${precisions.length} ${t('precision')}`;"
         in text
@@ -282,15 +297,19 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
 
-    assert "https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" in html_text
+    assert (
+        "https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" in html_text
+    )
     assert 'id="leaderboard-trend-panel"' in html_text
     assert 'id="leaderboard-trend-chart"' in html_text
     assert 'data-trend-metric="throughput_tps"' in html_text
     assert "leaderboard-cache-v6-20260701" in html_text
-    assert "leaderboard-overview-sample-20260701-2" in html_text
+    assert "leaderboard-version-rowspan-20260701" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
-    assert "const hardware = entry?.hardware?.chip_model || 'unknown-hardware';" in js_text
+    assert (
+        "const hardware = entry?.hardware?.chip_model || 'unknown-hardware';" in js_text
+    )
     assert (
         "return [workload, model, hardware, chipCount, nodeCount, precision, settingSignature].join('|');"
         in js_text
@@ -360,7 +379,7 @@ def test_leaderboard_version_display_contract_is_documented_and_split() -> None:
     )
 
     render_data_row_start = text.index(
-        "function renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse) {"
+        "function renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse, versionRowSpan = 1) {"
     )
     render_details_row_start = text.index(
         "function renderDetailsRow(entry, isExpanded) {"
@@ -371,8 +390,22 @@ def test_leaderboard_version_display_contract_is_documented_and_split() -> None:
         in render_data_row_text
     )
     assert "const versionMainText = tableVersionSummary" in render_data_row_text
+    assert 'rowspan="${Math.max(1, versionRowSpan)}"' in render_data_row_text
     assert "getEntryDetailedVersionText" not in render_data_row_text
     assert "formatDetailedVersion" not in render_data_row_text
+    assert "function getTableVersionRowSpanKey(entry)" in text
+    assert "return getTableVersionVisibilityKey(entry);" in text
+    assert "const key = getTableVersionRowSpanKey(entry);" in text
+    assert (
+        "const showVersionForEveryRow = showVersionAllParam\n"
+        "            || Boolean(sortState.column)\n"
+        "            || filters.version !== 'all';" in text
+    )
+    assert "forceEveryRow: showVersionForEveryRow," in text
+    assert (
+        "${renderDataRow(entry, isLatest, isExpanded, rowSpan.showVersion, isSparse, rowSpan.span)}"
+        in text
+    )
 
     render_versions_start = text.index("function renderVersionsSection(entry) {")
     render_build_start = text.index("function renderBuildVariantsSection(entry) {")
@@ -463,6 +496,4 @@ def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> No
     )
     assert "'./data/core_contributors.json'" in text
     assert "async function fetchPayload()" in text
-    assert (
-        "console.warn('[contributors] source failed', source, err);" in text
-    )
+    assert "console.warn('[contributors] source failed', source, err);" in text
