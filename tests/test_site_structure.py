@@ -94,7 +94,9 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     assert "return hardConstraintScopes.length === 0;" in text
     assert "assertUsableLeaderboardPayload(result, source);" in text
     assert "sources: ['local', 'github', 'hf']" in text
-    assert "const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v3';" in text
+    assert "const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v4';" in text
+    assert "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-2';" in text
+    assert "const url = `${HF_CONFIG.localPath}${filename}${separator}v=${LOCAL_DATA_CACHE_BUST}`;" in text
     assert "function clearCache()" in text
     assert "Ignoring unusable session cache" in text
 

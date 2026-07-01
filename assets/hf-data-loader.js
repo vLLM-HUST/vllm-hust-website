@@ -45,7 +45,8 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v3';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v4';
+const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-2';
 let lastLoadedSource = null;
 
 function getUniqueEndpoints() {
@@ -429,10 +430,11 @@ async function loadFromHuggingFace(filename) {
  * @returns {Promise<Array>} - 解析后的 JSON 数据
  */
 async function loadFromLocal(filename) {
-    const url = `${HF_CONFIG.localPath}${filename}`;
+    const separator = filename.includes('?') ? '&' : '?';
+    const url = `${HF_CONFIG.localPath}${filename}${separator}v=${LOCAL_DATA_CACHE_BUST}`;
     console.log(`[HF Loader] Fallback to local: ${url}`);
 
-    const response = await fetch(url);
+    const response = await fetch(url, { cache: 'no-cache' });
     if (!response.ok) {
         throw new Error(`Local file error: ${response.status}`);
     }
