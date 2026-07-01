@@ -196,23 +196,22 @@
             <pre><code># Install the default serving stack
 pip install vllm-hust
 
-# Or install from PyPI with an explicit version
-pip install vllm-hust==<span id="versions-install-version">latest</span></code></pre>
+# Package release status shown below
+vllm-hust <span id="versions-install-version">latest</span></code></pre>
             <p class="install-note">
-                vllm-hust 是由 HUST 维护的 vLLM fork 发行包。当前页面展示的是实际已发布包版本；
-                对外稳定发布建议采用“上游基线 + HUST 修订号”的规则，例如 0.17.2.post1。
-                这样既能说明它基于哪个上游版本，也能避免与官方同号版本产生等价误解。
+                vllm-hust 是由 HUST 维护的 vLLM fork。当前 PyPI 包需要重新打包上传；
+                在新包发布前，网站不把旧 PyPI 包版本等同于项目当前版本。
             </p>
         </div>
 
         <div class="version-card">
-            <h2>Runtime Packages</h2>
+            <h2>Project Repositories</h2>
             <div class="package-grid" id="core-packages"></div>
             <p class="loading-note" id="core-loading">Loading vllm-hust runtime package versions...</p>
         </div>
 
         <div class="version-card">
-            <h2>Extension Packages</h2>
+            <h2>Extension Repositories</h2>
             <div class="package-grid" id="infra-packages"></div>
             <p class="loading-note" id="infra-loading">Loading backend and integration package versions...</p>
         </div>

@@ -62,9 +62,6 @@
 
     const UI = {
         en: {
-            packageFallback: 'package',
-            packageRepo: 'GitHub',
-            packagePypi: 'PyPI',
             throughputUnit: 'tok/s',
             workloadFallback: 'Other',
             modelFallback: 'Unknown model',
@@ -78,9 +75,6 @@
             milestoneWorkstationBody: 'The website can embed or link to a live vllm-hust workstation for operator-facing serving workflows.',
         },
         zh: {
-            packageFallback: '软件包',
-            packageRepo: '代码仓库',
-            packagePypi: 'PyPI',
             throughputUnit: 'token/s',
             workloadFallback: '其他',
             modelFallback: '未知模型',
@@ -167,27 +161,6 @@
         `).join('');
     }
 
-    function renderPackages(versionMeta, lang = currentLang()) {
-        const target = document.getElementById('achievement-packages');
-        if (!target) return;
-        const text = ui(lang);
-        const packages = Array.isArray(versionMeta?.packages) ? versionMeta.packages : [];
-        target.innerHTML = packages.map((pkg) => `
-            <div class="data-row">
-                <div>
-                    <h3>${pkg.name || text.packageFallback}</h3>
-                    <p>${lang === 'zh' ? (pkg.version_note_zh || pkg.version_display_label || pkg.group || '') : (pkg.version_display_label || pkg.group || '')}</p>
-                    <div class="tag-list">
-                        <span class="tag">${pkg.group || text.packageFallback}</span>
-                        <span class="tag">${pkg.version || '-'}</span>
-                        ${pkg.pypi_name ? `<span class="tag">${text.packagePypi}: ${pkg.pypi_name}</span>` : ''}
-                    </div>
-                </div>
-                ${pkg.repo ? `<a class="action-button" href="${pkg.repo}" target="_blank" rel="noreferrer">${text.packageRepo}</a>` : ''}
-            </div>
-        `).join('');
-    }
-
     function renderMilestones(compare, lang = currentLang()) {
         const target = document.getElementById('achievement-milestones');
         if (!target) return;
@@ -226,7 +199,6 @@
 
     function renderDynamic(lang = currentLang()) {
         renderArtifacts(lang);
-        if (state.versionMeta) renderPackages(state.versionMeta, lang);
         if (state.compare) renderMilestones(state.compare, lang);
     }
 

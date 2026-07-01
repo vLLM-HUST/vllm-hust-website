@@ -291,6 +291,28 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievements-no-workload-evidence-20260701" in html_text
 
 
+def test_achievements_page_omits_package_version_cards() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "achievements.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    assert "achievement-packages" not in html_text
+    assert "achievements-packages" not in html_text
+    assert "renderPackages" not in js_text
+
+
+def test_version_metadata_excludes_sagellm_package_family() -> None:
+    root = Path(__file__).resolve().parents[1]
+    meta_text = (root / "data" / "version_meta.json").read_text(encoding="utf-8")
+    meta = json.loads(meta_text)
+    package_names = {package["name"] for package in meta.get("packages", [])}
+
+    assert "vllm-hust" in package_names
+    assert "vllm-hust-protocol" not in package_names
+    assert "ivllm-hust" not in meta_text
+    assert "0.17.2.post1" not in meta_text
+
+
 def test_leaderboard_overview_compare_scope_includes_precision() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
