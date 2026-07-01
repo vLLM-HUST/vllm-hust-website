@@ -1,6 +1,4 @@
-/* ==========================================
-   Leaderboard Section Styles
-   ========================================== */
+/* Leaderboard section styles */
 
 .leaderboard-section {
     position: relative;
@@ -1732,9 +1730,7 @@
     }
 }
 
-/* ============================================================
-   Sortable column headers
-   ============================================================ */
+/* Sortable column headers */
 .sortable-header {
     cursor: pointer;
     user-select: none;
@@ -1767,9 +1763,7 @@
     color: #6450c8;
 }
 
-/* ============================================================
-   Pagination controls
-   ============================================================ */
+/* Pagination controls */
 .leaderboard-pagination {
     margin: 0.75rem 0 0.5rem;
 }
@@ -1813,9 +1807,7 @@
     text-align: center;
 }
 
-/* ============================================================
-   Reset filters button
-   ============================================================ */
+/* Reset filters button */
 .filter-group--reset {
     display: flex;
     align-items: flex-end;
