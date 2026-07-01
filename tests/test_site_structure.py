@@ -94,8 +94,8 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     assert "return hardConstraintScopes.length === 0;" in text
     assert "assertUsableLeaderboardPayload(result, source);" in text
     assert "sources: ['github', 'hf', 'local']" in text
-    assert "llm_engine_hf_leaderboard_cache_v5" in text
-    assert "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-2';" in text
+    assert "llm_engine_hf_leaderboard_cache_v6" in text
+    assert "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-3';" in text
     assert "const url = `${HF_CONFIG.localPath}${filename}${separator}v=${LOCAL_DATA_CACHE_BUST}`;" in text
     assert "function clearCache()" in text
     assert "Ignoring unusable session cache" in text
@@ -286,6 +286,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'id="leaderboard-trend-panel"' in html_text
     assert 'id="leaderboard-trend-chart"' in html_text
     assert 'data-trend-metric="throughput_tps"' in html_text
+    assert "leaderboard-cache-v6-20260701" in html_text
+    assert "leaderboard-overview-sample-20260701-2" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
     assert "const hardware = entry?.hardware?.chip_model || 'unknown-hardware';" in js_text
