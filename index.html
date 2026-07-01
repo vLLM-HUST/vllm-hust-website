@@ -4,23 +4,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>vllm-hust - Benchmark-first vLLM Serving</title>
-  <meta name="description" content="vllm-hust is an upstream-compatible vLLM fork focused on domestic hardware, AGI4S serving, workstation workflows, and benchmark-driven validation." />
+  <title>vllm-hust - vLLM Serving on Domestic Hardware</title>
+  <meta name="description" content="vllm-hust is a HUST-maintained vLLM fork for serving workloads on domestic accelerator stacks, with published benchmark snapshots and project artifacts." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="vllm-hust" />
-  <meta property="og:description" content="Benchmark-first vLLM serving for domestic hardware and AGI4S workflows." />
+  <meta property="og:description" content="A HUST-maintained vLLM serving stack for domestic accelerator environments." />
+  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
   <meta property="og:url" content="https://vllm-hust.sage.org.ai/" />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=multi-page-20260701" />
+  <link rel="stylesheet" href="./assets/site.css?v=public-home-20260701" />
 </head>
 
 <body data-page="home">
   <nav class="site-nav">
     <div class="site-shell site-nav-inner">
       <a class="brand-link" href="./index.html">
-        <span class="brand-mark">VH</span>
-        <span class="brand-copy">vllm-hust<small>Benchmark-first serving</small></span>
+        <span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span>
+        <span class="brand-copy">vllm-hust<small>vLLM serving</small></span>
       </a>
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
@@ -32,185 +35,122 @@
     </div>
   </nav>
 
-  <main class="site-shell">
-    <section class="page-hero">
-      <div class="hero-grid">
-        <div class="hero-panel">
-          <span id="home-eyebrow" class="eyebrow">HUST vLLM Fork</span>
-          <div class="hero-icon" aria-label="vllm-hust logo">VH</div>
-          <h1>vllm-hust</h1>
-          <p id="home-lede" class="hero-lede">
-            Upstream-compatible vLLM serving for domestic hardware, AGI4S workloads, and benchmark-driven optimization.
-          </p>
-          <div class="hero-actions">
-            <a id="home-primary-cta" class="action-button primary" href="./leaderboard.html">View leaderboard</a>
-            <a id="home-secondary-cta" class="action-button" href="./achievements.html">Explore achievements</a>
-            <a id="home-github-cta" class="action-button" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">GitHub</a>
-          </div>
-          <div class="metric-strip">
-            <div class="metric-box"><span id="home-metric-1-label">Serving focus</span><strong>AGI4S</strong></div>
-            <div class="metric-box"><span id="home-metric-2-label">Validation</span><strong>Benchmark</strong></div>
-            <div class="metric-box"><span id="home-metric-3-label">Runtime</span><strong>vLLM</strong></div>
-          </div>
-        </div>
+  <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
 
-        <section class="content-panel" id="workstation-section">
-          <div class="section-head">
-            <div>
-              <span id="workstation-kicker" class="eyebrow">Live Workstation</span>
-              <h2 id="workstation-title">AGI4S Serving Console</h2>
-              <p id="workstation-desc">Operate chat, tool-calling, model status, and serving metrics from one workstation surface.</p>
-            </div>
-          </div>
-          <div class="workstation-layout">
-            <div class="workstation-copy">
-              <span class="workstation-pill" id="workstation-status-chip" data-state="pending">Pending</span>
-              <div class="workstation-note" id="workstation-status-detail">Waiting for a public workstation URL.</div>
-              <div class="workstation-meta">
-                <div class="workstation-meta-item">
-                  <strong id="workstation-backend-label">Serving Backend</strong>
-                  <span id="workstation-backend-value">Not configured</span>
-                </div>
-                <div class="workstation-meta-item">
-                  <strong id="workstation-url-label">Workstation URL</strong>
-                  <span id="workstation-target-value">Not configured</span>
-                </div>
-              </div>
-              <div class="workstation-actions">
-                <a id="workstation-open-link" class="action-button primary" href="#" target="_blank" rel="noreferrer">Open Workstation</a>
-                <a id="workstation-docs-link" class="action-button" href="./docs/DEPLOY.md" target="_blank" rel="noreferrer">Deployment Guide</a>
-              </div>
-              <div class="workstation-note" id="workstation-note">A reference surface for operating vllm-hust on domestic hardware.</div>
-            </div>
-            <div class="workstation-shell" id="workstation-preview-shell">
-              <div class="workstation-window">
-                <div class="workstation-topbar">
-                  <div class="workstation-dots"><span></span><span></span><span></span></div>
-                  <span id="workstation-topbar-title">Workstation Preview</span>
-                  <span class="workstation-pill" id="workstation-embed-mode" data-state="pending">Waiting</span>
-                </div>
-                <div class="workstation-embed-shell">
-                  <iframe id="workstation-embed-frame" class="workstation-iframe" title="vllm-hust workstation" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
-                  <div class="fallback-console" id="workstation-fallback-console">
-                    <div class="console-line">vllm-hust serve Qwen/Qwen2.5-14B-Instruct</div>
-                    <div class="console-line">runtime: upstream-compatible · backend: Ascend · benchmark: enabled</div>
-                    <div class="console-line">operator view: prompts, tool calls, model health, latency, throughput</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+  <main class="home-stage">
+    <section class="cosmic-hero" aria-labelledby="home-title">
+      <div class="cosmic-ring cosmic-ring-one" aria-hidden="true"></div>
+      <div class="cosmic-ring cosmic-ring-two" aria-hidden="true"></div>
+      <div class="cosmic-card">
+        <span id="home-eyebrow" class="cosmic-kicker">HUST vLLM project</span>
+        <h1 id="home-title">vllm-hust</h1>
+        <p id="home-lede" class="cosmic-lede">A HUST-maintained vLLM fork for serving workloads on domestic accelerator stacks.</p>
+        <div class="cosmic-facts" aria-label="vllm-hust facts">
+          <div><span id="home-fact-1-label">Focus</span><strong id="home-fact-1-value">Domestic accelerator support</strong></div>
+          <div><span id="home-fact-2-label">Published data</span><strong id="home-fact-2-value">Benchmark snapshots</strong></div>
+          <div><span id="home-fact-3-label">Runtime base</span><strong>vLLM</strong></div>
+        </div>
+        <div class="hero-actions">
+          <a id="home-primary-cta" class="action-button primary" href="./leaderboard.html">Leaderboard</a>
+          <a id="home-secondary-cta" class="action-button" href="./achievements.html">Achievements</a>
+          <a id="home-github-cta" class="action-button" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="cosmic-links" aria-label="Project surfaces">
+        <a href="./leaderboard.html"><span id="home-card-leaderboard-title">Leaderboard</span></a>
+        <a href="./achievements.html"><span id="home-card-achievements-title">Achievements</span></a>
+        <a href="./contributors.html"><span id="home-card-contributors-title">Contributors</span></a>
       </div>
     </section>
 
-    <section class="content-panel">
-      <div class="section-head">
-        <div>
-          <span id="home-map-kicker" class="eyebrow">Site Map</span>
-          <h2 id="home-map-title">Project surfaces</h2>
-          <p id="home-map-desc">Use the website as a small control room for project status, evidence, and people.</p>
-        </div>
-      </div>
-      <div class="card-grid">
-        <a class="info-card" href="./leaderboard.html">
-          <h3 id="home-card-leaderboard-title">Performance leaderboard</h3>
-          <p id="home-card-leaderboard-desc">Interactive trend chart, hard constraints, and benchmark detail table.</p>
-        </a>
-        <a class="info-card" href="./achievements.html">
-          <h3 id="home-card-achievements-title">Achievements</h3>
-          <p id="home-card-achievements-desc">Packages, benchmark evidence, workstation surface, and project milestones.</p>
-        </a>
-        <a class="info-card" href="./contributors.html">
-          <h3 id="home-card-contributors-title">Core contributors</h3>
-          <p id="home-card-contributors-desc">Current contributors across runtime, Ascend, benchmark, docs, website, and workstation repositories.</p>
-        </a>
-      </div>
+    <section class="visually-hidden" id="workstation-section" aria-hidden="true">
+      <span class="workstation-pill" id="workstation-status-chip" data-state="pending">Pending</span>
+      <span id="workstation-status-detail">Pending</span>
+      <span id="workstation-backend-label">Serving Backend</span>
+      <span id="workstation-backend-value">Not configured</span>
+      <span id="workstation-url-label">Workstation URL</span>
+      <span id="workstation-target-value">Not configured</span>
+      <a id="workstation-open-link" href="#" target="_blank" rel="noreferrer">Open Workstation</a>
+      <a id="workstation-docs-link" href="./docs/DEPLOY.md" target="_blank" rel="noreferrer">Deployment Guide</a>
+      <span id="workstation-note">Workstation</span>
+      <span id="workstation-embed-mode" data-state="pending">Waiting</span>
+      <iframe id="workstation-embed-frame" title="vllm-hust workstation" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <strong>vllm-hust</strong> · <span id="footer-copy">An upstream-compatible vLLM fork maintained by HUST.</span>
+  <footer class="site-footer home-footer">
+    <strong>vllm-hust</strong> · <span id="footer-copy">A HUST-maintained vLLM serving project.</span>
   </footer>
 
   <script>
     window.vllmHustPageDict = {
       en: {
-        title: 'vllm-hust - Benchmark-first vLLM Serving',
-        'home-eyebrow': 'HUST vLLM Fork',
-        'home-lede': 'Upstream-compatible vLLM serving for domestic hardware, AGI4S workloads, and benchmark-driven optimization.',
-        'home-primary-cta': 'View leaderboard',
-        'home-secondary-cta': 'Explore achievements',
+        title: 'vllm-hust - vLLM Serving on Domestic Hardware',
+        'home-eyebrow': 'HUST vLLM project',
+        'home-lede': 'A HUST-maintained vLLM fork for serving workloads on domestic accelerator stacks.',
+        'home-primary-cta': 'Leaderboard',
+        'home-secondary-cta': 'Achievements',
         'home-github-cta': 'GitHub',
-        'home-metric-1-label': 'Serving focus',
-        'home-metric-2-label': 'Validation',
-        'home-metric-3-label': 'Runtime',
-        'workstation-kicker': 'Live Workstation',
-        'workstation-title': 'AGI4S Serving Console',
-        'workstation-desc': 'Operate chat, tool-calling, model status, and serving metrics from one workstation surface.',
+        'home-fact-1-label': 'Focus',
+        'home-fact-1-value': 'Domestic accelerator support',
+        'home-fact-2-label': 'Published data',
+        'home-fact-2-value': 'Benchmark snapshots',
+        'home-fact-3-label': 'Runtime base',
         'workstation-backend-label': 'Serving Backend',
         'workstation-url-label': 'Workstation URL',
         'workstation-open-link': 'Open Workstation',
         'workstation-docs-link': 'Deployment Guide',
-        'workstation-note': 'A reference surface for operating vllm-hust on domestic hardware.',
         workstation_embed_live: 'Live',
         workstation_embed_pending: 'Pending',
-        workstation_status_waiting: 'Waiting for a public workstation URL.',
+        workstation_status_waiting: 'Pending',
         workstation_embed_mode_embed: 'Embed Preview',
-        workstation_embed_mode_link: 'Launch Only',
+        workstation_embed_mode_link: 'Open Link',
         workstation_embed_mode_waiting: 'Waiting',
         workstation_not_configured: 'Not configured',
-        'home-map-kicker': 'Site Map',
-        'home-map-title': 'Project surfaces',
-        'home-map-desc': 'Use the website as a small control room for project status, evidence, and people.',
-        'home-card-leaderboard-title': 'Performance leaderboard',
-        'home-card-leaderboard-desc': 'Interactive trend chart, hard constraints, and benchmark detail table.',
+        'home-card-leaderboard-title': 'Leaderboard',
+        'home-card-leaderboard-desc': 'Interactive trend chart and expandable benchmark details.',
         'home-card-achievements-title': 'Achievements',
         'home-card-achievements-desc': 'Packages, benchmark evidence, workstation surface, and project milestones.',
         'home-card-contributors-title': 'Core contributors',
         'home-card-contributors-desc': 'Current contributors across runtime, Ascend, benchmark, docs, website, and workstation repositories.',
-        'footer-copy': 'An upstream-compatible vLLM fork maintained by HUST.',
+        'footer-copy': 'A HUST-maintained vLLM serving project.',
       },
       zh: {
-        title: 'vllm-hust - Benchmark 驱动的 vLLM 服务',
-        'home-eyebrow': 'HUST vLLM Fork',
-        'home-lede': '面向国产硬件、AGI4S 工作负载和 benchmark 驱动优化的上游兼容 vLLM 服务。',
-        'home-primary-cta': '查看性能排行榜',
-        'home-secondary-cta': '查看项目成果',
+        title: 'vllm-hust - 面向国产算力的 vLLM 推理服务',
+        'home-eyebrow': 'HUST vLLM 项目',
+        'home-lede': '由 HUST 维护，面向国产加速器环境的 vLLM 推理服务分支。',
+        'home-primary-cta': '性能榜',
+        'home-secondary-cta': '成果',
         'home-github-cta': 'GitHub',
-        'home-metric-1-label': '服务场景',
-        'home-metric-2-label': '验证方式',
-        'home-metric-3-label': '运行时',
-        'workstation-kicker': '实时工作台',
-        'workstation-title': 'AGI4S 服务控制台',
-        'workstation-desc': '把对话、工具调用、模型状态和服务指标放在同一个 workstation 界面里操作。',
+        'home-fact-1-label': '方向',
+        'home-fact-1-value': '国产加速器适配',
+        'home-fact-2-label': '公开数据',
+        'home-fact-2-value': 'Benchmark 快照',
+        'home-fact-3-label': '运行时基座',
         'workstation-backend-label': '服务后端',
         'workstation-url-label': 'Workstation 地址',
         'workstation-open-link': '打开 Workstation',
         'workstation-docs-link': '部署说明',
-        'workstation-note': '这是一个面向国产算力运行 vllm-hust 的参考操作界面。',
         workstation_embed_live: '在线',
         workstation_embed_pending: '待配置',
         workstation_status_waiting: '等待公开 Workstation 地址。',
         workstation_embed_mode_embed: '嵌入预览',
-        workstation_embed_mode_link: '仅跳转',
+        workstation_embed_mode_link: '打开链接',
         workstation_embed_mode_waiting: '等待中',
         workstation_not_configured: '未配置',
-        'home-map-kicker': '站点导航',
-        'home-map-title': '项目页面',
-        'home-map-desc': '把项目状态、证据和核心成员集中放在几个清晰页面里。',
-        'home-card-leaderboard-title': '性能排行榜',
-        'home-card-leaderboard-desc': '动态趋势图、硬约束达成和 benchmark 明细表。',
+        'home-card-leaderboard-title': '性能榜',
+        'home-card-leaderboard-desc': '动态趋势图与可展开的 benchmark 明细。',
         'home-card-achievements-title': '成果',
         'home-card-achievements-desc': '包版本、benchmark 证据、workstation 界面和项目里程碑。',
         'home-card-contributors-title': '核心贡献成员',
         'home-card-contributors-desc': '展示 runtime、Ascend、benchmark、文档、website 和 workstation 仓库的当前贡献者。',
-        'footer-copy': 'HUST 维护的上游兼容 vLLM fork。',
+        'footer-copy': 'HUST 维护的 vLLM 推理服务项目。',
       }
     };
   </script>
-  <script src="./assets/site.js?v=multi-page-20260701"></script>
-  <script src="./assets/workstation-embed.js?v=workstation-link-mode-20260701"></script>
+  <script src="./assets/site.js?v=public-copy-20260701"></script>
+  <script src="./assets/workstation-embed.js?v=workstation-public-copy-20260701"></script>
 </body>
 
 </html>

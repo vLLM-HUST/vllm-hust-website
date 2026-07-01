@@ -5,16 +5,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Achievements - vllm-hust</title>
-  <meta name="description" content="Project achievements for vllm-hust, including package releases, benchmark evidence, workstation surfaces, and milestones." />
+  <meta name="description" content="Project outputs for vllm-hust, including package releases, benchmark snapshots, documentation, and repository milestones." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/achievements.html" />
+  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=multi-page-20260701" />
+  <link rel="stylesheet" href="./assets/site.css?v=public-copy-20260701" />
 </head>
 
 <body data-page="achievements">
   <nav class="site-nav">
     <div class="site-shell site-nav-inner">
-      <a class="brand-link" href="./index.html"><span class="brand-mark">VH</span><span class="brand-copy">vllm-hust<small id="brand-tagline">Benchmark-first serving</small></span></a>
+      <a class="brand-link" href="./index.html"><span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span><span class="brand-copy">vllm-hust<small id="brand-tagline">vLLM serving</small></span></a>
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
         <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
@@ -25,12 +28,14 @@
     </div>
   </nav>
 
+  <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
+
   <main class="site-shell">
     <section class="page-hero">
       <div class="content-panel">
         <span id="achievements-eyebrow" class="eyebrow">Project Evidence</span>
         <h1 id="achievements-title" style="margin-top: 16px">Achievements</h1>
-        <p id="achievements-lede" class="hero-lede">A data-backed view of releases, benchmark coverage, hard constraints, workstation integration, and project milestones.</p>
+        <p id="achievements-lede" class="hero-lede">A data-backed view of releases, benchmark coverage, validation results, workstation integration, and project milestones.</p>
       </div>
     </section>
 
@@ -54,7 +59,7 @@
         <div class="metric-strip">
           <div class="metric-box"><span id="achievement-stat-contributors-label">Contributors</span><strong id="achievement-stat-contributors">0</strong></div>
           <div class="metric-box"><span id="achievement-stat-groups-label">Compare groups</span><strong id="achievement-stat-groups">0</strong></div>
-          <div class="metric-box"><span id="achievement-stat-hard-label">Hard-constraint scopes</span><strong id="achievement-stat-hard">0</strong></div>
+          <div class="metric-box"><span id="achievement-stat-hard-label">Validation scopes</span><strong id="achievement-stat-hard">0</strong></div>
         </div>
       </section>
 
@@ -95,8 +100,8 @@
         <div class="section-head">
           <div>
             <span id="achievements-evidence-kicker" class="eyebrow">Benchmark Evidence</span>
-            <h2 id="achievements-evidence-title">Best visible workload results</h2>
-            <p id="achievements-evidence-desc">Top throughput result per workload from the current snapshots.</p>
+            <h2 id="achievements-evidence-title">Current visible workload results</h2>
+            <p id="achievements-evidence-desc">Highest throughput record per workload from the current snapshots.</p>
           </div>
           <a id="achievements-leaderboard-link" class="action-button" href="./leaderboard.html">Open leaderboard</a>
         </div>
@@ -105,16 +110,16 @@
     </div>
   </main>
 
-  <footer class="site-footer"><strong>vllm-hust</strong> · <span id="achievements-footer-copy">Benchmark evidence, not slideware.</span></footer>
+  <footer class="site-footer"><strong>vllm-hust</strong> · <span id="achievements-footer-copy">Published artifacts and benchmark snapshots.</span></footer>
 
   <script>
     window.vllmHustPageDict = {
       en: {
         title: 'Achievements - vllm-hust',
-        'brand-tagline': 'Benchmark-first serving',
+        'brand-tagline': 'vLLM serving',
         'achievements-eyebrow': 'Project Evidence',
         'achievements-title': 'Achievements',
-        'achievements-lede': 'A data-backed view of releases, benchmark coverage, hard constraints, workstation integration, and project milestones.',
+        'achievements-lede': 'A data-backed view of releases, benchmark coverage, validation results, workstation integration, and project milestones.',
         'achievements-loading': 'Loading achievements...',
         'achievements-error': 'Failed to load achievements data.',
         'achievements-stats-kicker': 'Snapshot',
@@ -125,7 +130,7 @@
         'achievement-stat-workloads-label': 'Workloads',
         'achievement-stat-contributors-label': 'Contributors',
         'achievement-stat-groups-label': 'Compare groups',
-        'achievement-stat-hard-label': 'Hard-constraint scopes',
+        'achievement-stat-hard-label': 'Validation scopes',
         'achievements-artifacts-kicker': 'Artifacts',
         'achievements-artifacts-title': 'Research and evaluation artifacts',
         'achievements-artifacts-desc': 'Selected project outputs beyond the live leaderboard snapshots.',
@@ -136,17 +141,17 @@
         'achievements-packages-title': 'Published packages and repositories',
         'achievements-packages-desc': 'Version metadata from the website release manifest.',
         'achievements-evidence-kicker': 'Benchmark Evidence',
-        'achievements-evidence-title': 'Best visible workload results',
-        'achievements-evidence-desc': 'Top throughput result per workload from the current snapshots.',
+        'achievements-evidence-title': 'Current visible workload results',
+        'achievements-evidence-desc': 'Highest throughput record per workload from the current snapshots.',
         'achievements-leaderboard-link': 'Open leaderboard',
-        'achievements-footer-copy': 'Benchmark evidence, not slideware.'
+        'achievements-footer-copy': 'Published artifacts and benchmark snapshots.'
       },
       zh: {
         title: '成果 - vllm-hust',
-        'brand-tagline': 'Benchmark 优先的推理服务',
+        'brand-tagline': 'vLLM 推理服务',
         'achievements-eyebrow': '项目证据',
         'achievements-title': '成果',
-        'achievements-lede': '基于当前数据快照展示发布版本、benchmark 覆盖、硬约束、workstation 集成和项目里程碑。',
+        'achievements-lede': '基于当前数据快照展示发布版本、benchmark 覆盖、验证项结果、workstation 集成和项目里程碑。',
         'achievements-loading': '正在加载成果数据...',
         'achievements-error': '成果数据加载失败。',
         'achievements-stats-kicker': '快照',
@@ -157,7 +162,7 @@
         'achievement-stat-workloads-label': '负载场景',
         'achievement-stat-contributors-label': '贡献者',
         'achievement-stat-groups-label': '对比组',
-        'achievement-stat-hard-label': '硬约束范围',
+        'achievement-stat-hard-label': '验证范围',
         'achievements-artifacts-kicker': '成果材料',
         'achievements-artifacts-title': '研究与评测成果',
         'achievements-artifacts-desc': '除实时 leaderboard 快照之外，当前已经沉淀的代表性项目产出。',
@@ -168,15 +173,15 @@
         'achievements-packages-title': '已发布的软件包与仓库',
         'achievements-packages-desc': '来自网站版本清单的版本元数据。',
         'achievements-evidence-kicker': 'Benchmark 证据',
-        'achievements-evidence-title': '当前可见负载的最佳结果',
-        'achievements-evidence-desc': '基于当前快照按 workload 汇总的最高吞吐结果。',
+        'achievements-evidence-title': '当前可见负载结果',
+        'achievements-evidence-desc': '基于当前快照按 workload 汇总的最高吞吐记录。',
         'achievements-leaderboard-link': '打开排行榜',
-        'achievements-footer-copy': '用 benchmark 证据说话。'
+        'achievements-footer-copy': '公开成果材料与 benchmark 快照。'
       }
     };
   </script>
-  <script src="./assets/site.js?v=multi-page-20260701"></script>
-  <script src="./assets/achievements-page.js?v=multi-page-i18n-20260701"></script>
+  <script src="./assets/site.js?v=public-copy-20260701"></script>
+  <script src="./assets/achievements-page.js?v=achievements-public-copy-20260701"></script>
 </body>
 
 </html>

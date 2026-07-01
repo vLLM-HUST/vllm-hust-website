@@ -61,7 +61,7 @@
         setText('workstation-embed-mode', enabled
             ? (embedMode
                 ? (dict.workstation_embed_mode_embed || 'Embed Preview')
-                : (dict.workstation_embed_mode_link || 'Launch Only'))
+                : (dict.workstation_embed_mode_link || 'Open Link'))
             : (dict.workstation_embed_mode_waiting || 'Waiting'));
         setText('workstation-topbar-title', enabled ? `${label}` : 'Workstation Preview');
         setText('workstation-backend-value', backendUrl || fallbackText);
