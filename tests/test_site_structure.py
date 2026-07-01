@@ -174,6 +174,26 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "font-weight: 600;" in css_text
 
 
+def test_leaderboard_renders_interactive_trend_chart() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "index.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
+
+    assert "https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" in html_text
+    assert 'id="leaderboard-trend-panel"' in html_text
+    assert 'id="leaderboard-trend-chart"' in html_text
+    assert 'data-trend-metric="throughput_tps"' in html_text
+    assert "function buildTrendChartModel(entries, metricConfig)" in js_text
+    assert "function renderPerformanceTrendChart(entries)" in js_text
+    assert "new Chart(canvas" in js_text
+    assert "pointDetails" in js_text
+    assert "renderPerformanceTrendChart(sortedFiltered);" in js_text
+    assert ".leaderboard-trend-panel {" in css_text
+    assert ".trend-chart-wrap {" in css_text
+    assert ".trend-metric-button.active {" in css_text
+
+
 def test_detail_sections_use_detail_only_version_formatting_and_memory_fallback() -> (
     None
 ):

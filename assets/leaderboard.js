@@ -229,6 +229,21 @@
             overviewTableNote: 'The main table shows the currently visible benchmark rows after filters, scope toggles, and version merging.',
             overviewGoalSnapshotNote: 'Hero deltas use the matched official compare snapshot. Cards below show the highlighted visible sample for each engine.',
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
+            trendLabel: 'Version Trend',
+            trendTitle: 'Performance trend',
+            trendSubtitle: 'Baseline first, then visible versions in submission order. Each line is one workload + precision setting.',
+            trendMetricThroughput: 'Tokens/s',
+            trendMetricTTFT: 'TTFT',
+            trendMetricTBT: 'TBT',
+            trendEmpty: 'No trend data under current filters.',
+            trendTooltipVersion: 'Version',
+            trendTooltipDate: 'Submitted',
+            trendTooltipWorkload: 'Workload',
+            trendTooltipPrecision: 'Precision',
+            trendTooltipEngine: 'Engine',
+            trendTooltipModel: 'Model',
+            trendTooltipHardware: 'Hardware',
+            trendTooltipSetting: 'Setting',
             resetFilters: 'Reset',
             paginationPrev: 'Prev',
             paginationNext: 'Next',
@@ -416,6 +431,21 @@
             overviewTableNote: '主表展示的是当前筛选、scope 开关和版本合并之后的 benchmark 可见行。',
             overviewGoalSnapshotNote: '顶部 Hero 的差距值来自当前命中的官方 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
+            trendLabel: '版本趋势',
+            trendTitle: '性能趋势',
+            trendSubtitle: '横轴从基线开始，再按提交时间展示当前可见版本；每条折线代表一个 workload + 精度组合。',
+            trendMetricThroughput: '吞吐',
+            trendMetricTTFT: 'TTFT',
+            trendMetricTBT: 'TBT',
+            trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
+            trendTooltipVersion: '版本',
+            trendTooltipDate: '提交时间',
+            trendTooltipWorkload: '工作负载',
+            trendTooltipPrecision: '精度',
+            trendTooltipEngine: '引擎',
+            trendTooltipModel: '模型',
+            trendTooltipHardware: '硬件',
+            trendTooltipSetting: '设置',
             resetFilters: '清空筛选',
             paginationPrev: '上一页',
             paginationNext: '下一页',
@@ -452,7 +482,9 @@
             'single-chip': { page: 1, pageSize: 20 },
             'multi-chip': { page: 1, pageSize: 20 },
             'multi-node': { page: 1, pageSize: 20 }
-        }
+        },
+        chartMetric: 'throughput_tps',
+        trendChart: null
     };
 
     // Initialize on DOM ready
@@ -2086,6 +2118,353 @@
         });
     }
 
+    function getTrendMetricConfig(metric) {
+        const configs = {
+            throughput_tps: {
+                key: 'throughput_tps',
+                label: t('trendMetricThroughput'),
+                unit: 'tok/s',
+                higherIsBetter: true,
+            },
+            ttft_ms: {
+                key: 'ttft_ms',
+                label: t('trendMetricTTFT'),
+                unit: 'ms',
+                higherIsBetter: false,
+            },
+            tbt_ms: {
+                key: 'tbt_ms',
+                label: t('trendMetricTBT'),
+                unit: 'ms',
+                higherIsBetter: false,
+            },
+        };
+        return configs[metric] || null;
+    }
+
+    function isTrendBaselineEntry(entry) {
+        return Boolean(entry?.isBaseline) || getEngine(entry) !== 'vllm-hust';
+    }
+
+    function getTrendSeriesKey(entry) {
+        const workload = getWorkloadId(entry) || 'Other';
+        const precision = entry?.model?.precision || 'unknown-precision';
+        return `${workload}|${precision}`;
+    }
+
+    function getTrendSeriesLabel(entry) {
+        const workload = getWorkloadLabel(getWorkloadId(entry) || 'Other');
+        const precision = entry?.model?.precision || t('unknown');
+        return `${workload} · ${precision}`;
+    }
+
+    function getTrendVersionText(entry) {
+        return getEntryFilterVersionText(entry) || formatEntryVersion(entry, { display: true });
+    }
+
+    function compactTrendLabel(value) {
+        const text = String(value || '').trim();
+        if (text.length <= 34) {
+            return text;
+        }
+        return `${text.slice(0, 15)}...${text.slice(-14)}`;
+    }
+
+    function getTrendVersionKey(entry) {
+        const version = getTrendVersionText(entry);
+        return `${isTrendBaselineEntry(entry) ? 'baseline' : 'current'}|${version}`;
+    }
+
+    function getTrendVersionLabel(entry) {
+        const version = compactTrendLabel(getTrendVersionText(entry));
+        return isTrendBaselineEntry(entry) ? `${t('baseline')} ${version}` : version;
+    }
+
+    function getTrendVersionDetail(entry) {
+        const version = getTrendVersionText(entry);
+        return isTrendBaselineEntry(entry) ? `${t('baseline')} ${version}` : version;
+    }
+
+    function shouldReplaceTrendPoint(currentEntry, candidateEntry, metricConfig) {
+        if (!currentEntry) {
+            return true;
+        }
+        const currentValue = Number(currentEntry?.metrics?.[metricConfig.key]);
+        const candidateValue = Number(candidateEntry?.metrics?.[metricConfig.key]);
+        if (!Number.isFinite(candidateValue)) {
+            return false;
+        }
+        if (!Number.isFinite(currentValue)) {
+            return true;
+        }
+        if (candidateValue !== currentValue) {
+            return metricConfig.higherIsBetter
+                ? candidateValue > currentValue
+                : candidateValue < currentValue;
+        }
+        return getEntryTimestamp(candidateEntry) > getEntryTimestamp(currentEntry);
+    }
+
+    function buildTrendChartModel(entries, metricConfig) {
+        const versionMap = new Map();
+        const seriesMap = new Map();
+
+        entries.forEach((entry) => {
+            const value = Number(entry?.metrics?.[metricConfig.key]);
+            if (!Number.isFinite(value)) {
+                return;
+            }
+
+            const versionKey = getTrendVersionKey(entry);
+            const timestamp = getEntryTimestamp(entry);
+            const baseline = isTrendBaselineEntry(entry);
+            const existingVersion = versionMap.get(versionKey);
+            const sortValue = baseline ? Number.NEGATIVE_INFINITY + (timestamp || 0) : (timestamp || 0);
+            if (!existingVersion || sortValue < existingVersion.sortValue) {
+                versionMap.set(versionKey, {
+                    key: versionKey,
+                    label: getTrendVersionLabel(entry),
+                    sortValue,
+                    timestamp,
+                    baseline,
+                });
+            }
+
+            const seriesKey = getTrendSeriesKey(entry);
+            if (!seriesMap.has(seriesKey)) {
+                seriesMap.set(seriesKey, {
+                    key: seriesKey,
+                    label: getTrendSeriesLabel(entry),
+                    points: new Map(),
+                });
+            }
+            const series = seriesMap.get(seriesKey);
+            const currentPoint = series.points.get(versionKey);
+            if (shouldReplaceTrendPoint(currentPoint?.entry, entry, metricConfig)) {
+                series.points.set(versionKey, { entry, value });
+            }
+        });
+
+        const versions = [...versionMap.values()].sort((left, right) => {
+            if (left.baseline !== right.baseline) {
+                return left.baseline ? -1 : 1;
+            }
+            if (left.sortValue !== right.sortValue) {
+                return left.sortValue - right.sortValue;
+            }
+            return String(left.label || '').localeCompare(String(right.label || ''));
+        });
+        const versionIndex = new Map(versions.map((version, index) => [version.key, index]));
+
+        const series = [...seriesMap.values()]
+            .map((item) => ({
+                ...item,
+                pointCount: item.points.size,
+                latestIndex: Math.max(...[...item.points.keys()].map((key) => versionIndex.get(key) ?? -1)),
+            }))
+            .filter((item) => item.pointCount > 0)
+            .sort((left, right) => {
+                if (right.pointCount !== left.pointCount) {
+                    return right.pointCount - left.pointCount;
+                }
+                if (right.latestIndex !== left.latestIndex) {
+                    return right.latestIndex - left.latestIndex;
+                }
+                return left.label.localeCompare(right.label);
+            });
+
+        return { versions, series };
+    }
+
+    function getTrendColors(index) {
+        const palette = [
+            '#2563eb', '#16a34a', '#dc2626', '#9333ea',
+            '#0891b2', '#ca8a04', '#db2777', '#475569',
+            '#ea580c', '#0f766e', '#7c3aed', '#1d4ed8',
+        ];
+        const color = palette[index % palette.length];
+        return {
+            borderColor: color,
+            backgroundColor: color,
+        };
+    }
+
+    function getTrendPointDetails(entry) {
+        return {
+            version: getTrendVersionDetail(entry),
+            date: getEntryDateLabel(entry) || '-',
+            workload: getWorkloadLabel(getWorkloadId(entry) || 'Other'),
+            precision: entry?.model?.precision || '-',
+            engine: getEngineLabel(getEngine(entry)),
+            model: getEntryModelDisplayName(entry),
+            hardware: getConfigText(entry).replace('<br><small>', ' ').replace('</small>', ''),
+            setting: getSettingSummary(entry),
+        };
+    }
+
+    function makeUniqueTrendLabels(labels) {
+        const counts = new Map();
+        return labels.map((label) => {
+            const text = String(label || '');
+            const count = (counts.get(text) || 0) + 1;
+            counts.set(text, count);
+            return count === 1 ? text : `${text} · ${count}`;
+        });
+    }
+
+    function renderPerformanceTrendChart(entries) {
+        const panel = document.getElementById('leaderboard-trend-panel');
+        const canvas = document.getElementById('leaderboard-trend-chart');
+        const empty = document.getElementById('leaderboard-trend-empty');
+        if (!panel || !canvas || !empty) {
+            return;
+        }
+
+        const metricConfig = getTrendMetricConfig(state.chartMetric) || getTrendMetricConfig('throughput_tps');
+        state.chartMetric = metricConfig.key;
+
+        const labelEl = document.getElementById('leaderboard-trend-label');
+        const titleEl = document.getElementById('leaderboard-trend-title');
+        const subtitleEl = document.getElementById('leaderboard-trend-subtitle');
+        if (labelEl) labelEl.textContent = t('trendLabel');
+        if (titleEl) titleEl.textContent = t('trendTitle');
+        if (subtitleEl) subtitleEl.textContent = t('trendSubtitle');
+        empty.textContent = t('trendEmpty');
+
+        document.querySelectorAll('[data-trend-metric]').forEach((button) => {
+            const metric = button.dataset.trendMetric;
+            const buttonConfig = getTrendMetricConfig(metric);
+            if (buttonConfig) {
+                button.textContent = buttonConfig.label;
+            }
+            button.classList.toggle('active', metric === metricConfig.key);
+            button.setAttribute('aria-pressed', metric === metricConfig.key ? 'true' : 'false');
+        });
+
+        if (typeof Chart === 'undefined') {
+            if (state.trendChart) {
+                state.trendChart.destroy();
+                state.trendChart = null;
+            }
+            empty.style.display = 'flex';
+            canvas.style.display = 'none';
+            return;
+        }
+
+        const model = buildTrendChartModel(entries, metricConfig);
+        if (model.versions.length < 1 || model.series.length < 1) {
+            if (state.trendChart) {
+                state.trendChart.destroy();
+                state.trendChart = null;
+            }
+            empty.style.display = 'flex';
+            canvas.style.display = 'none';
+            return;
+        }
+
+        empty.style.display = 'none';
+        canvas.style.display = 'block';
+
+        const labels = makeUniqueTrendLabels(model.versions.map((version) => version.label));
+        const datasets = model.series.map((series, index) => {
+            const colors = getTrendColors(index);
+            const pointDetails = model.versions.map((version) => {
+                const point = series.points.get(version.key);
+                return point ? getTrendPointDetails(point.entry) : null;
+            });
+            return {
+                label: series.label,
+                data: model.versions.map((version) => series.points.get(version.key)?.value ?? null),
+                pointDetails,
+                borderColor: colors.borderColor,
+                backgroundColor: colors.backgroundColor,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 6,
+                tension: 0.28,
+                spanGaps: false,
+            };
+        });
+
+        if (state.trendChart) {
+            state.trendChart.destroy();
+        }
+
+        state.trendChart = new Chart(canvas, {
+            type: 'line',
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'nearest',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            boxHeight: 8,
+                        },
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title(items) {
+                                const item = items[0];
+                                return item ? String(item.label || '') : '';
+                            },
+                            label(context) {
+                                const value = Number(context.parsed.y);
+                                const formatted = Number.isFinite(value) ? formatNumber(value) : '-';
+                                return `${context.dataset.label}: ${formatted} ${metricConfig.unit}`;
+                            },
+                            afterLabel(context) {
+                                const details = context.dataset.pointDetails?.[context.dataIndex];
+                                if (!details) {
+                                    return [];
+                                }
+                                return [
+                                    `${t('trendTooltipVersion')}: ${details.version}`,
+                                    `${t('trendTooltipDate')}: ${details.date}`,
+                                    `${t('trendTooltipWorkload')}: ${details.workload}`,
+                                    `${t('trendTooltipPrecision')}: ${details.precision}`,
+                                    `${t('trendTooltipEngine')}: ${details.engine}`,
+                                    `${t('trendTooltipModel')}: ${details.model}`,
+                                    `${t('trendTooltipHardware')}: ${details.hardware}`,
+                                    `${t('trendTooltipSetting')}: ${details.setting}`,
+                                ];
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 10,
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.16)',
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: `${metricConfig.label} (${metricConfig.unit})`,
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.16)',
+                        },
+                    },
+                },
+            },
+        });
+    }
+
     // 初始化筛选器默认值（选择第一个可用配置）
     function initializeFilters() {
         ['single-chip', 'multi-chip', 'multi-node'].forEach(tab => {
@@ -2138,6 +2517,17 @@
                 renderTable();
             });
         }
+
+        document.querySelectorAll('[data-trend-metric]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const metric = button.dataset.trendMetric;
+                if (!getTrendMetricConfig(metric)) {
+                    return;
+                }
+                state.chartMetric = metric;
+                renderTable();
+            });
+        });
 
         // Sortable column headers: click to sort, click again to toggle direction
         const SORTABLE_HEADER_MAP = {
@@ -2386,6 +2776,7 @@
             emptyState.style.display = 'block';
             renderDataStats(data.length, filtered.length, visibleEntries.length, 0, comparisonView);
             renderOverview([], comparisonView, viewOptions);
+            renderPerformanceTrendChart([]);
             renderPagination(0, 0); // clear any stale pagination controls
             renderSortHeaders();   // clear stale sort indicators on empty tab
             return;
@@ -2394,6 +2785,7 @@
         emptyState.style.display = 'none';
         renderDataStats(data.length, filtered.length, visibleEntries.length, mergedEntries.length, comparisonView);
         renderOverview(sortedFiltered, comparisonView, viewOptions);
+        renderPerformanceTrendChart(sortedFiltered);
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
 

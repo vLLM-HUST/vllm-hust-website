@@ -1395,6 +1395,25 @@
           <!-- Populated by JS -->
         </div>
 
+        <div id="leaderboard-trend-panel" class="leaderboard-trend-panel">
+          <div class="trend-panel-head">
+            <div>
+              <div id="leaderboard-trend-label" class="overview-section-label">Version Trend</div>
+              <h3 id="leaderboard-trend-title">Performance trend</h3>
+              <p id="leaderboard-trend-subtitle">Baseline first, then visible versions in submission order.</p>
+            </div>
+            <div class="trend-metric-toggle" role="group" aria-label="Trend metric">
+              <button type="button" class="trend-metric-button active" data-trend-metric="throughput_tps">Tokens/s</button>
+              <button type="button" class="trend-metric-button" data-trend-metric="ttft_ms">TTFT</button>
+              <button type="button" class="trend-metric-button" data-trend-metric="tbt_ms">TBT</button>
+            </div>
+          </div>
+          <div class="trend-chart-wrap">
+            <canvas id="leaderboard-trend-chart"></canvas>
+            <div id="leaderboard-trend-empty" class="trend-empty" style="display: none">No trend data under current filters.</div>
+          </div>
+        </div>
+
         <!-- Table -->
         <div class="table-container">
           <table class="leaderboard-table">
@@ -2400,8 +2419,11 @@
   <!-- Workstation Embed Loader -->
   <script src="./assets/workstation-embed.js?v=workstation-link-mode-20260604"></script>
 
+  <!-- Interactive charting for leaderboard trends -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+
   <!-- Leaderboard Script: bump ?v whenever leaderboard.js changes to bust browser/GitHub Pages caches -->
-  <script src="./assets/leaderboard.js?v=leaderboard-identity-cache-bust-20260604b"></script>
+  <script src="./assets/leaderboard.js?v=leaderboard-trend-chart-20260701"></script>
 </body>
 
 </html>
