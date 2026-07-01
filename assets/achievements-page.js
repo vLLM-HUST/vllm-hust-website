@@ -188,41 +188,6 @@
         `).join('');
     }
 
-    function renderEvidence(entries, lang = currentLang()) {
-        const target = document.getElementById('achievement-evidence');
-        if (!target) return;
-        const text = ui(lang);
-        const byWorkload = new Map();
-        entries.forEach((entry) => {
-            const workload = getWorkload(entry, lang);
-            const current = byWorkload.get(workload);
-            const throughput = Number(entry?.metrics?.throughput_tps || 0);
-            if (!current || throughput > current.throughput) {
-                byWorkload.set(workload, {
-                    workload,
-                    throughput,
-                    engine: getEngine(entry),
-                    model: getModel(entry, lang),
-                    precision: entry?.model?.precision || '-',
-                });
-            }
-        });
-        const rows = [...byWorkload.values()]
-            .sort((a, b) => b.throughput - a.throughput)
-            .slice(0, 8);
-        target.innerHTML = rows.map((row) => `
-            <div class="info-card">
-                <h3>${row.workload}</h3>
-                <p>${row.model}</p>
-                <div class="tag-list">
-                    <span class="tag">${row.engine}</span>
-                    <span class="tag">${row.precision}</span>
-                    <span class="tag">${row.throughput.toFixed(1)} ${text.throughputUnit}</span>
-                </div>
-            </div>
-        `).join('');
-    }
-
     function renderMilestones(compare, lang = currentLang()) {
         const target = document.getElementById('achievement-milestones');
         if (!target) return;
@@ -262,7 +227,6 @@
     function renderDynamic(lang = currentLang()) {
         renderArtifacts(lang);
         if (state.versionMeta) renderPackages(state.versionMeta, lang);
-        if (state.entries.length) renderEvidence(state.entries, lang);
         if (state.compare) renderMilestones(state.compare, lang);
     }
 

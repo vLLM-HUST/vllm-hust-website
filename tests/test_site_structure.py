@@ -280,6 +280,17 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "font-weight: 600;" in css_text
 
 
+def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "achievements.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    assert "achievement-evidence" not in html_text
+    assert "achievements-evidence" not in html_text
+    assert "renderEvidence" not in js_text
+    assert "achievements-no-workload-evidence-20260701" in html_text
+
+
 def test_leaderboard_overview_compare_scope_includes_precision() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
