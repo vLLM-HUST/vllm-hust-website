@@ -987,22 +987,22 @@
 
 /* Sticky First Column */
 .leaderboard-table th:first-child,
-.leaderboard-table td:first-child {
+.leaderboard-table td.version-table-cell {
     position: sticky;
     left: 0;
     z-index: 5;
     background: inherit;
 }
 
-.leaderboard-table tbody tr:nth-child(even) td:first-child {
+.leaderboard-table tbody tr:nth-child(even) td.version-table-cell {
     background: #f7fafc;
 }
 
-.leaderboard-table tbody tr:nth-child(odd) td:first-child {
+.leaderboard-table tbody tr:nth-child(odd) td.version-table-cell {
     background: white;
 }
 
-.leaderboard-table tbody tr:hover td:first-child {
+.leaderboard-table tbody tr:hover td.version-table-cell {
     background: #edf2f7;
 }
 
@@ -1012,10 +1012,7 @@
     vertical-align: top;
 }
 
-.leaderboard-table td:nth-child(4),
-.leaderboard-table td:nth-child(5),
-.leaderboard-table td:nth-child(6),
-.leaderboard-table td:nth-child(7) {
+.leaderboard-table td.metric-column {
     min-width: 122px;
 }
 
