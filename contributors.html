@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core Contributors - vllm-hust</title>
+  <meta name="description" content="Core contributors across vllm-hust runtime, Ascend, benchmark, docs, website, and workstation repositories." />
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/contributors.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css?v=multi-page-20260701" />
+</head>
+
+<body data-page="contributors">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html"><span class="brand-mark">VH</span><span class="brand-copy">vllm-hust<small>Benchmark-first serving</small></span></a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
+        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
+        <button id="langToggle" class="lang-toggle" type="button"><span id="langToggleText">中文</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="site-shell">
+    <section class="page-hero">
+      <div class="content-panel">
+        <span id="contributors-eyebrow" class="eyebrow">People</span>
+        <h1 id="contributors-title" style="margin-top: 16px">Core Contributors</h1>
+        <p id="contributors-lede" class="hero-lede">The people currently driving runtime, Ascend, benchmark, docs, website, and workstation work across the vLLM-HUST repositories.</p>
+      </div>
+    </section>
+
+    <div id="contributors-loading" class="loading-state">Loading contributor data...</div>
+    <div id="contributors-error" class="empty-state" style="display: none">Failed to load contributor data.</div>
+
+    <div id="contributors-content" style="display: none">
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Snapshot</span>
+            <h2>Contributor footprint</h2>
+            <p>Updated <strong id="contributors-updated">-</strong></p>
+          </div>
+        </div>
+        <div class="metric-strip">
+          <div class="metric-box"><span>All contributors</span><strong id="contributors-total">0</strong></div>
+          <div class="metric-box"><span>Core contributors</span><strong id="contributors-core-total">0</strong></div>
+          <div class="metric-box"><span>Active repos</span><strong id="contributors-repos">0</strong></div>
+        </div>
+      </section>
+
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
+            <span id="contributors-all-kicker" class="eyebrow">All repositories</span>
+            <h2 id="contributors-all-title">All repositories</h2>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="site-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Contributor</th>
+                <th>Commits</th>
+                <th>Changed Lines</th>
+                <th>Added / Deleted</th>
+                <th>Active Repos</th>
+                <th>Key Contributions</th>
+              </tr>
+            </thead>
+            <tbody id="contributors-all-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
+            <span id="contributors-core-kicker" class="eyebrow">Core performance repos</span>
+            <h2 id="contributors-core-title">Core performance repositories</h2>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="site-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Contributor</th>
+                <th>Commits</th>
+                <th>Changed Lines</th>
+                <th>Added / Deleted</th>
+                <th>Active Repos</th>
+                <th>Key Contributions</th>
+              </tr>
+            </thead>
+            <tbody id="contributors-core-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer"><strong>vllm-hust</strong> · People behind the benchmark and runtime work.</footer>
+
+  <script>
+    window.vllmHustPageDict = {
+      en: {
+        title: 'Core Contributors - vllm-hust',
+        'contributors-eyebrow': 'People',
+        'contributors-title': 'Core Contributors',
+        'contributors-lede': 'The people currently driving runtime, Ascend, benchmark, docs, website, and workstation work across the vLLM-HUST repositories.',
+        'contributors-all-title': 'All repositories',
+        'contributors-core-title': 'Core performance repositories'
+      },
+      zh: {
+        title: '核心贡献成员 - vllm-hust',
+        'contributors-eyebrow': '成员',
+        'contributors-title': '核心贡献成员',
+        'contributors-lede': '展示当前持续推动 vLLM-HUST 运行时、Ascend、benchmark、文档、website 与 workstation 演进的主要贡献者。',
+        'contributors-all-title': '全部仓库',
+        'contributors-core-title': '核心性能仓库'
+      }
+    };
+  </script>
+  <script src="./assets/site.js?v=multi-page-20260701"></script>
+  <script src="./assets/contributors-page.js?v=multi-page-20260701"></script>
+</body>
+
+</html>

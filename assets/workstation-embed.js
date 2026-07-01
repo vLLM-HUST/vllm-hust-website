@@ -80,8 +80,9 @@
         }
 
         const previewShell = document.getElementById('workstation-preview-shell');
+        const fallbackConsole = document.getElementById('workstation-fallback-console');
         if (previewShell) {
-            previewShell.hidden = !embedMode;
+            previewShell.hidden = !embedMode && !fallbackConsole;
         }
 
         const iframe = document.getElementById('workstation-embed-frame');
@@ -89,9 +90,15 @@
             if (embedMode) {
                 iframe.hidden = false;
                 iframe.setAttribute('src', workstationUrl);
+                if (fallbackConsole) {
+                    fallbackConsole.hidden = true;
+                }
             } else {
                 iframe.hidden = true;
                 iframe.removeAttribute('src');
+                if (fallbackConsole) {
+                    fallbackConsole.hidden = false;
+                }
             }
         }
     }

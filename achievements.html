@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Achievements - vllm-hust</title>
+  <meta name="description" content="Project achievements for vllm-hust, including package releases, benchmark evidence, workstation surfaces, and milestones." />
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/achievements.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css?v=multi-page-20260701" />
+</head>
+
+<body data-page="achievements">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html"><span class="brand-mark">VH</span><span class="brand-copy">vllm-hust<small>Benchmark-first serving</small></span></a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
+        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
+        <button id="langToggle" class="lang-toggle" type="button"><span id="langToggleText">中文</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="site-shell">
+    <section class="page-hero">
+      <div class="content-panel">
+        <span id="achievements-eyebrow" class="eyebrow">Project Evidence</span>
+        <h1 id="achievements-title" style="margin-top: 16px">Achievements</h1>
+        <p id="achievements-lede" class="hero-lede">A data-backed view of releases, benchmark coverage, hard constraints, workstation integration, and project milestones.</p>
+      </div>
+    </section>
+
+    <div id="achievements-loading" class="loading-state">Loading achievements...</div>
+    <div id="achievements-error" class="empty-state" style="display: none">Failed to load achievements data.</div>
+
+    <div id="achievements-content" style="display: none">
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
+            <span id="achievements-stats-kicker" class="eyebrow">Snapshot</span>
+            <h2 id="achievements-stats-title">Current project footprint</h2>
+            <p id="achievements-stats-desc">Computed from the published website data snapshots.</p>
+          </div>
+        </div>
+        <div class="metric-strip">
+          <div class="metric-box"><span>Benchmark records</span><strong id="achievement-stat-runs">0</strong></div>
+          <div class="metric-box"><span>Models</span><strong id="achievement-stat-models">0</strong></div>
+          <div class="metric-box"><span>Workloads</span><strong id="achievement-stat-workloads">0</strong></div>
+        </div>
+        <div class="metric-strip">
+          <div class="metric-box"><span>Contributors</span><strong id="achievement-stat-contributors">0</strong></div>
+          <div class="metric-box"><span>Compare groups</span><strong id="achievement-stat-groups">0</strong></div>
+          <div class="metric-box"><span>Hard-constraint scopes</span><strong id="achievement-stat-hard">0</strong></div>
+        </div>
+      </section>
+
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
+            <span id="achievements-milestones-kicker" class="eyebrow">Milestones</span>
+            <h2 id="achievements-milestones-title">What the project has built</h2>
+            <p id="achievements-milestones-desc">Core outcomes represented by the current website data.</p>
+          </div>
+        </div>
+        <div id="achievement-milestones" class="card-grid"></div>
+      </section>
+
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
+            <span id="achievements-packages-kicker" class="eyebrow">Releases</span>
+            <h2 id="achievements-packages-title">Published packages and repositories</h2>
+            <p id="achievements-packages-desc">Version metadata from the website release manifest.</p>
+          </div>
+        </div>
+        <div id="achievement-packages" class="data-list"></div>
+      </section>
+
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
+            <span id="achievements-evidence-kicker" class="eyebrow">Benchmark Evidence</span>
+            <h2 id="achievements-evidence-title">Best visible workload results</h2>
+            <p id="achievements-evidence-desc">Top throughput result per workload from the current snapshots.</p>
+          </div>
+          <a id="achievements-leaderboard-link" class="action-button" href="./leaderboard.html">Open leaderboard</a>
+        </div>
+        <div id="achievement-evidence" class="card-grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer"><strong>vllm-hust</strong> · Benchmark evidence, not slideware.</footer>
+
+  <script>
+    window.vllmHustPageDict = {
+      en: {
+        title: 'Achievements - vllm-hust',
+        'achievements-eyebrow': 'Project Evidence',
+        'achievements-title': 'Achievements',
+        'achievements-lede': 'A data-backed view of releases, benchmark coverage, hard constraints, workstation integration, and project milestones.',
+        'achievements-leaderboard-link': 'Open leaderboard'
+      },
+      zh: {
+        title: '成果 - vllm-hust',
+        'achievements-eyebrow': '项目证据',
+        'achievements-title': '成果',
+        'achievements-lede': '基于当前数据快照展示发布版本、benchmark 覆盖、硬约束、workstation 集成和项目里程碑。',
+        'achievements-leaderboard-link': '打开排行榜'
+      }
+    };
+  </script>
+  <script src="./assets/site.js?v=multi-page-20260701"></script>
+  <script src="./assets/achievements-page.js?v=multi-page-20260701"></script>
+</body>
+
+</html>

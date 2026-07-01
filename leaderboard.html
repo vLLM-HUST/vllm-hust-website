@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="hf-repo" content="intellistream/vllm-hust-benchmark-results" />
+  <meta name="hf-branch" content="main" />
+  <title>Performance Leaderboard - vllm-hust</title>
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/leaderboard.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css?v=multi-page-20260701" />
+  <link rel="stylesheet" href="./assets/leaderboard.css?v=leaderboard-trend-chart-20260701" />
+</head>
+
+<body data-page="leaderboard">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html">
+        <span class="brand-mark">VH</span>
+        <span class="brand-copy">vllm-hust<small>Benchmark-first serving</small></span>
+      </a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
+        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
+        <button id="langToggle" class="lang-toggle" type="button"><span id="langToggleText">中文</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="site-shell">
+    <section class="page-hero">
+      <div class="content-panel">
+        <span class="eyebrow">vLLM Benchmark</span>
+        <h1 id="page-title" style="margin-top: 16px">Performance Leaderboard</h1>
+        <p id="page-lede" class="hero-lede">Interactive benchmark trends, hard-constraint tracking, and table-level comparisons across visible scopes.</p>
+      </div>
+    </section>
+
+    <section class="leaderboard-section" id="leaderboard">
+      <div class="leaderboard-heading">
+        <div>
+          <div class="leaderboard-eyebrow" id="leaderboard-eyebrow">vLLM Benchmark</div>
+          <h2 id="leaderboard-title">Performance Leaderboard</h2>
+          <p id="leaderboard-description">
+            Built from vLLM benchmark artifacts to compare real serving performance across engines under aligned model,
+            hardware, precision, and workload settings.
+          </p>
+        </div>
+        <div class="leaderboard-schema-pill">
+          <span id="leaderboard-schema-label">Data model</span>
+          <strong id="leaderboard-schema-value">leaderboard_v1.schema.json</strong>
+        </div>
+      </div>
+
+      <div class="tab-nav">
+        <button id="tab-single-chip" class="tab-button active" data-tab="single-chip">Single Node · Single Accelerator</button>
+        <button id="tab-multi-chip" class="tab-button" data-tab="multi-chip">Single Node · Multi Accelerator</button>
+        <button id="tab-multi-node" class="tab-button" data-tab="multi-node">Multi Node · Multi Accelerator</button>
+      </div>
+
+      <div id="leaderboard-loading" class="loading-state">
+        <div class="spinner"></div>
+        <p id="leaderboard-loading-text">Loading leaderboard data...</p>
+      </div>
+
+      <div id="leaderboard-error" class="empty-state" style="display: none">
+        <h3 id="leaderboard-error-title">Failed to Load Data</h3>
+        <p id="leaderboard-error-text">Please refresh the page or check your internet connection.</p>
+      </div>
+
+      <div id="leaderboard-content" style="display: none">
+        <p id="leaderboard-data-stats" class="leaderboard-meta">Loaded 0 entries · Showing 0 entries</p>
+        <div id="leaderboard-hard-constraints" class="hard-constraints-panel" aria-live="polite"></div>
+        <div id="leaderboard-overview" class="leaderboard-overview"></div>
+        <p id="leaderboard-hint" class="leaderboard-hint">Align the scope first, then read the gap.</p>
+
+        <div class="filters">
+          <div class="filter-group"><label id="filter-engine-label" for="filter-engine">Engine</label><select id="filter-engine"><option value="all">All</option></select></div>
+          <div class="filter-group"><label id="filter-hardware-label" for="filter-hardware">Hardware</label><select id="filter-hardware"><option value="all">All</option></select></div>
+          <div class="filter-group"><label id="filter-model-label" for="filter-model">Model</label><select id="filter-model"><option value="all">All</option></select></div>
+          <div class="filter-group"><label id="filter-version-label" for="filter-version">Version</label><select id="filter-version"><option value="all">All</option></select></div>
+          <div class="filter-group"><label id="filter-workload-label" for="filter-workload">Workload</label><select id="filter-workload"><option value="all">All</option></select></div>
+          <div class="filter-group"><label id="filter-precision-label" for="filter-precision">Precision</label><select id="filter-precision"><option value="all">All</option></select></div>
+          <div class="filter-group filter-group--reset"><button id="btn-reset-filters" class="btn-reset-filters">Reset</button></div>
+        </div>
+
+        <div class="compare-controls">
+          <label class="toggle-card" for="toggle-same-scope">
+            <input id="toggle-same-scope" type="checkbox" />
+            <span id="toggle-same-scope-title">Same model + hardware only</span>
+            <small id="toggle-same-scope-desc">Keep only the closest apples-to-apples slice.</small>
+          </label>
+          <label class="toggle-card" for="toggle-hide-incomplete">
+            <input id="toggle-hide-incomplete" type="checkbox" />
+            <span id="toggle-hide-incomplete-title">Hide sparse benchmark rows</span>
+            <small id="toggle-hide-incomplete-desc">Keep the main table focused on real comparisons.</small>
+          </label>
+        </div>
+
+        <div id="leaderboard-coverage" class="coverage-strip"></div>
+
+        <div id="leaderboard-trend-panel" class="leaderboard-trend-panel">
+          <div class="trend-panel-head">
+            <div>
+              <div id="leaderboard-trend-label" class="overview-section-label">Version Trend</div>
+              <h3 id="leaderboard-trend-title">Performance trend</h3>
+              <p id="leaderboard-trend-subtitle">Baseline first, then visible versions in submission order.</p>
+            </div>
+            <div class="trend-metric-toggle" role="group" aria-label="Trend metric">
+              <button type="button" class="trend-metric-button active" data-trend-metric="throughput_tps">Tokens/s</button>
+              <button type="button" class="trend-metric-button" data-trend-metric="ttft_ms">TTFT</button>
+              <button type="button" class="trend-metric-button" data-trend-metric="tbt_ms">TBT</button>
+            </div>
+          </div>
+          <div class="trend-chart-wrap">
+            <canvas id="leaderboard-trend-chart"></canvas>
+            <div id="leaderboard-trend-empty" class="trend-empty" style="display: none">No trend data under current filters.</div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th id="table-head-engine">Engine / Version</th>
+                <th id="table-head-workload">Workload</th>
+                <th id="table-head-hardware">Hardware</th>
+                <th id="table-head-ttft">TTFT (ms)</th>
+                <th id="table-head-tbt">TBT (ms)</th>
+                <th id="table-head-tps">Tokens/s</th>
+                <th id="table-head-error">Error Rate</th>
+                <th id="table-head-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody"></tbody>
+          </table>
+        </div>
+
+        <div id="leaderboard-pagination" class="leaderboard-pagination"></div>
+        <div id="empty-state" class="empty-state" style="display: none">
+          <h3 id="leaderboard-empty-title">No Results Found</h3>
+          <p id="leaderboard-empty-text">Try adjusting your filters to see more data.</p>
+        </div>
+        <p id="leaderboard-last-updated" class="leaderboard-meta leaderboard-meta-footer">Last updated: -</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <strong>vllm-hust</strong> · Upstream-compatible serving for domestic hardware.
+  </footer>
+
+  <script>
+    window.vllmHustPageDict = {
+      en: {
+        title: 'Performance Leaderboard - vllm-hust',
+        'page-title': 'Performance Leaderboard',
+        'page-lede': 'Interactive benchmark trends, hard-constraint tracking, and table-level comparisons across visible scopes.'
+      },
+      zh: {
+        title: '性能排行榜 - vllm-hust',
+        'page-title': '性能排行榜',
+        'page-lede': '动态查看版本趋势、硬约束达成情况，以及当前筛选范围内的 benchmark 明细。'
+      }
+    };
+  </script>
+  <script src="./assets/site.js?v=multi-page-20260701"></script>
+  <script src="./assets/hf-data-loader.js?v=local-data-priority-20260701"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script src="./assets/leaderboard.js?v=leaderboard-trend-chart-20260701"></script>
+</body>
+
+</html>

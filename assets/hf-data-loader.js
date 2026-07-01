@@ -34,8 +34,8 @@ const HF_CONFIG = {
         'https://huggingface.co'
     ],
 
-    // 数据源优先级：github -> hf -> local
-    sources: ['github', 'hf', 'local'],
+    // 数据源优先级：优先使用随网站发布的同源 snapshot，远端作为回退。
+    sources: ['local', 'github', 'hf'],
 
     // GitHub 仓库配置（用于不依赖 HF 的数据发布方式）
     github: {
@@ -45,7 +45,7 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v2';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v3';
 let lastLoadedSource = null;
 
 function getUniqueEndpoints() {

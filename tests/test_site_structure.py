@@ -8,6 +8,9 @@ def test_required_entry_files_exist() -> None:
     root = Path(__file__).resolve().parents[1]
     required = [
         root / "index.html",
+        root / "leaderboard.html",
+        root / "achievements.html",
+        root / "contributors.html",
         root / "versions.html",
         root / "README.md",
         root / "CHANGELOG.md",
@@ -89,18 +92,32 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     assert "Incomplete compare snapshot from ${source}" in text
     assert "return hardConstraintScopes.length === 0;" in text
     assert "assertUsableLeaderboardPayload(result, source);" in text
-    assert "const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v2';" in text
+    assert "sources: ['local', 'github', 'hf']" in text
+    assert "const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v3';" in text
     assert "function clearCache()" in text
     assert "Ignoring unusable session cache" in text
 
 
 def test_index_cache_busts_leaderboard_script() -> None:
     root = Path(__file__).resolve().parents[1]
-    text = (root / "index.html").read_text(encoding="utf-8")
+    text = (root / "leaderboard.html").read_text(encoding="utf-8")
 
     assert re.search(r'\.\/assets\/hf-data-loader\.js\?v=[^"\']+', text)
     assert re.search(r'\.\/assets\/leaderboard\.js\?v=[^"\']+', text)
     assert re.search(r'\.\/assets\/leaderboard\.css\?v=[^"\']+', text)
+
+
+def test_homepage_exposes_multi_page_navigation_and_workstation() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "index.html").read_text(encoding="utf-8")
+
+    assert 'data-page="home"' in text
+    assert 'href="./leaderboard.html"' in text
+    assert 'href="./achievements.html"' in text
+    assert 'href="./contributors.html"' in text
+    assert 'id="workstation-section"' in text
+    assert 'id="workstation-embed-frame"' in text
+    assert './assets/workstation-embed.js?v=' in text
 
 
 def test_validation_dependencies_have_single_source_of_truth() -> None:
@@ -174,9 +191,27 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "font-weight: 600;" in css_text
 
 
+def test_leaderboard_overview_compare_scope_includes_precision() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "const precision = entry?.model?.precision || t('unknown');" in text
+    assert (
+        "return `${model} • ${hardware} • ${precision} • ${workload} • ${settingSummary}`;"
+        in text
+    )
+    assert "activeGroups," in text
+    assert "function getSingleCompleteOverviewGroup(comparisonView)" in text
+    assert "const precisions = getUniqueValues(entries, (entry) => entry?.model?.precision);" in text
+    assert (
+        "const precisionText = precisions.length === 1 ? precisions[0] : `${precisions.length} ${t('precision')}`;"
+        in text
+    )
+
+
 def test_leaderboard_renders_interactive_trend_chart() -> None:
     root = Path(__file__).resolve().parents[1]
-    html_text = (root / "index.html").read_text(encoding="utf-8")
+    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
 
@@ -343,15 +378,15 @@ def test_local_validation_script_and_hook_templates_track_ci() -> None:
 
 def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> None:
     root = Path(__file__).resolve().parents[1]
-    text = (root / "index.html").read_text(encoding="utf-8")
+    text = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
 
-    assert "const CONTRIBUTOR_DATA_SOURCES = [" in text
+    assert "const SOURCES = [" in text
     assert (
         "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-org-profile/main/profile/core_contributors.json"
         in text
     )
-    assert '"./data/core_contributors.json"' in text
-    assert "async function fetchContributorPayload()" in text
+    assert "'./data/core_contributors.json'" in text
+    assert "async function fetchPayload()" in text
     assert (
-        'console.warn("Failed to load contributor data source", source, error);' in text
+        "console.warn('[contributors] source failed', source, err);" in text
     )

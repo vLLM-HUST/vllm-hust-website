@@ -2856,7 +2856,19 @@
             return true;
         }
 
-        return Number(comparisonView?.activeCoverage?.completeGroupCount || 0) === 1;
+        const activeGroups = Array.isArray(comparisonView?.activeGroups)
+            ? comparisonView.activeGroups
+            : [];
+        const completeGroups = activeGroups.filter((group) => group?.isComplete);
+        return completeGroups.length === 1;
+    }
+
+    function getSingleCompleteOverviewGroup(comparisonView) {
+        const activeGroups = Array.isArray(comparisonView?.activeGroups)
+            ? comparisonView.activeGroups
+            : [];
+        const completeGroups = activeGroups.filter((group) => group?.isComplete);
+        return completeGroups.length === 1 ? completeGroups[0] : null;
     }
 
     function getOverviewAggregateScopeText(comparisonView) {
@@ -4176,9 +4188,10 @@
     function buildScopeLabel(entry) {
         const model = getEntryModelDisplayName(entry) || 'Unknown model';
         const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
+        const precision = entry?.model?.precision || t('unknown');
         const workload = getWorkloadLabel(getWorkloadId(entry));
         const settingSummary = entry?.scope?.setting_summary || getSettingSummary(entry);
-        return `${model} • ${hardware} • ${workload} • ${settingSummary}`;
+        return `${model} • ${hardware} • ${precision} • ${workload} • ${settingSummary}`;
     }
 
     function buildCompareGroups(entries) {
@@ -4252,6 +4265,7 @@
         return {
             visibleEntries,
             focusGroup,
+            activeGroups,
             incompleteKeys,
             totalIncompleteGroups: totalGroups.filter((group) => !group.isComplete).length,
             hiddenCount: Math.max(entries.length - visibleEntries.length, 0),
@@ -4357,12 +4371,17 @@
     function getOverviewSubtitle(entries, engineCount, comparisonView, viewOptions) {
         const models = getUniqueValues(entries, (entry) => getEntryModelDisplayName(entry));
         const hardware = getUniqueValues(entries, (entry) => entry?.hardware?.chip_model);
+        const precisions = getUniqueValues(entries, (entry) => entry?.model?.precision);
         const workloads = getUniqueValues(entries, (entry) => getWorkloadId(entry));
+        const singleCompleteGroup = getSingleCompleteOverviewGroup(comparisonView);
 
         const modelText = models.length === 1 ? models[0] : `${models.length} ${t('models')}`;
         const hardwareText = hardware.length === 1 ? hardware[0] : `${hardware.length} ${t('hardwareTargets')}`;
+        const precisionText = precisions.length === 1 ? precisions[0] : `${precisions.length} ${t('precision')}`;
         const workloadText = workloads.length === 1 ? getWorkloadLabel(workloads[0]) : `${workloads.length} ${t('workloads')}`;
-        const scopeText = `${modelText} • ${hardwareText} • ${workloadText}`;
+        const scopeText = singleCompleteGroup?.summaryLabel
+            ? singleCompleteGroup.summaryLabel
+            : `${modelText} • ${hardwareText} • ${precisionText} • ${workloadText}`;
 
         if (comparisonView.focusGroup) {
             return scopeText;
