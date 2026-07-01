@@ -174,12 +174,9 @@
             currentBestVersionLabel: 'Current best version: ',
             baselineVersionLabel: 'Baseline version: ',
             alignedVersionLabel: 'Aligned compare version: ',
-            avgTTFT: 'Avg TTFT',
-            avgTBT: 'Avg TBT',
-            avgThroughput: 'Avg Throughput',
-            sampleTTFT: 'Sample TTFT',
-            sampleTBT: 'Sample TBT',
-            sampleThroughput: 'Sample Throughput',
+            sampleTTFT: 'TTFT',
+            sampleTBT: 'TBT',
+            sampleThroughput: 'Throughput',
             errorRate: 'Error Rate',
             bestVisibleRun: 'Best visible run',
             visibleScopeLabel: 'Visible scope',
@@ -223,8 +220,8 @@
             overviewHeroCompareLabel: 'Snapshot Compare',
             overviewGridLabel: 'Visible Aggregate',
             overviewGridNote: 'Cards show the highlighted visible sample for each engine; row counts show coverage.',
-            overviewGridNoteAligned: 'Cards show the matched compare-scope sample for each engine; row counts show coverage.',
-            overviewGridNoteScopedOnly: 'Multiple complete compare groups are visible, so cards stay in aggregate mode and do not claim a single aligned sample.',
+            overviewGridNoteAligned: 'Cards show one matched compare-scope sample selected by the strongest vllm-hust improvement over vLLM 0.18; row counts show coverage.',
+            overviewGridNoteScopedOnly: 'No complete compare scope is visible, so cards do not show synthetic aggregate metrics.',
             overviewTableLabel: 'Visible Rows',
             overviewTableNote: 'The main table shows the currently visible benchmark rows after filters, scope toggles, and version merging.',
             overviewGoalSnapshotNote: 'Hero deltas use the matched official compare snapshot. Cards below show the highlighted visible sample for each engine.',
@@ -376,12 +373,9 @@
             currentBestVersionLabel: '当前最佳版本：',
             baselineVersionLabel: '基线版本：',
             alignedVersionLabel: '对齐对比版本：',
-            avgTTFT: '平均 TTFT',
-            avgTBT: '平均 TBT',
-            avgThroughput: '平均吞吐',
-            sampleTTFT: '样本 TTFT',
-            sampleTBT: '样本 TBT',
-            sampleThroughput: '样本吞吐',
+            sampleTTFT: 'TTFT',
+            sampleTBT: 'TBT',
+            sampleThroughput: '吞吐',
             errorRate: '错误率',
             bestVisibleRun: '当前最佳样本',
             visibleScopeLabel: '当前可见范围',
@@ -425,8 +419,8 @@
             overviewHeroCompareLabel: '快照对比',
             overviewGridLabel: '当前可见聚合',
             overviewGridNote: '下方卡片展示每个引擎当前高亮样本的指标；记录数表示覆盖范围。',
-            overviewGridNoteAligned: '下方卡片展示同一 compare scope 命中样本的指标；记录数表示覆盖范围。',
-            overviewGridNoteScopedOnly: '当前可见结果覆盖多个完整对比分组，所以下方卡片只展示聚合指标，不绑定单一对齐样本。',
+            overviewGridNoteAligned: '下方卡片展示一个同规格 compare scope 的实际样本；该 scope 按 vllm-hust 相对 vLLM 0.18 提升最大来选择，记录数表示覆盖范围。',
+            overviewGridNoteScopedOnly: '当前没有完整对比分组，卡片不会展示合成聚合指标。',
             overviewTableLabel: '当前可见明细',
             overviewTableNote: '主表展示的是当前筛选、scope 开关和版本合并之后的 benchmark 可见行。',
             overviewGoalSnapshotNote: '顶部 Hero 的差距值来自当前命中的官方 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
@@ -2916,7 +2910,6 @@
             ? [...representativeGroup.entries]
             : getOverviewRepresentativeEntries(entries, comparisonView, alignmentPayload);
         const summaries = summarizeEngines(entries, representativeEntries, {
-            aggregateOnly: !representativeGroup && !overviewScopeLocked && Number(comparisonView?.activeCoverage?.completeGroupCount || 0) > 1,
             aggregateScopeText: representativeGroup?.summaryLabel || getOverviewAggregateScopeText(comparisonView),
         });
         const leaders = getLeaders(summaries);
@@ -4239,21 +4232,35 @@
         return [...candidates].sort((a, b) => compareEntryQuality(b, a))[0] || null;
     }
 
+    function getOfficialVllmBaselineEntry(entries) {
+        const candidates = entries.filter((entry) => {
+            const engine = getEngine(entry);
+            const version = String(getEngineVersion(entry) || '').trim();
+            return engine === 'vllm' && version === '0.18.0';
+        });
+        if (candidates.length) {
+            return [...candidates].sort((a, b) => compareEntryQuality(b, a))[0] || null;
+        }
+        return getBestEntryForEngine(entries, 'vllm');
+    }
+
+    function getThroughputImprovementScore(currentEntry, baselineEntry) {
+        const currentThroughput = Number(currentEntry?.metrics?.throughput_tps);
+        const baselineThroughput = Number(baselineEntry?.metrics?.throughput_tps);
+        if (!Number.isFinite(currentThroughput) || !Number.isFinite(baselineThroughput) || baselineThroughput <= 0) {
+            return Number.NEGATIVE_INFINITY;
+        }
+        return (currentThroughput - baselineThroughput) / baselineThroughput;
+    }
+
     function getGroupRepresentativeScore(group) {
         if (!group?.isComplete || !Array.isArray(group.entries)) {
             return Number.NEGATIVE_INFINITY;
         }
 
-        const currentBest = getBestEntryForEngine(group.entries, 'vllm-hust')
-            || group.entries
-                .filter((entry) => !isBaselineEngine(getEngine(entry)))
-                .sort((a, b) => compareEntryQuality(b, a))[0]
-            || null;
-        const throughput = Number(currentBest?.metrics?.throughput_tps);
-        if (Number.isFinite(throughput)) {
-            return throughput;
-        }
-        return Number.NEGATIVE_INFINITY;
+        const currentBest = getBestEntryForEngine(group.entries, 'vllm-hust');
+        const officialBaseline = getOfficialVllmBaselineEntry(group.entries);
+        return getThroughputImprovementScore(currentBest, officialBaseline);
     }
 
     function selectOverviewRepresentativeGroup(comparisonView) {
@@ -4261,7 +4268,7 @@
             ? comparisonView.activeGroups
             : [];
         const completeGroups = activeGroups.filter((group) => group?.isComplete);
-        if (completeGroups.length <= 1) {
+        if (!completeGroups.length) {
             return null;
         }
 
@@ -4337,7 +4344,6 @@
     function summarizeEngines(entries, representativeEntries = [], options = {}) {
         const grouped = new Map();
         const representativeByEngine = new Map();
-        const aggregateOnly = Boolean(options?.aggregateOnly);
         const aggregateScopeText = String(options?.aggregateScopeText || '').trim();
 
         representativeEntries.forEach((entry) => {
@@ -4359,43 +4365,28 @@
         return Array.from(grouped.entries())
             .map(([engine, engineEntries]) => {
                 const representativeEntry = representativeByEngine.get(engine) || null;
-                const bestEntry = representativeEntry || [...engineEntries].sort((a, b) => compareEntryQuality(b, a))[0];
-                const displayEntry = aggregateOnly && !representativeEntry ? null : bestEntry;
+                const bestEntry = representativeEntry || null;
+                const coverageBestEntry = [...engineEntries].sort((a, b) => compareEntryQuality(b, a))[0] || null;
+                const displayEntry = representativeEntry;
                 const displayMetrics = displayEntry?.metrics || {};
                 return {
                     engine,
                     label: getEngineLabel(engine),
                     count: engineEntries.length,
-                    avgTTFT: averageMetric(engineEntries, 'ttft_ms'),
-                    avgTBT: averageMetric(engineEntries, 'tbt_ms'),
-                    avgTPS: averageMetric(engineEntries, 'throughput_tps'),
-                    avgError: averageMetric(engineEntries, 'error_rate'),
-                    displayTTFT: displayEntry ? Number(displayMetrics.ttft_ms) : averageMetric(engineEntries, 'ttft_ms'),
-                    displayTBT: displayEntry ? Number(displayMetrics.tbt_ms) : averageMetric(engineEntries, 'tbt_ms'),
-                    displayTPS: displayEntry ? Number(displayMetrics.throughput_tps) : averageMetric(engineEntries, 'throughput_tps'),
-                    displayError: displayEntry ? Number(displayMetrics.error_rate) : averageMetric(engineEntries, 'error_rate'),
+                    displayTTFT: displayEntry ? Number(displayMetrics.ttft_ms) : null,
+                    displayTBT: displayEntry ? Number(displayMetrics.tbt_ms) : null,
+                    displayTPS: displayEntry ? Number(displayMetrics.throughput_tps) : null,
+                    displayError: displayEntry ? Number(displayMetrics.error_rate) : null,
                     displayEntry,
                     representativeEntry,
-                    aggregateOnly: aggregateOnly && !representativeEntry,
+                    aggregateOnly: false,
                     aggregateScopeText,
-                    bestEntry,
-                    overviewComponents: buildTableVersionComponents(bestEntry),
-                    version: formatEntryVersion(bestEntry, { display: true }),
+                    bestEntry: bestEntry || coverageBestEntry,
+                    overviewComponents: buildTableVersionComponents(bestEntry || coverageBestEntry),
+                    version: formatEntryVersion(bestEntry || coverageBestEntry, { display: true }),
                 };
             })
             .sort((a, b) => (b.displayTPS || 0) - (a.displayTPS || 0));
-    }
-
-    function averageMetric(entries, metric) {
-        const values = entries
-            .map((entry) => Number(entry?.metrics?.[metric]))
-            .filter((value) => Number.isFinite(value));
-
-        if (!values.length) {
-            return null;
-        }
-
-        return values.reduce((sum, value) => sum + value, 0) / values.length;
     }
 
     function getLeaders(summaries) {
@@ -4805,7 +4796,7 @@
                 ? t('visibleScopeLabel')
                 : t('bestVisibleRun');
         const footerValue = aggregateOnly ? (summary.aggregateScopeText || t('compareNoData')) : bestVisibleRunText;
-        const metricLabel = (sampleKey, averageKey) => aggregateOnly ? t(averageKey) : t(sampleKey);
+        const metricLabel = (sampleKey) => t(sampleKey);
 
         return `
             <div class="engine-summary-card ${isLeader ? 'is-leader' : ''}">
@@ -4815,15 +4806,15 @@
                 </div>
                 <div class="engine-summary-metrics">
                     <div class="summary-metric">
-                        <span>${metricLabel('sampleTTFT', 'avgTTFT')}</span>
+                        <span>${metricLabel('sampleTTFT')}</span>
                         <strong>${formatNumber(summary.displayTTFT)} ms</strong>
                     </div>
                     <div class="summary-metric">
-                        <span>${metricLabel('sampleTBT', 'avgTBT')}</span>
+                        <span>${metricLabel('sampleTBT')}</span>
                         <strong>${formatNumber(summary.displayTBT)} ms</strong>
                     </div>
                     <div class="summary-metric">
-                        <span>${metricLabel('sampleThroughput', 'avgThroughput')}</span>
+                        <span>${metricLabel('sampleThroughput')}</span>
                         <strong>${formatNumber(summary.displayTPS)} tok/s</strong>
                     </div>
                     <div class="summary-metric">

@@ -211,7 +211,7 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "function getOverviewSummaryChipText(summary)" in text
     assert "function getOverviewSummaryVersionText(summary)" in text
     assert "return resolvedVersion;" in text
-    assert "overviewComponents: buildTableVersionComponents(bestEntry)" in text
+    assert "overviewComponents: buildTableVersionComponents(bestEntry || coverageBestEntry)" in text
     assert "const chipText = getOverviewSummaryChipText(summary);" in text
     assert "const versionText = getOverviewSummaryVersionText(summary);" in text
     assert "const bestVisibleRunText =" in text
@@ -219,7 +219,12 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "const representativeGroup = overviewScopeLocked" in text
     assert "representativeGroup?.summaryLabel || getOverviewAggregateScopeText(comparisonView)" in text
     assert "getBestEntryForEngine(group.entries, 'vllm-hust')" in text
-    assert "const displayEntry = aggregateOnly && !representativeEntry ? null : bestEntry;" in text
+    assert "function getOfficialVllmBaselineEntry(entries)" in text
+    assert "function getThroughputImprovementScore(currentEntry, baselineEntry)" in text
+    assert "const displayEntry = representativeEntry;" in text
+    assert "averageMetric(" not in text
+    assert "avgTTFT" not in text
+    assert "平均 TTFT" not in text
     assert "displayTTFT:" in text
     assert "sampleTTFT" in text
     assert "currentBestVersionLabel" in text
