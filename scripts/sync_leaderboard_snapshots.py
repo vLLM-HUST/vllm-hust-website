@@ -82,6 +82,7 @@ def sync_snapshots(source_dir: Path, target_dir: Path, *, check: bool) -> int:
         changed.append(name)
         if not check:
             shutil.copy2(source, target)
+            target.chmod(0o644)
 
     if check and changed:
         print("website leaderboard mirror is out of sync:")
