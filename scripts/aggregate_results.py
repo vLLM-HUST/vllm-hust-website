@@ -361,9 +361,9 @@ def is_public_official_candidate(entry: dict[str, Any]) -> bool:
     hardware = entry.get("hardware") if isinstance(entry.get("hardware"), dict) else {}
     same_spec = get_same_spec_payload(entry)
     spec_id = str(same_spec.get("spec_id") or "")
-    return (
-        workload in OFFICIAL_PUBLIC_WORKLOADS
-        and (is_910b_chip(hardware.get("chip_model")) or spec_id.startswith("official-ascend"))
+    return workload in OFFICIAL_PUBLIC_WORKLOADS and (
+        is_910b_chip(hardware.get("chip_model"))
+        or spec_id.startswith("official-ascend")
     )
 
 
@@ -378,7 +378,6 @@ def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
     metadata = entry.get("metadata") if isinstance(entry.get("metadata"), dict) else {}
     engine = str(entry.get("engine") or metadata.get("engine") or "").strip().lower()
     engine_version = get_entry_engine_version(entry)
-    workload = extract_workload_name(entry)
     model = entry.get("model") if isinstance(entry.get("model"), dict) else {}
     hardware = entry.get("hardware") if isinstance(entry.get("hardware"), dict) else {}
     same_spec = get_same_spec_payload(entry)
@@ -390,7 +389,9 @@ def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
         and engine == PUBLIC_BASELINE_ENGINE
         and engine_version != PUBLIC_BASELINE_VERSION
     ):
-        return f"public vllm baseline is {engine_version!r}, not {PUBLIC_BASELINE_VERSION}"
+        return (
+            f"public vllm baseline is {engine_version!r}, not {PUBLIC_BASELINE_VERSION}"
+        )
 
     if contains_retired_baseline_token(engine_version):
         return f"retired baseline token in engine_version {engine_version!r}"
@@ -415,7 +416,9 @@ def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
                 "official v0.18.0 precision mismatch: "
                 f"entry={entry_precision!r} same_spec={spec_precision!r}"
             )
-        if expected_chip and (entry_chip != expected_chip or spec_chip != expected_chip):
+        if expected_chip and (
+            entry_chip != expected_chip or spec_chip != expected_chip
+        ):
             return (
                 "official v0.18.0 hardware mismatch: "
                 f"entry={entry_chip!r} same_spec={spec_chip!r} expected={expected_chip!r}"
@@ -434,7 +437,9 @@ def filter_public_snapshot_entries(
         if reason is None:
             accepted.append(entry)
         else:
-            rejected.append((str(entry.get("entry_id") or "<missing-entry-id>"), reason))
+            rejected.append(
+                (str(entry.get("entry_id") or "<missing-entry-id>"), reason)
+            )
     return accepted, rejected
 
 

@@ -34,9 +34,17 @@ def test_site_uses_vllm_hust_brand_icon() -> None:
     icon = root / "assets" / "brand" / "vllm-hust-icon.png"
     assert icon.exists(), "official vLLM-HUST brand icon should be bundled"
     assert icon.stat().st_size > 1000
-    for name in ("index.html", "leaderboard.html", "achievements.html", "contributors.html", "versions.html"):
+    for name in (
+        "index.html",
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+        "versions.html",
+    ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/brand/vllm-hust-icon.png" in text, f"{name} should reference the brand icon"
+        assert "assets/brand/vllm-hust-icon.png" in text, (
+            f"{name} should reference the brand icon"
+        )
 
 
 def test_data_directory_has_sync_marker() -> None:
@@ -358,7 +366,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert 'id="leaderboard-trend-panel"' in html_text
     assert 'id="leaderboard-trend-chart"' in html_text
-    assert 'id="leaderboard-table-details" class="leaderboard-table-details is-collapsed" hidden' in html_text
+    assert (
+        'id="leaderboard-table-details" class="leaderboard-table-details is-collapsed" hidden'
+        in html_text
+    )
     assert 'data-trend-metric="throughput_tps"' in html_text
     assert "leaderboard-cache-v6-20260701" in html_text
     assert "leaderboard-public-20260701" in html_text

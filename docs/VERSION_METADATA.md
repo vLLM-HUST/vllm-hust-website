@@ -11,7 +11,8 @@
   to official `vllm`. Version copy should therefore preserve upstream mergeability semantics instead
   of implying a permanent, independently versioned downstream product line.
 - Development builds may carry upstream prerelease or dev identifiers. Avoid presenting an old PyPI
-  package version as the current project version unless it is explicitly the artifact being discussed.
+  package version as the current project version unless it is explicitly the artifact being
+  discussed.
 
 ## Leaderboard Version Display Contract
 
