@@ -231,7 +231,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Baseline first, then visible versions in submission order. Each line is one workload + precision setting.',
+            trendSubtitle: 'Baseline first, then visible versions in submission order. Each line is one aligned workload + model + hardware + precision setting.',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -433,7 +433,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '横轴从基线开始，再按提交时间展示当前可见版本；每条折线代表一个 workload + 精度组合。',
+            trendSubtitle: '横轴从基线开始，再按提交时间展示当前可见版本；每条折线代表一个对齐的 workload + 模型 + 硬件 + 精度组合。',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -2148,14 +2148,21 @@
 
     function getTrendSeriesKey(entry) {
         const workload = getWorkloadId(entry) || 'Other';
+        const model = getEntryModelCanonicalId(entry) || getEntryModelDisplayName(entry) || 'unknown-model';
+        const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
+        const chipCount = entry?.hardware?.chip_count || 0;
+        const nodeCount = entry?.cluster?.node_count || 1;
         const precision = entry?.model?.precision || 'unknown-precision';
-        return `${workload}|${precision}`;
+        const settingSignature = getSettingSignature(entry);
+        return [workload, model, hardware, chipCount, nodeCount, precision, settingSignature].join('|');
     }
 
     function getTrendSeriesLabel(entry) {
         const workload = getWorkloadLabel(getWorkloadId(entry) || 'Other');
+        const model = getEntryModelDisplayName(entry) || 'Unknown model';
+        const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
         const precision = entry?.model?.precision || t('unknown');
-        return `${workload} · ${precision}`;
+        return `${workload} · ${model} · ${hardware} · ${precision}`;
     }
 
     function getTrendVersionText(entry) {

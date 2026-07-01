@@ -282,6 +282,13 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'id="leaderboard-trend-chart"' in html_text
     assert 'data-trend-metric="throughput_tps"' in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
+    assert "const model = getEntryModelCanonicalId(entry)" in js_text
+    assert "const hardware = entry?.hardware?.chip_model || 'unknown-hardware';" in js_text
+    assert (
+        "return [workload, model, hardware, chipCount, nodeCount, precision, settingSignature].join('|');"
+        in js_text
+    )
+    assert "每条折线代表一个对齐的 workload + 模型 + 硬件 + 精度组合。" in js_text
     assert "function renderPerformanceTrendChart(entries)" in js_text
     assert "new Chart(canvas" in js_text
     assert "pointDetails" in js_text
