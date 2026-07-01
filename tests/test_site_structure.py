@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -96,6 +97,26 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     assert "const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v3';" in text
     assert "function clearCache()" in text
     assert "Ignoring unusable session cache" in text
+
+
+def test_leaderboard_data_backfills_performance_pr_points() -> None:
+    root = Path(__file__).resolve().parents[1]
+    single = json.loads((root / "data" / "leaderboard_single.json").read_text())
+    compare = json.loads((root / "data" / "leaderboard_compare.json").read_text())
+
+    ids = {entry["entry_id"] for entry in single}
+    assert "36551323-7a0b-4832-b14b-98bf4edfd271" in ids  # vllm-hust #41
+    assert "fd20fab5-1733-4bf0-b79b-9c41d09b53db" in ids  # vllm-hust #45
+    assert "e851c419-0115-440d-9304-2175859494b8" in ids  # vllm-hust #46
+    assert "b78295f6-3ad4-4a56-9c85-175165e5d347" in ids  # vllm-hust #49
+
+    workloads = {
+        entry["workload"]["name"]
+        for entry in single
+        if entry.get("engine") == "vllm-hust"
+    }
+    assert {"prefix-repetition-online", "sonnet-throughput"}.issubset(workloads)
+    assert compare["group_count"] >= 3
 
 
 def test_index_cache_busts_leaderboard_script() -> None:
