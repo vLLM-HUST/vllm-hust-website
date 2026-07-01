@@ -10,6 +10,8 @@
 - HF dataset: the secondary distribution surface for the website. It should publish the same
   `leaderboard_single.json`, `leaderboard_multi.json`, `leaderboard_compare.json`, and
   `last_updated.json` files from the benchmark snapshot set.
+- Retired baseline data: `vllm 0.11.0` / `v0110` rows must not appear in the website mirror.
+  The public baseline is `vllm 0.18.0` plus the matching `vllm-ascend 0.18.0` snapshot set.
 - Website `data/`: a compatibility cache for checked-in snapshots and offline development. It should
   not be edited by hand and should not ingest raw compare directory layouts.
 

@@ -101,24 +101,25 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     assert "Ignoring unusable session cache" in text
 
 
-def test_leaderboard_data_backfills_performance_pr_points() -> None:
+def test_leaderboard_data_excludes_retired_v0110_baselines() -> None:
     root = Path(__file__).resolve().parents[1]
     single = json.loads((root / "data" / "leaderboard_single.json").read_text())
-    compare = json.loads((root / "data" / "leaderboard_compare.json").read_text())
 
     ids = {entry["entry_id"] for entry in single}
-    assert "36551323-7a0b-4832-b14b-98bf4edfd271" in ids  # vllm-hust #41
-    assert "fd20fab5-1733-4bf0-b79b-9c41d09b53db" in ids  # vllm-hust #45
-    assert "e851c419-0115-440d-9304-2175859494b8" in ids  # vllm-hust #46
-    assert "b78295f6-3ad4-4a56-9c85-175165e5d347" in ids  # vllm-hust #49
+    assert "36551323-7a0b-4832-b14b-98bf4edfd271" not in ids  # vllm-hust #41, retired v0110 baseline
+    assert "fd20fab5-1733-4bf0-b79b-9c41d09b53db" not in ids  # vllm-hust #45, retired v0110 baseline
+    assert "e851c419-0115-440d-9304-2175859494b8" not in ids  # vllm-hust #46, retired v0110 baseline
+    assert "b78295f6-3ad4-4a56-9c85-175165e5d347" not in ids  # vllm-hust #49, retired v0110 baseline
 
-    workloads = {
-        entry["workload"]["name"]
-        for entry in single
-        if entry.get("engine") == "vllm-hust"
-    }
-    assert {"prefix-repetition-online", "sonnet-throughput"}.issubset(workloads)
-    assert compare["group_count"] >= 3
+    for entry in single:
+        same_spec = entry.get("same_spec") or {}
+        spec_id = str(same_spec.get("spec_id") or "")
+        engine_version = str(entry.get("engine_version") or "")
+        assert "v0.11.0" not in spec_id
+        assert "v0110" not in spec_id
+        assert engine_version != "0.11.0"
+        if entry.get("engine") == "vllm":
+            assert engine_version == "0.18.0"
 
 
 def test_leaderboard_data_is_benchmark_snapshot_mirror() -> None:
