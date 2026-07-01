@@ -93,7 +93,7 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     assert "Incomplete compare snapshot from ${source}" in text
     assert "return hardConstraintScopes.length === 0;" in text
     assert "assertUsableLeaderboardPayload(result, source);" in text
-    assert "sources: ['local', 'github', 'hf']" in text
+    assert "sources: ['github', 'hf', 'local']" in text
     assert "const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v4';" in text
     assert "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-2';" in text
     assert "const url = `${HF_CONFIG.localPath}${filename}${separator}v=${LOCAL_DATA_CACHE_BUST}`;" in text
@@ -119,6 +119,40 @@ def test_leaderboard_data_backfills_performance_pr_points() -> None:
     }
     assert {"prefix-repetition-online", "sonnet-throughput"}.issubset(workloads)
     assert compare["group_count"] >= 3
+
+
+def test_leaderboard_data_is_benchmark_snapshot_mirror() -> None:
+    root = Path(__file__).resolve().parents[1]
+    benchmark_snapshots = (
+        root.parent / "vllm-hust-benchmark" / "leaderboard-data" / "snapshots"
+    )
+    if not benchmark_snapshots.is_dir():
+        return
+
+    for name in (
+        "leaderboard_single.json",
+        "leaderboard_multi.json",
+        "leaderboard_compare.json",
+        "last_updated.json",
+    ):
+        assert (root / "data" / name).read_bytes() == (
+            benchmark_snapshots / name
+        ).read_bytes(), f"{name} is not synced from benchmark snapshots"
+
+
+def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
+    root = Path(__file__).resolve().parents[1]
+    workflow = (
+        root / ".github" / "workflows" / "sync-leaderboard-data.yml"
+    ).read_text(encoding="utf-8")
+    script = (root / "scripts" / "sync_leaderboard_snapshots.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "python scripts/sync_leaderboard_snapshots.py" in workflow
+    assert "vLLM-HUST/vllm-hust-benchmark" in workflow
+    assert "SNAPSHOT_FILES = (" in script
+    assert "--check" in script
 
 
 def test_index_cache_busts_leaderboard_script() -> None:

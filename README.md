@@ -85,15 +85,16 @@ The only supported leaderboard data chain is:
 
 1. Any benchmark pipeline that exports standard leaderboard artifacts (`leaderboard_manifest.json` +
    `*_leaderboard.json`)
-1. Snapshot publish to Hugging Face dataset `intellistream/llm-engine-benchmark-results`
-1. Website sync workflow fetches HF snapshot files directly:
+1. Snapshot publish in `vllm-hust-benchmark/leaderboard-data/snapshots`
+1. HF publish from the same benchmark snapshot files to `intellistream/vllm-hust-benchmark-results`
+1. Website sync workflow mirrors those benchmark snapshot files for offline/static fallback:
    - `data/leaderboard_single.json`
    - `data/leaderboard_multi.json`
    - `data/leaderboard_compare.json`
    - `data/last_updated.json`
 
-Homepage rendering consumes only those snapshot files, with `leaderboard_compare.json` providing
-neutral engine-vs-engine head-to-head views.
+Leaderboard rendering consumes benchmark GitHub raw snapshots first, then HF, then the checked-in
+website mirror. `leaderboard_compare.json` provides neutral engine-vs-engine head-to-head views.
 
 Leaderboard version rendering follows a split UI contract:
 

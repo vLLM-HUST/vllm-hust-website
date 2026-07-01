@@ -5,20 +5,21 @@
 - Local benchmark outputs: owned by `vllm-hust-benchmark`. The stable publishable interface is
   `leaderboard_manifest.json` plus per-entry `*_leaderboard.json` files emitted from canonical
   `execution_result` artifacts.
-- HF dataset: the primary distribution surface for the website. It should publish
+- Repo-hosted snapshots: `vllm-hust-benchmark/leaderboard-data/snapshots` is the canonical
+  publishable snapshot set for the website and HF.
+- HF dataset: the secondary distribution surface for the website. It should publish the same
   `leaderboard_single.json`, `leaderboard_multi.json`, `leaderboard_compare.json`, and
-  `last_updated.json` snapshots derived from validated standard leaderboard artifacts.
+  `last_updated.json` files from the benchmark snapshot set.
 - Website `data/`: a compatibility cache for checked-in snapshots and offline development. It should
   not be edited by hand and should not ingest raw compare directory layouts.
 
 ## Update Policy
 
-- Preferred path: benchmark `publish` validates the standard export boundary and uploads only the
-  canonical HF dataset snapshots. The website consumes those HF snapshot files.
-- Offline compatibility path: run `vllm-hust-benchmark/sync_results_to_website.sh`, which calls
-  `scripts/aggregate_results.py` on benchmark `leaderboard_manifest.json` exports and regenerates
-  the same snapshot files locally, including `leaderboard_compare.json` for direct head-to-head
-  rendering.
+- Preferred path: benchmark `publish-website` validates the standard export boundary and writes
+  `vllm-hust-benchmark/leaderboard-data/snapshots`.
+- Distribution path: upload the same benchmark snapshot files to HF.
+- Offline compatibility path: run `python scripts/sync_leaderboard_snapshots.py` from the website
+  repo to mirror benchmark snapshots into `data/`.
 - Fail-fast rule: invalid leaderboard entries or malformed manifests must be fixed at the benchmark
   export side; do not patch website data by hand.
 

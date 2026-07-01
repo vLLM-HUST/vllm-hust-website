@@ -28,28 +28,9 @@ jobs:
 
       - name: Sync snapshot files to website data/
         run: |
-          snapshot_dir="_benchmark/leaderboard-data/snapshots"
-          target_dir="data"
-
-          if [[ ! -d "$snapshot_dir" ]]; then
-            echo "No snapshots directory found in benchmark repo"
-            exit 0
-          fi
-
-          changed=0
-          for f in leaderboard_single.json leaderboard_multi.json leaderboard_compare.json last_updated.json; do
-            if [[ -f "$snapshot_dir/$f" ]]; then
-              if ! diff -q "$snapshot_dir/$f" "$target_dir/$f" >/dev/null 2>&1; then
-                cp "$snapshot_dir/$f" "$target_dir/$f"
-                changed=1
-                echo "Updated: $f"
-              fi
-            fi
-          done
-
-          if [[ "$changed" -eq 0 ]]; then
-            echo "No changes detected"
-          fi
+          python scripts/sync_leaderboard_snapshots.py \
+            --source-dir _benchmark/leaderboard-data/snapshots \
+            --target-dir data
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v7

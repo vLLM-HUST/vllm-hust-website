@@ -34,8 +34,8 @@ const HF_CONFIG = {
         'https://huggingface.co'
     ],
 
-    // 数据源优先级：优先使用随网站发布的同源 snapshot，远端作为回退。
-    sources: ['local', 'github', 'hf'],
+    // 数据源优先级：benchmark repo snapshots 是唯一真实数据源，HF 和本地镜像作为回退。
+    sources: ['github', 'hf', 'local'],
 
     // GitHub 仓库配置（用于不依赖 HF 的数据发布方式）
     github: {
