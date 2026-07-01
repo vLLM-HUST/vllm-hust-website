@@ -215,6 +215,10 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "const chipText = getOverviewSummaryChipText(summary);" in text
     assert "const versionText = getOverviewSummaryVersionText(summary);" in text
     assert "const bestVisibleRunText =" in text
+    assert "function selectOverviewRepresentativeGroup(comparisonView)" in text
+    assert "const representativeGroup = overviewScopeLocked" in text
+    assert "representativeGroup?.summaryLabel || getOverviewAggregateScopeText(comparisonView)" in text
+    assert "getBestEntryForEngine(group.entries, 'vllm-hust')" in text
     assert "const displayEntry = aggregateOnly && !representativeEntry ? null : bestEntry;" in text
     assert "displayTTFT:" in text
     assert "sampleTTFT" in text

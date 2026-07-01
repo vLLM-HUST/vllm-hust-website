@@ -2902,10 +2902,15 @@
         const compareSnapshotGroup = findCompareSnapshotGroup(entries, comparisonView);
         const overviewScopeLocked = shouldLockOverviewScope(comparisonView);
         const alignmentPayload = overviewScopeLocked ? (goalPair || compareSnapshotGroup) : null;
-        const representativeEntries = getOverviewRepresentativeEntries(entries, comparisonView, alignmentPayload);
+        const representativeGroup = overviewScopeLocked
+            ? null
+            : selectOverviewRepresentativeGroup(comparisonView);
+        const representativeEntries = representativeGroup
+            ? [...representativeGroup.entries]
+            : getOverviewRepresentativeEntries(entries, comparisonView, alignmentPayload);
         const summaries = summarizeEngines(entries, representativeEntries, {
-            aggregateOnly: !overviewScopeLocked && Number(comparisonView?.activeCoverage?.completeGroupCount || 0) > 1,
-            aggregateScopeText: getOverviewAggregateScopeText(comparisonView),
+            aggregateOnly: !representativeGroup && !overviewScopeLocked && Number(comparisonView?.activeCoverage?.completeGroupCount || 0) > 1,
+            aggregateScopeText: representativeGroup?.summaryLabel || getOverviewAggregateScopeText(comparisonView),
         });
         const leaders = getLeaders(summaries);
         const title = overviewScopeLocked && goalPair
@@ -4217,6 +4222,52 @@
             engineCount: group.engines.size,
             isComplete: group.engines.size >= 2,
         }));
+    }
+
+    function getBestEntryForEngine(entries, engine) {
+        const candidates = entries.filter((entry) => getEngine(entry) === engine);
+        if (!candidates.length) {
+            return null;
+        }
+        return [...candidates].sort((a, b) => compareEntryQuality(b, a))[0] || null;
+    }
+
+    function getGroupRepresentativeScore(group) {
+        if (!group?.isComplete || !Array.isArray(group.entries)) {
+            return Number.NEGATIVE_INFINITY;
+        }
+
+        const currentBest = getBestEntryForEngine(group.entries, 'vllm-hust')
+            || group.entries
+                .filter((entry) => !isBaselineEngine(getEngine(entry)))
+                .sort((a, b) => compareEntryQuality(b, a))[0]
+            || null;
+        const throughput = Number(currentBest?.metrics?.throughput_tps);
+        if (Number.isFinite(throughput)) {
+            return throughput;
+        }
+        return Number.NEGATIVE_INFINITY;
+    }
+
+    function selectOverviewRepresentativeGroup(comparisonView) {
+        const activeGroups = Array.isArray(comparisonView?.activeGroups)
+            ? comparisonView.activeGroups
+            : [];
+        const completeGroups = activeGroups.filter((group) => group?.isComplete);
+        if (completeGroups.length <= 1) {
+            return null;
+        }
+
+        return [...completeGroups].sort((a, b) => {
+            const scoreDelta = getGroupRepresentativeScore(b) - getGroupRepresentativeScore(a);
+            if (scoreDelta !== 0) {
+                return scoreDelta;
+            }
+            if (b.entries.length !== a.entries.length) {
+                return b.entries.length - a.entries.length;
+            }
+            return String(a.summaryLabel || '').localeCompare(String(b.summaryLabel || ''));
+        })[0] || null;
     }
 
     function selectFocusGroup(groups) {
