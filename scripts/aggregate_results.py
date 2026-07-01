@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +20,7 @@ SUPPORTED_MANIFEST_SCHEMA_VERSIONS = {
     "leaderboard-export-manifest/v1",
     "leaderboard-export-manifest/v2",
 }
+UTC = timezone.utc
 COMPARE_SNAPSHOT_SCHEMA_VERSION = "leaderboard-compare-snapshot/v1"
 RENDER_CATEGORY_SINGLE_CHIP = "single_chip"
 RENDER_CATEGORY_MULTI_CHIP = "multi_chip"
@@ -50,6 +51,21 @@ VALID_BASELINE_STATUSES = {
     BASELINE_STATUS_PENDING,
     BASELINE_STATUS_NONE,
 }
+PUBLIC_BASELINE_ENGINE = "vllm"
+PUBLIC_BASELINE_VERSION = "0.18.0"
+PUBLIC_CURRENT_ENGINE = "vllm-hust"
+RETIRED_BASELINE_TOKENS = ("v0.11.0", "v0110", "0.11.0")
+OFFICIAL_PUBLIC_WORKLOADS = {
+    "instructcoder-online",
+    "prefix-repetition-online",
+    "random-latency",
+    "random-online",
+    "sharegpt-online",
+    "sharegpt-throughput",
+    "sonnet-throughput",
+    "visionarena-online",
+}
+OFFICIAL_V0180_SPEC_PREFIX = "official-ascend-jan-2026-v0.18.0-"
 CANONICAL_MODEL_ID_PATTERN = re.compile(
     r"^(?P<registry>[a-z0-9][a-z0-9_-]*):(?P<repo_id>.+)$"
 )
@@ -328,6 +344,98 @@ def normalize_entry_model(entry: dict[str, Any]) -> dict[str, Any]:
 
     model.update(resolve_model_identity(model))
     return entry
+
+
+def contains_retired_baseline_token(value: Any) -> bool:
+    normalized = str(value or "")
+    return any(token in normalized for token in RETIRED_BASELINE_TOKENS)
+
+
+def is_910b_chip(value: Any) -> bool:
+    normalized = normalize_chip_model_key(value).replace(" ", "").replace("-", "")
+    return normalized.startswith("910b") or normalized.startswith("ascend910b")
+
+
+def is_public_official_candidate(entry: dict[str, Any]) -> bool:
+    workload = extract_workload_name(entry)
+    hardware = entry.get("hardware") if isinstance(entry.get("hardware"), dict) else {}
+    same_spec = get_same_spec_payload(entry)
+    spec_id = str(same_spec.get("spec_id") or "")
+    return (
+        workload in OFFICIAL_PUBLIC_WORKLOADS
+        and (is_910b_chip(hardware.get("chip_model")) or spec_id.startswith("official-ascend"))
+    )
+
+
+def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
+    """Return a rejection reason for entries that must not reach public data.
+
+    Historical backfills are only comparable when they are anchored to the
+    official vLLM 0.18.0 / 910B2 same-spec baseline. Older v0.11.0, 910B3,
+    missing same_spec, or side-experiment entries must be kept out of the
+    canonical website snapshots even if their raw submissions remain archived.
+    """
+    metadata = entry.get("metadata") if isinstance(entry.get("metadata"), dict) else {}
+    engine = str(entry.get("engine") or metadata.get("engine") or "").strip().lower()
+    engine_version = get_entry_engine_version(entry)
+    workload = extract_workload_name(entry)
+    model = entry.get("model") if isinstance(entry.get("model"), dict) else {}
+    hardware = entry.get("hardware") if isinstance(entry.get("hardware"), dict) else {}
+    same_spec = get_same_spec_payload(entry)
+    spec_id = str(same_spec.get("spec_id") or "")
+    official_public_candidate = is_public_official_candidate(entry)
+
+    if (
+        official_public_candidate
+        and engine == PUBLIC_BASELINE_ENGINE
+        and engine_version != PUBLIC_BASELINE_VERSION
+    ):
+        return f"public vllm baseline is {engine_version!r}, not {PUBLIC_BASELINE_VERSION}"
+
+    if contains_retired_baseline_token(engine_version):
+        return f"retired baseline token in engine_version {engine_version!r}"
+
+    if contains_retired_baseline_token(spec_id):
+        return f"retired baseline token in same_spec.spec_id {spec_id!r}"
+
+    if engine == PUBLIC_CURRENT_ENGINE and official_public_candidate:
+        if not spec_id:
+            return "official vllm-hust workload is missing same_spec"
+        if not spec_id.startswith(OFFICIAL_V0180_SPEC_PREFIX):
+            return f"official vllm-hust workload uses non-v0.18.0 spec {spec_id!r}"
+
+    if spec_id.startswith(OFFICIAL_V0180_SPEC_PREFIX):
+        expected_chip = "910B2" if spec_id.endswith("-910b2") else None
+        entry_precision = str(model.get("precision") or "")
+        spec_precision = str(same_spec.get("model_precision") or "")
+        entry_chip = str(hardware.get("chip_model") or "")
+        spec_chip = str(same_spec.get("hardware_chip_model") or "")
+        if not spec_precision or entry_precision != spec_precision:
+            return (
+                "official v0.18.0 precision mismatch: "
+                f"entry={entry_precision!r} same_spec={spec_precision!r}"
+            )
+        if expected_chip and (entry_chip != expected_chip or spec_chip != expected_chip):
+            return (
+                "official v0.18.0 hardware mismatch: "
+                f"entry={entry_chip!r} same_spec={spec_chip!r} expected={expected_chip!r}"
+            )
+
+    return None
+
+
+def filter_public_snapshot_entries(
+    entries: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[tuple[str, str]]]:
+    accepted: list[dict[str, Any]] = []
+    rejected: list[tuple[str, str]] = []
+    for entry in entries:
+        reason = public_snapshot_rejection_reason(entry)
+        if reason is None:
+            accepted.append(entry)
+        else:
+            rejected.append((str(entry.get("entry_id") or "<missing-entry-id>"), reason))
+    return accepted, rejected
 
 
 def prefer_newer_entry(
@@ -1785,12 +1893,19 @@ def main() -> None:
     args = parse_args()
     validator = Draft7Validator(load_schema(args.schema))
     incoming_entries = load_manifest_entries(args.source_dir, validator)
+    incoming_entries, rejected_incoming = filter_public_snapshot_entries(
+        incoming_entries
+    )
     existing_entries = []
+    rejected_existing: list[tuple[str, str]] = []
     touched_categories: set[str] = set(RENDER_CATEGORIES)
     if args.replace_all:
         single, multi = split_entries(incoming_entries)
     else:
         existing_entries = load_existing_snapshot_entries(args.output_dir, validator)
+        existing_entries, rejected_existing = filter_public_snapshot_entries(
+            existing_entries
+        )
         single, multi, touched_categories = merge_snapshot_entries_by_category(
             existing_entries, incoming_entries
         )
@@ -1813,6 +1928,13 @@ def main() -> None:
     print(f"  leaderboard_single.json: {len(single)} entries")
     print(f"  leaderboard_multi.json: {len(multi)} entries")
     print(f"  leaderboard_compare.json: {compare['group_count']} compare groups")
+    rejected_total = len(rejected_incoming) + len(rejected_existing)
+    if rejected_total:
+        print(f"  skipped invalid public entries: {rejected_total}")
+        for entry_id, reason in (rejected_incoming + rejected_existing)[:20]:
+            print(f"    - {entry_id}: {reason}")
+        if rejected_total > 20:
+            print(f"    ... {rejected_total - 20} more skipped")
     print(f"  output dir: {args.output_dir}")
 
 

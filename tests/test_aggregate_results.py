@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from copy import deepcopy
 from pathlib import Path
 
 
@@ -151,6 +152,51 @@ def _same_spec_payload(spec_id: str, spec_hash: str) -> dict:
     }
 
 
+def _official_same_spec_payload(
+    spec_id: str = "official-ascend-jan-2026-v0.18.0-random-online-qwen25-14b-910b2",
+    spec_hash: str = "official-hash",
+    *,
+    precision: str = "FP16",
+    chip_model: str = "910B2",
+) -> dict:
+    payload = _same_spec_payload(spec_id, spec_hash)
+    payload["model_precision"] = precision
+    payload["hardware_chip_model"] = chip_model
+    return payload
+
+
+def _official_public_entry(entry_id: str, *, engine: str = "vllm-hust") -> dict:
+    entry = deepcopy(_valid_entry())
+    entry["entry_id"] = entry_id
+    entry["engine"] = engine
+    entry["engine_version"] = "0.18.0" if engine == "vllm" else "ceec19ab"
+    entry["hardware"]["vendor"] = "Huawei"
+    entry["hardware"]["chip_model"] = "910B2"
+    entry["hardware"]["interconnect"] = "None"
+    entry["hardware"]["memory_per_chip_gb"] = 64
+    entry["hardware"]["total_memory_gb"] = 64
+    entry["model"]["canonical_id"] = "hf:Qwen/Qwen2.5-14B-Instruct"
+    entry["model"]["repo_id"] = "Qwen/Qwen2.5-14B-Instruct"
+    entry["model"]["short_name"] = "Qwen2.5-14B-Instruct"
+    entry["model"]["display_name"] = "Qwen2.5-14B-Instruct"
+    entry["model"]["name"] = "Qwen/Qwen2.5-14B-Instruct"
+    entry["model"]["precision"] = "FP16"
+    entry["workload"]["name"] = "random-online"
+    entry["workload"]["input_length"] = 1024
+    entry["workload"]["output_length"] = 256
+    entry["same_spec"] = _official_same_spec_payload()
+    entry["metadata"]["engine"] = engine
+    entry["metadata"]["engine_version"] = entry["engine_version"]
+    entry["metadata"]["github_repository"] = (
+        "vllm-project/vllm-ascend" if engine == "vllm" else "vLLM-HUST/vllm-hust"
+    )
+    entry["metadata"]["idempotency_key"] = (
+        f"{engine}|{entry['engine_version']}|random-online|qwen25-14b|fp16|910b2|1|1|single_gpu|{entry_id}"
+    )
+    entry["canonical_path"] = f"canonical/{entry_id}.json"
+    return entry
+
+
 def _load_compare_payload(script: Path, source_dir: Path, output_dir: Path) -> dict:
     result = subprocess.run(
         [
@@ -295,6 +341,65 @@ def test_aggregate_results_from_standard_manifest(tmp_path: Path) -> None:
     assert single_payload[0]["model"]["display_name"] == "Qwen2.5-0.5B-Instruct"
     assert single_payload[0]["metadata"]["github_user"] == "octocat"
     assert single_payload[0]["metadata"]["git_commit"] == "test-commit-123"
+
+
+def test_aggregate_results_filters_invalid_public_historical_entries(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    output_dir = tmp_path / "website_data"
+    source_dir.mkdir()
+
+    valid = _official_public_entry(
+        "11111111-1111-4111-8111-111111111111",
+        engine="vllm-hust",
+    )
+
+    retired_baseline = _official_public_entry(
+        "22222222-2222-4222-8222-222222222222",
+        engine="vllm",
+    )
+    retired_baseline["engine_version"] = "0.11.0"
+    retired_baseline["metadata"]["engine_version"] = "0.11.0"
+    retired_baseline["same_spec"] = _official_same_spec_payload(
+        "official-ascend-jan-2026-v0.11.0-random-online-qwen25-14b-910b3",
+        "retired-hash",
+        chip_model="910B3",
+    )
+
+    missing_same_spec = _official_public_entry(
+        "33333333-3333-4333-8333-333333333333",
+        engine="vllm-hust",
+    )
+    missing_same_spec.pop("same_spec")
+
+    wrong_chip = _official_public_entry(
+        "44444444-4444-4444-8444-444444444444",
+        engine="vllm-hust",
+    )
+    wrong_chip["hardware"]["chip_model"] = "910B3"
+    wrong_chip["same_spec"] = _official_same_spec_payload(chip_model="910B3")
+
+    _write_manifest_entries(
+        source_dir,
+        [valid, retired_baseline, missing_same_spec, wrong_chip],
+    )
+
+    result = _run_aggregate(script, source_dir, output_dir, "--replace-all")
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    assert "skipped invalid public entries: 3" in result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    assert [entry["entry_id"] for entry in single_payload] == [valid["entry_id"]]
+    assert single_payload[0]["hardware"]["chip_model"] == "910B2"
+    assert single_payload[0]["model"]["precision"] == "FP16"
+    assert single_payload[0]["same_spec"]["spec_id"].startswith(
+        "official-ascend-jan-2026-v0.18.0-"
+    )
 
 
 def test_aggregate_results_places_multi_gpu_entry_in_multi_snapshot(
