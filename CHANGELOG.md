@@ -189,7 +189,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - 新增 `data/last_updated.json` 作为 website 数据同步时间标记
 - 新增 workflow 守护校验：`validate-sync-workflow.yml`，防止 `sync-hf-data.yml` 回退到 `self-hosted` 或错误 dispatch
   type
-- Leaderboard 筛选新增 `Version` 下拉，自动拉取 `ivllm-hust` 在 PyPI 上 `>=0.5.0.0` 的全部版本号用于过滤
+- Leaderboard 筛选新增 `Version` 下拉。该历史实现曾错误引用不属于 vllm-hust 的 PyPI 命名空间；后续已改为不再使用外部包名前缀作为 vllm-hust 元数据来源。
 - 首页与 README 新增 v0.5 发布意义说明文案（工程可用性）
 - 新增统一版本元数据源 `data/version_meta.json`，集中维护首页发布文案、Quick Start 文案与包版本清单
 - 新增首页元数据加载器 `assets/version-meta-loader.js` 与版本页渲染器 `assets/versions-page.js`

@@ -313,6 +313,19 @@ def test_version_metadata_excludes_sagellm_package_family() -> None:
     assert "0.17.2.post1" not in meta_text
 
 
+def test_public_docs_do_not_use_ivllm_hust_prefix() -> None:
+    root = Path(__file__).resolve().parents[1]
+    checked_paths = [
+        root / "README.md",
+        root / "quickstart.sh",
+        root / "data" / "README.md",
+        root / "data" / "version_meta.json",
+    ]
+
+    for path in checked_paths:
+        assert "ivllm-hust" not in path.read_text(encoding="utf-8"), path
+
+
 def test_leaderboard_overview_compare_scope_includes_precision() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
