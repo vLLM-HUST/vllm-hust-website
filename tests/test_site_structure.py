@@ -140,6 +140,9 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "const chipText = getOverviewSummaryChipText(summary);" in text
     assert "const versionText = getOverviewSummaryVersionText(summary);" in text
     assert "const bestVisibleRunText =" in text
+    assert "const displayEntry = aggregateOnly && !representativeEntry ? null : bestEntry;" in text
+    assert "displayTTFT:" in text
+    assert "sampleTTFT" in text
     assert "currentBestVersionLabel" in text
     assert "baselineVersionLabel" in text
     assert (
@@ -151,11 +154,11 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert '<span class="engine-summary-version-label">${versionPrefix}</span>' in text
     assert '<span class="engine-summary-version-value">${versionText}</span>' in text
     assert (
-        "<span class=\"engine-summary-footer-label\">${t('bestVisibleRun')}:</span>"
+        '<span class="engine-summary-footer-label">${footerLabel}:</span>'
         in text
     )
     assert (
-        '<span class="engine-summary-footer-value">${bestVisibleRunText}</span>' in text
+        '<span class="engine-summary-footer-value">${footerValue}</span>' in text
     )
     metrics_index = text.index('<div class="engine-summary-metrics">')
     meta_index = text.index('<div class="engine-summary-meta">')

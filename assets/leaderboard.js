@@ -177,6 +177,9 @@
             avgTTFT: 'Avg TTFT',
             avgTBT: 'Avg TBT',
             avgThroughput: 'Avg Throughput',
+            sampleTTFT: 'Sample TTFT',
+            sampleTBT: 'Sample TBT',
+            sampleThroughput: 'Sample Throughput',
             errorRate: 'Error Rate',
             bestVisibleRun: 'Best visible run',
             visibleScopeLabel: 'Visible scope',
@@ -219,13 +222,13 @@
             overviewHeroGoalLabel: 'Official Compare',
             overviewHeroCompareLabel: 'Snapshot Compare',
             overviewGridLabel: 'Visible Aggregate',
-            overviewGridNote: 'Cards summarize the currently visible table rows by engine.',
-            overviewGridNoteAligned: 'Averages summarize the currently visible rows by engine; version and sample labels are aligned to the active compare scope when available.',
+            overviewGridNote: 'Cards show the highlighted visible sample for each engine; row counts show coverage.',
+            overviewGridNoteAligned: 'Cards show the matched compare-scope sample for each engine; row counts show coverage.',
             overviewGridNoteScopedOnly: 'Multiple complete compare groups are visible, so cards stay in aggregate mode and do not claim a single aligned sample.',
             overviewTableLabel: 'Visible Rows',
             overviewTableNote: 'The main table shows the currently visible benchmark rows after filters, scope toggles, and version merging.',
-            overviewGoalSnapshotNote: 'Hero deltas use the matched official compare snapshot. Cards below summarize the currently visible table rows.',
-            overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below summarize the currently visible table rows.',
+            overviewGoalSnapshotNote: 'Hero deltas use the matched official compare snapshot. Cards below show the highlighted visible sample for each engine.',
+            overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             resetFilters: 'Reset',
             paginationPrev: 'Prev',
             paginationNext: 'Next',
@@ -361,6 +364,9 @@
             avgTTFT: '平均 TTFT',
             avgTBT: '平均 TBT',
             avgThroughput: '平均吞吐',
+            sampleTTFT: '样本 TTFT',
+            sampleTBT: '样本 TBT',
+            sampleThroughput: '样本吞吐',
             errorRate: '错误率',
             bestVisibleRun: '当前最佳样本',
             visibleScopeLabel: '当前可见范围',
@@ -403,13 +409,13 @@
             overviewHeroGoalLabel: '官方对比',
             overviewHeroCompareLabel: '快照对比',
             overviewGridLabel: '当前可见聚合',
-            overviewGridNote: '下方卡片按引擎汇总当前主表可见行。',
-            overviewGridNoteAligned: '均值按当前主表可见行汇总；若存在命中的 compare scope，版本与样本会按同一 scope 对齐展示。',
+            overviewGridNote: '下方卡片展示每个引擎当前高亮样本的指标；记录数表示覆盖范围。',
+            overviewGridNoteAligned: '下方卡片展示同一 compare scope 命中样本的指标；记录数表示覆盖范围。',
             overviewGridNoteScopedOnly: '当前可见结果覆盖多个完整对比分组，所以下方卡片只展示聚合指标，不绑定单一对齐样本。',
             overviewTableLabel: '当前可见明细',
             overviewTableNote: '主表展示的是当前筛选、scope 开关和版本合并之后的 benchmark 可见行。',
-            overviewGoalSnapshotNote: '顶部 Hero 的差距值来自当前命中的官方 compare snapshot；下方卡片汇总的是当前主表可见行。',
-            overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片汇总的是当前主表可见行。',
+            overviewGoalSnapshotNote: '顶部 Hero 的差距值来自当前命中的官方 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
+            overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             resetFilters: '清空筛选',
             paginationPrev: '上一页',
             paginationNext: '下一页',
@@ -3890,6 +3896,8 @@
             .map(([engine, engineEntries]) => {
                 const representativeEntry = representativeByEngine.get(engine) || null;
                 const bestEntry = representativeEntry || [...engineEntries].sort((a, b) => compareEntryQuality(b, a))[0];
+                const displayEntry = aggregateOnly && !representativeEntry ? null : bestEntry;
+                const displayMetrics = displayEntry?.metrics || {};
                 return {
                     engine,
                     label: getEngineLabel(engine),
@@ -3898,6 +3906,11 @@
                     avgTBT: averageMetric(engineEntries, 'tbt_ms'),
                     avgTPS: averageMetric(engineEntries, 'throughput_tps'),
                     avgError: averageMetric(engineEntries, 'error_rate'),
+                    displayTTFT: displayEntry ? Number(displayMetrics.ttft_ms) : averageMetric(engineEntries, 'ttft_ms'),
+                    displayTBT: displayEntry ? Number(displayMetrics.tbt_ms) : averageMetric(engineEntries, 'tbt_ms'),
+                    displayTPS: displayEntry ? Number(displayMetrics.throughput_tps) : averageMetric(engineEntries, 'throughput_tps'),
+                    displayError: displayEntry ? Number(displayMetrics.error_rate) : averageMetric(engineEntries, 'error_rate'),
+                    displayEntry,
                     representativeEntry,
                     aggregateOnly: aggregateOnly && !representativeEntry,
                     aggregateScopeText,
@@ -3906,7 +3919,7 @@
                     version: formatEntryVersion(bestEntry, { display: true }),
                 };
             })
-            .sort((a, b) => (b.avgTPS || 0) - (a.avgTPS || 0));
+            .sort((a, b) => (b.displayTPS || 0) - (a.displayTPS || 0));
     }
 
     function averageMetric(entries, metric) {
@@ -3927,9 +3940,9 @@
         }
 
         return {
-            throughput: [...summaries].filter((item) => item.avgTPS != null).sort((a, b) => b.avgTPS - a.avgTPS)[0] || null,
-            ttft: [...summaries].filter((item) => item.avgTTFT != null).sort((a, b) => a.avgTTFT - b.avgTTFT)[0] || null,
-            tbt: [...summaries].filter((item) => item.avgTBT != null).sort((a, b) => a.avgTBT - b.avgTBT)[0] || null,
+            throughput: [...summaries].filter((item) => Number.isFinite(item.displayTPS)).sort((a, b) => b.displayTPS - a.displayTPS)[0] || null,
+            ttft: [...summaries].filter((item) => Number.isFinite(item.displayTTFT)).sort((a, b) => a.displayTTFT - b.displayTTFT)[0] || null,
+            tbt: [...summaries].filter((item) => Number.isFinite(item.displayTBT)).sort((a, b) => a.displayTBT - b.displayTBT)[0] || null,
         };
     }
 
@@ -3940,11 +3953,11 @@
 
         const leader = leaders.throughput;
         const runnerUp = summaries[1];
-        if (!leader || !runnerUp || !Number.isFinite(leader.avgTPS) || !Number.isFinite(runnerUp.avgTPS) || runnerUp.avgTPS === 0) {
+        if (!leader || !runnerUp || !Number.isFinite(leader.displayTPS) || !Number.isFinite(runnerUp.displayTPS) || runnerUp.displayTPS === 0) {
             return `${t('comparing')} ${summaries.length} ${t('enginesInView')}`;
         }
 
-        const delta = ((leader.avgTPS - runnerUp.avgTPS) / runnerUp.avgTPS) * 100;
+        const delta = ((leader.displayTPS - runnerUp.displayTPS) / runnerUp.displayTPS) * 100;
         const scopePrefix = comparisonView.focusGroup ? `${t('focusedSlice')} ` : '';
         return `${scopePrefix}${leader.label} ${t('leadsCurrentView')} ${delta.toFixed(1)}% ${t('throughputOver')} ${runnerUp.label}.`;
     }
@@ -4036,20 +4049,20 @@
         }
 
         const [left, right] = summaries;
-        const tpsDelta = relativeDelta(left.avgTPS, right.avgTPS, true);
-        const ttftDelta = relativeDelta(left.avgTTFT, right.avgTTFT, false);
-        const tbtDelta = relativeDelta(left.avgTBT, right.avgTBT, false);
+        const tpsDelta = relativeDelta(left.displayTPS, right.displayTPS, true);
+        const ttftDelta = relativeDelta(left.displayTTFT, right.displayTTFT, false);
+        const tbtDelta = relativeDelta(left.displayTBT, right.displayTBT, false);
 
         return `
             <div class="head-to-head">
                 <div class="head-to-head-side">
                     <strong>${left.label}</strong>
-                    <span>TTFT ${formatNumber(left.avgTTFT)} ms • TBT ${formatNumber(left.avgTBT)} ms • TPS ${formatNumber(left.avgTPS)}</span>
+                    <span>TTFT ${formatNumber(left.displayTTFT)} ms • TBT ${formatNumber(left.displayTBT)} ms • TPS ${formatNumber(left.displayTPS)}</span>
                 </div>
                 <div class="head-to-head-divider">${t('versusShort')}</div>
                 <div class="head-to-head-side">
                     <strong>${right.label}</strong>
-                    <span>TTFT ${formatNumber(right.avgTTFT)} ms • TBT ${formatNumber(right.avgTBT)} ms • TPS ${formatNumber(right.avgTPS)}</span>
+                    <span>TTFT ${formatNumber(right.displayTTFT)} ms • TBT ${formatNumber(right.displayTBT)} ms • TPS ${formatNumber(right.displayTPS)}</span>
                 </div>
             </div>
             <div class="head-to-head-deltas">
@@ -4323,6 +4336,7 @@
                 ? t('visibleScopeLabel')
                 : t('bestVisibleRun');
         const footerValue = aggregateOnly ? (summary.aggregateScopeText || t('compareNoData')) : bestVisibleRunText;
+        const metricLabel = (sampleKey, averageKey) => aggregateOnly ? t(averageKey) : t(sampleKey);
 
         return `
             <div class="engine-summary-card ${isLeader ? 'is-leader' : ''}">
@@ -4332,20 +4346,20 @@
                 </div>
                 <div class="engine-summary-metrics">
                     <div class="summary-metric">
-                        <span>${t('avgTTFT')}</span>
-                        <strong>${formatNumber(summary.avgTTFT)} ms</strong>
+                        <span>${metricLabel('sampleTTFT', 'avgTTFT')}</span>
+                        <strong>${formatNumber(summary.displayTTFT)} ms</strong>
                     </div>
                     <div class="summary-metric">
-                        <span>${t('avgTBT')}</span>
-                        <strong>${formatNumber(summary.avgTBT)} ms</strong>
+                        <span>${metricLabel('sampleTBT', 'avgTBT')}</span>
+                        <strong>${formatNumber(summary.displayTBT)} ms</strong>
                     </div>
                     <div class="summary-metric">
-                        <span>${t('avgThroughput')}</span>
-                        <strong>${formatNumber(summary.avgTPS)} tok/s</strong>
+                        <span>${metricLabel('sampleThroughput', 'avgThroughput')}</span>
+                        <strong>${formatNumber(summary.displayTPS)} tok/s</strong>
                     </div>
                     <div class="summary-metric">
                         <span>${t('errorRate')}</span>
-                        <strong>${formatPercent(summary.avgError)}</strong>
+                        <strong>${formatPercent(summary.displayError)}</strong>
                     </div>
                 </div>
                 <div class="engine-summary-meta">
@@ -4354,8 +4368,8 @@
                         <span class="engine-summary-version-value">${versionText}</span>
                     </div>
                     <div class="engine-summary-footer">
-                        <span class="engine-summary-footer-label">${t('bestVisibleRun')}:</span>
-                        <span class="engine-summary-footer-value">${bestVisibleRunText}</span>
+                        <span class="engine-summary-footer-label">${footerLabel}:</span>
+                        <span class="engine-summary-footer-value">${footerValue}</span>
                     </div>
                 </div>
             </div>
