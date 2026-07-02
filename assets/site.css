@@ -321,6 +321,7 @@ body:not([data-page="home"]) .leaderboard-eyebrow {
 body:not([data-page="home"]) .metric-box,
 body:not([data-page="home"]) .info-card,
 body:not([data-page="home"]) .data-row,
+body:not([data-page="home"]) .achievement-body,
 body:not([data-page="home"]) .loading-state,
 body:not([data-page="home"]) .empty-state,
 body:not([data-page="home"]) .table-wrap,
@@ -334,12 +335,15 @@ body:not([data-page="home"]) .workstation-window {
 body:not([data-page="home"]) .metric-box span,
 body:not([data-page="home"]) .metric-box strong,
 body:not([data-page="home"]) .data-row h3,
-body:not([data-page="home"]) .info-card h3 {
+body:not([data-page="home"]) .info-card h3,
+body:not([data-page="home"]) .achievement-body h3,
+body:not([data-page="home"]) .achievement-time span {
     color: #e5f2ff;
 }
 
 body:not([data-page="home"]) .metric-box span,
-body:not([data-page="home"]) .tag {
+body:not([data-page="home"]) .tag,
+body:not([data-page="home"]) .achievement-time strong {
     color: rgba(191, 219, 254, 0.78);
 }
 
@@ -352,6 +356,31 @@ body:not([data-page="home"]) .action-button {
     border-color: rgba(125, 211, 252, 0.30);
     background: rgba(14, 165, 233, 0.12);
     color: #dbeafe;
+}
+
+body:not([data-page="home"]) .achievement-body {
+    background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.10), transparent 34%),
+        rgba(15, 23, 42, 0.58);
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.20);
+}
+
+body:not([data-page="home"]) .achievement-item.is-latest .achievement-body {
+    border-color: rgba(134, 239, 172, 0.34);
+    background:
+        radial-gradient(circle at top right, rgba(134, 239, 172, 0.12), transparent 34%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.68), rgba(15, 23, 42, 0.52));
+}
+
+body:not([data-page="home"]) .achievement-body:hover {
+    border-color: rgba(125, 211, 252, 0.34);
+    box-shadow: 0 24px 78px rgba(0, 0, 0, 0.26);
+}
+
+body:not([data-page="home"]) .achievement-latest {
+    border-color: rgba(134, 239, 172, 0.42);
+    background: rgba(22, 163, 74, 0.18);
+    color: #bbf7d0;
 }
 
 body:not([data-page="home"]) .action-button.primary {
@@ -683,6 +712,131 @@ h1 {
     color: var(--muted);
 }
 
+.achievement-timeline {
+    position: relative;
+    display: grid;
+    gap: 16px;
+    padding-top: 2px;
+}
+
+.achievement-timeline::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 145px;
+    width: 1px;
+    background:
+        linear-gradient(180deg, rgba(56, 189, 248, 0.82), rgba(134, 239, 172, 0.20)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.24), transparent);
+    box-shadow: 0 0 22px rgba(56, 189, 248, 0.28);
+}
+
+.achievement-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+}
+
+.achievement-item::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    left: 139px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 2px solid rgba(226, 246, 255, 0.96);
+    background: #38bdf8;
+    box-shadow:
+        0 0 0 5px rgba(56, 189, 248, 0.14),
+        0 0 26px rgba(56, 189, 248, 0.38);
+}
+
+.achievement-item.is-latest::before {
+    background: #86efac;
+    box-shadow:
+        0 0 0 6px rgba(134, 239, 172, 0.16),
+        0 0 30px rgba(134, 239, 172, 0.46);
+}
+
+.achievement-time {
+    padding-top: 16px;
+    text-align: right;
+}
+
+.achievement-time span,
+.achievement-time strong {
+    display: block;
+}
+
+.achievement-time span {
+    font-weight: 800;
+    color: var(--ink);
+}
+
+.achievement-time strong {
+    margin-top: 5px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.achievement-body {
+    min-width: 0;
+    padding: 18px 20px;
+    border-radius: 16px;
+    border: 1px solid #dbe7f3;
+    background: #ffffff;
+    box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08);
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.achievement-item.is-latest .achievement-body {
+    border-color: rgba(14, 165, 233, 0.30);
+}
+
+.achievement-body:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 22px 54px rgba(15, 23, 42, 0.12);
+}
+
+.achievement-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 8px;
+}
+
+.achievement-body h3 {
+    margin: 0;
+    font-size: 1.06rem;
+}
+
+.achievement-body p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.achievement-latest {
+    flex: 0 0 auto;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(34, 197, 94, 0.34);
+    background: rgba(22, 163, 74, 0.12);
+    color: #15803d;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.achievement-actions {
+    margin-top: 14px;
+}
+
 .tag-list {
     display: flex;
     flex-wrap: wrap;
@@ -905,5 +1059,42 @@ h1 {
 
     .data-row {
         grid-template-columns: 1fr;
+    }
+
+    .achievement-timeline::before {
+        left: 7px;
+    }
+
+    .achievement-item {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding-left: 28px;
+    }
+
+    .achievement-item::before {
+        left: 1px;
+    }
+
+    .achievement-time {
+        padding-top: 0;
+        text-align: left;
+    }
+
+    .achievement-time span,
+    .achievement-time strong {
+        display: inline;
+    }
+
+    .achievement-time strong::before {
+        content: " / ";
+    }
+
+    .achievement-head {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .achievement-body {
+        padding: 16px;
     }
 }

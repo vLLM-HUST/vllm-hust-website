@@ -304,7 +304,24 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "achievements-bidkv-sc2026-20260702" in html_text
+    assert "achievements-timeline-20260702" in html_text
+
+
+def test_achievements_page_uses_reverse_chronological_timeline() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "achievements.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
+
+    assert 'id="achievement-timeline"' in html_text
+    assert 'class="achievement-timeline"' in html_text
+    assert "achievement-artifacts" not in html_text
+    assert "achievement-milestones" not in html_text
+    assert "const ACHIEVEMENTS = [" in js_text
+    assert "sortDate: '2026-07-02'" in js_text
+    assert "].sort((left, right) => right.sortDate.localeCompare(left.sortDate));" in js_text
+    assert "achievement-item" in css_text
+    assert "achievement-time" in css_text
 
 
 def test_bidkv_achievement_links_to_pdf_not_repository() -> None:
