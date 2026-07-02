@@ -1237,65 +1237,55 @@ def metric_winner(
 def select_preferred_pair(
     entries: list[dict[str, Any]],
 ) -> tuple[dict[str, Any], dict[str, Any]] | None:
-    if len(entries) < 2:
+    current_candidates = [
+        entry for entry in entries if normalize_engine_name(entry) == "vllm-hust"
+    ]
+    baseline_candidates = [
+        entry for entry in entries if normalize_engine_name(entry) == "vllm"
+    ]
+    if not current_candidates or not baseline_candidates:
         return None
 
-    same_spec_entries = [
-        entry for entry in entries if get_same_spec_hash(entry) is not None
-    ]
-    if same_spec_entries:
-        cross_engine_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
-        same_engine_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
-        ordered_same_spec = sorted(
-            same_spec_entries,
-            key=lambda item: (
-                parse_entry_timestamp(item),
-                float((item.get("metrics") or {}).get("throughput_tps") or 0.0),
-            ),
-            reverse=True,
-        )
-        for left_index, left_entry in enumerate(ordered_same_spec):
-            for right_entry in ordered_same_spec[left_index + 1 :]:
-                if same_spec_hashes_match(left_entry, right_entry):
-                    left_engine = str(
-                        left_entry.get("engine")
-                        or (left_entry.get("metadata") or {}).get("engine")
-                        or "unknown"
-                    )
-                    right_engine = str(
-                        right_entry.get("engine")
-                        or (right_entry.get("metadata") or {}).get("engine")
-                        or "unknown"
-                    )
-                    if left_engine != right_engine:
-                        cross_engine_pairs.append((left_entry, right_entry))
-                    else:
-                        same_engine_pairs.append((left_entry, right_entry))
-        matching_pairs = cross_engine_pairs or same_engine_pairs
-        if not matching_pairs:
-            return None
-
-        entries = list(matching_pairs[0])
-
-    ordered = sorted(
-        entries,
+    current_entry = sorted(
+        current_candidates,
         key=lambda item: (
-            -float((item.get("metrics") or {}).get("throughput_tps") or 0.0),
-            float((item.get("metrics") or {}).get("ttft_ms") or float("inf")),
-            float((item.get("metrics") or {}).get("tbt_ms") or float("inf")),
-            str(
-                item.get("engine")
-                or (item.get("metadata") or {}).get("engine")
-                or "unknown"
-            ),
-            str(
-                item.get("engine_version")
-                or (item.get("metadata") or {}).get("engine_version")
-                or "unknown"
-            ),
+            parse_entry_timestamp(item),
+            float((item.get("metrics") or {}).get("throughput_tps") or 0.0),
         ),
-    )
-    return ordered[0], ordered[1]
+        reverse=True,
+    )[0]
+
+    current_hash = get_same_spec_hash(current_entry)
+    current_spec_id = get_same_spec_id(current_entry)
+    matching_baselines = [
+        entry
+        for entry in baseline_candidates
+        if current_hash and get_same_spec_hash(entry) == current_hash
+    ]
+    if not matching_baselines and current_spec_id:
+        matching_baselines = [
+            entry
+            for entry in baseline_candidates
+            if get_same_spec_id(entry) == current_spec_id
+        ]
+    if not matching_baselines:
+        matching_baselines = baseline_candidates
+
+    baseline_entry = sorted(
+        matching_baselines,
+        key=lambda item: (
+            parse_entry_timestamp(item),
+            float((item.get("metrics") or {}).get("throughput_tps") or 0.0),
+        ),
+        reverse=True,
+    )[0]
+    return current_entry, baseline_entry
+
+
+def normalize_engine_name(entry: dict[str, Any]) -> str:
+    return str(
+        entry.get("engine") or (entry.get("metadata") or {}).get("engine") or "unknown"
+    ).strip().lower()
 
 
 def is_goal_baseline_entry(entry: dict[str, Any]) -> bool:

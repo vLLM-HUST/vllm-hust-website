@@ -1360,34 +1360,34 @@ def test_compare_snapshot_prefers_matching_same_spec_pair(tmp_path: Path) -> Non
 
     engine_a_newer = _valid_entry()
     engine_a_newer["entry_id"] = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
-    engine_a_newer["engine"] = "engine-a"
-    engine_a_newer["metadata"]["engine"] = "engine-a"
+    engine_a_newer["engine"] = "vllm-hust"
+    engine_a_newer["metadata"]["engine"] = "vllm-hust"
     engine_a_newer["metadata"]["submitted_at"] = "2026-03-14T12:10:00Z"
     engine_a_newer["metrics"]["throughput_tps"] = 120.0
     engine_a_newer["metadata"]["idempotency_key"] = (
-        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|hash-a"
+        "vllm-hust|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|hash-a"
     )
     engine_a_newer["same_spec"] = _same_spec_payload("spec-4", "hash-a")
 
     engine_a_matching = _valid_entry()
     engine_a_matching["entry_id"] = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
-    engine_a_matching["engine"] = "engine-a"
-    engine_a_matching["metadata"]["engine"] = "engine-a"
+    engine_a_matching["engine"] = "vllm-hust"
+    engine_a_matching["metadata"]["engine"] = "vllm-hust"
     engine_a_matching["metadata"]["submitted_at"] = "2026-03-14T12:05:00Z"
     engine_a_matching["metrics"]["throughput_tps"] = 110.0
     engine_a_matching["metadata"]["idempotency_key"] = (
-        "engine-a|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|hash-shared-a"
+        "vllm-hust|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|hash-shared-a"
     )
     engine_a_matching["same_spec"] = _same_spec_payload("spec-4", "hash-shared")
 
     engine_b_matching = _valid_entry()
     engine_b_matching["entry_id"] = "cccccccc-cccc-cccc-cccc-cccccccccccc"
-    engine_b_matching["engine"] = "engine-b"
-    engine_b_matching["metadata"]["engine"] = "engine-b"
+    engine_b_matching["engine"] = "vllm"
+    engine_b_matching["metadata"]["engine"] = "vllm"
     engine_b_matching["metadata"]["submitted_at"] = "2026-03-14T12:08:00Z"
     engine_b_matching["metrics"]["throughput_tps"] = 105.0
     engine_b_matching["metadata"]["idempotency_key"] = (
-        "engine-b|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|hash-shared-b"
+        "vllm|1.2.3|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu|hash-shared-b"
     )
     engine_b_matching["same_spec"] = _same_spec_payload("spec-4", "hash-shared")
 
@@ -1446,7 +1446,10 @@ def test_compare_snapshot_prefers_matching_same_spec_pair(tmp_path: Path) -> Non
     )
     preferred_pair = compare_payload["preferred_pairs"][0]["preferred_pair"]
 
-    assert preferred_pair["left"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
+    assert preferred_pair["left"]["engine"] == "vllm-hust"
+    assert preferred_pair["right"]["engine"] == "vllm"
+    assert preferred_pair["left"]["entry_id"] == engine_a_newer["entry_id"]
+    assert preferred_pair["left"]["same_spec"]["resolved_spec_hash"] == "hash-a"
     assert preferred_pair["right"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
 
 
@@ -1564,6 +1567,6 @@ def test_aggregate_results_prefers_cross_engine_same_spec_pair(
     )
     preferred_pair = compare_payload["preferred_pairs"][0]["preferred_pair"]
 
-    assert preferred_pair["left"]["engine"] == "vllm"
-    assert preferred_pair["right"]["engine"] == "vllm-hust"
-    assert preferred_pair["right"]["entry_id"] == latest_current_entry["entry_id"]
+    assert preferred_pair["left"]["engine"] == "vllm-hust"
+    assert preferred_pair["right"]["engine"] == "vllm"
+    assert preferred_pair["left"]["entry_id"] == latest_current_entry["entry_id"]
