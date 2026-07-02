@@ -304,7 +304,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "achievements-no-workload-evidence-20260701" in html_text
+    assert "achievements-bidkv-sc2026-20260702" in html_text
 
 
 def test_achievements_page_omits_package_version_cards() -> None:

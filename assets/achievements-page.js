@@ -10,6 +10,27 @@
     const ARTIFACTS = [
         {
             title: {
+                en: 'BidKV at SC 2026',
+                zh: 'BidKV 入选 SC 2026',
+            },
+            body: {
+                en: 'SC 2026 paper on utility-guided preemption scheduling for KV-pressure LLM serving, connecting vllm-hust serving research with system-level scheduling evidence.',
+                zh: 'SC 2026 论文，研究 KV cache 压力下大模型推理服务的 utility-guided preemption scheduling，体现 vllm-hust 在推理服务调度方向的系统研究成果。',
+            },
+            tags: [
+                { en: 'SC 2026', zh: 'SC 2026' },
+                { en: 'KV cache', zh: 'KV cache' },
+                { en: 'LLM serving', zh: 'LLM serving' },
+            ],
+            links: [
+                {
+                    label: { en: 'Repository', zh: '仓库' },
+                    href: 'https://github.com/ShuhaoZhangTony/bidkv',
+                },
+            ],
+        },
+        {
+            title: {
                 en: 'Domestic-hardware inference engine survey',
                 zh: '国产算力推理引擎综述',
             },
