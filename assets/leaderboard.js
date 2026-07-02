@@ -58,6 +58,7 @@
             statsComparisonRows: 'comparison rows across',
             statsCompleteGroups: 'complete groups',
             statsSource: 'source',
+            statsLoadingMore: 'loading more data...',
             quickCompare: 'Compare',
             hardConstraintsTitle: 'Validation Checks',
             hardConstraintsSubtitle: 'Current validation records from benchmark snapshots, with context from previous submissions.',
@@ -259,6 +260,7 @@
             statsComparisonRows: '条对比记录，覆盖',
             statsCompleteGroups: '个完整分组',
             statsSource: '数据源',
+            statsLoadingMore: '仍在加载更多数据...',
             quickCompare: '对比',
             hardConstraintsTitle: '验证项',
             hardConstraintsSubtitle: '展示当前 benchmark 快照中的验证记录，并保留与上次提交相关的上下文。',
@@ -483,7 +485,8 @@
         },
         chartMetric: 'throughput_tps',
         trendChart: null,
-        tableDetailsExpanded: false
+        tableDetailsExpanded: false,
+        loadingMore: false
     };
 
     // Initialize on DOM ready
@@ -497,13 +500,14 @@
     });
 
     async function init() {
-        await loadData();
         setupEventListeners();
+        await loadData();
         renderFilters();
         renderViewControls();
         updateTableDetailsToggle();
         renderTable();
         await renderLastUpdated();
+        startBackgroundDataSync();
     }
 
     // Load JSON data (支持 HF 和本地两种模式)
@@ -513,57 +517,67 @@
         const contentEl = document.getElementById('leaderboard-content');
 
         try {
-            let singleData, multiData;
+            let data;
+            let renderedPartial = false;
+
+            const renderPartialData = (progress) => {
+                const partialData = progress?.data || {};
+                const hasBenchmarkData =
+                    Array.isArray(partialData.single) || Array.isArray(partialData.multi);
+                if (!hasBenchmarkData) {
+                    return;
+                }
+
+                applyLeaderboardPayload(partialData, {
+                    partial: true,
+                    resetFilters: !renderedPartial
+                });
+                if (!renderedPartial) {
+                    ensureCurrentTabHasData();
+                }
+                renderedPartial = true;
+                state.loadingMore = !progress.complete;
+
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'none';
+                contentEl.style.display = 'block';
+                renderFilters();
+                renderViewControls();
+                updateTableDetailsToggle();
+                renderTable();
+            };
 
             // 优先使用 HF Data Loader（如果可用）
             if (window.HFDataLoader) {
                 console.log('[Leaderboard] Using HF Data Loader...');
-                const data = await window.HFDataLoader.loadLeaderboardData();
-                singleData = data.single;
-                multiData = data.multi;
-                state.compareSnapshot = data.compare || null;
+                data = await window.HFDataLoader.loadLeaderboardData({
+                    onProgress: renderPartialData
+                });
             } else {
                 // 备用：直接从本地加载
                 console.log('[Leaderboard] HF Loader not available, using local data...');
-                const [singleRes, multiRes] = await Promise.all([
+                const [singleRes, multiRes, compareRes] = await Promise.all([
                     fetch('./data/leaderboard_single.json'),
-                    fetch('./data/leaderboard_multi.json')
+                    fetch('./data/leaderboard_multi.json'),
+                    fetch('./data/leaderboard_compare.json')
                 ]);
 
                 if (!singleRes.ok || !multiRes.ok) {
                     throw new Error('Failed to load data');
                 }
 
-                singleData = await singleRes.json();
-                multiData = await multiRes.json();
-                state.compareSnapshot = null;
+                data = {
+                    single: await singleRes.json(),
+                    multi: await multiRes.json(),
+                    compare: compareRes.ok ? await compareRes.json() : null,
+                };
             }
 
-            // 按芯片数和节点数分类
-            state.singleChipData = singleData.filter(entry =>
-                entry.hardware.chip_count === 1 && (!entry.cluster || entry.cluster.node_count === 1)
-            );
-
-            state.multiChipData = multiData.filter(entry =>
-                entry.hardware.chip_count > 1 && (!entry.cluster || entry.cluster.node_count === 1)
-            );
-
-            state.multiNodeData = multiData.filter(entry =>
-                entry.cluster && entry.cluster.node_count > 1
-            );
-
-            state.totalLoadedEntries =
-                state.singleChipData.length +
-                state.multiChipData.length +
-                state.multiNodeData.length;
-
-            // 排序
-            [state.singleChipData, state.multiChipData, state.multiNodeData].forEach(data => {
-                data.sort(compareEntriesByVersionDesc);
-            });
-
-            // 初始化筛选器默认值
-            initializeFilters();
+            state.loadingMore = false;
+            applyLeaderboardPayload(data, { resetFilters: !renderedPartial });
+            if (!renderedPartial) {
+                ensureCurrentTabHasData();
+            }
 
             loadingEl.style.display = 'none';
             contentEl.style.display = 'block';
@@ -572,6 +586,87 @@
             loadingEl.style.display = 'none';
             errorEl.style.display = 'block';
         }
+    }
+
+    function applyLeaderboardPayload(data, options = {}) {
+        const hasSingle = Array.isArray(data?.single);
+        const hasMulti = Array.isArray(data?.multi);
+        const hasCompare = Object.prototype.hasOwnProperty.call(data || {}, 'compare');
+
+        if (hasCompare) {
+            state.compareSnapshot = data?.compare || null;
+        }
+
+        if (hasSingle || !options.partial) {
+            const singleData = hasSingle ? data.single : [];
+            // 按芯片数和节点数分类
+            state.singleChipData = singleData.filter(entry =>
+                entry.hardware.chip_count === 1 && (!entry.cluster || entry.cluster.node_count === 1)
+            );
+        }
+
+        if (hasMulti || !options.partial) {
+            const multiData = hasMulti ? data.multi : [];
+            state.multiChipData = multiData.filter(entry =>
+                entry.hardware.chip_count > 1 && (!entry.cluster || entry.cluster.node_count === 1)
+            );
+
+            state.multiNodeData = multiData.filter(entry =>
+                entry.cluster && entry.cluster.node_count > 1
+            );
+        }
+
+        state.totalLoadedEntries =
+            state.singleChipData.length +
+            state.multiChipData.length +
+            state.multiNodeData.length;
+
+        [state.singleChipData, state.multiChipData, state.multiNodeData].forEach(entries => {
+            entries.sort(compareEntriesByVersionDesc);
+        });
+
+        if (options.resetFilters) {
+            initializeFilters();
+        }
+    }
+
+    function ensureCurrentTabHasData() {
+        if (getDataByTab(state.currentTab).length > 0) {
+            return;
+        }
+
+        const firstPopulatedTab = ['single-chip', 'multi-chip', 'multi-node']
+            .find((tab) => getDataByTab(tab).length > 0);
+        if (!firstPopulatedTab) {
+            return;
+        }
+
+        state.currentTab = firstPopulatedTab;
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === firstPopulatedTab);
+        });
+    }
+
+    function startBackgroundDataSync() {
+        if (!window.HFDataLoader || typeof window.HFDataLoader.startBackgroundSync !== 'function') {
+            return;
+        }
+
+        window.addEventListener('vllm-hust:leaderboard-data-updated', (event) => {
+            const data = event.detail?.data;
+            if (!data) {
+                return;
+            }
+
+            applyLeaderboardPayload(data, { resetFilters: false });
+            renderFilters();
+            renderViewControls();
+            updateTableDetailsToggle();
+            renderTable();
+            void renderLastUpdated();
+        });
+
+        window.HFDataLoader.startBackgroundSync();
     }
 
     function getWorkloadId(entry) {
@@ -2938,7 +3033,8 @@
             ? window.HFDataLoader.getLastLoadedSource()
             : 'local';
         const sourceText = source ? ` • ${t('statsSource')}: ${source}` : '';
-        statsEl.textContent = `${t('statsLoaded')} ${state.totalLoadedEntries} • ${state.currentTab}: ${tabTotal} • ${t('statsMatched')} ${rawFilteredTotal} ${t('statsBuildEntries')} • ${t('statsShowing')} ${mergedTotal} ${t('statsComparisonRows')} ${comparisonView.activeCoverage.completeGroupCount} ${t('statsCompleteGroups')}${hiddenText}${sourceText}`;
+        const loadingMoreText = state.loadingMore ? ` • ${t('statsLoadingMore')}` : '';
+        statsEl.textContent = `${t('statsLoaded')} ${state.totalLoadedEntries} • ${state.currentTab}: ${tabTotal} • ${t('statsMatched')} ${rawFilteredTotal} ${t('statsBuildEntries')} • ${t('statsShowing')} ${mergedTotal} ${t('statsComparisonRows')} ${comparisonView.activeCoverage.completeGroupCount} ${t('statsCompleteGroups')}${hiddenText}${sourceText}${loadingMoreText}`;
     }
 
     function shouldLockOverviewScope(comparisonView) {

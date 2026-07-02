@@ -1,8 +1,8 @@
 /**
  * Hugging Face Data Loader for LLM Engine Leaderboard
  *
- * 从 Hugging Face Datasets Hub 加载 benchmark 结果
- * 支持实时更新，无需后端服务
+ * 从公开快照源加载 benchmark 结果
+ * 支持 GitHub / Hugging Face / 本地快照，无需后端服务
  */
 
 const HF_CONFIG = {
@@ -25,16 +25,24 @@ const HF_CONFIG = {
     // 前端缓存，避免频繁刷新时重复全量拉取
     cacheTTLms: 5 * 60 * 1000,
 
-    // 启用标记文件一致性校验，避免同步后继续命中旧缓存
+    // Remote-first mode keeps the visible leaderboard fresh. Marker checks run
+    // alongside data downloads so they do not add another network round trip.
     validateWithMarker: true,
 
-    // 远端优先使用镜像，官方站点作为回退
+    // 首屏展示后，在后台校验远端快照是否更新。
+    backgroundRemoteSync: true,
+
+    // 命中 session cache 时，marker 校验只短暂等待；慢网络下先展示缓存，
+    // 再交给后台同步补齐最新远端数据。
+    cacheMarkerTimeoutMs: 1200,
+
+    // Hugging Face 远端使用镜像，官方站点作为回退
     endpoints: [
         'https://hf-mirror.com',
         'https://huggingface.co'
     ],
 
-    // 数据源优先级：benchmark repo snapshots 是唯一真实数据源，HF 和本地镜像作为回退。
+    // 数据源优先级：远端快照优先，站点内置快照作为兜底。
     sources: ['github', 'hf', 'local'],
 
     // GitHub 仓库配置（用于不依赖 HF 的数据发布方式）
@@ -47,7 +55,10 @@ const HF_CONFIG = {
 
 const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v6';
 const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-3';
+const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';
+const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';
 let lastLoadedSource = null;
+let backgroundSyncPromise = null;
 
 function getUniqueEndpoints() {
     const configured = Array.isArray(HF_CONFIG.endpoints) ? HF_CONFIG.endpoints : [];
@@ -169,6 +180,42 @@ function setLastLoadedSource(source) {
 
 function getLastLoadedSource() {
     return lastLoadedSource;
+}
+
+function withTimeout(promise, timeoutMs, label) {
+    if (!timeoutMs || timeoutMs <= 0) {
+        return promise;
+    }
+
+    return new Promise((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+            reject(new Error(`${label || 'Operation'} timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+
+        promise.then(
+            (value) => {
+                clearTimeout(timeoutId);
+                resolve(value);
+            },
+            (error) => {
+                clearTimeout(timeoutId);
+                reject(error);
+            }
+        );
+    });
+}
+
+async function getLatestMarkerWithTimeout(sourcePriority, timeoutMs) {
+    try {
+        return await withTimeout(
+            getLatestMarker(sourcePriority),
+            timeoutMs,
+            'Leaderboard marker check'
+        );
+    } catch (error) {
+        console.warn('[HF Loader] Marker check skipped:', error?.message || error);
+        return null;
+    }
 }
 
 async function getLatestMarker(sourcePriority = getSourcePriority()) {
@@ -472,11 +519,145 @@ async function loadOptionalJson(loader, filename) {
     }
 }
 
+function dispatchProgress(payload, onProgress) {
+    if (typeof onProgress === 'function') {
+        onProgress(payload);
+    }
+    if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') {
+        return;
+    }
+    window.dispatchEvent(new CustomEvent(PROGRESS_EVENT, { detail: payload }));
+}
+
+async function loadSnapshotFromSource(source, markerPriority = [source], options = {}) {
+    const loaders = {
+        github: loadFromGitHub,
+        hf: loadFromHuggingFace,
+        local: loadFromLocal,
+    };
+    const loader = loaders[source];
+    if (!loader) {
+        throw new Error(`Unknown leaderboard data source: ${source}`);
+    }
+
+    const partial = {};
+    const notifyFileLoaded = (key, value) => {
+        partial[key] = value;
+        dispatchProgress({
+            source,
+            key,
+            data: { ...partial },
+            complete: false
+        }, options.onProgress);
+        return value;
+    };
+
+    const markerPromise = getLatestMarker(markerPriority);
+    const [singleData, multiData, compareData, marker] = await Promise.all([
+        loader(HF_CONFIG.files.single)
+            .then((data) => notifyFileLoaded('single', normalizeEntryArray(data))),
+        loader(HF_CONFIG.files.multi)
+            .then((data) => notifyFileLoaded('multi', normalizeEntryArray(data))),
+        loadOptionalJson(loader, HF_CONFIG.files.compare)
+            .then((data) => notifyFileLoaded(
+                'compare',
+                data && typeof data === 'object' ? data : null
+            )),
+        markerPromise
+    ]);
+
+    const result = {
+        single: singleData,
+        multi: multiData,
+        compare: compareData,
+    };
+
+    assertUsableLeaderboardPayload(result, source);
+    dispatchProgress({
+        source,
+        data: result,
+        complete: true
+    }, options.onProgress);
+    return { data: result, marker };
+}
+
+function getRemoteSourcePriority() {
+    const preferred = getSourcePriority().filter((source) => source !== 'local');
+    const fallback = ['github', 'hf'].filter((source) => !preferred.includes(source));
+    return [...preferred, ...fallback];
+}
+
+function dispatchBackgroundUpdate(data, source, marker) {
+    if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') {
+        return;
+    }
+    window.dispatchEvent(new CustomEvent(BACKGROUND_SYNC_EVENT, {
+        detail: { data, source, marker }
+    }));
+}
+
+async function syncRemoteSnapshotInBackground() {
+    if (!HF_CONFIG.backgroundRemoteSync) {
+        return null;
+    }
+    if (backgroundSyncPromise) {
+        return backgroundSyncPromise;
+    }
+
+    backgroundSyncPromise = (async () => {
+        const cachedEnvelope = readCacheEnvelope();
+        const currentMarker = cachedEnvelope?.marker || null;
+
+        for (const source of getRemoteSourcePriority()) {
+            try {
+                const remoteMarker = await getLatestMarker([source]);
+                if (!remoteMarker) {
+                    continue;
+                }
+                if (currentMarker && remoteMarker === currentMarker) {
+                    console.log(`[HF Loader] ✅ Background ${source} marker matched`);
+                    return null;
+                }
+
+                console.log(`[HF Loader] ♻️ Background ${source} marker changed, refreshing data`);
+                const snapshot = await loadSnapshotFromSource(source, [source]);
+                writeCache(snapshot.data, snapshot.marker || remoteMarker);
+                setLastLoadedSource(source);
+                dispatchBackgroundUpdate(snapshot.data, source, snapshot.marker || remoteMarker);
+                return snapshot.data;
+            } catch (error) {
+                console.warn(`[HF Loader] Background ${source} sync failed:`, error?.message || error);
+            }
+        }
+
+        return null;
+    })().finally(() => {
+        backgroundSyncPromise = null;
+    });
+
+    return backgroundSyncPromise;
+}
+
+function startBackgroundSync() {
+    if (typeof window === 'undefined') {
+        return Promise.resolve(null);
+    }
+
+    const run = () => syncRemoteSnapshotInBackground();
+    if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(run, { timeout: 2500 });
+        return backgroundSyncPromise || Promise.resolve(null);
+    }
+
+    window.setTimeout(run, 0);
+    return backgroundSyncPromise || Promise.resolve(null);
+}
+
 /**
- * 加载 leaderboard 数据（优先 HF，失败则本地）
+ * 加载 leaderboard 数据（远端优先，失败则本地）
  * @returns {Promise<{single: Array, multi: Array, compare: Object}>}
  */
-async function loadLeaderboardData() {
+async function loadLeaderboardData(options = {}) {
     const cachedEnvelope = readCacheEnvelope();
     if (cachedEnvelope) {
         if (!isCompareSnapshotUsable(cachedEnvelope.data?.compare)) {
@@ -487,7 +668,10 @@ async function loadLeaderboardData() {
             console.log('[HF Loader] ✅ Loaded from session cache');
             return cachedEnvelope.data;
         } else {
-            const latestMarker = await getLatestMarker();
+            const latestMarker = await getLatestMarkerWithTimeout(
+                getSourcePriority(),
+                HF_CONFIG.cacheMarkerTimeoutMs
+            );
             if (latestMarker && cachedEnvelope.marker && cachedEnvelope.marker === latestMarker) {
                 setLastLoadedSource('cache');
                 console.log('[HF Loader] ✅ Loaded from session cache (marker matched)');
@@ -497,6 +681,7 @@ async function loadLeaderboardData() {
             if (!latestMarker) {
                 setLastLoadedSource('cache');
                 console.log('[HF Loader] ⚠️ Marker unavailable, fallback to TTL cache');
+                startBackgroundSync();
                 return cachedEnvelope.data;
             }
 
@@ -526,20 +711,17 @@ async function loadLeaderboardData() {
 
         try {
             console.log(`[HF Loader] Loading from ${source}...`);
-            const marker = await getLatestMarker([source, ...sourcePriority.filter((item) => item !== source)]);
-            const [singleData, multiData, compareData] = await Promise.all([
-                loader(HF_CONFIG.files.single),
-                loader(HF_CONFIG.files.multi),
-                loadOptionalJson(loader, HF_CONFIG.files.compare)
-            ]);
+            const markerPriority = source === 'local'
+                ? ['local']
+                : [source, ...sourcePriority.filter((item) => item !== source)];
+            const snapshot = await loadSnapshotFromSource(source, markerPriority, {
+                onProgress: options.onProgress
+            });
+            result.single = snapshot.data.single;
+            result.multi = snapshot.data.multi;
+            result.compare = snapshot.data.compare;
 
-            result.single = normalizeEntryArray(singleData);
-            result.multi = normalizeEntryArray(multiData);
-            result.compare = compareData && typeof compareData === 'object' ? compareData : null;
-
-            assertUsableLeaderboardPayload(result, source);
-
-            writeCache(result, marker);
+            writeCache(result, snapshot.marker);
             setLastLoadedSource(source);
             console.log(
                 `[HF Loader] ✅ Loaded from ${source}: ${result.single.length} single, ${result.multi.length} multi`
@@ -565,9 +747,13 @@ async function getLastUpdated() {
         local: loadFromLocal,
     };
 
+    const cachedEnvelope = readCacheEnvelope();
+    if (cachedEnvelope?.marker) {
+        return cachedEnvelope.marker;
+    }
+
     const loadedSource = getLastLoadedSource();
     if (loadedSource === 'cache') {
-        const cachedEnvelope = readCacheEnvelope();
         if (cachedEnvelope?.marker) {
             return cachedEnvelope.marker;
         }
@@ -620,6 +806,7 @@ async function getLastUpdated() {
 // 导出供 leaderboard.js 使用
 window.HFDataLoader = {
     loadLeaderboardData,
+    startBackgroundSync,
     getLastUpdated,
     getLastLoadedSource,
     config: HF_CONFIG

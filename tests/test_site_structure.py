@@ -112,6 +112,14 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     assert "return hardConstraintScopes.length === 0;" in text
     assert "assertUsableLeaderboardPayload(result, source);" in text
     assert "sources: ['github', 'hf', 'local']" in text
+    assert "backgroundRemoteSync: true" in text
+    assert "cacheMarkerTimeoutMs: 1200" in text
+    assert "const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';" in text
+    assert "const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';" in text
+    assert "const markerPromise = getLatestMarker(markerPriority);" in text
+    assert "function dispatchProgress(payload, onProgress)" in text
+    assert "function startBackgroundSync()" in text
+    assert "startBackgroundSync," in text
     assert "llm_engine_hf_leaderboard_cache_v6" in text
     assert "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-3';" in text
     assert (
@@ -371,10 +379,17 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         in html_text
     )
     assert 'data-trend-metric="throughput_tps"' in html_text
-    assert "leaderboard-cache-v6-20260701" in html_text
+    assert "leaderboard-cache-v7-20260702" in html_text
     assert "leaderboard-public-20260701" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
+    assert "function startBackgroundDataSync()" in js_text
+    assert "const renderPartialData = (progress) => {" in js_text
+    assert "onProgress: renderPartialData" in js_text
+    assert "function ensureCurrentTabHasData()" in js_text
+    assert "statsLoadingMore" in js_text
+    assert "vllm-hust:leaderboard-data-updated" in js_text
+    assert "window.HFDataLoader.startBackgroundSync();" in js_text
     assert (
         "const hardware = entry?.hardware?.chip_model || 'unknown-hardware';" in js_text
     )
