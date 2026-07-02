@@ -24,8 +24,8 @@
             ],
             links: [
                 {
-                    label: { en: 'Repository', zh: '仓库' },
-                    href: 'https://github.com/ShuhaoZhangTony/bidkv',
+                    label: { en: 'Open PDF', zh: '查看 PDF' },
+                    href: './assets/papers/bidkv-sc2026.pdf',
                 },
             ],
         },

@@ -307,6 +307,18 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievements-bidkv-sc2026-20260702" in html_text
 
 
+def test_bidkv_achievement_links_to_pdf_not_repository() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+    pdf_path = root / "assets" / "papers" / "bidkv-sc2026.pdf"
+
+    assert "BidKV at SC 2026" in js_text
+    assert "./assets/papers/bidkv-sc2026.pdf" in js_text
+    assert "github.com/ShuhaoZhangTony/bidkv" not in js_text
+    assert pdf_path.is_file()
+    assert pdf_path.stat().st_size > 100_000
+
+
 def test_achievements_page_omits_package_version_cards() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
