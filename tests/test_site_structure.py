@@ -409,7 +409,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert 'data-trend-metric="throughput_tps"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260703-logscale2" in html_text
+    assert "leaderboard-public-20260703-logscale3" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
     assert "function startBackgroundDataSync()" in js_text
@@ -438,6 +438,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "const minValue = Math.min(...values);" in js_text
     assert "const maxValue = Math.max(...values);" in js_text
     assert "return maxValue / minValue >= LOG_TREND_AXIS_RATIO_THRESHOLD;" in js_text
+    assert "data: dataset.data.map((value) => {" in js_text
+    assert "Number.isFinite(number) && number > 0 ? number : null" in js_text
     assert "function getLogTrendAxisBounds(datasets)" in js_text
     assert "const yAxisBounds = useLogYAxis ? getLogTrendAxisBounds(datasets) : {};" in js_text
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text

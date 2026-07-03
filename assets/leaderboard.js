@@ -2433,8 +2433,8 @@
         if (metricConfig.key !== 'throughput_tps') {
             return false;
         }
-        const values = getTrendAxisValues(datasets);
-        if (values.length < 2 || values.some((value) => value <= 0)) {
+        const values = getTrendAxisValues(datasets).filter((value) => value > 0);
+        if (values.length < 2) {
             return false;
         }
         const minValue = Math.min(...values);
@@ -2509,7 +2509,7 @@
         canvas.style.display = 'block';
 
         const labels = makeUniqueTrendLabels(model.versions.map((version) => version.label));
-        const datasets = model.series.map((series, index) => {
+        let datasets = model.series.map((series, index) => {
             const colors = getTrendColors(index);
             const pointDetails = model.versions.map((version) => {
                 const point = series.points.get(version.key);
@@ -2533,6 +2533,15 @@
 
         const useLogYAxis = shouldUseLogTrendAxis(metricConfig, datasets);
         const yAxisBounds = useLogYAxis ? getLogTrendAxisBounds(datasets) : {};
+        if (useLogYAxis) {
+            datasets = datasets.map((dataset) => ({
+                ...dataset,
+                data: dataset.data.map((value) => {
+                    const number = Number(value);
+                    return Number.isFinite(number) && number > 0 ? number : null;
+                }),
+            }));
+        }
 
         if (state.trendChart) {
             state.trendChart.destroy();
