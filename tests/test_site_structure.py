@@ -319,7 +319,10 @@ def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     assert "achievement-milestones" not in html_text
     assert "const ACHIEVEMENTS = [" in js_text
     assert "sortDate: '2026-07-02'" in js_text
-    assert "].sort((left, right) => right.sortDate.localeCompare(left.sortDate));" in js_text
+    assert (
+        "].sort((left, right) => right.sortDate.localeCompare(left.sortDate));"
+        in js_text
+    )
     assert "achievement-item" in css_text
     assert "achievement-time" in css_text
 
@@ -448,7 +451,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "data: dataset.data.map((value) => {" in js_text
     assert "Number.isFinite(number) && number > 0 ? number : null" in js_text
     assert "function getLogTrendAxisBounds(datasets)" in js_text
-    assert "const yAxisBounds = useLogYAxis ? getLogTrendAxisBounds(datasets) : {};" in js_text
+    assert (
+        "const yAxisBounds = useLogYAxis ? getLogTrendAxisBounds(datasets) : {};"
+        in js_text
+    )
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text
     assert "min: yAxisBounds.min" in js_text
     assert "renderPerformanceTrendChart(sortedFiltered);" in js_text
