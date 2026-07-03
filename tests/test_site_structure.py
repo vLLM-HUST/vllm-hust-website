@@ -428,8 +428,9 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert (
         "const hardware = entry?.hardware?.chip_model || 'unknown-hardware';" in js_text
     )
+    assert "const quantization = getEntryQuantization(entry);" in js_text
     assert (
-        "return [workload, model, hardware, chipCount, nodeCount, precision, settingSignature].join('|');"
+        "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');"
         in js_text
     )
     assert "每条折线使用对齐的 workload、模型、硬件与精度设置。" in js_text
@@ -457,7 +458,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text
     assert "min: yAxisBounds.min" in js_text
-    assert "renderPerformanceTrendChart(sortedFiltered);" in js_text
+    assert (
+        "renderPerformanceTrendChart(sortedFiltered.filter((entry) => !shouldExcludeFromTrends(entry)));"
+        in js_text
+    )
     assert ".leaderboard-trend-panel {" in css_text
     assert ".trend-chart-wrap {" in css_text
     assert ".trend-axis-row {" in css_text

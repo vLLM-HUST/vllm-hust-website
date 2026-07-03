@@ -37,6 +37,7 @@ BASELINE_STATUS_PENDING = "pending-baseline"
 BASELINE_STATUS_NONE = "no-baseline-declared"
 DIRTY_ENGINE_VERSION_MARKERS = ("path string is null",)
 ENGINE_VERSION_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
+QUALITY_STATUS_SUSPECT = "suspect"
 KNOWN_MEMORY_PER_CHIP_GB = {
     # Ascend 910B series cards in the benchmark fleet expose 64 GB HBM.
     "910b2": 64.0,
@@ -108,6 +109,7 @@ def validate_entry(
     normalize_entry_hardware(entry)
     normalize_entry_model(entry)
     normalize_entry_accountable_scope(entry)
+    mark_entry_quality_issues(entry)
     return entry
 
 
@@ -531,6 +533,152 @@ def get_same_spec_hash(entry: dict[str, Any]) -> str | None:
     return spec_hash or None
 
 
+def _safe_int(value: Any) -> int | None:
+    if value in (None, ""):
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def get_same_spec_workload_lengths(
+    entry: dict[str, Any],
+) -> tuple[int | None, int | None]:
+    workload = entry.get("workload") or {}
+    workload_name = str(workload.get("name") or "").strip()
+    workload_dataset = str(workload.get("dataset") or "").strip()
+    same_spec = get_same_spec_payload(entry)
+    client = same_spec.get("resolved_client_parameters") or {}
+    dataset_name = str(client.get("dataset_name") or "").strip()
+
+    if dataset_name == "prefix_repetition":
+        if (
+            workload_dataset != "prefix_repetition"
+            and workload_name != "prefix-repetition-online"
+        ):
+            return None, None
+        prefix_len = _safe_int(client.get("prefix_repetition_prefix_len"))
+        suffix_len = _safe_int(client.get("prefix_repetition_suffix_len"))
+        output_len = _safe_int(client.get("prefix_repetition_output_len"))
+        input_len = (
+            prefix_len + suffix_len
+            if prefix_len is not None and suffix_len is not None
+            else None
+        )
+        return input_len, output_len
+
+    if dataset_name == "random":
+        if workload_dataset != "random" and not workload_name.startswith("random-"):
+            return None, None
+        return (
+            _safe_int(client.get("random_input_len")),
+            _safe_int(client.get("random_output_len")),
+        )
+
+    return None, None
+
+
+def build_same_spec_workload_mismatch_issue(
+    entry: dict[str, Any],
+) -> dict[str, str] | None:
+    if not get_same_spec_payload(entry):
+        return None
+
+    workload = entry.get("workload") or {}
+    actual_input = _safe_int(workload.get("input_length"))
+    actual_output = _safe_int(workload.get("output_length"))
+    expected_input, expected_output = get_same_spec_workload_lengths(entry)
+    if expected_input is None and expected_output is None:
+        return None
+
+    mismatches: list[str] = []
+    if (
+        actual_input is not None
+        and expected_input is not None
+        and actual_input != expected_input
+    ):
+        mismatches.append(f"input_length {actual_input} != same_spec {expected_input}")
+    if (
+        actual_output is not None
+        and expected_output is not None
+        and actual_output != expected_output
+    ):
+        mismatches.append(
+            f"output_length {actual_output} != same_spec {expected_output}"
+        )
+
+    same_spec = get_same_spec_payload(entry)
+    client = same_spec.get("resolved_client_parameters") or {}
+    request_rate = client.get("request_rate")
+    concurrency = workload.get("concurrent_requests")
+    if concurrency not in (None, "") and request_rate not in (None, ""):
+        mismatches.append(
+            f"concurrent_requests {concurrency} present with same_spec request_rate {request_rate}"
+        )
+
+    if not mismatches:
+        return None
+
+    return {
+        "code": "same_spec_workload_mismatch",
+        "message": "; ".join(mismatches),
+    }
+
+
+def mark_entry_quality_issues(entry: dict[str, Any]) -> dict[str, Any]:
+    issue = build_same_spec_workload_mismatch_issue(entry)
+    if issue is None:
+        return entry
+
+    quality = entry.get("quality")
+    if not isinstance(quality, dict):
+        quality = {}
+        entry["quality"] = quality
+
+    existing_issues = quality.get("issues")
+    if not isinstance(existing_issues, list):
+        existing_issues = []
+    if not any(
+        isinstance(item, dict) and item.get("code") == issue["code"]
+        for item in existing_issues
+    ):
+        existing_issues.append(issue)
+
+    quality["status"] = QUALITY_STATUS_SUSPECT
+    quality["exclude_from_trends"] = True
+    quality["exclude_from_compare"] = True
+    quality["issues"] = existing_issues
+    entry["status"] = QUALITY_STATUS_SUSPECT
+    return entry
+
+
+def is_suspect_entry(entry: dict[str, Any]) -> bool:
+    quality = entry.get("quality") or {}
+    labels = entry.get("labels") or []
+    normalized_labels = {
+        str(label or "").strip().lower() for label in labels if str(label or "").strip()
+    }
+    return (
+        str(entry.get("status") or "").strip().lower() == QUALITY_STATUS_SUSPECT
+        or str(quality.get("status") or "").strip().lower() == QUALITY_STATUS_SUSPECT
+        or QUALITY_STATUS_SUSPECT in normalized_labels
+    )
+
+
+def should_publish_compare_entry(entry: dict[str, Any]) -> bool:
+    quality = entry.get("quality") or {}
+    if bool(quality.get("exclude_from_compare")):
+        return False
+    return not is_suspect_entry(entry)
+
+
+def filter_compare_publish_entries(
+    entries: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    return [entry for entry in entries if should_publish_compare_entry(entry)]
+
+
 def build_setting_signature(entry: dict[str, Any]) -> str:
     same_spec_id = get_same_spec_id(entry)
     if same_spec_id:
@@ -660,6 +808,7 @@ def build_compare_scope_key(entry: dict[str, Any]) -> str:
         (entry.get("hardware") or {}).get("chip_model") or "unknown-hardware"
     )
     precision = str((entry.get("model") or {}).get("precision") or "unknown-precision")
+    quantization = str((entry.get("model") or {}).get("quantization") or "none").lower()
     workload = extract_workload_name(entry)
     config_type = str(entry.get("config_type") or "unknown-config")
     chip_count = int((entry.get("hardware") or {}).get("chip_count") or 0)
@@ -670,6 +819,7 @@ def build_compare_scope_key(entry: dict[str, Any]) -> str:
             model,
             hardware,
             precision,
+            quantization,
             workload,
             config_type,
             str(chip_count),
@@ -1912,9 +2062,10 @@ def main() -> None:
         )
 
     merged_entries = single + multi
-    validate_same_spec_goal_pairs(merged_entries)
-    validate_same_spec_compare_pairs(merged_entries)
-    compare = build_compare_snapshot(single + multi)
+    compare_entries = filter_compare_publish_entries(merged_entries)
+    validate_same_spec_goal_pairs(compare_entries)
+    validate_same_spec_compare_pairs(compare_entries)
+    compare = build_compare_snapshot(compare_entries)
     write_outputs(args.output_dir, single, multi, compare)
 
     print("✅ Aggregation complete")
