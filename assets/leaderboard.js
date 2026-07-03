@@ -2427,14 +2427,19 @@
             .map(Number);
     }
 
+    const LOG_TREND_AXIS_RATIO_THRESHOLD = 20;
+
     function shouldUseLogTrendAxis(metricConfig, datasets) {
-        const filters = state.filters[state.currentTab] || {};
-        const selectedWorkload = filters.workload || 'all';
-        if (metricConfig.key !== 'throughput_tps' || selectedWorkload !== 'all') {
+        if (metricConfig.key !== 'throughput_tps') {
             return false;
         }
         const values = getTrendAxisValues(datasets);
-        return values.length > 0 && values.every((value) => value > 0);
+        if (values.length < 2 || values.some((value) => value <= 0)) {
+            return false;
+        }
+        const minValue = Math.min(...values);
+        const maxValue = Math.max(...values);
+        return maxValue / minValue >= LOG_TREND_AXIS_RATIO_THRESHOLD;
     }
 
     function getLogTrendAxisBounds(datasets) {

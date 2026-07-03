@@ -434,7 +434,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "Keep one series continuous across x-axis slots" in js_text
     assert "function getTrendAxisValues(datasets)" in js_text
     assert "function shouldUseLogTrendAxis(metricConfig, datasets)" in js_text
-    assert "const selectedWorkload = filters.workload || 'all';" in js_text
+    assert "const LOG_TREND_AXIS_RATIO_THRESHOLD = 20;" in js_text
+    assert "const minValue = Math.min(...values);" in js_text
+    assert "const maxValue = Math.max(...values);" in js_text
+    assert "return maxValue / minValue >= LOG_TREND_AXIS_RATIO_THRESHOLD;" in js_text
     assert "function getLogTrendAxisBounds(datasets)" in js_text
     assert "const yAxisBounds = useLogYAxis ? getLogTrendAxisBounds(datasets) : {};" in js_text
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text
