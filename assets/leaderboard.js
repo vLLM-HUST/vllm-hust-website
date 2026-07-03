@@ -1686,6 +1686,34 @@
         return getEntryModelIdentity(entry).displayName || 'Unknown model';
     }
 
+    function getEntryQuantization(entry) {
+        const value = entry?.model?.quantization;
+        const normalized = String(value == null ? '' : value).trim();
+        if (!normalized || normalized.toLowerCase() === 'none') {
+            return 'none';
+        }
+        return normalized;
+    }
+
+    function formatPrecisionWithQuantization(entry) {
+        const precision = entry?.model?.precision || t('unknown');
+        const quantization = getEntryQuantization(entry);
+        return quantization === 'none' ? precision : `${precision}/${quantization}`;
+    }
+
+    function isSuspectEntry(entry) {
+        const qualityStatus = String(entry?.quality?.status || '').trim().toLowerCase();
+        const status = String(entry?.status || '').trim().toLowerCase();
+        const labels = Array.isArray(entry?.labels) ? entry.labels : [];
+        return qualityStatus === 'suspect'
+            || status === 'suspect'
+            || labels.some((label) => String(label || '').trim().toLowerCase() === 'suspect');
+    }
+
+    function shouldExcludeFromTrends(entry) {
+        return Boolean(entry?.quality?.exclude_from_trends) || isSuspectEntry(entry);
+    }
+
     function getScopeModelIdentity(scope) {
         return {
             canonicalId: String(scope?.model_canonical_id || '').trim(),
@@ -1933,6 +1961,7 @@
         const topology = entry?.cluster?.topology || '';
         const model = getEntryModelCanonicalId(entry) || '';
         const precision = entry?.model?.precision || '';
+        const quantization = getEntryQuantization(entry);
         const engine = getEngine(entry);
         const baseVersion = getEntryFilterVersionText(entry);
         const settingSignature = getSettingSignature(entry);
@@ -1955,6 +1984,7 @@
                 topology,
                 model,
                 precision,
+                quantization,
                 hust.rawVersion,
                 ascend.rawVersion,
                 settingSignature,
@@ -1971,6 +2001,7 @@
             topology,
             model,
             precision,
+            quantization,
             '__NO_AGGREGATE__',
             Date.now() + Math.random(), // ensure uniqueness
             settingSignature,
@@ -2102,12 +2133,18 @@
             }));
         }
 
-        const baseline = filtered[filtered.length - 1];
-        return filtered.map((entry, index) => {
-            const prevEntry = filtered[index + 1];
+        const trendable = filtered.filter((entry) => !shouldExcludeFromTrends(entry));
+        const trendIndex = new Map(trendable.map((entry, index) => [entry, index]));
+        const baseline = trendable[trendable.length - 1];
+        return filtered.map((entry) => {
+            const index = trendIndex.get(entry);
+            if (index == null || !baseline) {
+                return { ...entry, trends: {}, baselineTrends: {}, isBaseline: false };
+            }
+            const prevEntry = trendable[index + 1];
             const trends = prevEntry ? calculateTrends(entry, prevEntry) : {};
-            const baselineTrends = (index < filtered.length - 1) ? calculateTrends(entry, baseline) : {};
-            const isBaseline = (index === filtered.length - 1);
+            const baselineTrends = (index < trendable.length - 1) ? calculateTrends(entry, baseline) : {};
+            const isBaseline = (index === trendable.length - 1);
             return { ...entry, trends, baselineTrends, isBaseline };
         });
     }
@@ -2147,15 +2184,16 @@
         const chipCount = entry?.hardware?.chip_count || 0;
         const nodeCount = entry?.cluster?.node_count || 1;
         const precision = entry?.model?.precision || 'unknown-precision';
+        const quantization = getEntryQuantization(entry);
         const settingSignature = getSettingSignature(entry);
-        return [workload, model, hardware, chipCount, nodeCount, precision, settingSignature].join('|');
+        return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');
     }
 
     function getTrendSeriesLabel(entry) {
         const workload = getWorkloadLabel(getWorkloadId(entry) || 'Other');
         const model = getEntryModelDisplayName(entry) || 'Unknown model';
         const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
-        const precision = entry?.model?.precision || t('unknown');
+        const precision = formatPrecisionWithQuantization(entry);
         return `${workload} · ${model} · ${hardware} · ${precision}`;
     }
 
@@ -2295,7 +2333,7 @@
             version: getTrendVersionDetail(entry),
             date: getEntryDateLabel(entry) || '-',
             workload: getWorkloadLabel(getWorkloadId(entry) || 'Other'),
-            precision: entry?.model?.precision || '-',
+            precision: formatPrecisionWithQuantization(entry),
             engine: getEngineLabel(getEngine(entry)),
             model: getEntryModelDisplayName(entry),
             hardware: getConfigText(entry).replace('<br><small>', ' ').replace('</small>', ''),
@@ -2786,7 +2824,7 @@
         emptyState.style.display = 'none';
         renderDataStats(data.length, filtered.length, visibleEntries.length, mergedEntries.length, comparisonView);
         renderOverview(sortedFiltered, comparisonView, viewOptions);
-        renderPerformanceTrendChart(sortedFiltered);
+        renderPerformanceTrendChart(sortedFiltered.filter((entry) => !shouldExcludeFromTrends(entry)));
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
 
@@ -4182,18 +4220,19 @@
         const model = getEntryModelCanonicalId(entry) || 'unknown-model';
         const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
         const precision = entry?.model?.precision || 'unknown-precision';
+        const quantization = getEntryQuantization(entry);
         const workload = getWorkloadId(entry) || 'Other';
         const configType = entry?.config_type || state.currentTab || 'unknown-config';
         const chipCount = entry?.hardware?.chip_count || 0;
         const nodeCount = entry?.cluster?.node_count || 1;
         const settingSignature = getSettingSignature(entry);
-        return [model, hardware, precision, workload, configType, chipCount, nodeCount, settingSignature].join('|');
+        return [model, hardware, precision, quantization, workload, configType, chipCount, nodeCount, settingSignature].join('|');
     }
 
     function buildScopeLabel(entry) {
         const model = getEntryModelDisplayName(entry) || 'Unknown model';
         const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
-        const precision = entry?.model?.precision || t('unknown');
+        const precision = formatPrecisionWithQuantization(entry);
         const workload = getWorkloadLabel(getWorkloadId(entry));
         const settingSummary = entry?.scope?.setting_summary || getSettingSummary(entry);
         return `${model} • ${hardware} • ${precision} • ${workload} • ${settingSummary}`;

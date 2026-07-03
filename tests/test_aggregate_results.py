@@ -297,6 +297,154 @@ def test_aggregate_results_from_standard_manifest(tmp_path: Path) -> None:
     assert single_payload[0]["metadata"]["git_commit"] == "test-commit-123"
 
 
+def test_aggregate_results_marks_same_spec_workload_mismatch_suspect(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    entry = _valid_entry()
+    entry["workload"] = {
+        "name": "prefix-repetition-online",
+        "input_length": 512,
+        "output_length": 238,
+        "batch_size": None,
+        "concurrent_requests": 2,
+        "dataset": "prefix_repetition",
+    }
+    entry["metadata"]["idempotency_key"] = (
+        "engine-a|1.2.3|prefix-repetition-online|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    entry["same_spec"] = {
+        "schema_version": "benchmark-same-spec/v1",
+        "spec_id": "spec-prefix",
+        "resolved_spec_hash": "hash-prefix",
+        "resolved_server_parameters": {
+            "tensor_parallel_size": 1,
+            "dtype": "float16",
+        },
+        "resolved_client_parameters": {
+            "dataset_name": "prefix_repetition",
+            "prefix_repetition_prefix_len": 3840,
+            "prefix_repetition_suffix_len": 256,
+            "prefix_repetition_output_len": 256,
+            "request_rate": 1,
+        },
+    }
+
+    _write_manifest_entries(source_dir, [entry])
+
+    output_dir = tmp_path / "website_data"
+    result = _run_aggregate(script, source_dir, output_dir)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    assert single_payload[0]["status"] == "suspect"
+    assert single_payload[0]["quality"]["status"] == "suspect"
+    assert single_payload[0]["quality"]["exclude_from_trends"] is True
+    assert single_payload[0]["quality"]["issues"][0]["code"] == (
+        "same_spec_workload_mismatch"
+    )
+
+
+def test_aggregate_results_excludes_suspect_entries_from_compare_snapshot(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    current_entry = _valid_entry()
+    current_entry["entry_id"] = "11111111-1111-1111-1111-111111111111"
+    current_entry["engine"] = "vllm-hust"
+    current_entry["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["engine"] = "vllm-hust"
+    current_entry["metadata"]["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["github_repository"] = "vLLM-HUST/vllm-ascend-hust"
+    current_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|0.20.1rc1.dev314|prefix-repetition-online|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    current_entry["workload"] = {
+        "name": "prefix-repetition-online",
+        "input_length": 512,
+        "output_length": 238,
+        "batch_size": None,
+        "concurrent_requests": 2,
+        "dataset": "prefix_repetition",
+    }
+    current_entry["same_spec"] = {
+        "schema_version": "benchmark-same-spec/v1",
+        "spec_id": "spec-prefix",
+        "resolved_spec_hash": "hash-prefix",
+        "resolved_server_parameters": {
+            "tensor_parallel_size": 1,
+            "dtype": "float16",
+        },
+        "resolved_client_parameters": {
+            "dataset_name": "prefix_repetition",
+            "prefix_repetition_prefix_len": 3840,
+            "prefix_repetition_suffix_len": 256,
+            "prefix_repetition_output_len": 256,
+            "request_rate": 1,
+        },
+    }
+
+    baseline_entry = _valid_entry()
+    baseline_entry["entry_id"] = "22222222-2222-2222-2222-222222222222"
+    baseline_entry["engine"] = "vllm"
+    baseline_entry["engine_version"] = "0.18.0"
+    baseline_entry["metadata"]["engine"] = "vllm"
+    baseline_entry["metadata"]["engine_version"] = "0.18.0"
+    baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
+    baseline_entry["metadata"]["idempotency_key"] = (
+        "vllm|0.18.0|prefix-repetition-online|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    baseline_entry["workload"] = {
+        "name": "prefix-repetition-online",
+        "input_length": 4096,
+        "output_length": 256,
+        "batch_size": None,
+        "concurrent_requests": None,
+        "dataset": "prefix_repetition",
+    }
+    baseline_entry["same_spec"] = {
+        **current_entry["same_spec"],
+        "resolved_client_parameters": {
+            **current_entry["same_spec"]["resolved_client_parameters"],
+        },
+    }
+
+    _write_manifest_entries(source_dir, [current_entry, baseline_entry])
+
+    output_dir = tmp_path / "website_data"
+    result = _run_aggregate(script, source_dir, output_dir)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    compare_payload = json.loads(
+        (output_dir / "leaderboard_compare.json").read_text(encoding="utf-8")
+    )
+
+    current = next(
+        entry
+        for entry in single_payload
+        if entry["entry_id"] == "11111111-1111-1111-1111-111111111111"
+    )
+    assert current["status"] == "suspect"
+    assert compare_payload["preferred_pair_count"] == 0
+    assert compare_payload["goal_progress"]["pair_count"] == 0
+    assert "11111111-1111-1111-1111-111111111111" not in json.dumps(
+        compare_payload
+    )
+
+
 def test_aggregate_results_places_multi_gpu_entry_in_multi_snapshot(
     tmp_path: Path,
 ) -> None:
