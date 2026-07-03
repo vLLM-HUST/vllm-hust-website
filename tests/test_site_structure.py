@@ -415,7 +415,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260703-logscale5" in html_text
+    assert "leaderboard-public-20260703-logscale6" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
     assert "function startBackgroundDataSync()" in js_text
@@ -433,7 +433,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');"
         in js_text
     )
-    assert "每条折线使用对齐的 workload、模型、硬件与精度设置。" in js_text
+    assert "默认全部视图展示 online serving workload" in js_text
     assert "function renderPerformanceTrendChart(entries)" in js_text
     assert "new Chart(canvas" in js_text
     assert "pointDetails" in js_text
@@ -458,8 +458,14 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text
     assert "min: yAxisBounds.min" in js_text
+    assert "function isOnlineServingWorkload(entry)" in js_text
+    assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
     assert (
-        "renderPerformanceTrendChart(sortedFiltered.filter((entry) => !shouldExcludeFromTrends(entry)));"
+        "return selectedWorkload === 'all' ? isOnlineServingWorkload(entry) : true;"
+        in js_text
+    )
+    assert (
+        "renderPerformanceTrendChart(getPerformanceTrendEntries(sortedFiltered, filters.workload));"
         in js_text
     )
     assert ".leaderboard-trend-panel {" in css_text
