@@ -229,7 +229,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Baseline first, then visible versions in submission order. Each line uses an aligned workload, model, hardware, and precision setting.',
+            trendSubtitle: 'Baseline first, then visible versions in submission order. The default all-workloads trend shows online serving workloads; select a workload to inspect throughput or latency runs.',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -435,7 +435,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '横轴从基线开始，再按提交时间展示当前可见版本；每条折线使用对齐的 workload、模型、硬件与精度设置。',
+            trendSubtitle: '横轴从基线开始，再按提交时间展示当前可见版本；默认全部视图展示 online serving workload，throughput/latency 请切到具体 workload 查看。',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -1829,6 +1829,19 @@
         return Boolean(entry?.quality?.exclude_from_trends) || isSuspectEntry(entry);
     }
 
+    function isOnlineServingWorkload(entry) {
+        return String(getWorkloadId(entry) || '').endsWith('-online');
+    }
+
+    function getPerformanceTrendEntries(entries, selectedWorkload) {
+        return entries.filter((entry) => {
+            if (shouldExcludeFromTrends(entry)) {
+                return false;
+            }
+            return selectedWorkload === 'all' ? isOnlineServingWorkload(entry) : true;
+        });
+    }
+
     function getScopeModelIdentity(scope) {
         return {
             canonicalId: String(scope?.model_canonical_id || '').trim(),
@@ -3057,7 +3070,7 @@
         emptyState.style.display = 'none';
         renderDataStats(data.length, filtered.length, visibleEntries.length, mergedEntries.length, comparisonView);
         renderOverview(sortedFiltered, comparisonView, viewOptions);
-        renderPerformanceTrendChart(sortedFiltered.filter((entry) => !shouldExcludeFromTrends(entry)));
+        renderPerformanceTrendChart(getPerformanceTrendEntries(sortedFiltered, filters.workload));
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
 
