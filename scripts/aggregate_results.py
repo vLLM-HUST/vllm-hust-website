@@ -542,7 +542,9 @@ def _safe_int(value: Any) -> int | None:
         return None
 
 
-def get_same_spec_workload_lengths(entry: dict[str, Any]) -> tuple[int | None, int | None]:
+def get_same_spec_workload_lengths(
+    entry: dict[str, Any],
+) -> tuple[int | None, int | None]:
     workload = entry.get("workload") or {}
     workload_name = str(workload.get("name") or "").strip()
     workload_dataset = str(workload.get("dataset") or "").strip()
@@ -577,7 +579,9 @@ def get_same_spec_workload_lengths(entry: dict[str, Any]) -> tuple[int | None, i
     return None, None
 
 
-def build_same_spec_workload_mismatch_issue(entry: dict[str, Any]) -> dict[str, str] | None:
+def build_same_spec_workload_mismatch_issue(
+    entry: dict[str, Any],
+) -> dict[str, str] | None:
     if not get_same_spec_payload(entry):
         return None
 
@@ -653,9 +657,7 @@ def is_suspect_entry(entry: dict[str, Any]) -> bool:
     quality = entry.get("quality") or {}
     labels = entry.get("labels") or []
     normalized_labels = {
-        str(label or "").strip().lower()
-        for label in labels
-        if str(label or "").strip()
+        str(label or "").strip().lower() for label in labels if str(label or "").strip()
     }
     return (
         str(entry.get("status") or "").strip().lower() == QUALITY_STATUS_SUSPECT
@@ -806,9 +808,7 @@ def build_compare_scope_key(entry: dict[str, Any]) -> str:
         (entry.get("hardware") or {}).get("chip_model") or "unknown-hardware"
     )
     precision = str((entry.get("model") or {}).get("precision") or "unknown-precision")
-    quantization = str(
-        (entry.get("model") or {}).get("quantization") or "none"
-    ).lower()
+    quantization = str((entry.get("model") or {}).get("quantization") or "none").lower()
     workload = extract_workload_name(entry)
     config_type = str(entry.get("config_type") or "unknown-config")
     chip_count = int((entry.get("hardware") or {}).get("chip_count") or 0)
@@ -1433,9 +1433,15 @@ def select_preferred_pair(
 
 
 def normalize_engine_name(entry: dict[str, Any]) -> str:
-    return str(
-        entry.get("engine") or (entry.get("metadata") or {}).get("engine") or "unknown"
-    ).strip().lower()
+    return (
+        str(
+            entry.get("engine")
+            or (entry.get("metadata") or {}).get("engine")
+            or "unknown"
+        )
+        .strip()
+        .lower()
+    )
 
 
 def is_goal_baseline_entry(entry: dict[str, Any]) -> bool:

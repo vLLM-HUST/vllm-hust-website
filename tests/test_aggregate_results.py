@@ -486,9 +486,7 @@ def test_aggregate_results_excludes_suspect_entries_from_compare_snapshot(
     assert current["status"] == "suspect"
     assert compare_payload["preferred_pair_count"] == 0
     assert compare_payload["goal_progress"]["pair_count"] == 0
-    assert "11111111-1111-1111-1111-111111111111" not in json.dumps(
-        compare_payload
-    )
+    assert "11111111-1111-1111-1111-111111111111" not in json.dumps(compare_payload)
 
 
 def test_aggregate_results_filters_invalid_public_historical_entries(
