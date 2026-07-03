@@ -233,6 +233,7 @@
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
+            trendAxisLabel: 'Y axis',
             trendAxisAuto: 'Auto',
             trendAxisLog: 'Log',
             trendAxisLinear: 'Linear',
@@ -438,6 +439,7 @@
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
+            trendAxisLabel: 'Y 轴',
             trendAxisAuto: '自动',
             trendAxisLog: '对数',
             trendAxisLinear: '线性',
@@ -2482,6 +2484,8 @@
         if (labelEl) labelEl.textContent = t('trendLabel');
         if (titleEl) titleEl.textContent = t('trendTitle');
         if (subtitleEl) subtitleEl.textContent = t('trendSubtitle');
+        const axisLabelEl = document.getElementById('leaderboard-trend-axis-label');
+        if (axisLabelEl) axisLabelEl.textContent = t('trendAxisLabel');
         empty.textContent = t('trendEmpty');
 
         document.querySelectorAll('[data-trend-metric]').forEach((button) => {

@@ -836,19 +836,34 @@
     line-height: 1.45;
 }
 
-.trend-controls {
-    display: flex;
+.trend-metric-toggle {
+    display: inline-flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     justify-content: flex-end;
     flex: 0 0 auto;
 }
 
-.trend-metric-toggle,
+.trend-axis-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin: -6px 0 14px;
+}
+
+.trend-axis-label {
+    color: rgba(226, 242, 255, 0.72);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
 .trend-axis-toggle {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     justify-content: flex-end;
 }
 
@@ -873,6 +888,30 @@
 .trend-metric-button.active {
     background: #1d4ed8;
     border-color: #1d4ed8;
+    color: #ffffff;
+}
+
+.trend-axis-button {
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+
+.trend-axis-button:hover {
+    border-color: #60a5fa;
+    color: #1d4ed8;
+}
+
+.trend-axis-button.active {
+    background: #334155;
+    border-color: #334155;
     color: #ffffff;
 }
 
@@ -1645,6 +1684,11 @@
         width: 100%;
     }
 
+    .trend-axis-row {
+        justify-content: flex-start;
+        margin-top: -2px;
+    }
+
     .trend-chart-wrap {
         height: 340px;
         min-height: 320px;
@@ -1918,6 +1962,7 @@ body[data-page="leaderboard"] .trend-panel-head h3 {
 
 body[data-page="leaderboard"] .tab-button,
 body[data-page="leaderboard"] .trend-metric-button,
+body[data-page="leaderboard"] .trend-axis-button,
 body[data-page="leaderboard"] .pagination-btn,
 body[data-page="leaderboard"] .btn-reset-filters,
 body[data-page="leaderboard"] .btn-details {
@@ -1932,6 +1977,12 @@ body[data-page="leaderboard"] .pagination-btn:hover:not(:disabled),
 body[data-page="leaderboard"] .btn-details:hover {
     border-color: rgba(56, 189, 248, 0.72);
     background: rgba(56, 189, 248, 0.30);
+    color: #ffffff;
+}
+
+body[data-page="leaderboard"] .trend-axis-button.active {
+    border-color: rgba(148, 163, 184, 0.72);
+    background: rgba(148, 163, 184, 0.24);
     color: #ffffff;
 }
 

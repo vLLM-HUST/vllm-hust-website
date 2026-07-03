@@ -412,7 +412,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260703-logscale4" in html_text
+    assert "leaderboard-public-20260703-logscale5" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
     assert "function startBackgroundDataSync()" in js_text
@@ -454,8 +454,9 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "renderPerformanceTrendChart(sortedFiltered);" in js_text
     assert ".leaderboard-trend-panel {" in css_text
     assert ".trend-chart-wrap {" in css_text
+    assert ".trend-axis-row {" in css_text
     assert ".trend-axis-toggle {" in css_text
-    assert ".trend-metric-button.active {" in css_text
+    assert ".trend-axis-button.active {" in css_text
 
 
 def test_detail_sections_use_detail_only_version_formatting_and_memory_fallback() -> (

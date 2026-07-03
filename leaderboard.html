@@ -16,7 +16,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=public-copy-20260701" />
-  <link rel="stylesheet" href="./assets/leaderboard.css?v=leaderboard-public-20260703-logscale4" />
+  <link rel="stylesheet" href="./assets/leaderboard.css?v=leaderboard-public-20260703-logscale5" />
 </head>
 
 <body data-page="leaderboard">
@@ -112,17 +112,18 @@
               <h3 id="leaderboard-trend-title">Performance trend</h3>
               <p id="leaderboard-trend-subtitle">Baseline first, then visible versions in submission order.</p>
             </div>
-            <div class="trend-controls">
-              <div class="trend-metric-toggle" role="group" aria-label="Trend metric">
-                <button type="button" class="trend-metric-button active" data-trend-metric="throughput_tps">Tokens/s</button>
-                <button type="button" class="trend-metric-button" data-trend-metric="ttft_ms">TTFT</button>
-                <button type="button" class="trend-metric-button" data-trend-metric="tbt_ms">TBT</button>
-              </div>
-              <div class="trend-axis-toggle" role="group" aria-label="Y axis scale">
-                <button type="button" class="trend-metric-button active" data-trend-axis="auto">Auto</button>
-                <button type="button" class="trend-metric-button" data-trend-axis="log">Log</button>
-                <button type="button" class="trend-metric-button" data-trend-axis="linear">Linear</button>
-              </div>
+            <div class="trend-metric-toggle" role="group" aria-label="Trend metric">
+              <button type="button" class="trend-metric-button active" data-trend-metric="throughput_tps">Tokens/s</button>
+              <button type="button" class="trend-metric-button" data-trend-metric="ttft_ms">TTFT</button>
+              <button type="button" class="trend-metric-button" data-trend-metric="tbt_ms">TBT</button>
+            </div>
+          </div>
+          <div class="trend-axis-row">
+            <span id="leaderboard-trend-axis-label" class="trend-axis-label">Y axis</span>
+            <div class="trend-axis-toggle" role="group" aria-label="Y axis scale">
+              <button type="button" class="trend-axis-button active" data-trend-axis="auto">Auto</button>
+              <button type="button" class="trend-axis-button" data-trend-axis="log">Log</button>
+              <button type="button" class="trend-axis-button" data-trend-axis="linear">Linear</button>
             </div>
           </div>
           <div class="trend-chart-wrap">
@@ -199,7 +200,7 @@
   <script src="./assets/site.js?v=public-copy-20260701"></script>
   <script src="./assets/hf-data-loader.js?v=leaderboard-cache-v7-20260702"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
-  <script src="./assets/leaderboard.js?v=leaderboard-public-20260703-logscale4"></script>
+  <script src="./assets/leaderboard.js?v=leaderboard-public-20260703-logscale5"></script>
 </body>
 
 </html>
