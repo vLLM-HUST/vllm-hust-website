@@ -1283,9 +1283,15 @@ def select_preferred_pair(
 
 
 def normalize_engine_name(entry: dict[str, Any]) -> str:
-    return str(
-        entry.get("engine") or (entry.get("metadata") or {}).get("engine") or "unknown"
-    ).strip().lower()
+    return (
+        str(
+            entry.get("engine")
+            or (entry.get("metadata") or {}).get("engine")
+            or "unknown"
+        )
+        .strip()
+        .lower()
+    )
 
 
 def is_goal_baseline_entry(entry: dict[str, Any]) -> bool:
