@@ -233,6 +233,9 @@
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
+            trendAxisAuto: 'Auto',
+            trendAxisLog: 'Log',
+            trendAxisLinear: 'Linear',
             trendEmpty: 'No trend data under current filters.',
             trendTooltipVersion: 'Version',
             trendTooltipDate: 'Submitted',
@@ -435,6 +438,9 @@
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
+            trendAxisAuto: '自动',
+            trendAxisLog: '对数',
+            trendAxisLinear: '线性',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
             trendTooltipVersion: '版本',
             trendTooltipDate: '提交时间',
@@ -484,6 +490,7 @@
             'multi-node': { page: 1, pageSize: 20 }
         },
         chartMetric: 'throughput_tps',
+        trendAxisScale: 'auto',
         trendChart: null,
         tableDetailsExpanded: false,
         loadingMore: false
@@ -2430,11 +2437,14 @@
     const LOG_TREND_AXIS_RATIO_THRESHOLD = 20;
 
     function shouldUseLogTrendAxis(metricConfig, datasets) {
-        if (metricConfig.key !== 'throughput_tps') {
-            return false;
-        }
         const values = getTrendAxisValues(datasets).filter((value) => value > 0);
         if (values.length < 2) {
+            return false;
+        }
+        if (state.trendAxisScale === 'log') {
+            return true;
+        }
+        if (state.trendAxisScale === 'linear' || metricConfig.key !== 'throughput_tps') {
             return false;
         }
         const minValue = Math.min(...values);
@@ -2482,6 +2492,19 @@
             }
             button.classList.toggle('active', metric === metricConfig.key);
             button.setAttribute('aria-pressed', metric === metricConfig.key ? 'true' : 'false');
+        });
+        const axisLabels = {
+            auto: t('trendAxisAuto'),
+            log: t('trendAxisLog'),
+            linear: t('trendAxisLinear'),
+        };
+        document.querySelectorAll('[data-trend-axis]').forEach((button) => {
+            const axis = button.dataset.trendAxis;
+            if (axisLabels[axis]) {
+                button.textContent = axisLabels[axis];
+            }
+            button.classList.toggle('active', axis === state.trendAxisScale);
+            button.setAttribute('aria-pressed', axis === state.trendAxisScale ? 'true' : 'false');
         });
 
         if (typeof Chart === 'undefined') {
@@ -2708,6 +2731,16 @@
                     return;
                 }
                 state.chartMetric = metric;
+                renderTable();
+            });
+        });
+        document.querySelectorAll('[data-trend-axis]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const axis = button.dataset.trendAxis;
+                if (!['auto', 'log', 'linear'].includes(axis)) {
+                    return;
+                }
+                state.trendAxisScale = axis;
                 renderTable();
             });
         });

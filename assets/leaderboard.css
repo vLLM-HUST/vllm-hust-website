@@ -836,12 +836,20 @@
     line-height: 1.45;
 }
 
-.trend-metric-toggle {
+.trend-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+}
+
+.trend-metric-toggle,
+.trend-axis-toggle {
     display: inline-flex;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: flex-end;
-    flex: 0 0 auto;
 }
 
 .trend-metric-button {

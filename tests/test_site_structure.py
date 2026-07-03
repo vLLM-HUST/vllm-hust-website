@@ -408,8 +408,11 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         in html_text
     )
     assert 'data-trend-metric="throughput_tps"' in html_text
+    assert 'data-trend-axis="auto"' in html_text
+    assert 'data-trend-axis="log"' in html_text
+    assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260703-logscale3" in html_text
+    assert "leaderboard-public-20260703-logscale4" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
     assert "function startBackgroundDataSync()" in js_text
@@ -434,10 +437,14 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "Keep one series continuous across x-axis slots" in js_text
     assert "function getTrendAxisValues(datasets)" in js_text
     assert "function shouldUseLogTrendAxis(metricConfig, datasets)" in js_text
+    assert "trendAxisScale: 'auto'" in js_text
     assert "const LOG_TREND_AXIS_RATIO_THRESHOLD = 20;" in js_text
+    assert "state.trendAxisScale === 'log'" in js_text
+    assert "state.trendAxisScale === 'linear'" in js_text
     assert "const minValue = Math.min(...values);" in js_text
     assert "const maxValue = Math.max(...values);" in js_text
     assert "return maxValue / minValue >= LOG_TREND_AXIS_RATIO_THRESHOLD;" in js_text
+    assert "document.querySelectorAll('[data-trend-axis]')" in js_text
     assert "data: dataset.data.map((value) => {" in js_text
     assert "Number.isFinite(number) && number > 0 ? number : null" in js_text
     assert "function getLogTrendAxisBounds(datasets)" in js_text
@@ -447,6 +454,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "renderPerformanceTrendChart(sortedFiltered);" in js_text
     assert ".leaderboard-trend-panel {" in css_text
     assert ".trend-chart-wrap {" in css_text
+    assert ".trend-axis-toggle {" in css_text
     assert ".trend-metric-button.active {" in css_text
 
 
