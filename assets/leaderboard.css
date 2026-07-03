@@ -1,6 +1,4 @@
-/* ==========================================
-   Leaderboard Section Styles
-   ========================================== */
+/* Leaderboard section styles */
 
 .leaderboard-section {
     position: relative;
@@ -790,26 +788,44 @@
 }
 
 .leaderboard-trend-panel {
-    margin: 0 0 22px;
-    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    margin: 0 0 18px;
+    padding: clamp(18px, 3vw, 30px);
     border: 1px solid #dbe7f3;
-    border-radius: 18px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.07);
+    border-radius: 26px;
+    background:
+        radial-gradient(circle at 18% 4%, rgba(14, 165, 233, 0.16), transparent 28%),
+        radial-gradient(circle at 86% 16%, rgba(34, 197, 94, 0.12), transparent 26%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 251, 255, 0.84) 100%);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+}
+
+.leaderboard-trend-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.36), transparent 28%),
+        repeating-linear-gradient(90deg, rgba(14, 165, 233, 0.05) 0 1px, transparent 1px 92px);
+    opacity: 0.72;
 }
 
 .trend-panel-head {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 18px;
-    margin-bottom: 14px;
+    margin-bottom: 18px;
 }
 
 .trend-panel-head h3 {
     margin: 8px 0 4px;
     color: #0f172a;
-    font-size: 1.12rem;
+    font-size: clamp(1.18rem, 2vw, 1.65rem);
     letter-spacing: -0.01em;
 }
 
@@ -826,6 +842,29 @@
     gap: 8px;
     justify-content: flex-end;
     flex: 0 0 auto;
+}
+
+.trend-axis-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin: -6px 0 14px;
+}
+
+.trend-axis-label {
+    color: rgba(226, 242, 255, 0.72);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.trend-axis-toggle {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
 }
 
 .trend-metric-button {
@@ -852,10 +891,39 @@
     color: #ffffff;
 }
 
+.trend-axis-button {
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+
+.trend-axis-button:hover {
+    border-color: #60a5fa;
+    color: #1d4ed8;
+}
+
+.trend-axis-button.active {
+    background: #334155;
+    border-color: #334155;
+    color: #ffffff;
+}
+
 .trend-chart-wrap {
     position: relative;
-    height: 380px;
-    min-height: 320px;
+    z-index: 1;
+    height: min(62vh, 600px);
+    min-height: 420px;
+    padding: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.56);
 }
 
 .trend-chart-wrap canvas {
@@ -876,6 +944,34 @@
     color: #64748b;
     font-weight: 700;
     text-align: center;
+}
+
+.benchmark-details-toggle {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0 0;
+}
+
+.benchmark-details-toggle .action-button {
+    min-width: 180px;
+    justify-content: center;
+}
+
+.leaderboard-table-details {
+    display: grid;
+    gap: 18px;
+    margin-top: 22px;
+    padding: clamp(16px, 2.5vw, 24px);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 26px;
+    background:
+        radial-gradient(circle at top right, rgba(14, 165, 233, 0.10), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 251, 255, 0.72));
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.10);
+}
+
+.leaderboard-table-details[hidden] {
+    display: none !important;
 }
 
 /* Tab Navigation */
@@ -987,22 +1083,22 @@
 
 /* Sticky First Column */
 .leaderboard-table th:first-child,
-.leaderboard-table td:first-child {
+.leaderboard-table td.version-table-cell {
     position: sticky;
     left: 0;
     z-index: 5;
     background: inherit;
 }
 
-.leaderboard-table tbody tr:nth-child(even) td:first-child {
+.leaderboard-table tbody tr:nth-child(even) td.version-table-cell {
     background: #f7fafc;
 }
 
-.leaderboard-table tbody tr:nth-child(odd) td:first-child {
+.leaderboard-table tbody tr:nth-child(odd) td.version-table-cell {
     background: white;
 }
 
-.leaderboard-table tbody tr:hover td:first-child {
+.leaderboard-table tbody tr:hover td.version-table-cell {
     background: #edf2f7;
 }
 
@@ -1012,10 +1108,7 @@
     vertical-align: top;
 }
 
-.leaderboard-table td:nth-child(4),
-.leaderboard-table td:nth-child(5),
-.leaderboard-table td:nth-child(6),
-.leaderboard-table td:nth-child(7) {
+.leaderboard-table td.metric-column {
     min-width: 122px;
 }
 
@@ -1591,8 +1684,14 @@
         width: 100%;
     }
 
+    .trend-axis-row {
+        justify-content: flex-start;
+        margin-top: -2px;
+    }
+
     .trend-chart-wrap {
         height: 340px;
+        min-height: 320px;
     }
 
     .leaderboard-table {
@@ -1683,9 +1782,7 @@
     }
 }
 
-/* ============================================================
-   Sortable column headers
-   ============================================================ */
+/* Sortable column headers */
 .sortable-header {
     cursor: pointer;
     user-select: none;
@@ -1718,9 +1815,7 @@
     color: #6450c8;
 }
 
-/* ============================================================
-   Pagination controls
-   ============================================================ */
+/* Pagination controls */
 .leaderboard-pagination {
     margin: 0.75rem 0 0.5rem;
 }
@@ -1764,9 +1859,7 @@
     text-align: center;
 }
 
-/* ============================================================
-   Reset filters button
-   ============================================================ */
+/* Reset filters button */
 .filter-group--reset {
     display: flex;
     align-items: flex-end;
@@ -1790,4 +1883,229 @@
     background: #fff4f4;
     border-color: #e05050;
     color: #e05050;
+}
+
+/* Cosmic page theme */
+body[data-page="leaderboard"] .leaderboard-section {
+    background:
+        linear-gradient(180deg, rgba(6, 13, 27, 0.90), rgba(2, 6, 23, 0.82)),
+        radial-gradient(circle at top left, rgba(14, 165, 233, 0.24), transparent 32%);
+    border-color: rgba(125, 211, 252, 0.34);
+}
+
+body[data-page="leaderboard"] .leaderboard-section::before {
+    background: linear-gradient(90deg, rgba(56, 189, 248, 0.26), #38bdf8 48%, #86efac 100%);
+}
+
+body[data-page="leaderboard"] .leaderboard-description,
+body[data-page="leaderboard"] .leaderboard-meta,
+body[data-page="leaderboard"] .leaderboard-hint,
+body[data-page="leaderboard"] .hard-constraints-header p,
+body[data-page="leaderboard"] .pagination-info {
+    color: rgba(226, 242, 255, 0.88);
+}
+
+body[data-page="leaderboard"] .leaderboard-schema-pill,
+body[data-page="leaderboard"] .hard-constraints-panel,
+body[data-page="leaderboard"] .hard-constraints-baseline,
+body[data-page="leaderboard"] .hard-constraint-card,
+body[data-page="leaderboard"] .filters,
+body[data-page="leaderboard"] .toggle-card,
+body[data-page="leaderboard"] .coverage-card,
+body[data-page="leaderboard"] .leaderboard-overview,
+body[data-page="leaderboard"] .leaderboard-trend-panel,
+body[data-page="leaderboard"] .leaderboard-table-details,
+body[data-page="leaderboard"] .table-container,
+body[data-page="leaderboard"] .details-cell,
+body[data-page="leaderboard"] .version-cell,
+body[data-page="leaderboard"] .overview-card,
+body[data-page="leaderboard"] .engine-summary-card {
+    border-color: rgba(125, 211, 252, 0.34);
+    background: rgba(8, 18, 36, 0.78);
+    color: #f4faff;
+    box-shadow: 0 18px 54px rgba(0, 0, 0, 0.34);
+}
+
+body[data-page="leaderboard"] .leaderboard-trend-panel,
+body[data-page="leaderboard"] .leaderboard-table-details {
+    backdrop-filter: blur(22px);
+}
+
+body[data-page="leaderboard"] .leaderboard-trend-panel {
+    background:
+        radial-gradient(circle at 18% 0%, rgba(56, 189, 248, 0.28), transparent 30%),
+        radial-gradient(circle at 88% 12%, rgba(134, 239, 172, 0.18), transparent 28%),
+        linear-gradient(180deg, rgba(8, 18, 36, 0.88), rgba(2, 6, 23, 0.72));
+}
+
+body[data-page="leaderboard"] .leaderboard-trend-panel::before {
+    background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.12), transparent 30%),
+        repeating-linear-gradient(90deg, rgba(125, 211, 252, 0.075) 0 1px, transparent 1px 92px);
+}
+
+body[data-page="leaderboard"] .leaderboard-table-details {
+    background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 30%),
+        linear-gradient(180deg, rgba(8, 18, 36, 0.84), rgba(2, 6, 23, 0.68));
+}
+
+body[data-page="leaderboard"] .leaderboard-schema-pill strong,
+body[data-page="leaderboard"] .hard-constraints-header h3,
+body[data-page="leaderboard"] .hard-constraints-baseline-value,
+body[data-page="leaderboard"] .overview-title,
+body[data-page="leaderboard"] .overview-card h3,
+body[data-page="leaderboard"] .engine-summary-card h3,
+body[data-page="leaderboard"] .trend-panel-head h3 {
+    color: #f8fbff;
+}
+
+body[data-page="leaderboard"] .tab-button,
+body[data-page="leaderboard"] .trend-metric-button,
+body[data-page="leaderboard"] .trend-axis-button,
+body[data-page="leaderboard"] .pagination-btn,
+body[data-page="leaderboard"] .btn-reset-filters,
+body[data-page="leaderboard"] .btn-details {
+    border-color: rgba(125, 211, 252, 0.42);
+    background: rgba(14, 165, 233, 0.16);
+    color: #eef7ff;
+}
+
+body[data-page="leaderboard"] .tab-button.active,
+body[data-page="leaderboard"] .trend-metric-button.active,
+body[data-page="leaderboard"] .pagination-btn:hover:not(:disabled),
+body[data-page="leaderboard"] .btn-details:hover {
+    border-color: rgba(56, 189, 248, 0.72);
+    background: rgba(56, 189, 248, 0.30);
+    color: #ffffff;
+}
+
+body[data-page="leaderboard"] .trend-axis-button.active {
+    border-color: rgba(148, 163, 184, 0.72);
+    background: rgba(148, 163, 184, 0.24);
+    color: #ffffff;
+}
+
+body[data-page="leaderboard"] .benchmark-details-toggle .action-button {
+    border-color: rgba(125, 211, 252, 0.52);
+    background: rgba(14, 165, 233, 0.22);
+    color: #ffffff;
+    box-shadow: 0 12px 32px rgba(14, 165, 233, 0.22);
+}
+
+body[data-page="leaderboard"] .benchmark-details-toggle .action-button:hover {
+    border-color: rgba(56, 189, 248, 0.72);
+    background: rgba(56, 189, 248, 0.24);
+}
+
+body[data-page="leaderboard"] .filter-group label,
+body[data-page="leaderboard"] .toggle-card span,
+body[data-page="leaderboard"] .toggle-card small {
+    color: rgba(238, 247, 255, 0.92);
+}
+
+body[data-page="leaderboard"] select {
+    border-color: rgba(125, 211, 252, 0.44);
+    background: rgba(2, 6, 23, 0.92);
+    color: #f8fbff;
+}
+
+body[data-page="leaderboard"] .leaderboard-table {
+    color: #e5f2ff;
+}
+
+body[data-page="leaderboard"] .leaderboard-table th {
+    background: rgba(1, 8, 20, 0.98);
+    color: #f8fbff;
+}
+
+body[data-page="leaderboard"] .leaderboard-table td {
+    border-bottom-color: rgba(125, 211, 252, 0.22);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:hover {
+    background: rgba(14, 165, 233, 0.18);
+}
+
+body[data-page="leaderboard"] .trend-chart-wrap {
+    background: rgba(1, 8, 20, 0.68);
+    border-color: rgba(125, 211, 252, 0.30);
+}
+
+body[data-page="leaderboard"] .trend-panel-head p,
+body[data-page="leaderboard"] .overview-section-note,
+body[data-page="leaderboard"] .overview-subtitle,
+body[data-page="leaderboard"] .hard-constraints-empty,
+body[data-page="leaderboard"] .hc-row-meta,
+body[data-page="leaderboard"] .leaderboard-table td small,
+body[data-page="leaderboard"] .empty-state,
+body[data-page="leaderboard"] .loading-state {
+    color: rgba(226, 242, 255, 0.82) !important;
+}
+
+body[data-page="leaderboard"] .overview-section-label,
+body[data-page="leaderboard"] .engine-chip,
+body[data-page="leaderboard"] .coverage-pill,
+body[data-page="leaderboard"] .hc-badge {
+    border-color: rgba(125, 211, 252, 0.46);
+    background: rgba(14, 165, 233, 0.20);
+    color: #f8fbff;
+}
+
+body[data-page="leaderboard"] .coverage-pill.success,
+body[data-page="leaderboard"] .hc-badge.pass,
+body[data-page="leaderboard"] .leader-mark {
+    border-color: rgba(134, 239, 172, 0.58);
+    background: rgba(22, 163, 74, 0.26);
+    color: #dcfce7;
+}
+
+body[data-page="leaderboard"] .coverage-pill.warning,
+body[data-page="leaderboard"] .hc-badge.fail {
+    border-color: rgba(251, 191, 36, 0.62);
+    background: rgba(217, 119, 6, 0.24);
+    color: #fef3c7;
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd),
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd) td:first-child {
+    background: rgba(8, 18, 36, 0.78);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even),
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even) td:first-child {
+    background: rgba(13, 28, 52, 0.76);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:hover td:first-child {
+    background: rgba(14, 165, 233, 0.24);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse,
+body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse td:first-child {
+    background: rgba(120, 53, 15, 0.32);
+}
+
+body[data-page="leaderboard"] .version-cell,
+body[data-page="leaderboard"] .hc-row-title,
+body[data-page="leaderboard"] .empty-state h3,
+body[data-page="leaderboard"] .detail-section h4 {
+    color: #ffffff;
+}
+
+body[data-page="leaderboard"] .details-cell {
+    background: rgba(4, 14, 30, 0.88) !important;
+    border-left-color: #38bdf8;
+}
+
+body[data-page="leaderboard"] .detail-section {
+    border-color: rgba(125, 211, 252, 0.28);
+    background: rgba(8, 18, 36, 0.82);
+    color: #f4faff;
+}
+
+body[data-page="leaderboard"] .trend-empty {
+    border-color: rgba(125, 211, 252, 0.42);
+    background: rgba(2, 6, 23, 0.78);
+    color: #eef7ff;
 }

@@ -8,17 +8,23 @@
   <meta name="hf-branch" content="main" />
   <title>Performance Leaderboard - vllm-hust</title>
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/leaderboard.html" />
+  <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin />
+  <link rel="preconnect" href="https://hf-mirror.com" crossorigin />
+  <link rel="preconnect" href="https://huggingface.co" crossorigin />
+  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=multi-page-20260701" />
-  <link rel="stylesheet" href="./assets/leaderboard.css?v=leaderboard-overview-sample-20260701-2" />
+  <link rel="stylesheet" href="./assets/site.css?v=public-copy-20260701" />
+  <link rel="stylesheet" href="./assets/leaderboard.css?v=leaderboard-public-20260703-logscale5" />
 </head>
 
 <body data-page="leaderboard">
   <nav class="site-nav">
     <div class="site-shell site-nav-inner">
       <a class="brand-link" href="./index.html">
-        <span class="brand-mark">VH</span>
-        <span class="brand-copy">vllm-hust<small>Benchmark-first serving</small></span>
+        <span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span>
+        <span class="brand-copy">vllm-hust<small>vLLM serving</small></span>
       </a>
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
@@ -30,12 +36,14 @@
     </div>
   </nav>
 
+  <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
+
   <main class="site-shell">
     <section class="page-hero">
       <div class="content-panel">
         <span class="eyebrow">vLLM Benchmark</span>
         <h1 id="page-title" style="margin-top: 16px">Performance Leaderboard</h1>
-        <p id="page-lede" class="hero-lede">Interactive benchmark trends, hard-constraint tracking, and table-level comparisons across visible scopes.</p>
+        <p id="page-lede" class="hero-lede">Interactive benchmark trends, validation details, and expandable table data across visible scopes.</p>
       </div>
     </section>
 
@@ -45,7 +53,7 @@
           <div class="leaderboard-eyebrow" id="leaderboard-eyebrow">vLLM Benchmark</div>
           <h2 id="leaderboard-title">Performance Leaderboard</h2>
           <p id="leaderboard-description">
-            Built from vLLM benchmark artifacts to compare real serving performance across engines under aligned model,
+            Built from vLLM benchmark artifacts to compare serving results across engines under aligned model,
             hardware, precision, and workload settings.
           </p>
         </div>
@@ -73,9 +81,6 @@
 
       <div id="leaderboard-content" style="display: none">
         <p id="leaderboard-data-stats" class="leaderboard-meta">Loaded 0 entries · Showing 0 entries</p>
-        <div id="leaderboard-hard-constraints" class="hard-constraints-panel" aria-live="polite"></div>
-        <div id="leaderboard-overview" class="leaderboard-overview"></div>
-        <p id="leaderboard-hint" class="leaderboard-hint">Align the scope first, then read the gap.</p>
 
         <div class="filters">
           <div class="filter-group"><label id="filter-engine-label" for="filter-engine">Engine</label><select id="filter-engine"><option value="all">All</option></select></div>
@@ -90,17 +95,15 @@
         <div class="compare-controls">
           <label class="toggle-card" for="toggle-same-scope">
             <input id="toggle-same-scope" type="checkbox" />
-            <span id="toggle-same-scope-title">Same model + hardware only</span>
-            <small id="toggle-same-scope-desc">Keep only the closest apples-to-apples slice.</small>
+            <span id="toggle-same-scope-title">Align model + hardware</span>
+            <small id="toggle-same-scope-desc">Compare entries with matching model and hardware settings.</small>
           </label>
           <label class="toggle-card" for="toggle-hide-incomplete">
             <input id="toggle-hide-incomplete" type="checkbox" />
-            <span id="toggle-hide-incomplete-title">Hide sparse benchmark rows</span>
-            <small id="toggle-hide-incomplete-desc">Keep the main table focused on real comparisons.</small>
+            <span id="toggle-hide-incomplete-title">Focus comparable rows</span>
+            <small id="toggle-hide-incomplete-desc">Show rows with peer entries in the current scope.</small>
           </label>
         </div>
-
-        <div id="leaderboard-coverage" class="coverage-strip"></div>
 
         <div id="leaderboard-trend-panel" class="leaderboard-trend-panel">
           <div class="trend-panel-head">
@@ -115,42 +118,61 @@
               <button type="button" class="trend-metric-button" data-trend-metric="tbt_ms">TBT</button>
             </div>
           </div>
+          <div class="trend-axis-row">
+            <span id="leaderboard-trend-axis-label" class="trend-axis-label">Y axis</span>
+            <div class="trend-axis-toggle" role="group" aria-label="Y axis scale">
+              <button type="button" class="trend-axis-button active" data-trend-axis="auto">Auto</button>
+              <button type="button" class="trend-axis-button" data-trend-axis="log">Log</button>
+              <button type="button" class="trend-axis-button" data-trend-axis="linear">Linear</button>
+            </div>
+          </div>
           <div class="trend-chart-wrap">
             <canvas id="leaderboard-trend-chart"></canvas>
             <div id="leaderboard-trend-empty" class="trend-empty" style="display: none">No trend data under current filters.</div>
           </div>
         </div>
 
-        <div class="table-container">
-          <table class="leaderboard-table">
-            <thead>
-              <tr>
-                <th id="table-head-engine">Engine / Version</th>
-                <th id="table-head-workload">Workload</th>
-                <th id="table-head-hardware">Hardware</th>
-                <th id="table-head-ttft">TTFT (ms)</th>
-                <th id="table-head-tbt">TBT (ms)</th>
-                <th id="table-head-tps">Tokens/s</th>
-                <th id="table-head-error">Error Rate</th>
-                <th id="table-head-actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboard-tbody"></tbody>
-          </table>
+        <div class="benchmark-details-toggle">
+          <button id="toggle-table-details" class="action-button" type="button" aria-expanded="false" aria-controls="leaderboard-table-details">Show table data</button>
         </div>
 
-        <div id="leaderboard-pagination" class="leaderboard-pagination"></div>
-        <div id="empty-state" class="empty-state" style="display: none">
-          <h3 id="leaderboard-empty-title">No Results Found</h3>
-          <p id="leaderboard-empty-text">Try adjusting your filters to see more data.</p>
+        <div id="leaderboard-table-details" class="leaderboard-table-details is-collapsed" hidden>
+          <div id="leaderboard-hard-constraints" class="hard-constraints-panel" aria-live="polite"></div>
+          <div id="leaderboard-overview" class="leaderboard-overview"></div>
+          <p id="leaderboard-hint" class="leaderboard-hint">Align the scope, then compare the visible gap.</p>
+          <div id="leaderboard-coverage" class="coverage-strip"></div>
+
+          <div class="table-container">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th id="table-head-engine">Engine / Version</th>
+                  <th id="table-head-workload">Workload</th>
+                  <th id="table-head-hardware">Hardware</th>
+                  <th id="table-head-ttft">TTFT (ms)</th>
+                  <th id="table-head-tbt">TBT (ms)</th>
+                  <th id="table-head-tps">Tokens/s</th>
+                  <th id="table-head-error">Error Rate</th>
+                  <th id="table-head-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-tbody"></tbody>
+            </table>
+          </div>
+
+          <div id="leaderboard-pagination" class="leaderboard-pagination"></div>
+          <div id="empty-state" class="empty-state" style="display: none">
+            <h3 id="leaderboard-empty-title">No Results Found</h3>
+            <p id="leaderboard-empty-text">Try adjusting your filters to see more data.</p>
+          </div>
+          <p id="leaderboard-last-updated" class="leaderboard-meta leaderboard-meta-footer">Last updated: -</p>
         </div>
-        <p id="leaderboard-last-updated" class="leaderboard-meta leaderboard-meta-footer">Last updated: -</p>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <strong>vllm-hust</strong> · Upstream-compatible serving for domestic hardware.
+    <strong>vllm-hust</strong> · vLLM-compatible serving for domestic hardware.
   </footer>
 
   <script>
@@ -158,19 +180,27 @@
       en: {
         title: 'Performance Leaderboard - vllm-hust',
         'page-title': 'Performance Leaderboard',
-        'page-lede': 'Interactive benchmark trends, hard-constraint tracking, and table-level comparisons across visible scopes.'
+        'page-lede': 'Interactive benchmark trends, validation details, and expandable table data across visible scopes.',
+        'toggle-same-scope-title': 'Align model + hardware',
+        'toggle-same-scope-desc': 'Compare entries with matching model and hardware settings.',
+        'toggle-hide-incomplete-title': 'Focus comparable rows',
+        'toggle-hide-incomplete-desc': 'Show rows with peer entries in the current scope.'
       },
       zh: {
         title: '性能排行榜 - vllm-hust',
         'page-title': '性能排行榜',
-        'page-lede': '动态查看版本趋势、硬约束达成情况，以及当前筛选范围内的 benchmark 明细。'
+        'page-lede': '动态查看版本趋势、验证项详情，以及当前筛选范围内可展开的 benchmark 明细。',
+        'toggle-same-scope-title': '对齐模型与硬件',
+        'toggle-same-scope-desc': '比较模型与硬件设置一致的记录。',
+        'toggle-hide-incomplete-title': '聚焦可对比记录',
+        'toggle-hide-incomplete-desc': '展示当前范围内有对应参照的记录。'
       }
     };
   </script>
-  <script src="./assets/site.js?v=multi-page-20260701"></script>
-  <script src="./assets/hf-data-loader.js?v=leaderboard-cache-v6-20260701"></script>
+  <script src="./assets/site.js?v=public-copy-20260701"></script>
+  <script src="./assets/hf-data-loader.js?v=leaderboard-cache-v7-20260702"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
-  <script src="./assets/leaderboard.js?v=leaderboard-overview-sample-20260701-2"></script>
+  <script src="./assets/leaderboard.js?v=leaderboard-public-20260703-logscale5"></script>
 </body>
 
 </html>

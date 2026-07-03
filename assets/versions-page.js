@@ -9,15 +9,17 @@
         if (typeof pkg.version_note_zh === 'string' && pkg.version_note_zh) {
             metaLines.push(`<div class="package-meta">${pkg.version_note_zh}</div>`);
         }
-        const pypiUrl = `https://pypi.org/project/${encodeURIComponent(pkg.pypi_name)}/${encodeURIComponent(pkg.version)}/`;
+        const pypiUrl = pkg.pypi_name
+            ? `https://pypi.org/project/${encodeURIComponent(pkg.pypi_name)}/${encodeURIComponent(pkg.version || '')}/`
+            : '';
         return `
             <div class="package-item">
                 <div class="package-name">${pkg.name}</div>
-                <div class="package-version">v${pkg.version}</div>
+                <div class="package-version">${pkg.version || 'repository'}</div>
                 ${metaLines.join('')}
                 <div class="package-links">
-                    <a href="${pypiUrl}" target="_blank">PyPI</a>
-                    <a href="${pkg.repo}" target="_blank">GitHub</a>
+                    ${pypiUrl ? `<a href="${pypiUrl}" target="_blank">PyPI</a>` : ''}
+                    ${pkg.repo ? `<a href="${pkg.repo}" target="_blank">GitHub</a>` : ''}
                 </div>
             </div>
         `;
@@ -56,7 +58,7 @@
         if (infraLoading) {
             infraLoading.style.display = infra.length > 0 ? 'none' : 'block';
             if (infra.length === 0) {
-                infraLoading.textContent = 'No infrastructure package versions found.';
+                infraLoading.textContent = 'No extension repositories listed.';
             }
         }
 

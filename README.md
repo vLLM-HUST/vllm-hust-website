@@ -120,7 +120,7 @@ vLLM benchmark inheritance path as the accountable scenario and dataset source.
 - `--standard`：标准模式，依赖优先从 PyPI 安装（稳定/发布导向）
 - `--dev`：开发模式，在 standard 基础上尝试本地 editable 覆盖（使用 `--no-deps`）
 - `requirements-dev.txt`：本地校验依赖单一来源，供 quickstart、CI 和 `scripts/validate-local.sh` 统一复用
-- 安装前会执行同前缀包动态清理（默认前缀：`ivllm-hust-website`）
+- 安装前会执行同前缀包动态清理（默认前缀：`vllm-hust-website`）
 
 ```bash
 # 查看帮助

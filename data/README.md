@@ -10,8 +10,8 @@
 - HF dataset: the secondary distribution surface for the website. It should publish the same
   `leaderboard_single.json`, `leaderboard_multi.json`, `leaderboard_compare.json`, and
   `last_updated.json` files from the benchmark snapshot set.
-- Retired baseline data: `vllm 0.11.0` / `v0110` rows must not appear in the website mirror.
-  The public baseline is `vllm 0.18.0` plus the matching `vllm-ascend 0.18.0` snapshot set.
+- Retired baseline data: `vllm 0.11.0` / `v0110` rows must not appear in the website mirror. The
+  public baseline is `vllm 0.18.0` plus the matching `vllm-ascend 0.18.0` snapshot set.
 - Website `data/`: a compatibility cache for checked-in snapshots and offline development. It should
   not be edited by hand and should not ingest raw compare directory layouts.
 
@@ -119,18 +119,12 @@ ______________________________________________________________________
 
 ### 3. 版本追踪
 
-记录所有 vllm-hust 组件版本：
+记录 vllm-hust 相关运行与评测组件版本。不要使用 SageLLM/ivllm 包名前缀来表示 vllm-hust 组件。
 
-- ivllm-hust (umbrella)
-- ivllm-hust-protocol
-- ivllm-hust-backend
-- ivllm-hust-core
-- ivllm-hust-control-plane
-- ivllm-hust-gateway
-- ivllm-hust-kv-cache
-- ivllm-hust-comm (多机必填)
-- ivllm-hust-compression
-- ivllm-hust-benchmark
+- `vllm-hust`：主推理引擎版本或 Git 修订
+- `vllm-ascend-hust` / `backend`：Ascend 后端适配版本或 Git 修订
+- `benchmark`：评测脚本与数据导出版本或 Git 修订
+- `comm`：多机通信组件版本或 Git 修订（多机必填）
 
 ### 4. 可复现性
 

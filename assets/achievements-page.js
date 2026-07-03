@@ -7,8 +7,35 @@
         contributors: './data/core_contributors.json',
     };
 
-    const ARTIFACTS = [
+    const ACHIEVEMENTS = [
         {
+            sortDate: '2026-07-02',
+            date: { en: 'July 2026', zh: '2026 年 7 月' },
+            kind: { en: 'Publication', zh: '论文' },
+            title: {
+                en: 'BidKV at SC 2026',
+                zh: 'BidKV 入选 SC 2026',
+            },
+            body: {
+                en: 'SC 2026 paper on utility-guided preemption scheduling for KV-pressure LLM serving, connecting vllm-hust serving research with system-level scheduling evidence.',
+                zh: 'SC 2026 论文，研究 KV cache 压力下大模型推理服务的 utility-guided preemption scheduling，体现 vllm-hust 在推理服务调度方向的系统研究成果。',
+            },
+            tags: [
+                { en: 'SC 2026', zh: 'SC 2026' },
+                { en: 'KV cache', zh: 'KV cache' },
+                { en: 'LLM serving', zh: 'LLM serving' },
+            ],
+            links: [
+                {
+                    label: { en: 'Open PDF', zh: '查看 PDF' },
+                    href: './assets/papers/bidkv-sc2026.pdf',
+                },
+            ],
+        },
+        {
+            sortDate: '2026-07-01',
+            date: { en: 'July 2026', zh: '2026 年 7 月' },
+            kind: { en: 'Survey', zh: '综述' },
             title: {
                 en: 'Domestic-hardware inference engine survey',
                 zh: '国产算力推理引擎综述',
@@ -34,6 +61,9 @@
             ],
         },
         {
+            sortDate: '2026-07-01',
+            date: { en: 'July 2026', zh: '2026 年 7 月' },
+            kind: { en: 'Benchmark', zh: '评测' },
             title: {
                 en: 'Ascend performance evaluation documentation',
                 zh: 'Ascend 性能评测文档',
@@ -62,36 +92,36 @@
 
     const UI = {
         en: {
-            packageFallback: 'package',
-            packageRepo: 'GitHub',
-            packagePypi: 'PyPI',
             throughputUnit: 'tok/s',
             workloadFallback: 'Other',
             modelFallback: 'Unknown model',
             milestoneBenchmarkTitle: 'Benchmark snapshot pipeline',
             milestoneBenchmarkBody: (groups, pairs) => `${groups} compare groups and ${pairs} preferred pairs are published as static JSON snapshots.`,
-            milestoneHardTitle: 'Hard-constraint tracking',
-            milestoneHardBody: (scopes) => `${scopes} hard-constraint scopes are tracked with pass/fail and regression context.`,
+            milestoneHardTitle: 'Validation tracking',
+            milestoneHardBody: (scopes) => `${scopes} validation scopes are tracked with pass/fail status and regression context.`,
             milestoneBaselineTitle: 'Official baseline comparison',
             milestoneBaselineBody: (pairs) => `${pairs} goal-progress pairs compare vllm-hust against the official vLLM baseline.`,
             milestoneWorkstationTitle: 'Workstation surface',
             milestoneWorkstationBody: 'The website can embed or link to a live vllm-hust workstation for operator-facing serving workflows.',
+            currentDate: 'Current',
+            milestoneKind: 'Project',
+            latestLabel: 'Latest',
         },
         zh: {
-            packageFallback: '软件包',
-            packageRepo: '代码仓库',
-            packagePypi: 'PyPI',
             throughputUnit: 'token/s',
             workloadFallback: '其他',
             modelFallback: '未知模型',
             milestoneBenchmarkTitle: 'Benchmark 快照流水线',
             milestoneBenchmarkBody: (groups, pairs) => `当前以静态 JSON 快照发布 ${groups} 个对比组和 ${pairs} 个优选对比对。`,
-            milestoneHardTitle: '硬约束追踪',
-            milestoneHardBody: (scopes) => `当前追踪 ${scopes} 个硬约束范围，并保留通过状态与回归上下文。`,
+            milestoneHardTitle: '验证项追踪',
+            milestoneHardBody: (scopes) => `当前追踪 ${scopes} 个验证范围，并保留通过状态与回归上下文。`,
             milestoneBaselineTitle: '官方基线对比',
             milestoneBaselineBody: (pairs) => `${pairs} 个目标进展对比对用于比较 vllm-hust 与官方 vLLM 基线。`,
             milestoneWorkstationTitle: 'Workstation 入口',
             milestoneWorkstationBody: '网站可以嵌入或链接到实时 vllm-hust workstation，支撑面向操作者的推理服务工作流。',
+            currentDate: '当前',
+            milestoneKind: '项目',
+            latestLabel: '最新',
         },
     };
 
@@ -150,82 +180,7 @@
         setText('achievement-stat-hard', fmt(compare?.hard_constraints?.scope_count || 0));
     }
 
-    function renderArtifacts(lang = currentLang()) {
-        const target = document.getElementById('achievement-artifacts');
-        if (!target) return;
-        target.innerHTML = ARTIFACTS.map((artifact) => `
-            <div class="info-card">
-                <h3>${pick(artifact.title, lang)}</h3>
-                <p>${pick(artifact.body, lang)}</p>
-                <div class="tag-list">
-                    ${artifact.tags.map((tag) => `<span class="tag">${pick(tag, lang)}</span>`).join('')}
-                </div>
-                <div class="tag-list">
-                    ${artifact.links.map((link) => `<a class="action-button" href="${link.href}" target="_blank" rel="noreferrer">${pick(link.label, lang)}</a>`).join('')}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function renderPackages(versionMeta, lang = currentLang()) {
-        const target = document.getElementById('achievement-packages');
-        if (!target) return;
-        const text = ui(lang);
-        const packages = Array.isArray(versionMeta?.packages) ? versionMeta.packages : [];
-        target.innerHTML = packages.map((pkg) => `
-            <div class="data-row">
-                <div>
-                    <h3>${pkg.name || text.packageFallback}</h3>
-                    <p>${lang === 'zh' ? (pkg.version_note_zh || pkg.version_display_label || pkg.group || '') : (pkg.version_display_label || pkg.group || '')}</p>
-                    <div class="tag-list">
-                        <span class="tag">${pkg.group || text.packageFallback}</span>
-                        <span class="tag">${pkg.version || '-'}</span>
-                        ${pkg.pypi_name ? `<span class="tag">${text.packagePypi}: ${pkg.pypi_name}</span>` : ''}
-                    </div>
-                </div>
-                ${pkg.repo ? `<a class="action-button" href="${pkg.repo}" target="_blank" rel="noreferrer">${text.packageRepo}</a>` : ''}
-            </div>
-        `).join('');
-    }
-
-    function renderEvidence(entries, lang = currentLang()) {
-        const target = document.getElementById('achievement-evidence');
-        if (!target) return;
-        const text = ui(lang);
-        const byWorkload = new Map();
-        entries.forEach((entry) => {
-            const workload = getWorkload(entry, lang);
-            const current = byWorkload.get(workload);
-            const throughput = Number(entry?.metrics?.throughput_tps || 0);
-            if (!current || throughput > current.throughput) {
-                byWorkload.set(workload, {
-                    workload,
-                    throughput,
-                    engine: getEngine(entry),
-                    model: getModel(entry, lang),
-                    precision: entry?.model?.precision || '-',
-                });
-            }
-        });
-        const rows = [...byWorkload.values()]
-            .sort((a, b) => b.throughput - a.throughput)
-            .slice(0, 8);
-        target.innerHTML = rows.map((row) => `
-            <div class="info-card">
-                <h3>${row.workload}</h3>
-                <p>${row.model}</p>
-                <div class="tag-list">
-                    <span class="tag">${row.engine}</span>
-                    <span class="tag">${row.precision}</span>
-                    <span class="tag">${row.throughput.toFixed(1)} ${text.throughputUnit}</span>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function renderMilestones(compare, lang = currentLang()) {
-        const target = document.getElementById('achievement-milestones');
-        if (!target) return;
+    function buildMilestones(compare, lang = currentLang()) {
         const text = ui(lang);
         const hard = compare?.hard_constraints || {};
         const goal = compare?.goal_progress || {};
@@ -233,37 +188,107 @@
         const preferredPairCount = fmt(compare?.preferred_pair_count || 0);
         const hardScopeCount = fmt(hard.scope_count || 0);
         const goalPairCount = fmt(goal.pair_count || (goal.pairs || []).length || 0);
-        const cards = [
+        return [
             {
+                sortDate: '2026-07-01',
+                date: text.currentDate,
+                kind: text.milestoneKind,
                 title: text.milestoneBenchmarkTitle,
                 body: text.milestoneBenchmarkBody(groupCount, preferredPairCount),
+                tags: [
+                    { en: 'Leaderboard', zh: '排行榜' },
+                    { en: 'JSON snapshots', zh: 'JSON 快照' },
+                ],
+                links: [],
             },
             {
+                sortDate: '2026-07-01',
+                date: text.currentDate,
+                kind: text.milestoneKind,
                 title: text.milestoneHardTitle,
                 body: text.milestoneHardBody(hardScopeCount),
+                tags: [
+                    { en: 'Validation', zh: '验证' },
+                    { en: 'Regression context', zh: '回归上下文' },
+                ],
+                links: [],
             },
             {
+                sortDate: '2026-07-01',
+                date: text.currentDate,
+                kind: text.milestoneKind,
                 title: text.milestoneBaselineTitle,
                 body: text.milestoneBaselineBody(goalPairCount),
+                tags: [
+                    { en: 'Baseline', zh: '基线' },
+                    { en: 'vLLM', zh: 'vLLM' },
+                ],
+                links: [],
             },
             {
+                sortDate: '2026-07-01',
+                date: text.currentDate,
+                kind: text.milestoneKind,
                 title: text.milestoneWorkstationTitle,
                 body: text.milestoneWorkstationBody,
+                tags: [
+                    { en: 'Workstation', zh: 'Workstation' },
+                    { en: 'Operator workflow', zh: '操作工作流' },
+                ],
+                links: [],
             },
         ];
-        target.innerHTML = cards.map((card) => `
-            <div class="info-card">
-                <h3>${card.title}</h3>
-                <p>${card.body}</p>
-            </div>
+    }
+
+    function normalizeAchievement(item, lang) {
+        return {
+            sortDate: item.sortDate || '0000-00-00',
+            date: pick(item.date, lang) || item.date || '',
+            kind: pick(item.kind, lang) || item.kind || '',
+            title: pick(item.title, lang),
+            body: pick(item.body, lang),
+            tags: item.tags || [],
+            links: item.links || [],
+        };
+    }
+
+    function renderTimeline(compare, lang = currentLang()) {
+        const target = document.getElementById('achievement-timeline');
+        if (!target) return;
+        const items = [
+            ...ACHIEVEMENTS.map((item) => normalizeAchievement(item, lang)),
+            ...buildMilestones(compare, lang).map((item) => normalizeAchievement(item, lang)),
+        ].sort((left, right) => right.sortDate.localeCompare(left.sortDate));
+
+        target.innerHTML = items.map((item) => `
+            <article class="achievement-item ${item === items[0] ? 'is-latest' : ''}">
+                <div class="achievement-time">
+                    <span>${item.date}</span>
+                    <strong>${item.kind}</strong>
+                </div>
+                <div class="achievement-body">
+                    <div class="achievement-head">
+                        <h3>${item.title}</h3>
+                        ${item === items[0] ? `<span class="achievement-latest">${ui(lang).latestLabel}</span>` : ''}
+                    </div>
+                    <p>${item.body}</p>
+                    ${item.tags.length ? `
+                        <div class="tag-list">
+                            ${item.tags.map((tag) => `<span class="tag">${pick(tag, lang)}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    ${item.links.length ? `
+                        <div class="tag-list achievement-actions">
+                            ${item.links.map((link) => `<a class="action-button" href="${link.href}" target="_blank" rel="noreferrer">${pick(link.label, lang)}</a>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            </article>
         `).join('');
     }
 
     function renderDynamic(lang = currentLang()) {
-        renderArtifacts(lang);
-        if (state.versionMeta) renderPackages(state.versionMeta, lang);
-        if (state.entries.length) renderEvidence(state.entries, lang);
-        if (state.compare) renderMilestones(state.compare, lang);
+        if (state.compare) renderTimeline(state.compare, lang);
     }
 
     async function init() {

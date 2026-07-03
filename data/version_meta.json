@@ -20,76 +20,20 @@
   "packages": [
     {
       "name": "vllm-hust",
-      "repo": "https://github.com/intellistream/vllm-hust",
-      "pypi_name": "vllm-hust",
-      "version": "0.17.2.post1",
-      "version_display_label": "Recommended stable policy: upstream base + HUST revision",
-      "version_note_zh": "当前展示为已发布包版本；稳定发布建议采用 upstream.postN 形式（如 0.17.2.post1），既保留上游对应关系，也区分 HUST fork。",
+      "repo": "https://github.com/vLLM-HUST/vllm-hust",
+      "version": "pending-republish",
+      "version_display_label": "PyPI release pending",
+      "version_note_zh": "当前 PyPI 包需要重新打包上传；网站不再把旧发布包版本当作 vllm-hust 当前版本。",
       "group": "core"
     },
     {
-      "name": "vllm-hust-protocol",
-      "repo": "https://github.com/intellistream/vllm-hust-protocol",
-      "pypi_name": "ivllm-hust-protocol",
-      "version": "0.5.4.16",
+      "name": "vllm-ascend-hust",
+      "repo": "https://github.com/vLLM-HUST/vllm-ascend-hust",
+      "version": "repository",
+      "version_display_label": "Repository maintained with vllm-hust",
+      "version_note_zh": "Ascend 后端适配仓库修订，用于配合 vllm-hust 的国产算力服务链路。",
       "group": "core"
-    },
-    {
-      "name": "vllm-hust-backend",
-      "repo": "https://github.com/intellistream/vllm-hust-backend",
-      "pypi_name": "ivllm-hust-backend",
-      "version": "0.5.4.17",
-      "group": "core"
-    },
-    {
-      "name": "vllm-hust-core",
-      "repo": "https://github.com/intellistream/vllm-hust-core",
-      "pypi_name": "ivllm-hust-core",
-      "version": "0.5.4.26",
-      "group": "core"
-    },
-    {
-      "name": "vllm-hust-control-plane",
-      "repo": "https://github.com/intellistream/vllm-hust-control-plane",
-      "pypi_name": "ivllm-hust-control-plane",
-      "version": "0.5.4.14",
-      "group": "infrastructure"
-    },
-    {
-      "name": "vllm-hust-gateway",
-      "repo": "https://github.com/intellistream/vllm-hust-gateway",
-      "pypi_name": "ivllm-hust-gateway",
-      "version": "0.5.4.14",
-      "group": "infrastructure"
-    },
-    {
-      "name": "vllm-hust-kv-cache",
-      "repo": "https://github.com/intellistream/vllm-hust-kv-cache",
-      "pypi_name": "ivllm-hust-kv-cache",
-      "version": "0.5.4.15",
-      "group": "infrastructure"
-    },
-    {
-      "name": "vllm-hust-comm",
-      "repo": "https://github.com/intellistream/vllm-hust-comm",
-      "pypi_name": "ivllm-hust-comm",
-      "version": "0.5.4.15",
-      "group": "infrastructure"
-    },
-    {
-      "name": "vllm-hust-compression",
-      "repo": "https://github.com/intellistream/vllm-hust-compression",
-      "pypi_name": "ivllm-hust-compression",
-      "version": "0.5.4.12",
-      "group": "infrastructure"
-    },
-    {
-      "name": "vllm-hust-benchmark",
-      "repo": "https://github.com/intellistream/vllm-hust-benchmark",
-      "pypi_name": "ivllm-hust-benchmark",
-      "version": "0.5.4.14",
-      "group": "infrastructure"
     }
   ],
-  "updated_at": "2026-04-19"
+  "updated_at": "2026-07-01"
 }

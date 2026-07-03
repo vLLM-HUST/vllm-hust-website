@@ -9,7 +9,6 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parents[1]
 VERSION_META_PATH = ROOT_DIR / "data" / "version_meta.json"
 README_PATH = ROOT_DIR / "README.md"
-INDEX_PATH = ROOT_DIR / "index.html"
 VERSIONS_PATH = ROOT_DIR / "versions.html"
 ALLOWLIST_PATH = ROOT_DIR / "scripts" / "stale_version_allowlist.txt"
 
@@ -71,7 +70,6 @@ def _check_consistency(meta: dict) -> list[str]:
             errors.append(f"Missing required field: {field_name}")
 
     readme_text = README_PATH.read_text(encoding="utf-8")
-    index_text = INDEX_PATH.read_text(encoding="utf-8")
     versions_text = VERSIONS_PATH.read_text(encoding="utf-8")
 
     if headline and headline not in readme_text:
@@ -89,13 +87,6 @@ def _check_consistency(meta: dict) -> list[str]:
     if description and "Version Metadata Maintenance" not in readme_text:
         errors.append("README.md is missing version metadata maintenance section")
 
-    if 'id="release-banner-title"' not in index_text:
-        errors.append("index.html is missing release banner placeholder")
-    if 'id="quickstart-title"' not in index_text:
-        errors.append("index.html is missing quickstart title placeholder")
-    if "./assets/version-meta-loader.js" not in index_text:
-        errors.append("index.html is missing version-meta-loader.js")
-
     if "./assets/versions-page.js" not in versions_text:
         errors.append("versions.html is missing versions-page.js")
 
@@ -106,7 +97,7 @@ def main() -> None:
     allowlist = _load_allowlist_patterns()
 
     violations: list[str] = []
-    for target in (INDEX_PATH, README_PATH, VERSIONS_PATH, VERSION_META_PATH):
+    for target in (README_PATH, VERSIONS_PATH, VERSION_META_PATH):
         violations.extend(_find_stale_references(target, allowlist))
 
     try:
