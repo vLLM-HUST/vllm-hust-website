@@ -2489,7 +2489,9 @@
                 pointRadius: 3,
                 pointHoverRadius: 6,
                 tension: 0.28,
-                spanGaps: false,
+                // Keep one series continuous across x-axis slots that belong only to
+                // other workload/model/precision series. Missing entries still have no marker.
+                spanGaps: true,
             };
         });
 
