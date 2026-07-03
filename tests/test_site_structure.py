@@ -409,7 +409,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert 'data-trend-metric="throughput_tps"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260703-logscale" in html_text
+    assert "leaderboard-public-20260703-logscale2" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
     assert "function startBackgroundDataSync()" in js_text
@@ -432,9 +432,13 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "pointDetails" in js_text
     assert "spanGaps: true" in js_text
     assert "Keep one series continuous across x-axis slots" in js_text
+    assert "function getTrendAxisValues(datasets)" in js_text
     assert "function shouldUseLogTrendAxis(metricConfig, datasets)" in js_text
-    assert "metricConfig.key !== 'throughput_tps' || filters.workload !== 'all'" in js_text
+    assert "const selectedWorkload = filters.workload || 'all';" in js_text
+    assert "function getLogTrendAxisBounds(datasets)" in js_text
+    assert "const yAxisBounds = useLogYAxis ? getLogTrendAxisBounds(datasets) : {};" in js_text
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text
+    assert "min: yAxisBounds.min" in js_text
     assert "renderPerformanceTrendChart(sortedFiltered);" in js_text
     assert ".leaderboard-trend-panel {" in css_text
     assert ".trend-chart-wrap {" in css_text

@@ -2420,16 +2420,34 @@
     }
 
 
-    function shouldUseLogTrendAxis(metricConfig, datasets) {
-        const filters = state.filters[state.currentTab] || {};
-        if (metricConfig.key !== 'throughput_tps' || filters.workload !== 'all') {
-            return false;
-        }
-        const values = datasets
+    function getTrendAxisValues(datasets) {
+        return datasets
             .flatMap((dataset) => dataset.data || [])
             .filter((value) => Number.isFinite(Number(value)))
             .map(Number);
+    }
+
+    function shouldUseLogTrendAxis(metricConfig, datasets) {
+        const filters = state.filters[state.currentTab] || {};
+        const selectedWorkload = filters.workload || 'all';
+        if (metricConfig.key !== 'throughput_tps' || selectedWorkload !== 'all') {
+            return false;
+        }
+        const values = getTrendAxisValues(datasets);
         return values.length > 0 && values.every((value) => value > 0);
+    }
+
+    function getLogTrendAxisBounds(datasets) {
+        const values = getTrendAxisValues(datasets).filter((value) => value > 0);
+        if (!values.length) {
+            return {};
+        }
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        return {
+            min: Math.max(min * 0.65, Number.MIN_VALUE),
+            max: max * 1.18,
+        };
     }
 
     function renderPerformanceTrendChart(entries) {
@@ -2509,6 +2527,7 @@
         });
 
         const useLogYAxis = shouldUseLogTrendAxis(metricConfig, datasets);
+        const yAxisBounds = useLogYAxis ? getLogTrendAxisBounds(datasets) : {};
 
         if (state.trendChart) {
             state.trendChart.destroy();
@@ -2585,6 +2604,8 @@
                     },
                     y: {
                         type: useLogYAxis ? 'logarithmic' : 'linear',
+                        min: yAxisBounds.min,
+                        max: yAxisBounds.max,
                         ticks: {
                             color: '#dff3ff',
                             callback(value) {
