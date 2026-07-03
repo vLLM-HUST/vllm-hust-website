@@ -2419,6 +2419,19 @@
         });
     }
 
+
+    function shouldUseLogTrendAxis(metricConfig, datasets) {
+        const filters = state.filters[state.currentTab] || {};
+        if (metricConfig.key !== 'throughput_tps' || filters.workload !== 'all') {
+            return false;
+        }
+        const values = datasets
+            .flatMap((dataset) => dataset.data || [])
+            .filter((value) => Number.isFinite(Number(value)))
+            .map(Number);
+        return values.length > 0 && values.every((value) => value > 0);
+    }
+
     function renderPerformanceTrendChart(entries) {
         const panel = document.getElementById('leaderboard-trend-panel');
         const canvas = document.getElementById('leaderboard-trend-chart');
@@ -2495,6 +2508,8 @@
             };
         });
 
+        const useLogYAxis = shouldUseLogTrendAxis(metricConfig, datasets);
+
         if (state.trendChart) {
             state.trendChart.destroy();
         }
@@ -2569,8 +2584,12 @@
                         },
                     },
                     y: {
+                        type: useLogYAxis ? 'logarithmic' : 'linear',
                         ticks: {
                             color: '#dff3ff',
+                            callback(value) {
+                                return formatNumber(Number(value));
+                            },
                         },
                         title: {
                             display: true,
