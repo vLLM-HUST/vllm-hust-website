@@ -2386,8 +2386,8 @@
             const timestamp = getEntryTimestamp(entry);
             const baseline = isTrendBaselineEntry(entry);
             const existingVersion = versionMap.get(versionKey);
-            const sortValue = baseline ? Number.NEGATIVE_INFINITY + (timestamp || 0) : (timestamp || 0);
-            if (!existingVersion || sortValue < existingVersion.sortValue) {
+            const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);
+            if (!existingVersion) {
                 versionMap.set(versionKey, {
                     key: versionKey,
                     label: getTrendVersionLabel(entry),
@@ -2395,6 +2395,11 @@
                     timestamp,
                     baseline,
                 });
+            } else if (!baseline && sortValue > existingVersion.sortValue) {
+                existingVersion.sortValue = sortValue;
+                existingVersion.timestamp = timestamp;
+            } else if (baseline && timestamp > existingVersion.timestamp) {
+                existingVersion.timestamp = timestamp;
             }
 
             const seriesKey = getTrendSeriesKey(entry);
