@@ -229,7 +229,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Baseline first, then visible versions in submission order. The default all-workloads trend shows online serving workloads; select a workload to inspect throughput or latency runs.',
+            trendSubtitle: 'Baseline first, then mainline online serving versions. Select a workload to inspect the full PR and historical run sequence.',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -435,7 +435,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '横轴从基线开始，再按提交时间展示当前可见版本；默认全部视图展示 online serving workload，throughput/latency 请切到具体 workload 查看。',
+            trendSubtitle: '横轴从基线开始，默认全部视图只展示 mainline online serving 版本；切到具体 workload 可查看完整 PR 与历史运行序列。',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -1833,12 +1833,24 @@
         return String(getWorkloadId(entry) || '').endsWith('-online');
     }
 
+    function isMainlineTrendEntry(entry) {
+        if (isTrendBaselineEntry(entry)) {
+            return true;
+        }
+
+        const ref = String(entry?.metadata?.github_ref || '').trim().toLowerCase();
+        return ref === 'main' || ref === 'main-current' || ref.startsWith('main-');
+    }
+
     function getPerformanceTrendEntries(entries, selectedWorkload) {
         return entries.filter((entry) => {
             if (shouldExcludeFromTrends(entry)) {
                 return false;
             }
-            return selectedWorkload === 'all' ? isOnlineServingWorkload(entry) : true;
+            if (selectedWorkload !== 'all') {
+                return true;
+            }
+            return isOnlineServingWorkload(entry) && isMainlineTrendEntry(entry);
         });
     }
 
