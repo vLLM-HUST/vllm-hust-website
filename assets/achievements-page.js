@@ -9,6 +9,62 @@
 
     const ACHIEVEMENTS = [
         {
+            sortDate: '2026-07-05',
+            date: { en: 'July 2026', zh: '2026 年 7 月' },
+            kind: { en: 'Upstream', zh: '上游贡献' },
+            title: {
+                en: 'Official upstream PR portfolio for vLLM and vLLM-Ascend',
+                zh: 'vLLM 与 vLLM-Ascend 官方上游 PR 组合',
+            },
+            body: {
+                en: 'vllm-hust work has been packaged for official upstream review across vLLM and vLLM-Ascend. vLLM-Ascend #8958, #10735, #11417, #11422, and #11449 are mergeable with CI passing and awaiting review. vLLM #41449, #41507, #47622, and #47623 are mergeable but waiting for the official ready/verified label to trigger CI.',
+                zh: 'vllm-hust 的工作已持续整理提交到 vLLM 与 vLLM-Ascend 官方上游。vLLM-Ascend #8958、#10735、#11417、#11422、#11449 均已可合并且 CI 通过，等待官方 review；vLLM #41449、#41507、#47622、#47623 已可合并，但还在等待官方 ready/verified label 触发 CI。',
+            },
+            tags: [
+                { en: 'vLLM', zh: 'vLLM' },
+                { en: 'vLLM-Ascend', zh: 'vLLM-Ascend' },
+                { en: 'Upstream review', zh: '上游评审' },
+            ],
+            links: [
+                {
+                    label: { en: 'vLLM #41449 · label gate', zh: 'vLLM #41449 · 等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/41449',
+                },
+                {
+                    label: { en: 'vLLM #41507 · label gate', zh: 'vLLM #41507 · 等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/41507',
+                },
+                {
+                    label: { en: 'vLLM #47622 · label gate', zh: 'vLLM #47622 · 等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/47622',
+                },
+                {
+                    label: { en: 'vLLM #47623 · label gate', zh: 'vLLM #47623 · 等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/47623',
+                },
+                {
+                    label: { en: 'vLLM-Ascend #8958 · CI passed', zh: 'vLLM-Ascend #8958 · CI 已通过' },
+                    href: 'https://github.com/vllm-project/vllm-ascend/pull/8958',
+                },
+                {
+                    label: { en: 'vLLM-Ascend #10735 · CI passed', zh: 'vLLM-Ascend #10735 · CI 已通过' },
+                    href: 'https://github.com/vllm-project/vllm-ascend/pull/10735',
+                },
+                {
+                    label: { en: 'vLLM-Ascend #11417 · CI passed', zh: 'vLLM-Ascend #11417 · CI 已通过' },
+                    href: 'https://github.com/vllm-project/vllm-ascend/pull/11417',
+                },
+                {
+                    label: { en: 'vLLM-Ascend #11422 · CI passed', zh: 'vLLM-Ascend #11422 · CI 已通过' },
+                    href: 'https://github.com/vllm-project/vllm-ascend/pull/11422',
+                },
+                {
+                    label: { en: 'vLLM-Ascend #11449 · CI passed', zh: 'vLLM-Ascend #11449 · CI 已通过' },
+                    href: 'https://github.com/vllm-project/vllm-ascend/pull/11449',
+                },
+            ],
+        },
+        {
             sortDate: '2026-07-02',
             date: { en: 'July 2026', zh: '2026 年 7 月' },
             kind: { en: 'Publication', zh: '论文' },
@@ -29,6 +85,30 @@
                 {
                     label: { en: 'Open PDF', zh: '查看 PDF' },
                     href: './assets/papers/bidkv-sc2026.pdf',
+                },
+            ],
+        },
+        {
+            sortDate: '2026-06-18',
+            date: { en: 'June 2026', zh: '2026 年 6 月' },
+            kind: { en: 'Community', zh: '社区贡献' },
+            title: {
+                en: 'Jingyuan Tian PR accepted by the Qwen community',
+                zh: '恭喜 Jingyuan 同学的 PR 被 Qwen 社区正式接收',
+            },
+            body: {
+                en: 'Jingyuan Tian contributed a plan-gate fix to qwen-code, and the Qwen community merged it into the official repository.',
+                zh: 'Jingyuan Tian 向 qwen-code 贡献了 plan-gate 修复，并已被 Qwen 社区合入官方仓库。',
+            },
+            tags: [
+                { en: 'Qwen', zh: 'Qwen' },
+                { en: 'qwen-code', zh: 'qwen-code' },
+                { en: 'Merged PR', zh: '已合入 PR' },
+            ],
+            links: [
+                {
+                    label: { en: 'QwenLM/qwen-code #5185', zh: 'QwenLM/qwen-code #5185' },
+                    href: 'https://github.com/QwenLM/qwen-code/pull/5185',
                 },
             ],
         },

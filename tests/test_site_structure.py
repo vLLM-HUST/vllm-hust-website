@@ -304,7 +304,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "achievements-timeline-20260702" in html_text
+    assert "achievements-timeline-20260705" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -318,13 +318,44 @@ def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     assert "achievement-artifacts" not in html_text
     assert "achievement-milestones" not in html_text
     assert "const ACHIEVEMENTS = [" in js_text
-    assert "sortDate: '2026-07-02'" in js_text
+    assert "sortDate: '2026-07-05'" in js_text
     assert (
         "].sort((left, right) => right.sortDate.localeCompare(left.sortDate));"
         in js_text
     )
     assert "achievement-item" in css_text
     assert "achievement-time" in css_text
+
+
+def test_achievements_page_records_upstream_prs() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    assert "Official upstream PR portfolio for vLLM and vLLM-Ascend" in js_text
+    assert "https://github.com/vllm-project/vllm/pull/41449" in js_text
+    assert "https://github.com/vllm-project/vllm/pull/41507" in js_text
+    assert "https://github.com/vllm-project/vllm/pull/47622" in js_text
+    assert "https://github.com/vllm-project/vllm/pull/47623" in js_text
+    assert "https://github.com/vllm-project/vllm-ascend/pull/8958" in js_text
+    assert "https://github.com/vllm-project/vllm-ascend/pull/10735" in js_text
+    assert "https://github.com/vllm-project/vllm-ascend/pull/11417" in js_text
+    assert "https://github.com/vllm-project/vllm-ascend/pull/11422" in js_text
+    assert "https://github.com/vllm-project/vllm-ascend/pull/11449" in js_text
+    assert "vLLM-Ascend #8958 · CI passed" in js_text
+    assert "vLLM-Ascend #10735 · CI passed" in js_text
+    assert "vLLM-Ascend #11449 · CI passed" in js_text
+    assert "vLLM #41449 · label gate" in js_text
+    assert "vLLM #41507 · label gate" in js_text
+    assert "vLLM #47622 · label gate" in js_text
+
+
+def test_achievements_page_records_qwen_accepted_pr() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    assert "Jingyuan Tian PR accepted by the Qwen community" in js_text
+    assert "恭喜 Jingyuan 同学的 PR 被 Qwen 社区正式接收" in js_text
+    assert "https://github.com/QwenLM/qwen-code/pull/5185" in js_text
 
 
 def test_bidkv_achievement_links_to_pdf_not_repository() -> None:
