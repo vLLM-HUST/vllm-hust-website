@@ -415,7 +415,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260705-trendsort1" in html_text
+    assert "leaderboard-public-20260705-mainline1" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert (
         "const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);"
@@ -438,7 +438,9 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');"
         in js_text
     )
-    assert "默认全部视图展示 online serving workload" in js_text
+    assert "默认全部视图只展示 mainline online serving 版本" in js_text
+    assert "function isMainlineTrendEntry(entry)" in js_text
+    assert "isOnlineServingWorkload(entry) && isMainlineTrendEntry(entry)" in js_text
     assert "function renderPerformanceTrendChart(entries)" in js_text
     assert "new Chart(canvas" in js_text
     assert "pointDetails" in js_text
@@ -465,10 +467,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "min: yAxisBounds.min" in js_text
     assert "function isOnlineServingWorkload(entry)" in js_text
     assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
-    assert (
-        "return selectedWorkload === 'all' ? isOnlineServingWorkload(entry) : true;"
-        in js_text
-    )
+    assert "if (selectedWorkload !== 'all')" in js_text
+    assert "return true;" in js_text
     assert (
         "renderPerformanceTrendChart(getPerformanceTrendEntries(sortedFiltered, filters.workload));"
         in js_text
