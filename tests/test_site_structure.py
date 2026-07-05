@@ -415,8 +415,13 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260703-logscale6" in html_text
+    assert "leaderboard-public-20260705-trendsort1" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
+    assert (
+        "const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);"
+        in js_text
+    )
+    assert "sortValue > existingVersion.sortValue" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
     assert "function startBackgroundDataSync()" in js_text
     assert "const renderPartialData = (progress) => {" in js_text
