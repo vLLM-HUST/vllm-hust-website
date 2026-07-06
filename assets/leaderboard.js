@@ -1834,7 +1834,7 @@
         return workload.endsWith('-online')
             || workload.endsWith('-throughput')
             || workload.endsWith('-latency')
-            || /-(throughput|latency)-\d+chip$/.test(workload);
+            || /-(online|throughput|latency)-\d+chip$/.test(workload);
     }
 
     function isMainlineTrendEntry(entry) {
@@ -1843,7 +1843,10 @@
         }
 
         const ref = String(entry?.metadata?.github_ref || '').trim().toLowerCase();
-        return ref === 'main' || ref === 'main-current' || ref.startsWith('main-');
+        return ref === 'main'
+            || ref === 'main-current'
+            || ref.startsWith('main-')
+            || ref.startsWith('current-main');
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
