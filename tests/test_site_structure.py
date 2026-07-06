@@ -461,7 +461,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260706-focused-axis2" in html_text
+    assert "leaderboard-public-20260706-focused-axis3" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert (
         "const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);"
