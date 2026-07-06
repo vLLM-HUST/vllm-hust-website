@@ -471,6 +471,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert "默认全部视图只展示 mainline online serving 版本" in js_text
     assert "function isMainlineTrendEntry(entry)" in js_text
+    assert "function getSelectOptionLabel(value, option, labelMapper = null)" in js_text
+    assert "if (value === 'all')" in js_text
     assert "function isServingTrendWorkload(entry)" in js_text
     assert "workload.endsWith('-throughput')" in js_text
     assert "isServingTrendWorkload(entry) && isMainlineTrendEntry(entry)" in js_text

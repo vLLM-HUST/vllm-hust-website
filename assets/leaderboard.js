@@ -2975,12 +2975,7 @@
         // Update dropdowns
         updateSelect('filter-engine', ['all', ...engineOptions], filters.engine, getEngineLabel);
         updateSelect('filter-hardware', ['all', ...hardwareOptions], filters.hardware);
-        updateSelect('filter-model', ['all', ...modelOptions], filters.model, (value, option) => {
-            if (value === 'all') {
-                return getWorkloadLabel('all');
-            }
-            return option?.label || value;
-        });
+        updateSelect('filter-model', ['all', ...modelOptions], filters.model, (value, option) => option?.label || value);
         updateSelect('filter-version', ['all', ...versionOptions], filters.version);
         updateSelect('filter-workload', workloadOptions, filters.workload, getWorkloadLabel);
         updateSelect('filter-precision', ['all', ...precisionOptions], filters.precision);
@@ -3010,20 +3005,35 @@
         return [...new Set(data.map(accessor).filter(Boolean))];
     }
 
+    function getSelectOptionLabel(value, option, labelMapper = null) {
+        if (value === 'all') {
+            return getWorkloadLabel('all');
+        }
+
+        if (labelMapper) {
+            return labelMapper(value, option);
+        }
+
+        if (option && typeof option === 'object' && !Array.isArray(option)) {
+            return String(option.label ?? value);
+        }
+
+        return value;
+    }
+
     function normalizeSelectOption(option, labelMapper = null) {
         if (option && typeof option === 'object' && !Array.isArray(option)) {
             const value = String(option.value ?? '');
-            const fallbackLabel = String(option.label ?? value);
             return {
                 value,
-                label: labelMapper ? labelMapper(value, option) : fallbackLabel,
+                label: getSelectOptionLabel(value, option, labelMapper),
             };
         }
 
         const value = String(option);
         return {
             value,
-            label: labelMapper ? labelMapper(value, option) : value,
+            label: getSelectOptionLabel(value, option, labelMapper),
         };
     }
 
