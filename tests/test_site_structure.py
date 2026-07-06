@@ -349,6 +349,17 @@ def test_achievements_page_records_upstream_prs() -> None:
     assert "vLLM #47622 · label gate" in js_text
 
 
+def test_achievements_page_records_triton_ascend_core_sync() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    assert "triton-ascend-hust aligned with upstream Triton Ascend" in js_text
+    assert "triton-lang/triton-ascend main on the 3.5.0 line" in js_text
+    assert "https://github.com/vLLM-HUST/triton-ascend-hust" in js_text
+    assert "https://github.com/triton-lang/triton-ascend" in js_text
+    assert "https://github.com/vLLM-HUST/vllm-ascend-hust/pull/105" in js_text
+
+
 def test_achievements_page_records_qwen_accepted_pr() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
@@ -387,6 +398,13 @@ def test_version_metadata_excludes_sagellm_package_family() -> None:
     package_names = {package["name"] for package in meta.get("packages", [])}
 
     assert "vllm-hust" in package_names
+    assert "triton-ascend-hust" in package_names
+    assert any(
+        package.get("name") == "triton-ascend-hust"
+        and package.get("group") == "core"
+        and package.get("version") == "3.5.0-line"
+        for package in meta.get("packages", [])
+    )
     assert "vllm-hust-protocol" not in package_names
     assert "ivllm-hust" not in meta_text
     assert "0.17.2.post1" not in meta_text

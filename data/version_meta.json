@@ -33,7 +33,15 @@
       "version_display_label": "Repository maintained with vllm-hust",
       "version_note_zh": "Ascend 后端适配仓库修订，用于配合 vllm-hust 的国产算力服务链路。",
       "group": "core"
+    },
+    {
+      "name": "triton-ascend-hust",
+      "repo": "https://github.com/vLLM-HUST/triton-ascend-hust",
+      "version": "3.5.0-line",
+      "version_display_label": "Synced with triton-lang/triton-ascend main",
+      "version_note_zh": "Triton Ascend 编译后端核心库，已对齐官方 main 的 3.5.0 线，并通过 vllm-ascend-hust 兼容性 PR 接入当前服务栈。",
+      "group": "core"
     }
   ],
-  "updated_at": "2026-07-01"
+  "updated_at": "2026-07-06"
 }
