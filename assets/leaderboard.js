@@ -237,8 +237,9 @@
             trendAxisAuto: 'Auto',
             trendAxisLog: 'Log',
             trendAxisLinear: 'Linear',
+            trendAxisBreak: 'axis break',
             trendTooltipActualValue: 'Actual',
-            trendTooltipClipped: 'clipped to focused axis',
+            trendTooltipBrokenAxis: 'shown on broken axis',
             trendEmpty: 'No trend data under current filters.',
             trendTooltipVersion: 'Version',
             trendTooltipDate: 'Submitted',
@@ -445,8 +446,9 @@
             trendAxisAuto: '自动',
             trendAxisLog: '对数',
             trendAxisLinear: '线性',
+            trendAxisBreak: '断轴',
             trendTooltipActualValue: '实际值',
-            trendTooltipClipped: '已按聚焦坐标截断显示',
+            trendTooltipBrokenAxis: '断轴显示',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
             trendTooltipVersion: '版本',
             trendTooltipDate: '提交时间',
@@ -2530,8 +2532,9 @@
             .map(Number);
     }
 
-    const FOCUSED_TREND_AXIS_RATIO_THRESHOLD = 8;
-    const FOCUSED_TREND_AXIS_MEDIAN_MULTIPLIER = 3;
+    const BROKEN_TREND_AXIS_RATIO_THRESHOLD = 8;
+    const BROKEN_TREND_AXIS_MEDIAN_MULTIPLIER = 3;
+    const BROKEN_TREND_AXIS_HIGH_SEGMENT_MULTIPLIER = 1.25;
 
     function getSortedPositiveTrendValues(datasets) {
         return getTrendAxisValues(datasets)
@@ -2549,7 +2552,7 @@
             : values[middle];
     }
 
-    function getFocusedTrendAxisBounds(metricConfig, datasets) {
+    function getBrokenTrendAxisConfig(metricConfig, datasets) {
         if (state.trendAxisScale !== 'auto' || metricConfig.key !== 'throughput_tps') {
             return null;
         }
@@ -2559,23 +2562,98 @@
         }
         const median = getTrendMedian(values);
         const max = values[values.length - 1];
-        if (!median || max / median < FOCUSED_TREND_AXIS_RATIO_THRESHOLD) {
+        if (!median || max / median < BROKEN_TREND_AXIS_RATIO_THRESHOLD) {
             return null;
         }
 
-        const focusedMax = median * FOCUSED_TREND_AXIS_MEDIAN_MULTIPLIER;
-        const inFocusValues = values.filter((value) => value <= focusedMax);
-        if (inFocusValues.length < 2 || inFocusValues.length === values.length) {
+        const lowMax = median * BROKEN_TREND_AXIS_MEDIAN_MULTIPLIER;
+        const highValues = values.filter((value) => value > lowMax);
+        const lowValues = values.filter((value) => value <= lowMax);
+        if (lowValues.length < 2 || highValues.length < 1) {
             return null;
         }
 
-        const visibleMax = Math.max(...inFocusValues, focusedMax);
+        const highMin = Math.min(...highValues);
+        const highMax = Math.max(...highValues);
+        if (highMax <= highMin) {
+            return null;
+        }
+        const highDisplayMin = lowMax * 1.18;
+        const highDisplayMax = lowMax * BROKEN_TREND_AXIS_HIGH_SEGMENT_MULTIPLIER * 2;
         return {
+            lowMax,
+            highMin,
+            highMax,
+            highDisplayMin,
+            highDisplayMax,
             min: 0,
-            max: visibleMax * 1.12,
-            clipValue: visibleMax,
+            max: highDisplayMax * 1.08,
         };
     }
+
+    function mapBrokenTrendAxisValue(value, axisConfig) {
+        const number = Number(value);
+        if (!Number.isFinite(number)) {
+            return null;
+        }
+        if (!axisConfig || number <= axisConfig.lowMax) {
+            return number;
+        }
+        const sourceRange = axisConfig.highMax - axisConfig.highMin;
+        const displayRange = axisConfig.highDisplayMax - axisConfig.highDisplayMin;
+        if (sourceRange <= 0 || displayRange <= 0) {
+            return number;
+        }
+        const ratio = Math.max(0, Math.min(1, (number - axisConfig.highMin) / sourceRange));
+        return axisConfig.highDisplayMin + ratio * displayRange;
+    }
+
+    function unmapBrokenTrendAxisValue(value, axisConfig) {
+        const number = Number(value);
+        if (!Number.isFinite(number) || !axisConfig || number <= axisConfig.lowMax) {
+            return number;
+        }
+        if (number < axisConfig.highDisplayMin) {
+            return null;
+        }
+        const displayRange = axisConfig.highDisplayMax - axisConfig.highDisplayMin;
+        const sourceRange = axisConfig.highMax - axisConfig.highMin;
+        if (displayRange <= 0 || sourceRange <= 0) {
+            return number;
+        }
+        const ratio = Math.max(0, Math.min(1, (number - axisConfig.highDisplayMin) / displayRange));
+        return axisConfig.highMin + ratio * sourceRange;
+    }
+
+    const brokenTrendAxisPlugin = {
+        id: 'brokenTrendAxis',
+        afterDraw(chart, _args, options) {
+            const axisConfig = options?.axisConfig;
+            const yScale = chart.scales?.y;
+            const area = chart.chartArea;
+            if (!axisConfig || !yScale || !area) {
+                return;
+            }
+            const gapMiddle = (axisConfig.lowMax + axisConfig.highDisplayMin) / 2;
+            const y = yScale.getPixelForValue(gapMiddle);
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.strokeStyle = 'rgba(226, 246, 255, 0.82)';
+            ctx.lineWidth = 2;
+            const left = area.left - 10;
+            const right = area.left + 18;
+            ctx.beginPath();
+            ctx.moveTo(left, y + 8);
+            ctx.lineTo(left + 10, y - 8);
+            ctx.moveTo(left + 12, y + 8);
+            ctx.lineTo(right, y - 8);
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(226, 246, 255, 0.74)';
+            ctx.font = '600 11px Inter, sans-serif';
+            ctx.fillText(t('trendAxisBreak'), area.left + 8, y - 10);
+            ctx.restore();
+        },
+    };
 
     function shouldUseLogTrendAxis() {
         return state.trendAxisScale === 'log';
@@ -2685,26 +2763,26 @@
             };
         });
 
-        const focusedYAxisBounds = getFocusedTrendAxisBounds(metricConfig, datasets);
+        const brokenYAxisConfig = getBrokenTrendAxisConfig(metricConfig, datasets);
         const useLogYAxis = shouldUseLogTrendAxis();
         const yAxisBounds = useLogYAxis
             ? getLogTrendAxisBounds(datasets)
-            : (focusedYAxisBounds || {});
-        if (useLogYAxis || focusedYAxisBounds) {
+            : (brokenYAxisConfig || {});
+        if (useLogYAxis || brokenYAxisConfig) {
             datasets = datasets.map((dataset) => ({
                 ...dataset,
-                tension: focusedYAxisBounds ? 0 : dataset.tension,
+                tension: brokenYAxisConfig ? 0 : dataset.tension,
                 rawData: dataset.data,
                 data: dataset.data.map((value) => {
                     const number = Number(value);
                     if (!Number.isFinite(number) || (useLogYAxis && number <= 0)) {
                         return null;
                     }
-                    return focusedYAxisBounds ? Math.min(number, focusedYAxisBounds.clipValue) : number;
+                    return brokenYAxisConfig ? mapBrokenTrendAxisValue(number, brokenYAxisConfig) : number;
                 }),
-                clippedData: dataset.data.map((value) => {
+                brokenAxisData: dataset.data.map((value) => {
                     const number = Number(value);
-                    return Boolean(focusedYAxisBounds && Number.isFinite(number) && number > focusedYAxisBounds.clipValue);
+                    return Boolean(brokenYAxisConfig && Number.isFinite(number) && number > brokenYAxisConfig.lowMax);
                 }),
             }));
         }
@@ -2715,6 +2793,7 @@
 
         state.trendChart = new Chart(canvas, {
             type: 'line',
+            plugins: brokenYAxisConfig ? [brokenTrendAxisPlugin] : [],
             data: { labels, datasets },
             options: {
                 responsive: true,
@@ -2724,6 +2803,9 @@
                     intersect: false,
                 },
                 plugins: {
+                    brokenTrendAxis: {
+                        axisConfig: brokenYAxisConfig,
+                    },
                     legend: {
                         position: 'bottom',
                         labels: {
@@ -2748,8 +2830,8 @@
                             label(context) {
                                 const rawValue = Number(context.dataset.rawData?.[context.dataIndex] ?? context.parsed.y);
                                 const formatted = Number.isFinite(rawValue) ? formatNumber(rawValue) : '-';
-                                const suffix = context.dataset.clippedData?.[context.dataIndex]
-                                    ? ` (${t('trendTooltipClipped')})`
+                                const suffix = context.dataset.brokenAxisData?.[context.dataIndex]
+                                    ? ` (${t('trendTooltipBrokenAxis')})`
                                     : '';
                                 return `${context.dataset.label}: ${formatted} ${metricConfig.unit}${suffix}`;
                             },
@@ -2759,7 +2841,7 @@
                                     return [];
                                 }
                                 const extra = [];
-                                if (context.dataset.clippedData?.[context.dataIndex]) {
+                                if (context.dataset.brokenAxisData?.[context.dataIndex]) {
                                     const rawValue = Number(context.dataset.rawData?.[context.dataIndex]);
                                     if (Number.isFinite(rawValue)) {
                                         extra.push(`${t('trendTooltipActualValue')}: ${formatNumber(rawValue)} ${metricConfig.unit}`);
@@ -2800,7 +2882,8 @@
                         ticks: {
                             color: '#dff3ff',
                             callback(value) {
-                                return formatNumber(Number(value));
+                                const axisValue = brokenYAxisConfig ? unmapBrokenTrendAxisValue(value, brokenYAxisConfig) : Number(value);
+                                return Number.isFinite(axisValue) ? formatNumber(axisValue) : '⋯';
                             },
                         },
                         title: {
