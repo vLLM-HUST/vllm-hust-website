@@ -464,7 +464,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260706-generic-trends1" in html_text
+    assert "leaderboard-public-20260706-focused-axis1" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert (
         "const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);"
@@ -509,22 +509,26 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "spanGaps: true" in js_text
     assert "Keep one series continuous across x-axis slots" in js_text
     assert "function getTrendAxisValues(datasets)" in js_text
-    assert "function shouldUseLogTrendAxis(metricConfig, datasets)" in js_text
+    assert "function shouldUseLogTrendAxis()" in js_text
     assert "trendAxisScale: 'auto'" in js_text
-    assert "const LOG_TREND_AXIS_RATIO_THRESHOLD = 20;" in js_text
-    assert "state.trendAxisScale === 'log'" in js_text
-    assert "state.trendAxisScale === 'linear'" in js_text
-    assert "const minValue = Math.min(...values);" in js_text
-    assert "const maxValue = Math.max(...values);" in js_text
-    assert "return maxValue / minValue >= LOG_TREND_AXIS_RATIO_THRESHOLD;" in js_text
-    assert "document.querySelectorAll('[data-trend-axis]')" in js_text
-    assert "data: dataset.data.map((value) => {" in js_text
-    assert "Number.isFinite(number) && number > 0 ? number : null" in js_text
-    assert "function getLogTrendAxisBounds(datasets)" in js_text
+    assert "const FOCUSED_TREND_AXIS_RATIO_THRESHOLD = 8;" in js_text
+    assert "function getSortedPositiveTrendValues(datasets)" in js_text
+    assert "function getTrendMedian(values)" in js_text
+    assert "function getFocusedTrendAxisBounds(metricConfig, datasets)" in js_text
+    assert "FOCUSED_TREND_AXIS_MEDIAN_MULTIPLIER" in js_text
+    assert "max / median < FOCUSED_TREND_AXIS_RATIO_THRESHOLD" in js_text
     assert (
-        "const yAxisBounds = useLogYAxis ? getLogTrendAxisBounds(datasets) : {};"
+        "const focusedYAxisBounds = getFocusedTrendAxisBounds(metricConfig, datasets);"
         in js_text
     )
+    assert "rawData: dataset.data" in js_text
+    assert "clippedData: dataset.data.map((value) => {" in js_text
+    assert "state.trendAxisScale === 'log'" in js_text
+    assert "document.querySelectorAll('[data-trend-axis]')" in js_text
+    assert "data: dataset.data.map((value) => {" in js_text
+    assert "Math.min(number, focusedYAxisBounds.clipValue)" in js_text
+    assert "function getLogTrendAxisBounds(datasets)" in js_text
+    assert "focusedYAxisBounds || {}" in js_text
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text
     assert "min: yAxisBounds.min" in js_text
     assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
@@ -539,6 +543,33 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert ".trend-axis-row {" in css_text
     assert ".trend-axis-toggle {" in css_text
     assert ".trend-axis-button.active {" in css_text
+
+
+def test_single_chip_all_workload_auto_axis_focuses_outliers() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads((root / "data" / "leaderboard_single.json").read_text())
+
+    values = [
+        float(entry.get("metrics", {}).get("throughput_tps") or 0)
+        for entry in data
+        if entry.get("workload", {}).get("name")
+        and float(entry.get("metrics", {}).get("throughput_tps") or 0) > 0
+    ]
+    values.sort()
+    assert len(values) >= 4
+
+    median_index = len(values) // 2
+    median = (
+        (values[median_index - 1] + values[median_index]) / 2
+        if len(values) % 2 == 0
+        else values[median_index]
+    )
+    focused_max = median * 3
+    in_focus_values = [value for value in values if value <= focused_max]
+
+    assert values[-1] / median >= 8
+    assert len(in_focus_values) < len(values)
+    assert max(in_focus_values) < values[-1]
 
 
 def test_multichip_trend_filter_covers_mainline_online_workloads() -> None:
