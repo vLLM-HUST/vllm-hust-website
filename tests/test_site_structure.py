@@ -461,7 +461,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260706-broken-axis1" in html_text
+    assert "leaderboard-public-20260706-broken-axis2" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert (
         "const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);"
@@ -509,6 +509,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function shouldUseLogTrendAxis()" in js_text
     assert "trendAxisScale: 'auto'" in js_text
     assert "const BROKEN_TREND_AXIS_RATIO_THRESHOLD = 8;" in js_text
+    assert "function isMissingTrendValue(value)" in js_text
+    assert "!isMissingTrendValue(value) && Number.isFinite(Number(value))" in js_text
     assert "function getSortedPositiveTrendValues(datasets)" in js_text
     assert "function getTrendMedian(values)" in js_text
     assert "function getBrokenTrendAxisConfig(metricConfig, datasets)" in js_text
@@ -524,6 +526,9 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "document.querySelectorAll('[data-trend-axis]')" in js_text
     assert "data: dataset.data.map((value) => {" in js_text
     assert "mapBrokenTrendAxisValue(number, brokenYAxisConfig)" in js_text
+    assert "if (isMissingTrendValue(value))" in js_text
+    assert "const sourceValue = context.dataset.rawData?.[context.dataIndex]" in js_text
+    assert "const rawValue = isMissingTrendValue(sourceValue) ? NaN : Number(sourceValue)" in js_text
     assert "function getLogTrendAxisBounds(datasets)" in js_text
     assert "brokenYAxisConfig || {}" in js_text
     assert "function mapBrokenTrendAxisValue(value, axisConfig)" in js_text

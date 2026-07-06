@@ -2525,10 +2525,14 @@
     }
 
 
+    function isMissingTrendValue(value) {
+        return value === null || value === undefined || value === '';
+    }
+
     function getTrendAxisValues(datasets) {
         return datasets
             .flatMap((dataset) => dataset.data || [])
-            .filter((value) => Number.isFinite(Number(value)))
+            .filter((value) => !isMissingTrendValue(value) && Number.isFinite(Number(value)))
             .map(Number);
     }
 
@@ -2774,6 +2778,9 @@
                 tension: brokenYAxisConfig ? 0 : dataset.tension,
                 rawData: dataset.data,
                 data: dataset.data.map((value) => {
+                    if (isMissingTrendValue(value)) {
+                        return null;
+                    }
                     const number = Number(value);
                     if (!Number.isFinite(number) || (useLogYAxis && number <= 0)) {
                         return null;
@@ -2781,6 +2788,9 @@
                     return brokenYAxisConfig ? mapBrokenTrendAxisValue(number, brokenYAxisConfig) : number;
                 }),
                 brokenAxisData: dataset.data.map((value) => {
+                    if (isMissingTrendValue(value)) {
+                        return false;
+                    }
                     const number = Number(value);
                     return Boolean(brokenYAxisConfig && Number.isFinite(number) && number > brokenYAxisConfig.lowMax);
                 }),
@@ -2828,7 +2838,8 @@
                                 return item ? String(item.label || '') : '';
                             },
                             label(context) {
-                                const rawValue = Number(context.dataset.rawData?.[context.dataIndex] ?? context.parsed.y);
+                                const sourceValue = context.dataset.rawData?.[context.dataIndex];
+                                const rawValue = isMissingTrendValue(sourceValue) ? NaN : Number(sourceValue);
                                 const formatted = Number.isFinite(rawValue) ? formatNumber(rawValue) : '-';
                                 const suffix = context.dataset.brokenAxisData?.[context.dataIndex]
                                     ? ` (${t('trendTooltipBrokenAxis')})`
@@ -2842,7 +2853,8 @@
                                 }
                                 const extra = [];
                                 if (context.dataset.brokenAxisData?.[context.dataIndex]) {
-                                    const rawValue = Number(context.dataset.rawData?.[context.dataIndex]);
+                                    const sourceValue = context.dataset.rawData?.[context.dataIndex];
+                                    const rawValue = isMissingTrendValue(sourceValue) ? NaN : Number(sourceValue);
                                     if (Number.isFinite(rawValue)) {
                                         extra.push(`${t('trendTooltipActualValue')}: ${formatNumber(rawValue)} ${metricConfig.unit}`);
                                     }
