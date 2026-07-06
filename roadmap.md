@@ -1,6 +1,6 @@
 # vLLM-HUST Website / Upstream / Twin Roadmap
 
-Last updated: 2026-07-06 08:39 CST
+Last updated: 2026-07-06 14:30 CST
 
 ## Current Status
 
@@ -15,6 +15,40 @@ Last updated: 2026-07-06 08:39 CST
   - `reports/`
 - Do not include those local data/report changes in unrelated commits unless they are intentionally
   reviewed.
+
+### Leaderboard and Benchmark Data
+
+Observed on 2026-07-06:
+
+- The leaderboard now includes serving trend workloads in the default all-workload view, including
+  `*-online`, `*-throughput`, `*-latency`, and multi-chip `*-2chip` / `*-4chip` variants.
+- Filter labels were localized so the Chinese page should consistently show `全部` instead of a
+  mixture of `all` and Chinese labels.
+- The default throughput trend chart uses an automatic broken Y-axis when high-throughput workloads
+  would otherwise flatten the lower-throughput series.
+- Missing trend points are intentionally represented as missing values, not as `0.0 tok/s`.
+- Online deployment for the latest null-value fix was verified against
+  `leaderboard-public-20260706-broken-axis2`.
+- GitHub Pages deployments have intermittently failed with `Deployment failed, try again later.`;
+  rerunning the Pages job has recovered the deployment.
+- Local `tests/test_site_structure.py` can fail on
+  `test_leaderboard_data_is_benchmark_snapshot_mirror` when the sibling
+  `/home/shuhao/vllm-hust-benchmark/leaderboard-data/snapshots` tree is not synced with website
+  `data/`. GitHub CI does not hit that local-only mismatch unless the sibling benchmark checkout is
+  present.
+
+Known data and experiment issues to keep tracking:
+
+- `prefix-repetition-online @ 7fa0e3ed4b` was previously flagged as suspect because recorded
+  workload metadata and same-spec client parameters did not match the official 4096/256 workload.
+  It should remain excluded or be rerun with the official same-spec configuration.
+- Early `random-online` W8A8/`dtype=auto` points should not be mixed into the FP16 trend line.
+- Multi-chip current-main data around `ceec19` / `e068` showed high error rate or severe TTFT
+  regression and needs root-cause analysis before it is interpreted as a stable performance result.
+- Some right-side multi-chip workloads, especially current sonnet-throughput variants, still need
+  explicit completeness checks before concluding that data is final.
+- Future benchmark backfill should use an isolated vLLM-HUST checkout and explicit NPU allocation.
+  Do not switch PRs in the user's active optimization checkout.
 
 ### Official Upstream PRs
 
@@ -92,6 +126,53 @@ NPU/resource snapshot:
 - Do not restart the Qwen3-32B twin vLLM engine until NPU allocation is intentionally decided.
 
 ## Next Actions
+
+### Leaderboard / Benchmark Follow-up
+
+Data quality and audit:
+
+- Build or run a repeatable coverage audit that checks every visible x-axis version against every
+  displayed series. The audit should distinguish three states explicitly: valid point, missing point,
+  and true zero/error result.
+- Generate a short report from that audit before each data PR, especially for all-workload and
+  multi-chip views.
+- Keep suspect rows marked or excluded with written reasons instead of silently deleting or mixing
+  incompatible specs.
+- Reconcile website `data/leaderboard_*.json` with benchmark snapshot files under
+  `/home/shuhao/vllm-hust-benchmark/leaderboard-data/snapshots` so the local mirror test can pass
+  again.
+
+Single-card backfill:
+
+- Use only NPU0 for single-card reruns unless the user explicitly approves wider allocation.
+- Run backfill only from an isolated checkout dedicated to benchmark work.
+- Rerun `prefix-repetition-online @ 7fa0e3ed4b` with the official 4096/256 same-spec setup or keep
+  the old row marked suspect/invalid.
+- Recheck `random-online`, `sharegpt-online`, `instructcoder-online`, `agent-research-online`,
+  `visionarena-online`, `sonnet-throughput`, `sharegpt-throughput`, and `random-latency` from left
+  to right by x-axis version after every backfill import.
+
+Multi-chip analysis:
+
+- Do not start new 2-chip or 4-chip runs while the active constraint is NPU0-only.
+- When multi-chip capacity is approved, prioritize reproducing the `ceec19` / `e068` high error or
+  TTFT regression before adding more broad coverage.
+- For each multi-chip regression claim, record workload, chip count, commit/version, error rate,
+  TTFT, TPOT/TBT, throughput, `enforce_eager`, `gpu_memory_utilization`, `max_model_len`,
+  `max_num_seqs`, model path, and tensor-parallel size.
+- Missing current sonnet-throughput 2-chip/4-chip points should be treated as missing coverage, not
+  performance conclusions, until rerun or explicitly waived.
+
+Frontend and release validation:
+
+- Add an automated trend-chart smoke check that catches missing values becoming `0.0`, all-workload
+  data disappearing, and broken-axis mapping regressions.
+- Before merging chart changes, verify at least these views: single-chip all workloads, single-chip
+  each workload, multi-chip all workloads, and sonnet-throughput multi-chip.
+- After deployment, verify the live `leaderboard.html` cache token and live `assets/leaderboard.js`
+  content with no-cache requests.
+- If Pages returns `Deployment failed, try again later.`, rerun the Pages workflow and verify the
+  live asset token after success.
 
 ### Upstream PR Follow-up
 
