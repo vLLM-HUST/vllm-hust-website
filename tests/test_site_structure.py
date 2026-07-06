@@ -475,6 +475,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "if (value === 'all')" in js_text
     assert "function isServingTrendWorkload(entry)" in js_text
     assert "workload.endsWith('-throughput')" in js_text
+    assert "/-(online|throughput|latency)-\\d+chip$/" in js_text
+    assert "ref.startsWith('current-main')" in js_text
     assert "isServingTrendWorkload(entry) && isMainlineTrendEntry(entry)" in js_text
     assert "function renderPerformanceTrendChart(entries)" in js_text
     assert "new Chart(canvas" in js_text
