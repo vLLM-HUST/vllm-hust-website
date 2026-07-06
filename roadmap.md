@@ -40,8 +40,8 @@ Observed on 2026-07-06:
 Known data and experiment issues to keep tracking:
 
 - `prefix-repetition-online @ 7fa0e3ed4b` was previously flagged as suspect because recorded
-  workload metadata and same-spec client parameters did not match the official 4096/256 workload.
-  It should remain excluded or be rerun with the official same-spec configuration.
+  workload metadata and same-spec client parameters did not match the official 4096/256 workload. It
+  should remain excluded or be rerun with the official same-spec configuration.
 - Early `random-online` W8A8/`dtype=auto` points should not be mixed into the FP16 trend line.
 - Multi-chip current-main data around `ceec19` / `e068` showed high error rate or severe TTFT
   regression and needs root-cause analysis before it is interpreted as a stable performance result.
@@ -132,8 +132,8 @@ NPU/resource snapshot:
 Data quality and audit:
 
 - Build or run a repeatable coverage audit that checks every visible x-axis version against every
-  displayed series. The audit should distinguish three states explicitly: valid point, missing point,
-  and true zero/error result.
+  displayed series. The audit should distinguish three states explicitly: valid point, missing
+  point, and true zero/error result.
 - Generate a short report from that audit before each data PR, especially for all-workload and
   multi-chip views.
 - Keep suspect rows marked or excluded with written reasons instead of silently deleting or mixing
