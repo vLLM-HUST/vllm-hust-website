@@ -49,6 +49,12 @@ body[data-page="home"] .lang-toggle {
     color: rgba(226, 242, 255, 0.82);
 }
 
+body[data-page="home"] .nav-links,
+body[data-page="home"] .lang-toggle {
+    border-color: rgba(125, 211, 252, 0.18);
+    background: rgba(15, 23, 42, 0.42);
+}
+
 body[data-page="home"] .nav-link:hover,
 body[data-page="home"] .lang-toggle:hover,
 body[data-page="home"] .nav-link.active {
@@ -252,6 +258,12 @@ body:not([data-page="home"]) .lang-toggle {
     color: rgba(226, 242, 255, 0.82);
 }
 
+body:not([data-page="home"]) .nav-links,
+body:not([data-page="home"]) .lang-toggle {
+    border-color: rgba(125, 211, 252, 0.18);
+    background: rgba(15, 23, 42, 0.48);
+}
+
 body:not([data-page="home"]) .nav-link:hover,
 body:not([data-page="home"]) .lang-toggle:hover,
 body:not([data-page="home"]) .nav-link.active {
@@ -405,7 +417,8 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 18px;
+    gap: 24px;
+    padding-right: 88px;
 }
 
 .brand-link {
@@ -453,24 +466,61 @@ a {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
+    gap: 4px;
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 5px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.68);
+    box-shadow: 0 16px 44px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(16px);
+    overflow-x: auto;
+    scrollbar-width: none;
     justify-content: flex-end;
 }
 
-.nav-link,
-.lang-toggle {
+.nav-links::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 38px;
-    padding: 8px 12px;
+    min-height: 34px;
+    padding: 7px 12px;
     border-radius: 999px;
     border: 1px solid transparent;
     color: #334155;
     background: transparent;
+    white-space: nowrap;
     font-weight: 800;
+    font-size: 0.9rem;
     text-decoration: none;
+    cursor: pointer;
+}
+
+.lang-toggle {
+    position: fixed;
+    top: 16px;
+    right: max(18px, calc((100vw - 1240px) / 2));
+    z-index: 70;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    color: #334155;
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow: 0 16px 44px rgba(15, 23, 42, 0.12);
+    backdrop-filter: blur(16px);
+    white-space: nowrap;
+    font-weight: 900;
+    font-size: 0.9rem;
     cursor: pointer;
 }
 
@@ -1047,8 +1097,13 @@ h1 {
         align-items: stretch;
     }
 
+    .site-nav-inner {
+        padding-right: 0;
+    }
+
     .nav-links {
         justify-content: flex-start;
+        width: 100%;
     }
 
     .hero-grid,

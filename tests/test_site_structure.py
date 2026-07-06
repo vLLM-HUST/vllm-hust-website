@@ -255,6 +255,30 @@ def test_conference_navigation_is_general_not_event_specific() -> None:
     assert "https://workshop.sage.org.ai" in conferences_html
 
 
+def test_language_toggle_is_separate_from_primary_navigation() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
+
+    for name in (
+        "index.html",
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+        "conferences.html",
+    ):
+        text = (root / name).read_text(encoding="utf-8")
+        nav_start = text.index('<div class="nav-links">')
+        nav_end = text.index("</div>", nav_start)
+        toggle_pos = text.index('id="langToggle"')
+        close_nav_pos = text.index("</nav>")
+        assert toggle_pos > close_nav_pos
+        assert 'id="langToggle"' not in text[nav_start:nav_end]
+
+    assert ".lang-toggle {" in css_text
+    assert "position: fixed;" in css_text
+    assert "right: max(" in css_text
+
+
 def test_validation_dependencies_have_single_source_of_truth() -> None:
     root = Path(__file__).resolve().parents[1]
     requirements_text = (root / "requirements-dev.txt").read_text(encoding="utf-8")
