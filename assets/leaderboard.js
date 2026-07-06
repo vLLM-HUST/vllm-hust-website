@@ -1829,8 +1829,12 @@
         return Boolean(entry?.quality?.exclude_from_trends) || isSuspectEntry(entry);
     }
 
-    function isOnlineServingWorkload(entry) {
-        return String(getWorkloadId(entry) || '').endsWith('-online');
+    function isServingTrendWorkload(entry) {
+        const workload = String(getWorkloadId(entry) || '');
+        return workload.endsWith('-online')
+            || workload.endsWith('-throughput')
+            || workload.endsWith('-latency')
+            || /-(throughput|latency)-\d+chip$/.test(workload);
     }
 
     function isMainlineTrendEntry(entry) {
@@ -1850,7 +1854,7 @@
             if (selectedWorkload !== 'all') {
                 return true;
             }
-            return isOnlineServingWorkload(entry) && isMainlineTrendEntry(entry);
+            return isServingTrendWorkload(entry) && isMainlineTrendEntry(entry);
         });
     }
 
