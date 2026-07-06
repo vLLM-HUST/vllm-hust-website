@@ -237,7 +237,12 @@ def test_conference_navigation_is_general_not_event_specific() -> None:
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
     conferences_html = (root / "conferences.html").read_text(encoding="utf-8")
 
-    for name in ("index.html", "leaderboard.html", "achievements.html", "contributors.html"):
+    for name in (
+        "index.html",
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+    ):
         text = (root / name).read_text(encoding="utf-8")
         assert 'id="nav-conferences"' in text
         assert 'href="./conferences.html"' in text
