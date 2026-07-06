@@ -2569,10 +2569,9 @@
             return null;
         }
 
-        const min = Math.min(...inFocusValues);
         const visibleMax = Math.max(...inFocusValues, focusedMax);
         return {
-            min: Math.max(min * 0.85, 0),
+            min: 0,
             max: visibleMax * 1.12,
             clipValue: visibleMax,
         };
@@ -2694,6 +2693,7 @@
         if (useLogYAxis || focusedYAxisBounds) {
             datasets = datasets.map((dataset) => ({
                 ...dataset,
+                tension: focusedYAxisBounds ? 0 : dataset.tension,
                 rawData: dataset.data,
                 data: dataset.data.map((value) => {
                     const number = Number(value);

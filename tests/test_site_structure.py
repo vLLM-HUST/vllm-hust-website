@@ -461,7 +461,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260706-focused-axis1" in html_text
+    assert "leaderboard-public-20260706-focused-axis2" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert (
         "const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);"
@@ -526,6 +526,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "Math.min(number, focusedYAxisBounds.clipValue)" in js_text
     assert "function getLogTrendAxisBounds(datasets)" in js_text
     assert "focusedYAxisBounds || {}" in js_text
+    assert "min: 0," in js_text
+    assert "tension: focusedYAxisBounds ? 0 : dataset.tension" in js_text
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text
     assert "min: yAxisBounds.min" in js_text
     assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
