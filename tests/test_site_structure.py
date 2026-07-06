@@ -276,7 +276,9 @@ def test_language_toggle_is_separate_from_primary_navigation() -> None:
 
     assert ".lang-toggle {" in css_text
     assert "position: fixed;" in css_text
+    assert "top: 88px;" in css_text
     assert "right: max(" in css_text
+    assert "中 / EN" in (root / "assets" / "site.js").read_text(encoding="utf-8")
 
 
 def test_validation_dependencies_have_single_source_of_truth() -> None:

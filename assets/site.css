@@ -503,15 +503,15 @@ a {
 
 .lang-toggle {
     position: fixed;
-    top: 16px;
-    right: max(18px, calc((100vw - 1240px) / 2));
+    top: 88px;
+    right: max(22px, calc((100vw - 1240px) / 2));
     z-index: 70;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 58px;
-    min-height: 40px;
-    padding: 8px 12px;
+    min-width: 66px;
+    min-height: 38px;
+    padding: 7px 12px;
     border-radius: 999px;
     border: 1px solid rgba(148, 163, 184, 0.28);
     color: #334155;
@@ -520,7 +520,7 @@ a {
     backdrop-filter: blur(16px);
     white-space: nowrap;
     font-weight: 900;
-    font-size: 0.9rem;
+    font-size: 0.84rem;
     cursor: pointer;
 }
 
@@ -1099,6 +1099,11 @@ h1 {
 
     .site-nav-inner {
         padding-right: 0;
+    }
+
+    .lang-toggle {
+        top: 114px;
+        right: 18px;
     }
 
     .nav-links {

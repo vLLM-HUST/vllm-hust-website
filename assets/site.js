@@ -7,7 +7,7 @@
             navContributors: 'Contributors',
             navConferences: 'Conferences',
             brandSubtitle: 'vLLM serving',
-            langToggle: '中文',
+            langToggle: '中 / EN',
         },
         zh: {
             navHome: '首页',
@@ -16,7 +16,7 @@
             navContributors: '核心成员',
             navConferences: '会议',
             brandSubtitle: 'vLLM 推理服务',
-            langToggle: 'English',
+            langToggle: '中 / EN',
         },
     };
 
