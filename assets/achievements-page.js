@@ -9,38 +9,6 @@
 
     const ACHIEVEMENTS = [
         {
-            sortDate: '2026-07-06',
-            date: { en: 'July 2026', zh: '2026 年 7 月' },
-            kind: { en: 'Core stack', zh: '核心栈' },
-            title: {
-                en: 'triton-ascend-hust aligned with upstream Triton Ascend',
-                zh: 'triton-ascend-hust 对齐官方 Triton Ascend 最新主线',
-            },
-            body: {
-                en: 'triton-ascend-hust has been synchronized with triton-lang/triton-ascend main on the 3.5.0 line while preserving HUST build-artifact hygiene. vllm-ascend-hust now has a compatibility PR that keeps the current 3.2.1 wheel path available and allows the synchronized 3.5.x Triton Ascend stack.',
-                zh: 'triton-ascend-hust 已同步到 triton-lang/triton-ascend 官方 main 的 3.5.0 线，并保留 HUST 构建产物清理规则。vllm-ascend-hust 已提交兼容性 PR，既保留当前 3.2.1 wheel 路径，也允许接入同步后的 3.5.x Triton Ascend 栈。',
-            },
-            tags: [
-                { en: 'Triton Ascend', zh: 'Triton Ascend' },
-                { en: 'Compiler backend', zh: '编译后端' },
-                { en: 'Compatibility', zh: '兼容性' },
-            ],
-            links: [
-                {
-                    label: { en: 'triton-ascend-hust', zh: 'triton-ascend-hust' },
-                    href: 'https://github.com/vLLM-HUST/triton-ascend-hust',
-                },
-                {
-                    label: { en: 'Upstream Triton Ascend', zh: '官方 Triton Ascend' },
-                    href: 'https://github.com/triton-lang/triton-ascend',
-                },
-                {
-                    label: { en: 'vllm-ascend-hust #105 · compatibility', zh: 'vllm-ascend-hust #105 · 兼容性' },
-                    href: 'https://github.com/vLLM-HUST/vllm-ascend-hust/pull/105',
-                },
-            ],
-        },
-        {
             sortDate: '2026-07-05',
             date: { en: 'July 2026', zh: '2026 年 7 月' },
             kind: { en: 'Upstream', zh: '上游贡献' },

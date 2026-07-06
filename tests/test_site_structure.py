@@ -349,15 +349,12 @@ def test_achievements_page_records_upstream_prs() -> None:
     assert "vLLM #47622 · label gate" in js_text
 
 
-def test_achievements_page_records_triton_ascend_core_sync() -> None:
+def test_achievements_page_does_not_treat_upstream_sync_as_achievement() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "triton-ascend-hust aligned with upstream Triton Ascend" in js_text
-    assert "triton-lang/triton-ascend main on the 3.5.0 line" in js_text
-    assert "https://github.com/vLLM-HUST/triton-ascend-hust" in js_text
-    assert "https://github.com/triton-lang/triton-ascend" in js_text
-    assert "https://github.com/vLLM-HUST/vllm-ascend-hust/pull/105" in js_text
+    assert "triton-ascend-hust aligned with upstream Triton Ascend" not in js_text
+    assert "vllm-ascend-hust #105 · compatibility" not in js_text
 
 
 def test_achievements_page_records_qwen_accepted_pr() -> None:
