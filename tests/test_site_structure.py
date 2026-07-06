@@ -471,7 +471,9 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert "默认全部视图只展示 mainline online serving 版本" in js_text
     assert "function isMainlineTrendEntry(entry)" in js_text
-    assert "isOnlineServingWorkload(entry) && isMainlineTrendEntry(entry)" in js_text
+    assert "function isServingTrendWorkload(entry)" in js_text
+    assert "workload.endsWith('-throughput')" in js_text
+    assert "isServingTrendWorkload(entry) && isMainlineTrendEntry(entry)" in js_text
     assert "function renderPerformanceTrendChart(entries)" in js_text
     assert "new Chart(canvas" in js_text
     assert "pointDetails" in js_text
@@ -496,7 +498,6 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text
     assert "min: yAxisBounds.min" in js_text
-    assert "function isOnlineServingWorkload(entry)" in js_text
     assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
     assert "if (selectedWorkload !== 'all')" in js_text
     assert "return true;" in js_text
