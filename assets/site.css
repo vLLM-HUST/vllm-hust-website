@@ -187,31 +187,6 @@ body[data-page="home"] .action-button.primary {
     color: #06111f;
 }
 
-.cosmic-links {
-    position: absolute;
-    inset: auto 0 16px;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.cosmic-links a {
-    min-height: 38px;
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 12px;
-    border: 1px solid rgba(125, 211, 252, 0.20);
-    border-radius: 999px;
-    color: rgba(219, 234, 254, 0.82);
-    background: rgba(15, 23, 42, 0.46);
-    text-decoration: none;
-    font-size: 0.82rem;
-    font-weight: 900;
-    backdrop-filter: blur(10px);
-}
-
 .cosmic-ring {
     position: absolute;
     z-index: 1;

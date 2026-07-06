@@ -215,6 +215,19 @@ def test_homepage_exposes_multi_page_navigation_and_workstation() -> None:
     assert "./assets/workstation-embed.js?v=" in text
 
 
+def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "index.html").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
+
+    assert 'id="nav-home"' in html_text
+    assert 'id="nav-leaderboard"' in html_text
+    assert 'id="nav-achievements"' in html_text
+    assert 'class="cosmic-links"' not in html_text
+    assert "home-card-leaderboard-title" not in html_text
+    assert ".cosmic-links" not in css_text
+
+
 def test_validation_dependencies_have_single_source_of_truth() -> None:
     root = Path(__file__).resolve().parents[1]
     requirements_text = (root / "requirements-dev.txt").read_text(encoding="utf-8")
