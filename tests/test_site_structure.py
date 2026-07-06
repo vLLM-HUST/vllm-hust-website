@@ -528,7 +528,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "mapBrokenTrendAxisValue(number, brokenYAxisConfig)" in js_text
     assert "if (isMissingTrendValue(value))" in js_text
     assert "const sourceValue = context.dataset.rawData?.[context.dataIndex]" in js_text
-    assert "const rawValue = isMissingTrendValue(sourceValue) ? NaN : Number(sourceValue)" in js_text
+    assert (
+        "const rawValue = isMissingTrendValue(sourceValue) ? NaN : Number(sourceValue)"
+        in js_text
+    )
     assert "function getLogTrendAxisBounds(datasets)" in js_text
     assert "brokenYAxisConfig || {}" in js_text
     assert "function mapBrokenTrendAxisValue(value, axisConfig)" in js_text
