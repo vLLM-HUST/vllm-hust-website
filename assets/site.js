@@ -5,7 +5,7 @@
             navLeaderboard: 'Leaderboard',
             navAchievements: 'Achievements',
             navContributors: 'Contributors',
-            navWorkshop: 'StateSys 2026',
+            navConferences: 'Conferences',
             brandSubtitle: 'vLLM serving',
             langToggle: '中文',
         },
@@ -14,7 +14,7 @@
             navLeaderboard: '性能排行榜',
             navAchievements: '成果',
             navContributors: '核心成员',
-            navWorkshop: 'StateSys 2026',
+            navConferences: '会议',
             brandSubtitle: 'vLLM 推理服务',
             langToggle: 'English',
         },
@@ -66,7 +66,7 @@
         setText('nav-leaderboard', common.navLeaderboard);
         setText('nav-achievements', common.navAchievements);
         setText('nav-contributors', common.navContributors);
-        setText('nav-workshop', common.navWorkshop);
+        setText('nav-conferences', common.navConferences);
         setText('langToggleText', common.langToggle);
         document.querySelectorAll('.brand-copy small').forEach((node) => {
             node.textContent = common.brandSubtitle;

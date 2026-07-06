@@ -12,6 +12,7 @@ def test_required_entry_files_exist() -> None:
         root / "leaderboard.html",
         root / "achievements.html",
         root / "contributors.html",
+        root / "conferences.html",
         root / "versions.html",
         root / "README.md",
         root / "CHANGELOG.md",
@@ -39,6 +40,7 @@ def test_site_uses_vllm_hust_brand_icon() -> None:
         "leaderboard.html",
         "achievements.html",
         "contributors.html",
+        "conferences.html",
         "versions.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
@@ -210,6 +212,7 @@ def test_homepage_exposes_multi_page_navigation_and_workstation() -> None:
     assert 'href="./leaderboard.html"' in text
     assert 'href="./achievements.html"' in text
     assert 'href="./contributors.html"' in text
+    assert 'href="./conferences.html"' in text
     assert 'id="workstation-section"' in text
     assert 'id="workstation-embed-frame"' in text
     assert "./assets/workstation-embed.js?v=" in text
@@ -223,9 +226,28 @@ def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
     assert 'id="nav-home"' in html_text
     assert 'id="nav-leaderboard"' in html_text
     assert 'id="nav-achievements"' in html_text
+    assert 'id="nav-conferences"' in html_text
     assert 'class="cosmic-links"' not in html_text
     assert "home-card-leaderboard-title" not in html_text
     assert ".cosmic-links" not in css_text
+
+
+def test_conference_navigation_is_general_not_event_specific() -> None:
+    root = Path(__file__).resolve().parents[1]
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+    conferences_html = (root / "conferences.html").read_text(encoding="utf-8")
+
+    for name in ("index.html", "leaderboard.html", "achievements.html", "contributors.html"):
+        text = (root / name).read_text(encoding="utf-8")
+        assert 'id="nav-conferences"' in text
+        assert 'href="./conferences.html"' in text
+
+    assert "navConferences: 'Conferences'" in site_js
+    assert "navConferences: '会议'" in site_js
+    assert "navWorkshop" not in site_js
+    assert "StateSys 2026" not in (root / "index.html").read_text(encoding="utf-8")
+    assert "StateSys 2026" in conferences_html
+    assert "https://workshop.sage.org.ai" in conferences_html
 
 
 def test_validation_dependencies_have_single_source_of_truth() -> None:
