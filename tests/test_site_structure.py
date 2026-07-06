@@ -461,7 +461,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260706-focused-axis3" in html_text
+    assert "leaderboard-public-20260706-broken-axis1" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert (
         "const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);"
@@ -508,26 +508,32 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function getTrendAxisValues(datasets)" in js_text
     assert "function shouldUseLogTrendAxis()" in js_text
     assert "trendAxisScale: 'auto'" in js_text
-    assert "const FOCUSED_TREND_AXIS_RATIO_THRESHOLD = 8;" in js_text
+    assert "const BROKEN_TREND_AXIS_RATIO_THRESHOLD = 8;" in js_text
     assert "function getSortedPositiveTrendValues(datasets)" in js_text
     assert "function getTrendMedian(values)" in js_text
-    assert "function getFocusedTrendAxisBounds(metricConfig, datasets)" in js_text
-    assert "FOCUSED_TREND_AXIS_MEDIAN_MULTIPLIER" in js_text
-    assert "max / median < FOCUSED_TREND_AXIS_RATIO_THRESHOLD" in js_text
+    assert "function getBrokenTrendAxisConfig(metricConfig, datasets)" in js_text
+    assert "BROKEN_TREND_AXIS_MEDIAN_MULTIPLIER" in js_text
+    assert "max / median < BROKEN_TREND_AXIS_RATIO_THRESHOLD" in js_text
     assert (
-        "const focusedYAxisBounds = getFocusedTrendAxisBounds(metricConfig, datasets);"
+        "const brokenYAxisConfig = getBrokenTrendAxisConfig(metricConfig, datasets);"
         in js_text
     )
     assert "rawData: dataset.data" in js_text
-    assert "clippedData: dataset.data.map((value) => {" in js_text
+    assert "brokenAxisData: dataset.data.map((value) => {" in js_text
     assert "state.trendAxisScale === 'log'" in js_text
     assert "document.querySelectorAll('[data-trend-axis]')" in js_text
     assert "data: dataset.data.map((value) => {" in js_text
-    assert "Math.min(number, focusedYAxisBounds.clipValue)" in js_text
+    assert "mapBrokenTrendAxisValue(number, brokenYAxisConfig)" in js_text
     assert "function getLogTrendAxisBounds(datasets)" in js_text
-    assert "focusedYAxisBounds || {}" in js_text
+    assert "brokenYAxisConfig || {}" in js_text
+    assert "function mapBrokenTrendAxisValue(value, axisConfig)" in js_text
+    assert "function unmapBrokenTrendAxisValue(value, axisConfig)" in js_text
+    assert "trendAxisBreak" in js_text
+    assert "ctx.fillText(t('trendAxisBreak')" in js_text
+    assert "const brokenTrendAxisPlugin = {" in js_text
+    assert "plugins: brokenYAxisConfig ? [brokenTrendAxisPlugin] : []" in js_text
     assert "min: 0," in js_text
-    assert "tension: focusedYAxisBounds ? 0 : dataset.tension" in js_text
+    assert "tension: brokenYAxisConfig ? 0 : dataset.tension" in js_text
     assert "type: useLogYAxis ? 'logarithmic' : 'linear'" in js_text
     assert "min: yAxisBounds.min" in js_text
     assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
@@ -544,7 +550,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert ".trend-axis-button.active {" in css_text
 
 
-def test_single_chip_all_workload_auto_axis_focuses_outliers() -> None:
+def test_single_chip_all_workload_auto_axis_uses_broken_axis_for_outliers() -> None:
     root = Path(__file__).resolve().parents[1]
     data = json.loads((root / "data" / "leaderboard_single.json").read_text())
 
