@@ -281,6 +281,21 @@ def test_language_toggle_is_separate_from_primary_navigation() -> None:
     assert "中 / EN" in (root / "assets" / "site.js").read_text(encoding="utf-8")
 
 
+def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
+
+    assert "letter-spacing: -" not in css_text
+    assert "font-size: clamp(" not in css_text
+    assert ".cosmic-card::before" in css_text
+    assert ".feature-card:hover" in css_text
+
+    for name in ("index.html", "leaderboard.html", "achievements.html", "contributors.html", "conferences.html"):
+        text = (root / name).read_text(encoding="utf-8")
+        assert "assets/site.css?v=visual-polish-20260706" in text
+        assert "assets/site.js?v=visual-polish-20260706" in text
+
+
 def test_validation_dependencies_have_single_source_of_truth() -> None:
     root = Path(__file__).resolve().parents[1]
     requirements_text = (root / "requirements-dev.txt").read_text(encoding="utf-8")
