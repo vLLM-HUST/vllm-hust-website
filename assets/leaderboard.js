@@ -237,6 +237,8 @@
             trendAxisAuto: 'Auto',
             trendAxisLog: 'Log',
             trendAxisLinear: 'Linear',
+            trendTooltipActualValue: 'Actual',
+            trendTooltipClipped: 'clipped to focused axis',
             trendEmpty: 'No trend data under current filters.',
             trendTooltipVersion: 'Version',
             trendTooltipDate: 'Submitted',
@@ -443,6 +445,8 @@
             trendAxisAuto: '自动',
             trendAxisLog: '对数',
             trendAxisLinear: '线性',
+            trendTooltipActualValue: '实际值',
+            trendTooltipClipped: '已按聚焦坐标截断显示',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
             trendTooltipVersion: '版本',
             trendTooltipDate: '提交时间',
@@ -2526,22 +2530,56 @@
             .map(Number);
     }
 
-    const LOG_TREND_AXIS_RATIO_THRESHOLD = 20;
+    const FOCUSED_TREND_AXIS_RATIO_THRESHOLD = 8;
+    const FOCUSED_TREND_AXIS_MEDIAN_MULTIPLIER = 3;
 
-    function shouldUseLogTrendAxis(metricConfig, datasets) {
-        const values = getTrendAxisValues(datasets).filter((value) => value > 0);
-        if (values.length < 2) {
-            return false;
+    function getSortedPositiveTrendValues(datasets) {
+        return getTrendAxisValues(datasets)
+            .filter((value) => value > 0)
+            .sort((left, right) => left - right);
+    }
+
+    function getTrendMedian(values) {
+        if (!values.length) {
+            return 0;
         }
-        if (state.trendAxisScale === 'log') {
-            return true;
+        const middle = Math.floor(values.length / 2);
+        return values.length % 2 === 0
+            ? (values[middle - 1] + values[middle]) / 2
+            : values[middle];
+    }
+
+    function getFocusedTrendAxisBounds(metricConfig, datasets) {
+        if (state.trendAxisScale !== 'auto' || metricConfig.key !== 'throughput_tps') {
+            return null;
         }
-        if (state.trendAxisScale === 'linear' || metricConfig.key !== 'throughput_tps') {
-            return false;
+        const values = getSortedPositiveTrendValues(datasets);
+        if (values.length < 4) {
+            return null;
         }
-        const minValue = Math.min(...values);
-        const maxValue = Math.max(...values);
-        return maxValue / minValue >= LOG_TREND_AXIS_RATIO_THRESHOLD;
+        const median = getTrendMedian(values);
+        const max = values[values.length - 1];
+        if (!median || max / median < FOCUSED_TREND_AXIS_RATIO_THRESHOLD) {
+            return null;
+        }
+
+        const focusedMax = median * FOCUSED_TREND_AXIS_MEDIAN_MULTIPLIER;
+        const inFocusValues = values.filter((value) => value <= focusedMax);
+        if (inFocusValues.length < 2 || inFocusValues.length === values.length) {
+            return null;
+        }
+
+        const min = Math.min(...inFocusValues);
+        const visibleMax = Math.max(...inFocusValues, focusedMax);
+        return {
+            min: Math.max(min * 0.85, 0),
+            max: visibleMax * 1.12,
+            clipValue: visibleMax,
+        };
+    }
+
+    function shouldUseLogTrendAxis() {
+        return state.trendAxisScale === 'log';
     }
 
     function getLogTrendAxisBounds(datasets) {
@@ -2648,14 +2686,25 @@
             };
         });
 
-        const useLogYAxis = shouldUseLogTrendAxis(metricConfig, datasets);
-        const yAxisBounds = useLogYAxis ? getLogTrendAxisBounds(datasets) : {};
-        if (useLogYAxis) {
+        const focusedYAxisBounds = getFocusedTrendAxisBounds(metricConfig, datasets);
+        const useLogYAxis = shouldUseLogTrendAxis();
+        const yAxisBounds = useLogYAxis
+            ? getLogTrendAxisBounds(datasets)
+            : (focusedYAxisBounds || {});
+        if (useLogYAxis || focusedYAxisBounds) {
             datasets = datasets.map((dataset) => ({
                 ...dataset,
+                rawData: dataset.data,
                 data: dataset.data.map((value) => {
                     const number = Number(value);
-                    return Number.isFinite(number) && number > 0 ? number : null;
+                    if (!Number.isFinite(number) || (useLogYAxis && number <= 0)) {
+                        return null;
+                    }
+                    return focusedYAxisBounds ? Math.min(number, focusedYAxisBounds.clipValue) : number;
+                }),
+                clippedData: dataset.data.map((value) => {
+                    const number = Number(value);
+                    return Boolean(focusedYAxisBounds && Number.isFinite(number) && number > focusedYAxisBounds.clipValue);
                 }),
             }));
         }
@@ -2697,16 +2746,27 @@
                                 return item ? String(item.label || '') : '';
                             },
                             label(context) {
-                                const value = Number(context.parsed.y);
-                                const formatted = Number.isFinite(value) ? formatNumber(value) : '-';
-                                return `${context.dataset.label}: ${formatted} ${metricConfig.unit}`;
+                                const rawValue = Number(context.dataset.rawData?.[context.dataIndex] ?? context.parsed.y);
+                                const formatted = Number.isFinite(rawValue) ? formatNumber(rawValue) : '-';
+                                const suffix = context.dataset.clippedData?.[context.dataIndex]
+                                    ? ` (${t('trendTooltipClipped')})`
+                                    : '';
+                                return `${context.dataset.label}: ${formatted} ${metricConfig.unit}${suffix}`;
                             },
                             afterLabel(context) {
                                 const details = context.dataset.pointDetails?.[context.dataIndex];
                                 if (!details) {
                                     return [];
                                 }
+                                const extra = [];
+                                if (context.dataset.clippedData?.[context.dataIndex]) {
+                                    const rawValue = Number(context.dataset.rawData?.[context.dataIndex]);
+                                    if (Number.isFinite(rawValue)) {
+                                        extra.push(`${t('trendTooltipActualValue')}: ${formatNumber(rawValue)} ${metricConfig.unit}`);
+                                    }
+                                }
                                 return [
+                                    ...extra,
                                     `${t('trendTooltipVersion')}: ${details.version}`,
                                     `${t('trendTooltipDate')}: ${details.date}`,
                                     `${t('trendTooltipWorkload')}: ${details.workload}`,
