@@ -6,12 +6,15 @@ Last updated: 2026-07-06 08:39 CST
 
 ### Website and Achievements Page
 
-- The achievements page has been updated and pushed with upstream PR links and current status labels.
-- Latest pushed website commit observed locally: `f91b2b2 Update upstream PR statuses on achievements page`.
+- The achievements page has been updated and pushed with upstream PR links and current status
+  labels.
+- Latest pushed website commit observed locally:
+  `f91b2b2 Update upstream PR statuses on achievements page`.
 - Local working tree still has unrelated, uncommitted local data:
   - `data/core_contributors.json`
   - `reports/`
-- Do not include those local data/report changes in unrelated commits unless they are intentionally reviewed.
+- Do not include those local data/report changes in unrelated commits unless they are intentionally
+  reviewed.
 
 ### Official Upstream PRs
 
@@ -42,7 +45,8 @@ vLLM-Ascend:
 - [vLLM-Ascend #11422](https://github.com/vllm-project/vllm-ascend/pull/11422)
 - [vLLM-Ascend #11449](https://github.com/vllm-project/vllm-ascend/pull/11449)
 
-All five vLLM-Ascend PRs are mergeable, have DCO/lint/docs checks passing, and are mainly waiting for official review.
+All five vLLM-Ascend PRs are mergeable, have DCO/lint/docs checks passing, and are mainly waiting
+for official review.
 
 ### Faculty Twin / Slack Runtime
 
@@ -67,20 +71,24 @@ Observed on 2026-07-06:
 - Slack routes are registered in the app:
   - `/slack/commands/twin`
   - `/slack/events`
-  - Unsigned local probes return Slack signature/timestamp errors, which means the FastAPI routes exist.
+  - Unsigned local probes return Slack signature/timestamp errors, which means the FastAPI routes
+    exist.
 - Slack monitor notification configuration exists in `.env`:
   - bot token is set
   - target user id is set
   - token values were intentionally not recorded here.
-- Codex Slack MCP reminder creation failed twice with MCP startup timeout, so the Codex-side Slack connector is not currently usable.
+- Codex Slack MCP reminder creation failed twice with MCP startup timeout, so the Codex-side Slack
+  connector is not currently usable.
 - `sage-faculty-twin-site.service` is inactive.
 - `sage-faculty-twin-tunnel.service` is inactive/disabled.
-- `cloudflared-sage-local-235b.service` is active, so at least one Cloudflare tunnel process is running.
+- `cloudflared-sage-local-235b.service` is active, so at least one Cloudflare tunnel process is
+  running.
 
 NPU/resource snapshot:
 
 - `npu-smi info` reported NPU0 with about 53 GB HBM used by `VLLMEngineCor` PID `3268768`.
-- NPU1-7 showed only low baseline HBM in `npu-smi`, but many vLLM-related Docker containers and user services are present.
+- NPU1-7 showed only low baseline HBM in `npu-smi`, but many vLLM-related Docker containers and user
+  services are present.
 - Do not restart the Qwen3-32B twin vLLM engine until NPU allocation is intentionally decided.
 
 ## Next Actions
@@ -102,8 +110,10 @@ gh pr view 8958 --repo vllm-project/vllm-ascend --json mergeable,mergeStateStatu
 
 ### Twin Inference Recovery
 
-- Decide whether to free the NPUs required by the Qwen3-32B twin engine or temporarily retarget twin to a smaller model.
-- If using the current Qwen3-32B config, verify `VLLM_ENGINE_TP_SIZE=4` and reserve four intended Ascend devices before starting.
+- Decide whether to free the NPUs required by the Qwen3-32B twin engine or temporarily retarget twin
+  to a smaller model.
+- If using the current Qwen3-32B config, verify `VLLM_ENGINE_TP_SIZE=4` and reserve four intended
+  Ascend devices before starting.
 - After NPU capacity is available, start the engine and proxy through the project manager:
 
 ```bash
@@ -120,12 +130,15 @@ systemctl --user start sage-faculty-twin-inference-monitor.timer
 systemctl --user status sage-faculty-twin-inference-monitor.timer --no-pager
 ```
 
-- Keep the monitor timer disabled/inactive while the twin engine is intentionally paused, otherwise it may repeatedly attempt recovery.
+- Keep the monitor timer disabled/inactive while the twin engine is intentionally paused, otherwise
+  it may repeatedly attempt recovery.
 
 ### Slack / Public Entry
 
-- The app-side Slack routes exist. The remaining question is the external path from Slack to the app.
-- Confirm whether the active `cloudflared-sage-local-235b.service` already routes `https://twin.sage.org.ai/slack/commands/twin` to the app or to the local site proxy.
+- The app-side Slack routes exist. The remaining question is the external path from Slack to the
+  app.
+- Confirm whether the active `cloudflared-sage-local-235b.service` already routes
+  `https://twin.sage.org.ai/slack/commands/twin` to the app or to the local site proxy.
 - If the Cloudflare route expects the local site proxy, start it:
 
 ```bash
@@ -133,13 +146,17 @@ systemctl --user start sage-faculty-twin-site.service
 systemctl --user status sage-faculty-twin-site.service --no-pager
 ```
 
-- If using the older `sage-faculty-twin-tunnel.service`, confirm it is still the intended tunnel before enabling it, because another Cloudflare tunnel is already active.
-- For Slack notifications from the monitor, test only after the intended Slack target is confirmed. Avoid printing bot tokens in logs.
-- For Codex-side Slack reminders, retry only after the Slack MCP connector is available again; current error was MCP startup timeout.
+- If using the older `sage-faculty-twin-tunnel.service`, confirm it is still the intended tunnel
+  before enabling it, because another Cloudflare tunnel is already active.
+- For Slack notifications from the monitor, test only after the intended Slack target is confirmed.
+  Avoid printing bot tokens in logs.
+- For Codex-side Slack reminders, retry only after the Slack MCP connector is available again;
+  current error was MCP startup timeout.
 
 ### Cleanup / Hygiene
 
-- There are many old vLLM containers and some defunct engine/worker processes. Do not bulk-kill them without checking which benchmark or paper run owns each one.
+- There are many old vLLM containers and some defunct engine/worker processes. Do not bulk-kill them
+  without checking which benchmark or paper run owns each one.
 - If NPU memory is unexpectedly occupied, identify the owning process/container first:
 
 ```bash
