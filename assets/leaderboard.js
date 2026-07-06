@@ -1829,24 +1829,39 @@
         return Boolean(entry?.quality?.exclude_from_trends) || isSuspectEntry(entry);
     }
 
+    const SERVING_TREND_WORKLOAD_SUFFIXES = ['online', 'throughput', 'latency'];
+
+    function getServingTrendWorkloadBase(entry) {
+        return String(getWorkloadId(entry) || '').replace(/-\d+chip$/, '');
+    }
+
     function isServingTrendWorkload(entry) {
-        const workload = String(getWorkloadId(entry) || '');
-        return workload.endsWith('-online')
-            || workload.endsWith('-throughput')
-            || workload.endsWith('-latency')
-            || /-(online|throughput|latency)-\d+chip$/.test(workload);
+        const workload = getServingTrendWorkloadBase(entry);
+        return SERVING_TREND_WORKLOAD_SUFFIXES.some((suffix) => workload.endsWith(`-${suffix}`));
+    }
+
+    function getTrendRefTokens(entry) {
+        return String(entry?.metadata?.github_ref || '')
+            .trim()
+            .toLowerCase()
+            .split(/[^a-z0-9]+/)
+            .filter(Boolean);
+    }
+
+    function hasPullRequestMetadata(entry) {
+        const metadata = entry?.metadata || {};
+        return Boolean(metadata.github_pr_number || metadata.github_pr_url);
     }
 
     function isMainlineTrendEntry(entry) {
         if (isTrendBaselineEntry(entry)) {
             return true;
         }
+        if (hasPullRequestMetadata(entry)) {
+            return false;
+        }
 
-        const ref = String(entry?.metadata?.github_ref || '').trim().toLowerCase();
-        return ref === 'main'
-            || ref === 'main-current'
-            || ref.startsWith('main-')
-            || ref.startsWith('current-main');
+        return getTrendRefTokens(entry).includes('main');
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {

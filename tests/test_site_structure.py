@@ -446,7 +446,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260706-multichip-trends1" in html_text
+    assert "leaderboard-public-20260706-generic-trends1" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert (
         "const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);"
@@ -474,9 +474,16 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function getSelectOptionLabel(value, option, labelMapper = null)" in js_text
     assert "if (value === 'all')" in js_text
     assert "function isServingTrendWorkload(entry)" in js_text
-    assert "workload.endsWith('-throughput')" in js_text
-    assert "/-(online|throughput|latency)-\\d+chip$/" in js_text
-    assert "ref.startsWith('current-main')" in js_text
+    assert (
+        "const SERVING_TREND_WORKLOAD_SUFFIXES = ['online', 'throughput', 'latency'];"
+        in js_text
+    )
+    assert "function getServingTrendWorkloadBase(entry)" in js_text
+    assert "replace(/-\\d+chip$/, '')" in js_text
+    assert "function getTrendRefTokens(entry)" in js_text
+    assert "function hasPullRequestMetadata(entry)" in js_text
+    assert "getTrendRefTokens(entry).includes('main')" in js_text
+    assert "current-main" not in js_text
     assert "isServingTrendWorkload(entry) && isMainlineTrendEntry(entry)" in js_text
     assert "function renderPerformanceTrendChart(entries)" in js_text
     assert "new Chart(canvas" in js_text
@@ -514,6 +521,61 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert ".trend-axis-row {" in css_text
     assert ".trend-axis-toggle {" in css_text
     assert ".trend-axis-button.active {" in css_text
+
+
+def test_multichip_trend_filter_covers_mainline_online_workloads() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads((root / "data" / "leaderboard_multi.json").read_text())
+
+    def workload(entry: dict) -> str:
+        return entry.get("workload", {}).get("name", "")
+
+    def is_baseline(entry: dict) -> bool:
+        return bool(entry.get("isBaseline")) or entry.get("engine") != "vllm-hust"
+
+    def ref_tokens(entry: dict) -> set[str]:
+        ref = str(entry.get("metadata", {}).get("github_ref") or "").lower()
+        return {token for token in re.split(r"[^a-z0-9]+", ref) if token}
+
+    def has_pr_metadata(entry: dict) -> bool:
+        metadata = entry.get("metadata", {})
+        return bool(metadata.get("github_pr_number") or metadata.get("github_pr_url"))
+
+    def is_mainline(entry: dict) -> bool:
+        return is_baseline(entry) or (
+            not has_pr_metadata(entry) and "main" in ref_tokens(entry)
+        )
+
+    def is_serving_workload(entry: dict) -> bool:
+        base = re.sub(r"-\d+chip$", "", workload(entry))
+        return base.endswith(("-online", "-throughput", "-latency"))
+
+    rows = [
+        entry for entry in data if is_serving_workload(entry) and is_mainline(entry)
+    ]
+    online_chip_workloads = sorted(
+        {
+            workload(entry)
+            for entry in data
+            if re.search(r"-online-\d+chip$", workload(entry))
+        }
+    )
+    assert online_chip_workloads
+
+    refs_by_workload: dict[str, set[str]] = {
+        name: set() for name in online_chip_workloads
+    }
+    for entry in rows:
+        name = workload(entry)
+        if name in refs_by_workload:
+            refs_by_workload[name].add(entry.get("metadata", {}).get("github_ref", ""))
+
+    for name, refs in refs_by_workload.items():
+        assert "v0.18.0" in refs, f"{name} should include the baseline point"
+        assert any(
+            "main" in {token for token in re.split(r"[^a-z0-9]+", ref.lower()) if token}
+            for ref in refs
+        ), f"{name} should include at least one non-PR mainline point"
 
 
 def test_detail_sections_use_detail_only_version_formatting_and_memory_fallback() -> (
