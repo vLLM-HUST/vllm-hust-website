@@ -385,7 +385,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "achievements-timeline-20260707" in html_text
+    assert "achievements-timeline-20260707-prdates" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -412,7 +412,14 @@ def test_achievements_page_records_upstream_prs() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "Official upstream PR portfolio across vLLM, vLLM-Ascend, and Triton-Ascend" in js_text
+    assert "Triton/vLLM source-build fixes split for upstream review" in js_text
+    assert "vLLM and vLLM-Ascend performance fixes submitted upstream" in js_text
+    assert "vLLM-Ascend runtime reliability fix opened upstream" in js_text
+    assert "Early vLLM and vLLM-Ascend stability fixes opened upstream" in js_text
+    assert "sortDate: '2026-05-07'" in js_text
+    assert "sortDate: '2026-06-19'" in js_text
+    assert "date: { en: 'May 2026', zh: '2026 年 5 月' }" in js_text
+    assert "date: { en: 'June 2026', zh: '2026 年 6 月' }" in js_text
     assert "https://github.com/vllm-project/vllm/pull/47793" in js_text
     assert "https://github.com/triton-lang/triton-ascend/pull/918" in js_text
     assert "https://github.com/triton-lang/triton-ascend/pull/919" in js_text

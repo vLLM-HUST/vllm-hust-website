@@ -10,26 +10,33 @@
     const ACHIEVEMENTS = [
         {
             sortDate: '2026-07-07',
-            date: { en: 'July 2026', zh: '2026 年 7 月' },
+            date: { en: 'July 7, 2026', zh: '2026 年 7 月 7 日' },
             kind: { en: 'Upstream', zh: '上游贡献' },
             title: {
-                en: 'Official upstream PR portfolio across vLLM, vLLM-Ascend, and Triton-Ascend',
-                zh: 'vLLM、vLLM-Ascend 与 Triton-Ascend 官方上游 PR 组合',
+                en: 'Triton/vLLM source-build fixes split for upstream review',
+                zh: 'Triton/vLLM 源码构建修复拆分提交上游',
             },
             body: {
-                en: 'vllm-hust runtime bring-up fixes are being packaged for official upstream review across vLLM, vLLM-Ascend, and Triton-Ascend. The July split adds a vLLM source-checkout Triton metadata fix and several independently reviewable Triton-Ascend fixes: missing backend entry-point handling, Ascend C++ template disambiguation, MemAccOp specialization support, and optional tool-registration cleanup. vLLM-Ascend PRs #8958, #10735, #11417, #11422, and #11449 remain mergeable with CI passing; vLLM PRs still need the official ready/verified label to trigger or continue CI.',
-                zh: 'vllm-hust 在真实 Ascend/NPU runtime bring-up 中沉淀的修复，正在整理提交到 vLLM、vLLM-Ascend 与 Triton-Ascend 官方上游。7 月拆分新增了 vLLM 源码 checkout 下的 Triton metadata 修复，以及多个可独立 review 的 Triton-Ascend 修复：缺失 backend entry point 处理、Ascend C++ 模板消歧、MemAccOp specialization 支持和可选工具注册清理。vLLM-Ascend #8958、#10735、#11417、#11422、#11449 仍保持可合并且 CI 通过；vLLM PR 仍等待官方 ready/verified label 触发或继续 CI。',
+                en: 'Runtime bring-up fixes from vllm-hust were split into independently reviewable upstream PRs, covering vLLM source-checkout metadata handling and Triton-Ascend runtime, build, and tool-registration compatibility.',
+                zh: '将 vllm-hust 在真实 runtime bring-up 中沉淀的修复拆分为多个可独立 review 的上游 PR，覆盖 vLLM 源码 checkout metadata 处理，以及 Triton-Ascend runtime、build 与工具注册兼容性。',
             },
             tags: [
                 { en: 'vLLM', zh: 'vLLM' },
-                { en: 'vLLM-Ascend', zh: 'vLLM-Ascend' },
                 { en: 'Triton-Ascend', zh: 'Triton-Ascend' },
-                { en: 'Upstream review', zh: '上游评审' },
+                { en: 'Source builds', zh: '源码构建' },
             ],
             links: [
                 {
                     label: { en: 'vLLM #47793 · label gate', zh: 'vLLM #47793 · 等待 label' },
                     href: 'https://github.com/vllm-project/vllm/pull/47793',
+                },
+                {
+                    label: { en: 'vLLM #47789 · label gate', zh: 'vLLM #47789 · 等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/47789',
+                },
+                {
+                    label: { en: 'Triton-Ascend #917 · CI running', zh: 'Triton-Ascend #917 · CI 运行中' },
+                    href: 'https://github.com/triton-lang/triton-ascend/pull/917',
                 },
                 {
                     label: { en: 'Triton-Ascend #918 · CI passed', zh: 'Triton-Ascend #918 · CI 已通过' },
@@ -51,22 +58,26 @@
                     label: { en: 'Triton-Ascend #923 · CI passed, pipeline pending', zh: 'Triton-Ascend #923 · CI 已通过，pipeline 等待中' },
                     href: 'https://github.com/triton-lang/triton-ascend/pull/923',
                 },
-                {
-                    label: { en: 'vLLM #47789 · label gate', zh: 'vLLM #47789 · 等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/47789',
-                },
-                {
-                    label: { en: 'Triton-Ascend #917 · CI running', zh: 'Triton-Ascend #917 · CI 运行中' },
-                    href: 'https://github.com/triton-lang/triton-ascend/pull/917',
-                },
-                {
-                    label: { en: 'vLLM #41449 · label gate', zh: 'vLLM #41449 · 等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/41449',
-                },
-                {
-                    label: { en: 'vLLM #41507 · label gate', zh: 'vLLM #41507 · 等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/41507',
-                },
+            ],
+        },
+        {
+            sortDate: '2026-07-05',
+            date: { en: 'July 5, 2026', zh: '2026 年 7 月 5 日' },
+            kind: { en: 'Upstream', zh: '上游贡献' },
+            title: {
+                en: 'vLLM and vLLM-Ascend performance fixes submitted upstream',
+                zh: 'vLLM 与 vLLM-Ascend 性能修复提交上游',
+            },
+            body: {
+                en: 'July PRs package performance fixes around KV-scale host conversion, logprobs materialization, packaged custom-op lookup, NPU Python 3.12 runtime compatibility, and DP metadata buffer reuse.',
+                zh: '7 月 PR 整理了 KV scale host conversion、logprobs materialization、packaged custom-op lookup、NPU Python 3.12 runtime 兼容性和 DP metadata buffer 复用等性能与兼容性修复。',
+            },
+            tags: [
+                { en: 'Performance', zh: '性能' },
+                { en: 'vLLM', zh: 'vLLM' },
+                { en: 'vLLM-Ascend', zh: 'vLLM-Ascend' },
+            ],
+            links: [
                 {
                     label: { en: 'vLLM #47622 · label gate', zh: 'vLLM #47622 · 等待 label' },
                     href: 'https://github.com/vllm-project/vllm/pull/47622',
@@ -74,14 +85,6 @@
                 {
                     label: { en: 'vLLM #47623 · label gate', zh: 'vLLM #47623 · 等待 label' },
                     href: 'https://github.com/vllm-project/vllm/pull/47623',
-                },
-                {
-                    label: { en: 'vLLM-Ascend #8958 · CI passed', zh: 'vLLM-Ascend #8958 · CI 已通过' },
-                    href: 'https://github.com/vllm-project/vllm-ascend/pull/8958',
-                },
-                {
-                    label: { en: 'vLLM-Ascend #10735 · CI passed', zh: 'vLLM-Ascend #10735 · CI 已通过' },
-                    href: 'https://github.com/vllm-project/vllm-ascend/pull/10735',
                 },
                 {
                     label: { en: 'vLLM-Ascend #11417 · CI passed', zh: 'vLLM-Ascend #11417 · CI 已通过' },
@@ -94,6 +97,61 @@
                 {
                     label: { en: 'vLLM-Ascend #11449 · CI passed', zh: 'vLLM-Ascend #11449 · CI 已通过' },
                     href: 'https://github.com/vllm-project/vllm-ascend/pull/11449',
+                },
+            ],
+        },
+        {
+            sortDate: '2026-06-19',
+            date: { en: 'June 2026', zh: '2026 年 6 月' },
+            kind: { en: 'Upstream', zh: '上游贡献' },
+            title: {
+                en: 'vLLM-Ascend runtime reliability fix opened upstream',
+                zh: 'vLLM-Ascend 运行时可靠性修复提交上游',
+            },
+            body: {
+                en: 'The June upstream contribution carries the worker override persistence fix back to vLLM-Ascend, preserving NPU graph configuration across worker processes.',
+                zh: '6 月上游贡献将 worker override 持久化修复反馈到 vLLM-Ascend，确保 NPU graph 配置在 worker 进程间保持一致。',
+            },
+            tags: [
+                { en: 'Runtime reliability', zh: '运行时可靠性' },
+                { en: 'vLLM-Ascend', zh: 'vLLM-Ascend' },
+            ],
+            links: [
+                {
+                    label: { en: 'vLLM-Ascend #10735 · CI passed', zh: 'vLLM-Ascend #10735 · CI 已通过' },
+                    href: 'https://github.com/vllm-project/vllm-ascend/pull/10735',
+                },
+            ],
+        },
+        {
+            sortDate: '2026-05-07',
+            date: { en: 'May 2026', zh: '2026 年 5 月' },
+            kind: { en: 'Upstream', zh: '上游贡献' },
+            title: {
+                en: 'Early vLLM and vLLM-Ascend stability fixes opened upstream',
+                zh: '早期 vLLM 与 vLLM-Ascend 稳定性修复提交上游',
+            },
+            body: {
+                en: 'The earliest upstream PRs from this tracking set were opened in May, covering missing parent-module handling, clean-exit shutdown behavior, and Qwen2 compiled-path output correctness on Ascend.',
+                zh: '这批追踪中的最早上游 PR 于 5 月开启，覆盖 parent module 缺失处理、clean-exit shutdown 行为，以及 Ascend 上 Qwen2 compiled path 输出正确性。',
+            },
+            tags: [
+                { en: 'Stability', zh: '稳定性' },
+                { en: 'vLLM', zh: 'vLLM' },
+                { en: 'vLLM-Ascend', zh: 'vLLM-Ascend' },
+            ],
+            links: [
+                {
+                    label: { en: 'vLLM #41449 · label gate', zh: 'vLLM #41449 · 等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/41449',
+                },
+                {
+                    label: { en: 'vLLM #41507 · label gate', zh: 'vLLM #41507 · 等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/41507',
+                },
+                {
+                    label: { en: 'vLLM-Ascend #8958 · CI passed', zh: 'vLLM-Ascend #8958 · CI 已通过' },
+                    href: 'https://github.com/vllm-project/vllm-ascend/pull/8958',
                 },
             ],
         },
