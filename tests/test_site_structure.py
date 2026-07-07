@@ -385,7 +385,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "achievements-timeline-20260705" in html_text
+    assert "achievements-timeline-20260707" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -413,6 +413,12 @@ def test_achievements_page_records_upstream_prs() -> None:
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
     assert "Official upstream PR portfolio across vLLM, vLLM-Ascend, and Triton-Ascend" in js_text
+    assert "https://github.com/vllm-project/vllm/pull/47793" in js_text
+    assert "https://github.com/triton-lang/triton-ascend/pull/918" in js_text
+    assert "https://github.com/triton-lang/triton-ascend/pull/919" in js_text
+    assert "https://github.com/triton-lang/triton-ascend/pull/920" in js_text
+    assert "https://github.com/triton-lang/triton-ascend/pull/922" in js_text
+    assert "https://github.com/triton-lang/triton-ascend/pull/923" in js_text
     assert "https://github.com/vllm-project/vllm/pull/47789" in js_text
     assert "https://github.com/triton-lang/triton-ascend/pull/917" in js_text
     assert "https://github.com/vllm-project/vllm/pull/41449" in js_text
@@ -432,7 +438,13 @@ def test_achievements_page_records_upstream_prs() -> None:
     assert "vLLM #47622 · label gate" in js_text
     assert "vLLM #47623 · label gate" in js_text
     assert "vLLM #47789 · label gate" in js_text
+    assert "vLLM #47793 · label gate" in js_text
     assert "Triton-Ascend #917 · CI running" in js_text
+    assert "Triton-Ascend #918 · CI passed" in js_text
+    assert "Triton-Ascend #919 · CI passed, pipeline pending" in js_text
+    assert "Triton-Ascend #920 · CI passed, pipeline pending" in js_text
+    assert "Triton-Ascend #922 · runner retry needed" in js_text
+    assert "Triton-Ascend #923 · CI passed, pipeline pending" in js_text
 
 
 def test_achievements_page_does_not_treat_upstream_sync_as_achievement() -> None:

@@ -1,14 +1,15 @@
 # vLLM-HUST Website / Upstream / Twin Roadmap
 
-Last updated: 2026-07-06 14:30 CST
+Last updated: 2026-07-07 10:35 CST
 
 ## Current Status
 
 ### Website and Achievements Page
 
 - The achievements page has been updated and pushed with upstream PR links and current status
-  labels.
-- Latest pushed website commit observed locally:
+  labels. The 2026-07-07 update records the new vLLM #47793 and Triton-Ascend
+  #918/#919/#920/#922/#923 upstream PRs.
+- Latest pushed website commit observed locally before this update:
   `f91b2b2 Update upstream PR statuses on achievements page`.
 - Local working tree still has unrelated, uncommitted local data:
   - `data/core_contributors.json`
@@ -70,6 +71,11 @@ vLLM:
 - [vLLM #47623](https://github.com/vllm-project/vllm/pull/47623)
   - State: mergeable but still draft.
   - Blocker: official `pre-run-check` requires `ready` or `verified` label.
+- [vLLM #47793](https://github.com/vllm-project/vllm/pull/47793)
+  - State: mergeable, non-draft, review required.
+  - Scope: tolerate missing installed-package metadata when probing a Triton source checkout.
+  - Checks: DCO, Meta check, and Mergify Summary are green.
+  - Blocker: official `pre-run-check` requires `ready` or `verified` label.
 
 vLLM-Ascend:
 
@@ -81,6 +87,40 @@ vLLM-Ascend:
 
 All five vLLM-Ascend PRs are mergeable, have DCO/lint/docs checks passing, and are mainly waiting
 for official review.
+
+Triton-Ascend:
+
+- [Triton-Ascend #918](https://github.com/triton-lang/triton-ascend/pull/918)
+  - Scope: skip missing backend entry points during runtime backend discovery.
+  - Status: Build-Wheels, pre-commit, integration py3.10/py3.11, and Ascend950 Pipeline Tests pass;
+    one stale title-check failure remains in the historical rollup from before the title was fixed.
+- [Triton-Ascend #919](https://github.com/triton-lang/triton-ascend/pull/919)
+  - Scope: disambiguate dependent `getDefiningOp` template calls in Ascend block pointer analysis.
+  - Status: Build-Wheels, pre-commit, and integration py3.10/py3.11 pass; Ascend950 Pipeline Tests
+    were still pending at last check.
+- [Triton-Ascend #920](https://github.com/triton-lang/triton-ascend/pull/920)
+  - Scope: allow MemAccOp factory specializations in the unstructure conversion pass.
+  - Status: Build-Wheels, pre-commit, and integration py3.10/py3.11 pass; Ascend950 Pipeline Tests
+    were still pending at last check.
+- [Triton-Ascend #922](https://github.com/triton-lang/triton-ascend/pull/922)
+  - Scope: fix Python module CMake build dependencies.
+  - Status: integration py3.10/py3.11 pass; Build-Wheels failed because the GitHub runner pod was
+    unschedulable due to insufficient CPU/memory. A rerun attempt was rejected by GitHub Actions.
+- [Triton-Ascend #923](https://github.com/triton-lang/triton-ascend/pull/923)
+  - Scope: trim optional test dialect/pass registrations from production tools.
+  - Status: Build-Wheels, pre-commit, and integration py3.10/py3.11 pass; Ascend950 Pipeline Tests
+    were still pending at last check.
+
+Closed split PRs:
+
+- [Triton-Ascend #921](https://github.com/triton-lang/triton-ascend/pull/921) was closed because
+  dropping test libraries without removing the corresponding registrations caused unresolved
+  `mlir::test::*` symbols. The valid independent cleanup is #923.
+- [Triton-Ascend #924](https://github.com/triton-lang/triton-ascend/pull/924) was closed because
+  the NVWS target split caused duplicate `add_subdirectory` binary directories.
+- [Triton-Ascend #925](https://github.com/triton-lang/triton-ascend/pull/925) was closed because
+  gating Proton backend dependencies left the Python extension with an unresolved
+  `init_triton_proton` symbol.
 
 ### Faculty Twin / Slack Runtime
 
