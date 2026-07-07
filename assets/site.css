@@ -492,10 +492,11 @@ a {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     flex: 0 1 auto;
     min-width: 0;
-    padding: 5px;
+    margin-left: auto;
+    padding: 6px;
     border: 1px solid rgba(148, 163, 184, 0.22);
     border-radius: 999px;
     background:
@@ -515,15 +516,17 @@ a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 34px;
-    padding: 7px 12px;
+    flex: 0 0 126px;
+    min-height: 44px;
+    padding: 0 12px;
     border-radius: 999px;
     border: 1px solid transparent;
     color: #334155;
     background: transparent;
     white-space: nowrap;
     font-weight: 800;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
+    line-height: 1;
     text-decoration: none;
     cursor: pointer;
     transition: background 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
@@ -577,6 +580,12 @@ a {
     color: var(--blue);
     background: #eff6ff;
     border-color: #bfdbfe;
+}
+
+html[lang="zh"] .nav-link {
+    flex-basis: 132px;
+    padding: 0 12px;
+    font-size: 0.94rem;
 }
 
 .page-hero {
@@ -1164,17 +1173,27 @@ h1 {
     }
 
     .site-nav-inner {
-        padding-right: 0;
+        gap: 10px;
+        padding: 10px 0;
     }
 
     .lang-toggle {
-        top: 114px;
-        right: 18px;
+        position: relative;
+        top: auto;
+        right: auto;
+        left: auto;
+        margin: 10px 18px 0;
     }
 
     .nav-links {
+        flex-wrap: wrap;
         justify-content: flex-start;
+        overflow-x: visible;
         width: 100%;
+    }
+
+    .nav-link {
+        flex: 1 1 30%;
     }
 
     .hero-grid,
