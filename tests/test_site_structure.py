@@ -399,7 +399,7 @@ def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     assert "achievement-artifacts" not in html_text
     assert "achievement-milestones" not in html_text
     assert "const ACHIEVEMENTS = [" in js_text
-    assert "sortDate: '2026-07-05'" in js_text
+    assert "sortDate: '2026-07-07'" in js_text
     assert (
         "].sort((left, right) => right.sortDate.localeCompare(left.sortDate));"
         in js_text
@@ -412,7 +412,9 @@ def test_achievements_page_records_upstream_prs() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "Official upstream PR portfolio for vLLM and vLLM-Ascend" in js_text
+    assert "Official upstream PR portfolio across vLLM, vLLM-Ascend, and Triton-Ascend" in js_text
+    assert "https://github.com/vllm-project/vllm/pull/47789" in js_text
+    assert "https://github.com/triton-lang/triton-ascend/pull/917" in js_text
     assert "https://github.com/vllm-project/vllm/pull/41449" in js_text
     assert "https://github.com/vllm-project/vllm/pull/41507" in js_text
     assert "https://github.com/vllm-project/vllm/pull/47622" in js_text
@@ -428,6 +430,9 @@ def test_achievements_page_records_upstream_prs() -> None:
     assert "vLLM #41449 · label gate" in js_text
     assert "vLLM #41507 · label gate" in js_text
     assert "vLLM #47622 · label gate" in js_text
+    assert "vLLM #47623 · label gate" in js_text
+    assert "vLLM #47789 · label gate" in js_text
+    assert "Triton-Ascend #917 · CI running" in js_text
 
 
 def test_achievements_page_does_not_treat_upstream_sync_as_achievement() -> None:

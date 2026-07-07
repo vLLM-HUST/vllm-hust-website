@@ -9,23 +9,32 @@
 
     const ACHIEVEMENTS = [
         {
-            sortDate: '2026-07-05',
+            sortDate: '2026-07-07',
             date: { en: 'July 2026', zh: '2026 年 7 月' },
             kind: { en: 'Upstream', zh: '上游贡献' },
             title: {
-                en: 'Official upstream PR portfolio for vLLM and vLLM-Ascend',
-                zh: 'vLLM 与 vLLM-Ascend 官方上游 PR 组合',
+                en: 'Official upstream PR portfolio across vLLM, vLLM-Ascend, and Triton-Ascend',
+                zh: 'vLLM、vLLM-Ascend 与 Triton-Ascend 官方上游 PR 组合',
             },
             body: {
-                en: 'vllm-hust work has been packaged for official upstream review across vLLM and vLLM-Ascend. vLLM-Ascend #8958, #10735, #11417, #11422, and #11449 are mergeable with CI passing and awaiting review. vLLM #41449, #41507, #47622, and #47623 are mergeable but waiting for the official ready/verified label to trigger CI.',
-                zh: 'vllm-hust 的工作已持续整理提交到 vLLM 与 vLLM-Ascend 官方上游。vLLM-Ascend #8958、#10735、#11417、#11422、#11449 均已可合并且 CI 通过，等待官方 review；vLLM #41449、#41507、#47622、#47623 已可合并，但还在等待官方 ready/verified label 触发 CI。',
+                en: 'vllm-hust runtime bring-up fixes are being packaged for official upstream review across vLLM, vLLM-Ascend, and Triton-Ascend. The newest PRs cover source-checkout Triton probing in vLLM and Ascend-only runtime builds in Triton-Ascend. Earlier vLLM-Ascend PRs #8958, #10735, #11417, #11422, and #11449 are mergeable with CI passing and awaiting review; vLLM PRs #41449, #41507, #47622, #47623, and #47789 are waiting for the official ready/verified label to trigger or continue CI.',
+                zh: 'vllm-hust 在真实 Ascend/NPU runtime bring-up 中沉淀的修复，正在整理提交到 vLLM、vLLM-Ascend 与 Triton-Ascend 官方上游。最新 PR 覆盖 vLLM 源码 checkout 下的 Triton probing 兼容，以及 Triton-Ascend 的 Ascend-only runtime build。此前 vLLM-Ascend #8958、#10735、#11417、#11422、#11449 均已可合并且 CI 通过，等待官方 review；vLLM #41449、#41507、#47622、#47623、#47789 仍等待官方 ready/verified label 触发或继续 CI。',
             },
             tags: [
                 { en: 'vLLM', zh: 'vLLM' },
                 { en: 'vLLM-Ascend', zh: 'vLLM-Ascend' },
+                { en: 'Triton-Ascend', zh: 'Triton-Ascend' },
                 { en: 'Upstream review', zh: '上游评审' },
             ],
             links: [
+                {
+                    label: { en: 'vLLM #47789 · label gate', zh: 'vLLM #47789 · 等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/47789',
+                },
+                {
+                    label: { en: 'Triton-Ascend #917 · CI running', zh: 'Triton-Ascend #917 · CI 运行中' },
+                    href: 'https://github.com/triton-lang/triton-ascend/pull/917',
+                },
                 {
                     label: { en: 'vLLM #41449 · label gate', zh: 'vLLM #41449 · 等待 label' },
                     href: 'https://github.com/vllm-project/vllm/pull/41449',
