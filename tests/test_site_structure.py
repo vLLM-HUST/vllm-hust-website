@@ -13,6 +13,7 @@ def test_required_entry_files_exist() -> None:
         root / "achievements.html",
         root / "contributors.html",
         root / "conferences.html",
+        root / "courses.html",
         root / "versions.html",
         root / "README.md",
         root / "CHANGELOG.md",
@@ -213,6 +214,7 @@ def test_homepage_exposes_multi_page_navigation_and_workstation() -> None:
     assert 'href="./achievements.html"' in text
     assert 'href="./contributors.html"' in text
     assert 'href="./conferences.html"' in text
+    assert 'href="./courses.html"' in text
     assert 'id="workstation-section"' in text
     assert 'id="workstation-embed-frame"' in text
     assert "./assets/workstation-embed.js?v=" in text
@@ -227,6 +229,7 @@ def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
     assert 'id="nav-leaderboard"' in html_text
     assert 'id="nav-achievements"' in html_text
     assert 'id="nav-conferences"' in html_text
+    assert 'id="nav-courses"' in html_text
     assert 'class="cosmic-links"' not in html_text
     assert "home-card-leaderboard-title" not in html_text
     assert ".cosmic-links" not in css_text
@@ -242,6 +245,7 @@ def test_conference_navigation_is_general_not_event_specific() -> None:
         "leaderboard.html",
         "achievements.html",
         "contributors.html",
+        "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert 'id="nav-conferences"' in text
@@ -255,6 +259,32 @@ def test_conference_navigation_is_general_not_event_specific() -> None:
     assert "https://workshop.sage.org.ai" in conferences_html
 
 
+def test_courses_page_exposes_course_materials_and_project_pointers() -> None:
+    root = Path(__file__).resolve().parents[1]
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+    courses_html = (root / "courses.html").read_text(encoding="utf-8")
+
+    for name in (
+        "index.html",
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+        "conferences.html",
+    ):
+        text = (root / name).read_text(encoding="utf-8")
+        assert 'id="nav-courses"' in text
+        assert 'href="./courses.html"' in text
+
+    assert "navCourses: 'Courses'" in site_js
+    assert "navCourses: '课程'" in site_js
+    assert 'data-page="courses"' in courses_html
+    assert "大模型推理系统与实践" in courses_html
+    assert "LLM Inference Systems and Practice" in courses_html
+    assert "https://me.sage.org.ai/intro-to-llm-inference-engines.html" in courses_html
+    assert "案例与练习" in courses_html
+    assert "https://github.com/vLLM-HUST" in courses_html
+
+
 def test_language_toggle_is_separate_from_primary_navigation() -> None:
     root = Path(__file__).resolve().parents[1]
     css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
@@ -265,6 +295,7 @@ def test_language_toggle_is_separate_from_primary_navigation() -> None:
         "achievements.html",
         "contributors.html",
         "conferences.html",
+        "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
         nav_start = text.index('<div class="nav-links">')
@@ -290,10 +321,10 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     assert ".cosmic-card::before" in css_text
     assert ".feature-card:hover" in css_text
 
-    for name in ("index.html", "leaderboard.html", "achievements.html", "contributors.html", "conferences.html"):
+    for name in ("index.html", "leaderboard.html", "achievements.html", "contributors.html", "conferences.html", "courses.html"):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=visual-polish-20260706" in text
-        assert "assets/site.js?v=visual-polish-20260706" in text
+        assert "assets/site.css?v=courses-20260708" in text
+        assert "assets/site.js?v=courses-20260708" in text
 
 
 def test_validation_dependencies_have_single_source_of_truth() -> None:

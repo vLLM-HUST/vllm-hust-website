@@ -6,6 +6,7 @@
             navAchievements: 'Achievements',
             navContributors: 'Contributors',
             navConferences: 'Conferences',
+            navCourses: 'Courses',
             brandSubtitle: 'vLLM serving',
             langToggle: '中 / EN',
         },
@@ -15,6 +16,7 @@
             navAchievements: '成果',
             navContributors: '核心成员',
             navConferences: '会议',
+            navCourses: '课程',
             brandSubtitle: 'vLLM 推理服务',
             langToggle: '中 / EN',
         },
@@ -67,6 +69,7 @@
         setText('nav-achievements', common.navAchievements);
         setText('nav-contributors', common.navContributors);
         setText('nav-conferences', common.navConferences);
+        setText('nav-courses', common.navCourses);
         setText('langToggleText', common.langToggle);
         document.querySelectorAll('.brand-copy small').forEach((node) => {
             node.textContent = common.brandSubtitle;

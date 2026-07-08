@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Courses - vllm-hust</title>
+  <meta name="description" content="Course materials and practice pointers connected to vllm-hust development." />
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/courses.html" />
+  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css?v=courses-20260708" />
+</head>
+
+<body data-page="courses">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html"><span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span><span class="brand-copy">vllm-hust<small id="brand-tagline">vLLM serving</small></span></a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
+        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
+        <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
+        <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
+      </div>
+    </div>
+  </nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+
+  <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
+
+  <main class="site-shell">
+    <section class="page-hero">
+      <div class="content-panel">
+        <span id="courses-eyebrow" class="eyebrow">Teaching</span>
+        <h1 id="courses-title" style="margin-top: 16px">Courses</h1>
+        <p id="courses-lede" class="hero-lede">Course materials and practice routes that connect students with real vllm-hust development.</p>
+      </div>
+    </section>
+
+    <section class="content-panel">
+      <div class="section-head">
+        <div>
+          <span id="course-main-kicker" class="eyebrow">2026</span>
+          <h2 id="course-main-title">LLM Inference Systems and Practice</h2>
+          <p id="course-main-desc">A practice-oriented graduate course on inference serving, state management, heterogeneous execution, benchmarks, and open-source engineering.</p>
+        </div>
+      </div>
+      <div class="metric-strip">
+        <div class="metric-box"><span id="course-stat-format-label">Format</span><strong id="course-stat-format-value">Practice course</strong></div>
+        <div class="metric-box"><span id="course-stat-project-label">Project</span><strong id="course-stat-project-value">vLLM-HUST PRs</strong></div>
+        <div class="metric-box"><span id="course-stat-stack-label">Stack</span><strong>vLLM · Ascend · Benchmark</strong></div>
+      </div>
+      <div class="hero-actions">
+        <a id="course-site-link" class="action-button primary" href="https://me.sage.org.ai/intro-to-llm-inference-engines.html" target="_blank" rel="noreferrer">Course page</a>
+        <a id="course-handout-link" class="action-button" href="https://me.sage.org.ai/contents/teaching/intro-to-llm-inference-engines/2026/slides/handouts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD_%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AE%BA%E8%AE%B2%E4%B9%89.pdf" target="_blank" rel="noreferrer">Intro handout</a>
+        <a id="course-practice-link" class="action-button" href="https://me.sage.org.ai/contents/teaching/intro-to-llm-inference-engines/2026/slides/handouts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD_%E6%A1%88%E4%BE%8B%E4%B8%8E%E7%BB%83%E4%B9%A0%E8%A1%A5%E5%85%85.pdf" target="_blank" rel="noreferrer">Practice cases</a>
+      </div>
+    </section>
+
+    <section class="content-panel">
+      <div class="section-head">
+        <div>
+          <span id="course-path-kicker" class="eyebrow">Practice</span>
+          <h2 id="course-path-title">Development path</h2>
+          <p id="course-path-desc">Students work from reproducible observations to small patches, benchmark records, and reviewable pull requests.</p>
+        </div>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <span id="course-path-issue-kicker" class="eyebrow">Step 1</span>
+          <h3 id="course-path-issue-title">Find a concrete issue</h3>
+          <p id="course-path-issue-desc">Start from CI failures, benchmark gaps, workload metadata, runtime behavior, documentation, or small scheduling and KV-cache problems.</p>
+        </article>
+        <article class="feature-card">
+          <span id="course-path-repro-kicker" class="eyebrow">Step 2</span>
+          <h3 id="course-path-repro-title">Reproduce and measure</h3>
+          <p id="course-path-repro-desc">Record commit, model, hardware, driver, startup parameters, workload, token sizes, concurrency, and dtype before making claims.</p>
+        </article>
+        <article class="feature-card">
+          <span id="course-path-pr-kicker" class="eyebrow">Step 3</span>
+          <h3 id="course-path-pr-title">Submit a focused PR</h3>
+          <p id="course-path-pr-desc">Keep patches narrow, explain the affected path, include tests or benchmark evidence, and document any remaining risk.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="content-panel">
+      <div class="section-head">
+        <div>
+          <span id="course-links-kicker" class="eyebrow">Pointers</span>
+          <h2 id="course-links-title">Useful project entry points</h2>
+          <p id="course-links-desc">These links point students to the repositories and public artifacts most often used by the course project.</p>
+        </div>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <h3 id="course-link-org-title">vLLM-HUST organization</h3>
+          <p id="course-link-org-desc">Runtime, Ascend integration, Triton Ascend work, benchmark assets, docs, and website repositories.</p>
+          <div class="tag-list achievement-actions"><a id="course-link-org" class="action-button" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">Open GitHub</a></div>
+        </article>
+        <article class="feature-card">
+          <h3 id="course-link-benchmark-title">Benchmark and leaderboard</h3>
+          <p id="course-link-benchmark-desc">Standardized experiment records, workload coverage, baseline comparisons, and visible leaderboard trends.</p>
+          <div class="tag-list achievement-actions"><a id="course-link-leaderboard" class="action-button" href="./leaderboard.html">Open leaderboard</a></div>
+        </article>
+        <article class="feature-card">
+          <h3 id="course-link-achievements-title">Research and upstream work</h3>
+          <p id="course-link-achievements-desc">Papers, accepted upstream PRs, public docs, and project milestones that can be used as classroom examples.</p>
+          <div class="tag-list achievement-actions"><a id="course-link-achievements" class="action-button" href="./achievements.html">Open achievements</a></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><strong>vllm-hust</strong> · <span id="courses-footer-copy">Course materials and practice pointers.</span></footer>
+
+  <script>
+    window.vllmHustPageDict = {
+      en: {
+        title: 'Courses - vllm-hust',
+        'brand-tagline': 'vLLM serving',
+        'courses-eyebrow': 'Teaching',
+        'courses-title': 'Courses',
+        'courses-lede': 'Course materials and practice routes that connect students with real vllm-hust development.',
+        'course-main-kicker': '2026',
+        'course-main-title': 'LLM Inference Systems and Practice',
+        'course-main-desc': 'A practice-oriented graduate course on inference serving, state management, heterogeneous execution, benchmarks, and open-source engineering.',
+        'course-stat-format-label': 'Format',
+        'course-stat-format-value': 'Practice course',
+        'course-stat-project-label': 'Project',
+        'course-stat-project-value': 'vLLM-HUST PRs',
+        'course-stat-stack-label': 'Stack',
+        'course-site-link': 'Course page',
+        'course-handout-link': 'Intro handout',
+        'course-practice-link': 'Practice cases',
+        'course-path-kicker': 'Practice',
+        'course-path-title': 'Development path',
+        'course-path-desc': 'Students work from reproducible observations to small patches, benchmark records, and reviewable pull requests.',
+        'course-path-issue-kicker': 'Step 1',
+        'course-path-issue-title': 'Find a concrete issue',
+        'course-path-issue-desc': 'Start from CI failures, benchmark gaps, workload metadata, runtime behavior, documentation, or small scheduling and KV-cache problems.',
+        'course-path-repro-kicker': 'Step 2',
+        'course-path-repro-title': 'Reproduce and measure',
+        'course-path-repro-desc': 'Record commit, model, hardware, driver, startup parameters, workload, token sizes, concurrency, and dtype before making claims.',
+        'course-path-pr-kicker': 'Step 3',
+        'course-path-pr-title': 'Submit a focused PR',
+        'course-path-pr-desc': 'Keep patches narrow, explain the affected path, include tests or benchmark evidence, and document any remaining risk.',
+        'course-links-kicker': 'Pointers',
+        'course-links-title': 'Useful project entry points',
+        'course-links-desc': 'These links point students to the repositories and public artifacts most often used by the course project.',
+        'course-link-org-title': 'vLLM-HUST organization',
+        'course-link-org-desc': 'Runtime, Ascend integration, Triton Ascend work, benchmark assets, docs, and website repositories.',
+        'course-link-org': 'Open GitHub',
+        'course-link-benchmark-title': 'Benchmark and leaderboard',
+        'course-link-benchmark-desc': 'Standardized experiment records, workload coverage, baseline comparisons, and visible leaderboard trends.',
+        'course-link-leaderboard': 'Open leaderboard',
+        'course-link-achievements-title': 'Research and upstream work',
+        'course-link-achievements-desc': 'Papers, accepted upstream PRs, public docs, and project milestones that can be used as classroom examples.',
+        'course-link-achievements': 'Open achievements',
+        'courses-footer-copy': 'Course materials and practice pointers.'
+      },
+      zh: {
+        title: '课程 - vllm-hust',
+        'brand-tagline': 'vLLM 推理服务',
+        'courses-eyebrow': '教学',
+        'courses-title': '课程',
+        'courses-lede': '课程材料与实践路径，帮助学生进入真实的 vllm-hust 开发流程。',
+        'course-main-kicker': '2026',
+        'course-main-title': '大模型推理系统与实践',
+        'course-main-desc': '面向研究生的实践课程，覆盖推理服务、状态管理、异构执行、benchmark 与开源工程。',
+        'course-stat-format-label': '形式',
+        'course-stat-format-value': '实践课程',
+        'course-stat-project-label': '项目',
+        'course-stat-project-value': 'vLLM-HUST PR',
+        'course-stat-stack-label': '技术栈',
+        'course-site-link': '课程主页',
+        'course-handout-link': '导论讲义',
+        'course-practice-link': '案例与练习',
+        'course-path-kicker': '实践',
+        'course-path-title': '开发路径',
+        'course-path-desc': '从可复现实验观察出发，形成小 patch、benchmark 记录和可 review 的 PR。',
+        'course-path-issue-kicker': '步骤 1',
+        'course-path-issue-title': '找到具体问题',
+        'course-path-issue-desc': '从 CI 失败、benchmark 缺口、workload 元数据、运行行为、文档，或调度与 KV cache 小问题切入。',
+        'course-path-repro-kicker': '步骤 2',
+        'course-path-repro-title': '复现并测量',
+        'course-path-repro-desc': '在下结论前记录 commit、模型、硬件、驱动、启动参数、workload、token 长度、并发和 dtype。',
+        'course-path-pr-kicker': '步骤 3',
+        'course-path-pr-title': '提交聚焦的 PR',
+        'course-path-pr-desc': '控制修改范围，说明影响路径，给出测试或 benchmark 证据，并记录尚未解决的风险。',
+        'course-links-kicker': '指针',
+        'course-links-title': '常用项目入口',
+        'course-links-desc': '这些链接指向课程项目最常用的仓库与公开材料。',
+        'course-link-org-title': 'vLLM-HUST 组织',
+        'course-link-org-desc': '运行时、Ascend 适配、Triton Ascend、benchmark、文档和网站等仓库。',
+        'course-link-org': '打开 GitHub',
+        'course-link-benchmark-title': 'Benchmark 与排行榜',
+        'course-link-benchmark-desc': '标准化实验记录、workload 覆盖、基线比较和可见的性能趋势。',
+        'course-link-leaderboard': '打开性能榜',
+        'course-link-achievements-title': '论文与上游贡献',
+        'course-link-achievements-desc': '论文、上游接收的 PR、公开文档和项目进展，可作为课堂案例。',
+        'course-link-achievements': '打开成果页',
+        'courses-footer-copy': '课程材料与实践指针。'
+      }
+    };
+  </script>
+  <script src="./assets/site.js?v=courses-20260708"></script>
+</body>
+
+</html>
