@@ -321,7 +321,14 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     assert ".cosmic-card::before" in css_text
     assert ".feature-card:hover" in css_text
 
-    for name in ("index.html", "leaderboard.html", "achievements.html", "contributors.html", "conferences.html", "courses.html"):
+    for name in (
+        "index.html",
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+        "conferences.html",
+        "courses.html",
+    ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=courses-20260708" in text
         assert "assets/site.js?v=courses-20260708" in text
@@ -948,4 +955,9 @@ def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> No
     )
     assert "'./data/core_contributors.json'" in text
     assert "async function fetchPayload()" in text
+    assert (
+        "item.display_name || item.chinese_name || item.name || item.github_login || ''"
+        in text
+    )
+    assert "item.github_login && item.github_login !== displayName" in text
     assert "console.warn('[contributors] source failed', source, err);" in text

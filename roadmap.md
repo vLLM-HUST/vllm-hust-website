@@ -116,8 +116,8 @@ Closed split PRs:
 - [Triton-Ascend #921](https://github.com/triton-lang/triton-ascend/pull/921) was closed because
   dropping test libraries without removing the corresponding registrations caused unresolved
   `mlir::test::*` symbols. The valid independent cleanup is #923.
-- [Triton-Ascend #924](https://github.com/triton-lang/triton-ascend/pull/924) was closed because
-  the NVWS target split caused duplicate `add_subdirectory` binary directories.
+- [Triton-Ascend #924](https://github.com/triton-lang/triton-ascend/pull/924) was closed because the
+  NVWS target split caused duplicate `add_subdirectory` binary directories.
 - [Triton-Ascend #925](https://github.com/triton-lang/triton-ascend/pull/925) was closed because
   gating Proton backend dependencies left the Python extension with an unresolved
   `init_triton_proton` symbol.
