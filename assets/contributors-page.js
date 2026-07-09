@@ -47,14 +47,18 @@
         const tbody = document.getElementById(id);
         if (!tbody) return;
         tbody.innerHTML = contributors.map((item) => {
+            const displayName = item.display_name || item.chinese_name || item.name || item.github_login || '';
             const name = item.github_url
-                ? `<a href="${item.github_url}" target="_blank" rel="noreferrer">${item.name}</a>`
-                : item.name;
+                ? `<a href="${item.github_url}" target="_blank" rel="noreferrer">${displayName}</a>`
+                : displayName;
+            const loginLine = item.github_login && item.github_login !== displayName
+                ? `<br><small>${item.github_login}</small>`
+                : '';
             const repos = Array.isArray(item.repos) ? item.repos.slice(0, 5).join(', ') : '';
             return `
                 <tr>
                     <td>${item.rank || ''}</td>
-                    <td>${name}<br><small>${item.github_login || ''}</small></td>
+                    <td>${name}${loginLine}</td>
                     <td>${fmt(item.commits)}</td>
                     <td>${fmt(item.changed_lines)}</td>
                     <td>${fmt(item.added)} / ${fmt(item.deleted)}</td>

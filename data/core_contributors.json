@@ -34,7 +34,10 @@
           "vllm-hust-website",
           "vllm-hust-workstation"
         ],
-        "key_contributions": "CI/CD, leaderboard, bugfix, distributed"
+        "key_contributions": "CI/CD, leaderboard, bugfix, distributed",
+        "display_name": "张书豪",
+        "chinese_name": "张书豪",
+        "english_name": "Shuhao Zhang"
       },
       {
         "rank": 2,
@@ -50,7 +53,10 @@
           "vllm-hust-benchmark",
           "vllm-hust-website"
         ],
-        "key_contributions": "CI/CD, leaderboard, benchmark, maintenance"
+        "key_contributions": "CI/CD, leaderboard, benchmark, maintenance",
+        "display_name": "王明琪",
+        "chinese_name": "王明琪",
+        "english_name": ""
       },
       {
         "rank": 3,
@@ -65,7 +71,10 @@
         "repos": [
           "vllm-hust-perf-analyzer"
         ],
-        "key_contributions": "distributed, docs"
+        "key_contributions": "distributed, docs",
+        "display_name": "田景远",
+        "chinese_name": "田景远",
+        "english_name": "Jingyuan Tian"
       },
       {
         "rank": 4,
@@ -80,7 +89,10 @@
         "repos": [
           "vllm-hust-website"
         ],
-        "key_contributions": "leaderboard"
+        "key_contributions": "leaderboard",
+        "display_name": "高西岭",
+        "chinese_name": "高西岭",
+        "english_name": "Xiling Gao"
       },
       {
         "rank": 5,
@@ -98,7 +110,10 @@
           "vllm-hust-dev-hub",
           "vllm-hust-website"
         ],
-        "key_contributions": "CI/CD, leaderboard, testing, website"
+        "key_contributions": "CI/CD, leaderboard, testing, website",
+        "display_name": "王胜",
+        "chinese_name": "王胜",
+        "english_name": "Sheng Wang"
       },
       {
         "rank": 6,
@@ -114,7 +129,10 @@
           "vllm-hust-website",
           "vllm-hust-workstation"
         ],
-        "key_contributions": "bugfix, distributed, leaderboard, maintenance"
+        "key_contributions": "bugfix, distributed, leaderboard, maintenance",
+        "display_name": "KimmoZAG",
+        "chinese_name": "",
+        "english_name": ""
       },
       {
         "rank": 7,
@@ -129,7 +147,10 @@
         "repos": [
           "vllm-hust-dev-hub"
         ],
-        "key_contributions": "Ascend, CI/CD, bugfix"
+        "key_contributions": "Ascend, CI/CD, bugfix",
+        "display_name": "iliujunn",
+        "chinese_name": "",
+        "english_name": "Lou Jun"
       },
       {
         "rank": 8,
@@ -144,7 +165,10 @@
         "repos": [
           "vllm-hust"
         ],
-        "key_contributions": "tooling"
+        "key_contributions": "tooling",
+        "display_name": "Remygred",
+        "chinese_name": "",
+        "english_name": ""
       },
       {
         "rank": 9,
@@ -159,7 +183,10 @@
         "repos": [
           "vllm-ascend-quant-hust"
         ],
-        "key_contributions": "misc"
+        "key_contributions": "misc",
+        "display_name": "王鸿坤",
+        "chinese_name": "王鸿坤",
+        "english_name": ""
       },
       {
         "rank": 10,
@@ -174,13 +201,16 @@
         "repos": [
           "vllm-hust-website"
         ],
-        "key_contributions": "leaderboard"
+        "key_contributions": "leaderboard",
+        "display_name": "朱鑫材",
+        "chinese_name": "朱鑫材",
+        "english_name": "Xincai Zhu"
       },
       {
         "rank": 11,
         "name": "MingXuan Kuang",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "sad-and-bad1231",
+        "github_url": "https://github.com/sad-and-bad1231",
         "commits": 1,
         "changed_lines": 4,
         "added": 2,
@@ -189,7 +219,10 @@
         "repos": [
           ".github"
         ],
-        "key_contributions": "misc"
+        "key_contributions": "misc",
+        "display_name": "匡明轩",
+        "chinese_name": "匡明轩",
+        "english_name": "MingXuan Kuang"
       }
     ]
   },
@@ -214,7 +247,10 @@
           "vllm-ascend-hust",
           "vllm-hust"
         ],
-        "key_contributions": "CI/CD, Ascend, benchmark, bugfix"
+        "key_contributions": "CI/CD, Ascend, benchmark, bugfix",
+        "display_name": "张书豪",
+        "chinese_name": "张书豪",
+        "english_name": "Shuhao Zhang"
       },
       {
         "rank": 2,
@@ -229,7 +265,10 @@
         "repos": [
           "vllm-hust"
         ],
-        "key_contributions": "tooling"
+        "key_contributions": "tooling",
+        "display_name": "Remygred",
+        "chinese_name": "",
+        "english_name": ""
       },
       {
         "rank": 3,
@@ -244,7 +283,10 @@
         "repos": [
           "vllm-ascend-quant-hust"
         ],
-        "key_contributions": "misc"
+        "key_contributions": "misc",
+        "display_name": "王鸿坤",
+        "chinese_name": "王鸿坤",
+        "english_name": ""
       },
       {
         "rank": 4,
@@ -259,7 +301,10 @@
         "repos": [
           "vllm-hust"
         ],
-        "key_contributions": "kernel"
+        "key_contributions": "kernel",
+        "display_name": "王胜",
+        "chinese_name": "王胜",
+        "english_name": "Sheng Wang"
       }
     ]
   }

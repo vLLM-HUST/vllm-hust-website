@@ -948,4 +948,6 @@ def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> No
     )
     assert "'./data/core_contributors.json'" in text
     assert "async function fetchPayload()" in text
+    assert "item.display_name || item.chinese_name || item.name || item.github_login || ''" in text
+    assert "item.github_login && item.github_login !== displayName" in text
     assert "console.warn('[contributors] source failed', source, err);" in text
