@@ -1867,12 +1867,7 @@
             return false;
         }
 
-        const tokens = getTrendRefTokens(entry);
-        if (tokens.includes('main')) {
-            return true;
-        }
-
-        return getEngine(entry) === 'vllm-hust';
+        return getTrendRefTokens(entry).includes('main') || getEngine(entry) === 'vllm-hust';
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
