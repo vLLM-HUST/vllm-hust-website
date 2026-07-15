@@ -1878,10 +1878,7 @@
             if (selectedWorkload !== 'all') {
                 return true;
             }
-            if (!isServingTrendWorkload(entry)) {
-                return false;
-            }
-            return isMainlineTrendEntry(entry);
+            return isServingTrendWorkload(entry) && isMainlineTrendEntry(entry);
         });
     }
 
