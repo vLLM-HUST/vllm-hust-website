@@ -1867,7 +1867,12 @@
             return false;
         }
 
-        return getTrendRefTokens(entry).includes('main');
+        const tokens = getTrendRefTokens(entry);
+        if (tokens.includes('main')) {
+            return true;
+        }
+
+        return getEngine(entry) === 'vllm-hust';
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
@@ -1878,7 +1883,10 @@
             if (selectedWorkload !== 'all') {
                 return true;
             }
-            return isServingTrendWorkload(entry) && isMainlineTrendEntry(entry);
+            if (!isServingTrendWorkload(entry)) {
+                return false;
+            }
+            return isMainlineTrendEntry(entry);
         });
     }
 
@@ -2134,7 +2142,7 @@
         const baseVersion = getEntryFilterVersionText(entry);
         const settingSignature = getSettingSignature(entry);
 
-        // Strict aggregation: require both vllm-hust and vllm-ascend-hust to have valid PEP versions
+        // Try strict aggregation first: require both vllm-hust and vllm-ascend-hust to have valid PEP versions
         const components = buildTableVersionComponents(entry).filter((c) => c?.label && c?.version);
         const hust = components.find((c) => c.label === 'vllm-hust');
         const ascend = components.find((c) => c.label === 'vllm-ascend-hust');
@@ -2158,7 +2166,12 @@
                 settingSignature,
             ].join('|');
         }
-        // Fallback: use a unique key to prevent aggregation if missing/invalid
+
+        // Fallback: use git_commit or engine_version for aggregation when full PEP version info is missing
+        const gitCommit = String(entry?.metadata?.git_commit || '').trim();
+        const engineVersion = String(entry?.engine_version || '').trim();
+        const versionKey = gitCommit || engineVersion || '__UNKNOWN_VERSION__';
+
         return [
             engine,
             workload,
@@ -2170,8 +2183,7 @@
             model,
             precision,
             quantization,
-            '__NO_AGGREGATE__',
-            Date.now() + Math.random(), // ensure uniqueness
+            versionKey,
             settingSignature,
         ].join('|');
     }
