@@ -1867,6 +1867,7 @@
             return false;
         }
 
+        // return getTrendRefTokens(entry).includes('main');
         return getTrendRefTokens(entry).includes('main') || getEngine(entry) === 'vllm-hust';
     }
 
