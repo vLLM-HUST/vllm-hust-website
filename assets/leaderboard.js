@@ -1867,7 +1867,7 @@
             return false;
         }
 
-        return getTrendRefTokens(entry).includes('main') || getEngine(entry) === 'vllm-hust';
+        return getTrendRefTokens(entry).includes('main');
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
@@ -2381,14 +2381,38 @@
         return `${text.slice(0, 15)}...${text.slice(-14)}`;
     }
 
+    function getTrendVersionSortValue(entry) {
+        const engineVersion = String(entry?.engine_version || '').trim();
+        // For vllm-hust entries, extract the commit count from engine_version
+        // e.g. "v0.20.1rc0-441-g2206f1f7b7" → 441
+        const commitCountMatch = engineVersion.match(/-(\d+)-g[0-9a-f]+$/);
+        if (commitCountMatch) {
+            return parseInt(commitCountMatch[1], 10);
+        }
+        // Fallback: use timestamp for baseline / non-vllm-hust entries
+        return getEntryTimestamp(entry) || 0;
+    }
+
     function getTrendVersionKey(entry) {
+        const gitCommit = String(entry?.metadata?.git_commit || '').trim();
         const version = getTrendVersionText(entry);
-        return `${isTrendBaselineEntry(entry) ? 'baseline' : 'current'}|${version}`;
+        // Use git_commit for unique version identification when available
+        // This ensures all entries sharing the same git commit appear at the same x-axis position
+        return `${isTrendBaselineEntry(entry) ? 'baseline' : 'current'}|${gitCommit || version}`;
     }
 
     function getTrendVersionLabel(entry) {
-        const version = compactTrendLabel(getTrendVersionText(entry));
-        return isTrendBaselineEntry(entry) ? `${t('baseline')} ${version}` : version;
+        if (isTrendBaselineEntry(entry)) {
+            return `${t('baseline')} ${getTrendVersionText(entry)}`;
+        }
+        const commit = String(entry?.metadata?.git_commit || '').trim().slice(0, 10);
+        const engineVersion = String(entry?.engine_version || '').trim();
+        const commitCountMatch = engineVersion.match(/-(\d+)-g[0-9a-f]+$/);
+        if (commitCountMatch) {
+            return `${commit}(${commitCountMatch[1]})`;
+        }
+        // Fallback: show commit hash only if no engine version pattern matches
+        return commit;
     }
 
     function getTrendVersionDetail(entry) {
@@ -2430,7 +2454,7 @@
             const timestamp = getEntryTimestamp(entry);
             const baseline = isTrendBaselineEntry(entry);
             const existingVersion = versionMap.get(versionKey);
-            const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);
+            const sortValue = baseline ? Number.NEGATIVE_INFINITY : getTrendVersionSortValue(entry);
             if (!existingVersion) {
                 versionMap.set(versionKey, {
                     key: versionKey,
@@ -3251,7 +3275,8 @@
                 (filters.model === 'all' || getEntryModelCanonicalId(entry) === filters.model) &&
                 matchesVersionFilter(entry, filters.version) &&
                 (filters.workload === 'all' || workload === filters.workload) &&
-                (filters.precision === 'all' || entry.model.precision === filters.precision);
+                (filters.precision === 'all' || entry.model.precision === filters.precision) &&
+                isMainlineTrendEntry(entry);
         });
 
         const comparisonView = applyComparisonView(filtered, viewOptions);

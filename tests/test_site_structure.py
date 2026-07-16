@@ -607,7 +607,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "leaderboard-public-20260706-broken-axis2" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert (
-        "const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);"
+        "const sortValue = baseline ? Number.NEGATIVE_INFINITY : getTrendVersionSortValue(entry);"
         in js_text
     )
     assert "sortValue > existingVersion.sortValue" in js_text
