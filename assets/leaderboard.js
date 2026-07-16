@@ -1867,8 +1867,8 @@
             return false;
         }
 
-        // return getTrendRefTokens(entry).includes('main');
-        return getTrendRefTokens(entry).includes('main') || getEngine(entry) === 'vllm-hust';
+        return getTrendRefTokens(entry).includes('main');
+        // return getTrendRefTokens(entry).includes('main') || getEngine(entry) === 'vllm-hust';
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
@@ -2410,11 +2410,19 @@
         const commit = String(entry?.metadata?.git_commit || '').trim().slice(0, 10);
         const engineVersion = String(entry?.engine_version || '').trim();
         const commitCountMatch = engineVersion.match(/-(\d+)-g[0-9a-f]+$/);
+        let label;
         if (commitCountMatch) {
-            return `${engine}@${commit}(${commitCountMatch[1]})`;
+            label = `${engine}@${commit}(${commitCountMatch[1]})`;
+        } else {
+            label = `${engine}@${commit}`;
         }
-        // Fallback: show engine@commit if no engine version pattern matches
-        return `${engine}@${commit}`;
+        // Append plugin engine info (e.g. vllm-ascend-hust) to show both engines on the x-axis
+        const pluginEngine = String(entry?.metadata?.runtime_provenance?.plugin?.engine || '').trim();
+        const pluginCommit = String(entry?.metadata?.runtime_provenance?.plugin?.commit || '').trim().slice(0, 10);
+        if (pluginEngine && pluginCommit) {
+            label += ` + ${pluginEngine}@${pluginCommit}`;
+        }
+        return label;
     }
 
     function getTrendVersionDetail(entry) {
