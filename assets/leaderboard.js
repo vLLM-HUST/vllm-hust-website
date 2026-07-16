@@ -1867,7 +1867,7 @@
             return false;
         }
 
-        return getTrendRefTokens(entry).includes('main');
+        return getTrendRefTokens(entry).includes('main') || getEngine(entry) === 'vllm-hust';
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
@@ -2405,14 +2405,15 @@
         if (isTrendBaselineEntry(entry)) {
             return `${t('baseline')} ${getTrendVersionText(entry)}`;
         }
+        const engine = getEngine(entry);
         const commit = String(entry?.metadata?.git_commit || '').trim().slice(0, 10);
         const engineVersion = String(entry?.engine_version || '').trim();
         const commitCountMatch = engineVersion.match(/-(\d+)-g[0-9a-f]+$/);
         if (commitCountMatch) {
-            return `${commit}(${commitCountMatch[1]})`;
+            return `${engine}@${commit}(${commitCountMatch[1]})`;
         }
-        // Fallback: show commit hash only if no engine version pattern matches
-        return commit;
+        // Fallback: show engine@commit if no engine version pattern matches
+        return `${engine}@${commit}`;
     }
 
     function getTrendVersionDetail(entry) {
@@ -2444,12 +2445,10 @@
         const versionMap = new Map();
         const seriesMap = new Map();
 
+        // First pass: collect all versions from all entries to ensure
+        // every version node appears on the x-axis, even if there is no
+        // valid metric value for the current metric configuration.
         entries.forEach((entry) => {
-            const value = Number(entry?.metrics?.[metricConfig.key]);
-            if (!Number.isFinite(value)) {
-                return;
-            }
-
             const versionKey = getTrendVersionKey(entry);
             const timestamp = getEntryTimestamp(entry);
             const baseline = isTrendBaselineEntry(entry);
@@ -2469,7 +2468,16 @@
             } else if (baseline && timestamp > existingVersion.timestamp) {
                 existingVersion.timestamp = timestamp;
             }
+        });
 
+        // Second pass: populate series data only from entries with valid metric values
+        entries.forEach((entry) => {
+            const value = Number(entry?.metrics?.[metricConfig.key]);
+            if (!Number.isFinite(value)) {
+                return;
+            }
+
+            const versionKey = getTrendVersionKey(entry);
             const seriesKey = getTrendSeriesKey(entry);
             if (!seriesMap.has(seriesKey)) {
                 seriesMap.set(seriesKey, {
