@@ -55,6 +55,20 @@
         <div id="result-repository-list" class="result-repository-list"></div>
       </section>
 
+      <section class="content-panel upstream-pr-panel" aria-labelledby="upstream-pr-title">
+        <div class="section-head upstream-pr-head">
+          <div>
+            <span id="upstream-pr-kicker" class="eyebrow">Upstream PRs</span>
+            <h2 id="upstream-pr-title">Under review</h2>
+          </div>
+          <div class="upstream-pr-controls">
+            <button id="upstream-pr-prev" type="button" aria-label="Previous pull requests">←</button>
+            <button id="upstream-pr-next" type="button" aria-label="Next pull requests">→</button>
+          </div>
+        </div>
+        <div id="upstream-pr-track" class="upstream-pr-track" tabindex="0" aria-label="Open upstream pull requests"></div>
+      </section>
+
       <section class="content-panel">
         <div class="section-head">
           <div>
@@ -109,6 +123,8 @@
         'achievement-stat-hard-label': 'Validation scopes',
         'result-repositories-kicker': 'Result repository',
         'result-repositories-title': 'Published results',
+        'upstream-pr-kicker': 'Upstream PRs',
+        'upstream-pr-title': 'Under review',
         'achievements-timeline-kicker': 'Timeline',
         'achievements-timeline-title': 'Achievement timeline',
         'achievements-footer-copy': 'Research, benchmarks, and upstream contributions.'
@@ -131,6 +147,8 @@
         'achievement-stat-hard-label': '验证范围',
         'result-repositories-kicker': '成果仓库',
         'result-repositories-title': '已发表成果',
+        'upstream-pr-kicker': '上游 PR',
+        'upstream-pr-title': '评审中',
         'achievements-timeline-kicker': '时间轴',
         'achievements-timeline-title': '成果时间轴',
         'achievements-footer-copy': '研究成果、性能评测与上游贡献。'
@@ -138,7 +156,7 @@
     };
   </script>
   <script src="./assets/site.js?v=mobile-canvas-20260718"></script>
-  <script src="./assets/achievements-page.js?v=published-results-copy-20260718"></script>
+  <script src="./assets/achievements-page.js?v=upstream-pr-carousel-20260718"></script>
 </body>
 
 </html>
