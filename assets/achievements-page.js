@@ -9,153 +9,6 @@
 
     const ACHIEVEMENTS = [
         {
-            sortDate: '2026-07-07',
-            date: { en: 'July 7, 2026', zh: '2026 年 7 月 7 日' },
-            kind: { en: 'Upstream', zh: '上游贡献' },
-            title: {
-                en: 'Triton and vLLM source-build fixes submitted upstream',
-                zh: 'Triton 与 vLLM 源码构建修复提交上游',
-            },
-            body: {
-                en: 'These PRs improve source checkout handling in vLLM and strengthen Triton-Ascend compatibility across runtime loading, build dependencies, and optional tool registration.',
-                zh: '这组 PR 改进 vLLM 源码 checkout 场景下的 metadata 处理，并提升 Triton-Ascend 在 runtime 加载、构建依赖和可选工具注册上的兼容性。',
-            },
-            tags: [
-                { en: 'vLLM', zh: 'vLLM' },
-                { en: 'Triton-Ascend', zh: 'Triton-Ascend' },
-                { en: 'Source builds', zh: '源码构建' },
-            ],
-            links: [
-                {
-                    label: { en: 'vLLM #47793 · label gate', zh: 'vLLM #47793 · 等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/47793',
-                },
-                {
-                    label: { en: 'vLLM #47789 · label gate', zh: 'vLLM #47789 · 等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/47789',
-                },
-                {
-                    label: { en: 'Triton-Ascend #917 · superseded', zh: 'Triton-Ascend #917 · 已拆分关闭' },
-                    href: 'https://github.com/triton-lang/triton-ascend/pull/917',
-                },
-                {
-                    label: { en: 'Triton-Ascend #918 · CI passed', zh: 'Triton-Ascend #918 · CI 已通过' },
-                    href: 'https://github.com/triton-lang/triton-ascend/pull/918',
-                },
-                {
-                    label: { en: 'Triton-Ascend #919 · CI passed', zh: 'Triton-Ascend #919 · CI 已通过' },
-                    href: 'https://github.com/triton-lang/triton-ascend/pull/919',
-                },
-                {
-                    label: { en: 'Triton-Ascend #920 · CI passed', zh: 'Triton-Ascend #920 · CI 已通过' },
-                    href: 'https://github.com/triton-lang/triton-ascend/pull/920',
-                },
-                {
-                    label: { en: 'Triton-Ascend #922 · CI running', zh: 'Triton-Ascend #922 · CI 运行中' },
-                    href: 'https://github.com/triton-lang/triton-ascend/pull/922',
-                },
-                {
-                    label: { en: 'Triton-Ascend #923 · CI running', zh: 'Triton-Ascend #923 · CI 运行中' },
-                    href: 'https://github.com/triton-lang/triton-ascend/pull/923',
-                },
-            ],
-        },
-        {
-            sortDate: '2026-07-05',
-            date: { en: 'July 5, 2026', zh: '2026 年 7 月 5 日' },
-            kind: { en: 'Upstream', zh: '上游贡献' },
-            title: {
-                en: 'vLLM and vLLM-Ascend performance improvements submitted upstream',
-                zh: 'vLLM 与 vLLM-Ascend 性能改进提交上游',
-            },
-            body: {
-                en: 'The July submissions cover KV-scale host conversion, logprobs materialization, packaged custom-op lookup, NPU runtime support for Python 3.12, and DP metadata buffer reuse.',
-                zh: '7 月提交覆盖 KV scale host conversion、logprobs materialization、packaged custom-op lookup、Python 3.12 下的 NPU runtime 支持，以及 DP metadata buffer 复用。',
-            },
-            tags: [
-                { en: 'Performance', zh: '性能' },
-                { en: 'vLLM', zh: 'vLLM' },
-                { en: 'vLLM-Ascend', zh: 'vLLM-Ascend' },
-            ],
-            links: [
-                {
-                    label: { en: 'vLLM #49017 · draft, label gate', zh: 'vLLM #49017 · Draft，等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/49017',
-                },
-                {
-                    label: { en: 'vLLM #49018 · draft, label gate', zh: 'vLLM #49018 · Draft，等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/49018',
-                },
-                {
-                    label: { en: 'vLLM-Ascend #12316 · CI running', zh: 'vLLM-Ascend #12316 · CI 运行中' },
-                    href: 'https://github.com/vllm-project/vllm-ascend/pull/12316',
-                },
-                {
-                    label: { en: 'vLLM-Ascend #11422 · CI running', zh: 'vLLM-Ascend #11422 · CI 运行中' },
-                    href: 'https://github.com/vllm-project/vllm-ascend/pull/11422',
-                },
-                {
-                    label: { en: 'vLLM-Ascend #12317 · CI running', zh: 'vLLM-Ascend #12317 · CI 运行中' },
-                    href: 'https://github.com/vllm-project/vllm-ascend/pull/12317',
-                },
-            ],
-        },
-        {
-            sortDate: '2026-06-19',
-            date: { en: 'June 2026', zh: '2026 年 6 月' },
-            kind: { en: 'Upstream', zh: '上游贡献' },
-            title: {
-                en: 'vLLM-Ascend runtime reliability fix opened upstream',
-                zh: 'vLLM-Ascend 运行时可靠性修复提交上游',
-            },
-            body: {
-                en: 'This contribution keeps the worker override configuration consistent across vLLM-Ascend worker processes, including NPU graph settings.',
-                zh: '该贡献让 vLLM-Ascend 的 worker override 配置在不同 worker 进程间保持一致，包括 NPU graph 相关设置。',
-            },
-            tags: [
-                { en: 'Runtime reliability', zh: '运行时可靠性' },
-                { en: 'vLLM-Ascend', zh: 'vLLM-Ascend' },
-            ],
-            links: [
-                {
-                    label: { en: 'vLLM-Ascend #10735 · CI passed', zh: 'vLLM-Ascend #10735 · CI 已通过' },
-                    href: 'https://github.com/vllm-project/vllm-ascend/pull/10735',
-                },
-            ],
-        },
-        {
-            sortDate: '2026-05-07',
-            date: { en: 'May 2026', zh: '2026 年 5 月' },
-            kind: { en: 'Upstream', zh: '上游贡献' },
-            title: {
-                en: 'Early vLLM and vLLM-Ascend stability fixes opened upstream',
-                zh: '早期 vLLM 与 vLLM-Ascend 稳定性修复提交上游',
-            },
-            body: {
-                en: 'May submissions focused on everyday stability: missing parent-module handling, clean shutdown behavior, and Qwen2 compiled-path output correctness on Ascend.',
-                zh: '5 月提交聚焦基础稳定性：parent module 缺失处理、clean shutdown 行为，以及 Ascend 上 Qwen2 compiled path 的输出正确性。',
-            },
-            tags: [
-                { en: 'Stability', zh: '稳定性' },
-                { en: 'vLLM', zh: 'vLLM' },
-                { en: 'vLLM-Ascend', zh: 'vLLM-Ascend' },
-            ],
-            links: [
-                {
-                    label: { en: 'vLLM #41449 · label gate', zh: 'vLLM #41449 · 等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/41449',
-                },
-                {
-                    label: { en: 'vLLM #41507 · label gate', zh: 'vLLM #41507 · 等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/41507',
-                },
-                {
-                    label: { en: 'vLLM-Ascend #8958 · CI running', zh: 'vLLM-Ascend #8958 · CI 运行中' },
-                    href: 'https://github.com/vllm-project/vllm-ascend/pull/8958',
-                },
-            ],
-        },
-        {
             sortDate: '2026-07-02',
             date: { en: 'July 2026', zh: '2026 年 7 月' },
             kind: { en: 'Publication', zh: '论文' },
@@ -261,6 +114,25 @@
         },
     ];
 
+    const OPEN_UPSTREAM_PRS = [
+        { repository: 'vLLM', number: 41449, title: 'fix: handle missing parent modules in _has_module', href: 'https://github.com/vllm-project/vllm/pull/41449' },
+        { repository: 'vLLM', number: 41507, title: 'fix(v1): avoid false shutdown failures on clean exit', href: 'https://github.com/vllm-project/vllm/pull/41507' },
+        { repository: 'vLLM', number: 47789, title: 'fix: tolerate source checkout without vllm metadata', href: 'https://github.com/vllm-project/vllm/pull/47789' },
+        { repository: 'vLLM', number: 47793, title: 'Handle missing vLLM metadata in Triton import', href: 'https://github.com/vllm-project/vllm/pull/47793' },
+        { repository: 'vLLM', number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft', href: 'https://github.com/vllm-project/vllm/pull/49017' },
+        { repository: 'vLLM', number: 49018, title: '[Perf] Avoid redundant logprobs list materialization', status: 'draft', href: 'https://github.com/vllm-project/vllm/pull/49018' },
+        { repository: 'vLLM-Ascend', number: 8958, title: '[BugFix] Fix Qwen2 compiled-path outputs on Ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/8958' },
+        { repository: 'vLLM-Ascend', number: 10735, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', href: 'https://github.com/vllm-project/vllm-ascend/pull/10735' },
+        { repository: 'vLLM-Ascend', number: 11422, title: '[Ops][BugFix] Fix NPU memory profiling on Python 3.12', href: 'https://github.com/vllm-project/vllm-ascend/pull/11422' },
+        { repository: 'vLLM-Ascend', number: 12316, title: '[BugFix] Fix packaged custom opapi lookup', href: 'https://github.com/vllm-project/vllm-ascend/pull/12316' },
+        { repository: 'vLLM-Ascend', number: 12317, title: '[Performance] Reuse DP metadata sync buffers', href: 'https://github.com/vllm-project/vllm-ascend/pull/12317' },
+        { repository: 'Triton-Ascend', number: 918, title: '[runtime](fix) skip missing backend entry points', href: 'https://github.com/triton-lang/triton-ascend/pull/918' },
+        { repository: 'Triton-Ascend', number: 919, title: '[ascend](fix) disambiguate dependent getDefiningOp calls', href: 'https://github.com/triton-lang/triton-ascend/pull/919' },
+        { repository: 'Triton-Ascend', number: 920, title: '[ascend](fix) allow MemAccOp factory specializations', href: 'https://github.com/triton-lang/triton-ascend/pull/920' },
+        { repository: 'Triton-Ascend', number: 922, title: '[build](fix) fix Python module build dependencies', href: 'https://github.com/triton-lang/triton-ascend/pull/922' },
+        { repository: 'Triton-Ascend', number: 923, title: '[tools](fix) trim optional dialect registrations', href: 'https://github.com/triton-lang/triton-ascend/pull/923' },
+    ];
+
     const RESULT_REPOSITORIES = [
         {
             name: 'BiDKV',
@@ -291,6 +163,11 @@
             milestoneKind: 'Project',
             latestLabel: 'Latest',
             repositoryLabel: 'Explore repository',
+            openStatus: 'Open',
+            draftStatus: 'Draft',
+            previousPRs: 'Previous pull requests',
+            nextPRs: 'Next pull requests',
+            openPRs: 'Open upstream pull requests',
         },
         zh: {
             throughputUnit: 'token/s',
@@ -308,6 +185,11 @@
             milestoneKind: '项目',
             latestLabel: '最新',
             repositoryLabel: '查看优化仓库',
+            openStatus: '开放',
+            draftStatus: '草稿',
+            previousPRs: '上一组 PR',
+            nextPRs: '下一组 PR',
+            openPRs: '评审中的上游 PR',
         },
     };
 
@@ -491,8 +373,40 @@
         `).join('');
     }
 
+    function renderUpstreamPRs(lang = currentLang()) {
+        const target = document.getElementById('upstream-pr-track');
+        if (!target) return;
+        target.setAttribute('aria-label', ui(lang).openPRs);
+        target.innerHTML = OPEN_UPSTREAM_PRS.map((pullRequest) => {
+            const status = pullRequest.status === 'draft' ? ui(lang).draftStatus : ui(lang).openStatus;
+            return `
+                <a class="upstream-pr-card" href="${pullRequest.href}" target="_blank" rel="noreferrer">
+                    <div class="upstream-pr-meta">
+                        <span>${pullRequest.repository} #${pullRequest.number}</span>
+                        <strong data-status="${pullRequest.status || 'open'}">${status}</strong>
+                    </div>
+                    <h3>${pullRequest.title}</h3>
+                    <span class="upstream-pr-link" aria-hidden="true">↗</span>
+                </a>
+            `;
+        }).join('');
+
+        const previous = document.getElementById('upstream-pr-prev');
+        const next = document.getElementById('upstream-pr-next');
+        const scroll = (direction) => target.scrollBy({ left: direction * target.clientWidth * 0.82, behavior: 'smooth' });
+        if (previous) {
+            previous.setAttribute('aria-label', ui(lang).previousPRs);
+            previous.onclick = () => scroll(-1);
+        }
+        if (next) {
+            next.setAttribute('aria-label', ui(lang).nextPRs);
+            next.onclick = () => scroll(1);
+        }
+    }
+
     function renderDynamic(lang = currentLang()) {
         renderResultRepositories(lang);
+        renderUpstreamPRs(lang);
         if (state.compare) renderTimeline(state.compare, lang);
     }
 

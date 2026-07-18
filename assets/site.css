@@ -925,6 +925,132 @@ h1 {
     font-size: 1rem;
 }
 
+.upstream-pr-panel {
+    overflow: hidden;
+}
+
+.upstream-pr-head {
+    align-items: end;
+}
+
+.upstream-pr-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.upstream-pr-controls button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(125, 211, 252, 0.24);
+    border-radius: 12px;
+    color: rgba(226, 242, 255, 0.88);
+    background: rgba(8, 21, 39, 0.72);
+    font: inherit;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.upstream-pr-controls button:hover {
+    border-color: rgba(125, 211, 252, 0.56);
+    background: rgba(14, 37, 61, 0.88);
+    transform: translateY(-1px);
+}
+
+.upstream-pr-controls button:focus-visible {
+    outline: 3px solid rgba(125, 211, 252, 0.48);
+    outline-offset: 2px;
+}
+
+.upstream-pr-track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(260px, 330px);
+    gap: 12px;
+    overflow-x: auto;
+    padding: 2px 1px 14px;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: rgba(125, 211, 252, 0.5) rgba(125, 211, 252, 0.08);
+    scrollbar-width: thin;
+}
+
+.upstream-pr-track::-webkit-scrollbar {
+    height: 8px;
+}
+
+.upstream-pr-track::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: rgba(125, 211, 252, 0.08);
+}
+
+.upstream-pr-track::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(125, 211, 252, 0.5);
+}
+
+.upstream-pr-card {
+    position: relative;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    border: 1px solid rgba(125, 211, 252, 0.18);
+    border-radius: 16px;
+    color: rgba(226, 242, 255, 0.9);
+    background: rgba(8, 20, 38, 0.62);
+    text-decoration: none;
+    scroll-snap-align: start;
+    transition: border-color 160ms ease, background 160ms ease;
+}
+
+.upstream-pr-card:hover {
+    border-color: rgba(125, 211, 252, 0.46);
+    background: rgba(12, 31, 52, 0.78);
+}
+
+.upstream-pr-card:focus-visible {
+    outline: 3px solid rgba(125, 211, 252, 0.48);
+    outline-offset: -3px;
+}
+
+.upstream-pr-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: rgba(191, 219, 254, 0.62);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.upstream-pr-meta strong {
+    padding: 4px 8px;
+    border-radius: 999px;
+    color: #86efac;
+    background: rgba(134, 239, 172, 0.1);
+    font-size: 0.64rem;
+}
+
+.upstream-pr-meta strong[data-status="draft"] {
+    color: #fcd34d;
+    background: rgba(252, 211, 77, 0.1);
+}
+
+.upstream-pr-card h3 {
+    margin: 18px 24px 0 0;
+    color: rgba(241, 248, 255, 0.94);
+    font-size: 0.9rem;
+    line-height: 1.48;
+}
+
+.upstream-pr-link {
+    position: absolute;
+    right: 18px;
+    bottom: 16px;
+    color: #7dd3fc;
+}
+
 .achievement-timeline::before {
     content: "";
     position: absolute;
@@ -1343,6 +1469,15 @@ h1 {
         justify-content: space-between;
         padding-top: 14px;
         border-top: 1px solid rgba(var(--repo-accent), 0.18);
+    }
+
+    .upstream-pr-head {
+        flex-direction: row;
+        align-items: flex-end;
+    }
+
+    .upstream-pr-track {
+        grid-auto-columns: min(78vw, 300px);
     }
 
     .achievement-item {
