@@ -431,7 +431,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "upstream-repository-accordion-20260718" in html_text
+    assert "upstream-pr-readiness-20260718" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -489,7 +489,10 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert html_text.count("upstream-repository-accordion-20260718") == 2
+    assert "assets/site.css?v=upstream-repository-accordion-20260718" in html_text
+    assert "assets/achievements-page.js?v=upstream-pr-readiness-20260718" in html_text
+    assert "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'" not in js_text
+    assert "number: 49018, title: '[Perf] Avoid redundant logprobs list materialization', status: 'draft'" in js_text
 
     assert js_text.count("owner: 'vllm-project'") == 2
     assert js_text.count("owner: 'triton-lang'") == 1
