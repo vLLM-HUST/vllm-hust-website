@@ -495,27 +495,25 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
     )
-    assert (
-        "number: 49018, title: '[Perf] Avoid redundant logprobs list materialization', status: 'draft'"
-        in js_text
-    )
+    assert "number: 49018" not in js_text
+    assert "number: 49017" not in js_text
+    assert "number: 49034" in js_text
+    assert "number: 49035" in js_text
+    assert "number: 12343" in js_text
 
     assert js_text.count("owner: 'vllm-project'") == 2
     assert js_text.count("owner: 'triton-lang'") == 1
     assert "pullRequestCount(repository.pullRequests.length)" in js_text
 
     open_urls = (
-        "https://github.com/vllm-project/vllm/pull/41449",
-        "https://github.com/vllm-project/vllm/pull/41507",
-        "https://github.com/vllm-project/vllm/pull/47789",
         "https://github.com/vllm-project/vllm/pull/47793",
-        "https://github.com/vllm-project/vllm/pull/49017",
-        "https://github.com/vllm-project/vllm/pull/49018",
-        "https://github.com/vllm-project/vllm-ascend/pull/8958",
-        "https://github.com/vllm-project/vllm-ascend/pull/10735",
-        "https://github.com/vllm-project/vllm-ascend/pull/11422",
+        "https://github.com/vllm-project/vllm/pull/49034",
+        "https://github.com/vllm-project/vllm/pull/49035",
         "https://github.com/vllm-project/vllm-ascend/pull/12316",
         "https://github.com/vllm-project/vllm-ascend/pull/12317",
+        "https://github.com/vllm-project/vllm-ascend/pull/12342",
+        "https://github.com/vllm-project/vllm-ascend/pull/12343",
+        "https://github.com/vllm-project/vllm-ascend/pull/12344",
         "https://github.com/triton-lang/triton-ascend/pull/918",
         "https://github.com/triton-lang/triton-ascend/pull/919",
         "https://github.com/triton-lang/triton-ascend/pull/920",

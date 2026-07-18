@@ -115,17 +115,14 @@
     ];
 
     const OPEN_UPSTREAM_PRS = [
-        { repository: 'vLLM', number: 41449, title: 'fix: handle missing parent modules in _has_module', href: 'https://github.com/vllm-project/vllm/pull/41449' },
-        { repository: 'vLLM', number: 41507, title: 'fix(v1): avoid false shutdown failures on clean exit', href: 'https://github.com/vllm-project/vllm/pull/41507' },
-        { repository: 'vLLM', number: 47789, title: 'fix: tolerate source checkout without vllm metadata', href: 'https://github.com/vllm-project/vllm/pull/47789' },
         { repository: 'vLLM', number: 47793, title: 'Handle missing vLLM metadata in Triton import', href: 'https://github.com/vllm-project/vllm/pull/47793' },
-        { repository: 'vLLM', number: 49017, title: '[Perf] Batch KV scale host conversion', href: 'https://github.com/vllm-project/vllm/pull/49017' },
-        { repository: 'vLLM', number: 49018, title: '[Perf] Avoid redundant logprobs list materialization', status: 'draft', href: 'https://github.com/vllm-project/vllm/pull/49018' },
-        { repository: 'vLLM-Ascend', number: 8958, title: '[BugFix] Fix Qwen2 compiled-path outputs on Ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/8958' },
-        { repository: 'vLLM-Ascend', number: 10735, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', href: 'https://github.com/vllm-project/vllm-ascend/pull/10735' },
-        { repository: 'vLLM-Ascend', number: 11422, title: '[Ops][BugFix] Fix NPU memory profiling on Python 3.12', href: 'https://github.com/vllm-project/vllm-ascend/pull/11422' },
+        { repository: 'vLLM', number: 49034, title: 'fix(v1): avoid false shutdown failures on clean exit', href: 'https://github.com/vllm-project/vllm/pull/49034' },
+        { repository: 'vLLM', number: 49035, title: 'fix: handle missing parent modules in _has_module', href: 'https://github.com/vllm-project/vllm/pull/49035' },
         { repository: 'vLLM-Ascend', number: 12316, title: '[BugFix] Fix packaged custom opapi lookup', href: 'https://github.com/vllm-project/vllm-ascend/pull/12316' },
         { repository: 'vLLM-Ascend', number: 12317, title: '[Performance] Reuse DP metadata sync buffers', href: 'https://github.com/vllm-project/vllm-ascend/pull/12317' },
+        { repository: 'vLLM-Ascend', number: 12342, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', href: 'https://github.com/vllm-project/vllm-ascend/pull/12342' },
+        { repository: 'vLLM-Ascend', number: 12343, title: '[Ops][BugFix] Fix Qwen2 compiled-path outputs on Ascend', status: 'draft', href: 'https://github.com/vllm-project/vllm-ascend/pull/12343' },
+        { repository: 'vLLM-Ascend', number: 12344, title: '[Ops][BugFix] Fix NPU memory profiling on Python 3.12', href: 'https://github.com/vllm-project/vllm-ascend/pull/12344' },
         { repository: 'Triton-Ascend', number: 918, title: '[runtime](fix) skip missing backend entry points', href: 'https://github.com/triton-lang/triton-ascend/pull/918' },
         { repository: 'Triton-Ascend', number: 919, title: '[ascend](fix) disambiguate dependent getDefiningOp calls', href: 'https://github.com/triton-lang/triton-ascend/pull/919' },
         { repository: 'Triton-Ascend', number: 920, title: '[ascend](fix) allow MemAccOp factory specializations', href: 'https://github.com/triton-lang/triton-ascend/pull/920' },
