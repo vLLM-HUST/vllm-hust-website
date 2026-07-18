@@ -119,7 +119,7 @@
         { repository: 'vLLM', number: 41507, title: 'fix(v1): avoid false shutdown failures on clean exit', href: 'https://github.com/vllm-project/vllm/pull/41507' },
         { repository: 'vLLM', number: 47789, title: 'fix: tolerate source checkout without vllm metadata', href: 'https://github.com/vllm-project/vllm/pull/47789' },
         { repository: 'vLLM', number: 47793, title: 'Handle missing vLLM metadata in Triton import', href: 'https://github.com/vllm-project/vllm/pull/47793' },
-        { repository: 'vLLM', number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft', href: 'https://github.com/vllm-project/vllm/pull/49017' },
+        { repository: 'vLLM', number: 49017, title: '[Perf] Batch KV scale host conversion', href: 'https://github.com/vllm-project/vllm/pull/49017' },
         { repository: 'vLLM', number: 49018, title: '[Perf] Avoid redundant logprobs list materialization', status: 'draft', href: 'https://github.com/vllm-project/vllm/pull/49018' },
         { repository: 'vLLM-Ascend', number: 8958, title: '[BugFix] Fix Qwen2 compiled-path outputs on Ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/8958' },
         { repository: 'vLLM-Ascend', number: 10735, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', href: 'https://github.com/vllm-project/vllm-ascend/pull/10735' },
