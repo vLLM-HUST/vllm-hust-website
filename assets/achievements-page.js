@@ -163,6 +163,16 @@
                 zh: '用于 vLLM 的 KV Cache 回收插件。',
             },
             publication: { en: 'SC 2026', zh: 'SC 2026' },
+            team: [
+                {
+                    role: { en: 'Lead authors', zh: '主要作者' },
+                    names: { en: 'Yanbo Chen · Mingqi Wang', zh: '陈彦博 · 王明琪' },
+                },
+                {
+                    role: { en: 'Advisor', zh: '指导老师' },
+                    names: { en: 'Shuhao Zhang', zh: '张书豪' },
+                },
+            ],
             repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv',
         },
     ];
@@ -184,6 +194,7 @@
             milestoneKind: 'Project',
             latestLabel: 'Latest',
             repositoryLabel: 'Explore repository',
+            teamLabel: 'Project team',
             openStatus: 'Open',
             draftStatus: 'Draft',
             pullRequestCount: (count) => `${count} pull requests`,
@@ -207,6 +218,7 @@
             milestoneKind: '项目',
             latestLabel: '最新',
             repositoryLabel: '查看优化仓库',
+            teamLabel: '项目团队',
             openStatus: '开放',
             draftStatus: '草稿',
             pullRequestCount: (count) => `${count} 个 PR`,
@@ -393,6 +405,19 @@
                     </div>
                     <p>${pick(repository.summary, lang)}</p>
                 </div>
+                ${repository.team?.length ? `
+                    <div class="result-repository-team">
+                        <span class="result-repository-team-kicker">${ui(lang).teamLabel}</span>
+                        <div class="result-repository-team-list">
+                            ${repository.team.map((member) => `
+                                <div class="result-repository-team-row">
+                                    <span>${pick(member.role, lang)}</span>
+                                    <strong>${pick(member.names, lang)}</strong>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
                 <span class="result-repository-link">${ui(lang).repositoryLabel}<strong aria-hidden="true">↗</strong></span>
             </a>
         `).join('');

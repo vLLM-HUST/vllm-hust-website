@@ -330,7 +330,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=upstream-repository-accordion-20260718" in text
+        assert "assets/site.css?v=achievement-team-20260718" in text
         assert "assets/site.js?v=mobile-canvas-20260718" in text
 
 
@@ -431,7 +431,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "upstream-pr-readiness-20260718" in html_text
+    assert "achievement-team-20260718" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -482,17 +482,23 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "const UPSTREAM_REPOSITORIES = [" in js_text
     assert "function renderUpstreamPRs" in js_text
     assert "expandedUpstreamRepository" in js_text
-    assert "aria-expanded=\"${isExpanded}\"" in js_text
+    assert 'aria-expanded="${isExpanded}"' in js_text
     assert 'aria-controls="upstream-pr-details"' in js_text
     assert "upstream-repository-grid" in css_text
     assert "upstream-repository-card.is-active" in css_text
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=upstream-repository-accordion-20260718" in html_text
-    assert "assets/achievements-page.js?v=upstream-pr-readiness-20260718" in html_text
-    assert "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'" not in js_text
-    assert "number: 49018, title: '[Perf] Avoid redundant logprobs list materialization', status: 'draft'" in js_text
+    assert "assets/site.css?v=achievement-team-20260718" in html_text
+    assert "assets/achievements-page.js?v=achievement-team-20260718" in html_text
+    assert (
+        "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
+        not in js_text
+    )
+    assert (
+        "number: 49018, title: '[Perf] Avoid redundant logprobs list materialization', status: 'draft'"
+        in js_text
+    )
 
     assert js_text.count("owner: 'vllm-project'") == 2
     assert js_text.count("owner: 'triton-lang'") == 1
@@ -555,7 +561,10 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
     assert "github.com/intellistream/bidkv" not in js_text
     assert "repositoryName: 'vllm-ascend-hust-bidkv'" in js_text
+    assert "names: { en: 'Yanbo Chen · Mingqi Wang', zh: '陈彦博 · 王明琪' }" in js_text
+    assert "names: { en: 'Shuhao Zhang', zh: '张书豪' }" in js_text
     assert "result-repository-card" in css_text
+    assert "result-repository-team" in css_text
     assert pdf_path.is_file()
     assert pdf_path.stat().st_size > 100_000
 
