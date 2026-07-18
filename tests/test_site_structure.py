@@ -431,7 +431,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "published-results-copy-20260718" in html_text
+    assert "upstream-pr-status-20260718" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -476,28 +476,28 @@ def test_achievements_page_records_upstream_prs() -> None:
     assert "https://github.com/triton-lang/triton-ascend/pull/917" in js_text
     assert "https://github.com/vllm-project/vllm/pull/41449" in js_text
     assert "https://github.com/vllm-project/vllm/pull/41507" in js_text
-    assert "https://github.com/vllm-project/vllm/pull/47622" in js_text
-    assert "https://github.com/vllm-project/vllm/pull/47623" in js_text
+    assert "https://github.com/vllm-project/vllm/pull/49017" in js_text
+    assert "https://github.com/vllm-project/vllm/pull/49018" in js_text
     assert "https://github.com/vllm-project/vllm-ascend/pull/8958" in js_text
     assert "https://github.com/vllm-project/vllm-ascend/pull/10735" in js_text
-    assert "https://github.com/vllm-project/vllm-ascend/pull/11417" in js_text
+    assert "https://github.com/vllm-project/vllm-ascend/pull/12316" in js_text
     assert "https://github.com/vllm-project/vllm-ascend/pull/11422" in js_text
-    assert "https://github.com/vllm-project/vllm-ascend/pull/11449" in js_text
-    assert "vLLM-Ascend #8958 · CI passed" in js_text
+    assert "https://github.com/vllm-project/vllm-ascend/pull/12317" in js_text
+    assert "vLLM-Ascend #8958 · CI running" in js_text
     assert "vLLM-Ascend #10735 · CI passed" in js_text
-    assert "vLLM-Ascend #11449 · CI passed" in js_text
+    assert "vLLM-Ascend #12317 · CI running" in js_text
     assert "vLLM #41449 · label gate" in js_text
     assert "vLLM #41507 · label gate" in js_text
-    assert "vLLM #47622 · label gate" in js_text
-    assert "vLLM #47623 · label gate" in js_text
+    assert "vLLM #49017 · draft, label gate" in js_text
+    assert "vLLM #49018 · draft, label gate" in js_text
     assert "vLLM #47789 · label gate" in js_text
     assert "vLLM #47793 · label gate" in js_text
-    assert "Triton-Ascend #917 · CI running" in js_text
+    assert "Triton-Ascend #917 · superseded" in js_text
     assert "Triton-Ascend #918 · CI passed" in js_text
-    assert "Triton-Ascend #919 · CI passed, pipeline pending" in js_text
-    assert "Triton-Ascend #920 · CI passed, pipeline pending" in js_text
-    assert "Triton-Ascend #922 · runner retry needed" in js_text
-    assert "Triton-Ascend #923 · CI passed, pipeline pending" in js_text
+    assert "Triton-Ascend #919 · CI passed" in js_text
+    assert "Triton-Ascend #920 · CI passed" in js_text
+    assert "Triton-Ascend #922 · CI running" in js_text
+    assert "Triton-Ascend #923 · CI running" in js_text
 
 
 def test_achievements_page_does_not_treat_upstream_sync_as_achievement() -> None:

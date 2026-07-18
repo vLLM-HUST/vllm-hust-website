@@ -35,7 +35,7 @@
                     href: 'https://github.com/vllm-project/vllm/pull/47789',
                 },
                 {
-                    label: { en: 'Triton-Ascend #917 · CI running', zh: 'Triton-Ascend #917 · CI 运行中' },
+                    label: { en: 'Triton-Ascend #917 · superseded', zh: 'Triton-Ascend #917 · 已拆分关闭' },
                     href: 'https://github.com/triton-lang/triton-ascend/pull/917',
                 },
                 {
@@ -43,19 +43,19 @@
                     href: 'https://github.com/triton-lang/triton-ascend/pull/918',
                 },
                 {
-                    label: { en: 'Triton-Ascend #919 · CI passed, pipeline pending', zh: 'Triton-Ascend #919 · CI 已通过，pipeline 等待中' },
+                    label: { en: 'Triton-Ascend #919 · CI passed', zh: 'Triton-Ascend #919 · CI 已通过' },
                     href: 'https://github.com/triton-lang/triton-ascend/pull/919',
                 },
                 {
-                    label: { en: 'Triton-Ascend #920 · CI passed, pipeline pending', zh: 'Triton-Ascend #920 · CI 已通过，pipeline 等待中' },
+                    label: { en: 'Triton-Ascend #920 · CI passed', zh: 'Triton-Ascend #920 · CI 已通过' },
                     href: 'https://github.com/triton-lang/triton-ascend/pull/920',
                 },
                 {
-                    label: { en: 'Triton-Ascend #922 · runner retry needed', zh: 'Triton-Ascend #922 · 等待 runner 重试' },
+                    label: { en: 'Triton-Ascend #922 · CI running', zh: 'Triton-Ascend #922 · CI 运行中' },
                     href: 'https://github.com/triton-lang/triton-ascend/pull/922',
                 },
                 {
-                    label: { en: 'Triton-Ascend #923 · CI passed, pipeline pending', zh: 'Triton-Ascend #923 · CI 已通过，pipeline 等待中' },
+                    label: { en: 'Triton-Ascend #923 · CI running', zh: 'Triton-Ascend #923 · CI 运行中' },
                     href: 'https://github.com/triton-lang/triton-ascend/pull/923',
                 },
             ],
@@ -79,24 +79,24 @@
             ],
             links: [
                 {
-                    label: { en: 'vLLM #47622 · label gate', zh: 'vLLM #47622 · 等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/47622',
+                    label: { en: 'vLLM #49017 · draft, label gate', zh: 'vLLM #49017 · Draft，等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/49017',
                 },
                 {
-                    label: { en: 'vLLM #47623 · label gate', zh: 'vLLM #47623 · 等待 label' },
-                    href: 'https://github.com/vllm-project/vllm/pull/47623',
+                    label: { en: 'vLLM #49018 · draft, label gate', zh: 'vLLM #49018 · Draft，等待 label' },
+                    href: 'https://github.com/vllm-project/vllm/pull/49018',
                 },
                 {
-                    label: { en: 'vLLM-Ascend #11417 · CI passed', zh: 'vLLM-Ascend #11417 · CI 已通过' },
-                    href: 'https://github.com/vllm-project/vllm-ascend/pull/11417',
+                    label: { en: 'vLLM-Ascend #12316 · CI running', zh: 'vLLM-Ascend #12316 · CI 运行中' },
+                    href: 'https://github.com/vllm-project/vllm-ascend/pull/12316',
                 },
                 {
-                    label: { en: 'vLLM-Ascend #11422 · CI passed', zh: 'vLLM-Ascend #11422 · CI 已通过' },
+                    label: { en: 'vLLM-Ascend #11422 · CI running', zh: 'vLLM-Ascend #11422 · CI 运行中' },
                     href: 'https://github.com/vllm-project/vllm-ascend/pull/11422',
                 },
                 {
-                    label: { en: 'vLLM-Ascend #11449 · CI passed', zh: 'vLLM-Ascend #11449 · CI 已通过' },
-                    href: 'https://github.com/vllm-project/vllm-ascend/pull/11449',
+                    label: { en: 'vLLM-Ascend #12317 · CI running', zh: 'vLLM-Ascend #12317 · CI 运行中' },
+                    href: 'https://github.com/vllm-project/vllm-ascend/pull/12317',
                 },
             ],
         },
@@ -150,7 +150,7 @@
                     href: 'https://github.com/vllm-project/vllm/pull/41507',
                 },
                 {
-                    label: { en: 'vLLM-Ascend #8958 · CI passed', zh: 'vLLM-Ascend #8958 · CI 已通过' },
+                    label: { en: 'vLLM-Ascend #8958 · CI running', zh: 'vLLM-Ascend #8958 · CI 运行中' },
                     href: 'https://github.com/vllm-project/vllm-ascend/pull/8958',
                 },
             ],
