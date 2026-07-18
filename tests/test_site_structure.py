@@ -330,7 +330,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=courses-20260708" in text
+        assert "assets/site.css?v=upstream-repository-accordion-20260718" in text
         assert "assets/site.js?v=mobile-canvas-20260718" in text
 
 
@@ -431,7 +431,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "upstream-pr-carousel-20260718" in html_text
+    assert "upstream-repository-accordion-20260718" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -469,21 +469,31 @@ def test_achievements_timeline_only_records_merged_upstream_prs() -> None:
     assert "https://github.com/triton-lang/triton-ascend/pull/918" not in achievements
 
 
-def test_open_upstream_prs_render_in_scrollable_banner() -> None:
+def test_open_upstream_prs_render_in_repository_accordion() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
     css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
 
-    assert 'id="upstream-pr-track"' in html_text
-    assert 'id="upstream-pr-prev"' in html_text
-    assert 'id="upstream-pr-next"' in html_text
+    assert 'id="upstream-repository-browser"' in html_text
+    assert "upstream-pr-prev" not in html_text
+    assert "upstream-pr-next" not in html_text
     assert "const OPEN_UPSTREAM_PRS = [" in js_text
+    assert "const UPSTREAM_REPOSITORIES = [" in js_text
     assert "function renderUpstreamPRs" in js_text
-    assert "scrollBy({ left:" in js_text
-    assert "overflow-x: auto;" in css_text
-    assert "scroll-snap-type: x mandatory;" in css_text
-    assert "scrollbar-width: thin;" in css_text
+    assert "expandedUpstreamRepository" in js_text
+    assert "aria-expanded=\"${isExpanded}\"" in js_text
+    assert 'aria-controls="upstream-pr-details"' in js_text
+    assert "upstream-repository-grid" in css_text
+    assert "upstream-repository-card.is-active" in css_text
+    assert ".upstream-pr-details[hidden]" in css_text
+    assert "upstream-pr-track" not in css_text
+    assert "upstream-pr-card" not in css_text
+    assert html_text.count("upstream-repository-accordion-20260718") == 2
+
+    assert js_text.count("owner: 'vllm-project'") == 2
+    assert js_text.count("owner: 'triton-lang'") == 1
+    assert "pullRequestCount(repository.pullRequests.length)" in js_text
 
     open_urls = (
         "https://github.com/vllm-project/vllm/pull/41449",
