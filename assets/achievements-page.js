@@ -266,8 +266,8 @@
             name: 'BiDKV',
             repositoryName: 'vllm-ascend-hust-bidkv',
             summary: {
-                en: 'Utility-guided KV-cache reclamation for responsive admission under sustained memory pressure.',
-                zh: '效用驱动的 KV Cache 回收，在持续显存压力下改善请求准入响应。',
+                en: 'A KV-cache reclamation plugin for vLLM.',
+                zh: '用于 vLLM 的 KV Cache 回收插件。',
             },
             publication: { en: 'SC 2026', zh: 'SC 2026' },
             repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv',

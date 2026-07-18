@@ -431,7 +431,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "published-result-repository-20260718" in html_text
+    assert "published-results-copy-20260718" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
