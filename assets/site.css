@@ -929,125 +929,192 @@ h1 {
     overflow: hidden;
 }
 
-.upstream-pr-head {
-    align-items: end;
-}
-
-.upstream-pr-controls {
-    display: flex;
-    gap: 8px;
-}
-
-.upstream-pr-controls button {
-    width: 40px;
-    height: 40px;
-    border: 1px solid rgba(125, 211, 252, 0.24);
-    border-radius: 12px;
-    color: rgba(226, 242, 255, 0.88);
-    background: rgba(8, 21, 39, 0.72);
-    font: inherit;
-    font-size: 1.05rem;
-    cursor: pointer;
-    transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
-}
-
-.upstream-pr-controls button:hover {
-    border-color: rgba(125, 211, 252, 0.56);
-    background: rgba(14, 37, 61, 0.88);
-    transform: translateY(-1px);
-}
-
-.upstream-pr-controls button:focus-visible {
-    outline: 3px solid rgba(125, 211, 252, 0.48);
-    outline-offset: 2px;
-}
-
-.upstream-pr-track {
+.upstream-repository-browser {
     display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(260px, 330px);
+    gap: 14px;
+}
+
+.upstream-repository-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
-    overflow-x: auto;
-    padding: 2px 1px 14px;
-    scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
-    scrollbar-color: rgba(125, 211, 252, 0.5) rgba(125, 211, 252, 0.08);
-    scrollbar-width: thin;
 }
 
-.upstream-pr-track::-webkit-scrollbar {
-    height: 8px;
-}
-
-.upstream-pr-track::-webkit-scrollbar-track {
-    border-radius: 999px;
-    background: rgba(125, 211, 252, 0.08);
-}
-
-.upstream-pr-track::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-    background: rgba(125, 211, 252, 0.5);
-}
-
-.upstream-pr-card {
+.upstream-repository-card {
     position: relative;
-    min-height: 150px;
-    display: flex;
-    flex-direction: column;
+    min-width: 0;
+    min-height: 132px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto 1fr auto;
+    gap: 8px 14px;
     padding: 18px;
     border: 1px solid rgba(125, 211, 252, 0.18);
     border-radius: 16px;
+    text-align: left;
     color: rgba(226, 242, 255, 0.9);
     background: rgba(8, 20, 38, 0.62);
-    text-decoration: none;
-    scroll-snap-align: start;
-    transition: border-color 160ms ease, background 160ms ease;
+    font: inherit;
+    cursor: pointer;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
-.upstream-pr-card:hover {
+.upstream-repository-card:hover {
+    transform: translateY(-2px);
     border-color: rgba(125, 211, 252, 0.46);
     background: rgba(12, 31, 52, 0.78);
 }
 
-.upstream-pr-card:focus-visible {
+.upstream-repository-card:focus-visible {
     outline: 3px solid rgba(125, 211, 252, 0.48);
-    outline-offset: -3px;
+    outline-offset: 2px;
 }
 
-.upstream-pr-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+.upstream-repository-card.is-active {
+    border-color: rgba(134, 239, 172, 0.52);
+    background: linear-gradient(145deg, rgba(10, 40, 48, 0.86), rgba(8, 23, 42, 0.88));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 16px 36px rgba(0, 0, 0, 0.16);
+}
+
+.upstream-repository-owner {
+    grid-column: 1;
     color: rgba(191, 219, 254, 0.62);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
 }
 
-.upstream-pr-meta strong {
+.upstream-repository-card > strong {
+    grid-column: 1;
+    align-self: center;
+    overflow: hidden;
+    color: rgba(244, 250, 255, 0.96);
+    font-family: "Sora", sans-serif;
+    font-size: 1.05rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.upstream-repository-count {
+    grid-column: 1;
+    color: rgba(191, 219, 254, 0.68);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.upstream-repository-chevron {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(125, 211, 252, 0.18);
+    border-radius: 10px;
+    color: #7dd3fc;
+    font-size: 1.15rem;
+    transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.upstream-repository-card.is-active .upstream-repository-chevron {
+    transform: rotate(180deg);
+    border-color: rgba(134, 239, 172, 0.34);
+    color: #86efac;
+}
+
+.upstream-pr-details {
+    overflow: hidden;
+    border: 1px solid rgba(125, 211, 252, 0.18);
+    border-radius: 16px;
+    background: rgba(5, 15, 30, 0.46);
+}
+
+.upstream-pr-details[hidden] {
+    display: none;
+}
+
+.upstream-pr-details-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(125, 211, 252, 0.12);
+}
+
+.upstream-pr-details-head > strong {
+    color: rgba(244, 250, 255, 0.94);
+    font-family: "Sora", sans-serif;
+}
+
+.upstream-pr-details-head a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #7dd3fc;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.upstream-pr-list {
+    display: grid;
+}
+
+.upstream-pr-row {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) auto 18px;
+    gap: 12px;
+    align-items: center;
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(125, 211, 252, 0.1);
+    color: rgba(226, 242, 255, 0.86);
+    text-decoration: none;
+    transition: background 150ms ease;
+}
+
+.upstream-pr-row:last-child {
+    border-bottom: 0;
+}
+
+.upstream-pr-row:hover {
+    background: rgba(125, 211, 252, 0.06);
+}
+
+.upstream-pr-row:focus-visible {
+    outline: 2px solid rgba(125, 211, 252, 0.52);
+    outline-offset: -2px;
+}
+
+.upstream-pr-number {
+    color: #7dd3fc;
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.upstream-pr-title {
+    overflow: hidden;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.upstream-pr-row > strong {
     padding: 4px 8px;
     border-radius: 999px;
     color: #86efac;
     background: rgba(134, 239, 172, 0.1);
-    font-size: 0.64rem;
+    font-size: 0.62rem;
 }
 
-.upstream-pr-meta strong[data-status="draft"] {
+.upstream-pr-row > strong[data-status="draft"] {
     color: #fcd34d;
     background: rgba(252, 211, 77, 0.1);
 }
 
-.upstream-pr-card h3 {
-    margin: 18px 24px 0 0;
-    color: rgba(241, 248, 255, 0.94);
-    font-size: 0.9rem;
-    line-height: 1.48;
-}
-
 .upstream-pr-link {
-    position: absolute;
-    right: 18px;
-    bottom: 16px;
     color: #7dd3fc;
 }
 
@@ -1471,13 +1538,38 @@ h1 {
         border-top: 1px solid rgba(var(--repo-accent), 0.18);
     }
 
-    .upstream-pr-head {
-        flex-direction: row;
-        align-items: flex-end;
+    .upstream-repository-grid {
+        grid-template-columns: 1fr;
     }
 
-    .upstream-pr-track {
-        grid-auto-columns: min(78vw, 300px);
+    .upstream-repository-card {
+        min-height: 104px;
+    }
+
+    .upstream-pr-row {
+        grid-template-columns: minmax(0, 1fr) auto 18px;
+        gap: 8px 10px;
+    }
+
+    .upstream-pr-number {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .upstream-pr-title {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        white-space: normal;
+    }
+
+    .upstream-pr-row > strong {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .upstream-pr-link {
+        grid-column: 3;
+        grid-row: 1;
     }
 
     .achievement-item {

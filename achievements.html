@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=courses-20260708" />
+  <link rel="stylesheet" href="./assets/site.css?v=upstream-repository-accordion-20260718" />
 </head>
 
 <body data-page="achievements">
@@ -56,17 +56,13 @@
       </section>
 
       <section class="content-panel upstream-pr-panel" aria-labelledby="upstream-pr-title">
-        <div class="section-head upstream-pr-head">
+        <div class="section-head">
           <div>
             <span id="upstream-pr-kicker" class="eyebrow">Upstream PRs</span>
             <h2 id="upstream-pr-title">Under review</h2>
           </div>
-          <div class="upstream-pr-controls">
-            <button id="upstream-pr-prev" type="button" aria-label="Previous pull requests">←</button>
-            <button id="upstream-pr-next" type="button" aria-label="Next pull requests">→</button>
-          </div>
         </div>
-        <div id="upstream-pr-track" class="upstream-pr-track" tabindex="0" aria-label="Open upstream pull requests"></div>
+        <div id="upstream-repository-browser" class="upstream-repository-browser"></div>
       </section>
 
       <section class="content-panel">
@@ -156,7 +152,7 @@
     };
   </script>
   <script src="./assets/site.js?v=mobile-canvas-20260718"></script>
-  <script src="./assets/achievements-page.js?v=upstream-pr-carousel-20260718"></script>
+  <script src="./assets/achievements-page.js?v=upstream-repository-accordion-20260718"></script>
 </body>
 
 </html>

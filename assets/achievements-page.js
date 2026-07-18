@@ -133,6 +133,27 @@
         { repository: 'Triton-Ascend', number: 923, title: '[tools](fix) trim optional dialect registrations', href: 'https://github.com/triton-lang/triton-ascend/pull/923' },
     ];
 
+    const UPSTREAM_REPOSITORIES = [
+        {
+            id: 'vllm',
+            name: 'vLLM',
+            owner: 'vllm-project',
+            href: 'https://github.com/vllm-project/vllm',
+        },
+        {
+            id: 'vllm-ascend',
+            name: 'vLLM-Ascend',
+            owner: 'vllm-project',
+            href: 'https://github.com/vllm-project/vllm-ascend',
+        },
+        {
+            id: 'triton-ascend',
+            name: 'Triton-Ascend',
+            owner: 'triton-lang',
+            href: 'https://github.com/triton-lang/triton-ascend',
+        },
+    ];
+
     const RESULT_REPOSITORIES = [
         {
             name: 'BiDKV',
@@ -165,9 +186,10 @@
             repositoryLabel: 'Explore repository',
             openStatus: 'Open',
             draftStatus: 'Draft',
-            previousPRs: 'Previous pull requests',
-            nextPRs: 'Next pull requests',
-            openPRs: 'Open upstream pull requests',
+            pullRequestCount: (count) => `${count} pull requests`,
+            collapseRepository: (name) => `Collapse ${name} pull requests`,
+            expandRepository: (name) => `Show ${name} pull requests`,
+            repositoryLink: 'Open repository',
         },
         zh: {
             throughputUnit: 'token/s',
@@ -187,9 +209,10 @@
             repositoryLabel: '查看优化仓库',
             openStatus: '开放',
             draftStatus: '草稿',
-            previousPRs: '上一组 PR',
-            nextPRs: '下一组 PR',
-            openPRs: '评审中的上游 PR',
+            pullRequestCount: (count) => `${count} 个 PR`,
+            collapseRepository: (name) => `收起 ${name} PR`,
+            expandRepository: (name) => `查看 ${name} PR`,
+            repositoryLink: '打开仓库',
         },
     };
 
@@ -198,6 +221,8 @@
         entries: [],
         compare: null,
     };
+
+    let expandedUpstreamRepository = null;
 
     function fmt(value) {
         return Number(value || 0).toLocaleString();
@@ -374,34 +399,60 @@
     }
 
     function renderUpstreamPRs(lang = currentLang()) {
-        const target = document.getElementById('upstream-pr-track');
+        const target = document.getElementById('upstream-repository-browser');
         if (!target) return;
-        target.setAttribute('aria-label', ui(lang).openPRs);
-        target.innerHTML = OPEN_UPSTREAM_PRS.map((pullRequest) => {
+        const repositories = UPSTREAM_REPOSITORIES.map((repository) => ({
+            ...repository,
+            pullRequests: OPEN_UPSTREAM_PRS.filter((pullRequest) => pullRequest.repository === repository.name),
+        }));
+        const activeRepository = repositories.find((repository) => repository.id === expandedUpstreamRepository);
+
+        const renderPullRequests = (repository) => repository.pullRequests.map((pullRequest) => {
             const status = pullRequest.status === 'draft' ? ui(lang).draftStatus : ui(lang).openStatus;
             return `
-                <a class="upstream-pr-card" href="${pullRequest.href}" target="_blank" rel="noreferrer">
-                    <div class="upstream-pr-meta">
-                        <span>${pullRequest.repository} #${pullRequest.number}</span>
-                        <strong data-status="${pullRequest.status || 'open'}">${status}</strong>
-                    </div>
-                    <h3>${pullRequest.title}</h3>
+                <a class="upstream-pr-row" href="${pullRequest.href}" target="_blank" rel="noreferrer">
+                    <span class="upstream-pr-number">#${pullRequest.number}</span>
+                    <span class="upstream-pr-title">${pullRequest.title}</span>
+                    <strong data-status="${pullRequest.status || 'open'}">${status}</strong>
                     <span class="upstream-pr-link" aria-hidden="true">↗</span>
                 </a>
             `;
         }).join('');
 
-        const previous = document.getElementById('upstream-pr-prev');
-        const next = document.getElementById('upstream-pr-next');
-        const scroll = (direction) => target.scrollBy({ left: direction * target.clientWidth * 0.82, behavior: 'smooth' });
-        if (previous) {
-            previous.setAttribute('aria-label', ui(lang).previousPRs);
-            previous.onclick = () => scroll(-1);
-        }
-        if (next) {
-            next.setAttribute('aria-label', ui(lang).nextPRs);
-            next.onclick = () => scroll(1);
-        }
+        target.innerHTML = `
+            <div class="upstream-repository-grid">
+                ${repositories.map((repository) => {
+                    const isExpanded = repository.id === expandedUpstreamRepository;
+                    const label = isExpanded ? ui(lang).collapseRepository(repository.name) : ui(lang).expandRepository(repository.name);
+                    return `
+                        <button id="upstream-repository-${repository.id}" class="upstream-repository-card ${isExpanded ? 'is-active' : ''}" type="button" data-repository="${repository.id}" aria-expanded="${isExpanded}" aria-controls="upstream-pr-details" aria-label="${label}">
+                            <span class="upstream-repository-owner">${repository.owner} /</span>
+                            <strong>${repository.name}</strong>
+                            <span class="upstream-repository-count">${ui(lang).pullRequestCount(repository.pullRequests.length)}</span>
+                            <span class="upstream-repository-chevron" aria-hidden="true">⌄</span>
+                        </button>
+                    `;
+                }).join('')}
+            </div>
+            <div id="upstream-pr-details" class="upstream-pr-details" role="region" ${activeRepository ? `aria-labelledby="upstream-repository-${activeRepository.id}"` : 'hidden'}>
+                ${activeRepository ? `
+                    <div class="upstream-pr-details-head">
+                        <strong>${activeRepository.name}</strong>
+                        <a href="${activeRepository.href}" target="_blank" rel="noreferrer">${ui(lang).repositoryLink}<span aria-hidden="true">↗</span></a>
+                    </div>
+                    <div class="upstream-pr-list">${renderPullRequests(activeRepository)}</div>
+                ` : ''}
+            </div>
+        `;
+
+        target.querySelectorAll('.upstream-repository-card').forEach((button) => {
+            button.addEventListener('click', () => {
+                const repositoryId = button.dataset.repository;
+                expandedUpstreamRepository = expandedUpstreamRepository === repositoryId ? null : repositoryId;
+                renderUpstreamPRs(lang);
+                document.getElementById(`upstream-repository-${repositoryId}`)?.focus({ preventScroll: true });
+            });
+        });
     }
 
     function renderDynamic(lang = currentLang()) {
