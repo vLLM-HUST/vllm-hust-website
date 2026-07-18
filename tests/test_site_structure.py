@@ -431,7 +431,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "optimization-repositories-20260718" in html_text
+    assert "published-result-repository-20260718" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -537,7 +537,7 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     assert pdf_path.stat().st_size > 100_000
 
 
-def test_optimization_repositories_form_a_card_row_between_hero_and_snapshot() -> None:
+def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
@@ -550,15 +550,14 @@ def test_optimization_repositories_form_a_card_row_between_hero_and_snapshot() -
     snapshot_index = html_text.index('id="achievements-stats-kicker"')
     assert hero_index < repositories_index < snapshot_index
 
-    for repository in (
-        "vllm-ascend-hust-bidkv",
-        "pegaflow-hust",
-        "vllm-ascend-quant-hust",
-    ):
-        assert f"https://github.com/vLLM-HUST/{repository}" in js_text
-
-    assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in css_text
-    assert 'data-accent="${repository.accent}"' in js_text
+    assert "https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
+    assert "https://github.com/vLLM-HUST/pegaflow-hust" not in js_text
+    assert "https://github.com/vLLM-HUST/vllm-ascend-quant-hust" not in js_text
+    assert js_text.count("repositoryName:") == 1
+    assert "result-repository-title" in css_text
+    assert "result-repository-link" in css_text
+    assert "result-repository-index" not in css_text
+    assert "result-repository-tags" not in css_text
     assert "research-cache-salt-bucketing" not in js_text
 
 
