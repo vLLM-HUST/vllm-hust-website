@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Achievements - vllm-hust</title>
-  <meta name="description" content="Achievements from vllm-hust, including papers, upstream contributions, benchmarks, documentation, and community work." />
+  <meta name="description" content="Result repositories from vllm-hust: core research ideas, publications, reusable plugins, upstream contributions, and benchmarks." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/achievements.html" />
   <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
@@ -37,7 +37,7 @@
       <div class="content-panel">
         <span id="achievements-eyebrow" class="eyebrow">Highlights</span>
         <h1 id="achievements-title" style="margin-top: 16px">Achievements</h1>
-        <p id="achievements-lede" class="hero-lede">Papers, upstream contributions, benchmark assets, and community work from the vllm-hust project.</p>
+        <p id="achievements-lede" class="hero-lede">Result repositories connect core techniques, publications, and reusable runtime plugins—alongside upstream and community work.</p>
       </div>
     </section>
 
@@ -45,6 +45,18 @@
     <div id="achievements-error" class="empty-state" style="display: none">Failed to load achievements data.</div>
 
     <div id="achievements-content" style="display: none">
+      <section class="content-panel result-repositories-panel" aria-labelledby="result-repositories-title">
+        <div class="section-head result-repositories-head">
+          <div>
+            <span id="result-repositories-kicker" class="eyebrow">Optimization repositories</span>
+            <h2 id="result-repositories-title">Built in vLLM-HUST</h2>
+            <p id="result-repositories-desc">Standalone optimization results, packaged as reusable repositories for the HUST serving stack.</p>
+          </div>
+          <span id="result-repositories-count" class="result-repositories-count">3 public repositories</span>
+        </div>
+        <div id="result-repository-list" class="result-repository-list"></div>
+      </section>
+
       <section class="content-panel">
         <div class="section-head">
           <div>
@@ -88,7 +100,7 @@
         'brand-tagline': 'vLLM serving',
         'achievements-eyebrow': 'Highlights',
         'achievements-title': 'Achievements',
-        'achievements-lede': 'Papers, upstream contributions, benchmark assets, and community work from the vllm-hust project.',
+        'achievements-lede': 'Result repositories connect core techniques, publications, and reusable runtime plugins—alongside upstream and community work.',
         'achievements-loading': 'Loading achievements...',
         'achievements-error': 'Failed to load achievements data.',
         'achievements-stats-kicker': 'Snapshot',
@@ -100,6 +112,10 @@
         'achievement-stat-contributors-label': 'Contributors',
         'achievement-stat-groups-label': 'Compare groups',
         'achievement-stat-hard-label': 'Validation scopes',
+        'result-repositories-kicker': 'Optimization repositories',
+        'result-repositories-title': 'Built in vLLM-HUST',
+        'result-repositories-desc': 'Standalone optimization results, packaged as reusable repositories for the HUST serving stack.',
+        'result-repositories-count': '3 public repositories',
         'achievements-timeline-kicker': 'Timeline',
         'achievements-timeline-title': 'Achievement timeline',
         'achievements-timeline-desc': 'Recent research, upstream work, and project updates in reverse chronological order.',
@@ -110,7 +126,7 @@
         'brand-tagline': 'vLLM 推理服务',
         'achievements-eyebrow': '成果概览',
         'achievements-title': '成果',
-        'achievements-lede': '展示 vllm-hust 的论文、上游贡献、评测材料和社区工作。',
+        'achievements-lede': '以成果仓库串联核心技术、论文发表与可复用运行时插件，并展示上游和社区工作。',
         'achievements-loading': '正在加载成果数据...',
         'achievements-error': '成果数据加载失败。',
         'achievements-stats-kicker': '快照',
@@ -122,6 +138,10 @@
         'achievement-stat-contributors-label': '贡献者',
         'achievement-stat-groups-label': '对比组',
         'achievement-stat-hard-label': '验证范围',
+        'result-repositories-kicker': '优化仓库',
+        'result-repositories-title': '面向落地的优化成果',
+        'result-repositories-desc': '每个仓库独立承载核心机制、运行时接入与复现材料，并统一沉淀在 vLLM-HUST 组织下。',
+        'result-repositories-count': '3 个公开仓库',
         'achievements-timeline-kicker': '时间轴',
         'achievements-timeline-title': '成果时间轴',
         'achievements-timeline-desc': '按时间倒序展示近期研究、上游贡献与项目进展。',
@@ -129,8 +149,8 @@
       }
     };
   </script>
-  <script src="./assets/site.js?v=courses-20260708"></script>
-  <script src="./assets/achievements-page.js?v=achievements-timeline-20260707-polished"></script>
+  <script src="./assets/site.js?v=mobile-canvas-20260718"></script>
+  <script src="./assets/achievements-page.js?v=optimization-repositories-20260718"></script>
 </body>
 
 </html>
