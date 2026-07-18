@@ -331,7 +331,15 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=courses-20260708" in text
-        assert "assets/site.js?v=courses-20260708" in text
+        assert "assets/site.js?v=mobile-canvas-20260718" in text
+
+
+def test_cosmic_background_uses_scrollbar_safe_viewport_width() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "site.js").read_text(encoding="utf-8")
+
+    assert "width = document.documentElement.clientWidth || window.innerWidth;" in text
+    assert "width = window.innerWidth;" not in text
 
 
 def test_validation_dependencies_have_single_source_of_truth() -> None:
@@ -423,7 +431,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "achievements-timeline-20260707-polished" in html_text
+    assert "optimization-repositories-20260718" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -509,16 +517,49 @@ def test_achievements_page_records_qwen_accepted_pr() -> None:
     assert "https://github.com/QwenLM/qwen-code/pull/5185" in js_text
 
 
-def test_bidkv_achievement_links_to_pdf_not_repository() -> None:
+def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     root = Path(__file__).resolve().parents[1]
+    html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
     pdf_path = root / "assets" / "papers" / "bidkv-sc2026.pdf"
 
+    assert 'id="result-repository-list"' in html_text
+    assert "成果仓库" in html_text
+    assert "const RESULT_REPOSITORIES = [" in js_text
     assert "BidKV at SC 2026" in js_text
     assert "./assets/papers/bidkv-sc2026.pdf" in js_text
-    assert "github.com/ShuhaoZhangTony/bidkv" not in js_text
+    assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
+    assert "github.com/intellistream/bidkv" not in js_text
+    assert "repositoryName: 'vllm-ascend-hust-bidkv'" in js_text
+    assert "result-repository-card" in css_text
     assert pdf_path.is_file()
     assert pdf_path.stat().st_size > 100_000
+
+
+def test_optimization_repositories_form_a_card_row_between_hero_and_snapshot() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "achievements.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
+
+    hero_index = html_text.index('class="page-hero"')
+    repositories_index = html_text.index(
+        'class="content-panel result-repositories-panel"'
+    )
+    snapshot_index = html_text.index('id="achievements-stats-kicker"')
+    assert hero_index < repositories_index < snapshot_index
+
+    for repository in (
+        "vllm-ascend-hust-bidkv",
+        "pegaflow-hust",
+        "vllm-ascend-quant-hust",
+    ):
+        assert f"https://github.com/vLLM-HUST/{repository}" in js_text
+
+    assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in css_text
+    assert 'data-accent="${repository.accent}"' in js_text
+    assert "research-cache-salt-bucketing" not in js_text
 
 
 def test_achievements_page_omits_package_version_cards() -> None:

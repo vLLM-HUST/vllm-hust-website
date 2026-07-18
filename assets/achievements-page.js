@@ -261,6 +261,72 @@
         },
     ];
 
+    const RESULT_REPOSITORIES = [
+        {
+            name: 'BiDKV',
+            repositoryName: 'vllm-ascend-hust-bidkv',
+            category: { en: 'Scheduling', zh: '调度优化' },
+            title: {
+                en: 'Utility-guided KV-cache reclamation',
+                zh: '效用驱动的 KV Cache 回收',
+            },
+            summary: {
+                en: 'A bid-based victim selector that improves admission responsiveness under sustained KV pressure.',
+                zh: '基于 Bid 的受害请求选择插件，在持续 KV 压力下改善请求准入响应。',
+            },
+            repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv',
+            accent: 'cyan',
+            mark: 'B',
+            tags: [
+                { en: 'SC 2026', zh: 'SC 2026' },
+                { en: 'vLLM plugin', zh: 'vLLM 插件' },
+                { en: 'KV pressure', zh: 'KV 压力' },
+            ],
+        },
+        {
+            name: 'PegaFlow',
+            repositoryName: 'pegaflow-hust',
+            category: { en: 'KV storage', zh: 'KV 存储' },
+            title: {
+                en: 'External KV cache, built for serving',
+                zh: '面向推理服务的外部 KV Cache',
+            },
+            summary: {
+                en: 'Offload KV cache to host memory or SSD and share it across nodes through a drop-in vLLM connector.',
+                zh: '将 KV Cache 卸载到主机内存或 SSD，并通过 vLLM Connector 支持跨节点共享。',
+            },
+            repository: 'https://github.com/vLLM-HUST/pegaflow-hust',
+            accent: 'green',
+            mark: 'P',
+            tags: [
+                { en: 'RDMA', zh: 'RDMA' },
+                { en: 'KV connector', zh: 'KV Connector' },
+                { en: 'Rust core', zh: 'Rust 核心' },
+            ],
+        },
+        {
+            name: 'Ascend Quant',
+            repositoryName: 'vllm-ascend-quant-hust',
+            category: { en: 'Quantization', zh: '量化优化' },
+            title: {
+                en: 'Post-training quantization on Ascend',
+                zh: '面向 Ascend 的后训练量化',
+            },
+            summary: {
+                en: 'Reusable 8-bit, 4-bit, and mixed-precision quantization workflows for large language models.',
+                zh: '为大语言模型提供可复用的 8-bit、4-bit 与混合精度量化流程。',
+            },
+            repository: 'https://github.com/vLLM-HUST/vllm-ascend-quant-hust',
+            accent: 'violet',
+            mark: 'Q',
+            tags: [
+                { en: 'W8A8', zh: 'W8A8' },
+                { en: 'W4A4', zh: 'W4A4' },
+                { en: 'Mixed precision', zh: '混合精度' },
+            ],
+        },
+    ];
+
     const UI = {
         en: {
             throughputUnit: 'tok/s',
@@ -277,6 +343,7 @@
             currentDate: 'Current',
             milestoneKind: 'Project',
             latestLabel: 'Latest',
+            repositoryLabel: 'Explore repository',
         },
         zh: {
             throughputUnit: 'token/s',
@@ -293,6 +360,7 @@
             currentDate: '当前',
             milestoneKind: '项目',
             latestLabel: '最新',
+            repositoryLabel: '查看优化仓库',
         },
     };
 
@@ -458,7 +526,30 @@
         `).join('');
     }
 
+    function renderResultRepositories(lang = currentLang()) {
+        const target = document.getElementById('result-repository-list');
+        if (!target) return;
+        target.innerHTML = RESULT_REPOSITORIES.map((repository, index) => `
+            <a class="result-repository-card" data-accent="${repository.accent}" href="${repository.repository}" target="_blank" rel="noreferrer" aria-label="${repository.name} · ${repository.repositoryName}">
+                <div class="result-repository-topline">
+                    <span class="result-repository-mark" aria-hidden="true">${repository.mark}</span>
+                    <span class="result-repository-index">0${index + 1}</span>
+                </div>
+                <div class="result-repository-source"><span>vLLM-HUST /</span><strong>${repository.repositoryName}</strong></div>
+                <span class="result-repository-category">${pick(repository.category, lang)}</span>
+                <h3>${repository.name}</h3>
+                <h4>${pick(repository.title, lang)}</h4>
+                <p>${pick(repository.summary, lang)}</p>
+                <div class="result-repository-tags">
+                    ${repository.tags.map((tag) => `<span>${pick(tag, lang)}</span>`).join('')}
+                </div>
+                <div class="result-repository-footer"><span>${ui(lang).repositoryLabel}</span><strong aria-hidden="true">↗</strong></div>
+            </a>
+        `).join('');
+    }
+
     function renderDynamic(lang = currentLang()) {
+        renderResultRepositories(lang);
         if (state.compare) renderTimeline(state.compare, lang);
     }
 
