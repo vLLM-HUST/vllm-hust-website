@@ -1867,8 +1867,7 @@
             return false;
         }
 
-        // return getTrendRefTokens(entry).includes('main');
-        return getTrendRefTokens(entry).includes('main') || getEngine(entry) === 'vllm-hust';
+        return getTrendRefTokens(entry).includes('main');
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
@@ -3292,8 +3291,7 @@
                 (filters.model === 'all' || getEntryModelCanonicalId(entry) === filters.model) &&
                 matchesVersionFilter(entry, filters.version) &&
                 (filters.workload === 'all' || workload === filters.workload) &&
-                (filters.precision === 'all' || entry.model.precision === filters.precision) &&
-                isMainlineTrendEntry(entry);
+                (filters.precision === 'all' || entry.model.precision === filters.precision);
         });
 
         const comparisonView = applyComparisonView(filtered, viewOptions);

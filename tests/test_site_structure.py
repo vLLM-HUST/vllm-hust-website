@@ -95,6 +95,22 @@ def test_leaderboard_uses_normalized_model_identity_helpers() -> None:
     assert "function createCompareScopeKey(entry)" in text
 
 
+def test_mainline_filter_is_limited_to_the_trend_dataset() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    mainline_helper = text.split("function isMainlineTrendEntry(entry)", 1)[1].split(
+        "function getPerformanceTrendEntries", 1
+    )[0]
+    table_filter = text.split("function renderTable()", 1)[1].split(
+        "const comparisonView", 1
+    )[0]
+
+    assert "getTrendRefTokens(entry).includes('main')" in mainline_helper
+    assert "getEngine(entry) === 'vllm-hust'" not in mainline_helper
+    assert "isMainlineTrendEntry(entry)" not in table_filter
+
+
 def test_hard_constraints_baseline_block_is_rendered() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
