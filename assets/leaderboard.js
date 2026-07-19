@@ -1867,7 +1867,7 @@
             return false;
         }
 
-        return getTrendRefTokens(entry).includes('main') || getEngine(entry) === 'vllm-hust';
+        return getTrendRefTokens(entry).includes('main');
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
@@ -2381,14 +2381,47 @@
         return `${text.slice(0, 15)}...${text.slice(-14)}`;
     }
 
+    function getTrendVersionSortValue(entry) {
+        const engineVersion = String(entry?.engine_version || '').trim();
+        // For vllm-hust entries, extract the commit count from engine_version
+        // e.g. "v0.20.1rc0-441-g2206f1f7b7" → 441
+        const commitCountMatch = engineVersion.match(/-(\d+)-g[0-9a-f]+$/);
+        if (commitCountMatch) {
+            return parseInt(commitCountMatch[1], 10);
+        }
+        // Fallback: use timestamp for baseline / non-vllm-hust entries
+        return getEntryTimestamp(entry) || 0;
+    }
+
     function getTrendVersionKey(entry) {
+        const gitCommit = String(entry?.metadata?.git_commit || '').trim();
         const version = getTrendVersionText(entry);
-        return `${isTrendBaselineEntry(entry) ? 'baseline' : 'current'}|${version}`;
+        // Use git_commit for unique version identification when available
+        // This ensures all entries sharing the same git commit appear at the same x-axis position
+        return `${isTrendBaselineEntry(entry) ? 'baseline' : 'current'}|${gitCommit || version}`;
     }
 
     function getTrendVersionLabel(entry) {
-        const version = compactTrendLabel(getTrendVersionText(entry));
-        return isTrendBaselineEntry(entry) ? `${t('baseline')} ${version}` : version;
+        if (isTrendBaselineEntry(entry)) {
+            return `${t('baseline')} ${getTrendVersionText(entry)}`;
+        }
+        const engine = getEngine(entry);
+        const commit = String(entry?.metadata?.git_commit || '').trim().slice(0, 10);
+        const engineVersion = String(entry?.engine_version || '').trim();
+        const commitCountMatch = engineVersion.match(/-(\d+)-g[0-9a-f]+$/);
+        let label;
+        if (commitCountMatch) {
+            label = `${engine}@${commit}(${commitCountMatch[1]})`;
+        } else {
+            label = `${engine}@${commit}`;
+        }
+        // Append plugin engine info (e.g. vllm-ascend-hust) to show both engines on the x-axis
+        const pluginEngine = String(entry?.metadata?.runtime_provenance?.plugin?.engine || '').trim();
+        const pluginCommit = String(entry?.metadata?.runtime_provenance?.plugin?.commit || '').trim().slice(0, 10);
+        if (pluginEngine && pluginCommit) {
+            label += ` + ${pluginEngine}@${pluginCommit}`;
+        }
+        return label;
     }
 
     function getTrendVersionDetail(entry) {
@@ -2420,17 +2453,15 @@
         const versionMap = new Map();
         const seriesMap = new Map();
 
+        // First pass: collect all versions from all entries to ensure
+        // every version node appears on the x-axis, even if there is no
+        // valid metric value for the current metric configuration.
         entries.forEach((entry) => {
-            const value = Number(entry?.metrics?.[metricConfig.key]);
-            if (!Number.isFinite(value)) {
-                return;
-            }
-
             const versionKey = getTrendVersionKey(entry);
             const timestamp = getEntryTimestamp(entry);
             const baseline = isTrendBaselineEntry(entry);
             const existingVersion = versionMap.get(versionKey);
-            const sortValue = baseline ? Number.NEGATIVE_INFINITY : (timestamp || 0);
+            const sortValue = baseline ? Number.NEGATIVE_INFINITY : getTrendVersionSortValue(entry);
             if (!existingVersion) {
                 versionMap.set(versionKey, {
                     key: versionKey,
@@ -2445,7 +2476,16 @@
             } else if (baseline && timestamp > existingVersion.timestamp) {
                 existingVersion.timestamp = timestamp;
             }
+        });
 
+        // Second pass: populate series data only from entries with valid metric values
+        entries.forEach((entry) => {
+            const value = Number(entry?.metrics?.[metricConfig.key]);
+            if (!Number.isFinite(value)) {
+                return;
+            }
+
+            const versionKey = getTrendVersionKey(entry);
             const seriesKey = getTrendSeriesKey(entry);
             if (!seriesMap.has(seriesKey)) {
                 seriesMap.set(seriesKey, {
