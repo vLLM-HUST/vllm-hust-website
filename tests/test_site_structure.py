@@ -720,7 +720,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "leaderboard-public-20260720-trend-integrity" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "function getTrendVersionSortInfo(entry)" in js_text
-    assert "commitCount: commitCountMatch ? parseInt(commitCountMatch[1], 10) : null" in js_text
+    assert (
+        "commitCount: commitCountMatch ? parseInt(commitCountMatch[1], 10) : null"
+        in js_text
+    )
     assert "const leftHasCommitCount = left.commitCount !== null;" in js_text
     assert "return leftHasCommitCount ? -1 : 1;" in js_text
     assert "return left.timestamp - right.timestamp;" in js_text
@@ -760,7 +763,9 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function getTrendAxisValues(datasets)" in js_text
     assert "function getFiniteTrendMetricValue(entry, metricKey)" in js_text
     assert "rawValue === null || rawValue === undefined || rawValue === ''" in js_text
-    assert "const value = getFiniteTrendMetricValue(entry, metricConfig.key);" in js_text
+    assert (
+        "const value = getFiniteTrendMetricValue(entry, metricConfig.key);" in js_text
+    )
     assert "function shouldUseLogTrendAxis()" in js_text
     assert "trendAxisScale: 'auto'" in js_text
     assert "const BROKEN_TREND_AXIS_RATIO_THRESHOLD = 8;" in js_text
