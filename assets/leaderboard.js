@@ -2369,12 +2369,23 @@
         return getEntryTimestamp(entry) || 0;
     }
 
+    function normalizeTrendCommit(value) {
+        return String(value || '').trim().toLowerCase().slice(0, 10);
+    }
+
     function getTrendVersionKey(entry) {
-        const gitCommit = String(entry?.metadata?.git_commit || '').trim();
+        const coreCommit = normalizeTrendCommit(
+            getVersionFieldCommit(entry, 'core') || entry?.metadata?.git_commit
+        );
+        const backendCommit = normalizeTrendCommit(
+            getVersionFieldCommit(entry, 'backend')
+                || entry?.metadata?.runtime_provenance?.plugin?.commit
+        );
         const version = getTrendVersionText(entry);
-        // Use git_commit for unique version identification when available
-        // This ensures all entries sharing the same git commit appear at the same x-axis position
-        return `${isTrendBaselineEntry(entry) ? 'baseline' : 'current'}|${gitCommit || version}`;
+        const revision = [coreCommit, backendCommit].filter(Boolean).join('+') || version;
+        // A runtime revision is the core/backend pair. Backend PRs often reuse the
+        // same core commit and must still receive their own x-axis position.
+        return `${isTrendBaselineEntry(entry) ? 'baseline' : 'current'}|${revision}`;
     }
 
     function getTrendVersionLabel(entry) {

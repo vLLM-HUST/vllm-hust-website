@@ -109,6 +109,20 @@ def test_trend_dataset_keeps_pr_and_historical_revisions() -> None:
     assert "isMainlineTrendEntry" not in text
 
 
+def test_trend_version_key_includes_core_and_backend_commits() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    version_key = text.split("function getTrendVersionKey", 1)[1].split(
+        "function getTrendVersionLabel", 1
+    )[0]
+
+    assert "getVersionFieldCommit(entry, 'core')" in version_key
+    assert "getVersionFieldCommit(entry, 'backend')" in version_key
+    assert "runtime_provenance?.plugin?.commit" in version_key
+    assert "[coreCommit, backendCommit].filter(Boolean).join('+')" in version_key
+
+
 def test_hard_constraints_baseline_block_is_rendered() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
