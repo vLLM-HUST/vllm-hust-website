@@ -95,20 +95,18 @@ def test_leaderboard_uses_normalized_model_identity_helpers() -> None:
     assert "function createCompareScopeKey(entry)" in text
 
 
-def test_mainline_filter_is_limited_to_the_trend_dataset() -> None:
+def test_trend_dataset_keeps_pr_and_historical_revisions() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
 
-    mainline_helper = text.split("function isMainlineTrendEntry(entry)", 1)[1].split(
-        "function getPerformanceTrendEntries", 1
-    )[0]
-    table_filter = text.split("function renderTable()", 1)[1].split(
-        "const comparisonView", 1
+    trend_filter = text.split("function getPerformanceTrendEntries", 1)[1].split(
+        "function getScopeModelIdentity", 1
     )[0]
 
-    assert "getTrendRefTokens(entry).includes('main')" in mainline_helper
-    assert "getEngine(entry) === 'vllm-hust'" not in mainline_helper
-    assert "isMainlineTrendEntry(entry)" not in table_filter
+    assert "return isServingTrendWorkload(entry);" in trend_filter
+    assert "github_pr_number" not in trend_filter
+    assert "github_pr_url" not in trend_filter
+    assert "isMainlineTrendEntry" not in text
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
@@ -713,8 +711,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');"
         in js_text
     )
-    assert "默认全部视图只展示 mainline online serving 版本" in js_text
-    assert "function isMainlineTrendEntry(entry)" in js_text
+    assert "展示当前范围内全部在线服务版本，包括 PR 与历史运行" in js_text
     assert "function getSelectOptionLabel(value, option, labelMapper = null)" in js_text
     assert "if (value === 'all')" in js_text
     assert "function isServingTrendWorkload(entry)" in js_text
@@ -724,11 +721,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert "function getServingTrendWorkloadBase(entry)" in js_text
     assert "replace(/-\\d+chip$/, '')" in js_text
-    assert "function getTrendRefTokens(entry)" in js_text
-    assert "function hasPullRequestMetadata(entry)" in js_text
-    assert "getTrendRefTokens(entry).includes('main')" in js_text
     assert "current-main" not in js_text
-    assert "isServingTrendWorkload(entry) && isMainlineTrendEntry(entry)" in js_text
+    assert "return isServingTrendWorkload(entry);" in js_text
     assert "function renderPerformanceTrendChart(entries)" in js_text
     assert "new Chart(canvas" in js_text
     assert "pointDetails" in js_text
@@ -777,7 +771,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "if (selectedWorkload !== 'all')" in js_text
     assert "return true;" in js_text
     assert (
-        "renderPerformanceTrendChart(getPerformanceTrendEntries(sortedFiltered, filters.workload));"
+        "renderPerformanceTrendChart(getPerformanceTrendEntries(visibleEntries, filters.workload));"
         in js_text
     )
     assert ".leaderboard-trend-panel {" in css_text
@@ -814,36 +808,18 @@ def test_single_chip_all_workload_auto_axis_uses_broken_axis_for_outliers() -> N
     assert max(in_focus_values) < values[-1]
 
 
-def test_multichip_trend_filter_covers_mainline_online_workloads() -> None:
+def test_multichip_trend_filter_keeps_pr_and_historical_online_workloads() -> None:
     root = Path(__file__).resolve().parents[1]
     data = json.loads((root / "data" / "leaderboard_multi.json").read_text())
 
     def workload(entry: dict) -> str:
         return entry.get("workload", {}).get("name", "")
 
-    def is_baseline(entry: dict) -> bool:
-        return bool(entry.get("isBaseline")) or entry.get("engine") != "vllm-hust"
-
-    def ref_tokens(entry: dict) -> set[str]:
-        ref = str(entry.get("metadata", {}).get("github_ref") or "").lower()
-        return {token for token in re.split(r"[^a-z0-9]+", ref) if token}
-
-    def has_pr_metadata(entry: dict) -> bool:
-        metadata = entry.get("metadata", {})
-        return bool(metadata.get("github_pr_number") or metadata.get("github_pr_url"))
-
-    def is_mainline(entry: dict) -> bool:
-        return is_baseline(entry) or (
-            not has_pr_metadata(entry) and "main" in ref_tokens(entry)
-        )
-
     def is_serving_workload(entry: dict) -> bool:
         base = re.sub(r"-\d+chip$", "", workload(entry))
         return base.endswith(("-online", "-throughput", "-latency"))
 
-    rows = [
-        entry for entry in data if is_serving_workload(entry) and is_mainline(entry)
-    ]
+    rows = [entry for entry in data if is_serving_workload(entry)]
     online_chip_workloads = sorted(
         {
             workload(entry)
@@ -863,10 +839,13 @@ def test_multichip_trend_filter_covers_mainline_online_workloads() -> None:
 
     for name, refs in refs_by_workload.items():
         assert "v0.18.0" in refs, f"{name} should include the baseline point"
-        assert any(
-            "main" in {token for token in re.split(r"[^a-z0-9]+", ref.lower()) if token}
-            for ref in refs
-        ), f"{name} should include at least one non-PR mainline point"
+
+    all_visible_refs = {
+        str(entry.get("metadata", {}).get("github_ref") or "") for entry in rows
+    }
+    assert any("pr" in ref.lower() for ref in all_visible_refs), (
+        "the all-workload trend input should retain PR or historical revision points"
+    )
 
 
 def test_detail_sections_use_detail_only_version_formatting_and_memory_fallback() -> (

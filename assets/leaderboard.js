@@ -229,7 +229,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Baseline first, then mainline online serving versions. Select a workload to inspect the full PR and historical run sequence.',
+            trendSubtitle: 'Baseline first, then every visible online serving revision, including PR and historical runs.',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -438,7 +438,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '横轴从基线开始，默认全部视图只展示 mainline online serving 版本；切到具体 workload 可查看完整 PR 与历史运行序列。',
+            trendSubtitle: '横轴从基线开始，展示当前范围内全部在线服务版本，包括 PR 与历史运行。',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -1846,30 +1846,6 @@
         return SERVING_TREND_WORKLOAD_SUFFIXES.some((suffix) => workload.endsWith(`-${suffix}`));
     }
 
-    function getTrendRefTokens(entry) {
-        return String(entry?.metadata?.github_ref || '')
-            .trim()
-            .toLowerCase()
-            .split(/[^a-z0-9]+/)
-            .filter(Boolean);
-    }
-
-    function hasPullRequestMetadata(entry) {
-        const metadata = entry?.metadata || {};
-        return Boolean(metadata.github_pr_number || metadata.github_pr_url);
-    }
-
-    function isMainlineTrendEntry(entry) {
-        if (isTrendBaselineEntry(entry)) {
-            return true;
-        }
-        if (hasPullRequestMetadata(entry)) {
-            return false;
-        }
-
-        return getTrendRefTokens(entry).includes('main');
-    }
-
     function getPerformanceTrendEntries(entries, selectedWorkload) {
         return entries.filter((entry) => {
             if (shouldExcludeFromTrends(entry)) {
@@ -1878,7 +1854,7 @@
             if (selectedWorkload !== 'all') {
                 return true;
             }
-            return isServingTrendWorkload(entry) && isMainlineTrendEntry(entry);
+            return isServingTrendWorkload(entry);
         });
     }
 
@@ -3318,7 +3294,9 @@
         emptyState.style.display = 'none';
         renderDataStats(data.length, filtered.length, visibleEntries.length, mergedEntries.length, comparisonView);
         renderOverview(sortedFiltered, comparisonView, viewOptions);
-        renderPerformanceTrendChart(getPerformanceTrendEntries(sortedFiltered, filters.workload));
+        // The table intentionally collapses equivalent package builds. The trend chart must use
+        // the unaggregated rows so distinct commits and PR revisions remain visible on the axis.
+        renderPerformanceTrendChart(getPerformanceTrendEntries(visibleEntries, filters.workload));
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
 
