@@ -1686,14 +1686,14 @@
 
     function getSettingSignature(entry) {
         const sameSpec = getSameSpecPayload(entry);
-        const sameSpecId = getSameSpecId(entry);
-        if (sameSpecId) {
-            return sameSpecId;
-        }
-
         const sameSpecHash = String(sameSpec?.resolved_spec_hash || '').trim();
         if (sameSpecHash) {
-            return sameSpecHash;
+            return `hash:${sameSpecHash}`;
+        }
+
+        const sameSpecId = getSameSpecId(entry);
+        if (sameSpecId) {
+            return `spec:${sameSpecId}`;
         }
 
         const workload = entry?.workload || {};
@@ -2357,16 +2357,13 @@
         return `${text.slice(0, 15)}...${text.slice(-14)}`;
     }
 
-    function getTrendVersionSortValue(entry) {
+    function getTrendVersionSortInfo(entry) {
         const engineVersion = String(entry?.engine_version || '').trim();
-        // For vllm-hust entries, extract the commit count from engine_version
-        // e.g. "v0.20.1rc0-441-g2206f1f7b7" → 441
         const commitCountMatch = engineVersion.match(/-(\d+)-g[0-9a-f]+$/);
-        if (commitCountMatch) {
-            return parseInt(commitCountMatch[1], 10);
-        }
-        // Fallback: use timestamp for baseline / non-vllm-hust entries
-        return getEntryTimestamp(entry) || 0;
+        return {
+            commitCount: commitCountMatch ? parseInt(commitCountMatch[1], 10) : null,
+            timestamp: getEntryTimestamp(entry) || 0,
+        };
     }
 
     function normalizeTrendCommit(value) {
@@ -2420,12 +2417,12 @@
         if (!currentEntry) {
             return true;
         }
-        const currentValue = Number(currentEntry?.metrics?.[metricConfig.key]);
-        const candidateValue = Number(candidateEntry?.metrics?.[metricConfig.key]);
-        if (!Number.isFinite(candidateValue)) {
+        const currentValue = getFiniteTrendMetricValue(currentEntry, metricConfig.key);
+        const candidateValue = getFiniteTrendMetricValue(candidateEntry, metricConfig.key);
+        if (candidateValue === null) {
             return false;
         }
-        if (!Number.isFinite(currentValue)) {
+        if (currentValue === null) {
             return true;
         }
         if (candidateValue !== currentValue) {
@@ -2434,6 +2431,15 @@
                 : candidateValue < currentValue;
         }
         return getEntryTimestamp(candidateEntry) > getEntryTimestamp(currentEntry);
+    }
+
+    function getFiniteTrendMetricValue(entry, metricKey) {
+        const rawValue = entry?.metrics?.[metricKey];
+        if (rawValue === null || rawValue === undefined || rawValue === '') {
+            return null;
+        }
+        const value = Number(rawValue);
+        return Number.isFinite(value) ? value : null;
     }
 
     function buildTrendChartModel(entries, metricConfig) {
@@ -2448,17 +2454,24 @@
             const timestamp = getEntryTimestamp(entry);
             const baseline = isTrendBaselineEntry(entry);
             const existingVersion = versionMap.get(versionKey);
-            const sortValue = baseline ? Number.NEGATIVE_INFINITY : getTrendVersionSortValue(entry);
+            const sortInfo = getTrendVersionSortInfo(entry);
             if (!existingVersion) {
                 versionMap.set(versionKey, {
                     key: versionKey,
                     label: getTrendVersionLabel(entry),
-                    sortValue,
+                    commitCount: sortInfo.commitCount,
                     timestamp,
                     baseline,
                 });
-            } else if (!baseline && sortValue > existingVersion.sortValue) {
-                existingVersion.sortValue = sortValue;
+            } else if (!baseline && sortInfo.commitCount !== null
+                && (existingVersion.commitCount === null
+                    || sortInfo.commitCount > existingVersion.commitCount)) {
+                existingVersion.commitCount = sortInfo.commitCount;
+                existingVersion.label = getTrendVersionLabel(entry);
+                existingVersion.timestamp = Math.max(existingVersion.timestamp, timestamp);
+            } else if (!baseline && existingVersion.commitCount === null
+                && timestamp > existingVersion.timestamp) {
+                existingVersion.label = getTrendVersionLabel(entry);
                 existingVersion.timestamp = timestamp;
             } else if (baseline && timestamp > existingVersion.timestamp) {
                 existingVersion.timestamp = timestamp;
@@ -2467,8 +2480,8 @@
 
         // Second pass: populate series data only from entries with valid metric values
         entries.forEach((entry) => {
-            const value = Number(entry?.metrics?.[metricConfig.key]);
-            if (!Number.isFinite(value)) {
+            const value = getFiniteTrendMetricValue(entry, metricConfig.key);
+            if (value === null) {
                 return;
             }
 
@@ -2492,8 +2505,16 @@
             if (left.baseline !== right.baseline) {
                 return left.baseline ? -1 : 1;
             }
-            if (left.sortValue !== right.sortValue) {
-                return left.sortValue - right.sortValue;
+            const leftHasCommitCount = left.commitCount !== null;
+            const rightHasCommitCount = right.commitCount !== null;
+            if (leftHasCommitCount !== rightHasCommitCount) {
+                return leftHasCommitCount ? -1 : 1;
+            }
+            if (leftHasCommitCount && left.commitCount !== right.commitCount) {
+                return left.commitCount - right.commitCount;
+            }
+            if (left.timestamp !== right.timestamp) {
+                return left.timestamp - right.timestamp;
             }
             return String(left.label || '').localeCompare(String(right.label || ''));
         });
