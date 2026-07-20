@@ -15,6 +15,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - 修复性能趋势图把不同 PR 折叠成少数版本列的问题：图表改为直接消费当前可见的原始评测记录，不再复用表格的同版本择优聚合；“全部 workload”视图也会保留 PR 与历史在线服务记录。
 
+- 趋势图横轴现在按 vllm-hust core 与 vllm-ascend-hust backend 的 commit 组合区分版本；同一个 core 上测试的不同 backend PR 不再共用一个横轴位置。
+
 - `scripts/aggregate_results.py` now recognizes Ascend 910B2 memory metadata for
   quantized benchmark entries, keeping website aggregation aligned with the
   benchmark exporter when W8A8/INT8 Ascend runs publish leaderboard artifacts.
