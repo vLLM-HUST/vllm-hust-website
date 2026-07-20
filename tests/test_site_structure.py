@@ -123,6 +123,20 @@ def test_trend_version_key_includes_core_and_backend_commits() -> None:
     assert "[coreCommit, backendCommit].filter(Boolean).join('+')" in version_key
 
 
+def test_trend_series_prefers_resolved_hash_over_spec_id() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    setting_signature = text.split("function getSettingSignature", 1)[1].split(
+        "function getCompactSpecLabel", 1
+    )[0]
+
+    assert setting_signature.index("resolved_spec_hash") < setting_signature.index(
+        "getSameSpecId(entry)"
+    )
+    assert "return `hash:${sameSpecHash}`;" in setting_signature
+    assert "return `spec:${sameSpecId}`;" in setting_signature
+
+
 def test_hard_constraints_baseline_block_is_rendered() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
@@ -703,12 +717,13 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
     assert "leaderboard-public-20260706-broken-axis2" in html_text
+    assert "leaderboard-public-20260720-trend-integrity" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
-    assert (
-        "const sortValue = baseline ? Number.NEGATIVE_INFINITY : getTrendVersionSortValue(entry);"
-        in js_text
-    )
-    assert "sortValue > existingVersion.sortValue" in js_text
+    assert "function getTrendVersionSortInfo(entry)" in js_text
+    assert "commitCount: commitCountMatch ? parseInt(commitCountMatch[1], 10) : null" in js_text
+    assert "const leftHasCommitCount = left.commitCount !== null;" in js_text
+    assert "return leftHasCommitCount ? -1 : 1;" in js_text
+    assert "return left.timestamp - right.timestamp;" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
     assert "function startBackgroundDataSync()" in js_text
     assert "const renderPartialData = (progress) => {" in js_text
@@ -743,6 +758,9 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "spanGaps: true" in js_text
     assert "Keep one series continuous across x-axis slots" in js_text
     assert "function getTrendAxisValues(datasets)" in js_text
+    assert "function getFiniteTrendMetricValue(entry, metricKey)" in js_text
+    assert "rawValue === null || rawValue === undefined || rawValue === ''" in js_text
+    assert "const value = getFiniteTrendMetricValue(entry, metricConfig.key);" in js_text
     assert "function shouldUseLogTrendAxis()" in js_text
     assert "trendAxisScale: 'auto'" in js_text
     assert "const BROKEN_TREND_AXIS_RATIO_THRESHOLD = 8;" in js_text
