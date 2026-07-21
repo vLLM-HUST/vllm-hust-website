@@ -717,7 +717,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
     assert "leaderboard-public-20260706-broken-axis2" in html_text
-    assert "leaderboard-public-20260720-trend-integrity" in html_text
+    assert "leaderboard-public-20260721-sparse-trends" in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "function getTrendVersionSortInfo(entry)" in js_text
     assert (
@@ -843,6 +843,71 @@ def test_single_chip_all_workload_auto_axis_uses_broken_axis_for_outliers() -> N
     assert values[-1] / median >= 8
     assert len(in_focus_values) < len(values)
     assert max(in_focus_values) < values[-1]
+
+
+def test_default_all_workload_trend_uses_sparse_version_union() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    data = json.loads((root / "data" / "leaderboard_single.json").read_text())
+
+    def workload(entry: dict) -> str:
+        return entry.get("workload", {}).get("name", "")
+
+    def is_serving_workload(entry: dict) -> bool:
+        base = re.sub(r"-\d+chip$", "", workload(entry))
+        return base.endswith(("-online", "-throughput", "-latency"))
+
+    def commit(entry: dict, key: str) -> str:
+        versions = entry.get("metadata", {}).get("version_components") or {}
+        component = versions.get(key) or {}
+        return str(component.get("commit") or "")[:10].lower()
+
+    def version_key(entry: dict) -> str:
+        engine = entry.get("engine") or entry.get("metadata", {}).get("engine")
+        prefix = "baseline" if engine != "vllm-hust" else "current"
+        revision = "+".join(
+            part for part in (commit(entry, "core"), commit(entry, "backend")) if part
+        )
+        return f"{prefix}|{revision or entry.get('engine_version')}"
+
+    def series_key(entry: dict) -> tuple:
+        hardware = entry.get("hardware") or {}
+        model = entry.get("model") or {}
+        cluster = entry.get("cluster") or {}
+        return (
+            workload(entry),
+            model.get("canonical_id") or model.get("name"),
+            hardware.get("chip_model"),
+            hardware.get("chip_count"),
+            cluster.get("node_count", 1),
+            model.get("precision"),
+        )
+
+    rows = [
+        entry
+        for entry in data
+        if is_serving_workload(entry)
+        and not entry.get("quality", {}).get("exclude_from_trends")
+        and entry.get("metrics", {}).get("throughput_tps") not in (None, "")
+    ]
+    assert rows
+
+    points_by_series: dict[tuple, set[str]] = {}
+    for entry in rows:
+        points_by_series.setdefault(series_key(entry), set()).add(version_key(entry))
+
+    plotted_version_keys = set().union(*points_by_series.values())
+    complete_version_keys = {
+        version
+        for version in plotted_version_keys
+        if all(version in points for points in points_by_series.values())
+    }
+
+    assert plotted_version_keys
+    assert not complete_version_keys
+    assert "const plottedVersionKeys = new Set(" in js_text
+    assert "const completeVersionKeys = new Set(" not in js_text
+    assert "spanGaps: true" in js_text
 
 
 def test_multichip_trend_filter_keeps_pr_and_historical_online_workloads() -> None:
