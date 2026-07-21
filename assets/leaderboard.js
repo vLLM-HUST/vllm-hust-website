@@ -2135,10 +2135,15 @@
             ].join('|');
         }
 
-        // Fallback: use git_commit or engine_version for aggregation when full PEP version info is missing
+        // Fallback: use the runtime core/backend revision pair when full PEP
+        // version info is missing. Backend PRs can reuse the same core commit,
+        // so the plugin commit must stay in the aggregation key.
         const gitCommit = String(entry?.metadata?.git_commit || '').trim();
+        const pluginCommit = String(entry?.metadata?.runtime_provenance?.plugin?.commit || '').trim();
         const engineVersion = String(entry?.engine_version || '').trim();
-        const versionKey = gitCommit || engineVersion || '__UNKNOWN_VERSION__';
+        const versionKey = [gitCommit, pluginCommit].filter(Boolean).join('+')
+            || engineVersion
+            || '__UNKNOWN_VERSION__';
 
         return [
             engine,
@@ -2446,9 +2451,9 @@
         const versionMap = new Map();
         const seriesMap = new Map();
 
-        // First pass: collect all versions from all entries to ensure
-        // every version node appears on the x-axis, even if there is no
-        // valid metric value for the current metric configuration.
+        // First pass: collect candidate versions from all entries. Sparse
+        // versions are filtered after series construction so the x-axis only
+        // shows revisions that have values for every visible workload series.
         entries.forEach((entry) => {
             const versionKey = getTrendVersionKey(entry);
             const timestamp = getEntryTimestamp(entry);
@@ -2501,7 +2506,7 @@
             }
         });
 
-        const versions = [...versionMap.values()].sort((left, right) => {
+        const candidateVersions = [...versionMap.values()].sort((left, right) => {
             if (left.baseline !== right.baseline) {
                 return left.baseline ? -1 : 1;
             }
@@ -2518,9 +2523,19 @@
             }
             return String(left.label || '').localeCompare(String(right.label || ''));
         });
+        const completeVersionKeys = new Set(
+            candidateVersions
+                .filter((version) => [...seriesMap.values()].every((item) => item.points.has(version.key)))
+                .map((version) => version.key)
+        );
+        const versions = candidateVersions.filter((version) => completeVersionKeys.has(version.key));
         const versionIndex = new Map(versions.map((version, index) => [version.key, index]));
 
         const series = [...seriesMap.values()]
+            .map((item) => ({
+                ...item,
+                points: new Map([...item.points].filter(([key]) => completeVersionKeys.has(key))),
+            }))
             .map((item) => ({
                 ...item,
                 pointCount: item.points.size,
@@ -2813,9 +2828,7 @@
                 pointRadius: 3,
                 pointHoverRadius: 6,
                 tension: 0.28,
-                // Keep one series continuous across x-axis slots that belong only to
-                // other workload/model/precision series. Missing entries still have no marker.
-                spanGaps: true,
+                spanGaps: false,
             };
         });
 
