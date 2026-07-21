@@ -33,6 +33,30 @@
             ],
         },
         {
+            sortDate: '2026-07-02',
+            date: { en: 'July 2026', zh: '2026 年 7 月' },
+            kind: { en: 'Publication', zh: '论文' },
+            title: {
+                en: 'DiffSpec at SC 2026',
+                zh: 'DiffSpec 入选 SC 2026',
+            },
+            body: {
+                en: 'A differential speculative decoding acceleration system for ultra-long-sequence inference.',
+                zh: '面向超长序列推理的差分投机解码加速系统。',
+            },
+            tags: [
+                { en: 'SC 2026', zh: 'SC 2026' },
+                { en: 'Speculative decoding', zh: '投机解码' },
+                { en: 'Long context', zh: '超长序列' },
+            ],
+            links: [
+                {
+                    label: { en: 'Repository', zh: '仓库' },
+                    href: 'https://github.com/vLLM-HUST/vllm-hust',
+                },
+            ],
+        },
+        {
             sortDate: '2026-06-18',
             date: { en: 'June 2026', zh: '2026 年 6 月' },
             kind: { en: 'Community', zh: '社区贡献' },

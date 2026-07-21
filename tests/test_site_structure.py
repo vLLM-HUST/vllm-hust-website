@@ -532,7 +532,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=diffspec-20260721" in html_text
-    assert "assets/achievements-page.js?v=diffspec-20260721" in html_text
+    assert "assets/achievements-page.js?v=diffspec-timeline-20260721" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -611,8 +611,12 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
 
 def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     root = Path(__file__).resolve().parents[1]
+    html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
+    assert "DiffSpec at SC 2026" in js_text
+    assert "DiffSpec 入选 SC 2026" in js_text
+    assert "label: { en: 'Repository', zh: '仓库' }" in js_text
     assert "name: 'DiffSpec'" in js_text
     assert "repositoryName: 'vllm-hust'" in js_text
     assert "面向超长序列推理的差分投机解码加速系统。" in js_text
@@ -620,6 +624,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
     assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
     assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" in js_text
+    assert "assets/achievements-page.js?v=diffspec-timeline-20260721" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
