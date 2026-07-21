@@ -1156,6 +1156,22 @@ h1 {
     background: rgba(252, 211, 77, 0.1);
 }
 
+.upstream-pr-row > strong[data-status="needs-label"],
+.upstream-pr-row > strong[data-status="evidence-pending"] {
+    color: #fcd34d;
+    background: rgba(252, 211, 77, 0.1);
+}
+
+.upstream-pr-row > strong[data-status="review-requested"] {
+    color: #7dd3fc;
+    background: rgba(125, 211, 252, 0.1);
+}
+
+.upstream-pr-row > strong[data-status="ci-retry"] {
+    color: #fda4af;
+    background: rgba(253, 164, 175, 0.1);
+}
+
 .upstream-pr-link {
     color: #7dd3fc;
 }

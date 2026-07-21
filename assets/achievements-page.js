@@ -139,19 +139,19 @@
     ];
 
     const OPEN_UPSTREAM_PRS = [
-        { repository: 'vLLM', number: 47793, title: 'Handle missing vLLM metadata in Triton import', href: 'https://github.com/vllm-project/vllm/pull/47793' },
-        { repository: 'vLLM', number: 49034, title: 'fix(v1): avoid false shutdown failures on clean exit', href: 'https://github.com/vllm-project/vllm/pull/49034' },
-        { repository: 'vLLM', number: 49035, title: 'fix: handle missing parent modules in _has_module', href: 'https://github.com/vllm-project/vllm/pull/49035' },
-        { repository: 'vLLM-Ascend', number: 12316, title: '[BugFix] Fix packaged custom opapi lookup', href: 'https://github.com/vllm-project/vllm-ascend/pull/12316' },
-        { repository: 'vLLM-Ascend', number: 12317, title: '[Performance] Reuse DP metadata sync buffers', href: 'https://github.com/vllm-project/vllm-ascend/pull/12317' },
-        { repository: 'vLLM-Ascend', number: 12342, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', href: 'https://github.com/vllm-project/vllm-ascend/pull/12342' },
-        { repository: 'vLLM-Ascend', number: 12343, title: '[Ops][BugFix] Fix Qwen2 compiled-path outputs on Ascend', status: 'draft', href: 'https://github.com/vllm-project/vllm-ascend/pull/12343' },
-        { repository: 'vLLM-Ascend', number: 12344, title: '[Ops][BugFix] Fix NPU memory profiling on Python 3.12', href: 'https://github.com/vllm-project/vllm-ascend/pull/12344' },
-        { repository: 'Triton-Ascend', number: 918, title: '[runtime](fix) skip missing backend entry points', href: 'https://github.com/triton-lang/triton-ascend/pull/918' },
-        { repository: 'Triton-Ascend', number: 919, title: '[ascend](fix) disambiguate dependent getDefiningOp calls', href: 'https://github.com/triton-lang/triton-ascend/pull/919' },
-        { repository: 'Triton-Ascend', number: 920, title: '[ascend](fix) allow MemAccOp factory specializations', href: 'https://github.com/triton-lang/triton-ascend/pull/920' },
-        { repository: 'Triton-Ascend', number: 922, title: '[build](fix) fix Python module build dependencies', href: 'https://github.com/triton-lang/triton-ascend/pull/922' },
-        { repository: 'Triton-Ascend', number: 923, title: '[tools](fix) trim optional dialect registrations', href: 'https://github.com/triton-lang/triton-ascend/pull/923' },
+        { repository: 'vLLM', number: 47793, title: 'Handle missing vLLM metadata in Triton import', status: 'needs-label', href: 'https://github.com/vllm-project/vllm/pull/47793' },
+        { repository: 'vLLM', number: 49034, title: 'fix(v1): avoid false shutdown failures on clean exit', status: 'needs-label', href: 'https://github.com/vllm-project/vllm/pull/49034' },
+        { repository: 'vLLM', number: 49035, title: 'fix: handle missing parent modules in _has_module', status: 'needs-label', href: 'https://github.com/vllm-project/vllm/pull/49035' },
+        { repository: 'vLLM-Ascend', number: 12316, title: '[BugFix] Fix packaged custom opapi lookup', status: 'review-requested', href: 'https://github.com/vllm-project/vllm-ascend/pull/12316' },
+        { repository: 'vLLM-Ascend', number: 12317, title: '[Performance][Worker] Reuse DP metadata sync buffers', status: 'review-requested', href: 'https://github.com/vllm-project/vllm-ascend/pull/12317' },
+        { repository: 'vLLM-Ascend', number: 12342, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', status: 'review-requested', href: 'https://github.com/vllm-project/vllm-ascend/pull/12342' },
+        { repository: 'vLLM-Ascend', number: 12343, title: '[Ops][BugFix] Fix Qwen2 compiled-path outputs on Ascend', status: 'evidence-pending', href: 'https://github.com/vllm-project/vllm-ascend/pull/12343' },
+        { repository: 'vLLM-Ascend', number: 12344, title: '[Ops][BugFix] Fix NPU memory profiling on Python 3.12', status: 'review-requested', href: 'https://github.com/vllm-project/vllm-ascend/pull/12344' },
+        { repository: 'Triton-Ascend', number: 918, title: '[runtime](fix) skip missing backend entry points', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/918' },
+        { repository: 'Triton-Ascend', number: 919, title: '[ascend](fix) disambiguate dependent getDefiningOp calls', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/919' },
+        { repository: 'Triton-Ascend', number: 920, title: '[ascend](fix) allow MemAccOp factory specializations', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/920' },
+        { repository: 'Triton-Ascend', number: 922, title: '[build](fix) fix Python module build dependencies', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/922' },
+        { repository: 'Triton-Ascend', number: 923, title: '[tools](fix) trim optional dialect registrations', status: 'ci-retry', href: 'https://github.com/triton-lang/triton-ascend/pull/923' },
     ];
 
     const UPSTREAM_REPOSITORIES = [
@@ -238,6 +238,10 @@
             teamLabel: 'Project team',
             openStatus: 'Open',
             draftStatus: 'Draft',
+            needsLabelStatus: 'Needs label',
+            reviewRequestedStatus: 'Review requested',
+            evidencePendingStatus: 'Evidence pending',
+            ciRetryStatus: 'CI retry needed',
             pullRequestCount: (count) => `${count} pull requests`,
             collapseRepository: (name) => `Collapse ${name} pull requests`,
             expandRepository: (name) => `Show ${name} pull requests`,
@@ -262,6 +266,10 @@
             teamLabel: '项目团队',
             openStatus: '开放',
             draftStatus: '草稿',
+            needsLabelStatus: '待上游标签',
+            reviewRequestedStatus: '已请求评审',
+            evidencePendingStatus: '待补实测证据',
+            ciRetryStatus: '待重跑 CI',
             pullRequestCount: (count) => `${count} 个 PR`,
             collapseRepository: (name) => `收起 ${name} PR`,
             expandRepository: (name) => `查看 ${name} PR`,
@@ -474,7 +482,14 @@
         const activeRepository = repositories.find((repository) => repository.id === expandedUpstreamRepository);
 
         const renderPullRequests = (repository) => repository.pullRequests.map((pullRequest) => {
-            const status = pullRequest.status === 'draft' ? ui(lang).draftStatus : ui(lang).openStatus;
+            const statusLabels = {
+                draft: ui(lang).draftStatus,
+                'needs-label': ui(lang).needsLabelStatus,
+                'review-requested': ui(lang).reviewRequestedStatus,
+                'evidence-pending': ui(lang).evidencePendingStatus,
+                'ci-retry': ui(lang).ciRetryStatus,
+            };
+            const status = statusLabels[pullRequest.status] || ui(lang).openStatus;
             return `
                 <a class="upstream-pr-row" href="${pullRequest.href}" target="_blank" rel="noreferrer">
                     <span class="upstream-pr-number">#${pullRequest.number}</span>

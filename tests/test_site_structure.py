@@ -372,7 +372,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=diffspec-20260721" in text
+        assert "assets/site.css?v=upstream-review-status-20260721" in text
         assert "assets/site.js?v=mobile-canvas-20260718" in text
 
 
@@ -473,7 +473,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "diffspec-20260721" in html_text
+    assert "upstream-review-status-20260721" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -531,8 +531,8 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=diffspec-20260721" in html_text
-    assert "assets/achievements-page.js?v=diffspec-timeline-20260721" in html_text
+    assert "assets/site.css?v=upstream-review-status-20260721" in html_text
+    assert "assets/achievements-page.js?v=upstream-review-status-20260721" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -542,6 +542,16 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "number: 49034" in js_text
     assert "number: 49035" in js_text
     assert "number: 12343" in js_text
+    assert "status: 'needs-label'" in js_text
+    assert "status: 'review-requested'" in js_text
+    assert "status: 'evidence-pending'" in js_text
+    assert "status: 'ci-retry'" in js_text
+    assert "[Performance][Worker] Reuse DP metadata sync buffers" in js_text
+    assert "待上游标签" in js_text
+    assert "已请求评审" in js_text
+    assert "待补实测证据" in js_text
+    assert "待重跑 CI" in js_text
+    assert 'strong[data-status="review-requested"]' in css_text
 
     assert js_text.count("owner: 'vllm-project'") == 2
     assert js_text.count("owner: 'triton-lang'") == 1
@@ -624,7 +634,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
     assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
     assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" in js_text
-    assert "assets/achievements-page.js?v=diffspec-timeline-20260721" in html_text
+    assert "assets/achievements-page.js?v=upstream-review-status-20260721" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
