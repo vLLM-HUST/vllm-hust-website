@@ -172,6 +172,26 @@
             ],
             repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv',
         },
+        {
+            name: 'DiffSpec',
+            repositoryName: 'vllm-hust',
+            summary: {
+                en: 'A differential speculative decoding acceleration system for ultra-long-sequence inference.',
+                zh: '面向超长序列推理的差分投机解码加速系统。',
+            },
+            publication: { en: 'SC 2026', zh: 'SC 2026' },
+            team: [
+                {
+                    role: { en: 'Lead author', zh: '主要作者' },
+                    names: { en: 'Zhongcheng Du', zh: '杜忠承' },
+                },
+                {
+                    role: { en: 'Advisor', zh: '指导老师' },
+                    names: { en: 'Yu Huang', zh: '黄禹' },
+                },
+            ],
+            repository: 'https://github.com/vLLM-HUST/vllm-hust',
+        },
     ];
 
     const UI = {

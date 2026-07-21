@@ -372,7 +372,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=achievement-team-20260718" in text
+        assert "assets/site.css?v=diffspec-20260721" in text
         assert "assets/site.js?v=mobile-canvas-20260718" in text
 
 
@@ -473,7 +473,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "achievement-team-20260718" in html_text
+    assert "diffspec-20260721" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -531,8 +531,8 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=achievement-team-20260718" in html_text
-    assert "assets/achievements-page.js?v=achievement-team-20260718" in html_text
+    assert "assets/site.css?v=diffspec-20260721" in html_text
+    assert "assets/achievements-page.js?v=diffspec-20260721" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -609,6 +609,19 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     assert pdf_path.stat().st_size > 100_000
 
 
+def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    assert "name: 'DiffSpec'" in js_text
+    assert "repositoryName: 'vllm-hust'" in js_text
+    assert "面向超长序列推理的差分投机解码加速系统。" in js_text
+    assert "publication: { en: 'SC 2026', zh: 'SC 2026' }" in js_text
+    assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
+    assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
+    assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" in js_text
+
+
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
@@ -625,7 +638,7 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     assert "https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
     assert "https://github.com/vLLM-HUST/pegaflow-hust" not in js_text
     assert "https://github.com/vLLM-HUST/vllm-ascend-quant-hust" not in js_text
-    assert js_text.count("repositoryName:") == 1
+    assert js_text.count("repositoryName:") == 2
     assert "result-repository-title" in css_text
     assert "result-repository-link" in css_text
     assert "result-repository-index" not in css_text

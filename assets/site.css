@@ -821,6 +821,8 @@ h1 {
 }
 
 .result-repository-list {
+    display: grid;
+    gap: 16px;
     max-width: 960px;
 }
 
