@@ -2451,9 +2451,11 @@
         const versionMap = new Map();
         const seriesMap = new Map();
 
-        // First pass: collect candidate versions from all entries. Sparse
-        // versions are filtered after series construction so the x-axis only
-        // shows revisions that have values for every visible workload series.
+        // First pass: collect candidate versions from all entries. The default
+        // all-workload view is naturally sparse because each revision only
+        // covers some workload/model scopes, so the x-axis must be driven by
+        // versions that have at least one plotted point rather than the full
+        // intersection across every visible series.
         entries.forEach((entry) => {
             const versionKey = getTrendVersionKey(entry);
             const timestamp = getEntryTimestamp(entry);
@@ -2523,18 +2525,16 @@
             }
             return String(left.label || '').localeCompare(String(right.label || ''));
         });
-        const completeVersionKeys = new Set(
-            candidateVersions
-                .filter((version) => [...seriesMap.values()].every((item) => item.points.has(version.key)))
-                .map((version) => version.key)
+        const plottedVersionKeys = new Set(
+            [...seriesMap.values()].flatMap((item) => [...item.points.keys()])
         );
-        const versions = candidateVersions.filter((version) => completeVersionKeys.has(version.key));
+        const versions = candidateVersions.filter((version) => plottedVersionKeys.has(version.key));
         const versionIndex = new Map(versions.map((version, index) => [version.key, index]));
 
         const series = [...seriesMap.values()]
             .map((item) => ({
                 ...item,
-                points: new Map([...item.points].filter(([key]) => completeVersionKeys.has(key))),
+                points: new Map([...item.points].filter(([key]) => plottedVersionKeys.has(key))),
             }))
             .map((item) => ({
                 ...item,
@@ -2828,7 +2828,9 @@
                 pointRadius: 3,
                 pointHoverRadius: 6,
                 tension: 0.28,
-                spanGaps: false,
+                // Keep one series continuous across x-axis slots where other
+                // workload/model scopes have data but this series does not.
+                spanGaps: true,
             };
         });
 
