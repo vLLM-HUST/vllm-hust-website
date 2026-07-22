@@ -580,14 +580,17 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "number: 12343" in js_text
     assert "status: 'needs-label'" in js_text
     assert "status: 'review-requested'" in js_text
+    assert "status: 'ready-evidence'" in js_text
     assert "status: 'evidence-pending'" in js_text
     assert "status: 'ci-retry'" in js_text
     assert "[Performance][Worker] Reuse DP metadata sync buffers" in js_text
     assert "待上游标签" in js_text
     assert "已请求评审" in js_text
+    assert "实机证据已补" in js_text
     assert "Draft · 待复现问题" in js_text
     assert "待重跑 CI" in js_text
     assert 'strong[data-status="review-requested"]' in css_text
+    assert 'strong[data-status="ready-evidence"]' in css_text
     assert 'strong[data-status="evidence-pending"]' in css_text
 
     assert js_text.count("owner: 'vllm-project'") == 2
