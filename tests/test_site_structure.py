@@ -72,7 +72,17 @@ def test_contributors_page_lists_project_leadership() -> None:
     subproject_block = text.split('class="subproject-lead-list"', 1)[1].split(
         "</ul>", 1
     )[0]
-    for name in ("王雄", "郑龙", "王庆刚", "罗瑞坤", "赵进", "刘海坤", "项翔", "姚鹏程", "万瑶"):
+    for name in (
+        "王雄",
+        "郑龙",
+        "王庆刚",
+        "罗瑞坤",
+        "赵进",
+        "刘海坤",
+        "项翔",
+        "姚鹏程",
+        "万瑶",
+    ):
         assert f"<li>{name}</li>" in subproject_block
 
 
@@ -1219,12 +1229,15 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         for automation_marker in ("qoder", "dependabot", "github-actions", "[bot]"):
             assert automation_marker not in identities
 
-    all_names = {
-        item["display_name"] for item in payload["all_repos"]["contributors"]
-    }
+    all_names = {item["display_name"] for item in payload["all_repos"]["contributors"]}
     assert {"田景远", "程月甲", "张俊辉"} <= all_names
-    assert not {"Jingyuan", "Fletcher Tian", "Paul", "Paul Cheng", "Junhui Zhang"} & all_names
+    assert (
+        not {"Jingyuan", "Fletcher Tian", "Paul", "Paul Cheng", "Junhui Zhang"}
+        & all_names
+    )
 
-    canonical_snapshot = root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"
+    canonical_snapshot = (
+        root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"
+    )
     if canonical_snapshot.exists():
         assert snapshot_path.read_bytes() == canonical_snapshot.read_bytes()
