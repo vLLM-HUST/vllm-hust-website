@@ -1191,8 +1191,17 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
     assert payload["updated_at"] == "2026-07-22"
-    assert len(payload["all_repos"]["contributors"]) == 26
+    assert len(payload["all_repos"]["contributors"]) == 33
     assert len(payload["core_repos"]["contributors"]) == 18
+    assert "vllm-ascend-hust-bidkv" in payload["all_repos"]["scope_repos"]
+    assert len(payload["all_repos"]["scope_repos"]) == 17
+
+    mingqi = next(
+        item
+        for item in payload["all_repos"]["contributors"]
+        if item.get("github_login") == "MingqiWang-coder"
+    )
+    assert "vllm-ascend-hust-bidkv" in mingqi["repos"]
 
     for scope in ("all_repos", "core_repos"):
         contributors = payload[scope]["contributors"]

@@ -11,7 +11,14 @@
       "vllm-hust-website",
       "vllm-hust-workstation",
       "vllm-hust-perf-analyzer",
-      ".github"
+      ".github",
+      "ascend-runtime-manager",
+      "cccf-domestic-inference-engine-survey",
+      "pegaflow-hust",
+      "statesys-2026",
+      "vllm-ascend-hust-bidkv",
+      "vllm-ascend-hust-diffspec",
+      "vllm-hust.github.io"
     ],
     "contributors": [
       {
@@ -19,22 +26,26 @@
         "name": "Shuhao Zhang",
         "github_login": "ShuhaoZhangTony",
         "github_url": "https://github.com/ShuhaoZhangTony",
-        "commits": 775,
-        "changed_lines": 545182,
-        "added": 377139,
-        "deleted": 168043,
-        "active_repos": 8,
+        "commits": 838,
+        "changed_lines": 562684,
+        "added": 392515,
+        "deleted": 170169,
+        "active_repos": 12,
         "repos": [
           ".github",
+          "ascend-runtime-manager",
+          "cccf-domestic-inference-engine-survey",
+          "statesys-2026",
           "vllm-ascend-hust",
           "vllm-hust",
           "vllm-hust-benchmark",
           "vllm-hust-dev-hub",
           "vllm-hust-docs",
           "vllm-hust-website",
-          "vllm-hust-workstation"
+          "vllm-hust-workstation",
+          "vllm-hust.github.io"
         ],
-        "key_contributions": "CI/CD, leaderboard, benchmark, bugfix",
+        "key_contributions": "CI/CD, leaderboard, distributed, benchmark",
         "display_name": "张书豪",
         "chinese_name": "张书豪",
         "english_name": "Shuhao Zhang"
@@ -66,20 +77,22 @@
         "name": "Sheng Wang",
         "github_login": "moonandlife",
         "github_url": "https://github.com/moonandlife",
-        "commits": 97,
-        "changed_lines": 42060,
-        "added": 27199,
-        "deleted": 14861,
-        "active_repos": 6,
+        "commits": 106,
+        "changed_lines": 42426,
+        "added": 27536,
+        "deleted": 14890,
+        "active_repos": 8,
         "repos": [
+          "ascend-runtime-manager",
           "vllm-ascend-hust",
+          "vllm-ascend-hust-diffspec",
           "vllm-hust",
           "vllm-hust-benchmark",
           "vllm-hust-dev-hub",
           "vllm-hust-docs",
           "vllm-hust-website"
         ],
-        "key_contributions": "CI/CD, leaderboard, benchmark, Ascend",
+        "key_contributions": "CI/CD, leaderboard, Ascend, benchmark",
         "display_name": "王胜",
         "chinese_name": "王胜",
         "english_name": "Sheng Wang"
@@ -111,16 +124,17 @@
         "name": "MingqiWang-coder",
         "github_login": "MingqiWang-coder",
         "github_url": "https://github.com/MingqiWang-coder",
-        "commits": 38,
-        "changed_lines": 21449,
-        "added": 7608,
-        "deleted": 13841,
-        "active_repos": 2,
+        "commits": 43,
+        "changed_lines": 23363,
+        "added": 9439,
+        "deleted": 13924,
+        "active_repos": 3,
         "repos": [
+          "vllm-ascend-hust-bidkv",
           "vllm-hust-benchmark",
           "vllm-hust-website"
         ],
-        "key_contributions": "CI/CD, leaderboard, benchmark, maintenance",
+        "key_contributions": "CI/CD, leaderboard, benchmark, bugfix",
         "display_name": "王明琪",
         "chinese_name": "王明琪",
         "english_name": ""
@@ -130,23 +144,42 @@
         "name": "junhuizhang-boop",
         "github_login": "junhuizhang-boop",
         "github_url": "https://github.com/junhuizhang-boop",
-        "commits": 28,
-        "changed_lines": 14912,
-        "added": 13939,
-        "deleted": 973,
-        "active_repos": 3,
+        "commits": 32,
+        "changed_lines": 15162,
+        "added": 14144,
+        "deleted": 1018,
+        "active_repos": 4,
         "repos": [
+          "ascend-runtime-manager",
           "vllm-ascend-hust",
           "vllm-hust",
           "vllm-hust-benchmark"
         ],
-        "key_contributions": "benchmark, CI/CD, Ascend, engine",
+        "key_contributions": "benchmark, CI/CD, Ascend, bugfix",
         "display_name": "张俊辉",
         "chinese_name": "张俊辉",
         "english_name": ""
       },
       {
         "rank": 7,
+        "name": "czj",
+        "github_login": null,
+        "github_url": null,
+        "commits": 16,
+        "changed_lines": 14536,
+        "added": 9640,
+        "deleted": 4896,
+        "active_repos": 1,
+        "repos": [
+          "pegaflow-hust"
+        ],
+        "key_contributions": "Ascend, CI/CD, distributed, features",
+        "display_name": "czj",
+        "chinese_name": "",
+        "english_name": ""
+      },
+      {
+        "rank": 8,
         "name": "Xiling Gao",
         "github_login": "XilingGao",
         "github_url": "https://github.com/XilingGao",
@@ -164,7 +197,7 @@
         "english_name": "Xiling Gao"
       },
       {
-        "rank": 8,
+        "rank": 9,
         "name": "hustcui",
         "github_login": "hustcui",
         "github_url": "https://github.com/hustcui",
@@ -182,7 +215,7 @@
         "english_name": ""
       },
       {
-        "rank": 9,
+        "rank": 10,
         "name": "Gu Changwei",
         "github_login": "GuMorming",
         "github_url": "https://github.com/GuMorming",
@@ -202,7 +235,7 @@
         "english_name": "Gu Changwei"
       },
       {
-        "rank": 10,
+        "rank": 11,
         "name": "luoxiaohei",
         "github_login": "luoxiaohei",
         "github_url": "https://github.com/luoxiaohei",
@@ -221,7 +254,7 @@
         "english_name": ""
       },
       {
-        "rank": 11,
+        "rank": 12,
         "name": "KimmoZAG",
         "github_login": "KimmoZAG",
         "github_url": "https://github.com/KimmoZAG",
@@ -240,7 +273,7 @@
         "english_name": ""
       },
       {
-        "rank": 12,
+        "rank": 13,
         "name": "machuanhu",
         "github_login": "machuanhu",
         "github_url": "https://github.com/machuanhu",
@@ -258,7 +291,7 @@
         "english_name": ""
       },
       {
-        "rank": 13,
+        "rank": 14,
         "name": "Jie Yang",
         "github_login": "JieYang2001",
         "github_url": "https://github.com/JieYang2001",
@@ -276,7 +309,25 @@
         "english_name": "Jie Yang"
       },
       {
-        "rank": 14,
+        "rank": 15,
+        "name": "Sadboineedluv",
+        "github_login": null,
+        "github_url": null,
+        "commits": 9,
+        "changed_lines": 2797,
+        "added": 1692,
+        "deleted": 1105,
+        "active_repos": 1,
+        "repos": [
+          "cccf-domestic-inference-engine-survey"
+        ],
+        "key_contributions": "engine",
+        "display_name": "Sadboineedluv",
+        "chinese_name": "",
+        "english_name": ""
+      },
+      {
+        "rank": 16,
         "name": "Lou Jun",
         "github_login": "iliujunn",
         "github_url": "https://github.com/iliujunn",
@@ -296,25 +347,26 @@
         "english_name": "Lou Jun"
       },
       {
-        "rank": 15,
+        "rank": 17,
         "name": "Yanbo Chen",
         "github_login": "cybber695",
         "github_url": "https://github.com/cybber695",
-        "commits": 2,
+        "commits": 3,
         "changed_lines": 2238,
         "added": 2108,
         "deleted": 130,
-        "active_repos": 1,
+        "active_repos": 2,
         "repos": [
+          "pegaflow-hust",
           "vllm-ascend-hust"
         ],
-        "key_contributions": "misc",
+        "key_contributions": "Ascend",
         "display_name": "陈彦博",
         "chinese_name": "陈彦博",
         "english_name": "Yanbo Chen"
       },
       {
-        "rank": 16,
+        "rank": 18,
         "name": "vLLM-HUST Developer",
         "github_login": null,
         "github_url": null,
@@ -333,7 +385,25 @@
         "english_name": ""
       },
       {
-        "rank": 17,
+        "rank": 19,
+        "name": "JunHao Ma",
+        "github_login": null,
+        "github_url": null,
+        "commits": 3,
+        "changed_lines": 1616,
+        "added": 830,
+        "deleted": 786,
+        "active_repos": 1,
+        "repos": [
+          "cccf-domestic-inference-engine-survey"
+        ],
+        "key_contributions": "CI/CD, engine",
+        "display_name": "JunHao Ma",
+        "chinese_name": "",
+        "english_name": ""
+      },
+      {
+        "rank": 20,
         "name": "Tony",
         "github_login": null,
         "github_url": null,
@@ -351,7 +421,7 @@
         "english_name": ""
       },
       {
-        "rank": 18,
+        "rank": 21,
         "name": "sunYangGitHub",
         "github_login": null,
         "github_url": null,
@@ -369,8 +439,8 @@
         "english_name": ""
       },
       {
-        "rank": 19,
-        "name": "MASTER",
+        "rank": 22,
+        "name": "WMASTER123",
         "github_login": "WMASTER123",
         "github_url": "https://github.com/WMASTER123",
         "commits": 2,
@@ -388,7 +458,7 @@
         "english_name": ""
       },
       {
-        "rank": 20,
+        "rank": 23,
         "name": "MingXuan Kuang",
         "github_login": "sad-and-bad1231",
         "github_url": "https://github.com/sad-and-bad1231",
@@ -408,8 +478,8 @@
         "english_name": "MingXuan Kuang"
       },
       {
-        "rank": 21,
-        "name": "kotoriqaq",
+        "rank": 24,
+        "name": "kotoriqaq0",
         "github_login": "kotoriqaq0",
         "github_url": "https://github.com/kotoriqaq0",
         "commits": 1,
@@ -421,12 +491,12 @@
           "vllm-hust"
         ],
         "key_contributions": "features",
-        "display_name": "kotoriqaq",
+        "display_name": "kotoriqaq0",
         "chinese_name": "",
         "english_name": ""
       },
       {
-        "rank": 22,
+        "rank": 25,
         "name": "aly16-k",
         "github_login": "aly16-k",
         "github_url": "https://github.com/aly16-k",
@@ -445,7 +515,43 @@
         "english_name": ""
       },
       {
-        "rank": 23,
+        "rank": 26,
+        "name": "Remygred",
+        "github_login": "Remygred",
+        "github_url": "https://github.com/Remygred",
+        "commits": 6,
+        "changed_lines": 481,
+        "added": 356,
+        "deleted": 125,
+        "active_repos": 1,
+        "repos": [
+          "cccf-domestic-inference-engine-survey"
+        ],
+        "key_contributions": "engine, distributed",
+        "display_name": "Remygred",
+        "chinese_name": "",
+        "english_name": ""
+      },
+      {
+        "rank": 27,
+        "name": "Jerry01020",
+        "github_login": null,
+        "github_url": null,
+        "commits": 2,
+        "changed_lines": 394,
+        "added": 367,
+        "deleted": 27,
+        "active_repos": 1,
+        "repos": [
+          "cccf-domestic-inference-engine-survey"
+        ],
+        "key_contributions": "distributed, docs",
+        "display_name": "Jerry01020",
+        "chinese_name": "",
+        "english_name": ""
+      },
+      {
+        "rank": 28,
         "name": "Xincai Zhu",
         "github_login": "Pygone",
         "github_url": "https://github.com/Pygone",
@@ -463,7 +569,7 @@
         "english_name": "Xincai Zhu"
       },
       {
-        "rank": 24,
+        "rank": 29,
         "name": "xmdhb",
         "github_login": "xmdhb",
         "github_url": "https://github.com/xmdhb",
@@ -481,7 +587,7 @@
         "english_name": ""
       },
       {
-        "rank": 25,
+        "rank": 30,
         "name": "kms12425-ctrl",
         "github_login": null,
         "github_url": null,
@@ -499,7 +605,7 @@
         "english_name": ""
       },
       {
-        "rank": 26,
+        "rank": 31,
         "name": "Raing5Days",
         "github_login": "Raing5Days",
         "github_url": "https://github.com/Raing5Days",
@@ -514,6 +620,42 @@
         "key_contributions": "tooling",
         "display_name": "吴天宇",
         "chinese_name": "吴天宇",
+        "english_name": ""
+      },
+      {
+        "rank": 32,
+        "name": "sssarrior",
+        "github_login": null,
+        "github_url": null,
+        "commits": 1,
+        "changed_lines": 23,
+        "added": 23,
+        "deleted": 0,
+        "active_repos": 1,
+        "repos": [
+          "cccf-domestic-inference-engine-survey"
+        ],
+        "key_contributions": "engine",
+        "display_name": "sssarrior",
+        "chinese_name": "",
+        "english_name": ""
+      },
+      {
+        "rank": 33,
+        "name": "qixinzhang2601",
+        "github_login": "qixinzhang2601",
+        "github_url": "https://github.com/qixinzhang2601",
+        "commits": 1,
+        "changed_lines": 16,
+        "added": 12,
+        "deleted": 4,
+        "active_repos": 1,
+        "repos": [
+          "cccf-domestic-inference-engine-survey"
+        ],
+        "key_contributions": "misc",
+        "display_name": "qixinzhang2601",
+        "chinese_name": "",
         "english_name": ""
       }
     ]
@@ -712,7 +854,7 @@
       },
       {
         "rank": 11,
-        "name": "MASTER",
+        "name": "WMASTER123",
         "github_login": "WMASTER123",
         "github_url": "https://github.com/WMASTER123",
         "commits": 2,
@@ -750,7 +892,7 @@
       },
       {
         "rank": 13,
-        "name": "kotoriqaq",
+        "name": "kotoriqaq0",
         "github_login": "kotoriqaq0",
         "github_url": "https://github.com/kotoriqaq0",
         "commits": 1,
@@ -762,7 +904,7 @@
           "vllm-hust"
         ],
         "key_contributions": "features",
-        "display_name": "kotoriqaq",
+        "display_name": "kotoriqaq0",
         "chinese_name": "",
         "english_name": ""
       },
