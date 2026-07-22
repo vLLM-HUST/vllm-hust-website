@@ -1088,6 +1088,8 @@
     left: 0;
     z-index: 5;
     background: inherit;
+    min-width: 220px;
+    max-width: 320px;
 }
 
 .leaderboard-table tbody tr:nth-child(even) td.version-table-cell {
@@ -1109,7 +1111,13 @@
 }
 
 .leaderboard-table td.metric-column {
-    min-width: 122px;
+    min-width: 110px;
+}
+
+.leaderboard-table td.config-cell {
+    min-width: 100px;
+    max-width: 180px;
+    word-break: break-word;
 }
 
 .leaderboard-table td small {
@@ -2068,21 +2076,37 @@ body[data-page="leaderboard"] .hc-badge.fail {
 }
 
 body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd),
-body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd) td:first-child {
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd) td:first-child:not(.version-table-cell) {
     background: rgba(8, 18, 36, 0.78);
 }
 
 body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even),
-body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even) td:first-child {
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even) td:first-child:not(.version-table-cell) {
     background: rgba(13, 28, 52, 0.76);
 }
 
-body[data-page="leaderboard"] .leaderboard-table tbody tr:hover td:first-child {
+body[data-page="leaderboard"] .leaderboard-table tbody tr:hover td:first-child:not(.version-table-cell) {
     background: rgba(14, 165, 233, 0.24);
 }
 
 body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse,
-body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse td:first-child {
+body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse td:first-child:not(.version-table-cell) {
+    background: rgba(120, 53, 15, 0.32);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd) td.version-table-cell {
+    background: rgba(8, 18, 36, 0.78);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even) td.version-table-cell {
+    background: rgba(13, 28, 52, 0.76);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:hover td.version-table-cell {
+    background: rgba(14, 165, 233, 0.24);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse td.version-table-cell {
     background: rgba(120, 53, 15, 0.32);
 }
 
@@ -2108,4 +2132,39 @@ body[data-page="leaderboard"] .trend-empty {
     border-color: rgba(125, 211, 252, 0.42);
     background: rgba(2, 6, 23, 0.78);
     color: #eef7ff;
+}
+
+body[data-page="leaderboard"] .engine-summary-card {
+    border-color: rgba(125, 211, 252, 0.34);
+    background: rgba(8, 18, 36, 0.78);
+    color: #f4faff;
+    box-shadow: 0 18px 54px rgba(0, 0, 0, 0.34);
+}
+
+body[data-page="leaderboard"] .engine-summary-meta {
+    background: linear-gradient(180deg, rgba(8, 18, 36, 0.88), rgba(2, 6, 23, 0.72));
+    border-color: rgba(125, 211, 252, 0.34);
+}
+
+body[data-page="leaderboard"] .engine-summary-version-label,
+body[data-page="leaderboard"] .engine-summary-footer-label {
+    color: rgba(226, 242, 255, 0.72);
+}
+
+body[data-page="leaderboard"] .engine-summary-version-value,
+body[data-page="leaderboard"] .engine-summary-footer-value {
+    color: #f8fbff;
+}
+
+body[data-page="leaderboard"] .summary-metric {
+    background: rgba(2, 6, 23, 0.72);
+    border-color: rgba(125, 211, 252, 0.22);
+}
+
+body[data-page="leaderboard"] .summary-metric span {
+    color: rgba(226, 242, 255, 0.72);
+}
+
+body[data-page="leaderboard"] .summary-metric strong {
+    color: #f8fbff;
 }
