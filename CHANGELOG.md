@@ -13,6 +13,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- 成果页同步 vLLM-Ascend PR #12343 的最新状态：固定 commit 的 Ascend 910B2 正确性及五轮延迟/吞吐证据已附至上游 PR，PR 已由 Draft 转为 Ready 等待人工评审；上游 PR 列表显示“已 Ready · 已附 NPU 实测”。
+
 - 修正性能趋势图的三类数据完整性问题：缺失指标不再被当作 0，同一 workload 的不同 `resolved_spec_hash` 不再连成一条线，横轴也不再把 commit count 与毫秒时间戳混在一个排序值里。
 
 - 修复性能趋势图把不同 PR 折叠成少数版本列的问题：图表改为直接消费当前可见的原始评测记录，不再复用表格的同版本择优聚合；“全部 workload”视图也会保留 PR 与历史在线服务记录。

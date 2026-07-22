@@ -1167,6 +1167,11 @@ h1 {
     background: rgba(125, 211, 252, 0.1);
 }
 
+.upstream-pr-row > strong[data-status="ready-evidence"] {
+    color: #86efac;
+    background: rgba(134, 239, 172, 0.12);
+}
+
 .upstream-pr-row > strong[data-status="ci-retry"] {
     color: #fda4af;
     background: rgba(253, 164, 175, 0.1);
