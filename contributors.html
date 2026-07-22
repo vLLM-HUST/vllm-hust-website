@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=qwen2-npu-evidence-20260722" />
+  <link rel="stylesheet" href="./assets/site.css?v=contributors-leadership-20260722" />
 </head>
 
 <body data-page="contributors">
@@ -45,6 +45,55 @@
     <div id="contributors-error" class="empty-state" style="display: none">Failed to load contributor data.</div>
 
     <div id="contributors-content" style="display: none">
+      <section class="content-panel leadership-panel" aria-labelledby="contributors-leadership-title">
+        <div class="section-head">
+          <div>
+            <span id="contributors-leadership-kicker" class="eyebrow">Project team</span>
+            <h2 id="contributors-leadership-title">Project leadership</h2>
+            <p id="contributors-leadership-description">Leadership and subproject leads guiding the vLLM-HUST initiative.</p>
+          </div>
+        </div>
+
+        <div class="leadership-grid">
+          <article class="leadership-card">
+            <img src="./assets/contributors/jin-hai.jpg" alt="金海" width="160" height="160" loading="lazy" decoding="async" />
+            <div class="leadership-card-copy">
+              <h3>金海</h3>
+              <p id="contributors-role-lab-director">Lab Director</p>
+            </div>
+          </article>
+          <article class="leadership-card">
+            <img src="./assets/contributors/liao-xiaofei.jpg" alt="廖小飞" width="512" height="512" loading="lazy" decoding="async" />
+            <div class="leadership-card-copy">
+              <h3>廖小飞</h3>
+              <p id="contributors-role-dean">Dean</p>
+            </div>
+          </article>
+          <article class="leadership-card">
+            <img src="./assets/contributors/zhang-shuhao.jpg" alt="张书豪" width="512" height="512" loading="lazy" decoding="async" />
+            <div class="leadership-card-copy">
+              <h3>张书豪</h3>
+              <p id="contributors-role-project-lead">Project Lead</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="subproject-leads">
+          <h3 id="contributors-subproject-title">Subproject leads</h3>
+          <ul class="subproject-lead-list" aria-labelledby="contributors-subproject-title">
+            <li>王雄</li>
+            <li>郑龙</li>
+            <li>王庆刚</li>
+            <li>罗瑞坤</li>
+            <li>赵进</li>
+            <li>刘海坤</li>
+            <li>项翔</li>
+            <li>姚鹏程</li>
+            <li>万瑶</li>
+          </ul>
+        </div>
+      </section>
+
       <section class="content-panel">
         <div class="section-head">
           <div>
@@ -121,6 +170,13 @@
         'contributors-eyebrow': 'People',
         'contributors-title': 'Core Contributors',
         'contributors-lede': 'Contributors working across the runtime, Ascend integration, benchmark, documentation, website, and workstation repositories.',
+        'contributors-leadership-kicker': 'Project team',
+        'contributors-leadership-title': 'Project leadership',
+        'contributors-leadership-description': 'Leadership and subproject leads guiding the vLLM-HUST initiative.',
+        'contributors-role-lab-director': 'Lab Director',
+        'contributors-role-dean': 'Dean',
+        'contributors-role-project-lead': 'Project Lead',
+        'contributors-subproject-title': 'Subproject leads',
         'contributors-all-title': 'All repositories',
         'contributors-core-title': 'Core performance repositories'
       },
@@ -129,6 +185,13 @@
         'contributors-eyebrow': '成员',
         'contributors-title': '核心贡献成员',
         'contributors-lede': '展示参与 vLLM-HUST 运行时、Ascend 适配、benchmark、文档、website 与 workstation 仓库建设的贡献者。',
+        'contributors-leadership-kicker': '项目团队',
+        'contributors-leadership-title': '项目负责人',
+        'contributors-leadership-description': '汇集项目总体负责人和各子课题负责人。',
+        'contributors-role-lab-director': '实验室主任',
+        'contributors-role-dean': '院长',
+        'contributors-role-project-lead': '课题负责人',
+        'contributors-subproject-title': '子课题负责人',
         'contributors-all-title': '全部仓库',
         'contributors-core-title': '核心性能仓库'
       }

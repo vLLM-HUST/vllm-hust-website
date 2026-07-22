@@ -50,6 +50,42 @@ def test_site_uses_vllm_hust_brand_icon() -> None:
         )
 
 
+def test_contributors_page_lists_project_leadership() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "contributors.html").read_text(encoding="utf-8")
+
+    leadership_pos = text.index('class="content-panel leadership-panel"')
+    footprint_pos = text.index("Contributor footprint")
+    assert leadership_pos < footprint_pos
+
+    portrait_names = ("金海", "廖小飞", "张书豪")
+    portrait_files = ("jin-hai.jpg", "liao-xiaofei.jpg", "zhang-shuhao.jpg")
+    for name, file_name in zip(portrait_names, portrait_files, strict=True):
+        portrait = root / "assets" / "contributors" / file_name
+        assert portrait.exists() and portrait.stat().st_size > 1000
+        assert f'alt="{name}"' in text
+        assert f"assets/contributors/{file_name}" in text
+
+    for role in ("实验室主任", "院长", "课题负责人"):
+        assert role in text
+
+    subproject_block = text.split('class="subproject-lead-list"', 1)[1].split(
+        "</ul>", 1
+    )[0]
+    for name in (
+        "王雄",
+        "郑龙",
+        "王庆刚",
+        "罗瑞坤",
+        "赵进",
+        "刘海坤",
+        "项翔",
+        "姚鹏程",
+        "万瑶",
+    ):
+        assert f"<li>{name}</li>" in subproject_block
+
+
 def test_data_directory_has_sync_marker() -> None:
     root = Path(__file__).resolve().parents[1]
     marker = root / "data" / "last_updated.json"
@@ -372,7 +408,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=qwen2-npu-evidence-20260722" in text
+        assert "assets/site.css?v=contributors-leadership-20260722" in text
         assert "assets/site.js?v=mobile-canvas-20260718" in text
 
 
@@ -531,7 +567,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=qwen2-npu-evidence-20260722" in html_text
+    assert "assets/site.css?v=contributors-leadership-20260722" in html_text
     assert "assets/achievements-page.js?v=qwen2-npu-evidence-20260722" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
@@ -544,14 +580,17 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "number: 12343" in js_text
     assert "status: 'needs-label'" in js_text
     assert "status: 'review-requested'" in js_text
+    assert "status: 'ready-evidence'" in js_text
     assert "status: 'evidence-pending'" in js_text
     assert "status: 'ci-retry'" in js_text
     assert "[Performance][Worker] Reuse DP metadata sync buffers" in js_text
     assert "待上游标签" in js_text
     assert "已请求评审" in js_text
+    assert "实机证据已补" in js_text
     assert "Draft · 待复现问题" in js_text
     assert "待重跑 CI" in js_text
     assert 'strong[data-status="review-requested"]' in css_text
+    assert 'strong[data-status="ready-evidence"]' in css_text
     assert 'strong[data-status="evidence-pending"]' in css_text
 
     assert js_text.count("owner: 'vllm-project'") == 2
@@ -1157,3 +1196,51 @@ def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> No
     )
     assert "item.github_login && item.github_login !== displayName" in text
     assert "console.warn('[contributors] source failed', source, err);" in text
+
+
+def test_contributor_snapshot_has_unique_human_identities() -> None:
+    root = Path(__file__).resolve().parents[1]
+    snapshot_path = root / "data" / "core_contributors.json"
+    payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+    assert payload["updated_at"] == "2026-07-22"
+    assert len(payload["all_repos"]["contributors"]) == 33
+    assert len(payload["core_repos"]["contributors"]) == 18
+    assert "vllm-ascend-hust-bidkv" in payload["all_repos"]["scope_repos"]
+    assert len(payload["all_repos"]["scope_repos"]) == 17
+
+    mingqi = next(
+        item
+        for item in payload["all_repos"]["contributors"]
+        if item.get("github_login") == "MingqiWang-coder"
+    )
+    assert "vllm-ascend-hust-bidkv" in mingqi["repos"]
+
+    for scope in ("all_repos", "core_repos"):
+        contributors = payload[scope]["contributors"]
+        logins = [
+            item["github_login"].casefold()
+            for item in contributors
+            if item.get("github_login")
+        ]
+        assert len(logins) == len(set(logins))
+
+        identities = " ".join(
+            f"{item.get('display_name', '')} {item.get('github_login', '')}"
+            for item in contributors
+        ).casefold()
+        for automation_marker in ("qoder", "dependabot", "github-actions", "[bot]"):
+            assert automation_marker not in identities
+
+    all_names = {item["display_name"] for item in payload["all_repos"]["contributors"]}
+    assert {"田景远", "程月甲", "张俊辉"} <= all_names
+    assert (
+        not {"Jingyuan", "Fletcher Tian", "Paul", "Paul Cheng", "Junhui Zhang"}
+        & all_names
+    )
+
+    canonical_snapshot = (
+        root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"
+    )
+    if canonical_snapshot.exists():
+        assert snapshot_path.read_bytes() == canonical_snapshot.read_bytes()
