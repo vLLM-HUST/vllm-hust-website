@@ -441,7 +441,7 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/subpages.css?v=ecosystem-20260723" in text
+        assert "assets/subpages.css?v=ecosystem-contrast-20260723" in text
         assert '<span class="brand-mark">V</span>' in text
         assert "vLLM-HUST<small" in text
 
@@ -823,8 +823,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260706-broken-axis2" in html_text
-    assert "leaderboard-public-20260723-series-control" in html_text
+    assert "leaderboard-contrast-20260723" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
     assert 'id="trend-series-list"' in html_text
