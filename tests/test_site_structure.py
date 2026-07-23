@@ -311,6 +311,8 @@ def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
     assert 'class="cosmic-links"' not in html_text
     assert "home-card-leaderboard-title" not in html_text
     assert ".cosmic-links" not in css_text
+    assert 'href="https://sage.org.ai/"' in html_text
+    assert 'href="https://datasys.sage.org.ai/"' in html_text
 
 
 def test_conference_navigation_is_general_not_event_specific() -> None:
@@ -396,7 +398,6 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
 
     assert "letter-spacing: -" not in css_text
     assert "font-size: clamp(" not in css_text
-    assert ".cosmic-card::before" in css_text
     assert ".feature-card:hover" in css_text
 
     for name in (
@@ -410,6 +411,22 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=contributors-leadership-20260722" in text
         assert "assets/site.js?v=mobile-canvas-20260718" in text
+
+
+def test_homepage_uses_shared_ecosystem_visual_system() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "index.html").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
+
+    assert "assets/home.css?v=ecosystem-20260723" in html_text
+    assert "assets/brand/ecosystem-infrastructure.png" in html_text
+    assert 'class="execution-hero"' in html_text
+    assert 'class="execution-architecture"' in html_text
+    assert "cosmic-card" not in html_text
+    assert ".execution-hero" in css_text
+    assert ".execution-architecture" in css_text
+    assert "letter-spacing: -" not in css_text
+    assert "font-size: clamp(" not in css_text
 
 
 def test_cosmic_background_uses_scrollbar_safe_viewport_width() -> None:
