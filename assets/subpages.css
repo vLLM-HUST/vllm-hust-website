@@ -307,10 +307,6 @@ body[data-page="achievements"] .achievement-status[data-category="publication"] 
   color: #34560c;
   background: #dfeebf;
 }
-body[data-page="achievements"] .achievement-status[data-category="artifact"] {
-  color: #694a05;
-  background: #f4e1ae;
-}
 body[data-page="achievements"] .achievement-status[data-category="community"] {
   color: #81422e;
   background: #f5d5ca;

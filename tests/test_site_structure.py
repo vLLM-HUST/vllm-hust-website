@@ -554,7 +554,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "achievement-release-line-20260723" in html_text
+    assert "published-achievements-20260723" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -620,9 +620,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=contributors-leadership-20260722" in html_text
-    assert (
-        "assets/achievements-page.js?v=achievement-release-line-20260723" in html_text
-    )
+    assert "assets/achievements-page.js?v=published-achievements-20260723" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -743,9 +741,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
         "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
         in js_text
     )
-    assert (
-        "assets/achievements-page.js?v=achievement-release-line-20260723" in html_text
-    )
+    assert "assets/achievements-page.js?v=published-achievements-20260723" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -765,7 +761,7 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     assert "https://vllm.ai/blog/2026-05-18-pegaflow" in js_text
     assert "https://github.com/vLLM-HUST/pegaflow-hust" in js_text
     assert "https://github.com/vLLM-HUST/vllm-ascend-quant-hust" not in js_text
-    assert js_text.count("repositoryName:") == 5
+    assert js_text.count("repositoryName:") == 2
     assert "result-repository-title" in css_text
     assert "result-repository-link" in css_text
     assert "result-repository-index" not in css_text
@@ -773,16 +769,18 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     assert "research-cache-salt-bucketing" not in js_text
 
 
-def test_research_output_distinguishes_publications_from_unaccepted_artifacts() -> None:
+def test_research_output_excludes_unpublished_artifacts() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
     assert js_text.count("status: { en: 'Accepted · SC 2026'") == 2
-    assert "status: { en: 'Pre-submission', zh: '投稿前准备完成' }" in js_text
-    assert "Targeting FCS · Not accepted" in js_text
-    assert "拟投稿 FCS · 尚未接收" in js_text
+    assert "adaptive-selector-plugin" not in js_text
+    assert "fcs-domestic-chip-llm-recsys" not in js_text
+    assert "cccf-domestic-inference-engine-survey" not in js_text
+    assert "Pre-submission" not in js_text
+    assert "Targeting FCS" not in js_text
+    assert "Writing in public" not in js_text
     assert "Published on vLLM Blog" in js_text
-    assert "Writing in public" in js_text
 
 
 def test_achievements_page_omits_package_version_cards() -> None:
