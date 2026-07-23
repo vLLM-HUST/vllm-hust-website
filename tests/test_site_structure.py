@@ -824,7 +824,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
     assert "leaderboard-public-20260706-broken-axis2" in html_text
-    assert "leaderboard-public-20260721-sparse-trends" in html_text
+    assert "leaderboard-public-20260723-series-control" in html_text
+    assert 'id="toggle-trend-series"' in html_text
+    assert 'id="trend-series-search"' in html_text
+    assert 'id="trend-series-list"' in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "function getTrendVersionSortInfo(entry)" in js_text
     assert (
@@ -864,6 +867,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "return isServingTrendWorkload(entry);" in js_text
     assert "function renderPerformanceTrendChart(entries)" in js_text
     assert "new Chart(canvas" in js_text
+    assert "legend: {" in js_text
+    assert "display: false" in js_text
+    assert "function renderTrendSeriesControl(series)" in js_text
+    assert "state.trendChart.setDatasetVisibility(datasetIndex, visible)" in js_text
     assert "pointDetails" in js_text
     assert "spanGaps: true" in js_text
     assert "Keep one series continuous across x-axis slots" in js_text

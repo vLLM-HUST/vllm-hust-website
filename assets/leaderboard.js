@@ -238,6 +238,13 @@
             trendAxisLog: 'Log',
             trendAxisLinear: 'Linear',
             trendAxisBreak: 'axis break',
+            trendSeriesButton: 'Series',
+            trendSeriesSummary: '{visible} of {total} series visible',
+            trendSeriesHint: 'Open the series panel to focus the chart.',
+            trendSeriesSearch: 'Search series',
+            trendSeriesShowAll: 'Show all',
+            trendSeriesHideAll: 'Hide all',
+            trendSeriesEmpty: 'No matching series.',
             trendTooltipActualValue: 'Actual',
             trendTooltipBrokenAxis: 'shown on broken axis',
             trendEmpty: 'No trend data under current filters.',
@@ -447,6 +454,13 @@
             trendAxisLog: '对数',
             trendAxisLinear: '线性',
             trendAxisBreak: '断轴',
+            trendSeriesButton: '系列',
+            trendSeriesSummary: '已显示 {visible} / {total} 条系列',
+            trendSeriesHint: '打开系列面板以聚焦图表。',
+            trendSeriesSearch: '搜索系列',
+            trendSeriesShowAll: '全部显示',
+            trendSeriesHideAll: '全部隐藏',
+            trendSeriesEmpty: '没有匹配的系列。',
             trendTooltipActualValue: '实际值',
             trendTooltipBrokenAxis: '断轴显示',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
@@ -500,6 +514,9 @@
         chartMetric: 'throughput_tps',
         trendAxisScale: 'auto',
         trendChart: null,
+        trendSeries: [],
+        hiddenTrendSeries: new Set(),
+        trendSeriesExpanded: false,
         tableDetailsExpanded: false,
         loadingMore: false
     };
@@ -2498,6 +2515,10 @@
                 seriesMap.set(seriesKey, {
                     key: seriesKey,
                     label: getTrendSeriesLabel(entry),
+                    workload: getWorkloadLabel(getWorkloadId(entry) || 'Other'),
+                    model: getEntryModelDisplayName(entry) || 'Unknown model',
+                    hardware: getConfigText(entry).replace('<br><small>', ' ').replace('</small>', ''),
+                    precision: formatPrecisionWithQuantization(entry),
                     points: new Map(),
                 });
             }
@@ -2709,7 +2730,7 @@
             const y = yScale.getPixelForValue(gapMiddle);
             const ctx = chart.ctx;
             ctx.save();
-            ctx.strokeStyle = 'rgba(226, 246, 255, 0.82)';
+            ctx.strokeStyle = 'rgba(71, 85, 105, 0.76)';
             ctx.lineWidth = 2;
             const left = area.left - 10;
             const right = area.left + 18;
@@ -2719,7 +2740,7 @@
             ctx.moveTo(left + 12, y + 8);
             ctx.lineTo(right, y - 8);
             ctx.stroke();
-            ctx.fillStyle = 'rgba(226, 246, 255, 0.74)';
+            ctx.fillStyle = 'rgba(71, 85, 105, 0.82)';
             ctx.font = '600 11px Inter, sans-serif';
             ctx.fillText(t('trendAxisBreak'), area.left + 8, y - 10);
             ctx.restore();
@@ -2741,6 +2762,118 @@
             min: Math.max(min * 0.65, Number.MIN_VALUE),
             max: max * 1.18,
         };
+    }
+
+    function formatTrendSeriesSummary(visible, total) {
+        return t('trendSeriesSummary')
+            .replace('{visible}', String(visible))
+            .replace('{total}', String(total));
+    }
+
+    function updateTrendSeriesSummary() {
+        const summary = document.getElementById('leaderboard-trend-series-summary');
+        if (!summary) {
+            return;
+        }
+        const total = state.trendSeries.length;
+        const visible = state.trendSeries.filter((series) => !state.hiddenTrendSeries.has(series.key)).length;
+        summary.textContent = formatTrendSeriesSummary(visible, total);
+    }
+
+    function filterTrendSeriesList() {
+        const input = document.getElementById('trend-series-search');
+        const empty = document.getElementById('trend-series-empty');
+        const query = String(input?.value || '').trim().toLocaleLowerCase();
+        let matches = 0;
+        document.querySelectorAll('.trend-series-item').forEach((item) => {
+            const match = !query || String(item.dataset.search || '').includes(query);
+            item.hidden = !match;
+            if (match) {
+                matches += 1;
+            }
+        });
+        if (empty) {
+            empty.hidden = matches > 0;
+        }
+    }
+
+    function renderTrendSeriesControl(series) {
+        state.trendSeries = series;
+        const list = document.getElementById('trend-series-list');
+        const panel = document.getElementById('trend-series-panel');
+        const toggle = document.getElementById('toggle-trend-series');
+        const hint = document.getElementById('leaderboard-trend-series-hint');
+        const searchLabel = document.getElementById('trend-series-search-label');
+        const search = document.getElementById('trend-series-search');
+        const showAll = document.getElementById('trend-series-show-all');
+        const hideAll = document.getElementById('trend-series-hide-all');
+        const empty = document.getElementById('trend-series-empty');
+        if (!list || !panel || !toggle) {
+            return;
+        }
+
+        toggle.textContent = t('trendSeriesButton');
+        toggle.setAttribute('aria-expanded', state.trendSeriesExpanded ? 'true' : 'false');
+        panel.hidden = !state.trendSeriesExpanded;
+        if (hint) hint.textContent = t('trendSeriesHint');
+        if (searchLabel) searchLabel.textContent = t('trendSeriesSearch');
+        if (search) search.placeholder = t('trendSeriesSearch');
+        if (showAll) showAll.textContent = t('trendSeriesShowAll');
+        if (hideAll) hideAll.textContent = t('trendSeriesHideAll');
+        if (empty) empty.textContent = t('trendSeriesEmpty');
+
+        list.replaceChildren();
+        series.forEach((item, index) => {
+            const colors = getTrendColors(index);
+            const label = document.createElement('label');
+            label.className = 'trend-series-item';
+            label.dataset.seriesKey = item.key;
+            label.dataset.search = [item.label, item.workload, item.model, item.hardware, item.precision]
+                .join(' ')
+                .toLocaleLowerCase();
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = !state.hiddenTrendSeries.has(item.key);
+            checkbox.dataset.seriesKey = item.key;
+
+            const swatch = document.createElement('span');
+            swatch.className = 'trend-series-swatch';
+            swatch.style.setProperty('--series-color', colors.borderColor);
+            swatch.setAttribute('aria-hidden', 'true');
+
+            const copy = document.createElement('span');
+            copy.className = 'trend-series-copy';
+            const title = document.createElement('strong');
+            title.textContent = item.workload;
+            const meta = document.createElement('small');
+            meta.textContent = `${item.model} · ${item.hardware} · ${item.precision}`;
+            copy.append(title, meta);
+            label.append(checkbox, swatch, copy);
+            list.append(label);
+        });
+        updateTrendSeriesSummary();
+        filterTrendSeriesList();
+    }
+
+    function setTrendSeriesVisibility(seriesKey, visible, updateImmediately = true) {
+        if (visible) {
+            state.hiddenTrendSeries.delete(seriesKey);
+        } else {
+            state.hiddenTrendSeries.add(seriesKey);
+        }
+        const datasetIndex = state.trendChart?.data?.datasets?.findIndex(
+            (dataset) => dataset.seriesKey === seriesKey
+        );
+        if (Number.isInteger(datasetIndex) && datasetIndex >= 0) {
+            state.trendChart.setDatasetVisibility(datasetIndex, visible);
+            if (updateImmediately) {
+                state.trendChart.update();
+            }
+        }
+        if (updateImmediately) {
+            updateTrendSeriesSummary();
+        }
     }
 
     function renderPerformanceTrendChart(entries) {
@@ -2794,6 +2927,7 @@
             }
             empty.style.display = 'flex';
             canvas.style.display = 'none';
+            renderTrendSeriesControl([]);
             return;
         }
 
@@ -2805,6 +2939,7 @@
             }
             empty.style.display = 'flex';
             canvas.style.display = 'none';
+            renderTrendSeriesControl([]);
             return;
         }
 
@@ -2820,6 +2955,7 @@
             });
             return {
                 label: series.label,
+                seriesKey: series.key,
                 data: model.versions.map((version) => series.points.get(version.key)?.value ?? null),
                 pointDetails,
                 borderColor: colors.borderColor,
@@ -2831,6 +2967,7 @@
                 // Keep one series continuous across x-axis slots where other
                 // workload/model scopes have data but this series does not.
                 spanGaps: true,
+                hidden: state.hiddenTrendSeries.has(series.key),
             };
         });
 
@@ -2884,13 +3021,7 @@
                         axisConfig: brokenYAxisConfig,
                     },
                     legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#eaf6ff',
-                            usePointStyle: true,
-                            boxWidth: 8,
-                            boxHeight: 8,
-                        },
+                        display: false,
                     },
                     tooltip: {
                         backgroundColor: 'rgba(2, 6, 23, 0.94)',
@@ -2944,14 +3075,14 @@
                 scales: {
                     x: {
                         ticks: {
-                            color: '#dff3ff',
+                            color: '#52615f',
                             maxRotation: 45,
                             minRotation: 0,
                             autoSkip: true,
                             maxTicksLimit: 10,
                         },
                         grid: {
-                            color: 'rgba(125, 211, 252, 0.20)',
+                            color: 'rgba(82, 97, 95, 0.16)',
                         },
                     },
                     y: {
@@ -2959,7 +3090,7 @@
                         min: yAxisBounds.min,
                         max: yAxisBounds.max,
                         ticks: {
-                            color: '#dff3ff',
+                            color: '#52615f',
                             callback(value) {
                                 const axisValue = brokenYAxisConfig ? unmapBrokenTrendAxisValue(value, brokenYAxisConfig) : Number(value);
                                 return Number.isFinite(axisValue) ? formatNumber(axisValue) : '⋯';
@@ -2968,15 +3099,16 @@
                         title: {
                             display: true,
                             text: `${metricConfig.label} (${metricConfig.unit})`,
-                            color: '#f8fbff',
+                            color: '#25312f',
                         },
                         grid: {
-                            color: 'rgba(125, 211, 252, 0.20)',
+                            color: 'rgba(82, 97, 95, 0.16)',
                         },
                     },
                 },
             },
         });
+        renderTrendSeriesControl(model.series);
     }
 
     // 初始化筛选器默认值（选择第一个可用配置）
@@ -3058,6 +3190,49 @@
                 }
                 state.trendAxisScale = axis;
                 renderTable();
+            });
+        });
+
+        const trendSeriesToggle = document.getElementById('toggle-trend-series');
+        if (trendSeriesToggle) {
+            trendSeriesToggle.addEventListener('click', () => {
+                state.trendSeriesExpanded = !state.trendSeriesExpanded;
+                const panel = document.getElementById('trend-series-panel');
+                trendSeriesToggle.setAttribute('aria-expanded', state.trendSeriesExpanded ? 'true' : 'false');
+                if (panel) {
+                    panel.hidden = !state.trendSeriesExpanded;
+                }
+            });
+        }
+        const trendSeriesSearch = document.getElementById('trend-series-search');
+        if (trendSeriesSearch) {
+            trendSeriesSearch.addEventListener('input', filterTrendSeriesList);
+        }
+        const trendSeriesList = document.getElementById('trend-series-list');
+        if (trendSeriesList) {
+            trendSeriesList.addEventListener('change', (event) => {
+                const checkbox = event.target.closest('input[data-series-key]');
+                if (!checkbox) {
+                    return;
+                }
+                setTrendSeriesVisibility(checkbox.dataset.seriesKey, checkbox.checked);
+            });
+        }
+        ['show', 'hide'].forEach((action) => {
+            const button = document.getElementById(`trend-series-${action}-all`);
+            if (!button) {
+                return;
+            }
+            button.addEventListener('click', () => {
+                const visible = action === 'show';
+                state.trendSeries.forEach((series) => {
+                    setTrendSeriesVisibility(series.key, visible, false);
+                });
+                document.querySelectorAll('#trend-series-list input[data-series-key]').forEach((checkbox) => {
+                    checkbox.checked = visible;
+                });
+                state.trendChart?.update();
+                updateTrendSeriesSummary();
             });
         });
 

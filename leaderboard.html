@@ -129,6 +129,29 @@
               <button type="button" class="trend-axis-button" data-trend-axis="linear">Linear</button>
             </div>
           </div>
+          <div class="trend-series-toolbar">
+            <div>
+              <strong id="leaderboard-trend-series-summary">All series visible</strong>
+              <span id="leaderboard-trend-series-hint">Open the series panel to focus the chart.</span>
+            </div>
+            <button id="toggle-trend-series" class="trend-series-toggle" type="button" aria-expanded="false" aria-controls="trend-series-panel">
+              Series
+            </button>
+          </div>
+          <div id="trend-series-panel" class="trend-series-panel" hidden>
+            <div class="trend-series-actions">
+              <label class="trend-series-search">
+                <span id="trend-series-search-label">Search series</span>
+                <input id="trend-series-search" type="search" autocomplete="off" />
+              </label>
+              <div>
+                <button id="trend-series-show-all" type="button">Show all</button>
+                <button id="trend-series-hide-all" type="button">Hide all</button>
+              </div>
+            </div>
+            <div id="trend-series-list" class="trend-series-list"></div>
+            <p id="trend-series-empty" class="trend-series-empty" hidden>No matching series.</p>
+          </div>
           <div class="trend-chart-wrap">
             <canvas id="leaderboard-trend-chart"></canvas>
             <div id="leaderboard-trend-empty" class="trend-empty" style="display: none">No trend data under current filters.</div>
@@ -203,7 +226,7 @@
   <script src="./assets/site.js?v=mobile-canvas-20260718"></script>
   <script src="./assets/hf-data-loader.js?v=leaderboard-cache-v7-20260702"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
-  <script src="./assets/leaderboard.js?v=leaderboard-public-20260721-sparse-trends"></script>
+  <script src="./assets/leaderboard.js?v=leaderboard-public-20260723-series-control"></script>
 </body>
 
 </html>
