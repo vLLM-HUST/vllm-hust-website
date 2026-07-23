@@ -389,7 +389,11 @@ def test_language_toggle_is_separate_from_primary_navigation() -> None:
     assert "position: fixed;" in css_text
     assert "top: 88px;" in css_text
     assert "right: max(" in css_text
-    assert "中 / EN" in (root / "assets" / "site.js").read_text(encoding="utf-8")
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+    assert "langToggle: '中文'" in site_js
+    assert "langToggle: 'EN'" in site_js
+    assert "langToggleLabel: '切换为中文'" in site_js
+    assert "langToggleLabel: 'Switch to English'" in site_js
 
 
 def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() -> None:
@@ -410,7 +414,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=contributors-leadership-20260722" in text
-        assert "assets/site.js?v=mobile-canvas-20260718" in text
+        assert "assets/site.js?v=bilingual-toggle-20260723" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -441,12 +445,14 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/subpages.css?v=ecosystem-contrast-20260723" in text
+        assert "assets/subpages.css?v=achievement-timeline-mobile-20260723" in text
         assert '<span class="brand-mark">V</span>' in text
         assert "vLLM-HUST<small" in text
 
     assert 'body:not([data-page="home"])' in css_text
     assert 'body[data-page="leaderboard"]' in css_text
+    assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in css_text
+    assert "overflow-wrap: anywhere;" in css_text
     assert "letter-spacing: -" not in css_text
     assert "font-size: clamp(" not in css_text
 
@@ -548,14 +554,14 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "qwen2-npu-evidence-20260722" in html_text
+    assert "achievement-release-line-20260723" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
-    css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
 
     assert 'id="achievement-timeline"' in html_text
     assert 'class="achievement-timeline"' in html_text
@@ -563,12 +569,16 @@ def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     assert "achievement-milestones" not in html_text
     assert "const ACHIEVEMENTS = [" in js_text
     assert "sortDate: '2026-07-02'" in js_text
-    assert (
-        "].sort((left, right) => right.sortDate.localeCompare(left.sortDate));"
-        in js_text
-    )
+    assert ".sort((left, right) => right.sortDate.localeCompare(left.sortDate));" in js_text
+    assert 'id="achievement-release-line"' in html_text
+    assert 'data-achievement-filter="publication"' in html_text
+    assert "function renderReleaseLine" in js_text
+    assert "activeAchievementFilter" in js_text
+    assert "timelineFilterLabel: '筛选成果时间轴'" in js_text
+    assert "releaseLineLabel: '成果发布线'" in js_text
     assert "achievement-item" in css_text
-    assert "achievement-time" in css_text
+    assert "achievement-release-node" in css_text
+    assert "achievement-status" in css_text
 
 
 def test_achievements_timeline_only_records_merged_upstream_prs() -> None:
@@ -607,7 +617,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=contributors-leadership-20260722" in html_text
-    assert "assets/achievements-page.js?v=qwen2-npu-evidence-20260722" in html_text
+    assert "assets/achievements-page.js?v=achievement-release-line-20260723" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -670,8 +680,9 @@ def test_achievements_page_records_qwen_accepted_pr() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "Jingyuan Tian PR accepted by the Qwen community" in js_text
-    assert "恭喜 Jingyuan 同学的 PR 被 Qwen 社区正式接收" in js_text
+    assert "Plan-gate fix merged into Qwen Code" in js_text
+    assert "Plan-gate 修复合入 Qwen Code" in js_text
+    assert "status: { en: 'Merged', zh: '已合入' }" in js_text
     assert "https://github.com/QwenLM/qwen-code/pull/5185" in js_text
 
 
@@ -685,7 +696,8 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     assert 'id="result-repository-list"' in html_text
     assert "成果仓库" in html_text
     assert "const RESULT_REPOSITORIES = [" in js_text
-    assert "BidKV at SC 2026" in js_text
+    assert "BidKV: Utility-Guided Preemption Scheduling for KV-Pressure LLM Serving" in js_text
+    assert "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
     assert "./assets/papers/bidkv-sc2026.pdf" in js_text
     assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
     assert "github.com/intellistream/bidkv" not in js_text
@@ -703,17 +715,17 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "DiffSpec at SC 2026" in js_text
-    assert "DiffSpec 入选 SC 2026" in js_text
+    assert "DiffSpec: Accelerating Long Sequence Generation with Differential Speculative Decoding" in js_text
+    assert "DiffSpec：面向长序列生成的差分投机解码加速" in js_text
     assert "label: { en: 'Repository', zh: '仓库' }" in js_text
     assert "name: 'DiffSpec'" in js_text
-    assert "repositoryName: 'vllm-hust'" in js_text
+    assert "repositoryName: 'vllm-ascend-hust-diffspec'" in js_text
     assert "面向超长序列推理的差分投机解码加速系统。" in js_text
-    assert "publication: { en: 'SC 2026', zh: 'SC 2026' }" in js_text
+    assert "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
     assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
     assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
-    assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" in js_text
-    assert "assets/achievements-page.js?v=qwen2-npu-evidence-20260722" in html_text
+    assert "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'" in js_text
+    assert "assets/achievements-page.js?v=achievement-release-line-20260723" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -730,14 +742,27 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     assert hero_index < repositories_index < snapshot_index
 
     assert "https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
-    assert "https://github.com/vLLM-HUST/pegaflow-hust" not in js_text
+    assert "https://vllm.ai/blog/2026-05-18-pegaflow" in js_text
+    assert "https://github.com/vLLM-HUST/pegaflow-hust" in js_text
     assert "https://github.com/vLLM-HUST/vllm-ascend-quant-hust" not in js_text
-    assert js_text.count("repositoryName:") == 2
+    assert js_text.count("repositoryName:") == 5
     assert "result-repository-title" in css_text
     assert "result-repository-link" in css_text
     assert "result-repository-index" not in css_text
     assert "result-repository-tags" not in css_text
     assert "research-cache-salt-bucketing" not in js_text
+
+
+def test_research_output_distinguishes_publications_from_unaccepted_artifacts() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    assert js_text.count("status: { en: 'Accepted · SC 2026'") == 2
+    assert "status: { en: 'Pre-submission', zh: '投稿前准备完成' }" in js_text
+    assert "Targeting FCS · Not accepted" in js_text
+    assert "拟投稿 FCS · 尚未接收" in js_text
+    assert "Published on vLLM Blog" in js_text
+    assert "Writing in public" in js_text
 
 
 def test_achievements_page_omits_package_version_cards() -> None:

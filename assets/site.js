@@ -8,7 +8,8 @@
             navConferences: 'Conferences',
             navCourses: 'Courses',
             brandSubtitle: 'Execution layer',
-            langToggle: '中 / EN',
+            langToggle: '中文',
+            langToggleLabel: '切换为中文',
         },
         zh: {
             navHome: '首页',
@@ -18,7 +19,8 @@
             navConferences: '会议',
             navCourses: '课程',
             brandSubtitle: '推理执行层',
-            langToggle: '中 / EN',
+            langToggle: 'EN',
+            langToggleLabel: 'Switch to English',
         },
     };
 
@@ -71,6 +73,11 @@
         setText('nav-conferences', common.navConferences);
         setText('nav-courses', common.navCourses);
         setText('langToggleText', common.langToggle);
+        const languageButton = document.getElementById('langToggle');
+        if (languageButton) {
+            languageButton.setAttribute('aria-label', common.langToggleLabel);
+            languageButton.setAttribute('title', common.langToggleLabel);
+        }
         document.querySelectorAll('.brand-copy small').forEach((node) => {
             node.textContent = common.brandSubtitle;
         });
