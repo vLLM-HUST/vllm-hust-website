@@ -9,64 +9,100 @@
 
     const ACHIEVEMENTS = [
         {
-            sortDate: '2026-07-02',
-            date: { en: 'July 2026', zh: '2026 年 7 月' },
+            sortDate: '2026-07-22',
+            date: { en: 'Jul 22, 2026', zh: '2026 年 7 月 22 日' },
+            category: 'publication',
             kind: { en: 'Publication', zh: '论文' },
+            status: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' },
             title: {
-                en: 'BidKV at SC 2026',
-                zh: 'BidKV 入选 SC 2026',
+                en: 'DiffSpec: Accelerating Long Sequence Generation with Differential Speculative Decoding',
+                zh: 'DiffSpec：面向长序列生成的差分投机解码加速',
             },
             body: {
-                en: 'A SC 2026 paper on utility-guided preemption scheduling for LLM serving under KV-cache pressure.',
-                zh: '一篇关于 KV cache 压力下大模型推理服务 utility-guided preemption scheduling 的 SC 2026 论文。',
+                en: 'An accepted SC 2026 system for allocating speculative effort by position-specific utility during long-sequence generation, with a public Ascend implementation and reproducibility evidence.',
+                zh: 'SC 2026 已接收成果：依据长序列生成中的位置效用分配投机计算，并公开 Ascend 实现与可复现实验证据。',
             },
             tags: [
                 { en: 'SC 2026', zh: 'SC 2026' },
-                { en: 'KV cache', zh: 'KV cache' },
-                { en: 'LLM serving', zh: 'LLM serving' },
+                { en: 'Speculative decoding', zh: '投机解码' },
+                { en: 'Long context', zh: '长序列' },
+            ],
+            links: [
+                {
+                    label: { en: 'Repository', zh: '成果仓库' },
+                    href: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec',
+                },
+            ],
+        },
+        {
+            sortDate: '2026-07-19',
+            date: { en: 'Jul 19, 2026', zh: '2026 年 7 月 19 日' },
+            category: 'artifact',
+            kind: { en: 'Research artifact', zh: '研究制品' },
+            status: { en: 'Pre-submission', zh: '投稿前准备完成' },
+            title: {
+                en: 'Adaptive decode backend selector',
+                zh: '自适应解码后端选择器',
+            },
+            body: {
+                en: 'A public vLLM plugin and reproducibility artifact for online decode-backend selection. The repository is submission-ready, but its paper is not yet published.',
+                zh: '用于在线选择解码后端的公开 vLLM 插件与复现实验制品。仓库已具备投稿条件，但论文尚未发表。',
+            },
+            tags: [
+                { en: 'vLLM plugin', zh: 'vLLM 插件' },
+                { en: 'Adaptive execution', zh: '自适应执行' },
+                { en: 'Reproducibility', zh: '可复现性' },
+            ],
+            links: [
+                {
+                    label: { en: 'Repository', zh: '仓库' },
+                    href: 'https://github.com/vLLM-HUST/adaptive-selector-plugin',
+                },
+            ],
+        },
+        {
+            sortDate: '2026-07-02',
+            date: { en: 'July 2026', zh: '2026 年 7 月' },
+            category: 'publication',
+            kind: { en: 'Publication', zh: '论文' },
+            status: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' },
+            title: {
+                en: 'BidKV: Utility-Guided Preemption Scheduling for KV-Pressure LLM Serving',
+                zh: 'BidKV：KV 压力下大模型服务的效用引导抢占调度',
+            },
+            body: {
+                en: 'Yanbo Chen, Mingqi Wang, Shuhao Zhang, Xiaofei Liao, and Hai Jin. The public artifact implements utility-guided KV-cache reclamation and preemption scheduling for vLLM.',
+                zh: '作者：陈彦博、王明琪、张书豪、廖小飞、金海。公开制品实现了面向 vLLM 的效用引导 KV Cache 回收与抢占调度。',
+            },
+            tags: [
+                { en: 'SC 2026', zh: 'SC 2026' },
+                { en: 'KV cache', zh: 'KV Cache' },
+                { en: 'LLM serving', zh: '推理服务' },
             ],
             links: [
                 {
                     label: { en: 'Open PDF', zh: '查看 PDF' },
                     href: './assets/papers/bidkv-sc2026.pdf',
                 },
-            ],
-        },
-        {
-            sortDate: '2026-07-02',
-            date: { en: 'July 2026', zh: '2026 年 7 月' },
-            kind: { en: 'Publication', zh: '论文' },
-            title: {
-                en: 'DiffSpec at SC 2026',
-                zh: 'DiffSpec 入选 SC 2026',
-            },
-            body: {
-                en: 'A differential speculative decoding acceleration system for ultra-long-sequence inference.',
-                zh: '面向超长序列推理的差分投机解码加速系统。',
-            },
-            tags: [
-                { en: 'SC 2026', zh: 'SC 2026' },
-                { en: 'Speculative decoding', zh: '投机解码' },
-                { en: 'Long context', zh: '超长序列' },
-            ],
-            links: [
                 {
-                    label: { en: 'Repository', zh: '仓库' },
-                    href: 'https://github.com/vLLM-HUST/vllm-hust',
+                    label: { en: 'Repository', zh: '成果仓库' },
+                    href: 'https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv',
                 },
             ],
         },
         {
             sortDate: '2026-06-18',
-            date: { en: 'June 2026', zh: '2026 年 6 月' },
-            kind: { en: 'Community', zh: '社区贡献' },
+            date: { en: 'Jun 18, 2026', zh: '2026 年 6 月 18 日' },
+            category: 'community',
+            kind: { en: 'Upstream contribution', zh: '上游贡献' },
+            status: { en: 'Merged', zh: '已合入' },
             title: {
-                en: 'Jingyuan Tian PR accepted by the Qwen community',
-                zh: '恭喜 Jingyuan 同学的 PR 被 Qwen 社区正式接收',
+                en: 'Plan-gate fix merged into Qwen Code',
+                zh: 'Plan-gate 修复合入 Qwen Code',
             },
             body: {
-                en: 'Jingyuan Tian contributed a plan-gate fix to qwen-code, and the Qwen community merged it into the official repository.',
-                zh: 'Jingyuan Tian 向 qwen-code 贡献了 plan-gate 修复，并已被 Qwen 社区合入官方仓库。',
+                en: 'Jingyuan Tian contributed an AbortSignal isolation fix for the plan gate, and the Qwen community merged it into the official qwen-code repository.',
+                zh: 'Jingyuan Tian 提交了 plan gate 的 AbortSignal 隔离修复，并由 Qwen 社区合入 qwen-code 官方仓库。',
             },
             tags: [
                 { en: 'Qwen', zh: 'Qwen' },
@@ -81,21 +117,79 @@
             ],
         },
         {
-            sortDate: '2026-07-01',
-            date: { en: 'July 2026', zh: '2026 年 7 月' },
-            kind: { en: 'Survey', zh: '综述' },
+            sortDate: '2026-06-08',
+            date: { en: 'Jun 8, 2026', zh: '2026 年 6 月 8 日' },
+            category: 'artifact',
+            kind: { en: 'Public manuscript', zh: '公开稿件' },
+            status: { en: 'Targeting FCS', zh: '拟投稿 FCS' },
             title: {
-                en: 'Domestic-hardware inference engine survey',
+                en: 'LLM-Powered Recommendation Systems on Domestic AI Chips',
+                zh: '国产 AI 芯片上的大模型推荐系统',
+            },
+            body: {
+                en: 'A public manuscript on workload characteristics and system co-design for LLM-powered recommendation systems on domestic accelerators. It is targeting FCS and is not labeled as accepted.',
+                zh: '围绕国产加速器上的大模型推荐工作负载与系统协同设计形成的公开稿件，拟投稿 FCS，当前不标记为已接收。',
+            },
+            tags: [
+                { en: 'FCS target', zh: 'FCS 目标期刊' },
+                { en: 'Recommendation', zh: '推荐系统' },
+                { en: 'System co-design', zh: '系统协同设计' },
+            ],
+            links: [
+                {
+                    label: { en: 'Manuscript repository', zh: '稿件仓库' },
+                    href: 'https://github.com/vLLM-HUST/fcs-domestic-chip-llm-recsys',
+                },
+            ],
+        },
+        {
+            sortDate: '2026-05-18',
+            date: { en: 'May 18, 2026', zh: '2026 年 5 月 18 日' },
+            category: 'technical',
+            kind: { en: 'Technical publication', zh: '技术发表' },
+            status: { en: 'Published on vLLM Blog', zh: '发表于 vLLM 官方博客' },
+            title: {
+                en: 'vLLM x Novita AI: PegaFlow for Production-Grade External KV Cache',
+                zh: 'vLLM × Novita AI：面向生产环境的外部 KV Cache 系统 PegaFlow',
+            },
+            body: {
+                en: 'A joint technical article by Novita AI and the vLLM Team on external KV ownership, shared cache pools, RDMA, SSD tiers, and production serving integration.',
+                zh: 'Novita AI 与 vLLM Team 联合发布的技术文章，介绍外部 KV 所有权、共享缓存池、RDMA、SSD 分层与生产推理集成。',
+            },
+            tags: [
+                { en: 'vLLM Blog', zh: 'vLLM 官方博客' },
+                { en: 'External KV cache', zh: '外部 KV Cache' },
+                { en: 'Production serving', zh: '生产推理' },
+            ],
+            links: [
+                {
+                    label: { en: 'Read article', zh: '阅读文章' },
+                    href: 'https://vllm.ai/blog/2026-05-18-pegaflow',
+                },
+                {
+                    label: { en: 'Organization mirror', zh: '组织镜像' },
+                    href: 'https://github.com/vLLM-HUST/pegaflow-hust',
+                },
+            ],
+        },
+        {
+            sortDate: '2026-05-05',
+            date: { en: 'May 5, 2026', zh: '2026 年 5 月 5 日' },
+            category: 'artifact',
+            kind: { en: 'Survey manuscript', zh: '综述稿件' },
+            status: { en: 'Writing in public', zh: '公开撰写中' },
+            title: {
+                en: 'Survey of inference engines for domestic accelerators',
                 zh: '国产算力推理引擎综述',
             },
             body: {
-                en: 'A CCCF survey manuscript on domestic LLM inference engines, covering execution backends, state management, compression, and evaluation practice.',
-                zh: 'CCCF 通讯专刊综述稿件，系统梳理国产大模型推理引擎、执行后端、状态治理、压缩协同与评测实践。',
+                en: 'A public Chinese writing repository for a CCCF special-issue survey covering execution backends, KV-cache management, scheduling, serving, and evaluation.',
+                zh: '面向 CCCF 通讯专刊公开撰写的中文综述仓库，覆盖执行后端、KV Cache 管理、调度、服务化与评测。',
             },
             tags: [
-                { en: 'CCCF', zh: 'CCCF' },
+                { en: 'CCCF manuscript', zh: 'CCCF 稿件' },
                 { en: 'Survey', zh: '综述' },
-                { en: 'LaTeX', zh: 'LaTeX' },
+                { en: 'Domestic accelerators', zh: '国产算力' },
             ],
             links: [
                 {
@@ -109,30 +203,58 @@
             ],
         },
         {
-            sortDate: '2026-07-01',
-            date: { en: 'July 2026', zh: '2026 年 7 月' },
-            kind: { en: 'Benchmark', zh: '评测' },
+            sortDate: '2026-03-24',
+            date: { en: 'Mar 24, 2026', zh: '2026 年 3 月 24 日' },
+            category: 'technical',
+            kind: { en: 'Benchmark release', zh: '评测发布' },
+            status: { en: 'Public', zh: '已公开' },
             title: {
-                en: 'Ascend performance evaluation documentation',
-                zh: 'Ascend 性能评测文档',
+                en: 'Reproducible vLLM-HUST benchmark workflow',
+                zh: 'vLLM-HUST 可复现评测流程',
             },
             body: {
-                en: 'Benchmark documentation for Ascend baselines, same-configuration runs, result submission, and leaderboard publication.',
-                zh: 'benchmark 仓提供 Ascend 基线、同配置评测、结果提交和排行榜发布流程文档。',
+                en: 'The public benchmark repository standardizes baselines, aligned-configuration runs, result submission, schema validation, and leaderboard publication.',
+                zh: '公开 benchmark 仓统一了基线、同配置运行、结果提交、Schema 验证与排行榜发布流程。',
             },
             tags: [
                 { en: 'Benchmark', zh: 'Benchmark' },
+                { en: 'Reproducibility', zh: '可复现性' },
                 { en: 'Ascend', zh: 'Ascend' },
-                { en: 'Same configuration', zh: '同配置评测' },
             ],
             links: [
                 {
-                    label: { en: 'Baseline docs', zh: '基线文档' },
-                    href: 'https://github.com/vLLM-HUST/vllm-hust-benchmark#official-goal-baseline',
+                    label: { en: 'Repository', zh: '仓库' },
+                    href: 'https://github.com/vLLM-HUST/vllm-hust-benchmark',
                 },
                 {
-                    label: { en: 'Handoff doc', zh: '交接文档' },
-                    href: 'https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/docs/LEADERBOARD_HANDOFF.md',
+                    label: { en: 'Leaderboard', zh: '性能排行榜' },
+                    href: './leaderboard.html',
+                },
+            ],
+        },
+        {
+            sortDate: '2026-03-19',
+            date: { en: 'Mar 19, 2026', zh: '2026 年 3 月 19 日' },
+            category: 'technical',
+            kind: { en: 'Platform release', zh: '平台发布' },
+            status: { en: 'Public', zh: '已公开' },
+            title: {
+                en: 'vLLM-HUST public runtime repository',
+                zh: 'vLLM-HUST 推理运行时公开仓库',
+            },
+            body: {
+                en: 'The upstream-compatible runtime fork opened as the shared execution foundation for domestic-hardware enablement, plugins, benchmarks, and serving experiments.',
+                zh: '兼容上游的推理运行时仓库公开，作为国产硬件适配、插件、评测与服务实验的共同执行基础。',
+            },
+            tags: [
+                { en: 'Runtime', zh: '推理运行时' },
+                { en: 'Open source', zh: '开源' },
+                { en: 'Domestic hardware', zh: '国产硬件' },
+            ],
+            links: [
+                {
+                    label: { en: 'Repository', zh: '仓库' },
+                    href: 'https://github.com/vLLM-HUST/vllm-hust',
                 },
             ],
         },
@@ -177,13 +299,13 @@
 
     const RESULT_REPOSITORIES = [
         {
-            name: 'BiDKV',
+            name: 'BidKV',
             repositoryName: 'vllm-ascend-hust-bidkv',
             summary: {
                 en: 'A KV-cache reclamation plugin for vLLM.',
                 zh: '用于 vLLM 的 KV Cache 回收插件。',
             },
-            publication: { en: 'SC 2026', zh: 'SC 2026' },
+            publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' },
             team: [
                 {
                     role: { en: 'Lead authors', zh: '主要作者' },
@@ -198,12 +320,12 @@
         },
         {
             name: 'DiffSpec',
-            repositoryName: 'vllm-hust',
+            repositoryName: 'vllm-ascend-hust-diffspec',
             summary: {
                 en: 'A differential speculative decoding acceleration system for ultra-long-sequence inference.',
                 zh: '面向超长序列推理的差分投机解码加速系统。',
             },
-            publication: { en: 'SC 2026', zh: 'SC 2026' },
+            publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' },
             team: [
                 {
                     role: { en: 'Lead author', zh: '主要作者' },
@@ -214,7 +336,40 @@
                     names: { en: 'Yu Huang', zh: '黄禹' },
                 },
             ],
-            repository: 'https://github.com/vLLM-HUST/vllm-hust',
+            repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec',
+        },
+        {
+            name: 'Adaptive Selector',
+            repositoryName: 'adaptive-selector-plugin',
+            summary: {
+                en: 'A public vLLM plugin and reproducibility artifact for online decode-backend selection.',
+                zh: '用于在线选择解码后端的公开 vLLM 插件与可复现实验制品。',
+            },
+            publication: { en: 'Pre-submission artifact', zh: '投稿前研究制品' },
+            team: [],
+            repository: 'https://github.com/vLLM-HUST/adaptive-selector-plugin',
+        },
+        {
+            name: 'Domestic Inference Survey',
+            repositoryName: 'cccf-domestic-inference-engine-survey',
+            summary: {
+                en: 'A public Chinese survey manuscript on inference engines and serving stacks for domestic accelerators.',
+                zh: '关于国产算力推理引擎与服务技术栈的公开中文综述稿件。',
+            },
+            publication: { en: 'Public manuscript', zh: '公开稿件' },
+            team: [],
+            repository: 'https://github.com/vLLM-HUST/cccf-domestic-inference-engine-survey',
+        },
+        {
+            name: 'LLM RecSys on Domestic Chips',
+            repositoryName: 'fcs-domestic-chip-llm-recsys',
+            summary: {
+                en: 'A system co-design manuscript for LLM-powered recommendation workloads on domestic AI chips.',
+                zh: '面向国产 AI 芯片大模型推荐工作负载的系统协同设计稿件。',
+            },
+            publication: { en: 'Targeting FCS · Not accepted', zh: '拟投稿 FCS · 尚未接收' },
+            team: [],
+            repository: 'https://github.com/vLLM-HUST/fcs-domestic-chip-llm-recsys',
         },
     ];
 
@@ -247,6 +402,17 @@
             collapseRepository: (name) => `Collapse ${name} pull requests`,
             expandRepository: (name) => `Show ${name} pull requests`,
             repositoryLink: 'Open repository',
+            filterLabels: {
+                all: 'All',
+                publication: 'Papers',
+                artifact: 'Artifacts',
+                technical: 'Technical',
+                community: 'Community',
+            },
+            releaseCount: (count) => `${count} releases`,
+            timelineEmpty: 'No releases match this filter.',
+            timelineFilterLabel: 'Filter achievement timeline',
+            releaseLineLabel: 'Achievement release line',
         },
         zh: {
             throughputUnit: 'token/s',
@@ -276,6 +442,17 @@
             collapseRepository: (name) => `收起 ${name} PR`,
             expandRepository: (name) => `查看 ${name} PR`,
             repositoryLink: '打开仓库',
+            filterLabels: {
+                all: '全部',
+                publication: '论文',
+                artifact: '研究制品',
+                technical: '技术发布',
+                community: '社区贡献',
+            },
+            releaseCount: (count) => `${count} 项成果`,
+            timelineEmpty: '当前分类下暂无成果。',
+            timelineFilterLabel: '筛选成果时间轴',
+            releaseLineLabel: '成果发布线',
         },
     };
 
@@ -286,6 +463,7 @@
     };
 
     let expandedUpstreamRepository = null;
+    let activeAchievementFilter = 'all';
 
     function fmt(value) {
         return Number(value || 0).toLocaleString();
@@ -400,7 +578,9 @@
         return {
             sortDate: item.sortDate || '0000-00-00',
             date: pick(item.date, lang) || item.date || '',
+            category: item.category || 'technical',
             kind: pick(item.kind, lang) || item.kind || '',
+            status: pick(item.status, lang) || '',
             title: pick(item.title, lang),
             body: pick(item.body, lang),
             tags: item.tags || [],
@@ -408,13 +588,57 @@
         };
     }
 
-    function renderTimeline(compare, lang = currentLang()) {
+    function formatReleaseMonth(monthKey, lang) {
+        const [year, month] = monthKey.split('-').map(Number);
+        if (lang === 'zh') return `${year} 年 ${month} 月`;
+        return new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric', timeZone: 'UTC' })
+            .format(new Date(Date.UTC(year, month - 1, 1)));
+    }
+
+    function renderReleaseLine(items, lang) {
+        const target = document.getElementById('achievement-release-line');
+        if (!target) return;
+        target.setAttribute('aria-label', ui(lang).releaseLineLabel);
+        const months = new Map();
+        items.forEach((item) => {
+            const month = item.sortDate.slice(0, 7);
+            if (!months.has(month)) months.set(month, []);
+            months.get(month).push(item);
+        });
+        target.innerHTML = Array.from(months.entries()).map(([month, monthItems], index) => `
+            <div class="achievement-release-node ${index === 0 ? 'is-latest' : ''}">
+                <span>${formatReleaseMonth(month, lang)}</span>
+                <strong>${ui(lang).releaseCount(monthItems.length)}</strong>
+                <small>${Array.from(new Set(monthItems.map((item) => item.kind))).join(' · ')}</small>
+            </div>
+        `).join('');
+    }
+
+    function renderTimeline(lang = currentLang()) {
         const target = document.getElementById('achievement-timeline');
         if (!target) return;
-        const items = [
-            ...ACHIEVEMENTS.map((item) => normalizeAchievement(item, lang)),
-            ...buildMilestones(compare, lang).map((item) => normalizeAchievement(item, lang)),
-        ].sort((left, right) => right.sortDate.localeCompare(left.sortDate));
+        const allItems = ACHIEVEMENTS
+            .map((item) => normalizeAchievement(item, lang))
+            .sort((left, right) => right.sortDate.localeCompare(left.sortDate));
+        const items = activeAchievementFilter === 'all'
+            ? allItems
+            : allItems.filter((item) => item.category === activeAchievementFilter);
+
+        document.querySelectorAll('.achievement-filter-button').forEach((button) => {
+            const filter = button.dataset.achievementFilter;
+            const isActive = filter === activeAchievementFilter;
+            button.textContent = ui(lang).filterLabels[filter] || filter;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', String(isActive));
+        });
+        document.getElementById('achievement-filter')
+            ?.setAttribute('aria-label', ui(lang).timelineFilterLabel);
+        renderReleaseLine(items, lang);
+
+        if (!items.length) {
+            target.innerHTML = `<div class="empty-state">${ui(lang).timelineEmpty}</div>`;
+            return;
+        }
 
         target.innerHTML = items.map((item) => `
             <article class="achievement-item ${item === items[0] ? 'is-latest' : ''}">
@@ -425,7 +649,10 @@
                 <div class="achievement-body">
                     <div class="achievement-head">
                         <h3>${item.title}</h3>
-                        ${item === items[0] ? `<span class="achievement-latest">${ui(lang).latestLabel}</span>` : ''}
+                        <div class="achievement-badges">
+                            ${item.status ? `<span class="achievement-status" data-category="${item.category}">${item.status}</span>` : ''}
+                            ${item === items[0] ? `<span class="achievement-latest">${ui(lang).latestLabel}</span>` : ''}
+                        </div>
                     </div>
                     <p>${item.body}</p>
                     ${item.tags.length ? `
@@ -447,7 +674,7 @@
         const target = document.getElementById('result-repository-list');
         if (!target) return;
         target.innerHTML = RESULT_REPOSITORIES.map((repository) => `
-            <a class="result-repository-card" href="${repository.repository}" target="_blank" rel="noreferrer" aria-label="${repository.name} · ${repository.repositoryName}">
+            <a class="result-repository-card ${repository.team?.length ? 'has-team' : 'no-team'}" href="${repository.repository}" target="_blank" rel="noreferrer" aria-label="${repository.name} · ${repository.repositoryName}">
                 <div class="result-repository-content">
                 <div class="result-repository-source"><span>vLLM-HUST /</span><strong>${repository.repositoryName}</strong></div>
                     <div class="result-repository-title">
@@ -542,7 +769,16 @@
     function renderDynamic(lang = currentLang()) {
         renderResultRepositories(lang);
         renderUpstreamPRs(lang);
-        if (state.compare) renderTimeline(state.compare, lang);
+        renderTimeline(lang);
+    }
+
+    function bindTimelineFilters() {
+        document.querySelectorAll('.achievement-filter-button').forEach((button) => {
+            button.addEventListener('click', () => {
+                activeAchievementFilter = button.dataset.achievementFilter || 'all';
+                renderTimeline();
+            });
+        });
     }
 
     async function init() {
@@ -574,6 +810,7 @@
         }
     }
 
+    bindTimelineFilters();
     document.addEventListener('DOMContentLoaded', init);
     window.addEventListener('vllm-hust:langchange', (event) => {
         renderDynamic(event.detail?.lang || currentLang());

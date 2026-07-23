@@ -197,6 +197,124 @@ body:not([data-page="home"]) .achievement-item.is-latest .achievement-body {
   background: #fff;
   box-shadow: inset 4px 0 var(--sub-amber);
 }
+body[data-page="achievements"] .result-repository-card.no-team {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+body[data-page="achievements"] .achievement-timeline-toolbar {
+  margin-bottom: 30px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+body[data-page="achievements"] .achievement-timeline-toolbar > p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--sub-muted);
+}
+body[data-page="achievements"] .achievement-filter {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0;
+  border: 1px solid var(--sub-line);
+  border-radius: 4px;
+}
+body[data-page="achievements"] .achievement-filter-button {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 0;
+  border-right: 1px solid var(--sub-line);
+  color: var(--sub-muted);
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+body[data-page="achievements"] .achievement-filter-button:last-child { border-right: 0; }
+body[data-page="achievements"] .achievement-filter-button:hover,
+body[data-page="achievements"] .achievement-filter-button.active {
+  color: #fff;
+  background: var(--sub-ink);
+  box-shadow: inset 0 -3px var(--sub-amber);
+}
+body[data-page="achievements"] .achievement-release-line {
+  position: relative;
+  margin-bottom: 38px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  border-top: 1px solid var(--sub-line);
+  border-bottom: 1px solid var(--sub-line);
+}
+body[data-page="achievements"] .achievement-release-node {
+  position: relative;
+  min-height: 118px;
+  padding: 30px 18px 18px;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  border-right: 1px solid var(--sub-line);
+}
+body[data-page="achievements"] .achievement-release-node:last-child { border-right: 0; }
+body[data-page="achievements"] .achievement-release-node::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 18px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #176f72;
+  box-shadow: 0 0 0 1px #176f72;
+}
+body[data-page="achievements"] .achievement-release-node.is-latest::before {
+  background: var(--sub-amber);
+  box-shadow: 0 0 0 1px #9b6b12;
+}
+body[data-page="achievements"] .achievement-release-node span {
+  color: var(--sub-muted);
+  font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-transform: uppercase;
+}
+body[data-page="achievements"] .achievement-release-node strong {
+  color: var(--sub-ink);
+  font-size: 18px;
+}
+body[data-page="achievements"] .achievement-release-node small {
+  color: var(--sub-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+body[data-page="achievements"] .achievement-badges {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+body[data-page="achievements"] .achievement-status {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 3px;
+  color: #105456;
+  background: #c9e8e7;
+  font-size: 11px;
+  font-weight: 800;
+}
+body[data-page="achievements"] .achievement-status[data-category="publication"] {
+  color: #34560c;
+  background: #dfeebf;
+}
+body[data-page="achievements"] .achievement-status[data-category="artifact"] {
+  color: #694a05;
+  background: #f4e1ae;
+}
+body[data-page="achievements"] .achievement-status[data-category="community"] {
+  color: #81422e;
+  background: #f5d5ca;
+}
 body:not([data-page="home"]) .table-wrap {
   border-color: var(--sub-line);
   border-radius: 4px;
@@ -359,6 +477,16 @@ body[data-page="leaderboard"] .trend-chart-wrap { border-color: var(--sub-line);
 }
 @media (max-width: 680px) {
   body:not([data-page="home"]) .site-shell { width: calc(100% - 24px); }
+  body:not([data-page="home"]) .nav-links {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px 10px;
+    overflow: visible;
+  }
+  body:not([data-page="home"]) .nav-link {
+    min-width: 0;
+    justify-content: flex-start;
+  }
   body:not([data-page="home"]) .page-hero { padding-top: 24px; }
   body:not([data-page="home"]) .page-hero .content-panel { min-height: 230px; padding: 28px 22px; }
   body:not([data-page="home"]) .page-hero h1 { font-size: 42px; }
@@ -368,4 +496,29 @@ body[data-page="leaderboard"] .trend-chart-wrap { border-color: var(--sub-line);
   body[data-page="leaderboard"] .filters { grid-template-columns: minmax(0,1fr); }
   body[data-page="leaderboard"] .filter-group { min-width: 0; }
   body[data-page="leaderboard"] .filter-group select { width: 100%; min-width: 0; max-width: 100%; }
+  body[data-page="achievements"] .achievement-timeline-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  body[data-page="achievements"] .achievement-filter {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body[data-page="achievements"] .achievement-filter-button {
+    border-right: 1px solid var(--sub-line);
+    border-bottom: 1px solid var(--sub-line);
+  }
+  body[data-page="achievements"] .achievement-filter-button:nth-child(even) { border-right: 0; }
+  body[data-page="achievements"] .achievement-filter-button:last-child { border-bottom: 0; }
+  body[data-page="achievements"] .achievement-release-line { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body[data-page="achievements"] .achievement-release-node:nth-child(even) { border-right: 0; }
+  body[data-page="achievements"] .achievement-release-node { border-bottom: 1px solid var(--sub-line); }
+  body[data-page="achievements"] .achievement-release-node:last-child { border-bottom: 0; }
+  body[data-page="achievements"] .achievement-badges { justify-content: flex-start; }
+  body[data-page="achievements"] .result-repository-card.no-team { grid-template-columns: 1fr; }
+  body[data-page="achievements"] .result-repository-source strong {
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }

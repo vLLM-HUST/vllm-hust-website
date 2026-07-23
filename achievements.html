@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=contributors-leadership-20260722" />
-  <link rel="stylesheet" href="./assets/subpages.css?v=ecosystem-contrast-20260723" />
+  <link rel="stylesheet" href="./assets/subpages.css?v=achievement-timeline-mobile-20260723" />
 </head>
 
 <body data-page="achievements">
@@ -49,8 +49,8 @@
       <section class="content-panel result-repositories-panel" aria-labelledby="result-repositories-title">
         <div class="section-head">
           <div>
-            <span id="result-repositories-kicker" class="eyebrow">Result repository</span>
-            <h2 id="result-repositories-title">Published results</h2>
+            <span id="result-repositories-kicker" class="eyebrow">Publications and artifacts</span>
+            <h2 id="result-repositories-title">Research output</h2>
           </div>
         </div>
         <div id="result-repository-list" class="result-repository-list"></div>
@@ -88,10 +88,21 @@
       <section class="content-panel">
         <div class="section-head">
           <div>
-            <span id="achievements-timeline-kicker" class="eyebrow">Timeline</span>
-            <h2 id="achievements-timeline-title">Achievement timeline</h2>
+            <span id="achievements-timeline-kicker" class="eyebrow">Release line</span>
+            <h2 id="achievements-timeline-title">Research output over time</h2>
           </div>
         </div>
+        <div class="achievement-timeline-toolbar">
+          <p id="achievements-timeline-description">Accepted papers, public manuscripts, technical releases, and upstream contributions are labeled separately.</p>
+          <div id="achievement-filter" class="achievement-filter" role="group" aria-label="Filter achievement timeline">
+            <button type="button" class="achievement-filter-button active" data-achievement-filter="all" aria-pressed="true">All</button>
+            <button type="button" class="achievement-filter-button" data-achievement-filter="publication" aria-pressed="false">Papers</button>
+            <button type="button" class="achievement-filter-button" data-achievement-filter="artifact" aria-pressed="false">Artifacts</button>
+            <button type="button" class="achievement-filter-button" data-achievement-filter="technical" aria-pressed="false">Technical</button>
+            <button type="button" class="achievement-filter-button" data-achievement-filter="community" aria-pressed="false">Community</button>
+          </div>
+        </div>
+        <div id="achievement-release-line" class="achievement-release-line" aria-label="Achievement release line"></div>
         <div id="achievement-timeline" class="achievement-timeline"></div>
       </section>
 
@@ -118,12 +129,13 @@
         'achievement-stat-contributors-label': 'Contributors',
         'achievement-stat-groups-label': 'Compare groups',
         'achievement-stat-hard-label': 'Validation scopes',
-        'result-repositories-kicker': 'Result repository',
-        'result-repositories-title': 'Published results',
+        'result-repositories-kicker': 'Publications and artifacts',
+        'result-repositories-title': 'Research output',
         'upstream-pr-kicker': 'Upstream PRs',
         'upstream-pr-title': 'Under review',
-        'achievements-timeline-kicker': 'Timeline',
-        'achievements-timeline-title': 'Achievement timeline',
+        'achievements-timeline-kicker': 'Release line',
+        'achievements-timeline-title': 'Research output over time',
+        'achievements-timeline-description': 'Accepted papers, public manuscripts, technical releases, and upstream contributions are labeled separately.',
         'achievements-footer-copy': 'Research, benchmarks, and upstream contributions.'
       },
       zh: {
@@ -142,18 +154,19 @@
         'achievement-stat-contributors-label': '贡献者',
         'achievement-stat-groups-label': '对比组',
         'achievement-stat-hard-label': '验证范围',
-        'result-repositories-kicker': '成果仓库',
-        'result-repositories-title': '已发表成果',
+        'result-repositories-kicker': '论文与研究制品',
+        'result-repositories-title': '研究成果',
         'upstream-pr-kicker': '上游 PR',
         'upstream-pr-title': '评审中',
-        'achievements-timeline-kicker': '时间轴',
-        'achievements-timeline-title': '成果时间轴',
+        'achievements-timeline-kicker': '成果发布线',
+        'achievements-timeline-title': '研究成果时间轴',
+        'achievements-timeline-description': '已接收论文、公开稿件、技术发布与上游贡献采用不同状态标识，避免混淆。',
         'achievements-footer-copy': '研究成果、性能评测与上游贡献。'
       }
     };
   </script>
-  <script src="./assets/site.js?v=mobile-canvas-20260718"></script>
-  <script src="./assets/achievements-page.js?v=qwen2-npu-evidence-20260722"></script>
+  <script src="./assets/site.js?v=bilingual-toggle-20260723"></script>
+  <script src="./assets/achievements-page.js?v=achievement-release-line-20260723"></script>
 </body>
 
 </html>
