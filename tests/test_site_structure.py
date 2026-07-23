@@ -429,6 +429,28 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     assert "font-size: clamp(" not in css_text
 
 
+def test_subpages_use_shared_ecosystem_visual_system() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+
+    for name in (
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+        "conferences.html",
+        "courses.html",
+    ):
+        text = (root / name).read_text(encoding="utf-8")
+        assert "assets/subpages.css?v=ecosystem-20260723" in text
+        assert '<span class="brand-mark">V</span>' in text
+        assert "vLLM-HUST<small" in text
+
+    assert 'body:not([data-page="home"])' in css_text
+    assert 'body[data-page="leaderboard"]' in css_text
+    assert "letter-spacing: -" not in css_text
+    assert "font-size: clamp(" not in css_text
+
+
 def test_cosmic_background_uses_scrollbar_safe_viewport_width() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "site.js").read_text(encoding="utf-8")

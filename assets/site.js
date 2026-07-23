@@ -7,7 +7,7 @@
             navContributors: 'Contributors',
             navConferences: 'Conferences',
             navCourses: 'Courses',
-            brandSubtitle: 'vLLM serving',
+            brandSubtitle: 'Execution layer',
             langToggle: '中 / EN',
         },
         zh: {
@@ -17,7 +17,7 @@
             navContributors: '核心成员',
             navConferences: '会议',
             navCourses: '课程',
-            brandSubtitle: 'vLLM 推理服务',
+            brandSubtitle: '推理执行层',
             langToggle: '中 / EN',
         },
     };
