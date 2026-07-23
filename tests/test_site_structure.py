@@ -445,8 +445,8 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
         assert '<span class="brand-mark">V</span>' in text
         assert "vLLM-HUST<small" in text
 
-    assert "body:not([data-page=\"home\"])" in css_text
-    assert "body[data-page=\"leaderboard\"]" in css_text
+    assert 'body:not([data-page="home"])' in css_text
+    assert 'body[data-page="leaderboard"]' in css_text
     assert "letter-spacing: -" not in css_text
     assert "font-size: clamp(" not in css_text
 
