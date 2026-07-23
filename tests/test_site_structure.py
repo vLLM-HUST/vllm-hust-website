@@ -569,7 +569,10 @@ def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     assert "achievement-milestones" not in html_text
     assert "const ACHIEVEMENTS = [" in js_text
     assert "sortDate: '2026-07-02'" in js_text
-    assert ".sort((left, right) => right.sortDate.localeCompare(left.sortDate));" in js_text
+    assert (
+        ".sort((left, right) => right.sortDate.localeCompare(left.sortDate));"
+        in js_text
+    )
     assert 'id="achievement-release-line"' in html_text
     assert 'data-achievement-filter="publication"' in html_text
     assert "function renderReleaseLine" in js_text
@@ -617,7 +620,9 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=contributors-leadership-20260722" in html_text
-    assert "assets/achievements-page.js?v=achievement-release-line-20260723" in html_text
+    assert (
+        "assets/achievements-page.js?v=achievement-release-line-20260723" in html_text
+    )
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -696,8 +701,13 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     assert 'id="result-repository-list"' in html_text
     assert "成果仓库" in html_text
     assert "const RESULT_REPOSITORIES = [" in js_text
-    assert "BidKV: Utility-Guided Preemption Scheduling for KV-Pressure LLM Serving" in js_text
-    assert "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
+    assert (
+        "BidKV: Utility-Guided Preemption Scheduling for KV-Pressure LLM Serving"
+        in js_text
+    )
+    assert (
+        "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
+    )
     assert "./assets/papers/bidkv-sc2026.pdf" in js_text
     assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
     assert "github.com/intellistream/bidkv" not in js_text
@@ -715,17 +725,27 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "DiffSpec: Accelerating Long Sequence Generation with Differential Speculative Decoding" in js_text
+    assert (
+        "DiffSpec: Accelerating Long Sequence Generation with Differential Speculative Decoding"
+        in js_text
+    )
     assert "DiffSpec：面向长序列生成的差分投机解码加速" in js_text
     assert "label: { en: 'Repository', zh: '仓库' }" in js_text
     assert "name: 'DiffSpec'" in js_text
     assert "repositoryName: 'vllm-ascend-hust-diffspec'" in js_text
     assert "面向超长序列推理的差分投机解码加速系统。" in js_text
-    assert "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
+    assert (
+        "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
+    )
     assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
     assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
-    assert "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'" in js_text
-    assert "assets/achievements-page.js?v=achievement-release-line-20260723" in html_text
+    assert (
+        "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
+        in js_text
+    )
+    assert (
+        "assets/achievements-page.js?v=achievement-release-line-20260723" in html_text
+    )
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
