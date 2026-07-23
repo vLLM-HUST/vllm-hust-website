@@ -35,32 +35,6 @@
             ],
         },
         {
-            sortDate: '2026-07-19',
-            date: { en: 'Jul 19, 2026', zh: '2026 年 7 月 19 日' },
-            category: 'artifact',
-            kind: { en: 'Research artifact', zh: '研究制品' },
-            status: { en: 'Pre-submission', zh: '投稿前准备完成' },
-            title: {
-                en: 'Adaptive decode backend selector',
-                zh: '自适应解码后端选择器',
-            },
-            body: {
-                en: 'A public vLLM plugin and reproducibility artifact for online decode-backend selection. The repository is submission-ready, but its paper is not yet published.',
-                zh: '用于在线选择解码后端的公开 vLLM 插件与复现实验制品。仓库已具备投稿条件，但论文尚未发表。',
-            },
-            tags: [
-                { en: 'vLLM plugin', zh: 'vLLM 插件' },
-                { en: 'Adaptive execution', zh: '自适应执行' },
-                { en: 'Reproducibility', zh: '可复现性' },
-            ],
-            links: [
-                {
-                    label: { en: 'Repository', zh: '仓库' },
-                    href: 'https://github.com/vLLM-HUST/adaptive-selector-plugin',
-                },
-            ],
-        },
-        {
             sortDate: '2026-07-02',
             date: { en: 'July 2026', zh: '2026 年 7 月' },
             category: 'publication',
@@ -117,32 +91,6 @@
             ],
         },
         {
-            sortDate: '2026-06-08',
-            date: { en: 'Jun 8, 2026', zh: '2026 年 6 月 8 日' },
-            category: 'artifact',
-            kind: { en: 'Public manuscript', zh: '公开稿件' },
-            status: { en: 'Targeting FCS', zh: '拟投稿 FCS' },
-            title: {
-                en: 'LLM-Powered Recommendation Systems on Domestic AI Chips',
-                zh: '国产 AI 芯片上的大模型推荐系统',
-            },
-            body: {
-                en: 'A public manuscript on workload characteristics and system co-design for LLM-powered recommendation systems on domestic accelerators. It is targeting FCS and is not labeled as accepted.',
-                zh: '围绕国产加速器上的大模型推荐工作负载与系统协同设计形成的公开稿件，拟投稿 FCS，当前不标记为已接收。',
-            },
-            tags: [
-                { en: 'FCS target', zh: 'FCS 目标期刊' },
-                { en: 'Recommendation', zh: '推荐系统' },
-                { en: 'System co-design', zh: '系统协同设计' },
-            ],
-            links: [
-                {
-                    label: { en: 'Manuscript repository', zh: '稿件仓库' },
-                    href: 'https://github.com/vLLM-HUST/fcs-domestic-chip-llm-recsys',
-                },
-            ],
-        },
-        {
             sortDate: '2026-05-18',
             date: { en: 'May 18, 2026', zh: '2026 年 5 月 18 日' },
             category: 'technical',
@@ -169,36 +117,6 @@
                 {
                     label: { en: 'Organization mirror', zh: '组织镜像' },
                     href: 'https://github.com/vLLM-HUST/pegaflow-hust',
-                },
-            ],
-        },
-        {
-            sortDate: '2026-05-05',
-            date: { en: 'May 5, 2026', zh: '2026 年 5 月 5 日' },
-            category: 'artifact',
-            kind: { en: 'Survey manuscript', zh: '综述稿件' },
-            status: { en: 'Writing in public', zh: '公开撰写中' },
-            title: {
-                en: 'Survey of inference engines for domestic accelerators',
-                zh: '国产算力推理引擎综述',
-            },
-            body: {
-                en: 'A public Chinese writing repository for a CCCF special-issue survey covering execution backends, KV-cache management, scheduling, serving, and evaluation.',
-                zh: '面向 CCCF 通讯专刊公开撰写的中文综述仓库，覆盖执行后端、KV Cache 管理、调度、服务化与评测。',
-            },
-            tags: [
-                { en: 'CCCF manuscript', zh: 'CCCF 稿件' },
-                { en: 'Survey', zh: '综述' },
-                { en: 'Domestic accelerators', zh: '国产算力' },
-            ],
-            links: [
-                {
-                    label: { en: 'Open PDF', zh: '查看 PDF' },
-                    href: 'https://github.com/vLLM-HUST/cccf-domestic-inference-engine-survey/blob/main/rendered/main.pdf',
-                },
-                {
-                    label: { en: 'Repository', zh: '仓库' },
-                    href: 'https://github.com/vLLM-HUST/cccf-domestic-inference-engine-survey',
                 },
             ],
         },
@@ -338,39 +256,6 @@
             ],
             repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec',
         },
-        {
-            name: 'Adaptive Selector',
-            repositoryName: 'adaptive-selector-plugin',
-            summary: {
-                en: 'A public vLLM plugin and reproducibility artifact for online decode-backend selection.',
-                zh: '用于在线选择解码后端的公开 vLLM 插件与可复现实验制品。',
-            },
-            publication: { en: 'Pre-submission artifact', zh: '投稿前研究制品' },
-            team: [],
-            repository: 'https://github.com/vLLM-HUST/adaptive-selector-plugin',
-        },
-        {
-            name: 'Domestic Inference Survey',
-            repositoryName: 'cccf-domestic-inference-engine-survey',
-            summary: {
-                en: 'A public Chinese survey manuscript on inference engines and serving stacks for domestic accelerators.',
-                zh: '关于国产算力推理引擎与服务技术栈的公开中文综述稿件。',
-            },
-            publication: { en: 'Public manuscript', zh: '公开稿件' },
-            team: [],
-            repository: 'https://github.com/vLLM-HUST/cccf-domestic-inference-engine-survey',
-        },
-        {
-            name: 'LLM RecSys on Domestic Chips',
-            repositoryName: 'fcs-domestic-chip-llm-recsys',
-            summary: {
-                en: 'A system co-design manuscript for LLM-powered recommendation workloads on domestic AI chips.',
-                zh: '面向国产 AI 芯片大模型推荐工作负载的系统协同设计稿件。',
-            },
-            publication: { en: 'Targeting FCS · Not accepted', zh: '拟投稿 FCS · 尚未接收' },
-            team: [],
-            repository: 'https://github.com/vLLM-HUST/fcs-domestic-chip-llm-recsys',
-        },
     ];
 
     const UI = {
@@ -405,7 +290,6 @@
             filterLabels: {
                 all: 'All',
                 publication: 'Papers',
-                artifact: 'Artifacts',
                 technical: 'Technical',
                 community: 'Community',
             },
@@ -445,7 +329,6 @@
             filterLabels: {
                 all: '全部',
                 publication: '论文',
-                artifact: '研究制品',
                 technical: '技术发布',
                 community: '社区贡献',
             },
