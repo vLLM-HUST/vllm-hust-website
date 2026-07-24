@@ -446,7 +446,7 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert (
-            "assets/subpages.css?v=achievement-attribution-contrast-20260723"
+            "assets/subpages.css?v=upstream-pr-contrast-20260724"
             in text
         )
         assert '<span class="brand-mark">V</span>' in text
@@ -557,7 +557,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "achievement-attribution-contrast-20260723" in html_text
+    assert "upstream-pr-contrast-20260724" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
