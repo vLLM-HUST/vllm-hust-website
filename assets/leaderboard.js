@@ -3577,7 +3577,7 @@
         renderOverview(sortedFiltered, comparisonView, viewOptions);
         // The table intentionally collapses equivalent package builds. The trend chart must use
         // the unaggregated rows so distinct commits and PR revisions remain visible on the axis.
-        renderPerformanceTrendChart(getPerformanceTrendEntries(visibleEntries, filters.workload));
+        renderPerformanceTrendChart(getPerformanceTrendEntries(filtered, filters.workload));
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
 
