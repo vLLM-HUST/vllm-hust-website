@@ -445,7 +445,10 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/subpages.css?v=achievement-timeline-mobile-20260723" in text
+        assert (
+            "assets/subpages.css?v=achievement-attribution-contrast-20260723"
+            in text
+        )
         assert '<span class="brand-mark">V</span>' in text
         assert "vLLM-HUST<small" in text
 
@@ -554,7 +557,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "published-achievements-20260723" in html_text
+    assert "achievement-attribution-contrast-20260723" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -620,7 +623,10 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=contributors-leadership-20260722" in html_text
-    assert "assets/achievements-page.js?v=published-achievements-20260723" in html_text
+    assert (
+        "assets/achievements-page.js?v=bidkv-canonical-20260724"
+        in html_text
+    )
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -697,7 +703,8 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     pdf_path = root / "assets" / "papers" / "bidkv-sc2026.pdf"
 
     assert 'id="result-repository-list"' in html_text
-    assert "成果仓库" in html_text
+    assert "正式发表" in html_text
+    assert "成果仓库" in js_text
     assert "const RESULT_REPOSITORIES = [" in js_text
     assert (
         "BidKV: Utility-Guided Preemption Scheduling for KV-Pressure LLM Serving"
@@ -707,9 +714,10 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
         "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
     )
     assert "./assets/papers/bidkv-sc2026.pdf" in js_text
-    assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
+    assert "github.com/vLLM-HUST/vllm-hust-bidkv" in js_text
+    assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" not in js_text
     assert "github.com/intellistream/bidkv" not in js_text
-    assert "repositoryName: 'vllm-ascend-hust-bidkv'" in js_text
+    assert "repositoryName: 'vllm-hust-bidkv'" in js_text
     assert "names: { en: 'Yanbo Chen · Mingqi Wang', zh: '陈彦博 · 王明琪' }" in js_text
     assert "names: { en: 'Shuhao Zhang', zh: '张书豪' }" in js_text
     assert "result-repository-card" in css_text
@@ -741,7 +749,10 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
         "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
         in js_text
     )
-    assert "assets/achievements-page.js?v=published-achievements-20260723" in html_text
+    assert (
+        "assets/achievements-page.js?v=bidkv-canonical-20260724"
+        in html_text
+    )
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -757,9 +768,9 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     snapshot_index = html_text.index('id="achievements-stats-kicker"')
     assert hero_index < repositories_index < snapshot_index
 
-    assert "https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
-    assert "https://vllm.ai/blog/2026-05-18-pegaflow" in js_text
-    assert "https://github.com/vLLM-HUST/pegaflow-hust" in js_text
+    assert "https://github.com/vLLM-HUST/vllm-hust-bidkv" in js_text
+    assert "https://vllm.ai/blog/2026-05-18-pegaflow" not in js_text
+    assert "https://github.com/vLLM-HUST/pegaflow-hust" not in js_text
     assert "https://github.com/vLLM-HUST/vllm-ascend-quant-hust" not in js_text
     assert js_text.count("repositoryName:") == 2
     assert "result-repository-title" in css_text
@@ -780,7 +791,59 @@ def test_research_output_excludes_unpublished_artifacts() -> None:
     assert "Pre-submission" not in js_text
     assert "Targeting FCS" not in js_text
     assert "Writing in public" not in js_text
-    assert "Published on vLLM Blog" in js_text
+    assert "Published on vLLM Blog" not in js_text
+
+
+def test_achievements_page_excludes_external_origin_work() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "achievements.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    for external_claim in (
+        "PegaFlow",
+        "Novita AI",
+        "Organization mirror",
+        "组织镜像",
+        "Technical publication",
+        "技术发表",
+    ):
+        assert external_claim not in js_text
+
+    assert "projects that we mirror, integrate, validate, or adapt are not achievements." in js_text
+    assert (
+        "Accepted papers by our team, owned project releases, and upstream "
+        "contributions merged from our contributors."
+    ) in html_text
+    assert (
+        "仅展示本团队已接收论文、自主项目正式发布，以及团队成员已合入的上游贡献。"
+        in html_text
+    )
+    assert "Project releases" in html_text
+    assert "technical: 'Project releases'" in js_text
+
+
+def test_upstream_pr_light_panel_has_explicit_contrast_overrides() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+
+    required_selectors = (
+        ".upstream-pr-details-head > strong",
+        ".upstream-pr-details-head a",
+        ".upstream-pr-number",
+        ".upstream-pr-title",
+        ".upstream-pr-link",
+        '.upstream-pr-row > strong[data-status="draft"]',
+        '.upstream-pr-row > strong[data-status="review-requested"]',
+        '.upstream-pr-row > strong[data-status="ready-evidence"]',
+        '.upstream-pr-row > strong[data-status="ci-retry"]',
+    )
+    for selector in required_selectors:
+        assert selector in css_text
+
+    assert "color: var(--sub-ink);" in css_text
+    assert "color: #105d61;" in css_text
+    assert "background: #d9f0f4;" in css_text
+    assert "background: #fee3e7;" in css_text
 
 
 def test_achievements_page_omits_package_version_cards() -> None:
@@ -1267,17 +1330,19 @@ def test_local_validation_script_and_hook_templates_track_ci() -> None:
     assert "./scripts/validate-local.sh" in readme_text
 
 
-def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> None:
+def test_contributor_loader_uses_newest_canonical_or_local_snapshot() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
 
     assert "const SOURCES = [" in text
     assert (
-        "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-org-profile/main/profile/core_contributors.json"
+        "https://raw.githubusercontent.com/vLLM-HUST/.github/main/profile/core_contributors.json"
         in text
     )
     assert "'./data/core_contributors.json'" in text
     assert "async function fetchPayload()" in text
+    assert "right.updatedAt.localeCompare(left.updatedAt)" in text
+    assert "return candidates[0].payload;" in text
     assert (
         "item.display_name || item.chinese_name || item.name || item.github_login || ''"
         in text
@@ -1291,18 +1356,25 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     snapshot_path = root / "data" / "core_contributors.json"
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
-    assert payload["updated_at"] == "2026-07-22"
-    assert len(payload["all_repos"]["contributors"]) == 33
-    assert len(payload["core_repos"]["contributors"]) == 18
-    assert "vllm-ascend-hust-bidkv" in payload["all_repos"]["scope_repos"]
-    assert len(payload["all_repos"]["scope_repos"]) == 17
+    assert payload["updated_at"] == "2026-07-24"
+    assert len(payload["all_repos"]["contributors"]) == 28
+    assert len(payload["core_repos"]["contributors"]) == 16
+    assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
+    assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
+    assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
+    assert "vllm-hust-bidkv" in payload["core_repos"]["scope_repos"]
+    assert len(payload["all_repos"]["scope_repos"]) >= 17
 
-    mingqi = next(
-        item
-        for item in payload["all_repos"]["contributors"]
-        if item.get("github_login") == "MingqiWang-coder"
-    )
-    assert "vllm-ascend-hust-bidkv" in mingqi["repos"]
+    core_logins = {
+        item.get("github_login")
+        for item in payload["core_repos"]["contributors"]
+    }
+    core_names = {
+        item.get("display_name")
+        for item in payload["core_repos"]["contributors"]
+    }
+    assert "cybber695" in core_logins
+    assert "dzcixy" in core_names
 
     for scope in ("all_repos", "core_repos"):
         contributors = payload[scope]["contributors"]
@@ -1332,3 +1404,15 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     )
     if canonical_snapshot.exists():
         assert snapshot_path.read_bytes() == canonical_snapshot.read_bytes()
+
+
+def test_core_contributor_stats_precede_all_repository_stats() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "contributors.html").read_text(encoding="utf-8")
+
+    core_index = html_text.index('id="contributors-core-tbody"')
+    all_index = html_text.index('id="contributors-all-tbody"')
+
+    assert core_index < all_index
+    assert "核心仓库与独立优化成果" in html_text
+    assert "BidKV、DiffSpec" in html_text

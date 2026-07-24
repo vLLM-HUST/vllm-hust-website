@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=contributors-leadership-20260722" />
-  <link rel="stylesheet" href="./assets/subpages.css?v=achievement-timeline-mobile-20260723" />
+  <link rel="stylesheet" href="./assets/subpages.css?v=achievement-attribution-contrast-20260723" />
 </head>
 
 <body data-page="contributors">
@@ -113,6 +113,32 @@
       <section class="content-panel">
         <div class="section-head">
           <div>
+            <span id="contributors-core-kicker" class="eyebrow">Core scope</span>
+            <h2 id="contributors-core-title">Core repositories and optimization projects</h2>
+            <p id="contributors-core-description">Runtime cores and independently maintained projects that directly optimize inference execution.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="site-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Contributor</th>
+                <th>Commits</th>
+                <th>Changed Lines</th>
+                <th>Added / Deleted</th>
+                <th>Active Repos</th>
+                <th>Key Contributions</th>
+              </tr>
+            </thead>
+            <tbody id="contributors-core-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
             <span id="contributors-all-kicker" class="eyebrow">All repositories</span>
             <h2 id="contributors-all-title">All repositories</h2>
           </div>
@@ -131,31 +157,6 @@
               </tr>
             </thead>
             <tbody id="contributors-all-tbody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="content-panel">
-        <div class="section-head">
-          <div>
-            <span id="contributors-core-kicker" class="eyebrow">Core performance repos</span>
-            <h2 id="contributors-core-title">Core performance repositories</h2>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table class="site-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Contributor</th>
-                <th>Commits</th>
-                <th>Changed Lines</th>
-                <th>Added / Deleted</th>
-                <th>Active Repos</th>
-                <th>Key Contributions</th>
-              </tr>
-            </thead>
-            <tbody id="contributors-core-tbody"></tbody>
           </table>
         </div>
       </section>
@@ -178,8 +179,11 @@
         'contributors-role-dean': 'Dean',
         'contributors-role-project-lead': 'Project Lead',
         'contributors-subproject-title': 'Subproject leads',
+        'contributors-core-kicker': 'Core scope',
+        'contributors-all-kicker': 'All repositories',
         'contributors-all-title': 'All repositories',
-        'contributors-core-title': 'Core performance repositories'
+        'contributors-core-title': 'Core repositories and optimization projects',
+        'contributors-core-description': 'Runtime cores plus independently maintained BidKV and DiffSpec repositories that directly optimize inference execution.'
       },
       zh: {
         title: '核心贡献成员 - vllm-hust',
@@ -193,13 +197,16 @@
         'contributors-role-dean': '院长',
         'contributors-role-project-lead': '课题负责人',
         'contributors-subproject-title': '子课题负责人',
+        'contributors-core-kicker': '核心统计',
+        'contributors-all-kicker': '组织全量',
         'contributors-all-title': '全部仓库',
-        'contributors-core-title': '核心性能仓库'
+        'contributors-core-title': '核心仓库与独立优化成果',
+        'contributors-core-description': '统计运行时核心仓库，以及 BidKV、DiffSpec 等直接优化推理执行层的独立成果仓库。'
       }
     };
   </script>
   <script src="./assets/site.js?v=bilingual-toggle-20260723"></script>
-  <script src="./assets/contributors-page.js?v=multi-page-20260701"></script>
+  <script src="./assets/contributors-page.js?v=core-optimization-scope-20260724"></script>
 </body>
 
 </html>

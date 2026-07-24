@@ -191,6 +191,50 @@ body:not([data-page="home"]) .upstream-repository-chevron {
   border-radius: 4px;
   color: #176f72;
 }
+body:not([data-page="home"]) .upstream-pr-details-head {
+  border-bottom-color: var(--sub-line);
+}
+body:not([data-page="home"]) .upstream-pr-details-head > strong,
+body:not([data-page="home"]) .upstream-pr-row,
+body:not([data-page="home"]) .upstream-pr-title {
+  color: var(--sub-ink);
+}
+body:not([data-page="home"]) .upstream-pr-details-head a,
+body:not([data-page="home"]) .upstream-pr-number,
+body:not([data-page="home"]) .upstream-pr-link {
+  color: #105d61;
+}
+body:not([data-page="home"]) .upstream-pr-row {
+  border-bottom-color: #dbe3e0;
+}
+body:not([data-page="home"]) .upstream-pr-row:hover {
+  background: #f2f7f5;
+}
+body:not([data-page="home"]) .upstream-pr-row:focus-visible {
+  outline-color: #176f72;
+}
+body:not([data-page="home"]) .upstream-pr-row > strong {
+  color: #315b18;
+  background: #e4f1cf;
+}
+body:not([data-page="home"]) .upstream-pr-row > strong[data-status="draft"],
+body:not([data-page="home"]) .upstream-pr-row > strong[data-status="needs-label"],
+body:not([data-page="home"]) .upstream-pr-row > strong[data-status="evidence-pending"] {
+  color: #704600;
+  background: #fff0c2;
+}
+body:not([data-page="home"]) .upstream-pr-row > strong[data-status="review-requested"] {
+  color: #075b70;
+  background: #d9f0f4;
+}
+body:not([data-page="home"]) .upstream-pr-row > strong[data-status="ready-evidence"] {
+  color: #315b18;
+  background: #e4f1cf;
+}
+body:not([data-page="home"]) .upstream-pr-row > strong[data-status="ci-retry"] {
+  color: #912d3d;
+  background: #fee3e7;
+}
 body:not([data-page="home"]) .achievement-item.is-latest .achievement-body {
   border-color: var(--sub-amber);
   color: var(--sub-ink);
