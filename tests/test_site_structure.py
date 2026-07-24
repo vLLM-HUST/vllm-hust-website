@@ -445,10 +445,7 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert (
-            "assets/subpages.css?v=upstream-pr-contrast-20260724"
-            in text
-        )
+        assert "assets/subpages.css?v=upstream-pr-contrast-20260724" in text
         assert '<span class="brand-mark">V</span>' in text
         assert "vLLM-HUST<small" in text
 
@@ -623,10 +620,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=contributors-leadership-20260722" in html_text
-    assert (
-        "assets/achievements-page.js?v=bidkv-canonical-20260724"
-        in html_text
-    )
+    assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -749,10 +743,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
         "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
         in js_text
     )
-    assert (
-        "assets/achievements-page.js?v=bidkv-canonical-20260724"
-        in html_text
-    )
+    assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -809,7 +800,10 @@ def test_achievements_page_excludes_external_origin_work() -> None:
     ):
         assert external_claim not in js_text
 
-    assert "projects that we mirror, integrate, validate, or adapt are not achievements." in js_text
+    assert (
+        "projects that we mirror, integrate, validate, or adapt are not achievements."
+        in js_text
+    )
     assert (
         "Accepted papers by our team, owned project releases, and upstream "
         "contributions merged from our contributors."
@@ -1366,12 +1360,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["all_repos"]["scope_repos"]) >= 17
 
     core_logins = {
-        item.get("github_login")
-        for item in payload["core_repos"]["contributors"]
+        item.get("github_login") for item in payload["core_repos"]["contributors"]
     }
     core_names = {
-        item.get("display_name")
-        for item in payload["core_repos"]["contributors"]
+        item.get("display_name") for item in payload["core_repos"]["contributors"]
     }
     assert "cybber695" in core_logins
     assert "dzcixy" in core_names
