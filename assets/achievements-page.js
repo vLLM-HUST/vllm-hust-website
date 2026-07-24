@@ -7,6 +7,9 @@
         contributors: './data/core_contributors.json',
     };
 
+    // Inclusion policy: list only team-owned accepted publications and project
+    // releases, or merged upstream work authored by our contributors. External
+    // projects that we mirror, integrate, validate, or adapt are not achievements.
     const ACHIEVEMENTS = [
         {
             sortDate: '2026-07-22',
@@ -60,7 +63,7 @@
                 },
                 {
                     label: { en: 'Repository', zh: '成果仓库' },
-                    href: 'https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv',
+                    href: 'https://github.com/vLLM-HUST/vllm-hust-bidkv',
                 },
             ],
         },
@@ -87,36 +90,6 @@
                 {
                     label: { en: 'QwenLM/qwen-code #5185', zh: 'QwenLM/qwen-code #5185' },
                     href: 'https://github.com/QwenLM/qwen-code/pull/5185',
-                },
-            ],
-        },
-        {
-            sortDate: '2026-05-18',
-            date: { en: 'May 18, 2026', zh: '2026 年 5 月 18 日' },
-            category: 'technical',
-            kind: { en: 'Technical publication', zh: '技术发表' },
-            status: { en: 'Published on vLLM Blog', zh: '发表于 vLLM 官方博客' },
-            title: {
-                en: 'vLLM x Novita AI: PegaFlow for Production-Grade External KV Cache',
-                zh: 'vLLM × Novita AI：面向生产环境的外部 KV Cache 系统 PegaFlow',
-            },
-            body: {
-                en: 'A joint technical article by Novita AI and the vLLM Team on external KV ownership, shared cache pools, RDMA, SSD tiers, and production serving integration.',
-                zh: 'Novita AI 与 vLLM Team 联合发布的技术文章，介绍外部 KV 所有权、共享缓存池、RDMA、SSD 分层与生产推理集成。',
-            },
-            tags: [
-                { en: 'vLLM Blog', zh: 'vLLM 官方博客' },
-                { en: 'External KV cache', zh: '外部 KV Cache' },
-                { en: 'Production serving', zh: '生产推理' },
-            ],
-            links: [
-                {
-                    label: { en: 'Read article', zh: '阅读文章' },
-                    href: 'https://vllm.ai/blog/2026-05-18-pegaflow',
-                },
-                {
-                    label: { en: 'Organization mirror', zh: '组织镜像' },
-                    href: 'https://github.com/vLLM-HUST/pegaflow-hust',
                 },
             ],
         },
@@ -218,7 +191,7 @@
     const RESULT_REPOSITORIES = [
         {
             name: 'BidKV',
-            repositoryName: 'vllm-ascend-hust-bidkv',
+            repositoryName: 'vllm-hust-bidkv',
             summary: {
                 en: 'A KV-cache reclamation plugin for vLLM.',
                 zh: '用于 vLLM 的 KV Cache 回收插件。',
@@ -234,7 +207,7 @@
                     names: { en: 'Shuhao Zhang', zh: '张书豪' },
                 },
             ],
-            repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv',
+            repository: 'https://github.com/vLLM-HUST/vllm-hust-bidkv',
         },
         {
             name: 'DiffSpec',
@@ -290,7 +263,7 @@
             filterLabels: {
                 all: 'All',
                 publication: 'Papers',
-                technical: 'Technical',
+                technical: 'Project releases',
                 community: 'Community',
             },
             releaseCount: (count) => `${count} releases`,
@@ -329,7 +302,7 @@
             filterLabels: {
                 all: '全部',
                 publication: '论文',
-                technical: '技术发布',
+                technical: '项目发布',
                 community: '社区贡献',
             },
             releaseCount: (count) => `${count} 项成果`,
