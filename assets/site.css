@@ -919,59 +919,79 @@ h1 {
 }
 
 .research-members-content {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
     padding: 0 18px 18px;
     border-top: 1px solid rgba(125, 211, 252, 0.16);
 }
 
-.research-member-group {
-    min-width: 0;
-    padding-top: 16px;
-}
-
-.research-member-group h3 {
-    margin: 0 0 10px;
-    color: #7dd3fc;
+.research-members-status {
+    margin: 16px 0 0;
+    color: var(--muted);
     font-size: 0.82rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
 }
 
 .research-member-list {
     display: grid;
-    gap: 7px;
-    margin: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin: 16px 0 0;
     padding: 0;
     list-style: none;
 }
 
 .research-member-list li {
     display: grid;
-    grid-template-columns: minmax(72px, 0.28fr) minmax(0, 1fr);
-    gap: 12px;
-    align-items: baseline;
-    padding: 9px 11px;
+    grid-template-columns: minmax(112px, 0.34fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    padding: 11px 12px;
     border: 1px solid rgba(125, 211, 252, 0.14);
     border-radius: 10px;
     background: rgba(15, 23, 42, 0.42);
 }
 
-.research-member-list strong {
-    color: rgba(241, 245, 249, 0.96);
-    font-size: 0.86rem;
+.research-member-identity {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
 }
 
-.research-member-list span {
+.research-member-identity a,
+.research-member-identity strong {
+    color: rgba(241, 245, 249, 0.96);
+    font-size: 0.86rem;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.research-member-identity small {
+    color: rgba(148, 163, 184, 0.9);
+    font-size: 0.69rem;
+    overflow-wrap: anywhere;
+}
+
+.research-member-details {
+    display: grid;
+    gap: 6px;
     min-width: 0;
+}
+
+.research-member-focus {
     color: rgba(203, 213, 225, 0.88);
     font-size: 0.78rem;
     overflow-wrap: anywhere;
 }
 
-.research-member-group-prospective {
-    opacity: 0.78;
+.research-member-advisor {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    min-height: 1.1em;
+    color: rgba(148, 163, 184, 0.9);
+    font-size: 0.72rem;
+}
+
+.research-member-advisor b {
+    color: rgba(125, 211, 252, 0.88);
+    font-weight: 700;
 }
 
 .card-grid {
@@ -1801,12 +1821,12 @@ h1 {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .research-members-content {
+    .research-member-list {
         grid-template-columns: 1fr;
     }
 
     .research-member-list li {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(104px, 0.32fr) minmax(0, 1fr);
         gap: 3px;
     }
 
