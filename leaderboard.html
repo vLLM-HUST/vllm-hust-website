@@ -15,16 +15,17 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=upstream-review-status-20260721" />
-  <link rel="stylesheet" href="./assets/leaderboard.css?v=leaderboard-public-20260706-broken-axis2" />
+  <link rel="stylesheet" href="./assets/site.css?v=contributors-leadership-20260722" />
+  <link rel="stylesheet" href="./assets/leaderboard.css?v=leaderboard-contrast-20260723" />
+  <link rel="stylesheet" href="./assets/subpages.css?v=upstream-pr-contrast-20260724" />
 </head>
 
 <body data-page="leaderboard">
   <nav class="site-nav">
     <div class="site-shell site-nav-inner">
       <a class="brand-link" href="./index.html">
-        <span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span>
-        <span class="brand-copy">vllm-hust<small>vLLM serving</small></span>
+        <span class="brand-mark">V</span>
+        <span class="brand-copy">vLLM-HUST<small>Execution layer</small></span>
       </a>
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
@@ -128,6 +129,29 @@
               <button type="button" class="trend-axis-button" data-trend-axis="linear">Linear</button>
             </div>
           </div>
+          <div class="trend-series-toolbar">
+            <div>
+              <strong id="leaderboard-trend-series-summary">All series visible</strong>
+              <span id="leaderboard-trend-series-hint">Open the series panel to focus the chart.</span>
+            </div>
+            <button id="toggle-trend-series" class="trend-series-toggle" type="button" aria-expanded="false" aria-controls="trend-series-panel">
+              Series
+            </button>
+          </div>
+          <div id="trend-series-panel" class="trend-series-panel" hidden>
+            <div class="trend-series-actions">
+              <label class="trend-series-search">
+                <span id="trend-series-search-label">Search series</span>
+                <input id="trend-series-search" type="search" autocomplete="off" />
+              </label>
+              <div>
+                <button id="trend-series-show-all" type="button">Show all</button>
+                <button id="trend-series-hide-all" type="button">Hide all</button>
+              </div>
+            </div>
+            <div id="trend-series-list" class="trend-series-list"></div>
+            <p id="trend-series-empty" class="trend-series-empty" hidden>No matching series.</p>
+          </div>
           <div class="trend-chart-wrap">
             <canvas id="leaderboard-trend-chart"></canvas>
             <div id="leaderboard-trend-empty" class="trend-empty" style="display: none">No trend data under current filters.</div>
@@ -200,10 +224,10 @@
       }
     };
   </script>
-  <script src="./assets/site.js?v=mobile-canvas-20260718"></script>
+  <script src="./assets/site.js?v=bilingual-toggle-20260723"></script>
   <script src="./assets/hf-data-loader.js?v=leaderboard-cache-v7-20260702"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
-  <script src="./assets/leaderboard.js?v=leaderboard-public-20260721-sparse-trends"></script>
+  <script src="./assets/leaderboard.js?v=leaderboard-contrast-20260723"></script>
 </body>
 
 </html>

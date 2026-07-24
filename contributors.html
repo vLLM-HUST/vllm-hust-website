@@ -11,13 +11,14 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=upstream-review-status-20260721" />
+  <link rel="stylesheet" href="./assets/site.css?v=contributors-leadership-20260722" />
+  <link rel="stylesheet" href="./assets/subpages.css?v=upstream-pr-contrast-20260724" />
 </head>
 
 <body data-page="contributors">
   <nav class="site-nav">
     <div class="site-shell site-nav-inner">
-      <a class="brand-link" href="./index.html"><span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span><span class="brand-copy">vllm-hust<small>vLLM serving</small></span></a>
+      <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Execution layer</small></span></a>
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
         <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
@@ -45,6 +46,55 @@
     <div id="contributors-error" class="empty-state" style="display: none">Failed to load contributor data.</div>
 
     <div id="contributors-content" style="display: none">
+      <section class="content-panel leadership-panel" aria-labelledby="contributors-leadership-title">
+        <div class="section-head">
+          <div>
+            <span id="contributors-leadership-kicker" class="eyebrow">Project team</span>
+            <h2 id="contributors-leadership-title">Project leadership</h2>
+            <p id="contributors-leadership-description">Leadership and subproject leads guiding the vLLM-HUST initiative.</p>
+          </div>
+        </div>
+
+        <div class="leadership-grid">
+          <article class="leadership-card">
+            <img src="./assets/contributors/jin-hai.jpg" alt="金海" width="160" height="160" loading="lazy" decoding="async" />
+            <div class="leadership-card-copy">
+              <h3>金海</h3>
+              <p id="contributors-role-lab-director">Lab Director</p>
+            </div>
+          </article>
+          <article class="leadership-card">
+            <img src="./assets/contributors/liao-xiaofei.jpg" alt="廖小飞" width="512" height="512" loading="lazy" decoding="async" />
+            <div class="leadership-card-copy">
+              <h3>廖小飞</h3>
+              <p id="contributors-role-dean">Dean</p>
+            </div>
+          </article>
+          <article class="leadership-card">
+            <img src="./assets/contributors/zhang-shuhao.jpg" alt="张书豪" width="512" height="512" loading="lazy" decoding="async" />
+            <div class="leadership-card-copy">
+              <h3>张书豪</h3>
+              <p id="contributors-role-project-lead">Project Lead</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="subproject-leads">
+          <h3 id="contributors-subproject-title">Subproject leads</h3>
+          <ul class="subproject-lead-list" aria-labelledby="contributors-subproject-title">
+            <li>王雄</li>
+            <li>郑龙</li>
+            <li>王庆刚</li>
+            <li>罗瑞坤</li>
+            <li>赵进</li>
+            <li>刘海坤</li>
+            <li>项翔</li>
+            <li>姚鹏程</li>
+            <li>万瑶</li>
+          </ul>
+        </div>
+      </section>
+
       <section class="content-panel">
         <div class="section-head">
           <div>
@@ -57,6 +107,32 @@
           <div class="metric-box"><span>All contributors</span><strong id="contributors-total">0</strong></div>
           <div class="metric-box"><span>Core contributors</span><strong id="contributors-core-total">0</strong></div>
           <div class="metric-box"><span>Active repos</span><strong id="contributors-repos">0</strong></div>
+        </div>
+      </section>
+
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
+            <span id="contributors-core-kicker" class="eyebrow">Core scope</span>
+            <h2 id="contributors-core-title">Core repositories and optimization projects</h2>
+            <p id="contributors-core-description">Runtime cores and independently maintained projects that directly optimize inference execution.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="site-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Contributor</th>
+                <th>Commits</th>
+                <th>Changed Lines</th>
+                <th>Added / Deleted</th>
+                <th>Active Repos</th>
+                <th>Key Contributions</th>
+              </tr>
+            </thead>
+            <tbody id="contributors-core-tbody"></tbody>
+          </table>
         </div>
       </section>
 
@@ -84,31 +160,6 @@
           </table>
         </div>
       </section>
-
-      <section class="content-panel">
-        <div class="section-head">
-          <div>
-            <span id="contributors-core-kicker" class="eyebrow">Core performance repos</span>
-            <h2 id="contributors-core-title">Core performance repositories</h2>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table class="site-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Contributor</th>
-                <th>Commits</th>
-                <th>Changed Lines</th>
-                <th>Added / Deleted</th>
-                <th>Active Repos</th>
-                <th>Key Contributions</th>
-              </tr>
-            </thead>
-            <tbody id="contributors-core-tbody"></tbody>
-          </table>
-        </div>
-      </section>
     </div>
   </main>
 
@@ -121,21 +172,41 @@
         'contributors-eyebrow': 'People',
         'contributors-title': 'Core Contributors',
         'contributors-lede': 'Contributors working across the runtime, Ascend integration, benchmark, documentation, website, and workstation repositories.',
+        'contributors-leadership-kicker': 'Project team',
+        'contributors-leadership-title': 'Project leadership',
+        'contributors-leadership-description': 'Leadership and subproject leads guiding the vLLM-HUST initiative.',
+        'contributors-role-lab-director': 'Lab Director',
+        'contributors-role-dean': 'Dean',
+        'contributors-role-project-lead': 'Project Lead',
+        'contributors-subproject-title': 'Subproject leads',
+        'contributors-core-kicker': 'Core scope',
+        'contributors-all-kicker': 'All repositories',
         'contributors-all-title': 'All repositories',
-        'contributors-core-title': 'Core performance repositories'
+        'contributors-core-title': 'Core repositories and optimization projects',
+        'contributors-core-description': 'Runtime cores plus independently maintained BidKV and DiffSpec repositories that directly optimize inference execution.'
       },
       zh: {
         title: '核心贡献成员 - vllm-hust',
         'contributors-eyebrow': '成员',
         'contributors-title': '核心贡献成员',
         'contributors-lede': '展示参与 vLLM-HUST 运行时、Ascend 适配、benchmark、文档、website 与 workstation 仓库建设的贡献者。',
+        'contributors-leadership-kicker': '项目团队',
+        'contributors-leadership-title': '项目负责人',
+        'contributors-leadership-description': '汇集项目总体负责人和各子课题负责人。',
+        'contributors-role-lab-director': '实验室主任',
+        'contributors-role-dean': '院长',
+        'contributors-role-project-lead': '课题负责人',
+        'contributors-subproject-title': '子课题负责人',
+        'contributors-core-kicker': '核心统计',
+        'contributors-all-kicker': '组织全量',
         'contributors-all-title': '全部仓库',
-        'contributors-core-title': '核心性能仓库'
+        'contributors-core-title': '核心仓库与独立优化成果',
+        'contributors-core-description': '统计运行时核心仓库，以及 BidKV、DiffSpec 等直接优化推理执行层的独立成果仓库。'
       }
     };
   </script>
-  <script src="./assets/site.js?v=mobile-canvas-20260718"></script>
-  <script src="./assets/contributors-page.js?v=multi-page-20260701"></script>
+  <script src="./assets/site.js?v=bilingual-toggle-20260723"></script>
+  <script src="./assets/contributors-page.js?v=core-optimization-scope-20260724"></script>
 </body>
 
 </html>

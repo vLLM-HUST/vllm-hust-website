@@ -1,29 +1,28 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>vllm-hust - vLLM Serving on Domestic Hardware</title>
-  <meta name="description" content="vllm-hust is a HUST-maintained vLLM serving stack for domestic accelerator environments, spanning runtime, Ascend integration, Triton Ascend kernels, benchmark snapshots, and project artifacts." />
+  <title>vLLM-HUST | Inference and Hardware Execution</title>
+  <meta name="description" content="vLLM-HUST develops model runtime, KV-cache scheduling, compilation, kernels, benchmarks, and domestic hardware execution." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="vllm-hust" />
-  <meta property="og:description" content="A HUST-maintained vLLM serving stack for domestic accelerator environments, including Ascend and Triton Ascend integration." />
-  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
+  <meta property="og:title" content="vLLM-HUST" />
+  <meta property="og:description" content="The inference and hardware execution layer of the intelligent systems ecosystem." />
+  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/ecosystem-infrastructure.png" />
   <meta property="og:url" content="https://vllm-hust.sage.org.ai/" />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=upstream-review-status-20260721" />
+  <link rel="stylesheet" href="./assets/site.css?v=contributors-leadership-20260722" />
+  <link rel="stylesheet" href="./assets/home.css?v=mobile-navigation-20260723" />
 </head>
-
 <body data-page="home">
   <nav class="site-nav">
     <div class="site-shell site-nav-inner">
-      <a class="brand-link" href="./index.html">
-        <span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span>
-        <span class="brand-copy">vllm-hust<small>vLLM serving</small></span>
+      <a class="brand-link" href="#top">
+        <span class="brand-mark">V</span>
+        <span class="brand-copy">vLLM-HUST<small>Execution layer</small></span>
       </a>
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
@@ -37,102 +36,129 @@
   </nav>
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
 
-  <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
+  <main id="top" class="execution-home">
+    <section class="execution-hero" aria-labelledby="home-title">
+      <img class="execution-hero-media" src="./assets/brand/ecosystem-infrastructure.png" alt="" width="1944" height="809" />
+      <div class="execution-hero-shade"></div>
+      <div class="execution-hero-copy">
+        <p id="home-eyebrow" class="execution-signal"><span></span>Intelligent systems ecosystem / 03</p>
+        <h1 id="home-title">vLLM-HUST</h1>
+        <p id="home-kicker" class="execution-kicker">Inference that meets the hardware.</p>
+        <p id="home-lede" class="execution-lede">Upstream-compatible model serving across runtime, KV-cache scheduling, compilation, kernels, and domestic accelerators.</p>
+        <div class="execution-actions">
+          <a id="home-primary-cta" class="execution-button primary" href="./leaderboard.html">Explore leaderboard <span aria-hidden="true">→</span></a>
+          <a id="home-github-cta" class="execution-button quiet" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">Open GitHub <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <dl class="execution-metrics" aria-label="vLLM-HUST overview">
+        <div><dt>vLLM</dt><dd id="home-fact-1-value">upstream compatible</dd></div>
+        <div><dt>KV</dt><dd id="home-fact-2-value">cache + scheduling</dd></div>
+        <div><dt>NPU</dt><dd id="home-fact-3-value">domestic hardware</dd></div>
+      </dl>
+    </section>
 
-  <main class="home-stage">
-    <section class="cosmic-hero" aria-labelledby="home-title">
-      <div class="cosmic-ring cosmic-ring-one" aria-hidden="true"></div>
-      <div class="cosmic-ring cosmic-ring-two" aria-hidden="true"></div>
-      <div class="cosmic-card">
-        <span id="home-eyebrow" class="cosmic-kicker">HUST vLLM project</span>
-        <h1 id="home-title">vllm-hust</h1>
-        <p id="home-lede" class="cosmic-lede">A HUST-maintained vLLM serving stack for domestic accelerator environments.</p>
-        <div class="cosmic-facts" aria-label="vllm-hust facts">
-          <div><span id="home-fact-1-label">Focus</span><strong id="home-fact-1-value">Domestic accelerator support</strong></div>
-          <div><span id="home-fact-2-label">Published data</span><strong id="home-fact-2-value">Benchmark snapshots</strong></div>
-          <div><span id="home-fact-3-label">Core stack</span><strong>vLLM · Ascend · Triton</strong></div>
-        </div>
-        <div class="hero-actions">
-          <a id="home-github-cta" class="action-button primary" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">GitHub</a>
-        </div>
+    <section class="execution-scope" aria-label="vLLM-HUST technical scope">
+      <span id="scope-runtime" data-code="01">Model runtime</span>
+      <span id="scope-cache" data-code="02">KV + scheduling</span>
+      <span id="scope-compiler" data-code="03">Compilation</span>
+      <span id="scope-kernels" data-code="04">Kernels</span>
+      <span id="scope-hardware" data-code="05">Hardware execution</span>
+    </section>
+
+    <section class="execution-section execution-dark" id="stack">
+      <div class="execution-section-head">
+        <div><p id="stack-eyebrow" class="execution-eyebrow">Execution stack</p><h2 id="stack-title">From serving API to accelerator.</h2></div>
+        <p id="stack-summary">A benchmark-driven stack for upstream-compatible serving across runtime, scheduling, compilation, kernels, and domestic accelerators.</p>
+      </div>
+      <div class="stack-grid">
+        <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / RUNTIME</span><strong>vLLM-HUST Core</strong><p id="stack-core-copy">Upstream-compatible serving runtime and the integration point for hardware backends.</p><em>Repository ↗</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span>02 / BACKEND</span><strong>vLLM Ascend HUST</strong><p id="stack-ascend-copy">Ascend runtime convergence and domestic accelerator enablement.</p><em>Repository ↗</em></a>
+        <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span>03 / COMPILER</span><strong>Triton Ascend HUST</strong><p id="stack-triton-copy">Triton language, compiler, and kernel work for Ascend NPU execution.</p><em>Repository ↗</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / EVALUATION</span><strong>vLLM-HUST Benchmark</strong><p id="stack-benchmark-copy">Published performance snapshots and reproducible engine comparisons.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
+      </div>
+    </section>
+
+    <section class="execution-section execution-atlas" id="projects">
+      <div class="execution-section-head">
+        <div><p id="atlas-eyebrow" class="execution-eyebrow">Runtime atlas</p><h2 id="atlas-title">Assets by execution role.</h2></div>
+        <p id="atlas-summary">Core runtimes, hardware plugins, deployment tooling, and measurements remain visibly distinct.</p>
+      </div>
+      <div class="runtime-list">
+        <a href="https://github.com/vLLM-HUST/vllm-hust"><span class="runtime-name">vLLM-HUST</span><span id="atlas-core-role" class="runtime-role">Serving runtime and backend contract</span><span class="runtime-tag">core</span><span>↗</span></a>
+        <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="runtime-name">vLLM Ascend HUST</span><span id="atlas-ascend-role" class="runtime-role">Ascend integration layer</span><span class="runtime-tag green">backend</span><span>↗</span></a>
+        <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="runtime-name">Triton Ascend HUST</span><span id="atlas-triton-role" class="runtime-role">Compiler and kernel stack</span><span class="runtime-tag coral">compiler</span><span>↗</span></a>
+        <a href="https://github.com/vLLM-HUST/ascend-runtime-manager"><span class="runtime-name">Ascend Runtime Manager</span><span id="atlas-manager-role" class="runtime-role">Deployment diagnostics and setup</span><span class="runtime-tag amber">tooling</span><span>↗</span></a>
+        <a href="https://github.com/vLLM-HUST/vllm-hust-perf-analyzer"><span class="runtime-name">Performance Analyzer</span><span id="atlas-perf-role" class="runtime-role">Serving performance analysis</span><span class="runtime-tag cyan">analysis</span><span>↗</span></a>
+        <a href="./leaderboard.html"><span class="runtime-name">Public Leaderboard</span><span id="atlas-leaderboard-role" class="runtime-role">Benchmark-backed comparison surface</span><span class="runtime-tag amber">data</span><span>→</span></a>
+      </div>
+    </section>
+
+    <section class="execution-section execution-ecosystem" id="ecosystem">
+      <div class="execution-section-head">
+        <div><p id="ecosystem-eyebrow" class="execution-eyebrow">Shared architecture</p><h2 id="ecosystem-title">Open layers. Shared progress.</h2></div>
+        <p id="ecosystem-summary">The ecosystem connects research incubation, application orchestration, evolving data systems, and open model-execution communities.</p>
+      </div>
+      <div class="execution-architecture">
+        <a href="https://lab.sage.org.ai/"><span>00</span><strong>IntelliStream</strong><small id="ecosystem-intellistream">Cross-layer research incubator</small></a>
+        <a href="https://sage.org.ai/"><span>01</span><strong>SAGE</strong><small id="ecosystem-sage">Applications, agents, RAG, workflows</small></a>
+        <a href="https://datasys.sage.org.ai/"><span>02</span><strong>DataSys</strong><small id="ecosystem-datasys">Streams, graphs, vectors, indexes</small></a>
+        <a class="active" href="#top"><span>03</span><strong>vLLM-HUST</strong><small id="ecosystem-vllm">Runtime, scheduling, kernels, hardware</small></a>
       </div>
     </section>
 
     <section class="visually-hidden" id="workstation-section" aria-hidden="true">
       <span class="workstation-pill" id="workstation-status-chip" data-state="pending">Pending</span>
-      <span id="workstation-status-detail">Pending</span>
-      <span id="workstation-backend-label">Serving Backend</span>
-      <span id="workstation-backend-value">Not configured</span>
-      <span id="workstation-url-label">Workstation URL</span>
-      <span id="workstation-target-value">Not configured</span>
-      <a id="workstation-open-link" href="#" target="_blank" rel="noreferrer">Open Workstation</a>
-      <a id="workstation-docs-link" href="./docs/DEPLOY.md" target="_blank" rel="noreferrer">Deployment Guide</a>
-      <span id="workstation-note">Workstation</span>
-      <span id="workstation-embed-mode" data-state="pending">Waiting</span>
-      <iframe id="workstation-embed-frame" title="vllm-hust workstation" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
+      <span id="workstation-status-detail">Pending</span><span id="workstation-backend-label">Serving Backend</span>
+      <span id="workstation-backend-value">Not configured</span><span id="workstation-url-label">Workstation URL</span>
+      <span id="workstation-target-value">Not configured</span><a id="workstation-open-link" href="#" target="_blank" rel="noreferrer">Open Workstation</a>
+      <a id="workstation-docs-link" href="./docs/DEPLOY.md" target="_blank" rel="noreferrer">Deployment Guide</a><span id="workstation-note">Workstation</span>
+      <span id="workstation-embed-mode" data-state="pending">Waiting</span><iframe id="workstation-embed-frame" title="vLLM-HUST workstation" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
     </section>
   </main>
 
-  <footer class="site-footer home-footer">
-    <strong>vllm-hust</strong> · <span id="footer-copy">A HUST-maintained vLLM serving project.</span>
+  <footer class="execution-footer">
+    <div><strong>vLLM-HUST</strong><span id="footer-copy">Inference and hardware execution.</span></div>
+    <nav aria-label="Footer navigation"><a href="./leaderboard.html">Leaderboard</a><a href="./contributors.html">Contributors</a><a href="https://github.com/vLLM-HUST">GitHub</a></nav>
   </footer>
 
   <script>
     window.vllmHustPageDict = {
       en: {
-        title: 'vllm-hust - vLLM Serving on Domestic Hardware',
-        'home-eyebrow': 'HUST vLLM project',
-        'home-lede': 'A HUST-maintained vLLM serving stack for domestic accelerator environments.',
-        'home-primary-cta': 'Leaderboard',
-        'home-secondary-cta': 'Achievements',
-        'home-github-cta': 'GitHub',
-        'home-fact-1-label': 'Focus',
-        'home-fact-1-value': 'Domestic accelerator support',
-        'home-fact-2-label': 'Published data',
-        'home-fact-2-value': 'Benchmark snapshots',
-        'home-fact-3-label': 'Core stack',
-        'workstation-backend-label': 'Serving Backend',
-        'workstation-url-label': 'Workstation URL',
-        'workstation-open-link': 'Open Workstation',
-        'workstation-docs-link': 'Deployment Guide',
-        workstation_embed_live: 'Live',
-        workstation_embed_pending: 'Pending',
-        workstation_status_waiting: 'Pending',
-        workstation_embed_mode_embed: 'Embed Preview',
-        workstation_embed_mode_link: 'Open Link',
-        workstation_embed_mode_waiting: 'Waiting',
-        workstation_not_configured: 'Not configured',
-        'footer-copy': 'A HUST-maintained vLLM serving project.',
+        title: 'vLLM-HUST | Inference and Hardware Execution',
+        'home-eyebrow': 'Intelligent systems ecosystem / 03',
+        'home-kicker': 'Inference that meets the hardware.',
+        'home-lede': 'Upstream-compatible model serving across runtime, KV-cache scheduling, compilation, kernels, and domestic accelerators.',
+        'home-primary-cta': 'Explore leaderboard →', 'home-github-cta': 'Open GitHub ↗',
+        'home-fact-1-value': 'upstream compatible', 'home-fact-2-value': 'cache + scheduling', 'home-fact-3-value': 'domestic hardware',
+        'scope-runtime': 'Model runtime', 'scope-cache': 'KV + scheduling', 'scope-compiler': 'Compilation', 'scope-kernels': 'Kernels', 'scope-hardware': 'Hardware execution',
+        'footer-copy': 'Inference and hardware execution.'
       },
       zh: {
-        title: 'vllm-hust - 面向国产算力的 vLLM 推理服务',
-        'home-eyebrow': 'HUST vLLM 项目',
-        'home-lede': '由 HUST 维护，面向国产加速器环境的 vLLM 推理服务栈。',
-        'home-primary-cta': '性能榜',
-        'home-secondary-cta': '成果',
-        'home-github-cta': 'GitHub',
-        'home-fact-1-label': '方向',
-        'home-fact-1-value': '国产加速器适配',
-        'home-fact-2-label': '公开数据',
-        'home-fact-2-value': 'Benchmark 快照',
-        'home-fact-3-label': '核心栈',
-        'workstation-backend-label': '服务后端',
-        'workstation-url-label': 'Workstation 地址',
-        'workstation-open-link': '打开 Workstation',
-        'workstation-docs-link': '部署说明',
-        workstation_embed_live: '在线',
-        workstation_embed_pending: '待配置',
-        workstation_status_waiting: '等待公开 Workstation 地址。',
-        workstation_embed_mode_embed: '嵌入预览',
-        workstation_embed_mode_link: '打开链接',
-        workstation_embed_mode_waiting: '等待中',
-        workstation_not_configured: '未配置',
-        'footer-copy': 'HUST 维护的 vLLM 推理服务项目。',
+        title: 'vLLM-HUST | 推理与硬件执行',
+        'home-eyebrow': '智能推理服务系统生态 / 03', 'home-kicker': '让推理真正落到硬件上。',
+        'home-lede': '兼容上游 vLLM，覆盖运行时、KV 缓存调度、编译、算子与国产加速器执行。',
+        'home-primary-cta': '查看性能榜 →', 'home-github-cta': '打开 GitHub ↗',
+        'home-fact-1-value': '兼容上游', 'home-fact-2-value': '缓存与调度', 'home-fact-3-value': '国产硬件',
+        'scope-runtime': '模型运行时', 'scope-cache': 'KV 与调度', 'scope-compiler': '编译', 'scope-kernels': '算子', 'scope-hardware': '硬件执行',
+        'stack-eyebrow': '执行栈', 'stack-title': '从服务接口到加速器。',
+        'stack-summary': '以 Benchmark 驱动运行时、调度、编译、算子与国产加速器上的兼容服务。',
+        'stack-core-copy': '兼容上游的服务运行时，也是各类硬件后端的集成入口。',
+        'stack-ascend-copy': '面向昇腾的运行时收敛与国产加速器使能。',
+        'stack-triton-copy': '面向昇腾 NPU 的 Triton 语言、编译器与算子工作。',
+        'stack-benchmark-copy': '公开性能快照与可复现的推理引擎对比。', 'stack-benchmark-link': '打开 Benchmark ↗',
+        'atlas-eyebrow': '运行时图谱', 'atlas-title': '按执行职责组织资产。',
+        'atlas-summary': '核心运行时、硬件插件、部署工具与性能测量保持清晰边界。',
+        'atlas-core-role': '推理服务运行时与后端契约', 'atlas-ascend-role': '昇腾集成层', 'atlas-triton-role': '编译与算子栈',
+        'atlas-manager-role': '部署诊断与环境配置', 'atlas-perf-role': '推理服务性能分析', 'atlas-leaderboard-role': '由 Benchmark 数据驱动的对比页面',
+        'ecosystem-eyebrow': '共享架构', 'ecosystem-title': '开放分层，共同演进。',
+        'ecosystem-summary': '生态连接研究孵化、应用编排、演化数据系统与开放的模型执行社区。',
+        'ecosystem-intellistream': '跨层研究孵化器', 'ecosystem-sage': '应用、Agent、RAG 与工作流',
+        'ecosystem-datasys': '流、图、向量与索引', 'ecosystem-vllm': '运行时、调度、算子与硬件',
+        'footer-copy': '推理与硬件执行。'
       }
     };
   </script>
-  <script src="./assets/site.js?v=mobile-canvas-20260718"></script>
+  <script src="./assets/site.js?v=bilingual-toggle-20260723"></script>
   <script src="./assets/workstation-embed.js?v=workstation-public-copy-20260701"></script>
 </body>
-
 </html>

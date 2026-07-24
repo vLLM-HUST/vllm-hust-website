@@ -1,20 +1,33 @@
 (function () {
     const SOURCES = [
-        'https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-org-profile/main/profile/core_contributors.json',
+        'https://raw.githubusercontent.com/vLLM-HUST/.github/main/profile/core_contributors.json',
         './data/core_contributors.json',
     ];
 
     async function fetchPayload() {
         let lastError = null;
-        for (const source of SOURCES) {
+        const candidates = [];
+        for (const [index, source] of SOURCES.entries()) {
             try {
                 const response = await fetch(source, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return response.json();
+                const payload = await response.json();
+                candidates.push({
+                    payload,
+                    index,
+                    updatedAt: String(payload?.updated_at || ''),
+                });
             } catch (err) {
                 lastError = err;
                 console.warn('[contributors] source failed', source, err);
             }
+        }
+        if (candidates.length) {
+            candidates.sort((left, right) => (
+                right.updatedAt.localeCompare(left.updatedAt)
+                || left.index - right.index
+            ));
+            return candidates[0].payload;
         }
         throw lastError || new Error('No contributor data source succeeded');
     }
@@ -76,8 +89,8 @@
         try {
             const payload = await fetchPayload();
             renderMeta(payload);
-            renderTable('contributors-all-tbody', contributorsFor(payload, 'all_repos'));
             renderTable('contributors-core-tbody', contributorsFor(payload, 'core_repos'));
+            renderTable('contributors-all-tbody', contributorsFor(payload, 'all_repos'));
             if (loading) loading.style.display = 'none';
             if (error) error.style.display = 'none';
             if (content) content.style.display = 'block';

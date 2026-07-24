@@ -50,6 +50,42 @@ def test_site_uses_vllm_hust_brand_icon() -> None:
         )
 
 
+def test_contributors_page_lists_project_leadership() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "contributors.html").read_text(encoding="utf-8")
+
+    leadership_pos = text.index('class="content-panel leadership-panel"')
+    footprint_pos = text.index("Contributor footprint")
+    assert leadership_pos < footprint_pos
+
+    portrait_names = ("金海", "廖小飞", "张书豪")
+    portrait_files = ("jin-hai.jpg", "liao-xiaofei.jpg", "zhang-shuhao.jpg")
+    for name, file_name in zip(portrait_names, portrait_files, strict=True):
+        portrait = root / "assets" / "contributors" / file_name
+        assert portrait.exists() and portrait.stat().st_size > 1000
+        assert f'alt="{name}"' in text
+        assert f"assets/contributors/{file_name}" in text
+
+    for role in ("实验室主任", "院长", "课题负责人"):
+        assert role in text
+
+    subproject_block = text.split('class="subproject-lead-list"', 1)[1].split(
+        "</ul>", 1
+    )[0]
+    for name in (
+        "王雄",
+        "郑龙",
+        "王庆刚",
+        "罗瑞坤",
+        "赵进",
+        "刘海坤",
+        "项翔",
+        "姚鹏程",
+        "万瑶",
+    ):
+        assert f"<li>{name}</li>" in subproject_block
+
+
 def test_data_directory_has_sync_marker() -> None:
     root = Path(__file__).resolve().parents[1]
     marker = root / "data" / "last_updated.json"
@@ -275,6 +311,8 @@ def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
     assert 'class="cosmic-links"' not in html_text
     assert "home-card-leaderboard-title" not in html_text
     assert ".cosmic-links" not in css_text
+    assert 'href="https://sage.org.ai/"' in html_text
+    assert 'href="https://datasys.sage.org.ai/"' in html_text
 
 
 def test_conference_navigation_is_general_not_event_specific() -> None:
@@ -351,7 +389,11 @@ def test_language_toggle_is_separate_from_primary_navigation() -> None:
     assert "position: fixed;" in css_text
     assert "top: 88px;" in css_text
     assert "right: max(" in css_text
-    assert "中 / EN" in (root / "assets" / "site.js").read_text(encoding="utf-8")
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+    assert "langToggle: '中文'" in site_js
+    assert "langToggle: 'EN'" in site_js
+    assert "langToggleLabel: '切换为中文'" in site_js
+    assert "langToggleLabel: 'Switch to English'" in site_js
 
 
 def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() -> None:
@@ -360,7 +402,6 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
 
     assert "letter-spacing: -" not in css_text
     assert "font-size: clamp(" not in css_text
-    assert ".cosmic-card::before" in css_text
     assert ".feature-card:hover" in css_text
 
     for name in (
@@ -372,8 +413,48 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=upstream-review-status-20260721" in text
-        assert "assets/site.js?v=mobile-canvas-20260718" in text
+        assert "assets/site.css?v=contributors-leadership-20260722" in text
+        assert "assets/site.js?v=bilingual-toggle-20260723" in text
+
+
+def test_homepage_uses_shared_ecosystem_visual_system() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "index.html").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
+
+    assert "assets/home.css?v=mobile-navigation-20260723" in html_text
+    assert "assets/brand/ecosystem-infrastructure.png" in html_text
+    assert 'class="execution-hero"' in html_text
+    assert 'class="execution-architecture"' in html_text
+    assert "cosmic-card" not in html_text
+    assert ".execution-hero" in css_text
+    assert ".execution-architecture" in css_text
+    assert "letter-spacing: -" not in css_text
+    assert "font-size: clamp(" not in css_text
+
+
+def test_subpages_use_shared_ecosystem_visual_system() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+
+    for name in (
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+        "conferences.html",
+        "courses.html",
+    ):
+        text = (root / name).read_text(encoding="utf-8")
+        assert "assets/subpages.css?v=upstream-pr-contrast-20260724" in text
+        assert '<span class="brand-mark">V</span>' in text
+        assert "vLLM-HUST<small" in text
+
+    assert 'body:not([data-page="home"])' in css_text
+    assert 'body[data-page="leaderboard"]' in css_text
+    assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in css_text
+    assert "overflow-wrap: anywhere;" in css_text
+    assert "letter-spacing: -" not in css_text
+    assert "font-size: clamp(" not in css_text
 
 
 def test_cosmic_background_uses_scrollbar_safe_viewport_width() -> None:
@@ -473,14 +554,14 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "upstream-review-status-20260721" in html_text
+    assert "upstream-pr-contrast-20260724" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
-    css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
 
     assert 'id="achievement-timeline"' in html_text
     assert 'class="achievement-timeline"' in html_text
@@ -489,11 +570,18 @@ def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     assert "const ACHIEVEMENTS = [" in js_text
     assert "sortDate: '2026-07-02'" in js_text
     assert (
-        "].sort((left, right) => right.sortDate.localeCompare(left.sortDate));"
+        ".sort((left, right) => right.sortDate.localeCompare(left.sortDate));"
         in js_text
     )
+    assert 'id="achievement-release-line"' in html_text
+    assert 'data-achievement-filter="publication"' in html_text
+    assert "function renderReleaseLine" in js_text
+    assert "activeAchievementFilter" in js_text
+    assert "timelineFilterLabel: '筛选成果时间轴'" in js_text
+    assert "releaseLineLabel: '成果发布线'" in js_text
     assert "achievement-item" in css_text
-    assert "achievement-time" in css_text
+    assert "achievement-release-node" in css_text
+    assert "achievement-status" in css_text
 
 
 def test_achievements_timeline_only_records_merged_upstream_prs() -> None:
@@ -531,8 +619,8 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=upstream-review-status-20260721" in html_text
-    assert "assets/achievements-page.js?v=upstream-review-status-20260721" in html_text
+    assert "assets/site.css?v=contributors-leadership-20260722" in html_text
+    assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -544,14 +632,18 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "number: 12343" in js_text
     assert "status: 'needs-label'" in js_text
     assert "status: 'review-requested'" in js_text
+    assert "status: 'ready-evidence'" in js_text
     assert "status: 'evidence-pending'" in js_text
     assert "status: 'ci-retry'" in js_text
     assert "[Performance][Worker] Reuse DP metadata sync buffers" in js_text
     assert "待上游标签" in js_text
     assert "已请求评审" in js_text
-    assert "待补实测证据" in js_text
+    assert "实机证据已补" in js_text
+    assert "Draft · 待复现问题" in js_text
     assert "待重跑 CI" in js_text
     assert 'strong[data-status="review-requested"]' in css_text
+    assert 'strong[data-status="ready-evidence"]' in css_text
+    assert 'strong[data-status="evidence-pending"]' in css_text
 
     assert js_text.count("owner: 'vllm-project'") == 2
     assert js_text.count("owner: 'triton-lang'") == 1
@@ -591,8 +683,9 @@ def test_achievements_page_records_qwen_accepted_pr() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "Jingyuan Tian PR accepted by the Qwen community" in js_text
-    assert "恭喜 Jingyuan 同学的 PR 被 Qwen 社区正式接收" in js_text
+    assert "Plan-gate fix merged into Qwen Code" in js_text
+    assert "Plan-gate 修复合入 Qwen Code" in js_text
+    assert "status: { en: 'Merged', zh: '已合入' }" in js_text
     assert "https://github.com/QwenLM/qwen-code/pull/5185" in js_text
 
 
@@ -604,13 +697,21 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     pdf_path = root / "assets" / "papers" / "bidkv-sc2026.pdf"
 
     assert 'id="result-repository-list"' in html_text
-    assert "成果仓库" in html_text
+    assert "正式发表" in html_text
+    assert "成果仓库" in js_text
     assert "const RESULT_REPOSITORIES = [" in js_text
-    assert "BidKV at SC 2026" in js_text
+    assert (
+        "BidKV: Utility-Guided Preemption Scheduling for KV-Pressure LLM Serving"
+        in js_text
+    )
+    assert (
+        "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
+    )
     assert "./assets/papers/bidkv-sc2026.pdf" in js_text
-    assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
+    assert "github.com/vLLM-HUST/vllm-hust-bidkv" in js_text
+    assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" not in js_text
     assert "github.com/intellistream/bidkv" not in js_text
-    assert "repositoryName: 'vllm-ascend-hust-bidkv'" in js_text
+    assert "repositoryName: 'vllm-hust-bidkv'" in js_text
     assert "names: { en: 'Yanbo Chen · Mingqi Wang', zh: '陈彦博 · 王明琪' }" in js_text
     assert "names: { en: 'Shuhao Zhang', zh: '张书豪' }" in js_text
     assert "result-repository-card" in css_text
@@ -624,17 +725,25 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "DiffSpec at SC 2026" in js_text
-    assert "DiffSpec 入选 SC 2026" in js_text
+    assert (
+        "DiffSpec: Accelerating Long Sequence Generation with Differential Speculative Decoding"
+        in js_text
+    )
+    assert "DiffSpec：面向长序列生成的差分投机解码加速" in js_text
     assert "label: { en: 'Repository', zh: '仓库' }" in js_text
     assert "name: 'DiffSpec'" in js_text
-    assert "repositoryName: 'vllm-hust'" in js_text
+    assert "repositoryName: 'vllm-ascend-hust-diffspec'" in js_text
     assert "面向超长序列推理的差分投机解码加速系统。" in js_text
-    assert "publication: { en: 'SC 2026', zh: 'SC 2026' }" in js_text
+    assert (
+        "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
+    )
     assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
     assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
-    assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" in js_text
-    assert "assets/achievements-page.js?v=upstream-review-status-20260721" in html_text
+    assert (
+        "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
+        in js_text
+    )
+    assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -650,7 +759,8 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     snapshot_index = html_text.index('id="achievements-stats-kicker"')
     assert hero_index < repositories_index < snapshot_index
 
-    assert "https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
+    assert "https://github.com/vLLM-HUST/vllm-hust-bidkv" in js_text
+    assert "https://vllm.ai/blog/2026-05-18-pegaflow" not in js_text
     assert "https://github.com/vLLM-HUST/pegaflow-hust" not in js_text
     assert "https://github.com/vLLM-HUST/vllm-ascend-quant-hust" not in js_text
     assert js_text.count("repositoryName:") == 2
@@ -659,6 +769,75 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     assert "result-repository-index" not in css_text
     assert "result-repository-tags" not in css_text
     assert "research-cache-salt-bucketing" not in js_text
+
+
+def test_research_output_excludes_unpublished_artifacts() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    assert js_text.count("status: { en: 'Accepted · SC 2026'") == 2
+    assert "adaptive-selector-plugin" not in js_text
+    assert "fcs-domestic-chip-llm-recsys" not in js_text
+    assert "cccf-domestic-inference-engine-survey" not in js_text
+    assert "Pre-submission" not in js_text
+    assert "Targeting FCS" not in js_text
+    assert "Writing in public" not in js_text
+    assert "Published on vLLM Blog" not in js_text
+
+
+def test_achievements_page_excludes_external_origin_work() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "achievements.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    for external_claim in (
+        "PegaFlow",
+        "Novita AI",
+        "Organization mirror",
+        "组织镜像",
+        "Technical publication",
+        "技术发表",
+    ):
+        assert external_claim not in js_text
+
+    assert (
+        "projects that we mirror, integrate, validate, or adapt are not achievements."
+        in js_text
+    )
+    assert (
+        "Accepted papers by our team, owned project releases, and upstream "
+        "contributions merged from our contributors."
+    ) in html_text
+    assert (
+        "仅展示本团队已接收论文、自主项目正式发布，以及团队成员已合入的上游贡献。"
+        in html_text
+    )
+    assert "Project releases" in html_text
+    assert "technical: 'Project releases'" in js_text
+
+
+def test_upstream_pr_light_panel_has_explicit_contrast_overrides() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+
+    required_selectors = (
+        ".upstream-pr-details-head > strong",
+        ".upstream-pr-details-head a",
+        ".upstream-pr-number",
+        ".upstream-pr-title",
+        ".upstream-pr-link",
+        '.upstream-pr-row > strong[data-status="draft"]',
+        '.upstream-pr-row > strong[data-status="review-requested"]',
+        '.upstream-pr-row > strong[data-status="ready-evidence"]',
+        '.upstream-pr-row > strong[data-status="ci-retry"]',
+    )
+    for selector in required_selectors:
+        assert selector in css_text
+
+    assert "color: var(--sub-ink);" in css_text
+    assert "color: #105d61;" in css_text
+    assert "background: #d9f0f4;" in css_text
+    assert "background: #fee3e7;" in css_text
 
 
 def test_achievements_page_omits_package_version_cards() -> None:
@@ -744,8 +923,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260706-broken-axis2" in html_text
-    assert "leaderboard-public-20260721-sparse-trends" in html_text
+    assert "leaderboard-contrast-20260723" in html_text
+    assert 'id="toggle-trend-series"' in html_text
+    assert 'id="trend-series-search"' in html_text
+    assert 'id="trend-series-list"' in html_text
     assert "function buildTrendChartModel(entries, metricConfig)" in js_text
     assert "function getTrendVersionSortInfo(entry)" in js_text
     assert (
@@ -785,6 +966,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "return isServingTrendWorkload(entry);" in js_text
     assert "function renderPerformanceTrendChart(entries)" in js_text
     assert "new Chart(canvas" in js_text
+    assert "legend: {" in js_text
+    assert "display: false" in js_text
+    assert "function renderTrendSeriesControl(series)" in js_text
+    assert "state.trendChart.setDatasetVisibility(datasetIndex, visible)" in js_text
     assert "pointDetails" in js_text
     assert "spanGaps: true" in js_text
     assert "Keep one series continuous across x-axis slots" in js_text
@@ -1139,20 +1324,87 @@ def test_local_validation_script_and_hook_templates_track_ci() -> None:
     assert "./scripts/validate-local.sh" in readme_text
 
 
-def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> None:
+def test_contributor_loader_uses_newest_canonical_or_local_snapshot() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
 
     assert "const SOURCES = [" in text
     assert (
-        "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-org-profile/main/profile/core_contributors.json"
+        "https://raw.githubusercontent.com/vLLM-HUST/.github/main/profile/core_contributors.json"
         in text
     )
     assert "'./data/core_contributors.json'" in text
     assert "async function fetchPayload()" in text
+    assert "right.updatedAt.localeCompare(left.updatedAt)" in text
+    assert "return candidates[0].payload;" in text
     assert (
         "item.display_name || item.chinese_name || item.name || item.github_login || ''"
         in text
     )
     assert "item.github_login && item.github_login !== displayName" in text
     assert "console.warn('[contributors] source failed', source, err);" in text
+
+
+def test_contributor_snapshot_has_unique_human_identities() -> None:
+    root = Path(__file__).resolve().parents[1]
+    snapshot_path = root / "data" / "core_contributors.json"
+    payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+    assert payload["updated_at"] == "2026-07-24"
+    assert len(payload["all_repos"]["contributors"]) == 28
+    assert len(payload["core_repos"]["contributors"]) == 16
+    assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
+    assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
+    assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
+    assert "vllm-hust-bidkv" in payload["core_repos"]["scope_repos"]
+    assert len(payload["all_repos"]["scope_repos"]) >= 17
+
+    core_logins = {
+        item.get("github_login") for item in payload["core_repos"]["contributors"]
+    }
+    core_names = {
+        item.get("display_name") for item in payload["core_repos"]["contributors"]
+    }
+    assert "cybber695" in core_logins
+    assert "dzcixy" in core_names
+
+    for scope in ("all_repos", "core_repos"):
+        contributors = payload[scope]["contributors"]
+        logins = [
+            item["github_login"].casefold()
+            for item in contributors
+            if item.get("github_login")
+        ]
+        assert len(logins) == len(set(logins))
+
+        identities = " ".join(
+            f"{item.get('display_name', '')} {item.get('github_login', '')}"
+            for item in contributors
+        ).casefold()
+        for automation_marker in ("qoder", "dependabot", "github-actions", "[bot]"):
+            assert automation_marker not in identities
+
+    all_names = {item["display_name"] for item in payload["all_repos"]["contributors"]}
+    assert {"田景远", "程月甲", "张俊辉"} <= all_names
+    assert (
+        not {"Jingyuan", "Fletcher Tian", "Paul", "Paul Cheng", "Junhui Zhang"}
+        & all_names
+    )
+
+    canonical_snapshot = (
+        root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"
+    )
+    if canonical_snapshot.exists():
+        assert snapshot_path.read_bytes() == canonical_snapshot.read_bytes()
+
+
+def test_core_contributor_stats_precede_all_repository_stats() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "contributors.html").read_text(encoding="utf-8")
+
+    core_index = html_text.index('id="contributors-core-tbody"')
+    all_index = html_text.index('id="contributors-all-tbody"')
+
+    assert core_index < all_index
+    assert "核心仓库与独立优化成果" in html_text
+    assert "BidKV、DiffSpec" in html_text

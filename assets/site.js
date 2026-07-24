@@ -7,8 +7,9 @@
             navContributors: 'Contributors',
             navConferences: 'Conferences',
             navCourses: 'Courses',
-            brandSubtitle: 'vLLM serving',
-            langToggle: '中 / EN',
+            brandSubtitle: 'Execution layer',
+            langToggle: '中文',
+            langToggleLabel: '切换为中文',
         },
         zh: {
             navHome: '首页',
@@ -17,8 +18,9 @@
             navContributors: '核心成员',
             navConferences: '会议',
             navCourses: '课程',
-            brandSubtitle: 'vLLM 推理服务',
-            langToggle: '中 / EN',
+            brandSubtitle: '推理执行层',
+            langToggle: 'EN',
+            langToggleLabel: 'Switch to English',
         },
     };
 
@@ -71,6 +73,11 @@
         setText('nav-conferences', common.navConferences);
         setText('nav-courses', common.navCourses);
         setText('langToggleText', common.langToggle);
+        const languageButton = document.getElementById('langToggle');
+        if (languageButton) {
+            languageButton.setAttribute('aria-label', common.langToggleLabel);
+            languageButton.setAttribute('title', common.langToggleLabel);
+        }
         document.querySelectorAll('.brand-copy small').forEach((node) => {
             node.textContent = common.brandSubtitle;
         });
