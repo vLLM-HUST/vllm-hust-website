@@ -465,6 +465,24 @@ def test_cosmic_background_uses_scrollbar_safe_viewport_width() -> None:
     assert "width = window.innerWidth;" not in text
 
 
+def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
+
+    assert 'id="table-head-model"' in html_text
+    assert '<td colspan="9" class="details-cell">' in js_text
+    assert "entry.model?.short_name || entry.model?.name || t('unknown')" in js_text
+    assert "modelHeader.textContent = t('modelColumn');" in js_text
+    assert "./data/last_updated.json?v=" in js_text
+    assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
+    assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
+    assert "assets/leaderboard.js?v=model-column-sync-20260724" in html_text
+    assert "td:first-child:not(.version-table-cell)" in css_text
+    assert "td.version-table-cell" in css_text
+
+
 def test_validation_dependencies_have_single_source_of_truth() -> None:
     root = Path(__file__).resolve().parents[1]
     requirements_text = (root / "requirements-dev.txt").read_text(encoding="utf-8")
@@ -923,7 +941,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-contrast-20260723" in html_text
+    assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
     assert 'id="trend-series-list"' in html_text
