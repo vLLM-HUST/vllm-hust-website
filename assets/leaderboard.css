@@ -1022,7 +1022,7 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2px 12px;
-    max-height: 300px;
+    max-height: 480px;
     overflow-y: auto;
 }
 
@@ -1079,6 +1079,33 @@
 .trend-series-copy .trend-series-evidence {
     color: #3f5f59;
     font-weight: 650;
+}
+
+.trend-series-copy .trend-series-config {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    overflow: visible;
+    color: #52615f;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.trend-series-config-label {
+    align-self: center;
+    margin-right: 2px;
+    font-weight: 700;
+}
+
+.trend-series-config-chip {
+    padding: 1px 5px;
+    border: 1px solid #cbd8d5;
+    border-radius: 4px;
+    background: #f5f8f7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    overflow-wrap: anywhere;
 }
 
 .trend-series-empty {
