@@ -3476,8 +3476,12 @@
     function renderTable() {
         const tbody = document.getElementById('leaderboard-tbody');
         const emptyState = document.getElementById('empty-state');
+        const modelHeader = document.getElementById('table-head-model');
 
         if (!tbody) return;
+        if (modelHeader) {
+            modelHeader.textContent = t('modelColumn');
+        }
 
         const data = getDataByTab(state.currentTab);
         const filters = state.filters[state.currentTab];
@@ -4524,7 +4528,11 @@
 
         let timestamp = null;
         if (window.HFDataLoader && window.HFDataLoader.getLastUpdated) {
-            timestamp = await window.HFDataLoader.getLastUpdated();
+            try {
+                timestamp = await window.HFDataLoader.getLastUpdated();
+            } catch (_error) {
+                timestamp = null;
+            }
         }
 
         // Fallback: load local last_updated.json directly
@@ -4598,6 +4606,7 @@
             ? ''
             : renderProvenanceSummary(entry);
         const settingSummary = getSettingSummary(entry);
+        const modelText = entry.model?.short_name || entry.model?.name || t('unknown');
 
         // 生成配置描述（芯片数/节点数）
         const configText = getConfigText(entry);
@@ -4622,7 +4631,7 @@
                 ${versionCellHtml}
                 <td class="config-cell">${workloadText}</td>
                 <td class="config-cell">${configText}</td>
-                <td class="config-cell">${entry.model.short_name}</td>
+                <td class="config-cell">${modelText}</td>
                 <td class="metric-column">${renderMetricCell(m.ttft_ms, trends.ttft_ms, false, false, entry.isBaseline)}</td>
                 <td class="metric-column">${renderMetricCell(m.tbt_ms, trends.tbt_ms, false, false, entry.isBaseline)}</td>
                 <td class="metric-column">${renderMetricCell(m.throughput_tps, trends.throughput_tps, true, false, entry.isBaseline)}</td>
