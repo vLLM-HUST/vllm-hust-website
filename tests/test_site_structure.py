@@ -176,19 +176,29 @@ def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     assert "return `spec:${sameSpecId}`;" in setting_signature
 
 
-def test_trend_series_marks_single_points_as_observations_not_lines() -> None:
+def test_trend_series_discloses_configuration_gaps_for_single_points() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
 
-    assert "trendSeriesBaselineOnly: 'baseline only · 1 point · no trend'" in text
-    assert "trendSeriesSinglePoint: 'current only · 1 point · no trend'" in text
-    assert "trendSeriesBaselineOnly: '仅基线 · 1 个点 · 无趋势'" in text
-    assert "trendSeriesSinglePoint: '仅当前版本 · 1 个点 · 无趋势'" in text
+    assert (
+        "trendSeriesBaselineOnly: 'baseline result · 1 point · add matching current result'"
+        in text
+    )
+    assert (
+        "trendSeriesSinglePoint: 'current result · 1 point · add matching baseline result'"
+        in text
+    )
+    assert "trendSeriesBaselineOnly: '基线结果 · 1 个点 · 待补同配置当前结果'" in text
+    assert "trendSeriesSinglePoint: '当前结果 · 1 个点 · 待补同配置基线结果'" in text
     assert "showLine: series.pointCount > 1" in text
     assert "pointRadius: series.pointCount === 1 ? 5 : 3" in text
     assert "item.evidenceLabel = formatTrendSeriesEvidence(item);" in text
     assert "evidence.className = 'trend-series-evidence';" in text
-    assert "item.configurationLabel" in text
+    assert "function getDifferingTrendConfigKeys(seriesGroup)" in text
+    assert "function getTrendConfigDifferenceItems(series, differingKeys)" in text
+    assert "config.className = 'trend-series-config';" in text
+    assert "chip.className = 'trend-series-config-chip';" in text
+    assert "trendSeriesConfigMissing: '未记录'" in text
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
@@ -496,7 +506,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=trend-semantic-series-20260724" in html_text
+    assert "assets/leaderboard.js?v=trend-config-disclosure-20260724" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 

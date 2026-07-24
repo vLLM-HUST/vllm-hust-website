@@ -245,11 +245,13 @@
             trendSeriesShowAll: 'Show all',
             trendSeriesHideAll: 'Hide all',
             trendSeriesEmpty: 'No matching series.',
-            trendSeriesComparable: 'baseline + current · {count} points',
-            trendSeriesBaselineOnly: 'baseline only · 1 point · no trend',
-            trendSeriesCurrentHistory: 'current history · {count} points · no comparable baseline',
-            trendSeriesSinglePoint: 'current only · 1 point · no trend',
+            trendSeriesComparable: 'baseline + current results · {count} points',
+            trendSeriesBaselineOnly: 'baseline result · 1 point · add matching current result',
+            trendSeriesCurrentHistory: 'current results · {count} versions · add matching baseline result',
+            trendSeriesSinglePoint: 'current result · 1 point · add matching baseline result',
             trendSeriesConfig: 'config {token}',
+            trendSeriesConfigDifference: 'Config differences',
+            trendSeriesConfigMissing: 'not recorded',
             trendTooltipActualValue: 'Actual',
             trendTooltipBrokenAxis: 'shown on broken axis',
             trendEmpty: 'No trend data under current filters.',
@@ -467,11 +469,13 @@
             trendSeriesShowAll: '全部显示',
             trendSeriesHideAll: '全部隐藏',
             trendSeriesEmpty: '没有匹配的系列。',
-            trendSeriesComparable: '基线 + 当前版本 · {count} 个点',
-            trendSeriesBaselineOnly: '仅基线 · 1 个点 · 无趋势',
-            trendSeriesCurrentHistory: '当前版本历史 · {count} 个点 · 无可比基线',
-            trendSeriesSinglePoint: '仅当前版本 · 1 个点 · 无趋势',
+            trendSeriesComparable: '基线 + 当前结果 · {count} 个点',
+            trendSeriesBaselineOnly: '基线结果 · 1 个点 · 待补同配置当前结果',
+            trendSeriesCurrentHistory: '当前结果 · {count} 个版本点 · 待补同配置基线结果',
+            trendSeriesSinglePoint: '当前结果 · 1 个点 · 待补同配置基线结果',
             trendSeriesConfig: '配置 {token}',
+            trendSeriesConfigDifference: '配置差异',
+            trendSeriesConfigMissing: '未记录',
             trendTooltipActualValue: '实际值',
             trendTooltipBrokenAxis: '断轴显示',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
@@ -1766,6 +1770,76 @@
         return `${TREND_SEMANTIC_SPEC_VERSION}:${stableStringify(basis)}`;
     }
 
+    function getTrendSemanticConfig(entry) {
+        const sameSpec = getSameSpecPayload(entry);
+        const config = {};
+        const specId = String(sameSpec?.spec_id || '').trim();
+        if (specId) {
+            config.spec_id = specId;
+        }
+
+        [
+            ['server', normalizeSemanticSpecParameters(sameSpec?.resolved_server_parameters)],
+            ['client', normalizeSemanticSpecParameters(sameSpec?.resolved_client_parameters)],
+        ].forEach(([scope, parameters]) => {
+            Object.entries(parameters || {}).forEach(([key, value]) => {
+                config[`${scope}.${key}`] = value;
+            });
+        });
+        return config;
+    }
+
+    function getDifferingTrendConfigKeys(seriesGroup) {
+        const priority = [
+            'server.max_model_len',
+            'server.gpu_memory_utilization',
+            'server.max_num_seqs',
+            'server.max_num_batched_tokens',
+            'server.enable_prefix_caching',
+            'server.enable_chunked_prefill',
+            'client.request_rate',
+            'client.num_prompts',
+            'client.input_len',
+            'client.output_len',
+        ];
+        const priorityIndex = new Map(priority.map((key, index) => [key, index]));
+        const keys = new Set(
+            seriesGroup.flatMap((series) => Object.keys(series.semanticConfig || {}))
+        );
+        return [...keys]
+            .filter((key) => {
+                const values = new Set(seriesGroup.map((series) => (
+                    Object.prototype.hasOwnProperty.call(series.semanticConfig || {}, key)
+                        ? `value:${stableStringify(series.semanticConfig[key])}`
+                        : 'missing'
+                )));
+                return values.size > 1;
+            })
+            .sort((left, right) => {
+                const leftPriority = priorityIndex.get(left) ?? priority.length;
+                const rightPriority = priorityIndex.get(right) ?? priority.length;
+                return leftPriority - rightPriority || left.localeCompare(right);
+            });
+    }
+
+    function formatTrendConfigValue(config, key) {
+        if (!Object.prototype.hasOwnProperty.call(config || {}, key)) {
+            return t('trendSeriesConfigMissing');
+        }
+        const value = config[key];
+        if (typeof value === 'string') {
+            return value || '""';
+        }
+        return stableStringify(value);
+    }
+
+    function getTrendConfigDifferenceItems(series, differingKeys) {
+        return differingKeys.map((key) => ({
+            key,
+            value: formatTrendConfigValue(series.semanticConfig, key),
+        }));
+    }
+
     function getTrendSpecToken(signature) {
         let hash = 2166136261;
         for (const character of String(signature || '')) {
@@ -2610,6 +2684,7 @@
                     key: seriesKey,
                     baseLabel: getTrendSeriesLabel(entry),
                     specToken: getTrendSpecToken(settingSignature),
+                    semanticConfig: getTrendSemanticConfig(entry),
                     workload: getWorkloadLabel(getWorkloadId(entry) || 'Other'),
                     model: getEntryModelDisplayName(entry) || 'Unknown model',
                     hardware: getConfigText(entry).replace('<br><small>', ' ').replace('</small>', ''),
@@ -2671,8 +2746,13 @@
             });
 
         const labelCounts = new Map();
+        const seriesByLabel = new Map();
         series.forEach((item) => {
             labelCounts.set(item.baseLabel, (labelCounts.get(item.baseLabel) || 0) + 1);
+            if (!seriesByLabel.has(item.baseLabel)) {
+                seriesByLabel.set(item.baseLabel, []);
+            }
+            seriesByLabel.get(item.baseLabel).push(item);
         });
         series.forEach((item) => {
             item.hasDuplicateLabel = labelCounts.get(item.baseLabel) > 1;
@@ -2683,6 +2763,13 @@
                 ? `${item.baseLabel} · ${item.configurationLabel}`
                 : item.baseLabel;
             item.evidenceLabel = formatTrendSeriesEvidence(item);
+            item.configDifferenceItems = getTrendConfigDifferenceItems(
+                item,
+                getDifferingTrendConfigKeys(seriesByLabel.get(item.baseLabel) || [item])
+            );
+            item.configDifferenceLabel = item.configDifferenceItems
+                .map(({ key, value }) => `${key}=${value}`)
+                .join(' ');
         });
 
         return { versions, series };
@@ -2948,6 +3035,7 @@
                 item.precision,
                 item.evidenceLabel,
                 item.configurationLabel,
+                item.configDifferenceLabel,
             ]
                 .join(' ')
                 .toLocaleLowerCase();
@@ -2970,8 +3058,23 @@
             meta.textContent = `${item.model} · ${item.hardware} · ${item.precision}`;
             const evidence = document.createElement('small');
             evidence.className = 'trend-series-evidence';
-            evidence.textContent = [item.evidenceLabel, item.configurationLabel].filter(Boolean).join(' · ');
+            evidence.textContent = item.evidenceLabel;
             copy.append(title, meta, evidence);
+            if (item.configDifferenceItems.length) {
+                const config = document.createElement('span');
+                config.className = 'trend-series-config';
+                const configLabel = document.createElement('span');
+                configLabel.className = 'trend-series-config-label';
+                configLabel.textContent = t('trendSeriesConfigDifference');
+                config.append(configLabel);
+                item.configDifferenceItems.forEach(({ key, value }) => {
+                    const chip = document.createElement('span');
+                    chip.className = 'trend-series-config-chip';
+                    chip.textContent = `${key}=${value}`;
+                    config.append(chip);
+                });
+                copy.append(config);
+            }
             label.append(checkbox, swatch, copy);
             list.append(label);
         });
