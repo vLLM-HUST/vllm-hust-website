@@ -166,8 +166,20 @@ def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
         "function getCompactSpecLabel", 1
     )[0]
 
-    assert "const TREND_SEMANTIC_SPEC_VERSION = 'same-spec-semantic/v1';" in text
+    assert "const TREND_SEMANTIC_SPEC_VERSION = 'same-spec-semantic/v2';" in text
     assert "new Set(['host', 'port', 'model'])" in text
+    assert "function normalizeSemanticSpecValue(value)" in text
+    assert "function buildTrendSpecDefaults(entries)" in text
+    assert "entries.filter((entry) => isTrendBaselineEntry(entry))" in text
+    assert "function getEffectiveSemanticSpecParameters(" in text
+    assert "function getEffectiveTrendWorkloadSemanticConfig(" in text
+    assert "...(defaults.server || {}), ...parameters.server" in text
+    assert "...(defaults.client || {}), ...parameters.client" in text
+    assert (
+        "workload: getEffectiveTrendWorkloadSemanticConfig(entry, specDefaults)" in text
+    )
+    assert "delete client.input_len;" in text
+    assert "delete client.output_len;" in text
     assert setting_signature.index(
         "getSemanticSpecSignature"
     ) < setting_signature.index("resolved_spec_hash")
@@ -176,29 +188,153 @@ def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     assert "return `spec:${sameSpecId}`;" in setting_signature
 
 
-def test_trend_series_discloses_configuration_gaps_for_single_points() -> None:
+def test_trend_series_discloses_real_configuration_overrides() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
 
-    assert (
-        "trendSeriesBaselineOnly: 'baseline result · 1 point · add matching current result'"
-        in text
-    )
-    assert (
-        "trendSeriesSinglePoint: 'current result · 1 point · add matching baseline result'"
-        in text
-    )
-    assert "trendSeriesBaselineOnly: '基线结果 · 1 个点 · 待补同配置当前结果'" in text
-    assert "trendSeriesSinglePoint: '当前结果 · 1 个点 · 待补同配置基线结果'" in text
+    assert "trendSeriesBaselineOnly: 'baseline result · 1 point'" in text
+    assert "trendSeriesSinglePoint: 'current result · 1 point'" in text
+    assert "trendSeriesBaselineOnly: '基线结果 · 1 个点'" in text
+    assert "trendSeriesSinglePoint: '当前结果 · 1 个点'" in text
+    assert "add matching baseline result" not in text
+    assert "待补同配置基线结果" not in text
     assert "showLine: series.pointCount > 1" in text
     assert "pointRadius: series.pointCount === 1 ? 5 : 3" in text
     assert "item.evidenceLabel = formatTrendSeriesEvidence(item);" in text
     assert "evidence.className = 'trend-series-evidence';" in text
     assert "function getDifferingTrendConfigKeys(seriesGroup)" in text
+    assert "function getRelevantTrendConfigKeys(series)" in text
+    assert "isUnpaired ? getRelevantTrendConfigKeys(item) : []" in text
     assert "function getTrendConfigDifferenceItems(series, differingKeys)" in text
     assert "config.className = 'trend-series-config';" in text
     assert "chip.className = 'trend-series-config-chip';" in text
-    assert "trendSeriesConfigMissing: '未记录'" in text
+    assert "trendSeriesConfigDefault: '默认值（与基线一致）'" in text
+    assert "trendSeriesConfigDetails: '相关配置'" in text
+    assert "trendSeriesConfigMissing" not in text
+
+
+def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> None:
+    root = Path(__file__).resolve().parents[1]
+    entries = []
+    for name in ("leaderboard_single.json", "leaderboard_multi.json"):
+        entries.extend(json.loads((root / "data" / name).read_text(encoding="utf-8")))
+
+    ignored = {"host", "port", "model"}
+
+    def normalize(value):
+        if isinstance(value, dict):
+            return {key: normalize(value[key]) for key in sorted(value)}
+        if isinstance(value, list):
+            return [normalize(item) for item in value]
+        if isinstance(value, str):
+            stripped = value.strip()
+            if re.fullmatch(r"-?\d+(?:\.\d+)?", stripped):
+                return float(stripped)
+            if stripped.lower() in {"true", "false"}:
+                return stripped.lower() == "true"
+        return value
+
+    def parameters(entry):
+        same_spec = entry.get("same_spec") or {}
+        resolved = {}
+        for scope, source_key in (
+            ("server", "resolved_server_parameters"),
+            ("client", "resolved_client_parameters"),
+        ):
+            resolved[scope] = {
+                key: normalize(value)
+                for key, value in (same_spec.get(source_key) or {}).items()
+                if key not in ignored
+            }
+        workload = entry.get("workload") or {}
+        if resolved["client"].get("input_len") == normalize(
+            workload.get("input_length")
+        ):
+            resolved["client"].pop("input_len")
+        if resolved["client"].get("output_len") == normalize(
+            workload.get("output_length")
+        ):
+            resolved["client"].pop("output_len")
+        return resolved
+
+    def workload_parameters(entry):
+        workload = entry.get("workload") or {}
+        values = {
+            "name": str(workload.get("name") or ""),
+            "input_length": normalize(workload.get("input_length")),
+            "output_length": normalize(workload.get("output_length")),
+            "batch_size": normalize(workload.get("batch_size")),
+            "concurrent_requests": normalize(workload.get("concurrent_requests")),
+            "dataset": str(workload.get("dataset") or ""),
+        }
+        return {
+            key: value
+            for key, value in values.items()
+            if value is not None and value != ""
+        }
+
+    by_spec = {}
+    for entry in entries:
+        if (entry.get("quality") or {}).get("exclude_from_trends"):
+            continue
+        spec_id = str((entry.get("same_spec") or {}).get("spec_id") or "")
+        if spec_id:
+            by_spec.setdefault(spec_id, []).append(entry)
+
+    effective_signature_counts = {}
+    for spec_id, group in by_spec.items():
+        baselines = [entry for entry in group if entry.get("engine") != "vllm-hust"]
+        defaults = {
+            "workload": {},
+            "server": {},
+            "client": (
+                {"no_stream": False}
+                if str(
+                    (group[0].get("same_spec") or {}).get("scenario") or ""
+                ).endswith("-online")
+                else {}
+            ),
+        }
+        for scope in ("workload", "server", "client"):
+            baseline_values = [
+                workload_parameters(entry)
+                if scope == "workload"
+                else parameters(entry)[scope]
+                for entry in baselines
+            ]
+            keys = set().union(*baseline_values)
+            for key in keys:
+                recorded = [values[key] for values in baseline_values if key in values]
+                if (
+                    len(recorded) == len(baselines)
+                    and len({json.dumps(value, sort_keys=True) for value in recorded})
+                    == 1
+                ):
+                    defaults[scope][key] = recorded[0]
+
+        signatures = set()
+        for entry in group:
+            explicit = parameters(entry)
+            explicit["workload"] = workload_parameters(entry)
+            effective = {
+                scope: {**defaults[scope], **explicit[scope]}
+                for scope in ("workload", "server", "client")
+            }
+            signatures.add(json.dumps(effective, sort_keys=True))
+        scenario = str((group[0].get("same_spec") or {}).get("scenario") or "")
+        effective_signature_counts[scenario] = len(signatures)
+
+    assert effective_signature_counts["visionarena-online"] == 1
+    assert effective_signature_counts["instructcoder-online"] == 2
+    assert effective_signature_counts["prefix-repetition-online"] == 2
+    assert effective_signature_counts["random-online"] == 2
+    assert effective_signature_counts["random-latency"] == 3
+    for scenario in (
+        "sharegpt-online",
+        "sharegpt-throughput",
+        "sonnet-throughput",
+    ):
+        assert effective_signature_counts[scenario] == 1
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
@@ -506,7 +642,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=trend-config-disclosure-20260724" in html_text
+    assert "assets/leaderboard.js?v=trend-effective-defaults-20260724" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 
@@ -973,7 +1109,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
     assert 'id="trend-series-list"' in html_text
-    assert "function buildTrendChartModel(entries, metricConfig)" in js_text
+    assert (
+        "function buildTrendChartModel(entries, metricConfig, defaultEntries = entries)"
+        in js_text
+    )
     assert "function getTrendVersionSortInfo(entry)" in js_text
     assert (
         "commitCount: commitCountMatch ? parseInt(commitCountMatch[1], 10) : null"
@@ -1010,7 +1149,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "replace(/-\\d+chip$/, '')" in js_text
     assert "current-main" not in js_text
     assert "return isServingTrendWorkload(entry);" in js_text
-    assert "function renderPerformanceTrendChart(entries)" in js_text
+    assert (
+        "function renderPerformanceTrendChart(entries, defaultEntries = entries)"
+        in js_text
+    )
     assert "new Chart(canvas" in js_text
     assert "legend: {" in js_text
     assert "display: false" in js_text
@@ -1066,10 +1208,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
     assert "if (selectedWorkload !== 'all')" in js_text
     assert "return true;" in js_text
-    assert (
-        "renderPerformanceTrendChart(getPerformanceTrendEntries(visibleEntries, filters.workload));"
-        in js_text
-    )
+    assert "getPerformanceTrendEntries(data, 'all')" in js_text
     assert ".leaderboard-trend-panel {" in css_text
     assert ".trend-chart-wrap {" in css_text
     assert ".trend-axis-row {" in css_text
