@@ -496,9 +496,9 @@
             'multi-node': { engine: '', hardware: '', model: '', version: '', workload: '', precision: '' }
         },
         viewOptions: {
-            'single-chip': { sameScopeOnly: false, hideIncompleteGroups: false },
-            'multi-chip': { sameScopeOnly: false, hideIncompleteGroups: false },
-            'multi-node': { sameScopeOnly: false, hideIncompleteGroups: false }
+            'single-chip': { sameScopeOnly: false, hideIncompleteGroups: true },
+            'multi-chip': { sameScopeOnly: false, hideIncompleteGroups: true },
+            'multi-node': { sameScopeOnly: false, hideIncompleteGroups: true }
         },
         expandedRows: new Set(),
         sort: {
@@ -1722,6 +1722,8 @@
             server?.tensor_parallel_size ?? 'unknown-tp',
             server?.pipeline_parallel_size ?? 'unknown-pp',
             server?.dtype || 'unknown-dtype',
+            server?.gpu_memory_utilization ?? 'unknown-mem',
+            server?.max_model_len ?? 'unknown-maxlen',
             client?.request_rate ?? 'unknown-rps',
         ].join('|');
     }
@@ -1777,6 +1779,12 @@
         const dtype = formatSettingDtype(server?.dtype);
         if (dtype) {
             parts.push(dtype);
+        }
+        if (server?.gpu_memory_utilization != null) {
+            parts.push(`Mem ${server.gpu_memory_utilization}`);
+        }
+        if (server?.max_model_len != null) {
+            parts.push(`MaxLen ${server.max_model_len}`);
         }
         if (client?.request_rate != null) {
             parts.push(`RPS ${client.request_rate}`);
@@ -2085,18 +2093,69 @@
     }
 
     function isNumericVersion(version) {
-        return /^v?\d+(\.\d+){1,3}(\.x)?$/i.test(String(version || '').trim());
+        const text = String(version || '').trim();
+        if (!text) {
+            return false;
+        }
+
+        // Reject bare commit hashes (e.g. "7a63f81" or "g7a63f81")
+        // that are not real version numbers.
+        const candidate = text.replace(/^[vg]/i, '');
+        if (/[a-f]/i.test(candidate) && /^[0-9a-f]{7,40}$/i.test(candidate)) {
+            return false;
+        }
+
+        // Match PEP 440 / semver formats:
+        //   v0.18.0, 0.18.0, 0.18.0.post1, 0.20.1rc0,
+        //   0.17.2.post1-1357-g83cf83ff2, 0.23.1rc0-1276-g1aa7cd10b7
+        return /^v?\d+(\.\d+)+([a-zA-Z0-9._+*-]*)?$/i.test(text);
     }
 
     function compareDisplayVersions(a, b) {
-        const normalizedA = String(a || '').trim().replace(/^v/i, '').replace(/\.x$/, '.0');
-        const normalizedB = String(b || '').trim().replace(/^v/i, '').replace(/\.x$/, '.0');
+        const rawA = String(a || '').trim();
+        const rawB = String(b || '').trim();
 
-        if (isNumericVersion(a) && isNumericVersion(b)) {
+        // Strip #<commit> suffix (added by formatComponentVersion) and
+        // git-describe distance parts (e.g. "-535-gceec19abb0") to get
+        // the clean version core for numeric comparison.
+        const normalizedA = rawA
+            .replace(/^v/i, '')
+            .replace(/\.x$/, '.0')
+            .replace(/#.*$/, '')
+            .replace(/-\d+-g[0-9a-f]{7,40}$/i, '')
+            .replace(/[.+]-?g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '');
+        const normalizedB = rawB
+            .replace(/^v/i, '')
+            .replace(/\.x$/, '.0')
+            .replace(/#.*$/, '')
+            .replace(/-\d+-g[0-9a-f]{7,40}$/i, '')
+            .replace(/[.+]-?g[0-9a-f]{7,40}(?:\.d\d{8})?$/i, '');
+
+        if (isNumericVersion(normalizedA) && isNumericVersion(normalizedB)) {
             return compareVersions(normalizedA, normalizedB);
         }
 
-        return String(a || '').localeCompare(String(b || ''));
+        // Fallback: extract the first 1-3 numeric segments and compare
+        // those.  This handles edge cases like bare short hashes.
+        const numA = normalizedA.match(/^(\d+(?:\.\d+){0,2})/);
+        const numB = normalizedB.match(/^(\d+(?:\.\d+){0,2})/);
+        if (numA && numB) {
+            // If one string is a commit hash (e.g. "7a63f81") and the
+            // other is a real version, the extracted numeric prefix
+            // (e.g. "7" from "7a63f81") can be misleading.  The
+            // tiebreaker is: if the extracted number is the *entire*
+            // string, treat it as a real version; otherwise the
+            // remaining suffix identifies it as a commit hash.
+            const isHashA = numA[0] !== normalizedA;
+            const isHashB = numB[0] !== normalizedB;
+            if (isHashA !== isHashB) {
+                // A real version always sorts after a commit hash.
+                return isHashA ? -1 : 1;
+            }
+            return compareVersions(numA[1], numB[1]);
+        }
+
+        return rawA.localeCompare(rawB);
     }
 
     function compareEntriesByVersionDesc(a, b) {
@@ -5642,15 +5701,31 @@
 
     // Compare semantic versions (e.g., "0.3.2" > "0.3.1")
     function compareVersions(a, b) {
-        const aParts = String(a).split('.').map((part) => Number.parseInt(part, 10) || 0);
-        const bParts = String(b).split('.').map((part) => Number.parseInt(part, 10) || 0);
+        // Split on '.' and compare each segment numerically.
+        // Non-numeric suffixes (e.g. "post1" in "0.18.0.post1",
+        // "rc0" in "0.20.1rc0") are compared as 0 for the numeric
+        // part, then the full segment is used as a tiebreaker so
+        // that "0.18.0" < "0.18.0.post1".
+        const aParts = String(a).split('.');
+        const bParts = String(b).split('.');
+        const maxLen = Math.max(aParts.length, bParts.length);
 
-        for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
-            const aVal = aParts[i] || 0;
-            const bVal = bParts[i] || 0;
+        for (let i = 0; i < maxLen; i++) {
+            const aRaw = aParts[i] || '';
+            const bRaw = bParts[i] || '';
+            const aNum = Number.parseInt(aRaw, 10) || 0;
+            const bNum = Number.parseInt(bRaw, 10) || 0;
 
-            if (aVal !== bVal) {
-                return aVal - bVal;
+            if (aNum !== bNum) {
+                return aNum - bNum;
+            }
+
+            // Numeric parts are equal; tiebreak on the non-numeric
+            // suffix (e.g. "" < "post1", "rc0" < "post1").
+            const aSuffix = aRaw.slice(String(aNum).length);
+            const bSuffix = bRaw.slice(String(bNum).length);
+            if (aSuffix !== bSuffix) {
+                return aSuffix.localeCompare(bSuffix);
             }
         }
 

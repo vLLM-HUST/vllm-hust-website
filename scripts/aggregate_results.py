@@ -699,6 +699,8 @@ def build_setting_signature(entry: dict[str, Any]) -> str:
     pipeline_parallel = server.get("pipeline_parallel_size")
     dtype = server.get("dtype")
     request_rate = client.get("request_rate")
+    gpu_memory_utilization = server.get("gpu_memory_utilization")
+    max_model_len = server.get("max_model_len")
     return "|".join(
         [
             str(input_length if input_length is not None else "unknown-input"),
@@ -706,6 +708,8 @@ def build_setting_signature(entry: dict[str, Any]) -> str:
             str(tensor_parallel if tensor_parallel is not None else "unknown-tp"),
             str(pipeline_parallel if pipeline_parallel is not None else "unknown-pp"),
             str(dtype or "unknown-dtype"),
+            str(gpu_memory_utilization if gpu_memory_utilization is not None else "unknown-mem"),
+            str(max_model_len if max_model_len is not None else "unknown-maxlen"),
             str(request_rate if request_rate is not None else "unknown-rps"),
         ]
     )
@@ -764,6 +768,14 @@ def build_setting_summary(entry: dict[str, Any]) -> str:
     dtype_label = format_setting_dtype(dtype)
     if dtype_label:
         parts.append(dtype_label)
+
+    gpu_memory_utilization = server.get("gpu_memory_utilization")
+    if gpu_memory_utilization is not None:
+        parts.append(f"Mem {gpu_memory_utilization}")
+
+    max_model_len = server.get("max_model_len")
+    if max_model_len is not None:
+        parts.append(f"MaxLen {max_model_len}")
 
     request_rate = client.get("request_rate")
     if request_rate is not None:
