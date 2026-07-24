@@ -168,9 +168,9 @@ def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
 
     assert "const TREND_SEMANTIC_SPEC_VERSION = 'same-spec-semantic/v1';" in text
     assert "new Set(['host', 'port', 'model'])" in text
-    assert setting_signature.index("getSemanticSpecSignature") < setting_signature.index(
-        "resolved_spec_hash"
-    )
+    assert setting_signature.index(
+        "getSemanticSpecSignature"
+    ) < setting_signature.index("resolved_spec_hash")
     assert "return semanticSignature;" in setting_signature
     assert "return `hash:${sameSpecHash}`;" in setting_signature
     assert "return `spec:${sameSpecId}`;" in setting_signature
