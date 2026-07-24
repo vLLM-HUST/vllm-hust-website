@@ -858,6 +858,122 @@ h1 {
     white-space: nowrap;
 }
 
+.research-members-menu {
+    position: relative;
+    margin-top: 18px;
+    border: 1px solid rgba(125, 211, 252, 0.22);
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.46);
+}
+
+.research-members-menu summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 18px;
+    color: var(--ink);
+    cursor: pointer;
+    list-style: none;
+}
+
+.research-members-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.research-members-menu summary::after {
+    content: "+";
+    display: grid;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border: 1px solid rgba(125, 211, 252, 0.28);
+    border-radius: 50%;
+    color: #7dd3fc;
+    font-size: 1.15rem;
+    font-weight: 900;
+}
+
+.research-members-menu[open] summary::after {
+    content: "−";
+}
+
+.research-members-menu summary:focus-visible {
+    outline: 3px solid rgba(56, 189, 248, 0.45);
+    outline-offset: 3px;
+}
+
+.research-members-menu summary span {
+    display: grid;
+    gap: 4px;
+}
+
+.research-members-menu summary strong {
+    font-size: 0.98rem;
+}
+
+.research-members-menu summary small {
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+
+.research-members-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding: 0 18px 18px;
+    border-top: 1px solid rgba(125, 211, 252, 0.16);
+}
+
+.research-member-group {
+    min-width: 0;
+    padding-top: 16px;
+}
+
+.research-member-group h3 {
+    margin: 0 0 10px;
+    color: #7dd3fc;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.research-member-list {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.research-member-list li {
+    display: grid;
+    grid-template-columns: minmax(72px, 0.28fr) minmax(0, 1fr);
+    gap: 12px;
+    align-items: baseline;
+    padding: 9px 11px;
+    border: 1px solid rgba(125, 211, 252, 0.14);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.42);
+}
+
+.research-member-list strong {
+    color: rgba(241, 245, 249, 0.96);
+    font-size: 0.86rem;
+}
+
+.research-member-list span {
+    min-width: 0;
+    color: rgba(203, 213, 225, 0.88);
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+}
+
+.research-member-group-prospective {
+    opacity: 0.78;
+}
+
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -1683,6 +1799,15 @@ h1 {
 
     .subproject-lead-list {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .research-members-content {
+        grid-template-columns: 1fr;
+    }
+
+    .research-member-list li {
+        grid-template-columns: 1fr;
+        gap: 3px;
     }
 
     .data-row {

@@ -168,6 +168,40 @@ body:not([data-page="home"]) .subproject-lead-list li {
   color: var(--sub-ink);
   background: #dfeebf;
 }
+body:not([data-page="home"]) .research-members-menu {
+  border-color: var(--sub-line);
+  border-radius: 4px;
+  color: var(--sub-ink);
+  background: var(--sub-paper);
+}
+body:not([data-page="home"]) .research-members-menu summary {
+  color: var(--sub-ink);
+}
+body:not([data-page="home"]) .research-members-menu summary::after {
+  border-color: var(--sub-line);
+  border-radius: 3px;
+  color: #176f72;
+}
+body:not([data-page="home"]) .research-members-menu summary small {
+  color: var(--sub-muted);
+}
+body:not([data-page="home"]) .research-members-content {
+  border-top-color: var(--sub-line);
+}
+body:not([data-page="home"]) .research-member-group h3 {
+  color: #176f72;
+}
+body:not([data-page="home"]) .research-member-list li {
+  border-color: #dbe3e0;
+  border-radius: 3px;
+  background: var(--sub-panel);
+}
+body:not([data-page="home"]) .research-member-list strong {
+  color: var(--sub-ink);
+}
+body:not([data-page="home"]) .research-member-list span {
+  color: var(--sub-muted);
+}
 body:not([data-page="home"]) .result-repository-source,
 body:not([data-page="home"]) .result-repository-team-row span { color: var(--sub-muted); }
 body:not([data-page="home"]) .result-repository-team-kicker,
