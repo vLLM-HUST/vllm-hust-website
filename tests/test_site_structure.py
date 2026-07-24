@@ -159,18 +159,36 @@ def test_trend_version_key_includes_core_and_backend_commits() -> None:
     assert "[coreCommit, backendCommit].filter(Boolean).join('+')" in version_key
 
 
-def test_trend_series_prefers_resolved_hash_over_spec_id() -> None:
+def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     setting_signature = text.split("function getSettingSignature", 1)[1].split(
         "function getCompactSpecLabel", 1
     )[0]
 
-    assert setting_signature.index("resolved_spec_hash") < setting_signature.index(
-        "getSameSpecId(entry)"
+    assert "const TREND_SEMANTIC_SPEC_VERSION = 'same-spec-semantic/v1';" in text
+    assert "new Set(['host', 'port', 'model'])" in text
+    assert setting_signature.index("getSemanticSpecSignature") < setting_signature.index(
+        "resolved_spec_hash"
     )
+    assert "return semanticSignature;" in setting_signature
     assert "return `hash:${sameSpecHash}`;" in setting_signature
     assert "return `spec:${sameSpecId}`;" in setting_signature
+
+
+def test_trend_series_marks_single_points_as_observations_not_lines() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "trendSeriesBaselineOnly: 'baseline only · 1 point · no trend'" in text
+    assert "trendSeriesSinglePoint: 'current only · 1 point · no trend'" in text
+    assert "trendSeriesBaselineOnly: '仅基线 · 1 个点 · 无趋势'" in text
+    assert "trendSeriesSinglePoint: '仅当前版本 · 1 个点 · 无趋势'" in text
+    assert "showLine: series.pointCount > 1" in text
+    assert "pointRadius: series.pointCount === 1 ? 5 : 3" in text
+    assert "item.evidenceLabel = formatTrendSeriesEvidence(item);" in text
+    assert "evidence.className = 'trend-series-evidence';" in text
+    assert "item.configurationLabel" in text
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
@@ -478,7 +496,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=model-column-sync-20260724" in html_text
+    assert "assets/leaderboard.js?v=trend-semantic-series-20260724" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 

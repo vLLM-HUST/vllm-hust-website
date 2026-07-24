@@ -1076,6 +1076,11 @@
     font-size: 0.72rem;
 }
 
+.trend-series-copy .trend-series-evidence {
+    color: #3f5f59;
+    font-weight: 650;
+}
+
 .trend-series-empty {
     margin: 10px 0 0;
     color: #64706e;
