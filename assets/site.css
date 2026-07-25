@@ -923,6 +923,27 @@ h1 {
     border-top: 1px solid rgba(125, 211, 252, 0.16);
 }
 
+.research-member-group {
+    margin-top: 16px;
+}
+
+.research-member-group + .research-member-group {
+    padding-top: 18px;
+    border-top: 1px solid rgba(125, 211, 252, 0.16);
+}
+
+.research-member-group h3 {
+    margin: 0;
+    color: rgba(241, 245, 249, 0.96);
+    font-size: 0.95rem;
+}
+
+.research-member-group > p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
 .research-members-status {
     margin: 16px 0 0;
     color: var(--muted);
@@ -975,23 +996,22 @@ h1 {
     min-width: 0;
 }
 
-.research-member-focus {
+.research-member-detail-row {
+    display: grid;
+    grid-template-columns: minmax(76px, max-content) minmax(0, 1fr);
+    gap: 8px;
     color: rgba(203, 213, 225, 0.88);
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     overflow-wrap: anywhere;
 }
 
-.research-member-advisor {
-    display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
-    min-height: 1.1em;
-    color: rgba(148, 163, 184, 0.9);
-    font-size: 0.72rem;
-}
-
-.research-member-advisor b {
+.research-member-detail-row b {
     color: rgba(125, 211, 252, 0.88);
     font-weight: 700;
+}
+
+.contributors-metric-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .card-grid {
@@ -1826,8 +1846,12 @@ h1 {
     }
 
     .research-member-list li {
-        grid-template-columns: minmax(104px, 0.32fr) minmax(0, 1fr);
-        gap: 3px;
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .research-member-detail-row {
+        grid-template-columns: minmax(72px, max-content) minmax(0, 1fr);
     }
 
     .data-row {

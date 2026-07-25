@@ -3,82 +3,51 @@
         'https://raw.githubusercontent.com/vLLM-HUST/.github/main/profile/core_contributors.json',
         './data/core_contributors.json',
     ];
-    const EXCLUDED_PROFILE_IDENTITIES = new Set(['vllm-hust developer']);
-    const CURATED_PROFILES = {
-        shuhaozhangtony: {
-            en: 'State management · Distributed runtimes · Inference infrastructure',
-            zh: '状态管理 · 分布式运行时 · 推理基础设施',
-            advisor: false,
-        },
-        'mingqiwang-coder': {
-            en: 'vLLM runtime · Inference operators · Performance engineering',
-            zh: 'vLLM 运行时 · 推理算子 · 工程优化',
-            advisor: true,
-        },
-        cybber695: {
-            en: 'Domestic hardware · Performance testing · Inference engineering',
-            zh: '国产硬件适配 · 性能测试 · 推理工程',
-            advisor: true,
-        },
-        pygone: {
-            en: 'AgentDB · State persistence · Memory middleware',
-            zh: 'AgentDB · 状态持久化 · 记忆中间件',
-            advisor: true,
-        },
-        wmaster123: {
-            en: 'Inference engines · Testing · Engineering optimization',
-            zh: '推理引擎 · 测试 · 工程优化',
-            advisor: true,
-        },
-        xilinggao: {
-            en: 'Tiered KV cache · KV migration · Cache reuse',
-            zh: '多级 KV 缓存 · KV 迁移 · 缓存复用',
-            advisor: true,
-        },
-        moonandlife: {
-            en: 'Upstream sync · CI/CD · Performance regression',
-            zh: '上游同步 · CI/CD · 性能回归',
-            advisor: true,
-        },
-        succinctpaul: {
-            en: 'Benchmark infrastructure · Website · Engineering quality',
-            zh: 'Benchmark 基础设施 · 网站 · 工程质量',
-            advisor: true,
-        },
-        iliujunn: {
-            en: 'SLO scheduling · KV/MLA · Multi-GPU decoding',
-            zh: 'SLO 调度 · KV/MLA · 多 GPU 解码',
-            advisor: true,
-        },
-    };
+    const SYNTHETIC_IDENTITIES = new Set(['vllm-hust developer']);
     let currentPayload = null;
 
+    async function fetchSource(source, index) {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 4500);
+        try {
+            const response = await fetch(source, {
+                cache: 'no-store',
+                signal: controller.signal,
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const payload = await response.json();
+            return {
+                payload,
+                index,
+                updatedAt: String(payload?.updated_at || ''),
+                hasMemberProfiles: Boolean(payload?.member_profiles),
+            };
+        } finally {
+            window.clearTimeout(timeout);
+        }
+    }
+
     async function fetchPayload() {
-        let lastError = null;
+        const results = await Promise.allSettled(
+            SOURCES.map((source, index) => fetchSource(source, index)),
+        );
         const candidates = [];
-        for (const [index, source] of SOURCES.entries()) {
-            try {
-                const response = await fetch(source, { cache: 'no-store' });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const payload = await response.json();
-                candidates.push({
-                    payload,
-                    index,
-                    updatedAt: String(payload?.updated_at || ''),
-                });
-            } catch (err) {
-                lastError = err;
-                console.warn('[contributors] source failed', source, err);
+        results.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                candidates.push(result.value);
+            } else {
+                console.warn('[contributors] source failed', SOURCES[index], result.reason);
             }
+        });
+        if (!candidates.length) {
+            throw new Error('Remote and local contributor data sources both failed');
         }
-        if (candidates.length) {
-            candidates.sort((left, right) => (
-                right.updatedAt.localeCompare(left.updatedAt)
-                || left.index - right.index
-            ));
-            return candidates[0].payload;
-        }
-        throw lastError || new Error('No contributor data source succeeded');
+        candidates.sort((left, right) => (
+            right.updatedAt.localeCompare(left.updatedAt)
+            || Number(right.hasMemberProfiles) - Number(left.hasMemberProfiles)
+            || right.index - left.index
+        ));
+        return candidates[0].payload;
     }
 
     function contributorsFor(payload, scope) {
@@ -89,6 +58,30 @@
             return payload.all_repos.contributors;
         }
         return Array.isArray(payload?.contributors) ? payload.contributors : [];
+    }
+
+    function identityKey(item) {
+        return String(item.person_id || item.github_login || item.name || '').toLowerCase();
+    }
+
+    function isSynthetic(item) {
+        return [item.name, item.display_name, item.github_login]
+            .filter(Boolean)
+            .some((value) => SYNTHETIC_IDENTITIES.has(String(value).toLowerCase()));
+    }
+
+    function memberProfilesFor(payload) {
+        if (payload?.member_profiles) return payload.member_profiles;
+        const coreMembers = contributorsFor(payload, 'core_repos');
+        const coreIds = new Set(coreMembers.map(identityKey));
+        const participants = contributorsFor(payload, 'all_repos')
+            .filter((item) => !coreIds.has(identityKey(item)) && !isSynthetic(item));
+        return {
+            core_repo_names: payload?.core_repos?.scope_repos || [],
+            core_members: coreMembers,
+            participants,
+            unresolved_contributors: [],
+        };
     }
 
     function fmt(value) {
@@ -108,86 +101,166 @@
         return window.vllmHustSite?.getCurrentLang?.() === 'zh' ? 'zh' : 'en';
     }
 
-    function profileKey(item) {
-        return String(item.github_login || item.name || '').toLowerCase();
+    function localized(item, field, lang) {
+        const value = item?.[field];
+        if (value && typeof value === 'object') {
+            return String(value[lang] || value.en || value.zh || '');
+        }
+        return String(value || '');
     }
 
-    function renderMemberProfiles(payload) {
-        const list = document.getElementById('contributors-member-list');
-        const loading = document.getElementById('contributors-members-loading');
+    function labels(lang) {
+        return lang === 'zh'
+            ? {
+                role: '身份',
+                research: '研究方向',
+                participation: '参与方向',
+                areas: '贡献领域',
+                main: '主要贡献',
+                advisor: '指导老师',
+                pending: '身份待确认',
+                commits: '次提交',
+                none: '—',
+            }
+            : {
+                role: 'Role',
+                research: 'Research direction',
+                participation: 'Participation focus',
+                areas: 'Contribution areas',
+                main: 'Main contributions',
+                advisor: 'Advisor',
+                pending: 'Identity pending',
+                commits: 'commits',
+                none: '—',
+            };
+    }
+
+    function displayName(item, lang) {
+        const raw = item.display_name || item.chinese_name || item.name || item.github_login || '';
+        if (item.identity_confirmed === false) {
+            return `${labels(lang).pending}（${raw}）`;
+        }
+        return raw;
+    }
+
+    function memberNameMarkup(item, lang) {
+        const name = escapeHtml(displayName(item, lang));
+        const main = item.github_url
+            ? `<a href="${escapeHtml(item.github_url)}" target="_blank" rel="noreferrer">${name}</a>`
+            : `<strong>${name}</strong>`;
+        const login = item.github_login
+            ? `<small>@${escapeHtml(item.github_login)}</small>`
+            : '';
+        return `${main}${login}`;
+    }
+
+    function mainContribution(item, lang) {
+        const repos = Array.isArray(item.repos) ? item.repos.join(' · ') : '';
+        const commits = Number(item.commits || 0);
+        if (!commits && !repos) return '';
+        return [
+            commits ? `${fmt(commits)} ${labels(lang).commits}` : '',
+            repos,
+        ].filter(Boolean).join(' · ');
+    }
+
+    function detailRow(label, value) {
+        return `
+            <span class="research-member-detail-row">
+                <b>${escapeHtml(label)}</b>
+                <span>${escapeHtml(value || '—')}</span>
+            </span>
+        `;
+    }
+
+    function renderProfileList(id, members, kind) {
+        const list = document.getElementById(id);
         if (!list) return;
-
         const lang = currentLang();
-        const advisorLabel = lang === 'zh' ? '指导老师：' : 'Advisor: ';
-        const advisorName = lang === 'zh' ? '张书豪' : 'Shuhao Zhang';
-        const members = contributorsFor(payload, 'all_repos').filter((item) => {
-            const identities = [item.name, item.github_login, item.display_name]
-                .filter(Boolean)
-                .map((value) => String(value).toLowerCase());
-            return !identities.some((identity) => EXCLUDED_PROFILE_IDENTITIES.has(identity));
-        });
-
+        const text = labels(lang);
         list.innerHTML = members.map((item) => {
-            const displayName = item.display_name || item.chinese_name || item.name || item.github_login || '';
-            const key = profileKey(item);
-            const curated = CURATED_PROFILES[key];
-            const focus = curated?.[lang]
-                || item.key_contributions
-                || (Array.isArray(item.repos) ? item.repos.slice(0, 3).join(' · ') : '');
-            const name = item.github_url
-                ? `<a href="${escapeHtml(item.github_url)}" target="_blank" rel="noreferrer">${escapeHtml(displayName)}</a>`
-                : `<strong>${escapeHtml(displayName)}</strong>`;
-            const login = item.github_login && item.github_login !== displayName
-                ? `<small>@${escapeHtml(item.github_login)}</small>`
-                : '';
-            const advisor = curated?.advisor ? advisorName : '';
+            const role = localized(item, 'role', lang);
+            const research = localized(item, 'research_direction', lang);
+            const participation = localized(item, 'participation_direction', lang);
+            const areas = item.contribution_areas || item.key_contributions || '';
+            const advisor = localized(item, 'advisor', lang);
+            const rows = kind === 'core'
+                ? [
+                    detailRow(text.research, research),
+                    detailRow(text.areas, areas),
+                    detailRow(text.main, mainContribution(item, lang)),
+                    advisor ? detailRow(text.advisor, advisor) : '',
+                ]
+                : [
+                    role ? detailRow(text.role, role) : '',
+                    research ? detailRow(text.research, research) : '',
+                    participation ? detailRow(text.participation, participation) : '',
+                    areas ? detailRow(text.areas, areas) : '',
+                    advisor ? detailRow(text.advisor, advisor) : '',
+                ];
             return `
                 <li>
-                    <span class="research-member-identity">${name}${login}</span>
-                    <span class="research-member-details">
-                        <span class="research-member-focus">${escapeHtml(focus)}</span>
-                        <span class="research-member-advisor"><b>${advisorLabel}</b><span>${escapeHtml(advisor)}</span></span>
-                    </span>
+                    <span class="research-member-identity">${memberNameMarkup(item, lang)}</span>
+                    <span class="research-member-details">${rows.filter(Boolean).join('')}</span>
                 </li>
             `;
         }).join('');
-        if (loading) loading.hidden = true;
     }
 
-    function renderMeta(payload) {
+    function renderMeta(payload, profiles) {
         const all = contributorsFor(payload, 'all_repos');
-        const core = contributorsFor(payload, 'core_repos');
         const repoCount = new Set(all.flatMap((item) => item.repos || [])).size;
         document.getElementById('contributors-updated').textContent = payload.updated_at || '-';
         document.getElementById('contributors-total').textContent = fmt(all.length);
-        document.getElementById('contributors-core-total').textContent = fmt(core.length);
+        document.getElementById('contributors-core-total').textContent = fmt(profiles.core_members.length);
+        document.getElementById('contributors-participant-total').textContent = fmt(profiles.participants.length);
         document.getElementById('contributors-repos').textContent = fmt(repoCount);
     }
 
-    function renderTable(id, contributors) {
-        const tbody = document.getElementById(id);
+    function renderCoreTable(contributors) {
+        const tbody = document.getElementById('contributors-core-tbody');
         if (!tbody) return;
+        const lang = currentLang();
+        tbody.innerHTML = contributors.map((item) => `
+            <tr>
+                <td>${fmt(item.rank)}</td>
+                <td>${memberNameMarkup(item, lang)}</td>
+                <td>${escapeHtml(localized(item, 'research_direction', lang) || labels(lang).none)}</td>
+                <td>${escapeHtml(item.contribution_areas || item.key_contributions || labels(lang).none)}</td>
+                <td>${escapeHtml(mainContribution(item, lang) || labels(lang).none)}</td>
+            </tr>
+        `).join('');
+    }
+
+    function renderAllTable(contributors) {
+        const tbody = document.getElementById('contributors-all-tbody');
+        if (!tbody) return;
+        const lang = currentLang();
         tbody.innerHTML = contributors.map((item) => {
-            const displayName = item.display_name || item.chinese_name || item.name || item.github_login || '';
-            const name = item.github_url
-                ? `<a href="${item.github_url}" target="_blank" rel="noreferrer">${displayName}</a>`
-                : displayName;
-            const loginLine = item.github_login && item.github_login !== displayName
-                ? `<br><small>${item.github_login}</small>`
-                : '';
             const repos = Array.isArray(item.repos) ? item.repos.slice(0, 5).join(', ') : '';
             return `
                 <tr>
-                    <td>${item.rank || ''}</td>
-                    <td>${name}${loginLine}</td>
+                    <td>${fmt(item.rank)}</td>
+                    <td>${memberNameMarkup(item, lang)}</td>
                     <td>${fmt(item.commits)}</td>
                     <td>${fmt(item.changed_lines)}</td>
                     <td>${fmt(item.added)} / ${fmt(item.deleted)}</td>
-                    <td>${fmt(item.active_repos)}<br><small>${repos}</small></td>
-                    <td>${item.key_contributions || ''}</td>
+                    <td>${fmt(item.active_repos)}<br><small>${escapeHtml(repos)}</small></td>
+                    <td>${escapeHtml(item.contribution_areas || item.key_contributions || '')}</td>
                 </tr>
             `;
         }).join('');
+    }
+
+    function renderPayload(payload) {
+        const profiles = memberProfilesFor(payload);
+        renderMeta(payload, profiles);
+        renderProfileList('contributors-core-member-list', profiles.core_members, 'core');
+        renderProfileList('contributors-participant-list', profiles.participants, 'participant');
+        renderCoreTable(profiles.core_members);
+        renderAllTable(contributorsFor(payload, 'all_repos'));
+        const loading = document.getElementById('contributors-members-loading');
+        if (loading) loading.hidden = true;
     }
 
     async function init() {
@@ -195,12 +268,8 @@
         const content = document.getElementById('contributors-content');
         const error = document.getElementById('contributors-error');
         try {
-            const payload = await fetchPayload();
-            currentPayload = payload;
-            renderMeta(payload);
-            renderMemberProfiles(payload);
-            renderTable('contributors-core-tbody', contributorsFor(payload, 'core_repos'));
-            renderTable('contributors-all-tbody', contributorsFor(payload, 'all_repos'));
+            currentPayload = await fetchPayload();
+            renderPayload(currentPayload);
             if (loading) loading.style.display = 'none';
             if (error) error.style.display = 'none';
             if (content) content.style.display = 'block';
@@ -213,7 +282,7 @@
     }
 
     window.addEventListener('vllm-hust:langchange', () => {
-        if (currentPayload) renderMemberProfiles(currentPayload);
+        if (currentPayload) renderPayload(currentPayload);
     });
     document.addEventListener('DOMContentLoaded', init);
 })();
