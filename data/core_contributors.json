@@ -778,7 +778,7 @@
         "english_name": "MingXuan Kuang",
         "person_id": "github:sad-and-bad1231",
         "identity_confirmed": true,
-        "core_member": false,
+        "core_member": true,
         "role": {
           "zh": "",
           "en": ""
@@ -798,7 +798,7 @@
         "contribution_areas": "engine, benchmark, CI/CD",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": true
       },
       {
         "rank": 19,
