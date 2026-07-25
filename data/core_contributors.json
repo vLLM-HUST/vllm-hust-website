@@ -91,7 +91,7 @@
           "vllm-hust-dev-hub",
           "vllm-hust-perf-analyzer"
         ],
-        "key_contributions": "distributed, Ascend, docs, benchmark",
+        "key_contributions": "distributed, storage, profiling, development environment",
         "display_name": "田景远",
         "chinese_name": "田景远",
         "english_name": "Jingyuan Tian",
@@ -103,8 +103,8 @@
           "en": "Student intern"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "异构大模型推理系统的端到端性能分析与优化",
+          "en": "End-to-end performance analysis and optimization for heterogeneous LLM inference systems"
         },
         "participation_direction": {
           "zh": "",
@@ -114,7 +114,7 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "distributed, Ascend, docs, benchmark",
+        "contribution_areas": "distributed, storage, profiling, development environment",
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": true
@@ -1344,8 +1344,8 @@
       {
         "rank": 32,
         "name": "sssarrior",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "sssarrior",
+        "github_url": "https://github.com/sssarrior",
         "commits": 1,
         "changed_lines": 23,
         "added": 23,
@@ -1358,7 +1358,7 @@
         "display_name": "李旭恒",
         "chinese_name": "李旭恒",
         "english_name": "Xuheng Li",
-        "person_id": "profile:李旭恒",
+        "person_id": "github:sssarrior",
         "identity_confirmed": true,
         "core_member": false,
         "role": {
@@ -1781,7 +1781,7 @@
           "vllm-ascend-hust",
           "vllm-hust"
         ],
-        "key_contributions": "Ascend, engine",
+        "key_contributions": "distributed, storage, profiling, development environment",
         "display_name": "田景远",
         "chinese_name": "田景远",
         "english_name": "Jingyuan Tian",
@@ -1793,8 +1793,8 @@
           "en": "Student intern"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "异构大模型推理系统的端到端性能分析与优化",
+          "en": "End-to-end performance analysis and optimization for heterogeneous LLM inference systems"
         },
         "participation_direction": {
           "zh": "",
@@ -1804,7 +1804,7 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "Ascend, engine",
+        "contribution_areas": "distributed, storage, profiling, development environment",
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": true
@@ -2581,7 +2581,7 @@
           "vllm-ascend-hust",
           "vllm-hust"
         ],
-        "key_contributions": "Ascend, engine",
+        "key_contributions": "distributed, storage, profiling, development environment",
         "display_name": "田景远",
         "chinese_name": "田景远",
         "english_name": "Jingyuan Tian",
@@ -2593,8 +2593,8 @@
           "en": "Student intern"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "异构大模型推理系统的端到端性能分析与优化",
+          "en": "End-to-end performance analysis and optimization for heterogeneous LLM inference systems"
         },
         "participation_direction": {
           "zh": "",
@@ -2604,7 +2604,7 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "Ascend, engine",
+        "contribution_areas": "distributed, storage, profiling, development environment",
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": true
@@ -3068,6 +3068,44 @@
         "all_repos_rank": 22
       },
       {
+        "name": "万瑞鹏",
+        "github_login": "wrp-wrp",
+        "github_url": "https://github.com/wrp-wrp",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "万瑞鹏",
+        "chinese_name": "万瑞鹏",
+        "english_name": "",
+        "person_id": "github:wrp-wrp",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "",
+          "en": ""
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
         "name": "Seas0",
         "github_login": "Seas0",
         "github_url": "https://github.com/Seas0",
@@ -3102,6 +3140,44 @@
         "advisor": {
           "zh": "万瑶",
           "en": "Yao Wan"
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "周雨桐",
+        "github_login": "FirmamentumX",
+        "github_url": "https://github.com/FirmamentumX",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "周雨桐",
+        "chinese_name": "周雨桐",
+        "english_name": "",
+        "person_id": "github:firmamentumx",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "",
+          "en": ""
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": ""
       },
@@ -3186,8 +3262,8 @@
       },
       {
         "name": "Senlei Zhang",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "zslchase",
+        "github_url": "https://github.com/zslchase",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -3198,7 +3274,7 @@
         "display_name": "张森磊",
         "chinese_name": "张森磊",
         "english_name": "Senlei Zhang",
-        "person_id": "profile:张森磊",
+        "person_id": "github:zslchase",
         "identity_confirmed": true,
         "external_contributor": false,
         "staff_member": false,
@@ -3421,8 +3497,8 @@
       },
       {
         "name": "sssarrior",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "sssarrior",
+        "github_url": "https://github.com/sssarrior",
         "commits": 1,
         "changed_lines": 23,
         "added": 23,
@@ -3435,7 +3511,7 @@
         "display_name": "李旭恒",
         "chinese_name": "李旭恒",
         "english_name": "Xuheng Li",
-        "person_id": "profile:李旭恒",
+        "person_id": "github:sssarrior",
         "identity_confirmed": true,
         "core_member": false,
         "role": {
@@ -3500,8 +3576,8 @@
       },
       {
         "name": "Jinyun Yang",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "Yang-YJY",
+        "github_url": "https://github.com/Yang-YJY",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -3512,7 +3588,7 @@
         "display_name": "杨锦昀",
         "chinese_name": "杨锦昀",
         "english_name": "Jinyun Yang",
-        "person_id": "profile:杨锦昀",
+        "person_id": "github:yang-yjy",
         "identity_confirmed": true,
         "external_contributor": false,
         "staff_member": false,
@@ -3537,9 +3613,47 @@
         "contribution_areas": ""
       },
       {
+        "name": "Yancan Mao",
+        "github_login": "yancanmao",
+        "github_url": "https://github.com/yancanmao",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "毛言粲",
+        "chinese_name": "毛言粲",
+        "english_name": "Yancan Mao",
+        "person_id": "github:yancanmao",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "",
+          "en": ""
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
         "name": "Ziao Wang",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "ZeroJustMe",
+        "github_url": "https://github.com/ZeroJustMe",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -3550,7 +3664,7 @@
         "display_name": "王子澳",
         "chinese_name": "王子澳",
         "english_name": "Ziao Wang",
-        "person_id": "profile:王子澳",
+        "person_id": "github:zerojustme",
         "identity_confirmed": true,
         "external_contributor": false,
         "staff_member": false,
@@ -3615,6 +3729,44 @@
         "staff_member": false,
         "core_repository_contributor": false,
         "all_repos_rank": 5
+      },
+      {
+        "name": "董君瑶",
+        "github_login": "carsontung666",
+        "github_url": "https://github.com/carsontung666",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "董君瑶",
+        "chinese_name": "董君瑶",
+        "english_name": "",
+        "person_id": "github:carsontung666",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "",
+          "en": ""
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
       },
       {
         "name": "Jianjun Zhao",
@@ -3689,6 +3841,44 @@
         "advisor": {
           "zh": "姚鹏程",
           "en": "Pengcheng Yao"
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "路庆浩",
+        "github_login": "Luqhhh",
+        "github_url": "https://github.com/Luqhhh",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "路庆浩",
+        "chinese_name": "路庆浩",
+        "english_name": "",
+        "person_id": "github:luqhhh",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "",
+          "en": ""
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": ""
       },
@@ -3776,8 +3966,8 @@
       },
       {
         "name": "Debin Chen",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "pluviophile-chen",
+        "github_url": "https://github.com/pluviophile-chen",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -3788,7 +3978,7 @@
         "display_name": "陈德斌",
         "chinese_name": "陈德斌",
         "english_name": "Debin Chen",
-        "person_id": "profile:陈德斌",
+        "person_id": "github:pluviophile-chen",
         "identity_confirmed": true,
         "external_contributor": false,
         "staff_member": false,
@@ -3809,6 +3999,44 @@
         "advisor": {
           "zh": "张书豪",
           "en": "Shuhao Zhang"
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "雷欣妍",
+        "github_login": "leixy2004",
+        "github_url": "https://github.com/leixy2004",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "雷欣妍",
+        "chinese_name": "雷欣妍",
+        "english_name": "",
+        "person_id": "github:leixy2004",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "",
+          "en": ""
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": ""
       },
@@ -3855,8 +4083,8 @@
       },
       {
         "name": "Hongru Gao",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "hongrugao",
+        "github_url": "https://github.com/hongrugao",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -3867,7 +4095,7 @@
         "display_name": "高鸿儒",
         "chinese_name": "高鸿儒",
         "english_name": "Hongru Gao",
-        "person_id": "profile:高鸿儒",
+        "person_id": "github:hongrugao",
         "identity_confirmed": true,
         "external_contributor": false,
         "staff_member": false,

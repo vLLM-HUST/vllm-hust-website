@@ -1586,7 +1586,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 22
+    assert len(profiles["participants"]) == 28
     assert len(profiles["staff_members"]) == 5
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 1
@@ -1676,6 +1676,26 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         )
     }
     assert people["张睿诚"]["github_login"] == "KimmoZAG"
+    expected_github_ids = {
+        "张书豪": "ShuhaoZhangTony",
+        "李昶吾": "Li-changwu",
+        "李旭恒": "sssarrior",
+        "高鸿儒": "hongrugao",
+        "彭浩然": "Tkhkrnx",
+        "王明琪": "MingqiWang-coder",
+        "杨锦昀": "Yang-YJY",
+        "王子澳": "ZeroJustMe",
+        "张森磊": "zslchase",
+        "陈德斌": "pluviophile-chen",
+        "毛言粲": "yancanmao",
+        "万瑞鹏": "wrp-wrp",
+        "周雨桐": "FirmamentumX",
+        "董君瑶": "carsontung666",
+        "雷欣妍": "leixy2004",
+        "路庆浩": "Luqhhh",
+    }
+    for name, github_id in expected_github_ids.items():
+        assert people[name]["github_login"] == github_id
     assert people["田景远"]["github_login"] == "CubeLander"
     assert people["田景远"]["role"]["zh"] == "实习生"
     assert people["田景远"]["advisor"]["zh"] == "张书豪"
