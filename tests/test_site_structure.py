@@ -1676,7 +1676,11 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         )
     }
     assert people["张睿诚"]["github_login"] == "KimmoZAG"
+    assert people["田景远"]["github_login"] == "CubeLander"
+    assert people["田景远"]["role"]["zh"] == "实习生"
+    assert people["田景远"]["advisor"]["zh"] == "张书豪"
     assert people["匡明轩"]["github_login"] == "sad-and-bad1231"
+    assert people["匡明轩"]["advisor"]["zh"] == "张书豪"
     assert people["马俊豪"]["github_login"] == "kms12425"
     assert people["邱瑞杰"]["github_login"] == "Jerry01020"
     assert people["赵建军"]["github_login"] == "curryzjj"

@@ -99,8 +99,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "实习生",
+          "en": "Student intern"
         },
         "research_direction": {
           "zh": "",
@@ -111,8 +111,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "distributed, Ascend, docs, benchmark",
         "external_contributor": false,
@@ -792,8 +792,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "engine, benchmark, CI/CD",
         "external_contributor": false,
@@ -1789,8 +1789,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "实习生",
+          "en": "Student intern"
         },
         "research_direction": {
           "zh": "",
@@ -1801,8 +1801,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "Ascend, engine",
         "external_contributor": false,
@@ -1885,8 +1885,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "benchmark, CI/CD, engine",
         "external_contributor": false,
@@ -2589,8 +2589,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "实习生",
+          "en": "Student intern"
         },
         "research_direction": {
           "zh": "",
@@ -2601,8 +2601,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "Ascend, engine",
         "external_contributor": false,
@@ -2685,8 +2685,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "benchmark, CI/CD, engine",
         "external_contributor": false,
