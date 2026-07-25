@@ -164,7 +164,11 @@
             : `<strong>${name}</strong>`;
         const login = item.github_login
             ? `<small>@${escapeHtml(item.github_login)}</small>`
-            : '';
+            : (
+                localized(item, 'github_status', lang)
+                    ? `<small>${escapeHtml(localized(item, 'github_status', lang))}</small>`
+                    : ''
+            );
         return `${main}${login}`;
     }
 

@@ -1716,6 +1716,9 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["程月甲"]["staff_member"] is True
     assert people["龙斌"]["role"]["zh"] == "项目/科研助理"
     assert people["龙斌"]["staff_member"] is True
+    assert people["龙斌"]["github_status"]["zh"] == "无 GitHub ID"
+    assert people["宋功轩"]["github_status"]["zh"] == "GitHub ID 待确认"
+    assert people["彭成"]["github_status"]["zh"] == "GitHub ID 待确认"
     assert people["赵建军"]["role"]["zh"] == "已毕业博士生，目前已入职高校"
     assert people["高西岭"]["research_direction"]["zh"] == "KV量化"
     assert "多级" not in people["高西岭"]["research_direction"]["zh"]
@@ -1800,3 +1803,8 @@ def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
     assert ".research-member-detail-row b" in css_text
     assert "color: #176f72;" in css_text
     assert "contributors-contrast-20260725" in html_text
+    assert "github-status" in html_text
+    page_js = (root / "assets" / "contributors-page.js").read_text(
+        encoding="utf-8"
+    )
+    assert "localized(item, 'github_status', lang)" in page_js

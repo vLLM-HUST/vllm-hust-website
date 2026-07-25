@@ -72,7 +72,11 @@
         "contribution_areas": "CI/CD, leaderboard, distributed, benchmark",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 2,
@@ -117,7 +121,11 @@
         "contribution_areas": "distributed, storage, profiling, development environment",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 3,
@@ -162,7 +170,11 @@
         "contribution_areas": "maintenance, features, Ascend, benchmark",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 4,
@@ -210,7 +222,11 @@
         "contribution_areas": "CI/CD, leaderboard, Ascend, benchmark",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 5,
@@ -252,7 +268,11 @@
         "contribution_areas": "CI/CD, leaderboard, benchmark, maintenance",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 6,
@@ -296,7 +316,11 @@
         "contribution_areas": "Ascend, engine, features",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 7,
@@ -340,7 +364,11 @@
         "contribution_areas": "benchmark, CI/CD, Ascend, bugfix",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 8,
@@ -381,7 +409,11 @@
         "contribution_areas": "Ascend, CI/CD, distributed, features",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 9,
@@ -422,7 +454,11 @@
         "contribution_areas": "leaderboard",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 10,
@@ -463,7 +499,11 @@
         "contribution_areas": "benchmark",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 11,
@@ -506,7 +546,11 @@
         "contribution_areas": "benchmark, engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 12,
@@ -548,7 +592,11 @@
         "contribution_areas": "benchmark, distributed, leaderboard, CI/CD",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 13,
@@ -589,7 +637,11 @@
         "contribution_areas": "misc",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 14,
@@ -631,7 +683,11 @@
         "contribution_areas": "bugfix, distributed, leaderboard, maintenance",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 15,
@@ -672,7 +728,11 @@
         "contribution_areas": "distributed",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 16,
@@ -713,7 +773,11 @@
         "contribution_areas": "distributed",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 17,
@@ -754,7 +818,11 @@
         "contribution_areas": "misc",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 18,
@@ -798,7 +866,11 @@
         "contribution_areas": "engine, benchmark, CI/CD",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 19,
@@ -841,7 +913,11 @@
         "contribution_areas": "Ascend, CI/CD, bugfix, distributed",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 20,
@@ -883,7 +959,11 @@
         "contribution_areas": "leaderboard",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 21,
@@ -925,7 +1005,11 @@
         "contribution_areas": "CI/CD, engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 22,
@@ -966,7 +1050,11 @@
         "contribution_areas": "tooling",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 23,
@@ -1008,7 +1096,11 @@
         "contribution_areas": "CI/CD, kernel",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 24,
@@ -1050,7 +1142,11 @@
         "contribution_areas": "engine, distributed, tooling",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 25,
@@ -1091,7 +1187,11 @@
         "contribution_areas": "features",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 26,
@@ -1133,7 +1233,11 @@
         "contribution_areas": "engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 27,
@@ -1175,7 +1279,11 @@
         "contribution_areas": "features, kernel",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 28,
@@ -1216,7 +1324,11 @@
         "contribution_areas": "distributed, docs",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 29,
@@ -1257,7 +1369,11 @@
         "contribution_areas": "leaderboard",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 30,
@@ -1298,7 +1414,11 @@
         "contribution_areas": "Ascend",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 31,
@@ -1339,7 +1459,11 @@
         "contribution_areas": "tooling",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 32,
@@ -1380,7 +1504,11 @@
         "contribution_areas": "engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       }
     ]
   },
@@ -1433,7 +1561,11 @@
         "contribution_areas": "CI/CD, Ascend, benchmark, docs",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 2,
@@ -1476,7 +1608,11 @@
         "contribution_areas": "engine, features",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 3,
@@ -1518,7 +1654,11 @@
         "contribution_areas": "benchmark, CI/CD, Ascend",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 4,
@@ -1560,7 +1700,11 @@
         "contribution_areas": "CI/CD, kernel, Ascend, engine",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 5,
@@ -1601,7 +1745,11 @@
         "contribution_areas": "misc",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 6,
@@ -1642,7 +1790,11 @@
         "contribution_areas": "benchmark, engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 7,
@@ -1683,7 +1835,11 @@
         "contribution_areas": "distributed",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 8,
@@ -1724,7 +1880,11 @@
         "contribution_areas": "distributed",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 9,
@@ -1765,7 +1925,11 @@
         "contribution_areas": "misc",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 10,
@@ -1807,7 +1971,11 @@
         "contribution_areas": "distributed, storage, profiling, development environment",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 11,
@@ -1849,7 +2017,11 @@
         "contribution_areas": "CI/CD, kernel",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 12,
@@ -1891,7 +2063,11 @@
         "contribution_areas": "benchmark, CI/CD, engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 13,
@@ -1933,7 +2109,11 @@
         "contribution_areas": "distributed, kernel",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 14,
@@ -1974,7 +2154,11 @@
         "contribution_areas": "features",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 15,
@@ -2016,7 +2200,11 @@
         "contribution_areas": "engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 16,
@@ -2058,7 +2246,11 @@
         "contribution_areas": "features, kernel",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 17,
@@ -2099,7 +2291,11 @@
         "contribution_areas": "tooling",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 18,
@@ -2140,7 +2336,11 @@
         "contribution_areas": "Ascend",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 19,
@@ -2181,7 +2381,11 @@
         "contribution_areas": "misc",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 20,
@@ -2222,7 +2426,11 @@
         "contribution_areas": "tooling",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 21,
@@ -2264,7 +2472,11 @@
         "contribution_areas": "CI/CD",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       }
     ]
   },
@@ -2317,7 +2529,11 @@
         "contribution_areas": "CI/CD, Ascend, benchmark, docs",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 2,
@@ -2360,7 +2576,11 @@
         "contribution_areas": "engine, features",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 3,
@@ -2401,7 +2621,11 @@
         "contribution_areas": "misc",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 4,
@@ -2442,7 +2666,11 @@
         "contribution_areas": "benchmark, engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 5,
@@ -2483,7 +2711,11 @@
         "contribution_areas": "distributed",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 6,
@@ -2524,7 +2756,11 @@
         "contribution_areas": "distributed",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 7,
@@ -2565,7 +2801,11 @@
         "contribution_areas": "misc",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 8,
@@ -2607,7 +2847,11 @@
         "contribution_areas": "distributed, storage, profiling, development environment",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 9,
@@ -2649,7 +2893,11 @@
         "contribution_areas": "CI/CD, kernel",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 10,
@@ -2691,7 +2939,11 @@
         "contribution_areas": "benchmark, CI/CD, engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 11,
@@ -2733,7 +2985,11 @@
         "contribution_areas": "distributed, kernel",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 12,
@@ -2774,7 +3030,11 @@
         "contribution_areas": "features",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 13,
@@ -2816,7 +3076,11 @@
         "contribution_areas": "engine",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 14,
@@ -2858,7 +3122,11 @@
         "contribution_areas": "features, kernel",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 15,
@@ -2899,7 +3167,11 @@
         "contribution_areas": "tooling",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 16,
@@ -2940,7 +3212,11 @@
         "contribution_areas": "Ascend",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 17,
@@ -2981,7 +3257,11 @@
         "contribution_areas": "misc",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 18,
@@ -3022,7 +3302,11 @@
         "contribution_areas": "tooling",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       }
     ],
     "participants": [
@@ -3065,6 +3349,10 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "all_repos_rank": 22
       },
       {
@@ -3100,6 +3388,10 @@
           "en": ""
         },
         "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
           "zh": "",
           "en": ""
         },
@@ -3141,6 +3433,10 @@
           "zh": "万瑶",
           "en": "Yao Wan"
         },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "contribution_areas": ""
       },
       {
@@ -3176,6 +3472,10 @@
           "en": ""
         },
         "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
           "zh": "",
           "en": ""
         },
@@ -3216,6 +3516,10 @@
         "advisor": {
           "zh": "张书豪",
           "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "GitHub ID 待确认",
+          "en": "GitHub ID pending confirmation"
         },
         "contribution_areas": ""
       },
@@ -3258,6 +3562,10 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "all_repos_rank": 10
       },
       {
@@ -3295,6 +3603,10 @@
         "advisor": {
           "zh": "张书豪",
           "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": ""
       },
@@ -3338,6 +3650,10 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "all_repos_rank": 14
       },
       {
@@ -3376,6 +3692,10 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
+        "github_status": {
+          "zh": "GitHub ID 待确认",
+          "en": "GitHub ID pending confirmation"
+        },
         "contribution_areas": ""
       },
       {
@@ -3413,6 +3733,10 @@
         "advisor": {
           "zh": "张书豪",
           "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": ""
       },
@@ -3455,6 +3779,10 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "all_repos_rank": 29
       },
       {
@@ -3492,6 +3820,10 @@
         "advisor": {
           "zh": "张书豪",
           "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": ""
       },
@@ -3534,6 +3866,10 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "all_repos_rank": 32
       },
       {
@@ -3571,6 +3907,10 @@
         "advisor": {
           "zh": "张书豪",
           "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": ""
       },
@@ -3610,6 +3950,10 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "contribution_areas": ""
       },
       {
@@ -3645,6 +3989,10 @@
           "en": ""
         },
         "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
           "zh": "",
           "en": ""
         },
@@ -3685,6 +4033,10 @@
         "advisor": {
           "zh": "张书豪",
           "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": ""
       },
@@ -3728,6 +4080,10 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "all_repos_rank": 5
       },
       {
@@ -3763,6 +4119,10 @@
           "en": ""
         },
         "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
           "zh": "",
           "en": ""
         },
@@ -3804,6 +4164,10 @@
           "zh": "",
           "en": ""
         },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "contribution_areas": ""
       },
       {
@@ -3842,6 +4206,10 @@
           "zh": "姚鹏程",
           "en": "Pengcheng Yao"
         },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "contribution_areas": ""
       },
       {
@@ -3877,6 +4245,10 @@
           "en": ""
         },
         "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
           "zh": "",
           "en": ""
         },
@@ -3921,6 +4293,10 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "all_repos_rank": 28
       },
       {
@@ -3962,6 +4338,10 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "all_repos_rank": 8
       },
       {
@@ -4000,6 +4380,10 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "contribution_areas": ""
       },
       {
@@ -4035,6 +4419,10 @@
           "en": ""
         },
         "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
           "zh": "",
           "en": ""
         },
@@ -4079,6 +4467,10 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
         "all_repos_rank": 9
       },
       {
@@ -4116,6 +4508,10 @@
         "advisor": {
           "zh": "张书豪",
           "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": ""
       }
@@ -4161,7 +4557,11 @@
         "contribution_areas": "benchmark, distributed, leaderboard, CI/CD",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 3,
@@ -4203,7 +4603,11 @@
         "contribution_areas": "benchmark, CI/CD, Ascend",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 4,
@@ -4245,7 +4649,11 @@
         "contribution_areas": "CI/CD, kernel, Ascend, engine",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "rank": 21,
@@ -4287,7 +4695,11 @@
         "contribution_areas": "CI/CD",
         "external_contributor": false,
         "staff_member": true,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       },
       {
         "name": "Bin Long",
@@ -4324,6 +4736,10 @@
         "advisor": {
           "zh": "",
           "en": ""
+        },
+        "github_status": {
+          "zh": "无 GitHub ID",
+          "en": "No GitHub ID"
         },
         "contribution_areas": ""
       }
@@ -4362,6 +4778,10 @@
           "en": "Pipeline-parallel decoding and balanced microbatch scheduling"
         },
         "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
           "zh": "",
           "en": ""
         },
@@ -4408,7 +4828,11 @@
         "contribution_areas": "features",
         "external_contributor": false,
         "staff_member": false,
-        "core_repository_contributor": true
+        "core_repository_contributor": true,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       }
     ]
   }
