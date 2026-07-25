@@ -364,16 +364,16 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
         effective_signature_counts[scenario] = len(signatures)
 
     assert effective_signature_counts["visionarena-online"] == 1
-    assert effective_signature_counts["instructcoder-online"] == 2
-    assert effective_signature_counts["prefix-repetition-online"] == 2
-    assert effective_signature_counts["random-online"] == 2
-    assert effective_signature_counts["random-latency"] == 3
+    assert effective_signature_counts["instructcoder-online"] == 4
+    assert effective_signature_counts["prefix-repetition-online"] == 3
+    assert effective_signature_counts["random-online"] == 3
+    assert effective_signature_counts["random-latency"] == 4
     for scenario in (
         "sharegpt-online",
         "sharegpt-throughput",
         "sonnet-throughput",
     ):
-        assert effective_signature_counts[scenario] == 1
+        assert effective_signature_counts[scenario] == 3
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
