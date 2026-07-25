@@ -1765,3 +1765,18 @@ def test_core_contributor_stats_precede_all_repository_stats() -> None:
     assert core_index < all_index
     assert "核心仓库与独立优化成果" in html_text
     assert "BidKV、DiffSpec" in html_text
+
+
+def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+    html_text = (root / "contributors.html").read_text(encoding="utf-8")
+
+    assert ".research-member-identity a:visited" in css_text
+    assert ".research-member-identity strong" in css_text
+    assert "color: #0c1112;" in css_text
+    assert ".research-member-identity small" in css_text
+    assert "color: #475569;" in css_text
+    assert ".research-member-detail-row b" in css_text
+    assert "color: #176f72;" in css_text
+    assert "contributors-contrast-20260725" in html_text
