@@ -99,11 +99,14 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert 'id="contributors-members-menu-title"' in details
     assert 'id="contributors-core-member-list"' in details
     assert 'id="contributors-participant-list"' in details
+    assert 'id="contributors-external-list"' in details
     assert 'id="contributors-profile-core-title"' in details
     assert 'id="contributors-profile-participant-title"' in details
+    assert 'id="contributors-profile-external-title"' in details
     assert "payload?.member_profiles" in script
     assert "profiles.core_members" in script
     assert "profiles.participants" in script
+    assert "profiles.external_contributors" in script
     assert "CURATED_PROFILES" not in script
     assert "vllm-hust developer" in script
     assert "research_direction" in script
@@ -112,7 +115,7 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert "Identity pending" in script
     assert "function memberContextMarkup(item, lang)" in script
     assert "contributor-member-context" in script
-    assert "contributors-page.js?v=identity-mapping-20260725" in text
+    assert "contributors-page.js?v=external-contributors-20260725" in text
     assert ".research-members-menu[open] summary::after" in css
     assert ".research-member-detail-row" in css
     assert ".research-member-group + .research-member-group" in css
@@ -1581,6 +1584,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 21
     assert len(profiles["participants"]) == 22
+    assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 4
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
     assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
@@ -1627,9 +1631,13 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     core_repo_names = set(profiles["core_repo_names"])
     core_ids = {item["person_id"] for item in profiles["core_members"]}
     participant_ids = {item["person_id"] for item in profiles["participants"]}
+    external_ids = {item["person_id"] for item in profiles["external_contributors"]}
     assert core_ids.isdisjoint(participant_ids)
+    assert core_ids.isdisjoint(external_ids)
+    assert participant_ids.isdisjoint(external_ids)
     assert len(core_ids) == len(profiles["core_members"])
     assert len(participant_ids) == len(profiles["participants"])
+    assert len(external_ids) == len(profiles["external_contributors"])
     assert all(
         set(item["repos"]) & core_repo_names for item in profiles["core_members"]
     )
@@ -1639,7 +1647,11 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
 
     people = {
         item["display_name"]: item
-        for item in profiles["core_members"] + profiles["participants"]
+        for item in (
+            profiles["core_members"]
+            + profiles["participants"]
+            + profiles["external_contributors"]
+        )
     }
     assert people["张睿诚"]["github_login"] == "KimmoZAG"
     assert people["匡明轩"]["github_login"] == "sad-and-bad1231"
@@ -1663,6 +1675,9 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["李庚"]["advisor"]["zh"] == "张书豪"
     assert people["杜忠承"]["github_login"] == "dzcixy"
     assert people["杜忠承"]["advisor"]["zh"] == "黄禹"
+    assert people["徐晨曦"]["github_login"] == "xsun2001"
+    assert people["徐晨曦"]["external_contributor"] is True
+    assert people["徐晨曦"]["role"]["zh"] == "外部贡献者（港科大（广州））"
     expected_advisors = {
         "马川湖": "王雄",
         "吴天宇": "郑龙",

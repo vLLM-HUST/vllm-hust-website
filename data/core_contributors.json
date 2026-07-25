@@ -69,7 +69,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "CI/CD, leaderboard, distributed, benchmark"
+        "contribution_areas": "CI/CD, leaderboard, distributed, benchmark",
+        "external_contributor": false
       },
       {
         "rank": 2,
@@ -111,7 +112,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "distributed, Ascend, docs, benchmark"
+        "contribution_areas": "distributed, Ascend, docs, benchmark",
+        "external_contributor": false
       },
       {
         "rank": 3,
@@ -153,7 +155,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "maintenance, features, Ascend, benchmark"
+        "contribution_areas": "maintenance, features, Ascend, benchmark",
+        "external_contributor": false
       },
       {
         "rank": 4,
@@ -198,7 +201,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "CI/CD, leaderboard, Ascend, benchmark"
+        "contribution_areas": "CI/CD, leaderboard, Ascend, benchmark",
+        "external_contributor": false
       },
       {
         "rank": 5,
@@ -237,7 +241,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "CI/CD, leaderboard, benchmark, maintenance"
+        "contribution_areas": "CI/CD, leaderboard, benchmark, maintenance",
+        "external_contributor": false
       },
       {
         "rank": 6,
@@ -278,7 +283,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "Ascend, engine, features"
+        "contribution_areas": "Ascend, engine, features",
+        "external_contributor": false
       },
       {
         "rank": 7,
@@ -319,7 +325,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "benchmark, CI/CD, Ascend, bugfix"
+        "contribution_areas": "benchmark, CI/CD, Ascend, bugfix",
+        "external_contributor": false
       },
       {
         "rank": 8,
@@ -357,7 +364,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "Ascend, CI/CD, distributed, features"
+        "contribution_areas": "Ascend, CI/CD, distributed, features",
+        "external_contributor": false
       },
       {
         "rank": 9,
@@ -395,7 +403,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "leaderboard"
+        "contribution_areas": "leaderboard",
+        "external_contributor": false
       },
       {
         "rank": 10,
@@ -433,7 +442,8 @@
           "zh": "姚鹏程",
           "en": "Pengcheng Yao"
         },
-        "contribution_areas": "benchmark"
+        "contribution_areas": "benchmark",
+        "external_contributor": false
       },
       {
         "rank": 11,
@@ -473,7 +483,8 @@
           "zh": "罗瑞坤",
           "en": "Ruikun Luo"
         },
-        "contribution_areas": "benchmark, engine"
+        "contribution_areas": "benchmark, engine",
+        "external_contributor": false
       },
       {
         "rank": 12,
@@ -512,7 +523,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "benchmark, distributed, leaderboard, CI/CD"
+        "contribution_areas": "benchmark, distributed, leaderboard, CI/CD",
+        "external_contributor": false
       },
       {
         "rank": 13,
@@ -550,7 +562,8 @@
           "zh": "刘海坤",
           "en": "Haikun Liu"
         },
-        "contribution_areas": "misc"
+        "contribution_areas": "misc",
+        "external_contributor": false
       },
       {
         "rank": 14,
@@ -589,7 +602,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "bugfix, distributed, leaderboard, maintenance"
+        "contribution_areas": "bugfix, distributed, leaderboard, maintenance",
+        "external_contributor": false
       },
       {
         "rank": 15,
@@ -627,7 +641,8 @@
           "zh": "黄禹",
           "en": "Yu Huang"
         },
-        "contribution_areas": "distributed"
+        "contribution_areas": "distributed",
+        "external_contributor": false
       },
       {
         "rank": 16,
@@ -665,7 +680,8 @@
           "zh": "王雄",
           "en": "Xiong Wang"
         },
-        "contribution_areas": "distributed"
+        "contribution_areas": "distributed",
+        "external_contributor": false
       },
       {
         "rank": 17,
@@ -703,7 +719,8 @@
           "zh": "赵进",
           "en": "Jin Zhao"
         },
-        "contribution_areas": "misc"
+        "contribution_areas": "misc",
+        "external_contributor": false
       },
       {
         "rank": 18,
@@ -741,7 +758,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "engine"
+        "contribution_areas": "engine",
+        "external_contributor": false
       },
       {
         "rank": 19,
@@ -781,7 +799,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "Ascend, CI/CD, bugfix, distributed"
+        "contribution_areas": "Ascend, CI/CD, bugfix, distributed",
+        "external_contributor": false
       },
       {
         "rank": 20,
@@ -820,7 +839,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "leaderboard"
+        "contribution_areas": "leaderboard",
+        "external_contributor": false
       },
       {
         "rank": 21,
@@ -859,7 +879,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "CI/CD, engine"
+        "contribution_areas": "CI/CD, engine",
+        "external_contributor": false
       },
       {
         "rank": 22,
@@ -897,7 +918,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "tooling"
+        "contribution_areas": "tooling",
+        "external_contributor": false
       },
       {
         "rank": 23,
@@ -936,7 +958,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "CI/CD, kernel"
+        "contribution_areas": "CI/CD, kernel",
+        "external_contributor": false
       },
       {
         "rank": 24,
@@ -976,7 +999,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "benchmark, CI/CD, engine"
+        "contribution_areas": "benchmark, CI/CD, engine",
+        "external_contributor": false
       },
       {
         "rank": 25,
@@ -1015,7 +1039,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "engine, distributed, tooling"
+        "contribution_areas": "engine, distributed, tooling",
+        "external_contributor": false
       },
       {
         "rank": 26,
@@ -1053,7 +1078,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "features"
+        "contribution_areas": "features",
+        "external_contributor": false
       },
       {
         "rank": 27,
@@ -1092,7 +1118,8 @@
           "zh": "项翔",
           "en": "Xiang Xiang"
         },
-        "contribution_areas": "engine"
+        "contribution_areas": "engine",
+        "external_contributor": false
       },
       {
         "rank": 28,
@@ -1131,7 +1158,8 @@
           "zh": "王庆刚",
           "en": "Qinggang Wang"
         },
-        "contribution_areas": "features, kernel"
+        "contribution_areas": "features, kernel",
+        "external_contributor": false
       },
       {
         "rank": 29,
@@ -1169,7 +1197,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "distributed, docs"
+        "contribution_areas": "distributed, docs",
+        "external_contributor": false
       },
       {
         "rank": 30,
@@ -1207,7 +1236,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "leaderboard"
+        "contribution_areas": "leaderboard",
+        "external_contributor": false
       },
       {
         "rank": 31,
@@ -1245,7 +1275,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "Ascend"
+        "contribution_areas": "Ascend",
+        "external_contributor": false
       },
       {
         "rank": 32,
@@ -1283,7 +1314,8 @@
           "zh": "郑龙",
           "en": "Long Zheng"
         },
-        "contribution_areas": "tooling"
+        "contribution_areas": "tooling",
+        "external_contributor": false
       },
       {
         "rank": 33,
@@ -1321,7 +1353,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "engine"
+        "contribution_areas": "engine",
+        "external_contributor": false
       }
     ]
   },
@@ -1371,7 +1404,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "CI/CD, Ascend, benchmark, docs"
+        "contribution_areas": "CI/CD, Ascend, benchmark, docs",
+        "external_contributor": false
       },
       {
         "rank": 2,
@@ -1411,7 +1445,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "engine, features"
+        "contribution_areas": "engine, features",
+        "external_contributor": false
       },
       {
         "rank": 3,
@@ -1450,7 +1485,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "benchmark, CI/CD, Ascend"
+        "contribution_areas": "benchmark, CI/CD, Ascend",
+        "external_contributor": false
       },
       {
         "rank": 4,
@@ -1489,7 +1525,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "CI/CD, kernel, Ascend, engine"
+        "contribution_areas": "CI/CD, kernel, Ascend, engine",
+        "external_contributor": false
       },
       {
         "rank": 5,
@@ -1527,7 +1564,8 @@
           "zh": "刘海坤",
           "en": "Haikun Liu"
         },
-        "contribution_areas": "misc"
+        "contribution_areas": "misc",
+        "external_contributor": false
       },
       {
         "rank": 6,
@@ -1565,7 +1603,8 @@
           "zh": "罗瑞坤",
           "en": "Ruikun Luo"
         },
-        "contribution_areas": "benchmark, engine"
+        "contribution_areas": "benchmark, engine",
+        "external_contributor": false
       },
       {
         "rank": 7,
@@ -1603,7 +1642,8 @@
           "zh": "黄禹",
           "en": "Yu Huang"
         },
-        "contribution_areas": "distributed"
+        "contribution_areas": "distributed",
+        "external_contributor": false
       },
       {
         "rank": 8,
@@ -1641,7 +1681,8 @@
           "zh": "王雄",
           "en": "Xiong Wang"
         },
-        "contribution_areas": "distributed"
+        "contribution_areas": "distributed",
+        "external_contributor": false
       },
       {
         "rank": 9,
@@ -1679,7 +1720,8 @@
           "zh": "赵进",
           "en": "Jin Zhao"
         },
-        "contribution_areas": "misc"
+        "contribution_areas": "misc",
+        "external_contributor": false
       },
       {
         "rank": 10,
@@ -1718,7 +1760,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "Ascend, engine"
+        "contribution_areas": "Ascend, engine",
+        "external_contributor": false
       },
       {
         "rank": 11,
@@ -1757,7 +1800,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "CI/CD, kernel"
+        "contribution_areas": "CI/CD, kernel",
+        "external_contributor": false
       },
       {
         "rank": 12,
@@ -1796,7 +1840,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "benchmark, CI/CD, engine"
+        "contribution_areas": "benchmark, CI/CD, engine",
+        "external_contributor": false
       },
       {
         "rank": 13,
@@ -1835,7 +1880,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "distributed, kernel"
+        "contribution_areas": "distributed, kernel",
+        "external_contributor": false
       },
       {
         "rank": 14,
@@ -1873,7 +1919,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "features"
+        "contribution_areas": "features",
+        "external_contributor": false
       },
       {
         "rank": 15,
@@ -1912,7 +1959,8 @@
           "zh": "项翔",
           "en": "Xiang Xiang"
         },
-        "contribution_areas": "engine"
+        "contribution_areas": "engine",
+        "external_contributor": false
       },
       {
         "rank": 16,
@@ -1951,7 +1999,8 @@
           "zh": "王庆刚",
           "en": "Qinggang Wang"
         },
-        "contribution_areas": "features, kernel"
+        "contribution_areas": "features, kernel",
+        "external_contributor": false
       },
       {
         "rank": 17,
@@ -1989,7 +2038,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "tooling"
+        "contribution_areas": "tooling",
+        "external_contributor": false
       },
       {
         "rank": 18,
@@ -2027,7 +2077,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "Ascend"
+        "contribution_areas": "Ascend",
+        "external_contributor": false
       },
       {
         "rank": 19,
@@ -2065,7 +2116,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "misc"
+        "contribution_areas": "misc",
+        "external_contributor": false
       },
       {
         "rank": 20,
@@ -2103,7 +2155,8 @@
           "zh": "郑龙",
           "en": "Long Zheng"
         },
-        "contribution_areas": "tooling"
+        "contribution_areas": "tooling",
+        "external_contributor": false
       },
       {
         "rank": 21,
@@ -2142,7 +2195,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "CI/CD"
+        "contribution_areas": "CI/CD",
+        "external_contributor": false
       }
     ]
   },
@@ -2192,7 +2246,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "CI/CD, Ascend, benchmark, docs"
+        "contribution_areas": "CI/CD, Ascend, benchmark, docs",
+        "external_contributor": false
       },
       {
         "rank": 2,
@@ -2232,7 +2287,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "engine, features"
+        "contribution_areas": "engine, features",
+        "external_contributor": false
       },
       {
         "rank": 3,
@@ -2271,7 +2327,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "benchmark, CI/CD, Ascend"
+        "contribution_areas": "benchmark, CI/CD, Ascend",
+        "external_contributor": false
       },
       {
         "rank": 4,
@@ -2310,7 +2367,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "CI/CD, kernel, Ascend, engine"
+        "contribution_areas": "CI/CD, kernel, Ascend, engine",
+        "external_contributor": false
       },
       {
         "rank": 5,
@@ -2348,7 +2406,8 @@
           "zh": "刘海坤",
           "en": "Haikun Liu"
         },
-        "contribution_areas": "misc"
+        "contribution_areas": "misc",
+        "external_contributor": false
       },
       {
         "rank": 6,
@@ -2386,7 +2445,8 @@
           "zh": "罗瑞坤",
           "en": "Ruikun Luo"
         },
-        "contribution_areas": "benchmark, engine"
+        "contribution_areas": "benchmark, engine",
+        "external_contributor": false
       },
       {
         "rank": 7,
@@ -2424,7 +2484,8 @@
           "zh": "黄禹",
           "en": "Yu Huang"
         },
-        "contribution_areas": "distributed"
+        "contribution_areas": "distributed",
+        "external_contributor": false
       },
       {
         "rank": 8,
@@ -2462,7 +2523,8 @@
           "zh": "王雄",
           "en": "Xiong Wang"
         },
-        "contribution_areas": "distributed"
+        "contribution_areas": "distributed",
+        "external_contributor": false
       },
       {
         "rank": 9,
@@ -2500,7 +2562,8 @@
           "zh": "赵进",
           "en": "Jin Zhao"
         },
-        "contribution_areas": "misc"
+        "contribution_areas": "misc",
+        "external_contributor": false
       },
       {
         "rank": 10,
@@ -2539,7 +2602,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "Ascend, engine"
+        "contribution_areas": "Ascend, engine",
+        "external_contributor": false
       },
       {
         "rank": 11,
@@ -2578,7 +2642,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "CI/CD, kernel"
+        "contribution_areas": "CI/CD, kernel",
+        "external_contributor": false
       },
       {
         "rank": 12,
@@ -2617,7 +2682,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "benchmark, CI/CD, engine"
+        "contribution_areas": "benchmark, CI/CD, engine",
+        "external_contributor": false
       },
       {
         "rank": 13,
@@ -2656,7 +2722,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "distributed, kernel"
+        "contribution_areas": "distributed, kernel",
+        "external_contributor": false
       },
       {
         "rank": 14,
@@ -2694,7 +2761,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "features"
+        "contribution_areas": "features",
+        "external_contributor": false
       },
       {
         "rank": 15,
@@ -2733,7 +2801,8 @@
           "zh": "项翔",
           "en": "Xiang Xiang"
         },
-        "contribution_areas": "engine"
+        "contribution_areas": "engine",
+        "external_contributor": false
       },
       {
         "rank": 16,
@@ -2772,7 +2841,8 @@
           "zh": "王庆刚",
           "en": "Qinggang Wang"
         },
-        "contribution_areas": "features, kernel"
+        "contribution_areas": "features, kernel",
+        "external_contributor": false
       },
       {
         "rank": 17,
@@ -2810,7 +2880,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "tooling"
+        "contribution_areas": "tooling",
+        "external_contributor": false
       },
       {
         "rank": 18,
@@ -2848,7 +2919,8 @@
           "zh": "张书豪",
           "en": "Shuhao Zhang"
         },
-        "contribution_areas": "Ascend"
+        "contribution_areas": "Ascend",
+        "external_contributor": false
       },
       {
         "rank": 19,
@@ -2886,7 +2958,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "misc"
+        "contribution_areas": "misc",
+        "external_contributor": false
       },
       {
         "rank": 20,
@@ -2924,7 +2997,8 @@
           "zh": "郑龙",
           "en": "Long Zheng"
         },
-        "contribution_areas": "tooling"
+        "contribution_areas": "tooling",
+        "external_contributor": false
       },
       {
         "rank": 21,
@@ -2963,7 +3037,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "CI/CD"
+        "contribution_areas": "CI/CD",
+        "external_contributor": false
       }
     ],
     "participants": [
@@ -2983,6 +3058,7 @@
         "english_name": "",
         "person_id": "github:seas0",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "学生",
@@ -3018,6 +3094,7 @@
         "english_name": "Gongxuan Song",
         "person_id": "profile:宋功轩",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "工程成员",
@@ -3073,6 +3150,7 @@
           "en": "Pengcheng Yao"
         },
         "contribution_areas": "benchmark",
+        "external_contributor": false,
         "all_repos_rank": 10
       },
       {
@@ -3091,6 +3169,7 @@
         "english_name": "Senlei Zhang",
         "person_id": "profile:张森磊",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "工程成员",
@@ -3147,6 +3226,7 @@
           "en": "Shuhao Zhang"
         },
         "contribution_areas": "bugfix, distributed, leaderboard, maintenance",
+        "external_contributor": false,
         "all_repos_rank": 14
       },
       {
@@ -3165,6 +3245,7 @@
         "english_name": "Cheng Peng",
         "person_id": "profile:彭成",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "工程成员",
@@ -3200,6 +3281,7 @@
         "english_name": "Pharos Peng",
         "person_id": "github:tkhkrnx",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "学术成员",
@@ -3255,6 +3337,7 @@
           "en": "Shuhao Zhang"
         },
         "contribution_areas": "leaderboard",
+        "external_contributor": false,
         "all_repos_rank": 30
       },
       {
@@ -3273,6 +3356,7 @@
         "english_name": "Geng Li",
         "person_id": "github:anjiangy",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "马上入学的华科研究生",
@@ -3328,6 +3412,7 @@
           "en": "Shuhao Zhang"
         },
         "contribution_areas": "engine",
+        "external_contributor": false,
         "all_repos_rank": 33
       },
       {
@@ -3346,6 +3431,7 @@
         "english_name": "Changwu Li",
         "person_id": "github:li-changwu",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "学生",
@@ -3381,6 +3467,7 @@
         "english_name": "Jinyun Yang",
         "person_id": "profile:杨锦昀",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "工程成员",
@@ -3416,6 +3503,7 @@
         "english_name": "Ziao Wang",
         "person_id": "profile:王子澳",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "工程成员",
@@ -3472,6 +3560,7 @@
           "en": "Shuhao Zhang"
         },
         "contribution_areas": "CI/CD, leaderboard, benchmark, maintenance",
+        "external_contributor": false,
         "all_repos_rank": 5
       },
       {
@@ -3490,6 +3579,7 @@
         "english_name": "Jianjun Zhao",
         "person_id": "github:curryzjj",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "已毕业博士生，目前已入职高校",
@@ -3525,6 +3615,7 @@
         "english_name": "",
         "person_id": "github:wenjuzhao",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "学生",
@@ -3580,6 +3671,7 @@
           "en": ""
         },
         "contribution_areas": "distributed, docs",
+        "external_contributor": false,
         "all_repos_rank": 29
       },
       {
@@ -3618,6 +3710,7 @@
           "en": ""
         },
         "contribution_areas": "Ascend, CI/CD, distributed, features",
+        "external_contributor": false,
         "all_repos_rank": 8
       },
       {
@@ -3636,6 +3729,7 @@
         "english_name": "Debin Chen",
         "person_id": "profile:陈德斌",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "工程成员",
@@ -3691,6 +3785,7 @@
           "en": "Shuhao Zhang"
         },
         "contribution_areas": "leaderboard",
+        "external_contributor": false,
         "all_repos_rank": 9
       },
       {
@@ -3709,6 +3804,7 @@
         "english_name": "Hongru Gao",
         "person_id": "profile:高鸿儒",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "学术成员",
@@ -3744,6 +3840,7 @@
         "english_name": "Bin Long",
         "person_id": "profile:龙斌",
         "identity_confirmed": true,
+        "external_contributor": false,
         "core_member": false,
         "role": {
           "zh": "项目/科研助理",
@@ -3756,6 +3853,44 @@
         "participation_direction": {
           "zh": "科研项目管理与团队协同",
           "en": "Research project management and team coordination"
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      }
+    ],
+    "external_contributors": [
+      {
+        "name": "Chenxi Xu",
+        "github_login": "xsun2001",
+        "github_url": "https://github.com/xsun2001",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "徐晨曦",
+        "chinese_name": "徐晨曦",
+        "english_name": "Chenxi Xu",
+        "person_id": "github:xsun2001",
+        "identity_confirmed": true,
+        "external_contributor": true,
+        "core_member": false,
+        "role": {
+          "zh": "外部贡献者（港科大（广州））",
+          "en": "External contributor (HKUST(GZ))"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "流水线并行解码与均衡微批调度",
+          "en": "Pipeline-parallel decoding and balanced microbatch scheduling"
         },
         "advisor": {
           "zh": "",
@@ -3802,7 +3937,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "benchmark, distributed, leaderboard, CI/CD"
+        "contribution_areas": "benchmark, distributed, leaderboard, CI/CD",
+        "external_contributor": false
       },
       {
         "rank": 18,
@@ -3840,7 +3976,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "engine"
+        "contribution_areas": "engine",
+        "external_contributor": false
       },
       {
         "rank": 22,
@@ -3878,7 +4015,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "tooling"
+        "contribution_areas": "tooling",
+        "external_contributor": false
       },
       {
         "rank": 26,
@@ -3916,7 +4054,8 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "features"
+        "contribution_areas": "features",
+        "external_contributor": false
       }
     ]
   }
