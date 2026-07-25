@@ -86,6 +86,45 @@ def test_contributors_page_lists_project_leadership() -> None:
         assert f"<li>{name}</li>" in subproject_block
 
 
+def test_contributors_page_has_contribution_driven_member_profiles() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "contributors.html").read_text(encoding="utf-8")
+    css = (root / "assets" / "site.css").read_text(encoding="utf-8")
+    script = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
+
+    details_start = text.index('<details class="research-members-menu">')
+    details_end = text.index("</details>", details_start)
+    details = text[details_start:details_end]
+    assert " open" not in details.split(">", 1)[0]
+    assert 'id="contributors-members-menu-title"' in details
+    assert 'id="contributors-member-list"' in details
+    assert "contributorsFor(payload, 'all_repos').filter" in script
+    assert "EXCLUDED_PROFILE_IDENTITIES" in script
+    assert "vllm-hust developer" in script
+    assert "const advisor = curated?.advisor ? advisorName : '';" in script
+    for login in (
+        "mingqiwang-coder",
+        "cybber695",
+        "pygone",
+        "wmaster123",
+        "xilinggao",
+        "moonandlife",
+        "succinctpaul",
+        "iliujunn",
+    ):
+        marker = f"'{login}': {{" if "-" in login else f"{login}: {{"
+        profile = script.split(marker, 1)[1].split("},", 1)[0]
+        assert "advisor: true" in profile
+    assert "指导老师：" in script
+    assert "张书豪" in script
+    assert "contributors-page.js?v=verified-advisors-20260725" in text
+    for unverified_name in ("张睿诚", "刘俊", "李昶吾", "毛言粲"):
+        assert unverified_name not in details
+    assert ".research-members-menu[open] summary::after" in css
+    assert ".research-member-advisor" in css
+    assert "@media (max-width: 860px)" in css
+
+
 def test_data_directory_has_sync_marker() -> None:
     root = Path(__file__).resolve().parents[1]
     marker = root / "data" / "last_updated.json"
@@ -577,7 +616,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=contributors-leadership-20260722" in text
+        assert "assets/site.css?v=contributor-profiles-20260725" in text
         assert "assets/site.js?v=bilingual-toggle-20260723" in text
 
 
@@ -801,7 +840,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=contributors-leadership-20260722" in html_text
+    assert "assets/site.css?v=contributor-profiles-20260725" in html_text
     assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
@@ -1535,9 +1574,9 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     snapshot_path = root / "data" / "core_contributors.json"
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
-    assert payload["updated_at"] == "2026-07-24"
-    assert len(payload["all_repos"]["contributors"]) == 28
-    assert len(payload["core_repos"]["contributors"]) == 16
+    assert payload["updated_at"] == "2026-07-25"
+    assert len(payload["all_repos"]["contributors"]) == 27
+    assert len(payload["core_repos"]["contributors"]) == 15
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
     assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
     assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
@@ -1570,6 +1609,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
             assert automation_marker not in identities
 
     all_names = {item["display_name"] for item in payload["all_repos"]["contributors"]}
+    all_git_names = {
+        item.get("name", "").casefold() for item in payload["all_repos"]["contributors"]
+    }
+    assert {"tony", "qixinzhang2601"}.isdisjoint(all_git_names)
     assert {"田景远", "程月甲", "张俊辉"} <= all_names
     assert (
         not {"Jingyuan", "Fletcher Tian", "Paul", "Paul Cheng", "Junhui Zhang"}

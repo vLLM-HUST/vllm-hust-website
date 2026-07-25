@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=contributors-leadership-20260722" />
+  <link rel="stylesheet" href="./assets/site.css?v=contributor-profiles-20260725" />
   <link rel="stylesheet" href="./assets/subpages.css?v=upstream-pr-contrast-20260724" />
 </head>
 
@@ -93,6 +93,19 @@
             <li>万瑶</li>
           </ul>
         </div>
+
+        <details class="research-members-menu">
+          <summary>
+            <span>
+              <strong id="contributors-members-menu-title">Contributor profiles</strong>
+              <small id="contributors-members-menu-hint">Verified contributors, focus areas, and advisor information</small>
+            </span>
+          </summary>
+          <div class="research-members-content">
+            <p id="contributors-members-loading" class="research-members-status">Loading verified contributor profiles…</p>
+            <ul id="contributors-member-list" class="research-member-list" aria-live="polite"></ul>
+          </div>
+        </details>
       </section>
 
       <section class="content-panel">
@@ -179,6 +192,9 @@
         'contributors-role-dean': 'Dean',
         'contributors-role-project-lead': 'Project Lead',
         'contributors-subproject-title': 'Subproject leads',
+        'contributors-members-menu-title': 'Contributor profiles',
+        'contributors-members-menu-hint': 'Verified contributors, focus areas, and advisor information',
+        'contributors-members-loading': 'Loading verified contributor profiles…',
         'contributors-core-kicker': 'Core scope',
         'contributors-all-kicker': 'All repositories',
         'contributors-all-title': 'All repositories',
@@ -197,6 +213,9 @@
         'contributors-role-dean': '院长',
         'contributors-role-project-lead': '课题负责人',
         'contributors-subproject-title': '子课题负责人',
+        'contributors-members-menu-title': '贡献成员档案',
+        'contributors-members-menu-hint': '仅展示有可验证仓库贡献的成员、方向关键词与指导老师',
+        'contributors-members-loading': '正在加载已验证贡献成员…',
         'contributors-core-kicker': '核心统计',
         'contributors-all-kicker': '组织全量',
         'contributors-all-title': '全部仓库',
@@ -206,7 +225,7 @@
     };
   </script>
   <script src="./assets/site.js?v=bilingual-toggle-20260723"></script>
-  <script src="./assets/contributors-page.js?v=core-optimization-scope-20260724"></script>
+  <script src="./assets/contributors-page.js?v=verified-advisors-20260725"></script>
 </body>
 
 </html>
