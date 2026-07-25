@@ -1632,8 +1632,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         set(item["repos"]) & core_repo_names for item in profiles["core_members"]
     )
     assert all(
-        not (set(item["repos"]) & core_repo_names)
-        for item in profiles["participants"]
+        not (set(item["repos"]) & core_repo_names) for item in profiles["participants"]
     )
 
     people = {
