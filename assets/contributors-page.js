@@ -71,7 +71,16 @@
     }
 
     function memberProfilesFor(payload) {
-        if (payload?.member_profiles) return payload.member_profiles;
+        if (payload?.member_profiles) {
+            return {
+                ...payload.member_profiles,
+                external_contributors: Array.isArray(
+                    payload.member_profiles.external_contributors,
+                )
+                    ? payload.member_profiles.external_contributors
+                    : [],
+            };
+        }
         const coreMembers = contributorsFor(payload, 'core_repos');
         const coreIds = new Set(coreMembers.map(identityKey));
         const participants = contributorsFor(payload, 'all_repos')
@@ -80,6 +89,7 @@
             core_repo_names: payload?.core_repos?.scope_repos || [],
             core_members: coreMembers,
             participants,
+            external_contributors: [],
             unresolved_contributors: [],
         };
     }
@@ -228,6 +238,9 @@
         document.getElementById('contributors-total').textContent = fmt(all.length);
         document.getElementById('contributors-core-total').textContent = fmt(profiles.core_members.length);
         document.getElementById('contributors-participant-total').textContent = fmt(profiles.participants.length);
+        document.getElementById('contributors-external-total').textContent = fmt(
+            profiles.external_contributors.length,
+        );
         document.getElementById('contributors-repos').textContent = fmt(repoCount);
     }
 
@@ -271,6 +284,11 @@
         renderMeta(payload, profiles);
         renderProfileList('contributors-core-member-list', profiles.core_members, 'core');
         renderProfileList('contributors-participant-list', profiles.participants, 'participant');
+        renderProfileList(
+            'contributors-external-list',
+            profiles.external_contributors,
+            'external',
+        );
         renderCoreTable(profiles.core_members);
         renderAllTable(contributorsFor(payload, 'all_repos'));
         const loading = document.getElementById('contributors-members-loading');
