@@ -97,31 +97,23 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     details = text[details_start:details_end]
     assert " open" not in details.split(">", 1)[0]
     assert 'id="contributors-members-menu-title"' in details
-    assert 'id="contributors-member-list"' in details
-    assert "contributorsFor(payload, 'all_repos').filter" in script
-    assert "EXCLUDED_PROFILE_IDENTITIES" in script
+    assert 'id="contributors-core-member-list"' in details
+    assert 'id="contributors-participant-list"' in details
+    assert 'id="contributors-profile-core-title"' in details
+    assert 'id="contributors-profile-participant-title"' in details
+    assert "payload?.member_profiles" in script
+    assert "profiles.core_members" in script
+    assert "profiles.participants" in script
+    assert "CURATED_PROFILES" not in script
     assert "vllm-hust developer" in script
-    assert "const advisor = curated?.advisor ? advisorName : '';" in script
-    for login in (
-        "mingqiwang-coder",
-        "cybber695",
-        "pygone",
-        "wmaster123",
-        "xilinggao",
-        "moonandlife",
-        "succinctpaul",
-        "iliujunn",
-    ):
-        marker = f"'{login}': {{" if "-" in login else f"{login}: {{"
-        profile = script.split(marker, 1)[1].split("},", 1)[0]
-        assert "advisor: true" in profile
-    assert "指导老师：" in script
-    assert "张书豪" in script
-    assert "contributors-page.js?v=verified-advisors-20260725" in text
-    for unverified_name in ("张睿诚", "刘俊", "李昶吾", "毛言粲"):
-        assert unverified_name not in details
+    assert "research_direction" in script
+    assert "contribution_areas" in script
+    assert "participation_direction" in script
+    assert "Identity pending" in script
+    assert "contributors-page.js?v=member-classification-20260725" in text
     assert ".research-members-menu[open] summary::after" in css
-    assert ".research-member-advisor" in css
+    assert ".research-member-detail-row" in css
+    assert ".research-member-group + .research-member-group" in css
     assert "@media (max-width: 860px)" in css
 
 
@@ -616,7 +608,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=contributor-profiles-20260725" in text
+        assert "assets/site.css?v=member-classification-20260725" in text
         assert "assets/site.js?v=bilingual-toggle-20260723" in text
 
 
@@ -840,7 +832,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=contributor-profiles-20260725" in html_text
+    assert "assets/site.css?v=member-classification-20260725" in html_text
     assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
@@ -1559,14 +1551,21 @@ def test_contributor_loader_uses_newest_canonical_or_local_snapshot() -> None:
     )
     assert "'./data/core_contributors.json'" in text
     assert "async function fetchPayload()" in text
+    assert "Promise.allSettled" in text
+    assert "AbortController" in text
     assert "right.updatedAt.localeCompare(left.updatedAt)" in text
+    assert "Number(right.hasMemberProfiles) - Number(left.hasMemberProfiles)" in text
+    assert "right.index - left.index" in text
     assert "return candidates[0].payload;" in text
     assert (
         "item.display_name || item.chinese_name || item.name || item.github_login || ''"
         in text
     )
-    assert "item.github_login && item.github_login !== displayName" in text
-    assert "console.warn('[contributors] source failed', source, err);" in text
+    assert "item.identity_confirmed === false" in text
+    assert (
+        "console.warn('[contributors] source failed', SOURCES[index], result.reason);"
+        in text
+    )
 
 
 def test_contributor_snapshot_has_unique_human_identities() -> None:
@@ -1577,6 +1576,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert payload["updated_at"] == "2026-07-25"
     assert len(payload["all_repos"]["contributors"]) == 27
     assert len(payload["core_repos"]["contributors"]) == 15
+    profiles = payload["member_profiles"]
+    assert len(profiles["core_members"]) == 15
+    assert len(profiles["participants"]) == 23
+    assert len(profiles["unresolved_contributors"]) == 5
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
     assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
     assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
@@ -1618,6 +1621,36 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         not {"Jingyuan", "Fletcher Tian", "Paul", "Paul Cheng", "Junhui Zhang"}
         & all_names
     )
+
+    core_repo_names = set(profiles["core_repo_names"])
+    core_ids = {item["person_id"] for item in profiles["core_members"]}
+    participant_ids = {item["person_id"] for item in profiles["participants"]}
+    assert core_ids.isdisjoint(participant_ids)
+    assert len(core_ids) == len(profiles["core_members"])
+    assert len(participant_ids) == len(profiles["participants"])
+    assert all(
+        set(item["repos"]) & core_repo_names for item in profiles["core_members"]
+    )
+    assert all(
+        not (set(item["repos"]) & core_repo_names)
+        for item in profiles["participants"]
+    )
+
+    people = {
+        item["display_name"]: item
+        for item in profiles["core_members"] + profiles["participants"]
+    }
+    assert people["张睿诚"]["github_login"] == "KimmoZAG"
+    assert people["匡明轩"]["github_login"] == "sad-and-bad1231"
+    assert people["马俊豪"]["github_login"] == "kms12425"
+    assert people["邱瑞杰"]["github_login"] == "Jerry01020"
+    assert people["赵建军"]["github_login"] == "curryzjj"
+    assert people["高西岭"]["github_login"] == "XilingGao"
+    assert people["王胜"]["role"]["zh"] == "工程师"
+    assert people["程月甲"]["role"]["zh"] == "工程师"
+    assert people["赵建军"]["role"]["zh"] == "已毕业博士生，目前已入职高校"
+    assert people["高西岭"]["research_direction"]["zh"] == "KV量化"
+    assert "多级" not in people["高西岭"]["research_direction"]["zh"]
 
     canonical_snapshot = (
         root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"
