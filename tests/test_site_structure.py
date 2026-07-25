@@ -198,6 +198,22 @@ def test_trend_version_key_includes_core_and_backend_commits() -> None:
     assert "[coreCommit, backendCommit].filter(Boolean).join('+')" in version_key
 
 
+def test_ci_runs_engine_version_consistency_sentinel() -> None:
+    """The CI workflow must invoke the engine_version vs. git_commit sentinel.
+
+    Catches the ``v0.17.2rc0-2810-ga46abb7ae`` / ``0.18.0.post1`` kind of
+    split documented for the ``a46abb7ae`` backfill batch: two records for
+    the same vllm-hust core+plugin pair rendered as two separate x-axis
+    points because ``engine_version`` came from different sources.
+    """
+    root = Path(__file__).resolve().parents[1]
+    workflow = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    script = root / "scripts" / "check_engine_version_consistency.py"
+    assert script.is_file(), f"missing sentinel script: {script}"
+    assert "check_engine_version_consistency.py" in workflow
+    assert "vllm-hust" in script.read_text(encoding="utf-8")
+
+
 def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
@@ -364,16 +380,16 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
         effective_signature_counts[scenario] = len(signatures)
 
     assert effective_signature_counts["visionarena-online"] == 1
-    assert effective_signature_counts["instructcoder-online"] == 4
+    assert effective_signature_counts["instructcoder-online"] == 3
     assert effective_signature_counts["prefix-repetition-online"] == 3
-    assert effective_signature_counts["random-online"] == 3
-    assert effective_signature_counts["random-latency"] == 4
+    assert effective_signature_counts["random-online"] == 2
+    assert effective_signature_counts["random-latency"] == 3
     for scenario in (
         "sharegpt-online",
         "sharegpt-throughput",
         "sonnet-throughput",
     ):
-        assert effective_signature_counts[scenario] == 3
+        assert effective_signature_counts[scenario] == 2
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
