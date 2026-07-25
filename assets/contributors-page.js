@@ -45,6 +45,11 @@
             zh: 'Benchmark 基础设施 · 网站 · 工程质量',
             advisor: true,
         },
+        iliujunn: {
+            en: 'SLO scheduling · KV/MLA · Multi-GPU decoding',
+            zh: 'SLO 调度 · KV/MLA · 多 GPU 解码',
+            advisor: true,
+        },
     };
     let currentPayload = null;
 

@@ -110,12 +110,14 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
         "xilinggao",
         "moonandlife",
         "succinctpaul",
+        "iliujunn",
     ):
         marker = f"'{login}': {{" if "-" in login else f"{login}: {{"
         profile = script.split(marker, 1)[1].split("},", 1)[0]
         assert "advisor: true" in profile
     assert "指导老师：" in script
     assert "张书豪" in script
+    assert "contributors-page.js?v=verified-advisors-20260725" in text
     for unverified_name in ("张睿诚", "刘俊", "李昶吾", "毛言粲"):
         assert unverified_name not in details
     assert ".research-members-menu[open] summary::after" in css
@@ -1572,7 +1574,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     snapshot_path = root / "data" / "core_contributors.json"
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
-    assert payload["updated_at"] == "2026-07-24"
+    assert payload["updated_at"] == "2026-07-25"
     assert len(payload["all_repos"]["contributors"]) == 27
     assert len(payload["core_repos"]["contributors"]) == 15
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]

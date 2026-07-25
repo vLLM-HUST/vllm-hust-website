@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-24",
+  "updated_at": "2026-07-25",
   "all_repos": {
     "scope_repos": [
       "vllm-hust",
@@ -342,7 +342,7 @@
       },
       {
         "rank": 17,
-        "name": "Lou Jun",
+        "name": "Liu Jun",
         "github_login": "iliujunn",
         "github_url": "https://github.com/iliujunn",
         "commits": 9,
@@ -356,9 +356,9 @@
           "vllm-hust-dev-hub"
         ],
         "key_contributions": "Ascend, distributed, CI/CD, bugfix",
-        "display_name": "Lou Jun",
-        "chinese_name": "",
-        "english_name": "Lou Jun"
+        "display_name": "刘俊",
+        "chinese_name": "刘俊",
+        "english_name": "Liu Jun"
       },
       {
         "rank": 18,
@@ -687,7 +687,7 @@
       },
       {
         "rank": 8,
-        "name": "Lou Jun",
+        "name": "Liu Jun",
         "github_login": "iliujunn",
         "github_url": "https://github.com/iliujunn",
         "commits": 4,
@@ -700,9 +700,9 @@
           "vllm-hust"
         ],
         "key_contributions": "distributed, kernel, quantization",
-        "display_name": "Lou Jun",
-        "chinese_name": "",
-        "english_name": "Lou Jun"
+        "display_name": "刘俊",
+        "chinese_name": "刘俊",
+        "english_name": "Liu Jun"
       },
       {
         "rank": 9,
