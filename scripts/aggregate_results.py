@@ -369,6 +369,131 @@ def is_public_official_candidate(entry: dict[str, Any]) -> bool:
     )
 
 
+def _get_entry_runtime_plugin_commit(entry: dict[str, Any]) -> str:
+    metadata = entry.get("metadata") if isinstance(entry.get("metadata"), dict) else {}
+    provenance = (
+        metadata.get("runtime_provenance")
+        if isinstance(metadata.get("runtime_provenance"), dict)
+        else {}
+    )
+    plugin = (
+        provenance.get("plugin") if isinstance(provenance.get("plugin"), dict) else {}
+    )
+    return str(plugin.get("commit") or "").strip()
+
+
+def _parse_entry_sort_timestamp(entry: dict[str, Any]) -> float:
+    metadata = entry.get("metadata") if isinstance(entry.get("metadata"), dict) else {}
+    for field in ("submitted_at", "release_date"):
+        raw = metadata.get(field)
+        if not raw:
+            continue
+        try:
+            return datetime.fromisoformat(str(raw)).timestamp()
+        except ValueError:
+            continue
+    return 0.0
+
+
+def compute_canonical_plugin_commit_map(
+    entries: list[dict[str, Any]],
+) -> dict[str, str]:
+    """Build a ``{git_commit_ish: canonical_plugin_commit}`` map.
+
+    For each ``metadata.git_commit`` group among ``vllm-hust`` entries whose
+    ``runtime_provenance.plugin.commit`` is a real 40-char SHA, the canonical
+    plugin commit is the one from the **earliest-submitted** entry of that
+    group.  The earliest-submitted rule mirrors "what plugin was actually
+    installed the first time this vllm-hust commit was benchmarked" — later
+    backfills that pair the same core commit with a different plugin commit
+    would otherwise split a single runtime revision across multiple x-axis
+    points on the trend chart, even though the benchmarked binary is the same.
+
+    Groups that contain no entry with a usable 40-char plugin commit are
+    omitted from the map entirely; this lets callers fall back to "no
+    canonical known" rather than reject every entry in that group.
+    """
+    SHORT_LEN = 9
+    FULL_LEN = 40
+
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for entry in entries:
+        engine = str(entry.get("engine") or "").strip().lower()
+        if engine != PUBLIC_CURRENT_ENGINE:
+            continue
+        metadata = (
+            entry.get("metadata") if isinstance(entry.get("metadata"), dict) else {}
+        )
+        git_commit = str(metadata.get("git_commit") or "").strip()
+        if len(git_commit) < SHORT_LEN:
+            continue
+        plugin_commit = _get_entry_runtime_plugin_commit(entry)
+        if len(plugin_commit) != FULL_LEN:
+            continue
+        # Key by the stable short prefix so 40-char and 9-char references to
+        # the same commit collapse together.
+        key = git_commit[:SHORT_LEN].lower()
+        grouped.setdefault(key, []).append(entry)
+
+    canonical: dict[str, str] = {}
+    for key, members in grouped.items():
+        earliest = min(
+            members,
+            key=lambda e: (
+                _parse_entry_sort_timestamp(e),
+                -_get_entry_sort_throughput(e),
+            ),
+        )
+        canonical[key] = _get_entry_runtime_plugin_commit(earliest).lower()
+    return canonical
+
+
+def _get_entry_sort_throughput(entry: dict[str, Any]) -> float:
+    metrics = entry.get("metrics") if isinstance(entry.get("metrics"), dict) else {}
+    try:
+        return float(metrics.get("throughput_tps") or 0.0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def plugin_commit_mismatch_rejection_reason(
+    entry: dict[str, Any], canonical_map: dict[str, str]
+) -> str | None:
+    """Reject vllm-hust entries whose plugin commit differs from the canonical.
+
+    The canonical plugin commit for a given ``metadata.git_commit`` is the
+    one carried by the earliest-submitted entry of that commit group (see
+    :func:`compute_canonical_plugin_commit_map`).  A mismatch means the same
+    vllm-hust commit was benchmarked against two different vllm-ascend-hust
+    plugin revisions, which would render as two separate x-axis positions on
+    the trend chart even though ``metadata.git_commit`` is identical — i.e.
+    the same binary shown twice.  We drop the non-canonical side to keep the
+    trend chart honest.
+
+    Entries without ``runtime_provenance.plugin.commit`` are not rejected
+    here (older snapshots may predate the field), and groups without a
+    canonical entry are likewise skipped.
+    """
+    engine = str(entry.get("engine") or "").strip().lower()
+    if engine != PUBLIC_CURRENT_ENGINE:
+        return None
+    metadata = entry.get("metadata") if isinstance(entry.get("metadata"), dict) else {}
+    git_commit = str(metadata.get("git_commit") or "").strip()
+    entry_plugin = _get_entry_runtime_plugin_commit(entry)
+    if len(git_commit) < 9 or not entry_plugin:
+        return None
+    key = git_commit[:9].lower()
+    canonical = canonical_map.get(key)
+    if not canonical:
+        return None
+    if entry_plugin.lower() != canonical:
+        return (
+            f"plugin commit mismatch for git_commit {git_commit[:9]}: "
+            f"canonical={canonical[:9]} entry={entry_plugin[:9]}"
+        )
+    return None
+
+
 def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
     """Return a rejection reason for entries that must not reach public data.
 
@@ -434,8 +559,17 @@ def filter_public_snapshot_entries(
 ) -> tuple[list[dict[str, Any]], list[tuple[str, str]]]:
     accepted: list[dict[str, Any]] = []
     rejected: list[tuple[str, str]] = []
+    # Compute the canonical plugin commit per vllm-hust git_commit BEFORE
+    # the per-entry rejectors: the canonical-side filter needs to see the
+    # full population of the same commit group, including entries that the
+    # per-entry rejectors below would otherwise accept individually.
+    canonical_plugin_map = compute_canonical_plugin_commit_map(entries)
     for entry in entries:
         reason = public_snapshot_rejection_reason(entry)
+        if reason is None:
+            reason = plugin_commit_mismatch_rejection_reason(
+                entry, canonical_plugin_map
+            )
         if reason is None:
             accepted.append(entry)
         else:
