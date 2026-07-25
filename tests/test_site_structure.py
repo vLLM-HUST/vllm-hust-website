@@ -110,7 +110,9 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert "contribution_areas" in script
     assert "participation_direction" in script
     assert "Identity pending" in script
-    assert "contributors-page.js?v=member-classification-20260725" in text
+    assert "function memberContextMarkup(item, lang)" in script
+    assert "contributor-member-context" in script
+    assert "contributors-page.js?v=identity-mapping-20260725" in text
     assert ".research-members-menu[open] summary::after" in css
     assert ".research-member-detail-row" in css
     assert ".research-member-group + .research-member-group" in css
@@ -608,7 +610,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=member-classification-20260725" in text
+        assert "assets/site.css?v=identity-mapping-20260725" in text
         assert "assets/site.js?v=bilingual-toggle-20260723" in text
 
 
@@ -832,7 +834,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=member-classification-20260725" in html_text
+    assert "assets/site.css?v=identity-mapping-20260725" in html_text
     assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
@@ -1574,12 +1576,12 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
     assert payload["updated_at"] == "2026-07-25"
-    assert len(payload["all_repos"]["contributors"]) == 27
-    assert len(payload["core_repos"]["contributors"]) == 15
+    assert len(payload["all_repos"]["contributors"]) == 33
+    assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
-    assert len(profiles["core_members"]) == 15
-    assert len(profiles["participants"]) == 23
-    assert len(profiles["unresolved_contributors"]) == 5
+    assert len(profiles["core_members"]) == 21
+    assert len(profiles["participants"]) == 22
+    assert len(profiles["unresolved_contributors"]) == 4
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
     assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
     assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
@@ -1650,6 +1652,33 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["赵建军"]["role"]["zh"] == "已毕业博士生，目前已入职高校"
     assert people["高西岭"]["research_direction"]["zh"] == "KV量化"
     assert "多级" not in people["高西岭"]["research_direction"]["zh"]
+    assert people["刘世锋"]["github_login"] == "Remygred"
+    assert people["刘世锋"]["role"]["zh"] == "华科大三实习生"
+    assert people["刘世锋"]["advisor"]["zh"] == "张书豪"
+    assert people["曹哲"]["github_login"] == "xmdhb"
+    assert people["曹哲"]["role"]["zh"] == "即将入学的研究生"
+    assert people["曹哲"]["advisor"]["zh"] == "张书豪"
+    assert people["dzcixy"]["github_login"] == "dzcixy"
+    assert people["dzcixy"]["advisor"]["zh"] == "黄禹"
+    expected_advisors = {
+        "马川湖": "王雄",
+        "吴天宇": "郑龙",
+        "李昶吾": "张书豪",
+        "王润泽": "王庆刚",
+        "谷昌伟": "罗瑞坤",
+        "杨杰": "赵进",
+        "陈彦博": "张书豪",
+        "郑凌峰": "刘海坤",
+        "王鸿坤": "项翔",
+        "崔钰嘉": "姚鹏程",
+        "赵文举": "姚鹏程",
+        "刘思辰": "万瑶",
+    }
+    for name, advisor in expected_advisors.items():
+        assert people[name]["advisor"]["zh"] == advisor
+    unresolved_ids = {item["person_id"] for item in profiles["unresolved_contributors"]}
+    assert "github:remygred" not in unresolved_ids
+    assert "github:dzcixy" not in unresolved_ids
 
     canonical_snapshot = (
         root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"
