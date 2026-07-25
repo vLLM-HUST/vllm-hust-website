@@ -1014,6 +1014,19 @@ h1 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.contributor-table-member {
+    display: grid;
+    gap: 2px;
+    min-width: 150px;
+}
+
+.contributor-table-member .contributor-member-context {
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));

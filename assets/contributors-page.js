@@ -154,6 +154,20 @@
         return `${main}${login}`;
     }
 
+    function memberContextMarkup(item, lang) {
+        const role = localized(item, 'role', lang);
+        const advisor = localized(item, 'advisor', lang);
+        const parts = [
+            role,
+            advisor
+                ? `${labels(lang).advisor}${lang === 'zh' ? '：' : ': '}${advisor}`
+                : '',
+        ].filter(Boolean);
+        return parts.length
+            ? `<small class="contributor-member-context">${escapeHtml(parts.join(' · '))}</small>`
+            : '';
+    }
+
     function mainContribution(item, lang) {
         const repos = Array.isArray(item.repos) ? item.repos.join(' · ') : '';
         const commits = Number(item.commits || 0);
@@ -224,7 +238,7 @@
         tbody.innerHTML = contributors.map((item) => `
             <tr>
                 <td>${fmt(item.rank)}</td>
-                <td>${memberNameMarkup(item, lang)}</td>
+                <td><span class="contributor-table-member">${memberNameMarkup(item, lang)}${memberContextMarkup(item, lang)}</span></td>
                 <td>${escapeHtml(localized(item, 'research_direction', lang) || labels(lang).none)}</td>
                 <td>${escapeHtml(item.contribution_areas || item.key_contributions || labels(lang).none)}</td>
                 <td>${escapeHtml(mainContribution(item, lang) || labels(lang).none)}</td>
