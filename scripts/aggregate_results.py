@@ -708,7 +708,11 @@ def build_setting_signature(entry: dict[str, Any]) -> str:
             str(tensor_parallel if tensor_parallel is not None else "unknown-tp"),
             str(pipeline_parallel if pipeline_parallel is not None else "unknown-pp"),
             str(dtype or "unknown-dtype"),
-            str(gpu_memory_utilization if gpu_memory_utilization is not None else "unknown-mem"),
+            str(
+                gpu_memory_utilization
+                if gpu_memory_utilization is not None
+                else "unknown-mem"
+            ),
             str(max_model_len if max_model_len is not None else "unknown-maxlen"),
             str(request_rate if request_rate is not None else "unknown-rps"),
         ]
