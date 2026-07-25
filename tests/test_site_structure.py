@@ -1582,14 +1582,14 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
     assert payload["updated_at"] == "2026-07-25"
-    assert len(payload["all_repos"]["contributors"]) == 33
+    assert len(payload["all_repos"]["contributors"]) == 32
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
-    assert len(profiles["core_members"]) == 19
-    assert len(profiles["participants"]) == 21
-    assert len(profiles["staff_members"]) == 3
+    assert len(profiles["core_members"]) == 18
+    assert len(profiles["participants"]) == 22
+    assert len(profiles["staff_members"]) == 5
     assert len(profiles["external_contributors"]) == 1
-    assert len(profiles["unresolved_contributors"]) == 4
+    assert len(profiles["unresolved_contributors"]) == 1
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
     assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
     assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
@@ -1654,6 +1654,8 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         not (set(item["repos"]) & core_repo_names) for item in profiles["participants"]
     )
     assert {item["display_name"] for item in profiles["staff_members"]} == {
+        "luoxiaohei",
+        "张俊辉",
         "王胜",
         "程月甲",
         "龙斌",
@@ -1662,7 +1664,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         item["display_name"]
         for item in profiles["staff_members"]
         if item["core_repository_contributor"]
-    } == {"王胜", "程月甲"}
+    } == {"王胜", "程月甲", "张俊辉"}
 
     people = {
         item["display_name"]: item
@@ -1681,6 +1683,11 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["高西岭"]["github_login"] == "XilingGao"
     assert people["王胜"]["role"]["zh"] == "工程师"
     assert people["王胜"]["staff_member"] is True
+    assert people["张俊辉"]["github_login"] == "junhuizhang-boop"
+    assert people["张俊辉"]["role"]["zh"] == "工程师（派欧云）"
+    assert people["张俊辉"]["staff_member"] is True
+    assert people["luoxiaohei"]["role"]["zh"] == "工程师（派欧云）"
+    assert people["luoxiaohei"]["staff_member"] is True
     assert people["程月甲"]["role"]["zh"] == "工程师"
     assert people["程月甲"]["staff_member"] is True
     assert people["龙斌"]["role"]["zh"] == "项目/科研助理"
@@ -1697,6 +1704,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["李庚"]["github_login"] == "Anjiangy"
     assert people["李庚"]["role"]["zh"] == "马上入学的华科研究生"
     assert people["李庚"]["advisor"]["zh"] == "张书豪"
+    assert people["马俊豪"]["advisor"]["zh"] == "张书豪"
+    assert people["sunYangGitHub"]["github_login"] == "sunYangGitHub"
+    assert people["sunYangGitHub"]["role"]["zh"] == "外校实习生"
+    assert people["sunYangGitHub"]["advisor"]["zh"] == "张书豪"
     assert people["杜忠承"]["github_login"] == "dzcixy"
     assert people["杜忠承"]["advisor"]["zh"] == "黄禹"
     assert people["徐晨曦"]["github_login"] == "xsun2001"
@@ -1721,6 +1732,17 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     unresolved_ids = {item["person_id"] for item in profiles["unresolved_contributors"]}
     assert "github:remygred" not in unresolved_ids
     assert "github:dzcixy" not in unresolved_ids
+    assert "github:sunyanggithub" not in unresolved_ids
+    assert "github:luoxiaohei" not in unresolved_ids
+    assert unresolved_ids == {"github:kotoriqaq0"}
+
+    kuang_rows = [
+        item
+        for item in payload["all_repos"]["contributors"]
+        if item["person_id"] == "github:sad-and-bad1231"
+    ]
+    assert len(kuang_rows) == 1
+    assert kuang_rows[0]["commits"] == 17
 
     canonical_snapshot = (
         root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"

@@ -317,21 +317,21 @@
         "key_contributions": "benchmark, CI/CD, Ascend, bugfix",
         "display_name": "张俊辉",
         "chinese_name": "张俊辉",
-        "english_name": "",
+        "english_name": "Junhui Zhang",
         "person_id": "github:junhuizhang-boop",
         "identity_confirmed": true,
-        "core_member": true,
+        "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "工程师（派欧云）",
+          "en": "Engineer (PPIO)"
         },
         "research_direction": {
           "zh": "",
           "en": ""
         },
         "participation_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "Benchmark 基础设施、上游同步与推理工程支持",
+          "en": "Benchmark infrastructure, upstream synchronization, and inference engineering support"
         },
         "advisor": {
           "zh": "",
@@ -339,7 +339,7 @@
         },
         "contribution_areas": "benchmark, CI/CD, Ascend, bugfix",
         "external_contributor": false,
-        "staff_member": false,
+        "staff_member": true,
         "core_repository_contributor": true
       },
       {
@@ -527,19 +527,19 @@
         "chinese_name": "",
         "english_name": "",
         "person_id": "github:luoxiaohei",
-        "identity_confirmed": false,
+        "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "工程师（派欧云）",
+          "en": "Engineer (PPIO)"
         },
         "research_direction": {
           "zh": "",
           "en": ""
         },
         "participation_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "Benchmark、排行榜、CI/CD 与数据质量工程",
+          "en": "Benchmarking, leaderboards, CI/CD, and data-quality engineering"
         },
         "advisor": {
           "zh": "",
@@ -547,7 +547,7 @@
         },
         "contribution_areas": "benchmark, distributed, leaderboard, CI/CD",
         "external_contributor": false,
-        "staff_member": false,
+        "staff_member": true,
         "core_repository_contributor": false
       },
       {
@@ -759,22 +759,25 @@
       {
         "rank": 18,
         "name": "Sadboineedluv",
-        "github_login": null,
-        "github_url": null,
-        "commits": 9,
-        "changed_lines": 2797,
-        "added": 1692,
-        "deleted": 1105,
-        "active_repos": 1,
+        "github_login": "sad-and-bad1231",
+        "github_url": "https://github.com/sad-and-bad1231",
+        "commits": 17,
+        "changed_lines": 3806,
+        "added": 2577,
+        "deleted": 1229,
+        "active_repos": 4,
         "repos": [
-          "cccf-domestic-inference-engine-survey"
+          ".github",
+          "cccf-domestic-inference-engine-survey",
+          "vllm-ascend-hust",
+          "vllm-hust"
         ],
-        "key_contributions": "engine",
-        "display_name": "Sadboineedluv",
-        "chinese_name": "",
-        "english_name": "",
-        "person_id": "author:sadboineedluv",
-        "identity_confirmed": false,
+        "key_contributions": "engine, benchmark, CI/CD",
+        "display_name": "匡明轩",
+        "chinese_name": "匡明轩",
+        "english_name": "MingXuan Kuang",
+        "person_id": "github:sad-and-bad1231",
+        "identity_confirmed": true,
         "core_member": false,
         "role": {
           "zh": "",
@@ -792,7 +795,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "engine",
+        "contribution_areas": "engine, benchmark, CI/CD",
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false
@@ -904,8 +907,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -916,8 +919,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "CI/CD, engine",
         "external_contributor": false,
@@ -927,8 +930,8 @@
       {
         "rank": 22,
         "name": "sunYangGitHub",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "sunYangGitHub",
+        "github_url": "https://github.com/sunYangGitHub",
         "commits": 1,
         "changed_lines": 1089,
         "added": 1087,
@@ -941,24 +944,24 @@
         "display_name": "sunYangGitHub",
         "chinese_name": "",
         "english_name": "",
-        "person_id": "author:sunyanggithub",
-        "identity_confirmed": false,
+        "person_id": "github:sunyanggithub",
+        "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "外校实习生",
+          "en": "Visiting student intern"
         },
         "research_direction": {
           "zh": "",
           "en": ""
         },
         "participation_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "性能分析工具",
+          "en": "Performance-analysis tooling"
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "tooling",
         "external_contributor": false,
@@ -1009,49 +1012,6 @@
       },
       {
         "rank": 24,
-        "name": "MingXuan Kuang",
-        "github_login": "sad-and-bad1231",
-        "github_url": "https://github.com/sad-and-bad1231",
-        "commits": 8,
-        "changed_lines": 1009,
-        "added": 885,
-        "deleted": 124,
-        "active_repos": 3,
-        "repos": [
-          ".github",
-          "vllm-ascend-hust",
-          "vllm-hust"
-        ],
-        "key_contributions": "benchmark, CI/CD, engine",
-        "display_name": "匡明轩",
-        "chinese_name": "匡明轩",
-        "english_name": "MingXuan Kuang",
-        "person_id": "github:sad-and-bad1231",
-        "identity_confirmed": true,
-        "core_member": true,
-        "role": {
-          "zh": "",
-          "en": ""
-        },
-        "research_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "benchmark, CI/CD, engine",
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": true
-      },
-      {
-        "rank": 25,
         "name": "Remygred",
         "github_login": "Remygred",
         "github_url": "https://github.com/Remygred",
@@ -1093,7 +1053,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 26,
+        "rank": 25,
         "name": "kotoriqaq0",
         "github_login": "kotoriqaq0",
         "github_url": "https://github.com/kotoriqaq0",
@@ -1134,7 +1094,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 27,
+        "rank": 26,
         "name": "aly16-k",
         "github_login": "aly16-k",
         "github_url": "https://github.com/aly16-k",
@@ -1176,7 +1136,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 28,
+        "rank": 27,
         "name": "rzwang22",
         "github_login": "rzwang22",
         "github_url": "https://github.com/rzwang22",
@@ -1218,7 +1178,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 29,
+        "rank": 28,
         "name": "Ruijie Qiu",
         "github_login": "Jerry01020",
         "github_url": "https://github.com/Jerry01020",
@@ -1259,7 +1219,7 @@
         "core_repository_contributor": false
       },
       {
-        "rank": 30,
+        "rank": 29,
         "name": "Xincai Zhu",
         "github_login": "Pygone",
         "github_url": "https://github.com/Pygone",
@@ -1300,7 +1260,7 @@
         "core_repository_contributor": false
       },
       {
-        "rank": 31,
+        "rank": 30,
         "name": "xmdhb",
         "github_login": "xmdhb",
         "github_url": "https://github.com/xmdhb",
@@ -1341,7 +1301,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 32,
+        "rank": 31,
         "name": "Raing5Days",
         "github_login": "Raing5Days",
         "github_url": "https://github.com/Raing5Days",
@@ -1382,7 +1342,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 33,
+        "rank": 32,
         "name": "sssarrior",
         "github_login": null,
         "github_url": null,
@@ -1535,21 +1495,21 @@
         "key_contributions": "benchmark, CI/CD, Ascend",
         "display_name": "张俊辉",
         "chinese_name": "张俊辉",
-        "english_name": "",
+        "english_name": "Junhui Zhang",
         "person_id": "github:junhuizhang-boop",
         "identity_confirmed": true,
-        "core_member": true,
+        "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "工程师（派欧云）",
+          "en": "Engineer (PPIO)"
         },
         "research_direction": {
           "zh": "",
           "en": ""
         },
         "participation_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "Benchmark 基础设施、上游同步与推理工程支持",
+          "en": "Benchmark infrastructure, upstream synchronization, and inference engineering support"
         },
         "advisor": {
           "zh": "",
@@ -1557,7 +1517,7 @@
         },
         "contribution_areas": "benchmark, CI/CD, Ascend",
         "external_contributor": false,
-        "staff_member": false,
+        "staff_member": true,
         "core_repository_contributor": true
       },
       {
@@ -2203,8 +2163,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -2215,8 +2175,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "misc",
         "external_contributor": false,
@@ -2404,48 +2364,6 @@
       },
       {
         "rank": 3,
-        "name": "junhuizhang-boop",
-        "github_login": "junhuizhang-boop",
-        "github_url": "https://github.com/junhuizhang-boop",
-        "commits": 18,
-        "changed_lines": 13136,
-        "added": 12246,
-        "deleted": 890,
-        "active_repos": 2,
-        "repos": [
-          "vllm-ascend-hust",
-          "vllm-hust"
-        ],
-        "key_contributions": "benchmark, CI/CD, Ascend",
-        "display_name": "张俊辉",
-        "chinese_name": "张俊辉",
-        "english_name": "",
-        "person_id": "github:junhuizhang-boop",
-        "identity_confirmed": true,
-        "core_member": true,
-        "role": {
-          "zh": "",
-          "en": ""
-        },
-        "research_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "benchmark, CI/CD, Ascend",
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": true
-      },
-      {
-        "rank": 4,
         "name": "Amber1qq",
         "github_login": "Amber1qq",
         "github_url": "https://github.com/Amber1qq",
@@ -2486,7 +2404,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 5,
+        "rank": 4,
         "name": "Gu Changwei",
         "github_login": "GuMorming",
         "github_url": "https://github.com/GuMorming",
@@ -2527,7 +2445,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 6,
+        "rank": 5,
         "name": "dzcixy",
         "github_login": "dzcixy",
         "github_url": "https://github.com/dzcixy",
@@ -2568,7 +2486,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 7,
+        "rank": 6,
         "name": "machuanhu",
         "github_login": "machuanhu",
         "github_url": "https://github.com/machuanhu",
@@ -2609,7 +2527,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 8,
+        "rank": 7,
         "name": "Jie Yang",
         "github_login": "JieYang2001",
         "github_url": "https://github.com/JieYang2001",
@@ -2650,7 +2568,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 9,
+        "rank": 8,
         "name": "Jingyuan Tian",
         "github_login": "CubeLander",
         "github_url": "https://github.com/CubeLander",
@@ -2692,7 +2610,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 10,
+        "rank": 9,
         "name": "WMASTER123",
         "github_login": "WMASTER123",
         "github_url": "https://github.com/WMASTER123",
@@ -2734,7 +2652,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 11,
+        "rank": 10,
         "name": "MingXuan Kuang",
         "github_login": "sad-and-bad1231",
         "github_url": "https://github.com/sad-and-bad1231",
@@ -2776,7 +2694,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 12,
+        "rank": 11,
         "name": "Liu Jun",
         "github_login": "iliujunn",
         "github_url": "https://github.com/iliujunn",
@@ -2818,7 +2736,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 13,
+        "rank": 12,
         "name": "kotoriqaq0",
         "github_login": "kotoriqaq0",
         "github_url": "https://github.com/kotoriqaq0",
@@ -2859,7 +2777,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 14,
+        "rank": 13,
         "name": "aly16-k",
         "github_login": "aly16-k",
         "github_url": "https://github.com/aly16-k",
@@ -2901,7 +2819,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 15,
+        "rank": 14,
         "name": "rzwang22",
         "github_login": "rzwang22",
         "github_url": "https://github.com/rzwang22",
@@ -2943,7 +2861,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 16,
+        "rank": 15,
         "name": "Remygred",
         "github_login": "Remygred",
         "github_url": "https://github.com/Remygred",
@@ -2984,7 +2902,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 17,
+        "rank": 16,
         "name": "xmdhb",
         "github_login": "xmdhb",
         "github_url": "https://github.com/xmdhb",
@@ -3025,7 +2943,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 18,
+        "rank": 17,
         "name": "Junhao Ma",
         "github_login": "kms12425",
         "github_url": "https://github.com/kms12425",
@@ -3045,8 +2963,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -3057,8 +2975,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "misc",
         "external_contributor": false,
@@ -3066,7 +2984,7 @@
         "core_repository_contributor": true
       },
       {
-        "rank": 19,
+        "rank": 18,
         "name": "Raing5Days",
         "github_login": "Raing5Days",
         "github_url": "https://github.com/Raing5Days",
@@ -3108,6 +3026,47 @@
       }
     ],
     "participants": [
+      {
+        "name": "sunYangGitHub",
+        "github_login": "sunYangGitHub",
+        "github_url": "https://github.com/sunYangGitHub",
+        "commits": 1,
+        "changed_lines": 1089,
+        "added": 1087,
+        "deleted": 2,
+        "active_repos": 1,
+        "repos": [
+          "vllm-hust-perf-analyzer"
+        ],
+        "key_contributions": "tooling",
+        "display_name": "sunYangGitHub",
+        "chinese_name": "",
+        "english_name": "",
+        "person_id": "github:sunyanggithub",
+        "identity_confirmed": true,
+        "core_member": false,
+        "role": {
+          "zh": "外校实习生",
+          "en": "Visiting student intern"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "性能分析工具",
+          "en": "Performance-analysis tooling"
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "contribution_areas": "tooling",
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "all_repos_rank": 22
+      },
       {
         "name": "Seas0",
         "github_login": "Seas0",
@@ -3420,7 +3379,7 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
-        "all_repos_rank": 30
+        "all_repos_rank": 29
       },
       {
         "name": "Geng Li",
@@ -3499,7 +3458,7 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
-        "all_repos_rank": 33
+        "all_repos_rank": 32
       },
       {
         "name": "Changwu Li",
@@ -3772,7 +3731,7 @@
         "external_contributor": false,
         "staff_member": false,
         "core_repository_contributor": false,
-        "all_repos_rank": 29
+        "all_repos_rank": 28
       },
       {
         "name": "Zijia Chen",
@@ -3934,6 +3893,90 @@
       }
     ],
     "staff_members": [
+      {
+        "rank": 12,
+        "name": "luoxiaohei",
+        "github_login": "luoxiaohei",
+        "github_url": "https://github.com/luoxiaohei",
+        "commits": 31,
+        "changed_lines": 7185,
+        "added": 5233,
+        "deleted": 1952,
+        "active_repos": 2,
+        "repos": [
+          "vllm-hust-benchmark",
+          "vllm-hust-website"
+        ],
+        "key_contributions": "benchmark, distributed, leaderboard, CI/CD",
+        "display_name": "luoxiaohei",
+        "chinese_name": "",
+        "english_name": "",
+        "person_id": "github:luoxiaohei",
+        "identity_confirmed": true,
+        "core_member": false,
+        "role": {
+          "zh": "工程师（派欧云）",
+          "en": "Engineer (PPIO)"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "Benchmark、排行榜、CI/CD 与数据质量工程",
+          "en": "Benchmarking, leaderboards, CI/CD, and data-quality engineering"
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "benchmark, distributed, leaderboard, CI/CD",
+        "external_contributor": false,
+        "staff_member": true,
+        "core_repository_contributor": false
+      },
+      {
+        "rank": 3,
+        "name": "junhuizhang-boop",
+        "github_login": "junhuizhang-boop",
+        "github_url": "https://github.com/junhuizhang-boop",
+        "commits": 18,
+        "changed_lines": 13136,
+        "added": 12246,
+        "deleted": 890,
+        "active_repos": 2,
+        "repos": [
+          "vllm-ascend-hust",
+          "vllm-hust"
+        ],
+        "key_contributions": "benchmark, CI/CD, Ascend",
+        "display_name": "张俊辉",
+        "chinese_name": "张俊辉",
+        "english_name": "Junhui Zhang",
+        "person_id": "github:junhuizhang-boop",
+        "identity_confirmed": true,
+        "core_member": false,
+        "role": {
+          "zh": "工程师（派欧云）",
+          "en": "Engineer (PPIO)"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "Benchmark 基础设施、上游同步与推理工程支持",
+          "en": "Benchmark infrastructure, upstream synchronization, and inference engineering support"
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "benchmark, CI/CD, Ascend",
+        "external_contributor": false,
+        "staff_member": true,
+        "core_repository_contributor": true
+      },
       {
         "rank": 4,
         "name": "Sheng Wang",
@@ -4099,131 +4142,7 @@
     ],
     "unresolved_contributors": [
       {
-        "rank": 12,
-        "name": "luoxiaohei",
-        "github_login": "luoxiaohei",
-        "github_url": "https://github.com/luoxiaohei",
-        "commits": 31,
-        "changed_lines": 7185,
-        "added": 5233,
-        "deleted": 1952,
-        "active_repos": 2,
-        "repos": [
-          "vllm-hust-benchmark",
-          "vllm-hust-website"
-        ],
-        "key_contributions": "benchmark, distributed, leaderboard, CI/CD",
-        "display_name": "luoxiaohei",
-        "chinese_name": "",
-        "english_name": "",
-        "person_id": "github:luoxiaohei",
-        "identity_confirmed": false,
-        "core_member": false,
-        "role": {
-          "zh": "",
-          "en": ""
-        },
-        "research_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "benchmark, distributed, leaderboard, CI/CD",
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": false
-      },
-      {
-        "rank": 18,
-        "name": "Sadboineedluv",
-        "github_login": null,
-        "github_url": null,
-        "commits": 9,
-        "changed_lines": 2797,
-        "added": 1692,
-        "deleted": 1105,
-        "active_repos": 1,
-        "repos": [
-          "cccf-domestic-inference-engine-survey"
-        ],
-        "key_contributions": "engine",
-        "display_name": "Sadboineedluv",
-        "chinese_name": "",
-        "english_name": "",
-        "person_id": "author:sadboineedluv",
-        "identity_confirmed": false,
-        "core_member": false,
-        "role": {
-          "zh": "",
-          "en": ""
-        },
-        "research_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "engine",
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": false
-      },
-      {
-        "rank": 22,
-        "name": "sunYangGitHub",
-        "github_login": null,
-        "github_url": null,
-        "commits": 1,
-        "changed_lines": 1089,
-        "added": 1087,
-        "deleted": 2,
-        "active_repos": 1,
-        "repos": [
-          "vllm-hust-perf-analyzer"
-        ],
-        "key_contributions": "tooling",
-        "display_name": "sunYangGitHub",
-        "chinese_name": "",
-        "english_name": "",
-        "person_id": "author:sunyanggithub",
-        "identity_confirmed": false,
-        "core_member": false,
-        "role": {
-          "zh": "",
-          "en": ""
-        },
-        "research_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "tooling",
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": false
-      },
-      {
-        "rank": 26,
+        "rank": 25,
         "name": "kotoriqaq0",
         "github_login": "kotoriqaq0",
         "github_url": "https://github.com/kotoriqaq0",
