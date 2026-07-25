@@ -86,6 +86,45 @@ def test_contributors_page_lists_project_leadership() -> None:
         assert f"<li>{name}</li>" in subproject_block
 
 
+def test_contributors_page_has_contribution_driven_member_profiles() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "contributors.html").read_text(encoding="utf-8")
+    css = (root / "assets" / "site.css").read_text(encoding="utf-8")
+    script = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
+
+    details_start = text.index('<details class="research-members-menu">')
+    details_end = text.index("</details>", details_start)
+    details = text[details_start:details_end]
+    assert " open" not in details.split(">", 1)[0]
+    assert 'id="contributors-members-menu-title"' in details
+    assert 'id="contributors-core-member-list"' in details
+    assert 'id="contributors-participant-list"' in details
+    assert 'id="contributors-staff-list"' in details
+    assert 'id="contributors-external-list"' in details
+    assert 'id="contributors-profile-core-title"' in details
+    assert 'id="contributors-profile-participant-title"' in details
+    assert 'id="contributors-profile-staff-title"' in details
+    assert 'id="contributors-profile-external-title"' in details
+    assert "payload?.member_profiles" in script
+    assert "profiles.core_members" in script
+    assert "profiles.participants" in script
+    assert "profiles.staff_members" in script
+    assert "profiles.external_contributors" in script
+    assert "CURATED_PROFILES" not in script
+    assert "vllm-hust developer" in script
+    assert "research_direction" in script
+    assert "contribution_areas" in script
+    assert "participation_direction" in script
+    assert "Identity pending" in script
+    assert "function memberContextMarkup(item, lang)" in script
+    assert "contributor-member-context" in script
+    assert "contributors-page.js?v=staff-contributors-20260725" in text
+    assert ".research-members-menu[open] summary::after" in css
+    assert ".research-member-detail-row" in css
+    assert ".research-member-group + .research-member-group" in css
+    assert "@media (max-width: 860px)" in css
+
+
 def test_data_directory_has_sync_marker() -> None:
     root = Path(__file__).resolve().parents[1]
     marker = root / "data" / "last_updated.json"
@@ -159,18 +198,182 @@ def test_trend_version_key_includes_core_and_backend_commits() -> None:
     assert "[coreCommit, backendCommit].filter(Boolean).join('+')" in version_key
 
 
-def test_trend_series_prefers_resolved_hash_over_spec_id() -> None:
+def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     setting_signature = text.split("function getSettingSignature", 1)[1].split(
         "function getCompactSpecLabel", 1
     )[0]
 
-    assert setting_signature.index("resolved_spec_hash") < setting_signature.index(
-        "getSameSpecId(entry)"
+    assert "const TREND_SEMANTIC_SPEC_VERSION = 'same-spec-semantic/v2';" in text
+    assert "new Set(['host', 'port', 'model'])" in text
+    assert "function normalizeSemanticSpecValue(value)" in text
+    assert "function buildTrendSpecDefaults(entries)" in text
+    assert "entries.filter((entry) => isTrendBaselineEntry(entry))" in text
+    assert "function getEffectiveSemanticSpecParameters(" in text
+    assert "function getEffectiveTrendWorkloadSemanticConfig(" in text
+    assert "...(defaults.server || {}), ...parameters.server" in text
+    assert "...(defaults.client || {}), ...parameters.client" in text
+    assert (
+        "workload: getEffectiveTrendWorkloadSemanticConfig(entry, specDefaults)" in text
     )
+    assert "delete client.input_len;" in text
+    assert "delete client.output_len;" in text
+    assert setting_signature.index(
+        "getSemanticSpecSignature"
+    ) < setting_signature.index("resolved_spec_hash")
+    assert "return semanticSignature;" in setting_signature
     assert "return `hash:${sameSpecHash}`;" in setting_signature
     assert "return `spec:${sameSpecId}`;" in setting_signature
+
+
+def test_trend_series_discloses_real_configuration_overrides() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "trendSeriesBaselineOnly: 'baseline result · 1 point'" in text
+    assert "trendSeriesSinglePoint: 'current result · 1 point'" in text
+    assert "trendSeriesBaselineOnly: '基线结果 · 1 个点'" in text
+    assert "trendSeriesSinglePoint: '当前结果 · 1 个点'" in text
+    assert "add matching baseline result" not in text
+    assert "待补同配置基线结果" not in text
+    assert "showLine: series.pointCount > 1" in text
+    assert "pointRadius: series.pointCount === 1 ? 5 : 3" in text
+    assert "item.evidenceLabel = formatTrendSeriesEvidence(item);" in text
+    assert "evidence.className = 'trend-series-evidence';" in text
+    assert "function getDifferingTrendConfigKeys(seriesGroup)" in text
+    assert "function getRelevantTrendConfigKeys(series)" in text
+    assert "isUnpaired ? getRelevantTrendConfigKeys(item) : []" in text
+    assert "function getTrendConfigDifferenceItems(series, differingKeys)" in text
+    assert "config.className = 'trend-series-config';" in text
+    assert "chip.className = 'trend-series-config-chip';" in text
+    assert "trendSeriesConfigDefault: '默认值（与基线一致）'" in text
+    assert "trendSeriesConfigDetails: '相关配置'" in text
+    assert "trendSeriesConfigMissing" not in text
+
+
+def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> None:
+    root = Path(__file__).resolve().parents[1]
+    entries = []
+    for name in ("leaderboard_single.json", "leaderboard_multi.json"):
+        entries.extend(json.loads((root / "data" / name).read_text(encoding="utf-8")))
+
+    ignored = {"host", "port", "model"}
+
+    def normalize(value):
+        if isinstance(value, dict):
+            return {key: normalize(value[key]) for key in sorted(value)}
+        if isinstance(value, list):
+            return [normalize(item) for item in value]
+        if isinstance(value, str):
+            stripped = value.strip()
+            if re.fullmatch(r"-?\d+(?:\.\d+)?", stripped):
+                return float(stripped)
+            if stripped.lower() in {"true", "false"}:
+                return stripped.lower() == "true"
+        return value
+
+    def parameters(entry):
+        same_spec = entry.get("same_spec") or {}
+        resolved = {}
+        for scope, source_key in (
+            ("server", "resolved_server_parameters"),
+            ("client", "resolved_client_parameters"),
+        ):
+            resolved[scope] = {
+                key: normalize(value)
+                for key, value in (same_spec.get(source_key) or {}).items()
+                if key not in ignored
+            }
+        workload = entry.get("workload") or {}
+        if resolved["client"].get("input_len") == normalize(
+            workload.get("input_length")
+        ):
+            resolved["client"].pop("input_len")
+        if resolved["client"].get("output_len") == normalize(
+            workload.get("output_length")
+        ):
+            resolved["client"].pop("output_len")
+        return resolved
+
+    def workload_parameters(entry):
+        workload = entry.get("workload") or {}
+        values = {
+            "name": str(workload.get("name") or ""),
+            "input_length": normalize(workload.get("input_length")),
+            "output_length": normalize(workload.get("output_length")),
+            "batch_size": normalize(workload.get("batch_size")),
+            "concurrent_requests": normalize(workload.get("concurrent_requests")),
+            "dataset": str(workload.get("dataset") or ""),
+        }
+        return {
+            key: value
+            for key, value in values.items()
+            if value is not None and value != ""
+        }
+
+    by_spec = {}
+    for entry in entries:
+        if (entry.get("quality") or {}).get("exclude_from_trends"):
+            continue
+        spec_id = str((entry.get("same_spec") or {}).get("spec_id") or "")
+        if spec_id:
+            by_spec.setdefault(spec_id, []).append(entry)
+
+    effective_signature_counts = {}
+    for spec_id, group in by_spec.items():
+        baselines = [entry for entry in group if entry.get("engine") != "vllm-hust"]
+        defaults = {
+            "workload": {},
+            "server": {},
+            "client": (
+                {"no_stream": False}
+                if str(
+                    (group[0].get("same_spec") or {}).get("scenario") or ""
+                ).endswith("-online")
+                else {}
+            ),
+        }
+        for scope in ("workload", "server", "client"):
+            baseline_values = [
+                workload_parameters(entry)
+                if scope == "workload"
+                else parameters(entry)[scope]
+                for entry in baselines
+            ]
+            keys = set().union(*baseline_values)
+            for key in keys:
+                recorded = [values[key] for values in baseline_values if key in values]
+                if (
+                    len(recorded) == len(baselines)
+                    and len({json.dumps(value, sort_keys=True) for value in recorded})
+                    == 1
+                ):
+                    defaults[scope][key] = recorded[0]
+
+        signatures = set()
+        for entry in group:
+            explicit = parameters(entry)
+            explicit["workload"] = workload_parameters(entry)
+            effective = {
+                scope: {**defaults[scope], **explicit[scope]}
+                for scope in ("workload", "server", "client")
+            }
+            signatures.add(json.dumps(effective, sort_keys=True))
+        scenario = str((group[0].get("same_spec") or {}).get("scenario") or "")
+        effective_signature_counts[scenario] = len(signatures)
+
+    assert effective_signature_counts["visionarena-online"] == 1
+    assert effective_signature_counts["instructcoder-online"] == 2
+    assert effective_signature_counts["prefix-repetition-online"] == 2
+    assert effective_signature_counts["random-online"] == 2
+    assert effective_signature_counts["random-latency"] == 3
+    for scenario in (
+        "sharegpt-online",
+        "sharegpt-throughput",
+        "sonnet-throughput",
+    ):
+        assert effective_signature_counts[scenario] == 1
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
@@ -389,7 +592,11 @@ def test_language_toggle_is_separate_from_primary_navigation() -> None:
     assert "position: fixed;" in css_text
     assert "top: 88px;" in css_text
     assert "right: max(" in css_text
-    assert "中 / EN" in (root / "assets" / "site.js").read_text(encoding="utf-8")
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+    assert "langToggle: '中文'" in site_js
+    assert "langToggle: 'EN'" in site_js
+    assert "langToggleLabel: '切换为中文'" in site_js
+    assert "langToggleLabel: 'Switch to English'" in site_js
 
 
 def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() -> None:
@@ -409,8 +616,8 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=contributors-leadership-20260722" in text
-        assert "assets/site.js?v=mobile-canvas-20260718" in text
+        assert "assets/site.css?v=identity-mapping-20260725" in text
+        assert "assets/site.js?v=bilingual-toggle-20260723" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -418,7 +625,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=ecosystem-20260723" in html_text
+    assert "assets/home.css?v=mobile-navigation-20260723" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
@@ -441,12 +648,14 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/subpages.css?v=ecosystem-20260723" in text
+        assert "assets/subpages.css?v=upstream-pr-contrast-20260724" in text
         assert '<span class="brand-mark">V</span>' in text
         assert "vLLM-HUST<small" in text
 
     assert 'body:not([data-page="home"])' in css_text
     assert 'body[data-page="leaderboard"]' in css_text
+    assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in css_text
+    assert "overflow-wrap: anywhere;" in css_text
     assert "letter-spacing: -" not in css_text
     assert "font-size: clamp(" not in css_text
 
@@ -457,6 +666,24 @@ def test_cosmic_background_uses_scrollbar_safe_viewport_width() -> None:
 
     assert "width = document.documentElement.clientWidth || window.innerWidth;" in text
     assert "width = window.innerWidth;" not in text
+
+
+def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
+
+    assert 'id="table-head-model"' in html_text
+    assert '<td colspan="9" class="details-cell">' in js_text
+    assert "entry.model?.short_name || entry.model?.name || t('unknown')" in js_text
+    assert "modelHeader.textContent = t('modelColumn');" in js_text
+    assert "./data/last_updated.json?v=" in js_text
+    assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
+    assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
+    assert "assets/leaderboard.js?v=trend-effective-defaults-20260724" in html_text
+    assert "td:first-child:not(.version-table-cell)" in css_text
+    assert "td.version-table-cell" in css_text
 
 
 def test_validation_dependencies_have_single_source_of_truth() -> None:
@@ -548,14 +775,14 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "qwen2-npu-evidence-20260722" in html_text
+    assert "upstream-pr-contrast-20260724" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
-    css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
 
     assert 'id="achievement-timeline"' in html_text
     assert 'class="achievement-timeline"' in html_text
@@ -564,11 +791,18 @@ def test_achievements_page_uses_reverse_chronological_timeline() -> None:
     assert "const ACHIEVEMENTS = [" in js_text
     assert "sortDate: '2026-07-02'" in js_text
     assert (
-        "].sort((left, right) => right.sortDate.localeCompare(left.sortDate));"
+        ".sort((left, right) => right.sortDate.localeCompare(left.sortDate));"
         in js_text
     )
+    assert 'id="achievement-release-line"' in html_text
+    assert 'data-achievement-filter="publication"' in html_text
+    assert "function renderReleaseLine" in js_text
+    assert "activeAchievementFilter" in js_text
+    assert "timelineFilterLabel: '筛选成果时间轴'" in js_text
+    assert "releaseLineLabel: '成果发布线'" in js_text
     assert "achievement-item" in css_text
-    assert "achievement-time" in css_text
+    assert "achievement-release-node" in css_text
+    assert "achievement-status" in css_text
 
 
 def test_achievements_timeline_only_records_merged_upstream_prs() -> None:
@@ -606,8 +840,8 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=contributors-leadership-20260722" in html_text
-    assert "assets/achievements-page.js?v=qwen2-npu-evidence-20260722" in html_text
+    assert "assets/site.css?v=identity-mapping-20260725" in html_text
+    assert "assets/achievements-page.js?v=diffspec-sc2026-20260725" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -670,8 +904,9 @@ def test_achievements_page_records_qwen_accepted_pr() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "Jingyuan Tian PR accepted by the Qwen community" in js_text
-    assert "恭喜 Jingyuan 同学的 PR 被 Qwen 社区正式接收" in js_text
+    assert "Plan-gate fix merged into Qwen Code" in js_text
+    assert "Plan-gate 修复合入 Qwen Code" in js_text
+    assert "status: { en: 'Merged', zh: '已合入' }" in js_text
     assert "https://github.com/QwenLM/qwen-code/pull/5185" in js_text
 
 
@@ -683,13 +918,21 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     pdf_path = root / "assets" / "papers" / "bidkv-sc2026.pdf"
 
     assert 'id="result-repository-list"' in html_text
-    assert "成果仓库" in html_text
+    assert "正式发表" in html_text
+    assert "成果仓库" in js_text
     assert "const RESULT_REPOSITORIES = [" in js_text
-    assert "BidKV at SC 2026" in js_text
+    assert (
+        "BidKV: Utility-Guided Preemption Scheduling for KV-Pressure LLM Serving"
+        in js_text
+    )
+    assert (
+        "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
+    )
     assert "./assets/papers/bidkv-sc2026.pdf" in js_text
-    assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
+    assert "github.com/vLLM-HUST/vllm-hust-bidkv" in js_text
+    assert "github.com/vLLM-HUST/vllm-ascend-hust-bidkv" not in js_text
     assert "github.com/intellistream/bidkv" not in js_text
-    assert "repositoryName: 'vllm-ascend-hust-bidkv'" in js_text
+    assert "repositoryName: 'vllm-hust-bidkv'" in js_text
     assert "names: { en: 'Yanbo Chen · Mingqi Wang', zh: '陈彦博 · 王明琪' }" in js_text
     assert "names: { en: 'Shuhao Zhang', zh: '张书豪' }" in js_text
     assert "result-repository-card" in css_text
@@ -703,17 +946,23 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
-    assert "DiffSpec at SC 2026" in js_text
-    assert "DiffSpec 入选 SC 2026" in js_text
-    assert "label: { en: 'Repository', zh: '仓库' }" in js_text
+    assert (
+        "DiffSpec: Differential Speculative Decoding for Ultra-Long-Sequence Inference"
+        in js_text
+    )
+    assert "DiffSpec：面向超长序列推理的差分投机解码加速系统" in js_text
+    assert "项目团队：主要作者杜忠承；指导老师黄禹。" in js_text
     assert "name: 'DiffSpec'" in js_text
     assert "repositoryName: 'vllm-hust'" in js_text
     assert "面向超长序列推理的差分投机解码加速系统。" in js_text
-    assert "publication: { en: 'SC 2026', zh: 'SC 2026' }" in js_text
+    assert (
+        "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
+    )
     assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
     assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
     assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" in js_text
-    assert "assets/achievements-page.js?v=qwen2-npu-evidence-20260722" in html_text
+    assert "github.com/vLLM-HUST/vllm-ascend-hust-diffspec" not in js_text
+    assert "assets/achievements-page.js?v=diffspec-sc2026-20260725" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -729,7 +978,8 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     snapshot_index = html_text.index('id="achievements-stats-kicker"')
     assert hero_index < repositories_index < snapshot_index
 
-    assert "https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv" in js_text
+    assert "https://github.com/vLLM-HUST/vllm-hust-bidkv" in js_text
+    assert "https://vllm.ai/blog/2026-05-18-pegaflow" not in js_text
     assert "https://github.com/vLLM-HUST/pegaflow-hust" not in js_text
     assert "https://github.com/vLLM-HUST/vllm-ascend-quant-hust" not in js_text
     assert js_text.count("repositoryName:") == 2
@@ -738,6 +988,75 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     assert "result-repository-index" not in css_text
     assert "result-repository-tags" not in css_text
     assert "research-cache-salt-bucketing" not in js_text
+
+
+def test_research_output_excludes_unpublished_artifacts() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    assert js_text.count("status: { en: 'Accepted · SC 2026'") == 2
+    assert "adaptive-selector-plugin" not in js_text
+    assert "fcs-domestic-chip-llm-recsys" not in js_text
+    assert "cccf-domestic-inference-engine-survey" not in js_text
+    assert "Pre-submission" not in js_text
+    assert "Targeting FCS" not in js_text
+    assert "Writing in public" not in js_text
+    assert "Published on vLLM Blog" not in js_text
+
+
+def test_achievements_page_excludes_external_origin_work() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "achievements.html").read_text(encoding="utf-8")
+    js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
+
+    for external_claim in (
+        "PegaFlow",
+        "Novita AI",
+        "Organization mirror",
+        "组织镜像",
+        "Technical publication",
+        "技术发表",
+    ):
+        assert external_claim not in js_text
+
+    assert (
+        "projects that we mirror, integrate, validate, or adapt are not achievements."
+        in js_text
+    )
+    assert (
+        "Accepted papers by our team, owned project releases, and upstream "
+        "contributions merged from our contributors."
+    ) in html_text
+    assert (
+        "仅展示本团队已接收论文、自主项目正式发布，以及团队成员已合入的上游贡献。"
+        in html_text
+    )
+    assert "Project releases" in html_text
+    assert "technical: 'Project releases'" in js_text
+
+
+def test_upstream_pr_light_panel_has_explicit_contrast_overrides() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+
+    required_selectors = (
+        ".upstream-pr-details-head > strong",
+        ".upstream-pr-details-head a",
+        ".upstream-pr-number",
+        ".upstream-pr-title",
+        ".upstream-pr-link",
+        '.upstream-pr-row > strong[data-status="draft"]',
+        '.upstream-pr-row > strong[data-status="review-requested"]',
+        '.upstream-pr-row > strong[data-status="ready-evidence"]',
+        '.upstream-pr-row > strong[data-status="ci-retry"]',
+    )
+    for selector in required_selectors:
+        assert selector in css_text
+
+    assert "color: var(--sub-ink);" in css_text
+    assert "color: #105d61;" in css_text
+    assert "background: #d9f0f4;" in css_text
+    assert "background: #fee3e7;" in css_text
 
 
 def test_achievements_page_omits_package_version_cards() -> None:
@@ -823,12 +1142,14 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
     assert "leaderboard-cache-v7-20260702" in html_text
-    assert "leaderboard-public-20260706-broken-axis2" in html_text
-    assert "leaderboard-public-20260723-series-control" in html_text
+    assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
     assert 'id="trend-series-list"' in html_text
-    assert "function buildTrendChartModel(entries, metricConfig)" in js_text
+    assert (
+        "function buildTrendChartModel(entries, metricConfig, defaultEntries = entries)"
+        in js_text
+    )
     assert "function getTrendVersionSortInfo(entry)" in js_text
     assert (
         "commitCount: commitCountMatch ? parseInt(commitCountMatch[1], 10) : null"
@@ -865,7 +1186,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "replace(/-\\d+chip$/, '')" in js_text
     assert "current-main" not in js_text
     assert "return isServingTrendWorkload(entry);" in js_text
-    assert "function renderPerformanceTrendChart(entries)" in js_text
+    assert (
+        "function renderPerformanceTrendChart(entries, defaultEntries = entries)"
+        in js_text
+    )
     assert "new Chart(canvas" in js_text
     assert "legend: {" in js_text
     assert "display: false" in js_text
@@ -921,10 +1245,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
     assert "if (selectedWorkload !== 'all')" in js_text
     assert "return true;" in js_text
-    assert (
-        "renderPerformanceTrendChart(getPerformanceTrendEntries(visibleEntries, filters.workload));"
-        in js_text
-    )
+    assert "getPerformanceTrendEntries(data, 'all')" in js_text
     assert ".leaderboard-trend-panel {" in css_text
     assert ".trend-chart-wrap {" in css_text
     assert ".trend-axis-row {" in css_text
@@ -1225,23 +1546,32 @@ def test_local_validation_script_and_hook_templates_track_ci() -> None:
     assert "./scripts/validate-local.sh" in readme_text
 
 
-def test_contributor_loader_prefers_org_profile_json_with_local_fallback() -> None:
+def test_contributor_loader_uses_newest_canonical_or_local_snapshot() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
 
     assert "const SOURCES = [" in text
     assert (
-        "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-org-profile/main/profile/core_contributors.json"
+        "https://raw.githubusercontent.com/vLLM-HUST/.github/main/profile/core_contributors.json"
         in text
     )
     assert "'./data/core_contributors.json'" in text
     assert "async function fetchPayload()" in text
+    assert "Promise.allSettled" in text
+    assert "AbortController" in text
+    assert "right.updatedAt.localeCompare(left.updatedAt)" in text
+    assert "Number(right.hasMemberProfiles) - Number(left.hasMemberProfiles)" in text
+    assert "right.index - left.index" in text
+    assert "return candidates[0].payload;" in text
     assert (
         "item.display_name || item.chinese_name || item.name || item.github_login || ''"
         in text
     )
-    assert "item.github_login && item.github_login !== displayName" in text
-    assert "console.warn('[contributors] source failed', source, err);" in text
+    assert "item.identity_confirmed === false" in text
+    assert (
+        "console.warn('[contributors] source failed', SOURCES[index], result.reason);"
+        in text
+    )
 
 
 def test_contributor_snapshot_has_unique_human_identities() -> None:
@@ -1249,18 +1579,29 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     snapshot_path = root / "data" / "core_contributors.json"
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
-    assert payload["updated_at"] == "2026-07-22"
-    assert len(payload["all_repos"]["contributors"]) == 33
-    assert len(payload["core_repos"]["contributors"]) == 18
-    assert "vllm-ascend-hust-bidkv" in payload["all_repos"]["scope_repos"]
-    assert len(payload["all_repos"]["scope_repos"]) == 17
+    assert payload["updated_at"] == "2026-07-25"
+    assert len(payload["all_repos"]["contributors"]) == 32
+    assert len(payload["core_repos"]["contributors"]) == 21
+    profiles = payload["member_profiles"]
+    assert len(profiles["core_members"]) == 18
+    assert len(profiles["participants"]) == 28
+    assert len(profiles["staff_members"]) == 5
+    assert len(profiles["external_contributors"]) == 1
+    assert len(profiles["unresolved_contributors"]) == 1
+    assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
+    assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
+    assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
+    assert "vllm-hust-bidkv" in payload["core_repos"]["scope_repos"]
+    assert len(payload["all_repos"]["scope_repos"]) >= 17
 
-    mingqi = next(
-        item
-        for item in payload["all_repos"]["contributors"]
-        if item.get("github_login") == "MingqiWang-coder"
-    )
-    assert "vllm-ascend-hust-bidkv" in mingqi["repos"]
+    core_logins = {
+        item.get("github_login") for item in payload["core_repos"]["contributors"]
+    }
+    core_names = {
+        item.get("display_name") for item in payload["core_repos"]["contributors"]
+    }
+    assert "cybber695" in core_logins
+    assert "杜忠承" in core_names
 
     for scope in ("all_repos", "core_repos"):
         contributors = payload[scope]["contributors"]
@@ -1279,14 +1620,187 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
             assert automation_marker not in identities
 
     all_names = {item["display_name"] for item in payload["all_repos"]["contributors"]}
+    all_git_names = {
+        item.get("name", "").casefold() for item in payload["all_repos"]["contributors"]
+    }
+    assert {"tony", "qixinzhang2601"}.isdisjoint(all_git_names)
     assert {"田景远", "程月甲", "张俊辉"} <= all_names
     assert (
         not {"Jingyuan", "Fletcher Tian", "Paul", "Paul Cheng", "Junhui Zhang"}
         & all_names
     )
 
+    core_repo_names = set(profiles["core_repo_names"])
+    core_ids = {item["person_id"] for item in profiles["core_members"]}
+    participant_ids = {item["person_id"] for item in profiles["participants"]}
+    staff_ids = {item["person_id"] for item in profiles["staff_members"]}
+    external_ids = {item["person_id"] for item in profiles["external_contributors"]}
+    assert core_ids.isdisjoint(participant_ids)
+    assert core_ids.isdisjoint(staff_ids)
+    assert core_ids.isdisjoint(external_ids)
+    assert participant_ids.isdisjoint(staff_ids)
+    assert participant_ids.isdisjoint(external_ids)
+    assert staff_ids.isdisjoint(external_ids)
+    assert len(core_ids) == len(profiles["core_members"])
+    assert len(participant_ids) == len(profiles["participants"])
+    assert len(staff_ids) == len(profiles["staff_members"])
+    assert len(external_ids) == len(profiles["external_contributors"])
+    assert all(
+        set(item["repos"]) & core_repo_names for item in profiles["core_members"]
+    )
+    assert all(
+        not (set(item["repos"]) & core_repo_names) for item in profiles["participants"]
+    )
+    assert {item["display_name"] for item in profiles["staff_members"]} == {
+        "luoxiaohei",
+        "张俊辉",
+        "王胜",
+        "程月甲",
+        "龙斌",
+    }
+    assert {
+        item["display_name"]
+        for item in profiles["staff_members"]
+        if item["core_repository_contributor"]
+    } == {"王胜", "程月甲", "张俊辉"}
+
+    people = {
+        item["display_name"]: item
+        for item in (
+            profiles["core_members"]
+            + profiles["participants"]
+            + profiles["staff_members"]
+            + profiles["external_contributors"]
+        )
+    }
+    assert people["张睿诚"]["github_login"] == "KimmoZAG"
+    expected_github_ids = {
+        "张书豪": "ShuhaoZhangTony",
+        "李昶吾": "Li-changwu",
+        "李旭恒": "sssarrior",
+        "高鸿儒": "hongrugao",
+        "彭浩然": "Tkhkrnx",
+        "王明琪": "MingqiWang-coder",
+        "杨锦昀": "Yang-YJY",
+        "王子澳": "ZeroJustMe",
+        "张森磊": "zslchase",
+        "陈德斌": "pluviophile-chen",
+        "毛言粲": "yancanmao",
+        "万瑞鹏": "wrp-wrp",
+        "周雨桐": "FirmamentumX",
+        "董君瑶": "carsontung666",
+        "雷欣妍": "leixy2004",
+        "路庆浩": "Luqhhh",
+    }
+    for name, github_id in expected_github_ids.items():
+        assert people[name]["github_login"] == github_id
+    assert people["田景远"]["github_login"] == "CubeLander"
+    assert people["田景远"]["role"]["zh"] == "实习生"
+    assert people["田景远"]["advisor"]["zh"] == "张书豪"
+    assert people["匡明轩"]["github_login"] == "sad-and-bad1231"
+    assert people["匡明轩"]["advisor"]["zh"] == "张书豪"
+    assert people["马俊豪"]["github_login"] == "kms12425"
+    assert people["邱瑞杰"]["github_login"] == "Jerry01020"
+    assert people["赵建军"]["github_login"] == "curryzjj"
+    assert people["高西岭"]["github_login"] == "XilingGao"
+    assert people["王胜"]["role"]["zh"] == "工程师"
+    assert people["王胜"]["staff_member"] is True
+    assert people["张俊辉"]["github_login"] == "junhuizhang-boop"
+    assert people["张俊辉"]["role"]["zh"] == "工程师（派欧云）"
+    assert people["张俊辉"]["staff_member"] is True
+    assert people["luoxiaohei"]["role"]["zh"] == "工程师（派欧云）"
+    assert people["luoxiaohei"]["staff_member"] is True
+    assert people["程月甲"]["role"]["zh"] == "工程师"
+    assert people["程月甲"]["staff_member"] is True
+    assert people["龙斌"]["role"]["zh"] == "项目/科研助理"
+    assert people["龙斌"]["staff_member"] is True
+    assert people["龙斌"]["github_status"]["zh"] == "无 GitHub ID"
+    assert people["宋功轩"]["github_status"]["zh"] == "GitHub ID 待确认"
+    assert people["彭成"]["github_status"]["zh"] == "GitHub ID 待确认"
+    assert people["赵建军"]["role"]["zh"] == "已毕业博士生，目前已入职高校"
+    assert people["高西岭"]["research_direction"]["zh"] == "KV量化"
+    assert "多级" not in people["高西岭"]["research_direction"]["zh"]
+    assert people["刘世锋"]["github_login"] == "Remygred"
+    assert people["刘世锋"]["role"]["zh"] == "华科大三实习生"
+    assert people["刘世锋"]["advisor"]["zh"] == "张书豪"
+    assert people["曹哲"]["github_login"] == "xmdhb"
+    assert people["曹哲"]["role"]["zh"] == "即将入学的研究生"
+    assert people["曹哲"]["advisor"]["zh"] == "张书豪"
+    assert people["李庚"]["github_login"] == "Anjiangy"
+    assert people["李庚"]["role"]["zh"] == "马上入学的华科研究生"
+    assert people["李庚"]["advisor"]["zh"] == "张书豪"
+    assert people["马俊豪"]["advisor"]["zh"] == "张书豪"
+    assert people["sunYangGitHub"]["github_login"] == "sunYangGitHub"
+    assert people["sunYangGitHub"]["role"]["zh"] == "外校实习生"
+    assert people["sunYangGitHub"]["advisor"]["zh"] == "张书豪"
+    assert people["杜忠承"]["github_login"] == "dzcixy"
+    assert people["杜忠承"]["advisor"]["zh"] == "黄禹"
+    assert people["徐晨曦"]["github_login"] == "xsun2001"
+    assert people["徐晨曦"]["external_contributor"] is True
+    assert people["徐晨曦"]["role"]["zh"] == "外部贡献者（港科大（广州））"
+    expected_advisors = {
+        "马川湖": "王雄",
+        "吴天宇": "郑龙",
+        "李昶吾": "张书豪",
+        "王润泽": "王庆刚",
+        "谷昌伟": "罗瑞坤",
+        "杨杰": "赵进",
+        "陈彦博": "张书豪",
+        "郑凌峰": "刘海坤",
+        "王鸿坤": "项翔",
+        "崔钰嘉": "姚鹏程",
+        "赵文举": "姚鹏程",
+        "刘思辰": "万瑶",
+    }
+    for name, advisor in expected_advisors.items():
+        assert people[name]["advisor"]["zh"] == advisor
+    unresolved_ids = {item["person_id"] for item in profiles["unresolved_contributors"]}
+    assert "github:remygred" not in unresolved_ids
+    assert "github:dzcixy" not in unresolved_ids
+    assert "github:sunyanggithub" not in unresolved_ids
+    assert "github:luoxiaohei" not in unresolved_ids
+    assert unresolved_ids == {"github:kotoriqaq0"}
+
+    kuang_rows = [
+        item
+        for item in payload["all_repos"]["contributors"]
+        if item["person_id"] == "github:sad-and-bad1231"
+    ]
+    assert len(kuang_rows) == 1
+    assert kuang_rows[0]["commits"] == 17
+
     canonical_snapshot = (
         root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"
     )
     if canonical_snapshot.exists():
         assert snapshot_path.read_bytes() == canonical_snapshot.read_bytes()
+
+
+def test_core_contributor_stats_precede_all_repository_stats() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "contributors.html").read_text(encoding="utf-8")
+
+    core_index = html_text.index('id="contributors-core-tbody"')
+    all_index = html_text.index('id="contributors-all-tbody"')
+
+    assert core_index < all_index
+    assert "核心仓库与独立优化成果" in html_text
+    assert "BidKV、DiffSpec" in html_text
+
+
+def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+    html_text = (root / "contributors.html").read_text(encoding="utf-8")
+
+    assert ".research-member-identity a:visited" in css_text
+    assert ".research-member-identity strong" in css_text
+    assert "color: #0c1112;" in css_text
+    assert ".research-member-identity small" in css_text
+    assert "color: #475569;" in css_text
+    assert ".research-member-detail-row b" in css_text
+    assert "color: #176f72;" in css_text
+    assert "contributors-contrast-20260725" in html_text
+    assert "github-status" in html_text
+    page_js = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
+    assert "localized(item, 'github_status', lang)" in page_js

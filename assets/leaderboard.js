@@ -245,6 +245,14 @@
             trendSeriesShowAll: 'Show all',
             trendSeriesHideAll: 'Hide all',
             trendSeriesEmpty: 'No matching series.',
+            trendSeriesComparable: 'baseline + current results · {count} points',
+            trendSeriesBaselineOnly: 'baseline result · 1 point',
+            trendSeriesCurrentHistory: 'current results · {count} versions',
+            trendSeriesSinglePoint: 'current result · 1 point',
+            trendSeriesConfig: 'config {token}',
+            trendSeriesConfigDifference: 'Config differences',
+            trendSeriesConfigDetails: 'Configuration',
+            trendSeriesConfigDefault: 'default (same as baseline)',
             trendTooltipActualValue: 'Actual',
             trendTooltipBrokenAxis: 'shown on broken axis',
             trendEmpty: 'No trend data under current filters.',
@@ -263,6 +271,7 @@
             paginationNext: 'Next',
             paginationPage: 'Page',
             paginationRows: 'rows',
+            modelColumn: 'Model',
         },
         zh: {
             statsHidden: '已隐藏',
@@ -461,6 +470,14 @@
             trendSeriesShowAll: '全部显示',
             trendSeriesHideAll: '全部隐藏',
             trendSeriesEmpty: '没有匹配的系列。',
+            trendSeriesComparable: '基线 + 当前结果 · {count} 个点',
+            trendSeriesBaselineOnly: '基线结果 · 1 个点',
+            trendSeriesCurrentHistory: '当前结果 · {count} 个版本点',
+            trendSeriesSinglePoint: '当前结果 · 1 个点',
+            trendSeriesConfig: '配置 {token}',
+            trendSeriesConfigDifference: '配置差异',
+            trendSeriesConfigDetails: '相关配置',
+            trendSeriesConfigDefault: '默认值（与基线一致）',
             trendTooltipActualValue: '实际值',
             trendTooltipBrokenAxis: '断轴显示',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
@@ -479,6 +496,7 @@
             paginationNext: '下一页',
             paginationPage: '第',
             paginationRows: '条',
+            modelColumn: '模型',
         },
     };
 
@@ -515,6 +533,7 @@
         trendAxisScale: 'auto',
         trendChart: null,
         trendSeries: [],
+        semanticSpecDefaults: new Map(),
         hiddenTrendSeries: new Set(),
         trendSeriesExpanded: false,
         tableDetailsExpanded: false,
@@ -652,6 +671,11 @@
             state.singleChipData.length +
             state.multiChipData.length +
             state.multiNodeData.length;
+        state.semanticSpecDefaults = buildTrendSpecDefaults([
+            ...state.singleChipData,
+            ...state.multiChipData,
+            ...state.multiNodeData,
+        ]);
 
         [state.singleChipData, state.multiChipData, state.multiNodeData].forEach(entries => {
             entries.sort(compareEntriesByVersionDesc);
@@ -1701,7 +1725,304 @@
         return String(getSameSpecPayload(entry)?.spec_id || '').trim();
     }
 
-    function getSettingSignature(entry) {
+    const TREND_SEMANTIC_SPEC_VERSION = 'same-spec-semantic/v2';
+    const NON_SEMANTIC_SPEC_PARAMETER_KEYS = new Set(['host', 'port', 'model']);
+    const KNOWN_SEMANTIC_PARAMETER_DEFAULTS = {
+        server: {},
+        client: {
+            no_stream: false,
+        },
+    };
+
+    function normalizeSemanticSpecValue(value) {
+        if (Array.isArray(value)) {
+            return value.map((item) => normalizeSemanticSpecValue(item));
+        }
+        if (value && typeof value === 'object') {
+            return Object.fromEntries(
+                Object.entries(value)
+                    .sort(([left], [right]) => left.localeCompare(right))
+                    .map(([key, item]) => [key, normalizeSemanticSpecValue(item)])
+            );
+        }
+        if (typeof value !== 'string') {
+            return value;
+        }
+        const normalized = value.trim();
+        if (/^-?\d+(?:\.\d+)?$/.test(normalized)) {
+            return Number(normalized);
+        }
+        if (/^(?:true|false)$/i.test(normalized)) {
+            return normalized.toLowerCase() === 'true';
+        }
+        return value;
+    }
+
+    function normalizeSemanticSpecParameters(parameters) {
+        if (!parameters || typeof parameters !== 'object' || Array.isArray(parameters)) {
+            return null;
+        }
+        return Object.fromEntries(
+            Object.entries(parameters)
+                .filter(([key]) => !NON_SEMANTIC_SPEC_PARAMETER_KEYS.has(key))
+                .sort(([left], [right]) => left.localeCompare(right))
+                .map(([key, value]) => [key, normalizeSemanticSpecValue(value)])
+        );
+    }
+
+    function stableStringify(value) {
+        if (Array.isArray(value)) {
+            return `[${value.map((item) => stableStringify(item)).join(',')}]`;
+        }
+        if (value && typeof value === 'object') {
+            return `{${Object.keys(value).sort().map((key) => (
+                `${JSON.stringify(key)}:${stableStringify(value[key])}`
+            )).join(',')}}`;
+        }
+        return JSON.stringify(value);
+    }
+
+    function getTrendWorkloadSemanticConfig(entry) {
+        const workload = entry?.workload || {};
+        return Object.fromEntries(Object.entries({
+            name: String(getWorkloadId(entry) || ''),
+            input_length: normalizeSemanticSpecValue(workload.input_length ?? null),
+            output_length: normalizeSemanticSpecValue(workload.output_length ?? null),
+            batch_size: normalizeSemanticSpecValue(workload.batch_size ?? null),
+            concurrent_requests: normalizeSemanticSpecValue(workload.concurrent_requests ?? null),
+            dataset: String(workload.dataset || ''),
+        }).filter(([, value]) => value !== null && value !== ''));
+    }
+
+    function getEntrySemanticSpecParameters(entry) {
+        const sameSpec = getSameSpecPayload(entry);
+        const server = normalizeSemanticSpecParameters(sameSpec?.resolved_server_parameters);
+        const client = normalizeSemanticSpecParameters(sameSpec?.resolved_client_parameters);
+        if (!server || !client) {
+            return null;
+        }
+
+        const workload = getTrendWorkloadSemanticConfig(entry);
+        if (stableStringify(client.input_len) === stableStringify(workload.input_length)) {
+            delete client.input_len;
+        }
+        if (stableStringify(client.output_len) === stableStringify(workload.output_length)) {
+            delete client.output_len;
+        }
+        return { server, client };
+    }
+
+    function buildTrendSpecDefaults(entries) {
+        const baselineGroups = new Map();
+        entries.filter((entry) => isTrendBaselineEntry(entry)).forEach((entry) => {
+            const specId = getSameSpecId(entry);
+            const parameters = getEntrySemanticSpecParameters(entry);
+            if (!specId || !parameters) {
+                return;
+            }
+            if (!baselineGroups.has(specId)) {
+                baselineGroups.set(specId, []);
+            }
+            baselineGroups.get(specId).push({
+                parameters,
+                workload: getTrendWorkloadSemanticConfig(entry),
+            });
+        });
+
+        const defaults = new Map();
+        baselineGroups.forEach((baselineEntries, specId) => {
+            const resolved = {
+                workload: {},
+                server: { ...KNOWN_SEMANTIC_PARAMETER_DEFAULTS.server },
+                client: {},
+            };
+            if (baselineEntries.some((item) => (
+                String(item.workload?.name || '').endsWith('-online')
+            ))) {
+                Object.assign(resolved.client, KNOWN_SEMANTIC_PARAMETER_DEFAULTS.client);
+            }
+            const semanticSets = baselineEntries.map((item) => ({
+                workload: item.workload,
+                ...item.parameters,
+            }));
+            ['workload', 'server', 'client'].forEach((scope) => {
+                const keys = new Set(semanticSets.flatMap((item) => Object.keys(item[scope])));
+                keys.forEach((key) => {
+                    const recorded = semanticSets
+                        .filter((item) => Object.prototype.hasOwnProperty.call(item[scope], key))
+                        .map((item) => item[scope][key]);
+                    const values = new Map(
+                        recorded.map((value) => [stableStringify(value), value])
+                    );
+                    if (recorded.length === semanticSets.length && values.size === 1) {
+                        resolved[scope][key] = recorded[0];
+                    }
+                });
+            });
+            defaults.set(specId, resolved);
+        });
+        return defaults;
+    }
+
+    function getEffectiveSemanticSpecParameters(
+        entry,
+        specDefaults = state.semanticSpecDefaults
+    ) {
+        const parameters = getEntrySemanticSpecParameters(entry);
+        if (!parameters) {
+            return null;
+        }
+        const defaults = specDefaults?.get(getSameSpecId(entry)) || {};
+        return {
+            server: { ...(defaults.server || {}), ...parameters.server },
+            client: { ...(defaults.client || {}), ...parameters.client },
+        };
+    }
+
+    function getEffectiveTrendWorkloadSemanticConfig(
+        entry,
+        specDefaults = state.semanticSpecDefaults
+    ) {
+        const defaults = specDefaults?.get(getSameSpecId(entry)) || {};
+        return {
+            ...(defaults.workload || {}),
+            ...getTrendWorkloadSemanticConfig(entry),
+        };
+    }
+
+    function getSemanticSpecSignature(entry, specDefaults = state.semanticSpecDefaults) {
+        const sameSpec = getSameSpecPayload(entry);
+        const parameters = getEffectiveSemanticSpecParameters(entry, specDefaults);
+        const server = parameters?.server;
+        const client = parameters?.client;
+        if (!server || !client) {
+            return '';
+        }
+
+        const basis = {
+            schema_version: String(sameSpec?.schema_version || ''),
+            spec_id: String(sameSpec?.spec_id || ''),
+            scenario: String(sameSpec?.scenario || ''),
+            model: String(sameSpec?.model || ''),
+            model_parameters: String(sameSpec?.model_parameters || ''),
+            model_precision: String(sameSpec?.model_precision || ''),
+            model_quantization: String(sameSpec?.model_quantization || ''),
+            hardware_vendor: String(sameSpec?.hardware_vendor || ''),
+            hardware_chip_model: String(sameSpec?.hardware_chip_model || ''),
+            chip_count: Number.parseInt(sameSpec?.chip_count, 10) || 0,
+            node_count: Number.parseInt(sameSpec?.node_count, 10) || 0,
+            workload: getEffectiveTrendWorkloadSemanticConfig(entry, specDefaults),
+            resolved_server_parameters: server,
+            resolved_client_parameters: client,
+        };
+        return `${TREND_SEMANTIC_SPEC_VERSION}:${stableStringify(basis)}`;
+    }
+
+    function getTrendSemanticConfig(entry, specDefaults = state.semanticSpecDefaults) {
+        const sameSpec = getSameSpecPayload(entry);
+        const config = {};
+        const specId = String(sameSpec?.spec_id || '').trim();
+        if (specId) {
+            config.spec_id = specId;
+        }
+
+        Object.entries(
+            getEffectiveTrendWorkloadSemanticConfig(entry, specDefaults)
+        ).forEach(([key, value]) => {
+            config[`workload.${key}`] = value;
+        });
+        const parameters = getEffectiveSemanticSpecParameters(entry, specDefaults);
+        [
+            ['server', parameters?.server],
+            ['client', parameters?.client],
+        ].forEach(([scope, parameters]) => {
+            Object.entries(parameters || {}).forEach(([key, value]) => {
+                config[`${scope}.${key}`] = value;
+            });
+        });
+        return config;
+    }
+
+    const TREND_RELEVANT_CONFIG_KEYS = [
+        'workload.input_length',
+        'workload.output_length',
+        'workload.batch_size',
+        'workload.concurrent_requests',
+        'server.max_model_len',
+        'server.gpu_memory_utilization',
+        'server.max_num_seqs',
+        'server.max_num_batched_tokens',
+        'server.enable_prefix_caching',
+        'server.enable_chunked_prefill',
+        'client.request_rate',
+        'client.num_prompts',
+        'client.no_stream',
+        'client.input_len',
+        'client.output_len',
+    ];
+
+    function getDifferingTrendConfigKeys(seriesGroup) {
+        const priorityIndex = new Map(
+            TREND_RELEVANT_CONFIG_KEYS.map((key, index) => [key, index])
+        );
+        const keys = new Set(
+            seriesGroup.flatMap((series) => Object.keys(series.semanticConfig || {}))
+        );
+        return [...keys]
+            .filter((key) => {
+                const values = new Set(seriesGroup.map((series) => (
+                    Object.prototype.hasOwnProperty.call(series.semanticConfig || {}, key)
+                        ? `value:${stableStringify(series.semanticConfig[key])}`
+                        : 'missing'
+                )));
+                return values.size > 1;
+            })
+            .sort((left, right) => {
+                const leftPriority = priorityIndex.get(left) ?? TREND_RELEVANT_CONFIG_KEYS.length;
+                const rightPriority = priorityIndex.get(right) ?? TREND_RELEVANT_CONFIG_KEYS.length;
+                return leftPriority - rightPriority || left.localeCompare(right);
+            });
+    }
+
+    function getRelevantTrendConfigKeys(series) {
+        return TREND_RELEVANT_CONFIG_KEYS.filter((key) => (
+            Object.prototype.hasOwnProperty.call(series.semanticConfig || {}, key)
+        ));
+    }
+
+    function formatTrendConfigValue(config, key) {
+        if (!Object.prototype.hasOwnProperty.call(config || {}, key)) {
+            return t('trendSeriesConfigDefault');
+        }
+        const value = config[key];
+        if (typeof value === 'string') {
+            return value || '""';
+        }
+        return stableStringify(value);
+    }
+
+    function getTrendConfigDifferenceItems(series, differingKeys) {
+        return differingKeys.map((key) => ({
+            key,
+            value: formatTrendConfigValue(series.semanticConfig, key),
+        }));
+    }
+
+    function getTrendSpecToken(signature) {
+        let hash = 2166136261;
+        for (const character of String(signature || '')) {
+            hash ^= character.codePointAt(0);
+            hash = Math.imul(hash, 16777619);
+        }
+        return (hash >>> 0).toString(16).padStart(8, '0');
+    }
+
+    function getSettingSignature(entry, specDefaults = state.semanticSpecDefaults) {
+        const semanticSignature = getSemanticSpecSignature(entry, specDefaults);
+        if (semanticSignature) {
+            return semanticSignature;
+        }
+
         const sameSpec = getSameSpecPayload(entry);
         const sameSpecHash = String(sameSpec?.resolved_spec_hash || '').trim();
         if (sameSpecHash) {
@@ -2406,7 +2727,7 @@
         return Boolean(entry?.isBaseline) || getEngine(entry) !== 'vllm-hust';
     }
 
-    function getTrendSeriesKey(entry) {
+    function getTrendSeriesKey(entry, specDefaults) {
         const workload = getWorkloadId(entry) || 'Other';
         const model = getEntryModelCanonicalId(entry) || getEntryModelDisplayName(entry) || 'unknown-model';
         const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
@@ -2414,7 +2735,7 @@
         const nodeCount = entry?.cluster?.node_count || 1;
         const precision = entry?.model?.precision || 'unknown-precision';
         const quantization = getEntryQuantization(entry);
-        const settingSignature = getSettingSignature(entry);
+        const settingSignature = getSettingSignature(entry, specDefaults);
         return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');
     }
 
@@ -2424,6 +2745,20 @@
         const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
         const precision = formatPrecisionWithQuantization(entry);
         return `${workload} · ${model} · ${hardware} · ${precision}`;
+    }
+
+    function formatTrendSeriesEvidence(series) {
+        const count = series.pointCount;
+        if (series.hasBaseline && series.hasCurrent) {
+            return t('trendSeriesComparable').replace('{count}', String(count));
+        }
+        if (series.hasBaseline) {
+            return t('trendSeriesBaselineOnly');
+        }
+        if (count === 1) {
+            return t('trendSeriesSinglePoint');
+        }
+        return t('trendSeriesCurrentHistory').replace('{count}', String(count));
     }
 
     function getTrendVersionText(entry) {
@@ -2523,9 +2858,10 @@
         return Number.isFinite(value) ? value : null;
     }
 
-    function buildTrendChartModel(entries, metricConfig) {
+    function buildTrendChartModel(entries, metricConfig, defaultEntries = entries) {
         const versionMap = new Map();
         const seriesMap = new Map();
+        const specDefaults = buildTrendSpecDefaults(defaultEntries);
 
         // First pass: collect candidate versions from all entries. The default
         // all-workload view is naturally sparse because each revision only
@@ -2569,11 +2905,14 @@
             }
 
             const versionKey = getTrendVersionKey(entry);
-            const seriesKey = getTrendSeriesKey(entry);
+            const seriesKey = getTrendSeriesKey(entry, specDefaults);
             if (!seriesMap.has(seriesKey)) {
+                const settingSignature = getSettingSignature(entry, specDefaults);
                 seriesMap.set(seriesKey, {
                     key: seriesKey,
-                    label: getTrendSeriesLabel(entry),
+                    baseLabel: getTrendSeriesLabel(entry),
+                    specToken: getTrendSpecToken(settingSignature),
+                    semanticConfig: getTrendSemanticConfig(entry, specDefaults),
                     workload: getWorkloadLabel(getWorkloadId(entry) || 'Other'),
                     model: getEntryModelDisplayName(entry) || 'Unknown model',
                     hardware: getConfigText(entry).replace('<br><small>', ' ').replace('</small>', ''),
@@ -2619,6 +2958,8 @@
             .map((item) => ({
                 ...item,
                 pointCount: item.points.size,
+                hasBaseline: [...item.points.values()].some(({ entry }) => isTrendBaselineEntry(entry)),
+                hasCurrent: [...item.points.values()].some(({ entry }) => !isTrendBaselineEntry(entry)),
                 latestIndex: Math.max(...[...item.points.keys()].map((key) => versionIndex.get(key) ?? -1)),
             }))
             .filter((item) => item.pointCount > 0)
@@ -2629,8 +2970,42 @@
                 if (right.latestIndex !== left.latestIndex) {
                     return right.latestIndex - left.latestIndex;
                 }
-                return left.label.localeCompare(right.label);
+                return left.baseLabel.localeCompare(right.baseLabel);
             });
+
+        const labelCounts = new Map();
+        const seriesByLabel = new Map();
+        series.forEach((item) => {
+            labelCounts.set(item.baseLabel, (labelCounts.get(item.baseLabel) || 0) + 1);
+            if (!seriesByLabel.has(item.baseLabel)) {
+                seriesByLabel.set(item.baseLabel, []);
+            }
+            seriesByLabel.get(item.baseLabel).push(item);
+        });
+        series.forEach((item) => {
+            item.hasDuplicateLabel = labelCounts.get(item.baseLabel) > 1;
+            item.configurationLabel = item.hasDuplicateLabel
+                ? t('trendSeriesConfig').replace('{token}', item.specToken)
+                : '';
+            item.label = item.hasDuplicateLabel
+                ? `${item.baseLabel} · ${item.configurationLabel}`
+                : item.baseLabel;
+            item.evidenceLabel = formatTrendSeriesEvidence(item);
+            const seriesGroup = seriesByLabel.get(item.baseLabel) || [item];
+            const differingKeys = getDifferingTrendConfigKeys(seriesGroup);
+            const isUnpaired = !(item.hasBaseline && item.hasCurrent);
+            const configKeys = differingKeys.length
+                ? differingKeys
+                : (isUnpaired ? getRelevantTrendConfigKeys(item) : []);
+            item.configIsDifference = differingKeys.length > 0;
+            item.configDifferenceItems = getTrendConfigDifferenceItems(item, configKeys);
+            item.configSectionLabel = item.configIsDifference
+                ? t('trendSeriesConfigDifference')
+                : t('trendSeriesConfigDetails');
+            item.configDifferenceLabel = item.configDifferenceItems
+                .map(({ key, value }) => `${key}=${value}`)
+                .join(' ');
+        });
 
         return { versions, series };
     }
@@ -2887,7 +3262,16 @@
             const label = document.createElement('label');
             label.className = 'trend-series-item';
             label.dataset.seriesKey = item.key;
-            label.dataset.search = [item.label, item.workload, item.model, item.hardware, item.precision]
+            label.dataset.search = [
+                item.label,
+                item.workload,
+                item.model,
+                item.hardware,
+                item.precision,
+                item.evidenceLabel,
+                item.configurationLabel,
+                item.configDifferenceLabel,
+            ]
                 .join(' ')
                 .toLocaleLowerCase();
 
@@ -2907,7 +3291,25 @@
             title.textContent = item.workload;
             const meta = document.createElement('small');
             meta.textContent = `${item.model} · ${item.hardware} · ${item.precision}`;
-            copy.append(title, meta);
+            const evidence = document.createElement('small');
+            evidence.className = 'trend-series-evidence';
+            evidence.textContent = item.evidenceLabel;
+            copy.append(title, meta, evidence);
+            if (item.configDifferenceItems.length) {
+                const config = document.createElement('span');
+                config.className = 'trend-series-config';
+                const configLabel = document.createElement('span');
+                configLabel.className = 'trend-series-config-label';
+                configLabel.textContent = item.configSectionLabel;
+                config.append(configLabel);
+                item.configDifferenceItems.forEach(({ key, value }) => {
+                    const chip = document.createElement('span');
+                    chip.className = 'trend-series-config-chip';
+                    chip.textContent = `${key}=${value}`;
+                    config.append(chip);
+                });
+                copy.append(config);
+            }
             label.append(checkbox, swatch, copy);
             list.append(label);
         });
@@ -2935,7 +3337,7 @@
         }
     }
 
-    function renderPerformanceTrendChart(entries) {
+    function renderPerformanceTrendChart(entries, defaultEntries = entries) {
         const panel = document.getElementById('leaderboard-trend-panel');
         const canvas = document.getElementById('leaderboard-trend-chart');
         const empty = document.getElementById('leaderboard-trend-empty');
@@ -2990,7 +3392,7 @@
             return;
         }
 
-        const model = buildTrendChartModel(entries, metricConfig);
+        const model = buildTrendChartModel(entries, metricConfig, defaultEntries);
         if (model.versions.length < 1 || model.series.length < 1) {
             if (state.trendChart) {
                 state.trendChart.destroy();
@@ -3020,9 +3422,10 @@
                 borderColor: colors.borderColor,
                 backgroundColor: colors.backgroundColor,
                 borderWidth: 2,
-                pointRadius: 3,
+                pointRadius: series.pointCount === 1 ? 5 : 3,
                 pointHoverRadius: 6,
                 tension: 0.28,
+                showLine: series.pointCount > 1,
                 // Keep one series continuous across x-axis slots where other
                 // workload/model scopes have data but this series does not.
                 spanGaps: true,
@@ -3533,8 +3936,12 @@
     function renderTable() {
         const tbody = document.getElementById('leaderboard-tbody');
         const emptyState = document.getElementById('empty-state');
+        const modelHeader = document.getElementById('table-head-model');
 
         if (!tbody) return;
+        if (modelHeader) {
+            modelHeader.textContent = t('modelColumn');
+        }
 
         const data = getDataByTab(state.currentTab);
         const filters = state.filters[state.currentTab];
@@ -3577,7 +3984,10 @@
         renderOverview(sortedFiltered, comparisonView, viewOptions);
         // The table intentionally collapses equivalent package builds. The trend chart must use
         // the unaggregated rows so distinct commits and PR revisions remain visible on the axis.
-        renderPerformanceTrendChart(getPerformanceTrendEntries(filtered, filters.workload));
+        renderPerformanceTrendChart(
+            getPerformanceTrendEntries(visibleEntries, filters.workload),
+            getPerformanceTrendEntries(data, 'all')
+        );
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
 
@@ -4581,7 +4991,24 @@
 
         let timestamp = null;
         if (window.HFDataLoader && window.HFDataLoader.getLastUpdated) {
-            timestamp = await window.HFDataLoader.getLastUpdated();
+            try {
+                timestamp = await window.HFDataLoader.getLastUpdated();
+            } catch (_error) {
+                timestamp = null;
+            }
+        }
+
+        // Fallback: load local last_updated.json directly
+        if (!timestamp) {
+            try {
+                const response = await fetch(`./data/last_updated.json?v=${LOCAL_DATA_CACHE_BUST || '1'}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    timestamp = data?.last_updated || null;
+                }
+            } catch (_e) {
+                // ignore
+            }
         }
 
         if (!timestamp) {
@@ -4642,6 +5069,7 @@
             ? ''
             : renderProvenanceSummary(entry);
         const settingSummary = getSettingSummary(entry);
+        const modelText = entry.model?.short_name || entry.model?.name || t('unknown');
 
         // 生成配置描述（芯片数/节点数）
         const configText = getConfigText(entry);
@@ -4666,6 +5094,7 @@
                 ${versionCellHtml}
                 <td class="config-cell">${workloadText}</td>
                 <td class="config-cell">${configText}</td>
+                <td class="config-cell">${modelText}</td>
                 <td class="metric-column">${renderMetricCell(m.ttft_ms, trends.ttft_ms, false, false, entry.isBaseline)}</td>
                 <td class="metric-column">${renderMetricCell(m.tbt_ms, trends.tbt_ms, false, false, entry.isBaseline)}</td>
                 <td class="metric-column">${renderMetricCell(m.throughput_tps, trends.throughput_tps, true, false, entry.isBaseline)}</td>
@@ -4734,7 +5163,7 @@
     function renderDetailsRow(entry, isExpanded) {
         return `
             <tr class="details-row ${isExpanded ? 'show' : ''}" data-details-for="${entry.entry_id}">
-                <td colspan="8" class="details-cell">
+                <td colspan="9" class="details-cell">
                     <div class="details-content">
                         ${renderHardwareSection(entry)}
                         ${renderBuildVariantsSection(entry)}

@@ -1022,7 +1022,7 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2px 12px;
-    max-height: 300px;
+    max-height: 480px;
     overflow-y: auto;
 }
 
@@ -1074,6 +1074,38 @@
 .trend-series-copy small {
     color: #64706e;
     font-size: 0.72rem;
+}
+
+.trend-series-copy .trend-series-evidence {
+    color: #3f5f59;
+    font-weight: 650;
+}
+
+.trend-series-copy .trend-series-config {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    overflow: visible;
+    color: #52615f;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.trend-series-config-label {
+    align-self: center;
+    margin-right: 2px;
+    font-weight: 700;
+}
+
+.trend-series-config-chip {
+    padding: 1px 5px;
+    border: 1px solid #cbd8d5;
+    border-radius: 4px;
+    background: #f5f8f7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    overflow-wrap: anywhere;
 }
 
 .trend-series-empty {
@@ -1244,6 +1276,8 @@
     left: 0;
     z-index: 5;
     background: inherit;
+    min-width: 220px;
+    max-width: 320px;
 }
 
 .leaderboard-table tbody tr:nth-child(even) td.version-table-cell {
@@ -1265,7 +1299,13 @@
 }
 
 .leaderboard-table td.metric-column {
-    min-width: 122px;
+    min-width: 110px;
+}
+
+.leaderboard-table td.config-cell {
+    min-width: 100px;
+    max-width: 180px;
+    word-break: break-word;
 }
 
 .leaderboard-table td small {
@@ -2239,21 +2279,37 @@ body[data-page="leaderboard"] .hc-badge.fail {
 }
 
 body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd),
-body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd) td:first-child {
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd) td:first-child:not(.version-table-cell) {
     background: rgba(8, 18, 36, 0.78);
 }
 
 body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even),
-body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even) td:first-child {
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even) td:first-child:not(.version-table-cell) {
     background: rgba(13, 28, 52, 0.76);
 }
 
-body[data-page="leaderboard"] .leaderboard-table tbody tr:hover td:first-child {
+body[data-page="leaderboard"] .leaderboard-table tbody tr:hover td:first-child:not(.version-table-cell) {
     background: rgba(14, 165, 233, 0.24);
 }
 
 body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse,
-body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse td:first-child {
+body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse td:first-child:not(.version-table-cell) {
+    background: rgba(120, 53, 15, 0.32);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(odd) td.version-table-cell {
+    background: rgba(8, 18, 36, 0.78);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:nth-child(even) td.version-table-cell {
+    background: rgba(13, 28, 52, 0.76);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr:hover td.version-table-cell {
+    background: rgba(14, 165, 233, 0.24);
+}
+
+body[data-page="leaderboard"] .leaderboard-table tbody tr.is-sparse td.version-table-cell {
     background: rgba(120, 53, 15, 0.32);
 }
 
@@ -2279,4 +2335,39 @@ body[data-page="leaderboard"] .trend-empty {
     border-color: rgba(125, 211, 252, 0.42);
     background: rgba(2, 6, 23, 0.78);
     color: #eef7ff;
+}
+
+body[data-page="leaderboard"] .engine-summary-card {
+    border-color: rgba(125, 211, 252, 0.34);
+    background: rgba(8, 18, 36, 0.78);
+    color: #f4faff;
+    box-shadow: 0 18px 54px rgba(0, 0, 0, 0.34);
+}
+
+body[data-page="leaderboard"] .engine-summary-meta {
+    background: linear-gradient(180deg, rgba(8, 18, 36, 0.88), rgba(2, 6, 23, 0.72));
+    border-color: rgba(125, 211, 252, 0.34);
+}
+
+body[data-page="leaderboard"] .engine-summary-version-label,
+body[data-page="leaderboard"] .engine-summary-footer-label {
+    color: rgba(226, 242, 255, 0.72);
+}
+
+body[data-page="leaderboard"] .engine-summary-version-value,
+body[data-page="leaderboard"] .engine-summary-footer-value {
+    color: #f8fbff;
+}
+
+body[data-page="leaderboard"] .summary-metric {
+    background: rgba(2, 6, 23, 0.72);
+    border-color: rgba(125, 211, 252, 0.22);
+}
+
+body[data-page="leaderboard"] .summary-metric span {
+    color: rgba(226, 242, 255, 0.72);
+}
+
+body[data-page="leaderboard"] .summary-metric strong {
+    color: #f8fbff;
 }
