@@ -605,15 +605,15 @@
           "vllm-ascend-hust-diffspec"
         ],
         "key_contributions": "distributed",
-        "display_name": "dzcixy",
-        "chinese_name": "",
-        "english_name": "",
+        "display_name": "杜忠承",
+        "chinese_name": "杜忠承",
+        "english_name": "Zhongcheng Du",
         "person_id": "github:dzcixy",
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "黄禹指导学生",
-          "en": "Student advised by Yu Huang"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -1581,15 +1581,15 @@
           "vllm-ascend-hust-diffspec"
         ],
         "key_contributions": "distributed",
-        "display_name": "dzcixy",
-        "chinese_name": "",
-        "english_name": "",
+        "display_name": "杜忠承",
+        "chinese_name": "杜忠承",
+        "english_name": "Zhongcheng Du",
         "person_id": "github:dzcixy",
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "黄禹指导学生",
-          "en": "Student advised by Yu Huang"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -2402,15 +2402,15 @@
           "vllm-ascend-hust-diffspec"
         ],
         "key_contributions": "distributed",
-        "display_name": "dzcixy",
-        "chinese_name": "",
-        "english_name": "",
+        "display_name": "杜忠承",
+        "chinese_name": "杜忠承",
+        "english_name": "Zhongcheng Du",
         "person_id": "github:dzcixy",
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "黄禹指导学生",
-          "en": "Student advised by Yu Huang"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -3259,8 +3259,8 @@
       },
       {
         "name": "Geng Li",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "Anjiangy",
+        "github_url": "https://github.com/Anjiangy",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -3271,12 +3271,12 @@
         "display_name": "李庚",
         "chinese_name": "李庚",
         "english_name": "Geng Li",
-        "person_id": "profile:李庚",
+        "person_id": "github:anjiangy",
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "工程成员",
-          "en": "Engineering member"
+          "zh": "马上入学的华科研究生",
+          "en": "Incoming HUST graduate student"
         },
         "research_direction": {
           "zh": "",

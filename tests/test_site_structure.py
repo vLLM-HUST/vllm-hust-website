@@ -1595,7 +1595,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         item.get("display_name") for item in payload["core_repos"]["contributors"]
     }
     assert "cybber695" in core_logins
-    assert "dzcixy" in core_names
+    assert "杜忠承" in core_names
 
     for scope in ("all_repos", "core_repos"):
         contributors = payload[scope]["contributors"]
@@ -1658,8 +1658,11 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["曹哲"]["github_login"] == "xmdhb"
     assert people["曹哲"]["role"]["zh"] == "即将入学的研究生"
     assert people["曹哲"]["advisor"]["zh"] == "张书豪"
-    assert people["dzcixy"]["github_login"] == "dzcixy"
-    assert people["dzcixy"]["advisor"]["zh"] == "黄禹"
+    assert people["李庚"]["github_login"] == "Anjiangy"
+    assert people["李庚"]["role"]["zh"] == "马上入学的华科研究生"
+    assert people["李庚"]["advisor"]["zh"] == "张书豪"
+    assert people["杜忠承"]["github_login"] == "dzcixy"
+    assert people["杜忠承"]["advisor"]["zh"] == "黄禹"
     expected_advisors = {
         "马川湖": "王雄",
         "吴天宇": "郑龙",
