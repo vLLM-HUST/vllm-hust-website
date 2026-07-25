@@ -99,13 +99,16 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert 'id="contributors-members-menu-title"' in details
     assert 'id="contributors-core-member-list"' in details
     assert 'id="contributors-participant-list"' in details
+    assert 'id="contributors-staff-list"' in details
     assert 'id="contributors-external-list"' in details
     assert 'id="contributors-profile-core-title"' in details
     assert 'id="contributors-profile-participant-title"' in details
+    assert 'id="contributors-profile-staff-title"' in details
     assert 'id="contributors-profile-external-title"' in details
     assert "payload?.member_profiles" in script
     assert "profiles.core_members" in script
     assert "profiles.participants" in script
+    assert "profiles.staff_members" in script
     assert "profiles.external_contributors" in script
     assert "CURATED_PROFILES" not in script
     assert "vllm-hust developer" in script
@@ -115,7 +118,7 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert "Identity pending" in script
     assert "function memberContextMarkup(item, lang)" in script
     assert "contributor-member-context" in script
-    assert "contributors-page.js?v=external-contributors-20260725" in text
+    assert "contributors-page.js?v=staff-contributors-20260725" in text
     assert ".research-members-menu[open] summary::after" in css
     assert ".research-member-detail-row" in css
     assert ".research-member-group + .research-member-group" in css
@@ -1582,8 +1585,9 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["all_repos"]["contributors"]) == 33
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
-    assert len(profiles["core_members"]) == 21
-    assert len(profiles["participants"]) == 22
+    assert len(profiles["core_members"]) == 19
+    assert len(profiles["participants"]) == 21
+    assert len(profiles["staff_members"]) == 3
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 4
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
@@ -1631,12 +1635,17 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     core_repo_names = set(profiles["core_repo_names"])
     core_ids = {item["person_id"] for item in profiles["core_members"]}
     participant_ids = {item["person_id"] for item in profiles["participants"]}
+    staff_ids = {item["person_id"] for item in profiles["staff_members"]}
     external_ids = {item["person_id"] for item in profiles["external_contributors"]}
     assert core_ids.isdisjoint(participant_ids)
+    assert core_ids.isdisjoint(staff_ids)
     assert core_ids.isdisjoint(external_ids)
+    assert participant_ids.isdisjoint(staff_ids)
     assert participant_ids.isdisjoint(external_ids)
+    assert staff_ids.isdisjoint(external_ids)
     assert len(core_ids) == len(profiles["core_members"])
     assert len(participant_ids) == len(profiles["participants"])
+    assert len(staff_ids) == len(profiles["staff_members"])
     assert len(external_ids) == len(profiles["external_contributors"])
     assert all(
         set(item["repos"]) & core_repo_names for item in profiles["core_members"]
@@ -1644,12 +1653,23 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert all(
         not (set(item["repos"]) & core_repo_names) for item in profiles["participants"]
     )
+    assert {item["display_name"] for item in profiles["staff_members"]} == {
+        "王胜",
+        "程月甲",
+        "龙斌",
+    }
+    assert {
+        item["display_name"]
+        for item in profiles["staff_members"]
+        if item["core_repository_contributor"]
+    } == {"王胜", "程月甲"}
 
     people = {
         item["display_name"]: item
         for item in (
             profiles["core_members"]
             + profiles["participants"]
+            + profiles["staff_members"]
             + profiles["external_contributors"]
         )
     }
@@ -1660,7 +1680,11 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["赵建军"]["github_login"] == "curryzjj"
     assert people["高西岭"]["github_login"] == "XilingGao"
     assert people["王胜"]["role"]["zh"] == "工程师"
+    assert people["王胜"]["staff_member"] is True
     assert people["程月甲"]["role"]["zh"] == "工程师"
+    assert people["程月甲"]["staff_member"] is True
+    assert people["龙斌"]["role"]["zh"] == "项目/科研助理"
+    assert people["龙斌"]["staff_member"] is True
     assert people["赵建军"]["role"]["zh"] == "已毕业博士生，目前已入职高校"
     assert people["高西岭"]["research_direction"]["zh"] == "KV量化"
     assert "多级" not in people["高西岭"]["research_direction"]["zh"]

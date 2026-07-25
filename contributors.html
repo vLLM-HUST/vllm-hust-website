@@ -113,6 +113,11 @@
               <p id="contributors-profile-participant-description">Confirmed project participants who do not currently meet the core-repository contribution rule.</p>
               <ul id="contributors-participant-list" class="research-member-list" aria-live="polite"></ul>
             </section>
+            <section class="research-member-group" aria-labelledby="contributors-profile-staff-title">
+              <h3 id="contributors-profile-staff-title">Engineers &amp; Assistants</h3>
+              <p id="contributors-profile-staff-description">Professional engineers and project/research assistants supporting implementation, quality, and coordination.</p>
+              <ul id="contributors-staff-list" class="research-member-list" aria-live="polite"></ul>
+            </section>
             <section class="research-member-group" aria-labelledby="contributors-profile-external-title">
               <h3 id="contributors-profile-external-title">External contributors</h3>
               <p id="contributors-profile-external-description">Outside collaborators with attributable contributions who are not members of the vLLM-HUST research group.</p>
@@ -134,6 +139,7 @@
           <div class="metric-box"><span>All contributors</span><strong id="contributors-total">0</strong></div>
           <div class="metric-box"><span id="contributors-core-metric-label">Core members</span><strong id="contributors-core-total">0</strong></div>
           <div class="metric-box"><span id="contributors-participant-metric-label">Participants</span><strong id="contributors-participant-total">0</strong></div>
+          <div class="metric-box"><span id="contributors-staff-metric-label">Engineers &amp; Assistants</span><strong id="contributors-staff-total">0</strong></div>
           <div class="metric-box"><span id="contributors-external-metric-label">External contributors</span><strong id="contributors-external-total">0</strong></div>
           <div class="metric-box"><span>Active repos</span><strong id="contributors-repos">0</strong></div>
         </div>
@@ -213,10 +219,13 @@
         'contributors-profile-core-description': 'Members with verified code contributions in runtime or performance-optimization repositories.',
         'contributors-profile-participant-title': 'Participants',
         'contributors-profile-participant-description': 'Confirmed project participants who do not currently meet the core-repository contribution rule.',
+        'contributors-profile-staff-title': 'Engineers & Assistants',
+        'contributors-profile-staff-description': 'Professional engineers and project/research assistants supporting implementation, quality, and coordination.',
         'contributors-profile-external-title': 'External contributors',
         'contributors-profile-external-description': 'Outside collaborators with attributable contributions who are not members of the vLLM-HUST research group.',
         'contributors-core-metric-label': 'Core members',
         'contributors-participant-metric-label': 'Participants',
+        'contributors-staff-metric-label': 'Engineers & Assistants',
         'contributors-external-metric-label': 'External contributors',
         'contributors-core-col-member': 'Member',
         'contributors-core-col-research': 'Research direction',
@@ -247,10 +256,13 @@
         'contributors-profile-core-description': '仅包含在运行时或性能优化核心仓库中有可验证代码贡献的成员。',
         'contributors-profile-participant-title': '参与人员',
         'contributors-profile-participant-description': '已确认参与项目、但当前尚未满足核心仓库贡献条件的人员。',
+        'contributors-profile-staff-title': '工程师与助理',
+        'contributors-profile-staff-description': '承担工程实现、质量保障及项目协调工作的工程师和项目/科研助理。',
         'contributors-profile-external-title': '外部贡献者',
         'contributors-profile-external-description': '拥有可归属贡献、但不属于 vLLM-HUST 课题组成员的外部协作者。',
         'contributors-core-metric-label': '核心成员',
         'contributors-participant-metric-label': '参与人员',
+        'contributors-staff-metric-label': '工程师与助理',
         'contributors-external-metric-label': '外部贡献者',
         'contributors-core-col-member': '成员',
         'contributors-core-col-research': '研究方向',
@@ -265,7 +277,7 @@
     };
   </script>
   <script src="./assets/site.js?v=bilingual-toggle-20260723"></script>
-  <script src="./assets/contributors-page.js?v=external-contributors-20260725"></script>
+  <script src="./assets/contributors-page.js?v=staff-contributors-20260725"></script>
 </body>
 
 </html>

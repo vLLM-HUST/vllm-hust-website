@@ -74,6 +74,9 @@
         if (payload?.member_profiles) {
             return {
                 ...payload.member_profiles,
+                staff_members: Array.isArray(payload.member_profiles.staff_members)
+                    ? payload.member_profiles.staff_members
+                    : [],
                 external_contributors: Array.isArray(
                     payload.member_profiles.external_contributors,
                 )
@@ -89,6 +92,7 @@
             core_repo_names: payload?.core_repos?.scope_repos || [],
             core_members: coreMembers,
             participants,
+            staff_members: [],
             external_contributors: [],
             unresolved_contributors: [],
         };
@@ -215,13 +219,23 @@
                     detailRow(text.main, mainContribution(item, lang)),
                     advisor ? detailRow(text.advisor, advisor) : '',
                 ]
-                : [
-                    role ? detailRow(text.role, role) : '',
-                    research ? detailRow(text.research, research) : '',
-                    participation ? detailRow(text.participation, participation) : '',
-                    areas ? detailRow(text.areas, areas) : '',
-                    advisor ? detailRow(text.advisor, advisor) : '',
-                ];
+                : kind === 'staff'
+                    ? [
+                        role ? detailRow(text.role, role) : '',
+                        research ? detailRow(text.research, research) : '',
+                        participation ? detailRow(text.participation, participation) : '',
+                        areas ? detailRow(text.areas, areas) : '',
+                        mainContribution(item, lang)
+                            ? detailRow(text.main, mainContribution(item, lang))
+                            : '',
+                    ]
+                    : [
+                        role ? detailRow(text.role, role) : '',
+                        research ? detailRow(text.research, research) : '',
+                        participation ? detailRow(text.participation, participation) : '',
+                        areas ? detailRow(text.areas, areas) : '',
+                        advisor ? detailRow(text.advisor, advisor) : '',
+                    ];
             return `
                 <li>
                     <span class="research-member-identity">${memberNameMarkup(item, lang)}</span>
@@ -238,6 +252,9 @@
         document.getElementById('contributors-total').textContent = fmt(all.length);
         document.getElementById('contributors-core-total').textContent = fmt(profiles.core_members.length);
         document.getElementById('contributors-participant-total').textContent = fmt(profiles.participants.length);
+        document.getElementById('contributors-staff-total').textContent = fmt(
+            profiles.staff_members.length,
+        );
         document.getElementById('contributors-external-total').textContent = fmt(
             profiles.external_contributors.length,
         );
@@ -284,6 +301,7 @@
         renderMeta(payload, profiles);
         renderProfileList('contributors-core-member-list', profiles.core_members, 'core');
         renderProfileList('contributors-participant-list', profiles.participants, 'participant');
+        renderProfileList('contributors-staff-list', profiles.staff_members, 'staff');
         renderProfileList(
             'contributors-external-list',
             profiles.external_contributors,
