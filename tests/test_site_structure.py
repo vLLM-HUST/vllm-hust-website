@@ -841,7 +841,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=identity-mapping-20260725" in html_text
-    assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
+    assert "assets/achievements-page.js?v=diffspec-sc2026-20260725" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -947,24 +947,22 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
     assert (
-        "DiffSpec: Accelerating Long Sequence Generation with Differential Speculative Decoding"
+        "DiffSpec: Differential Speculative Decoding for Ultra-Long-Sequence Inference"
         in js_text
     )
-    assert "DiffSpec：面向长序列生成的差分投机解码加速" in js_text
-    assert "label: { en: 'Repository', zh: '仓库' }" in js_text
+    assert "DiffSpec：面向超长序列推理的差分投机解码加速系统" in js_text
+    assert "项目团队：主要作者杜忠承；指导老师黄禹。" in js_text
     assert "name: 'DiffSpec'" in js_text
-    assert "repositoryName: 'vllm-ascend-hust-diffspec'" in js_text
+    assert "repositoryName: 'vllm-hust'" in js_text
     assert "面向超长序列推理的差分投机解码加速系统。" in js_text
     assert (
         "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
     )
     assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
     assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
-    assert (
-        "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
-        in js_text
-    )
-    assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
+    assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" in js_text
+    assert "github.com/vLLM-HUST/vllm-ascend-hust-diffspec" not in js_text
+    assert "assets/achievements-page.js?v=diffspec-sc2026-20260725" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -1804,7 +1802,5 @@ def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
     assert "color: #176f72;" in css_text
     assert "contributors-contrast-20260725" in html_text
     assert "github-status" in html_text
-    page_js = (root / "assets" / "contributors-page.js").read_text(
-        encoding="utf-8"
-    )
+    page_js = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
     assert "localized(item, 'github_status', lang)" in page_js
