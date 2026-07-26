@@ -397,8 +397,8 @@ def _parse_entry_sort_timestamp(entry: dict[str, Any]) -> float:
 
 def compute_canonical_plugin_commit_map(
     entries: list[dict[str, Any]],
-) -> dict[str, str]:
-    """Build a ``{git_commit_ish: canonical_plugin_commit}`` map.
+) -> dict[str, tuple[str, str]]:
+    """Build a ``{git_commit_ish: (canonical_plugin_commit, source_entry_id)}`` map.
 
     For each ``metadata.git_commit`` group among ``vllm-hust`` entries whose
     ``runtime_provenance.plugin.commit`` is a real 40-char SHA, the canonical
@@ -408,6 +408,10 @@ def compute_canonical_plugin_commit_map(
     backfills that pair the same core commit with a different plugin commit
     would otherwise split a single runtime revision across multiple x-axis
     points on the trend chart, even though the benchmarked binary is the same.
+
+    The returned tuple also carries the entry_id of the canonical-side entry,
+    so rejection logs can attribute the canonical choice to a concrete
+    leaderboard row instead of leaving an operator to rediscover it by hand.
 
     Groups that contain no entry with a usable 40-char plugin commit are
     omitted from the map entirely; this lets callers fall back to "no
@@ -435,7 +439,7 @@ def compute_canonical_plugin_commit_map(
         key = git_commit[:SHORT_LEN].lower()
         grouped.setdefault(key, []).append(entry)
 
-    canonical: dict[str, str] = {}
+    canonical: dict[str, tuple[str, str]] = {}
     for key, members in grouped.items():
         earliest = min(
             members,
@@ -444,7 +448,10 @@ def compute_canonical_plugin_commit_map(
                 -_get_entry_sort_throughput(e),
             ),
         )
-        canonical[key] = _get_entry_runtime_plugin_commit(earliest).lower()
+        canonical[key] = (
+            _get_entry_runtime_plugin_commit(earliest).lower(),
+            str(earliest.get("entry_id") or "<missing-entry-id>"),
+        )
     return canonical
 
 
@@ -457,7 +464,7 @@ def _get_entry_sort_throughput(entry: dict[str, Any]) -> float:
 
 
 def plugin_commit_mismatch_rejection_reason(
-    entry: dict[str, Any], canonical_map: dict[str, str]
+    entry: dict[str, Any], canonical_map: dict[str, tuple[str, str]]
 ) -> str | None:
     """Reject vllm-hust entries whose plugin commit differs from the canonical.
 
@@ -469,6 +476,10 @@ def plugin_commit_mismatch_rejection_reason(
     the trend chart even though ``metadata.git_commit`` is identical — i.e.
     the same binary shown twice.  We drop the non-canonical side to keep the
     trend chart honest.
+
+    The rejection message embeds the entry_id of the canonical-side row so
+    a post-hoc audit can attribute the canonical choice to a concrete
+    leaderboard entry instead of leaving an operator to rediscover it.
 
     Entries without ``runtime_provenance.plugin.commit`` are not rejected
     here (older snapshots may predate the field), and groups without a
@@ -483,13 +494,15 @@ def plugin_commit_mismatch_rejection_reason(
     if len(git_commit) < 9 or not entry_plugin:
         return None
     key = git_commit[:9].lower()
-    canonical = canonical_map.get(key)
-    if not canonical:
+    canonical_entry = canonical_map.get(key)
+    if not canonical_entry:
         return None
-    if entry_plugin.lower() != canonical:
+    canonical_commit, canonical_entry_id = canonical_entry
+    if entry_plugin.lower() != canonical_commit:
         return (
             f"plugin commit mismatch for git_commit {git_commit[:9]}: "
-            f"canonical={canonical[:9]} entry={entry_plugin[:9]}"
+            f"canonical={canonical_commit[:9]} (entry {canonical_entry_id}) "
+            f"entry={entry_plugin[:9]}"
         )
     return None
 
