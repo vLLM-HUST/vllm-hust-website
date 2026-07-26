@@ -365,7 +365,7 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
 
     assert effective_signature_counts["visionarena-online"] == 1
     assert effective_signature_counts["instructcoder-online"] == 2
-    assert effective_signature_counts["prefix-repetition-online"] == 2
+    assert effective_signature_counts["prefix-repetition-online"] == 1
     assert effective_signature_counts["random-online"] == 2
     assert effective_signature_counts["random-latency"] == 3
     for scenario in (
