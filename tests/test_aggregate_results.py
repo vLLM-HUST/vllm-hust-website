@@ -1804,6 +1804,9 @@ def test_aggregate_results_rejects_entries_with_mismatched_plugin_commit(
     assert "plugin commit mismatch" in result.stdout
     assert canonical_plugin[:9] in result.stdout
     assert divergent_plugin[:9] in result.stdout
+    # The canonical-side row contributes its entry_id to the rejection line so
+    # a post-hoc audit can attribute the canonical choice to a concrete entry.
+    assert canonical_entry["entry_id"] in result.stdout
     single_payload = json.loads(
         (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
     )
