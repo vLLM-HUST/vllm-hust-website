@@ -1247,7 +1247,7 @@ h1 {
 
 .upstream-repository-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
 }
 
@@ -1437,6 +1437,11 @@ h1 {
 }
 
 .upstream-pr-row > strong[data-status="ready-evidence"] {
+    color: #86efac;
+    background: rgba(134, 239, 172, 0.12);
+}
+
+.upstream-pr-row > strong[data-status="merged"] {
     color: #86efac;
     background: rgba(134, 239, 172, 0.12);
 }

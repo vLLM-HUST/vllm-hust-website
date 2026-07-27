@@ -11,14 +11,14 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=identity-mapping-20260725" />
-  <link rel="stylesheet" href="./assets/subpages.css?v=upstream-pr-contrast-20260724" />
+  <link rel="stylesheet" href="./assets/site.css?v=upstream-qwen-community-20260727" />
+  <link rel="stylesheet" href="./assets/subpages.css?v=leaderboard-contrast-system-20260727" />
 </head>
 
 <body data-page="achievements">
   <nav class="site-nav">
     <div class="site-shell site-nav-inner">
-      <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small id="brand-tagline">Execution layer</small></span></a>
+      <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small id="brand-tagline">Plugin proving ground</small></span></a>
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
         <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
@@ -49,9 +49,10 @@
       <section class="content-panel result-repositories-panel" aria-labelledby="result-repositories-title">
         <div class="section-head">
           <div>
-            <span id="result-repositories-kicker" class="eyebrow">Publications</span>
-            <h2 id="result-repositories-title">Published results</h2>
+            <span id="result-repositories-kicker" class="eyebrow">Validated artifacts</span>
+            <h2 id="result-repositories-title">Published plugins and systems</h2>
           </div>
+          <p id="result-repositories-summary">Accepted work is packaged as a focused artifact and validated in the vLLM-HUST proving ground.</p>
         </div>
         <div id="result-repository-list" class="result-repository-list"></div>
       </section>
@@ -59,8 +60,8 @@
       <section class="content-panel upstream-pr-panel" aria-labelledby="upstream-pr-title">
         <div class="section-head">
           <div>
-            <span id="upstream-pr-kicker" class="eyebrow">Upstream PRs</span>
-            <h2 id="upstream-pr-title">Under review</h2>
+            <span id="upstream-pr-kicker" class="eyebrow">Upstream ecosystem</span>
+            <h2 id="upstream-pr-title">Open and merged contributions</h2>
           </div>
         </div>
         <div id="upstream-repository-browser" class="upstream-repository-browser"></div>
@@ -114,7 +115,7 @@
     window.vllmHustPageDict = {
       en: {
         title: 'Achievements - vllm-hust',
-        'brand-tagline': 'Execution layer',
+        'brand-tagline': 'Plugin proving ground',
         'achievements-eyebrow': 'Highlights',
         'achievements-title': 'Achievements',
         'achievements-lede': 'Accepted papers, owned project releases, and upstream contributions by the vLLM-HUST community.',
@@ -128,10 +129,11 @@
         'achievement-stat-contributors-label': 'Contributors',
         'achievement-stat-groups-label': 'Compare groups',
         'achievement-stat-hard-label': 'Validation scopes',
-        'result-repositories-kicker': 'Publications',
-        'result-repositories-title': 'Published results',
-        'upstream-pr-kicker': 'Upstream PRs',
-        'upstream-pr-title': 'Under review',
+        'result-repositories-kicker': 'Validated artifacts',
+        'result-repositories-title': 'Published plugins and systems',
+        'result-repositories-summary': 'Accepted work is packaged as a focused artifact and validated in the vLLM-HUST proving ground.',
+        'upstream-pr-kicker': 'Upstream ecosystem',
+        'upstream-pr-title': 'Open and merged contributions',
         'achievements-timeline-kicker': 'Release line',
         'achievements-timeline-title': 'Research output over time',
         'achievements-timeline-description': 'Accepted papers by our team, owned project releases, and upstream contributions merged from our contributors.',
@@ -139,7 +141,7 @@
       },
       zh: {
         title: '成果 - vllm-hust',
-        'brand-tagline': '推理执行层',
+        'brand-tagline': '插件试验场',
         'achievements-eyebrow': '成果概览',
         'achievements-title': '成果',
         'achievements-lede': '展示本团队已接收论文、自主项目发布，以及团队成员已合入的上游贡献。',
@@ -153,10 +155,11 @@
         'achievement-stat-contributors-label': '贡献者',
         'achievement-stat-groups-label': '对比组',
         'achievement-stat-hard-label': '验证范围',
-        'result-repositories-kicker': '正式发表',
-        'result-repositories-title': '已发表成果',
-        'upstream-pr-kicker': '上游 PR',
-        'upstream-pr-title': '评审中',
+        'result-repositories-kicker': '验证制品',
+        'result-repositories-title': '已发表插件与系统',
+        'result-repositories-summary': '已接收工作以聚焦制品发布，并在 vLLM-HUST 试验场中完成系统验证。',
+        'upstream-pr-kicker': '上游生态',
+        'upstream-pr-title': '开放与已合入贡献',
         'achievements-timeline-kicker': '成果发布线',
         'achievements-timeline-title': '研究成果时间轴',
         'achievements-timeline-description': '仅展示本团队已接收论文、自主项目正式发布，以及团队成员已合入的上游贡献。',
@@ -164,8 +167,8 @@
       }
     };
   </script>
-  <script src="./assets/site.js?v=bilingual-toggle-20260723"></script>
-  <script src="./assets/achievements-page.js?v=diffspec-sc2026-20260725"></script>
+  <script src="./assets/site.js?v=plugin-ecosystem-20260727"></script>
+  <script src="./assets/achievements-page.js?v=plugin-ecosystem-20260727"></script>
 </body>
 
 </html>

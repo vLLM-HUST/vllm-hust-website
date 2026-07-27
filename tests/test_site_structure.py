@@ -629,8 +629,8 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=identity-mapping-20260725" in text
-        assert "assets/site.js?v=bilingual-toggle-20260723" in text
+        assert "assets/site.css?v=upstream-qwen-community-20260727" in text
+        assert "assets/site.js?v=plugin-ecosystem-20260727" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -638,15 +638,55 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=mobile-navigation-20260723" in html_text
+    assert "assets/home.css?v=plugin-ecosystem-20260727" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
     assert "cosmic-card" not in html_text
     assert ".execution-hero" in css_text
     assert ".execution-architecture" in css_text
+    assert ".plugin-path" in css_text
     assert "letter-spacing: -" not in css_text
     assert "font-size: clamp(" not in css_text
+
+
+def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "index.html").read_text(encoding="utf-8")
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+
+    assert "A proving ground for reusable inference ideas." in html_text
+    assert "让可复用的推理机制在真实系统中得到验证。" in html_text
+    assert "Plugin proving ground" in site_js
+    assert "插件试验场" in site_js
+    assert 'class="plugin-path"' in html_text
+    assert "Mechanisms first. Engine second." in html_text
+    assert "机制优先，引擎解耦。" in html_text
+
+    expected_repositories = (
+        "vllm-hust-bidkv",
+        "vllm-ascend-hust-diffspec",
+        "vllm-ascend-hust-LatchMoE",
+        "vllm-ascend-quant-hust",
+        "ascend-runtime-manager",
+        "vllm-hust-perf-analyzer",
+        "vllm-hust-profiling",
+        "vllm-hust-benchmark",
+        "vllm-ascend-hust",
+        "triton-ascend-hust",
+        "vllm-metal-hust",
+    )
+    for repository in expected_repositories:
+        assert f"https://github.com/vLLM-HUST/{repository}" in html_text
+
+    for internal_phrase in (
+        "讲述口径",
+        "提示词",
+        "内部说明",
+        "TODO",
+        "speaker note",
+    ):
+        assert internal_phrase not in html_text
 
 
 def test_subpages_use_shared_ecosystem_visual_system() -> None:
@@ -661,7 +701,7 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/subpages.css?v=upstream-pr-contrast-20260724" in text
+        assert "assets/subpages.css?v=leaderboard-contrast-system-20260727" in text
         assert '<span class="brand-mark">V</span>' in text
         assert "vLLM-HUST<small" in text
 
@@ -780,6 +820,44 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "font-weight: 600;" in css_text
 
 
+def test_leaderboard_summary_cards_have_complete_light_theme_contrast_contract() -> (
+    None
+):
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+
+    assert html_text.index("assets/leaderboard.css") < html_text.index(
+        "assets/subpages.css"
+    )
+    assert "leaderboard-contrast-system-20260727" in html_text
+
+    required_selectors = (
+        'body[data-page="leaderboard"] .engine-summary-card.is-leader',
+        'body[data-page="leaderboard"] .engine-summary-card .summary-metric',
+        'body[data-page="leaderboard"] .engine-summary-card .summary-metric span',
+        'body[data-page="leaderboard"] .engine-summary-card .summary-metric strong',
+        'body[data-page="leaderboard"] .engine-summary-card.is-leader .engine-summary-meta',
+        'body[data-page="leaderboard"] .engine-summary-card .engine-summary-version-label',
+        'body[data-page="leaderboard"] .engine-summary-card .engine-summary-version-value',
+        'body[data-page="leaderboard"] .engine-summary-card .engine-summary-footer-label',
+        'body[data-page="leaderboard"] .engine-summary-card .engine-summary-footer-value',
+        'body[data-page="leaderboard"] .engine-summary-card .leader-mark',
+        'body[data-page="leaderboard"] .coverage-pill.success',
+        'body[data-page="leaderboard"] .coverage-pill.warning',
+        'body[data-page="leaderboard"] .hc-badge.pass',
+        'body[data-page="leaderboard"] .hc-badge.fail',
+    )
+    for selector in required_selectors:
+        assert selector in css_text
+
+    # These declared light-theme pairs all exceed WCAG AA's 4.5:1 threshold.
+    assert "color: #52615f;" in css_text
+    assert "background: #e5f1ed;" in css_text
+    assert "color: #195c35;" in css_text
+    assert "background: #e2f3e7;" in css_text
+
+
 def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
@@ -788,7 +866,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "upstream-pr-contrast-20260724" in html_text
+    assert "leaderboard-contrast-system-20260727" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -822,10 +900,11 @@ def test_achievements_timeline_only_records_merged_upstream_prs() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
     achievements = js_text.split("const ACHIEVEMENTS = [", 1)[1].split(
-        "const OPEN_UPSTREAM_PRS = [", 1
+        "const UPSTREAM_PULL_REQUESTS = [", 1
     )[0]
 
     assert "https://github.com/QwenLM/qwen-code/pull/5185" in achievements
+    assert "https://github.com/QwenLM/qwen-code/pull/7701" in achievements
     assert "submitted upstream" not in achievements
     assert "opened upstream" not in achievements
     assert "https://github.com/vllm-project/vllm/pull/41449" not in achievements
@@ -842,7 +921,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert 'id="upstream-repository-browser"' in html_text
     assert "upstream-pr-prev" not in html_text
     assert "upstream-pr-next" not in html_text
-    assert "const OPEN_UPSTREAM_PRS = [" in js_text
+    assert "const UPSTREAM_PULL_REQUESTS = [" in js_text
     assert "const UPSTREAM_REPOSITORIES = [" in js_text
     assert "function renderUpstreamPRs" in js_text
     assert "expandedUpstreamRepository" in js_text
@@ -853,8 +932,8 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=identity-mapping-20260725" in html_text
-    assert "assets/achievements-page.js?v=diffspec-sc2026-20260725" in html_text
+    assert "assets/site.css?v=upstream-qwen-community-20260727" in html_text
+    assert "assets/achievements-page.js?v=plugin-ecosystem-20260727" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -869,6 +948,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "status: 'ready-evidence'" in js_text
     assert "status: 'evidence-pending'" in js_text
     assert "status: 'ci-retry'" in js_text
+    assert "status: 'merged'" in js_text
     assert "[Performance][Worker] Reuse DP metadata sync buffers" in js_text
     assert "待上游标签" in js_text
     assert "已请求评审" in js_text
@@ -878,9 +958,16 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert 'strong[data-status="review-requested"]' in css_text
     assert 'strong[data-status="ready-evidence"]' in css_text
     assert 'strong[data-status="evidence-pending"]' in css_text
+    assert 'strong[data-status="merged"]' in css_text
 
     assert js_text.count("owner: 'vllm-project'") == 2
     assert js_text.count("owner: 'triton-lang'") == 1
+    assert js_text.count("owner: 'QwenLM'") == 1
+    assert "https://github.com/QwenLM/qwen-code" in js_text
+    assert "https://github.com/QwenLM/qwen-code/pull/5185" in js_text
+    assert "https://github.com/QwenLM/qwen-code/pull/7701" in js_text
+    assert "'upstream-pr-kicker': '上游生态'" in html_text
+    assert "'upstream-pr-title': '开放与已合入贡献'" in html_text
     assert "pullRequestCount(repository.pullRequests.length)" in js_text
 
     open_urls = (
@@ -913,7 +1000,7 @@ def test_achievements_page_does_not_treat_upstream_sync_as_achievement() -> None
     assert "vllm-ascend-hust #105 · compatibility" not in js_text
 
 
-def test_achievements_page_records_qwen_accepted_pr() -> None:
+def test_achievements_page_records_qwen_accepted_prs() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
@@ -921,6 +1008,11 @@ def test_achievements_page_records_qwen_accepted_pr() -> None:
     assert "Plan-gate 修复合入 Qwen Code" in js_text
     assert "status: { en: 'Merged', zh: '已合入' }" in js_text
     assert "https://github.com/QwenLM/qwen-code/pull/5185" in js_text
+    assert "Inline-math recognition fix merged into Qwen Code" in js_text
+    assert "行内公式识别修复合入 Qwen Code" in js_text
+    assert "Jingyuan Tian unified bounded inline-math recognition" in js_text
+    assert "田景远为 Qwen Code CLI" in js_text
+    assert "https://github.com/QwenLM/qwen-code/pull/7701" in js_text
 
 
 def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
@@ -931,7 +1023,7 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     pdf_path = root / "assets" / "papers" / "bidkv-sc2026.pdf"
 
     assert 'id="result-repository-list"' in html_text
-    assert "正式发表" in html_text
+    assert "已发表插件与系统" in html_text
     assert "成果仓库" in js_text
     assert "const RESULT_REPOSITORIES = [" in js_text
     assert (
@@ -950,6 +1042,9 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     assert "names: { en: 'Shuhao Zhang', zh: '张书豪' }" in js_text
     assert "result-repository-card" in css_text
     assert "result-repository-team" in css_text
+    assert "artifact: { en: 'Scheduling plugin', zh: '调度插件' }" in js_text
+    assert "boundary: { en: 'KV lifecycle + scheduler hooks'" in js_text
+    assert "provingGround: { en: 'vLLM-HUST', zh: 'vLLM-HUST' }" in js_text
     assert pdf_path.is_file()
     assert pdf_path.stat().st_size > 100_000
 
@@ -966,16 +1061,27 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     assert "DiffSpec：面向超长序列推理的差分投机解码加速系统" in js_text
     assert "项目团队：主要作者杜忠承；指导老师黄禹。" in js_text
     assert "name: 'DiffSpec'" in js_text
-    assert "repositoryName: 'vllm-hust'" in js_text
-    assert "面向超长序列推理的差分投机解码加速系统。" in js_text
+    assert "repositoryName: 'vllm-ascend-hust-diffspec'" in js_text
+    assert "面向超长序列的差分投机解码系统" in js_text
     assert (
         "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
     )
     assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
     assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
-    assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" in js_text
-    assert "github.com/vLLM-HUST/vllm-ascend-hust-diffspec" not in js_text
-    assert "assets/achievements-page.js?v=diffspec-sc2026-20260725" in html_text
+    assert (
+        "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
+        in js_text
+    )
+    assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" not in js_text
+    result_repositories = js_text.split("const RESULT_REPOSITORIES = [", 1)[1].split(
+        "    ];", 1
+    )[0]
+    assert result_repositories.index(
+        "repositoryName: 'vllm-hust-bidkv'"
+    ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
+    assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
+    assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
+    assert "assets/achievements-page.js?v=plugin-ecosystem-20260727" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -1797,7 +1903,7 @@ def test_core_contributor_stats_precede_all_repository_stats() -> None:
     all_index = html_text.index('id="contributors-all-tbody"')
 
     assert core_index < all_index
-    assert "核心仓库与独立优化成果" in html_text
+    assert "试验场核心仓库与已接收插件" in html_text
     assert "BidKV、DiffSpec" in html_text
 
 
@@ -1813,7 +1919,7 @@ def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
     assert "color: #475569;" in css_text
     assert ".research-member-detail-row b" in css_text
     assert "color: #176f72;" in css_text
-    assert "contributors-contrast-20260725" in html_text
+    assert "leaderboard-contrast-system-20260727" in html_text
     assert "github-status" in html_text
     page_js = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
     assert "localized(item, 'github_status', lang)" in page_js
