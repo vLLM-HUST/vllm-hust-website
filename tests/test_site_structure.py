@@ -841,7 +841,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=contributor-profiles-20260725" in html_text
-    assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
+    assert "assets/achievements-page.js?v=repository-link-20260727" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -964,7 +964,13 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
         "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
         in js_text
     )
-    assert "assets/achievements-page.js?v=bidkv-canonical-20260724" in html_text
+    result_repositories = js_text.split("const RESULT_REPOSITORIES = [", 1)[1].split(
+        "    ];", 1
+    )[0]
+    assert result_repositories.index("repositoryName: 'vllm-hust-bidkv'") < result_repositories.index(
+        "repositoryName: 'vllm-ascend-hust-diffspec'"
+    )
+    assert "assets/achievements-page.js?v=repository-link-20260727" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
