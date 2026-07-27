@@ -613,7 +613,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=identity-mapping-20260725" in text
+        assert "assets/site.css?v=upstream-qwen-community-20260727" in text
         assert "assets/site.js?v=bilingual-toggle-20260723" in text
 
 
