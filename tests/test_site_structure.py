@@ -968,9 +968,9 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     result_repositories = js_text.split("const RESULT_REPOSITORIES = [", 1)[1].split(
         "    ];", 1
     )[0]
-    assert result_repositories.index("repositoryName: 'vllm-hust-bidkv'") < result_repositories.index(
-        "repositoryName: 'vllm-ascend-hust-diffspec'"
-    )
+    assert result_repositories.index(
+        "repositoryName: 'vllm-hust-bidkv'"
+    ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
     assert "assets/achievements-page.js?v=repository-link-20260727" in html_text
 
 
