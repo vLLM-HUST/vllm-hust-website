@@ -33,7 +33,7 @@
             links: [
                 {
                     label: { en: 'Repository', zh: '成果仓库' },
-                    href: 'https://github.com/vLLM-HUST/vllm-hust',
+                    href: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec',
                 },
             ],
         },
@@ -211,7 +211,7 @@
         },
         {
             name: 'DiffSpec',
-            repositoryName: 'vllm-hust',
+            repositoryName: 'vllm-ascend-hust-diffspec',
             summary: {
                 en: 'A differential speculative decoding acceleration system for ultra-long-sequence inference.',
                 zh: '面向超长序列推理的差分投机解码加速系统。',
@@ -227,7 +227,7 @@
                     names: { en: 'Yu Huang', zh: '黄禹' },
                 },
             ],
-            repository: 'https://github.com/vLLM-HUST/vllm-hust',
+            repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec',
         },
     ];
 

@@ -365,15 +365,12 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
 
     assert effective_signature_counts["visionarena-online"] == 1
     assert effective_signature_counts["instructcoder-online"] == 2
-    assert effective_signature_counts["prefix-repetition-online"] == 1
-    assert effective_signature_counts["random-online"] == 2
+    assert effective_signature_counts["prefix-repetition-online"] == 2
+    assert effective_signature_counts["random-online"] == 3
     assert effective_signature_counts["random-latency"] == 3
-    for scenario in (
-        "sharegpt-online",
-        "sharegpt-throughput",
-        "sonnet-throughput",
-    ):
-        assert effective_signature_counts[scenario] == 1
+    assert effective_signature_counts["sharegpt-online"] == 2
+    assert effective_signature_counts["sharegpt-throughput"] == 1
+    assert effective_signature_counts["sonnet-throughput"] == 1
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
@@ -841,7 +838,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=identity-mapping-20260725" in html_text
-    assert "assets/achievements-page.js?v=diffspec-sc2026-20260725" in html_text
+    assert "assets/achievements-page.js?v=repository-link-20260727" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -953,16 +950,25 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     assert "DiffSpec：面向超长序列推理的差分投机解码加速系统" in js_text
     assert "项目团队：主要作者杜忠承；指导老师黄禹。" in js_text
     assert "name: 'DiffSpec'" in js_text
-    assert "repositoryName: 'vllm-hust'" in js_text
+    assert "repositoryName: 'vllm-ascend-hust-diffspec'" in js_text
     assert "面向超长序列推理的差分投机解码加速系统。" in js_text
     assert (
         "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
     )
     assert "names: { en: 'Zhongcheng Du', zh: '杜忠承' }" in js_text
     assert "names: { en: 'Yu Huang', zh: '黄禹' }" in js_text
-    assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" in js_text
-    assert "github.com/vLLM-HUST/vllm-ascend-hust-diffspec" not in js_text
-    assert "assets/achievements-page.js?v=diffspec-sc2026-20260725" in html_text
+    assert (
+        "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
+        in js_text
+    )
+    assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" not in js_text
+    result_repositories = js_text.split("const RESULT_REPOSITORIES = [", 1)[1].split(
+        "    ];", 1
+    )[0]
+    assert result_repositories.index(
+        "repositoryName: 'vllm-hust-bidkv'"
+    ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
+    assert "assets/achievements-page.js?v=repository-link-20260727" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
