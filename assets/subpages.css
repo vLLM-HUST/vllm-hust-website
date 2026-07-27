@@ -275,6 +275,10 @@ body:not([data-page="home"]) .upstream-pr-row > strong[data-status="ready-eviden
   color: #315b18;
   background: #e4f1cf;
 }
+body:not([data-page="home"]) .upstream-pr-row > strong[data-status="merged"] {
+  color: #17623a;
+  background: #dcefe2;
+}
 body:not([data-page="home"]) .upstream-pr-row > strong[data-status="ci-retry"] {
   color: #912d3d;
   background: #fee3e7;
@@ -526,6 +530,65 @@ body[data-page="leaderboard"] .overview-section-label,
 body[data-page="leaderboard"] .engine-chip,
 body[data-page="leaderboard"] .coverage-pill,
 body[data-page="leaderboard"] .hc-badge { border-radius: 3px; color: #694a05; background: #f4e1ae; }
+
+/*
+ * Summary cards are authored in leaderboard.css and then adapted to the light
+ * editorial theme here. Keep every nested surface and text role in this final
+ * theme layer: partial overrides can otherwise combine a light panel with the
+ * earlier dark-theme text colors.
+ */
+body[data-page="leaderboard"] .engine-summary-card,
+body[data-page="leaderboard"] .engine-summary-card.is-leader {
+  border-color: var(--sub-line);
+  color: var(--sub-ink);
+  background: var(--sub-panel);
+  box-shadow: none;
+}
+body[data-page="leaderboard"] .engine-summary-card.is-leader {
+  border-color: #83aaa0;
+}
+body[data-page="leaderboard"] .engine-summary-card .summary-metric {
+  border-color: var(--sub-line);
+  color: var(--sub-ink);
+  background: var(--sub-paper);
+}
+body[data-page="leaderboard"] .engine-summary-card .summary-metric span,
+body[data-page="leaderboard"] .engine-summary-card .engine-summary-version-label,
+body[data-page="leaderboard"] .engine-summary-card .engine-summary-footer-label {
+  color: #52615f;
+}
+body[data-page="leaderboard"] .engine-summary-card .summary-metric strong,
+body[data-page="leaderboard"] .engine-summary-card .engine-summary-version-value,
+body[data-page="leaderboard"] .engine-summary-card .engine-summary-footer-value {
+  color: var(--sub-ink);
+}
+body[data-page="leaderboard"] .engine-summary-card .engine-summary-meta,
+body[data-page="leaderboard"] .engine-summary-card.is-leader .engine-summary-meta {
+  border-color: var(--sub-line);
+  color: var(--sub-ink);
+  background: #e9efed;
+}
+body[data-page="leaderboard"] .engine-summary-card.is-leader .engine-summary-meta {
+  border-color: #a7c8be;
+  background: #e5f1ed;
+}
+body[data-page="leaderboard"] .engine-summary-card .leader-mark {
+  border: 1px solid #9bc9aa;
+  color: #195c35;
+  background: #e2f3e7;
+}
+body[data-page="leaderboard"] .coverage-pill.success,
+body[data-page="leaderboard"] .hc-badge.pass {
+  border-color: #9bc9aa;
+  color: #195c35;
+  background: #e2f3e7;
+}
+body[data-page="leaderboard"] .coverage-pill.warning,
+body[data-page="leaderboard"] .hc-badge.fail {
+  border-color: #d9b45f;
+  color: #694a05;
+  background: #f4e1ae;
+}
 body[data-page="leaderboard"] .leaderboard-table { color: var(--sub-ink); background: #fff; }
 body[data-page="leaderboard"] .leaderboard-table th { border-color: var(--sub-dark-line); color: #fff; background: var(--sub-ink); }
 body[data-page="leaderboard"] .leaderboard-table td { border-bottom-color: var(--sub-line); color: var(--sub-ink); }

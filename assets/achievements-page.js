@@ -12,6 +12,32 @@
     // projects that we mirror, integrate, validate, or adapt are not achievements.
     const ACHIEVEMENTS = [
         {
+            sortDate: '2026-07-25',
+            date: { en: 'Jul 25, 2026', zh: '2026 年 7 月 25 日' },
+            category: 'community',
+            kind: { en: 'Upstream contribution', zh: '上游贡献' },
+            status: { en: 'Merged', zh: '已合入' },
+            title: {
+                en: 'Inline-math recognition fix merged into Qwen Code',
+                zh: '行内公式识别修复合入 Qwen Code',
+            },
+            body: {
+                en: 'Jingyuan Tian unified bounded inline-math recognition across Qwen Code CLI prose, tables, source copying, and streaming measurement, aligning single-character formulas with escaped-dollar, code-span, and currency safeguards.',
+                zh: '田景远为 Qwen Code CLI 的正文、表格、源码复制与流式测量统一了有长度边界的行内公式识别契约，使单字符公式识别与转义美元符号、代码段及货币防护保持一致。',
+            },
+            tags: [
+                { en: 'Qwen', zh: 'Qwen' },
+                { en: 'CLI rendering', zh: 'CLI 渲染' },
+                { en: 'Merged PR', zh: '已合入 PR' },
+            ],
+            links: [
+                {
+                    label: { en: 'QwenLM/qwen-code #7701', zh: 'QwenLM/qwen-code #7701' },
+                    href: 'https://github.com/QwenLM/qwen-code/pull/7701',
+                },
+            ],
+        },
+        {
             sortDate: '2026-07-22',
             date: { en: 'Jul 22, 2026', zh: '2026 年 7 月 22 日' },
             category: 'publication',
@@ -151,7 +177,7 @@
         },
     ];
 
-    const OPEN_UPSTREAM_PRS = [
+    const UPSTREAM_PULL_REQUESTS = [
         { repository: 'vLLM', number: 47793, title: 'Handle missing vLLM metadata in Triton import', status: 'needs-label', href: 'https://github.com/vllm-project/vllm/pull/47793' },
         { repository: 'vLLM', number: 49034, title: 'fix(v1): avoid false shutdown failures on clean exit', status: 'needs-label', href: 'https://github.com/vllm-project/vllm/pull/49034' },
         { repository: 'vLLM', number: 49035, title: 'fix: handle missing parent modules in _has_module', status: 'needs-label', href: 'https://github.com/vllm-project/vllm/pull/49035' },
@@ -165,6 +191,8 @@
         { repository: 'Triton-Ascend', number: 920, title: '[ascend](fix) allow MemAccOp factory specializations', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/920' },
         { repository: 'Triton-Ascend', number: 922, title: '[build](fix) fix Python module build dependencies', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/922' },
         { repository: 'Triton-Ascend', number: 923, title: '[tools](fix) trim optional dialect registrations', status: 'ci-retry', href: 'https://github.com/triton-lang/triton-ascend/pull/923' },
+        { repository: 'Qwen Code', number: 5185, title: 'fix(plan-gate): isolate gate agent AbortSignal from parent signal chain', status: 'merged', href: 'https://github.com/QwenLM/qwen-code/pull/5185' },
+        { repository: 'Qwen Code', number: 7701, title: 'fix(cli): align inline math recognition', status: 'merged', href: 'https://github.com/QwenLM/qwen-code/pull/7701' },
     ];
 
     const UPSTREAM_REPOSITORIES = [
@@ -185,6 +213,12 @@
             name: 'Triton-Ascend',
             owner: 'triton-lang',
             href: 'https://github.com/triton-lang/triton-ascend',
+        },
+        {
+            id: 'qwen-code',
+            name: 'Qwen Code',
+            owner: 'QwenLM',
+            href: 'https://github.com/QwenLM/qwen-code',
         },
     ];
 
@@ -250,6 +284,7 @@
             repositoryLabel: 'Explore repository',
             teamLabel: 'Project team',
             openStatus: 'Open',
+            mergedStatus: 'Merged',
             draftStatus: 'Draft',
             needsLabelStatus: 'Needs label',
             reviewRequestedStatus: 'Review requested',
@@ -289,6 +324,7 @@
             repositoryLabel: '查看优化仓库',
             teamLabel: '项目团队',
             openStatus: '开放',
+            mergedStatus: '已合入',
             draftStatus: '草稿',
             needsLabelStatus: '待上游标签',
             reviewRequestedStatus: '已请求评审',
@@ -562,7 +598,7 @@
         if (!target) return;
         const repositories = UPSTREAM_REPOSITORIES.map((repository) => ({
             ...repository,
-            pullRequests: OPEN_UPSTREAM_PRS.filter((pullRequest) => pullRequest.repository === repository.name),
+            pullRequests: UPSTREAM_PULL_REQUESTS.filter((pullRequest) => pullRequest.repository === repository.name),
         }));
         const activeRepository = repositories.find((repository) => repository.id === expandedUpstreamRepository);
 
@@ -574,6 +610,7 @@
                 'ready-evidence': ui(lang).readyEvidenceStatus,
                 'evidence-pending': ui(lang).evidencePendingStatus,
                 'ci-retry': ui(lang).ciRetryStatus,
+                merged: ui(lang).mergedStatus,
             };
             const status = statusLabels[pullRequest.status] || ui(lang).openStatus;
             return `
