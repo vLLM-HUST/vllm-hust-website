@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=upstream-qwen-community-20260727" />
-  <link rel="stylesheet" href="./assets/home.css?v=plugin-ecosystem-20260727" />
+  <link rel="stylesheet" href="./assets/home.css?v=mechanism-taxonomy-20260727" />
 </head>
 <body data-page="home">
   <nav class="site-nav">
@@ -77,30 +77,65 @@
         <div><span>04</span><strong id="path-transfer-title">Transfer</strong><small id="path-transfer-copy">Adapt the mechanism to upstream or another engine</small></div>
       </div>
       <div class="stack-grid">
-        <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / INTEGRATE</span><strong>vLLM-HUST Runtime</strong><p id="stack-core-copy">The upstream-compatible host where plugins meet scheduler, cache, and execution interfaces.</p><em>Repository ↗</em></a>
-        <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span>02 / VALIDATE</span><strong>Ascend Backend</strong><p id="stack-ascend-copy">Real-hardware integration and validation for mechanisms that cross the runtime/backend boundary.</p><em>Repository ↗</em></a>
-        <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span>03 / LOWER</span><strong>Triton Ascend</strong><p id="stack-triton-copy">The compiler and kernel path for testing portable execution ideas on Ascend NPU.</p><em>Repository ↗</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / HOST</span><strong>Runtime Contract</strong><p id="stack-core-copy">The upstream-compatible integration host where plugins meet scheduler, state, cache, and execution interfaces.</p><em>Repository ↗</em></a>
+        <a href="#projects"><span>02 / CONNECT</span><strong>Plugin Interfaces</strong><p id="stack-ascend-copy">Narrow hooks keep scheduling, state, decoding, quantization, and execution mechanisms separable from one engine.</p><em id="stack-catalog-link">Explore catalog ↓</em></a>
+        <a href="./leaderboard.html"><span>03 / VALIDATE</span><strong>Validation Matrix</strong><p id="stack-triton-copy">The same mechanism is checked across available engine, compiler, and hardware adapters rather than one privileged backend.</p><em id="stack-leaderboard-link">Open leaderboard →</em></a>
         <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / MEASURE</span><strong>Benchmark Contract</strong><p id="stack-benchmark-copy">Fixed targets, comparable configurations, and public evidence for every claimed improvement.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
       </div>
     </section>
 
     <section class="execution-section execution-atlas" id="projects">
       <div class="execution-section-head">
-        <div><p id="atlas-eyebrow" class="execution-eyebrow">Plugin &amp; tool catalog</p><h2 id="atlas-title">Mechanisms first. Engine second.</h2></div>
-        <p id="atlas-summary">Each public repository owns one focused capability. Accepted artifacts, active research plugins, engineering tools, and adapters remain explicitly distinguished.</p>
+        <div><p id="atlas-eyebrow" class="execution-eyebrow">Portable mechanism catalog</p><h2 id="atlas-title">Core mechanisms by system position.</h2></div>
+        <p id="atlas-summary">Projects are organized by where they intervene in the inference path. Each isolates a capability that can be validated here, then independently integrated, transferred, or licensed.</p>
       </div>
       <div class="runtime-list">
-        <a href="https://github.com/vLLM-HUST/vllm-hust-bidkv"><span class="runtime-name">BidKV</span><span id="atlas-bidkv-role" class="runtime-role">KV-pressure eviction and preemption policy</span><span class="runtime-tag">plugin</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec"><span class="runtime-name">DiffSpec</span><span id="atlas-diffspec-role" class="runtime-role">Differential speculative decoding for ultra-long sequences</span><span class="runtime-tag">plugin</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE"><span class="runtime-name">LatchMoE</span><span id="atlas-latchmoe-role" class="runtime-role">Address-stable, graph-compatible expert offloading</span><span class="runtime-tag">plugin</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-ascend-quant-hust"><span class="runtime-name">Ascend Quant</span><span id="atlas-quant-role" class="runtime-role">Post-training and mixed-precision quantization</span><span class="runtime-tag amber">tool</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/ascend-runtime-manager"><span class="runtime-name">Ascend Runtime Manager</span><span id="atlas-manager-role" class="runtime-role">Deployment diagnostics and setup</span><span class="runtime-tag amber">tooling</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-hust-perf-analyzer"><span class="runtime-name">Performance Analyzer</span><span id="atlas-perf-role" class="runtime-role">Serving performance analysis</span><span class="runtime-tag cyan">analysis</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-hust-profiling"><span class="runtime-name">Profiling Toolkit</span><span id="atlas-profiling-role" class="runtime-role">Repeatable profiling workflows for runtime and backend</span><span class="runtime-tag cyan">analysis</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span class="runtime-name">Benchmark Suite</span><span id="atlas-benchmark-role" class="runtime-role">Fixed-target comparison and evidence pipeline</span><span class="runtime-tag amber">validation</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="runtime-name">Ascend Adapter</span><span id="atlas-ascend-role" class="runtime-role">Runtime and hardware integration boundary</span><span class="runtime-tag green">adapter</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="runtime-name">Triton Ascend</span><span id="atlas-triton-role" class="runtime-role">Compiler and kernel integration boundary</span><span class="runtime-tag green">adapter</span><span>↗</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="runtime-name">vLLM Metal HUST</span><span id="atlas-metal-role" class="runtime-role">Apple Silicon hardware plugin</span><span class="runtime-tag green">adapter</span><span>↗</span></a>
+        <section class="runtime-group" aria-labelledby="mechanism-control-title">
+          <div class="runtime-group-head"><span>01 / CONTROL + STATE</span><strong id="mechanism-control-title">Control &amp; state</strong><p id="mechanism-control-copy">Admission, scheduling, KV lifecycle, eviction, and preemption.</p></div>
+          <div class="runtime-group-items">
+            <a href="https://github.com/vLLM-HUST/vllm-hust-bidkv"><span class="runtime-name">BidKV</span><span id="atlas-bidkv-role" class="runtime-role">KV-pressure eviction and preemption policy</span><span class="runtime-tag">plugin</span><span>↗</span></a>
+          </div>
+        </section>
+        <section class="runtime-group" aria-labelledby="mechanism-execution-title">
+          <div class="runtime-group-head"><span>02 / DECODE + EXECUTE</span><strong id="mechanism-execution-title">Decoding &amp; execution</strong><p id="mechanism-execution-copy">Token generation, speculation, expert placement, and execution control.</p></div>
+          <div class="runtime-group-items">
+            <a href="https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec"><span class="runtime-name">DiffSpec</span><span id="atlas-diffspec-role" class="runtime-role">Differential speculative decoding for ultra-long sequences</span><span class="runtime-tag">plugin</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE"><span class="runtime-name">LatchMoE</span><span id="atlas-latchmoe-role" class="runtime-role">Address-stable, graph-compatible expert offloading</span><span class="runtime-tag">plugin</span><span>↗</span></a>
+          </div>
+        </section>
+        <section class="runtime-group" aria-labelledby="mechanism-representation-title">
+          <div class="runtime-group-head"><span>03 / REPRESENT</span><strong id="mechanism-representation-title">Model representation</strong><p id="mechanism-representation-copy">Precision, quantization, storage cost, and accuracy tradeoffs.</p></div>
+          <div class="runtime-group-items">
+            <a href="https://github.com/vLLM-HUST/vllm-ascend-quant-hust"><span class="runtime-name">Ascend Quant</span><span id="atlas-quant-role" class="runtime-role">Post-training and mixed-precision quantization</span><span class="runtime-tag amber">tool</span><span>↗</span></a>
+          </div>
+        </section>
+        <section class="runtime-group" aria-labelledby="mechanism-compiler-title">
+          <div class="runtime-group-head"><span>04 / LOWER</span><strong id="mechanism-compiler-title">Compiler &amp; kernels</strong><p id="mechanism-compiler-copy">Graph lowering, operator generation, and hardware-aware kernels.</p></div>
+          <div class="runtime-group-items">
+            <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="runtime-name">Triton Ascend</span><span id="atlas-triton-role" class="runtime-role">Compiler and kernel toolchain for the Ascend adapter</span><span class="runtime-tag cyan">toolchain</span><span>↗</span></a>
+          </div>
+        </section>
+        <section class="runtime-group" aria-labelledby="mechanism-adapters-title">
+          <div class="runtime-group-head"><span>05 / ADAPT</span><strong id="mechanism-adapters-title">Hardware adapters</strong><p id="mechanism-adapters-copy">Peer engine backends that connect the runtime contract to different accelerators.</p></div>
+          <div class="runtime-group-items">
+            <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="runtime-name">vLLM Ascend HUST</span><span id="atlas-ascend-role" class="runtime-role">vLLM hardware adapter for Ascend accelerators</span><span class="runtime-tag green">adapter</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="runtime-name">vLLM Metal HUST</span><span id="atlas-metal-role" class="runtime-role">vLLM hardware adapter for Apple Silicon</span><span class="runtime-tag green">adapter</span><span>↗</span></a>
+          </div>
+        </section>
+        <section class="runtime-group" aria-labelledby="mechanism-operations-title">
+          <div class="runtime-group-head"><span>06 / OPERATE</span><strong id="mechanism-operations-title">Operations &amp; observability</strong><p id="mechanism-operations-copy">Deployment, environment diagnosis, profiling, and performance attribution.</p></div>
+          <div class="runtime-group-items">
+            <a href="https://github.com/vLLM-HUST/ascend-runtime-manager"><span class="runtime-name">Ascend Runtime Manager</span><span id="atlas-manager-role" class="runtime-role">Deployment diagnostics and setup</span><span class="runtime-tag amber">tooling</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/vllm-hust-perf-analyzer"><span class="runtime-name">Performance Analyzer</span><span id="atlas-perf-role" class="runtime-role">Serving performance analysis</span><span class="runtime-tag cyan">analysis</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/vllm-hust-profiling"><span class="runtime-name">Profiling Toolkit</span><span id="atlas-profiling-role" class="runtime-role">Repeatable profiling workflows for runtime and backend</span><span class="runtime-tag cyan">analysis</span><span>↗</span></a>
+          </div>
+        </section>
+        <section class="runtime-group" aria-labelledby="mechanism-validation-title">
+          <div class="runtime-group-head"><span>07 / PROVE</span><strong id="mechanism-validation-title">Validation &amp; evidence</strong><p id="mechanism-validation-copy">Fixed targets, comparable configurations, regression gates, and public evidence.</p></div>
+          <div class="runtime-group-items">
+            <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span class="runtime-name">Benchmark Suite</span><span id="atlas-benchmark-role" class="runtime-role">Fixed-target comparison and evidence pipeline</span><span class="runtime-tag amber">validation</span><span>↗</span></a>
+          </div>
+        </section>
       </div>
     </section>
 
@@ -149,18 +184,27 @@
         'path-adapter-title': 'Adapter', 'path-adapter-copy': 'A narrow boundary to runtime and hardware hooks',
         'path-prove-title': 'Prove', 'path-prove-copy': 'Correctness, performance, and hardware evidence in vLLM-HUST',
         'path-transfer-title': 'Transfer', 'path-transfer-copy': 'Adapt the mechanism to upstream or another engine',
-        'stack-core-copy': 'The upstream-compatible host where plugins meet scheduler, cache, and execution interfaces.',
-        'stack-ascend-copy': 'Real-hardware integration and validation for mechanisms that cross the runtime/backend boundary.',
-        'stack-triton-copy': 'The compiler and kernel path for testing portable execution ideas on Ascend NPU.',
+        'stack-core-copy': 'The upstream-compatible integration host where plugins meet scheduler, state, cache, and execution interfaces.',
+        'stack-ascend-copy': 'Narrow hooks keep scheduling, state, decoding, quantization, and execution mechanisms separable from one engine.',
+        'stack-triton-copy': 'The same mechanism is checked across available engine, compiler, and hardware adapters rather than one privileged backend.',
+        'stack-catalog-link': 'Explore catalog ↓', 'stack-leaderboard-link': 'Open leaderboard →',
         'stack-benchmark-copy': 'Fixed targets, comparable configurations, and public evidence for every claimed improvement.', 'stack-benchmark-link': 'Open benchmark ↗',
-        'atlas-eyebrow': 'Plugin & tool catalog', 'atlas-title': 'Mechanisms first. Engine second.',
-        'atlas-summary': 'Each public repository owns one focused capability. Accepted artifacts, active research plugins, engineering tools, and adapters remain explicitly distinguished.',
+        'atlas-eyebrow': 'Portable mechanism catalog', 'atlas-title': 'Core mechanisms by system position.',
+        'atlas-summary': 'Projects are organized by where they intervene in the inference path. Each isolates a capability that can be validated here, then independently integrated, transferred, or licensed.',
+        'mechanism-control-title': 'Control & state', 'mechanism-control-copy': 'Admission, scheduling, KV lifecycle, eviction, and preemption.',
+        'mechanism-execution-title': 'Decoding & execution', 'mechanism-execution-copy': 'Token generation, speculation, expert placement, and execution control.',
+        'mechanism-representation-title': 'Model representation', 'mechanism-representation-copy': 'Precision, quantization, storage cost, and accuracy tradeoffs.',
+        'mechanism-compiler-title': 'Compiler & kernels', 'mechanism-compiler-copy': 'Graph lowering, operator generation, and hardware-aware kernels.',
+        'mechanism-adapters-title': 'Hardware adapters', 'mechanism-adapters-copy': 'Peer engine backends that connect the runtime contract to different accelerators.',
+        'mechanism-operations-title': 'Operations & observability', 'mechanism-operations-copy': 'Deployment, environment diagnosis, profiling, and performance attribution.',
+        'mechanism-validation-title': 'Validation & evidence', 'mechanism-validation-copy': 'Fixed targets, comparable configurations, regression gates, and public evidence.',
         'atlas-bidkv-role': 'KV-pressure eviction and preemption policy', 'atlas-diffspec-role': 'Differential speculative decoding for ultra-long sequences',
         'atlas-latchmoe-role': 'Address-stable, graph-compatible expert offloading', 'atlas-quant-role': 'Post-training and mixed-precision quantization',
         'atlas-manager-role': 'Deployment diagnostics and setup', 'atlas-perf-role': 'Serving performance analysis',
         'atlas-profiling-role': 'Repeatable profiling workflows for runtime and backend', 'atlas-benchmark-role': 'Fixed-target comparison and evidence pipeline',
-        'atlas-ascend-role': 'Runtime and hardware integration boundary', 'atlas-triton-role': 'Compiler and kernel integration boundary',
-        'atlas-metal-role': 'Apple Silicon hardware plugin',
+        'atlas-triton-role': 'Compiler and kernel toolchain for the Ascend adapter',
+        'atlas-ascend-role': 'vLLM hardware adapter for Ascend accelerators',
+        'atlas-metal-role': 'vLLM hardware adapter for Apple Silicon',
         'ecosystem-eyebrow': 'Shared architecture', 'ecosystem-title': 'Open layers. Shared progress.',
         'ecosystem-summary': 'The ecosystem connects research incubation, application orchestration, evolving data systems, and open model-execution communities.',
         'ecosystem-intellistream': 'Cross-layer research incubator', 'ecosystem-sage': 'Applications, agents, RAG, workflows',
@@ -181,18 +225,27 @@
         'path-adapter-title': '适配', 'path-adapter-copy': '连接运行时与硬件钩子的窄接口',
         'path-prove-title': '验证', 'path-prove-copy': '在 vLLM-HUST 中形成正确性、性能与硬件证据',
         'path-transfer-title': '迁移', 'path-transfer-copy': '将机制适配到上游或其他推理引擎',
-        'stack-core-copy': '兼容上游的集成宿主，让插件接入调度器、缓存与执行接口。',
-        'stack-ascend-copy': '面向跨越运行时与后端边界的机制，提供真实硬件集成和验证。',
-        'stack-triton-copy': '在昇腾 NPU 上验证可迁移执行机制的编译与算子路径。',
+        'stack-core-copy': '兼容上游的集成宿主，让插件接入调度器、状态、缓存与执行接口。',
+        'stack-ascend-copy': '通过窄接口使调度、状态、解码、量化与执行机制不与单一引擎绑定。',
+        'stack-triton-copy': '同一机制面向现有引擎、编译器与硬件适配器验证，不预设唯一后端。',
+        'stack-catalog-link': '查看目录 ↓', 'stack-leaderboard-link': '打开排行榜 →',
         'stack-benchmark-copy': '以固定靶、可比配置和公开证据约束每项性能结论。', 'stack-benchmark-link': '打开 Benchmark ↗',
-        'atlas-eyebrow': '插件与工具目录', 'atlas-title': '机制优先，引擎解耦。',
-        'atlas-summary': '每个公开仓库聚焦一种能力，并明确区分已发表制品、在研插件、工程工具和适配层。',
+        'atlas-eyebrow': '可迁移机制目录', 'atlas-title': '按系统位置组织核心机制。',
+        'atlas-summary': '项目按照其介入推理链路的位置归类。每项能力都以独立边界封装，可先在这里验证，再单独集成、迁移或授权。',
+        'mechanism-control-title': '控制与状态', 'mechanism-control-copy': '请求准入、调度、KV 生命周期、驱逐与抢占。',
+        'mechanism-execution-title': '解码与执行', 'mechanism-execution-copy': 'Token 生成、投机解码、专家放置与执行控制。',
+        'mechanism-representation-title': '模型表示', 'mechanism-representation-copy': '精度、量化、存储成本与准确率权衡。',
+        'mechanism-compiler-title': '编译与算子', 'mechanism-compiler-copy': '计算图下沉、算子生成与硬件感知内核。',
+        'mechanism-adapters-title': '硬件适配器', 'mechanism-adapters-copy': '将运行时契约连接到不同加速器的同级引擎后端。',
+        'mechanism-operations-title': '运维与观测', 'mechanism-operations-copy': '部署、环境诊断、性能剖析与性能归因。',
+        'mechanism-validation-title': '验证与证据', 'mechanism-validation-copy': '固定靶、可比配置、回归门禁与公开证据。',
         'atlas-bidkv-role': 'KV 压力感知驱逐与抢占策略', 'atlas-diffspec-role': '面向超长序列的差分投机解码',
         'atlas-latchmoe-role': '地址稳定、兼容计算图的专家卸载', 'atlas-quant-role': '训练后量化与混合精度量化',
         'atlas-manager-role': '部署诊断与环境配置', 'atlas-perf-role': '推理服务性能归因分析',
         'atlas-profiling-role': '面向运行时与后端的可复现性能剖析流程', 'atlas-benchmark-role': '固定靶对比与证据流水线',
-        'atlas-ascend-role': '运行时与硬件的集成边界', 'atlas-triton-role': '编译器与算子的集成边界',
-        'atlas-metal-role': '面向 Apple Silicon 的硬件插件',
+        'atlas-triton-role': '服务于昇腾适配器的编译与算子工具链',
+        'atlas-ascend-role': '面向昇腾加速器的 vLLM 硬件适配器',
+        'atlas-metal-role': '面向 Apple Silicon 的 vLLM 硬件适配器',
         'ecosystem-eyebrow': '共享架构', 'ecosystem-title': '开放分层，共同演进。',
         'ecosystem-summary': '生态连接研究孵化、应用编排、演化数据系统与开放的模型执行社区。',
         'ecosystem-intellistream': '跨层研究孵化器', 'ecosystem-sage': '应用、Agent、RAG 与工作流',

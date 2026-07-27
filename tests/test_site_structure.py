@@ -622,7 +622,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=plugin-ecosystem-20260727" in html_text
+    assert "assets/home.css?v=mechanism-taxonomy-20260727" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
@@ -644,8 +644,10 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     assert "Plugin proving ground" in site_js
     assert "插件试验场" in site_js
     assert 'class="plugin-path"' in html_text
-    assert "Mechanisms first. Engine second." in html_text
-    assert "机制优先，引擎解耦。" in html_text
+    assert "Core mechanisms by system position." in html_text
+    assert "按系统位置组织核心机制。" in html_text
+    assert "independently integrated, transferred, or licensed" in html_text
+    assert "单独集成、迁移或授权" in html_text
 
     expected_repositories = (
         "vllm-hust-bidkv",
@@ -662,6 +664,52 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     )
     for repository in expected_repositories:
         assert f"https://github.com/vLLM-HUST/{repository}" in html_text
+
+    proving_ground = html_text.split('id="stack"', 1)[1].split(
+        'id="projects"', 1
+    )[0]
+    assert "Runtime Contract" in proving_ground
+    assert "Plugin Interfaces" in proving_ground
+    assert "Validation Matrix" in proving_ground
+    assert "Benchmark Contract" in proving_ground
+    assert "vllm-ascend-hust" not in proving_ground
+    assert "triton-ascend-hust" not in proving_ground
+
+    catalog = html_text.split('id="projects"', 1)[1].split(
+        'id="ecosystem"', 1
+    )[0]
+    ascend_adapter = catalog.index("vLLM Ascend HUST")
+    metal_adapter = catalog.index("vLLM Metal HUST")
+    assert ascend_adapter < metal_adapter
+    assert "Compiler and kernel toolchain for the Ascend adapter" in catalog
+    assert catalog.count('<span class="runtime-tag green">adapter</span>') == 2
+
+    group_ids = (
+        "mechanism-control-title",
+        "mechanism-execution-title",
+        "mechanism-representation-title",
+        "mechanism-compiler-title",
+        "mechanism-adapters-title",
+        "mechanism-operations-title",
+        "mechanism-validation-title",
+    )
+    group_positions = [catalog.index(f'id="{group_id}"') for group_id in group_ids]
+    assert group_positions == sorted(group_positions)
+
+    control_group = catalog.split('id="mechanism-control-title"', 1)[1].split(
+        'id="mechanism-execution-title"', 1
+    )[0]
+    execution_group = catalog.split('id="mechanism-execution-title"', 1)[1].split(
+        'id="mechanism-representation-title"', 1
+    )[0]
+    adapter_group = catalog.split('id="mechanism-adapters-title"', 1)[1].split(
+        'id="mechanism-operations-title"', 1
+    )[0]
+    assert "vllm-hust-bidkv" in control_group
+    assert "vllm-ascend-hust-diffspec" in execution_group
+    assert "vllm-ascend-hust-LatchMoE" in execution_group
+    assert "vllm-ascend-hust" in adapter_group
+    assert "vllm-metal-hust" in adapter_group
 
     for internal_phrase in (
         "讲述口径",
