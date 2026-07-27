@@ -614,7 +614,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=upstream-qwen-community-20260727" in text
-        assert "assets/site.js?v=bilingual-toggle-20260723" in text
+        assert "assets/site.js?v=plugin-ecosystem-20260727" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -622,15 +622,55 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=mobile-navigation-20260723" in html_text
+    assert "assets/home.css?v=plugin-ecosystem-20260727" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
     assert "cosmic-card" not in html_text
     assert ".execution-hero" in css_text
     assert ".execution-architecture" in css_text
+    assert ".plugin-path" in css_text
     assert "letter-spacing: -" not in css_text
     assert "font-size: clamp(" not in css_text
+
+
+def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "index.html").read_text(encoding="utf-8")
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+
+    assert "A proving ground for reusable inference ideas." in html_text
+    assert "让可复用的推理机制在真实系统中得到验证。" in html_text
+    assert "Plugin proving ground" in site_js
+    assert "插件试验场" in site_js
+    assert 'class="plugin-path"' in html_text
+    assert "Mechanisms first. Engine second." in html_text
+    assert "机制优先，引擎解耦。" in html_text
+
+    expected_repositories = (
+        "vllm-hust-bidkv",
+        "vllm-ascend-hust-diffspec",
+        "vllm-ascend-hust-LatchMoE",
+        "vllm-ascend-quant-hust",
+        "ascend-runtime-manager",
+        "vllm-hust-perf-analyzer",
+        "vllm-hust-profiling",
+        "vllm-hust-benchmark",
+        "vllm-ascend-hust",
+        "triton-ascend-hust",
+        "vllm-metal-hust",
+    )
+    for repository in expected_repositories:
+        assert f"https://github.com/vLLM-HUST/{repository}" in html_text
+
+    for internal_phrase in (
+        "讲述口径",
+        "提示词",
+        "内部说明",
+        "TODO",
+        "speaker note",
+    ):
+        assert internal_phrase not in html_text
 
 
 def test_subpages_use_shared_ecosystem_visual_system() -> None:
@@ -873,7 +913,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=upstream-qwen-community-20260727" in html_text
-    assert "assets/achievements-page.js?v=upstream-qwen-community-20260727" in html_text
+    assert "assets/achievements-page.js?v=plugin-ecosystem-20260727" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -963,7 +1003,7 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     pdf_path = root / "assets" / "papers" / "bidkv-sc2026.pdf"
 
     assert 'id="result-repository-list"' in html_text
-    assert "正式发表" in html_text
+    assert "已发表插件与系统" in html_text
     assert "成果仓库" in js_text
     assert "const RESULT_REPOSITORIES = [" in js_text
     assert (
@@ -982,6 +1022,9 @@ def test_bidkv_is_presented_as_a_reusable_result_repository() -> None:
     assert "names: { en: 'Shuhao Zhang', zh: '张书豪' }" in js_text
     assert "result-repository-card" in css_text
     assert "result-repository-team" in css_text
+    assert "artifact: { en: 'Scheduling plugin', zh: '调度插件' }" in js_text
+    assert "boundary: { en: 'KV lifecycle + scheduler hooks'" in js_text
+    assert "provingGround: { en: 'vLLM-HUST', zh: 'vLLM-HUST' }" in js_text
     assert pdf_path.is_file()
     assert pdf_path.stat().st_size > 100_000
 
@@ -999,7 +1042,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     assert "项目团队：主要作者杜忠承；指导老师黄禹。" in js_text
     assert "name: 'DiffSpec'" in js_text
     assert "repositoryName: 'vllm-ascend-hust-diffspec'" in js_text
-    assert "面向超长序列推理的差分投机解码加速系统。" in js_text
+    assert "面向超长序列的差分投机解码系统" in js_text
     assert (
         "publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' }" in js_text
     )
@@ -1016,7 +1059,9 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     assert result_repositories.index(
         "repositoryName: 'vllm-hust-bidkv'"
     ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
-    assert "assets/achievements-page.js?v=upstream-qwen-community-20260727" in html_text
+    assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
+    assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
+    assert "assets/achievements-page.js?v=plugin-ecosystem-20260727" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -1838,7 +1883,7 @@ def test_core_contributor_stats_precede_all_repository_stats() -> None:
     all_index = html_text.index('id="contributors-all-tbody"')
 
     assert core_index < all_index
-    assert "核心仓库与独立优化成果" in html_text
+    assert "试验场核心仓库与已接收插件" in html_text
     assert "BidKV、DiffSpec" in html_text
 
 

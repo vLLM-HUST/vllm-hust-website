@@ -160,8 +160,8 @@
                 zh: 'vLLM-HUST 推理运行时公开仓库',
             },
             body: {
-                en: 'The upstream-compatible runtime fork opened as the shared execution foundation for domestic-hardware enablement, plugins, benchmarks, and serving experiments.',
-                zh: '兼容上游的推理运行时仓库公开，作为国产硬件适配、插件、评测与服务实验的共同执行基础。',
+                en: 'The upstream-compatible runtime opened as the shared proving ground for hardware adapters, inference plugins, benchmarks, and serving experiments.',
+                zh: '兼容上游的推理运行时仓库公开，作为硬件适配、推理插件、Benchmark 与服务实验的共享试验场。',
             },
             tags: [
                 { en: 'Runtime', zh: '推理运行时' },
@@ -227,9 +227,12 @@
             name: 'BidKV',
             repositoryName: 'vllm-hust-bidkv',
             summary: {
-                en: 'A KV-cache reclamation plugin for vLLM.',
-                zh: '用于 vLLM 的 KV Cache 回收插件。',
+                en: 'A KV-cache reclamation and preemption plugin, packaged around scheduler and KV-lifecycle hooks and evaluated in vLLM-HUST.',
+                zh: '围绕调度器与 KV 生命周期钩子封装的 KV Cache 回收和抢占插件，并在 vLLM-HUST 中完成评测。',
             },
+            artifact: { en: 'Scheduling plugin', zh: '调度插件' },
+            boundary: { en: 'KV lifecycle + scheduler hooks', zh: 'KV 生命周期与调度器钩子' },
+            provingGround: { en: 'vLLM-HUST', zh: 'vLLM-HUST' },
             publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' },
             team: [
                 {
@@ -247,9 +250,12 @@
             name: 'DiffSpec',
             repositoryName: 'vllm-ascend-hust-diffspec',
             summary: {
-                en: 'A differential speculative decoding acceleration system for ultra-long-sequence inference.',
-                zh: '面向超长序列推理的差分投机解码加速系统。',
+                en: 'A differential speculative-decoding system for ultra-long sequences, packaged as an independent artifact and integrated through vLLM-HUST.',
+                zh: '面向超长序列的差分投机解码系统，以独立制品封装并通过 vLLM-HUST 完成集成。',
             },
+            artifact: { en: 'Decoding system', zh: '解码系统' },
+            boundary: { en: 'Draft + verify + decode hooks', zh: '草稿、验证与解码钩子' },
+            provingGround: { en: 'vLLM Ascend HUST', zh: 'vLLM Ascend HUST' },
             publication: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' },
             team: [
                 {
@@ -283,6 +289,9 @@
             latestLabel: 'Latest',
             repositoryLabel: 'Explore repository',
             teamLabel: 'Project team',
+            artifactLabel: 'Artifact',
+            boundaryLabel: 'Interface',
+            provingGroundLabel: 'Proven in',
             openStatus: 'Open',
             mergedStatus: 'Merged',
             draftStatus: 'Draft',
@@ -323,6 +332,9 @@
             latestLabel: '最新',
             repositoryLabel: '查看优化仓库',
             teamLabel: '项目团队',
+            artifactLabel: '制品',
+            boundaryLabel: '接口',
+            provingGroundLabel: '验证环境',
             openStatus: '开放',
             mergedStatus: '已合入',
             draftStatus: '草稿',
@@ -574,6 +586,11 @@
                         <span>${pick(repository.publication, lang)}</span>
                     </div>
                     <p>${pick(repository.summary, lang)}</p>
+                    <div class="tag-list result-repository-capabilities">
+                        <span class="tag">${ui(lang).artifactLabel} · ${pick(repository.artifact, lang)}</span>
+                        <span class="tag">${ui(lang).boundaryLabel} · ${pick(repository.boundary, lang)}</span>
+                        <span class="tag">${ui(lang).provingGroundLabel} · ${pick(repository.provingGround, lang)}</span>
+                    </div>
                 </div>
                 ${repository.team?.length ? `
                     <div class="result-repository-team">
