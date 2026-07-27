@@ -11,8 +11,8 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=contributor-profiles-20260725" />
-  <link rel="stylesheet" href="./assets/subpages.css?v=upstream-pr-contrast-20260724" />
+  <link rel="stylesheet" href="./assets/site.css?v=identity-mapping-20260725" />
+  <link rel="stylesheet" href="./assets/subpages.css?v=upstream-pr-contrast-20260724-contributors-contrast-20260725" />
 </head>
 
 <body data-page="contributors">
@@ -98,12 +98,31 @@
           <summary>
             <span>
               <strong id="contributors-members-menu-title">Contributor profiles</strong>
-              <small id="contributors-members-menu-hint">Verified contributors, focus areas, and advisor information</small>
+              <small id="contributors-members-menu-hint">Canonical identities classified by verified core-repository contributions</small>
             </span>
           </summary>
           <div class="research-members-content">
             <p id="contributors-members-loading" class="research-members-status">Loading verified contributor profiles…</p>
-            <ul id="contributors-member-list" class="research-member-list" aria-live="polite"></ul>
+            <section class="research-member-group" aria-labelledby="contributors-profile-core-title">
+              <h3 id="contributors-profile-core-title">Core members</h3>
+              <p id="contributors-profile-core-description">Members with verified code contributions in runtime or performance-optimization repositories.</p>
+              <ul id="contributors-core-member-list" class="research-member-list" aria-live="polite"></ul>
+            </section>
+            <section class="research-member-group" aria-labelledby="contributors-profile-participant-title">
+              <h3 id="contributors-profile-participant-title">Participants</h3>
+              <p id="contributors-profile-participant-description">Confirmed project participants who do not currently meet the core-repository contribution rule.</p>
+              <ul id="contributors-participant-list" class="research-member-list" aria-live="polite"></ul>
+            </section>
+            <section class="research-member-group" aria-labelledby="contributors-profile-staff-title">
+              <h3 id="contributors-profile-staff-title">Engineers &amp; Assistants</h3>
+              <p id="contributors-profile-staff-description">Professional engineers and project/research assistants supporting implementation, quality, and coordination.</p>
+              <ul id="contributors-staff-list" class="research-member-list" aria-live="polite"></ul>
+            </section>
+            <section class="research-member-group" aria-labelledby="contributors-profile-external-title">
+              <h3 id="contributors-profile-external-title">External contributors</h3>
+              <p id="contributors-profile-external-description">Outside collaborators with attributable contributions who are not members of the vLLM-HUST research group.</p>
+              <ul id="contributors-external-list" class="research-member-list" aria-live="polite"></ul>
+            </section>
           </div>
         </details>
       </section>
@@ -116,9 +135,12 @@
             <p>Updated <strong id="contributors-updated">-</strong></p>
           </div>
         </div>
-        <div class="metric-strip">
+        <div class="metric-strip contributors-metric-strip">
           <div class="metric-box"><span>All contributors</span><strong id="contributors-total">0</strong></div>
-          <div class="metric-box"><span>Core contributors</span><strong id="contributors-core-total">0</strong></div>
+          <div class="metric-box"><span id="contributors-core-metric-label">Core members</span><strong id="contributors-core-total">0</strong></div>
+          <div class="metric-box"><span id="contributors-participant-metric-label">Participants</span><strong id="contributors-participant-total">0</strong></div>
+          <div class="metric-box"><span id="contributors-staff-metric-label">Engineers &amp; Assistants</span><strong id="contributors-staff-total">0</strong></div>
+          <div class="metric-box"><span id="contributors-external-metric-label">External contributors</span><strong id="contributors-external-total">0</strong></div>
           <div class="metric-box"><span>Active repos</span><strong id="contributors-repos">0</strong></div>
         </div>
       </section>
@@ -135,13 +157,11 @@
           <table class="site-table">
             <thead>
               <tr>
-                <th>Rank</th>
-                <th>Contributor</th>
-                <th>Commits</th>
-                <th>Changed Lines</th>
-                <th>Added / Deleted</th>
-                <th>Active Repos</th>
-                <th>Key Contributions</th>
+                <th>#</th>
+                <th id="contributors-core-col-member">Member</th>
+                <th id="contributors-core-col-research">Research direction</th>
+                <th id="contributors-core-col-areas">Contribution areas</th>
+                <th id="contributors-core-col-main">Main contributions</th>
               </tr>
             </thead>
             <tbody id="contributors-core-tbody"></tbody>
@@ -193,8 +213,24 @@
         'contributors-role-project-lead': 'Project Lead',
         'contributors-subproject-title': 'Subproject leads',
         'contributors-members-menu-title': 'Contributor profiles',
-        'contributors-members-menu-hint': 'Verified contributors, focus areas, and advisor information',
+        'contributors-members-menu-hint': 'Canonical identities classified by verified core-repository contributions',
         'contributors-members-loading': 'Loading verified contributor profiles…',
+        'contributors-profile-core-title': 'Core members',
+        'contributors-profile-core-description': 'Members with verified code contributions in runtime or performance-optimization repositories.',
+        'contributors-profile-participant-title': 'Participants',
+        'contributors-profile-participant-description': 'Confirmed project participants who do not currently meet the core-repository contribution rule.',
+        'contributors-profile-staff-title': 'Engineers & Assistants',
+        'contributors-profile-staff-description': 'Professional engineers and project/research assistants supporting implementation, quality, and coordination.',
+        'contributors-profile-external-title': 'External contributors',
+        'contributors-profile-external-description': 'Outside collaborators with attributable contributions who are not members of the vLLM-HUST research group.',
+        'contributors-core-metric-label': 'Core members',
+        'contributors-participant-metric-label': 'Participants',
+        'contributors-staff-metric-label': 'Engineers & Assistants',
+        'contributors-external-metric-label': 'External contributors',
+        'contributors-core-col-member': 'Member',
+        'contributors-core-col-research': 'Research direction',
+        'contributors-core-col-areas': 'Contribution areas',
+        'contributors-core-col-main': 'Main contributions',
         'contributors-core-kicker': 'Core scope',
         'contributors-all-kicker': 'All repositories',
         'contributors-all-title': 'All repositories',
@@ -214,8 +250,24 @@
         'contributors-role-project-lead': '课题负责人',
         'contributors-subproject-title': '子课题负责人',
         'contributors-members-menu-title': '贡献成员档案',
-        'contributors-members-menu-hint': '仅展示有可验证仓库贡献的成员、方向关键词与指导老师',
+        'contributors-members-menu-hint': '按真实核心仓库贡献统一归并身份并分类',
         'contributors-members-loading': '正在加载已验证贡献成员…',
+        'contributors-profile-core-title': '核心成员',
+        'contributors-profile-core-description': '仅包含在运行时或性能优化核心仓库中有可验证代码贡献的成员。',
+        'contributors-profile-participant-title': '参与人员',
+        'contributors-profile-participant-description': '已确认参与项目、但当前尚未满足核心仓库贡献条件的人员。',
+        'contributors-profile-staff-title': '工程师与助理',
+        'contributors-profile-staff-description': '承担工程实现、质量保障及项目协调工作的工程师和项目/科研助理。',
+        'contributors-profile-external-title': '外部贡献者',
+        'contributors-profile-external-description': '拥有可归属贡献、但不属于 vLLM-HUST 课题组成员的外部协作者。',
+        'contributors-core-metric-label': '核心成员',
+        'contributors-participant-metric-label': '参与人员',
+        'contributors-staff-metric-label': '工程师与助理',
+        'contributors-external-metric-label': '外部贡献者',
+        'contributors-core-col-member': '成员',
+        'contributors-core-col-research': '研究方向',
+        'contributors-core-col-areas': '贡献领域',
+        'contributors-core-col-main': '主要贡献',
         'contributors-core-kicker': '核心统计',
         'contributors-all-kicker': '组织全量',
         'contributors-all-title': '全部仓库',
@@ -225,7 +277,7 @@
     };
   </script>
   <script src="./assets/site.js?v=bilingual-toggle-20260723"></script>
-  <script src="./assets/contributors-page.js?v=verified-advisors-20260725"></script>
+  <script src="./assets/contributors-page.js?v=staff-contributors-20260725-github-status"></script>
 </body>
 
 </html>

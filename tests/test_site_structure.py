@@ -97,31 +97,31 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     details = text[details_start:details_end]
     assert " open" not in details.split(">", 1)[0]
     assert 'id="contributors-members-menu-title"' in details
-    assert 'id="contributors-member-list"' in details
-    assert "contributorsFor(payload, 'all_repos').filter" in script
-    assert "EXCLUDED_PROFILE_IDENTITIES" in script
+    assert 'id="contributors-core-member-list"' in details
+    assert 'id="contributors-participant-list"' in details
+    assert 'id="contributors-staff-list"' in details
+    assert 'id="contributors-external-list"' in details
+    assert 'id="contributors-profile-core-title"' in details
+    assert 'id="contributors-profile-participant-title"' in details
+    assert 'id="contributors-profile-staff-title"' in details
+    assert 'id="contributors-profile-external-title"' in details
+    assert "payload?.member_profiles" in script
+    assert "profiles.core_members" in script
+    assert "profiles.participants" in script
+    assert "profiles.staff_members" in script
+    assert "profiles.external_contributors" in script
+    assert "CURATED_PROFILES" not in script
     assert "vllm-hust developer" in script
-    assert "const advisor = curated?.advisor ? advisorName : '';" in script
-    for login in (
-        "mingqiwang-coder",
-        "cybber695",
-        "pygone",
-        "wmaster123",
-        "xilinggao",
-        "moonandlife",
-        "succinctpaul",
-        "iliujunn",
-    ):
-        marker = f"'{login}': {{" if "-" in login else f"{login}: {{"
-        profile = script.split(marker, 1)[1].split("},", 1)[0]
-        assert "advisor: true" in profile
-    assert "指导老师：" in script
-    assert "张书豪" in script
-    assert "contributors-page.js?v=verified-advisors-20260725" in text
-    for unverified_name in ("张睿诚", "刘俊", "李昶吾", "毛言粲"):
-        assert unverified_name not in details
+    assert "research_direction" in script
+    assert "contribution_areas" in script
+    assert "participation_direction" in script
+    assert "Identity pending" in script
+    assert "function memberContextMarkup(item, lang)" in script
+    assert "contributor-member-context" in script
+    assert "contributors-page.js?v=staff-contributors-20260725" in text
     assert ".research-members-menu[open] summary::after" in css
-    assert ".research-member-advisor" in css
+    assert ".research-member-detail-row" in css
+    assert ".research-member-group + .research-member-group" in css
     assert "@media (max-width: 860px)" in css
 
 
@@ -365,7 +365,7 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
 
     assert effective_signature_counts["visionarena-online"] == 1
     assert effective_signature_counts["instructcoder-online"] == 2
-    assert effective_signature_counts["prefix-repetition-online"] == 2
+    assert effective_signature_counts["prefix-repetition-online"] == 1
     assert effective_signature_counts["random-online"] == 2
     assert effective_signature_counts["random-latency"] == 3
     for scenario in (
@@ -616,7 +616,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=contributor-profiles-20260725" in text
+        assert "assets/site.css?v=identity-mapping-20260725" in text
         assert "assets/site.js?v=bilingual-toggle-20260723" in text
 
 
@@ -840,7 +840,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=contributor-profiles-20260725" in html_text
+    assert "assets/site.css?v=identity-mapping-20260725" in html_text
     assert "assets/achievements-page.js?v=repository-link-20260727" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
@@ -947,11 +947,11 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
 
     assert (
-        "DiffSpec: Accelerating Long Sequence Generation with Differential Speculative Decoding"
+        "DiffSpec: Differential Speculative Decoding for Ultra-Long-Sequence Inference"
         in js_text
     )
-    assert "DiffSpec：面向长序列生成的差分投机解码加速" in js_text
-    assert "label: { en: 'Repository', zh: '仓库' }" in js_text
+    assert "DiffSpec：面向超长序列推理的差分投机解码加速系统" in js_text
+    assert "项目团队：主要作者杜忠承；指导老师黄禹。" in js_text
     assert "name: 'DiffSpec'" in js_text
     assert "repositoryName: 'vllm-ascend-hust-diffspec'" in js_text
     assert "面向超长序列推理的差分投机解码加速系统。" in js_text
@@ -964,6 +964,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
         "repository: 'https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec'"
         in js_text
     )
+    assert "repository: 'https://github.com/vLLM-HUST/vllm-hust'" not in js_text
     result_repositories = js_text.split("const RESULT_REPOSITORIES = [", 1)[1].split(
         "    ];", 1
     )[0]
@@ -1565,14 +1566,21 @@ def test_contributor_loader_uses_newest_canonical_or_local_snapshot() -> None:
     )
     assert "'./data/core_contributors.json'" in text
     assert "async function fetchPayload()" in text
+    assert "Promise.allSettled" in text
+    assert "AbortController" in text
     assert "right.updatedAt.localeCompare(left.updatedAt)" in text
+    assert "Number(right.hasMemberProfiles) - Number(left.hasMemberProfiles)" in text
+    assert "right.index - left.index" in text
     assert "return candidates[0].payload;" in text
     assert (
         "item.display_name || item.chinese_name || item.name || item.github_login || ''"
         in text
     )
-    assert "item.github_login && item.github_login !== displayName" in text
-    assert "console.warn('[contributors] source failed', source, err);" in text
+    assert "item.identity_confirmed === false" in text
+    assert (
+        "console.warn('[contributors] source failed', SOURCES[index], result.reason);"
+        in text
+    )
 
 
 def test_contributor_snapshot_has_unique_human_identities() -> None:
@@ -1581,8 +1589,14 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
     assert payload["updated_at"] == "2026-07-25"
-    assert len(payload["all_repos"]["contributors"]) == 27
-    assert len(payload["core_repos"]["contributors"]) == 15
+    assert len(payload["all_repos"]["contributors"]) == 32
+    assert len(payload["core_repos"]["contributors"]) == 21
+    profiles = payload["member_profiles"]
+    assert len(profiles["core_members"]) == 18
+    assert len(profiles["participants"]) == 28
+    assert len(profiles["staff_members"]) == 5
+    assert len(profiles["external_contributors"]) == 1
+    assert len(profiles["unresolved_contributors"]) == 1
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
     assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
     assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
@@ -1596,7 +1610,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         item.get("display_name") for item in payload["core_repos"]["contributors"]
     }
     assert "cybber695" in core_logins
-    assert "dzcixy" in core_names
+    assert "杜忠承" in core_names
 
     for scope in ("all_repos", "core_repos"):
         contributors = payload[scope]["contributors"]
@@ -1625,6 +1639,145 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         & all_names
     )
 
+    core_repo_names = set(profiles["core_repo_names"])
+    core_ids = {item["person_id"] for item in profiles["core_members"]}
+    participant_ids = {item["person_id"] for item in profiles["participants"]}
+    staff_ids = {item["person_id"] for item in profiles["staff_members"]}
+    external_ids = {item["person_id"] for item in profiles["external_contributors"]}
+    assert core_ids.isdisjoint(participant_ids)
+    assert core_ids.isdisjoint(staff_ids)
+    assert core_ids.isdisjoint(external_ids)
+    assert participant_ids.isdisjoint(staff_ids)
+    assert participant_ids.isdisjoint(external_ids)
+    assert staff_ids.isdisjoint(external_ids)
+    assert len(core_ids) == len(profiles["core_members"])
+    assert len(participant_ids) == len(profiles["participants"])
+    assert len(staff_ids) == len(profiles["staff_members"])
+    assert len(external_ids) == len(profiles["external_contributors"])
+    assert all(
+        set(item["repos"]) & core_repo_names for item in profiles["core_members"]
+    )
+    assert all(
+        not (set(item["repos"]) & core_repo_names) for item in profiles["participants"]
+    )
+    assert {item["display_name"] for item in profiles["staff_members"]} == {
+        "luoxiaohei",
+        "张俊辉",
+        "王胜",
+        "程月甲",
+        "龙斌",
+    }
+    assert {
+        item["display_name"]
+        for item in profiles["staff_members"]
+        if item["core_repository_contributor"]
+    } == {"王胜", "程月甲", "张俊辉"}
+
+    people = {
+        item["display_name"]: item
+        for item in (
+            profiles["core_members"]
+            + profiles["participants"]
+            + profiles["staff_members"]
+            + profiles["external_contributors"]
+        )
+    }
+    assert people["张睿诚"]["github_login"] == "KimmoZAG"
+    expected_github_ids = {
+        "张书豪": "ShuhaoZhangTony",
+        "李昶吾": "Li-changwu",
+        "李旭恒": "sssarrior",
+        "高鸿儒": "hongrugao",
+        "彭浩然": "Tkhkrnx",
+        "王明琪": "MingqiWang-coder",
+        "杨锦昀": "Yang-YJY",
+        "王子澳": "ZeroJustMe",
+        "张森磊": "zslchase",
+        "陈德斌": "pluviophile-chen",
+        "毛言粲": "yancanmao",
+        "万瑞鹏": "wrp-wrp",
+        "周雨桐": "FirmamentumX",
+        "董君瑶": "carsontung666",
+        "雷欣妍": "leixy2004",
+        "路庆浩": "Luqhhh",
+    }
+    for name, github_id in expected_github_ids.items():
+        assert people[name]["github_login"] == github_id
+    assert people["田景远"]["github_login"] == "CubeLander"
+    assert people["田景远"]["role"]["zh"] == "实习生"
+    assert people["田景远"]["advisor"]["zh"] == "张书豪"
+    assert people["匡明轩"]["github_login"] == "sad-and-bad1231"
+    assert people["匡明轩"]["advisor"]["zh"] == "张书豪"
+    assert people["马俊豪"]["github_login"] == "kms12425"
+    assert people["邱瑞杰"]["github_login"] == "Jerry01020"
+    assert people["赵建军"]["github_login"] == "curryzjj"
+    assert people["高西岭"]["github_login"] == "XilingGao"
+    assert people["王胜"]["role"]["zh"] == "工程师"
+    assert people["王胜"]["staff_member"] is True
+    assert people["张俊辉"]["github_login"] == "junhuizhang-boop"
+    assert people["张俊辉"]["role"]["zh"] == "工程师（派欧云）"
+    assert people["张俊辉"]["staff_member"] is True
+    assert people["luoxiaohei"]["role"]["zh"] == "工程师（派欧云）"
+    assert people["luoxiaohei"]["staff_member"] is True
+    assert people["程月甲"]["role"]["zh"] == "工程师"
+    assert people["程月甲"]["staff_member"] is True
+    assert people["龙斌"]["role"]["zh"] == "项目/科研助理"
+    assert people["龙斌"]["staff_member"] is True
+    assert people["龙斌"]["github_status"]["zh"] == "无 GitHub ID"
+    assert people["宋功轩"]["github_status"]["zh"] == "GitHub ID 待确认"
+    assert people["彭成"]["github_status"]["zh"] == "GitHub ID 待确认"
+    assert people["赵建军"]["role"]["zh"] == "已毕业博士生，目前已入职高校"
+    assert people["高西岭"]["research_direction"]["zh"] == "KV量化"
+    assert "多级" not in people["高西岭"]["research_direction"]["zh"]
+    assert people["刘世锋"]["github_login"] == "Remygred"
+    assert people["刘世锋"]["role"]["zh"] == "华科大三实习生"
+    assert people["刘世锋"]["advisor"]["zh"] == "张书豪"
+    assert people["曹哲"]["github_login"] == "xmdhb"
+    assert people["曹哲"]["role"]["zh"] == "即将入学的研究生"
+    assert people["曹哲"]["advisor"]["zh"] == "张书豪"
+    assert people["李庚"]["github_login"] == "Anjiangy"
+    assert people["李庚"]["role"]["zh"] == "马上入学的华科研究生"
+    assert people["李庚"]["advisor"]["zh"] == "张书豪"
+    assert people["马俊豪"]["advisor"]["zh"] == "张书豪"
+    assert people["sunYangGitHub"]["github_login"] == "sunYangGitHub"
+    assert people["sunYangGitHub"]["role"]["zh"] == "外校实习生"
+    assert people["sunYangGitHub"]["advisor"]["zh"] == "张书豪"
+    assert people["杜忠承"]["github_login"] == "dzcixy"
+    assert people["杜忠承"]["advisor"]["zh"] == "黄禹"
+    assert people["徐晨曦"]["github_login"] == "xsun2001"
+    assert people["徐晨曦"]["external_contributor"] is True
+    assert people["徐晨曦"]["role"]["zh"] == "外部贡献者（港科大（广州））"
+    expected_advisors = {
+        "马川湖": "王雄",
+        "吴天宇": "郑龙",
+        "李昶吾": "张书豪",
+        "王润泽": "王庆刚",
+        "谷昌伟": "罗瑞坤",
+        "杨杰": "赵进",
+        "陈彦博": "张书豪",
+        "郑凌峰": "刘海坤",
+        "王鸿坤": "项翔",
+        "崔钰嘉": "姚鹏程",
+        "赵文举": "姚鹏程",
+        "刘思辰": "万瑶",
+    }
+    for name, advisor in expected_advisors.items():
+        assert people[name]["advisor"]["zh"] == advisor
+    unresolved_ids = {item["person_id"] for item in profiles["unresolved_contributors"]}
+    assert "github:remygred" not in unresolved_ids
+    assert "github:dzcixy" not in unresolved_ids
+    assert "github:sunyanggithub" not in unresolved_ids
+    assert "github:luoxiaohei" not in unresolved_ids
+    assert unresolved_ids == {"github:kotoriqaq0"}
+
+    kuang_rows = [
+        item
+        for item in payload["all_repos"]["contributors"]
+        if item["person_id"] == "github:sad-and-bad1231"
+    ]
+    assert len(kuang_rows) == 1
+    assert kuang_rows[0]["commits"] == 17
+
     canonical_snapshot = (
         root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"
     )
@@ -1642,3 +1795,21 @@ def test_core_contributor_stats_precede_all_repository_stats() -> None:
     assert core_index < all_index
     assert "核心仓库与独立优化成果" in html_text
     assert "BidKV、DiffSpec" in html_text
+
+
+def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
+    root = Path(__file__).resolve().parents[1]
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+    html_text = (root / "contributors.html").read_text(encoding="utf-8")
+
+    assert ".research-member-identity a:visited" in css_text
+    assert ".research-member-identity strong" in css_text
+    assert "color: #0c1112;" in css_text
+    assert ".research-member-identity small" in css_text
+    assert "color: #475569;" in css_text
+    assert ".research-member-detail-row b" in css_text
+    assert "color: #176f72;" in css_text
+    assert "contributors-contrast-20260725" in html_text
+    assert "github-status" in html_text
+    page_js = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
+    assert "localized(item, 'github_status', lang)" in page_js

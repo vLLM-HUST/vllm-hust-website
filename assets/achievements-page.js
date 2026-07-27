@@ -18,12 +18,12 @@
             kind: { en: 'Publication', zh: '论文' },
             status: { en: 'Accepted · SC 2026', zh: '已接收 · SC 2026' },
             title: {
-                en: 'DiffSpec: Accelerating Long Sequence Generation with Differential Speculative Decoding',
-                zh: 'DiffSpec：面向长序列生成的差分投机解码加速',
+                en: 'DiffSpec: Differential Speculative Decoding for Ultra-Long-Sequence Inference',
+                zh: 'DiffSpec：面向超长序列推理的差分投机解码加速系统',
             },
             body: {
-                en: 'An accepted SC 2026 system for allocating speculative effort by position-specific utility during long-sequence generation, with a public Ascend implementation and reproducibility evidence.',
-                zh: 'SC 2026 已接收成果：依据长序列生成中的位置效用分配投机计算，并公开 Ascend 实现与可复现实验证据。',
+                en: 'Project team: lead author Zhongcheng Du; advisor Yu Huang.',
+                zh: '项目团队：主要作者杜忠承；指导老师黄禹。',
             },
             tags: [
                 { en: 'SC 2026', zh: 'SC 2026' },

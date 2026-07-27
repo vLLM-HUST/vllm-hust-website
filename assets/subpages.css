@@ -194,13 +194,23 @@ body:not([data-page="home"]) .research-member-group h3 {
 body:not([data-page="home"]) .research-member-list li {
   border-color: #dbe3e0;
   border-radius: 3px;
-  background: var(--sub-panel);
+  color: #334155;
+  background: #fff;
 }
-body:not([data-page="home"]) .research-member-list strong {
-  color: var(--sub-ink);
+body:not([data-page="home"]) .research-member-identity a,
+body:not([data-page="home"]) .research-member-identity a:visited,
+body:not([data-page="home"]) .research-member-identity strong {
+  color: #0c1112;
 }
-body:not([data-page="home"]) .research-member-list span {
-  color: var(--sub-muted);
+body:not([data-page="home"]) .research-member-identity small {
+  color: #475569;
+}
+body:not([data-page="home"]) .research-member-detail-row,
+body:not([data-page="home"]) .research-member-detail-row span {
+  color: #334155;
+}
+body:not([data-page="home"]) .research-member-detail-row b {
+  color: #176f72;
 }
 body:not([data-page="home"]) .result-repository-source,
 body:not([data-page="home"]) .result-repository-team-row span { color: var(--sub-muted); }
