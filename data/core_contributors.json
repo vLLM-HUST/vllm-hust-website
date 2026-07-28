@@ -58,8 +58,8 @@
           "en": "Project lead"
         },
         "research_direction": {
-          "zh": "状态管理、分布式运行时与大模型推理基础设施",
-          "en": "State management, distributed runtimes, and LLM inference infrastructure"
+          "zh": "并行与分布式系统；状态管理；流处理；运行时系统；大模型推理基础设施；状态复用；记忆增强智能体中间件",
+          "en": "Parallel and distributed systems; state management; stream processing; runtime systems; LLM inference infrastructure; state reuse; memory-augmented agent middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -302,8 +302,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "SLO-aware 请求调度",
-          "en": "SLO-aware request scheduling"
+          "zh": "SLO-aware 请求调度；国产硬件推理引擎适配；性能测试与工程实现",
+          "en": "SLO-aware request scheduling; domestic-hardware inference-engine adaptation; performance testing and engineering implementation"
         },
         "participation_direction": {
           "zh": "",
@@ -669,8 +669,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "记忆体",
-          "en": "Memory systems"
+          "zh": "智能体记忆体；长期记忆评测；推理技术实现；Benchmark；多模态长上下文推理",
+          "en": "Agent memory systems; long-term memory evaluation; inference implementation; benchmarking; multimodal long-context inference"
         },
         "participation_direction": {
           "zh": "",
@@ -1173,8 +1173,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -1355,8 +1355,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "AgentDB",
-          "en": "AgentDB"
+          "zh": "智能体数据库；Agent 状态与记忆持久化；数据管理中间件",
+          "en": "Agent databases; Agent state and memory persistence; data-management middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -1400,8 +1400,8 @@
           "en": "Incoming graduate student"
         },
         "research_direction": {
-          "zh": "KV 复用",
-          "en": "KV reuse"
+          "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
+          "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -1490,8 +1490,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "KV 复用",
-          "en": "KV reuse"
+          "zh": "KV Cache 跨请求与跨 Chunk 复用；共享选择层；缓存精度与存储权衡；vLLM、SGLang、Mooncake 与 CacheBlend",
+          "en": "Cross-request and cross-chunk KV Cache reuse; shared selection layers; cache-accuracy and storage tradeoffs; vLLM, SGLang, Mooncake, and CacheBlend"
         },
         "participation_direction": {
           "zh": "",
@@ -1547,8 +1547,8 @@
           "en": "Project lead"
         },
         "research_direction": {
-          "zh": "状态管理、分布式运行时与大模型推理基础设施",
-          "en": "State management, distributed runtimes, and LLM inference infrastructure"
+          "zh": "并行与分布式系统；状态管理；流处理；运行时系统；大模型推理基础设施；状态复用；记忆增强智能体中间件",
+          "en": "Parallel and distributed systems; state management; stream processing; runtime systems; LLM inference infrastructure; state reuse; memory-augmented agent middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -1594,8 +1594,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "SLO-aware 请求调度",
-          "en": "SLO-aware request scheduling"
+          "zh": "SLO-aware 请求调度；国产硬件推理引擎适配；性能测试与工程实现",
+          "en": "SLO-aware request scheduling; domestic-hardware inference-engine adaptation; performance testing and engineering implementation"
         },
         "participation_direction": {
           "zh": "",
@@ -2140,8 +2140,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -2322,8 +2322,8 @@
           "en": "Incoming graduate student"
         },
         "research_direction": {
-          "zh": "KV 复用",
-          "en": "KV reuse"
+          "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
+          "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -2515,8 +2515,8 @@
           "en": "Project lead"
         },
         "research_direction": {
-          "zh": "状态管理、分布式运行时与大模型推理基础设施",
-          "en": "State management, distributed runtimes, and LLM inference infrastructure"
+          "zh": "并行与分布式系统；状态管理；流处理；运行时系统；大模型推理基础设施；状态复用；记忆增强智能体中间件",
+          "en": "Parallel and distributed systems; state management; stream processing; runtime systems; LLM inference infrastructure; state reuse; memory-augmented agent middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -2562,8 +2562,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "SLO-aware 请求调度",
-          "en": "SLO-aware request scheduling"
+          "zh": "SLO-aware 请求调度；国产硬件推理引擎适配；性能测试与工程实现",
+          "en": "SLO-aware request scheduling; domestic-hardware inference-engine adaptation; performance testing and engineering implementation"
         },
         "participation_direction": {
           "zh": "",
@@ -3016,8 +3016,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -3198,8 +3198,8 @@
           "en": "Incoming graduate student"
         },
         "research_direction": {
-          "zh": "KV 复用",
-          "en": "KV reuse"
+          "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
+          "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -3380,8 +3380,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -3632,8 +3632,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -3845,8 +3845,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "记忆体",
-          "en": "Memory systems"
+          "zh": "智能体记忆体；长期记忆评测；推理技术实现；Benchmark；多模态长上下文推理",
+          "en": "Agent memory systems; long-term memory evaluation; inference implementation; benchmarking; multimodal long-context inference"
         },
         "participation_direction": {
           "zh": "",
@@ -3933,8 +3933,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "SLO-aware 调度",
-          "en": "SLO-aware scheduling"
+          "zh": "SLO-aware 调度；Workflow/Agent-aware Serving；程序感知调度；工作流状态管理",
+          "en": "SLO-aware scheduling; workflow- and agent-aware serving; program-aware scheduling; workflow state management"
         },
         "participation_direction": {
           "zh": "",
@@ -3974,8 +3974,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "AgentDB",
-          "en": "AgentDB"
+          "zh": "智能体数据库；Agent 状态与记忆持久化；数据管理中间件",
+          "en": "Agent databases; Agent state and memory persistence; data-management middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -4061,8 +4061,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "KV 复用",
-          "en": "KV reuse"
+          "zh": "KV Cache 跨请求与跨 Chunk 复用；共享选择层；缓存精度与存储权衡；vLLM、SGLang、Mooncake 与 CacheBlend",
+          "en": "Cross-request and cross-chunk KV Cache reuse; shared selection layers; cache-accuracy and storage tradeoffs; vLLM, SGLang, Mooncake, and CacheBlend"
         },
         "participation_direction": {
           "zh": "",
@@ -4233,8 +4233,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "Flink",
-          "en": "Flink"
+          "zh": "Flink 流处理；分布式数据处理；流系统与推理系统协同",
+          "en": "Flink stream processing; distributed data processing; stream-system and inference-system integration"
         },
         "participation_direction": {
           "zh": "",
@@ -4359,8 +4359,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -4443,8 +4443,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "ANNS",
-          "en": "ANNS"
+          "zh": "ANNS；向量流连接；多核并行；RAG 检索基础设施",
+          "en": "ANNS; streaming vector joins; multicore parallelism; RAG retrieval infrastructure"
         },
         "participation_direction": {
           "zh": "",
@@ -4915,8 +4915,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -5002,8 +5002,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "动态图",
-          "en": "Dynamic graphs"
+          "zh": "动态图系统；计算机系统结构；国产硬件运行时与推理引擎优化",
+          "en": "Dynamic-graph systems; computer architecture; runtime and inference-engine optimization on domestic hardware"
         },
         "participation_direction": {
           "zh": "",
