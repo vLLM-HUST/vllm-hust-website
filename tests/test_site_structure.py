@@ -113,12 +113,14 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert "CURATED_PROFILES" not in script
     assert "vllm-hust developer" in script
     assert "research_direction" in script
+    assert "研究特长或兴趣方向" in text
+    assert "Research strengths or interests" in text
     assert "contribution_areas" in script
     assert "participation_direction" in script
     assert "Identity pending" in script
     assert "function memberContextMarkup(item, lang)" in script
     assert "contributor-member-context" in script
-    assert "contributors-page.js?v=staff-contributors-20260725" in text
+    assert "contributors-page.js?v=member-interests-20260728-github-status" in text
     assert ".research-members-menu[open] summary::after" in css
     assert ".research-member-detail-row" in css
     assert ".research-member-group + .research-member-group" in css
@@ -630,7 +632,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=upstream-qwen-community-20260727" in text
-        assert "assets/site.js?v=plugin-ecosystem-20260727" in text
+        assert "assets/site.js?v=engine-and-proving-ground-20260728" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -638,7 +640,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=plugin-ecosystem-20260727" in html_text
+    assert "assets/home.css?v=integration-branches-20260727" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
@@ -655,13 +657,19 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "A proving ground for reusable inference ideas." in html_text
-    assert "让可复用的推理机制在真实系统中得到验证。" in html_text
-    assert "Plugin proving ground" in site_js
-    assert "插件试验场" in site_js
+    assert (
+        "A domestic-compute inference engine—and a proving ground for reusable "
+        "serving mechanisms."
+        in html_text
+    )
+    assert "面向国产算力的大模型推理引擎，也是推理系统创新的试验场。" in html_text
+    assert "Domestic-compute inference engine" in site_js
+    assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
-    assert "Mechanisms first. Engine second." in html_text
-    assert "机制优先，引擎解耦。" in html_text
+    assert "Core mechanisms by system position." in html_text
+    assert "按系统位置组织核心机制。" in html_text
+    assert "independently integrated, transferred, or licensed" in html_text
+    assert "独立集成、迁移或授权" in html_text
 
     expected_repositories = (
         "vllm-hust-bidkv",
@@ -678,6 +686,63 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     )
     for repository in expected_repositories:
         assert f"https://github.com/vLLM-HUST/{repository}" in html_text
+
+    proving_ground = html_text.split('id="stack"', 1)[1].split(
+        'id="projects"', 1
+    )[0]
+    assert "Runtime Contract" in proving_ground
+    assert "Plugin Interfaces" in proving_ground
+    assert "Validation Matrix" in proving_ground
+    assert "Benchmark Contract" in proving_ground
+    assert "vllm-ascend-hust" not in proving_ground
+    assert "triton-ascend-hust" not in proving_ground
+
+    catalog = html_text.split('id="projects"', 1)[1].split(
+        'id="ecosystem"', 1
+    )[0]
+    ascend_adapter = catalog.index("vLLM Ascend HUST")
+    metal_adapter = catalog.index("vLLM Metal HUST")
+    assert ascend_adapter < metal_adapter
+    assert "Triton Ascend HUST" in catalog
+    assert "HUST-maintained Triton Ascend adaptation" in catalog
+    assert catalog.count(
+        '<span class="runtime-tag slate">integration branch</span>'
+    ) == 3
+    assert '<span class="runtime-tag green">adapter</span>' not in catalog
+
+    group_ids = (
+        "mechanism-control-title",
+        "mechanism-execution-title",
+        "mechanism-representation-title",
+        "mechanism-compiler-title",
+        "mechanism-adapters-title",
+        "mechanism-operations-title",
+        "mechanism-validation-title",
+    )
+    group_positions = [catalog.index(f'id="{group_id}"') for group_id in group_ids]
+    assert group_positions == sorted(group_positions)
+
+    control_group = catalog.split('id="mechanism-control-title"', 1)[1].split(
+        'id="mechanism-execution-title"', 1
+    )[0]
+    execution_group = catalog.split('id="mechanism-execution-title"', 1)[1].split(
+        'id="mechanism-representation-title"', 1
+    )[0]
+    adapter_group = catalog.split('id="mechanism-adapters-title"', 1)[1].split(
+        'id="mechanism-operations-title"', 1
+    )[0]
+    assert "vllm-hust-bidkv" in control_group
+    assert "vllm-ascend-hust-diffspec" in execution_group
+    assert "vllm-ascend-hust-LatchMoE" in execution_group
+    assert "vllm-ascend-hust" in adapter_group
+    assert "vllm-metal-hust" in adapter_group
+    assert '<span class="runtime-tag">plugin</span>' not in adapter_group
+    compiler_group = catalog.split('id="mechanism-compiler-title"', 1)[1].split(
+        'id="mechanism-adapters-title"', 1
+    )[0]
+    assert "triton-ascend-hust" in compiler_group
+    assert "integration branch" in compiler_group
+    assert '<span class="runtime-tag">plugin</span>' not in compiler_group
 
     for internal_phrase in (
         "讲述口径",
@@ -933,7 +998,10 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=upstream-qwen-community-20260727" in html_text
-    assert "assets/achievements-page.js?v=plugin-ecosystem-20260727" in html_text
+    assert (
+        "assets/achievements-page.js?v=engine-and-proving-ground-20260728"
+        in html_text
+    )
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -1081,7 +1149,10 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
-    assert "assets/achievements-page.js?v=plugin-ecosystem-20260727" in html_text
+    assert (
+        "assets/achievements-page.js?v=engine-and-proving-ground-20260728"
+        in html_text
+    )
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -1703,10 +1774,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 28
+    assert len(profiles["participants"]) == 40
     assert len(profiles["staff_members"]) == 5
     assert len(profiles["external_contributors"]) == 1
-    assert len(profiles["unresolved_contributors"]) == 1
+    assert len(profiles["unresolved_contributors"]) == 0
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
     assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
     assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
@@ -1810,6 +1881,19 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         "董君瑶": "carsontung666",
         "雷欣妍": "leixy2004",
         "路庆浩": "Luqhhh",
+        "刘子墨": "Liu-zimo-LZM",
+        "欧丹丹": "oddod",
+        "钱柯彤": "Devilsssssss",
+        "段盈君": "qingwanruojun",
+        "何维": "healer-positive",
+        "谢汉龙": "xiehanlong834-gif",
+        "周升晖": "keridone",
+        "姚世文": "YWHUTER",
+        "沈家乐": "Fuze1111",
+        "李林浩": "Sunshine-llh",
+        "余天成": "yutiantian0115",
+        "李欣妍": "XinYanLi-0725",
+        "韦若皓": "kotoriqaq0",
     }
     for name, github_id in expected_github_ids.items():
         assert people[name]["github_login"] == github_id
@@ -1837,11 +1921,55 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["宋功轩"]["github_status"]["zh"] == "GitHub ID 待确认"
     assert people["彭成"]["github_status"]["zh"] == "GitHub ID 待确认"
     assert people["赵建军"]["role"]["zh"] == "已毕业博士生，目前已入职高校"
-    assert people["高西岭"]["research_direction"]["zh"] == "KV量化"
+    assert people["高西岭"]["research_direction"]["zh"] == "KV 量化"
     assert "多级" not in people["高西岭"]["research_direction"]["zh"]
-    assert people["刘世锋"]["github_login"] == "Remygred"
-    assert people["刘世锋"]["role"]["zh"] == "华科大三实习生"
-    assert people["刘世锋"]["advisor"]["zh"] == "张书豪"
+    assert people["刘世峰"]["github_login"] == "Remygred"
+    assert people["刘世峰"]["role"]["zh"] == "华科大三实习生"
+    assert people["刘世峰"]["advisor"]["zh"] == "张书豪"
+    expanded_research_profiles = {
+        "张书豪": "并行与分布式系统；状态管理；流处理；运行时系统；大模型推理基础设施；状态复用；记忆增强智能体中间件",
+        "张睿诚": "智能体记忆体；长期记忆评测；推理技术实现；Benchmark；多模态长上下文推理",
+        "陈彦博": "SLO-aware 请求调度；国产硬件推理引擎适配；性能测试与工程实现",
+        "李旭恒": "KV Cache 跨请求与跨 Chunk 复用；共享选择层；缓存精度与存储权衡；vLLM、SGLang、Mooncake 与 CacheBlend",
+        "高鸿儒": "动态图系统；计算机系统结构；国产硬件运行时与推理引擎优化",
+        "曹哲": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
+        "彭浩然": "SLO-aware 调度；Workflow/Agent-aware Serving；程序感知调度；工作流状态管理",
+        "杨锦昀": "Flink 流处理；分布式数据处理；流系统与推理系统协同",
+        "王子澳": "ANNS；向量流连接；多核并行；RAG 检索基础设施",
+        "朱鑫材": "智能体数据库；Agent 状态与记忆持久化；数据管理中间件",
+    }
+    for name, expected in expanded_research_profiles.items():
+        assert people[name]["research_direction"]["zh"] == expected
+    for name in ("韦若皓", "万瑞鹏", "周雨桐", "毛言粲", "雷欣妍"):
+        assert people[name]["research_direction"]["zh"] == "待补充"
+    assert (
+        people["刘俊"]["research_direction"]["zh"]
+        == "SLO 感知的 LLM Serving 调度；MLA 与 KV Cache 优化；张量并行与多 GPU 推理解码；延迟保障与资源分配；应用感知 Serving"
+    )
+    assert (
+        people["李昶吾"]["research_direction"]["zh"]
+        == "大模型推理系统软硬件协同优化；动态 MoE 推理；AI 加速器执行效率优化；Ascend NPU Host–Device 协同优化"
+    )
+    assert people["田景远"]["research_direction"]["zh"].startswith("昇腾 NPU 推理系统优化")
+    assert people["匡明轩"]["research_direction"]["zh"].endswith("Attention Kernel")
+    assert people["谢汉龙"]["research_direction"]["zh"].startswith("异构 GPU 推理分离")
+    assert people["姚世文"]["research_direction"]["zh"].endswith("异构计算")
+    assert people["陈德斌"]["research_direction"]["zh"] == "MoE 专家卸载优化；控制面优化（与李昶吾协作）"
+    assert (
+        people["陈子嘉"]["research_direction"]["zh"]
+        == "昇腾 NPU 算子级性能调优；PyPTO Tile 编程；算子融合"
+    )
+    assert people["何维"]["research_direction"]["zh"] == "性能优化；算法与硬件调优；方向适应性强"
+    assert people["董君瑶"]["research_direction"]["zh"] == "向量数据库"
+    assert people["路庆浩"]["research_direction"]["zh"] == "Profiling；vLLM 性能问题分析与优化"
+    assert people["沈家乐"]["research_direction"]["zh"] == "KV Cache 复用；长上下文推理优化；多后端运行时适配"
+    for name in ("李林浩", "余天成"):
+        assert people[name]["role"]["zh"] == "2027 年待入学学生"
+        assert people[name]["advisor"]["zh"] == "张书豪"
+    assert (
+        people["余天成"]["research_direction"]["zh"]
+        == "大模型推理方向待定；愿意根据课题安排探索相关研究"
+    )
     assert people["曹哲"]["github_login"] == "xmdhb"
     assert people["曹哲"]["role"]["zh"] == "即将入学的研究生"
     assert people["曹哲"]["advisor"]["zh"] == "张书豪"
@@ -1870,15 +1998,43 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         "崔钰嘉": "姚鹏程",
         "赵文举": "姚鹏程",
         "刘思辰": "万瑶",
+        "韦若皓": "万瑶",
+        "周升晖": "张书豪",
+        "何维": "张书豪",
+        "路庆浩": "张书豪",
+        "钱柯彤": "张书豪",
+        "沈家乐": "张书豪",
+        "刘子墨": "张书豪",
+        "欧丹丹": "张书豪",
+        "段盈君": "张书豪",
+        "陈子嘉": "张书豪",
+        "董君瑶": "张书豪",
+        "谢汉龙": "张书豪",
+        "姚世文": "张书豪",
     }
     for name, advisor in expected_advisors.items():
         assert people[name]["advisor"]["zh"] == advisor
+        if advisor == "张书豪" and name in {
+            "周升晖",
+            "何维",
+            "路庆浩",
+            "钱柯彤",
+            "沈家乐",
+            "刘子墨",
+            "欧丹丹",
+            "段盈君",
+            "陈子嘉",
+            "董君瑶",
+            "谢汉龙",
+            "姚世文",
+        }:
+            assert people[name]["role"]["zh"] == "学生"
     unresolved_ids = {item["person_id"] for item in profiles["unresolved_contributors"]}
     assert "github:remygred" not in unresolved_ids
     assert "github:dzcixy" not in unresolved_ids
     assert "github:sunyanggithub" not in unresolved_ids
     assert "github:luoxiaohei" not in unresolved_ids
-    assert unresolved_ids == {"github:kotoriqaq0"}
+    assert unresolved_ids == set()
 
     kuang_rows = [
         item
@@ -1903,7 +2059,7 @@ def test_core_contributor_stats_precede_all_repository_stats() -> None:
     all_index = html_text.index('id="contributors-all-tbody"')
 
     assert core_index < all_index
-    assert "试验场核心仓库与已接收插件" in html_text
+    assert "推理引擎核心仓库与已接收插件" in html_text
     assert "BidKV、DiffSpec" in html_text
 
 

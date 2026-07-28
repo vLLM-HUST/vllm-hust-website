@@ -58,8 +58,8 @@
           "en": "Project lead"
         },
         "research_direction": {
-          "zh": "状态管理、分布式运行时与大模型推理基础设施",
-          "en": "State management, distributed runtimes, and LLM inference infrastructure"
+          "zh": "并行与分布式系统；状态管理；流处理；运行时系统；大模型推理基础设施；状态复用；记忆增强智能体中间件",
+          "en": "Parallel and distributed systems; state management; stream processing; runtime systems; LLM inference infrastructure; state reuse; memory-augmented agent middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -107,8 +107,8 @@
           "en": "Student intern"
         },
         "research_direction": {
-          "zh": "异构大模型推理系统的端到端性能分析与优化",
-          "en": "End-to-end performance analysis and optimization for heterogeneous LLM inference systems"
+          "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
+          "en": "Ascend NPU inference-system optimization; scheduling; communication-computation overlap; multi-device scaling; hardware-software co-design; real workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -254,8 +254,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "vLLM工程化、推理算子与运行时性能优化",
-          "en": "vLLM engineering, inference operators, and runtime performance"
+          "zh": "大模型推理系统工程开发；LLM Serving；vLLM 架构；KV Cache 生命周期管理；PagedAttention；缓存置换与资源调度；长序列推理内存优化",
+          "en": "LLM inference-system engineering; LLM Serving; vLLM architecture; KV Cache lifecycle management; PagedAttention; cache eviction and resource scheduling; long-sequence memory optimization"
         },
         "participation_direction": {
           "zh": "",
@@ -302,8 +302,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "压力感知KV缓存驱逐机制",
-          "en": "Pressure-aware KV-cache eviction"
+          "zh": "SLO-aware 请求调度；国产硬件推理引擎适配；性能测试与工程实现",
+          "en": "SLO-aware request scheduling; domestic-hardware inference-engine adaptation; performance testing and engineering implementation"
         },
         "participation_direction": {
           "zh": "",
@@ -391,20 +391,20 @@
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "昇腾 NPU 算子级性能调优；PyPTO Tile 编程；算子融合",
+          "en": "Operator-level performance tuning on Ascend NPUs; PyPTO tile programming; operator fusion"
         },
         "participation_direction": {
           "zh": "",
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "Ascend, CI/CD, distributed, features",
         "external_contributor": false,
@@ -440,7 +440,7 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "KV量化",
+          "zh": "KV 量化",
           "en": "KV quantization"
         },
         "participation_direction": {
@@ -669,8 +669,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "智能体记忆体、长期记忆评测、多模态长上下文推理",
-          "en": "Agent memory, long-term memory evaluation, and multimodal long-context inference"
+          "zh": "智能体记忆体；长期记忆评测；推理技术实现；Benchmark；多模态长上下文推理",
+          "en": "Agent memory systems; long-term memory evaluation; inference implementation; benchmarking; multimodal long-context inference"
         },
         "participation_direction": {
           "zh": "",
@@ -852,8 +852,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "KV Cache 压缩；调度同步开销优化；Attention Kernel",
+          "en": "KV Cache compression; scheduling synchronization-overhead optimization; Attention kernels"
         },
         "participation_direction": {
           "zh": "",
@@ -899,8 +899,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "SLO感知调度、KV/MLA、多GPU解码",
-          "en": "SLO-aware scheduling, KV/MLA, and multi-GPU decoding"
+          "zh": "SLO 感知的 LLM Serving 调度；MLA 与 KV Cache 优化；张量并行与多 GPU 推理解码；延迟保障与资源分配；应用感知 Serving",
+          "en": "SLO-aware LLM serving and scheduling; MLA and KV Cache optimization; tensor parallelism and multi-GPU decoding; latency guarantees and resource allocation; application-aware serving"
         },
         "participation_direction": {
           "zh": "",
@@ -991,8 +991,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待定",
+          "en": "To be determined"
         },
         "participation_direction": {
           "zh": "",
@@ -1082,8 +1082,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "推理引擎实现、测试与工程优化",
-          "en": "Inference-engine implementation, testing, and engineering optimization"
+          "zh": "面向长上下文工作负载的大模型推理引擎性能优化；Prefill 阶段计算与数据搬运瓶颈；KV Cache 复用；分层缓存；运行时调度；算子优化",
+          "en": "LLM inference-engine optimization for long-context workloads; Prefill compute and data-movement bottlenecks; KV Cache reuse; hierarchical caching; runtime scheduling; operator optimization"
         },
         "participation_direction": {
           "zh": "",
@@ -1117,8 +1117,8 @@
           "vllm-hust"
         ],
         "key_contributions": "engine, distributed, tooling",
-        "display_name": "刘世锋",
-        "chinese_name": "刘世锋",
+        "display_name": "刘世峰",
+        "chinese_name": "刘世峰",
         "english_name": "",
         "person_id": "github:remygred",
         "identity_confirmed": true,
@@ -1128,12 +1128,12 @@
           "en": "HUST third-year undergraduate intern"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
+          "en": "Request scheduling; resource management; KV Cache optimization; long-context serving"
         },
         "participation_direction": {
-          "zh": "vLLM推理运行时与调度优化",
-          "en": "vLLM inference runtime and scheduling optimization"
+          "zh": "",
+          "en": ""
         },
         "advisor": {
           "zh": "张书豪",
@@ -1162,27 +1162,27 @@
           "vllm-hust"
         ],
         "key_contributions": "features",
-        "display_name": "kotoriqaq0",
-        "chinese_name": "",
+        "display_name": "韦若皓",
+        "chinese_name": "韦若皓",
         "english_name": "",
         "person_id": "github:kotoriqaq0",
-        "identity_confirmed": false,
+        "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "万瑶",
+          "en": "Yao Wan"
         },
         "contribution_areas": "features",
         "external_contributor": false,
@@ -1310,12 +1310,12 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待定",
+          "en": "To be determined"
         },
         "participation_direction": {
-          "zh": "国产推理引擎调研",
-          "en": "Domestic inference-engine survey"
+          "zh": "",
+          "en": ""
         },
         "advisor": {
           "zh": "",
@@ -1355,8 +1355,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "AgentDB、智能体状态持久化与记忆中间件",
-          "en": "AgentDB, agent-state persistence, and memory middleware"
+          "zh": "智能体数据库；Agent 状态与记忆持久化；数据管理中间件",
+          "en": "Agent databases; Agent state and memory persistence; data-management middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -1400,8 +1400,8 @@
           "en": "Incoming graduate student"
         },
         "research_direction": {
-          "zh": "语义感知KV管理、缓存驱逐与在线自适应",
-          "en": "Semantic-aware KV management, cache eviction, and online adaptation"
+          "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
+          "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -1490,8 +1490,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "KV Cache跨请求与跨Chunk复用",
-          "en": "Cross-request and cross-chunk KV cache reuse"
+          "zh": "KV Cache 跨请求与跨 Chunk 复用；共享选择层；缓存精度与存储权衡；vLLM、SGLang、Mooncake 与 CacheBlend",
+          "en": "Cross-request and cross-chunk KV Cache reuse; shared selection layers; cache-accuracy and storage tradeoffs; vLLM, SGLang, Mooncake, and CacheBlend"
         },
         "participation_direction": {
           "zh": "",
@@ -1547,8 +1547,8 @@
           "en": "Project lead"
         },
         "research_direction": {
-          "zh": "状态管理、分布式运行时与大模型推理基础设施",
-          "en": "State management, distributed runtimes, and LLM inference infrastructure"
+          "zh": "并行与分布式系统；状态管理；流处理；运行时系统；大模型推理基础设施；状态复用；记忆增强智能体中间件",
+          "en": "Parallel and distributed systems; state management; stream processing; runtime systems; LLM inference infrastructure; state reuse; memory-augmented agent middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -1594,8 +1594,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "压力感知KV缓存驱逐机制",
-          "en": "Pressure-aware KV-cache eviction"
+          "zh": "SLO-aware 请求调度；国产硬件推理引擎适配；性能测试与工程实现",
+          "en": "SLO-aware request scheduling; domestic-hardware inference-engine adaptation; performance testing and engineering implementation"
         },
         "participation_direction": {
           "zh": "",
@@ -1957,8 +1957,8 @@
           "en": "Student intern"
         },
         "research_direction": {
-          "zh": "异构大模型推理系统的端到端性能分析与优化",
-          "en": "End-to-end performance analysis and optimization for heterogeneous LLM inference systems"
+          "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
+          "en": "Ascend NPU inference-system optimization; scheduling; communication-computation overlap; multi-device scaling; hardware-software co-design; real workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -2003,8 +2003,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "推理引擎实现、测试与工程优化",
-          "en": "Inference-engine implementation, testing, and engineering optimization"
+          "zh": "面向长上下文工作负载的大模型推理引擎性能优化；Prefill 阶段计算与数据搬运瓶颈；KV Cache 复用；分层缓存；运行时调度；算子优化",
+          "en": "LLM inference-engine optimization for long-context workloads; Prefill compute and data-movement bottlenecks; KV Cache reuse; hierarchical caching; runtime scheduling; operator optimization"
         },
         "participation_direction": {
           "zh": "",
@@ -2049,8 +2049,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "KV Cache 压缩；调度同步开销优化；Attention Kernel",
+          "en": "KV Cache compression; scheduling synchronization-overhead optimization; Attention kernels"
         },
         "participation_direction": {
           "zh": "",
@@ -2095,8 +2095,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "SLO感知调度、KV/MLA、多GPU解码",
-          "en": "SLO-aware scheduling, KV/MLA, and multi-GPU decoding"
+          "zh": "SLO 感知的 LLM Serving 调度；MLA 与 KV Cache 优化；张量并行与多 GPU 推理解码；延迟保障与资源分配；应用感知 Serving",
+          "en": "SLO-aware LLM serving and scheduling; MLA and KV Cache optimization; tensor parallelism and multi-GPU decoding; latency guarantees and resource allocation; application-aware serving"
         },
         "participation_direction": {
           "zh": "",
@@ -2129,27 +2129,27 @@
           "vllm-hust"
         ],
         "key_contributions": "features",
-        "display_name": "kotoriqaq0",
-        "chinese_name": "",
+        "display_name": "韦若皓",
+        "chinese_name": "韦若皓",
         "english_name": "",
         "person_id": "github:kotoriqaq0",
-        "identity_confirmed": false,
+        "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "万瑶",
+          "en": "Yao Wan"
         },
         "contribution_areas": "features",
         "external_contributor": false,
@@ -2266,8 +2266,8 @@
           "vllm-hust"
         ],
         "key_contributions": "tooling",
-        "display_name": "刘世锋",
-        "chinese_name": "刘世锋",
+        "display_name": "刘世峰",
+        "chinese_name": "刘世峰",
         "english_name": "",
         "person_id": "github:remygred",
         "identity_confirmed": true,
@@ -2277,12 +2277,12 @@
           "en": "HUST third-year undergraduate intern"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
+          "en": "Request scheduling; resource management; KV Cache optimization; long-context serving"
         },
         "participation_direction": {
-          "zh": "vLLM推理运行时与调度优化",
-          "en": "vLLM inference runtime and scheduling optimization"
+          "zh": "",
+          "en": ""
         },
         "advisor": {
           "zh": "张书豪",
@@ -2322,8 +2322,8 @@
           "en": "Incoming graduate student"
         },
         "research_direction": {
-          "zh": "语义感知KV管理、缓存驱逐与在线自适应",
-          "en": "Semantic-aware KV management, cache eviction, and online adaptation"
+          "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
+          "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -2367,8 +2367,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待定",
+          "en": "To be determined"
         },
         "participation_direction": {
           "zh": "",
@@ -2515,8 +2515,8 @@
           "en": "Project lead"
         },
         "research_direction": {
-          "zh": "状态管理、分布式运行时与大模型推理基础设施",
-          "en": "State management, distributed runtimes, and LLM inference infrastructure"
+          "zh": "并行与分布式系统；状态管理；流处理；运行时系统；大模型推理基础设施；状态复用；记忆增强智能体中间件",
+          "en": "Parallel and distributed systems; state management; stream processing; runtime systems; LLM inference infrastructure; state reuse; memory-augmented agent middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -2562,8 +2562,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "压力感知KV缓存驱逐机制",
-          "en": "Pressure-aware KV-cache eviction"
+          "zh": "SLO-aware 请求调度；国产硬件推理引擎适配；性能测试与工程实现",
+          "en": "SLO-aware request scheduling; domestic-hardware inference-engine adaptation; performance testing and engineering implementation"
         },
         "participation_direction": {
           "zh": "",
@@ -2833,8 +2833,8 @@
           "en": "Student intern"
         },
         "research_direction": {
-          "zh": "异构大模型推理系统的端到端性能分析与优化",
-          "en": "End-to-end performance analysis and optimization for heterogeneous LLM inference systems"
+          "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
+          "en": "Ascend NPU inference-system optimization; scheduling; communication-computation overlap; multi-device scaling; hardware-software co-design; real workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -2879,8 +2879,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "推理引擎实现、测试与工程优化",
-          "en": "Inference-engine implementation, testing, and engineering optimization"
+          "zh": "面向长上下文工作负载的大模型推理引擎性能优化；Prefill 阶段计算与数据搬运瓶颈；KV Cache 复用；分层缓存；运行时调度；算子优化",
+          "en": "LLM inference-engine optimization for long-context workloads; Prefill compute and data-movement bottlenecks; KV Cache reuse; hierarchical caching; runtime scheduling; operator optimization"
         },
         "participation_direction": {
           "zh": "",
@@ -2925,8 +2925,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "KV Cache 压缩；调度同步开销优化；Attention Kernel",
+          "en": "KV Cache compression; scheduling synchronization-overhead optimization; Attention kernels"
         },
         "participation_direction": {
           "zh": "",
@@ -2971,8 +2971,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "SLO感知调度、KV/MLA、多GPU解码",
-          "en": "SLO-aware scheduling, KV/MLA, and multi-GPU decoding"
+          "zh": "SLO 感知的 LLM Serving 调度；MLA 与 KV Cache 优化；张量并行与多 GPU 推理解码；延迟保障与资源分配；应用感知 Serving",
+          "en": "SLO-aware LLM serving and scheduling; MLA and KV Cache optimization; tensor parallelism and multi-GPU decoding; latency guarantees and resource allocation; application-aware serving"
         },
         "participation_direction": {
           "zh": "",
@@ -3005,27 +3005,27 @@
           "vllm-hust"
         ],
         "key_contributions": "features",
-        "display_name": "kotoriqaq0",
-        "chinese_name": "",
+        "display_name": "韦若皓",
+        "chinese_name": "韦若皓",
         "english_name": "",
         "person_id": "github:kotoriqaq0",
-        "identity_confirmed": false,
+        "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "万瑶",
+          "en": "Yao Wan"
         },
         "contribution_areas": "features",
         "external_contributor": false,
@@ -3142,8 +3142,8 @@
           "vllm-hust"
         ],
         "key_contributions": "tooling",
-        "display_name": "刘世锋",
-        "chinese_name": "刘世锋",
+        "display_name": "刘世峰",
+        "chinese_name": "刘世峰",
         "english_name": "",
         "person_id": "github:remygred",
         "identity_confirmed": true,
@@ -3153,12 +3153,12 @@
           "en": "HUST third-year undergraduate intern"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
+          "en": "Request scheduling; resource management; KV Cache optimization; long-context serving"
         },
         "participation_direction": {
-          "zh": "vLLM推理运行时与调度优化",
-          "en": "vLLM inference runtime and scheduling optimization"
+          "zh": "",
+          "en": ""
         },
         "advisor": {
           "zh": "张书豪",
@@ -3198,8 +3198,8 @@
           "en": "Incoming graduate student"
         },
         "research_direction": {
-          "zh": "语义感知KV管理、缓存驱逐与在线自适应",
-          "en": "Semantic-aware KV management, cache eviction, and online adaptation"
+          "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
+          "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -3243,8 +3243,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待定",
+          "en": "To be determined"
         },
         "participation_direction": {
           "zh": "",
@@ -3380,8 +3380,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -3390,6 +3390,132 @@
         "advisor": {
           "zh": "",
           "en": ""
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "He Wei",
+        "github_login": "healer-positive",
+        "github_url": "https://github.com/healer-positive",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "何维",
+        "chinese_name": "何维",
+        "english_name": "He Wei",
+        "person_id": "github:healer-positive",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "性能优化；算法与硬件调优；方向适应性强",
+          "en": "Performance optimization; algorithm-hardware tuning; adaptable research direction"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "余天成",
+        "github_login": "yutiantian0115",
+        "github_url": "https://github.com/yutiantian0115",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "余天成",
+        "chinese_name": "余天成",
+        "english_name": "",
+        "person_id": "github:yutiantian0115",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "2027 年待入学学生",
+          "en": "Incoming student (2027 cohort)"
+        },
+        "research_direction": {
+          "zh": "大模型推理方向待定；愿意根据课题安排探索相关研究",
+          "en": "LLM inference direction to be determined; open to exploring research topics aligned with project needs"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "刘子墨",
+        "github_login": "Liu-zimo-LZM",
+        "github_url": "https://github.com/Liu-zimo-LZM",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "刘子墨",
+        "chinese_name": "刘子墨",
+        "english_name": "",
+        "person_id": "github:liu-zimo-lzm",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "待定",
+          "en": "To be determined"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "github_status": {
           "zh": "",
@@ -3440,6 +3566,48 @@
         "contribution_areas": ""
       },
       {
+        "name": "周升晖",
+        "github_login": "keridone",
+        "github_url": "https://github.com/keridone",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "周升晖",
+        "chinese_name": "周升晖",
+        "english_name": "",
+        "person_id": "github:keridone",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "Profiling；算子性能瓶颈分析；算子融合；减少计算冗余",
+          "en": "Profiling; operator bottleneck analysis; operator fusion; reduction of redundant computation"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
         "name": "周雨桐",
         "github_login": "FirmamentumX",
         "github_url": "https://github.com/FirmamentumX",
@@ -3464,8 +3632,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -3474,6 +3642,48 @@
         "advisor": {
           "zh": "",
           "en": ""
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "姚世文",
+        "github_login": "YWHUTER",
+        "github_url": "https://github.com/YWHUTER",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "姚世文",
+        "chinese_name": "姚世文",
+        "english_name": "",
+        "person_id": "github:ywhuter",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "资源调度；任务卸载；复杂系统优化；LLM Serving 性能优化；智能调度；异构计算",
+          "en": "Resource scheduling; task offloading; complex-system optimization; LLM serving performance optimization; intelligent scheduling; heterogeneous computing"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "github_status": {
           "zh": "",
@@ -3593,8 +3803,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "长上下文分布式推理",
-          "en": "Distributed long-context inference"
+          "zh": "待定",
+          "en": "To be determined"
         },
         "participation_direction": {
           "zh": "",
@@ -3635,8 +3845,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "智能体记忆体、长期记忆评测、多模态长上下文推理",
-          "en": "Agent memory, long-term memory evaluation, and multimodal long-context inference"
+          "zh": "智能体记忆体；长期记忆评测；推理技术实现；Benchmark；多模态长上下文推理",
+          "en": "Agent memory systems; long-term memory evaluation; inference implementation; benchmarking; multimodal long-context inference"
         },
         "participation_direction": {
           "zh": "",
@@ -3723,8 +3933,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "工作流感知Serving、程序感知调度与Agent状态管理",
-          "en": "Workflow-aware serving, program-aware scheduling, and agent state management"
+          "zh": "SLO-aware 调度；Workflow/Agent-aware Serving；程序感知调度；工作流状态管理",
+          "en": "SLO-aware scheduling; workflow- and agent-aware serving; program-aware scheduling; workflow state management"
         },
         "participation_direction": {
           "zh": "",
@@ -3764,8 +3974,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "AgentDB、智能体状态持久化与记忆中间件",
-          "en": "AgentDB, agent-state persistence, and memory middleware"
+          "zh": "智能体数据库；Agent 状态与记忆持久化；数据管理中间件",
+          "en": "Agent databases; Agent state and memory persistence; data-management middleware"
         },
         "participation_direction": {
           "zh": "",
@@ -3810,12 +4020,12 @@
           "en": "Incoming HUST graduate student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "分布式推理加速",
+          "en": "Distributed inference acceleration"
         },
         "participation_direction": {
-          "zh": "LLM推理系统工程化",
-          "en": "LLM inference-system engineering"
+          "zh": "",
+          "en": ""
         },
         "advisor": {
           "zh": "张书豪",
@@ -3851,8 +4061,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "KV Cache跨请求与跨Chunk复用",
-          "en": "Cross-request and cross-chunk KV cache reuse"
+          "zh": "KV Cache 跨请求与跨 Chunk 复用；共享选择层；缓存精度与存储权衡；vLLM、SGLang、Mooncake 与 CacheBlend",
+          "en": "Cross-request and cross-chunk KV Cache reuse; shared selection layers; cache-accuracy and storage tradeoffs; vLLM, SGLang, Mooncake, and CacheBlend"
         },
         "participation_direction": {
           "zh": "",
@@ -3897,8 +4107,92 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "动态专家卸载与图重放适配机制",
-          "en": "Dynamic expert offloading and graph-replay adaptation"
+          "zh": "大模型推理系统软硬件协同优化；动态 MoE 推理；AI 加速器执行效率优化；Ascend NPU Host–Device 协同优化",
+          "en": "Hardware-software co-optimization for LLM inference systems; dynamic MoE inference; AI-accelerator execution-efficiency optimization; Host-Device co-optimization on Ascend NPUs"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "李林浩",
+        "github_login": "Sunshine-llh",
+        "github_url": "https://github.com/Sunshine-llh",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "李林浩",
+        "chinese_name": "李林浩",
+        "english_name": "",
+        "person_id": "github:sunshine-llh",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "2027 年待入学学生",
+          "en": "Incoming student (2027 cohort)"
+        },
+        "research_direction": {
+          "zh": "待定",
+          "en": "To be determined"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "李欣妍",
+        "github_login": "XinYanLi-0725",
+        "github_url": "https://github.com/XinYanLi-0725",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "李欣妍",
+        "chinese_name": "李欣妍",
+        "english_name": "",
+        "person_id": "github:xinyanli-0725",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "模型执行优化；状态管理；KV Cache 复用与压缩；多模态推理优化；AI4S 场景",
+          "en": "Model execution optimization; state management; KV Cache reuse and compression; multimodal inference optimization; AI4S workloads"
         },
         "participation_direction": {
           "zh": "",
@@ -3939,8 +4233,92 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "Flink、流处理与流推理系统融合",
-          "en": "Flink, stream processing, and streaming-inference systems"
+          "zh": "Flink 流处理；分布式数据处理；流系统与推理系统协同",
+          "en": "Flink stream processing; distributed data processing; stream-system and inference-system integration"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "欧丹丹",
+        "github_login": "oddod",
+        "github_url": "https://github.com/oddod",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "欧丹丹",
+        "chinese_name": "欧丹丹",
+        "english_name": "",
+        "person_id": "github:oddod",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "待定",
+          "en": "To be determined"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "段盈君",
+        "github_login": "qingwanruojun",
+        "github_url": "https://github.com/qingwanruojun",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "段盈君",
+        "chinese_name": "段盈君",
+        "english_name": "",
+        "person_id": "github:qingwanruojun",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "算子优化；寒武纪算子开发",
+          "en": "Operator optimization; Cambricon operator development"
         },
         "participation_direction": {
           "zh": "",
@@ -3981,8 +4359,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -3991,6 +4369,48 @@
         "advisor": {
           "zh": "",
           "en": ""
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "沈家乐",
+        "github_login": "Fuze1111",
+        "github_url": "https://github.com/Fuze1111",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "沈家乐",
+        "chinese_name": "沈家乐",
+        "english_name": "",
+        "person_id": "github:fuze1111",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "KV Cache 复用；长上下文推理优化；多后端运行时适配",
+          "en": "KV Cache reuse; long-context inference optimization; multi-backend runtime adaptation"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "github_status": {
           "zh": "",
@@ -4023,8 +4443,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "ANNS、向量流连接与RAG检索基础设施",
-          "en": "ANNS, streaming vector joins, and RAG retrieval infrastructure"
+          "zh": "ANNS；向量流连接；多核并行；RAG 检索基础设施",
+          "en": "ANNS; streaming vector joins; multicore parallelism; RAG retrieval infrastructure"
         },
         "participation_direction": {
           "zh": "",
@@ -4065,8 +4485,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "vLLM工程化、推理算子与运行时性能优化",
-          "en": "vLLM engineering, inference operators, and runtime performance"
+          "zh": "大模型推理系统工程开发；LLM Serving；vLLM 架构；KV Cache 生命周期管理；PagedAttention；缓存置换与资源调度；长序列推理内存优化",
+          "en": "LLM inference-system engineering; LLM Serving; vLLM architecture; KV Cache lifecycle management; PagedAttention; cache eviction and resource scheduling; long-sequence memory optimization"
         },
         "participation_direction": {
           "zh": "",
@@ -4107,20 +4527,62 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "向量数据库",
+          "en": "Vector databases"
         },
         "participation_direction": {
           "zh": "",
           "en": ""
         },
         "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
           "zh": "",
           "en": ""
+        },
+        "contribution_areas": ""
+      },
+      {
+        "name": "谢汉龙",
+        "github_login": "xiehanlong834-gif",
+        "github_url": "https://github.com/xiehanlong834-gif",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "谢汉龙",
+        "chinese_name": "谢汉龙",
+        "english_name": "",
+        "person_id": "github:xiehanlong834-gif",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "异构 GPU 推理分离；系统架构；资源调度；异构兼容；成本敏感型部署；自动并行",
+          "en": "Heterogeneous GPU inference disaggregation; system architecture; resource scheduling; heterogeneous compatibility; cost-aware deployment; automatic parallelism"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "github_status": {
           "zh": "",
@@ -4233,20 +4695,20 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "Profiling；vLLM 性能问题分析与优化",
+          "en": "Profiling; vLLM performance diagnosis and optimization"
         },
         "participation_direction": {
           "zh": "",
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "github_status": {
           "zh": "",
@@ -4278,12 +4740,12 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待定",
+          "en": "To be determined"
         },
         "participation_direction": {
-          "zh": "国产推理引擎调研",
-          "en": "Domestic inference-engine survey"
+          "zh": "",
+          "en": ""
         },
         "advisor": {
           "zh": "",
@@ -4298,6 +4760,48 @@
           "en": ""
         },
         "all_repos_rank": 28
+      },
+      {
+        "name": "钱柯彤",
+        "github_login": "Devilsssssss",
+        "github_url": "https://github.com/Devilsssssss",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "钱柯彤",
+        "chinese_name": "钱柯彤",
+        "english_name": "",
+        "person_id": "github:devilsssssss",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "vLLM-HUST 推理系统性能分析与调度优化；系统 Profiling；瓶颈定位；资源利用率提升；工程化性能改进",
+          "en": "vLLM-HUST inference performance analysis and scheduling optimization; system profiling; bottleneck diagnosis; resource-utilization improvement; engineering performance optimization"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": ""
       },
       {
         "name": "Zijia Chen",
@@ -4319,20 +4823,20 @@
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "昇腾 NPU 算子级性能调优；PyPTO Tile 编程；算子融合",
+          "en": "Operator-level performance tuning on Ascend NPUs; PyPTO tile programming; operator fusion"
         },
         "participation_direction": {
           "zh": "",
           "en": ""
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "contribution_areas": "Ascend, CI/CD, distributed, features",
         "external_contributor": false,
@@ -4369,8 +4873,8 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "时序数据库与推理引擎工程",
-          "en": "Time-series databases and inference-engine engineering"
+          "zh": "MoE 专家卸载优化；控制面优化（与李昶吾协作）",
+          "en": "MoE expert-offloading optimization and control-plane optimization, in collaboration with Changwu Li"
         },
         "participation_direction": {
           "zh": "",
@@ -4411,8 +4915,8 @@
           "en": ""
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "待补充",
+          "en": "To be provided"
         },
         "participation_direction": {
           "zh": "",
@@ -4452,7 +4956,7 @@
           "en": "Engineering member"
         },
         "research_direction": {
-          "zh": "KV量化",
+          "zh": "KV 量化",
           "en": "KV quantization"
         },
         "participation_direction": {
@@ -4498,8 +5002,8 @@
           "en": "Academic member"
         },
         "research_direction": {
-          "zh": "动态图系统、计算机系统结构与国产推理优化",
-          "en": "Dynamic graph systems, computer architecture, and domestic inference optimization"
+          "zh": "动态图系统；计算机系统结构；国产硬件运行时与推理引擎优化",
+          "en": "Dynamic-graph systems; computer architecture; runtime and inference-engine optimization on domestic hardware"
         },
         "participation_direction": {
           "zh": "",
@@ -4788,52 +5292,6 @@
         "contribution_areas": ""
       }
     ],
-    "unresolved_contributors": [
-      {
-        "rank": 25,
-        "name": "kotoriqaq0",
-        "github_login": "kotoriqaq0",
-        "github_url": "https://github.com/kotoriqaq0",
-        "commits": 1,
-        "changed_lines": 613,
-        "added": 609,
-        "deleted": 4,
-        "active_repos": 1,
-        "repos": [
-          "vllm-hust"
-        ],
-        "key_contributions": "features",
-        "display_name": "kotoriqaq0",
-        "chinese_name": "",
-        "english_name": "",
-        "person_id": "github:kotoriqaq0",
-        "identity_confirmed": false,
-        "core_member": true,
-        "role": {
-          "zh": "",
-          "en": ""
-        },
-        "research_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "features",
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": true,
-        "github_status": {
-          "zh": "",
-          "en": ""
-        }
-      }
-    ]
+    "unresolved_contributors": []
   }
 }

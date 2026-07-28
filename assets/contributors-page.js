@@ -127,7 +127,7 @@
         return lang === 'zh'
             ? {
                 role: '身份',
-                research: '研究方向',
+                research: '研究特长或兴趣方向',
                 participation: '参与方向',
                 areas: '贡献领域',
                 main: '主要贡献',
@@ -138,7 +138,7 @@
             }
             : {
                 role: 'Role',
-                research: 'Research direction',
+                research: 'Research strengths or interests',
                 participation: 'Participation focus',
                 areas: 'Contribution areas',
                 main: 'Main contributions',

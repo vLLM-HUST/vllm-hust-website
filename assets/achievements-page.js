@@ -160,8 +160,8 @@
                 zh: 'vLLM-HUST 推理运行时公开仓库',
             },
             body: {
-                en: 'The upstream-compatible runtime opened as the shared proving ground for hardware adapters, inference plugins, benchmarks, and serving experiments.',
-                zh: '兼容上游的推理运行时仓库公开，作为硬件适配、推理插件、Benchmark 与服务实验的共享试验场。',
+                en: 'The upstream-compatible inference engine opened for domestic compute, while also serving as the integration and validation ground for maintained branches, reusable mechanisms, benchmarks, and serving experiments.',
+                zh: '兼容上游、面向国产算力的推理引擎公开，同时承担适配分支、可复用机制、Benchmark 与服务实验的集成和验证试验场。',
             },
             tags: [
                 { en: 'Runtime', zh: '推理运行时' },
