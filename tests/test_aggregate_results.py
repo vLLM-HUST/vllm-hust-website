@@ -1716,3 +1716,277 @@ def test_aggregate_results_prefers_cross_engine_same_spec_pair(
     assert preferred_pair["left"]["engine"] == "vllm-hust"
     assert preferred_pair["right"]["engine"] == "vllm"
     assert preferred_pair["left"]["entry_id"] == latest_current_entry["entry_id"]
+
+
+def test_aggregate_results_rejects_entries_with_mismatched_plugin_commit(
+    tmp_path: Path,
+) -> None:
+    """Two vllm-hust entries share the same ``metadata.git_commit`` but pair
+    with two different ``runtime_provenance.plugin.commit`` values (the a46abb7
+    case: one task ran live against plugin ``f430530``, a later backfill
+    batch paired the same core commit with ``03a12f9``).  The aggregator must
+    keep the earliest-submitted entry's plugin commit as canonical and reject
+    the later, non-canonical entry from the public snapshot so the two tasks
+    don't render as separate x-axis positions on the trend chart.
+    """
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    output_dir = tmp_path / "website_data"
+    source_dir.mkdir()
+
+    git_commit = "a46abb7ae68acc13a4fc5870db98619b3f97c6e0"  # pragma: allowlist secret
+    canonical_plugin = (
+        "f430530ada2c0c2ec2f925606494bc95a474d9c8"  # pragma: allowlist secret
+    )
+    divergent_plugin = (
+        "03a12f9bddd944952bd029c6b62e23d68fa3a28e"  # pragma: allowlist secret
+    )
+
+    canonical_entry = _official_public_entry(
+        "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        engine="vllm-hust",
+    )
+    canonical_entry["metadata"]["git_commit"] = git_commit
+    canonical_entry["metadata"]["github_commit_url"] = (
+        f"https://github.com/vLLM-HUST/vllm-hust/commit/{git_commit}"
+    )
+    canonical_entry["metadata"]["submitted_at"] = "2026-07-20T02:41:34Z"
+    canonical_entry["metadata"]["runtime_provenance"] = {
+        "engine": {
+            "ref": "a46abb7ae6",
+            "commit": git_commit,
+        },
+        "plugin": {
+            "engine": "vllm-ascend-hust",
+            "repository": "vllm-hust/vllm-ascend-hust",
+            "ref": canonical_plugin[:10],
+            "commit": canonical_plugin,
+        },
+    }
+
+    divergent_entry = _official_public_entry(
+        "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        engine="vllm-hust",
+    )
+    divergent_entry["metadata"]["git_commit"] = git_commit
+    divergent_entry["metadata"]["github_commit_url"] = (
+        f"https://github.com/vLLM-HUST/vllm-hust/commit/{git_commit}"
+    )
+    # Submitted *later* than the canonical entry: this is the backfill.
+    divergent_entry["metadata"]["submitted_at"] = "2026-07-22T07:21:25Z"
+    divergent_entry["metadata"]["runtime_provenance"] = {
+        "engine": {
+            "ref": "a46abb7ae6",
+            "commit": git_commit,
+        },
+        "plugin": {
+            "engine": "vllm-ascend-hust",
+            "repository": "vllm-hust/vllm-ascend-hust",
+            "ref": divergent_plugin[:10],
+            "commit": divergent_plugin,
+        },
+    }
+    # Use a different workload so both would otherwise pass the public filter
+    # and survive dedup-by-entry_id; we want the plugin-mismatch filter alone
+    # to evict the divergent one.
+    divergent_entry["workload"]["name"] = "prefix-repetition-online"
+    divergent_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|ceec19ab|prefix-repetition-online|qwen25-14b|fp16|910b2|1|1|single_gpu|bbbbbbbb"
+    )
+
+    _write_manifest_entries(source_dir, [canonical_entry, divergent_entry])
+
+    result = _run_aggregate(script, source_dir, output_dir, "--replace-all")
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    assert "skipped invalid public entries: 1" in result.stdout
+    assert "plugin commit mismatch" in result.stdout
+    assert canonical_plugin[:9] in result.stdout
+    assert divergent_plugin[:9] in result.stdout
+    # The canonical-side row contributes its entry_id to the rejection line so
+    # a post-hoc audit can attribute the canonical choice to a concrete entry.
+    assert canonical_entry["entry_id"] in result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    assert [entry["entry_id"] for entry in single_payload] == [
+        canonical_entry["entry_id"]
+    ]
+    # The surviving entry must carry the canonical plugin commit unchanged.
+    assert (
+        single_payload[0]["metadata"]["runtime_provenance"]["plugin"]["commit"]
+        == canonical_plugin
+    )
+
+
+def test_aggregate_results_keeps_historical_pr_backfill_despite_plugin_mismatch(
+    tmp_path: Path,
+) -> None:
+    """Historical-PR-backfill entries (data_source=
+    "real-online-historical-pr-backfill") are intentional cross-PR comparison
+    runs — e.g. PR#66 / PR#70 / PR#77 each testing a different plugin commit
+    against the same vllm-hust engine commit.  They must NOT be rejected by
+    the canonical-plugin-commit rule, otherwise the cross-PR compare cards
+    lose their data.  This test guards against the regression seen in
+    https://example.invalid/pr-backfill-plugin-mismatch where 190 such
+    entries were silently dropped.
+    """
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    output_dir = tmp_path / "website_data"
+    source_dir.mkdir()
+
+    git_commit = "ceec19abb0ba590f536d32c8fea6fd569a8ce7ad"  # pragma: allowlist secret
+    canonical_plugin = (
+        "51e577b17b0000000000000000000000000000000"  # pragma: allowlist secret
+    )
+    divergent_plugin = (
+        "e0686f12d10000000000000000000000000000000"  # pragma: allowlist secret
+    )
+
+    # Canonical-side entry: a normal main-branch backfill with the canonical
+    # plugin commit. data_source is NOT historical-pr-backfill, so the rule
+    # still applies to it (it is the canonical reference).
+    canonical_entry = _official_public_entry(
+        "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        engine="vllm-hust",
+    )
+    canonical_entry["metadata"]["git_commit"] = git_commit
+    canonical_entry["metadata"]["github_commit_url"] = (
+        f"https://github.com/vLLM-HUST/vllm-hust/commit/{git_commit}"
+    )
+    canonical_entry["metadata"]["submitted_at"] = "2026-07-02T10:06:46Z"
+    canonical_entry["metadata"]["runtime_provenance"] = {
+        "engine": {"ref": "ceec19abb0", "commit": git_commit},
+        "plugin": {
+            "engine": "vllm-ascend-hust",
+            "repository": "vllm-hust/vllm-ascend-hust",
+            "ref": canonical_plugin[:10],
+            "commit": canonical_plugin,
+        },
+    }
+
+    # Divergent-side entry: a historical-PR-backfill (PR#66) with a different
+    # plugin commit. data_source IS historical-pr-backfill, so it must bypass
+    # the canonical-plugin-commit check and survive into the public snapshot.
+    divergent_entry = _official_public_entry(
+        "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        engine="vllm-hust",
+    )
+    divergent_entry["metadata"]["git_commit"] = git_commit
+    divergent_entry["metadata"]["github_commit_url"] = (
+        f"https://github.com/vLLM-HUST/vllm-hust/commit/{git_commit}"
+    )
+    divergent_entry["metadata"]["submitted_at"] = "2026-07-01T14:51:46Z"
+    divergent_entry["metadata"]["data_source"] = "real-online-historical-pr-backfill"
+    divergent_entry["metadata"]["github_ref"] = "ascend-pr66-simllm-kv-manager"
+    divergent_entry["metadata"]["runtime_provenance"] = {
+        "engine": {"ref": "ceec19abb0", "commit": git_commit},
+        "plugin": {
+            "engine": "vllm-ascend-hust",
+            "repository": "vllm-hust/vllm-ascend-hust",
+            "ref": divergent_plugin[:10],
+            "commit": divergent_plugin,
+        },
+    }
+    # Use a different workload so both survive dedup-by-entry_id.
+    divergent_entry["workload"]["name"] = "prefix-repetition-online"
+    divergent_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|ceec19ab|prefix-repetition-online|qwen25-14b|fp16|910b2|1|1|single_gpu|bbbbbbbb"
+    )
+
+    _write_manifest_entries(source_dir, [canonical_entry, divergent_entry])
+
+    result = _run_aggregate(script, source_dir, output_dir, "--replace-all")
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    # NO entries should be skipped — the historical-pr-backfill exemption
+    # must keep the divergent-plugin entry alive.
+    assert "skipped invalid public entries" not in result.stdout, result.stdout
+    assert "plugin commit mismatch" not in result.stdout, result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    surviving_ids = {entry["entry_id"] for entry in single_payload}
+    assert surviving_ids == {
+        canonical_entry["entry_id"],
+        divergent_entry["entry_id"],
+    }, surviving_ids
+
+
+def test_plugin_commit_mismatch_still_rejects_non_historical_backfill(
+    tmp_path: Path,
+) -> None:
+    """A non-historical-backfill entry with a mismatched plugin commit must
+    still be rejected.  This guards the flip side of the historical-backfill
+    exemption: regular main-branch backfills (data_source != historical) must
+    continue to honour the canonical-plugin-commit rule so the trend chart
+    does not show the same binary twice.
+    """
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    output_dir = tmp_path / "website_data"
+    source_dir.mkdir()
+
+    git_commit = "a46abb7ae68acc13a4fc5870db98619b3f97c6e0"  # pragma: allowlist secret
+    canonical_plugin = (
+        "f430530ada2c0c2ec2f925606494bc95a474d9c8"  # pragma: allowlist secret
+    )
+    divergent_plugin = (
+        "03a12f9bddd944952bd029c6b62e23d68fa3a28e"  # pragma: allowlist secret
+    )
+
+    # Canonical entry: main-branch, earliest submitted.
+    canonical_entry = _official_public_entry(
+        "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        engine="vllm-hust",
+    )
+    canonical_entry["metadata"]["git_commit"] = git_commit
+    canonical_entry["metadata"]["submitted_at"] = "2026-07-20T02:41:34Z"
+    canonical_entry["metadata"]["runtime_provenance"] = {
+        "engine": {"ref": "a46abb7ae6", "commit": git_commit},
+        "plugin": {
+            "engine": "vllm-ascend-hust",
+            "repository": "vllm-hust/vllm-ascend-hust",
+            "ref": canonical_plugin[:10],
+            "commit": canonical_plugin,
+        },
+    }
+    # Divergent entry: also main-branch (data_source="compare", the helper
+    # default), submitted later — must be rejected.
+    divergent_entry = _official_public_entry(
+        "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        engine="vllm-hust",
+    )
+    divergent_entry["metadata"]["git_commit"] = git_commit
+    divergent_entry["metadata"]["submitted_at"] = "2026-07-22T07:21:25Z"
+    divergent_entry["metadata"]["runtime_provenance"] = {
+        "engine": {"ref": "a46abb7ae6", "commit": git_commit},
+        "plugin": {
+            "engine": "vllm-ascend-hust",
+            "repository": "vllm-hust/vllm-ascend-hust",
+            "ref": divergent_plugin[:10],
+            "commit": divergent_plugin,
+        },
+    }
+    divergent_entry["workload"]["name"] = "prefix-repetition-online"
+    divergent_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|a46abb7|prefix-repetition-online|qwen25-14b|fp16|910b2|1|1|single_gpu|bbbbbbbb"
+    )
+
+    _write_manifest_entries(source_dir, [canonical_entry, divergent_entry])
+
+    result = _run_aggregate(script, source_dir, output_dir, "--replace-all")
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    assert "skipped invalid public entries: 1" in result.stdout
+    assert "plugin commit mismatch" in result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    assert [entry["entry_id"] for entry in single_payload] == [
+        canonical_entry["entry_id"]
+    ]

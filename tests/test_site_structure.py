@@ -200,6 +200,22 @@ def test_trend_version_key_includes_core_and_backend_commits() -> None:
     assert "[coreCommit, backendCommit].filter(Boolean).join('+')" in version_key
 
 
+def test_ci_runs_engine_version_consistency_sentinel() -> None:
+    """The CI workflow must invoke the engine_version vs. git_commit sentinel.
+
+    Catches the ``v0.17.2rc0-2810-ga46abb7ae`` / ``0.18.0.post1`` kind of
+    split documented for the ``a46abb7ae`` backfill batch: two records for
+    the same vllm-hust core+plugin pair rendered as two separate x-axis
+    points because ``engine_version`` came from different sources.
+    """
+    root = Path(__file__).resolve().parents[1]
+    workflow = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    script = root / "scripts" / "check_engine_version_consistency.py"
+    assert script.is_file(), f"missing sentinel script: {script}"
+    assert "check_engine_version_consistency.py" in workflow
+    assert "vllm-hust" in script.read_text(encoding="utf-8")
+
+
 def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
@@ -366,13 +382,13 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
         effective_signature_counts[scenario] = len(signatures)
 
     assert effective_signature_counts["visionarena-online"] == 1
-    assert effective_signature_counts["instructcoder-online"] == 2
-    assert effective_signature_counts["prefix-repetition-online"] == 2
-    assert effective_signature_counts["random-online"] == 3
-    assert effective_signature_counts["random-latency"] == 3
-    assert effective_signature_counts["sharegpt-online"] == 2
-    assert effective_signature_counts["sharegpt-throughput"] == 1
-    assert effective_signature_counts["sonnet-throughput"] == 1
+    assert effective_signature_counts["instructcoder-online"] == 4
+    assert effective_signature_counts["prefix-repetition-online"] == 4
+    assert effective_signature_counts["random-online"] == 4
+    assert effective_signature_counts["random-latency"] == 5
+    assert effective_signature_counts["sharegpt-online"] == 3
+    assert effective_signature_counts["sharegpt-throughput"] == 3
+    assert effective_signature_counts["sonnet-throughput"] == 3
 
 
 def test_hard_constraints_baseline_block_is_rendered() -> None:
@@ -643,8 +659,7 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
 
     assert (
         "A domestic-compute inference engine—and a proving ground for reusable "
-        "serving mechanisms."
-        in html_text
+        "serving mechanisms." in html_text
     )
     assert "面向国产算力的大模型推理引擎，也是推理系统创新的试验场。" in html_text
     assert "Domestic-compute inference engine" in site_js
@@ -671,9 +686,7 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     for repository in expected_repositories:
         assert f"https://github.com/vLLM-HUST/{repository}" in html_text
 
-    proving_ground = html_text.split('id="stack"', 1)[1].split(
-        'id="projects"', 1
-    )[0]
+    proving_ground = html_text.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
     assert "Runtime Contract" in proving_ground
     assert "Plugin Interfaces" in proving_ground
     assert "Validation Matrix" in proving_ground
@@ -681,17 +694,15 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     assert "vllm-ascend-hust" not in proving_ground
     assert "triton-ascend-hust" not in proving_ground
 
-    catalog = html_text.split('id="projects"', 1)[1].split(
-        'id="ecosystem"', 1
-    )[0]
+    catalog = html_text.split('id="projects"', 1)[1].split('id="ecosystem"', 1)[0]
     ascend_adapter = catalog.index("vLLM Ascend HUST")
     metal_adapter = catalog.index("vLLM Metal HUST")
     assert ascend_adapter < metal_adapter
     assert "Triton Ascend HUST" in catalog
     assert "HUST-maintained Triton Ascend adaptation" in catalog
-    assert catalog.count(
-        '<span class="runtime-tag slate">integration branch</span>'
-    ) == 3
+    assert (
+        catalog.count('<span class="runtime-tag slate">integration branch</span>') == 3
+    )
     assert '<span class="runtime-tag green">adapter</span>' not in catalog
 
     group_ids = (
@@ -869,12 +880,16 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "font-weight: 600;" in css_text
 
 
-def test_leaderboard_summary_cards_have_complete_light_theme_contrast_contract() -> None:
+def test_leaderboard_summary_cards_have_complete_light_theme_contrast_contract() -> (
+    None
+):
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
 
-    assert html_text.index("assets/leaderboard.css") < html_text.index("assets/subpages.css")
+    assert html_text.index("assets/leaderboard.css") < html_text.index(
+        "assets/subpages.css"
+    )
     assert "leaderboard-contrast-system-20260727" in html_text
 
     required_selectors = (
@@ -979,8 +994,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=upstream-qwen-community-20260727" in html_text
     assert (
-        "assets/achievements-page.js?v=engine-and-proving-ground-20260728"
-        in html_text
+        "assets/achievements-page.js?v=engine-and-proving-ground-20260728" in html_text
     )
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
@@ -1130,8 +1144,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
     assert (
-        "assets/achievements-page.js?v=engine-and-proving-ground-20260728"
-        in html_text
+        "assets/achievements-page.js?v=engine-and-proving-ground-20260728" in html_text
     )
 
 
@@ -1930,19 +1943,33 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         people["李昶吾"]["research_direction"]["zh"]
         == "大模型推理系统软硬件协同优化；动态 MoE 推理；AI 加速器执行效率优化；Ascend NPU Host–Device 协同优化"
     )
-    assert people["田景远"]["research_direction"]["zh"].startswith("昇腾 NPU 推理系统优化")
+    assert people["田景远"]["research_direction"]["zh"].startswith(
+        "昇腾 NPU 推理系统优化"
+    )
     assert people["匡明轩"]["research_direction"]["zh"].endswith("Attention Kernel")
     assert people["谢汉龙"]["research_direction"]["zh"].startswith("异构 GPU 推理分离")
     assert people["姚世文"]["research_direction"]["zh"].endswith("异构计算")
-    assert people["陈德斌"]["research_direction"]["zh"] == "MoE 专家卸载优化；控制面优化（与李昶吾协作）"
+    assert (
+        people["陈德斌"]["research_direction"]["zh"]
+        == "MoE 专家卸载优化；控制面优化（与李昶吾协作）"
+    )
     assert (
         people["陈子嘉"]["research_direction"]["zh"]
         == "昇腾 NPU 算子级性能调优；PyPTO Tile 编程；算子融合"
     )
-    assert people["何维"]["research_direction"]["zh"] == "性能优化；算法与硬件调优；方向适应性强"
+    assert (
+        people["何维"]["research_direction"]["zh"]
+        == "性能优化；算法与硬件调优；方向适应性强"
+    )
     assert people["董君瑶"]["research_direction"]["zh"] == "向量数据库"
-    assert people["路庆浩"]["research_direction"]["zh"] == "Profiling；vLLM 性能问题分析与优化"
-    assert people["沈家乐"]["research_direction"]["zh"] == "KV Cache 复用；长上下文推理优化；多后端运行时适配"
+    assert (
+        people["路庆浩"]["research_direction"]["zh"]
+        == "Profiling；vLLM 性能问题分析与优化"
+    )
+    assert (
+        people["沈家乐"]["research_direction"]["zh"]
+        == "KV Cache 复用；长上下文推理优化；多后端运行时适配"
+    )
     for name in ("李林浩", "余天成"):
         assert people[name]["role"]["zh"] == "2027 年待入学学生"
         assert people[name]["advisor"]["zh"] == "张书豪"

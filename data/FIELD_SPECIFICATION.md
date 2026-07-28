@@ -112,6 +112,53 @@ Normalized exporters must emit `model.canonical_id`, `model.repo_id`, `model.sho
 `model.display_name`. Website filters and grouping logic treat `canonical_id` as the machine
 identity and `display_name` as presentation-only.
 
+## `metadata.runtime_provenance`
+
+Optional but strongly recommended for any `vllm-hust` engine entry. The website trend chart uses the
+contained `(engine, plugin)` commit pair to compute the x-axis position; a missing block is
+tolerated for legacy entries but loses trend-axis precision.
+
+Expected shape:
+
+```json
+"runtime_provenance": {
+  "engine": {
+    "ref": "a46abb7ae6",  // pragma: allowlist secret
+    "commit": "a46abb7ae68acc13a4fc5870db98619b3f97c6e0"  // pragma: allowlist secret
+  },
+  "plugin": {
+    "engine": "vllm-ascend-hust",
+    "repository": "vllm-hust/vllm-ascend-hust",
+    "ref": "f430530ada",  // pragma: allowlist secret
+    "commit": "f430530ada2c0c2ec2f925606494bc95a474d9c8"  // pragma: allowlist secret
+  }
+}
+```
+
+### Plugin commit alignment rule
+
+For any `metadata.git_commit` already present in
+`leaderboard-data/snapshots/leaderboard_single.json`, a new submission's
+`runtime_provenance.plugin.commit` MUST equal the canonical plugin commit, defined as **the plugin
+commit of the earliest-submitted existing entry of that commit group**. This prevents the same
+vllm-hust binary from rendering as two separate x-axis positions on the trend chart (the `a46abb7ae`
+split incident; see `vllm-hust-benchmark/docs/HISTORICAL_PR_BACKFILL.md`).
+
+The rule is enforced at three layers:
+
+1. **Backfill-time guard** — `vllm-hust-benchmark/scripts/backfill_single_gpu.py` raises
+   `PluginCommitMismatch` during `run` and warns during `plan`. `--force-mismatched-plugin-commit`
+   overrides and writes an audit entry into `.benchmarks/backfill-single-gpu/state.json`.
+1. **Publish-time filter** — this repository's
+   `scripts/aggregate_results.py::plugin_commit_mismatch_rejection_reason` drops any entry whose
+   plugin commit disagrees with the canonical derived from the merged entry set. The rejection
+   message includes the entry_id of the canonical-side row for traceability.
+1. **CI sentinel** — `scripts/check_engine_version_consistency.py` and `.github/workflows/ci.yml`
+   surface a runtime WARNING when a release `engine_version` (e.g. `0.18.0.post1`) co-exists with a
+   dev-build `engine_version` (e.g. `v0.17.2rc0-2810-ga46abb7ae`) for the same
+   `metadata.git_commit`. The sentinel fails CI only on hard dev-build sha / `git_commit`
+   disagreement, not on the warn-only co-existence case.
+
 ## Derived compare snapshot
 
 `leaderboard_compare.json` is generated from validated leaderboard entries after deduplication. It

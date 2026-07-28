@@ -24,6 +24,8 @@ jobs:
           SKIP: ${{ github.ref == 'refs/heads/main' && 'no-commit-to-branch' || '' }}
       - name: Run unit tests
         run: pytest tests/ -v
+      - name: Validate engine_version vs. git_commit consistency
+        run: python scripts/check_engine_version_consistency.py
       - name: Verify repository hook templates
         run: |
           test -f hooks/pre-commit
