@@ -113,12 +113,14 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert "CURATED_PROFILES" not in script
     assert "vllm-hust developer" in script
     assert "research_direction" in script
+    assert "研究特长或兴趣方向" in text
+    assert "Research strengths or interests" in text
     assert "contribution_areas" in script
     assert "participation_direction" in script
     assert "Identity pending" in script
     assert "function memberContextMarkup(item, lang)" in script
     assert "contributor-member-context" in script
-    assert "contributors-page.js?v=staff-contributors-20260725" in text
+    assert "contributors-page.js?v=member-interests-20260728-github-status" in text
     assert ".research-members-menu[open] summary::after" in css
     assert ".research-member-detail-row" in css
     assert ".research-member-group + .research-member-group" in css
@@ -1752,10 +1754,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 28
+    assert len(profiles["participants"]) == 40
     assert len(profiles["staff_members"]) == 5
     assert len(profiles["external_contributors"]) == 1
-    assert len(profiles["unresolved_contributors"]) == 1
+    assert len(profiles["unresolved_contributors"]) == 0
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
     assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
     assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
@@ -1859,6 +1861,19 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         "董君瑶": "carsontung666",
         "雷欣妍": "leixy2004",
         "路庆浩": "Luqhhh",
+        "刘子墨": "Liu-zimo-LZM",
+        "欧丹丹": "oddod",
+        "钱柯彤": "Devilsssssss",
+        "段盈君": "qingwanruojun",
+        "何维": "healer-positive",
+        "谢汉龙": "xiehanlong834-gif",
+        "周升晖": "keridone",
+        "姚世文": "YWHUTER",
+        "沈家乐": "Fuze1111",
+        "李林浩": "Sunshine-llh",
+        "余天成": "yutiantian0115",
+        "李欣妍": "XinYanLi-0725",
+        "韦若皓": "kotoriqaq0",
     }
     for name, github_id in expected_github_ids.items():
         assert people[name]["github_login"] == github_id
@@ -1886,11 +1901,33 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["宋功轩"]["github_status"]["zh"] == "GitHub ID 待确认"
     assert people["彭成"]["github_status"]["zh"] == "GitHub ID 待确认"
     assert people["赵建军"]["role"]["zh"] == "已毕业博士生，目前已入职高校"
-    assert people["高西岭"]["research_direction"]["zh"] == "KV量化"
+    assert people["高西岭"]["research_direction"]["zh"] == "KV 量化"
     assert "多级" not in people["高西岭"]["research_direction"]["zh"]
-    assert people["刘世锋"]["github_login"] == "Remygred"
-    assert people["刘世锋"]["role"]["zh"] == "华科大三实习生"
-    assert people["刘世锋"]["advisor"]["zh"] == "张书豪"
+    assert people["刘世峰"]["github_login"] == "Remygred"
+    assert people["刘世峰"]["role"]["zh"] == "华科大三实习生"
+    assert people["刘世峰"]["advisor"]["zh"] == "张书豪"
+    assert people["张睿诚"]["research_direction"]["zh"] == "记忆体"
+    assert people["李昶吾"]["research_direction"]["zh"] == "MoE 专家卸载优化；控制面优化"
+    assert people["田景远"]["research_direction"]["zh"].startswith("昇腾 NPU 推理系统优化")
+    assert people["匡明轩"]["research_direction"]["zh"].endswith("Attention Kernel")
+    assert people["谢汉龙"]["research_direction"]["zh"].startswith("异构 GPU 推理分离")
+    assert people["姚世文"]["research_direction"]["zh"].endswith("异构计算")
+    assert people["陈德斌"]["research_direction"]["zh"] == "MoE 专家卸载优化；控制面优化（与李昶吾协作）"
+    assert (
+        people["陈子嘉"]["research_direction"]["zh"]
+        == "昇腾 NPU 算子级性能调优；PyPTO Tile 编程；算子融合"
+    )
+    assert people["何维"]["research_direction"]["zh"] == "性能优化；算法与硬件调优；方向适应性强"
+    assert people["董君瑶"]["research_direction"]["zh"] == "向量数据库"
+    assert people["路庆浩"]["research_direction"]["zh"] == "Profiling；vLLM 性能问题分析与优化"
+    assert people["沈家乐"]["research_direction"]["zh"] == "KV Cache 复用；长上下文推理优化；多后端运行时适配"
+    for name in ("李林浩", "余天成"):
+        assert people[name]["role"]["zh"] == "2027 年待入学学生"
+        assert people[name]["advisor"]["zh"] == "张书豪"
+    assert (
+        people["余天成"]["research_direction"]["zh"]
+        == "大模型推理方向待定；愿意根据课题安排探索相关研究"
+    )
     assert people["曹哲"]["github_login"] == "xmdhb"
     assert people["曹哲"]["role"]["zh"] == "即将入学的研究生"
     assert people["曹哲"]["advisor"]["zh"] == "张书豪"
@@ -1919,15 +1956,43 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         "崔钰嘉": "姚鹏程",
         "赵文举": "姚鹏程",
         "刘思辰": "万瑶",
+        "韦若皓": "万瑶",
+        "周升晖": "张书豪",
+        "何维": "张书豪",
+        "路庆浩": "张书豪",
+        "钱柯彤": "张书豪",
+        "沈家乐": "张书豪",
+        "刘子墨": "张书豪",
+        "欧丹丹": "张书豪",
+        "段盈君": "张书豪",
+        "陈子嘉": "张书豪",
+        "董君瑶": "张书豪",
+        "谢汉龙": "张书豪",
+        "姚世文": "张书豪",
     }
     for name, advisor in expected_advisors.items():
         assert people[name]["advisor"]["zh"] == advisor
+        if advisor == "张书豪" and name in {
+            "周升晖",
+            "何维",
+            "路庆浩",
+            "钱柯彤",
+            "沈家乐",
+            "刘子墨",
+            "欧丹丹",
+            "段盈君",
+            "陈子嘉",
+            "董君瑶",
+            "谢汉龙",
+            "姚世文",
+        }:
+            assert people[name]["role"]["zh"] == "学生"
     unresolved_ids = {item["person_id"] for item in profiles["unresolved_contributors"]}
     assert "github:remygred" not in unresolved_ids
     assert "github:dzcixy" not in unresolved_ids
     assert "github:sunyanggithub" not in unresolved_ids
     assert "github:luoxiaohei" not in unresolved_ids
-    assert unresolved_ids == {"github:kotoriqaq0"}
+    assert unresolved_ids == set()
 
     kuang_rows = [
         item
