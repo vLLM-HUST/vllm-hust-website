@@ -1926,7 +1926,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         people["刘俊"]["research_direction"]["zh"]
         == "SLO 感知的 LLM Serving 调度；MLA 与 KV Cache 优化；张量并行与多 GPU 推理解码；延迟保障与资源分配；应用感知 Serving"
     )
-    assert people["李昶吾"]["research_direction"]["zh"] == "MoE 专家卸载优化；控制面优化"
+    assert (
+        people["李昶吾"]["research_direction"]["zh"]
+        == "大模型推理系统软硬件协同优化；动态 MoE 推理；AI 加速器执行效率优化；Ascend NPU Host–Device 协同优化"
+    )
     assert people["田景远"]["research_direction"]["zh"].startswith("昇腾 NPU 推理系统优化")
     assert people["匡明轩"]["research_direction"]["zh"].endswith("Attention Kernel")
     assert people["谢汉龙"]["research_direction"]["zh"].startswith("异构 GPU 推理分离")

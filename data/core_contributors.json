@@ -4107,8 +4107,8 @@
           "en": "Student"
         },
         "research_direction": {
-          "zh": "MoE 专家卸载优化；控制面优化",
-          "en": "MoE expert-offloading optimization; control-plane optimization"
+          "zh": "大模型推理系统软硬件协同优化；动态 MoE 推理；AI 加速器执行效率优化；Ascend NPU Host–Device 协同优化",
+          "en": "Hardware-software co-optimization for LLM inference systems; dynamic MoE inference; AI-accelerator execution-efficiency optimization; Host-Device co-optimization on Ascend NPUs"
         },
         "participation_direction": {
           "zh": "",
