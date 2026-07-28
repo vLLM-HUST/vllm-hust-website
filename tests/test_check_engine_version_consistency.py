@@ -38,7 +38,7 @@ def _entry(
     *,
     engine: str = "vllm-hust",
     engine_version: str = "v0.18.0.post1",
-    git_commit: str = "ceec19abb0f1b5b5e4f1bcfc0d1f1d2b7aa8a4a3",
+    git_commit: str = "ceec19abb0f1b5b5e4f1bcfc0d1f1d2b7aa8a4a3",  # pragma: allowlist secret
     throughput_tps: float = 1.0,
 ) -> dict:
     return {
@@ -62,7 +62,7 @@ def test_check_passes_when_dev_build_sha_matches_git_commit(tmp_path: Path) -> N
             _entry(
                 "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
                 engine_version="v0.20.1rc0-535-gceec19abb0",
-                git_commit="ceec19abb0f1b5b5e4f1bcfc0d1f1d2b7aa8a4a3",
+                git_commit="ceec19abb0f1b5b5e4f1bcfc0d1f1d2b7aa8a4a3",  # pragma: allowlist secret
             )
         ],
     )
@@ -82,7 +82,7 @@ def test_check_fails_when_dev_build_sha_disagrees_with_git_commit(
             _entry(
                 "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
                 engine_version="v0.20.1rc0-535-gdeadbeef00",
-                git_commit="ceec19abb0f1b5b5e4f1bcfc0d1f1d2b7aa8a4a3",
+                git_commit="ceec19abb0f1b5b5e4f1bcfc0d1f1d2b7aa8a4a3",  # pragma: allowlist secret
             )
         ],
     )
@@ -97,7 +97,7 @@ def test_check_fails_when_dev_build_sha_disagrees_with_git_commit(
 def test_check_warns_when_release_and_dev_build_share_git_commit(
     tmp_path: Path,
 ) -> None:
-    git_commit = "2fb7859dd0c1ce5a62f8db1d4fb1f1f8b0af3a1c"
+    git_commit = "2fb7859dd0c1ce5a62f8db1d4fb1f1f8b0af3a1c"  # pragma: allowlist secret
     _write_snapshot(
         tmp_path,
         "leaderboard_single.json",
@@ -133,7 +133,7 @@ def test_check_ignores_vllm_baseline_entries(tmp_path: Path) -> None:
                 "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
                 engine="vllm",
                 engine_version="0.18.0",
-                git_commit="e18643f8a4d5bd9990727654318ad069ea0b56e2",
+                git_commit="e18643f8a4d5bd9990727654318ad069ea0b56e2",  # pragma: allowlist secret
             ),
             _entry(
                 "ffffffff-ffff-4fff-8fff-ffffffffffff",
