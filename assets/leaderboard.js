@@ -245,6 +245,9 @@
             trendSeriesShowAll: 'Show all',
             trendSeriesHideAll: 'Hide all',
             trendSeriesEmpty: 'No matching series.',
+            modelColumn: 'Model',
+            trendSeriesBaselineOnly: 'baseline result · 1 point',
+            trendSeriesSinglePoint: 'current result · 1 point',
             trendTooltipActualValue: 'Actual',
             trendTooltipBrokenAxis: 'shown on broken axis',
             trendEmpty: 'No trend data under current filters.',
@@ -461,6 +464,11 @@
             trendSeriesShowAll: '全部显示',
             trendSeriesHideAll: '全部隐藏',
             trendSeriesEmpty: '没有匹配的系列。',
+            modelColumn: '模型',
+            trendSeriesBaselineOnly: '基线结果 · 1 个点',
+            trendSeriesSinglePoint: '当前结果 · 1 个点',
+            trendSeriesConfigDefault: '默认值（与基线一致）',
+            trendSeriesConfigDetails: '相关配置',
             trendTooltipActualValue: '实际值',
             trendTooltipBrokenAxis: '断轴显示',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
@@ -1703,6 +1711,12 @@
 
     function getSettingSignature(entry) {
         const sameSpec = getSameSpecPayload(entry);
+
+        const semanticSignature = getSemanticSpecSignature(entry);
+        if (semanticSignature) {
+            return semanticSignature;
+        }
+
         const sameSpecHash = String(sameSpec?.resolved_spec_hash || '').trim();
         if (sameSpecHash) {
             return `hash:${sameSpecHash}`;
@@ -1737,6 +1751,115 @@
             return 'official spec';
         }
         return normalized.length > 32 ? `spec ${normalized.slice(0, 29)}...` : `spec ${normalized}`;
+    }
+
+    const TREND_SEMANTIC_SPEC_VERSION = 'same-spec-semantic/v2';
+    const TREND_SEMANTIC_IGNORED_KEYS = new Set(['host', 'port', 'model']);
+
+    function normalizeSemanticSpecValue(value) {
+        if (value === null || value === undefined) return undefined;
+        if (typeof value === 'string') {
+            const stripped = value.trim();
+            if (/^-?\d+(\.\d+)?$/.test(stripped)) return parseFloat(stripped);
+            if (stripped.toLowerCase() === 'true') return true;
+            if (stripped.toLowerCase() === 'false') return false;
+            return stripped;
+        }
+        return value;
+    }
+
+    function buildTrendSpecDefaults(entries) {
+        const baselines = entries.filter((entry) => isTrendBaselineEntry(entry));
+        if (baselines.length === 0) return { server: {}, client: {} };
+        const defaults = { server: {}, client: {} };
+        for (const scope of ['server', 'client']) {
+            const sourceKey = scope === 'server' ? 'resolved_server_parameters' : 'resolved_client_parameters';
+            const baselineValues = baselines.map((e) => {
+                const params = (e.same_spec || {})[sourceKey] || {};
+                const result = {};
+                for (const key of Object.keys(params)) {
+                    if (!TREND_SEMANTIC_IGNORED_KEYS.has(key)) {
+                        result[key] = normalizeSemanticSpecValue(params[key]);
+                    }
+                }
+                return result;
+            });
+            if (baselineValues.length === 0) continue;
+            const allKeys = new Set();
+            baselineValues.forEach((v) => Object.keys(v).forEach((k) => allKeys.add(k)));
+            for (const key of allKeys) {
+                const valuesForKey = baselineValues.filter((v) => key in v);
+                if (valuesForKey.length === baselines.length) {
+                    const serialized = new Set(valuesForKey.map((v) => JSON.stringify(v[key])));
+                    if (serialized.size === 1) {
+                        defaults[scope][key] = valuesForKey[0][key];
+                    }
+                }
+            }
+        }
+        return defaults;
+    }
+
+    function getEffectiveSemanticSpecParameters(entry, specDefaults) {
+        const sameSpec = entry.same_spec || {};
+        const ignored = TREND_SEMANTIC_IGNORED_KEYS;
+        const parameters = { server: {}, client: {} };
+        for (const [scope, sourceKey] of [
+            ['server', 'resolved_server_parameters'],
+            ['client', 'resolved_client_parameters'],
+        ]) {
+            const params = sameSpec[sourceKey] || {};
+            for (const key of Object.keys(params)) {
+                if (!ignored.has(key)) {
+                    parameters[scope][key] = normalizeSemanticSpecValue(params[key]);
+                }
+            }
+        }
+        const defaults = specDefaults || { server: {}, client: {} };
+        return {
+            server: { ...(defaults.server || {}), ...parameters.server },
+            client: { ...(defaults.client || {}), ...parameters.client },
+        };
+    }
+
+    function getEffectiveTrendWorkloadSemanticConfig(entry, specDefaults) {
+        const workload = entry.workload || {};
+        const params = getEffectiveSemanticSpecParameters(entry, specDefaults);
+        const client = { ...(params.client || {}) };
+        if (client.input_len === normalizeSemanticSpecValue(workload.input_length)) {
+            delete client.input_len;
+        }
+        if (client.output_len === normalizeSemanticSpecValue(workload.output_length)) {
+            delete client.output_len;
+        }
+        return {
+            name: workload.name || '',
+            input_length: normalizeSemanticSpecValue(workload.input_length),
+            output_length: normalizeSemanticSpecValue(workload.output_length),
+            batch_size: normalizeSemanticSpecValue(workload.batch_size),
+            concurrent_requests: normalizeSemanticSpecValue(workload.concurrent_requests),
+        };
+    }
+
+    function getSemanticSpecSignature(entry) {
+        const sameSpec = getSameSpecPayload(entry);
+        const sameSpecId = getSameSpecId(entry);
+        if (!sameSpecId) return null;
+        const specDefaults = buildTrendSpecDefaults([entry]);
+        const params = getEffectiveSemanticSpecParameters(entry, specDefaults);
+        const client = { ...(params.client || {}) };
+        const workload = entry.workload || {};
+        if (client.input_len === normalizeSemanticSpecValue(workload.input_length)) {
+            delete client.input_len;
+        }
+        if (client.output_len === normalizeSemanticSpecValue(workload.output_length)) {
+            delete client.output_len;
+        }
+        return JSON.stringify({
+            server: params.server,
+            client,
+            workload: getEffectiveTrendWorkloadSemanticConfig(entry, specDefaults),
+        });
     }
 
     function formatSettingDtype(value) {
@@ -2523,7 +2646,7 @@
         return Number.isFinite(value) ? value : null;
     }
 
-    function buildTrendChartModel(entries, metricConfig) {
+    function buildTrendChartModel(entries, metricConfig, defaultEntries = entries) {
         const versionMap = new Map();
         const seriesMap = new Map();
 
@@ -2856,6 +2979,38 @@
         }
     }
 
+    function formatTrendSeriesEvidence(item) {
+        if (item.pointCount <= 1) {
+            const isBaseline = isTrendBaselineEntry(item.points.values().next().value?.entry);
+            return isBaseline ? t('trendSeriesBaselineOnly') : t('trendSeriesSinglePoint');
+        }
+        return '';
+    }
+
+    function getRelevantTrendConfigKeys(series) {
+        return ['workload', 'model', 'hardware', 'precision'];
+    }
+
+    function getDifferingTrendConfigKeys(seriesGroup) {
+        if (seriesGroup.length < 2) return [];
+        const allKeySets = seriesGroup.map((series) => new Set(getRelevantTrendConfigKeys(series)));
+        const commonKeys = [...allKeySets[0]].filter((key) =>
+            allKeySets.every((keySet) => keySet.has(key))
+        );
+        return commonKeys.filter((key) => {
+            const values = seriesGroup.map((series) => series[key] || '');
+            return new Set(values).size > 1;
+        });
+    }
+
+    function getTrendConfigDifferenceItems(series, differingKeys) {
+        return differingKeys.map((key) => ({
+            key,
+            value: series[key] || '',
+            label: key,
+        }));
+    }
+
     function renderTrendSeriesControl(series) {
         state.trendSeries = series;
         const list = document.getElementById('trend-series-list');
@@ -2884,6 +3039,11 @@
         list.replaceChildren();
         series.forEach((item, index) => {
             const colors = getTrendColors(index);
+            item.evidenceLabel = formatTrendSeriesEvidence(item);
+            const isUnpaired = item.pointCount <= 1;
+            const relevantKeys = isUnpaired ? getRelevantTrendConfigKeys(item) : [];
+            const differingKeys = getDifferingTrendConfigKeys(series);
+
             const label = document.createElement('label');
             label.className = 'trend-series-item';
             label.dataset.seriesKey = item.key;
@@ -2908,6 +3068,27 @@
             const meta = document.createElement('small');
             meta.textContent = `${item.model} · ${item.hardware} · ${item.precision}`;
             copy.append(title, meta);
+
+            if (item.evidenceLabel) {
+                const evidence = document.createElement('span');
+                evidence.className = 'trend-series-evidence';
+                evidence.textContent = item.evidenceLabel;
+                copy.append(evidence);
+            }
+
+            if (differingKeys.length > 0) {
+                const config = document.createElement('div');
+                config.className = 'trend-series-config';
+                const configItems = getTrendConfigDifferenceItems(item, differingKeys);
+                configItems.forEach((configItem) => {
+                    const chip = document.createElement('span');
+                    chip.className = 'trend-series-config-chip';
+                    chip.textContent = `${configItem.label}: ${configItem.value}`;
+                    config.append(chip);
+                });
+                copy.append(config);
+            }
+
             label.append(checkbox, swatch, copy);
             list.append(label);
         });
@@ -2935,7 +3116,7 @@
         }
     }
 
-    function renderPerformanceTrendChart(entries) {
+    function renderPerformanceTrendChart(entries, defaultEntries = entries) {
         const panel = document.getElementById('leaderboard-trend-panel');
         const canvas = document.getElementById('leaderboard-trend-chart');
         const empty = document.getElementById('leaderboard-trend-empty');
@@ -3020,7 +3201,8 @@
                 borderColor: colors.borderColor,
                 backgroundColor: colors.backgroundColor,
                 borderWidth: 2,
-                pointRadius: 3,
+                showLine: series.pointCount > 1,
+                pointRadius: series.pointCount === 1 ? 5 : 3,
                 pointHoverRadius: 6,
                 tension: 0.28,
                 // Keep one series continuous across x-axis slots where other
@@ -3309,6 +3491,8 @@
             th.setAttribute('tabindex', '0');
             th.setAttribute('role', 'columnheader');
             th.setAttribute('aria-sort', 'none');
+            const modelHeader = document.getElementById('table-head-model');
+            if (modelHeader) modelHeader.textContent = t('modelColumn');
             function activateSort() {
                 const sortState = state.sort[state.currentTab];
                 if (sortState.column === col) {
@@ -3577,7 +3761,11 @@
         renderOverview(sortedFiltered, comparisonView, viewOptions);
         // The table intentionally collapses equivalent package builds. The trend chart must use
         // the unaggregated rows so distinct commits and PR revisions remain visible on the axis.
-        renderPerformanceTrendChart(getPerformanceTrendEntries(filtered, filters.workload));
+        renderPerformanceTrendChart(
+            filters.workload === 'all'
+                ? getPerformanceTrendEntries(data, 'all')
+                : getPerformanceTrendEntries(filtered, filters.workload)
+        );
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
 
@@ -4585,6 +4773,16 @@
         }
 
         if (!timestamp) {
+            try {
+                const fallbackRes = await fetch('./data/last_updated.json?v=' + Date.now());
+                if (fallbackRes.ok) {
+                    const fallbackData = await fallbackRes.json();
+                    timestamp = fallbackData?.last_updated || fallbackData;
+                }
+            } catch (_) { /* ignore */ }
+        }
+
+        if (!timestamp) {
             el.textContent = `${t('lastUpdated')}: -`;
             return;
         }
@@ -4666,6 +4864,7 @@
                 ${versionCellHtml}
                 <td class="config-cell">${workloadText}</td>
                 <td class="config-cell">${configText}</td>
+                <td class="config-cell">${entry.model?.short_name || entry.model?.name || t('unknown')}</td>
                 <td class="metric-column">${renderMetricCell(m.ttft_ms, trends.ttft_ms, false, false, entry.isBaseline)}</td>
                 <td class="metric-column">${renderMetricCell(m.tbt_ms, trends.tbt_ms, false, false, entry.isBaseline)}</td>
                 <td class="metric-column">${renderMetricCell(m.throughput_tps, trends.throughput_tps, true, false, entry.isBaseline)}</td>
@@ -4734,7 +4933,7 @@
     function renderDetailsRow(entry, isExpanded) {
         return `
             <tr class="details-row ${isExpanded ? 'show' : ''}" data-details-for="${entry.entry_id}">
-                <td colspan="8" class="details-cell">
+                <td colspan="9" class="details-cell">
                     <div class="details-content">
                         ${renderHardwareSection(entry)}
                         ${renderBuildVariantsSection(entry)}

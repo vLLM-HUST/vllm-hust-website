@@ -463,6 +463,9 @@ def _get_entry_sort_throughput(entry: dict[str, Any]) -> float:
         return 0.0
 
 
+HISTORICAL_PR_BACKFILL_DATA_SOURCE = "real-online-historical-pr-backfill"
+
+
 def plugin_commit_mismatch_rejection_reason(
     entry: dict[str, Any], canonical_map: dict[str, tuple[str, str]]
 ) -> str | None:
@@ -484,11 +487,24 @@ def plugin_commit_mismatch_rejection_reason(
     Entries without ``runtime_provenance.plugin.commit`` are not rejected
     here (older snapshots may predate the field), and groups without a
     canonical entry are likewise skipped.
+
+    **Historical-PR-backfill exemption**: entries whose
+    ``metadata.data_source`` is ``"real-online-historical-pr-backfill"`` are
+    intentional cross-PR comparison runs (e.g. PR#66 / PR#70 / PR#77 each
+    testing a different plugin commit against the same engine commit).  They
+    are *not* backfill mistakes and must coexist on the public snapshot so
+    the compare cards can render the cross-PR delta.  Such entries bypass
+    the canonical-plugin-commit check.
     """
     engine = str(entry.get("engine") or "").strip().lower()
     if engine != PUBLIC_CURRENT_ENGINE:
         return None
     metadata = entry.get("metadata") if isinstance(entry.get("metadata"), dict) else {}
+    # Historical-PR-backfill entries are intentional cross-PR comparison
+    # runs and must not be rejected by the canonical-plugin-commit rule.
+    data_source = str(metadata.get("data_source") or "").strip()
+    if data_source == HISTORICAL_PR_BACKFILL_DATA_SOURCE:
+        return None
     git_commit = str(metadata.get("git_commit") or "").strip()
     entry_plugin = _get_entry_runtime_plugin_commit(entry)
     if len(git_commit) < 9 or not entry_plugin:
