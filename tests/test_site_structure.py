@@ -1907,6 +1907,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["刘世峰"]["role"]["zh"] == "华科大三实习生"
     assert people["刘世峰"]["advisor"]["zh"] == "张书豪"
     assert people["张睿诚"]["research_direction"]["zh"] == "记忆体"
+    assert (
+        people["刘俊"]["research_direction"]["zh"]
+        == "SLO 感知的 LLM Serving 调度；MLA 与 KV Cache 优化；张量并行与多 GPU 推理解码；延迟保障与资源分配；应用感知 Serving"
+    )
     assert people["李昶吾"]["research_direction"]["zh"] == "MoE 专家卸载优化；控制面优化"
     assert people["田景远"]["research_direction"]["zh"].startswith("昇腾 NPU 推理系统优化")
     assert people["匡明轩"]["research_direction"]["zh"].endswith("Attention Kernel")
