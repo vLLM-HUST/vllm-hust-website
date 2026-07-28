@@ -614,7 +614,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=upstream-qwen-community-20260727" in text
-        assert "assets/site.js?v=plugin-ecosystem-20260727" in text
+        assert "assets/site.js?v=engine-and-proving-ground-20260728" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -622,7 +622,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=mechanism-taxonomy-20260727" in html_text
+    assert "assets/home.css?v=integration-branches-20260727" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
@@ -639,15 +639,19 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "A proving ground for reusable inference ideas." in html_text
-    assert "让可复用的推理机制在真实系统中得到验证。" in html_text
-    assert "Plugin proving ground" in site_js
-    assert "插件试验场" in site_js
+    assert (
+        "A domestic-compute inference engine—and a proving ground for reusable "
+        "serving mechanisms."
+        in html_text
+    )
+    assert "面向国产算力的大模型推理引擎，也是推理系统创新的试验场。" in html_text
+    assert "Domestic-compute inference engine" in site_js
+    assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
     assert "Core mechanisms by system position." in html_text
     assert "按系统位置组织核心机制。" in html_text
     assert "independently integrated, transferred, or licensed" in html_text
-    assert "单独集成、迁移或授权" in html_text
+    assert "独立集成、迁移或授权" in html_text
 
     expected_repositories = (
         "vllm-hust-bidkv",
@@ -681,8 +685,12 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     ascend_adapter = catalog.index("vLLM Ascend HUST")
     metal_adapter = catalog.index("vLLM Metal HUST")
     assert ascend_adapter < metal_adapter
-    assert "Compiler and kernel toolchain for the Ascend adapter" in catalog
-    assert catalog.count('<span class="runtime-tag green">adapter</span>') == 2
+    assert "Triton Ascend HUST" in catalog
+    assert "HUST-maintained Triton Ascend adaptation" in catalog
+    assert catalog.count(
+        '<span class="runtime-tag slate">integration branch</span>'
+    ) == 3
+    assert '<span class="runtime-tag green">adapter</span>' not in catalog
 
     group_ids = (
         "mechanism-control-title",
@@ -710,6 +718,13 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     assert "vllm-ascend-hust-LatchMoE" in execution_group
     assert "vllm-ascend-hust" in adapter_group
     assert "vllm-metal-hust" in adapter_group
+    assert '<span class="runtime-tag">plugin</span>' not in adapter_group
+    compiler_group = catalog.split('id="mechanism-compiler-title"', 1)[1].split(
+        'id="mechanism-adapters-title"', 1
+    )[0]
+    assert "triton-ascend-hust" in compiler_group
+    assert "integration branch" in compiler_group
+    assert '<span class="runtime-tag">plugin</span>' not in compiler_group
 
     for internal_phrase in (
         "讲述口径",
@@ -961,7 +976,10 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=upstream-qwen-community-20260727" in html_text
-    assert "assets/achievements-page.js?v=plugin-ecosystem-20260727" in html_text
+    assert (
+        "assets/achievements-page.js?v=engine-and-proving-ground-20260728"
+        in html_text
+    )
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -1109,7 +1127,10 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
-    assert "assets/achievements-page.js?v=plugin-ecosystem-20260727" in html_text
+    assert (
+        "assets/achievements-page.js?v=engine-and-proving-ground-20260728"
+        in html_text
+    )
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -1931,7 +1952,7 @@ def test_core_contributor_stats_precede_all_repository_stats() -> None:
     all_index = html_text.index('id="contributors-all-tbody"')
 
     assert core_index < all_index
-    assert "试验场核心仓库与已接收插件" in html_text
+    assert "推理引擎核心仓库与已接收插件" in html_text
     assert "BidKV、DiffSpec" in html_text
 
 

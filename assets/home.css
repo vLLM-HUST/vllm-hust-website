@@ -223,6 +223,7 @@ body[data-page="home"] .lang-toggle {
 .runtime-tag.coral { color: #81422e; background: #f5d5ca; }
 .runtime-tag.amber { color: #694a05; background: #f4e1ae; }
 .runtime-tag.cyan { color: #105456; background: #c9e8e7; }
+.runtime-tag.slate { color: #344341; background: #dce4e1; }
 
 .execution-ecosystem { color: var(--exec-white); background: #111819; }
 .execution-architecture { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border-top: 1px solid var(--exec-dark-line); border-left: 1px solid var(--exec-dark-line); }
