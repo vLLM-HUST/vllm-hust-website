@@ -266,15 +266,22 @@ function isCompareSnapshotUsable(compareSnapshot) {
     const goalPairs = Array.isArray(compareSnapshot?.goal_progress?.pairs)
         ? compareSnapshot.goal_progress.pairs
         : [];
-    const hardConstraintScopes = Array.isArray(compareSnapshot?.hard_constraints?.scopes)
-        ? compareSnapshot.hard_constraints.scopes
-        : [];
+    const declaredGroupCount = Number(compareSnapshot.group_count);
+    const declaredPairCount = Number(compareSnapshot.preferred_pair_count);
+    const hasDeclaredCounts =
+        Number.isInteger(declaredGroupCount) &&
+        declaredGroupCount >= 0 &&
+        Number.isInteger(declaredPairCount) &&
+        declaredPairCount >= 0;
 
-    if (groups.length > 0 || goalPairs.length > 0) {
-        return true;
+    if (hasDeclaredCounts) {
+        return declaredGroupCount === groups.length && declaredPairCount === goalPairs.length;
     }
 
-    return hardConstraintScopes.length === 0;
+    // Older snapshots do not declare counts. Empty arrays are a valid business
+    // state while canonical baselines are being rebuilt; their emptiness alone
+    // must not turn otherwise usable single/multi snapshots into a fatal load.
+    return Array.isArray(compareSnapshot.groups);
 }
 
 function assertUsableLeaderboardPayload(result, source) {
