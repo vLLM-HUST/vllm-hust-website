@@ -194,6 +194,9 @@
             compareMultiTenantLabel: 'Multi-tenant',
             compareLongContextLabel: 'Long ctx',
             compareNoData: 'n/a',
+            metricMissing: 'not collected',
+            metricNotApplicable: 'N/A',
+            metricInvalid: 'invalid',
             compareStableYes: 'stable',
             compareStableNo: 'unstable',
             onlyEngineView: 'is the single engine in the current view.',
@@ -414,6 +417,9 @@
             compareMultiTenantLabel: '多租户',
             compareLongContextLabel: '长上下文',
             compareNoData: '暂无',
+            metricMissing: '未采集',
+            metricNotApplicable: '不适用',
+            metricInvalid: '无效',
             compareStableYes: '稳定',
             compareStableNo: '不稳定',
             onlyEngineView: '是当前视图中的单个引擎。',
@@ -729,6 +735,57 @@
     function getWorkloadLabel(workloadId) {
         const lang = getCurrentLang();
         return (WORKLOAD_LABELS[lang] && WORKLOAD_LABELS[lang][workloadId]) || workloadId;
+    }
+
+    function getMetricState(entry, metricKey) {
+        const declared =
+            entry?.metric_states?.[metricKey] ??
+            entry?.metrics_state?.[metricKey] ??
+            entry?.metric_state?.[metricKey];
+        const declaredState = typeof declared === 'string' ? declared : declared?.state;
+        if (['measured', 'missing', 'not_applicable', 'invalid', 'blocked', 'excluded'].includes(declaredState)) {
+            return declaredState;
+        }
+
+        const rawValue = entry?.metrics?.[metricKey];
+        if (rawValue === null || rawValue === undefined || rawValue === '') {
+            return 'missing';
+        }
+        const value = Number(rawValue);
+        if (!Number.isFinite(value)) {
+            return 'invalid';
+        }
+
+        const workload = getWorkloadId(entry).toLowerCase();
+        if ((metricKey === 'ttft_ms' || metricKey === 'tbt_ms') && value === 0) {
+            return workload.endsWith('-throughput') ? 'not_applicable' : 'invalid';
+        }
+        if (metricKey === 'peak_mem_mb' && value === 0) {
+            return 'missing';
+        }
+        return 'measured';
+    }
+
+    function getMeasuredMetricValue(entry, metricKey) {
+        if (getMetricState(entry, metricKey) !== 'measured') {
+            return null;
+        }
+        const value = Number(entry?.metrics?.[metricKey]);
+        return Number.isFinite(value) ? value : null;
+    }
+
+    function formatMetricState(entry, metricKey, isPercentage = false) {
+        const stateName = getMetricState(entry, metricKey);
+        if (stateName !== 'measured') {
+            if (stateName === 'not_applicable') {
+                return t('metricNotApplicable');
+            }
+            if (stateName === 'invalid' || stateName === 'blocked' || stateName === 'excluded') {
+                return t('metricInvalid');
+            }
+            return t('metricMissing');
+        }
+        return formatMetric(getMeasuredMetricValue(entry, metricKey), isPercentage);
     }
 
     function getEntryTimestamp(entry) {
@@ -2372,20 +2429,20 @@
         const c = candidate.metrics || {};
         const i = incumbent.metrics || {};
 
-        const cThroughput = Number(c.throughput_tps) || 0;
-        const iThroughput = Number(i.throughput_tps) || 0;
+        const cThroughput = getMeasuredMetricValue(candidate, 'throughput_tps') ?? Number.NEGATIVE_INFINITY;
+        const iThroughput = getMeasuredMetricValue(incumbent, 'throughput_tps') ?? Number.NEGATIVE_INFINITY;
         if (cThroughput !== iThroughput) {
             return cThroughput - iThroughput;
         }
 
-        const cTtft = Number(c.ttft_ms) || Number.POSITIVE_INFINITY;
-        const iTtft = Number(i.ttft_ms) || Number.POSITIVE_INFINITY;
+        const cTtft = getMeasuredMetricValue(candidate, 'ttft_ms') ?? Number.POSITIVE_INFINITY;
+        const iTtft = getMeasuredMetricValue(incumbent, 'ttft_ms') ?? Number.POSITIVE_INFINITY;
         if (cTtft !== iTtft) {
             return iTtft - cTtft;
         }
 
-        const cError = Number(c.error_rate) || 0;
-        const iError = Number(i.error_rate) || 0;
+        const cError = getMeasuredMetricValue(candidate, 'error_rate') ?? Number.POSITIVE_INFINITY;
+        const iError = getMeasuredMetricValue(incumbent, 'error_rate') ?? Number.POSITIVE_INFINITY;
         if (cError !== iError) {
             return iError - cError;
         }
@@ -2396,8 +2453,8 @@
             return cHit - iHit;
         }
 
-        const cMem = Number(c.peak_mem_mb) || Number.POSITIVE_INFINITY;
-        const iMem = Number(i.peak_mem_mb) || Number.POSITIVE_INFINITY;
+        const cMem = getMeasuredMetricValue(candidate, 'peak_mem_mb') ?? Number.POSITIVE_INFINITY;
+        const iMem = getMeasuredMetricValue(incumbent, 'peak_mem_mb') ?? Number.POSITIVE_INFINITY;
         if (cMem !== iMem) {
             return iMem - cMem;
         }
@@ -2646,12 +2703,7 @@
     }
 
     function getFiniteTrendMetricValue(entry, metricKey) {
-        const rawValue = entry?.metrics?.[metricKey];
-        if (rawValue === null || rawValue === undefined || rawValue === '') {
-            return null;
-        }
-        const value = Number(rawValue);
-        return Number.isFinite(value) ? value : null;
+        return getMeasuredMetricValue(entry, metricKey);
     }
 
     function buildTrendChartModel(entries, metricConfig, defaultEntries = entries) {
@@ -4845,7 +4897,6 @@
 
     // Render data row
     function renderDataRow(entry, isLatest, isExpanded, showVersion, isSparse, versionRowSpan = 1) {
-        const m = entry.metrics;
         const trends = entry.trends || {};
         const dateLabel = getEntryDateLabel(entry);
         const displayVersion = formatEntryVersion(entry, { display: true });
@@ -4883,10 +4934,10 @@
                 <td class="config-cell">${workloadText}</td>
                 <td class="config-cell">${configText}</td>
                 <td class="config-cell">${entry.model?.short_name || entry.model?.name || t('unknown')}</td>
-                <td class="metric-column">${renderMetricCell(m.ttft_ms, trends.ttft_ms, false, false, entry.isBaseline)}</td>
-                <td class="metric-column">${renderMetricCell(m.tbt_ms, trends.tbt_ms, false, false, entry.isBaseline)}</td>
-                <td class="metric-column">${renderMetricCell(m.throughput_tps, trends.throughput_tps, true, false, entry.isBaseline)}</td>
-                <td class="metric-column">${renderMetricCell(m.error_rate, trends.error_rate, false, true, entry.isBaseline)}</td>
+                <td class="metric-column">${renderMetricCell(getMeasuredMetricValue(entry, 'ttft_ms'), trends.ttft_ms, false, false, entry.isBaseline, getMetricState(entry, 'ttft_ms'))}</td>
+                <td class="metric-column">${renderMetricCell(getMeasuredMetricValue(entry, 'tbt_ms'), trends.tbt_ms, false, false, entry.isBaseline, getMetricState(entry, 'tbt_ms'))}</td>
+                <td class="metric-column">${renderMetricCell(getMeasuredMetricValue(entry, 'throughput_tps'), trends.throughput_tps, true, false, entry.isBaseline, getMetricState(entry, 'throughput_tps'))}</td>
+                <td class="metric-column">${renderMetricCell(getMeasuredMetricValue(entry, 'error_rate'), trends.error_rate, false, true, entry.isBaseline, getMetricState(entry, 'error_rate'))}</td>
                 <td class="action-cell">
                     <button class="btn-details" data-entry-id="${entry.entry_id}">
                         ${isExpanded ? t('hide') : (buildCount > 1 ? t('fourthVersion') : t('details'))}
@@ -4915,10 +4966,14 @@
     }
 
     // Render metric cell with trend (双重对比：vs baseline 和 vs 上一版)
-    function renderMetricCell(value, trend, higherIsBetter, isPercentage = false, isBaseline = false) {
-        const formattedValue = isPercentage ?
-            formatPercent(value) :
-            formatNumber(value);
+    function renderMetricCell(value, trend, higherIsBetter, isPercentage = false, isBaseline = false, metricState = 'measured') {
+        const formattedValue = metricState === 'measured'
+            ? (isPercentage ? formatPercent(value) : formatNumber(value))
+            : metricState === 'not_applicable'
+                ? t('metricNotApplicable')
+                : metricState === 'missing'
+                    ? t('metricMissing')
+                    : t('metricInvalid');
 
         if (isBaseline) {
             return `<div class="metric-cell"><span class="metric-value">${formattedValue}</span></div>`;
@@ -5029,18 +5084,17 @@
                         </thead>
                         <tbody>
                             ${variants.map((variant, index) => {
-            const vm = variant.metrics || {};
             const selected = variant.entry_id === entry.entry_id ? 'selected' : '';
             const variantVersion = getEntryDetailedVersionText(variant);
             return `
                                     <tr class="${selected}">
                                         <td><span class="build-version-summary">${variantVersion}</span>${index === 0 ? ` <span class="build-version-marker">${t('selectedStar')}</span>` : ''}</td>
                                         <td>${getEntryDateLabel(variant) || '-'}</td>
-                                        <td>${formatMetric(vm.ttft_ms)}</td>
-                                        <td>${formatMetric(vm.throughput_tps)}</td>
-                                        <td>${formatMetric(vm.peak_mem_mb)}</td>
-                                        <td>${formatMetric(vm.error_rate, true)}</td>
-                                        <td>${formatMetric(vm.prefix_hit_rate, true)}</td>
+                                        <td>${formatMetricState(variant, 'ttft_ms')}</td>
+                                        <td>${formatMetricState(variant, 'throughput_tps')}</td>
+                                        <td>${formatMetricState(variant, 'peak_mem_mb')}</td>
+                                        <td>${formatMetricState(variant, 'error_rate', true)}</td>
+                                        <td>${formatMetricState(variant, 'prefix_hit_rate', true)}</td>
                                     </tr>
                                 `;
         }).join('')}
@@ -5111,10 +5165,10 @@
         const { column, direction } = sortState;
         const sorted = [...entries];
         sorted.sort((a, b) => {
-            const aVal = Number(a.metrics?.[column]);
-            const bVal = Number(b.metrics?.[column]);
-            const aValid = Number.isFinite(aVal);
-            const bValid = Number.isFinite(bVal);
+            const aVal = getMeasuredMetricValue(a, column);
+            const bVal = getMeasuredMetricValue(b, column);
+            const aValid = aVal !== null;
+            const bValid = bVal !== null;
             if (!aValid && !bValid) return 0;
             if (!aValid) return 1;
             if (!bValid) return -1;
@@ -5226,8 +5280,8 @@
         const metrics = ['ttft_ms', 'tbt_ms', 'throughput_tps', 'error_rate'];
 
         metrics.forEach(metric => {
-            const curr = current.metrics[metric];
-            const prev = previous.metrics[metric];
+            const curr = getMeasuredMetricValue(current, metric);
+            const prev = getMeasuredMetricValue(previous, metric);
 
             if (curr != null && prev != null && prev !== 0) {
                 trends[metric] = ((curr - prev) / prev) * 100;
@@ -5428,15 +5482,18 @@
                 const bestEntry = representativeEntry || null;
                 const coverageBestEntry = [...engineEntries].sort((a, b) => compareEntryQuality(b, a))[0] || null;
                 const displayEntry = representativeEntry;
-                const displayMetrics = displayEntry?.metrics || {};
                 return {
                     engine,
                     label: getEngineLabel(engine),
                     count: engineEntries.length,
-                    displayTTFT: displayEntry ? Number(displayMetrics.ttft_ms) : null,
-                    displayTBT: displayEntry ? Number(displayMetrics.tbt_ms) : null,
-                    displayTPS: displayEntry ? Number(displayMetrics.throughput_tps) : null,
-                    displayError: displayEntry ? Number(displayMetrics.error_rate) : null,
+                    displayTTFT: displayEntry ? getMeasuredMetricValue(displayEntry, 'ttft_ms') : null,
+                    displayTBT: displayEntry ? getMeasuredMetricValue(displayEntry, 'tbt_ms') : null,
+                    displayTPS: displayEntry ? getMeasuredMetricValue(displayEntry, 'throughput_tps') : null,
+                    displayError: displayEntry ? getMeasuredMetricValue(displayEntry, 'error_rate') : null,
+                    displayTTFTState: displayEntry ? getMetricState(displayEntry, 'ttft_ms') : 'missing',
+                    displayTBTState: displayEntry ? getMetricState(displayEntry, 'tbt_ms') : 'missing',
+                    displayTPSState: displayEntry ? getMetricState(displayEntry, 'throughput_tps') : 'missing',
+                    displayErrorState: displayEntry ? getMetricState(displayEntry, 'error_rate') : 'missing',
                     displayEntry,
                     representativeEntry,
                     aggregateOnly: false,
@@ -5867,19 +5924,19 @@
                 <div class="engine-summary-metrics">
                     <div class="summary-metric">
                         <span>${metricLabel('sampleTTFT')}</span>
-                        <strong>${formatNumber(summary.displayTTFT)} ms</strong>
+                        <strong>${formatSummaryMetric(summary.displayTTFT, summary.displayTTFTState, 'ms')}</strong>
                     </div>
                     <div class="summary-metric">
                         <span>${metricLabel('sampleTBT')}</span>
-                        <strong>${formatNumber(summary.displayTBT)} ms</strong>
+                        <strong>${formatSummaryMetric(summary.displayTBT, summary.displayTBTState, 'ms')}</strong>
                     </div>
                     <div class="summary-metric">
                         <span>${metricLabel('sampleThroughput')}</span>
-                        <strong>${formatNumber(summary.displayTPS)} tok/s</strong>
+                        <strong>${formatSummaryMetric(summary.displayTPS, summary.displayTPSState, 'tok/s')}</strong>
                     </div>
                     <div class="summary-metric">
                         <span>${t('errorRate')}</span>
-                        <strong>${formatPercent(summary.displayError)}</strong>
+                        <strong>${formatSummaryMetric(summary.displayError, summary.displayErrorState, '', true)}</strong>
                     </div>
                 </div>
                 <div class="engine-summary-meta">
@@ -5906,6 +5963,20 @@
         }
 
         return String(value);
+    }
+
+    function formatSummaryMetric(value, metricState, unit, isPercentage = false) {
+        if (metricState !== 'measured') {
+            if (metricState === 'not_applicable') {
+                return t('metricNotApplicable');
+            }
+            if (metricState === 'missing') {
+                return t('metricMissing');
+            }
+            return t('metricInvalid');
+        }
+        const formatted = isPercentage ? formatPercent(value) : formatNumber(value);
+        return unit ? `${formatted} ${unit}` : formatted;
     }
 
     function formatPercent(value) {
