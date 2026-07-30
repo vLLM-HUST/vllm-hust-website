@@ -245,6 +245,7 @@
             trendSeriesShowAll: 'Show all',
             trendSeriesHideAll: 'Hide all',
             trendSeriesEmpty: 'No matching series.',
+            compareRebuilding: 'Comparable baseline groups are being rebuilt.',
             modelColumn: 'Model',
             trendSeriesBaselineOnly: 'baseline result · 1 point',
             trendSeriesSinglePoint: 'current result · 1 point',
@@ -464,6 +465,7 @@
             trendSeriesShowAll: '全部显示',
             trendSeriesHideAll: '全部隐藏',
             trendSeriesEmpty: '没有匹配的系列。',
+            compareRebuilding: '可比基线组正在重建。',
             modelColumn: '模型',
             trendSeriesBaselineOnly: '基线结果 · 1 个点',
             trendSeriesSinglePoint: '当前结果 · 1 个点',
@@ -620,6 +622,7 @@
             }
 
             loadingEl.style.display = 'none';
+            errorEl.style.display = 'none';
             contentEl.style.display = 'block';
         } catch (error) {
             console.error('Error loading leaderboard data:', error);
@@ -635,6 +638,11 @@
 
         if (hasCompare) {
             state.compareSnapshot = data?.compare || null;
+            if (!hasCompleteSnapshotCompareGroups()) {
+                Object.values(state.viewOptions).forEach((viewOptions) => {
+                    viewOptions.hideIncompleteGroups = false;
+                });
+            }
         }
 
         if (hasSingle || !options.partial) {
@@ -3597,8 +3605,18 @@
         }
 
         if (hideIncompleteToggle) {
+            const hasCompleteGroups = hasCompleteSnapshotCompareGroups();
             hideIncompleteToggle.checked = viewOptions.hideIncompleteGroups;
+            hideIncompleteToggle.disabled = !hasCompleteGroups;
+            hideIncompleteToggle.title = hasCompleteGroups ? '' : t('compareRebuilding');
         }
+    }
+
+    function hasCompleteSnapshotCompareGroups() {
+        const groups = Array.isArray(state.compareSnapshot?.groups)
+            ? state.compareSnapshot.groups
+            : [];
+        return groups.length > 0;
     }
 
     // Render filter dropdowns

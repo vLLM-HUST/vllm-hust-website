@@ -409,13 +409,22 @@ def test_hard_constraints_baseline_block_is_rendered() -> None:
     assert ".hard-constraints-baseline {" in css_text
 
 
-def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
+def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "hf-data-loader.js").read_text(encoding="utf-8")
 
     assert "function isCompareSnapshotUsable(compareSnapshot)" in text
     assert "Incomplete compare snapshot from ${source}" in text
-    assert "return hardConstraintScopes.length === 0;" in text
+    assert "const declaredGroupCount = Number(compareSnapshot.group_count);" in text
+    assert (
+        "const declaredPairCount = Number(compareSnapshot.preferred_pair_count);"
+        in text
+    )
+    assert (
+        "return declaredGroupCount === groups.length && declaredPairCount === goalPairs.length;"
+        in text
+    )
+    assert "return Array.isArray(compareSnapshot.groups);" in text
     assert "assertUsableLeaderboardPayload(result, source);" in text
     assert "sources: ['github', 'hf', 'local']" in text
     assert "backgroundRemoteSync: true" in text
@@ -434,6 +443,19 @@ def test_hf_loader_rejects_incomplete_compare_snapshots() -> None:
     )
     assert "function clearCache()" in text
     assert "Ignoring unusable session cache" in text
+
+
+def test_empty_compare_snapshot_disables_focus_without_hiding_rows() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function hasCompleteSnapshotCompareGroups()" in js_text
+    assert "viewOptions.hideIncompleteGroups = false;" in js_text
+    assert "hideIncompleteToggle.disabled = !hasCompleteGroups;" in js_text
+    assert (
+        "compareRebuilding: 'Comparable baseline groups are being rebuilt.'" in js_text
+    )
+    assert "compareRebuilding: '可比基线组正在重建。'" in js_text
 
 
 def test_leaderboard_data_excludes_retired_v0110_baselines() -> None:
@@ -1331,7 +1353,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "leaderboard-cache-v7-20260702" in html_text
+    assert "leaderboard-empty-compare-v8-20260730" in html_text
     assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
