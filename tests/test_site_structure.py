@@ -1778,7 +1778,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 40
+    assert len(profiles["participants"]) == 41
     assert len(profiles["staff_members"]) == 5
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
@@ -1827,6 +1827,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     core_repo_names = set(profiles["core_repo_names"])
     core_ids = {item["person_id"] for item in profiles["core_members"]}
     participant_ids = {item["person_id"] for item in profiles["participants"]}
+    assert "github:apei-520" in participant_ids
     staff_ids = {item["person_id"] for item in profiles["staff_members"]}
     external_ids = {item["person_id"] for item in profiles["external_contributors"]}
     assert core_ids.isdisjoint(participant_ids)

@@ -3311,6 +3311,48 @@
     ],
     "participants": [
       {
+        "name": "Apei-520",
+        "github_login": "Apei-520",
+        "github_url": "https://github.com/Apei-520",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "Apei-520",
+        "chinese_name": "",
+        "english_name": "",
+        "person_id": "github:apei-520",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "研究成员",
+          "en": "Research member"
+        },
+        "research_direction": {
+          "zh": "推理集群并行计算与通信优化；HCCL/NCCL；计算—通信协同；无损网络与跨机通信；资源受限的单卡与单机推理优化",
+          "en": "Parallel computing and communication optimization for inference clusters; HCCL/NCCL; communication-computation co-design; lossless and inter-node networking; resource-constrained single-device and single-server inference optimization"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "GitHub ID 已确认；两个组织的普通成员邀请待接受；姓名待补充",
+          "en": "GitHub ID confirmed; ordinary-member invitations to both organizations are pending; name pending"
+        },
+        "contribution_areas": ""
+      },
+      {
         "name": "sunYangGitHub",
         "github_login": "sunYangGitHub",
         "github_url": "https://github.com/sunYangGitHub",
