@@ -768,7 +768,7 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/subpages.css?v=leaderboard-contrast-system-20260727" in text
+        assert "assets/subpages.css?v=leaderboard-contrast-system-20260730" in text
         assert '<span class="brand-mark">V</span>' in text
         assert "vLLM-HUST<small" in text
 
@@ -897,7 +897,7 @@ def test_leaderboard_summary_cards_have_complete_light_theme_contrast_contract()
     assert html_text.index("assets/leaderboard.css") < html_text.index(
         "assets/subpages.css"
     )
-    assert "leaderboard-contrast-system-20260727" in html_text
+    assert "leaderboard-contrast-system-20260730" in html_text
 
     required_selectors = (
         'body[data-page="leaderboard"] .engine-summary-card.is-leader',
@@ -925,6 +925,38 @@ def test_leaderboard_summary_cards_have_complete_light_theme_contrast_contract()
     assert "background: #e2f3e7;" in css_text
 
 
+def test_leaderboard_failure_state_has_bilingual_aa_contrast_contract() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
+
+    assert "leaderboard-contrast-system-20260730" in html_text
+    assert "'leaderboard-error-title': '排行榜数据加载失败'" in html_text
+    assert "'leaderboard-error-text': '请刷新页面或检查网络连接。'" in html_text
+    assert 'body[data-page="leaderboard"] #leaderboard-error-title' in css_text
+    assert 'body[data-page="leaderboard"] #leaderboard-error-text' in css_text
+    assert "background: #fff4f4;" in css_text
+
+    def luminance(hex_color: str) -> float:
+        channels = [int(hex_color[index : index + 2], 16) / 255 for index in (1, 3, 5)]
+        linear = [
+            channel / 12.92
+            if channel <= 0.04045
+            else ((channel + 0.055) / 1.055) ** 2.4
+            for channel in channels
+        ]
+        return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+    def contrast(foreground: str, background: str) -> float:
+        lighter, darker = sorted(
+            (luminance(foreground), luminance(background)), reverse=True
+        )
+        return (lighter + 0.05) / (darker + 0.05)
+
+    assert contrast("#7f1d1d", "#fff4f4") >= 4.5
+    assert contrast("#5f2525", "#fff4f4") >= 4.5
+
+
 def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
@@ -933,7 +965,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "leaderboard-contrast-system-20260727" in html_text
+    assert "leaderboard-contrast-system-20260730" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -2094,7 +2126,7 @@ def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
     assert "color: #475569;" in css_text
     assert ".research-member-detail-row b" in css_text
     assert "color: #176f72;" in css_text
-    assert "leaderboard-contrast-system-20260727" in html_text
+    assert "leaderboard-contrast-system-20260730" in html_text
     assert "github-status" in html_text
     page_js = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
     assert "localized(item, 'github_status', lang)" in page_js

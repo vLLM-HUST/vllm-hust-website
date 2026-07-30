@@ -510,6 +510,17 @@ body[data-page="leaderboard"] .hc-row-meta,
 body[data-page="leaderboard"] .leaderboard-table td small,
 body[data-page="leaderboard"] .empty-state,
 body[data-page="leaderboard"] .loading-state { color: var(--sub-muted) !important; }
+body[data-page="leaderboard"] #leaderboard-error {
+  border-color: #e6b8b8;
+  color: #5f2525 !important;
+  background: #fff4f4;
+}
+body[data-page="leaderboard"] #leaderboard-error-title {
+  color: #7f1d1d;
+}
+body[data-page="leaderboard"] #leaderboard-error-text {
+  color: #5f2525;
+}
 body[data-page="leaderboard"] .trend-axis-label,
 body[data-page="leaderboard"] .trend-series-toolbar span,
 body[data-page="leaderboard"] .trend-series-copy small,
@@ -588,6 +599,14 @@ body[data-page="leaderboard"] .hc-badge.fail {
   border-color: #d9b45f;
   color: #694a05;
   background: #f4e1ae;
+}
+body[data-page="leaderboard"] button:disabled,
+body[data-page="leaderboard"] select:disabled {
+  border-color: #cbd5d1;
+  color: #52615f;
+  background: #eef2f1;
+  cursor: not-allowed;
+  opacity: 1;
 }
 body[data-page="leaderboard"] .leaderboard-table { color: var(--sub-ink); background: #fff; }
 body[data-page="leaderboard"] .leaderboard-table th { border-color: var(--sub-dark-line); color: #fff; background: var(--sub-ink); }
