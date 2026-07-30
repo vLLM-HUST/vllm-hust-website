@@ -801,7 +801,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=trend-effective-defaults-20260724" in html_text
+    assert "assets/leaderboard.js?v=metric-state-semantics-20260730" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 
@@ -2098,3 +2098,23 @@ def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
     assert "github-status" in html_text
     page_js = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
     assert "localized(item, 'github_status', lang)" in page_js
+
+
+def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+
+    assert "function getMetricState(entry, metricKey)" in js_text
+    assert "function getMeasuredMetricValue(entry, metricKey)" in js_text
+    assert "function formatMetricState(entry, metricKey" in js_text
+    assert "function formatSummaryMetric(value, metricState" in js_text
+    assert "workload.endsWith('-throughput') ? 'not_applicable' : 'invalid'" in js_text
+    assert "metricKey === 'peak_mem_mb' && value === 0" in js_text
+    assert "return getMeasuredMetricValue(entry, metricKey)" in js_text
+    assert "getMeasuredMetricValue(a, column)" in js_text
+    assert "getMeasuredMetricValue(current, metric)" in js_text
+    assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
+    assert "metricMissing: '未采集'" in js_text
+    assert "metricNotApplicable: '不适用'" in js_text
+    assert "metric-state-semantics-20260730" in html_text
