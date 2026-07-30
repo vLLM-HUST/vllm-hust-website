@@ -16,19 +16,23 @@ jobs:
     env:
       HF_REPO: intellistream/llm-engine-benchmark-results
       HF_RELEASE_DIR: changzheng/windows
+      TARGET_BRANCH: ${{ github.event.repository.default_branch }}
 
     steps:
       - name: Checkout website repo
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event.repository.default_branch }}
 
       - name: Download Changzheng release manifest from Hugging Face
         run: |
+          set -euo pipefail
           mkdir -p .tmp/changzheng/windows
-          curl -L "https://huggingface.co/datasets/${HF_REPO}/resolve/main/${HF_RELEASE_DIR}/LATEST.json" \
+          curl --fail --show-error --location --retry 4 --retry-all-errors \
+               "https://huggingface.co/datasets/${HF_REPO}/resolve/main/${HF_RELEASE_DIR}/LATEST.json" \
                -o .tmp/changzheng/windows/LATEST.json
-          curl -L "https://huggingface.co/datasets/${HF_REPO}/resolve/main/${HF_RELEASE_DIR}/RELEASES.json" \
+          curl --fail --show-error --location --retry 4 --retry-all-errors \
+               "https://huggingface.co/datasets/${HF_REPO}/resolve/main/${HF_RELEASE_DIR}/RELEASES.json" \
                -o .tmp/changzheng/windows/RELEASES.json
 
       - name: Download Changzheng release artifacts from Hugging Face
@@ -51,7 +55,14 @@ jobs:
               for name in (file_name, f"{file_name}.sha256"):
                   url = f"https://huggingface.co/datasets/{hf_repo}/resolve/main/{hf_release_dir}/{name}"
                   target = root / name
-                  subprocess.run(['curl', '-L', url, '-o', str(target)], check=True)
+                  subprocess.run(
+                      [
+                          'curl', '--fail', '--show-error', '--location',
+                          '--retry', '4', '--retry-all-errors',
+                          url, '-o', str(target),
+                      ],
+                      check=True,
+                  )
           PY
 
       - name: Sync downloaded release into website static directory
@@ -80,4 +91,8 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add downloads/changzheng/windows data/changzheng_release.json
           git commit -m "chore: sync changzheng release from Hugging Face [skip ci]"
-          git push origin HEAD:main
+          git push origin "HEAD:${TARGET_BRANCH}"
+
+      - name: Remove downloaded staging files
+        if: always()
+        run: rm -rf .tmp/changzheng/windows

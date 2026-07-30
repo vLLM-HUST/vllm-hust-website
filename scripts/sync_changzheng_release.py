@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import shutil
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -101,23 +104,89 @@ def clean_destination(dest_dir: Path) -> None:
             path.unlink()
 
 
-def copy_release_assets(
-    source_dir: Path, dest_dir: Path, artifacts: list[ReleaseArtifact]
-) -> None:
+def calculate_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_release_assets(
+    source_dir: Path, artifacts: list[ReleaseArtifact]
+) -> set[str]:
     required_names = {"LATEST.json", "RELEASES.json"}
     required_names.update(artifact.file_name for artifact in artifacts)
     required_names.update(f"{artifact.file_name}.sha256" for artifact in artifacts)
 
     missing = sorted(
-        name for name in required_names if not (source_dir / name).exists()
+        name for name in required_names if not (source_dir / name).is_file()
     )
     if missing:
         raise FileNotFoundError(f"source release 缺少文件: {', '.join(missing)}")
 
-    clean_destination(dest_dir)
+    json.loads((source_dir / "RELEASES.json").read_text(encoding="utf-8-sig"))
+    for artifact in artifacts:
+        if Path(artifact.file_name).name != artifact.file_name:
+            raise ValueError(f"artifact 文件名不安全: {artifact.file_name}")
 
-    for file_name in sorted(required_names):
-        shutil.copy2(source_dir / file_name, dest_dir / file_name)
+        artifact_path = source_dir / artifact.file_name
+        actual_size = artifact_path.stat().st_size
+        if actual_size != artifact.size:
+            raise ValueError(
+                f"{artifact.file_name} size 不一致: manifest={artifact.size}, actual={actual_size}"
+            )
+
+        actual_sha256 = calculate_sha256(artifact_path)
+        expected_sha256 = artifact.sha256.strip().lower()
+        if actual_sha256 != expected_sha256:
+            raise ValueError(
+                f"{artifact.file_name} SHA256 不一致: manifest={expected_sha256}, actual={actual_sha256}"
+            )
+
+        checksum_text = (source_dir / f"{artifact.file_name}.sha256").read_text(
+            encoding="utf-8"
+        )
+        checksum_token = checksum_text.strip().split()[0].lower()
+        if checksum_token != expected_sha256:
+            raise ValueError(f"{artifact.file_name}.sha256 与 manifest 不一致")
+
+    return required_names
+
+
+def copy_release_assets(
+    source_dir: Path, dest_dir: Path, artifacts: list[ReleaseArtifact]
+) -> None:
+    required_names = validate_release_assets(source_dir, artifacts)
+    dest_dir.parent.mkdir(parents=True, exist_ok=True)
+    staging_dir = Path(
+        tempfile.mkdtemp(prefix=f".{dest_dir.name}.staging-", dir=dest_dir.parent)
+    )
+    backup_dir = dest_dir.with_name(f".{dest_dir.name}.previous")
+
+    try:
+        if dest_dir.exists():
+            for keep_name in KEEP_DEST_FILES:
+                keep_path = dest_dir / keep_name
+                if keep_path.is_file():
+                    shutil.copy2(keep_path, staging_dir / keep_name)
+        for file_name in sorted(required_names):
+            shutil.copy2(source_dir / file_name, staging_dir / file_name)
+
+        if backup_dir.exists():
+            shutil.rmtree(backup_dir)
+        if dest_dir.exists():
+            os.replace(dest_dir, backup_dir)
+        os.replace(staging_dir, dest_dir)
+        if backup_dir.exists():
+            shutil.rmtree(backup_dir)
+    except Exception:
+        if not dest_dir.exists() and backup_dir.exists():
+            os.replace(backup_dir, dest_dir)
+        raise
+    finally:
+        if staging_dir.exists():
+            shutil.rmtree(staging_dir)
 
 
 def build_site_metadata(
@@ -171,10 +240,17 @@ def build_site_metadata(
 
 def write_site_metadata(site_data_path: Path, payload: dict[str, Any]) -> None:
     site_data_path.parent.mkdir(parents=True, exist_ok=True)
-    site_data_path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+    content = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    with tempfile.NamedTemporaryFile(
+        "w",
         encoding="utf-8",
-    )
+        dir=site_data_path.parent,
+        prefix=f".{site_data_path.name}.",
+        delete=False,
+    ) as stream:
+        stream.write(content)
+        temporary_path = Path(stream.name)
+    os.replace(temporary_path, site_data_path)
 
 
 def main() -> None:
