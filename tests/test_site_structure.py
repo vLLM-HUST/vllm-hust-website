@@ -517,6 +517,13 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
 
     assert "python scripts/sync_leaderboard_snapshots.py" in workflow
     assert "vLLM-HUST/vllm-hust-benchmark" in workflow
+    assert "scripts/validate_public_leaderboard_snapshots.py" in workflow
+    assert "src/vllm_hust_benchmark" in workflow
+    assert "steps.benchmark-source.outputs.commit" in workflow
+    validator_step = workflow.index("Validate benchmark snapshots before website sync")
+    sync_step = workflow.index("Sync snapshot files to website data/")
+    pull_request_step = workflow.index("Create pull request")
+    assert validator_step < sync_step < pull_request_step
     assert "SNAPSHOT_FILES = (" in script
     assert "--check" in script
 
