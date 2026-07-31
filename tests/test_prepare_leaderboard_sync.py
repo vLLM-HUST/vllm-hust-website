@@ -78,7 +78,9 @@ def test_valid_snapshot_and_declared_empty_compare_pass(tmp_path: Path) -> None:
     }
 
 
-@pytest.mark.parametrize("missing", ["target_id", "target_version", "target_registry_sha256"])
+@pytest.mark.parametrize(
+    "missing", ["target_id", "target_version", "target_registry_sha256"]
+)
 def test_missing_target_binding_fails_closed(tmp_path: Path, missing: str) -> None:
     _, _, info = registry(tmp_path)
     source = snapshot_dir(tmp_path, info)
