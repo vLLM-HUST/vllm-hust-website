@@ -23,8 +23,21 @@ jobs:
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
           path: _benchmark
-          sparse-checkout: leaderboard-data/snapshots
+          sparse-checkout: |
+            leaderboard-data/snapshots
+            schemas
+            scripts/validate_public_leaderboard_snapshots.py
+            src/vllm_hust_benchmark
           sparse-checkout-cone-mode: false
+
+      - name: Record benchmark source
+        id: benchmark-source
+        run: echo "commit=$(git -C _benchmark rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Validate benchmark snapshots before website sync
+        run: |
+          python _benchmark/scripts/validate_public_leaderboard_snapshots.py \
+            --snapshot-dir _benchmark/leaderboard-data/snapshots
 
       - name: Sync snapshot files to website data/
         run: |
@@ -40,6 +53,9 @@ jobs:
           title: 'data: sync leaderboard snapshots'
           body: |
             Automated sync of leaderboard data from `vllm-hust-benchmark/leaderboard-data/snapshots/`.
+
+            Benchmark source commit: `${{ steps.benchmark-source.outputs.commit }}`
+            Public snapshot admission: `passed`
 
             This PR updates the website's leaderboard display with the latest benchmark results.
           delete-branch: true
