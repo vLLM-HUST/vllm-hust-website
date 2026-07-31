@@ -75,7 +75,9 @@ def require_public_entry_contract(
     entry_id = str(entry.get("entry_id") or "<missing-entry-id>")
     prefix = f"{source}:{entry_id}"
     metadata = entry.get("metadata") if isinstance(entry.get("metadata"), dict) else {}
-    same_spec = entry.get("same_spec") if isinstance(entry.get("same_spec"), dict) else {}
+    same_spec = (
+        entry.get("same_spec") if isinstance(entry.get("same_spec"), dict) else {}
+    )
 
     if metadata.get("verified") is not True:
         errors.append(f"{prefix}: metadata.verified must be true")
@@ -100,8 +102,13 @@ def require_public_entry_contract(
     if target is None:
         errors.append(f"{prefix}: target_id {target_id!r} is not in the registry")
         return errors
-    if target.get("status") != "active" or target.get("intended_use") != "public-leaderboard":
-        errors.append(f"{prefix}: target_id {target_id!r} is not an active public target")
+    if (
+        target.get("status") != "active"
+        or target.get("intended_use") != "public-leaderboard"
+    ):
+        errors.append(
+            f"{prefix}: target_id {target_id!r} is not an active public target"
+        )
     if target_version and target_version != str(target.get("target_version") or ""):
         errors.append(
             f"{prefix}: target_version mismatch; entry={target_version!r} "
@@ -141,7 +148,10 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
     compare = load_json(source_dir / "leaderboard_compare.json")
     marker = load_json(source_dir / "last_updated.json")
     errors: list[str] = []
-    for name, payload in (("leaderboard_single.json", single), ("leaderboard_multi.json", multi)):
+    for name, payload in (
+        ("leaderboard_single.json", single),
+        ("leaderboard_multi.json", multi),
+    ):
         if not isinstance(payload, list):
             errors.append(f"{name} must be an array")
             continue
@@ -154,7 +164,9 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
     if not isinstance(marker, dict) or not marker.get("last_updated"):
         errors.append("last_updated.json must declare last_updated")
     if errors:
-        raise ValueError("snapshot admission failed:\n" + "\n".join(f"- {item}" for item in errors))
+        raise ValueError(
+            "snapshot admission failed:\n" + "\n".join(f"- {item}" for item in errors)
+        )
     return {
         "single": len(single),
         "multi": len(multi),
