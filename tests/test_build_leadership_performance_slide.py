@@ -627,9 +627,7 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
         ["git", "-C", str(repo), "config", "user.email", "test@example.com"],
         check=True,
     )
-    subprocess.run(
-        ["git", "-C", str(repo), "config", "user.name", "Test"], check=True
-    )
+    subprocess.run(["git", "-C", str(repo), "config", "user.name", "Test"], check=True)
     subprocess.run(
         [
             "git",
@@ -670,7 +668,16 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
         ],
         check=True,
     )
-    verify = MODULE.milestone_commit_verifier(repo)
+    remote_listing = f"{commits[-1]}\trefs/heads/main\n".encode()
+    verify = MODULE.milestone_commit_verifier(
+        repo,
+        fetch_remote=lambda _root: None,
+        ls_remote=lambda _root: remote_listing,
+    )
+    proof = verify.provenance()
+    assert proof["remote_url"] == "git@github.com:vLLM-HUST/vllm-hust.git"
+    assert proof["ref_tips"] == {"refs/heads/main": commits[-1]}
+    assert proof["fetched_at"].endswith("+00:00")
     verify("vLLM-HUST/vllm-hust", None, commits[0])
     verify("vLLM-HUST/vllm-hust", commits[0], commits[1])
     with pytest.raises(ValueError, match="not in strict ancestor order"):
@@ -692,6 +699,32 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
     ).stdout.strip()
     with pytest.raises(ValueError, match="local-only"):
         verify("vLLM-HUST/vllm-hust", commits[-1], local_only)
+
+    with pytest.raises(ValueError, match="stale or inconsistent"):
+        MODULE.milestone_commit_verifier(
+            repo,
+            fetch_remote=lambda _root: None,
+            ls_remote=lambda _root: f"{local_only}\trefs/heads/main\n".encode(),
+        )
+
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo),
+            "remote",
+            "set-url",
+            "origin",
+            "git@evilgithub.com:vLLM-HUST/vllm-hust.git",
+        ],
+        check=True,
+    )
+    with pytest.raises(ValueError, match="github.com host"):
+        MODULE.milestone_commit_verifier(
+            repo,
+            fetch_remote=lambda _root: None,
+            ls_remote=lambda _root: remote_listing,
+        )
 
 
 def test_target_pin_is_stale_when_registry_hash_changes(tmp_path: Path) -> None:
