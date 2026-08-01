@@ -560,6 +560,114 @@ def test_checkpoint_boundary_must_bind_exact_commit(tmp_path: Path) -> None:
         MODULE.load_story(story_path, entries)
 
 
+def test_cumulative_story_requires_monotonic_prs_and_commit_ancestry(
+    tmp_path: Path,
+) -> None:
+    registry, pins, _, snapshot_dir, story_path = fixtures(tmp_path)
+    entries, _ = MODULE.admit_snapshot(snapshot_dir, registry, pins)
+    story = json.loads(story_path.read_text())
+    milestones = story["series"][0]["milestones"]
+    second = copy.deepcopy(milestones[0])
+    second["entry_id"] = "entry-agent-second"
+    second["pr_number"] = 20
+    second["pr_url"] = "https://github.com/vLLM-HUST/vllm-hust/pull/20"
+    second["commit"] = "a" * 40
+    second["attribution"]["boundary_id"] = "checkpoint-agent-second"
+    second["attribution"]["checkpoint_entry_id"] = second["entry_id"]
+    second["attribution"]["checkpoint_commit"] = second["commit"]
+    source = copy.deepcopy(entries[milestones[0]["entry_id"]])
+    source["entry_id"] = second["entry_id"]
+    source["metadata"]["github_pr_number"] = 20
+    source["metadata"]["github_pr_url"] = second["pr_url"]
+    source["metadata"]["git_commit"] = second["commit"]
+    source["metadata"]["github_commit_url"] = (
+        f"https://github.com/vLLM-HUST/vllm-hust/commit/{second['commit']}"
+    )
+    entries[second["entry_id"]] = source
+    milestones.append(second)
+    dump(story_path, story)
+
+    calls: list[tuple[str, str | None, str]] = []
+    MODULE.load_story(
+        story_path,
+        entries,
+        commit_verifier=lambda repository, previous, current: calls.append(
+            (repository, previous, current)
+        ),
+    )
+    assert (
+        "vLLM-HUST/vllm-hust",
+        milestones[0]["commit"],
+        second["commit"],
+    ) in calls
+
+    with pytest.raises(ValueError, match="no commit ancestry verifier"):
+        MODULE.load_story(story_path, entries)
+
+    story["series"][0]["milestones"][1]["pr_number"] = 1
+    story["series"][0]["milestones"][1]["pr_url"] = (
+        "https://github.com/vLLM-HUST/vllm-hust/pull/1"
+    )
+    entries[second["entry_id"]]["metadata"]["github_pr_number"] = 1
+    entries[second["entry_id"]]["metadata"]["github_pr_url"] = (
+        "https://github.com/vLLM-HUST/vllm-hust/pull/1"
+    )
+    dump(story_path, story)
+    with pytest.raises(ValueError, match="strictly increasing"):
+        MODULE.load_story(story_path, entries, commit_verifier=lambda *_: None)
+
+
+def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "milestones"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.email", "test@example.com"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.name", "Test"], check=True
+    )
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo),
+            "remote",
+            "add",
+            "origin",
+            "git@github.com:vLLM-HUST/vllm-hust.git",
+        ],
+        check=True,
+    )
+    commits = []
+    for index in range(2):
+        (repo / "checkpoint.txt").write_text(str(index), encoding="utf-8")
+        subprocess.run(["git", "-C", str(repo), "add", "."], check=True)
+        subprocess.run(
+            ["git", "-C", str(repo), "commit", "-qm", f"checkpoint {index}"],
+            check=True,
+        )
+        commits.append(
+            subprocess.run(
+                ["git", "-C", str(repo), "rev-parse", "HEAD"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+        )
+
+    verify = MODULE.milestone_commit_verifier(repo)
+    verify("vLLM-HUST/vllm-hust", None, commits[0])
+    verify("vLLM-HUST/vllm-hust", commits[0], commits[1])
+    with pytest.raises(ValueError, match="not in strict ancestor order"):
+        verify("vLLM-HUST/vllm-hust", commits[1], commits[0])
+    with pytest.raises(ValueError, match="does not match"):
+        verify("other/repo", None, commits[0])
+
+
 def test_target_pin_is_stale_when_registry_hash_changes(tmp_path: Path) -> None:
     registry, _, pin_path, _, _ = fixtures(tmp_path)
     changed = MODULE.Registry(registry.version, "f" * 64, registry.targets)
@@ -853,6 +961,50 @@ def test_staged_publish_rolls_back_on_mid_publish_failure(tmp_path: Path) -> Non
     with pytest.raises(OSError, match="injected publish failure"):
         MODULE.publish_staged_outputs(staged, output, replace_file=fail_second)
     for name in MODULE.PUBLISHED_FILES:
+        assert (output / name).read_text(encoding="utf-8") == f"old:{name}"
+    assert not list(tmp_path.glob("leadership-slide-backup-*"))
+
+
+def test_staged_publish_preserves_backup_when_recovery_is_incomplete(
+    tmp_path: Path,
+) -> None:
+    staged = tmp_path / "staged"
+    output = tmp_path / "output"
+    staged.mkdir()
+    output.mkdir()
+    names = sorted(MODULE.PUBLISHED_FILES)
+    for name in names:
+        (staged / name).write_text(f"new:{name}", encoding="utf-8")
+        (output / name).write_text(f"old:{name}", encoding="utf-8")
+    install_calls = 0
+
+    def fail_install(source: Path, target: Path) -> None:
+        nonlocal install_calls
+        install_calls += 1
+        if install_calls == 2:
+            raise OSError("injected install failure")
+        source.replace(target)
+
+    failed_restore = names[0]
+
+    def fail_one_restore(source: Path, target: Path) -> None:
+        if source.name == failed_restore:
+            raise OSError("injected restore failure")
+        source.replace(target)
+
+    with pytest.raises(RuntimeError, match="preserved backup"):
+        MODULE.publish_staged_outputs(
+            staged,
+            output,
+            replace_file=fail_install,
+            restore_file=fail_one_restore,
+        )
+    backups = list(tmp_path.glob("leadership-slide-backup-*"))
+    assert len(backups) == 1
+    assert (backups[0] / failed_restore).read_text(encoding="utf-8") == (
+        f"old:{failed_restore}"
+    )
+    for name in names[1:]:
         assert (output / name).read_text(encoding="utf-8") == f"old:{name}"
 
 
