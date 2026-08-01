@@ -973,8 +973,11 @@ def render_svg(series: dict[str, list[Point]], provenance: dict[str, Any]) -> st
     )
     maximum = max(point.throughput_tps for point in all_points)
     width, height = 1600, 900
-    left, top, chart_w, chart_h = 150, 155, 1320, 560
+    left, top, chart_w, chart_h = 150, 155, 1320, 480
     colors = ("#667eea", "#14b8a6", "#f59e0b")
+    marker_jitter = (-28.0, 0.0, 28.0)
+    annotation_lanes = (682.0, 730.0, 778.0)
+    ordinal_slots = max(len(points) for points in series.values())
     metadata = escape(json.dumps(provenance, ensure_ascii=False, sort_keys=True))
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
@@ -997,7 +1000,13 @@ def render_svg(series: dict[str, list[Point]], provenance: dict[str, Any]) -> st
         color = colors[row]
         coords: list[tuple[float, float]] = []
         for index, point in enumerate(points):
-            x = left + (chart_w * index / max(1, len(points) - 1))
+            if ordinal_slots == 1:
+                base_x = left + chart_w / 2
+            else:
+                base_x = left + 60 + (chart_w - 120) * index / (ordinal_slots - 1)
+            # The base position is the shared milestone ordinal. The bounded
+            # series offset is visual separation only; it does not encode data.
+            x = base_x + marker_jitter[row]
             y = top + chart_h - point.throughput_tps / maximum * chart_h
             coords.append((x, y))
         if len(coords) > 1:
@@ -1006,19 +1015,33 @@ def render_svg(series: dict[str, list[Point]], provenance: dict[str, Any]) -> st
                 f'<polyline points="{polyline}" fill="none" stroke="{color}" stroke-width="5"/>'
             )
         for (x, y), point in zip(coords, points, strict=True):
-            parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="8" fill="{color}"/>')
+            lane_y = annotation_lanes[row]
             parts.append(
-                f'<text x="{x:.1f}" y="{y - 18:.1f}" text-anchor="middle" font-family="sans-serif" font-size="17" fill="#172033">PR #{point.pr_number} · {point.throughput_tps:.2f}</text>'
+                f'<line class="point-leader" data-series="{row}" '
+                f'x1="{x:.1f}" y1="{y + 10:.1f}" x2="{x:.1f}" '
+                f'y2="{lane_y - 16:.1f}" stroke="{color}" stroke-width="1.5" '
+                'stroke-dasharray="4 4" opacity="0.7"/>'
             )
             parts.append(
-                f'<text x="{x:.1f}" y="{y + 31:.1f}" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#516078">{escape(point.label)}</text>'
+                f'<circle class="series-marker" data-series="{row}" '
+                f'data-entry-id="{escape(point.entry_id)}" cx="{x:.1f}" '
+                f'cy="{y:.1f}" r="8" fill="{color}"/>'
             )
-        legend_y = 770 + row * 34
+            parts.append(
+                f'<text class="point-annotation" data-series="{row}" '
+                f'data-entry-id="{escape(point.entry_id)}" x="{x:.1f}" '
+                f'y="{lane_y:.1f}" text-anchor="middle" font-family="sans-serif" '
+                f'font-size="16" fill="#172033">PR #{point.pr_number} · '
+                f"{point.throughput_tps:.2f} · {escape(point.label)}</text>"
+            )
+        legend_x = 150 + row * 470
         parts.append(
-            f'<line x1="150" y1="{legend_y}" x2="195" y2="{legend_y}" stroke="{color}" stroke-width="5"/>'
+            f'<line x1="{legend_x}" y1="842" x2="{legend_x + 45}" y2="842" '
+            f'stroke="{color}" stroke-width="5"/>'
         )
         parts.append(
-            f'<text x="210" y="{legend_y + 7}" font-family="sans-serif" font-size="20" fill="#334155">{_display_label(workload)}</text>'
+            f'<text x="{legend_x + 60}" y="849" font-family="sans-serif" '
+            f'font-size="20" fill="#334155">{_display_label(workload)}</text>'
         )
     parts.append("</svg>")
     return "\n".join(parts) + "\n"
