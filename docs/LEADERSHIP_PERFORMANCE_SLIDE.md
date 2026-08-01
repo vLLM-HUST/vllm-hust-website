@@ -43,15 +43,18 @@ base/head relationship. Until that schema exists, each admitted milestone must b
 bind an explicit checkpoint entry and commit boundary. Within each series, PR numbers must increase
 strictly and every checkpoint commit after the first must be a strict descendant of its predecessor
 in the GitHub repository supplied by `--milestone-repo`. Its `origin` host must be exactly
-`github.com`. Generation first performs a live, fail-closed `git ls-remote --heads --tags origin`,
-then fetches every advertised source ref through explicit refspecs into a random proof namespace.
-It verifies the fetched object against the advertisement and deletes the temporary refs, so the
-proof works even for single-branch clones or custom `remote.origin.fetch` settings. Every checkpoint,
-including the first, must be reachable from one of those fetched tips. Network errors, advertisement
-races, inconsistent tags, and local-only commits are rejected. Provenance records the canonical
-credential-free `https://github.com/owner/repo.git` URL, fetch time, complete advertised head/tag
-tips, and redacted temporary-namespace refspecs; userinfo, query, and fragment data are never
-persisted. JSON array order alone is never accepted as evidence of a cumulative progression.
+`github.com`. Generation creates a temporary bare proof repository with system, global, environment,
+and source-repository Git configuration isolated, then performs a live, fail-closed
+`git ls-remote --heads --tags` and explicit-refspec fetch against the canonical credential-free
+`https://github.com/owner/repo.git` URL. It verifies each fetched object against the advertisement,
+materializes the fetched commit graph with replace-object handling disabled, and deletes the entire
+proof repository. This works even for single-branch clones or custom `remote.origin.fetch` settings,
+without accepting `url.*.insteadOf` rewrites. Source or proof repositories containing `refs/replace`
+or `info/grafts` are rejected. Every checkpoint, including the first, must occur in that fetched
+graph. Network errors, advertisement races, inconsistent tags, replacement ancestry, and local-only
+commits are rejected. Provenance records the canonical URL, fetch time, complete advertised head/tag
+tips, and redacted temporary-namespace refspecs; userinfo, query, fragment data, and temporary paths
+are never persisted. JSON array order alone is never accepted as evidence of a cumulative progression.
 
 ```json
 {
