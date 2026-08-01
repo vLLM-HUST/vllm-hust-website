@@ -658,22 +658,43 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
         )
 
     remote_listing = f"{commits[-1]}\trefs/heads/main\n".encode()
+    canonical_remote = "https://github.com/vLLM-HUST/vllm-hust.git"
+    proof_directories: list[Path] = []
 
     def fetch_advertised(
-        root: Path, refspecs: tuple[str, ...], *, commit: str = commits[-1]
+        proof_root: Path,
+        remote_url: str,
+        refspecs: tuple[str, ...],
+        *,
+        commit: str = commits[-1],
     ) -> None:
+        assert remote_url == canonical_remote
         assert len(refspecs) == 1
         source, destination = refspecs[0].removeprefix("+").split(":", 1)
         assert source == "refs/heads/main"
         subprocess.run(
-            ["git", "-C", str(root), "update-ref", destination, commit],
+            [
+                "git",
+                "-C",
+                str(proof_root),
+                "fetch",
+                "--no-tags",
+                str(repo),
+                f"+{commit}:{destination}",
+            ],
             check=True,
+            capture_output=True,
         )
+
+    def list_advertised(proof_root: Path, remote_url: str) -> bytes:
+        assert remote_url == canonical_remote
+        proof_directories.append(proof_root.parent)
+        return remote_listing
 
     verify = MODULE.milestone_commit_verifier(
         repo,
         fetch_remote=fetch_advertised,
-        ls_remote=lambda _root: remote_listing,
+        ls_remote=list_advertised,
     )
     proof = verify.provenance()
     assert proof["remote_url"] == "https://github.com/vLLM-HUST/vllm-hust.git"
@@ -682,15 +703,7 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
         "+refs/heads/main:refs/leadership-proof/<temporary>/heads/main"
     ]
     assert proof["fetched_at"].endswith("+00:00")
-    assert (
-        subprocess.run(
-            ["git", "-C", str(repo), "for-each-ref", "refs/leadership-proof"],
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout
-        == ""
-    )
+    assert proof_directories and all(not path.exists() for path in proof_directories)
     verify("vLLM-HUST/vllm-hust", None, commits[0])
     verify("vLLM-HUST/vllm-hust", commits[0], commits[1])
     with pytest.raises(ValueError, match="not in strict ancestor order"):
@@ -716,10 +729,12 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
     with pytest.raises(ValueError, match="stale or inconsistent"):
         MODULE.milestone_commit_verifier(
             repo,
-            fetch_remote=lambda root, refspecs: fetch_advertised(
-                root, refspecs, commit=commits[-1]
+            fetch_remote=lambda root, remote_url, refspecs: fetch_advertised(
+                root, remote_url, refspecs, commit=commits[-1]
             ),
-            ls_remote=lambda _root: f"{local_only}\trefs/heads/main\n".encode(),
+            ls_remote=lambda _root, _remote: (
+                f"{local_only}\trefs/heads/main\n".encode()
+            ),
         )
 
     subprocess.run(
@@ -737,37 +752,9 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
     custom_refspec_verify = MODULE.milestone_commit_verifier(
         repo,
         fetch_remote=fetch_advertised,
-        ls_remote=lambda _root: remote_listing,
+        ls_remote=lambda _root, _remote: remote_listing,
     )
     custom_refspec_verify("vLLM-HUST/vllm-hust", None, commits[-1])
-
-    branch = subprocess.run(
-        ["git", "-C", str(repo), "symbolic-ref", "--short", "HEAD"],
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
-    canonical_remote = "https://github.com/vLLM-HUST/vllm-hust.git"
-    subprocess.run(
-        ["git", "-C", str(repo), "remote", "set-url", "origin", canonical_remote],
-        check=True,
-    )
-    subprocess.run(
-        [
-            "git",
-            "-C",
-            str(repo),
-            "config",
-            f"url.file://{repo}.insteadOf",
-            canonical_remote,
-        ],
-        check=True,
-    )
-    single_branch_verify = MODULE.milestone_commit_verifier(repo)
-    single_branch_verify("vLLM-HUST/vllm-hust", None, local_only)
-    assert single_branch_verify.provenance()["fetch_refspecs"] == [
-        f"+refs/heads/{branch}:refs/leadership-proof/<temporary>/heads/{branch}"
-    ]
 
     credential = "credential-must-not-enter-provenance"
     subprocess.run(
@@ -785,7 +772,7 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
     credential_verify = MODULE.milestone_commit_verifier(
         repo,
         fetch_remote=fetch_advertised,
-        ls_remote=lambda _root: remote_listing,
+        ls_remote=lambda _root, _remote: remote_listing,
     )
     credential_proof = credential_verify.provenance()
     assert credential_proof["remote_url"] == (
@@ -810,16 +797,81 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
         MODULE.milestone_commit_verifier(
             repo,
             fetch_remote=fetch_advertised,
-            ls_remote=lambda _root: remote_listing,
+            ls_remote=lambda _root, _remote: remote_listing,
+        )
+
+    subprocess.run(
+        ["git", "-C", str(repo), "remote", "set-url", "origin", canonical_remote],
+        check=True,
+    )
+    tree = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD^{tree}"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    unrelated = subprocess.run(
+        ["git", "-C", str(repo), "commit-tree", tree],
+        input="unrelated checkpoint\n",
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    subprocess.run(
+        ["git", "-C", str(repo), "replace", "--graft", commits[-1], unrelated],
+        check=True,
+    )
+    assert subprocess.run(
+        ["git", "-C", str(repo), "merge-base", "--is-ancestor", unrelated, commits[-1]],
+        check=False,
+    ).returncode == 0
+    with pytest.raises(ValueError, match="replace refs"):
+        MODULE.milestone_commit_verifier(
+            repo,
+            fetch_remote=fetch_advertised,
+            ls_remote=lambda _root, _remote: remote_listing,
+        )
+    subprocess.run(
+        ["git", "-C", str(repo), "replace", "-d", commits[-1]], check=True
+    )
+
+    grafts = Path(
+        subprocess.run(
+            ["git", "-C", str(repo), "rev-parse", "--git-path", "info/grafts"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    )
+    if not grafts.is_absolute():
+        grafts = repo / grafts
+    grafts.write_text(f"{commits[-1]} {unrelated}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="info/grafts"):
+        MODULE.milestone_commit_verifier(
+            repo,
+            fetch_remote=fetch_advertised,
+            ls_remote=lambda _root, _remote: remote_listing,
         )
 
 
-def test_milestone_remote_git_never_propagates_credentials(
+def test_proof_git_isolates_config_and_never_propagates_credentials(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     credential = "credential-must-not-be-written"
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", "/attacker/global-config")
+    monkeypatch.setenv("GIT_CONFIG_SYSTEM", "/attacker/system-config")
+    monkeypatch.setenv(
+        "GIT_CONFIG_PARAMETERS",
+        "url.file:///attacker.insteadOf=https://github.com/",
+    )
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "url.file:///attacker.insteadOf")
+    monkeypatch.setenv("GIT_CONFIG_VALUE_0", "https://github.com/")
+    observed: dict[str, object] = {}
 
-    def fail(*_args: object, **_kwargs: object) -> object:
+    def fail(command: object, **kwargs: object) -> object:
+        observed["command"] = command
+        observed["env"] = kwargs.get("env")
         raise subprocess.CalledProcessError(
             128,
             ["git", "fetch"],
@@ -828,9 +880,23 @@ def test_milestone_remote_git_never_propagates_credentials(
 
     monkeypatch.setattr(MODULE.subprocess, "run", fail)
     with pytest.raises(ValueError) as raised:
-        MODULE._milestone_remote_git(tmp_path, "fetch", "origin")
+        MODULE._proof_git(
+            tmp_path,
+            "fetch",
+            "https://github.com/org/repo.git",
+            remote=True,
+        )
     assert str(raised.value) == "cannot contact milestone repository origin"
     assert credential not in str(raised.value)
+    assert observed["command"][-1] == "https://github.com/org/repo.git"
+    environment = observed["env"]
+    assert isinstance(environment, dict)
+    assert environment["GIT_CONFIG_GLOBAL"] == "/dev/null"
+    assert environment["GIT_CONFIG_NOSYSTEM"] == "1"
+    assert environment["GIT_CONFIG_COUNT"] == "0"
+    assert environment["GIT_NO_REPLACE_OBJECTS"] == "1"
+    assert "GIT_CONFIG_PARAMETERS" not in environment
+    assert "GIT_CONFIG_KEY_0" not in environment
 
 
 def test_target_pin_is_stale_when_registry_hash_changes(tmp_path: Path) -> None:

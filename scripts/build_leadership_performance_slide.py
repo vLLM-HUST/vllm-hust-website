@@ -12,6 +12,7 @@ import binascii
 import hashlib
 import json
 import math
+import os
 import re
 import secrets
 import shutil
@@ -947,13 +948,13 @@ def _github_origin_identity(remote: str) -> tuple[str, str]:
 
 @dataclass
 class MilestoneCommitVerifier:
-    root: Path
     remote_url: str
     repository: str
     fetched_at: str
     advertised_refs: dict[str, str]
     reachable_tips: tuple[tuple[str, str], ...]
     fetch_refspecs: tuple[str, ...]
+    commit_parents: dict[str, tuple[str, ...]]
 
     def __call__(self, repository: str, previous: str | None, current: str) -> None:
         if repository.casefold() != self.repository.casefold():
@@ -961,30 +962,7 @@ class MilestoneCommitVerifier:
                 "story milestone repository does not match --milestone-repo origin: "
                 f"story={repository!r} origin={self.repository!r}"
             )
-        resolved = (
-            _git(self.root, "rev-parse", f"{current}^{{commit}}").decode().strip()
-        )
-        if resolved != current:
-            raise ValueError(
-                f"story checkpoint commit does not resolve exactly: {current}"
-            )
-        if not any(
-            subprocess.run(
-                [
-                    "git",
-                    "-C",
-                    str(self.root),
-                    "merge-base",
-                    "--is-ancestor",
-                    current,
-                    tip,
-                ],
-                check=False,
-                capture_output=True,
-            ).returncode
-            == 0
-            for _, tip in self.reachable_tips
-        ):
+        if current not in self.commit_parents:
             raise ValueError(
                 "story checkpoint commit is local-only or stale; it must be reachable "
                 f"from a currently advertised and fetched origin ref: {current}"
@@ -993,27 +971,21 @@ class MilestoneCommitVerifier:
             return
         if previous == current:
             raise ValueError("cumulative checkpoint commits must be distinct")
-        completed = subprocess.run(
-            [
-                "git",
-                "-C",
-                str(self.root),
-                "merge-base",
-                "--is-ancestor",
-                previous,
-                current,
-            ],
-            check=False,
-            capture_output=True,
-        )
-        if completed.returncode == 1:
+        pending = list(self.commit_parents.get(current, ()))
+        visited: set[str] = set()
+        while pending:
+            candidate = pending.pop()
+            if candidate == previous:
+                break
+            if candidate in visited:
+                continue
+            visited.add(candidate)
+            pending.extend(self.commit_parents.get(candidate, ()))
+        else:
             raise ValueError(
                 "cumulative checkpoint commits are not in strict ancestor order: "
                 f"{previous} !< {current}"
             )
-        if completed.returncode != 0:
-            detail = completed.stderr.decode("utf-8", errors="replace").strip()
-            raise ValueError(f"cannot verify checkpoint commit ancestry: {detail}")
 
     def provenance(self) -> dict[str, Any]:
         return {
@@ -1028,94 +1000,177 @@ class MilestoneCommitVerifier:
 def milestone_commit_verifier(
     repo: Path,
     *,
-    fetch_remote: Callable[[Path, tuple[str, ...]], None] | None = None,
-    ls_remote: Callable[[Path], bytes] | None = None,
+    fetch_remote: Callable[[Path, str, tuple[str, ...]], None] | None = None,
+    ls_remote: Callable[[Path, str], bytes] | None = None,
 ) -> MilestoneCommitVerifier:
     root = Path(_git(repo, "rev-parse", "--show-toplevel").decode().strip()).resolve()
-    remote = _git(root, "config", "--get", "remote.origin.url").decode().strip()
+    _reject_replacement_state(root)
+    remote = (
+        _git(root, "config", "--local", "--get", "remote.origin.url")
+        .decode()
+        .strip()
+    )
     local_repository, canonical_remote = _github_origin_identity(remote)
-    output = (
-        _milestone_remote_git(root, "ls-remote", "--heads", "--tags", "origin")
-        if ls_remote is None
-        else ls_remote(root)
-    )
-    advertised: dict[str, str] = {}
-    for line in output.decode().splitlines():
-        fields = line.split("\t")
-        if len(fields) != 2 or not re.fullmatch(r"[0-9a-f]{40}", fields[0]):
-            raise ValueError("origin advertised an invalid ref tip")
-        ref = fields[1]
-        if not re.fullmatch(r"refs/(?:heads|tags)/[^\s^]+(?:\^\{\})?", ref):
-            raise ValueError("origin advertised an invalid head or tag name")
-        if ref in advertised and advertised[ref] != fields[0]:
-            raise ValueError("origin advertised inconsistent duplicate ref tips")
-        advertised[ref] = fields[0]
-    if not advertised:
-        raise ValueError("origin advertised no heads or tags")
+    with tempfile.TemporaryDirectory(prefix="leadership-proof-") as tmp:
+        proof_root = Path(tmp) / "repository.git"
+        proof_root.mkdir()
+        _proof_git(proof_root, "init", "--bare", "--quiet", ".")
+        output = (
+            _proof_git(
+                proof_root,
+                "ls-remote",
+                "--heads",
+                "--tags",
+                canonical_remote,
+                remote=True,
+            )
+            if ls_remote is None
+            else ls_remote(proof_root, canonical_remote)
+        )
+        advertised: dict[str, str] = {}
+        for line in output.decode().splitlines():
+            fields = line.split("\t")
+            if len(fields) != 2 or not re.fullmatch(r"[0-9a-f]{40}", fields[0]):
+                raise ValueError("origin advertised an invalid ref tip")
+            ref = fields[1]
+            if not re.fullmatch(r"refs/(?:heads|tags)/[^\s^]+(?:\^\{\})?", ref):
+                raise ValueError("origin advertised an invalid head or tag name")
+            if ref in advertised and advertised[ref] != fields[0]:
+                raise ValueError("origin advertised inconsistent duplicate ref tips")
+            advertised[ref] = fields[0]
+        if not advertised:
+            raise ValueError("origin advertised no heads or tags")
 
-    source_refs = sorted(ref for ref in advertised if not ref.endswith("^{}"))
-    for source in source_refs:
-        _git(root, "check-ref-format", source)
-    namespace = f"refs/leadership-proof/{secrets.token_hex(8)}"
-    destinations = {
-        source: f"{namespace}/{source.removeprefix('refs/')}" for source in source_refs
-    }
-    actual_refspecs = tuple(
-        f"+{source}:{destinations[source]}" for source in source_refs
-    )
-    recorded_refspecs = tuple(
-        f"+{source}:refs/leadership-proof/<temporary>/{source.removeprefix('refs/')}"
-        for source in source_refs
-    )
-    reachable: list[tuple[str, str]] = []
-    try:
+        source_refs = sorted(ref for ref in advertised if not ref.endswith("^{}"))
+        for source in source_refs:
+            _proof_git(proof_root, "check-ref-format", source)
+        namespace = f"refs/leadership-proof/{secrets.token_hex(8)}"
+        destinations = {
+            source: f"{namespace}/{source.removeprefix('refs/')}"
+            for source in source_refs
+        }
+        actual_refspecs = tuple(
+            f"+{source}:{destinations[source]}" for source in source_refs
+        )
+        recorded_refspecs = tuple(
+            f"+{source}:refs/leadership-proof/<temporary>/{source.removeprefix('refs/')}"
+            for source in source_refs
+        )
         if fetch_remote is None:
-            _milestone_remote_git(
-                root, "fetch", "--no-tags", "origin", *actual_refspecs
+            _proof_git(
+                proof_root,
+                "fetch",
+                "--no-tags",
+                canonical_remote,
+                *actual_refspecs,
+                remote=True,
             )
         else:
-            fetch_remote(root, actual_refspecs)
+            fetch_remote(proof_root, canonical_remote, actual_refspecs)
         fetched_at = datetime.now(timezone.utc).isoformat()
+        _reject_replacement_state(proof_root, proof=True)
+        reachable: list[tuple[str, str]] = []
         for ref in source_refs:
             advertised_object = advertised[ref]
             destination = destinations[ref]
-            local_object = _git(root, "rev-parse", destination).decode().strip()
+            local_object = _proof_git(proof_root, "rev-parse", destination).decode().strip()
             if local_object != advertised_object:
                 raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
-            commit = (
-                _git(root, "rev-parse", f"{destination}^{{commit}}").decode().strip()
-            )
+            commit = _proof_git(
+                proof_root, "rev-parse", f"{destination}^{{commit}}"
+            ).decode().strip()
             expected_commit = advertised.get(f"{ref}^{{}}", advertised_object)
             if commit != expected_commit:
                 raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
             reachable.append((ref, commit))
-    finally:
-        for destination in destinations.values():
-            _git(root, "update-ref", "-d", destination)
-    if not reachable:
-        raise ValueError("origin advertised no usable heads or tags")
+        if not reachable:
+            raise ValueError("origin advertised no usable heads or tags")
+        graph = _proof_git(
+            proof_root,
+            "rev-list",
+            "--parents",
+            *(tip for _, tip in reachable),
+        ).decode()
+        commit_parents = {
+            fields[0]: tuple(fields[1:])
+            for line in graph.splitlines()
+            if (fields := line.split())
+        }
     return MilestoneCommitVerifier(
-        root,
         canonical_remote,
         local_repository,
         fetched_at,
         advertised,
         tuple(reachable),
         recorded_refspecs,
+        commit_parents,
     )
 
 
-def _milestone_remote_git(repo: Path, *args: str) -> bytes:
-    """Run remote Git without propagating stderr that may echo credentials."""
+def _proof_environment() -> dict[str, str]:
+    """Return a Git environment isolated from URL rewrites and replace objects."""
+    environment = dict(os.environ)
+    for name in tuple(environment):
+        if name.startswith("GIT_CONFIG_KEY_") or name.startswith("GIT_CONFIG_VALUE_"):
+            environment.pop(name)
+    for name in (
+        "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+        "GIT_COMMON_DIR",
+        "GIT_CONFIG",
+        "GIT_CONFIG_PARAMETERS",
+        "GIT_CONFIG_SYSTEM",
+        "GIT_DIR",
+        "GIT_NAMESPACE",
+        "GIT_OBJECT_DIRECTORY",
+        "GIT_REPLACE_REF_BASE",
+        "GIT_SHALLOW_FILE",
+        "GIT_WORK_TREE",
+    ):
+        environment.pop(name, None)
+    environment.update(
+        {
+            "GIT_ALLOW_PROTOCOL": "https",
+            "GIT_CONFIG_COUNT": "0",
+            "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_NO_REPLACE_OBJECTS": "1",
+        }
+    )
+    return environment
+
+
+def _proof_git(repo: Path, *args: str, remote: bool = False) -> bytes:
+    """Run isolated proof Git without propagating credential-bearing stderr."""
     try:
         completed = subprocess.run(
             ["git", "-C", str(repo), *args],
             check=True,
             capture_output=True,
+            env=_proof_environment(),
         )
     except (OSError, subprocess.CalledProcessError) as exc:
-        raise ValueError("cannot contact milestone repository origin") from exc
+        message = (
+            "cannot contact milestone repository origin"
+            if remote
+            else "cannot verify milestone repository proof"
+        )
+        raise ValueError(message) from exc
     return completed.stdout
+
+
+def _reject_replacement_state(repo: Path, *, proof: bool = False) -> None:
+    git = _proof_git if proof else _git
+    replacements = git(
+        repo, "for-each-ref", "--format=%(refname)", "refs/replace"
+    ).decode().strip()
+    if replacements:
+        raise ValueError("milestone repository must not contain replace refs")
+    grafts_raw = git(repo, "rev-parse", "--git-path", "info/grafts").decode().strip()
+    grafts = Path(grafts_raw)
+    if not grafts.is_absolute():
+        grafts = repo / grafts
+    if os.path.lexists(grafts):
+        raise ValueError("milestone repository must not contain info/grafts")
 
 
 def build_provenance(
