@@ -1,0 +1,25 @@
+{
+  "schema_version": "leadership-performance-target-pin/v1",
+  "registry_version": "1.0.0",
+  "registry_sha256": "2073283467797cbe4a74682249b4e40c7c5ded4ebd393392161e038dd9bdb94c",
+  "targets": [
+    {
+      "workload": "agent-research-online",
+      "target_id": "official-ascend-jan-2026-v0.18.0-agent-research-online-qwen25-14b-910b2",
+      "target_version": "1.0.0",
+      "profile_id": "core-text"
+    },
+    {
+      "workload": "sharegpt-online",
+      "target_id": "official-ascend-jan-2026-v0.18.0-sharegpt-online-qwen25-14b-910b2",
+      "target_version": "1.0.0",
+      "profile_id": "core-text"
+    },
+    {
+      "workload": "random-online",
+      "target_id": "official-ascend-jan-2026-v0.18.0-random-online-qwen25-14b-910b2",
+      "target_version": "1.0.0",
+      "profile_id": "core-text"
+    }
+  ]
+}
