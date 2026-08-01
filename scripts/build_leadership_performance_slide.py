@@ -944,6 +944,19 @@ def milestone_commit_verifier(
         resolved = _git(root, "rev-parse", f"{current}^{{commit}}").decode().strip()
         if resolved != current:
             raise ValueError(f"story checkpoint commit does not resolve exactly: {current}")
+        remote_refs = _git(
+            root,
+            "for-each-ref",
+            "--format=%(refname)",
+            "--contains",
+            current,
+            "refs/remotes/origin",
+        ).decode().splitlines()
+        if not any(ref.startswith("refs/remotes/origin/") for ref in remote_refs):
+            raise ValueError(
+                "story checkpoint commit is local-only; it must be reachable from "
+                f"a fetched origin remote ref: {current}"
+            )
         if previous is None:
             return
         if previous == current:

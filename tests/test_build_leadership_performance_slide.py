@@ -659,6 +659,17 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
             ).stdout.strip()
         )
 
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo),
+            "update-ref",
+            "refs/remotes/origin/main",
+            commits[-1],
+        ],
+        check=True,
+    )
     verify = MODULE.milestone_commit_verifier(repo)
     verify("vLLM-HUST/vllm-hust", None, commits[0])
     verify("vLLM-HUST/vllm-hust", commits[0], commits[1])
@@ -666,6 +677,21 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
         verify("vLLM-HUST/vllm-hust", commits[1], commits[0])
     with pytest.raises(ValueError, match="does not match"):
         verify("other/repo", None, commits[0])
+
+    (repo / "checkpoint.txt").write_text("local-only", encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "."], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "commit", "-qm", "local only checkpoint"],
+        check=True,
+    )
+    local_only = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    with pytest.raises(ValueError, match="local-only"):
+        verify("vLLM-HUST/vllm-hust", commits[-1], local_only)
 
 
 def test_target_pin_is_stale_when_registry_hash_changes(tmp_path: Path) -> None:
