@@ -9,6 +9,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- 为 #163 新增领导汇报性能页的 fail-close 正式生成骨架：固定版本化 official-target
+  registry（`target_id/version/profile_id/hash`），拒绝 legacy/config-unverified 快照，校验
+  canonical story/PR 归因和 PPTX 文本层禁词，并为 SVG/PNG/PPTX 写入可检测 stale 的 provenance。
+
 - 新增 `agent-research-online` workload 场景：基于 EvoScientist 多智能体研究系统的真实请求轨迹（32 轮 LLM 交互，覆盖文献调研、代码生成、数据分析、论文写作等 7 个阶段），可用于评测推理引擎在 AI Agent 长对话场景下的服务性能。workload 数据已集成至 `vllm-hust-benchmark`，leaderboard 后续可展示对应结果。
 
 ### Changed
