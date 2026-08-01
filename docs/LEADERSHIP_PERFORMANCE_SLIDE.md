@@ -40,7 +40,10 @@ presentation text and a real PR number. The PR number must match the entry's can
 repository, URL, and full commit identity. The current canonical snapshot schema does not publish a
 commit-bound pair/cohort identity, so `paired` attribution fails closed even if the story names a
 base/head relationship. Until that schema exists, each admitted milestone must be cumulative and
-bind an explicit checkpoint entry and commit boundary.
+bind an explicit checkpoint entry and commit boundary. Within each series, PR numbers must increase
+strictly and every checkpoint commit after the first must be a strict descendant of its predecessor
+in the GitHub repository supplied by `--milestone-repo`; JSON array order alone is never accepted as
+evidence of a cumulative progression.
 
 ```json
 {
@@ -124,6 +127,7 @@ python3 scripts/build_leadership_performance_slide.py \
   --story path/to/admitted-story.json \
   --benchmark-repo ../vllm-hust-benchmark \
   --benchmark-commit <full-benchmark-commit-sha> \
+  --milestone-repo ../vllm-hust \
   --output-dir output/leadership-performance
 ```
 
@@ -133,7 +137,8 @@ sidecar only after all admission checks pass. SVG metadata, a PNG `tEXt` chunk, 
 properties/footer, and the sidecar identify the registry, story, commit/tree, and snapshot source.
 Story labels are audited before SVG/PNG rendering, and the finished PPTX XML text layer is audited
 again. Publishing uses a same-filesystem staging set and restores the previous four files if a
-mid-publish replacement fails.
+mid-publish replacement fails. If any individual restore fails, recovery continues for the other
+files and the backup directory is retained and reported instead of being automatically deleted.
 
 To detect a changed registry, target pin, story, snapshot, benchmark commit, or output bytes without
 regenerating:

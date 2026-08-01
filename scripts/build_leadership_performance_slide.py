@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 import re
+import shutil
 import struct
 import subprocess
 import tempfile
@@ -777,7 +778,10 @@ def _validate_pr_identity(
 
 
 def load_story(
-    path: Path, entries: dict[str, dict[str, Any]]
+    path: Path,
+    entries: dict[str, dict[str, Any]],
+    *,
+    commit_verifier: Callable[[str, str | None, str], None] | None = None,
 ) -> dict[str, list[Point]]:
     payload = load_json(path)
     if not isinstance(payload, dict) or payload.get("schema_version") != (
@@ -810,6 +814,9 @@ def load_story(
         if not isinstance(milestones, list) or not milestones:
             raise ValueError(f"story series {workload!r} has no milestones")
         points: list[Point] = []
+        previous_pr: int | None = None
+        previous_repository: str | None = None
+        previous_commit: str | None = None
         for milestone in milestones:
             if not isinstance(milestone, dict):
                 raise TypeError("every milestone must be an object")
@@ -844,6 +851,22 @@ def load_story(
             pr_number, commit = _validate_pr_identity(
                 milestone, entry, entry_id=entry_id
             )
+            repository = str(milestone.get("repository") or "")
+            if previous_pr is not None and pr_number <= previous_pr:
+                raise ValueError(
+                    f"story series {workload!r} PR numbers must be strictly increasing"
+                )
+            if previous_repository is not None and repository != previous_repository:
+                raise ValueError(
+                    f"story series {workload!r} cumulative checkpoints must use one repository"
+                )
+            if commit_verifier is None and previous_commit is not None:
+                raise ValueError(
+                    f"story series {workload!r} has multiple cumulative checkpoints "
+                    "but no commit ancestry verifier"
+                )
+            if commit_verifier is not None:
+                commit_verifier(repository, previous_commit, commit)
             attribution = _dict(milestone.get("attribution"))
             kind = str(attribution.get("kind") or "")
             base_id = attribution.get("base_entry_id")
@@ -893,10 +916,52 @@ def load_story(
                     boundary,
                 )
             )
+            previous_pr = pr_number
+            previous_repository = repository
+            previous_commit = commit
         series[workload] = points
     if set(series) != set(REQUIRED_WORKLOADS):
         raise ValueError("story must contain exactly all three leadership workloads")
     return series
+
+
+def milestone_commit_verifier(
+    repo: Path,
+) -> Callable[[str, str | None, str], None]:
+    root = Path(_git(repo, "rev-parse", "--show-toplevel").decode().strip()).resolve()
+    remote = _git(root, "remote", "get-url", "origin").decode().strip()
+    match = re.search(r"github\.com[/:]([^/]+/[^/]+?)(?:\.git)?$", remote)
+    if match is None:
+        raise ValueError("milestone repository origin must be a GitHub repository")
+    local_repository = match.group(1)
+
+    def verify(repository: str, previous: str | None, current: str) -> None:
+        if repository.casefold() != local_repository.casefold():
+            raise ValueError(
+                "story milestone repository does not match --milestone-repo origin: "
+                f"story={repository!r} origin={local_repository!r}"
+            )
+        resolved = _git(root, "rev-parse", f"{current}^{{commit}}").decode().strip()
+        if resolved != current:
+            raise ValueError(f"story checkpoint commit does not resolve exactly: {current}")
+        if previous is None:
+            return
+        if previous == current:
+            raise ValueError("cumulative checkpoint commits must be distinct")
+        completed = subprocess.run(
+            ["git", "-C", str(root), "merge-base", "--is-ancestor", previous, current],
+            capture_output=True,
+        )
+        if completed.returncode == 1:
+            raise ValueError(
+                "cumulative checkpoint commits are not in strict ancestor order: "
+                f"{previous} !< {current}"
+            )
+        if completed.returncode != 0:
+            detail = completed.stderr.decode("utf-8", errors="replace").strip()
+            raise ValueError(f"cannot verify checkpoint commit ancestry: {detail}")
+
+    return verify
 
 
 def build_provenance(
@@ -1248,37 +1313,59 @@ def publish_staged_outputs(
     output_dir: Path,
     *,
     replace_file: Callable[[Path, Path], Any] = _replace_file,
+    restore_file: Callable[[Path, Path], Any] = _replace_file,
 ) -> None:
     staged_names = {path.name for path in staged.iterdir() if path.is_file()}
     if staged_names != PUBLISHED_FILES:
         raise ValueError("staged leadership output set is incomplete or unexpected")
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(
-        prefix="leadership-slide-backup-", dir=output_dir.parent
-    ) as backup_raw:
-        backup = Path(backup_raw)
-        backed_up: list[str] = []
-        installed: list[str] = []
-        try:
-            for name in sorted(PUBLISHED_FILES):
-                destination = output_dir / name
-                if destination.exists():
-                    if not destination.is_file():
-                        raise ValueError(f"output target is not a file: {destination}")
-                    destination.replace(backup / name)
-                    backed_up.append(name)
-            for name in sorted(PUBLISHED_FILES):
-                replace_file(staged / name, output_dir / name)
-                installed.append(name)
-        except Exception:
-            for name in installed:
-                destination = output_dir / name
-                if destination.is_file():
+    backup = Path(
+        tempfile.mkdtemp(prefix="leadership-slide-backup-", dir=output_dir.parent)
+    )
+    backed_up: list[str] = []
+    installed: list[str] = []
+    try:
+        for name in sorted(PUBLISHED_FILES):
+            destination = output_dir / name
+            if destination.exists():
+                if not destination.is_file():
+                    raise ValueError(f"output target is not a file: {destination}")
+                destination.replace(backup / name)
+                backed_up.append(name)
+        for name in sorted(PUBLISHED_FILES):
+            replace_file(staged / name, output_dir / name)
+            installed.append(name)
+    except Exception as publish_error:
+        recovery_errors: list[str] = []
+        backed_up_set = set(backed_up)
+        for name in installed:
+            if name in backed_up_set:
+                continue
+            destination = output_dir / name
+            try:
+                if destination.is_file() or destination.is_symlink():
                     destination.unlink()
-            for name in backed_up:
-                (backup / name).replace(output_dir / name)
-            raise
+            except OSError as exc:
+                recovery_errors.append(f"remove new {name}: {exc}")
+        for name in backed_up:
+            try:
+                restore_file(backup / name, output_dir / name)
+            except OSError as exc:
+                recovery_errors.append(f"restore {name}: {exc}")
+        if recovery_errors:
+            raise RuntimeError(
+                "leadership output publish failed and recovery was incomplete; "
+                f"preserved backup at {backup}: " + "; ".join(recovery_errors)
+            ) from publish_error
+        shutil.rmtree(backup)
+        raise
+    try:
+        shutil.rmtree(backup)
+    except OSError as exc:
+        raise RuntimeError(
+            f"leadership output published but backup cleanup failed; preserved at {backup}: {exc}"
+        ) from exc
 
 
 def parse_args() -> argparse.Namespace:
@@ -1290,6 +1377,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--story", type=Path, required=True)
     parser.add_argument("--benchmark-repo", type=Path, required=True)
     parser.add_argument("--benchmark-commit", required=True)
+    parser.add_argument("--milestone-repo", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
         "--check-stale",
@@ -1312,7 +1400,11 @@ def main() -> int:
             checksum_path=args.registry_checksum,
         )
         entries, snapshot_time = admit_snapshot(args.snapshot_dir, registry, pins)
-        series = load_story(args.story, entries)
+        series = load_story(
+            args.story,
+            entries,
+            commit_verifier=milestone_commit_verifier(args.milestone_repo),
+        )
         provenance = build_provenance(
             snapshot_dir=args.snapshot_dir,
             registry=registry,
