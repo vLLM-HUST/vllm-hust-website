@@ -42,9 +42,13 @@ commit-bound pair/cohort identity, so `paired` attribution fails closed even if 
 base/head relationship. Until that schema exists, each admitted milestone must be cumulative and
 bind an explicit checkpoint entry and commit boundary. Within each series, PR numbers must increase
 strictly and every checkpoint commit after the first must be a strict descendant of its predecessor
-in the GitHub repository supplied by `--milestone-repo`. Every checkpoint, including the first, must
-also be reachable from at least one already-fetched `refs/remotes/origin/*` ref; a local-only commit
-chain is rejected. JSON array order alone is never accepted as evidence of a cumulative progression.
+in the GitHub repository supplied by `--milestone-repo`. Its `origin` host must be exactly
+`github.com`. Generation performs a fail-closed `git fetch --prune --tags origin` followed by a live
+`git ls-remote --heads --tags origin`; every checkpoint, including the first, must be reachable from
+a locally fetched ref whose tip exactly matches that advertisement. Network errors, stale local
+tracking refs, inconsistent tags, and local-only commits are rejected. The provenance records the
+remote URL, fetch time, and complete advertised head/tag tips. JSON array order alone is never
+accepted as evidence of a cumulative progression.
 
 ```json
 {

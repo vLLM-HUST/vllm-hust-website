@@ -25,6 +25,7 @@ from datetime import datetime, timezone
 from html import escape, unescape
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 SNAPSHOT_FILES = (
     "leaderboard_single.json",
@@ -925,44 +926,78 @@ def load_story(
     return series
 
 
-def milestone_commit_verifier(
-    repo: Path,
-) -> Callable[[str, str | None, str], None]:
-    root = Path(_git(repo, "rev-parse", "--show-toplevel").decode().strip()).resolve()
-    remote = _git(root, "remote", "get-url", "origin").decode().strip()
-    match = re.search(r"github\.com[/:]([^/]+/[^/]+?)(?:\.git)?$", remote)
+def _github_repository_from_remote(remote: str) -> str:
+    scp = re.fullmatch(r"git@github\.com:([^/]+/[^/]+?)(?:\.git)?", remote)
+    if scp is not None:
+        return scp.group(1)
+    parsed = urlsplit(remote)
+    if parsed.scheme not in {"https", "ssh"} or parsed.hostname != "github.com":
+        raise ValueError("milestone repository origin must use the github.com host")
+    path = parsed.path.removeprefix("/")
+    match = re.fullmatch(r"([^/]+/[^/]+?)(?:\.git)?", path)
     if match is None:
         raise ValueError("milestone repository origin must be a GitHub repository")
-    local_repository = match.group(1)
+    return match.group(1)
 
-    def verify(repository: str, previous: str | None, current: str) -> None:
-        if repository.casefold() != local_repository.casefold():
+
+@dataclass
+class MilestoneCommitVerifier:
+    root: Path
+    remote_url: str
+    repository: str
+    fetched_at: str
+    advertised_refs: dict[str, str]
+    reachable_tips: tuple[tuple[str, str], ...]
+
+    def __call__(self, repository: str, previous: str | None, current: str) -> None:
+        if repository.casefold() != self.repository.casefold():
             raise ValueError(
                 "story milestone repository does not match --milestone-repo origin: "
-                f"story={repository!r} origin={local_repository!r}"
+                f"story={repository!r} origin={self.repository!r}"
             )
-        resolved = _git(root, "rev-parse", f"{current}^{{commit}}").decode().strip()
+        resolved = (
+            _git(self.root, "rev-parse", f"{current}^{{commit}}").decode().strip()
+        )
         if resolved != current:
-            raise ValueError(f"story checkpoint commit does not resolve exactly: {current}")
-        remote_refs = _git(
-            root,
-            "for-each-ref",
-            "--format=%(refname)",
-            "--contains",
-            current,
-            "refs/remotes/origin",
-        ).decode().splitlines()
-        if not any(ref.startswith("refs/remotes/origin/") for ref in remote_refs):
             raise ValueError(
-                "story checkpoint commit is local-only; it must be reachable from "
-                f"a fetched origin remote ref: {current}"
+                f"story checkpoint commit does not resolve exactly: {current}"
+            )
+        if not any(
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(self.root),
+                    "merge-base",
+                    "--is-ancestor",
+                    current,
+                    tip,
+                ],
+                check=False,
+                capture_output=True,
+            ).returncode
+            == 0
+            for _, tip in self.reachable_tips
+        ):
+            raise ValueError(
+                "story checkpoint commit is local-only or stale; it must be reachable "
+                f"from a currently advertised and fetched origin ref: {current}"
             )
         if previous is None:
             return
         if previous == current:
             raise ValueError("cumulative checkpoint commits must be distinct")
         completed = subprocess.run(
-            ["git", "-C", str(root), "merge-base", "--is-ancestor", previous, current],
+            [
+                "git",
+                "-C",
+                str(self.root),
+                "merge-base",
+                "--is-ancestor",
+                previous,
+                current,
+            ],
+            check=False,
             capture_output=True,
         )
         if completed.returncode == 1:
@@ -974,7 +1009,67 @@ def milestone_commit_verifier(
             detail = completed.stderr.decode("utf-8", errors="replace").strip()
             raise ValueError(f"cannot verify checkpoint commit ancestry: {detail}")
 
-    return verify
+    def provenance(self) -> dict[str, Any]:
+        return {
+            "repository": self.repository,
+            "remote_url": self.remote_url,
+            "fetched_at": self.fetched_at,
+            "ref_tips": dict(sorted(self.advertised_refs.items())),
+        }
+
+
+def milestone_commit_verifier(
+    repo: Path,
+    *,
+    fetch_remote: Callable[[Path], None] | None = None,
+    ls_remote: Callable[[Path], bytes] | None = None,
+) -> MilestoneCommitVerifier:
+    root = Path(_git(repo, "rev-parse", "--show-toplevel").decode().strip()).resolve()
+    remote = _git(root, "remote", "get-url", "origin").decode().strip()
+    local_repository = _github_repository_from_remote(remote)
+    if fetch_remote is None:
+        _git(root, "fetch", "--prune", "--tags", "origin")
+    else:
+        fetch_remote(root)
+    fetched_at = datetime.now(timezone.utc).isoformat()
+    output = (
+        _git(root, "ls-remote", "--heads", "--tags", "origin")
+        if ls_remote is None
+        else ls_remote(root)
+    )
+    advertised: dict[str, str] = {}
+    for line in output.decode().splitlines():
+        fields = line.split("\t")
+        if len(fields) != 2 or not re.fullmatch(r"[0-9a-f]{40}", fields[0]):
+            raise ValueError("origin advertised an invalid ref tip")
+        advertised[fields[1]] = fields[0]
+    if not advertised:
+        raise ValueError("origin advertised no heads or tags")
+
+    reachable: list[tuple[str, str]] = []
+    for ref, advertised_object in advertised.items():
+        if ref.endswith("^{}"):
+            continue
+        if ref.startswith("refs/heads/"):
+            local_ref = "refs/remotes/origin/" + ref.removeprefix("refs/heads/")
+            local_object = _git(root, "rev-parse", local_ref).decode().strip()
+            if local_object != advertised_object:
+                raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
+            reachable.append((ref, advertised_object))
+        elif ref.startswith("refs/tags/"):
+            local_object = _git(root, "rev-parse", ref).decode().strip()
+            if local_object != advertised_object:
+                raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
+            commit = _git(root, "rev-parse", f"{ref}^{{commit}}").decode().strip()
+            expected_commit = advertised.get(f"{ref}^{{}}", advertised_object)
+            if commit != expected_commit:
+                raise ValueError(f"fetched origin tag is stale or inconsistent: {ref}")
+            reachable.append((ref, commit))
+    if not reachable:
+        raise ValueError("origin advertised no usable heads or tags")
+    return MilestoneCommitVerifier(
+        root, remote, local_repository, fetched_at, advertised, tuple(reachable)
+    )
 
 
 def build_provenance(
@@ -987,6 +1082,7 @@ def build_provenance(
     benchmark_commit: str,
     benchmark_tree: str,
     snapshot_time: str,
+    milestone_remote: dict[str, Any],
 ) -> dict[str, Any]:
     if not re.fullmatch(r"[0-9a-f]{40}", benchmark_commit):
         raise ValueError("benchmark commit must be a full lowercase 40-hex SHA")
@@ -1002,6 +1098,7 @@ def build_provenance(
         "benchmark_commit": benchmark_commit,
         "benchmark_tree": benchmark_tree,
         "snapshot_time": snapshot_time,
+        "milestone_remote": milestone_remote,
         "registry_version": registry.version,
         "registry_sha256": registry.sha256,
         "target_pin_sha256": sha256_file(target_pin_path),
@@ -1075,7 +1172,15 @@ def verify_benchmark_source(
 
 def provenance_identity(provenance: dict[str, Any]) -> dict[str, Any]:
     """Return stable inputs only, excluding render time and output checksums."""
-    return {key: value for key, value in provenance.items() if key != "generated_at"}
+    identity = {
+        key: value for key, value in provenance.items() if key != "generated_at"
+    }
+    remote = identity.get("milestone_remote")
+    if isinstance(remote, dict):
+        identity["milestone_remote"] = {
+            key: value for key, value in remote.items() if key != "fetched_at"
+        }
+    return identity
 
 
 def check_stale(path: Path, current: dict[str, Any]) -> None:
@@ -1413,10 +1518,11 @@ def main() -> int:
             checksum_path=args.registry_checksum,
         )
         entries, snapshot_time = admit_snapshot(args.snapshot_dir, registry, pins)
+        milestone_verifier = milestone_commit_verifier(args.milestone_repo)
         series = load_story(
             args.story,
             entries,
-            commit_verifier=milestone_commit_verifier(args.milestone_repo),
+            commit_verifier=milestone_verifier,
         )
         provenance = build_provenance(
             snapshot_dir=args.snapshot_dir,
@@ -1427,6 +1533,7 @@ def main() -> int:
             benchmark_commit=args.benchmark_commit,
             benchmark_tree=benchmark_tree,
             snapshot_time=snapshot_time,
+            milestone_remote=milestone_verifier.provenance(),
         )
         provenance_path = args.output_dir / "leadership_performance.provenance.json"
         if args.check_stale:
