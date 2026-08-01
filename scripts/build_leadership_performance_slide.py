@@ -91,10 +91,27 @@ class Point:
     audit_boundary: str
 
 
+def _reject_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON constant is forbidden: {value}")
+
+
+def _reject_duplicate_json_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError(f"duplicate JSON key is forbidden: {key}")
+        value[key] = item
+    return value
+
+
 def load_json(path: Path) -> Any:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        return json.loads(
+            path.read_text(encoding="utf-8"),
+            parse_constant=_reject_json_constant,
+            object_pairs_hook=_reject_duplicate_json_keys,
+        )
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
         raise ValueError(f"cannot load {path}: {exc}") from exc
 
 
@@ -104,6 +121,17 @@ def sha256_file(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _require_exact_keys(
+    value: dict[str, Any], expected: set[str], *, context: str
+) -> None:
+    actual = set(value)
+    if actual != expected:
+        raise ValueError(
+            f"{context} has unexpected schema keys: "
+            f"missing={sorted(expected - actual)!r} extra={sorted(actual - expected)!r}"
+        )
 
 
 def load_registry(path: Path, checksum_path: Path) -> Registry:
@@ -142,6 +170,11 @@ def load_target_pins(path: Path, registry: Registry) -> dict[str, TargetPin]:
         "leadership-performance-target-pin/v1"
     ):
         raise ValueError("unsupported leadership performance target-pin schema")
+    _require_exact_keys(
+        payload,
+        {"schema_version", "registry_version", "registry_sha256", "targets"},
+        context="target pin",
+    )
     if str(payload.get("registry_version") or "") != registry.version:
         raise ValueError("target pin is stale: registry_version changed")
     if str(payload.get("registry_sha256") or "") != registry.sha256:
@@ -153,6 +186,11 @@ def load_target_pins(path: Path, registry: Registry) -> dict[str, TargetPin]:
     for raw in raw_pins:
         if not isinstance(raw, dict):
             raise TypeError("every target pin must be an object")
+        _require_exact_keys(
+            raw,
+            {"workload", "target_id", "target_version", "profile_id"},
+            context="target pin entry",
+        )
         pin = TargetPin(
             workload=str(raw.get("workload") or ""),
             target_id=str(raw.get("target_id") or ""),
@@ -746,6 +784,11 @@ def load_story(
         "leadership-performance-story/v1"
     ):
         raise ValueError("unsupported leadership performance story schema")
+    _require_exact_keys(
+        payload,
+        {"schema_version", "series"},
+        context="story",
+    )
     raw_series = payload.get("series")
     if not isinstance(raw_series, list):
         raise TypeError("story series must be an array")
@@ -755,6 +798,11 @@ def load_story(
     for raw in raw_series:
         if not isinstance(raw, dict):
             raise TypeError("every story series must be an object")
+        _require_exact_keys(
+            raw,
+            {"workload", "milestones"},
+            context="story series",
+        )
         workload = str(raw.get("workload") or "")
         if workload in series or workload not in REQUIRED_WORKLOADS:
             raise ValueError(f"unexpected or duplicate story workload: {workload!r}")
@@ -765,6 +813,19 @@ def load_story(
         for milestone in milestones:
             if not isinstance(milestone, dict):
                 raise TypeError("every milestone must be an object")
+            _require_exact_keys(
+                milestone,
+                {
+                    "entry_id",
+                    "label",
+                    "pr_number",
+                    "repository",
+                    "pr_url",
+                    "commit",
+                    "attribution",
+                },
+                context="story milestone",
+            )
             entry_id = str(milestone.get("entry_id") or "")
             entry = entries.get(entry_id)
             if entry is None:
@@ -792,6 +853,16 @@ def load_story(
                     "publishes a commit-bound pair/cohort identity"
                 )
             elif kind == "checkpoint-cumulative":
+                _require_exact_keys(
+                    attribution,
+                    {
+                        "kind",
+                        "boundary_id",
+                        "checkpoint_entry_id",
+                        "checkpoint_commit",
+                    },
+                    context=f"checkpoint attribution {entry_id}",
+                )
                 base_id = None
                 boundary = str(attribution.get("boundary_id") or "")
                 if (
