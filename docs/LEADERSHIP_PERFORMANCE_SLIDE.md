@@ -43,12 +43,15 @@ base/head relationship. Until that schema exists, each admitted milestone must b
 bind an explicit checkpoint entry and commit boundary. Within each series, PR numbers must increase
 strictly and every checkpoint commit after the first must be a strict descendant of its predecessor
 in the GitHub repository supplied by `--milestone-repo`. Its `origin` host must be exactly
-`github.com`. Generation performs a fail-closed `git fetch --prune --tags origin` followed by a live
-`git ls-remote --heads --tags origin`; every checkpoint, including the first, must be reachable from
-a locally fetched ref whose tip exactly matches that advertisement. Network errors, stale local
-tracking refs, inconsistent tags, and local-only commits are rejected. The provenance records the
-remote URL, fetch time, and complete advertised head/tag tips. JSON array order alone is never
-accepted as evidence of a cumulative progression.
+`github.com`. Generation first performs a live, fail-closed `git ls-remote --heads --tags origin`,
+then fetches every advertised source ref through explicit refspecs into a random proof namespace.
+It verifies the fetched object against the advertisement and deletes the temporary refs, so the
+proof works even for single-branch clones or custom `remote.origin.fetch` settings. Every checkpoint,
+including the first, must be reachable from one of those fetched tips. Network errors, advertisement
+races, inconsistent tags, and local-only commits are rejected. Provenance records the canonical
+credential-free `https://github.com/owner/repo.git` URL, fetch time, complete advertised head/tag
+tips, and redacted temporary-namespace refspecs; userinfo, query, and fragment data are never
+persisted. JSON array order alone is never accepted as evidence of a cumulative progression.
 
 ```json
 {

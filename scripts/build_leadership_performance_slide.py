@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 import re
+import secrets
 import shutil
 import struct
 import subprocess
@@ -926,18 +927,22 @@ def load_story(
     return series
 
 
-def _github_repository_from_remote(remote: str) -> str:
+def _github_origin_identity(remote: str) -> tuple[str, str]:
     scp = re.fullmatch(r"git@github\.com:([^/]+/[^/]+?)(?:\.git)?", remote)
     if scp is not None:
-        return scp.group(1)
-    parsed = urlsplit(remote)
-    if parsed.scheme not in {"https", "ssh"} or parsed.hostname != "github.com":
-        raise ValueError("milestone repository origin must use the github.com host")
-    path = parsed.path.removeprefix("/")
-    match = re.fullmatch(r"([^/]+/[^/]+?)(?:\.git)?", path)
-    if match is None:
+        repository = scp.group(1)
+    else:
+        parsed = urlsplit(remote)
+        if parsed.scheme not in {"https", "ssh"} or parsed.hostname != "github.com":
+            raise ValueError("milestone repository origin must use the github.com host")
+        if parsed.port not in {None, 22, 443}:
+            raise ValueError("milestone repository origin uses an unexpected port")
+        repository = parsed.path.removeprefix("/")
+        repository = repository.removesuffix(".git")
+    if re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository) is None:
         raise ValueError("milestone repository origin must be a GitHub repository")
-    return match.group(1)
+    canonical = f"https://github.com/{repository}.git"
+    return repository, canonical
 
 
 @dataclass
@@ -948,6 +953,7 @@ class MilestoneCommitVerifier:
     fetched_at: str
     advertised_refs: dict[str, str]
     reachable_tips: tuple[tuple[str, str], ...]
+    fetch_refspecs: tuple[str, ...]
 
     def __call__(self, repository: str, previous: str | None, current: str) -> None:
         if repository.casefold() != self.repository.casefold():
@@ -1015,25 +1021,21 @@ class MilestoneCommitVerifier:
             "remote_url": self.remote_url,
             "fetched_at": self.fetched_at,
             "ref_tips": dict(sorted(self.advertised_refs.items())),
+            "fetch_refspecs": list(self.fetch_refspecs),
         }
 
 
 def milestone_commit_verifier(
     repo: Path,
     *,
-    fetch_remote: Callable[[Path], None] | None = None,
+    fetch_remote: Callable[[Path, tuple[str, ...]], None] | None = None,
     ls_remote: Callable[[Path], bytes] | None = None,
 ) -> MilestoneCommitVerifier:
     root = Path(_git(repo, "rev-parse", "--show-toplevel").decode().strip()).resolve()
-    remote = _git(root, "remote", "get-url", "origin").decode().strip()
-    local_repository = _github_repository_from_remote(remote)
-    if fetch_remote is None:
-        _git(root, "fetch", "--prune", "--tags", "origin")
-    else:
-        fetch_remote(root)
-    fetched_at = datetime.now(timezone.utc).isoformat()
+    remote = _git(root, "config", "--get", "remote.origin.url").decode().strip()
+    local_repository, canonical_remote = _github_origin_identity(remote)
     output = (
-        _git(root, "ls-remote", "--heads", "--tags", "origin")
+        _milestone_remote_git(root, "ls-remote", "--heads", "--tags", "origin")
         if ls_remote is None
         else ls_remote(root)
     )
@@ -1042,34 +1044,78 @@ def milestone_commit_verifier(
         fields = line.split("\t")
         if len(fields) != 2 or not re.fullmatch(r"[0-9a-f]{40}", fields[0]):
             raise ValueError("origin advertised an invalid ref tip")
-        advertised[fields[1]] = fields[0]
+        ref = fields[1]
+        if not re.fullmatch(r"refs/(?:heads|tags)/[^\s^]+(?:\^\{\})?", ref):
+            raise ValueError("origin advertised an invalid head or tag name")
+        if ref in advertised and advertised[ref] != fields[0]:
+            raise ValueError("origin advertised inconsistent duplicate ref tips")
+        advertised[ref] = fields[0]
     if not advertised:
         raise ValueError("origin advertised no heads or tags")
 
+    source_refs = sorted(ref for ref in advertised if not ref.endswith("^{}"))
+    for source in source_refs:
+        _git(root, "check-ref-format", source)
+    namespace = f"refs/leadership-proof/{secrets.token_hex(8)}"
+    destinations = {
+        source: f"{namespace}/{source.removeprefix('refs/')}" for source in source_refs
+    }
+    actual_refspecs = tuple(
+        f"+{source}:{destinations[source]}" for source in source_refs
+    )
+    recorded_refspecs = tuple(
+        f"+{source}:refs/leadership-proof/<temporary>/{source.removeprefix('refs/')}"
+        for source in source_refs
+    )
     reachable: list[tuple[str, str]] = []
-    for ref, advertised_object in advertised.items():
-        if ref.endswith("^{}"):
-            continue
-        if ref.startswith("refs/heads/"):
-            local_ref = "refs/remotes/origin/" + ref.removeprefix("refs/heads/")
-            local_object = _git(root, "rev-parse", local_ref).decode().strip()
+    try:
+        if fetch_remote is None:
+            _milestone_remote_git(
+                root, "fetch", "--no-tags", "origin", *actual_refspecs
+            )
+        else:
+            fetch_remote(root, actual_refspecs)
+        fetched_at = datetime.now(timezone.utc).isoformat()
+        for ref in source_refs:
+            advertised_object = advertised[ref]
+            destination = destinations[ref]
+            local_object = _git(root, "rev-parse", destination).decode().strip()
             if local_object != advertised_object:
                 raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
-            reachable.append((ref, advertised_object))
-        elif ref.startswith("refs/tags/"):
-            local_object = _git(root, "rev-parse", ref).decode().strip()
-            if local_object != advertised_object:
-                raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
-            commit = _git(root, "rev-parse", f"{ref}^{{commit}}").decode().strip()
+            commit = (
+                _git(root, "rev-parse", f"{destination}^{{commit}}").decode().strip()
+            )
             expected_commit = advertised.get(f"{ref}^{{}}", advertised_object)
             if commit != expected_commit:
-                raise ValueError(f"fetched origin tag is stale or inconsistent: {ref}")
+                raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
             reachable.append((ref, commit))
+    finally:
+        for destination in destinations.values():
+            _git(root, "update-ref", "-d", destination)
     if not reachable:
         raise ValueError("origin advertised no usable heads or tags")
     return MilestoneCommitVerifier(
-        root, remote, local_repository, fetched_at, advertised, tuple(reachable)
+        root,
+        canonical_remote,
+        local_repository,
+        fetched_at,
+        advertised,
+        tuple(reachable),
+        recorded_refspecs,
     )
+
+
+def _milestone_remote_git(repo: Path, *args: str) -> bytes:
+    """Run remote Git without propagating stderr that may echo credentials."""
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(repo), *args],
+            check=True,
+            capture_output=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise ValueError("cannot contact milestone repository origin") from exc
+    return completed.stdout
 
 
 def build_provenance(
