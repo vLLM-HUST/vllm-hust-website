@@ -7,7 +7,9 @@ import importlib.util
 import json
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 import zipfile
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -608,6 +610,65 @@ def test_svg_and_png_embed_provenance(tmp_path: Path) -> None:
     )
     MODULE.embed_png_provenance(png, provenance)
     assert b"leadership-performance-provenance" in png.read_bytes()
+
+
+def test_svg_single_near_value_series_use_distinct_markers_and_annotation_lanes() -> (
+    None
+):
+    provenance = {
+        "schema_version": MODULE.PROVENANCE_SCHEMA,
+        "registry_sha256": "a" * 64,
+    }
+    series = {
+        workload: [
+            MODULE.Point(
+                f"Optimization {index}",
+                index,
+                99.0 + index,
+                f"entry-{index}",
+                "checkpoint-cumulative",
+                None,
+                f"checkpoint-{index}",
+            )
+        ]
+        for index, workload in enumerate(MODULE.REQUIRED_WORKLOADS, 1)
+    }
+    root = ET.fromstring(MODULE.render_svg(series, provenance))
+    namespace = {"svg": "http://www.w3.org/2000/svg"}
+    markers = [
+        node
+        for node in root.findall("svg:circle", namespace)
+        if node.get("class") == "series-marker"
+    ]
+    annotations = [
+        node
+        for node in root.findall("svg:text", namespace)
+        if node.get("class") == "point-annotation"
+    ]
+    leaders = [
+        node
+        for node in root.findall("svg:line", namespace)
+        if node.get("class") == "point-leader"
+    ]
+    assert len(markers) == len(annotations) == len(leaders) == 3
+
+    marker_positions = [
+        (float(marker.attrib["cx"]), float(marker.attrib["cy"])) for marker in markers
+    ]
+    assert len({x for x, _ in marker_positions}) == 3
+    for index, (left, right) in enumerate(pairwise(marker_positions), 1):
+        distance = ((right[0] - left[0]) ** 2 + (right[1] - left[1]) ** 2) ** 0.5
+        assert distance > 16, f"markers {index}/{index + 1} overlap"
+    assert marker_positions[0][1] > marker_positions[1][1] > marker_positions[2][1]
+
+    lane_positions = [float(annotation.attrib["y"]) for annotation in annotations]
+    assert lane_positions == sorted(lane_positions)
+    assert min(right - left for left, right in pairwise(lane_positions)) >= 40
+    annotation_text = ["".join(annotation.itertext()) for annotation in annotations]
+    for index, text in enumerate(annotation_text, 1):
+        assert f"PR #{index}" in text
+        assert f"{99.0 + index:.2f}" in text
+        assert f"Optimization {index}" in text
 
 
 def test_svg_rejects_forbidden_text_before_rasterization() -> None:
