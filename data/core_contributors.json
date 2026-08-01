@@ -204,8 +204,8 @@
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "工程师",
-          "en": "Engineer"
+          "zh": "历史贡献者",
+          "en": "Historical contributor"
         },
         "research_direction": {
           "zh": "",
@@ -221,12 +221,13 @@
         },
         "contribution_areas": "CI/CD, leaderboard, Ascend, benchmark",
         "external_contributor": false,
-        "staff_member": true,
+        "staff_member": false,
         "core_repository_contributor": true,
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "former_member": true
       },
       {
         "rank": 5,
@@ -1025,9 +1026,9 @@
           "vllm-hust-perf-analyzer"
         ],
         "key_contributions": "tooling",
-        "display_name": "Yang Sun",
+        "display_name": "sunYangGitHub",
         "chinese_name": "",
-        "english_name": "Yang Sun",
+        "english_name": "",
         "person_id": "github:sunyanggithub",
         "identity_confirmed": true,
         "core_member": false,
@@ -1682,8 +1683,8 @@
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "工程师",
-          "en": "Engineer"
+          "zh": "历史贡献者",
+          "en": "Historical contributor"
         },
         "research_direction": {
           "zh": "",
@@ -1699,12 +1700,13 @@
         },
         "contribution_areas": "CI/CD, kernel, Ascend, engine",
         "external_contributor": false,
-        "staff_member": true,
+        "staff_member": false,
         "core_repository_contributor": true,
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "former_member": true
       },
       {
         "rank": 5,
@@ -3323,9 +3325,9 @@
           "vllm-hust-perf-analyzer"
         ],
         "key_contributions": "tooling",
-        "display_name": "Yang Sun",
+        "display_name": "sunYangGitHub",
         "chinese_name": "",
-        "english_name": "Yang Sun",
+        "english_name": "",
         "person_id": "github:sunyanggithub",
         "identity_confirmed": true,
         "core_member": false,
@@ -5147,52 +5149,6 @@
           "en": ""
         },
         "contribution_areas": "benchmark, CI/CD, Ascend",
-        "external_contributor": false,
-        "staff_member": true,
-        "core_repository_contributor": true,
-        "github_status": {
-          "zh": "",
-          "en": ""
-        }
-      },
-      {
-        "rank": 4,
-        "name": "Sheng Wang",
-        "github_login": "moonandlife",
-        "github_url": "https://github.com/moonandlife",
-        "commits": 27,
-        "changed_lines": 10106,
-        "added": 8684,
-        "deleted": 1422,
-        "active_repos": 2,
-        "repos": [
-          "vllm-ascend-hust",
-          "vllm-hust"
-        ],
-        "key_contributions": "CI/CD, kernel, Ascend, engine",
-        "display_name": "王胜",
-        "chinese_name": "王胜",
-        "english_name": "Sheng Wang",
-        "person_id": "github:moonandlife",
-        "identity_confirmed": true,
-        "core_member": false,
-        "role": {
-          "zh": "工程师",
-          "en": "Engineer"
-        },
-        "research_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "participation_direction": {
-          "zh": "推理引擎工程治理、上游协作与性能回归",
-          "en": "Inference-engine governance, upstream collaboration, and performance regression"
-        },
-        "advisor": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "CI/CD, kernel, Ascend, engine",
         "external_contributor": false,
         "staff_member": true,
         "core_repository_contributor": true,

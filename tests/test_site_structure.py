@@ -1845,7 +1845,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
     assert len(profiles["participants"]) == 41
-    assert len(profiles["staff_members"]) == 5
+    assert len(profiles["staff_members"]) == 4
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
@@ -1915,15 +1915,24 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert {item["display_name"] for item in profiles["staff_members"]} == {
         "luoxiaohei",
         "张俊辉",
-        "王胜",
         "程月甲",
         "龙斌",
+    }
+    assert "王胜" not in {
+        item["display_name"]
+        for group in (
+            profiles["core_members"],
+            profiles["participants"],
+            profiles["staff_members"],
+            profiles["external_contributors"],
+        )
+        for item in group
     }
     assert {
         item["display_name"]
         for item in profiles["staff_members"]
         if item["core_repository_contributor"]
-    } == {"王胜", "程月甲", "张俊辉"}
+    } == {"程月甲", "张俊辉"}
 
     people = {
         item["display_name"]: item
@@ -1977,8 +1986,6 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["邱瑞杰"]["github_login"] == "Jerry01020"
     assert people["赵建军"]["github_login"] == "curryzjj"
     assert people["高西岭"]["github_login"] == "XilingGao"
-    assert people["王胜"]["role"]["zh"] == "工程师"
-    assert people["王胜"]["staff_member"] is True
     assert people["张俊辉"]["github_login"] == "junhuizhang-boop"
     assert people["张俊辉"]["role"]["zh"] == "工程师（派欧云）"
     assert people["张俊辉"]["staff_member"] is True
@@ -2062,9 +2069,9 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["李庚"]["role"]["zh"] == "马上入学的华科研究生"
     assert people["李庚"]["advisor"]["zh"] == "张书豪"
     assert people["马俊豪"]["advisor"]["zh"] == "张书豪"
-    assert people["Yang Sun"]["github_login"] == "sunYangGitHub"
-    assert people["Yang Sun"]["role"]["zh"] == "外校实习生"
-    assert people["Yang Sun"]["advisor"]["zh"] == "张书豪"
+    assert people["sunYangGitHub"]["github_login"] == "sunYangGitHub"
+    assert people["sunYangGitHub"]["role"]["zh"] == "外校实习生"
+    assert people["sunYangGitHub"]["advisor"]["zh"] == "张书豪"
     assert people["杜忠承"]["github_login"] == "dzcixy"
     assert people["杜忠承"]["advisor"]["zh"] == "黄禹"
     assert people["徐晨曦"]["github_login"] == "xsun2001"
