@@ -29,6 +29,23 @@ def dump(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+@pytest.mark.parametrize(
+    ("raw", "message"),
+    [
+        ('{"outer":{"value":1,"value":2}}', "duplicate JSON key"),
+        ('{"value":NaN}', "non-finite JSON constant"),
+        ('{"value":Infinity}', "non-finite JSON constant"),
+    ],
+)
+def test_all_json_inputs_fail_closed_on_ambiguous_values(
+    tmp_path: Path, raw: str, message: str
+) -> None:
+    path = tmp_path / "ambiguous.json"
+    path.write_text(raw, encoding="utf-8")
+    with pytest.raises(ValueError, match=message):
+        MODULE.load_json(path)
+
+
 def fixtures(tmp_path: Path) -> tuple[object, dict, Path, Path, Path]:
     registry_path = tmp_path / "official-targets.json"
     checksum_path = tmp_path / "official-targets.sha256"
@@ -418,6 +435,33 @@ def test_story_uses_only_canonical_metric_and_matching_pr(tmp_path: Path) -> Non
         MODULE.load_story(story_path, entries)
 
 
+@pytest.mark.parametrize(
+    ("location", "field"),
+    [
+        ("top", "throughput_tps"),
+        ("series", "performance_value"),
+        ("milestone", "throughput_tps"),
+        ("attribution", "delta_tps"),
+    ],
+)
+def test_story_rejects_manual_performance_or_unknown_fields(
+    tmp_path: Path, location: str, field: str
+) -> None:
+    registry, pins, _, snapshot_dir, story_path = fixtures(tmp_path)
+    entries, _ = MODULE.admit_snapshot(snapshot_dir, registry, pins)
+    story = json.loads(story_path.read_text())
+    target = {
+        "top": story,
+        "series": story["series"][0],
+        "milestone": story["series"][0]["milestones"][0],
+        "attribution": story["series"][0]["milestones"][0]["attribution"],
+    }[location]
+    target[field] = 123.45
+    dump(story_path, story)
+    with pytest.raises(ValueError, match="unexpected schema keys"):
+        MODULE.load_story(story_path, entries)
+
+
 def test_story_rejects_forbidden_image_text_and_duplicate_entry(tmp_path: Path) -> None:
     registry, pins, _, snapshot_dir, story_path = fixtures(tmp_path)
     entries, _ = MODULE.admit_snapshot(snapshot_dir, registry, pins)
@@ -521,6 +565,15 @@ def test_target_pin_is_stale_when_registry_hash_changes(tmp_path: Path) -> None:
     changed = MODULE.Registry(registry.version, "f" * 64, registry.targets)
     with pytest.raises(ValueError, match="stale"):
         MODULE.load_target_pins(pin_path, changed)
+
+
+def test_target_pin_rejects_unknown_fields(tmp_path: Path) -> None:
+    registry, _, pin_path, _, _ = fixtures(tmp_path)
+    pins = json.loads(pin_path.read_text())
+    pins["targets"][0]["throughput_tps"] = 999.0
+    dump(pin_path, pins)
+    with pytest.raises(ValueError, match="unexpected schema keys"):
+        MODULE.load_target_pins(pin_path, registry)
 
 
 def test_stale_check_covers_inputs_and_artifact_bytes(tmp_path: Path) -> None:
