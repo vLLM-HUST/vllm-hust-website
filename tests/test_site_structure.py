@@ -1647,13 +1647,10 @@ def test_multichip_trend_filter_keeps_pr_and_historical_online_workloads() -> No
         production_trace = [
             entry
             for entry in data
-            if (entry.get("metadata") or {}).get("profile_id")
-            == "production-trace"
+            if (entry.get("metadata") or {}).get("profile_id") == "production-trace"
         ]
         assert production_trace
-        assert all(
-            workload(entry).endswith("-replay") for entry in production_trace
-        )
+        assert all(workload(entry).endswith("-replay") for entry in production_trace)
         return
 
     refs_by_workload: dict[str, set[str]] = {
