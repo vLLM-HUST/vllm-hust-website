@@ -817,4 +817,7 @@ def test_checked_in_snapshot_is_not_formally_admitted() -> None:
     ) as caught:
         MODULE.admit_snapshot(ROOT / "data", registry, pins)
     assert "metadata.verified must be true" in str(caught.value)
-    assert "canonical compare snapshot has no admitted groups" in str(caught.value)
+    assert (
+        "canonical compare snapshot requires exactly one admitted group for "
+        "agent-research-online; found=0"
+    ) in str(caught.value)

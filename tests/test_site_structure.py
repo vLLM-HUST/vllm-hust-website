@@ -304,13 +304,13 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
                 if key not in ignored
             }
         workload = entry.get("workload") or {}
-        if resolved["client"].get("input_len") == normalize(
-            workload.get("input_length")
-        ):
+        if "input_len" in resolved["client"] and resolved["client"].get(
+            "input_len"
+        ) == normalize(workload.get("input_length")):
             resolved["client"].pop("input_len")
-        if resolved["client"].get("output_len") == normalize(
-            workload.get("output_length")
-        ):
+        if "output_len" in resolved["client"] and resolved["client"].get(
+            "output_len"
+        ) == normalize(workload.get("output_length")):
             resolved["client"].pop("output_len")
         return resolved
 
@@ -862,6 +862,25 @@ def test_validation_dependencies_have_single_source_of_truth() -> None:
     assert (
         "uv run --python 3.11 --with-requirements requirements-dev.txt" in readme_text
     )
+
+
+def test_leaderboard_schema_accepts_variable_trace_token_lengths() -> None:
+    root = Path(__file__).resolve().parents[1]
+    schema = json.loads(
+        (root / "data" / "schemas" / "leaderboard_v1.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    workload = schema["$defs"]["entry"]["properties"]["workload"]["properties"]
+    assert set(workload["input_length"]["type"]) == {"integer", "null"}
+    assert set(workload["output_length"]["type"]) == {"integer", "null"}
+    assert workload["input_token_distribution"]["$ref"].endswith(
+        "tokenLengthDistributionOrNull"
+    )
+    assert workload["output_token_distribution"]["$ref"].endswith(
+        "tokenLengthDistributionOrNull"
+    )
+    assert workload["arrival_transform"]["oneOf"]
 
 
 def test_engine_summary_cards_use_composite_version_components() -> None:
@@ -1624,7 +1643,18 @@ def test_multichip_trend_filter_keeps_pr_and_historical_online_workloads() -> No
         assert rows == []
         assert online_chip_workloads == []
         return
-    assert online_chip_workloads
+    if not online_chip_workloads:
+        production_trace = [
+            entry
+            for entry in data
+            if (entry.get("metadata") or {}).get("profile_id")
+            == "production-trace"
+        ]
+        assert production_trace
+        assert all(
+            workload(entry).endswith("-replay") for entry in production_trace
+        )
+        return
 
     refs_by_workload: dict[str, set[str]] = {
         name: set() for name in online_chip_workloads
