@@ -304,16 +304,19 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
                 errors.append(f"{name}: every entry must be an object")
                 continue
             metadata = (
-                entry.get("metadata")
-                if isinstance(entry.get("metadata"), dict)
-                else {}
+                entry.get("metadata") if isinstance(entry.get("metadata"), dict) else {}
             )
             if metadata.get("official_admission_status") == "historical-unverified":
                 historical_unverified += 1
                 errors.extend(require_historical_unverified_marker(entry, name))
             else:
                 errors.extend(require_public_entry_contract(entry, name, registry))
-    if isinstance(single, list) and isinstance(multi, list) and not single and not multi:
+    if (
+        isinstance(single, list)
+        and isinstance(multi, list)
+        and not single
+        and not multi
+    ):
         errors.append(
             "public snapshot set must contain at least one admitted entry; "
             "refusing an empty replacement"

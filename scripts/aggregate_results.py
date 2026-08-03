@@ -554,9 +554,7 @@ def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
             else PUBLIC_BASELINE_VERSION
         )
         if engine_version != expected_version:
-            return (
-                f"public vllm baseline is {engine_version!r}, not {expected_version}"
-            )
+            return f"public vllm baseline is {engine_version!r}, not {expected_version}"
 
     if contains_retired_baseline_token(engine_version):
         return f"retired baseline token in engine_version {engine_version!r}"

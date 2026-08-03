@@ -256,8 +256,11 @@ def test_same_spec_comparator_matches_benchmark_contract() -> None:
         if target["target_id"].endswith("agent-research-online-qwen25-14b-910b2")
     )
     expected = MODULE.expected_same_spec(target)
-    assert expected["resolved_spec_hash"] == (
-        "05e08764f0853bcb19e84c3dc604018d567773fd6d7942d385190266c21a04cb"
+    assert (
+        expected["resolved_spec_hash"]
+        == (
+            "05e08764f0853bcb19e84c3dc604018d567773fd6d7942d385190266c21a04cb"  # pragma: allowlist secret
+        )
     )
 
 
