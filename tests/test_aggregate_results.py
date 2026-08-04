@@ -548,6 +548,48 @@ def test_aggregate_results_filters_invalid_public_historical_entries(
     )
 
 
+def test_aggregate_results_admits_pinned_production_trace_baseline_only(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    output_dir = tmp_path / "website_data"
+    source_dir.mkdir()
+
+    admitted = _official_public_entry(
+        "55555555-5555-4555-8555-555555555555",
+        engine="vllm",
+    )
+    admitted["engine_version"] = "0.22.1rc1"
+    admitted["metadata"]["engine_version"] = "0.22.1rc1"
+    admitted["metadata"]["idempotency_key"] += "|production-trace"
+    admitted["workload"]["name"] = "tracelab-coding-agent-replay"
+    admitted["model"]["precision"] = "BF16"
+    admitted["same_spec"] = _official_same_spec_payload(
+        "official-ascend-jan-2026-v0.22.1rc1-tracelab-coding-agent-replay-"
+        "deepseek-r1-distill-qwen32b-2chip-910b2",
+        "production-trace-hash",
+        precision="BF16",
+    )
+
+    wrong_version = deepcopy(admitted)
+    wrong_version["entry_id"] = "66666666-6666-4666-8666-666666666666"
+    wrong_version["engine_version"] = "0.18.0"
+    wrong_version["metadata"]["engine_version"] = "0.18.0"
+    wrong_version["metadata"]["idempotency_key"] += "|wrong-version"
+
+    _write_manifest_entries(source_dir, [admitted, wrong_version])
+    result = _run_aggregate(script, source_dir, output_dir, "--replace-all")
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    assert "skipped invalid public entries: 1" in result.stdout
+    single_payload = json.loads(
+        (output_dir / "leaderboard_single.json").read_text(encoding="utf-8")
+    )
+    assert [entry["entry_id"] for entry in single_payload] == [admitted["entry_id"]]
+
+
 def test_aggregate_results_places_multi_gpu_entry_in_multi_snapshot(
     tmp_path: Path,
 ) -> None:
@@ -1595,9 +1637,7 @@ def test_compare_snapshot_prefers_matching_same_spec_pair(tmp_path: Path) -> Non
     assert preferred_pair["left"]["engine"] == "vllm-hust"
     assert preferred_pair["right"]["engine"] == "vllm"
     assert preferred_pair["left"]["entry_id"] == engine_a_matching["entry_id"]
-    assert (
-        preferred_pair["left"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
-    )
+    assert preferred_pair["left"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
     assert preferred_pair["right"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
 
 
