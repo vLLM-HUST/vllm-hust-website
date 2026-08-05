@@ -196,11 +196,17 @@
               "type": "string"
             },
             "input_length": {
-              "type": "integer",
+              "type": [
+                "integer",
+                "null"
+              ],
               "minimum": 1
             },
             "output_length": {
-              "type": "integer",
+              "type": [
+                "integer",
+                "null"
+              ],
               "minimum": 1
             },
             "batch_size": {
@@ -224,6 +230,45 @@
               ]
             }
           },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "enum": [
+                      "burstgpt-production-replay",
+                      "tracelab-coding-agent-replay"
+                    ]
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "input_length": {
+                    "type": "null"
+                  },
+                  "output_length": {
+                    "type": "null"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "input_length": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "output_length": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          ],
           "additionalProperties": true
         },
         "metrics": {
