@@ -997,6 +997,44 @@ def test_aggregate_results_fails_on_invalid_schema(tmp_path: Path) -> None:
     assert "schema validation failed" in (result.stderr + result.stdout)
 
 
+def test_aggregate_results_accepts_null_lengths_for_variable_trace(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    output_dir = tmp_path / "out"
+    source_dir.mkdir()
+    entry = _valid_entry()
+    entry["workload"]["name"] = "burstgpt-production-replay"
+    entry["workload"]["input_length"] = None
+    entry["workload"]["output_length"] = None
+    _write_manifest_entries(source_dir, [entry])
+
+    result = _run_aggregate(script, source_dir, output_dir)
+
+    assert result.returncode == 0, result.stderr or result.stdout
+
+
+def test_aggregate_results_rejects_null_lengths_for_fixed_workload(
+    tmp_path: Path,
+) -> None:
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    output_dir = tmp_path / "out"
+    source_dir.mkdir()
+    entry = _valid_entry()
+    entry["workload"]["input_length"] = None
+    entry["workload"]["output_length"] = None
+    _write_manifest_entries(source_dir, [entry])
+
+    result = _run_aggregate(script, source_dir, output_dir)
+
+    assert result.returncode != 0
+    assert "schema validation failed" in (result.stderr + result.stdout)
+
+
 def test_aggregate_results_builds_goal_progress_for_official_baseline(
     tmp_path: Path,
 ) -> None:
