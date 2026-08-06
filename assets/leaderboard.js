@@ -2682,27 +2682,68 @@
         return isTrendBaselineEntry(entry) ? `${t('baseline')} ${version}` : version;
     }
 
-    function shouldReplaceTrendPoint(currentEntry, candidateEntry, metricConfig) {
-        if (!currentEntry) {
+    function getCanonicalAggregateMetric(entry, metricKey) {
+        // Per issue #135: the website must consume canonical_aggregate from
+        // the benchmark aggregator and must NOT perform best-of aggregation.
+        // canonical_aggregate.metrics[metricKey].value is the pre-aggregated
+        // value (median/mean/etc.) produced by the benchmark pipeline.
+        const agg = entry?.canonical_aggregate;
+        if (!agg || !agg.metrics) {
+            return null;
+        }
+        const m = agg.metrics[metricKey];
+        if (!m || !Number.isFinite(m.value)) {
+            return null;
+        }
+        return m.value;
+    }
+
+    function getCanonicalAggregateCount(entry) {
+        return entry?.canonical_aggregate?.count ?? null;
+    }
+
+    function selectTrendPoint(currentPoint, candidateEntry, metricConfig) {
+        // Per issue #135: do NOT pick the "better" metric value (best-of).
+        // Instead:
+        //   1. Prefer entries that carry canonical_aggregate (pre-aggregated
+        //      by the benchmark aggregator).
+        //   2. Among canonical entries, prefer the one with the higher
+        //      repetition count (more reliable).
+        //   3. For legacy entries without canonical_aggregate, fall back to
+        //      the latest by timestamp — never compare metric values.
+        if (!currentPoint) {
             return true;
         }
-        const currentValue = getFiniteTrendMetricValue(currentEntry, metricConfig.key);
-        const candidateValue = getFiniteTrendMetricValue(candidateEntry, metricConfig.key);
-        if (candidateValue === null) {
-            return false;
+        const currentEntry = currentPoint.entry;
+        const currentCanonical = getCanonicalAggregateMetric(currentEntry, metricConfig.key);
+        const candidateCanonical = getCanonicalAggregateMetric(candidateEntry, metricConfig.key);
+
+        if (candidateCanonical !== null && currentCanonical === null) {
+            return true;  // canonical beats legacy
         }
-        if (currentValue === null) {
-            return true;
+        if (candidateCanonical === null && currentCanonical !== null) {
+            return false;  // legacy loses to canonical
         }
-        if (candidateValue !== currentValue) {
-            return metricConfig.higherIsBetter
-                ? candidateValue > currentValue
-                : candidateValue < currentValue;
+        if (candidateCanonical !== null && currentCanonical !== null) {
+            // Both canonical: prefer higher repetition count, then latest timestamp
+            const currentCount = getCanonicalAggregateCount(currentEntry) ?? 0;
+            const candidateCount = getCanonicalAggregateCount(candidateEntry) ?? 0;
+            if (candidateCount !== currentCount) {
+                return candidateCount > currentCount;
+            }
+            return getEntryTimestamp(candidateEntry) > getEntryTimestamp(currentEntry);
         }
+        // Both legacy: use latest by timestamp (NO best-of metric comparison)
         return getEntryTimestamp(candidateEntry) > getEntryTimestamp(currentEntry);
     }
 
     function getFiniteTrendMetricValue(entry, metricKey) {
+        // Prefer canonical_aggregate value (pre-aggregated by benchmark
+        // aggregator) over raw metric value, per issue #135.
+        const canonical = getCanonicalAggregateMetric(entry, metricKey);
+        if (canonical !== null) {
+            return canonical;
+        }
         return getMeasuredMetricValue(entry, metricKey);
     }
 
@@ -2766,8 +2807,16 @@
             }
             const series = seriesMap.get(seriesKey);
             const currentPoint = series.points.get(versionKey);
-            if (shouldReplaceTrendPoint(currentPoint?.entry, entry, metricConfig)) {
-                series.points.set(versionKey, { entry, value });
+            if (selectTrendPoint(currentPoint, entry, metricConfig)) {
+                // Prefer canonical_aggregate value when available; fall back
+                // to the raw metric value for legacy entries.
+                const canonicalValue = getCanonicalAggregateMetric(entry, metricConfig.key);
+                series.points.set(versionKey, {
+                    entry,
+                    value: canonicalValue !== null ? canonicalValue : value,
+                    canonical: canonicalValue !== null,
+                    sampleCount: getCanonicalAggregateCount(entry),
+                });
             }
         });
 

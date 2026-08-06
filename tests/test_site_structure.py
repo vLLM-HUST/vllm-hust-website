@@ -2191,3 +2191,101 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
     assert "metric-state-semantics-20260730" in html_text
+
+
+# ---------------------------------------------------------------------------
+# Issue #135: website must not perform best-of aggregation.
+# These tests verify that shouldReplaceTrendPoint (best-of) is removed and
+# replaced with selectTrendPoint (canonical_aggregate consumption).
+# ---------------------------------------------------------------------------
+
+
+def test_should_replace_trend_point_is_removed() -> None:
+    """shouldReplaceTrendPoint (best-of logic) must be completely removed."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    assert "shouldReplaceTrendPoint" not in js_text, (
+        "shouldReplaceTrendPoint must be removed — issue #135 forbids "
+        "website-side best-of aggregation"
+    )
+
+
+def test_select_trend_point_exists() -> None:
+    """selectTrendPoint must replace shouldReplaceTrendPoint."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    assert (
+        "function selectTrendPoint(currentPoint, candidateEntry, metricConfig)"
+        in js_text
+    )
+
+
+def test_select_trend_point_does_not_compare_metric_values() -> None:
+    """selectTrendPoint must NOT compare metric values for better selection."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    # Extract the selectTrendPoint function body
+    start = js_text.find("function selectTrendPoint(")
+    assert start != -1, "selectTrendPoint not found"
+    # Find the end of the function (next closing brace at same indentation)
+    fn_body = js_text[start : js_text.find("}", start + 600)]
+    # Must NOT contain higherIsBetter comparison (the best-of pattern)
+    assert "higherIsBetter" not in fn_body, (
+        "selectTrendPoint must not use higherIsBetter — that is best-of "
+        "aggregation which issue #135 forbids"
+    )
+
+
+def test_get_canonical_aggregate_metric_exists() -> None:
+    """getCanonicalAggregateMetric must exist to consume canonical_aggregate."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    assert "function getCanonicalAggregateMetric(entry, metricKey)" in js_text
+    assert "function getCanonicalAggregateCount(entry)" in js_text
+
+
+def test_get_canonical_aggregate_metric_reads_from_canonical_aggregate() -> None:
+    """getCanonicalAggregateMetric must read from entry.canonical_aggregate."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    start = js_text.find("function getCanonicalAggregateMetric(")
+    assert start != -1
+    fn_body = js_text[start : js_text.find("}", start + 400)]
+    assert "canonical_aggregate" in fn_body
+    assert "metrics" in fn_body
+    assert ".value" in fn_body
+
+
+def test_get_finite_trend_metric_value_prefers_canonical() -> None:
+    """getFiniteTrendMetricValue must prefer canonical_aggregate over raw."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    start = js_text.find("function getFiniteTrendMetricValue(")
+    assert start != -1
+    fn_body = js_text[start : js_text.find("}", start + 400)]
+    assert "getCanonicalAggregateMetric" in fn_body, (
+        "getFiniteTrendMetricValue must prefer canonical_aggregate value"
+    )
+
+
+def test_build_trend_chart_uses_select_trend_point() -> None:
+    """buildTrendChartModel call site must use selectTrendPoint."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    assert "selectTrendPoint(currentPoint, entry, metricConfig)" in js_text
+    # Must NOT call shouldReplaceTrendPoint
+    assert "shouldReplaceTrendPoint" not in js_text
+
+
+def test_select_trend_point_prefers_canonical_over_legacy() -> None:
+    """selectTrendPoint logic must prefer canonical_aggregate entries."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    start = js_text.find("function selectTrendPoint(")
+    # Use a generous range to capture the full function body
+    fn_body = js_text[start : start + 2000]
+    # Must check for canonical presence
+    assert "candidateCanonical !== null" in fn_body
+    assert "currentCanonical === null" in fn_body
+    # Legacy fallback must use timestamp, not metric comparison
+    assert "getEntryTimestamp" in fn_body
