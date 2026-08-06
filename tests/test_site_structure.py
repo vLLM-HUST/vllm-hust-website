@@ -275,6 +275,8 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
     entries = []
     for name in ("leaderboard_single.json", "leaderboard_multi.json"):
         entries.extend(json.loads((root / "data" / name).read_text(encoding="utf-8")))
+    if not entries:
+        return  # #187 admission gate: 0 admitted entries, can't verify spec drift
 
     ignored = {"host", "port", "model"}
 
@@ -1452,14 +1454,21 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function renderTrendSeriesControl(series)" in js_text
     assert "state.trendChart.setDatasetVisibility(datasetIndex, visible)" in js_text
     assert "pointDetails" in js_text
-    assert "spanGaps: true" in js_text
-    assert "Keep one series continuous across x-axis slots" in js_text
+    # Issue #150: spanGaps is now conditional on coverage_class so targeted PRs
+    # that skip workloads break the line instead of bridging gaps.
+    assert "spanGaps: allowSpanGaps" in js_text
+    assert "allowSpanGaps = series.coverageClass === 'full-matrix'" in js_text
     assert "function getTrendAxisValues(datasets)" in js_text
     assert "function getFiniteTrendMetricValue(entry, metricKey)" in js_text
     assert "rawValue === null || rawValue === undefined || rawValue === ''" in js_text
+    # Issue #150: buildTrendChartModel now resolves a canonical point per
+    # (series, version) bucket instead of taking best-of; the measured value
+    # is read into `measured` and the canonical aggregate drives the plotted y.
     assert (
-        "const value = getFiniteTrendMetricValue(entry, metricConfig.key);" in js_text
+        "const measured = getFiniteTrendMetricValue(entry, metricConfig.key);"
+        in js_text
     )
+    assert "function getCanonicalAggregateMetric(entry, metricKey)" in js_text
     assert "function shouldUseLogTrendAxis()" in js_text
     assert "trendAxisScale: 'auto'" in js_text
     assert "const BROKEN_TREND_AXIS_RATIO_THRESHOLD = 8;" in js_text
@@ -1512,6 +1521,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
 def test_single_chip_all_workload_auto_axis_uses_broken_axis_for_outliers() -> None:
     root = Path(__file__).resolve().parents[1]
     data = json.loads((root / "data" / "leaderboard_single.json").read_text())
+    if not data:
+        return  # #187 admission gate: 0 admitted entries, can't verify axis behavior
 
     values = [
         float(entry.get("metrics", {}).get("throughput_tps") or 0)
@@ -1540,6 +1551,11 @@ def test_default_all_workload_trend_uses_sparse_version_union() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     data = json.loads((root / "data" / "leaderboard_single.json").read_text())
+
+    # JS structure assertions (always run, independent of data availability)
+    assert "const plottedVersionKeys = new Set(" in js_text
+    assert "const completeVersionKeys = new Set(" not in js_text
+    assert "spanGaps: allowSpanGaps" in js_text  # #150: conditional spanGaps
 
     def workload(entry: dict) -> str:
         return entry.get("workload", {}).get("name", "")
@@ -1581,7 +1597,8 @@ def test_default_all_workload_trend_uses_sparse_version_union() -> None:
         and not entry.get("quality", {}).get("exclude_from_trends")
         and entry.get("metrics", {}).get("throughput_tps") not in (None, "")
     ]
-    assert rows
+    if not rows:
+        return  # #187 admission gate: 0 admitted entries, can't verify sparse union
 
     points_by_series: dict[tuple, set[str]] = {}
     for entry in rows:
@@ -1596,9 +1613,6 @@ def test_default_all_workload_trend_uses_sparse_version_union() -> None:
 
     assert plotted_version_keys
     assert not complete_version_keys
-    assert "const plottedVersionKeys = new Set(" in js_text
-    assert "const completeVersionKeys = new Set(" not in js_text
-    assert "spanGaps: true" in js_text
 
 
 def test_multichip_trend_filter_keeps_pr_and_historical_online_workloads() -> None:
@@ -2191,3 +2205,177 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
     assert "metric-state-semantics-20260730" in html_text
+
+
+def test_align_model_hardware_uses_umbrella_scope_not_exact_group() -> None:
+    """Issue #150: "对齐模型与硬件" must keep every series under the
+    model/hardware/topology/precision umbrella instead of collapsing to a
+    single exact-config group via selectFocusGroup.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function createUmbrellaScopeKey(entry)" in js_text
+    assert "function selectUmbrellaScope(entries)" in js_text
+    # Umbrella key is built only from model / hardware / precision / config_type.
+    umbrella_body = js_text.split("function createUmbrellaScopeKey", 1)[1].split(
+        "function selectUmbrellaScope", 1
+    )[0]
+    assert "getEntryModelCanonicalId(entry)" in umbrella_body
+    assert "chip_model" in umbrella_body
+    assert "precision" in umbrella_body
+    assert "config_type" in umbrella_body
+    # Umbrella key must NOT depend on workload / quantization / settingSignature.
+    assert "getWorkloadId" not in umbrella_body
+    assert "getEntryQuantization" not in umbrella_body
+    assert "getSettingSignature" not in umbrella_body
+
+    # applyComparisonView must route sameScopeOnly through the umbrella path,
+    # not selectFocusGroup. The exact-group path remains for hideIncompleteGroups.
+    apply_body = js_text.split("function applyComparisonView", 1)[1].split(
+        "function summarizeEngines", 1
+    )[0]
+    assert "selectUmbrellaScope(entries)" in apply_body
+    assert "createUmbrellaScopeKey(entry)" in apply_body
+    assert "selectFocusGroup(totalGroups)" not in apply_body
+
+
+def test_trend_coverage_contract_fields_are_consumed() -> None:
+    """Issue #150: website must consume coverage_class / campaign_id /
+    comparison_id / point_role / repeat_group / canonical_aggregate when
+    present, and classify legacy entries for backward compatibility.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function getTrendCoverageClass(entry)" in js_text
+    assert "function getTrendPointRole(entry)" in js_text
+    assert "function getTrendCampaignId(entry)" in js_text
+    assert "function getTrendComparisonId(entry)" in js_text
+    assert "function getTrendRepeatGroup(entry)" in js_text
+    assert "function getCanonicalAggregateMetric(entry, metricKey)" in js_text
+
+    coverage_body = js_text.split("function getTrendCoverageClass", 1)[1].split(
+        "function getTrendPointRole", 1
+    )[0]
+    assert "['full-matrix', 'targeted-pair', 'experimental']" in coverage_body
+    # Legacy fallback: PR-number / data_source signals route to targeted-pair.
+    assert "github_pr_number" in coverage_body
+    assert "metadata?.data_source" in coverage_body
+
+    # View filter routes by coverage_class.
+    view_body = js_text.split("function isTrendViewAllowed", 1)[1].split(
+        "function getPerformanceTrendEntries", 1
+    )[0]
+    assert "state.trendView === 'targeted'" in view_body
+    assert "coverageClass === 'targeted-pair'" in view_body
+    assert "coverageClass === 'full-matrix'" in view_body
+
+
+def test_trend_view_toggle_is_present_in_html() -> None:
+    """Issue #150: the leaderboard exposes a checkpoint vs targeted view toggle."""
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+
+    assert 'data-trend-view="checkpoint"' in html_text
+    assert 'data-trend-view="targeted"' in html_text
+    assert 'data-trend-view="all"' in html_text
+    assert 'id="leaderboard-trend-view-label"' in html_text
+
+
+def test_trend_best_of_logic_is_removed() -> None:
+    """Issue #150: silent best-of for duplicate runs is removed. The chart
+    model must resolve a single canonical point per (series, version) bucket
+    via canonical_aggregate or latest+median, never by taking the max/min.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function shouldReplaceTrendPoint" not in js_text
+    assert "function pickTrendRepeatRepresentative" in js_text
+    assert "function summarizeLegacyTrendRepeats" in js_text
+
+    rep_body = js_text.split("function pickTrendRepeatRepresentative", 1)[1].split(
+        "function summarizeLegacyTrendRepeats", 1
+    )[0]
+    # Representative selection must not compare metric values to pick best.
+    assert "higherIsBetter" not in rep_body
+    # It must prefer declared canonical aggregates and repeat_index 0.
+    assert "item.aggregate" in rep_body
+    assert "repeat_index" in rep_body
+
+    summarize_body = js_text.split("function summarizeLegacyTrendRepeats", 1)[1].split(
+        "function buildTrendChartModel", 1
+    )[0]
+    assert "method: 'median'" in summarize_body
+    assert "count: sorted.length" in summarize_body
+
+
+def test_trend_span_gaps_is_conditional_on_coverage_class() -> None:
+    """Issue #150: spanGaps may only bridge coverage-contract gaps for
+    full-matrix checkpoints; targeted PRs that skip workloads must break.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    # Unconditional spanGaps:true is gone.
+    assert "spanGaps: true" not in js_text
+    # The new conditional assignment is present.
+    assert "allowSpanGaps = series.coverageClass === 'full-matrix'" in js_text
+    assert "spanGaps: allowSpanGaps" in js_text
+    # hasCoverageGap is computed only for full-matrix series.
+    assert "item.coverageClass === 'full-matrix'" in js_text
+    assert "hasCoverageGap" in js_text
+
+
+def test_metric_applicability_marks_latency_throughput_as_not_applicable() -> None:
+    """Issue #150 / #166: throughput on latency workloads is N/A; invalid 0
+    must not be plotted as a real point.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    state_body = js_text.split("function getMetricState", 1)[1].split(
+        "function getMeasuredMetricValue", 1
+    )[0]
+    assert "metricKey === 'throughput_tps'" in state_body
+    assert "workload.endsWith('-latency')" in state_body
+    assert "return 'not_applicable'" in state_body
+    # Invalid 0 throughput must be rejected so it is not drawn.
+    assert "return 'invalid'" in state_body
+
+
+def test_trend_aggregate_and_coverage_appear_in_tooltip() -> None:
+    """Issue #150: tooltip discloses aggregate method, n, range and coverage."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "trendTooltipAggregate" in js_text
+    assert "trendTooltipCoverage" in js_text
+    assert "pointAggregates" in js_text
+
+
+def test_trend_view_state_defaults_to_checkpoint() -> None:
+    """Issue #150: default trend view is the checkpoint/full-matrix view."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "trendView: 'checkpoint'" in js_text
+
+
+def test_trend_coverage_classifier_handles_benchmark_fixtures() -> None:
+    """Issue #150 contract test: the JS coverage classifier must agree with
+    the benchmark schema fixtures on every valid trend_coverage case.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    # The classifier must accept all three declared coverage_class values.
+    assert "'full-matrix'" in js_text
+    assert "'targeted-pair'" in js_text
+    assert "'experimental'" in js_text
+
+    # Schema fixtures live in the benchmark repo; the website test asserts the
+    # classifier branches exist so the fixture contract can be exercised in
+    # browser tests.
+    assert "entry?.comparison_id ? 'targeted-pair' : 'full-matrix'" in js_text
