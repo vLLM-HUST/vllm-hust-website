@@ -915,6 +915,30 @@
     color: #ffffff;
 }
 
+.trend-view-button {
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+
+.trend-view-button:hover {
+    border-color: #60a5fa;
+    color: #1d4ed8;
+}
+
+.trend-view-button.active {
+    background: #334155;
+    border-color: #334155;
+    color: #ffffff;
+}
+
 .trend-chart-wrap {
     position: relative;
     z-index: 1;
@@ -2174,6 +2198,7 @@ body[data-page="leaderboard"] .trend-panel-head h3 {
 body[data-page="leaderboard"] .tab-button,
 body[data-page="leaderboard"] .trend-metric-button,
 body[data-page="leaderboard"] .trend-axis-button,
+body[data-page="leaderboard"] .trend-view-button,
 body[data-page="leaderboard"] .pagination-btn,
 body[data-page="leaderboard"] .btn-reset-filters,
 body[data-page="leaderboard"] .btn-details {
@@ -2191,7 +2216,8 @@ body[data-page="leaderboard"] .btn-details:hover {
     color: #ffffff;
 }
 
-body[data-page="leaderboard"] .trend-axis-button.active {
+body[data-page="leaderboard"] .trend-axis-button.active,
+body[data-page="leaderboard"] .trend-view-button.active {
     border-color: rgba(148, 163, 184, 0.72);
     background: rgba(148, 163, 184, 0.24);
     color: #ffffff;
