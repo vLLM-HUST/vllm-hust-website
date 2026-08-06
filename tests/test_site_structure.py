@@ -1452,14 +1452,20 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function renderTrendSeriesControl(series)" in js_text
     assert "state.trendChart.setDatasetVisibility(datasetIndex, visible)" in js_text
     assert "pointDetails" in js_text
-    assert "spanGaps: true" in js_text
-    assert "Keep one series continuous across x-axis slots" in js_text
+    # Issue #150: spanGaps is now conditional on coverage_class so targeted PRs
+    # that skip workloads break the line instead of bridging gaps.
+    assert "spanGaps: allowSpanGaps" in js_text
+    assert "allowSpanGaps = series.coverageClass === 'full-matrix'" in js_text
     assert "function getTrendAxisValues(datasets)" in js_text
     assert "function getFiniteTrendMetricValue(entry, metricKey)" in js_text
     assert "rawValue === null || rawValue === undefined || rawValue === ''" in js_text
+    # Issue #150: buildTrendChartModel now resolves a canonical point per
+    # (series, version) bucket instead of taking best-of; the measured value
+    # is read into `measured` and the canonical aggregate drives the plotted y.
     assert (
-        "const value = getFiniteTrendMetricValue(entry, metricConfig.key);" in js_text
+        "const measured = getFiniteTrendMetricValue(entry, metricConfig.key);" in js_text
     )
+    assert "function getCanonicalAggregateMetric(entry, metricKey)" in js_text
     assert "function shouldUseLogTrendAxis()" in js_text
     assert "trendAxisScale: 'auto'" in js_text
     assert "const BROKEN_TREND_AXIS_RATIO_THRESHOLD = 8;" in js_text
