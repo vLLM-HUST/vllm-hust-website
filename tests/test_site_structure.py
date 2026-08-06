@@ -1463,7 +1463,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     # (series, version) bucket instead of taking best-of; the measured value
     # is read into `measured` and the canonical aggregate drives the plotted y.
     assert (
-        "const measured = getFiniteTrendMetricValue(entry, metricConfig.key);" in js_text
+        "const measured = getFiniteTrendMetricValue(entry, metricConfig.key);"
+        in js_text
     )
     assert "function getCanonicalAggregateMetric(entry, metricKey)" in js_text
     assert "function shouldUseLogTrendAxis()" in js_text
