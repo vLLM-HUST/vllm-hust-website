@@ -2191,3 +2191,85 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
     assert "metric-state-semantics-20260730" in html_text
+
+
+def test_issues_page_exists_and_has_nav() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "issues.html").read_text(encoding="utf-8")
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+
+    assert 'data-page="issues"' in html_text
+    assert 'id="nav-issues"' in html_text
+    assert 'href="./issues.html"' in html_text
+    assert 'id="issue-list"' in html_text
+    assert 'id="issues-loading"' in html_text
+    assert 'id="issues-error"' in html_text
+    assert 'id="issues-content"' in html_text
+    assert "assets/issues-page.js?v=" in html_text
+    assert "assets/site.css?v=upstream-qwen-community-20260727" in html_text
+    assert "assets/subpages.css?v=leaderboard-contrast-system-20260730" in html_text
+    assert "assets/site.js?v=engine-and-proving-ground-20260728" in html_text
+    assert "window.vllmHustIssuesDataUrl" in html_text
+    assert "./data/issues.json" in html_text
+    assert "navIssues: 'Issues'" in site_js
+    assert "navIssues: '议题'" in site_js
+
+
+def test_issues_data_has_three_tracked_issues() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads((root / "data" / "issues.json").read_text(encoding="utf-8"))
+
+    assert data["source_repo"] == "vLLM-HUST/vllm-hust-benchmark"
+    issues = data["issues"]
+    assert len(issues) == 3
+
+    numbers = [issue["number"] for issue in issues]
+    assert numbers == [135, 134, 127]
+
+    for issue in issues:
+        assert "title" in issue and "en" in issue["title"] and "zh" in issue["title"]
+        assert (
+            "summary" in issue and "en" in issue["summary"] and "zh" in issue["summary"]
+        )
+        assert "category" in issue
+        assert "status" in issue
+        assert "status_label" in issue
+        assert "acceptance_criteria" in issue
+        assert "tags" in issue
+        assert "links" in issue
+        assert "pr" in issue
+        assert "number" in issue["pr"]
+        assert "state" in issue["pr"]
+        assert "url" in issue["pr"]
+
+
+def test_all_pages_have_issues_nav_link() -> None:
+    root = Path(__file__).resolve().parents[1]
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+
+    for name in (
+        "index.html",
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+        "conferences.html",
+        "courses.html",
+        "issues.html",
+    ):
+        text = (root / name).read_text(encoding="utf-8")
+        assert 'id="nav-issues"' in text, f"{name} should have the Issues nav link"
+        assert 'href="./issues.html"' in text, f"{name} should link to issues.html"
+
+    assert "navIssues: 'Issues'" in site_js
+    assert "navIssues: '议题'" in site_js
+    assert "setText('nav-issues', common.navIssues);" in site_js
+
+
+def test_site_js_has_issues_nav_i18n() -> None:
+    root = Path(__file__).resolve().parents[1]
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+
+    assert "navIssues: 'Issues'" in site_js
+    assert "navIssues: '议题'" in site_js
+    assert "setText('nav-issues', common.navIssues);" in site_js
+    assert "navWorkshop" not in site_js
