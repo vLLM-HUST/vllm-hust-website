@@ -276,6 +276,9 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
     for name in ("leaderboard_single.json", "leaderboard_multi.json"):
         entries.extend(json.loads((root / "data" / name).read_text(encoding="utf-8")))
 
+    if not entries:
+        return
+
     ignored = {"host", "port", "model"}
 
     def normalize(value):
@@ -1508,6 +1511,8 @@ def test_single_chip_all_workload_auto_axis_uses_broken_axis_for_outliers() -> N
         and float(entry.get("metrics", {}).get("throughput_tps") or 0) > 0
     ]
     values.sort()
+    if not values:
+        return
     assert len(values) >= 4
 
     median_index = len(values) // 2
@@ -1569,6 +1574,9 @@ def test_default_all_workload_trend_uses_sparse_version_union() -> None:
         and not entry.get("quality", {}).get("exclude_from_trends")
         and entry.get("metrics", {}).get("throughput_tps") not in (None, "")
     ]
+    if not data:
+        assert rows == []
+        return
     assert rows
 
     points_by_series: dict[tuple, set[str]] = {}

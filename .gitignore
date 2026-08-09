@@ -38,6 +38,13 @@ Thumbs.db
 *.log
 .pre-commit-cache/
 .website-deploy/
+.planning/
+.playwright-cli/
+output/
+tmp/
+findings.md
+progress.md
+task_plan.md
 .env
 .env.local
 .env.*
