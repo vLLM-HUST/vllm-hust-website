@@ -5062,6 +5062,48 @@
           "en": ""
         },
         "contribution_areas": ""
+      },
+      {
+        "name": "LuckyWindovo",
+        "github_login": "LuckyWindovo",
+        "github_url": "https://github.com/LuckyWindovo",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "杜雨枫",
+        "chinese_name": "杜雨枫",
+        "english_name": "",
+        "person_id": "github:luckywindovo",
+        "identity_confirmed": true,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "大模型推理系统与性能建模",
+          "en": "LLM inference systems and performance modeling"
+        },
+        "participation_direction": {
+          "zh": "Ascend Serving Roofline",
+          "en": "Ascend Serving Roofline"
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "contribution_areas": "",
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       }
     ],
     "staff_members": [
