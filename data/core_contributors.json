@@ -103,8 +103,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "实习生",
-          "en": "Student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
@@ -1033,8 +1033,8 @@
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "外校实习生",
-          "en": "Visiting student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -1125,8 +1125,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "华科大三实习生",
-          "en": "HUST third-year undergraduate intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
@@ -1397,8 +1397,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "即将入学的研究生",
-          "en": "Incoming graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
@@ -1955,8 +1955,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "实习生",
-          "en": "Student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
@@ -2275,8 +2275,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "华科大三实习生",
-          "en": "HUST third-year undergraduate intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
@@ -2320,8 +2320,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "即将入学的研究生",
-          "en": "Incoming graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
@@ -2831,8 +2831,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "实习生",
-          "en": "Student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
@@ -3151,8 +3151,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "华科大三实习生",
-          "en": "HUST third-year undergraduate intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
@@ -3196,8 +3196,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "即将入学的研究生",
-          "en": "Incoming graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
@@ -3332,8 +3332,8 @@
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "外校实习生",
-          "en": "Visiting student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -3462,8 +3462,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "2027 年待入学学生",
-          "en": "Incoming student (2027 cohort)"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "大模型推理方向待定；愿意根据课题安排探索相关研究",
@@ -4018,8 +4018,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "马上入学的华科研究生",
-          "en": "Incoming HUST graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "分布式推理加速",
@@ -4147,8 +4147,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "2027 年待入学学生",
-          "en": "Incoming student (2027 cohort)"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "待定",
@@ -4655,8 +4655,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "已毕业博士生，目前已入职高校",
-          "en": "PhD alumnus, now university faculty"
+          "zh": "教师",
+          "en": "Faculty"
         },
         "research_direction": {
           "zh": "",
