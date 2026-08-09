@@ -4655,8 +4655,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "教师",
-          "en": "Faculty"
+          "zh": "已毕业",
+          "en": "Graduated"
         },
         "research_direction": {
           "zh": "",
