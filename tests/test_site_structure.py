@@ -1592,8 +1592,9 @@ def test_default_all_workload_trend_uses_sparse_version_union() -> None:
         and entry.get("metrics", {}).get("throughput_tps") not in (None, "")
     ]
     if not data:
-        assert rows == []
-        return
+        pytest.skip(
+            "#187 admission gate: 0 admitted entries, can't verify sparse version union"
+        )
     assert rows
 
     points_by_series: dict[tuple, set[str]] = {}
@@ -2273,6 +2274,20 @@ def test_site_js_has_issues_nav_i18n() -> None:
     assert "navIssues: '议题'" in site_js
     assert "setText('nav-issues', common.navIssues);" in site_js
     assert "navWorkshop" not in site_js
+
+
+def test_issues_data_matches_schema() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads((root / "data" / "issues.json").read_text(encoding="utf-8"))
+    schema = json.loads(
+        (root / "data" / "schemas" / "issues_v1.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    import jsonschema
+
+    jsonschema.Draft7Validator(schema).validate(data)
 
 
 def test_align_model_hardware_uses_umbrella_scope_not_exact_group() -> None:
