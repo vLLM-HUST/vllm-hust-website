@@ -2561,3 +2561,118 @@ def test_checkpoint_view_excludes_targeted_entries() -> None:
     assert {e["entry_id"] for e in checkpoint} == {"a", "d"}
     assert {e["entry_id"] for e in targeted} == {"b", "c"}
     assert len(all_view) == 4
+
+
+# --- Official fixed-target card (issue #168) -----------------------------
+
+
+def test_leaderboard_has_official_target_card_markup() -> None:
+    """The leaderboard page must expose the fixed-target card section and load
+    its renderer, but must not hard-code the target configuration.
+    """
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "leaderboard.html").read_text(encoding="utf-8")
+
+    assert 'id="official-target-card"' in text
+    assert 'id="official-target-eyebrow"' in text
+    assert 'id="official-target-title"' in text
+    assert 'id="official-target-body"' in text
+    assert "./assets/official-targets.js" in text
+
+    # The card must not embed the active target config (issue #168 forbids
+    # hard-coding config in the frontend).
+    for forbidden in ("910B2", "Qwen", "0.18.0", "32768", "0.6"):
+        assert not re.search(rf"\b{re.escape(forbidden)}\b", text), (
+            f"leaderboard.html must not hard-code target config: {forbidden}"
+        )
+
+
+def test_official_target_data_matches_schema() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads(
+        (root / "data" / "official_targets.json").read_text(encoding="utf-8")
+    )
+    schema = json.loads(
+        (
+            root / "data" / "schemas" / "official_target_registry_v1.schema.json"
+        ).read_text(encoding="utf-8")
+    )
+
+    import jsonschema
+
+    jsonschema.Draft7Validator(schema).validate(data)
+
+
+def test_official_target_mirror_matches_sha256_sidecar() -> None:
+    """The repo-hosted mirror must match the published SHA-256 sidecar so the
+    local fallback is provably byte-identical to the benchmark registry.
+    """
+    root = Path(__file__).resolve().parents[1]
+    import hashlib
+
+    data_path = root / "data" / "official_targets.json"
+    sidecar = (
+        (root / "data" / "official_targets.sha256").read_text(encoding="utf-8").strip()
+    )
+    expected = sidecar.split()[0]
+
+    actual = hashlib.sha256(data_path.read_bytes()).hexdigest()
+    assert actual == expected
+
+
+def test_official_target_fail_closed_classification() -> None:
+    """The official view is fail-closed: only active + public-leaderboard
+    targets are eligible, and 3B perfgate targets must never be promoted into
+    the public fixed-target view.
+    """
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads(
+        (root / "data" / "official_targets.json").read_text(encoding="utf-8")
+    )
+    targets = data["targets"]
+
+    # At least one active public target must exist so the card renders.
+    official = [
+        t
+        for t in targets
+        if t.get("status") == "active" and t.get("intended_use") == "public-leaderboard"
+    ]
+    assert official, "registry must contain an active public fixed target"
+
+    # No target may be both perfgate/3B and an active public target.
+    for target in targets:
+        perfgate = target.get("intended_use") == "perfgate"
+        params = target.get("model", {}).get("parameters", "")
+        if perfgate or params == "3B":
+            assert not (
+                target.get("status") == "active"
+                and target.get("intended_use") == "public-leaderboard"
+            ), (
+                f"perfgate/3B target must not be an active public target: {target.get('target_id')}"
+            )
+
+    # The 3B perfgate must not be a public-leaderboard target (issue #168:
+    # 3B perfgate is CI-only and never promoted into the public view).
+    for target in targets:
+        if target.get("model", {}).get("parameters") == "3B":
+            assert target.get("intended_use") == "perfgate", (
+                f"3B target must be perfgate-only: {target.get('target_id')}"
+            )
+
+
+def test_official_target_js_does_not_hardcode_config() -> None:
+    """The renderer must read the registry at runtime and must not embed the
+    active target configuration (issue #168: no hard-coded config in JS).
+    """
+    root = Path(__file__).resolve().parents[1]
+    js = (root / "assets" / "official-targets.js").read_text(encoding="utf-8")
+
+    for forbidden in ("910B2", "Qwen", "0.18.0", "32768", "0.6"):
+        assert not re.search(rf"\b{re.escape(forbidden)}\b", js), (
+            f"official-targets.js must not hard-code target config: {forbidden}"
+        )
+
+    # The renderer must consume the central contract, not local constants.
+    assert "official-targets.json" in js
+    assert "intended_use" in js
+    assert "public-leaderboard" in js
