@@ -254,6 +254,12 @@
             trendSeriesSinglePoint: 'current result · 1 point',
             trendTooltipActualValue: 'Actual',
             trendTooltipBrokenAxis: 'shown on broken axis',
+            trendTooltipAggregate: 'Aggregate',
+            trendTooltipCoverage: 'Coverage',
+            trendViewLabel: 'Trend view',
+            trendViewCheckpoint: 'Checkpoint',
+            trendViewTargeted: 'Targeted PR',
+            trendViewAll: 'All',
             trendEmpty: 'No trend data under current filters.',
             trendTooltipVersion: 'Version',
             trendTooltipDate: 'Submitted',
@@ -479,6 +485,12 @@
             trendSeriesConfigDetails: '相关配置',
             trendTooltipActualValue: '实际值',
             trendTooltipBrokenAxis: '断轴显示',
+            trendTooltipAggregate: '聚合',
+            trendTooltipCoverage: '覆盖类型',
+            trendViewLabel: '趋势视图',
+            trendViewCheckpoint: '检查点',
+            trendViewTargeted: '专项 PR',
+            trendViewAll: '全部',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
             trendTooltipVersion: '版本',
             trendTooltipDate: '提交时间',
@@ -529,6 +541,7 @@
         },
         chartMetric: 'throughput_tps',
         trendAxisScale: 'auto',
+        trendView: 'checkpoint',
         trendChart: null,
         trendSeries: [],
         hiddenTrendSeries: new Set(),
@@ -759,6 +772,18 @@
         const workload = getWorkloadId(entry).toLowerCase();
         if ((metricKey === 'ttft_ms' || metricKey === 'tbt_ms') && value === 0) {
             return workload.endsWith('-throughput') ? 'not_applicable' : 'invalid';
+        }
+        // latency workloads do not produce a steady-state throughput; the
+        // recorded 0 / null must surface as N/A instead of being plotted
+        // (issue #150 / #166). Throughput 0 on any other workload is an
+        // invalid measurement and must not be drawn as a real point.
+        if (metricKey === 'throughput_tps') {
+            if (workload.endsWith('-latency')) {
+                return 'not_applicable';
+            }
+            if (value === 0) {
+                return 'invalid';
+            }
         }
         if (metricKey === 'peak_mem_mb' && value === 0) {
             return 'missing';
@@ -2059,9 +2084,102 @@
         return SERVING_TREND_WORKLOAD_SUFFIXES.some((suffix) => workload.endsWith(`-${suffix}`));
     }
 
+    // Classify a trend entry by its coverage contract. New snapshots declare
+    // `coverage_class` explicitly; legacy entries are classified from
+    // metadata.data_source / github_pr_number so the trend view can still
+    // separate checkpoint runs from targeted PR comparisons (issue #150).
+    function getTrendCoverageClass(entry) {
+        const declared = String(entry?.coverage_class || '').trim();
+        if (['full-matrix', 'targeted-pair', 'experimental'].includes(declared)) {
+            return declared;
+        }
+        if (entry?.trend_schema_version || entry?.trend_status) {
+            // Migrating snapshot that forgot coverage_class: treat as full-matrix
+            // unless a comparison_id is present.
+            return entry?.comparison_id ? 'targeted-pair' : 'full-matrix';
+        }
+        const prNumber = Number(entry?.github_pr_number);
+        const prUrl = String(entry?.github_pr_url || '').trim();
+        if (Number.isFinite(prNumber) && prNumber > 0) {
+            return 'targeted-pair';
+        }
+        if (prUrl) {
+            return 'targeted-pair';
+        }
+        const dataSource = String(entry?.metadata?.data_source || '').toLowerCase();
+        if (dataSource.includes('pr') || dataSource.includes('comparison')) {
+            return 'targeted-pair';
+        }
+        return 'full-matrix';
+    }
+
+    function getTrendPointRole(entry) {
+        const role = String(entry?.point_role || '').trim();
+        if (['baseline', 'head', 'checkpoint'].includes(role)) {
+            return role;
+        }
+        // Legacy inference: non-vllm-hust engines act as baseline references.
+        return isTrendBaselineEntry(entry) ? 'baseline' : 'checkpoint';
+    }
+
+    function getTrendCampaignId(entry) {
+        return String(entry?.campaign_id || '').trim();
+    }
+
+    function getTrendComparisonId(entry) {
+        return String(entry?.comparison_id || '').trim();
+    }
+
+    function getTrendRepeatGroup(entry) {
+        return String(entry?.repeat_group || '').trim();
+    }
+
+    // Resolve the canonical aggregate value for a metric. New snapshots declare
+    // `canonical_aggregate`; legacy entries fall back to the recorded metric
+    // value with count=1. Returns null when the metric is not measured.
+    function getCanonicalAggregateMetric(entry, metricKey) {
+        const aggregate = entry?.canonical_aggregate;
+        if (aggregate && aggregate.metrics && aggregate.metrics[metricKey]) {
+            const metric = aggregate.metrics[metricKey];
+            const value = Number(metric.value);
+            if (!Number.isFinite(value)) {
+                return null;
+            }
+            return {
+                value,
+                method: String(aggregate.method || 'latest'),
+                count: Number(aggregate.count) || 1,
+                min: Number.isFinite(Number(metric.min)) ? Number(metric.min) : null,
+                max: Number.isFinite(Number(metric.max)) ? Number(metric.max) : null,
+                std: Number.isFinite(Number(metric.std)) ? Number(metric.std) : null,
+            };
+        }
+        const value = getMeasuredMetricValue(entry, metricKey);
+        if (value === null) {
+            return null;
+        }
+        return { value, method: 'latest', count: 1, min: null, max: null, std: null };
+    }
+
+    function isTrendViewAllowed(entry) {
+        const coverageClass = getTrendCoverageClass(entry);
+        if (state.trendView === 'targeted') {
+            return coverageClass === 'targeted-pair';
+        }
+        if (state.trendView === 'all') {
+            return true;
+        }
+        // Default checkpoint view: full-matrix plus legacy entries (which are
+        // already classified as full-matrix by getTrendCoverageClass).
+        return coverageClass === 'full-matrix';
+    }
+
     function getPerformanceTrendEntries(entries, selectedWorkload) {
         return entries.filter((entry) => {
             if (shouldExcludeFromTrends(entry)) {
+                return false;
+            }
+            if (!isTrendViewAllowed(entry)) {
                 return false;
             }
             if (selectedWorkload !== 'all') {
@@ -2682,28 +2800,69 @@
         return isTrendBaselineEntry(entry) ? `${t('baseline')} ${version}` : version;
     }
 
-    function shouldReplaceTrendPoint(currentEntry, candidateEntry, metricConfig) {
-        if (!currentEntry) {
-            return true;
-        }
-        const currentValue = getFiniteTrendMetricValue(currentEntry, metricConfig.key);
-        const candidateValue = getFiniteTrendMetricValue(candidateEntry, metricConfig.key);
-        if (candidateValue === null) {
-            return false;
-        }
-        if (currentValue === null) {
-            return true;
-        }
-        if (candidateValue !== currentValue) {
-            return metricConfig.higherIsBetter
-                ? candidateValue > currentValue
-                : candidateValue < currentValue;
-        }
-        return getEntryTimestamp(candidateEntry) > getEntryTimestamp(currentEntry);
-    }
-
     function getFiniteTrendMetricValue(entry, metricKey) {
         return getMeasuredMetricValue(entry, metricKey);
+    }
+
+    // Pick a single representative entry for a (series, version) bucket when
+    // multiple repeat runs land on the same x-axis slot. New snapshots declare
+    // a canonical_aggregate per repeat_group, so we prefer the entry whose
+    // aggregate we can show. Legacy entries without repeat_group fall back to
+    // the latest run; we never silently take the best value (issue #150).
+    function pickTrendRepeatRepresentative(candidates, metricConfig) {
+        if (!candidates.length) {
+            return null;
+        }
+        const withAggregate = candidates.filter(
+            (item) => item.aggregate && Number.isFinite(item.aggregate.value)
+        );
+        const pool = withAggregate.length ? withAggregate : candidates;
+        // Prefer repeat_index 0 when declared (canonical run), then the latest
+        // submission timestamp. Equal timestamps fall back to entry_id to keep
+        // the order deterministic.
+        return [...pool].sort((a, b) => {
+            const aRepeat = Number(a.entry?.repeat_index);
+            const bRepeat = Number(b.entry?.repeat_index);
+            const aHasRepeat = Number.isFinite(aRepeat);
+            const bHasRepeat = Number.isFinite(bRepeat);
+            if (aHasRepeat && bHasRepeat && aRepeat !== bRepeat) {
+                return aRepeat - bRepeat;
+            }
+            const aTime = getEntryTimestamp(a.entry);
+            const bTime = getEntryTimestamp(b.entry);
+            if (aTime !== bTime) {
+                return bTime - aTime;
+            }
+            return String(a.entry?.entry_id || '').localeCompare(String(b.entry?.entry_id || ''));
+        })[0] || null;
+    }
+
+    // For legacy repeat runs without canonical_aggregate, compute a median
+    // across the bucket so the tooltip can still disclose n and range instead
+    // of silently picking the best value (issue #150).
+    function summarizeLegacyTrendRepeats(candidates, metricConfig) {
+        if (!candidates.length) {
+            return null;
+        }
+        const values = candidates
+            .map((item) => item.value)
+            .filter((value) => Number.isFinite(value));
+        if (!values.length) {
+            return null;
+        }
+        const sorted = [...values].sort((a, b) => a - b);
+        const middle = Math.floor(sorted.length / 2);
+        const median = sorted.length % 2 === 0
+            ? (sorted[middle - 1] + sorted[middle]) / 2
+            : sorted[middle];
+        return {
+            value: median,
+            method: 'median',
+            count: sorted.length,
+            min: sorted[0],
+            max: sorted[sorted.length - 1],
+            std: null,
+        };
     }
 
     function buildTrendChartModel(entries, metricConfig, defaultEntries = entries) {
@@ -2744,15 +2903,58 @@
             }
         });
 
-        // Second pass: populate series data only from entries with valid metric values
+        // Second pass: collect candidate points per (series, version). Repeat
+        // runs that share a repeat_group (or fall in the same bucket for
+        // legacy data) are grouped so we can resolve a single canonical point
+        // without silently taking the best value (issue #150).
+        const bucketMap = new Map();
         entries.forEach((entry) => {
-            const value = getFiniteTrendMetricValue(entry, metricConfig.key);
-            if (value === null) {
+            const measured = getFiniteTrendMetricValue(entry, metricConfig.key);
+            const aggregate = getCanonicalAggregateMetric(entry, metricConfig.key);
+            // Skip entries whose metric is not measurable. N/A / invalid / missing
+            // states must not be plotted as 0 (issue #150 / #166).
+            if (measured === null && !aggregate) {
+                return;
+            }
+            const value = aggregate ? aggregate.value : measured;
+            if (value === null || !Number.isFinite(value)) {
                 return;
             }
 
             const versionKey = getTrendVersionKey(entry);
             const seriesKey = getTrendSeriesKey(entry);
+            const bucketKey = `${seriesKey}::${versionKey}`;
+            if (!bucketMap.has(bucketKey)) {
+                bucketMap.set(bucketKey, {
+                    seriesKey,
+                    versionKey,
+                    candidates: [],
+                });
+            }
+            bucketMap.get(bucketKey).candidates.push({ entry, value, aggregate });
+        });
+
+        bucketMap.forEach((bucket) => {
+            const representative = pickTrendRepeatRepresentative(bucket.candidates, metricConfig);
+            if (!representative) {
+                return;
+            }
+            // If the representative comes from a legacy run (no canonical_aggregate
+            // declared), summarize the full bucket so n / range stay visible.
+            let aggregate = representative.aggregate;
+            if (!aggregate) {
+                aggregate = summarizeLegacyTrendRepeats(bucket.candidates, metricConfig) || {
+                    value: representative.value,
+                    method: 'latest',
+                    count: 1,
+                    min: null,
+                    max: null,
+                    std: null,
+                };
+            }
+
+            const entry = representative.entry;
+            const seriesKey = bucket.seriesKey;
             if (!seriesMap.has(seriesKey)) {
                 seriesMap.set(seriesKey, {
                     key: seriesKey,
@@ -2761,14 +2963,18 @@
                     model: getEntryModelDisplayName(entry) || 'Unknown model',
                     hardware: getConfigText(entry).replace('<br><small>', ' ').replace('</small>', ''),
                     precision: formatPrecisionWithQuantization(entry),
+                    coverageClass: getTrendCoverageClass(entry),
+                    campaignId: getTrendCampaignId(entry),
+                    comparisonId: getTrendComparisonId(entry),
                     points: new Map(),
                 });
             }
             const series = seriesMap.get(seriesKey);
-            const currentPoint = series.points.get(versionKey);
-            if (shouldReplaceTrendPoint(currentPoint?.entry, entry, metricConfig)) {
-                series.points.set(versionKey, { entry, value });
-            }
+            series.points.set(bucket.versionKey, {
+                entry,
+                value: aggregate.value,
+                aggregate,
+            });
         });
 
         const candidateVersions = [...versionMap.values()].sort((left, right) => {
@@ -2799,11 +3005,30 @@
                 ...item,
                 points: new Map([...item.points].filter(([key]) => plottedVersionKeys.has(key))),
             }))
-            .map((item) => ({
-                ...item,
-                pointCount: item.points.size,
-                latestIndex: Math.max(...[...item.points.keys()].map((key) => versionIndex.get(key) ?? -1)),
-            }))
+            .map((item) => {
+                const versionKeys = [...item.points.keys()];
+                const indices = versionKeys.map((key) => versionIndex.get(key) ?? -1);
+                // A coverage gap is a missing x-axis slot between two plotted
+                // points that the series' coverage contract expects to cover.
+                // Only full-matrix checkpoints carry such a contract; targeted
+                // PRs that skip workloads are not gaps (issue #150).
+                let hasCoverageGap = false;
+                if (item.coverageClass === 'full-matrix' && indices.length > 1) {
+                    const sortedIndices = [...indices].sort((a, b) => a - b);
+                    for (let i = 1; i < sortedIndices.length; i += 1) {
+                        if (sortedIndices[i] - sortedIndices[i - 1] > 1) {
+                            hasCoverageGap = true;
+                            break;
+                        }
+                    }
+                }
+                return {
+                    ...item,
+                    pointCount: item.points.size,
+                    latestIndex: indices.length ? Math.max(...indices) : -1,
+                    hasCoverageGap,
+                };
+            })
             .filter((item) => item.pointCount > 0)
             .sort((left, right) => {
                 if (right.pointCount !== left.pointCount) {
@@ -3195,6 +3420,8 @@
         if (subtitleEl) subtitleEl.textContent = t('trendSubtitle');
         const axisLabelEl = document.getElementById('leaderboard-trend-axis-label');
         if (axisLabelEl) axisLabelEl.textContent = t('trendAxisLabel');
+        const viewLabelEl = document.getElementById('leaderboard-trend-view-label');
+        if (viewLabelEl) viewLabelEl.textContent = t('trendViewLabel');
         empty.textContent = t('trendEmpty');
 
         document.querySelectorAll('[data-trend-metric]').forEach((button) => {
@@ -3218,6 +3445,19 @@
             }
             button.classList.toggle('active', axis === state.trendAxisScale);
             button.setAttribute('aria-pressed', axis === state.trendAxisScale ? 'true' : 'false');
+        });
+        const viewLabels = {
+            checkpoint: t('trendViewCheckpoint'),
+            targeted: t('trendViewTargeted'),
+            all: t('trendViewAll'),
+        };
+        document.querySelectorAll('[data-trend-view]').forEach((button) => {
+            const view = button.dataset.trendView;
+            if (viewLabels[view]) {
+                button.textContent = viewLabels[view];
+            }
+            button.classList.toggle('active', view === state.trendView);
+            button.setAttribute('aria-pressed', view === state.trendView ? 'true' : 'false');
         });
 
         if (typeof Chart === 'undefined') {
@@ -3253,11 +3493,20 @@
                 const point = series.points.get(version.key);
                 return point ? getTrendPointDetails(point.entry) : null;
             });
+            const pointAggregates = model.versions.map((version) => series.points.get(version.key)?.aggregate || null);
+            // spanGaps may only bridge slots the series' coverage contract expects
+            // to cover. full-matrix checkpoints declare such a contract; targeted
+            // PRs that skip workloads are not gaps and must break the line (#150).
+            const allowSpanGaps = series.coverageClass === 'full-matrix';
             return {
                 label: series.label,
                 seriesKey: series.key,
+                coverageClass: series.coverageClass,
+                campaignId: series.campaignId,
+                comparisonId: series.comparisonId,
                 data: model.versions.map((version) => series.points.get(version.key)?.value ?? null),
                 pointDetails,
+                pointAggregates,
                 borderColor: colors.borderColor,
                 backgroundColor: colors.backgroundColor,
                 borderWidth: 2,
@@ -3265,9 +3514,7 @@
                 pointRadius: series.pointCount === 1 ? 5 : 3,
                 pointHoverRadius: 6,
                 tension: 0.28,
-                // Keep one series continuous across x-axis slots where other
-                // workload/model scopes have data but this series does not.
-                spanGaps: true,
+                spanGaps: allowSpanGaps,
                 hidden: state.hiddenTrendSeries.has(series.key),
             };
         });
@@ -3357,6 +3604,22 @@
                                     if (Number.isFinite(rawValue)) {
                                         extra.push(`${t('trendTooltipActualValue')}: ${formatNumber(rawValue)} ${metricConfig.unit}`);
                                     }
+                                }
+                                const aggregate = context.dataset.pointAggregates?.[context.dataIndex];
+                                if (aggregate && aggregate.count > 1) {
+                                    const rangeParts = [];
+                                    if (Number.isFinite(aggregate.min) && Number.isFinite(aggregate.max)) {
+                                        rangeParts.push(`${formatNumber(aggregate.min)}–${formatNumber(aggregate.max)}`);
+                                    }
+                                    extra.push(
+                                        `${t('trendTooltipAggregate')}: ${aggregate.method} · n=${aggregate.count}${
+                                            rangeParts.length ? ` · ${rangeParts[0]}` : ''
+                                        }`
+                                    );
+                                }
+                                const coverageClass = context.dataset.coverageClass;
+                                if (coverageClass) {
+                                    extra.push(`${t('trendTooltipCoverage')}: ${coverageClass}`);
                                 }
                                 return [
                                     ...extra,
@@ -3490,6 +3753,16 @@
                     return;
                 }
                 state.trendAxisScale = axis;
+                renderTable();
+            });
+        });
+        document.querySelectorAll('[data-trend-view]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const view = button.dataset.trendView;
+                if (!['checkpoint', 'targeted', 'all'].includes(view)) {
+                    return;
+                }
+                state.trendView = view;
                 renderTable();
             });
         });
@@ -5304,6 +5577,41 @@
         return [model, hardware, precision, quantization, workload, configType, chipCount, nodeCount, settingSignature].join('|');
     }
 
+    // Umbrella scope covers model / hardware / topology / precision only, matching
+    // the public文案 of "对齐模型与硬件". It keeps every workload and
+    // semantic-config series under the same umbrella, instead of collapsing to
+    // a single exact-config group (issue #150).
+    function createUmbrellaScopeKey(entry) {
+        const model = getEntryModelCanonicalId(entry) || 'unknown-model';
+        const hardware = entry?.hardware?.chip_model || 'unknown-hardware';
+        const precision = entry?.model?.precision || 'unknown-precision';
+        const configType = entry?.config_type || state.currentTab || 'unknown-config';
+        return [model, hardware, precision, configType].join('|');
+    }
+
+    function selectUmbrellaScope(entries) {
+        if (!entries.length) {
+            return null;
+        }
+        const buckets = new Map();
+        entries.forEach((entry) => {
+            const key = createUmbrellaScopeKey(entry);
+            if (!buckets.has(key)) {
+                buckets.set(key, { key, entries: [] });
+            }
+            buckets.get(key).entries.push(entry);
+        });
+        const candidates = [...buckets.values()];
+        return [...candidates].sort((a, b) => {
+            if (b.entries.length !== a.entries.length) {
+                return b.entries.length - a.entries.length;
+            }
+            const latestA = [...a.entries].sort(compareByReleaseDateDesc)[0];
+            const latestB = [...b.entries].sort(compareByReleaseDateDesc)[0];
+            return compareByReleaseDateDesc(latestB, latestA);
+        })[0] || null;
+    }
+
     function buildScopeLabel(entry) {
         const model = getEntryModelDisplayName(entry) || 'Unknown model';
         const hardware = entry?.hardware?.chip_model || 'Unknown hardware';
@@ -5427,8 +5735,16 @@
         let focusGroup = null;
 
         if (viewOptions.sameScopeOnly) {
-            focusGroup = selectFocusGroup(totalGroups);
-            visibleEntries = focusGroup ? [...focusGroup.entries] : [];
+            // "对齐模型与硬件" keeps every series under the model/hardware/topology/
+            // precision umbrella instead of collapsing to a single exact-config
+            // group (issue #150). The exact-group view remains available to the
+            // "聚焦可对比记录" toggle below.
+            const umbrella = selectUmbrellaScope(entries);
+            const umbrellaKey = umbrella?.key || '';
+            visibleEntries = umbrellaKey
+                ? entries.filter((entry) => createUmbrellaScopeKey(entry) === umbrellaKey)
+                : [];
+            focusGroup = umbrella ? { ...umbrella, isComplete: false, engineCount: 0 } : null;
         }
 
         let activeGroups = buildCompareGroups(visibleEntries);
