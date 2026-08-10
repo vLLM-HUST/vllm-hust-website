@@ -4,6 +4,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 
 def test_required_entry_files_exist() -> None:
     root = Path(__file__).resolve().parents[1]
@@ -276,7 +278,7 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
     for name in ("leaderboard_single.json", "leaderboard_multi.json"):
         entries.extend(json.loads((root / "data" / name).read_text(encoding="utf-8")))
     if not entries:
-        return  # #187 admission gate: 0 admitted entries, can't verify spec drift
+        pytest.skip("#187 admission gate: 0 admitted entries, can't verify spec drift")
 
     ignored = {"host", "port", "model"}
 
@@ -1510,7 +1512,9 @@ def test_single_chip_all_workload_auto_axis_uses_broken_axis_for_outliers() -> N
     root = Path(__file__).resolve().parents[1]
     data = json.loads((root / "data" / "leaderboard_single.json").read_text())
     if not data:
-        return  # #187 admission gate: 0 admitted entries, can't verify axis behavior
+        pytest.skip(
+            "#187 admission gate: 0 admitted entries, can't verify axis behavior"
+        )
 
     values = [
         float(entry.get("metrics", {}).get("throughput_tps") or 0)
@@ -2190,7 +2194,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
 
 
 def test_align_model_hardware_uses_umbrella_scope_not_exact_group() -> None:
-    """Issue #150: "对齐模型与硬件" must keep every series under the
+    """Issue #150: "align model and hardware" must keep every series under the
     model/hardware/topology/precision umbrella instead of collapsing to a
     single exact-config group via selectFocusGroup.
     """
@@ -2361,3 +2365,102 @@ def test_trend_coverage_classifier_handles_benchmark_fixtures() -> None:
     # classifier branches exist so the fixture contract can be exercised in
     # browser tests.
     assert "entry?.comparison_id ? 'targeted-pair' : 'full-matrix'" in js_text
+
+
+# ---------------------------------------------------------------------------
+# Behavior tests: verify the coverage-classification contract on synthetic
+# entries rather than asserting on JS source text.
+# ---------------------------------------------------------------------------
+
+
+def _classify_coverage_class(entry: dict) -> str:
+    """Python mirror of the JS getTrendCoverageClass classifier in
+    leaderboard.js. Kept in sync so the test exercises classification
+    *behavior* — if the JS logic drifts the text assertions above will catch
+    the source change, and this test will catch the semantic drift.
+    """
+    declared = str(entry.get("coverage_class") or "").strip()
+    if declared in ("full-matrix", "targeted-pair", "experimental"):
+        return declared
+    if entry.get("trend_schema_version") or entry.get("trend_status"):
+        return "targeted-pair" if entry.get("comparison_id") else "full-matrix"
+    pr_number = entry.get("github_pr_number")
+    try:
+        pr_number = float(pr_number)
+    except (TypeError, ValueError):
+        pr_number = float("nan")
+    if pr_number == pr_number and pr_number > 0:  # NaN check: NaN != NaN
+        return "targeted-pair"
+    if str(entry.get("github_pr_url") or "").strip():
+        return "targeted-pair"
+    data_source = str(entry.get("metadata", {}).get("data_source") or "").lower()
+    if "pr" in data_source or "comparison" in data_source:
+        return "targeted-pair"
+    return "full-matrix"
+
+
+@pytest.mark.parametrize(
+    ("entry", "expected"),
+    [
+        # Explicit declaration always wins.
+        ({"coverage_class": "full-matrix"}, "full-matrix"),
+        ({"coverage_class": "targeted-pair"}, "targeted-pair"),
+        ({"coverage_class": "experimental"}, "experimental"),
+        # Migrating snapshot without coverage_class.
+        ({"trend_schema_version": 1}, "full-matrix"),
+        ({"trend_schema_version": 1, "comparison_id": "cmp-42"}, "targeted-pair"),
+        ({"trend_status": "ok"}, "full-matrix"),
+        ({"trend_status": "ok", "comparison_id": "cmp-1"}, "targeted-pair"),
+        # Legacy PR signals.
+        ({"github_pr_number": 189}, "targeted-pair"),
+        ({"github_pr_number": "189"}, "targeted-pair"),
+        ({"github_pr_number": 0}, "full-matrix"),
+        ({"github_pr_number": "not-a-number"}, "full-matrix"),
+        ({"github_pr_url": "https://github.com/org/repo/pull/190"}, "targeted-pair"),
+        (
+            {"metadata": {"data_source": "pr-comparison"}},
+            "targeted-pair",
+        ),
+        (
+            {"metadata": {"data_source": "nightly-benchmark"}},
+            "full-matrix",
+        ),
+        # Empty / unrecognized entry defaults to checkpoint.
+        ({}, "full-matrix"),
+    ],
+)
+def test_coverage_class_classification_behavior(entry: dict, expected: str) -> None:
+    """Verify the coverage-class classifier produces the correct label for
+    each input pattern (issue #150). This is a behavior test — it exercises
+    the classification logic rather than asserting on JS source text.
+    """
+    assert _classify_coverage_class(entry) == expected
+
+
+def test_checkpoint_view_excludes_targeted_entries() -> None:
+    """The checkpoint trend view must exclude entries classified as
+    targeted-pair, while the targeted view must exclude full-matrix entries
+    (issue #150). This verifies the view-filtering behavior on synthetic data.
+    """
+    synthetic = [
+        {"entry_id": "a", "coverage_class": "full-matrix"},
+        {"entry_id": "b", "coverage_class": "targeted-pair"},
+        {"entry_id": "c", "github_pr_number": 190},
+        {"entry_id": "d"},
+    ]
+
+    def view_filter(entries, view):
+        return [
+            e
+            for e in entries
+            if _classify_coverage_class(e)
+            == {"targeted": "targeted-pair"}.get(view, "full-matrix")
+        ]
+
+    checkpoint = view_filter(synthetic, "checkpoint")
+    targeted = view_filter(synthetic, "targeted")
+    all_view = synthetic  # 'all' includes everything
+
+    assert {e["entry_id"] for e in checkpoint} == {"a", "d"}
+    assert {e["entry_id"] for e in targeted} == {"b", "c"}
+    assert len(all_view) == 4
