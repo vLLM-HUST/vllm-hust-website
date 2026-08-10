@@ -253,6 +253,16 @@
             trendSeriesBaselineOnly: 'baseline result · 1 point',
             trendSeriesSinglePoint: 'current result · 1 point',
             trendTooltipActualValue: 'Actual',
+            evidenceVerified: 'Verified',
+            evidenceConfigUnverified: 'Historical config unverified',
+            evidenceDrifted: 'Drifted from official spec',
+            evidenceLegacy: 'Legacy',
+            evidenceSpecialty: 'Specialty',
+            evidenceValueActual: 'recorded',
+            evidenceValueOfficial: 'official default',
+            evidenceValueMissing: 'not recorded',
+            evidenceConfigSectionTitle: 'Config evidence',
+            trendDefaultVerifiedHint: 'The aligned trend only shows verified configurations. Unverified or drifted records live in the "All" view.',
             trendTooltipBrokenAxis: 'shown on broken axis',
             trendTooltipAggregate: 'Aggregate',
             trendTooltipCoverage: 'Coverage',
@@ -484,6 +494,16 @@
             trendSeriesConfigDefault: '默认值（与基线一致）',
             trendSeriesConfigDetails: '相关配置',
             trendTooltipActualValue: '实际值',
+            evidenceVerified: '已验证',
+            evidenceConfigUnverified: '历史配置未证实',
+            evidenceDrifted: '偏离官方 spec',
+            evidenceLegacy: '历史记录',
+            evidenceSpecialty: '专项',
+            evidenceValueActual: '实际记录值',
+            evidenceValueOfficial: '官方默认值',
+            evidenceValueMissing: '历史未记录',
+            evidenceConfigSectionTitle: '配置证据',
+            trendDefaultVerifiedHint: '对齐趋势仅展示已验证配置。未验证或偏离的记录位于“全部”视图。',
             trendTooltipBrokenAxis: '断轴显示',
             trendTooltipAggregate: '聚合',
             trendTooltipCoverage: '覆盖类型',
@@ -547,7 +567,9 @@
         hiddenTrendSeries: new Set(),
         trendSeriesExpanded: false,
         tableDetailsExpanded: false,
-        loadingMore: false
+        loadingMore: false,
+        evidenceRegistry: null,
+        evidenceRegistrySource: null
     };
 
     // Initialize on DOM ready
@@ -562,7 +584,10 @@
 
     async function init() {
         setupEventListeners();
-        await loadData();
+        // Load the fixed-target registry so config evidence can be classified
+        // before the first render. It is safe to fail closed (no registry => no
+        // record is treated as verified).
+        await Promise.allSettled([loadData(), loadEvidenceRegistry()]);
         renderFilters();
         renderViewControls();
         updateTableDetailsToggle();
@@ -1858,36 +1883,216 @@
         return value;
     }
 
-    function buildTrendSpecDefaults(entries) {
-        const baselines = entries.filter((entry) => isTrendBaselineEntry(entry));
-        if (baselines.length === 0) return { server: {}, client: {} };
-        const defaults = { server: {}, client: {} };
-        for (const scope of ['server', 'client']) {
-            const sourceKey = scope === 'server' ? 'resolved_server_parameters' : 'resolved_client_parameters';
-            const baselineValues = baselines.map((e) => {
-                const params = (e.same_spec || {})[sourceKey] || {};
-                const result = {};
-                for (const key of Object.keys(params)) {
-                    if (!TREND_SEMANTIC_IGNORED_KEYS.has(key)) {
-                        result[key] = normalizeSemanticSpecValue(params[key]);
-                    }
+    // --- Config evidence state -------------------------------------------
+    //
+    // Issue #164: a record's configuration evidence is computed relative to the
+    // published fixed-target registry, never inherited from a baseline default.
+    // A record missing a critical server parameter must not silently stand in
+    // for the official default (e.g. gpu_memory_utilization=0.6). Only records
+    // whose critical parameters are present AND match the active public target
+    // are `verified`; everything else is kept out of the default aligned trend.
+
+    const EVIDENCE_STATE = Object.freeze({
+        VERIFIED: 'verified',
+        CONFIG_UNVERIFIED: 'config-unverified',
+        DRIFTED: 'drifted',
+        LEGACY: 'legacy',
+        SPECIALTY: 'specialty',
+    });
+
+    // Fields that materially determine the serving configuration. Missing values
+    // are evidence gaps, not license to adopt the baseline default.
+    const EVIDENCE_CRITICAL_SERVER_KEYS = ['gpu_memory_utilization', 'max_model_len'];
+
+    const EVIDENCE_REGISTRY_CONFIG = {
+        github: {
+            repo: 'vLLM-HUST/vllm-hust-benchmark',
+            branch: 'main',
+            path: 'leaderboard-data/official-targets.json',
+        },
+        localPath: './data/official_targets.json',
+    };
+
+    function buildEvidenceRegistryUrl() {
+        const cfg = EVIDENCE_REGISTRY_CONFIG.github;
+        return `https://raw.githubusercontent.com/${cfg.repo}/${cfg.branch}/${cfg.path}`;
+    }
+
+    // Load the fixed-target registry, remote GitHub first and the repo-hosted
+    // mirror as a local fallback. Both sources use the same registry contract, so
+    // classification is identical regardless of which source wins.
+    async function loadEvidenceRegistry() {
+        const sources = [
+            { name: 'github', url: buildEvidenceRegistryUrl() },
+            { name: 'local', url: EVIDENCE_REGISTRY_CONFIG.localPath },
+        ];
+        let lastError = null;
+        for (const source of sources) {
+            try {
+                const response = await fetch(source.url, {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-cache',
+                });
+                if (!response.ok) {
+                    throw new Error(`registry ${source.name} error: ${response.status}`);
                 }
-                return result;
-            });
-            if (baselineValues.length === 0) continue;
-            const allKeys = new Set();
-            baselineValues.forEach((v) => Object.keys(v).forEach((k) => allKeys.add(k)));
-            for (const key of allKeys) {
-                const valuesForKey = baselineValues.filter((v) => key in v);
-                if (valuesForKey.length === baselines.length) {
-                    const serialized = new Set(valuesForKey.map((v) => JSON.stringify(v[key])));
-                    if (serialized.size === 1) {
-                        defaults[scope][key] = valuesForKey[0][key];
-                    }
-                }
+                const payload = await response.json();
+                const targets = Array.isArray(payload?.targets) ? payload.targets : [];
+                state.evidenceRegistry = { payload, targets };
+                state.evidenceRegistrySource = source.name;
+                return state.evidenceRegistry;
+            } catch (error) {
+                lastError = error;
+                console.warn(`[Leaderboard] evidence registry ${source.name} load failed:`, error?.message || error);
             }
         }
-        return defaults;
+        // Fail closed: no registry means no record can be proven verified.
+        state.evidenceRegistry = { payload: null, targets: [] };
+        state.evidenceRegistrySource = 'local';
+        return state.evidenceRegistry;
+    }
+
+    function normalizeEvidenceValue(value) {
+        return normalizeSemanticSpecValue(value);
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // Match a record against an active public fixed target by workload, model and
+    // hardware. Returns the best explicit workload match or null.
+    function findEvidenceTarget(entry, targets) {
+        if (!Array.isArray(targets) || !targets.length) {
+            return null;
+        }
+        const workload = String(getWorkloadId(entry) || '').trim();
+        const model = String(getEntryModelRepoId(entry) || getEntryModelCanonicalId(entry) || '').trim();
+        const chip = String(entry?.hardware?.chip_model || '').trim();
+        let best = null;
+        for (const target of targets) {
+            if (!target || target.status !== 'active' || target.intended_use !== 'public-leaderboard') {
+                continue;
+            }
+            const tWorkload = String(target.workload?.name || '').trim();
+            const tModel = String(target.model?.id || '').trim();
+            const tChip = String(target.hardware?.chip_model || '').trim();
+            if (tModel && model && tModel !== model) {
+                continue;
+            }
+            if (tChip && chip && tChip !== chip) {
+                continue;
+            }
+            if (tWorkload && tWorkload !== workload) {
+                continue;
+            }
+            // Prefer the exact workload match; otherwise keep the last candidate.
+            if (tWorkload === workload || !best) {
+                best = target;
+            }
+        }
+        return best || null;
+    }
+
+    function getEntryCriticalServerParams(entry) {
+        const server = getSameSpecPayload(entry).resolved_server_parameters || {};
+        const out = {};
+        for (const key of EVIDENCE_CRITICAL_SERVER_KEYS) {
+            const value = server[key];
+            if (value !== undefined && value !== null) {
+                out[key] = normalizeEvidenceValue(value);
+            }
+        }
+        return out;
+    }
+
+    // Describe each critical server parameter's provenance relative to the
+    // official target so the UI can tell "recorded value" from "official
+    // default" from "not recorded" (issue #164).
+    function getConfigEvidenceRows(entry) {
+        const recorded = getEntryCriticalServerParams(entry);
+        const target = findEvidenceTarget(entry, state.evidenceRegistry?.targets || []);
+        const targetServer = target?.server_parameters || {};
+        return EVIDENCE_CRITICAL_SERVER_KEYS.map((key) => {
+            let value;
+            let kind = 'missing';
+            if (key in recorded) {
+                value = recorded[key];
+                kind = 'actual';
+            } else if (key in targetServer) {
+                value = normalizeEvidenceValue(targetServer[key]);
+                kind = 'official';
+            }
+            return { key, value: value === undefined ? null : value, kind };
+        });
+    }
+
+    function renderConfigEvidenceSection(entry) {
+        const rows = getConfigEvidenceRows(entry);
+        const evidenceLabel = getEvidenceLabel(entry);
+        const rowsHtml = rows.map(({ key, value, kind }) => {
+            const kindText = kind === 'actual'
+                ? t('evidenceValueActual')
+                : kind === 'official'
+                    ? t('evidenceValueOfficial')
+                    : t('evidenceValueMissing');
+            const display = value === null ? '—' : escapeHtml(String(value));
+            return `
+                <p class="config-evidence-row">
+                    <code>${escapeHtml(key)}</code>
+                    <span class="config-evidence-value">${display}</span>
+                    <span class="config-evidence-kind">(${escapeHtml(kindText)})</span>
+                </p>`;
+        }).join('');
+        return `
+            <div class="detail-section">
+                <h4>${escapeHtml(t('evidenceConfigSectionTitle'))}</h4>
+                <p class="config-evidence-badge">${escapeHtml(evidenceLabel || t('evidenceVerified'))}</p>
+                ${rowsHtml}
+            </div>`;
+    }
+
+    function getEvidenceState(entry) {
+        // The reference baseline itself is always treated as verified.
+        if (isTrendBaselineEntry(entry)) {
+            return EVIDENCE_STATE.VERIFIED;
+        }
+        const targets = state.evidenceRegistry?.targets || [];
+        const target = findEvidenceTarget(entry, targets);
+        if (!target) {
+            return EVIDENCE_STATE.LEGACY;
+        }
+        const params = getEntryCriticalServerParams(entry);
+        const missing = EVIDENCE_CRITICAL_SERVER_KEYS.filter((key) => !(key in params));
+        if (missing.length > 0) {
+            return EVIDENCE_STATE.CONFIG_UNVERIFIED;
+        }
+        const targetServer = target.server_parameters || {};
+        const matches = EVIDENCE_CRITICAL_SERVER_KEYS.every(
+            (key) => normalizeEvidenceValue(targetServer[key]) === params[key]
+        );
+        return matches ? EVIDENCE_STATE.VERIFIED : EVIDENCE_STATE.DRIFTED;
+    }
+
+    function getEvidenceLabel(entry) {
+        const evidenceState = getEvidenceState(entry);
+        const labels = {
+            [EVIDENCE_STATE.VERIFIED]: t('evidenceVerified'),
+            [EVIDENCE_STATE.CONFIG_UNVERIFIED]: t('evidenceConfigUnverified'),
+            [EVIDENCE_STATE.DRIFTED]: t('evidenceDrifted'),
+            [EVIDENCE_STATE.LEGACY]: t('evidenceLegacy'),
+            [EVIDENCE_STATE.SPECIALTY]: t('evidenceSpecialty'),
+        };
+        return labels[evidenceState] || '';
+    }
+
+    function isVerifiedEvidence(entry) {
+        return getEvidenceState(entry) === EVIDENCE_STATE.VERIFIED;
     }
 
     function getEffectiveSemanticSpecParameters(entry, specDefaults) {
@@ -1932,10 +2137,13 @@
     }
 
     function getSemanticSpecSignature(entry) {
-        const sameSpec = getSameSpecPayload(entry);
         const sameSpecId = getSameSpecId(entry);
         if (!sameSpecId) return null;
-        const specDefaults = buildTrendSpecDefaults([entry]);
+        // Issue #164: the semantic signature must reflect ONLY the record's own
+        // declared parameters. Missing fields stay missing and are never patched
+        // with baseline defaults, so a config-incomplete legacy record cannot
+        // collapse into the same-spec group of a fully-specified baseline.
+        const specDefaults = { server: {}, client: {} };
         const params = getEffectiveSemanticSpecParameters(entry, specDefaults);
         const client = { ...(params.client || {}) };
         const workload = entry.workload || {};
@@ -2169,9 +2377,11 @@
         if (state.trendView === 'all') {
             return true;
         }
-        // Default checkpoint view: full-matrix plus legacy entries (which are
-        // already classified as full-matrix by getTrendCoverageClass).
-        return coverageClass === 'full-matrix';
+        // Default checkpoint view: only full-matrix records with verified config
+        // evidence may enter the aligned trend. Legacy / config-unverified /
+        // drifted records are kept out and surfaced only in the "all" view
+        // (issue #164).
+        return coverageClass === 'full-matrix' && isVerifiedEvidence(entry);
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
@@ -2721,7 +2931,11 @@
         const precision = entry?.model?.precision || 'unknown-precision';
         const quantization = getEntryQuantization(entry);
         const settingSignature = getSettingSignature(entry);
-        return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');
+        // Issue #164: records with different config evidence must never share a
+        // series, so a verified point is never connected to an unverified or
+        // drifted one even in the "all" view.
+        const evidenceState = getEvidenceState(entry);
+        return [workload, model, hardware, chipCount, nodeCount, precision, quantization, evidenceState, settingSignature].join('|');
     }
 
     function getTrendSeriesLabel(entry) {
@@ -3265,11 +3479,19 @@
     }
 
     function formatTrendSeriesEvidence(item) {
-        if (item.pointCount <= 1) {
-            const isBaseline = isTrendBaselineEntry(item.points.values().next().value?.entry);
+        const firstEntry = item.points.values().next().value?.entry;
+        const evidenceLabel = getEvidenceLabel(firstEntry);
+        // Issue #164: surface non-verified evidence so the user can tell a
+        // trusted series from a config-unverified or drifted one.
+        const evidencePart = evidenceLabel
+            && getEvidenceState(firstEntry) !== EVIDENCE_STATE.VERIFIED
+            ? evidenceLabel
+            : '';
+        if (item.pointCount <= 1 && !evidencePart) {
+            const isBaseline = isTrendBaselineEntry(firstEntry);
             return isBaseline ? t('trendSeriesBaselineOnly') : t('trendSeriesSinglePoint');
         }
-        return '';
+        return evidencePart;
     }
 
     function getRelevantTrendConfigKeys(series) {
@@ -5281,6 +5503,7 @@
             <tr class="details-row ${isExpanded ? 'show' : ''}" data-details-for="${entry.entry_id}">
                 <td colspan="9" class="details-cell">
                     <div class="details-content">
+                        ${renderConfigEvidenceSection(entry)}
                         ${renderHardwareSection(entry)}
                         ${renderBuildVariantsSection(entry)}
                         ${renderVersionsSection(entry)}

@@ -228,8 +228,6 @@ def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     assert "const TREND_SEMANTIC_SPEC_VERSION = 'same-spec-semantic/v2';" in text
     assert "new Set(['host', 'port', 'model'])" in text
     assert "function normalizeSemanticSpecValue(value)" in text
-    assert "function buildTrendSpecDefaults(entries)" in text
-    assert "entries.filter((entry) => isTrendBaselineEntry(entry))" in text
     assert "function getEffectiveSemanticSpecParameters(" in text
     assert "function getEffectiveTrendWorkloadSemanticConfig(" in text
     assert "...(defaults.server || {}), ...parameters.server" in text
@@ -239,6 +237,9 @@ def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     )
     assert "delete client.input_len;" in text
     assert "delete client.output_len;" in text
+    # Issue #164: the semantic signature must not inherit baseline defaults.
+    assert "buildTrendSpecDefaults" not in text
+    assert "const specDefaults = { server: {}, client: {} };" in text
     assert setting_signature.index(
         "getSemanticSpecSignature"
     ) < setting_signature.index("resolved_spec_hash")
@@ -1419,7 +1420,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert "const quantization = getEntryQuantization(entry);" in js_text
     assert (
-        "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');"
+        "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, evidenceState, settingSignature].join('|');"
         in js_text
     )
     assert "展示当前范围内全部在线服务版本，包括 PR 与历史运行" in js_text
@@ -2676,3 +2677,268 @@ def test_official_target_js_does_not_hardcode_config() -> None:
     assert "official-targets.json" in js
     assert "intended_use" in js
     assert "public-leaderboard" in js
+
+
+# ---------------------------------------------------------------------------
+# Config evidence state (issue #164)
+# ---------------------------------------------------------------------------
+
+
+# Python mirrors of the JS config-evidence classifier in leaderboard.js. The
+# JS contract is cross-checked by the text assertions in
+# test_trend_evidence_state_contract; these mirrors exercise the *behavior* so
+# a legacy/config-unverified point can never group with a verified one.
+EVIDENCE_CRITICAL_SERVER_KEYS = ("gpu_memory_utilization", "max_model_len")
+
+
+def _normalize_evidence_value(value):
+    if value is None:
+        return None
+    if isinstance(value, str):
+        stripped = value.strip()
+        if re.fullmatch(r"-?\d+(?:\.\d+)?", stripped):
+            return float(stripped)
+        if stripped.lower() == "true":
+            return True
+        if stripped.lower() == "false":
+            return False
+        return stripped
+    return value
+
+
+def _find_evidence_target(entry, targets):
+    workload = str((entry.get("workload") or {}).get("name") or "").strip()
+    model = str((entry.get("model") or {}).get("id") or "").strip()
+    chip = str((entry.get("hardware") or {}).get("chip_model") or "").strip()
+    best = None
+    for target in targets or []:
+        if (
+            not target
+            or target.get("status") != "active"
+            or target.get("intended_use") != "public-leaderboard"
+        ):
+            continue
+        t_workload = str((target.get("workload") or {}).get("name") or "").strip()
+        t_model = str((target.get("model") or {}).get("id") or "").strip()
+        t_chip = str((target.get("hardware") or {}).get("chip_model") or "").strip()
+        if t_model and model and t_model != model:
+            continue
+        if t_chip and chip and t_chip != chip:
+            continue
+        if t_workload and t_workload != workload:
+            continue
+        if t_workload == workload or best is None:
+            best = target
+    return best
+
+
+def _entry_critical_server_params(entry):
+    same_spec = entry.get("same_spec") or {}
+    server = same_spec.get("resolved_server_parameters") or {}
+    out = {}
+    for key in EVIDENCE_CRITICAL_SERVER_KEYS:
+        value = server.get(key)
+        if value is not None:
+            out[key] = _normalize_evidence_value(value)
+    return out
+
+
+def _is_trend_baseline_entry(entry):
+    return bool(entry.get("isBaseline")) or entry.get("engine") != "vllm-hust"
+
+
+def _evidence_state(entry, targets):
+    if _is_trend_baseline_entry(entry):
+        return "verified"
+    target = _find_evidence_target(entry, targets)
+    if target is None:
+        return "legacy"
+    params = _entry_critical_server_params(entry)
+    missing = [key for key in EVIDENCE_CRITICAL_SERVER_KEYS if key not in params]
+    if missing:
+        return "config-unverified"
+    target_server = target.get("server_parameters") or {}
+    matches = all(
+        _normalize_evidence_value(target_server.get(key)) == params[key]
+        for key in EVIDENCE_CRITICAL_SERVER_KEYS
+    )
+    return "verified" if matches else "drifted"
+
+
+@pytest.fixture(scope="module")
+def official_targets():
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads(
+        (root / "data" / "official_targets.json").read_text(encoding="utf-8")
+    )
+    return data.get("targets", [])
+
+
+def _sonnet_entry(**overrides):
+    """A synthetic record for the sonnet-throughput fixed target that the issue
+    calls out (gpu_memory_utilization=0.6 / max_model_len=32768). Callers pass
+    the full ``same_spec`` dict when they want to drop a critical key.
+    """
+    entry = {
+        "engine": "vllm-hust",
+        "workload": {"name": "sonnet-throughput"},
+        "model": {"id": "Qwen/Qwen2.5-14B-Instruct"},
+        "hardware": {"chip_model": "910B2"},
+        "same_spec": {
+            "resolved_server_parameters": {
+                "gpu_memory_utilization": 0.6,
+                "max_model_len": 32768,
+            }
+        },
+    }
+    entry.update(overrides)
+    return entry
+
+
+def test_evidence_missing_gpu_memory_utilization_is_not_verified(
+    official_targets,
+) -> None:
+    """Acceptance #1: a legacy record missing gpu_memory_utilization must not
+    group with the explicit 0.6 baseline.
+    """
+    missing = _sonnet_entry(
+        same_spec={"resolved_server_parameters": {"max_model_len": 32768}}
+    )
+    verified = _sonnet_entry()
+
+    assert _evidence_state(missing, official_targets) == "config-unverified"
+    assert _evidence_state(verified, official_targets) == "verified"
+    # Different evidence state => never the same trend series.
+    assert _evidence_state(missing, official_targets) != _evidence_state(
+        verified, official_targets
+    )
+
+
+def test_evidence_missing_max_model_len_never_enters_same_spec(
+    official_targets,
+) -> None:
+    """Acceptance #2: a legacy record missing max_model_len is config-unverified
+    and therefore excluded from the verified same-spec group.
+    """
+    missing = _sonnet_entry(
+        same_spec={"resolved_server_parameters": {"gpu_memory_utilization": 0.6}}
+    )
+    assert _evidence_state(missing, official_targets) == "config-unverified"
+
+
+def test_evidence_explicit_090_drifts_from_06_target(official_targets) -> None:
+    """Acceptance #3: an explicit gpu_memory_utilization=0.90 record is drifted
+    from the 0.6 target and must not share the 0.6 curve.
+    """
+    drifted = _sonnet_entry(
+        same_spec={
+            "resolved_server_parameters": {
+                "gpu_memory_utilization": 0.90,
+                "max_model_len": 32768,
+            }
+        }
+    )
+    verified = _sonnet_entry()
+
+    assert _evidence_state(drifted, official_targets) == "drifted"
+    assert _evidence_state(verified, official_targets) == "verified"
+    assert _evidence_state(drifted, official_targets) != _evidence_state(
+        verified, official_targets
+    )
+
+
+def test_evidence_classification_is_source_independent(official_targets) -> None:
+    """Acceptance #4: remote GitHub and local fallback must classify identically.
+
+    The local mirror is proven byte-identical to the remote registry by
+    test_official_target_mirror_matches_sha256_sidecar. Classification reads only
+    ``state.evidenceRegistry.targets``, so either source yields the same state.
+    """
+    verified = _sonnet_entry()
+    missing = _sonnet_entry(
+        same_spec={"resolved_server_parameters": {"max_model_len": 32768}}
+    )
+    for entry in (verified, missing):
+        via_local = _evidence_state(entry, official_targets)
+        # The same targets list is what any source resolves to; assert the
+        # classifier is deterministic and source transport independent.
+        assert via_local == _evidence_state(entry, list(official_targets))
+        assert via_local in (
+            "verified",
+            "config-unverified",
+            "drifted",
+            "legacy",
+            "specialty",
+        )
+
+
+def test_legacy_point_stays_out_of_verified_trend_math(official_targets) -> None:
+    """Acceptance #5: a legacy point (no matching active public target) is not
+    verified, so it stays out of the default trend and gets its own series key,
+    never connecting to a verified curve.
+    """
+    legacy = _sonnet_entry(workload={"name": "unregistered-workload"})
+    verified = _sonnet_entry()
+
+    assert _evidence_state(legacy, official_targets) == "legacy"
+    assert _evidence_state(verified, official_targets) == "verified"
+
+    # Default trend view admits only verified records (fail-closed).
+    def trend_view_allowed(entry):
+        return _evidence_state(entry, official_targets) == "verified"
+
+    assert trend_view_allowed(verified) is True
+    assert trend_view_allowed(legacy) is False
+
+    # Series key encodes the evidence state, so a legacy point and a verified
+    # point for the same workload/model never share a series.
+    def series_key(entry, targets):
+        return (
+            str((entry.get("workload") or {}).get("name") or ""),
+            str((entry.get("model") or {}).get("id") or ""),
+            _evidence_state(entry, targets),
+        )
+
+    assert series_key(legacy, official_targets) != series_key(
+        verified, official_targets
+    )
+
+
+def test_trend_evidence_state_contract() -> None:
+    """Source-level contract for issue #164: the JS must gate the aligned trend
+    on verified evidence, put evidence state in the series key, refuse baseline
+    default inheritance, and resolve both remote/local registry sources through
+    the same payload contract.
+    """
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    # Evidence state classification exists and is registry driven.
+    assert "const EVIDENCE_STATE = Object.freeze({" in text
+    assert "VERIFIED: 'verified'" in text
+    assert "CONFIG_UNVERIFIED: 'config-unverified'" in text
+    assert "DRIFTED: 'drifted'" in text
+    assert "LEGACY: 'legacy'" in text
+    assert "SPECIALTY: 'specialty'" in text
+    assert "function getEvidenceState(entry)" in text
+    assert "function isVerifiedEvidence(entry)" in text
+
+    # Default aligned trend is verified-only (fail closed).
+    assert (
+        "return coverageClass === 'full-matrix' && isVerifiedEvidence(entry);" in text
+    )
+
+    # Evidence state participates in the series key so different evidence never
+    # gets connected.
+    assert "evidenceState" in text
+    assert "quantization, evidenceState, settingSignature" in text
+
+    # The semantic signature must not inherit baseline defaults.
+    assert "buildTrendSpecDefaults" not in text
+    assert "const specDefaults = { server: {}, client: {} };" in text
+
+    # Registry sources share one payload contract (remote first, local fallback).
+    assert "function loadEvidenceRegistry()" in text
+    assert "payload?.targets" in text
+    assert "state.evidenceRegistry = { payload, targets };" in text
+    assert "state.evidenceRegistry?.targets || []" in text
