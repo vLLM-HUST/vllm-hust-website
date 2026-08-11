@@ -688,3 +688,212 @@ body[data-page="leaderboard"] .trend-chart-wrap { border-color: var(--sub-line);
     overflow-wrap: anywhere;
   }
 }
+
+/* Issue tracking page styles */
+body[data-page="issues"] .issue-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+body[data-page="issues"] .issue-card {
+  border: 1px solid var(--sub-line);
+  border-radius: 4px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  color: var(--sub-ink);
+  background: var(--sub-panel);
+  box-shadow: none;
+}
+body[data-page="issues"] .issue-card-header {
+  margin-bottom: 16px;
+}
+body[data-page="issues"] .issue-card-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+body[data-page="issues"] .issue-number {
+  flex: 0 0 auto;
+  color: var(--sub-muted);
+  font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+body[data-page="issues"] .issue-title {
+  margin: 0;
+  color: var(--sub-ink);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+body[data-page="issues"] .issue-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+body[data-page="issues"] .issue-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #694a05;
+  background: #f4e1ae;
+}
+body[data-page="issues"] .issue-badge--category {
+  color: #105456;
+  background: #c9e8e7;
+}
+body[data-page="issues"] .issue-badge--priority {
+  color: #81422e;
+  background: #f5d5ca;
+}
+body[data-page="issues"] .issue-badge--in-progress {
+  color: #075b70;
+  background: #d9f0f4;
+}
+body[data-page="issues"] .issue-badge--blocked {
+  color: #912d3d;
+  background: #fee3e7;
+}
+body[data-page="issues"] .issue-badge--draft {
+  color: #704600;
+  background: #fff0c2;
+}
+body[data-page="issues"] .issue-summary {
+  margin: 0 0 16px;
+  color: var(--sub-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+body[data-page="issues"] .issue-pr {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 6px 10px;
+  border: 1px solid var(--sub-line);
+  border-radius: 4px;
+  color: #105d61;
+  background: var(--sub-paper);
+  font-size: 12px;
+  text-decoration: none;
+}
+body[data-page="issues"] .issue-pr:hover {
+  border-color: var(--sub-amber);
+  color: var(--sub-ink);
+  background: #fff;
+}
+body[data-page="issues"] .issue-pr-label {
+  font-weight: 700;
+}
+body[data-page="issues"] .issue-pr-state {
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: #694a05;
+  background: #f4e1ae;
+  font-size: 11px;
+  font-weight: 700;
+}
+body[data-page="issues"] .issue-pr-branch {
+  color: var(--sub-muted);
+  font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+body[data-page="issues"] .issue-progress {
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+body[data-page="issues"] .issue-progress-label {
+  color: var(--sub-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+body[data-page="issues"] .issue-progress-text {
+  color: var(--sub-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+body[data-page="issues"] .issue-criteria {
+  margin: 0 0 16px;
+}
+body[data-page="issues"] .issue-criteria-heading {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--sub-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+body[data-page="issues"] .issue-criteria-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+body[data-page="issues"] .issue-criteria-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+body[data-page="issues"] .issue-criteria-mark {
+  flex: 0 0 auto;
+  font-weight: 700;
+}
+body[data-page="issues"] .issue-criteria-item.is-met .issue-criteria-mark {
+  color: #195c35;
+}
+body[data-page="issues"] .issue-criteria-item.is-unmet .issue-criteria-mark {
+  color: #912d3d;
+}
+body[data-page="issues"] .issue-criteria-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+body[data-page="issues"] .issue-criteria-label-text {
+  color: var(--sub-ink);
+  font-size: 13px;
+  line-height: 1.4;
+}
+body[data-page="issues"] .issue-criteria-state {
+  color: var(--sub-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+body[data-page="issues"] .issue-criteria-item.is-met .issue-criteria-state {
+  color: #195c35;
+}
+body[data-page="issues"] .issue-criteria-item.is-unmet .issue-criteria-state {
+  color: #912d3d;
+}
+body[data-page="issues"] .issue-note {
+  display: block;
+  color: var(--sub-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+body[data-page="issues"] .issue-empty {
+  margin: 0;
+  color: var(--sub-muted);
+  font-size: 13px;
+}
+body[data-page="issues"] .issue-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 16px;
+}
+body[data-page="issues"] .issue-links {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 860px) {
+  body[data-page="issues"] .issue-list {
+    grid-template-columns: 1fr;
+  }
+}

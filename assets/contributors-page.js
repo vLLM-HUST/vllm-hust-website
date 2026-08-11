@@ -157,6 +157,17 @@
         return raw;
     }
 
+    // These contributors are students. Keep the public site from inferring
+    // different status from their engineering/academic contribution areas.
+    const studentContributorLogins = new Set(['wmaster123', 'sad-and-bad1231', 'iliujunn']);
+    function memberRole(item, lang) {
+        const login = String(item.github_login || '').toLowerCase();
+        if (studentContributorLogins.has(login)) {
+            return lang === 'zh' ? '学生' : 'Student';
+        }
+        return localized(item, 'role', lang);
+    }
+
     function memberNameMarkup(item, lang) {
         const name = escapeHtml(displayName(item, lang));
         const main = item.github_url
@@ -173,7 +184,7 @@
     }
 
     function memberContextMarkup(item, lang) {
-        const role = localized(item, 'role', lang);
+        const role = memberRole(item, lang);
         const advisor = localized(item, 'advisor', lang);
         const parts = [
             role,
@@ -211,7 +222,7 @@
         const lang = currentLang();
         const text = labels(lang);
         list.innerHTML = members.map((item) => {
-            const role = localized(item, 'role', lang);
+            const role = memberRole(item, lang);
             const research = localized(item, 'research_direction', lang);
             const participation = localized(item, 'participation_direction', lang);
             const areas = item.contribution_areas || item.key_contributions || '';

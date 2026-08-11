@@ -7,6 +7,7 @@
             navContributors: 'Contributors',
             navConferences: 'Conferences',
             navCourses: 'Courses',
+            navIssues: 'Issues',
             brandSubtitle: 'Domestic-compute inference engine',
             langToggle: '中文',
             langToggleLabel: '切换为中文',
@@ -18,6 +19,7 @@
             navContributors: '核心成员',
             navConferences: '会议',
             navCourses: '课程',
+            navIssues: '议题',
             brandSubtitle: '面向国产算力的推理引擎',
             langToggle: 'EN',
             langToggleLabel: 'Switch to English',
@@ -72,6 +74,7 @@
         setText('nav-contributors', common.navContributors);
         setText('nav-conferences', common.navConferences);
         setText('nav-courses', common.navCourses);
+        setText('nav-issues', common.navIssues);
         setText('langToggleText', common.langToggle);
         const languageButton = document.getElementById('langToggle');
         if (languageButton) {
