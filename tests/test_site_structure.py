@@ -450,6 +450,26 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     assert "Ignoring unusable session cache" in text
 
 
+def test_hf_loader_falls_through_empty_snapshots() -> None:
+    root = Path(__file__).resolve().parents[1]
+    loader = (root / "assets" / "hf-data-loader.js").read_text(encoding="utf-8")
+    leaderboard = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    # The loader must skip empty snapshots (no records) so a fail-closed primary
+    # source does not blank out the leaderboard while a later source still has data.
+    assert "function isSnapshotEmpty(snapshot)" in loader
+    assert "return single.length === 0 && multi.length === 0;" in loader
+    assert "Empty leaderboard snapshot from ${source}: no benchmark records" in loader
+    assert "emptyError.isEmptySnapshot = true;" in loader
+    assert "emptySources.add(source);" in loader
+    assert "triedSources.every((source) => emptySources.has(source))" in loader
+    assert "return { single: [], multi: [], compare: null };" in loader
+
+    # Partial rendering must not fire for snapshots with zero records.
+    assert "partialData.single.length > 0" in leaderboard
+    assert "partialData.multi.length > 0" in leaderboard
+
+
 def test_empty_compare_snapshot_disables_focus_without_hiding_rows() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
