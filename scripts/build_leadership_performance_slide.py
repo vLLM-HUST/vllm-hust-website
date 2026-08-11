@@ -12,7 +12,10 @@ import binascii
 import hashlib
 import json
 import math
+import os
 import re
+import secrets
+import shutil
 import struct
 import subprocess
 import tempfile
@@ -24,6 +27,7 @@ from datetime import datetime, timezone
 from html import escape, unescape
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 SNAPSHOT_FILES = (
     "leaderboard_single.json",
@@ -91,10 +95,27 @@ class Point:
     audit_boundary: str
 
 
+def _reject_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON constant is forbidden: {value}")
+
+
+def _reject_duplicate_json_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError(f"duplicate JSON key is forbidden: {key}")
+        value[key] = item
+    return value
+
+
 def load_json(path: Path) -> Any:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        return json.loads(
+            path.read_text(encoding="utf-8"),
+            parse_constant=_reject_json_constant,
+            object_pairs_hook=_reject_duplicate_json_keys,
+        )
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
         raise ValueError(f"cannot load {path}: {exc}") from exc
 
 
@@ -104,6 +125,17 @@ def sha256_file(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _require_exact_keys(
+    value: dict[str, Any], expected: set[str], *, context: str
+) -> None:
+    actual = set(value)
+    if actual != expected:
+        raise ValueError(
+            f"{context} has unexpected schema keys: "
+            f"missing={sorted(expected - actual)!r} extra={sorted(actual - expected)!r}"
+        )
 
 
 def load_registry(path: Path, checksum_path: Path) -> Registry:
@@ -142,6 +174,11 @@ def load_target_pins(path: Path, registry: Registry) -> dict[str, TargetPin]:
         "leadership-performance-target-pin/v1"
     ):
         raise ValueError("unsupported leadership performance target-pin schema")
+    _require_exact_keys(
+        payload,
+        {"schema_version", "registry_version", "registry_sha256", "targets"},
+        context="target pin",
+    )
     if str(payload.get("registry_version") or "") != registry.version:
         raise ValueError("target pin is stale: registry_version changed")
     if str(payload.get("registry_sha256") or "") != registry.sha256:
@@ -153,6 +190,11 @@ def load_target_pins(path: Path, registry: Registry) -> dict[str, TargetPin]:
     for raw in raw_pins:
         if not isinstance(raw, dict):
             raise TypeError("every target pin must be an object")
+        _require_exact_keys(
+            raw,
+            {"workload", "target_id", "target_version", "profile_id"},
+            context="target pin entry",
+        )
         pin = TargetPin(
             workload=str(raw.get("workload") or ""),
             target_id=str(raw.get("target_id") or ""),
@@ -739,13 +781,21 @@ def _validate_pr_identity(
 
 
 def load_story(
-    path: Path, entries: dict[str, dict[str, Any]]
+    path: Path,
+    entries: dict[str, dict[str, Any]],
+    *,
+    commit_verifier: Callable[[str, str | None, str], None] | None = None,
 ) -> dict[str, list[Point]]:
     payload = load_json(path)
     if not isinstance(payload, dict) or payload.get("schema_version") != (
         "leadership-performance-story/v1"
     ):
         raise ValueError("unsupported leadership performance story schema")
+    _require_exact_keys(
+        payload,
+        {"schema_version", "series"},
+        context="story",
+    )
     raw_series = payload.get("series")
     if not isinstance(raw_series, list):
         raise TypeError("story series must be an array")
@@ -755,6 +805,11 @@ def load_story(
     for raw in raw_series:
         if not isinstance(raw, dict):
             raise TypeError("every story series must be an object")
+        _require_exact_keys(
+            raw,
+            {"workload", "milestones"},
+            context="story series",
+        )
         workload = str(raw.get("workload") or "")
         if workload in series or workload not in REQUIRED_WORKLOADS:
             raise ValueError(f"unexpected or duplicate story workload: {workload!r}")
@@ -762,9 +817,25 @@ def load_story(
         if not isinstance(milestones, list) or not milestones:
             raise ValueError(f"story series {workload!r} has no milestones")
         points: list[Point] = []
+        previous_pr: int | None = None
+        previous_repository: str | None = None
+        previous_commit: str | None = None
         for milestone in milestones:
             if not isinstance(milestone, dict):
                 raise TypeError("every milestone must be an object")
+            _require_exact_keys(
+                milestone,
+                {
+                    "entry_id",
+                    "label",
+                    "pr_number",
+                    "repository",
+                    "pr_url",
+                    "commit",
+                    "attribution",
+                },
+                context="story milestone",
+            )
             entry_id = str(milestone.get("entry_id") or "")
             entry = entries.get(entry_id)
             if entry is None:
@@ -783,6 +854,22 @@ def load_story(
             pr_number, commit = _validate_pr_identity(
                 milestone, entry, entry_id=entry_id
             )
+            repository = str(milestone.get("repository") or "")
+            if previous_pr is not None and pr_number <= previous_pr:
+                raise ValueError(
+                    f"story series {workload!r} PR numbers must be strictly increasing"
+                )
+            if previous_repository is not None and repository != previous_repository:
+                raise ValueError(
+                    f"story series {workload!r} cumulative checkpoints must use one repository"
+                )
+            if commit_verifier is None and previous_commit is not None:
+                raise ValueError(
+                    f"story series {workload!r} has multiple cumulative checkpoints "
+                    "but no commit ancestry verifier"
+                )
+            if commit_verifier is not None:
+                commit_verifier(repository, previous_commit, commit)
             attribution = _dict(milestone.get("attribution"))
             kind = str(attribution.get("kind") or "")
             base_id = attribution.get("base_entry_id")
@@ -792,6 +879,16 @@ def load_story(
                     "publishes a commit-bound pair/cohort identity"
                 )
             elif kind == "checkpoint-cumulative":
+                _require_exact_keys(
+                    attribution,
+                    {
+                        "kind",
+                        "boundary_id",
+                        "checkpoint_entry_id",
+                        "checkpoint_commit",
+                    },
+                    context=f"checkpoint attribution {entry_id}",
+                )
                 base_id = None
                 boundary = str(attribution.get("boundary_id") or "")
                 if (
@@ -822,10 +919,262 @@ def load_story(
                     boundary,
                 )
             )
+            previous_pr = pr_number
+            previous_repository = repository
+            previous_commit = commit
         series[workload] = points
     if set(series) != set(REQUIRED_WORKLOADS):
         raise ValueError("story must contain exactly all three leadership workloads")
     return series
+
+
+def _github_origin_identity(remote: str) -> tuple[str, str]:
+    scp = re.fullmatch(r"git@github\.com:([^/]+/[^/]+?)(?:\.git)?", remote)
+    if scp is not None:
+        repository = scp.group(1)
+    else:
+        parsed = urlsplit(remote)
+        if parsed.scheme not in {"https", "ssh"} or parsed.hostname != "github.com":
+            raise ValueError("milestone repository origin must use the github.com host")
+        if parsed.port not in {None, 22, 443}:
+            raise ValueError("milestone repository origin uses an unexpected port")
+        repository = parsed.path.removeprefix("/")
+        repository = repository.removesuffix(".git")
+    if re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository) is None:
+        raise ValueError("milestone repository origin must be a GitHub repository")
+    canonical = f"https://github.com/{repository}.git"
+    return repository, canonical
+
+
+@dataclass
+class MilestoneCommitVerifier:
+    remote_url: str
+    repository: str
+    fetched_at: str
+    advertised_refs: dict[str, str]
+    reachable_tips: tuple[tuple[str, str], ...]
+    fetch_refspecs: tuple[str, ...]
+    commit_parents: dict[str, tuple[str, ...]]
+
+    def __call__(self, repository: str, previous: str | None, current: str) -> None:
+        if repository.casefold() != self.repository.casefold():
+            raise ValueError(
+                "story milestone repository does not match --milestone-repo origin: "
+                f"story={repository!r} origin={self.repository!r}"
+            )
+        if current not in self.commit_parents:
+            raise ValueError(
+                "story checkpoint commit is local-only or stale; it must be reachable "
+                f"from a currently advertised and fetched origin ref: {current}"
+            )
+        if previous is None:
+            return
+        if previous == current:
+            raise ValueError("cumulative checkpoint commits must be distinct")
+        pending = list(self.commit_parents.get(current, ()))
+        visited: set[str] = set()
+        while pending:
+            candidate = pending.pop()
+            if candidate == previous:
+                break
+            if candidate in visited:
+                continue
+            visited.add(candidate)
+            pending.extend(self.commit_parents.get(candidate, ()))
+        else:
+            raise ValueError(
+                "cumulative checkpoint commits are not in strict ancestor order: "
+                f"{previous} !< {current}"
+            )
+
+    def provenance(self) -> dict[str, Any]:
+        return {
+            "repository": self.repository,
+            "remote_url": self.remote_url,
+            "fetched_at": self.fetched_at,
+            "ref_tips": dict(sorted(self.advertised_refs.items())),
+            "fetch_refspecs": list(self.fetch_refspecs),
+        }
+
+
+def milestone_commit_verifier(
+    repo: Path,
+    *,
+    fetch_remote: Callable[[Path, str, tuple[str, ...]], None] | None = None,
+    ls_remote: Callable[[Path, str], bytes] | None = None,
+) -> MilestoneCommitVerifier:
+    root = Path(_git(repo, "rev-parse", "--show-toplevel").decode().strip()).resolve()
+    _reject_replacement_state(root)
+    remote = (
+        _git(root, "config", "--local", "--get", "remote.origin.url").decode().strip()
+    )
+    local_repository, canonical_remote = _github_origin_identity(remote)
+    with tempfile.TemporaryDirectory(prefix="leadership-proof-") as tmp:
+        proof_root = Path(tmp) / "repository.git"
+        proof_root.mkdir()
+        _proof_git(proof_root, "init", "--bare", "--quiet", ".")
+        output = (
+            _proof_git(
+                proof_root,
+                "ls-remote",
+                "--heads",
+                "--tags",
+                canonical_remote,
+                remote=True,
+            )
+            if ls_remote is None
+            else ls_remote(proof_root, canonical_remote)
+        )
+        advertised: dict[str, str] = {}
+        for line in output.decode().splitlines():
+            fields = line.split("\t")
+            if len(fields) != 2 or not re.fullmatch(r"[0-9a-f]{40}", fields[0]):
+                raise ValueError("origin advertised an invalid ref tip")
+            ref = fields[1]
+            if not re.fullmatch(r"refs/(?:heads|tags)/[^\s^]+(?:\^\{\})?", ref):
+                raise ValueError("origin advertised an invalid head or tag name")
+            if ref in advertised and advertised[ref] != fields[0]:
+                raise ValueError("origin advertised inconsistent duplicate ref tips")
+            advertised[ref] = fields[0]
+        if not advertised:
+            raise ValueError("origin advertised no heads or tags")
+
+        source_refs = sorted(ref for ref in advertised if not ref.endswith("^{}"))
+        for source in source_refs:
+            _proof_git(proof_root, "check-ref-format", source)
+        namespace = f"refs/leadership-proof/{secrets.token_hex(8)}"
+        destinations = {
+            source: f"{namespace}/{source.removeprefix('refs/')}"
+            for source in source_refs
+        }
+        actual_refspecs = tuple(
+            f"+{source}:{destinations[source]}" for source in source_refs
+        )
+        recorded_refspecs = tuple(
+            f"+{source}:refs/leadership-proof/<temporary>/{source.removeprefix('refs/')}"
+            for source in source_refs
+        )
+        if fetch_remote is None:
+            _proof_git(
+                proof_root,
+                "fetch",
+                "--no-tags",
+                canonical_remote,
+                *actual_refspecs,
+                remote=True,
+            )
+        else:
+            fetch_remote(proof_root, canonical_remote, actual_refspecs)
+        fetched_at = datetime.now(timezone.utc).isoformat()
+        _reject_replacement_state(proof_root, proof=True)
+        reachable: list[tuple[str, str]] = []
+        for ref in source_refs:
+            advertised_object = advertised[ref]
+            destination = destinations[ref]
+            local_object = (
+                _proof_git(proof_root, "rev-parse", destination).decode().strip()
+            )
+            if local_object != advertised_object:
+                raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
+            commit = (
+                _proof_git(proof_root, "rev-parse", f"{destination}^{{commit}}")
+                .decode()
+                .strip()
+            )
+            expected_commit = advertised.get(f"{ref}^{{}}", advertised_object)
+            if commit != expected_commit:
+                raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
+            reachable.append((ref, commit))
+        if not reachable:
+            raise ValueError("origin advertised no usable heads or tags")
+        graph = _proof_git(
+            proof_root,
+            "rev-list",
+            "--parents",
+            *(tip for _, tip in reachable),
+        ).decode()
+        commit_parents = {
+            fields[0]: tuple(fields[1:])
+            for line in graph.splitlines()
+            if (fields := line.split())
+        }
+    return MilestoneCommitVerifier(
+        canonical_remote,
+        local_repository,
+        fetched_at,
+        advertised,
+        tuple(reachable),
+        recorded_refspecs,
+        commit_parents,
+    )
+
+
+def _proof_environment() -> dict[str, str]:
+    """Return a Git environment isolated from URL rewrites and replace objects."""
+    environment = dict(os.environ)
+    for name in tuple(environment):
+        if name.startswith("GIT_CONFIG_KEY_") or name.startswith("GIT_CONFIG_VALUE_"):
+            environment.pop(name)
+    for name in (
+        "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+        "GIT_COMMON_DIR",
+        "GIT_CONFIG",
+        "GIT_CONFIG_PARAMETERS",
+        "GIT_CONFIG_SYSTEM",
+        "GIT_DIR",
+        "GIT_NAMESPACE",
+        "GIT_OBJECT_DIRECTORY",
+        "GIT_REPLACE_REF_BASE",
+        "GIT_SHALLOW_FILE",
+        "GIT_WORK_TREE",
+    ):
+        environment.pop(name, None)
+    environment.update(
+        {
+            "GIT_ALLOW_PROTOCOL": "https",
+            "GIT_CONFIG_COUNT": "0",
+            "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_NO_REPLACE_OBJECTS": "1",
+        }
+    )
+    return environment
+
+
+def _proof_git(repo: Path, *args: str, remote: bool = False) -> bytes:
+    """Run isolated proof Git without propagating credential-bearing stderr."""
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(repo), *args],
+            check=True,
+            capture_output=True,
+            env=_proof_environment(),
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        message = (
+            "cannot contact milestone repository origin"
+            if remote
+            else "cannot verify milestone repository proof"
+        )
+        raise ValueError(message) from exc
+    return completed.stdout
+
+
+def _reject_replacement_state(repo: Path, *, proof: bool = False) -> None:
+    git = _proof_git if proof else _git
+    replacements = (
+        git(repo, "for-each-ref", "--format=%(refname)", "refs/replace")
+        .decode()
+        .strip()
+    )
+    if replacements:
+        raise ValueError("milestone repository must not contain replace refs")
+    grafts_raw = git(repo, "rev-parse", "--git-path", "info/grafts").decode().strip()
+    grafts = Path(grafts_raw)
+    if not grafts.is_absolute():
+        grafts = repo / grafts
+    if os.path.lexists(grafts):
+        raise ValueError("milestone repository must not contain info/grafts")
 
 
 def build_provenance(
@@ -838,6 +1187,7 @@ def build_provenance(
     benchmark_commit: str,
     benchmark_tree: str,
     snapshot_time: str,
+    milestone_remote: dict[str, Any],
 ) -> dict[str, Any]:
     if not re.fullmatch(r"[0-9a-f]{40}", benchmark_commit):
         raise ValueError("benchmark commit must be a full lowercase 40-hex SHA")
@@ -853,6 +1203,7 @@ def build_provenance(
         "benchmark_commit": benchmark_commit,
         "benchmark_tree": benchmark_tree,
         "snapshot_time": snapshot_time,
+        "milestone_remote": milestone_remote,
         "registry_version": registry.version,
         "registry_sha256": registry.sha256,
         "target_pin_sha256": sha256_file(target_pin_path),
@@ -926,7 +1277,15 @@ def verify_benchmark_source(
 
 def provenance_identity(provenance: dict[str, Any]) -> dict[str, Any]:
     """Return stable inputs only, excluding render time and output checksums."""
-    return {key: value for key, value in provenance.items() if key != "generated_at"}
+    identity = {
+        key: value for key, value in provenance.items() if key != "generated_at"
+    }
+    remote = identity.get("milestone_remote")
+    if isinstance(remote, dict):
+        identity["milestone_remote"] = {
+            key: value for key, value in remote.items() if key != "fetched_at"
+        }
+    return identity
 
 
 def check_stale(path: Path, current: dict[str, Any]) -> None:
@@ -973,8 +1332,11 @@ def render_svg(series: dict[str, list[Point]], provenance: dict[str, Any]) -> st
     )
     maximum = max(point.throughput_tps for point in all_points)
     width, height = 1600, 900
-    left, top, chart_w, chart_h = 150, 155, 1320, 560
+    left, top, chart_w, chart_h = 150, 155, 1320, 480
     colors = ("#667eea", "#14b8a6", "#f59e0b")
+    marker_jitter = (-28.0, 0.0, 28.0)
+    annotation_lanes = (682.0, 730.0, 778.0)
+    ordinal_slots = max(len(points) for points in series.values())
     metadata = escape(json.dumps(provenance, ensure_ascii=False, sort_keys=True))
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
@@ -997,7 +1359,13 @@ def render_svg(series: dict[str, list[Point]], provenance: dict[str, Any]) -> st
         color = colors[row]
         coords: list[tuple[float, float]] = []
         for index, point in enumerate(points):
-            x = left + (chart_w * index / max(1, len(points) - 1))
+            if ordinal_slots == 1:
+                base_x = left + chart_w / 2
+            else:
+                base_x = left + 60 + (chart_w - 120) * index / (ordinal_slots - 1)
+            # The base position is the shared milestone ordinal. The bounded
+            # series offset is visual separation only; it does not encode data.
+            x = base_x + marker_jitter[row]
             y = top + chart_h - point.throughput_tps / maximum * chart_h
             coords.append((x, y))
         if len(coords) > 1:
@@ -1006,19 +1374,33 @@ def render_svg(series: dict[str, list[Point]], provenance: dict[str, Any]) -> st
                 f'<polyline points="{polyline}" fill="none" stroke="{color}" stroke-width="5"/>'
             )
         for (x, y), point in zip(coords, points, strict=True):
-            parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="8" fill="{color}"/>')
+            lane_y = annotation_lanes[row]
             parts.append(
-                f'<text x="{x:.1f}" y="{y - 18:.1f}" text-anchor="middle" font-family="sans-serif" font-size="17" fill="#172033">PR #{point.pr_number} · {point.throughput_tps:.2f}</text>'
+                f'<line class="point-leader" data-series="{row}" '
+                f'x1="{x:.1f}" y1="{y + 10:.1f}" x2="{x:.1f}" '
+                f'y2="{lane_y - 16:.1f}" stroke="{color}" stroke-width="1.5" '
+                'stroke-dasharray="4 4" opacity="0.7"/>'
             )
             parts.append(
-                f'<text x="{x:.1f}" y="{y + 31:.1f}" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#516078">{escape(point.label)}</text>'
+                f'<circle class="series-marker" data-series="{row}" '
+                f'data-entry-id="{escape(point.entry_id)}" cx="{x:.1f}" '
+                f'cy="{y:.1f}" r="8" fill="{color}"/>'
             )
-        legend_y = 770 + row * 34
+            parts.append(
+                f'<text class="point-annotation" data-series="{row}" '
+                f'data-entry-id="{escape(point.entry_id)}" x="{x:.1f}" '
+                f'y="{lane_y:.1f}" text-anchor="middle" font-family="sans-serif" '
+                f'font-size="16" fill="#172033">PR #{point.pr_number} · '
+                f"{point.throughput_tps:.2f} · {escape(point.label)}</text>"
+            )
+        legend_x = 150 + row * 470
         parts.append(
-            f'<line x1="150" y1="{legend_y}" x2="195" y2="{legend_y}" stroke="{color}" stroke-width="5"/>'
+            f'<line x1="{legend_x}" y1="842" x2="{legend_x + 45}" y2="842" '
+            f'stroke="{color}" stroke-width="5"/>'
         )
         parts.append(
-            f'<text x="210" y="{legend_y + 7}" font-family="sans-serif" font-size="20" fill="#334155">{_display_label(workload)}</text>'
+            f'<text x="{legend_x + 60}" y="849" font-family="sans-serif" '
+            f'font-size="20" fill="#334155">{_display_label(workload)}</text>'
         )
     parts.append("</svg>")
     return "\n".join(parts) + "\n"
@@ -1154,37 +1536,59 @@ def publish_staged_outputs(
     output_dir: Path,
     *,
     replace_file: Callable[[Path, Path], Any] = _replace_file,
+    restore_file: Callable[[Path, Path], Any] = _replace_file,
 ) -> None:
     staged_names = {path.name for path in staged.iterdir() if path.is_file()}
     if staged_names != PUBLISHED_FILES:
         raise ValueError("staged leadership output set is incomplete or unexpected")
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(
-        prefix="leadership-slide-backup-", dir=output_dir.parent
-    ) as backup_raw:
-        backup = Path(backup_raw)
-        backed_up: list[str] = []
-        installed: list[str] = []
-        try:
-            for name in sorted(PUBLISHED_FILES):
-                destination = output_dir / name
-                if destination.exists():
-                    if not destination.is_file():
-                        raise ValueError(f"output target is not a file: {destination}")
-                    destination.replace(backup / name)
-                    backed_up.append(name)
-            for name in sorted(PUBLISHED_FILES):
-                replace_file(staged / name, output_dir / name)
-                installed.append(name)
-        except Exception:
-            for name in installed:
-                destination = output_dir / name
-                if destination.is_file():
+    backup = Path(
+        tempfile.mkdtemp(prefix="leadership-slide-backup-", dir=output_dir.parent)
+    )
+    backed_up: list[str] = []
+    installed: list[str] = []
+    try:
+        for name in sorted(PUBLISHED_FILES):
+            destination = output_dir / name
+            if destination.exists():
+                if not destination.is_file():
+                    raise ValueError(f"output target is not a file: {destination}")
+                destination.replace(backup / name)
+                backed_up.append(name)
+        for name in sorted(PUBLISHED_FILES):
+            replace_file(staged / name, output_dir / name)
+            installed.append(name)
+    except Exception as publish_error:
+        recovery_errors: list[str] = []
+        backed_up_set = set(backed_up)
+        for name in installed:
+            if name in backed_up_set:
+                continue
+            destination = output_dir / name
+            try:
+                if destination.is_file() or destination.is_symlink():
                     destination.unlink()
-            for name in backed_up:
-                (backup / name).replace(output_dir / name)
-            raise
+            except OSError as exc:
+                recovery_errors.append(f"remove new {name}: {exc}")
+        for name in backed_up:
+            try:
+                restore_file(backup / name, output_dir / name)
+            except OSError as exc:
+                recovery_errors.append(f"restore {name}: {exc}")
+        if recovery_errors:
+            raise RuntimeError(
+                "leadership output publish failed and recovery was incomplete; "
+                f"preserved backup at {backup}: " + "; ".join(recovery_errors)
+            ) from publish_error
+        shutil.rmtree(backup)
+        raise
+    try:
+        shutil.rmtree(backup)
+    except OSError as exc:
+        raise RuntimeError(
+            f"leadership output published but backup cleanup failed; preserved at {backup}: {exc}"
+        ) from exc
 
 
 def parse_args() -> argparse.Namespace:
@@ -1196,6 +1600,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--story", type=Path, required=True)
     parser.add_argument("--benchmark-repo", type=Path, required=True)
     parser.add_argument("--benchmark-commit", required=True)
+    parser.add_argument("--milestone-repo", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
         "--check-stale",
@@ -1218,7 +1623,12 @@ def main() -> int:
             checksum_path=args.registry_checksum,
         )
         entries, snapshot_time = admit_snapshot(args.snapshot_dir, registry, pins)
-        series = load_story(args.story, entries)
+        milestone_verifier = milestone_commit_verifier(args.milestone_repo)
+        series = load_story(
+            args.story,
+            entries,
+            commit_verifier=milestone_verifier,
+        )
         provenance = build_provenance(
             snapshot_dir=args.snapshot_dir,
             registry=registry,
@@ -1228,6 +1638,7 @@ def main() -> int:
             benchmark_commit=args.benchmark_commit,
             benchmark_tree=benchmark_tree,
             snapshot_time=snapshot_time,
+            milestone_remote=milestone_verifier.provenance(),
         )
         provenance_path = args.output_dir / "leadership_performance.provenance.json"
         if args.check_stale:

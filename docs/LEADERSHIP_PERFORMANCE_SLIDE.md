@@ -40,7 +40,22 @@ presentation text and a real PR number. The PR number must match the entry's can
 repository, URL, and full commit identity. The current canonical snapshot schema does not publish a
 commit-bound pair/cohort identity, so `paired` attribution fails closed even if the story names a
 base/head relationship. Until that schema exists, each admitted milestone must be cumulative and
-bind an explicit checkpoint entry and commit boundary.
+bind an explicit checkpoint entry and commit boundary. Within each series, PR numbers must increase
+strictly and every checkpoint commit after the first must be a strict descendant of its predecessor
+in the GitHub repository supplied by `--milestone-repo`. Its `origin` host must be exactly
+`github.com`. Generation creates a temporary bare proof repository with system, global, environment,
+and source-repository Git configuration isolated, then performs a live, fail-closed
+`git ls-remote --heads --tags` and explicit-refspec fetch against the canonical credential-free
+`https://github.com/owner/repo.git` URL. It verifies each fetched object against the advertisement,
+materializes the fetched commit graph with replace-object handling disabled, and deletes the entire
+proof repository. This works even for single-branch clones or custom `remote.origin.fetch` settings,
+without accepting `url.*.insteadOf` rewrites. Source or proof repositories containing `refs/replace`
+or `info/grafts` are rejected. Every checkpoint, including the first, must occur in that fetched
+graph. Network errors, advertisement races, inconsistent tags, replacement ancestry, and local-only
+commits are rejected. Provenance records the canonical URL, fetch time, complete advertised head/tag
+tips, and redacted temporary-namespace refspecs; userinfo, query, fragment data, and temporary paths
+are never persisted. JSON array order alone is never accepted as evidence of a cumulative
+progression.
 
 ```json
 {
@@ -124,6 +139,7 @@ python3 scripts/build_leadership_performance_slide.py \
   --story path/to/admitted-story.json \
   --benchmark-repo ../vllm-hust-benchmark \
   --benchmark-commit <full-benchmark-commit-sha> \
+  --milestone-repo ../vllm-hust \
   --output-dir output/leadership-performance
 ```
 
@@ -133,7 +149,8 @@ JSON sidecar only after all admission checks pass. SVG metadata, a PNG `tEXt` ch
 properties/footer, and the sidecar identify the registry, story, commit/tree, and snapshot source.
 Story labels are audited before SVG/PNG rendering, and the finished PPTX XML text layer is audited
 again. Publishing uses a same-filesystem staging set and restores the previous four files if a
-mid-publish replacement fails.
+mid-publish replacement fails. If any individual restore fails, recovery continues for the other
+files and the backup directory is retained and reported instead of being automatically deleted.
 
 To detect a changed registry, target pin, story, snapshot, benchmark commit, or output bytes without
 regenerating:
