@@ -54,6 +54,7 @@ VALID_BASELINE_STATUSES = {
 }
 PUBLIC_BASELINE_ENGINE = "vllm"
 PUBLIC_BASELINE_VERSION = "0.18.0"
+PUBLIC_PRODUCTION_TRACE_BASELINE_VERSION = "0.22.1rc1"
 PUBLIC_CURRENT_ENGINE = "vllm-hust"
 RETIRED_BASELINE_TOKENS = ("v0.11.0", "v0110", "0.11.0")
 OFFICIAL_PUBLIC_WORKLOADS = {
@@ -549,7 +550,7 @@ def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
 
     if official_public_candidate and engine == PUBLIC_BASELINE_ENGINE:
         expected_version = (
-            "0.22.1rc1"
+            PUBLIC_PRODUCTION_TRACE_BASELINE_VERSION
             if spec_id.startswith(OFFICIAL_PRODUCTION_TRACE_SPEC_PREFIX)
             else PUBLIC_BASELINE_VERSION
         )
