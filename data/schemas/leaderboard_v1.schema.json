@@ -19,6 +19,56 @@
       "type": "string",
       "pattern": "^(\\d+\\.\\d+[\\w.\\-+]*|N/A)$"
     },
+    "tokenLengthDistributionOrNull": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "count",
+            "min",
+            "p50",
+            "p95",
+            "p99",
+            "max",
+            "total"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "min": {
+              "type": "number",
+              "minimum": 1
+            },
+            "p50": {
+              "type": "number",
+              "minimum": 1
+            },
+            "p95": {
+              "type": "number",
+              "minimum": 1
+            },
+            "p99": {
+              "type": "number",
+              "minimum": 1
+            },
+            "max": {
+              "type": "number",
+              "minimum": 1
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
     "entry": {
       "type": "object",
       "required": [
@@ -196,11 +246,17 @@
               "type": "string"
             },
             "input_length": {
-              "type": "integer",
+              "type": [
+                "integer",
+                "null"
+              ],
               "minimum": 1
             },
             "output_length": {
-              "type": "integer",
+              "type": [
+                "integer",
+                "null"
+              ],
               "minimum": 1
             },
             "batch_size": {
@@ -221,6 +277,43 @@
               "type": [
                 "string",
                 "null"
+              ]
+            },
+            "input_token_distribution": {
+              "$ref": "#/$defs/tokenLengthDistributionOrNull"
+            },
+            "output_token_distribution": {
+              "$ref": "#/$defs/tokenLengthDistributionOrNull"
+            },
+            "cohort_setting_signature": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "arrival_transform": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "time_scale",
+                    "max_interarrival_s"
+                  ],
+                  "properties": {
+                    "time_scale": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "max_interarrival_s": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "additionalProperties": false
+                }
               ]
             }
           },
