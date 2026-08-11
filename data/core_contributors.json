@@ -103,8 +103,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "实习生",
-          "en": "Student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
@@ -204,8 +204,8 @@
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "工程师",
-          "en": "Engineer"
+          "zh": "历史贡献者",
+          "en": "Historical contributor"
         },
         "research_direction": {
           "zh": "",
@@ -221,12 +221,13 @@
         },
         "contribution_areas": "CI/CD, leaderboard, Ascend, benchmark",
         "external_contributor": false,
-        "staff_member": true,
+        "staff_member": false,
         "core_repository_contributor": true,
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "former_member": true
       },
       {
         "rank": 5,
@@ -1025,15 +1026,15 @@
           "vllm-hust-perf-analyzer"
         ],
         "key_contributions": "tooling",
-        "display_name": "Yang Sun",
+        "display_name": "sunYangGitHub",
         "chinese_name": "",
-        "english_name": "Yang Sun",
+        "english_name": "",
         "person_id": "github:sunyanggithub",
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "外校实习生",
-          "en": "Visiting student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -1124,8 +1125,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "华科大三实习生",
-          "en": "HUST third-year undergraduate intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
@@ -1396,8 +1397,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "即将入学的研究生",
-          "en": "Incoming graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
@@ -1682,8 +1683,8 @@
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "工程师",
-          "en": "Engineer"
+          "zh": "历史贡献者",
+          "en": "Historical contributor"
         },
         "research_direction": {
           "zh": "",
@@ -1699,12 +1700,13 @@
         },
         "contribution_areas": "CI/CD, kernel, Ascend, engine",
         "external_contributor": false,
-        "staff_member": true,
+        "staff_member": false,
         "core_repository_contributor": true,
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "former_member": true
       },
       {
         "rank": 5,
@@ -1953,8 +1955,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "实习生",
-          "en": "Student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
@@ -2273,8 +2275,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "华科大三实习生",
-          "en": "HUST third-year undergraduate intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
@@ -2318,8 +2320,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "即将入学的研究生",
-          "en": "Incoming graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
@@ -2829,8 +2831,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "实习生",
-          "en": "Student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
@@ -3149,8 +3151,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "华科大三实习生",
-          "en": "HUST third-year undergraduate intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
@@ -3194,8 +3196,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "即将入学的研究生",
-          "en": "Incoming graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
@@ -3323,15 +3325,15 @@
           "vllm-hust-perf-analyzer"
         ],
         "key_contributions": "tooling",
-        "display_name": "Yang Sun",
+        "display_name": "sunYangGitHub",
         "chinese_name": "",
-        "english_name": "Yang Sun",
+        "english_name": "",
         "person_id": "github:sunyanggithub",
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "外校实习生",
-          "en": "Visiting student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -3460,8 +3462,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "2027 年待入学学生",
-          "en": "Incoming student (2027 cohort)"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "大模型推理方向待定；愿意根据课题安排探索相关研究",
@@ -4016,8 +4018,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "马上入学的华科研究生",
-          "en": "Incoming HUST graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "分布式推理加速",
@@ -4145,8 +4147,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "2027 年待入学学生",
-          "en": "Incoming student (2027 cohort)"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "待定",
@@ -4653,8 +4655,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "已毕业博士生，目前已入职高校",
-          "en": "PhD alumnus, now university faculty"
+          "zh": "已毕业",
+          "en": "Graduated"
         },
         "research_direction": {
           "zh": "",
@@ -5060,6 +5062,48 @@
           "en": ""
         },
         "contribution_areas": ""
+      },
+      {
+        "name": "LuckyWindovo",
+        "github_login": "LuckyWindovo",
+        "github_url": "https://github.com/LuckyWindovo",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "杜雨枫",
+        "chinese_name": "杜雨枫",
+        "english_name": "",
+        "person_id": "github:luckywindovo",
+        "identity_confirmed": true,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "大模型推理系统与性能建模",
+          "en": "LLM inference systems and performance modeling"
+        },
+        "participation_direction": {
+          "zh": "Ascend Serving Roofline",
+          "en": "Ascend Serving Roofline"
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "contribution_areas": "",
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       }
     ],
     "staff_members": [
@@ -5147,52 +5191,6 @@
           "en": ""
         },
         "contribution_areas": "benchmark, CI/CD, Ascend",
-        "external_contributor": false,
-        "staff_member": true,
-        "core_repository_contributor": true,
-        "github_status": {
-          "zh": "",
-          "en": ""
-        }
-      },
-      {
-        "rank": 4,
-        "name": "Sheng Wang",
-        "github_login": "moonandlife",
-        "github_url": "https://github.com/moonandlife",
-        "commits": 27,
-        "changed_lines": 10106,
-        "added": 8684,
-        "deleted": 1422,
-        "active_repos": 2,
-        "repos": [
-          "vllm-ascend-hust",
-          "vllm-hust"
-        ],
-        "key_contributions": "CI/CD, kernel, Ascend, engine",
-        "display_name": "王胜",
-        "chinese_name": "王胜",
-        "english_name": "Sheng Wang",
-        "person_id": "github:moonandlife",
-        "identity_confirmed": true,
-        "core_member": false,
-        "role": {
-          "zh": "工程师",
-          "en": "Engineer"
-        },
-        "research_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "participation_direction": {
-          "zh": "推理引擎工程治理、上游协作与性能回归",
-          "en": "Inference-engine governance, upstream collaboration, and performance regression"
-        },
-        "advisor": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "CI/CD, kernel, Ascend, engine",
         "external_contributor": false,
         "staff_member": true,
         "core_repository_contributor": true,

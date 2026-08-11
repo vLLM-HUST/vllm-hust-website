@@ -1594,8 +1594,8 @@ def test_compare_snapshot_prefers_matching_same_spec_pair(tmp_path: Path) -> Non
 
     assert preferred_pair["left"]["engine"] == "vllm-hust"
     assert preferred_pair["right"]["engine"] == "vllm"
-    assert preferred_pair["left"]["entry_id"] == engine_a_newer["entry_id"]
-    assert preferred_pair["left"]["same_spec"]["resolved_spec_hash"] == "hash-a"
+    assert preferred_pair["left"]["entry_id"] == engine_a_matching["entry_id"]
+    assert preferred_pair["left"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
     assert preferred_pair["right"]["same_spec"]["resolved_spec_hash"] == "hash-shared"
 
 

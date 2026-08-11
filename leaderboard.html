@@ -34,6 +34,7 @@
         <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
         <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
         <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
+        <a id="nav-issues" class="nav-link" data-nav-page="issues" href="./issues.html">Issues</a>
       </div>
     </div>
   </nav>
@@ -47,6 +48,17 @@
         <span class="eyebrow">vLLM Benchmark</span>
         <h1 id="page-title" style="margin-top: 16px">Performance Leaderboard</h1>
         <p id="page-lede" class="hero-lede">Interactive benchmark trends, validation details, and expandable table data across visible scopes.</p>
+      </div>
+    </section>
+
+    <section class="official-target-card" id="official-target-card" aria-live="polite">
+      <div class="content-panel official-target-card-panel">
+        <span class="eyebrow" id="official-target-eyebrow">Official Fixed Target</span>
+        <h2 id="official-target-title" style="margin-top: 12px">Official Fixed Target v1</h2>
+        <p id="official-target-desc" class="official-target-desc">
+          Active public fixed-target registry, including baseline, hardware and the workload / profile matrix, sourced from the central machine-readable contract.
+        </p>
+        <div id="official-target-body"></div>
       </div>
     </section>
 
@@ -127,6 +139,14 @@
               <button type="button" class="trend-axis-button active" data-trend-axis="auto">Auto</button>
               <button type="button" class="trend-axis-button" data-trend-axis="log">Log</button>
               <button type="button" class="trend-axis-button" data-trend-axis="linear">Linear</button>
+            </div>
+          </div>
+          <div class="trend-axis-row">
+            <span id="leaderboard-trend-view-label" class="trend-axis-label">Trend view</span>
+            <div class="trend-axis-toggle" role="group" aria-label="Trend view">
+              <button type="button" class="trend-view-button active" data-trend-view="checkpoint">Checkpoint</button>
+              <button type="button" class="trend-view-button" data-trend-view="targeted">Targeted PR</button>
+              <button type="button" class="trend-view-button" data-trend-view="all">All</button>
             </div>
           </div>
           <div class="trend-series-toolbar">
@@ -214,7 +234,10 @@
         'toggle-hide-incomplete-desc': 'Show rows with peer entries in the current scope.',
         'leaderboard-loading-text': 'Loading leaderboard data...',
         'leaderboard-error-title': 'Failed to load leaderboard data',
-        'leaderboard-error-text': 'Please refresh the page or check your network connection.'
+        'leaderboard-error-text': 'Please refresh the page or check your network connection.',
+        'official-target-eyebrow': 'Official Fixed Target',
+        'official-target-title': 'Official Fixed Target v1',
+        'official-target-desc': 'Active public fixed-target registry, including baseline, hardware and the workload / profile matrix, sourced from the central machine-readable contract.'
       },
       zh: {
         title: '性能排行榜 - vllm-hust',
@@ -226,7 +249,10 @@
         'toggle-hide-incomplete-desc': '展示当前范围内有对应参照的记录。',
         'leaderboard-loading-text': '正在加载排行榜数据……',
         'leaderboard-error-title': '排行榜数据加载失败',
-        'leaderboard-error-text': '请刷新页面或检查网络连接。'
+        'leaderboard-error-text': '请刷新页面或检查网络连接。',
+        'official-target-eyebrow': '官方固定靶',
+        'official-target-title': '官方固定靶 v1',
+        'official-target-desc': '当前 active 的公开固定靶 registry，含基线、硬件与 workload / profile 矩阵，来源为中心机器可读契约。'
       }
     };
   </script>
@@ -234,6 +260,7 @@
   <script src="./assets/hf-data-loader.js?v=leaderboard-empty-compare-v8-20260730"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
   <script src="./assets/leaderboard.js?v=metric-state-semantics-20260730"></script>
+  <script src="./assets/official-targets.js?v=official-target-v1-20260810"></script>
 </body>
 
 </html>

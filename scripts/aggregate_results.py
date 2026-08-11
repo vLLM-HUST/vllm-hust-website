@@ -1575,40 +1575,35 @@ def select_preferred_pair(
     if not current_candidates or not baseline_candidates:
         return None
 
-    current_entry = sorted(
-        current_candidates,
-        key=lambda item: (
+    def preference_key(item: dict[str, Any]) -> tuple[float, float]:
+        return (
             parse_entry_timestamp(item),
             float((item.get("metrics") or {}).get("throughput_tps") or 0.0),
-        ),
-        reverse=True,
-    )[0]
+        )
 
+    baseline_hashes = {
+        spec_hash
+        for entry in baseline_candidates
+        if (spec_hash := get_same_spec_hash(entry)) is not None
+    }
+    matching_currents = [
+        entry
+        for entry in current_candidates
+        if get_same_spec_hash(entry) in baseline_hashes
+    ]
+    if not matching_currents:
+        return None
+
+    current_entry = max(matching_currents, key=preference_key)
     current_hash = get_same_spec_hash(current_entry)
-    current_spec_id = get_same_spec_id(current_entry)
     matching_baselines = [
         entry
         for entry in baseline_candidates
-        if current_hash and get_same_spec_hash(entry) == current_hash
+        if current_hash is not None and get_same_spec_hash(entry) == current_hash
     ]
-    if not matching_baselines and current_spec_id:
-        matching_baselines = [
-            entry
-            for entry in baseline_candidates
-            if get_same_spec_id(entry) == current_spec_id
-        ]
     if not matching_baselines:
-        matching_baselines = baseline_candidates
-
-    baseline_entry = sorted(
-        matching_baselines,
-        key=lambda item: (
-            parse_entry_timestamp(item),
-            float((item.get("metrics") or {}).get("throughput_tps") or 0.0),
-        ),
-        reverse=True,
-    )[0]
-    return current_entry, baseline_entry
+        return None
+    return current_entry, max(matching_baselines, key=preference_key)
 
 
 def normalize_engine_name(entry: dict[str, Any]) -> str:

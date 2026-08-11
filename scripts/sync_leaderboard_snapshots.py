@@ -17,6 +17,13 @@ SNAPSHOT_FILES = (
     "last_updated.json",
 )
 
+# Official fixed-target registry mirror. The benchmark repo publishes these under
+# hyphens; the website mirror uses underscores to match our data/ naming style.
+REGISTRY_MIRROR = {
+    "official-targets.json": "official_targets.json",
+    "official-targets.sha256": "official_targets.sha256",
+}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -68,6 +75,18 @@ def validate_snapshot_set(source_dir: Path) -> None:
     if not isinstance(marker, dict) or not marker.get("last_updated"):
         raise SystemExit("last_updated.json must contain last_updated")
 
+    missing_mirror = [
+        name for name in REGISTRY_MIRROR if not (source_dir / name).is_file()
+    ]
+    if missing_mirror:
+        raise SystemExit(
+            "missing benchmark registry mirror file(s): "
+            + ", ".join(sorted(missing_mirror))
+        )
+    registry = load_json(source_dir / "official-targets.json")
+    if not isinstance(registry, dict) or not isinstance(registry.get("targets"), list):
+        raise SystemExit("official-targets.json must contain a targets array")
+
 
 def sync_snapshots(source_dir: Path, target_dir: Path, *, check: bool) -> int:
     validate_snapshot_set(source_dir)
@@ -80,6 +99,16 @@ def sync_snapshots(source_dir: Path, target_dir: Path, *, check: bool) -> int:
         if target.is_file() and filecmp.cmp(source, target, shallow=False):
             continue
         changed.append(name)
+        if not check:
+            shutil.copy2(source, target)
+            target.chmod(0o644)
+
+    for source_name, target_name in REGISTRY_MIRROR.items():
+        source = source_dir / source_name
+        target = target_dir / target_name
+        if target.is_file() and filecmp.cmp(source, target, shallow=False):
+            continue
+        changed.append(target_name)
         if not check:
             shutil.copy2(source, target)
             target.chmod(0o644)
