@@ -1006,9 +1006,7 @@ def milestone_commit_verifier(
     root = Path(_git(repo, "rev-parse", "--show-toplevel").decode().strip()).resolve()
     _reject_replacement_state(root)
     remote = (
-        _git(root, "config", "--local", "--get", "remote.origin.url")
-        .decode()
-        .strip()
+        _git(root, "config", "--local", "--get", "remote.origin.url").decode().strip()
     )
     local_repository, canonical_remote = _github_origin_identity(remote)
     with tempfile.TemporaryDirectory(prefix="leadership-proof-") as tmp:
@@ -1073,12 +1071,16 @@ def milestone_commit_verifier(
         for ref in source_refs:
             advertised_object = advertised[ref]
             destination = destinations[ref]
-            local_object = _proof_git(proof_root, "rev-parse", destination).decode().strip()
+            local_object = (
+                _proof_git(proof_root, "rev-parse", destination).decode().strip()
+            )
             if local_object != advertised_object:
                 raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
-            commit = _proof_git(
-                proof_root, "rev-parse", f"{destination}^{{commit}}"
-            ).decode().strip()
+            commit = (
+                _proof_git(proof_root, "rev-parse", f"{destination}^{{commit}}")
+                .decode()
+                .strip()
+            )
             expected_commit = advertised.get(f"{ref}^{{}}", advertised_object)
             if commit != expected_commit:
                 raise ValueError(f"fetched origin ref is stale or inconsistent: {ref}")
@@ -1160,9 +1162,11 @@ def _proof_git(repo: Path, *args: str, remote: bool = False) -> bytes:
 
 def _reject_replacement_state(repo: Path, *, proof: bool = False) -> None:
     git = _proof_git if proof else _git
-    replacements = git(
-        repo, "for-each-ref", "--format=%(refname)", "refs/replace"
-    ).decode().strip()
+    replacements = (
+        git(repo, "for-each-ref", "--format=%(refname)", "refs/replace")
+        .decode()
+        .strip()
+    )
     if replacements:
         raise ValueError("milestone repository must not contain replace refs")
     grafts_raw = git(repo, "rev-parse", "--git-path", "info/grafts").decode().strip()
