@@ -608,8 +608,12 @@
 
             const renderPartialData = (progress) => {
                 const partialData = progress?.data || {};
+                // Issue #200: skip partial snapshots with no records so an empty
+                // primary source (e.g. a fail-closed snapshot) does not render an
+                // empty table before the loader falls back to a source with data.
                 const hasBenchmarkData =
-                    Array.isArray(partialData.single) || Array.isArray(partialData.multi);
+                    (Array.isArray(partialData.single) && partialData.single.length > 0) ||
+                    (Array.isArray(partialData.multi) && partialData.multi.length > 0);
                 if (!hasBenchmarkData) {
                     return;
                 }
