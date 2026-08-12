@@ -4389,16 +4389,16 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "教授",
+          "en": "Professor"
         },
         "research_direction": {
-          "zh": "待补充",
-          "en": "To be provided"
+          "zh": "分布式系统",
+          "en": "Distributed systems"
         },
         "profile_status": {
-          "zh": "GitHub 已确认，特长待补",
-          "en": "GitHub confirmed; research focus pending"
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
         },
         "participation_direction": {
           "zh": "",

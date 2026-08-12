@@ -2067,8 +2067,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     }
     for name, expected in expanded_research_profiles.items():
         assert people[name]["research_direction"]["zh"] == expected
-    for name in ("韦若皓", "万瑞鹏", "周雨桐", "毛言粲", "雷欣妍"):
+    for name in ("韦若皓", "万瑞鹏", "周雨桐", "雷欣妍"):
         assert people[name]["research_direction"]["zh"] == "待补充"
+    assert people["毛言粲"]["research_direction"]["zh"] == "分布式系统"
+    assert people["毛言粲"]["role"]["zh"] == "教授"
     assert (
         people["刘俊"]["research_direction"]["zh"]
         == "SLO 感知的 LLM Serving 调度；MLA 与 KV Cache 优化；张量并行与多 GPU 推理解码；延迟保障与资源分配；应用感知 Serving"
