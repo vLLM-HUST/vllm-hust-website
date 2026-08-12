@@ -1483,6 +1483,12 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "state.trendChart.setDatasetVisibility(datasetIndex, visible)" in js_text
     assert "pointDetails" in js_text
     assert "function getTrendVersionTrack(entry)" in js_text
+    assert (
+        "const family = normalized.match(/^(\\d+(?:\\.\\d+){0,2})/i)?.[1] || '';"
+        in js_text
+    )
+    assert "&& previousPoint.trendTrack" in js_text
+    assert "&& point.trendTrack" in js_text
     assert "trackBreakIndices.add(versionIndex)" in js_text
     assert (
         "borderColor: (context) => trackBreakIndices.has(context.p1DataIndex)"
