@@ -123,6 +123,11 @@
         return String(value || '');
     }
 
+    function profileStatus(item, lang) {
+        return localized(item, 'profile_status', lang)
+            || localized(item, 'github_status', lang);
+    }
+
     function labels(lang) {
         return lang === 'zh'
             ? {
@@ -132,6 +137,7 @@
                 areas: '贡献领域',
                 main: '主要贡献',
                 advisor: '指导老师',
+                status: '状态',
                 pending: '身份待确认',
                 commits: '次提交',
                 none: '—',
@@ -143,6 +149,7 @@
                 areas: 'Contribution areas',
                 main: 'Main contributions',
                 advisor: 'Advisor',
+                status: 'Status',
                 pending: 'Identity pending',
                 commits: 'commits',
                 none: '—',
@@ -228,8 +235,11 @@
             const areas = item.contribution_areas || item.key_contributions || '';
             const advisor = localized(item, 'advisor', lang);
             const rows = kind === 'core'
-                ? [
+                    ? [
                     detailRow(text.research, research),
+                    profileStatus(item, lang)
+                        ? detailRow(text.status, profileStatus(item, lang))
+                        : '',
                     detailRow(text.areas, areas),
                     detailRow(text.main, mainContribution(item, lang)),
                     advisor ? detailRow(text.advisor, advisor) : '',
@@ -238,6 +248,9 @@
                     ? [
                         role ? detailRow(text.role, role) : '',
                         research ? detailRow(text.research, research) : '',
+                        profileStatus(item, lang)
+                            ? detailRow(text.status, profileStatus(item, lang))
+                            : '',
                         participation ? detailRow(text.participation, participation) : '',
                         areas ? detailRow(text.areas, areas) : '',
                         mainContribution(item, lang)
@@ -247,6 +260,9 @@
                     : [
                         role ? detailRow(text.role, role) : '',
                         research ? detailRow(text.research, research) : '',
+                        profileStatus(item, lang)
+                            ? detailRow(text.status, profileStatus(item, lang))
+                            : '',
                         participation ? detailRow(text.participation, participation) : '',
                         areas ? detailRow(text.areas, areas) : '',
                         advisor ? detailRow(text.advisor, advisor) : '',
