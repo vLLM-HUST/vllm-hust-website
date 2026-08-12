@@ -284,7 +284,22 @@ function isCompareSnapshotUsable(compareSnapshot) {
     return Array.isArray(compareSnapshot.groups);
 }
 
+function isSnapshotEmpty(snapshot) {
+    const single = Array.isArray(snapshot?.single) ? snapshot.single : [];
+    const multi = Array.isArray(snapshot?.multi) ? snapshot.multi : [];
+    return single.length === 0 && multi.length === 0;
+}
+
 function assertUsableLeaderboardPayload(result, source) {
+    // Issue #200: a snapshot with zero benchmark records cannot populate the
+    // leaderboard. Treat it as unusable so the loader falls through to the next
+    // source instead of returning an empty page while other sources still hold data.
+    if (isSnapshotEmpty(result)) {
+        const emptyError = new Error(`Empty leaderboard snapshot from ${source}: no benchmark records`);
+        emptyError.isEmptySnapshot = true;
+        throw emptyError;
+    }
+
     if (isCompareSnapshotUsable(result.compare)) {
         return;
     }
@@ -706,6 +721,7 @@ async function loadLeaderboardData(options = {}) {
 
     const sourcePriority = getSourcePriority();
     let lastError = null;
+    const emptySources = new Set();
 
     for (const source of sourcePriority) {
         const loader = loaders[source];
@@ -736,8 +752,23 @@ async function loadLeaderboardData(options = {}) {
             return result;
         } catch (error) {
             lastError = error;
-            console.warn(`[HF Loader] ⚠️ ${source} load failed:`, error?.message || error);
+            if (error?.isEmptySnapshot) {
+                emptySources.add(source);
+                console.warn(`[HF Loader] ⚠️ ${source} snapshot is empty, trying next source`);
+            } else {
+                console.warn(`[HF Loader] ⚠️ ${source} load failed:`, error?.message || error);
+            }
         }
+    }
+
+    // Every reachable source returned an empty snapshot (no records). Surface the
+    // empty leaderboard state instead of a hard error, since no source really failed.
+    const triedSources = sourcePriority.filter(
+        (source) => source !== 'local' || HF_CONFIG.fallbackToLocal
+    );
+    if (triedSources.length && triedSources.every((source) => emptySources.has(source))) {
+        console.warn('[HF Loader] ⚠️ All sources returned empty snapshots; showing empty state');
+        return { single: [], multi: [], compare: null };
     }
 
     throw new Error(lastError?.message || 'Failed to load leaderboard data from all sources');

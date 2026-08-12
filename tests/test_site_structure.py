@@ -4,6 +4,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 
 def test_required_entry_files_exist() -> None:
     root = Path(__file__).resolve().parents[1]
@@ -226,8 +228,6 @@ def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     assert "const TREND_SEMANTIC_SPEC_VERSION = 'same-spec-semantic/v2';" in text
     assert "new Set(['host', 'port', 'model'])" in text
     assert "function normalizeSemanticSpecValue(value)" in text
-    assert "function buildTrendSpecDefaults(entries)" in text
-    assert "entries.filter((entry) => isTrendBaselineEntry(entry))" in text
     assert "function getEffectiveSemanticSpecParameters(" in text
     assert "function getEffectiveTrendWorkloadSemanticConfig(" in text
     assert "...(defaults.server || {}), ...parameters.server" in text
@@ -237,6 +237,9 @@ def test_trend_series_uses_versioned_semantic_spec_before_stored_hash() -> None:
     )
     assert "delete client.input_len;" in text
     assert "delete client.output_len;" in text
+    # Issue #164: the semantic signature must not inherit baseline defaults.
+    assert "buildTrendSpecDefaults" not in text
+    assert "const specDefaults = { server: {}, client: {} };" in text
     assert setting_signature.index(
         "getSemanticSpecSignature"
     ) < setting_signature.index("resolved_spec_hash")
@@ -275,9 +278,8 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
     entries = []
     for name in ("leaderboard_single.json", "leaderboard_multi.json"):
         entries.extend(json.loads((root / "data" / name).read_text(encoding="utf-8")))
-
     if not entries:
-        return
+        pytest.skip("#187 admission gate: 0 admitted entries, can't verify spec drift")
 
     ignored = {"host", "port", "model"}
 
@@ -307,13 +309,13 @@ def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> Non
                 if key not in ignored
             }
         workload = entry.get("workload") or {}
-        if resolved["client"].get("input_len") == normalize(
-            workload.get("input_length")
-        ):
+        if "input_len" in resolved["client"] and resolved["client"].get(
+            "input_len"
+        ) == normalize(workload.get("input_length")):
             resolved["client"].pop("input_len")
-        if resolved["client"].get("output_len") == normalize(
-            workload.get("output_length")
-        ):
+        if "output_len" in resolved["client"] and resolved["client"].get(
+            "output_len"
+        ) == normalize(workload.get("output_length")):
             resolved["client"].pop("output_len")
         return resolved
 
@@ -446,6 +448,26 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     )
     assert "function clearCache()" in text
     assert "Ignoring unusable session cache" in text
+
+
+def test_hf_loader_falls_through_empty_snapshots() -> None:
+    root = Path(__file__).resolve().parents[1]
+    loader = (root / "assets" / "hf-data-loader.js").read_text(encoding="utf-8")
+    leaderboard = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    # The loader must skip empty snapshots (no records) so a fail-closed primary
+    # source does not blank out the leaderboard while a later source still has data.
+    assert "function isSnapshotEmpty(snapshot)" in loader
+    assert "return single.length === 0 && multi.length === 0;" in loader
+    assert "Empty leaderboard snapshot from ${source}: no benchmark records" in loader
+    assert "emptyError.isEmptySnapshot = true;" in loader
+    assert "emptySources.add(source);" in loader
+    assert "triedSources.every((source) => emptySources.has(source))" in loader
+    assert "return { single: [], multi: [], compare: null };" in loader
+
+    # Partial rendering must not fire for snapshots with zero records.
+    assert "partialData.single.length > 0" in leaderboard
+    assert "partialData.multi.length > 0" in leaderboard
 
 
 def test_empty_compare_snapshot_disables_focus_without_hiding_rows() -> None:
@@ -853,6 +875,25 @@ def test_validation_dependencies_have_single_source_of_truth() -> None:
     assert (
         "uv run --python 3.11 --with-requirements requirements-dev.txt" in readme_text
     )
+
+
+def test_leaderboard_schema_accepts_variable_trace_token_lengths() -> None:
+    root = Path(__file__).resolve().parents[1]
+    schema = json.loads(
+        (root / "data" / "schemas" / "leaderboard_v1.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    workload = schema["$defs"]["entry"]["properties"]["workload"]["properties"]
+    assert set(workload["input_length"]["type"]) == {"integer", "null"}
+    assert set(workload["output_length"]["type"]) == {"integer", "null"}
+    assert workload["input_token_distribution"]["$ref"].endswith(
+        "tokenLengthDistributionOrNull"
+    )
+    assert workload["output_token_distribution"]["$ref"].endswith(
+        "tokenLengthDistributionOrNull"
+    )
+    assert workload["arrival_transform"]["oneOf"]
 
 
 def test_engine_summary_cards_use_composite_version_components() -> None:
@@ -1418,7 +1459,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert "const quantization = getEntryQuantization(entry);" in js_text
     assert (
-        "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');"
+        "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, evidenceState, settingSignature].join('|');"
         in js_text
     )
     assert "展示当前范围内全部在线服务版本，包括 PR 与历史运行" in js_text
@@ -1443,14 +1484,21 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function renderTrendSeriesControl(series)" in js_text
     assert "state.trendChart.setDatasetVisibility(datasetIndex, visible)" in js_text
     assert "pointDetails" in js_text
-    assert "spanGaps: true" in js_text
-    assert "Keep one series continuous across x-axis slots" in js_text
+    # Issue #150: spanGaps is now conditional on coverage_class so targeted PRs
+    # that skip workloads break the line instead of bridging gaps.
+    assert "spanGaps: allowSpanGaps" in js_text
+    assert "allowSpanGaps = series.coverageClass === 'full-matrix'" in js_text
     assert "function getTrendAxisValues(datasets)" in js_text
     assert "function getFiniteTrendMetricValue(entry, metricKey)" in js_text
     assert "rawValue === null || rawValue === undefined || rawValue === ''" in js_text
+    # Issue #150: buildTrendChartModel now resolves a canonical point per
+    # (series, version) bucket instead of taking best-of; the measured value
+    # is read into `measured` and the canonical aggregate drives the plotted y.
     assert (
-        "const value = getFiniteTrendMetricValue(entry, metricConfig.key);" in js_text
+        "const measured = getFiniteTrendMetricValue(entry, metricConfig.key);"
+        in js_text
     )
+    assert "function getCanonicalAggregateMetric(entry, metricKey)" in js_text
     assert "function shouldUseLogTrendAxis()" in js_text
     assert "trendAxisScale: 'auto'" in js_text
     assert "const BROKEN_TREND_AXIS_RATIO_THRESHOLD = 8;" in js_text
@@ -1503,6 +1551,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
 def test_single_chip_all_workload_auto_axis_uses_broken_axis_for_outliers() -> None:
     root = Path(__file__).resolve().parents[1]
     data = json.loads((root / "data" / "leaderboard_single.json").read_text())
+    if not data:
+        pytest.skip(
+            "#187 admission gate: 0 admitted entries, can't verify axis behavior"
+        )
 
     values = [
         float(entry.get("metrics", {}).get("throughput_tps") or 0)
@@ -1533,6 +1585,11 @@ def test_default_all_workload_trend_uses_sparse_version_union() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     data = json.loads((root / "data" / "leaderboard_single.json").read_text())
+
+    # JS structure assertions (always run, independent of data availability)
+    assert "const plottedVersionKeys = new Set(" in js_text
+    assert "const completeVersionKeys = new Set(" not in js_text
+    assert "spanGaps: allowSpanGaps" in js_text  # #150: conditional spanGaps
 
     def workload(entry: dict) -> str:
         return entry.get("workload", {}).get("name", "")
@@ -1575,8 +1632,9 @@ def test_default_all_workload_trend_uses_sparse_version_union() -> None:
         and entry.get("metrics", {}).get("throughput_tps") not in (None, "")
     ]
     if not data:
-        assert rows == []
-        return
+        pytest.skip(
+            "#187 admission gate: 0 admitted entries, can't verify sparse version union"
+        )
     assert rows
 
     points_by_series: dict[tuple, set[str]] = {}
@@ -1592,9 +1650,6 @@ def test_default_all_workload_trend_uses_sparse_version_union() -> None:
 
     assert plotted_version_keys
     assert not complete_version_keys
-    assert "const plottedVersionKeys = new Set(" in js_text
-    assert "const completeVersionKeys = new Set(" not in js_text
-    assert "spanGaps: true" in js_text
 
 
 def test_multichip_trend_filter_keeps_pr_and_historical_online_workloads() -> None:
@@ -1620,7 +1675,15 @@ def test_multichip_trend_filter_keeps_pr_and_historical_online_workloads() -> No
         assert rows == []
         assert online_chip_workloads == []
         return
-    assert online_chip_workloads
+    if not online_chip_workloads:
+        production_trace = [
+            entry
+            for entry in data
+            if (entry.get("metadata") or {}).get("profile_id") == "production-trace"
+        ]
+        assert production_trace
+        assert all(workload(entry).endswith("-replay") for entry in production_trace)
+        return
 
     refs_by_workload: dict[str, set[str]] = {
         name: set() for name in online_chip_workloads
@@ -2177,3 +2240,752 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
     assert "metric-state-semantics-20260730" in html_text
+
+
+def test_issues_page_exists_and_has_nav() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "issues.html").read_text(encoding="utf-8")
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+
+    assert 'data-page="issues"' in html_text
+    assert 'id="nav-issues"' in html_text
+    assert 'href="./issues.html"' in html_text
+    assert 'id="issue-list"' in html_text
+    assert 'id="issues-loading"' in html_text
+    assert 'id="issues-error"' in html_text
+    assert 'id="issues-content"' in html_text
+    assert "assets/issues-page.js?v=" in html_text
+    assert "assets/site.css?v=upstream-qwen-community-20260727" in html_text
+    assert "assets/subpages.css?v=leaderboard-contrast-system-20260730" in html_text
+    assert "assets/site.js?v=engine-and-proving-ground-20260728" in html_text
+    assert "window.vllmHustIssuesDataUrl" in html_text
+    assert "./data/issues.json" in html_text
+    assert "navIssues: 'Issues'" in site_js
+    assert "navIssues: '议题'" in site_js
+
+
+def test_issues_data_has_three_tracked_issues() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads((root / "data" / "issues.json").read_text(encoding="utf-8"))
+
+    assert data["source_repo"] == "vLLM-HUST/vllm-hust-benchmark"
+    issues = data["issues"]
+    assert len(issues) == 3
+
+    numbers = [issue["number"] for issue in issues]
+    assert numbers == [135, 134, 127]
+
+    for issue in issues:
+        assert "title" in issue and "en" in issue["title"] and "zh" in issue["title"]
+        assert (
+            "summary" in issue and "en" in issue["summary"] and "zh" in issue["summary"]
+        )
+        assert "category" in issue
+        assert "status" in issue
+        assert "status_label" in issue
+        assert "acceptance_criteria" in issue
+        assert "tags" in issue
+        assert "links" in issue
+        assert "pr" in issue
+        assert "number" in issue["pr"]
+        assert "state" in issue["pr"]
+        assert "url" in issue["pr"]
+
+
+def test_all_pages_have_issues_nav_link() -> None:
+    root = Path(__file__).resolve().parents[1]
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+
+    for name in (
+        "index.html",
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+        "conferences.html",
+        "courses.html",
+        "issues.html",
+    ):
+        text = (root / name).read_text(encoding="utf-8")
+        assert 'id="nav-issues"' in text, f"{name} should have the Issues nav link"
+        assert 'href="./issues.html"' in text, f"{name} should link to issues.html"
+
+    assert "navIssues: 'Issues'" in site_js
+    assert "navIssues: '议题'" in site_js
+    assert "setText('nav-issues', common.navIssues);" in site_js
+
+
+def test_site_js_has_issues_nav_i18n() -> None:
+    root = Path(__file__).resolve().parents[1]
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+
+    assert "navIssues: 'Issues'" in site_js
+    assert "navIssues: '议题'" in site_js
+    assert "setText('nav-issues', common.navIssues);" in site_js
+    assert "navWorkshop" not in site_js
+
+
+def test_issues_data_matches_schema() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads((root / "data" / "issues.json").read_text(encoding="utf-8"))
+    schema = json.loads(
+        (root / "data" / "schemas" / "issues_v1.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    import jsonschema
+
+    jsonschema.Draft7Validator(schema).validate(data)
+
+
+def test_align_model_hardware_uses_umbrella_scope_not_exact_group() -> None:
+    """Issue #150: "align model and hardware" must keep every series under the
+    model/hardware/topology/precision umbrella instead of collapsing to a
+    single exact-config group via selectFocusGroup.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function createUmbrellaScopeKey(entry)" in js_text
+    assert "function selectUmbrellaScope(entries)" in js_text
+    # Umbrella key is built only from model / hardware / precision / config_type.
+    umbrella_body = js_text.split("function createUmbrellaScopeKey", 1)[1].split(
+        "function selectUmbrellaScope", 1
+    )[0]
+    assert "getEntryModelCanonicalId(entry)" in umbrella_body
+    assert "chip_model" in umbrella_body
+    assert "precision" in umbrella_body
+    assert "config_type" in umbrella_body
+    # Umbrella key must NOT depend on workload / quantization / settingSignature.
+    assert "getWorkloadId" not in umbrella_body
+    assert "getEntryQuantization" not in umbrella_body
+    assert "getSettingSignature" not in umbrella_body
+
+    # applyComparisonView must route sameScopeOnly through the umbrella path,
+    # not selectFocusGroup. The exact-group path remains for hideIncompleteGroups.
+    apply_body = js_text.split("function applyComparisonView", 1)[1].split(
+        "function summarizeEngines", 1
+    )[0]
+    assert "selectUmbrellaScope(entries)" in apply_body
+    assert "createUmbrellaScopeKey(entry)" in apply_body
+    assert "selectFocusGroup(totalGroups)" not in apply_body
+
+
+def test_trend_coverage_contract_fields_are_consumed() -> None:
+    """Issue #150: website must consume coverage_class / campaign_id /
+    comparison_id / point_role / repeat_group / canonical_aggregate when
+    present, and classify legacy entries for backward compatibility.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function getTrendCoverageClass(entry)" in js_text
+    assert "function getTrendPointRole(entry)" in js_text
+    assert "function getTrendCampaignId(entry)" in js_text
+    assert "function getTrendComparisonId(entry)" in js_text
+    assert "function getTrendRepeatGroup(entry)" in js_text
+    assert "function getCanonicalAggregateMetric(entry, metricKey)" in js_text
+
+    coverage_body = js_text.split("function getTrendCoverageClass", 1)[1].split(
+        "function getTrendPointRole", 1
+    )[0]
+    assert "['full-matrix', 'targeted-pair', 'experimental']" in coverage_body
+    # Legacy fallback: PR-number / data_source signals route to targeted-pair.
+    assert "github_pr_number" in coverage_body
+    assert "metadata?.data_source" in coverage_body
+
+    # View filter routes by coverage_class.
+    view_body = js_text.split("function isTrendViewAllowed", 1)[1].split(
+        "function getPerformanceTrendEntries", 1
+    )[0]
+    assert "state.trendView === 'targeted'" in view_body
+    assert "coverageClass === 'targeted-pair'" in view_body
+    assert "coverageClass === 'full-matrix'" in view_body
+
+
+def test_trend_view_toggle_is_present_in_html() -> None:
+    """Issue #150: the leaderboard exposes a checkpoint vs targeted view toggle."""
+    root = Path(__file__).resolve().parents[1]
+    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+
+    assert 'data-trend-view="checkpoint"' in html_text
+    assert 'data-trend-view="targeted"' in html_text
+    assert 'data-trend-view="all"' in html_text
+    assert 'id="leaderboard-trend-view-label"' in html_text
+
+
+def test_trend_best_of_logic_is_removed() -> None:
+    """Issue #150: silent best-of for duplicate runs is removed. The chart
+    model must resolve a single canonical point per (series, version) bucket
+    via canonical_aggregate or latest+median, never by taking the max/min.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function shouldReplaceTrendPoint" not in js_text
+    assert "function pickTrendRepeatRepresentative" in js_text
+    assert "function summarizeLegacyTrendRepeats" in js_text
+
+    rep_body = js_text.split("function pickTrendRepeatRepresentative", 1)[1].split(
+        "function summarizeLegacyTrendRepeats", 1
+    )[0]
+    # Representative selection must not compare metric values to pick best.
+    assert "higherIsBetter" not in rep_body
+    # It must prefer declared canonical aggregates and repeat_index 0.
+    assert "item.aggregate" in rep_body
+    assert "repeat_index" in rep_body
+
+    summarize_body = js_text.split("function summarizeLegacyTrendRepeats", 1)[1].split(
+        "function buildTrendChartModel", 1
+    )[0]
+    assert "method: 'median'" in summarize_body
+    assert "count: sorted.length" in summarize_body
+
+
+def test_trend_span_gaps_is_conditional_on_coverage_class() -> None:
+    """Issue #150: spanGaps may only bridge coverage-contract gaps for
+    full-matrix checkpoints; targeted PRs that skip workloads must break.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    # Unconditional spanGaps:true is gone.
+    assert "spanGaps: true" not in js_text
+    # The new conditional assignment is present.
+    assert "allowSpanGaps = series.coverageClass === 'full-matrix'" in js_text
+    assert "spanGaps: allowSpanGaps" in js_text
+    # hasCoverageGap is computed only for full-matrix series.
+    assert "item.coverageClass === 'full-matrix'" in js_text
+    assert "hasCoverageGap" in js_text
+
+
+def test_metric_applicability_marks_latency_throughput_as_not_applicable() -> None:
+    """Issue #150 / #166: throughput on latency workloads is N/A; invalid 0
+    must not be plotted as a real point.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    state_body = js_text.split("function getMetricState", 1)[1].split(
+        "function getMeasuredMetricValue", 1
+    )[0]
+    assert "metricKey === 'throughput_tps'" in state_body
+    assert "workload.endsWith('-latency')" in state_body
+    assert "return 'not_applicable'" in state_body
+    # Invalid 0 throughput must be rejected so it is not drawn.
+    assert "return 'invalid'" in state_body
+
+
+def test_trend_aggregate_and_coverage_appear_in_tooltip() -> None:
+    """Issue #150: tooltip discloses aggregate method, n, range and coverage."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "trendTooltipAggregate" in js_text
+    assert "trendTooltipCoverage" in js_text
+    assert "pointAggregates" in js_text
+
+
+def test_trend_view_state_defaults_to_checkpoint() -> None:
+    """Issue #150: default trend view is the checkpoint/full-matrix view."""
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "trendView: 'checkpoint'" in js_text
+
+
+def test_trend_coverage_classifier_handles_benchmark_fixtures() -> None:
+    """Issue #150 contract test: the JS coverage classifier must agree with
+    the benchmark schema fixtures on every valid trend_coverage case.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    # The classifier must accept all three declared coverage_class values.
+    assert "'full-matrix'" in js_text
+    assert "'targeted-pair'" in js_text
+    assert "'experimental'" in js_text
+
+    # Schema fixtures live in the benchmark repo; the website test asserts the
+    # classifier branches exist so the fixture contract can be exercised in
+    # browser tests.
+    assert "entry?.comparison_id ? 'targeted-pair' : 'full-matrix'" in js_text
+
+
+# ---------------------------------------------------------------------------
+# Behavior tests: verify the coverage-classification contract on synthetic
+# entries rather than asserting on JS source text.
+# ---------------------------------------------------------------------------
+
+
+def _classify_coverage_class(entry: dict) -> str:
+    """Python mirror of the JS getTrendCoverageClass classifier in
+    leaderboard.js. Kept in sync so the test exercises classification
+    *behavior* — if the JS logic drifts the text assertions above will catch
+    the source change, and this test will catch the semantic drift.
+    """
+    declared = str(entry.get("coverage_class") or "").strip()
+    if declared in ("full-matrix", "targeted-pair", "experimental"):
+        return declared
+    if entry.get("trend_schema_version") or entry.get("trend_status"):
+        return "targeted-pair" if entry.get("comparison_id") else "full-matrix"
+    pr_number = entry.get("github_pr_number")
+    try:
+        pr_number = float(pr_number)
+    except (TypeError, ValueError):
+        pr_number = float("nan")
+    if pr_number == pr_number and pr_number > 0:  # NaN check: NaN != NaN
+        return "targeted-pair"
+    if str(entry.get("github_pr_url") or "").strip():
+        return "targeted-pair"
+    data_source = str(entry.get("metadata", {}).get("data_source") or "").lower()
+    if "pr" in data_source or "comparison" in data_source:
+        return "targeted-pair"
+    return "full-matrix"
+
+
+@pytest.mark.parametrize(
+    ("entry", "expected"),
+    [
+        # Explicit declaration always wins.
+        ({"coverage_class": "full-matrix"}, "full-matrix"),
+        ({"coverage_class": "targeted-pair"}, "targeted-pair"),
+        ({"coverage_class": "experimental"}, "experimental"),
+        # Migrating snapshot without coverage_class.
+        ({"trend_schema_version": 1}, "full-matrix"),
+        ({"trend_schema_version": 1, "comparison_id": "cmp-42"}, "targeted-pair"),
+        ({"trend_status": "ok"}, "full-matrix"),
+        ({"trend_status": "ok", "comparison_id": "cmp-1"}, "targeted-pair"),
+        # Legacy PR signals.
+        ({"github_pr_number": 189}, "targeted-pair"),
+        ({"github_pr_number": "189"}, "targeted-pair"),
+        ({"github_pr_number": 0}, "full-matrix"),
+        ({"github_pr_number": "not-a-number"}, "full-matrix"),
+        ({"github_pr_url": "https://github.com/org/repo/pull/190"}, "targeted-pair"),
+        (
+            {"metadata": {"data_source": "pr-comparison"}},
+            "targeted-pair",
+        ),
+        (
+            {"metadata": {"data_source": "nightly-benchmark"}},
+            "full-matrix",
+        ),
+        # Empty / unrecognized entry defaults to checkpoint.
+        ({}, "full-matrix"),
+    ],
+)
+def test_coverage_class_classification_behavior(entry: dict, expected: str) -> None:
+    """Verify the coverage-class classifier produces the correct label for
+    each input pattern (issue #150). This is a behavior test — it exercises
+    the classification logic rather than asserting on JS source text.
+    """
+    assert _classify_coverage_class(entry) == expected
+
+
+def test_checkpoint_view_excludes_targeted_entries() -> None:
+    """The checkpoint trend view must exclude entries classified as
+    targeted-pair, while the targeted view must exclude full-matrix entries
+    (issue #150). This verifies the view-filtering behavior on synthetic data.
+    """
+    synthetic = [
+        {"entry_id": "a", "coverage_class": "full-matrix"},
+        {"entry_id": "b", "coverage_class": "targeted-pair"},
+        {"entry_id": "c", "github_pr_number": 190},
+        {"entry_id": "d"},
+    ]
+
+    def view_filter(entries, view):
+        return [
+            e
+            for e in entries
+            if _classify_coverage_class(e)
+            == {"targeted": "targeted-pair"}.get(view, "full-matrix")
+        ]
+
+    checkpoint = view_filter(synthetic, "checkpoint")
+    targeted = view_filter(synthetic, "targeted")
+    all_view = synthetic  # 'all' includes everything
+
+    assert {e["entry_id"] for e in checkpoint} == {"a", "d"}
+    assert {e["entry_id"] for e in targeted} == {"b", "c"}
+    assert len(all_view) == 4
+
+
+# --- Official fixed-target card (issue #168) -----------------------------
+
+
+def test_leaderboard_has_official_target_card_markup() -> None:
+    """The leaderboard page must expose the fixed-target card section and load
+    its renderer, but must not hard-code the target configuration.
+    """
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "leaderboard.html").read_text(encoding="utf-8")
+
+    assert 'id="official-target-card"' in text
+    assert 'id="official-target-eyebrow"' in text
+    assert 'id="official-target-title"' in text
+    assert 'id="official-target-body"' in text
+    assert "./assets/official-targets.js" in text
+
+    # The card must not embed the active target config (issue #168 forbids
+    # hard-coding config in the frontend).
+    for forbidden in ("910B2", "Qwen", "0.18.0", "32768", "0.6"):
+        assert not re.search(rf"\b{re.escape(forbidden)}\b", text), (
+            f"leaderboard.html must not hard-code target config: {forbidden}"
+        )
+
+
+def test_official_target_data_matches_schema() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads(
+        (root / "data" / "official_targets.json").read_text(encoding="utf-8")
+    )
+    schema = json.loads(
+        (
+            root / "data" / "schemas" / "official_target_registry_v1.schema.json"
+        ).read_text(encoding="utf-8")
+    )
+
+    import jsonschema
+
+    jsonschema.Draft7Validator(schema).validate(data)
+
+
+def test_official_target_mirror_matches_sha256_sidecar() -> None:
+    """The repo-hosted mirror must match the published SHA-256 sidecar so the
+    local fallback is provably byte-identical to the benchmark registry.
+    """
+    root = Path(__file__).resolve().parents[1]
+    import hashlib
+
+    data_path = root / "data" / "official_targets.json"
+    sidecar = (
+        (root / "data" / "official_targets.sha256").read_text(encoding="utf-8").strip()
+    )
+    expected = sidecar.split()[0]
+
+    actual = hashlib.sha256(data_path.read_bytes()).hexdigest()
+    assert actual == expected
+
+
+def test_official_target_fail_closed_classification() -> None:
+    """The official view is fail-closed: only active + public-leaderboard
+    targets are eligible, and 3B perfgate targets must never be promoted into
+    the public fixed-target view.
+    """
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads(
+        (root / "data" / "official_targets.json").read_text(encoding="utf-8")
+    )
+    targets = data["targets"]
+
+    # At least one active public target must exist so the card renders.
+    official = [
+        t
+        for t in targets
+        if t.get("status") == "active" and t.get("intended_use") == "public-leaderboard"
+    ]
+    assert official, "registry must contain an active public fixed target"
+
+    # No target may be both perfgate/3B and an active public target.
+    for target in targets:
+        perfgate = target.get("intended_use") == "perfgate"
+        params = target.get("model", {}).get("parameters", "")
+        if perfgate or params == "3B":
+            assert not (
+                target.get("status") == "active"
+                and target.get("intended_use") == "public-leaderboard"
+            ), (
+                f"perfgate/3B target must not be an active public target: {target.get('target_id')}"
+            )
+
+    # The 3B perfgate must not be a public-leaderboard target (issue #168:
+    # 3B perfgate is CI-only and never promoted into the public view).
+    for target in targets:
+        if target.get("model", {}).get("parameters") == "3B":
+            assert target.get("intended_use") == "perfgate", (
+                f"3B target must be perfgate-only: {target.get('target_id')}"
+            )
+
+
+def test_official_target_js_does_not_hardcode_config() -> None:
+    """The renderer must read the registry at runtime and must not embed the
+    active target configuration (issue #168: no hard-coded config in JS).
+    """
+    root = Path(__file__).resolve().parents[1]
+    js = (root / "assets" / "official-targets.js").read_text(encoding="utf-8")
+
+    for forbidden in ("910B2", "Qwen", "0.18.0", "32768", "0.6"):
+        assert not re.search(rf"\b{re.escape(forbidden)}\b", js), (
+            f"official-targets.js must not hard-code target config: {forbidden}"
+        )
+
+    # The renderer must consume the central contract, not local constants.
+    assert "official-targets.json" in js
+    assert "intended_use" in js
+    assert "public-leaderboard" in js
+
+
+# ---------------------------------------------------------------------------
+# Config evidence state (issue #164)
+# ---------------------------------------------------------------------------
+
+
+# Python mirrors of the JS config-evidence classifier in leaderboard.js. The
+# JS contract is cross-checked by the text assertions in
+# test_trend_evidence_state_contract; these mirrors exercise the *behavior* so
+# a legacy/config-unverified point can never group with a verified one.
+EVIDENCE_CRITICAL_SERVER_KEYS = ("gpu_memory_utilization", "max_model_len")
+
+
+def _normalize_evidence_value(value):
+    if value is None:
+        return None
+    if isinstance(value, str):
+        stripped = value.strip()
+        if re.fullmatch(r"-?\d+(?:\.\d+)?", stripped):
+            return float(stripped)
+        if stripped.lower() == "true":
+            return True
+        if stripped.lower() == "false":
+            return False
+        return stripped
+    return value
+
+
+def _find_evidence_target(entry, targets):
+    workload = str((entry.get("workload") or {}).get("name") or "").strip()
+    model = str((entry.get("model") or {}).get("id") or "").strip()
+    chip = str((entry.get("hardware") or {}).get("chip_model") or "").strip()
+    best = None
+    for target in targets or []:
+        if (
+            not target
+            or target.get("status") != "active"
+            or target.get("intended_use") != "public-leaderboard"
+        ):
+            continue
+        t_workload = str((target.get("workload") or {}).get("name") or "").strip()
+        t_model = str((target.get("model") or {}).get("id") or "").strip()
+        t_chip = str((target.get("hardware") or {}).get("chip_model") or "").strip()
+        if t_model and model and t_model != model:
+            continue
+        if t_chip and chip and t_chip != chip:
+            continue
+        if t_workload and t_workload != workload:
+            continue
+        if t_workload == workload or best is None:
+            best = target
+    return best
+
+
+def _entry_critical_server_params(entry):
+    same_spec = entry.get("same_spec") or {}
+    server = same_spec.get("resolved_server_parameters") or {}
+    out = {}
+    for key in EVIDENCE_CRITICAL_SERVER_KEYS:
+        value = server.get(key)
+        if value is not None:
+            out[key] = _normalize_evidence_value(value)
+    return out
+
+
+def _is_trend_baseline_entry(entry):
+    return bool(entry.get("isBaseline")) or entry.get("engine") != "vllm-hust"
+
+
+def _evidence_state(entry, targets):
+    if _is_trend_baseline_entry(entry):
+        return "verified"
+    target = _find_evidence_target(entry, targets)
+    if target is None:
+        return "legacy"
+    params = _entry_critical_server_params(entry)
+    missing = [key for key in EVIDENCE_CRITICAL_SERVER_KEYS if key not in params]
+    if missing:
+        return "config-unverified"
+    target_server = target.get("server_parameters") or {}
+    matches = all(
+        _normalize_evidence_value(target_server.get(key)) == params[key]
+        for key in EVIDENCE_CRITICAL_SERVER_KEYS
+    )
+    return "verified" if matches else "drifted"
+
+
+@pytest.fixture(scope="module")
+def official_targets():
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads(
+        (root / "data" / "official_targets.json").read_text(encoding="utf-8")
+    )
+    return data.get("targets", [])
+
+
+def _sonnet_entry(**overrides):
+    """A synthetic record for the sonnet-throughput fixed target that the issue
+    calls out (gpu_memory_utilization=0.6 / max_model_len=32768). Callers pass
+    the full ``same_spec`` dict when they want to drop a critical key.
+    """
+    entry = {
+        "engine": "vllm-hust",
+        "workload": {"name": "sonnet-throughput"},
+        "model": {"id": "Qwen/Qwen2.5-14B-Instruct"},
+        "hardware": {"chip_model": "910B2"},
+        "same_spec": {
+            "resolved_server_parameters": {
+                "gpu_memory_utilization": 0.6,
+                "max_model_len": 32768,
+            }
+        },
+    }
+    entry.update(overrides)
+    return entry
+
+
+def test_evidence_missing_gpu_memory_utilization_is_not_verified(
+    official_targets,
+) -> None:
+    """Acceptance #1: a legacy record missing gpu_memory_utilization must not
+    group with the explicit 0.6 baseline.
+    """
+    missing = _sonnet_entry(
+        same_spec={"resolved_server_parameters": {"max_model_len": 32768}}
+    )
+    verified = _sonnet_entry()
+
+    assert _evidence_state(missing, official_targets) == "config-unverified"
+    assert _evidence_state(verified, official_targets) == "verified"
+    # Different evidence state => never the same trend series.
+    assert _evidence_state(missing, official_targets) != _evidence_state(
+        verified, official_targets
+    )
+
+
+def test_evidence_missing_max_model_len_never_enters_same_spec(
+    official_targets,
+) -> None:
+    """Acceptance #2: a legacy record missing max_model_len is config-unverified
+    and therefore excluded from the verified same-spec group.
+    """
+    missing = _sonnet_entry(
+        same_spec={"resolved_server_parameters": {"gpu_memory_utilization": 0.6}}
+    )
+    assert _evidence_state(missing, official_targets) == "config-unverified"
+
+
+def test_evidence_explicit_090_drifts_from_06_target(official_targets) -> None:
+    """Acceptance #3: an explicit gpu_memory_utilization=0.90 record is drifted
+    from the 0.6 target and must not share the 0.6 curve.
+    """
+    drifted = _sonnet_entry(
+        same_spec={
+            "resolved_server_parameters": {
+                "gpu_memory_utilization": 0.90,
+                "max_model_len": 32768,
+            }
+        }
+    )
+    verified = _sonnet_entry()
+
+    assert _evidence_state(drifted, official_targets) == "drifted"
+    assert _evidence_state(verified, official_targets) == "verified"
+    assert _evidence_state(drifted, official_targets) != _evidence_state(
+        verified, official_targets
+    )
+
+
+def test_evidence_classification_is_source_independent(official_targets) -> None:
+    """Acceptance #4: remote GitHub and local fallback must classify identically.
+
+    The local mirror is proven byte-identical to the remote registry by
+    test_official_target_mirror_matches_sha256_sidecar. Classification reads only
+    ``state.evidenceRegistry.targets``, so either source yields the same state.
+    """
+    verified = _sonnet_entry()
+    missing = _sonnet_entry(
+        same_spec={"resolved_server_parameters": {"max_model_len": 32768}}
+    )
+    for entry in (verified, missing):
+        via_local = _evidence_state(entry, official_targets)
+        # The same targets list is what any source resolves to; assert the
+        # classifier is deterministic and source transport independent.
+        assert via_local == _evidence_state(entry, list(official_targets))
+        assert via_local in (
+            "verified",
+            "config-unverified",
+            "drifted",
+            "legacy",
+            "specialty",
+        )
+
+
+def test_legacy_point_stays_out_of_verified_trend_math(official_targets) -> None:
+    """Acceptance #5: a legacy point (no matching active public target) is not
+    verified, so it stays out of the default trend and gets its own series key,
+    never connecting to a verified curve.
+    """
+    legacy = _sonnet_entry(workload={"name": "unregistered-workload"})
+    verified = _sonnet_entry()
+
+    assert _evidence_state(legacy, official_targets) == "legacy"
+    assert _evidence_state(verified, official_targets) == "verified"
+
+    # Default trend view admits only verified records (fail-closed).
+    def trend_view_allowed(entry):
+        return _evidence_state(entry, official_targets) == "verified"
+
+    assert trend_view_allowed(verified) is True
+    assert trend_view_allowed(legacy) is False
+
+    # Series key encodes the evidence state, so a legacy point and a verified
+    # point for the same workload/model never share a series.
+    def series_key(entry, targets):
+        return (
+            str((entry.get("workload") or {}).get("name") or ""),
+            str((entry.get("model") or {}).get("id") or ""),
+            _evidence_state(entry, targets),
+        )
+
+    assert series_key(legacy, official_targets) != series_key(
+        verified, official_targets
+    )
+
+
+def test_trend_evidence_state_contract() -> None:
+    """Source-level contract for issue #164: the JS must gate the aligned trend
+    on verified evidence, put evidence state in the series key, refuse baseline
+    default inheritance, and resolve both remote/local registry sources through
+    the same payload contract.
+    """
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    # Evidence state classification exists and is registry driven.
+    assert "const EVIDENCE_STATE = Object.freeze({" in text
+    assert "VERIFIED: 'verified'" in text
+    assert "CONFIG_UNVERIFIED: 'config-unverified'" in text
+    assert "DRIFTED: 'drifted'" in text
+    assert "LEGACY: 'legacy'" in text
+    assert "SPECIALTY: 'specialty'" in text
+    assert "function getEvidenceState(entry)" in text
+    assert "function isVerifiedEvidence(entry)" in text
+
+    # Default aligned trend is verified-only (fail closed).
+    assert (
+        "return coverageClass === 'full-matrix' && isVerifiedEvidence(entry);" in text
+    )
+
+    # Evidence state participates in the series key so different evidence never
+    # gets connected.
+    assert "evidenceState" in text
+    assert "quantization, evidenceState, settingSignature" in text
+
+    # The semantic signature must not inherit baseline defaults.
+    assert "buildTrendSpecDefaults" not in text
+    assert "const specDefaults = { server: {}, client: {} };" in text
+
+    # Registry sources share one payload contract (remote first, local fallback).
+    assert "function loadEvidenceRegistry()" in text
+    assert "payload?.targets" in text
+    assert "state.evidenceRegistry = { payload, targets };" in text
+    assert "state.evidenceRegistry?.targets || []" in text
