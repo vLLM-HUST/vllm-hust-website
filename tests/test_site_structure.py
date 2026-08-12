@@ -1484,7 +1484,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "pointDetails" in js_text
     assert "function getTrendVersionTrack(entry)" in js_text
     assert "trackBreakIndices.add(versionIndex)" in js_text
-    assert "borderColor: (context) => trackBreakIndices.has(context.p1DataIndex)" in js_text
+    assert (
+        "borderColor: (context) => trackBreakIndices.has(context.p1DataIndex)"
+        in js_text
+    )
     # Issue #150: spanGaps is now conditional on coverage_class so targeted PRs
     # that skip workloads break the line instead of bridging gaps.
     assert "spanGaps: allowSpanGaps" in js_text
