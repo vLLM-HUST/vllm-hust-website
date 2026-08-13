@@ -2974,18 +2974,23 @@
     function getTrendVersionTrack(entry) {
         const components = buildTableVersionComponents(entry)
             .filter((component) => component?.label);
-        const trackComponents = components
-            .map((component) => {
-                const rawVersion = component.rawVersion || '';
-                const normalized = normalizePackageVersion(rawVersion);
-                const family = normalized.match(/^(\d+(?:\.\d+){0,2})/i)?.[1] || '';
-                return family ? `${component.label}:${family}` : '';
-            })
-            .filter(Boolean);
-        if (trackComponents.length) {
-            return trackComponents.join('+');
-        }
-        return '';
+        return components.reduce((track, component) => {
+            const rawVersion = component.rawVersion || '';
+            const normalized = normalizePackageVersion(rawVersion);
+            const family = normalized.match(/^(\d+(?:\.\d+){0,2})/i)?.[1] || '';
+            if (family) {
+                track[component.label] = family;
+            }
+            return track;
+        }, {});
+    }
+
+    function areTrendTracksIncompatible(leftTrack, rightTrack) {
+        const left = leftTrack || {};
+        const right = rightTrack || {};
+        return Object.keys(left).some((label) => (
+            right[label] && right[label] !== left[label]
+        ));
     }
 
     function normalizeTrendCommit(value) {
@@ -3730,7 +3735,10 @@
                     && !isTrendBaselineEntry(point.entry)
                     && previousPoint.trendTrack
                     && point.trendTrack
-                    && previousPoint.trendTrack !== point.trendTrack;
+                    && areTrendTracksIncompatible(
+                        previousPoint.trendTrack,
+                        point.trendTrack,
+                    );
                 if (incompatibleTrack) {
                     trackBreakIndices.add(versionIndex);
                 }
