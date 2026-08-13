@@ -1975,6 +1975,23 @@
         if (!Array.isArray(targets) || !targets.length) {
             return null;
         }
+        const entryTargetId = String(
+            entry?.target_id
+                || entry?.metadata?.target_id
+                || entry?.same_spec?.spec_id
+                || ''
+        ).trim();
+        if (entryTargetId) {
+            const exactTarget = targets.find((target) => (
+                target
+                && target.status === 'active'
+                && target.intended_use === 'public-leaderboard'
+                && String(target.target_id || '').trim() === entryTargetId
+            ));
+            if (exactTarget) {
+                return exactTarget;
+            }
+        }
         const workload = String(getWorkloadId(entry) || '').trim();
         const model = String(getEntryModelRepoId(entry) || getEntryModelCanonicalId(entry) || '').trim();
         const chip = String(entry?.hardware?.chip_model || '').trim();
@@ -2001,6 +2018,31 @@
             }
         }
         return best || null;
+    }
+
+    function getEntryCoreRuntimeVersion(entry) {
+        const components = buildTableVersionComponents(entry);
+        const core = components.find((component) => (
+            ['vllm', 'vllm-hust'].includes(String(component?.label || '').toLowerCase())
+        ));
+        return normalizePackageVersion(
+            core?.rawVersion
+                || entry?.versions?.core
+                || entry?.engine_version
+                || entry?.metadata?.engine_version
+                || ''
+        );
+    }
+
+    function isTargetRuntimeCompatible(entry, target) {
+        const targetVersion = normalizePackageVersion(
+            target?.baseline_runtime?.engine_version || ''
+        );
+        const entryVersion = getEntryCoreRuntimeVersion(entry);
+        // The official fixed target is an exact release contract. A 0.17.x
+        // record must not become verified merely because it shares a numeric
+        // prefix with the 0.18.0 target; rc/post releases are distinct too.
+        return Boolean(targetVersion && entryVersion && targetVersion === entryVersion);
     }
 
     function getEntryCriticalServerParams(entry) {
@@ -2070,6 +2112,9 @@
         const target = findEvidenceTarget(entry, targets);
         if (!target) {
             return EVIDENCE_STATE.LEGACY;
+        }
+        if (!isTargetRuntimeCompatible(entry, target)) {
+            return EVIDENCE_STATE.DRIFTED;
         }
         const params = getEntryCriticalServerParams(entry);
         const missing = EVIDENCE_CRITICAL_SERVER_KEYS.filter((key) => !(key in params));
