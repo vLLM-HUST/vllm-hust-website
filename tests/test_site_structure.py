@@ -3003,3 +3003,18 @@ def test_trend_evidence_state_contract() -> None:
     assert "payload?.targets" in text
     assert "state.evidenceRegistry = { payload, targets };" in text
     assert "state.evidenceRegistry?.targets || []" in text
+
+
+def test_evidence_requires_exact_official_runtime_release() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "function getEntryCoreRuntimeVersion(entry)" in text
+    assert "function isTargetRuntimeCompatible(entry, target)" in text
+    assert "target?.baseline_runtime?.engine_version" in text
+    assert "targetVersion === entryVersion" in text
+    assert "return EVIDENCE_STATE.DRIFTED;" in text
+
+    # Historical 0.17.2 records, including rc/post releases, must not enter
+    # the official 0.18.0 aligned trend merely by numeric-family matching.
+    assert "rc/post releases are distinct too" in text
