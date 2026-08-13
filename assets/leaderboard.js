@@ -232,7 +232,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Baseline first, then every visible online serving revision, including PR and historical runs.',
+            trendSubtitle: 'Baseline first, then visible online revisions in submission order; incompatible revision tracks are shown as breaks.',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -471,7 +471,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '横轴从基线开始，展示当前范围内全部在线服务版本，包括 PR 与历史运行。',
+            trendSubtitle: '横轴从基线开始，按提交时间展示当前可见在线版本；不兼容的版本轨道之间会断线。',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -2971,6 +2971,28 @@
         };
     }
 
+    function getTrendVersionTrack(entry) {
+        const components = buildTableVersionComponents(entry)
+            .filter((component) => component?.label);
+        return components.reduce((track, component) => {
+            const rawVersion = component.rawVersion || '';
+            const normalized = normalizePackageVersion(rawVersion);
+            const family = normalized.match(/^(\d+(?:\.\d+){0,2})/i)?.[1] || '';
+            if (family) {
+                track[component.label] = family;
+            }
+            return track;
+        }, {});
+    }
+
+    function areTrendTracksIncompatible(leftTrack, rightTrack) {
+        const left = leftTrack || {};
+        const right = rightTrack || {};
+        return Object.keys(left).some((label) => (
+            right[label] && right[label] !== left[label]
+        ));
+    }
+
     function normalizeTrendCommit(value) {
         return String(value || '').trim().toLowerCase().slice(0, 10);
     }
@@ -3097,26 +3119,15 @@
             const timestamp = getEntryTimestamp(entry);
             const baseline = isTrendBaselineEntry(entry);
             const existingVersion = versionMap.get(versionKey);
-            const sortInfo = getTrendVersionSortInfo(entry);
             if (!existingVersion) {
                 versionMap.set(versionKey, {
                     key: versionKey,
                     label: getTrendVersionLabel(entry),
-                    commitCount: sortInfo.commitCount,
                     timestamp,
                     baseline,
                 });
-            } else if (!baseline && sortInfo.commitCount !== null
-                && (existingVersion.commitCount === null
-                    || sortInfo.commitCount > existingVersion.commitCount)) {
-                existingVersion.commitCount = sortInfo.commitCount;
+            } else if (timestamp > existingVersion.timestamp) {
                 existingVersion.label = getTrendVersionLabel(entry);
-                existingVersion.timestamp = Math.max(existingVersion.timestamp, timestamp);
-            } else if (!baseline && existingVersion.commitCount === null
-                && timestamp > existingVersion.timestamp) {
-                existingVersion.label = getTrendVersionLabel(entry);
-                existingVersion.timestamp = timestamp;
-            } else if (baseline && timestamp > existingVersion.timestamp) {
                 existingVersion.timestamp = timestamp;
             }
         });
@@ -3192,6 +3203,7 @@
                 entry,
                 value: aggregate.value,
                 aggregate,
+                trendTrack: getTrendVersionTrack(entry),
             });
         });
 
@@ -3199,16 +3211,12 @@
             if (left.baseline !== right.baseline) {
                 return left.baseline ? -1 : 1;
             }
-            const leftHasCommitCount = left.commitCount !== null;
-            const rightHasCommitCount = right.commitCount !== null;
-            if (leftHasCommitCount !== rightHasCommitCount) {
-                return leftHasCommitCount ? -1 : 1;
-            }
-            if (leftHasCommitCount && left.commitCount !== right.commitCount) {
-                return left.commitCount - right.commitCount;
-            }
             if (left.timestamp !== right.timestamp) {
                 return left.timestamp - right.timestamp;
+            }
+            if (left.commitCount !== null && right.commitCount !== null
+                && left.commitCount !== right.commitCount) {
+                return left.commitCount - right.commitCount;
             }
             return String(left.label || '').localeCompare(String(right.label || ''));
         });
@@ -3715,6 +3723,28 @@
         const labels = makeUniqueTrendLabels(model.versions.map((version) => version.label));
         let datasets = model.series.map((series, index) => {
             const colors = getTrendColors(index);
+            let previousPoint = null;
+            const trackBreakIndices = new Set();
+            const data = model.versions.map((version, versionIndex) => {
+                const point = series.points.get(version.key);
+                if (!point) {
+                    return null;
+                }
+                const incompatibleTrack = previousPoint
+                    && !isTrendBaselineEntry(previousPoint.entry)
+                    && !isTrendBaselineEntry(point.entry)
+                    && previousPoint.trendTrack
+                    && point.trendTrack
+                    && areTrendTracksIncompatible(
+                        previousPoint.trendTrack,
+                        point.trendTrack,
+                    );
+                if (incompatibleTrack) {
+                    trackBreakIndices.add(versionIndex);
+                }
+                previousPoint = point;
+                return point.value;
+            });
             const pointDetails = model.versions.map((version) => {
                 const point = series.points.get(version.key);
                 return point ? getTrendPointDetails(point.entry) : null;
@@ -3730,7 +3760,7 @@
                 coverageClass: series.coverageClass,
                 campaignId: series.campaignId,
                 comparisonId: series.comparisonId,
-                data: model.versions.map((version) => series.points.get(version.key)?.value ?? null),
+                data,
                 pointDetails,
                 pointAggregates,
                 borderColor: colors.borderColor,
@@ -3741,6 +3771,11 @@
                 pointHoverRadius: 6,
                 tension: 0.28,
                 spanGaps: allowSpanGaps,
+                segment: {
+                    borderColor: (context) => trackBreakIndices.has(context.p1DataIndex)
+                        ? 'transparent'
+                        : colors.borderColor,
+                },
                 hidden: state.hiddenTrendSeries.has(series.key),
             };
         });
