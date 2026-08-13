@@ -848,7 +848,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=metric-state-semantics-20260730" in html_text
+    assert "assets/leaderboard.js?v=trend-track-breaks-20260812" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 
@@ -1443,8 +1443,6 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         "commitCount: commitCountMatch ? parseInt(commitCountMatch[1], 10) : null"
         in js_text
     )
-    assert "const leftHasCommitCount = left.commitCount !== null;" in js_text
-    assert "return leftHasCommitCount ? -1 : 1;" in js_text
     assert "return left.timestamp - right.timestamp;" in js_text
     assert "const model = getEntryModelCanonicalId(entry)" in js_text
     assert "function startBackgroundDataSync()" in js_text
@@ -1462,7 +1460,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, evidenceState, settingSignature].join('|');"
         in js_text
     )
-    assert "展示当前范围内全部在线服务版本，包括 PR 与历史运行" in js_text
+    assert "按提交时间展示当前可见在线版本；不兼容的版本轨道之间会断线" in js_text
     assert "function getSelectOptionLabel(value, option, labelMapper = null)" in js_text
     assert "if (value === 'all')" in js_text
     assert "function isServingTrendWorkload(entry)" in js_text
@@ -1484,6 +1482,20 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function renderTrendSeriesControl(series)" in js_text
     assert "state.trendChart.setDatasetVisibility(datasetIndex, visible)" in js_text
     assert "pointDetails" in js_text
+    assert "function getTrendVersionTrack(entry)" in js_text
+    assert "function areTrendTracksIncompatible(leftTrack, rightTrack)" in js_text
+    assert "right[label] && right[label] !== left[label]" in js_text
+    assert (
+        "const family = normalized.match(/^(\\d+(?:\\.\\d+){0,2})/i)?.[1] || '';"
+        in js_text
+    )
+    assert "&& previousPoint.trendTrack" in js_text
+    assert "&& point.trendTrack" in js_text
+    assert "trackBreakIndices.add(versionIndex)" in js_text
+    assert (
+        "borderColor: (context) => trackBreakIndices.has(context.p1DataIndex)"
+        in js_text
+    )
     # Issue #150: spanGaps is now conditional on coverage_class so targeted PRs
     # that skip workloads break the line instead of bridging gaps.
     assert "spanGaps: allowSpanGaps" in js_text
@@ -2241,7 +2253,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "metric-state-semantics-20260730" in html_text
+    assert "trend-track-breaks-20260812" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:
