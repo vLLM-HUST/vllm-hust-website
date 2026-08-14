@@ -140,8 +140,8 @@
             pypiLoadFailed: 'Failed to load PyPI versions; showing benchmark metadata only.',
             fullBuildResults: '🧩 Full Build Results',
             displayedVersion: 'Displayed version:',
-            bestFourthInline: '(the selected 4th-segment build under this 3-segment version is shown on the main table)',
-            displayedVersionHint: 'the selected 4th-segment build under this 3-segment version is shown on the main table',
+            bestFourthInline: '(the selected canonical run for this 3-segment version is shown on the main table)',
+            displayedVersionHint: 'the selected canonical run for this 3-segment version is shown on the main table',
             fullVersion: 'Full Version',
             releaseDate: 'Result Date',
             ttft: 'TTFT',
@@ -265,6 +265,7 @@
             trendDefaultVerifiedHint: 'The aligned trend only shows verified configurations. Unverified or drifted records live in the "All" view.',
             trendTooltipBrokenAxis: 'shown on broken axis',
             trendTooltipAggregate: 'Aggregate',
+            representativeFallback: 'No producer aggregate; showing the latest run',
             trendTooltipCoverage: 'Coverage',
             trendViewLabel: 'Trend view',
             trendViewCheckpoint: 'Checkpoint',
@@ -379,8 +380,8 @@
             pypiLoadFailed: 'PyPI 版本拉取失败，仅展示 benchmark metadata。',
             fullBuildResults: '🧩 完整构建结果',
             displayedVersion: '当前展示版本：',
-            bestFourthInline: '（主表展示该三位版本下选中的四段版本）',
-            displayedVersionHint: '主表展示该三位版本下选中的四段版本',
+            bestFourthInline: '（主表展示该三位版本下选定的规范运行）',
+            displayedVersionHint: '主表展示该三位版本下选定的规范运行',
             fullVersion: '完整版本',
             releaseDate: '结果日期',
             ttft: 'TTFT',
@@ -506,6 +507,7 @@
             trendDefaultVerifiedHint: '对齐趋势仅展示已验证配置。未验证或偏离的记录位于“全部”视图。',
             trendTooltipBrokenAxis: '断轴显示',
             trendTooltipAggregate: '聚合',
+            representativeFallback: '无生产者聚合；展示最近一次运行',
             trendTooltipCoverage: '覆盖类型',
             trendViewLabel: '趋势视图',
             trendViewCheckpoint: '检查点',
@@ -2802,41 +2804,35 @@
         ].join('|');
     }
 
-    function compareEntryQuality(candidate, incumbent) {
-        const c = candidate.metrics || {};
-        const i = incumbent.metrics || {};
-
-        const cThroughput = getMeasuredMetricValue(candidate, 'throughput_tps') ?? Number.NEGATIVE_INFINITY;
-        const iThroughput = getMeasuredMetricValue(incumbent, 'throughput_tps') ?? Number.NEGATIVE_INFINITY;
-        if (cThroughput !== iThroughput) {
-            return cThroughput - iThroughput;
+    // Resolve a single representative entry for a group of repeat variants
+    // (same engine/version/config). Prefer an entry that declares a
+    // producer-published canonical_aggregate (lowest repeat_index, then latest
+    // submission); for legacy repeats without one, fall back to the latest run.
+    // Never ranks by measured quality, so an outlier high-throughput repeat can
+    // never become the representative (issue #207).
+    function pickCanonicalVariant(variants) {
+        if (!Array.isArray(variants) || !variants.length) {
+            return null;
         }
-
-        const cTtft = getMeasuredMetricValue(candidate, 'ttft_ms') ?? Number.POSITIVE_INFINITY;
-        const iTtft = getMeasuredMetricValue(incumbent, 'ttft_ms') ?? Number.POSITIVE_INFINITY;
-        if (cTtft !== iTtft) {
-            return iTtft - cTtft;
-        }
-
-        const cError = getMeasuredMetricValue(candidate, 'error_rate') ?? Number.POSITIVE_INFINITY;
-        const iError = getMeasuredMetricValue(incumbent, 'error_rate') ?? Number.POSITIVE_INFINITY;
-        if (cError !== iError) {
-            return iError - cError;
-        }
-
-        const cHit = Number(c.prefix_hit_rate) || 0;
-        const iHit = Number(i.prefix_hit_rate) || 0;
-        if (cHit !== iHit) {
-            return cHit - iHit;
-        }
-
-        const cMem = getMeasuredMetricValue(candidate, 'peak_mem_mb') ?? Number.POSITIVE_INFINITY;
-        const iMem = getMeasuredMetricValue(incumbent, 'peak_mem_mb') ?? Number.POSITIVE_INFINITY;
-        if (cMem !== iMem) {
-            return iMem - cMem;
-        }
-
-        return compareByReleaseDateDesc(candidate, incumbent);
+        const withAggregate = variants.filter(
+            (item) => item?.canonical_aggregate && item.canonical_aggregate.metrics
+        );
+        const pool = withAggregate.length ? withAggregate : variants;
+        return [...pool].sort((a, b) => {
+            const aRepeat = Number(a?.repeat_index);
+            const bRepeat = Number(b?.repeat_index);
+            const aHasRepeat = Number.isFinite(aRepeat);
+            const bHasRepeat = Number.isFinite(bRepeat);
+            if (aHasRepeat && bHasRepeat && aRepeat !== bRepeat) {
+                return aRepeat - bRepeat;
+            }
+            const aTime = getEntryTimestamp(a);
+            const bTime = getEntryTimestamp(b);
+            if (aTime !== bTime) {
+                return bTime - aTime;
+            }
+            return String(a?.entry_id || '').localeCompare(String(b?.entry_id || ''));
+        })[0] || null;
     }
 
     function aggregateVersionBuilds(entries) {
@@ -2847,34 +2843,28 @@
             const existing = groups.get(key);
 
             if (!existing) {
-                groups.set(key, {
-                    best: entry,
-                    variants: [entry],
-                });
+                groups.set(key, { variants: [entry] });
                 return;
             }
 
             existing.variants.push(entry);
-            if (compareEntryQuality(entry, existing.best) > 0) {
-                existing.best = entry;
-            }
         });
 
         return Array.from(groups.values()).map((group) => {
+            const representative = pickCanonicalVariant(group.variants);
+            if (!representative) {
+                return null;
+            }
             const sortedVariants = [...group.variants].sort((a, b) => {
-                const qualityCompare = compareEntryQuality(b, a);
-                if (qualityCompare !== 0) {
-                    return qualityCompare;
-                }
                 return compareEntriesByCompositeVersion(a, b);
             });
 
             return {
-                ...group.best,
-                displayVersion: normalizeDisplayVersion(getEngineVersion(group.best)),
+                ...representative,
+                displayVersion: normalizeDisplayVersion(getEngineVersion(representative)),
                 versionVariants: sortedVariants,
             };
-        });
+        }).filter(Boolean);
     }
 
     function sortForDisplay(entries, selectedWorkload) {
@@ -5641,6 +5631,22 @@
         `;
     }
 
+    function getRepresentativeDisclosureNote(entry, variants) {
+        const aggregate = entry?.canonical_aggregate;
+        const count = Array.isArray(variants) ? variants.length : 1;
+        if (aggregate && aggregate.metrics && aggregate.metrics.throughput_tps) {
+            const metric = aggregate.metrics.throughput_tps;
+            const method = String(aggregate.method || 'latest');
+            const n = Number(aggregate.count) || count;
+            const nText = n > 1 ? ` · n=${n}` : '';
+            if (Number.isFinite(Number(metric.min)) && Number.isFinite(Number(metric.max))) {
+                return `${t('trendTooltipAggregate')}: ${method}${nText} · ${formatNumber(metric.min)}–${formatNumber(metric.max)}`;
+            }
+            return `${t('trendTooltipAggregate')}: ${method}${nText}`;
+        }
+        return `${t('representativeFallback')} (n=${count})`;
+    }
+
     function renderBuildVariantsSection(entry) {
         const variants = entry.versionVariants || [entry];
         const displayedVersion = getEntryDetailedVersionText(entry);
@@ -5649,6 +5655,7 @@
             <div class="detail-section">
                 <h4>${t('fullBuildResults')}</h4>
                 <p><strong>${t('displayedVersion')}:</strong> ${displayedVersion} ${t('bestFourthInline')}</p>
+                <p class="build-rep-note">${getRepresentativeDisclosureNote(entry, variants)}</p>
                 <div class="build-variants-table-wrap">
                     <table class="build-variants-table">
                         <thead>
@@ -5958,7 +5965,7 @@
         if (!candidates.length) {
             return null;
         }
-        return [...candidates].sort((a, b) => compareEntryQuality(b, a))[0] || null;
+        return pickCanonicalVariant(candidates);
     }
 
     function getOfficialVllmBaselineEntry(entries) {
@@ -5968,28 +5975,16 @@
             return engine === 'vllm' && version === '0.18.0';
         });
         if (candidates.length) {
-            return [...candidates].sort((a, b) => compareEntryQuality(b, a))[0] || null;
+            return pickCanonicalVariant(candidates);
         }
         return getBestEntryForEngine(entries, 'vllm');
     }
 
-    function getThroughputImprovementScore(currentEntry, baselineEntry) {
-        const currentThroughput = Number(currentEntry?.metrics?.throughput_tps);
-        const baselineThroughput = Number(baselineEntry?.metrics?.throughput_tps);
-        if (!Number.isFinite(currentThroughput) || !Number.isFinite(baselineThroughput) || baselineThroughput <= 0) {
+    function getLatestGroupTimestamp(group) {
+        if (!Array.isArray(group?.entries) || !group.entries.length) {
             return Number.NEGATIVE_INFINITY;
         }
-        return (currentThroughput - baselineThroughput) / baselineThroughput;
-    }
-
-    function getGroupRepresentativeScore(group) {
-        if (!group?.isComplete || !Array.isArray(group.entries)) {
-            return Number.NEGATIVE_INFINITY;
-        }
-
-        const currentBest = getBestEntryForEngine(group.entries, 'vllm-hust');
-        const officialBaseline = getOfficialVllmBaselineEntry(group.entries);
-        return getThroughputImprovementScore(currentBest, officialBaseline);
+        return Math.max(...group.entries.map((entry) => getEntryTimestamp(entry) || 0));
     }
 
     function selectOverviewRepresentativeGroup(comparisonView) {
@@ -6001,10 +5996,15 @@
             return null;
         }
 
+        // Deterministic non-performance key: prefer the group with the most
+        // recently updated data, then the most entries, then lexicographic
+        // label. We never feature a scope by the largest measured improvement
+        // (issue #207).
         return [...completeGroups].sort((a, b) => {
-            const scoreDelta = getGroupRepresentativeScore(b) - getGroupRepresentativeScore(a);
-            if (scoreDelta !== 0) {
-                return scoreDelta;
+            const latestA = getLatestGroupTimestamp(a);
+            const latestB = getLatestGroupTimestamp(b);
+            if (latestA !== latestB) {
+                return latestB - latestA;
             }
             if (b.entries.length !== a.entries.length) {
                 return b.entries.length - a.entries.length;
@@ -6080,14 +6080,22 @@
 
     function summarizeEngines(entries, representativeEntries = [], options = {}) {
         const grouped = new Map();
-        const representativeByEngine = new Map();
+        const repCandidatesByEngine = new Map();
         const aggregateScopeText = String(options?.aggregateScopeText || '').trim();
 
         representativeEntries.forEach((entry) => {
             const engine = getEngine(entry);
-            const incumbent = representativeByEngine.get(engine);
-            if (!incumbent || compareEntryQuality(entry, incumbent) > 0) {
-                representativeByEngine.set(engine, entry);
+            if (!repCandidatesByEngine.has(engine)) {
+                repCandidatesByEngine.set(engine, []);
+            }
+            repCandidatesByEngine.get(engine).push(entry);
+        });
+
+        const representativeByEngine = new Map();
+        repCandidatesByEngine.forEach((candidates, engine) => {
+            const representative = pickCanonicalVariant(candidates);
+            if (representative) {
+                representativeByEngine.set(engine, representative);
             }
         });
 
@@ -6103,7 +6111,7 @@
             .map(([engine, engineEntries]) => {
                 const representativeEntry = representativeByEngine.get(engine) || null;
                 const bestEntry = representativeEntry || null;
-                const coverageBestEntry = [...engineEntries].sort((a, b) => compareEntryQuality(b, a))[0] || null;
+                const coverageBestEntry = pickCanonicalVariant(engineEntries);
                 const displayEntry = representativeEntry;
                 return {
                     engine,

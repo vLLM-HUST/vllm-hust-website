@@ -1712,6 +1712,13 @@
     font-size: 0.85em;
 }
 
+.build-rep-note {
+    font-size: 0.85em;
+    color: #718096;
+    margin: 2px 0 8px;
+    line-height: 1.5;
+}
+
 /* Build Variants Table Container */
 .build-variants-table-wrap {
     overflow-x: auto;
