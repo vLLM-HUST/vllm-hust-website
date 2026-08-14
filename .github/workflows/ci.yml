@@ -25,7 +25,7 @@ jobs:
       - name: Run unit tests
         run: pytest tests/ -v
       - name: Run JS loader unit tests
-        run: node --test tests/
+        run: node --test tests/loader_publication_identity.test.cjs
       - name: Validate engine_version vs. git_commit consistency
         run: python scripts/check_engine_version_consistency.py
       - name: Verify repository hook templates
