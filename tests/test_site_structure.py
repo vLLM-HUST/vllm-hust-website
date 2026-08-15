@@ -931,14 +931,17 @@ def test_engine_summary_cards_use_composite_version_components() -> None:
     assert "const versionText = getOverviewSummaryVersionText(summary);" in text
     assert "const bestVisibleRunText =" in text
     assert "function selectOverviewRepresentativeGroup(comparisonView)" in text
+    assert "function getLatestGroupTimestamp(group)" in text
     assert "const representativeGroup = overviewScopeLocked" in text
     assert (
         "representativeGroup?.summaryLabel || getOverviewAggregateScopeText(comparisonView)"
         in text
     )
-    assert "getBestEntryForEngine(group.entries, 'vllm-hust')" in text
+    assert "function getBestEntryForEngine(entries, engine)" in text
     assert "function getOfficialVllmBaselineEntry(entries)" in text
-    assert "function getThroughputImprovementScore(currentEntry, baselineEntry)" in text
+    assert "function pickCanonicalVariant(variants)" in text
+    assert "getThroughputImprovementScore" not in text
+    assert "getGroupRepresentativeScore" not in text
     assert "const displayEntry = representativeEntry;" in text
     assert "averageMetric(" not in text
     assert "avgTTFT" not in text
@@ -2472,6 +2475,58 @@ def test_trend_best_of_logic_is_removed() -> None:
     )[0]
     assert "method: 'median'" in summarize_body
     assert "count: sorted.length" in summarize_body
+
+
+def test_table_overview_best_of_logic_is_removed() -> None:
+    """Issue #207: the table and overview must not pick the best run (winner's
+    curse) for repeated runs of the same engine/version/config. A single
+    canonical representative is resolved via canonical_aggregate / latest, never
+    by ranking measured quality, and the overview never features a scope by the
+    largest measured improvement.
+    """
+    root = Path(__file__).resolve().parents[1]
+    js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    # The throughput-first quality ranking that powered best-of is gone.
+    assert "function compareEntryQuality" not in js_text
+    assert "getThroughputImprovementScore" not in js_text
+    assert "getGroupRepresentativeScore" not in js_text
+
+    # Table aggregation resolves a canonical representative.
+    assert "function pickCanonicalVariant(variants)" in js_text
+    aggregate_body = js_text.split("function aggregateVersionBuilds", 1)[1].split(
+        "function sortForDisplay", 1
+    )[0]
+    assert "pickCanonicalVariant(group.variants)" in aggregate_body
+    assert "best: entry" not in aggregate_body
+
+    # Representative selection must prefer canonical_aggregate and repeat_index
+    # 0, and must not compare measured values to pick the best.
+    pick_body = js_text.split("function pickCanonicalVariant", 1)[1].split(
+        "function aggregateVersionBuilds", 1
+    )[0]
+    assert "canonical_aggregate" in pick_body
+    assert "repeat_index" in pick_body
+    assert "throughput_tps" not in pick_body
+
+    # Overview representative-group selection uses a deterministic non-perf key.
+    overview_body = js_text.split("function selectOverviewRepresentativeGroup", 1)[
+        1
+    ].split("function selectFocusGroup", 1)[0]
+    assert "getLatestGroupTimestamp" in overview_body
+    assert "getGroupRepresentativeScore" not in overview_body
+
+    # Overview engine summaries also resolve representatives canonically.
+    summarize_body = js_text.split("function summarizeEngines", 1)[1].split(
+        "function getLeaders", 1
+    )[0]
+    assert "pickCanonicalVariant(candidates)" in summarize_body
+    assert "pickCanonicalVariant(engineEntries)" in summarize_body
+    assert "compareEntryQuality" not in summarize_body
+
+    # The build-variants detail discloses how the representative was chosen.
+    assert "getRepresentativeDisclosureNote(entry, variants)" in js_text
+    assert "representativeFallback" in js_text
 
 
 def test_trend_span_gaps_is_conditional_on_coverage_class() -> None:
