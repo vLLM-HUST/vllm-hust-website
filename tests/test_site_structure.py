@@ -2826,9 +2826,72 @@ def _is_trend_baseline_entry(entry):
     return bool(entry.get("isBaseline")) or entry.get("engine") != "vllm-hust"
 
 
+def _find_specialty_target(entry, targets):
+    entry_target_id = str(
+        entry.get("target_id")
+        or (entry.get("metadata") or {}).get("target_id")
+        or (entry.get("same_spec") or {}).get("spec_id")
+        or ""
+    ).strip()
+    if not entry_target_id:
+        return None
+    for target in targets or []:
+        if (
+            target
+            and target.get("status") == "provisional"
+            and target.get("intended_use") == "specialty"
+            and str(target.get("target_id") or "").strip() == entry_target_id
+        ):
+            return target
+    return None
+
+
+def _specialty_hardware_compatible(entry, target):
+    hw = entry.get("hardware") or {}
+    t_hw = target.get("hardware") or {}
+    t_chip = str(t_hw.get("chip_model") or "").strip()
+    chip = str(hw.get("chip_model") or "").strip()
+    if t_chip and chip != t_chip:
+        return False
+    t_chip_count = t_hw.get("chip_count")
+    if t_chip_count is not None and hw.get("chip_count") != t_chip_count:
+        return False
+    t_node_count = t_hw.get("node_count")
+    if (
+        t_node_count is not None
+        and (entry.get("cluster") or {}).get("node_count") != t_node_count
+    ):
+        return False
+    return True
+
+
+def _is_runtime_compatible(entry, target):
+    target_version = str(
+        (target.get("baseline_runtime") or {}).get("engine_version") or ""
+    ).strip()
+    entry_version = str(entry.get("engine_version") or "").strip()
+    return bool(target_version and entry_version and target_version == entry_version)
+
+
 def _evidence_state(entry, targets):
     if _is_trend_baseline_entry(entry):
         return "verified"
+    specialty_target = _find_specialty_target(entry, targets)
+    if specialty_target is not None:
+        if not _specialty_hardware_compatible(entry, specialty_target):
+            return "drifted"
+        if not _is_runtime_compatible(entry, specialty_target):
+            return "drifted"
+        params = _entry_critical_server_params(entry)
+        missing = [key for key in EVIDENCE_CRITICAL_SERVER_KEYS if key not in params]
+        if missing:
+            return "config-unverified"
+        target_server = specialty_target.get("server_parameters") or {}
+        matches = all(
+            _normalize_evidence_value(target_server.get(key)) == params[key]
+            for key in EVIDENCE_CRITICAL_SERVER_KEYS
+        )
+        return "specialty" if matches else "drifted"
     target = _find_evidence_target(entry, targets)
     if target is None:
         return "legacy"
@@ -3036,3 +3099,136 @@ def test_evidence_requires_exact_official_runtime_release() -> None:
     # Historical 0.17.2 records, including rc/post releases, must not enter
     # the official 0.18.0 aligned trend merely by numeric-family matching.
     assert "rc/post releases are distinct too" in text
+
+
+# ---------------------------------------------------------------------------
+# Specialty hardware series (issue #206)
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def specialty_targets():
+    """Two provisional specialty contracts: 910B3 and 910B2, same workload/model
+    but distinct hardware. They must never be connected or compared.
+    """
+    base = {
+        "status": "provisional",
+        "intended_use": "specialty",
+        "baseline_runtime": {"engine": "vllm", "engine_version": "0.18.0"},
+        "server_parameters": {
+            "gpu_memory_utilization": 0.6,
+            "max_model_len": 32768,
+        },
+        "workload": {"name": "sonnet-throughput"},
+        "model": {"id": "Qwen/Qwen2.5-14B-Instruct"},
+    }
+    b3 = dict(base)
+    b3["target_id"] = "specialty-ascend-910b3-sonnet-throughput"
+    b3["hardware"] = {"chip_model": "910B3", "chip_count": 2, "node_count": 1}
+    b2 = dict(base)
+    b2["target_id"] = "specialty-ascend-910b2-sonnet-throughput"
+    b2["hardware"] = {"chip_model": "910B2", "chip_count": 2, "node_count": 1}
+    return [b3, b2]
+
+
+def _specialty_entry(target_id, chip="910B3", engine_version="0.18.0", **overrides):
+    entry = {
+        "engine": "vllm-hust",
+        "target_id": target_id,
+        "engine_version": engine_version,
+        "workload": {"name": "sonnet-throughput"},
+        "model": {"id": "Qwen/Qwen2.5-14B-Instruct"},
+        "hardware": {"chip_model": chip, "chip_count": 2, "node_count": 1},
+        "cluster": {"node_count": 1},
+        "same_spec": {
+            "resolved_server_parameters": {
+                "gpu_memory_utilization": 0.6,
+                "max_model_len": 32768,
+            }
+        },
+    }
+    entry.update(overrides)
+    return entry
+
+
+def test_specialty_910b3_is_isolated_series(specialty_targets) -> None:
+    """Issue #206 acceptance: a valid 910B3 specialty result is classified as
+    specialty and visible only in the specialty view; it is absent from the
+    verified-only official aligned view.
+    """
+    b3 = _specialty_entry("specialty-ascend-910b3-sonnet-throughput")
+    assert _evidence_state(b3, specialty_targets) == "specialty"
+
+    def specialty_view_allowed(entry):
+        return _evidence_state(entry, specialty_targets) == "specialty"
+
+    def aligned_view_allowed(entry):
+        return _evidence_state(entry, specialty_targets) == "verified"
+
+    assert specialty_view_allowed(b3) is True
+    assert aligned_view_allowed(b3) is False
+
+
+def test_specialty_mismatched_hardware_or_runtime_fails_closed(
+    specialty_targets,
+) -> None:
+    """Issue #206 acceptance: a specialty result on the wrong hardware (910B2
+    against the 910B3 contract) or a different runtime version fails closed and
+    is never emitted as specialty.
+    """
+    wrong_hw = _specialty_entry(
+        "specialty-ascend-910b3-sonnet-throughput", chip="910B2"
+    )
+    wrong_runtime = _specialty_entry(
+        "specialty-ascend-910b3-sonnet-throughput", engine_version="0.17.2"
+    )
+    assert _evidence_state(wrong_hw, specialty_targets) == "drifted"
+    assert _evidence_state(wrong_runtime, specialty_targets) == "drifted"
+
+
+def test_specialty_910b2_and_910b3_never_share_series(specialty_targets) -> None:
+    """Issue #206 acceptance: 910B2 and 910B3 produce separate series. The
+    hardware-aware series identity (chip model, chip count, node count) keeps
+    their curves/deltas apart so no cross-hardware comparison is possible.
+    """
+    b2 = _specialty_entry("specialty-ascend-910b2-sonnet-throughput", chip="910B2")
+    b3 = _specialty_entry("specialty-ascend-910b3-sonnet-throughput", chip="910B3")
+
+    def series_key(entry):
+        return (
+            str((entry.get("hardware") or {}).get("chip_model") or ""),
+            (entry.get("hardware") or {}).get("chip_count"),
+            (entry.get("cluster") or {}).get("node_count"),
+            _evidence_state(entry, specialty_targets),
+        )
+
+    assert _evidence_state(b2, specialty_targets) == "specialty"
+    assert _evidence_state(b3, specialty_targets) == "specialty"
+    assert series_key(b2) != series_key(b3)
+
+
+def test_specialty_hardware_series_identity_encoded_in_source() -> None:
+    """Source-level contract for issue #206: a specialty view exists, exact
+    specialty targets are resolved by target_id, and chip model / chip count /
+    node count are part of the trend series identity.
+    """
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    html = (root / "leaderboard.html").read_text(encoding="utf-8")
+
+    # Dedicated specialty view button + admission gate.
+    assert 'data-trend-view="specialty"' in html
+    assert "state.trendView === 'specialty'" in text
+    assert "getEvidenceState(entry) === EVIDENCE_STATE.SPECIALTY" in text
+
+    # Exact specialty target resolution by target_id, fails closed on mismatch.
+    assert "function findSpecialtyTarget(entry, targets)" in text
+    assert "function isSpecialtyTargetHardwareCompatible(entry, target)" in text
+    assert "intended_use === 'specialty'" in text
+    assert "return matches ? EVIDENCE_STATE.SPECIALTY : EVIDENCE_STATE.DRIFTED;" in text
+
+    # Hardware-aware series identity keeps 910B2 and 910B3 apart.
+    assert (
+        "chipCount, nodeCount, precision, quantization, evidenceState, settingSignature"
+        in text
+    )
