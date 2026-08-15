@@ -269,6 +269,7 @@
             trendViewLabel: 'Trend view',
             trendViewCheckpoint: 'Checkpoint',
             trendViewTargeted: 'Targeted PR',
+            trendViewSpecialty: 'Specialty',
             trendViewAll: 'All',
             leaderboardEmptyTitle: 'No Results Found',
             leaderboardEmptyText: 'Try adjusting your filters to see more data.',
@@ -514,6 +515,7 @@
             trendViewLabel: '趋势视图',
             trendViewCheckpoint: '检查点',
             trendViewTargeted: '专项 PR',
+            trendViewSpecialty: '专项硬件',
             trendViewAll: '全部',
             leaderboardEmptyTitle: '未找到结果',
             leaderboardEmptyText: '请调整筛选条件以查看更多数据。',
@@ -1982,24 +1984,86 @@
             .replace(/'/g, '&#39;');
     }
 
-    // Match a record against an active public fixed target by workload, model and
-    // hardware. Returns the best explicit workload match or null.
-    function findEvidenceTarget(entry, targets) {
-        if (!Array.isArray(targets) || !targets.length) {
-            return null;
-        }
-        const entryTargetId = String(
+    // The official public leaderboard admits a target when it is active and
+    // declared for public-leaderboard use.
+    function isPublicActiveTarget(target) {
+        return Boolean(
+            target
+            && target.status === 'active'
+            && target.intended_use === 'public-leaderboard'
+        );
+    }
+
+    // A specialty (provisional) target is an explicit, isolated hardware/config
+    // contract (e.g. 910B3 multi-chip). It is never admitted to the official
+    // aligned view, only to the dedicated specialty view (issue #206).
+    function isSpecialtyTarget(target) {
+        return Boolean(
+            target
+            && target.status === 'provisional'
+            && target.intended_use === 'specialty'
+        );
+    }
+
+    function getEntryTargetId(entry) {
+        return String(
             entry?.target_id
                 || entry?.metadata?.target_id
                 || entry?.same_spec?.spec_id
                 || ''
         ).trim();
+    }
+
+    // Resolve an exact specialty target by target_id. Only an exact contract
+    // match qualifies; specialty results are never inferred by fuzzy matching.
+    function findSpecialtyTarget(entry, targets) {
+        if (!Array.isArray(targets) || !targets.length) {
+            return null;
+        }
+        const entryTargetId = getEntryTargetId(entry);
+        if (!entryTargetId) {
+            return null;
+        }
+        return targets.find((target) => (
+            isSpecialtyTarget(target)
+            && String(target.target_id || '').trim() === entryTargetId
+        )) || null;
+    }
+
+    // A specialty contract is exact: a mismatched chip model, chip count or node
+    // count fails closed so 910B2 and 910B3 can never be conflated (issue #206).
+    function isSpecialtyTargetHardwareCompatible(entry, target) {
+        const hw = entry?.hardware || {};
+        const tHw = target?.hardware || {};
+        const tChip = String(tHw.chip_model || '').trim();
+        const chip = String(hw.chip_model || '').trim();
+        if (tChip && chip !== tChip) {
+            return false;
+        }
+        const tChipCount = Number(tHw.chip_count);
+        if (Number.isFinite(tChipCount) && Number(hw.chip_count) !== tChipCount) {
+            return false;
+        }
+        const tNodeCount = Number(tHw.node_count);
+        if (Number.isFinite(tNodeCount) && Number(entry?.cluster?.node_count) !== tNodeCount) {
+            return false;
+        }
+        return true;
+    }
+
+    // Match a record against an active public fixed target by workload, model and
+    // hardware. Returns the best explicit workload match or null. Exact target_id
+    // resolution also covers specialty targets so the caller can classify them.
+    function findEvidenceTarget(entry, targets) {
+        if (!Array.isArray(targets) || !targets.length) {
+            return null;
+        }
+        const entryTargetId = getEntryTargetId(entry);
         if (entryTargetId) {
             const exactTarget = targets.find((target) => (
                 target
-                && target.status === 'active'
-                && target.intended_use === 'public-leaderboard'
                 && String(target.target_id || '').trim() === entryTargetId
+                && (isPublicActiveTarget(target) || isSpecialtyTarget(target))
             ));
             if (exactTarget) {
                 return exactTarget;
@@ -2010,7 +2074,7 @@
         const chip = String(entry?.hardware?.chip_model || '').trim();
         let best = null;
         for (const target of targets) {
-            if (!target || target.status !== 'active' || target.intended_use !== 'public-leaderboard') {
+            if (!isPublicActiveTarget(target)) {
                 continue;
             }
             const tWorkload = String(target.workload?.name || '').trim();
@@ -2122,6 +2186,28 @@
             return EVIDENCE_STATE.VERIFIED;
         }
         const targets = state.evidenceRegistry?.targets || [];
+        // A specialty target is an exact isolated hardware contract. It is
+        // classified as specialty only when hardware, runtime and critical
+        // params all match; any mismatch fails closed (issue #206).
+        const specialtyTarget = findSpecialtyTarget(entry, targets);
+        if (specialtyTarget) {
+            if (!isSpecialtyTargetHardwareCompatible(entry, specialtyTarget)) {
+                return EVIDENCE_STATE.DRIFTED;
+            }
+            if (!isTargetRuntimeCompatible(entry, specialtyTarget)) {
+                return EVIDENCE_STATE.DRIFTED;
+            }
+            const params = getEntryCriticalServerParams(entry);
+            const missing = EVIDENCE_CRITICAL_SERVER_KEYS.filter((key) => !(key in params));
+            if (missing.length > 0) {
+                return EVIDENCE_STATE.CONFIG_UNVERIFIED;
+            }
+            const targetServer = specialtyTarget.server_parameters || {};
+            const matches = EVIDENCE_CRITICAL_SERVER_KEYS.every(
+                (key) => normalizeEvidenceValue(targetServer[key]) === params[key]
+            );
+            return matches ? EVIDENCE_STATE.SPECIALTY : EVIDENCE_STATE.DRIFTED;
+        }
         const target = findEvidenceTarget(entry, targets);
         if (!target) {
             return EVIDENCE_STATE.LEGACY;
@@ -2435,6 +2521,12 @@
         const coverageClass = getTrendCoverageClass(entry);
         if (state.trendView === 'targeted') {
             return coverageClass === 'targeted-pair';
+        }
+        if (state.trendView === 'specialty') {
+            // Issue #206: the specialty view surfaces exact specialty contracts
+            // (e.g. 910B3 isolated series) without mixing them into the official
+            // aligned checkpoint view.
+            return getEvidenceState(entry) === EVIDENCE_STATE.SPECIALTY;
         }
         if (state.trendView === 'all') {
             return true;
@@ -3741,6 +3833,7 @@
         const viewLabels = {
             checkpoint: t('trendViewCheckpoint'),
             targeted: t('trendViewTargeted'),
+            specialty: t('trendViewSpecialty'),
             all: t('trendViewAll'),
         };
         document.querySelectorAll('[data-trend-view]').forEach((button) => {
@@ -4078,7 +4171,7 @@
         document.querySelectorAll('[data-trend-view]').forEach((button) => {
             button.addEventListener('click', () => {
                 const view = button.dataset.trendView;
-                if (!['checkpoint', 'targeted', 'all'].includes(view)) {
+                if (!['checkpoint', 'targeted', 'specialty', 'all'].includes(view)) {
                     return;
                 }
                 state.trendView = view;
