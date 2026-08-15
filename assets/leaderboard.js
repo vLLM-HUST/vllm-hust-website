@@ -270,6 +270,10 @@
             trendViewCheckpoint: 'Checkpoint',
             trendViewTargeted: 'Targeted PR',
             trendViewAll: 'All',
+            leaderboardEmptyTitle: 'No Results Found',
+            leaderboardEmptyText: 'Try adjusting your filters to see more data.',
+            leaderboardStaleTitle: 'Leaderboard Unavailable',
+            leaderboardStaleText: 'No verified snapshot could be loaded. The canonical publication is unreachable and no exact mirror matched, so stale data was not revived.',
             trendEmpty: 'No trend data under current filters.',
             trendTooltipVersion: 'Version',
             trendTooltipDate: 'Submitted',
@@ -511,6 +515,10 @@
             trendViewCheckpoint: '检查点',
             trendViewTargeted: '专项 PR',
             trendViewAll: '全部',
+            leaderboardEmptyTitle: '未找到结果',
+            leaderboardEmptyText: '请调整筛选条件以查看更多数据。',
+            leaderboardStaleTitle: '榜单暂不可用',
+            leaderboardStaleText: '未能加载到经过核验的快照。规范发布源当前不可达，且没有匹配的精确镜像，因此不会回退到过期数据。',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
             trendTooltipVersion: '版本',
             trendTooltipDate: '提交时间',
@@ -537,6 +545,7 @@
         multiChipData: [],
         multiNodeData: [],
         compareSnapshot: null,
+        staleness: null,
         totalLoadedEntries: 0,
         filters: {
             'single-chip': { engine: '', hardware: '', model: '', version: '', workload: '', precision: '' },
@@ -683,6 +692,10 @@
         const hasSingle = Array.isArray(data?.single);
         const hasMulti = Array.isArray(data?.multi);
         const hasCompare = Object.prototype.hasOwnProperty.call(data || {}, 'compare');
+
+        // Issue #205: record a stale/unavailable signal when the loader could not
+        // source an exact canonical publication, so the empty state can explain it.
+        state.staleness = data?.staleness || null;
 
         if (hasCompare) {
             state.compareSnapshot = data?.compare || null;
@@ -4362,6 +4375,24 @@
         }
     }
 
+    // Issue #205: explain an empty table. When the loader signalled a stale or
+    // unavailable canonical publication, surface that instead of a "no filters"
+    // message so the user knows stale data was deliberately not revived.
+    function renderEmptyStateMessage(emptyState) {
+        const titleEl = document.getElementById('leaderboard-empty-title');
+        const textEl = document.getElementById('leaderboard-empty-text');
+        if (!emptyState || !titleEl || !textEl) {
+            return;
+        }
+        if (state.staleness) {
+            titleEl.textContent = t('leaderboardStaleTitle');
+            textEl.textContent = t('leaderboardStaleText');
+        } else {
+            titleEl.textContent = t('leaderboardEmptyTitle');
+            textEl.textContent = t('leaderboardEmptyText');
+        }
+    }
+
     // Render leaderboard table
     function renderTable() {
         const tbody = document.getElementById('leaderboard-tbody');
@@ -4397,6 +4428,7 @@
         if (mergedEntries.length === 0) {
             tbody.innerHTML = '';
             emptyState.style.display = 'block';
+            renderEmptyStateMessage(emptyState);
             renderDataStats(data.length, filtered.length, visibleEntries.length, 0, comparisonView);
             renderOverview([], comparisonView, viewOptions);
             renderPerformanceTrendChart([]);

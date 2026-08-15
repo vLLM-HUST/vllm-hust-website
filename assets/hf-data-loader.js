@@ -290,6 +290,76 @@ function isSnapshotEmpty(snapshot) {
     return single.length === 0 && multi.length === 0;
 }
 
+// -------------------------------------------------------------------------
+// Publication identity (issue #205)
+//
+// The canonical source's atomic publication marker is authoritative, including
+// an intentionally empty snapshot. A fallback source may only replace an
+// unavailable canonical source when it carries the exact same publication
+// identity (atomic marker + target-registry checksum) - never merely because it
+// is non-empty.
+// -------------------------------------------------------------------------
+
+function getEntryTargetRegistryHash(entry) {
+    return String(
+        entry?.target_registry_sha256
+            || entry?.metadata?.target_registry_sha256
+            || ''
+    ).trim();
+}
+
+// Consensus target-registry checksum across single/multi/compare of one
+// publication. Returns the shared hash, '' when no entry declares one, or null
+// when entries disagree (mixed generations - never mergeable).
+function getPublicationTargetRegistryFingerprint(result) {
+    const hashes = new Set();
+    const collect = (entries) => {
+        (Array.isArray(entries) ? entries : []).forEach((entry) => {
+            const hash = getEntryTargetRegistryHash(entry);
+            if (hash) {
+                hashes.add(hash);
+            }
+        });
+    };
+    collect(result?.single);
+    collect(result?.multi);
+    const groups = Array.isArray(result?.compare?.groups) ? result.compare.groups : [];
+    groups.forEach((group) => {
+        collect(group?.engines);
+    });
+    if (hashes.size > 1) {
+        return null;
+    }
+    return hashes.size === 1 ? [...hashes][0] : '';
+}
+
+function buildPublicationIdentity(result, marker) {
+    return {
+        marker: String(marker || '').trim(),
+        targetRegistry: getPublicationTargetRegistryFingerprint(result),
+    };
+}
+
+// Two identities match only when every declared component agrees. A marker
+// (atomic publication ID) or checksum present on either side must match; a
+// mixed-generation fingerprint (null) never matches because the files cannot
+// be atomically reconciled.
+function publicationIdentitiesMatch(a, b) {
+    if (!a || !b) {
+        return false;
+    }
+    if (a.targetRegistry === null || b.targetRegistry === null) {
+        return false;
+    }
+    if (a.marker && b.marker && a.marker !== b.marker) {
+        return false;
+    }
+    if (a.targetRegistry && b.targetRegistry && a.targetRegistry !== b.targetRegistry) {
+        return false;
+    }
+    return true;
+}
+
 function assertUsableLeaderboardPayload(result, source) {
     // Issue #200: a snapshot with zero benchmark records cannot populate the
     // leaderboard. Treat it as unusable so the loader falls through to the next
@@ -711,67 +781,90 @@ async function loadLeaderboardData(options = {}) {
         }
     }
 
-    const result = { single: [], multi: [], compare: null };
-
-    const loaders = {
-        github: loadFromGitHub,
-        hf: loadFromHuggingFace,
-        local: loadFromLocal,
-    };
-
     const sourcePriority = getSourcePriority();
-    let lastError = null;
-    const emptySources = new Set();
+    const canonicalSource = sourcePriority[0];
 
-    for (const source of sourcePriority) {
-        const loader = loaders[source];
-        if (!loader) {
-            continue;
-        }
-        if (source === 'local' && !HF_CONFIG.fallbackToLocal) {
-            continue;
-        }
-
-        try {
-            console.log(`[HF Loader] Loading from ${source}...`);
-            const markerPriority = source === 'local'
-                ? ['local']
-                : [source, ...sourcePriority.filter((item) => item !== source)];
-            const snapshot = await loadSnapshotFromSource(source, markerPriority, {
-                onProgress: options.onProgress
-            });
-            result.single = snapshot.data.single;
-            result.multi = snapshot.data.multi;
-            result.compare = snapshot.data.compare;
-
-            writeCache(result, snapshot.marker);
-            setLastLoadedSource(source);
-            console.log(
-                `[HF Loader] ✅ Loaded from ${source}: ${result.single.length} single, ${result.multi.length} multi`
+    // 1. The canonical source is authoritative - even when it publishes an
+    // intentional empty snapshot. Never fall through to stale downstream data
+    // merely because it still holds records (issue #205).
+    try {
+        console.log(`[HF Loader] Loading canonical from ${canonicalSource}...`);
+        const canonical = await loadSnapshotFromSource(canonicalSource, sourcePriority, {
+            onProgress: options.onProgress
+        });
+        writeCache(canonical.data, canonical.marker);
+        setLastLoadedSource(canonicalSource);
+        console.log(
+            `[HF Loader] ✅ Loaded canonical from ${canonicalSource}: ` +
+            `${canonical.data.single.length} single, ${canonical.data.multi.length} multi`
+        );
+        return canonical.data;
+    } catch (canonicalError) {
+        if (canonicalError?.isEmptySnapshot) {
+            // Canonical is reachable but intentionally empty -> authoritative
+            // empty/admission state. Do not revive older HF/local records.
+            writeCache({ single: [], multi: [], compare: null }, null);
+            setLastLoadedSource(canonicalSource);
+            console.warn(
+                `[HF Loader] ⚠️ Canonical ${canonicalSource} published an empty snapshot; ` +
+                'showing empty admission state'
             );
-            return result;
-        } catch (error) {
-            lastError = error;
-            if (error?.isEmptySnapshot) {
-                emptySources.add(source);
-                console.warn(`[HF Loader] ⚠️ ${source} snapshot is empty, trying next source`);
-            } else {
-                console.warn(`[HF Loader] ⚠️ ${source} load failed:`, error?.message || error);
+            return { single: [], multi: [], compare: null };
+        }
+
+        // Canonical is network-unavailable. Fall back ONLY to an exact mirrored
+        // publication carrying the same atomic publication identity.
+        console.warn(`[HF Loader] ⚠️ Canonical ${canonicalSource} unavailable:`, canonicalError?.message || canonicalError);
+        const expectedIdentity = await getExpectedCanonicalIdentity(sourcePriority);
+        if (!expectedIdentity) {
+            console.warn('[HF Loader] ⚠️ Canonical publication identity unknown; cannot verify any fallback');
+            return { single: [], multi: [], compare: null, staleness: 'no-verified-fallback' };
+        }
+
+        for (const source of sourcePriority.slice(1)) {
+            if (source === 'local' && !HF_CONFIG.fallbackToLocal) {
+                continue;
+            }
+            try {
+                console.log(`[HF Loader] Checking fallback ${source}...`);
+                const snapshot = await loadSnapshotFromSource(source, [source], {
+                    onProgress: options.onProgress
+                });
+                const actual = buildPublicationIdentity(snapshot.data, snapshot.marker);
+                if (publicationIdentitiesMatch(actual, expectedIdentity)) {
+                    writeCache(snapshot.data, snapshot.marker);
+                    setLastLoadedSource(source);
+                    console.log(
+                        `[HF Loader] ✅ Fallback ${source} matched canonical publication: ` +
+                        `${snapshot.data.single.length} single, ${snapshot.data.multi.length} multi`
+                    );
+                    return snapshot.data;
+                }
+                console.warn(`[HF Loader] ⚠️ Fallback ${source} identity mismatch; skipping`);
+            } catch (fallbackError) {
+                console.warn(`[HF Loader] ⚠️ Fallback ${source} unavailable:`, fallbackError?.message || fallbackError);
             }
         }
-    }
 
-    // Every reachable source returned an empty snapshot (no records). Surface the
-    // empty leaderboard state instead of a hard error, since no source really failed.
-    const triedSources = sourcePriority.filter(
-        (source) => source !== 'local' || HF_CONFIG.fallbackToLocal
-    );
-    if (triedSources.length && triedSources.every((source) => emptySources.has(source))) {
-        console.warn('[HF Loader] ⚠️ All sources returned empty snapshots; showing empty state');
-        return { single: [], multi: [], compare: null };
+        console.warn('[HF Loader] ⚠️ No fallback matched the canonical publication identity');
+        return { single: [], multi: [], compare: null, staleness: 'no-verified-fallback' };
     }
+}
 
-    throw new Error(lastError?.message || 'Failed to load leaderboard data from all sources');
+// Resolve the canonical source's atomic publication identity when its data files
+// are network-unavailable. Only an exact mirrored publication may be used as a
+// fallback, so we must know what the canonical publication is before trusting one.
+async function getExpectedCanonicalIdentity(sourcePriority) {
+    const canonical = sourcePriority[0];
+    try {
+        const marker = await getLatestMarker([canonical]);
+        if (marker) {
+            return { marker: String(marker || '').trim(), targetRegistry: '' };
+        }
+    } catch (_e) {
+        // canonical marker also unreachable -> no identity to verify against
+    }
+    return null;
 }
 
 /**

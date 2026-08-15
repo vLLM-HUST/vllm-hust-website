@@ -450,20 +450,38 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     assert "Ignoring unusable session cache" in text
 
 
-def test_hf_loader_falls_through_empty_snapshots() -> None:
+def test_hf_loader_does_not_revive_stale_data_from_empty_canonical() -> None:
     root = Path(__file__).resolve().parents[1]
     loader = (root / "assets" / "hf-data-loader.js").read_text(encoding="utf-8")
     leaderboard = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
 
-    # The loader must skip empty snapshots (no records) so a fail-closed primary
-    # source does not blank out the leaderboard while a later source still has data.
+    # Issue #205: an empty snapshot is detected, but the canonical source is still
+    # authoritative. The loader must NOT fall through to stale HF/local records
+    # with data just because the canonical snapshot is intentionally empty.
     assert "function isSnapshotEmpty(snapshot)" in loader
     assert "return single.length === 0 && multi.length === 0;" in loader
     assert "Empty leaderboard snapshot from ${source}: no benchmark records" in loader
     assert "emptyError.isEmptySnapshot = true;" in loader
-    assert "emptySources.add(source);" in loader
-    assert "triedSources.every((source) => emptySources.has(source))" in loader
-    assert "return { single: [], multi: [], compare: null };" in loader
+
+    # The canonical source (first priority) is authoritative even when empty.
+    assert "const canonicalSource = sourcePriority[0];" in loader
+    assert "canonicalError?.isEmptySnapshot" in loader
+    assert "writeCache({ single: [], multi: [], compare: null }, null);" in loader
+
+    # A fallback may only replace an unavailable canonical source when it carries
+    # the exact same atomic publication identity (marker/checksum), never merely
+    # because it is non-empty.
+    assert "function getPublicationTargetRegistryFingerprint(result)" in loader
+    assert "function buildPublicationIdentity(result, marker)" in loader
+    assert "function publicationIdentitiesMatch(a, b)" in loader
+    assert "publicationIdentitiesMatch(actual, expectedIdentity)" in loader
+    assert "staleness: 'no-verified-fallback'" in loader
+
+    # The frontend surfaces a distinct stale/unavailable message so users know
+    # stale data was deliberately not revived.
+    assert "state.staleness" in leaderboard
+    assert "function renderEmptyStateMessage(emptyState)" in leaderboard
+    assert "leaderboardStaleTitle" in leaderboard
 
     # Partial rendering must not fire for snapshots with zero records.
     assert "partialData.single.length > 0" in leaderboard
