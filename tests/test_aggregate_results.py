@@ -152,6 +152,13 @@ def _same_spec_payload(spec_id: str, spec_hash: str) -> dict:
     }
 
 
+# Exact active goal baseline provenance: vllm-ascend plugin commit for v0.18.0.
+# Mirrors GOAL_BASELINE_TARGET["vllm_ascend_commit"] in scripts/aggregate_results.py.
+_GOAL_BASELINE_ASCEND_COMMIT = (
+    "e18643f8a4d5bd9990727654318ad069ea0b56e2"  # pragma: allowlist secret
+)
+
+
 def _official_same_spec_payload(
     spec_id: str = "official-ascend-jan-2026-v0.18.0-random-online-qwen25-14b-910b2",
     spec_hash: str = "official-hash",
@@ -1065,19 +1072,20 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(
     baseline_entry = _valid_entry()
     baseline_entry["entry_id"] = "22222222-2222-2222-2222-222222222222"
     baseline_entry["engine"] = "vllm"
-    baseline_entry["engine_version"] = "0.17.2rc0"
+    baseline_entry["engine_version"] = "0.18.0"
     baseline_entry["metadata"]["engine"] = "vllm"
-    baseline_entry["metadata"]["engine_version"] = "0.17.2rc0"
+    baseline_entry["metadata"]["engine_version"] = "0.18.0"
     baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
     baseline_entry["metadata"]["github_commit_url"] = (
-        "https://github.com/vllm-project/vllm-ascend/commit/def456"
+        "https://github.com/vllm-project/vllm-ascend/commit/"
+        f"{_GOAL_BASELINE_ASCEND_COMMIT}"
     )
-    baseline_entry["metadata"]["git_commit"] = "def456"
+    baseline_entry["metadata"]["git_commit"] = _GOAL_BASELINE_ASCEND_COMMIT
     baseline_entry["metrics"]["ttft_ms"] = 100.0
     baseline_entry["metrics"]["tbt_ms"] = 8.0
     baseline_entry["metrics"]["throughput_tps"] = 240.0
     baseline_entry["metadata"]["idempotency_key"] = (
-        "vllm|0.17.2rc0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+        "vllm|0.18.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
     baseline_entry["same_spec"] = _same_spec_payload("spec-1", "hash-1")
 
@@ -1152,9 +1160,93 @@ def test_aggregate_results_builds_goal_progress_for_official_baseline(
     assert goal_progress["headline_pair"]["baseline"]["engine"] == "vllm"
     assert (
         goal_progress["headline_pair"]["baseline_target"]["id"]
-        == "official-ascend-2026-v0.17.2rc0"
+        == "official-ascend-jan-2026-v0.18.0"
+    )
+    assert (
+        goal_progress["headline_pair"]["baseline_target"]["engine_version"] == "0.18.0"
     )
     assert goal_progress["headline_pair"]["remaining_gap_pct"]["throughput"] == 12.5
+
+
+def test_aggregate_results_goal_baseline_requires_exact_0180(
+    tmp_path: Path,
+) -> None:
+    """Only the exact active 0.18.0 goal baseline may drive goal/headline
+    numbers. 0.17.2rc0, 0.17.2.post1 and a future non-active 0.x release must
+    not be selected as the goal baseline, even though they share the same
+    engine/repository ancestry.
+    """
+    website_root = Path(__file__).resolve().parents[1]
+    script = website_root / "scripts" / "aggregate_results.py"
+    source_dir = tmp_path / "benchmark_outputs"
+    source_dir.mkdir()
+
+    current_entry = _valid_entry()
+    current_entry["entry_id"] = "a11b1111-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+    current_entry["engine"] = "vllm-hust"
+    current_entry["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["engine"] = "vllm-hust"
+    current_entry["metadata"]["engine_version"] = "0.20.1rc1.dev314"
+    current_entry["metadata"]["github_repository"] = "vLLM-HUST/vllm-ascend-hust"
+    current_entry["metadata"]["idempotency_key"] = (
+        "vllm-hust|0.20.1rc1.dev314|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+    )
+    current_entry["same_spec"] = _same_spec_payload("spec-1", "hash-1")
+
+    def _baseline(entry_id: str, version: str, *, commit: str) -> dict:
+        entry = _valid_entry()
+        entry["entry_id"] = entry_id
+        entry["engine"] = "vllm"
+        entry["engine_version"] = version
+        entry["metadata"]["engine"] = "vllm"
+        entry["metadata"]["engine_version"] = version
+        entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
+        entry["metadata"]["git_commit"] = commit
+        entry["metadata"]["idempotency_key"] = (
+            f"vllm|{version}|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+        )
+        entry["same_spec"] = _same_spec_payload("spec-1", "hash-1")
+        return entry
+
+    old_rc = _baseline(
+        "a12b2222-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "0.17.2rc0",
+        commit="1111111",
+    )
+    old_post = _baseline(
+        "a13b3333-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "0.17.2.post1",
+        commit="2222222",
+    )
+    exact = _baseline(
+        "a14b4444-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "0.18.0",
+        commit=_GOAL_BASELINE_ASCEND_COMMIT,
+    )
+    future = _baseline(
+        "a15b5555-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "0.19.0",
+        commit="3333333",
+    )
+
+    _write_manifest_entries(
+        source_dir, [current_entry, old_rc, old_post, exact, future]
+    )
+    compare_payload = _load_compare_payload(
+        script, source_dir, tmp_path / "website_data"
+    )
+    goal_progress = compare_payload["goal_progress"]
+
+    assert goal_progress["pair_count"] == 1
+    assert goal_progress["headline_pair"]["baseline"]["engine_version"] == "0.18.0"
+    assert goal_progress["headline_pair"]["baseline"]["entry_id"] == exact["entry_id"]
+    assert (
+        goal_progress["headline_pair"]["baseline_target"]["id"]
+        == "official-ascend-jan-2026-v0.18.0"
+    )
+    assert (
+        goal_progress["headline_pair"]["baseline_target"]["engine_version"] == "0.18.0"
+    )
 
 
 def test_aggregate_results_rejects_legacy_model_payload_without_normalized_identity(
@@ -1411,12 +1503,13 @@ def test_aggregate_results_fails_on_same_spec_hash_mismatch(tmp_path: Path) -> N
     baseline_entry = _valid_entry()
     baseline_entry["entry_id"] = "99999999-9999-9999-9999-999999999999"
     baseline_entry["engine"] = "vllm"
-    baseline_entry["engine_version"] = "0.17.2rc0"
+    baseline_entry["engine_version"] = "0.18.0"
     baseline_entry["metadata"]["engine"] = "vllm"
-    baseline_entry["metadata"]["engine_version"] = "0.17.2rc0"
+    baseline_entry["metadata"]["engine_version"] = "0.18.0"
     baseline_entry["metadata"]["github_repository"] = "vllm-project/vllm-ascend"
+    baseline_entry["metadata"]["git_commit"] = _GOAL_BASELINE_ASCEND_COMMIT
     baseline_entry["metadata"]["idempotency_key"] = (
-        "vllm|0.17.2rc0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
+        "vllm|0.18.0|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
     baseline_entry["same_spec"] = _same_spec_payload("spec-3", "hash-baseline")
 
