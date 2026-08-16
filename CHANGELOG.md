@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-08-16
+
+### Fixed
+
+- 将 Sage Mate 中文主按钮统一为正式文案“体验 Sage Mate”，并同步更新新标签页可访问名称与产品目录缓存版本。
+
 ## [0.3.1] - 2026-08-16
 
 ### Changed
