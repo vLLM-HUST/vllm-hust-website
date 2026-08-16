@@ -211,9 +211,9 @@ def test_stable_trend_milestones_are_fixed_and_non_regressing_across_metrics() -
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     entries = json.loads((root / "data" / "leaderboard_historical.json").read_text())
     milestone_plugins = {
-        "0657f3f2a6": "03a12f9bdd",
-        "73187bc8ba": "03a12f9bdd",
-        "1aa7cd10b7": "03ae1d03db",
+        "0657f3f2a6": "03a12f9bdd",  # pragma: allowlist secret
+        "73187bc8ba": "03a12f9bdd",  # pragma: allowlist secret
+        "1aa7cd10b7": "03ae1d03db",  # pragma: allowlist secret
     }
     milestones = list(milestone_plugins)
     versions = milestones
@@ -221,15 +221,15 @@ def test_stable_trend_milestones_are_fixed_and_non_regressing_across_metrics() -
     tolerances = {"throughput_tps": 0.01, "ttft_ms": 0.10, "tbt_ms": 0.05}
 
     assert all(commit in text for commit in milestones)
-    assert "plugin: '03a12f9bdd'" in text
-    assert "plugin: '03ae1d03db'" in text
+    assert "plugin: '03a12f9bdd'" in text  # pragma: allowlist secret
+    assert "plugin: '03ae1d03db'" in text  # pragma: allowlist secret
     assert "pluginCommit !== milestone.plugin" in text
-    assert "6f612fbedf" not in text
-    assert "a46abb7ae6" not in text
-    assert "ec4847981f" not in text
-    assert "83cf83ff20" not in text
-    assert "f273f9c5e2" not in text
-    assert "89334ef1f0" not in text
+    assert "6f612fbedf" not in text  # pragma: allowlist secret
+    assert "a46abb7ae6" not in text  # pragma: allowlist secret
+    assert "ec4847981f" not in text  # pragma: allowlist secret
+    assert "83cf83ff20" not in text  # pragma: allowlist secret
+    assert "f273f9c5e2" not in text  # pragma: allowlist secret
+    assert "89334ef1f0" not in text  # pragma: allowlist secret
     assert "state.trendView !== 'checkpoint'" in text
     assert "? 'historical-recovered'" not in text
     assert "const stableTrendMilestone = state.trendView === 'checkpoint'" in text
@@ -273,9 +273,11 @@ def test_stable_trend_milestones_are_fixed_and_non_regressing_across_metrics() -
             continue
         input_contract = "input:default"
         if workload.get("name") == "visionarena-online":
-            contract = (entry.get("historical_recovery") or {}).get(
-                "input_contract"
-            ) or metadata.get("input_contract") or {}
+            contract = (
+                (entry.get("historical_recovery") or {}).get("input_contract")
+                or metadata.get("input_contract")
+                or {}
+            )
             input_contract = f"input:{contract.get('content_sha256') or 'unrecorded'}"
         series = (
             workload.get("name"),

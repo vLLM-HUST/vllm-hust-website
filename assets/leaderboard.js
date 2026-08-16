@@ -2499,9 +2499,9 @@
     const SERVING_TREND_WORKLOAD_SUFFIXES = ['online', 'throughput', 'latency'];
 
     const TREND_MILESTONE_LABELS = {
-        '0657f3f2a6': { rank: 1, plugin: '03a12f9bdd', en: 'Post-prefix-caching stable', zh: '前缀缓存后稳定点' },
-        '73187bc8ba': { rank: 2, plugin: '03a12f9bdd', en: 'Runtime lifecycle checkpoint', zh: '运行时生命周期检查点' },
-        '1aa7cd10b7': { rank: 3, plugin: '03ae1d03db', en: 'July stable main checkpoint', zh: '7 月稳定主线检查点' },
+        '0657f3f2a6': { rank: 1, plugin: '03a12f9bdd', en: 'Post-prefix-caching stable', zh: '前缀缓存后稳定点' }, // pragma: allowlist secret
+        '73187bc8ba': { rank: 2, plugin: '03a12f9bdd', en: 'Runtime lifecycle checkpoint', zh: '运行时生命周期检查点' }, // pragma: allowlist secret
+        '1aa7cd10b7': { rank: 3, plugin: '03ae1d03db', en: 'July stable main checkpoint', zh: '7 月稳定主线检查点' }, // pragma: allowlist secret
     };
 
     const STABLE_TREND_METRIC_DIRECTIONS = {
