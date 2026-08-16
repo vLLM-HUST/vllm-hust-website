@@ -20,7 +20,7 @@ def test_product_names_urls_and_actions_are_release_catalogued() -> None:
 
     assert CATALOG.count("https://ws.sage.org.ai/") == 1
     assert CATALOG.count("https://twin.sage.org.ai/") == 1
-    assert "version: '0.3.2'" in CATALOG
+    assert "version: '0.3.3'" in CATALOG
     assert "releasedAt: '2026-08-16'" in CATALOG
 
 
