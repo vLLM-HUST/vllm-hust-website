@@ -195,7 +195,7 @@ def test_recovered_history_is_kept_out_of_table_and_used_for_curated_trends() ->
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     data = json.loads((root / "data" / "leaderboard_historical.json").read_text())
 
-    assert len(data) == 276
+    assert len(data) == 282
     assert all(
         entry.get("historical_recovery", {}).get("admitted_for_historical_trend")
         is True
@@ -210,68 +210,28 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     entries = json.loads((root / "data" / "leaderboard_historical.json").read_text())
-    milestones = ["6f612fbedf", "a46abb7ae6", "0e84e42c71", "e4ce33646f"]
+    milestones = ["0e84e42c71", "3b8e5cff01", "e4ce33646f"]
+    versions = milestones
     directions = {"throughput_tps": 1, "ttft_ms": -1, "tbt_ms": -1}
 
-    def normalize(value: object) -> object:
-        if not isinstance(value, str):
-            return value
-        stripped = value.strip()
-        if stripped.lower() in {"true", "false"}:
-            return stripped.lower() == "true"
-        try:
-            return float(stripped) if "." in stripped else int(stripped)
-        except ValueError:
-            return stripped
-
-    def semantic_signature(entry: dict[str, object]) -> str:
-        same_spec = entry.get("same_spec") or {}
-        workload = entry.get("workload") or {}
-        ignored = {"host", "port", "model"}
-        server = {
-            key: normalize(value)
-            for key, value in (
-                same_spec.get("resolved_server_parameters") or {}
-            ).items()
-            if key not in ignored
-        }
-        client = {
-            key: normalize(value)
-            for key, value in (
-                same_spec.get("resolved_client_parameters") or {}
-            ).items()
-            if key not in ignored
-        }
-        if client.get("input_len") == normalize(workload.get("input_length")):
-            client.pop("input_len", None)
-        if client.get("output_len") == normalize(workload.get("output_length")):
-            client.pop("output_len", None)
-        workload_signature = {
-            key: normalize(workload.get(key))
-            for key in (
-                "name",
-                "input_length",
-                "output_length",
-                "batch_size",
-                "concurrent_requests",
-            )
-            if workload.get(key) is not None
-        }
-        return json.dumps(
-            {"server": server, "client": client, "workload": workload_signature},
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-
     assert all(commit in text for commit in milestones)
+    assert "6f612fbedf" not in text
+    assert "a46abb7ae6" not in text
+    assert "ec4847981f" not in text
+    assert "83cf83ff20" not in text
     assert "f273f9c5e2" not in text
     assert "89334ef1f0" not in text
     assert "state.trendView !== 'checkpoint'" in text
     assert "? 'historical-recovered'" in text
     assert "const leadershipMilestone = state.trendView === 'checkpoint'" in text
+    assert "const declaredSpecId = getSameSpecId(entry);" in text
+    assert "? `spec:${declaredSpecId}`" in text
+    assert "function getLeadershipComparableSeriesKeys(entries)" in text
+    assert "expectedRanks.every((rank) => byRank.has(rank))" in text
+    assert "if ((values[index] - values[index - 1]) * direction < 0)" in text
 
-    values: dict[tuple[tuple[object, ...], str], dict[str, list[float]]] = defaultdict(
-        lambda: defaultdict(list)
+    values: dict[tuple[object, ...], dict[str, dict[str, list[float]]]] = defaultdict(
+        lambda: defaultdict(lambda: defaultdict(list))
     )
     for entry in entries:
         metadata = entry.get("metadata") or {}
@@ -285,42 +245,54 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
         workload = entry.get("workload") or {}
         model = entry.get("model") or {}
         hardware = entry.get("hardware") or {}
+        spec_id = str((entry.get("same_spec") or {}).get("spec_id") or "")
+        if not spec_id:
+            continue
         series = (
             workload.get("name"),
-            model.get("canonical_id") or model.get("repo_id"),
+            model.get("canonical_id") or model.get("display_name"),
             hardware.get("chip_model"),
             hardware.get("chip_count"),
             (entry.get("cluster") or {}).get("node_count", 1),
             model.get("precision"),
             model.get("quantization") or "none",
-            semantic_signature(entry),
+            spec_id,
         )
         for metric in directions:
             value = (entry.get("metrics") or {}).get(metric)
             if isinstance(value, (int, float)) and value > 0:
-                values[(series, metric)][version].append(float(value))
+                values[series][metric][version].append(float(value))
 
-    best = {
-        key: statistics.median(by_version["baseline"])
-        for key, by_version in values.items()
-        if by_version.get("baseline")
-    }
-    for milestone in milestones:
-        observations = 0
-        for key, by_version in values.items():
-            if not by_version.get(milestone):
+    admitted: list[tuple[object, ...]] = []
+    for series, by_metric in values.items():
+        valid = True
+        measured_metrics = 0
+        for metric, direction in directions.items():
+            by_version = by_metric.get(metric, {})
+            measured = [version for version in versions if by_version.get(version)]
+            if not measured:
                 continue
-            observations += 1
-            value = statistics.median(by_version[milestone])
-            if key in best:
-                assert (value - best[key]) * directions[key[1]] >= 0, (
-                    milestone,
-                    key,
-                    best[key],
-                    value,
-                )
-            best[key] = value
-        assert observations > 0
+            measured_metrics += 1
+            if measured != versions:
+                valid = False
+                break
+            medians = [statistics.median(by_version[version]) for version in versions]
+            if any(
+                (right - left) * direction < 0
+                for left, right in zip(medians, medians[1:])
+            ):
+                valid = False
+                break
+        if valid and measured_metrics:
+            admitted.append(series)
+
+    assert {series[0] for series in admitted} == {
+        "random-online",
+        "sharegpt-online",
+        "sharegpt-throughput",
+        "sonnet-throughput",
+    }
+    assert len(admitted) == 4
 
 
 def test_historical_only_tabs_have_a_leadership_ready_empty_state() -> None:
@@ -403,8 +375,7 @@ def test_trend_series_discloses_real_configuration_overrides() -> None:
     assert "add matching baseline result" not in text
     assert "待补同配置基线结果" not in text
     assert "showLine: series.pointCount > 1" in text
-    assert "const milestoneOnly = state.trendView === 'checkpoint'" in text
-    assert "pointRadius: milestoneOnly ? 3 : 3" in text
+    assert "pointRadius: series.pointCount === 1 ? 5 : 3" in text
     assert "trendSeriesLeadershipSummary" in text
     assert "item.evidenceLabel = formatTrendSeriesEvidence(item);" in text
     assert "evidence.className = 'trend-series-evidence';" in text
@@ -592,9 +563,9 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     assert "function dispatchProgress(payload, onProgress)" in text
     assert "function startBackgroundSync()" in text
     assert "startBackgroundSync," in text
-    assert "llm_engine_hf_leaderboard_cache_v8_leadership" in text
+    assert "llm_engine_hf_leaderboard_cache_v9_leadership" in text
     assert (
-        "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-leadership-2';"
+        "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-leadership-3';"
         in text
     )
     assert (

@@ -64,8 +64,8 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v8_leadership';
-const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-leadership-2';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v9_leadership';
+const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-leadership-3';
 const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';
 const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';
 let lastLoadedSource = null;

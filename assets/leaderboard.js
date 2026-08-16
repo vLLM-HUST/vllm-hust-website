@@ -232,7 +232,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Leadership view uses one fixed milestone set that passes throughput, TTFT, and TBT non-regression checks. Lines connect only exact comparable workload specs; muted standalone dots show additional milestone coverage.',
+            trendSubtitle: 'Leadership view uses one fixed milestone set that passes throughput, TTFT, and TBT non-regression checks. Only workloads with complete results at every milestone under the same declared benchmark contract are shown.',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -243,7 +243,7 @@
             trendAxisBreak: 'axis break',
             trendSeriesButton: 'Series',
             trendSeriesSummary: '{visible} of {total} series visible',
-            trendSeriesLeadershipSummary: 'Comparable lines: {lines} · Milestone-only workloads: {points} · Visible: {visible}/{total}',
+            trendSeriesLeadershipSummary: 'Comparable workload lines: {lines} · Visible: {visible}/{total}',
             trendSeriesHint: 'Open the series panel to focus the chart.',
             trendSeriesSearch: 'Search series',
             trendSeriesShowAll: 'Show all',
@@ -275,8 +275,8 @@
             trendViewAll: 'All',
             leaderboardEmptyTitle: 'No Results Found',
             leaderboardEmptyText: 'Try adjusting your filters to see more data.',
-            leaderboardHistoricalOnlyTitle: 'Historical trend available',
-            leaderboardHistoricalOnlyText: 'No current formally admitted ranking rows exist for this tab. The curated historical trend remains available below.',
+            leaderboardHistoricalOnlyTitle: 'Historical records available',
+            leaderboardHistoricalOnlyText: 'No current formally admitted ranking rows exist for this tab. Historical records remain available in the technical views; no incomplete leadership trend is inferred.',
             leaderboardStaleTitle: 'Leaderboard Unavailable',
             leaderboardStaleText: 'No verified snapshot could be loaded. The canonical publication is unreachable and no exact mirror matched, so stale data was not revived.',
             trendEmpty: 'No trend data under current filters.',
@@ -480,7 +480,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '领导视图固定使用一组同时通过吞吐、TTFT、TBT 不退化检查的里程碑。只有严格同规格 workload 才连线；淡色独立点表示其他里程碑覆盖。',
+            trendSubtitle: '领导视图固定使用一组同时通过吞吐、TTFT、TBT 不退化检查的里程碑。只展示在同一已声明 benchmark 合约下覆盖全部里程碑的 workload。',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -491,7 +491,7 @@
             trendAxisBreak: '断轴',
             trendSeriesButton: '系列',
             trendSeriesSummary: '已显示 {visible} / {total} 条系列',
-            trendSeriesLeadershipSummary: '{lines} 条可比较连线 · {points} 个仅里程碑点 workload · 已显示 {visible} / {total}',
+            trendSeriesLeadershipSummary: '可比较 workload 连线：{lines} · 已显示 {visible} / {total}',
             trendSeriesHint: '打开系列面板以聚焦图表。',
             trendSeriesSearch: '搜索系列',
             trendSeriesShowAll: '全部显示',
@@ -525,8 +525,8 @@
             trendViewAll: '全部',
             leaderboardEmptyTitle: '未找到结果',
             leaderboardEmptyText: '请调整筛选条件以查看更多数据。',
-            leaderboardHistoricalOnlyTitle: '可查看历史趋势',
-            leaderboardHistoricalOnlyText: '此分类当前没有正式准入的排名记录；下方仍展示经过筛选的历史里程碑趋势。',
+            leaderboardHistoricalOnlyTitle: '可查看历史记录',
+            leaderboardHistoricalOnlyText: '此分类当前没有正式准入的排名记录。历史记录仍可在技术视图中查看；领导视图不会推断不完整的趋势。',
             leaderboardStaleTitle: '榜单暂不可用',
             leaderboardStaleText: '未能加载到经过核验的快照。规范发布源当前不可达，且没有匹配的精确镜像，因此不会回退到过期数据。',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
@@ -2450,10 +2450,15 @@
     const SERVING_TREND_WORKLOAD_SUFFIXES = ['online', 'throughput', 'latency'];
 
     const TREND_MILESTONE_LABELS = {
-        '6f612fbedf': { rank: 1, en: 'June main checkpoint', zh: '六月主线检查点' },
-        a46abb7ae6: { rank: 2, en: 'Quantization compatibility', zh: '量化兼容检查点' },
-        '0e84e42c71': { rank: 3, en: 'Prefix caching default', zh: '前缀缓存默认启用' },
-        e4ce33646f: { rank: 4, en: 'Pooling hotpath stabilization', zh: 'Pooling 热路径稳定化' },
+        '0e84e42c71': { rank: 1, en: 'Prefix caching default', zh: '前缀缓存默认启用' },
+        '3b8e5cff01': { rank: 2, en: 'Logprobs batching checkpoint', zh: 'Logprobs 批处理检查点' },
+        e4ce33646f: { rank: 3, en: 'Latest stable main', zh: '最新稳定主线' },
+    };
+
+    const LEADERSHIP_METRIC_DIRECTIONS = {
+        throughput_tps: 1,
+        ttft_ms: -1,
+        tbt_ms: -1,
     };
 
     function getServingTrendWorkloadBase(entry) {
@@ -2573,8 +2578,90 @@
             && (recoveredHistorical || isVerifiedEvidence(entry));
     }
 
+    function getLeadershipMilestoneRank(entry) {
+        if (isTrendBaselineEntry(entry)) {
+            return null;
+        }
+        const commit = normalizeTrendCommit(
+            getVersionFieldCommit(entry, 'core') || entry?.metadata?.git_commit
+        );
+        const rank = TREND_MILESTONE_LABELS[commit]?.rank;
+        return Number.isFinite(rank) ? rank : null;
+    }
+
+    function getMedianTrendValue(entries, metricKey) {
+        const values = entries
+            .map((entry) => getCanonicalAggregateMetric(entry, metricKey)?.value)
+            .filter((value) => Number.isFinite(value))
+            .sort((left, right) => left - right);
+        if (!values.length) {
+            return null;
+        }
+        const middle = Math.floor(values.length / 2);
+        return values.length % 2
+            ? values[middle]
+            : (values[middle - 1] + values[middle]) / 2;
+    }
+
+    // Leadership is a complete longitudinal matrix, not a collection of points.
+    // A series must cover the official baseline and every fixed main milestone.
+    // Every metric it measures must be present at all nodes and monotonic in its
+    // correct direction. This prevents both false singletons and metric-local
+    // cherry-picking from entering the default view.
+    function getLeadershipComparableSeriesKeys(entries) {
+        const expectedRanks = [
+            ...Object.values(TREND_MILESTONE_LABELS)
+                .map((milestone) => milestone.rank)
+                .sort((left, right) => left - right),
+        ];
+        const grouped = new Map();
+        entries.forEach((entry) => {
+            const rank = getLeadershipMilestoneRank(entry);
+            if (rank === null) {
+                return;
+            }
+            const key = getTrendSeriesKey(entry);
+            if (!grouped.has(key)) {
+                grouped.set(key, new Map());
+            }
+            const byRank = grouped.get(key);
+            if (!byRank.has(rank)) {
+                byRank.set(rank, []);
+            }
+            byRank.get(rank).push(entry);
+        });
+
+        const admitted = new Set();
+        grouped.forEach((byRank, key) => {
+            if (!expectedRanks.every((rank) => byRank.has(rank))) {
+                return;
+            }
+            let measuredMetricCount = 0;
+            for (const [metricKey, direction] of Object.entries(LEADERSHIP_METRIC_DIRECTIONS)) {
+                const values = expectedRanks.map((rank) => getMedianTrendValue(byRank.get(rank), metricKey));
+                const measured = values.filter((value) => value !== null).length;
+                if (measured === 0) {
+                    continue;
+                }
+                measuredMetricCount += 1;
+                if (measured !== expectedRanks.length) {
+                    return;
+                }
+                for (let index = 1; index < values.length; index += 1) {
+                    if ((values[index] - values[index - 1]) * direction < 0) {
+                        return;
+                    }
+                }
+            }
+            if (measuredMetricCount > 0) {
+                admitted.add(key);
+            }
+        });
+        return admitted;
+    }
+
     function getPerformanceTrendEntries(entries, selectedWorkload) {
-        return entries.filter((entry) => {
+        const filtered = entries.filter((entry) => {
             if (shouldExcludeFromTrends(entry)) {
                 return false;
             }
@@ -2594,6 +2681,14 @@
             }
             return isServingTrendWorkload(entry);
         });
+        if (state.trendView !== 'checkpoint') {
+            return filtered;
+        }
+        const admittedSeries = getLeadershipComparableSeriesKeys(filtered);
+        return filtered.filter((entry) => (
+            getLeadershipMilestoneRank(entry) !== null
+            && admittedSeries.has(getTrendSeriesKey(entry))
+        ));
     }
 
     function getScopeModelIdentity(scope) {
@@ -3115,7 +3210,17 @@
         const nodeCount = entry?.cluster?.node_count || 1;
         const precision = entry?.model?.precision || 'unknown-precision';
         const quantization = getEntryQuantization(entry);
-        const settingSignature = getSettingSignature(entry);
+        const declaredSpecId = getSameSpecId(entry);
+        // A spec_id is the benchmark contract identity. Historical runners may
+        // serialize implicit defaults (for example no_stream=false or the model
+        // context limit) differently even though they executed the same declared
+        // contract. Rebuilding identity from every resolved field fragmented one
+        // real longitudinal workload into many false singletons. Leadership uses
+        // the admitted/verified contract id; technical views retain exact
+        // resolved-parameter identity for diagnosis.
+        const settingSignature = state.trendView === 'checkpoint' && declaredSpecId
+            ? `spec:${declaredSpecId}`
+            : getSettingSignature(entry);
         // Issue #164: records with different config evidence must never share a
         // series, so a verified point is never connected to an unverified or
         // drifted one even in the "all" view.
@@ -3487,6 +3592,17 @@
                 return left.label.localeCompare(right.label);
             });
 
+        if (state.trendView === 'checkpoint') {
+            const comparableSeries = series.filter((item) => item.pointCount > 1);
+            const comparableVersionKeys = new Set(
+                comparableSeries.flatMap((item) => [...item.points.keys()])
+            );
+            return {
+                versions: versions.filter((version) => comparableVersionKeys.has(version.key)),
+                series: comparableSeries,
+            };
+        }
+
         return { versions, series };
     }
 
@@ -3684,10 +3800,8 @@
                 (series) => !state.hiddenTrendSeries.has(series.key)
             );
             const lines = visibleSeries.filter((series) => series.pointCount > 1).length;
-            const points = visibleSeries.filter((series) => series.pointCount === 1).length;
             return t('trendSeriesLeadershipSummary')
                 .replace('{lines}', String(lines))
-                .replace('{points}', String(points))
                 .replace('{visible}', String(visible))
                 .replace('{total}', String(total));
         }
@@ -3957,7 +4071,6 @@
         const labels = makeUniqueTrendLabels(model.versions.map((version) => version.label));
         let datasets = model.series.map((series, index) => {
             const colors = getTrendColors(index);
-            const milestoneOnly = state.trendView === 'checkpoint' && series.pointCount === 1;
             let previousPoint = null;
             const trackBreakIndices = new Set();
             const data = model.versions.map((version, versionIndex) => {
@@ -3999,11 +4112,11 @@
                 data,
                 pointDetails,
                 pointAggregates,
-                borderColor: milestoneOnly ? 'rgba(71, 85, 105, 0.55)' : colors.borderColor,
-                backgroundColor: milestoneOnly ? 'rgba(148, 163, 184, 0.28)' : colors.backgroundColor,
-                borderWidth: milestoneOnly ? 1 : 2,
+                borderColor: colors.borderColor,
+                backgroundColor: colors.backgroundColor,
+                borderWidth: 2,
                 showLine: series.pointCount > 1,
-                pointRadius: milestoneOnly ? 3 : 3,
+                pointRadius: series.pointCount === 1 ? 5 : 3,
                 pointHoverRadius: 6,
                 tension: 0.28,
                 spanGaps: allowSpanGaps,
