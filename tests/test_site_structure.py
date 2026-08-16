@@ -586,7 +586,7 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     assert 'id="products"' in text
     assert 'data-product-id="workstation"' in text
     assert 'data-product-id="sage-mate"' in text
-    assert "./assets/product-catalog.js?v=0.3.0" in text
+    assert "./assets/product-catalog.js?v=0.3.1" in text
     assert 'id="workstation-section"' not in text
     assert "workstation-embed.js" not in text
 
@@ -715,7 +715,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=product-ecosystem-20260816" in html_text
+    assert "assets/home.css?v=product-polish-20260816" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
