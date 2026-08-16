@@ -1006,7 +1006,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=leadership-trends-v4-20260816" in html_text
+    assert "assets/leaderboard.js?v=leadership-trends-v5-20260816" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 
@@ -3456,6 +3456,9 @@ def test_specialty_hardware_series_identity_encoded_in_source() -> None:
 
     # Dedicated specialty view button + admission gate.
     assert 'data-trend-view="specialty"' in html
+    assert ">Hardware configurations</button>" in html
+    assert "trendViewSpecialty: 'Hardware configurations'" in text
+    assert "trendViewSpecialty: '硬件配置'" in text
     assert "state.trendView === 'specialty'" in text
     assert "getEvidenceState(entry) === EVIDENCE_STATE.SPECIALTY" in text
 
