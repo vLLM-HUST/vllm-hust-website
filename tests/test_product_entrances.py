@@ -20,7 +20,7 @@ def test_product_names_urls_and_actions_are_release_catalogued() -> None:
 
     assert CATALOG.count("https://ws.sage.org.ai/") == 1
     assert CATALOG.count("https://twin.sage.org.ai/") == 1
-    assert "version: '0.3.4'" in CATALOG
+    assert "version: '0.3.5'" in CATALOG
     assert "releasedAt: '2026-08-16'" in CATALOG
 
 
@@ -102,6 +102,14 @@ def test_mobile_source_order_prioritizes_name_positioning_and_cta() -> None:
         visual = card.index('class="product-visual')
         features = card.index('class="product-features"')
         assert positioning < cta < visual < features
+
+
+def test_desktop_layout_prioritizes_product_name_and_value_before_visual() -> None:
+    assert (
+        'grid-template-areas: "meta" "title" "position" "visual" "features" "cta";'
+        in HOME_CSS
+    )
+    assert "border-left: 3px solid var(--product-accent);" in HOME_CSS
 
 
 def test_whole_card_click_uses_the_visible_cta_as_the_single_link() -> None:

@@ -586,7 +586,7 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     assert 'id="products"' in text
     assert 'data-product-id="workstation"' in text
     assert 'data-product-id="sage-mate"' in text
-    assert "./assets/product-catalog.js?v=0.3.4" in text
+    assert "./assets/product-catalog.js?v=0.3.5" in text
     assert 'id="workstation-section"' not in text
     assert "workstation-embed.js" not in text
 
@@ -715,7 +715,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=site-structure-20260816" in html_text
+    assert "assets/home.css?v=leadership-value-20260816" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
@@ -732,8 +732,8 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "An upstream-compatible inference engine for domestic compute." in html_text
-    assert "面向国产算力、兼容上游的大模型推理引擎。" in html_text
+    assert "Turn domestic compute into usable, verifiable inference." in html_text
+    assert "让国产算力成为可用、可验证的推理能力。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text

@@ -20,12 +20,45 @@ def _copy(dictionary: str, key: str) -> str:
 
 
 def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
-    keys = ("home-lede", "products-summary", "stack-summary", "atlas-summary")
+    keys = (
+        "home-kicker",
+        "home-lede",
+        "products-title",
+        "products-summary",
+        "product-workstation-positioning",
+        "product-mate-positioning",
+        "stack-summary",
+        "atlas-summary",
+    )
     en = _dictionary("en")
     zh = _dictionary("zh")
 
     assert max(len(_copy(en, key)) for key in keys) <= 125
     assert max(len(_copy(zh, key)) for key in keys) <= 55
+
+
+def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
+    for phrase in (
+        "Turn domestic compute into usable, verifiable inference.",
+        "One engine connects upstream compatibility, system innovation, and public evidence.",
+        "Two products. From infrastructure to impact.",
+        "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
+        "A cited AI twin that turns personal knowledge into an always-available service.",
+        "让国产算力成为可用、可验证的推理能力。",
+        "两款产品，让基础设施真正产生价值。",
+    ):
+        assert phrase in INDEX
+
+    for advantage in ("Usable", "Evolvable", "Verifiable", "可用", "可演进", "可验证"):
+        assert advantage in INDEX
+
+
+def test_workstation_visual_uses_capabilities_not_unverified_metrics() -> None:
+    product_section = INDEX.split('id="products"', 1)[1].split('id="stack"', 1)[0]
+    for capability in ("OPENAI", "LIVE", "ASCEND", "API", "METRICS", "BACKEND"):
+        assert capability in product_section
+    for decorative_metric in (">128<", ">32<", ">100%<", "tok/s", ">ms<", ">health<"):
+        assert decorative_metric not in product_section
 
 
 def test_home_copy_avoids_retired_prompt_like_explanations() -> None:
