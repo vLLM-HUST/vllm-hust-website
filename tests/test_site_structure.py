@@ -188,6 +188,22 @@ def test_trend_dataset_keeps_pr_and_historical_revisions() -> None:
     assert "isMainlineTrendEntry" not in text
 
 
+def test_recovered_history_is_kept_out_of_table_and_used_for_curated_trends() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    data = json.loads((root / "data" / "leaderboard_historical.json").read_text())
+
+    assert len(data) == 276
+    assert all(
+        entry.get("historical_recovery", {}).get("admitted_for_historical_trend")
+        is True
+        for entry in data
+    )
+    assert "function getHistoricalDataByTab(tab)" in text
+    assert "const trendData = [...data, ...historical];" in text
+    assert "function selectMonotonicMilestoneVersions" in text
+
+
 def test_trend_version_key_includes_core_and_backend_commits() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
@@ -440,8 +456,11 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     assert "function dispatchProgress(payload, onProgress)" in text
     assert "function startBackgroundSync()" in text
     assert "startBackgroundSync," in text
-    assert "llm_engine_hf_leaderboard_cache_v6" in text
-    assert "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-3';" in text
+    assert "llm_engine_hf_leaderboard_cache_v7_historical" in text
+    assert (
+        "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-historical-1';"
+        in text
+    )
     assert (
         "const url = `${HF_CONFIG.localPath}${filename}${separator}v=${LOCAL_DATA_CACHE_BUST}`;"
         in text
@@ -459,14 +478,20 @@ def test_hf_loader_does_not_revive_stale_data_from_empty_canonical() -> None:
     # authoritative. The loader must NOT fall through to stale HF/local records
     # with data just because the canonical snapshot is intentionally empty.
     assert "function isSnapshotEmpty(snapshot)" in loader
-    assert "return single.length === 0 && multi.length === 0;" in loader
+    assert (
+        "return single.length === 0 && multi.length === 0 && historical.length === 0;"
+        in loader
+    )
     assert "Empty leaderboard snapshot from ${source}: no benchmark records" in loader
     assert "emptyError.isEmptySnapshot = true;" in loader
 
     # The canonical source (first priority) is authoritative even when empty.
     assert "const canonicalSource = sourcePriority[0];" in loader
     assert "canonicalError?.isEmptySnapshot" in loader
-    assert "writeCache({ single: [], multi: [], compare: null }, null);" in loader
+    assert (
+        "writeCache({ single: [], multi: [], historical: [], compare: null }, null);"
+        in loader
+    )
 
     # A fallback may only replace an unavailable canonical source when it carries
     # the exact same atomic publication identity (marker/checksum), never merely
@@ -541,6 +566,7 @@ def test_leaderboard_data_is_benchmark_snapshot_mirror() -> None:
     for name in (
         "leaderboard_single.json",
         "leaderboard_multi.json",
+        "leaderboard_historical.json",
         "leaderboard_compare.json",
         "last_updated.json",
     ):
@@ -866,7 +892,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=trend-track-breaks-20260812" in html_text
+    assert "assets/leaderboard.js?v=historical-milestones-v1-20260816" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 
@@ -1450,7 +1476,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "leaderboard-empty-compare-v8-20260730" in html_text
+    assert "historical-milestones-v1-20260816" in html_text
     assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
@@ -1481,7 +1507,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, evidenceState, settingSignature].join('|');"
         in js_text
     )
-    assert "按提交时间展示当前可见在线版本；不兼容的版本轨道之间会断线" in js_text
+    assert "所有可比 workload 均提升或持平的精选里程碑" in js_text
     assert "function getSelectOptionLabel(value, option, labelMapper = null)" in js_text
     assert "if (value === 'all')" in js_text
     assert "function isServingTrendWorkload(entry)" in js_text
@@ -1573,7 +1599,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
     assert "if (selectedWorkload !== 'all')" in js_text
     assert "return true;" in js_text
-    assert "getPerformanceTrendEntries(data, 'all')" in js_text
+    assert "getPerformanceTrendEntries(trendData, 'all')" in js_text
     assert ".leaderboard-trend-panel {" in css_text
     assert ".trend-chart-wrap {" in css_text
     assert ".trend-axis-row {" in css_text
@@ -2274,7 +2300,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "trend-track-breaks-20260812" in html_text
+    assert "historical-milestones-v1-20260816" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:
@@ -3121,9 +3147,8 @@ def test_trend_evidence_state_contract() -> None:
     assert "function isVerifiedEvidence(entry)" in text
 
     # Default aligned trend is verified-only (fail closed).
-    assert (
-        "return coverageClass === 'full-matrix' && isVerifiedEvidence(entry);" in text
-    )
+    assert "const recoveredHistorical =" in text
+    assert "&& (recoveredHistorical || isVerifiedEvidence(entry));" in text
 
     # Evidence state participates in the series key so different evidence never
     # gets connected.

@@ -14,6 +14,7 @@ from typing import Any
 SNAPSHOT_FILES = (
     "leaderboard_single.json",
     "leaderboard_multi.json",
+    "leaderboard_historical.json",
     "leaderboard_compare.json",
     "last_updated.json",
 )
@@ -288,6 +289,7 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
 
     single = load_json(source_dir / "leaderboard_single.json")
     multi = load_json(source_dir / "leaderboard_multi.json")
+    historical = load_json(source_dir / "leaderboard_historical.json")
     compare = load_json(source_dir / "leaderboard_compare.json")
     marker = load_json(source_dir / "last_updated.json")
     errors: list[str] = []
@@ -311,6 +313,27 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
                 errors.extend(require_historical_unverified_marker(entry, name))
             else:
                 errors.extend(require_public_entry_contract(entry, name, registry))
+    historical_admitted = 0
+    if not isinstance(historical, list):
+        errors.append("leaderboard_historical.json must be an array")
+    else:
+        for entry in historical:
+            if not isinstance(entry, dict):
+                errors.append(
+                    "leaderboard_historical.json: every entry must be an object"
+                )
+                continue
+            recovery = entry.get("historical_recovery")
+            if (
+                not isinstance(recovery, dict)
+                or recovery.get("admitted_for_historical_trend") is not True
+            ):
+                errors.append(
+                    "leaderboard_historical.json: every entry must be admitted "
+                    "for the historical trend"
+                )
+                continue
+            historical_admitted += 1
     if (
         isinstance(single, list)
         and isinstance(multi, list)
@@ -332,6 +355,7 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
         "single": len(single),
         "multi": len(multi),
         "compare": len(compare["groups"]),
+        "historical": historical_admitted,
         "historical_unverified": historical_unverified,
     }
 
@@ -416,6 +440,7 @@ def write_pr_body(
         f"| Single-chip snapshot | passed | {counts['single']} |",
         f"| Multi-chip snapshot | passed | {counts['multi']} |",
         f"| Compare snapshot | passed | {counts['compare']} groups |",
+        f"| Recovered historical snapshot | passed | {counts['historical']} |",
         "| Official entry verification and fixed-target binding | passed | all target-bound entries |",
         f"| Explicit historical-unverified retention markers | passed | {counts['historical_unverified']} |",
         "",

@@ -114,6 +114,7 @@ def snapshot_dir(tmp_path: Path, registry_info: object) -> Path:
     root.mkdir()
     dump(root / "leaderboard_single.json", [entry(registry_info)])
     dump(root / "leaderboard_multi.json", [])
+    dump(root / "leaderboard_historical.json", [])
     dump(root / "leaderboard_compare.json", {"group_count": 0, "groups": []})
     dump(root / "last_updated.json", {"last_updated": "2026-07-31T00:00:00Z"})
     return root
@@ -126,8 +127,25 @@ def test_valid_snapshot_and_declared_empty_compare_pass(tmp_path: Path) -> None:
         "single": 1,
         "multi": 0,
         "compare": 0,
+        "historical": 0,
         "historical_unverified": 0,
     }
+
+
+def test_recovered_history_is_admitted_without_formal_verification(
+    tmp_path: Path,
+) -> None:
+    _, _, info = registry(tmp_path)
+    source = snapshot_dir(tmp_path, info)
+    recovered = entry(info)
+    recovered["metadata"]["verified"] = None
+    recovered["historical_recovery"] = {
+        "admitted_for_historical_trend": True,
+        "spec_resolution": "derived",
+    }
+    dump(source / "leaderboard_historical.json", [recovered])
+
+    assert MODULE.validate_snapshot_set(source, info)["historical"] == 1
 
 
 @pytest.mark.parametrize(

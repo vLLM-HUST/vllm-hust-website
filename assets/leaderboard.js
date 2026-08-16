@@ -232,7 +232,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Baseline first, then visible online revisions in submission order; incompatible revision tracks are shown as breaks.',
+            trendSubtitle: 'Checkpoint view shows curated milestones only when every comparable workload improves or holds; targeted PR and specialty runs stay separate.',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -477,7 +477,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '横轴从基线开始，按提交时间展示当前可见在线版本；不兼容的版本轨道之间会断线。',
+            trendSubtitle: '检查点视图只展示所有可比 workload 均提升或持平的精选里程碑；专项 PR 与专项硬件保持独立。',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -548,6 +548,7 @@
         singleChipData: [],
         multiChipData: [],
         multiNodeData: [],
+        historicalData: [],
         compareSnapshot: null,
         staleness: null,
         totalLoadedEntries: 0,
@@ -626,7 +627,8 @@
                 // empty table before the loader falls back to a source with data.
                 const hasBenchmarkData =
                     (Array.isArray(partialData.single) && partialData.single.length > 0) ||
-                    (Array.isArray(partialData.multi) && partialData.multi.length > 0);
+                    (Array.isArray(partialData.multi) && partialData.multi.length > 0) ||
+                    (Array.isArray(partialData.historical) && partialData.historical.length > 0);
                 if (!hasBenchmarkData) {
                     return;
                 }
@@ -659,9 +661,10 @@
             } else {
                 // 备用：直接从本地加载
                 console.log('[Leaderboard] HF Loader not available, using local data...');
-                const [singleRes, multiRes, compareRes] = await Promise.all([
+                const [singleRes, multiRes, historicalRes, compareRes] = await Promise.all([
                     fetch('./data/leaderboard_single.json'),
                     fetch('./data/leaderboard_multi.json'),
+                    fetch('./data/leaderboard_historical.json'),
                     fetch('./data/leaderboard_compare.json')
                 ]);
 
@@ -672,6 +675,7 @@
                 data = {
                     single: await singleRes.json(),
                     multi: await multiRes.json(),
+                    historical: historicalRes.ok ? await historicalRes.json() : [],
                     compare: compareRes.ok ? await compareRes.json() : null,
                 };
             }
@@ -695,6 +699,7 @@
     function applyLeaderboardPayload(data, options = {}) {
         const hasSingle = Array.isArray(data?.single);
         const hasMulti = Array.isArray(data?.multi);
+        const hasHistorical = Array.isArray(data?.historical);
         const hasCompare = Object.prototype.hasOwnProperty.call(data || {}, 'compare');
 
         // Issue #205: record a stale/unavailable signal when the loader could not
@@ -727,6 +732,11 @@
             state.multiNodeData = multiData.filter(entry =>
                 entry.cluster && entry.cluster.node_count > 1
             );
+        }
+
+        if (hasHistorical || !options.partial) {
+            state.historicalData = hasHistorical ? data.historical : [];
+            state.historicalData.sort(compareEntriesByVersionDesc);
         }
 
         state.totalLoadedEntries =
@@ -2433,6 +2443,14 @@
 
     const SERVING_TREND_WORKLOAD_SUFFIXES = ['online', 'throughput', 'latency'];
 
+    const TREND_MILESTONE_LABELS = {
+        f273f9c5e2: { en: 'PR #49 · KV offload', zh: 'PR #49 · KV 卸载' },
+        '7a63f81e86': { en: 'June main checkpoint', zh: '六月主线检查点' },
+        '6f612fbedf': { en: 'InstructCoder checkpoint', zh: 'InstructCoder 检查点' },
+        '89334ef1f0': { en: 'PR #124 · KV tiering', zh: 'PR #124 · KV 分层' },
+        e4ce33646f: { en: 'PR #175 · pooling rollback', zh: 'PR #175 · pooling 回退修复' },
+    };
+
     function getServingTrendWorkloadBase(entry) {
         return String(getWorkloadId(entry) || '').replace(/-\d+chip$/, '');
     }
@@ -2463,6 +2481,14 @@
         }
         if (prUrl) {
             return 'targeted-pair';
+        }
+        const ref = String(
+            entry?.metadata?.github_ref
+            || entry?.metadata?.runtime_provenance?.engine?.ref
+            || ''
+        ).trim();
+        if (/^(?:refs\/heads\/)?(?:main|master)(?:$|[-/_])/i.test(ref)) {
+            return 'full-matrix';
         }
         const dataSource = String(entry?.metadata?.data_source || '').toLowerCase();
         if (dataSource.includes('pr') || dataSource.includes('comparison')) {
@@ -2537,7 +2563,9 @@
         // evidence may enter the aligned trend. Legacy / config-unverified /
         // drifted records are kept out and surfaced only in the "all" view
         // (issue #164).
-        return coverageClass === 'full-matrix' && isVerifiedEvidence(entry);
+        const recoveredHistorical = entry?.historical_recovery?.admitted_for_historical_trend === true;
+        return coverageClass === 'full-matrix'
+            && (recoveredHistorical || isVerifiedEvidence(entry));
     }
 
     function getPerformanceTrendEntries(entries, selectedWorkload) {
@@ -2547,6 +2575,14 @@
             }
             if (!isTrendViewAllowed(entry)) {
                 return false;
+            }
+            if (state.trendView === 'checkpoint' && !isTrendBaselineEntry(entry)) {
+                const commit = normalizeTrendCommit(
+                    getVersionFieldCommit(entry, 'core') || entry?.metadata?.git_commit
+                );
+                if (!Object.prototype.hasOwnProperty.call(TREND_MILESTONE_LABELS, commit)) {
+                    return false;
+                }
             }
             if (selectedWorkload !== 'all') {
                 return true;
@@ -3158,6 +3194,10 @@
         }
         const engine = getEngine(entry);
         const commit = String(entry?.metadata?.git_commit || '').trim().slice(0, 10);
+        const milestone = TREND_MILESTONE_LABELS[commit];
+        if (milestone) {
+            return `${milestone[getCurrentLang()] || milestone.en} · ${commit}`;
+        }
         const engineVersion = String(entry?.engine_version || '').trim();
         const commitCountMatch = engineVersion.match(/-(\d+)-g[0-9a-f]+$/);
         let label;
@@ -3243,6 +3283,43 @@
             max: sorted[sorted.length - 1],
             std: null,
         };
+    }
+
+    function selectMonotonicMilestoneVersions(versions, seriesMap, metricConfig) {
+        if (state.trendView !== 'checkpoint') {
+            return versions;
+        }
+        const selected = [];
+        const bestBySeries = new Map();
+        versions.forEach((version) => {
+            const observations = [...seriesMap.values()]
+                .map((series) => ({ seriesKey: series.key, point: series.points.get(version.key) }))
+                .filter((item) => item.point && Number.isFinite(item.point.value));
+            if (!observations.length) {
+                return;
+            }
+            if (version.baseline) {
+                selected.push(version);
+                observations.forEach(({ seriesKey, point }) => bestBySeries.set(seriesKey, point.value));
+                return;
+            }
+            const regresses = observations.some(({ seriesKey, point }) => {
+                const current = bestBySeries.get(seriesKey);
+                if (current === undefined) return false;
+                return metricConfig.higherIsBetter ? point.value < current : point.value > current;
+            });
+            const advances = observations.some(({ seriesKey, point }) => {
+                const current = bestBySeries.get(seriesKey);
+                if (current === undefined) return true;
+                return metricConfig.higherIsBetter ? point.value > current : point.value < current;
+            });
+            if (regresses || !advances) {
+                return;
+            }
+            selected.push(version);
+            observations.forEach(({ seriesKey, point }) => bestBySeries.set(seriesKey, point.value));
+        });
+        return selected;
     }
 
     function buildTrendChartModel(entries, metricConfig, defaultEntries = entries) {
@@ -3363,13 +3440,17 @@
         const plottedVersionKeys = new Set(
             [...seriesMap.values()].flatMap((item) => [...item.points.keys()])
         );
-        const versions = candidateVersions.filter((version) => plottedVersionKeys.has(version.key));
+        const plottedVersions = candidateVersions.filter((version) => plottedVersionKeys.has(version.key));
+        const versions = selectMonotonicMilestoneVersions(
+            plottedVersions, seriesMap, metricConfig
+        );
+        const selectedVersionKeys = new Set(versions.map((version) => version.key));
         const versionIndex = new Map(versions.map((version, index) => [version.key, index]));
 
         const series = [...seriesMap.values()]
             .map((item) => ({
                 ...item,
-                points: new Map([...item.points].filter(([key]) => plottedVersionKeys.has(key))),
+                points: new Map([...item.points].filter(([key]) => selectedVersionKeys.has(key))),
             }))
             .map((item) => {
                 const versionKeys = [...item.points.keys()];
@@ -4302,6 +4383,27 @@
         }
     }
 
+    function getHistoricalDataByTab(tab) {
+        return state.historicalData.filter((entry) => {
+            const chipCount = Number(entry?.hardware?.chip_count || 0);
+            const nodeCount = Number(entry?.cluster?.node_count || 1);
+            if (tab === 'single-chip') return chipCount === 1 && nodeCount === 1;
+            if (tab === 'multi-chip') return chipCount > 1 && nodeCount === 1;
+            if (tab === 'multi-node') return nodeCount > 1;
+            return false;
+        });
+    }
+
+    function matchesLeaderboardFilters(entry, filters) {
+        const workload = getWorkloadId(entry);
+        return (filters.engine === 'all' || getEngine(entry) === filters.engine) &&
+            (filters.hardware === 'all' || entry.hardware.chip_model === filters.hardware) &&
+            (filters.model === 'all' || getEntryModelCanonicalId(entry) === filters.model) &&
+            matchesVersionFilter(entry, filters.version) &&
+            (filters.workload === 'all' || workload === filters.workload) &&
+            (filters.precision === 'all' || entry.model.precision === filters.precision);
+    }
+
     // Switch between single-chip/multi-chip/multi-node tabs
     function switchTab(tab) {
         state.currentTab = tab;
@@ -4488,15 +4590,13 @@
         const viewOptions = state.viewOptions[state.currentTab];
 
         // Apply filters
-        const filtered = data.filter(entry => {
-            const workload = getWorkloadId(entry);
-            return (filters.engine === 'all' || getEngine(entry) === filters.engine) &&
-                (filters.hardware === 'all' || entry.hardware.chip_model === filters.hardware) &&
-                (filters.model === 'all' || getEntryModelCanonicalId(entry) === filters.model) &&
-                matchesVersionFilter(entry, filters.version) &&
-                (filters.workload === 'all' || workload === filters.workload) &&
-                (filters.precision === 'all' || entry.model.precision === filters.precision);
-        });
+        const filtered = data.filter((entry) => matchesLeaderboardFilters(entry, filters));
+        const historical = getHistoricalDataByTab(state.currentTab);
+        const filteredHistorical = historical.filter(
+            (entry) => matchesLeaderboardFilters(entry, filters)
+        );
+        const trendData = [...data, ...historical];
+        const filteredTrendData = [...filtered, ...filteredHistorical];
 
         const comparisonView = applyComparisonView(filtered, viewOptions);
         const visibleEntries = comparisonView.visibleEntries;
@@ -4514,7 +4614,11 @@
             renderEmptyStateMessage(emptyState);
             renderDataStats(data.length, filtered.length, visibleEntries.length, 0, comparisonView);
             renderOverview([], comparisonView, viewOptions);
-            renderPerformanceTrendChart([]);
+            renderPerformanceTrendChart(
+                filters.workload === 'all'
+                    ? getPerformanceTrendEntries(trendData, 'all')
+                    : getPerformanceTrendEntries(filteredTrendData, filters.workload)
+            );
             renderPagination(0, 0); // clear any stale pagination controls
             renderSortHeaders();   // clear stale sort indicators on empty tab
             return;
@@ -4527,8 +4631,8 @@
         // the unaggregated rows so distinct commits and PR revisions remain visible on the axis.
         renderPerformanceTrendChart(
             filters.workload === 'all'
-                ? getPerformanceTrendEntries(data, 'all')
-                : getPerformanceTrendEntries(filtered, filters.workload)
+                ? getPerformanceTrendEntries(trendData, 'all')
+                : getPerformanceTrendEntries(filteredTrendData, filters.workload)
         );
 
         const withTrends = buildTrendRows(sortedFiltered, filters.workload);
