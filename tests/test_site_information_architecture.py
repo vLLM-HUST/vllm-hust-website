@@ -14,7 +14,7 @@ def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -
     assert "pages: ['leaderboard', 'achievements']" in SITE_JS
     assert "pages: ['contributors', 'conferences', 'courses']" in SITE_JS
     assert "pages: ['versions', 'issues']" in SITE_JS
-    assert "<details class=\"nav-group\"" in SITE_JS
+    assert '<details class="nav-group"' in SITE_JS
 
 
 def test_mobile_navigation_uses_compact_accessible_disclosure() -> None:
