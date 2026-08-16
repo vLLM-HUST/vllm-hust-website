@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import re
+import statistics
+from collections import defaultdict
 from pathlib import Path
 
 import pytest
@@ -202,6 +204,81 @@ def test_recovered_history_is_kept_out_of_table_and_used_for_curated_trends() ->
     assert "function getHistoricalDataByTab(tab)" in text
     assert "const trendData = [...data, ...historical];" in text
     assert "function selectMonotonicMilestoneVersions" in text
+
+
+def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    entries = json.loads((root / "data" / "leaderboard_historical.json").read_text())
+    milestones = ["7a63f81e86", "6f612fbedf", "89334ef1f0"]
+    directions = {"throughput_tps": 1, "ttft_ms": -1, "tbt_ms": -1}
+
+    assert all(f"'{commit}'" in text for commit in milestones)
+    assert "f273f9c5e2" not in text
+    assert "e4ce33646f" not in text
+    assert "state.trendView !== 'checkpoint'" in text
+
+    values: dict[tuple[tuple[object, ...], str], dict[str, list[float]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for entry in entries:
+        metadata = entry.get("metadata") or {}
+        version = (
+            "baseline"
+            if entry.get("engine") != "vllm-hust"
+            else str(metadata.get("git_commit") or "")[:10]
+        )
+        if version != "baseline" and version not in milestones:
+            continue
+        workload = entry.get("workload") or {}
+        model = entry.get("model") or {}
+        hardware = entry.get("hardware") or {}
+        same_spec = entry.get("same_spec") or {}
+        series = (
+            workload.get("name"),
+            model.get("canonical_id") or model.get("repo_id"),
+            hardware.get("chip_model"),
+            hardware.get("chip_count"),
+            (entry.get("cluster") or {}).get("node_count", 1),
+            model.get("precision"),
+            model.get("quantization") or "none",
+            same_spec.get("resolved_spec_hash") or same_spec.get("spec_id"),
+        )
+        for metric in directions:
+            value = (entry.get("metrics") or {}).get(metric)
+            if isinstance(value, (int, float)) and value > 0:
+                values[(series, metric)][version].append(float(value))
+
+    best = {
+        key: statistics.median(by_version["baseline"])
+        for key, by_version in values.items()
+        if by_version.get("baseline")
+    }
+    for milestone in milestones:
+        observations = 0
+        for key, by_version in values.items():
+            if not by_version.get(milestone):
+                continue
+            observations += 1
+            value = statistics.median(by_version[milestone])
+            if key in best:
+                assert (value - best[key]) * directions[key[1]] >= 0, (
+                    milestone,
+                    key,
+                    best[key],
+                    value,
+                )
+            best[key] = value
+        assert observations > 0
+
+
+def test_historical_only_tabs_have_a_leadership_ready_empty_state() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "leaderboardHistoricalOnlyTitle" in text
+    assert "leaderboardHistoricalOnlyText" in text
+    assert "renderEmptyStateMessage(emptyState, filteredHistorical.length > 0)" in text
 
 
 def test_trend_version_key_includes_core_and_backend_commits() -> None:
@@ -456,9 +533,9 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     assert "function dispatchProgress(payload, onProgress)" in text
     assert "function startBackgroundSync()" in text
     assert "startBackgroundSync," in text
-    assert "llm_engine_hf_leaderboard_cache_v7_historical" in text
+    assert "llm_engine_hf_leaderboard_cache_v8_leadership" in text
     assert (
-        "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-historical-1';"
+        "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-leadership-2';"
         in text
     )
     assert (
@@ -505,7 +582,10 @@ def test_hf_loader_does_not_revive_stale_data_from_empty_canonical() -> None:
     # The frontend surfaces a distinct stale/unavailable message so users know
     # stale data was deliberately not revived.
     assert "state.staleness" in leaderboard
-    assert "function renderEmptyStateMessage(emptyState)" in leaderboard
+    assert (
+        "function renderEmptyStateMessage(emptyState, hasHistoricalTrend = false)"
+        in leaderboard
+    )
     assert "leaderboardStaleTitle" in leaderboard
 
     # Partial rendering must not fire for snapshots with zero records.
@@ -892,7 +972,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=historical-milestones-v1-20260816" in html_text
+    assert "assets/leaderboard.js?v=leadership-trends-v2-20260816" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 
@@ -1476,7 +1556,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "historical-milestones-v1-20260816" in html_text
+    assert "leadership-trends-v2-20260816" in html_text
     assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
@@ -1507,7 +1587,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, evidenceState, settingSignature].join('|');"
         in js_text
     )
-    assert "所有可比 workload 均提升或持平的精选里程碑" in js_text
+    assert "同时通过吞吐、TTFT、TBT 不退化检查的里程碑" in js_text
     assert "function getSelectOptionLabel(value, option, labelMapper = null)" in js_text
     assert "if (value === 'all')" in js_text
     assert "function isServingTrendWorkload(entry)" in js_text
@@ -2300,7 +2380,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "historical-milestones-v1-20260816" in html_text
+    assert "leadership-trends-v2-20260816" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:
