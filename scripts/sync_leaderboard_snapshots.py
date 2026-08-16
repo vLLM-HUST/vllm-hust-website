@@ -76,9 +76,7 @@ def validate_snapshot_set(source_dir: Path) -> None:
         raise SystemExit("leaderboard_historical.json must be a JSON array")
     if any(
         not isinstance(entry, dict)
-        or entry.get("historical_recovery", {}).get(
-            "admitted_for_historical_trend"
-        )
+        or entry.get("historical_recovery", {}).get("admitted_for_historical_trend")
         is not True
         for entry in historical
     ):

@@ -324,9 +324,10 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
                 )
                 continue
             recovery = entry.get("historical_recovery")
-            if not isinstance(recovery, dict) or recovery.get(
-                "admitted_for_historical_trend"
-            ) is not True:
+            if (
+                not isinstance(recovery, dict)
+                or recovery.get("admitted_for_historical_trend") is not True
+            ):
                 errors.append(
                     "leaderboard_historical.json: every entry must be admitted "
                     "for the historical trend"

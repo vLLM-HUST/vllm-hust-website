@@ -195,9 +195,7 @@ def test_recovered_history_is_kept_out_of_table_and_used_for_curated_trends() ->
 
     assert len(data) == 276
     assert all(
-        entry.get("historical_recovery", {}).get(
-            "admitted_for_historical_trend"
-        )
+        entry.get("historical_recovery", {}).get("admitted_for_historical_trend")
         is True
         for entry in data
     )
