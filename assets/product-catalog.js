@@ -2,7 +2,7 @@
     'use strict';
 
     const SITE_RELEASE = Object.freeze({
-        version: '0.3.3',
+        version: '0.3.4',
         releasedAt: '2026-08-16',
     });
 

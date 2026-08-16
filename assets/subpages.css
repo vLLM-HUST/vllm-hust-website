@@ -39,7 +39,7 @@ body:not([data-page="home"]) .brand-mark img { display: none; }
 body:not([data-page="home"]) .brand-copy { color: #fff; }
 body:not([data-page="home"]) .brand-copy small { margin-top: 2px; color: #aebdbc; font-size: 11px; }
 body:not([data-page="home"]) .nav-links {
-  gap: 22px;
+  gap: 2px;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -50,7 +50,7 @@ body:not([data-page="home"]) .nav-links {
 body:not([data-page="home"]) .nav-link {
   flex: 0 0 auto;
   min-height: 40px;
-  padding: 0;
+  padding: 0 12px;
   border: 0;
   border-radius: 0;
   color: #d7e0df;
@@ -620,39 +620,18 @@ body[data-page="leaderboard"] .leaderboard-table tbody tr:hover td:first-child {
 body[data-page="leaderboard"] .trend-chart-wrap { border-color: var(--sub-line); border-radius: 4px; background: #fff; }
 
 @media (max-width: 1120px) {
-  body:not([data-page="home"]) .nav-links { gap: 13px; }
+  body:not([data-page="home"]) .nav-links { gap: 2px; }
   body:not([data-page="home"]) .nav-link { font-size: 11px; }
 }
 @media (max-width: 860px) {
   body:not([data-page="home"]) .site-nav-inner {
-    min-height: 112px;
-    padding: 10px 66px 8px 0;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
+    min-height: 64px;
+    padding: 0 94px 0 0;
   }
-  body:not([data-page="home"]) .lang-toggle { position: fixed; top: 15px; right: 16px; margin: 0; }
-  body:not([data-page="home"]) .nav-links {
-    order: 2;
-    width: 100%;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-  }
-  body:not([data-page="home"]) .nav-link { flex: 0 0 auto; }
+  body:not([data-page="home"]) .lang-toggle { position: fixed; top: 14px; right: 60px; margin: 0; }
 }
 @media (max-width: 680px) {
   body:not([data-page="home"]) .site-shell { width: calc(100% - 24px); }
-  body:not([data-page="home"]) .nav-links {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px 10px;
-    overflow: visible;
-  }
-  body:not([data-page="home"]) .nav-link {
-    min-width: 0;
-    justify-content: flex-start;
-  }
   body:not([data-page="home"]) .page-hero { padding-top: 24px; }
   body:not([data-page="home"]) .page-hero .content-panel { min-height: 230px; padding: 28px 22px; }
   body:not([data-page="home"]) .page-hero h1 { font-size: 42px; }

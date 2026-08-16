@@ -1,12 +1,19 @@
 (function () {
     'use strict';
 
-    function packageCard(pkg) {
+    let currentMeta = null;
+
+    function currentLanguage() {
+        return window.vllmHustSite?.getCurrentLang?.() === 'zh' ? 'zh' : 'en';
+    }
+
+    function packageCard(pkg, lang) {
         const metaLines = [];
         if (typeof pkg.version_display_label === 'string' && pkg.version_display_label) {
-            metaLines.push(`<div class="package-meta"><strong>Version policy:</strong> ${pkg.version_display_label}</div>`);
+            const label = lang === 'zh' ? '版本口径' : 'Version policy';
+            metaLines.push(`<div class="package-meta"><strong>${label}:</strong> ${pkg.version_display_label}</div>`);
         }
-        if (typeof pkg.version_note_zh === 'string' && pkg.version_note_zh) {
+        if (lang === 'zh' && typeof pkg.version_note_zh === 'string' && pkg.version_note_zh) {
             metaLines.push(`<div class="package-meta">${pkg.version_note_zh}</div>`);
         }
         const pypiUrl = pkg.pypi_name
@@ -18,14 +25,16 @@
                 <div class="package-version">${pkg.version || 'repository'}</div>
                 ${metaLines.join('')}
                 <div class="package-links">
-                    ${pypiUrl ? `<a href="${pypiUrl}" target="_blank">PyPI</a>` : ''}
-                    ${pkg.repo ? `<a href="${pkg.repo}" target="_blank">GitHub</a>` : ''}
+                    ${pypiUrl ? `<a href="${pypiUrl}" target="_blank" rel="noopener noreferrer">PyPI</a>` : ''}
+                    ${pkg.repo ? `<a href="${pkg.repo}" target="_blank" rel="noopener noreferrer">GitHub</a>` : ''}
                 </div>
             </div>
         `;
     }
 
     function renderPackages(meta) {
+        currentMeta = meta;
+        const lang = currentLanguage();
         const coreContainer = document.getElementById('core-packages');
         const infraContainer = document.getElementById('infra-packages');
         const updatedNode = document.getElementById('versions-updated-at');
@@ -42,8 +51,8 @@
         const infra = packages.filter((pkg) => pkg.group === 'infrastructure');
         const rootPackage = packages.find((pkg) => pkg.name === 'vllm-hust');
 
-        coreContainer.innerHTML = core.map(packageCard).join('');
-        infraContainer.innerHTML = infra.map(packageCard).join('');
+        coreContainer.innerHTML = core.map((pkg) => packageCard(pkg, lang)).join('');
+        infraContainer.innerHTML = infra.map((pkg) => packageCard(pkg, lang)).join('');
 
         if (installVersionNode) {
             installVersionNode.textContent = rootPackage?.version || 'latest';
@@ -86,5 +95,9 @@
                 infraLoading.textContent = 'Failed to load package versions.';
             }
         }
+    });
+
+    window.addEventListener('vllm-hust:langchange', () => {
+        if (currentMeta) renderPackages(currentMeta);
     });
 })();
