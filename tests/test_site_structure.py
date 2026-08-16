@@ -586,7 +586,7 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     assert 'id="products"' in text
     assert 'data-product-id="workstation"' in text
     assert 'data-product-id="sage-mate"' in text
-    assert "./assets/product-catalog.js?v=0.3.3" in text
+    assert "./assets/product-catalog.js?v=0.3.4" in text
     assert 'id="workstation-section"' not in text
     assert "workstation-embed.js" not in text
 
@@ -680,7 +680,7 @@ def test_language_toggle_is_separate_from_primary_navigation() -> None:
 
     assert ".lang-toggle {" in css_text
     assert "position: fixed;" in css_text
-    assert "top: 88px;" in css_text
+    assert "top: 14px;" in css_text
     assert "right: max(" in css_text
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
     assert "langToggle: '中文'" in site_js
@@ -706,8 +706,8 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=upstream-qwen-community-20260727" in text
-        assert "assets/site.js?v=engine-and-proving-ground-20260728" in text
+        assert "assets/site.css?v=site-structure-20260816" in text
+        assert "assets/site.js?v=site-structure-20260816" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -715,7 +715,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=product-polish-20260816" in html_text
+    assert "assets/home.css?v=site-structure-20260816" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
@@ -833,13 +833,13 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/subpages.css?v=leaderboard-contrast-system-20260730" in text
+        assert "assets/subpages.css?v=site-structure-20260816" in text
         assert '<span class="brand-mark">V</span>' in text
         assert "vLLM-HUST<small" in text
 
     assert 'body:not([data-page="home"])' in css_text
     assert 'body[data-page="leaderboard"]' in css_text
-    assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in css_text
+    assert "min-height: 64px;" in css_text
     assert "overflow-wrap: anywhere;" in css_text
     assert "letter-spacing: -" not in css_text
     assert "font-size: clamp(" not in css_text
@@ -984,7 +984,7 @@ def test_leaderboard_summary_cards_have_complete_light_theme_contrast_contract()
     assert html_text.index("assets/leaderboard.css") < html_text.index(
         "assets/subpages.css"
     )
-    assert "leaderboard-contrast-system-20260730" in html_text
+    assert "site-structure-20260816" in html_text
 
     required_selectors = (
         'body[data-page="leaderboard"] .engine-summary-card.is-leader',
@@ -1017,7 +1017,7 @@ def test_leaderboard_failure_state_has_bilingual_aa_contrast_contract() -> None:
     html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
 
-    assert "leaderboard-contrast-system-20260730" in html_text
+    assert "site-structure-20260816" in html_text
     assert "'leaderboard-error-title': '排行榜数据加载失败'" in html_text
     assert "'leaderboard-error-text': '请刷新页面或检查网络连接。'" in html_text
     assert 'body[data-page="leaderboard"] #leaderboard-error-title' in css_text
@@ -1052,7 +1052,7 @@ def test_achievements_page_omits_ambiguous_workload_evidence_cards() -> None:
     assert "achievement-evidence" not in html_text
     assert "achievements-evidence" not in html_text
     assert "renderEvidence" not in js_text
-    assert "leaderboard-contrast-system-20260730" in html_text
+    assert "site-structure-20260816" in html_text
 
 
 def test_achievements_page_uses_reverse_chronological_timeline() -> None:
@@ -1118,7 +1118,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=upstream-qwen-community-20260727" in html_text
+    assert "assets/site.css?v=site-structure-20260816" in html_text
     assert (
         "assets/achievements-page.js?v=engine-and-proving-ground-20260728" in html_text
     )
@@ -2251,7 +2251,7 @@ def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
     assert "color: #475569;" in css_text
     assert ".research-member-detail-row b" in css_text
     assert "color: #176f72;" in css_text
-    assert "leaderboard-contrast-system-20260730" in html_text
+    assert "site-structure-20260816" in html_text
     assert "github-status" in html_text
     page_js = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
     assert "localized(item, 'github_status', lang)" in page_js
@@ -2290,9 +2290,9 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert 'id="issues-error"' in html_text
     assert 'id="issues-content"' in html_text
     assert "assets/issues-page.js?v=" in html_text
-    assert "assets/site.css?v=upstream-qwen-community-20260727" in html_text
-    assert "assets/subpages.css?v=leaderboard-contrast-system-20260730" in html_text
-    assert "assets/site.js?v=engine-and-proving-ground-20260728" in html_text
+    assert "assets/site.css?v=site-structure-20260816" in html_text
+    assert "assets/subpages.css?v=site-structure-20260816" in html_text
+    assert "assets/site.js?v=site-structure-20260816" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js

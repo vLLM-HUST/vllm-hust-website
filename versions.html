@@ -1,227 +1,101 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>vllm-hust - Versions</title>
-    <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
-    <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background:
-                radial-gradient(circle at 50% 16%, rgba(14, 165, 233, 0.22), transparent 26%),
-                radial-gradient(circle at 18% 22%, rgba(22, 163, 74, 0.18), transparent 26%),
-                radial-gradient(circle at 82% 18%, rgba(124, 58, 237, 0.20), transparent 24%),
-                linear-gradient(120deg, rgba(125, 211, 252, 0.06) 0 1px, transparent 1px 72px),
-                #030712;
-            min-height: 100vh;
-            padding: 40px 20px;
-            color: #e5f2ff;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
-
-        header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .version-card {
-            background: rgba(15, 23, 42, 0.72);
-            border: 1px solid rgba(125, 211, 252, 0.22);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 28px 90px rgba(0,0,0,0.34);
-            backdrop-filter: blur(18px);
-        }
-
-        .version-card h2 {
-            color: #dbeafe;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-            border-bottom: 1px solid rgba(125, 211, 252, 0.22);
-            padding-bottom: 10px;
-        }
-
-        .package-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .package-item {
-            background: rgba(3, 7, 18, 0.50);
-            border: 1px solid rgba(125, 211, 252, 0.16);
-            border-radius: 16px;
-            padding: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .package-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 18px 44px rgba(14, 165, 233, 0.18);
-        }
-
-        .package-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #7dd3fc;
-            margin-bottom: 10px;
-        }
-
-        .package-version {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #bbf7d0;
-            margin-bottom: 10px;
-        }
-
-        .package-meta {
-            font-size: 0.92rem;
-            color: rgba(219, 234, 254, 0.78);
-            line-height: 1.5;
-        }
-
-        .package-meta strong {
-            color: #e5f2ff;
-        }
-
-        .package-links {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .package-links a {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(14, 165, 233, 0.14);
-            border: 1px solid rgba(125, 211, 252, 0.28);
-            color: #dbeafe;
-            text-decoration: none;
-            border-radius: 999px;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-
-        .package-links a:hover {
-            background: rgba(56, 189, 248, 0.24);
-        }
-
-        .update-info {
-            text-align: center;
-            color: white;
-            margin-top: 40px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .loading-note {
-            color: rgba(219, 234, 254, 0.68);
-            font-size: 0.95rem;
-            margin-top: 10px;
-        }
-
-        .install-section {
-            background: rgba(15, 23, 42, 0.72);
-            border: 1px solid rgba(125, 211, 252, 0.22);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 28px 90px rgba(0,0,0,0.34);
-            backdrop-filter: blur(18px);
-        }
-
-        .install-section h2 {
-            color: #dbeafe;
-            margin-bottom: 20px;
-        }
-
-        .install-note {
-            margin-top: 14px;
-            color: rgba(219, 234, 254, 0.78);
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-
-        pre {
-            background: rgba(3, 7, 18, 0.76);
-            border: 1px solid rgba(125, 211, 252, 0.16);
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 16px;
-            overflow-x: auto;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        code {
-            font-family: 'Courier New', monospace;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Versions - vLLM-HUST</title>
+  <meta name="description" content="Release and repository version status for the vLLM-HUST runtime and integration stack." />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="stylesheet" href="./assets/site.css?v=site-structure-20260816" />
+  <link rel="stylesheet" href="./assets/versions.css?v=site-structure-20260816" />
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>vllm-hust</h1>
-            <p>vLLM-compatible packages for domestic accelerator environments</p>
-        </header>
-
-        <div class="install-section">
-            <h2>Installation Entry</h2>
-            <pre><code># Install the default serving stack
-pip install vllm-hust
-
-# Package release status shown below
-vllm-hust <span id="versions-install-version">latest</span></code></pre>
-            <p class="install-note">
-                vllm-hust 是由 HUST 维护的 vLLM fork。当前 PyPI 包需要重新打包上传；
-                在新包发布前，网站不把旧 PyPI 包版本等同于项目当前版本。
-            </p>
-        </div>
-
-        <div class="version-card">
-            <h2>Project Repositories</h2>
-            <div class="package-grid" id="core-packages"></div>
-            <p class="loading-note" id="core-loading">Loading vllm-hust runtime package versions...</p>
-        </div>
-
-        <div class="version-card">
-            <h2>Extension Repositories</h2>
-            <div class="package-grid" id="infra-packages"></div>
-            <p class="loading-note" id="infra-loading">Loading backend and integration package versions...</p>
-        </div>
-
-        <div class="update-info">
-            <p>Last Updated: <span id="versions-updated-at">-</span></p>
-            <p>Website: <a href="https://vllm-hust.sage.org.ai" style="color: white;">vllm-hust.sage.org.ai</a></p>
-            <p>Maintained by HUST for vLLM-compatible serving on domestic hardware</p>
-        </div>
+<body data-page="versions">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html">
+        <span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span>
+        <span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span>
+      </a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
+        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
+        <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
+        <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
+        <a id="nav-issues" class="nav-link" data-nav-page="issues" href="./issues.html">Issues</a>
+      </div>
     </div>
-    <script src="./assets/versions-page.js"></script>
+  </nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+
+  <main>
+    <section class="page-hero versions-hero">
+      <div class="site-shell">
+        <div class="versions-hero-copy">
+          <p id="versions-eyebrow" class="eyebrow">Release directory</p>
+          <h1 id="versions-title">Runtime and integration versions</h1>
+          <p id="versions-lede" class="hero-lede">One status page for the engine, backends, and maintained extension repositories.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="site-shell versions-layout">
+      <section class="content-panel versions-install" aria-labelledby="versions-install-title">
+        <div>
+          <p id="versions-install-kicker" class="eyebrow">Get started</p>
+          <h2 id="versions-install-title">Install the serving stack</h2>
+          <p id="versions-install-note" class="versions-note">The repository is the source of truth while the next PyPI package is prepared.</p>
+        </div>
+        <pre><code>pip install vllm-hust
+
+vllm-hust <span id="versions-install-version">latest</span></code></pre>
+      </section>
+
+      <section class="content-panel versions-section" aria-labelledby="versions-core-title">
+        <div class="section-head"><div><p id="versions-core-kicker" class="eyebrow">Engine</p><h2 id="versions-core-title">Project repositories</h2></div></div>
+        <div class="package-grid" id="core-packages"></div>
+        <p class="loading-note" id="core-loading">Loading runtime versions…</p>
+      </section>
+
+      <section class="content-panel versions-section" aria-labelledby="versions-infra-title">
+        <div class="section-head"><div><p id="versions-infra-kicker" class="eyebrow">Integrations</p><h2 id="versions-infra-title">Extension repositories</h2></div></div>
+        <div class="package-grid" id="infra-packages"></div>
+        <p class="loading-note" id="infra-loading">Loading integration versions…</p>
+      </section>
+
+      <p class="versions-updated"><span id="versions-updated-label">Last updated</span>: <span id="versions-updated-at">-</span></p>
+    </div>
+  </main>
+
+  <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="footer-copy">Release status across the inference stack.</span></footer>
+
+  <script>
+    window.vllmHustPageDict = {
+      en: {
+        title: 'Versions - vLLM-HUST',
+        'versions-eyebrow': 'Release directory', 'versions-title': 'Runtime and integration versions',
+        'versions-lede': 'One status page for the engine, backends, and maintained extension repositories.',
+        'versions-install-kicker': 'Get started', 'versions-install-title': 'Install the serving stack',
+        'versions-install-note': 'The repository is the source of truth while the next PyPI package is prepared.',
+        'versions-core-kicker': 'Engine', 'versions-core-title': 'Project repositories',
+        'versions-infra-kicker': 'Integrations', 'versions-infra-title': 'Extension repositories',
+        'versions-updated-label': 'Last updated', 'footer-copy': 'Release status across the inference stack.'
+      },
+      zh: {
+        title: '版本目录 - vLLM-HUST',
+        'versions-eyebrow': '版本目录', 'versions-title': '运行时与集成版本',
+        'versions-lede': '集中查看推理引擎、后端与维护中扩展仓库的版本状态。',
+        'versions-install-kicker': '开始使用', 'versions-install-title': '安装推理服务栈',
+        'versions-install-note': '下一版 PyPI 包发布前，以项目仓库为准。',
+        'versions-core-kicker': '引擎', 'versions-core-title': '项目仓库',
+        'versions-infra-kicker': '集成', 'versions-infra-title': '扩展仓库',
+        'versions-updated-label': '最后更新', 'footer-copy': '推理栈版本状态。'
+      }
+    };
+  </script>
+  <script src="./assets/site.js?v=site-structure-20260816"></script>
+  <script src="./assets/versions-page.js?v=site-structure-20260816"></script>
 </body>
 </html>

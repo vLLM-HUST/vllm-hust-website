@@ -14,8 +14,8 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=upstream-qwen-community-20260727" />
-  <link rel="stylesheet" href="./assets/home.css?v=product-polish-20260816" />
+  <link rel="stylesheet" href="./assets/site.css?v=site-structure-20260816" />
+  <link rel="stylesheet" href="./assets/home.css?v=site-structure-20260816" />
 </head>
 <body data-page="home">
   <nav class="site-nav">
@@ -47,7 +47,7 @@
         <p id="home-kicker" class="execution-kicker">An upstream-compatible inference engine for domestic compute.</p>
         <p id="home-lede" class="execution-lede">Build and validate serving mechanisms in one runtime.</p>
         <div class="execution-actions">
-          <a id="home-primary-cta" class="execution-button primary" href="./leaderboard.html">Explore leaderboard <span aria-hidden="true">→</span></a>
+          <a id="home-primary-cta" class="execution-button primary" href="#products">Explore products <span aria-hidden="true">↓</span></a>
           <a id="home-github-cta" class="execution-button quiet" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">Open GitHub <span aria-hidden="true">↗</span></a>
         </div>
       </div>
@@ -58,13 +58,12 @@
       </dl>
     </section>
 
-    <section class="execution-scope" aria-label="vLLM-HUST technical scope">
-      <span id="scope-runtime" data-code="01">Scheduling plugins</span>
-      <span id="scope-cache" data-code="02">State + KV tools</span>
-      <span id="scope-compiler" data-code="03">Compiler + kernels</span>
-      <span id="scope-kernels" data-code="04">Hardware adapters</span>
-      <span id="scope-hardware" data-code="05">Benchmark evidence</span>
-    </section>
+    <nav class="execution-scope" aria-label="Homepage sections">
+      <a id="scope-products" data-code="01" href="#products">Products</a>
+      <a id="scope-engine" data-code="02" href="#stack">Engine</a>
+      <a id="scope-projects" data-code="03" href="#projects">Projects</a>
+      <a id="scope-ecosystem" data-code="04" href="#ecosystem">Ecosystem</a>
+    </nav>
 
     <section class="execution-section execution-products" id="products" aria-labelledby="products-title">
       <div class="execution-section-head">
@@ -211,10 +210,10 @@
         'home-eyebrow': 'Domestic compute · inference engine / 03',
         'home-kicker': 'An upstream-compatible inference engine for domestic compute.',
         'home-lede': 'Build and validate serving mechanisms in one runtime.',
-        'home-primary-cta': 'Explore leaderboard →', 'home-github-cta': 'Open GitHub ↗',
+        'home-primary-cta': 'Explore products ↓', 'home-github-cta': 'Open GitHub ↗',
         'home-fact-1-label': 'Engine', 'home-fact-2-label': 'Mechanisms', 'home-fact-3-label': 'Evidence',
         'home-fact-1-value': 'upstream-compatible runtime', 'home-fact-2-value': 'scheduling + state + execution', 'home-fact-3-value': 'multi-backend validation',
-        'scope-runtime': 'Scheduling plugins', 'scope-cache': 'State + KV tools', 'scope-compiler': 'Compiler + kernels', 'scope-kernels': 'Hardware adapters', 'scope-hardware': 'Benchmark evidence',
+        'scope-products': 'Products', 'scope-engine': 'Engine', 'scope-projects': 'Projects', 'scope-ecosystem': 'Ecosystem',
         'products-eyebrow': 'Product ecosystem', 'products-title': 'Inference tools and knowledge applications.',
         'products-summary': 'Workstation operates the inference stack. Sage Mate turns SAGE workflows and knowledge into a personal AI twin.',
         'product-workstation-type': 'Engineering workspace', 'product-workstation-positioning': 'A developer workspace for model serving, monitoring, and research.',
@@ -262,10 +261,10 @@
         title: 'vLLM-HUST | 面向国产算力的大模型推理引擎',
         'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '面向国产算力、兼容上游的大模型推理引擎。',
         'home-lede': '在统一运行时中开发并验证推理机制。',
-        'home-primary-cta': '查看性能榜 →', 'home-github-cta': '打开 GitHub ↗',
+        'home-primary-cta': '查看产品 ↓', 'home-github-cta': '打开 GitHub ↗',
         'home-fact-1-label': '引擎', 'home-fact-2-label': '机制', 'home-fact-3-label': '证据',
         'home-fact-1-value': '兼容上游的推理运行时', 'home-fact-2-value': '调度、状态与执行', 'home-fact-3-value': '跨后端系统验证',
-        'scope-runtime': '调度插件', 'scope-cache': '状态与 KV 工具', 'scope-compiler': '编译与算子', 'scope-kernels': '硬件适配', 'scope-hardware': 'Benchmark 证据',
+        'scope-products': '产品', 'scope-engine': '引擎', 'scope-projects': '项目', 'scope-ecosystem': '生态',
         'products-eyebrow': '产品生态', 'products-title': '推理工具与知识应用。',
         'products-summary': 'Workstation 负责推理栈；Sage Mate 将 SAGE 工作流和知识库转化为个人分身。',
         'product-workstation-type': '工程工作台', 'product-workstation-positioning': '面向模型服务、监控与研究的开发工作台。',
@@ -311,7 +310,7 @@
       }
     };
   </script>
-  <script src="./assets/site.js?v=engine-and-proving-ground-20260728"></script>
-  <script src="./assets/product-catalog.js?v=0.3.3"></script>
+  <script src="./assets/site.js?v=site-structure-20260816"></script>
+  <script src="./assets/product-catalog.js?v=0.3.4"></script>
 </body>
 </html>
