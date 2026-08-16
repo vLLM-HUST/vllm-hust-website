@@ -188,6 +188,24 @@ def test_trend_dataset_keeps_pr_and_historical_revisions() -> None:
     assert "isMainlineTrendEntry" not in text
 
 
+def test_recovered_history_is_kept_out_of_table_and_used_for_curated_trends() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    data = json.loads((root / "data" / "leaderboard_historical.json").read_text())
+
+    assert len(data) == 276
+    assert all(
+        entry.get("historical_recovery", {}).get(
+            "admitted_for_historical_trend"
+        )
+        is True
+        for entry in data
+    )
+    assert "function getHistoricalDataByTab(tab)" in text
+    assert "const trendData = [...data, ...historical];" in text
+    assert "function selectMonotonicMilestoneVersions" in text
+
+
 def test_trend_version_key_includes_core_and_backend_commits() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
@@ -541,6 +559,7 @@ def test_leaderboard_data_is_benchmark_snapshot_mirror() -> None:
     for name in (
         "leaderboard_single.json",
         "leaderboard_multi.json",
+        "leaderboard_historical.json",
         "leaderboard_compare.json",
         "last_updated.json",
     ):

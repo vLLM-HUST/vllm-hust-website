@@ -13,6 +13,7 @@ from pathlib import Path
 SNAPSHOT_FILES = (
     "leaderboard_single.json",
     "leaderboard_multi.json",
+    "leaderboard_historical.json",
     "leaderboard_compare.json",
     "last_updated.json",
 )
@@ -63,6 +64,7 @@ def validate_snapshot_set(source_dir: Path) -> None:
 
     single = load_json(source_dir / "leaderboard_single.json")
     multi = load_json(source_dir / "leaderboard_multi.json")
+    historical = load_json(source_dir / "leaderboard_historical.json")
     compare = load_json(source_dir / "leaderboard_compare.json")
     marker = load_json(source_dir / "last_updated.json")
 
@@ -70,22 +72,43 @@ def validate_snapshot_set(source_dir: Path) -> None:
         raise SystemExit("leaderboard_single.json must be a JSON array")
     if not isinstance(multi, list):
         raise SystemExit("leaderboard_multi.json must be a JSON array")
+    if not isinstance(historical, list):
+        raise SystemExit("leaderboard_historical.json must be a JSON array")
+    if any(
+        not isinstance(entry, dict)
+        or entry.get("historical_recovery", {}).get(
+            "admitted_for_historical_trend"
+        )
+        is not True
+        for entry in historical
+    ):
+        raise SystemExit(
+            "leaderboard_historical.json entries must be admitted historical records"
+        )
     if not isinstance(compare, dict) or "groups" not in compare:
         raise SystemExit("leaderboard_compare.json must contain groups")
     if not isinstance(marker, dict) or not marker.get("last_updated"):
         raise SystemExit("last_updated.json must contain last_updated")
 
+    registry_source_dir = get_registry_source_dir(source_dir)
     missing_mirror = [
-        name for name in REGISTRY_MIRROR if not (source_dir / name).is_file()
+        name for name in REGISTRY_MIRROR if not (registry_source_dir / name).is_file()
     ]
     if missing_mirror:
         raise SystemExit(
             "missing benchmark registry mirror file(s): "
             + ", ".join(sorted(missing_mirror))
         )
-    registry = load_json(source_dir / "official-targets.json")
+    registry = load_json(registry_source_dir / "official-targets.json")
     if not isinstance(registry, dict) or not isinstance(registry.get("targets"), list):
         raise SystemExit("official-targets.json must contain a targets array")
+
+
+def get_registry_source_dir(source_dir: Path) -> Path:
+    """Support the benchmark layout where registries sit beside snapshots/."""
+    if all((source_dir / name).is_file() for name in REGISTRY_MIRROR):
+        return source_dir
+    return source_dir.parent
 
 
 def sync_snapshots(source_dir: Path, target_dir: Path, *, check: bool) -> int:
@@ -103,8 +126,9 @@ def sync_snapshots(source_dir: Path, target_dir: Path, *, check: bool) -> int:
             shutil.copy2(source, target)
             target.chmod(0o644)
 
+    registry_source_dir = get_registry_source_dir(source_dir)
     for source_name, target_name in REGISTRY_MIRROR.items():
-        source = source_dir / source_name
+        source = registry_source_dir / source_name
         target = target_dir / target_name
         if target.is_file() and filecmp.cmp(source, target, shallow=False):
             continue

@@ -90,6 +90,7 @@ The only supported leaderboard data chain is:
 1. Website sync workflow mirrors those benchmark snapshot files for offline/static fallback:
    - `data/leaderboard_single.json`
    - `data/leaderboard_multi.json`
+   - `data/leaderboard_historical.json` (recovered trend-only records)
    - `data/leaderboard_compare.json`
    - `data/last_updated.json`
 
