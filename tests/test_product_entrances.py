@@ -16,11 +16,11 @@ def test_product_names_urls_and_actions_are_release_catalogued() -> None:
     assert "Open Workstation" in INDEX
     assert "Talk to Sage Mate" in INDEX
     assert "打开 Workstation" in INDEX
-    assert "与分身对话" in INDEX
+    assert "体验 Sage Mate" in INDEX
 
     assert CATALOG.count("https://ws.sage.org.ai/") == 1
     assert CATALOG.count("https://twin.sage.org.ai/") == 1
-    assert "version: '0.3.1'" in CATALOG
+    assert "version: '0.3.2'" in CATALOG
     assert "releasedAt: '2026-08-16'" in CATALOG
 
 
@@ -31,7 +31,7 @@ def test_product_links_have_consistent_accessible_external_link_contract() -> No
     assert "Open vLLM-HUST Workstation in a new tab" in CATALOG
     assert "Talk to Sage Mate in a new tab" in CATALOG
     assert "在新标签页打开 vLLM-HUST Workstation" in CATALOG
-    assert "在新标签页与 Sage Mate 分身对话" in CATALOG
+    assert "在新标签页体验 Sage Mate" in CATALOG
 
     for product_id in ("workstation", "sage-mate"):
         assert f'data-product-id="{product_id}"' in INDEX

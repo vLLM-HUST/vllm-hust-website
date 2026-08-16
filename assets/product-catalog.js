@@ -2,7 +2,7 @@
     'use strict';
 
     const SITE_RELEASE = Object.freeze({
-        version: '0.3.1',
+        version: '0.3.2',
         releasedAt: '2026-08-16',
     });
 
@@ -18,7 +18,7 @@
             url: 'https://twin.sage.org.ai/',
             ariaLabel: Object.freeze({
                 en: 'Talk to Sage Mate in a new tab',
-                zh: '在新标签页与 Sage Mate 分身对话',
+                zh: '在新标签页体验 Sage Mate',
             }),
         }),
     });
