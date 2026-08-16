@@ -37,6 +37,16 @@ const HF_CONFIG = {
     // 再交给后台同步补齐最新远端数据。
     cacheMarkerTimeoutMs: 1200,
 
+    // A stalled remote must not leave the leadership screen on a spinner.
+    // The bundled snapshot is an atomic publication mirror and takes over once
+    // the remote request budget is exhausted.
+    remoteRequestTimeoutMs: 4500,
+    canonicalIdentityTimeoutMs: 1200,
+
+    // When the first remote attempt already timed out, do not immediately
+    // repeat the same requests behind a successfully rendered local snapshot.
+    offlineRetryDelayMs: 60 * 1000,
+
     // Hugging Face 远端使用镜像，官方站点作为回退
     endpoints: [
         'https://hf-mirror.com',
@@ -44,7 +54,7 @@ const HF_CONFIG = {
     ],
 
     // 数据源优先级：远端快照优先，站点内置快照作为兜底。
-    sources: ['github', 'hf', 'local'],
+    sources: ['github', 'local'],
 
     // GitHub 仓库配置（用于不依赖 HF 的数据发布方式）
     github: {
@@ -54,8 +64,8 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v8_leadership';
-const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-leadership-2';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v9_leadership';
+const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-leadership-3';
 const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';
 const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';
 let lastLoadedSource = null;
@@ -204,6 +214,24 @@ function withTimeout(promise, timeoutMs, label) {
             }
         );
     });
+}
+
+async function fetchWithTimeout(url, options = {}, label = 'Remote leaderboard request') {
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    const timeoutId = controller
+        ? setTimeout(() => controller.abort(), HF_CONFIG.remoteRequestTimeoutMs)
+        : null;
+    try {
+        return await withTimeout(
+            fetch(url, { ...options, ...(controller ? { signal: controller.signal } : {}) }),
+            HF_CONFIG.remoteRequestTimeoutMs,
+            label
+        );
+    } finally {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+    }
 }
 
 async function getLatestMarkerWithTimeout(sourcePriority, timeoutMs) {
@@ -545,7 +573,7 @@ async function loadFromHuggingFace(filename) {
         const url = buildDatasetResolveUrl(endpoint, filename);
         console.log(`[HF Loader] Fetching: ${url}`);
         try {
-            const response = await fetch(url, {
+            const response = await fetchWithTimeout(url, {
                 headers: {
                     'Accept': 'application/json'
                 },
@@ -591,7 +619,7 @@ async function loadFromGitHub(filename) {
     const url = buildGitHubRawUrl(filename);
     console.log(`[HF Loader] Fetching GitHub raw: ${url}`);
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
         headers: {
             'Accept': 'application/json'
         },
@@ -741,6 +769,10 @@ function startBackgroundSync() {
     }
 
     const run = () => syncRemoteSnapshotInBackground();
+    if (getLastLoadedSource() === 'local') {
+        window.setTimeout(run, HF_CONFIG.offlineRetryDelayMs);
+        return backgroundSyncPromise || Promise.resolve(null);
+    }
     if (typeof window.requestIdleCallback === 'function') {
         window.requestIdleCallback(run, { timeout: 2500 });
         return backgroundSyncPromise || Promise.resolve(null);
@@ -826,7 +858,15 @@ async function loadLeaderboardData(options = {}) {
             return { single: [], multi: [], historical: [], compare: null, staleness: 'no-verified-fallback' };
         }
 
-        for (const source of sourcePriority.slice(1)) {
+        // The bundled site snapshot was copied from the canonical publication
+        // at build time. Prefer it over another network hop during an outage so
+        // the leadership screen has a bounded first paint.
+        const fallbackSources = sourcePriority.slice(1).sort((left, right) => {
+            if (left === 'local') return -1;
+            if (right === 'local') return 1;
+            return 0;
+        });
+        for (const source of fallbackSources) {
             if (source === 'local' && !HF_CONFIG.fallbackToLocal) {
                 continue;
             }
@@ -861,13 +901,28 @@ async function loadLeaderboardData(options = {}) {
 // fallback, so we must know what the canonical publication is before trusting one.
 async function getExpectedCanonicalIdentity(sourcePriority) {
     const canonical = sourcePriority[0];
+    const marker = await getLatestMarkerWithTimeout(
+        [canonical],
+        HF_CONFIG.canonicalIdentityTimeoutMs
+    );
+    if (marker) {
+        return { marker: String(marker || '').trim(), targetRegistry: '' };
+    }
+
+    // The local marker is pinned together with all bundled JSON files in the
+    // same website release. It is therefore a trustworthy publication identity
+    // when the live canonical marker cannot be reached, unlike an arbitrary
+    // browser cache or an unversioned mirror.
     try {
-        const marker = await getLatestMarker([canonical]);
-        if (marker) {
-            return { marker: String(marker || '').trim(), targetRegistry: '' };
+        const bundledMarker = await loadFromLocal(HF_CONFIG.files.lastUpdated);
+        if (bundledMarker?.last_updated) {
+            return {
+                marker: String(bundledMarker.last_updated).trim(),
+                targetRegistry: '',
+            };
         }
     } catch (_e) {
-        // canonical marker also unreachable -> no identity to verify against
+        // No pinned local publication is available; fail closed below.
     }
     return null;
 }
@@ -926,7 +981,7 @@ async function getLastUpdated() {
         // Fallback: HF Datasets API repo metadata
         for (const endpoint of getUniqueEndpoints()) {
             const url = buildDatasetApiUrl(endpoint);
-            const response = await fetch(url);
+            const response = await fetchWithTimeout(url);
             if (response.ok) {
                 const info = await response.json();
                 return info.lastModified || null;
