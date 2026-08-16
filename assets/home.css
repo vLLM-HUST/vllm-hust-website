@@ -159,8 +159,8 @@ body[data-page="home"] .lang-toggle {
   min-height: 680px;
   padding: 28px;
   display: grid;
-  grid-template-areas: "meta" "visual" "title" "position" "features" "cta";
-  grid-template-rows: auto 180px auto auto auto 1fr;
+  grid-template-areas: "meta" "title" "position" "visual" "features" "cta";
+  grid-template-rows: auto auto auto 180px auto 1fr;
   overflow: hidden;
   border-right: 1px solid var(--product-border);
   border-bottom: 1px solid var(--product-border);
@@ -177,7 +177,7 @@ body[data-page="home"] .lang-toggle {
 .product-card-topline { grid-area: meta; display: flex; align-items: center; justify-content: space-between; gap: 18px; color: var(--product-faint); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
 .product-type { padding: 5px 8px; border: 1px solid color-mix(in srgb, var(--product-accent) 48%, transparent); border-radius: 3px; color: var(--product-accent); text-transform: uppercase; }
 .product-card h3 { grid-area: title; margin: 34px 0 0; max-width: 560px; color: var(--product-text); font-family: "Sora", "Inter", sans-serif; font-size: 42px; line-height: 1; }
-.product-positioning { grid-area: position; margin: 16px 0 0; max-width: 620px; color: var(--product-copy); font-size: 18px; line-height: 1.5; }
+.product-positioning { grid-area: position; margin: 16px 0 0; max-width: 620px; padding-left: 14px; border-left: 3px solid var(--product-accent); color: var(--product-copy); font-size: 19px; font-weight: 650; line-height: 1.45; }
 .product-visual {
   grid-area: visual;
   position: relative;
@@ -196,7 +196,7 @@ body[data-page="home"] .lang-toggle {
 .workstation-metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--product-border); }
 .workstation-metrics span { min-width: 0; padding: 12px 10px 0; display: flex; align-items: baseline; gap: 6px; border-left: 1px solid var(--product-border); }
 .workstation-metrics span:first-child { padding-left: 0; border-left: 0; }
-.workstation-metrics strong { color: var(--product-accent); font: 800 20px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.workstation-metrics strong { color: var(--product-accent); font: 800 clamp(12px, 1.4vw, 18px) ui-monospace, SFMono-Regular, Menlo, monospace; }
 .workstation-metrics small { color: var(--product-faint); font-size: 9px; text-transform: uppercase; }
 .mate-visual { min-height: 0; }
 .mate-visual::before, .mate-visual::after { content: ""; position: absolute; inset: 50% 15% auto; height: 1px; background: color-mix(in srgb, var(--product-accent) 34%, var(--product-border)); transform-origin: center; }
@@ -421,7 +421,7 @@ body[data-page="home"] .lang-toggle {
   .product-features li { min-height: 48px; }
   .workstation-visual { padding: 14px; }
   .workstation-metrics span { padding: 10px 5px 0; gap: 4px; }
-  .workstation-metrics strong { font-size: 17px; }
+  .workstation-metrics strong { font-size: 14px; }
   .mate-node-profile, .mate-node-courses { left: 14px; }
   .mate-node-research, .mate-node-cited { right: 14px; }
   .plugin-path, .stack-grid, .execution-architecture { grid-template-columns: 1fr; }
