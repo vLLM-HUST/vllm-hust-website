@@ -1006,7 +1006,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=leadership-trends-v3-20260816" in html_text
+    assert "assets/leaderboard.js?v=leadership-trends-v4-20260816" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 
@@ -1590,7 +1590,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "leadership-trends-v3-20260816" in html_text
+    assert "leadership-trends-v4-20260816" in html_text
     assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
@@ -2414,7 +2414,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "leadership-trends-v3-20260816" in html_text
+    assert "leadership-trends-v4-20260816" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:
@@ -3052,18 +3052,30 @@ def _specialty_hardware_compatible(entry, target):
     if t_chip_count is not None and hw.get("chip_count") != t_chip_count:
         return False
     t_node_count = t_hw.get("node_count")
-    if (
-        t_node_count is not None
-        and (entry.get("cluster") or {}).get("node_count") != t_node_count
-    ):
+    entry_node_count = (
+        (entry.get("cluster") or {}).get("node_count")
+        or (entry.get("same_spec") or {}).get("node_count")
+        or 1
+    )
+    if t_node_count is not None and entry_node_count != t_node_count:
         return False
     return True
 
 
 def _is_runtime_compatible(entry, target):
-    target_version = str(
-        (target.get("baseline_runtime") or {}).get("engine_version") or ""
+    target_runtime = target.get("baseline_runtime") or {}
+    target_commit = str(
+        target_runtime.get("git_commit") or target_runtime.get("vllm_ref") or ""
     ).strip()
+    metadata = entry.get("metadata") or {}
+    entry_commit = str(
+        ((metadata.get("runtime_provenance") or {}).get("engine") or {}).get("commit")
+        or metadata.get("git_commit")
+        or ""
+    ).strip()
+    if target_commit and entry_commit:
+        return target_commit == entry_commit
+    target_version = str(target_runtime.get("engine_version") or "").strip()
     entry_version = str(entry.get("engine_version") or "").strip()
     return bool(target_version and entry_version and target_version == entry_version)
 
@@ -3275,6 +3287,8 @@ def test_trend_evidence_state_contract() -> None:
 
     # Registry sources share one payload contract (remote first, local fallback).
     assert "function loadEvidenceRegistry()" in text
+    assert "requestTimeoutMs: 4500" in text
+    assert "async function fetchEvidenceRegistry(url)" in text
     assert "payload?.targets" in text
     assert "state.evidenceRegistry = { payload, targets };" in text
     assert "state.evidenceRegistry?.targets || []" in text
@@ -3286,6 +3300,9 @@ def test_evidence_requires_exact_official_runtime_release() -> None:
 
     assert "function getEntryCoreRuntimeVersion(entry)" in text
     assert "function isTargetRuntimeCompatible(entry, target)" in text
+    assert "function getEntryCoreRuntimeCommit(entry)" in text
+    assert "function getTargetCoreRuntimeCommit(target)" in text
+    assert "return targetCommit === entryCommit;" in text
     assert "target?.baseline_runtime?.engine_version" in text
     assert "targetVersion === entryVersion" in text
     assert "return EVIDENCE_STATE.DRIFTED;" in text
@@ -3293,6 +3310,24 @@ def test_evidence_requires_exact_official_runtime_release() -> None:
     # Historical 0.17.2 records, including rc/post releases, must not enter
     # the official 0.18.0 aligned trend merely by numeric-family matching.
     assert "rc/post releases are distinct too" in text
+
+
+def test_exact_runtime_commit_overrides_stale_package_label() -> None:
+    commit = "9ca08a102a068cba27c03efd86e858b76a99fde7"  # pragma: allowlist secret
+    target = {
+        "baseline_runtime": {
+            "engine_version": "0.18.0",
+            "git_commit": commit,
+        }
+    }
+    entry = {
+        "engine_version": "0.17.2.post1",
+        "metadata": {"git_commit": commit},
+    }
+    assert _is_runtime_compatible(entry, target) is True
+
+    entry["metadata"]["git_commit"] = "0" * 40
+    assert _is_runtime_compatible(entry, target) is False
 
 
 # ---------------------------------------------------------------------------
@@ -3361,6 +3396,15 @@ def test_specialty_910b3_is_isolated_series(specialty_targets) -> None:
 
     assert specialty_view_allowed(b3) is True
     assert aligned_view_allowed(b3) is False
+
+
+def test_specialty_single_node_is_inferred_from_declared_spec(
+    specialty_targets,
+) -> None:
+    b3 = _specialty_entry("specialty-ascend-910b3-sonnet-throughput")
+    b3.pop("cluster")
+    b3["same_spec"]["node_count"] = 1
+    assert _evidence_state(b3, specialty_targets) == "specialty"
 
 
 def test_specialty_mismatched_hardware_or_runtime_fails_closed(
