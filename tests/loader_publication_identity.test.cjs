@@ -38,7 +38,7 @@ function loadSandbox() {
 }
 
 function emptySnapshot() {
-    return { single: [], multi: [], compare: null };
+    return { single: [], multi: [], historical: [], compare: null };
 }
 
 test('canonical EMPTY snapshot renders empty state and does not revive stale HF/local', async () => {
