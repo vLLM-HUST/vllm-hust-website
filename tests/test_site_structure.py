@@ -586,7 +586,7 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     assert 'id="products"' in text
     assert 'data-product-id="workstation"' in text
     assert 'data-product-id="sage-mate"' in text
-    assert "./assets/product-catalog.js?v=0.3.2" in text
+    assert "./assets/product-catalog.js?v=0.3.3" in text
     assert 'id="workstation-section"' not in text
     assert "workstation-embed.js" not in text
 
@@ -732,18 +732,15 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert (
-        "A domestic-compute inference engine—and a proving ground for reusable "
-        "serving mechanisms." in html_text
-    )
-    assert "面向国产算力的大模型推理引擎，也是推理系统创新的试验场。" in html_text
+    assert "An upstream-compatible inference engine for domestic compute." in html_text
+    assert "面向国产算力、兼容上游的大模型推理引擎。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
-    assert "Core mechanisms by system position." in html_text
-    assert "按系统位置组织核心机制。" in html_text
-    assert "independently integrated, transferred, or licensed" in html_text
-    assert "独立集成、迁移或授权" in html_text
+    assert "Mechanisms by system layer." in html_text
+    assert "按系统层次组织机制。" in html_text
+    assert "Portable mechanisms stay independent." in html_text
+    assert "可迁移机制保持独立" in html_text
 
     expected_repositories = (
         "vllm-hust-bidkv",
