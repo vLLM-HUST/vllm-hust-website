@@ -7,6 +7,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-16
+
+### Added
+
+- 首页首屏后的第一个正式内容区新增 vLLM-HUST Workstation 与 Sage Mate 两个独立产品入口，分别突出推理工程/监控与知识分身/研究工作流，并提供中英双语介绍和一键外链。
+- 新增集中式 `assets/product-catalog.js` 产品目录与站点版本元数据，统一维护正式产品 URL、外链策略和可访问名称。
+- 新增产品入口回归测试，覆盖名称、URL、按钮、键盘焦点状态、窄屏单列布局和推理凭据泄露检查。
+
+### Changed
+
+- 移除首页不可见的旧 Workstation iframe/后端状态占位和对应配置加载器；官网只保留可信产品介绍与外链，不复制应用界面或运行状态。
+
 ### Added
 
 - 为 #163 新增领导汇报性能页的 fail-close 正式生成骨架：固定版本化 official-target

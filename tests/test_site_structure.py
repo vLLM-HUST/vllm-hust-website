@@ -573,7 +573,7 @@ def test_index_cache_busts_leaderboard_script() -> None:
     assert re.search(r'\.\/assets\/leaderboard\.css\?v=[^"\']+', text)
 
 
-def test_homepage_exposes_multi_page_navigation_and_workstation() -> None:
+def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "index.html").read_text(encoding="utf-8")
 
@@ -583,9 +583,12 @@ def test_homepage_exposes_multi_page_navigation_and_workstation() -> None:
     assert 'href="./contributors.html"' in text
     assert 'href="./conferences.html"' in text
     assert 'href="./courses.html"' in text
-    assert 'id="workstation-section"' in text
-    assert 'id="workstation-embed-frame"' in text
-    assert "./assets/workstation-embed.js?v=" in text
+    assert 'id="products"' in text
+    assert 'data-product-id="workstation"' in text
+    assert 'data-product-id="sage-mate"' in text
+    assert "./assets/product-catalog.js?v=0.3.0" in text
+    assert 'id="workstation-section"' not in text
+    assert "workstation-embed.js" not in text
 
 
 def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
@@ -712,7 +715,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=integration-branches-20260727" in html_text
+    assert "assets/home.css?v=product-ecosystem-20260816" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
