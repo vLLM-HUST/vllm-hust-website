@@ -37,7 +37,7 @@ const HF_CONFIG = {
     // 再交给后台同步补齐最新远端数据。
     cacheMarkerTimeoutMs: 1200,
 
-    // A stalled remote must not leave the leadership screen on a spinner.
+    // A stalled remote must not leave the stable-trend screen on a spinner.
     // The bundled snapshot is an atomic publication mirror and takes over once
     // the remote request budget is exhausted.
     remoteRequestTimeoutMs: 4500,
@@ -64,8 +64,8 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v9_leadership';
-const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-leadership-3';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v10_stable_trend';
+const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-stable-trend-1';
 const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';
 const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';
 let lastLoadedSource = null;
@@ -860,7 +860,7 @@ async function loadLeaderboardData(options = {}) {
 
         // The bundled site snapshot was copied from the canonical publication
         // at build time. Prefer it over another network hop during an outage so
-        // the leadership screen has a bounded first paint.
+        // the stable-trend screen has a bounded first paint.
         const fallbackSources = sourcePriority.slice(1).sort((left, right) => {
             if (left === 'local') return -1;
             if (right === 'local') return 1;
