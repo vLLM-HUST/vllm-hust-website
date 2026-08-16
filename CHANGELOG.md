@@ -7,6 +7,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.6] - 2026-08-16
+
+### Removed
+
+- 移除已无官网消费者、持续失败的 Changzheng/Hugging Face 定时发布同步链路，包括 workflow、同步脚本、陈旧 manifest 与对应测试。
+- 清理 README 中已经失效的首页下载区和独立下载页说明，避免继续误导维护者。
+
+### Tests
+
+- 全量测试、pre-commit 与 GitHub Actions 验证通过，并确认仓库不再注册 Changzheng 定时同步 workflow。
+
 ## [0.3.5] - 2026-08-16
 
 ### Changed

@@ -586,7 +586,7 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     assert 'id="products"' in text
     assert 'data-product-id="workstation"' in text
     assert 'data-product-id="sage-mate"' in text
-    assert "./assets/product-catalog.js?v=0.3.5" in text
+    assert "./assets/product-catalog.js?v=0.3.6" in text
     assert 'id="workstation-section"' not in text
     assert "workstation-embed.js" not in text
 
