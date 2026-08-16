@@ -111,7 +111,7 @@
             unknown: 'Unknown',
             row: 'row',
             singleNode: 'single-node',
-            nodes: 'nodes',
+            nodes: 'machines per run',
             chips: 'chips',
             vsPrev: 'vs Prev',
             hardwareConfig: 'Hardware Configuration',
@@ -233,6 +233,7 @@
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
             trendSubtitle: 'Stable trend uses one fixed milestone set that passes throughput, TTFT, and TBT non-regression checks. Only workloads with complete results at every milestone under the same declared benchmark contract are shown.',
+            trendMetricIndex: 'Stable index',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -243,7 +244,7 @@
             trendAxisBreak: 'axis break',
             trendSeriesButton: 'Series',
             trendSeriesSummary: '{visible} of {total} series visible',
-            trendSeriesLeadershipSummary: 'Comparable workload lines: {lines} · Visible: {visible}/{total}',
+            trendSeriesStableSummary: 'Comparable workload lines: {lines} · Visible: {visible}/{total}',
             trendSeriesHint: 'Open the series panel to focus the chart.',
             trendSeriesSearch: 'Search series',
             trendSeriesShowAll: 'Show all',
@@ -263,7 +264,7 @@
             evidenceValueOfficial: 'official default',
             evidenceValueMissing: 'not recorded',
             evidenceConfigSectionTitle: 'Config evidence',
-            trendDefaultVerifiedHint: 'The aligned trend only shows verified configurations. Unverified or drifted records live in the "All" view.',
+            trendDefaultVerifiedHint: 'The stable trend only shows complete same-contract milestone lines. Changes within the declared noise band (throughput 1%, TTFT 10%, TBT 5%) count as unchanged; tooltips keep the raw values.',
             trendTooltipBrokenAxis: 'shown on broken axis',
             trendTooltipAggregate: 'Aggregate',
             representativeFallback: 'No producer aggregate; showing the latest run',
@@ -359,7 +360,7 @@
             unknown: '未知',
             row: '条记录',
             singleNode: '单机',
-            nodes: '节点',
+            nodes: '台机器（单次测试）',
             chips: '卡',
             vsPrev: '较上一版',
             hardwareConfig: '硬件配置',
@@ -481,6 +482,7 @@
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
             trendSubtitle: '稳定趋势固定使用一组同时通过吞吐、TTFT、TBT 不退化检查的里程碑。只展示在同一已声明 benchmark 合约下覆盖全部里程碑的 workload。',
+            trendMetricIndex: '稳定指数',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -491,7 +493,7 @@
             trendAxisBreak: '断轴',
             trendSeriesButton: '系列',
             trendSeriesSummary: '已显示 {visible} / {total} 条系列',
-            trendSeriesLeadershipSummary: '可比较 workload 连线：{lines} · 已显示 {visible} / {total}',
+            trendSeriesStableSummary: '可比较 workload 连线：{lines} · 已显示 {visible} / {total}',
             trendSeriesHint: '打开系列面板以聚焦图表。',
             trendSeriesSearch: '搜索系列',
             trendSeriesShowAll: '全部显示',
@@ -513,7 +515,7 @@
             evidenceValueOfficial: '官方默认值',
             evidenceValueMissing: '历史未记录',
             evidenceConfigSectionTitle: '配置证据',
-            trendDefaultVerifiedHint: '对齐趋势仅展示已验证配置。未验证或偏离的记录位于“全部”视图。',
+            trendDefaultVerifiedHint: '稳定趋势只展示同一契约且三个 milestone 数据点齐全的连线。落在声明噪声带内的变化（吞吐 1%、TTFT 10%、TBT 5%）视为持平；悬浮提示仍展示原始数值。',
             trendTooltipBrokenAxis: '断轴显示',
             trendTooltipAggregate: '聚合',
             representativeFallback: '无生产者聚合；展示最近一次运行',
@@ -579,7 +581,7 @@
             'multi-chip': { page: 1, pageSize: 20 },
             'multi-node': { page: 1, pageSize: 20 }
         },
-        chartMetric: 'throughput_tps',
+        chartMetric: 'performance_index',
         trendAxisScale: 'auto',
         trendView: 'checkpoint',
         trendChart: null,
@@ -2497,16 +2499,35 @@
     const SERVING_TREND_WORKLOAD_SUFFIXES = ['online', 'throughput', 'latency'];
 
     const TREND_MILESTONE_LABELS = {
-        '0e84e42c71': { rank: 1, en: 'Prefix caching default', zh: '前缀缓存默认启用' },
-        '3b8e5cff01': { rank: 2, en: 'Logprobs batching checkpoint', zh: 'Logprobs 批处理检查点' }, // pragma: allowlist secret
-        e4ce33646f: { rank: 3, en: 'Latest stable main', zh: '最新稳定主线' },
+        '0657f3f2a6': { rank: 1, plugin: '03a12f9bdd', en: 'Post-prefix-caching stable', zh: '前缀缓存后稳定点' },
+        '73187bc8ba': { rank: 2, plugin: '03a12f9bdd', en: 'Runtime lifecycle checkpoint', zh: '运行时生命周期检查点' },
+        '1aa7cd10b7': { rank: 3, plugin: '03ae1d03db', en: 'July stable main checkpoint', zh: '7 月稳定主线检查点' },
     };
 
-    const LEADERSHIP_METRIC_DIRECTIONS = {
+    const STABLE_TREND_METRIC_DIRECTIONS = {
         throughput_tps: 1,
         ttft_ms: -1,
         tbt_ms: -1,
     };
+
+    // Single-run serving measurements contain small scheduler and request-arrival
+    // noise. Treat only changes beyond the declared relative tolerance as a
+    // regression; keep and render the original measured values unchanged.
+    const STABLE_TREND_NON_REGRESSION_TOLERANCES = {
+        throughput_tps: 0.01,
+        ttft_ms: 0.10,
+        tbt_ms: 0.05,
+    };
+
+    function isStableTrendMetricNonRegressing(previous, current, metricKey, direction) {
+        if (!Number.isFinite(previous) || !Number.isFinite(current) || previous === 0) {
+            return false;
+        }
+        const regression = direction > 0
+            ? (previous - current) / Math.abs(previous)
+            : (current - previous) / Math.abs(previous);
+        return regression <= (STABLE_TREND_NON_REGRESSION_TOLERANCES[metricKey] || 0);
+    }
 
     function getServingTrendWorkloadBase(entry) {
         return String(getWorkloadId(entry) || '').replace(/-\d+chip$/, '');
@@ -2525,6 +2546,13 @@
         const declared = String(entry?.coverage_class || '').trim();
         if (['full-matrix', 'targeted-pair', 'experimental'].includes(declared)) {
             return declared;
+        }
+        // Historical recovery has already proven an exact official target and
+        // admitted the artifact as a checkpoint.  Do this before legacy text
+        // heuristics: provenance labels such as "historical-pr-backfill" describe
+        // where the artifact was recovered, not a targeted-PR load contract.
+        if (entry?.historical_recovery?.admitted_for_historical_trend === true) {
+            return 'full-matrix';
         }
         if (entry?.trend_schema_version || entry?.trend_status) {
             // Migrating snapshot that forgot coverage_class: treat as full-matrix
@@ -2625,14 +2653,22 @@
             && (recoveredHistorical || isVerifiedEvidence(entry));
     }
 
-    function getLeadershipMilestoneRank(entry) {
+    function getStableTrendMilestoneRank(entry) {
         if (isTrendBaselineEntry(entry)) {
             return null;
         }
         const commit = normalizeTrendCommit(
             getVersionFieldCommit(entry, 'core') || entry?.metadata?.git_commit
         );
-        const rank = TREND_MILESTONE_LABELS[commit]?.rank;
+        const milestone = TREND_MILESTONE_LABELS[commit];
+        const pluginCommit = normalizeTrendCommit(
+            getVersionFieldCommit(entry, 'backend')
+                || entry?.metadata?.runtime_provenance?.plugin?.commit
+        );
+        if (!milestone || pluginCommit !== milestone.plugin) {
+            return null;
+        }
+        const rank = milestone.rank;
         return Number.isFinite(rank) ? rank : null;
     }
 
@@ -2650,12 +2686,12 @@
             : (values[middle - 1] + values[middle]) / 2;
     }
 
-    // Leadership is a complete longitudinal matrix, not a collection of points.
+    // Stable trend is a complete longitudinal matrix, not a collection of points.
     // A series must cover the official baseline and every fixed main milestone.
     // Every metric it measures must be present at all nodes and monotonic in its
     // correct direction. This prevents both false singletons and metric-local
     // cherry-picking from entering the default view.
-    function getLeadershipComparableSeriesKeys(entries) {
+    function getStableTrendComparableSeriesKeys(entries) {
         const expectedRanks = [
             ...Object.values(TREND_MILESTONE_LABELS)
                 .map((milestone) => milestone.rank)
@@ -2663,7 +2699,7 @@
         ];
         const grouped = new Map();
         entries.forEach((entry) => {
-            const rank = getLeadershipMilestoneRank(entry);
+            const rank = getStableTrendMilestoneRank(entry);
             if (rank === null) {
                 return;
             }
@@ -2684,7 +2720,7 @@
                 return;
             }
             let measuredMetricCount = 0;
-            for (const [metricKey, direction] of Object.entries(LEADERSHIP_METRIC_DIRECTIONS)) {
+            for (const [metricKey, direction] of Object.entries(STABLE_TREND_METRIC_DIRECTIONS)) {
                 const values = expectedRanks.map((rank) => getMedianTrendValue(byRank.get(rank), metricKey));
                 const measured = values.filter((value) => value !== null).length;
                 if (measured === 0) {
@@ -2695,7 +2731,9 @@
                     return;
                 }
                 for (let index = 1; index < values.length; index += 1) {
-                    if ((values[index] - values[index - 1]) * direction < 0) {
+                    if (!isStableTrendMetricNonRegressing(
+                        values[index - 1], values[index], metricKey, direction
+                    )) {
                         return;
                     }
                 }
@@ -2716,10 +2754,7 @@
                 return false;
             }
             if (state.trendView === 'checkpoint' && !isTrendBaselineEntry(entry)) {
-                const commit = normalizeTrendCommit(
-                    getVersionFieldCommit(entry, 'core') || entry?.metadata?.git_commit
-                );
-                if (!Object.prototype.hasOwnProperty.call(TREND_MILESTONE_LABELS, commit)) {
+                if (getStableTrendMilestoneRank(entry) === null) {
                     return false;
                 }
             }
@@ -2731,9 +2766,9 @@
         if (state.trendView !== 'checkpoint') {
             return filtered;
         }
-        const admittedSeries = getLeadershipComparableSeriesKeys(filtered);
+        const admittedSeries = getStableTrendComparableSeriesKeys(filtered);
         return filtered.filter((entry) => (
-            getLeadershipMilestoneRank(entry) !== null
+            getStableTrendMilestoneRank(entry) !== null
             && admittedSeries.has(getTrendSeriesKey(entry))
         ));
     }
@@ -3223,6 +3258,12 @@
 
     function getTrendMetricConfig(metric) {
         const configs = {
+            performance_index: {
+                key: 'performance_index',
+                label: t('trendMetricIndex'),
+                unit: 'M1=100',
+                higherIsBetter: true,
+            },
             throughput_tps: {
                 key: 'throughput_tps',
                 label: t('trendMetricThroughput'),
@@ -3249,6 +3290,17 @@
         return Boolean(entry?.isBaseline) || getEngine(entry) !== 'vllm-hust';
     }
 
+    function getTrendInputContractKey(entry) {
+        if (getServingTrendWorkloadBase(entry) !== 'visionarena-online') {
+            return 'input:default';
+        }
+        const inputContract = entry?.historical_recovery?.input_contract
+            || entry?.metadata?.input_contract
+            || {};
+        const contentSha = String(inputContract.content_sha256 || '').trim().toLowerCase();
+        return contentSha ? `input:${contentSha}` : 'input:unrecorded';
+    }
+
     function getTrendSeriesKey(entry) {
         const workload = getWorkloadId(entry) || 'Other';
         const model = getEntryModelCanonicalId(entry) || getEntryModelDisplayName(entry) || 'unknown-model';
@@ -3257,29 +3309,29 @@
         const nodeCount = entry?.cluster?.node_count || 1;
         const precision = entry?.model?.precision || 'unknown-precision';
         const quantization = getEntryQuantization(entry);
+        const inputContract = getTrendInputContractKey(entry);
         const declaredSpecId = getSameSpecId(entry);
         // A spec_id is the benchmark contract identity. Historical runners may
         // serialize implicit defaults (for example no_stream=false or the model
         // context limit) differently even though they executed the same declared
         // contract. Rebuilding identity from every resolved field fragmented one
-        // real longitudinal workload into many false singletons. Leadership uses
+        // real longitudinal workload into many false singletons. Stable trend uses
         // the admitted/verified contract id; technical views retain exact
         // resolved-parameter identity for diagnosis.
         const settingSignature = state.trendView === 'checkpoint' && declaredSpecId
             ? `spec:${declaredSpecId}`
             : getSettingSignature(entry);
-        // Issue #164: records with different config evidence must never share a
-        // series, so a verified point is never connected to an unverified or
-        // drifted one even in the "all" view.
-        const recoveredHistorical = entry?.historical_recovery?.admitted_for_historical_trend === true;
-        // Leadership history is admitted by the recovery contract rather than
-        // the newer formal-entry verifier. Normalize both recovered baseline
-        // and recovered checkpoint evidence so exact semantic specs can form a
-        // continuous series; technical views retain the original evidence split.
-        const evidenceState = state.trendView === 'checkpoint' && recoveredHistorical
-            ? 'historical-recovered'
+        // The checkpoint view has already admitted each record through either
+        // the formal verifier or the historical-recovery contract. Evidence
+        // provenance must not split one semantic contract into separate series;
+        // technical views retain the original evidence-state partition.
+        const evidenceState = state.trendView === 'checkpoint'
+            ? 'contract-admitted'
             : getEvidenceState(entry);
-        return [workload, model, hardware, chipCount, nodeCount, precision, quantization, evidenceState, settingSignature].join('|');
+        // Physical-machine identity (hostname/IP/rack) is provenance only.
+        // Runs from different servers remain comparable when the effective
+        // 910B2 hardware and benchmark contract above are identical.
+        return [workload, model, hardware, chipCount, nodeCount, precision, quantization, inputContract, evidenceState, settingSignature].join('|');
     }
 
     function getTrendSeriesLabel(entry) {
@@ -3346,9 +3398,9 @@
                 || entry?.metadata?.runtime_provenance?.plugin?.commit
         );
         const version = getTrendVersionText(entry);
-        const leadershipMilestone = state.trendView === 'checkpoint'
-            && Object.prototype.hasOwnProperty.call(TREND_MILESTONE_LABELS, coreCommit);
-        const revision = leadershipMilestone
+        const stableTrendMilestone = state.trendView === 'checkpoint'
+            && getStableTrendMilestoneRank(entry) !== null;
+        const revision = stableTrendMilestone
             ? coreCommit
             : ([coreCommit, backendCommit].filter(Boolean).join('+') || version);
         // A runtime revision is the core/backend pair. Backend PRs often reuse the
@@ -3362,7 +3414,9 @@
         }
         const engine = getEngine(entry);
         const commit = String(entry?.metadata?.git_commit || '').trim().slice(0, 10);
-        const milestone = TREND_MILESTONE_LABELS[commit];
+        const milestone = getStableTrendMilestoneRank(entry) !== null
+            ? TREND_MILESTONE_LABELS[commit]
+            : null;
         if (milestone) {
             return `${milestone[getCurrentLang()] || milestone.en} · ${commit}`;
         }
@@ -3390,6 +3444,21 @@
 
     function getFiniteTrendMetricValue(entry, metricKey) {
         return getMeasuredMetricValue(entry, metricKey);
+    }
+
+    function getStableTrendPrimaryMeasurement(entry) {
+        for (const [metricKey, direction] of [
+            ['throughput_tps', 1],
+            ['ttft_ms', -1],
+        ]) {
+            const aggregate = getCanonicalAggregateMetric(entry, metricKey);
+            const measured = getFiniteTrendMetricValue(entry, metricKey);
+            const value = aggregate ? aggregate.value : measured;
+            if (Number.isFinite(value) && value > 0) {
+                return { aggregate, direction, metricKey, value };
+            }
+        }
+        return null;
     }
 
     // Pick a single representative entry for a (series, version) bucket when
@@ -3457,7 +3526,7 @@
         if (state.trendView !== 'checkpoint') {
             return versions;
         }
-        // The leadership set is validated across all three metrics in CI. Keep
+        // The stable-trend set is validated across all three metrics in CI. Keep
         // the same x-axis when the presenter switches metrics; metric-local
         // selection makes milestones jump around and weakens the story.
         void seriesMap;
@@ -3498,8 +3567,15 @@
         // without silently taking the best value (issue #150).
         const bucketMap = new Map();
         entries.forEach((entry) => {
-            const measured = getFiniteTrendMetricValue(entry, metricConfig.key);
-            const aggregate = getCanonicalAggregateMetric(entry, metricConfig.key);
+            const primary = metricConfig.key === 'performance_index'
+                ? getStableTrendPrimaryMeasurement(entry)
+                : null;
+            const measured = primary
+                ? primary.value
+                : getFiniteTrendMetricValue(entry, metricConfig.key);
+            const aggregate = primary
+                ? primary.aggregate
+                : getCanonicalAggregateMetric(entry, metricConfig.key);
             // Skip entries whose metric is not measurable. N/A / invalid / missing
             // states must not be plotted as 0 (issue #150 / #166).
             if (measured === null && !aggregate) {
@@ -3520,7 +3596,13 @@
                     candidates: [],
                 });
             }
-            bucketMap.get(bucketKey).candidates.push({ entry, value, aggregate });
+            bucketMap.get(bucketKey).candidates.push({
+                entry,
+                value,
+                aggregate,
+                primaryDirection: primary?.direction || null,
+                primaryMetricKey: primary?.metricKey || null,
+            });
         });
 
         bucketMap.forEach((bucket) => {
@@ -3563,9 +3645,48 @@
                 entry,
                 value: aggregate.value,
                 aggregate,
+                primaryDirection: representative.primaryDirection,
+                primaryMetricKey: representative.primaryMetricKey,
                 trendTrack: getTrendVersionTrack(entry),
             });
         });
+
+        if (metricConfig.key === 'performance_index') {
+            seriesMap.forEach((series) => {
+                const baseline = [...series.points.values()].find(
+                    (point) => getStableTrendMilestoneRank(point.entry) === 1
+                );
+                if (!baseline || !Number.isFinite(baseline.value) || baseline.value <= 0) {
+                    series.points.clear();
+                    return;
+                }
+                const baselineValue = baseline.value;
+                series.points.forEach((point, versionKey) => {
+                    if (
+                        point.primaryMetricKey !== baseline.primaryMetricKey
+                        || point.primaryDirection !== baseline.primaryDirection
+                        || !Number.isFinite(point.value)
+                        || point.value <= 0
+                    ) {
+                        series.points.delete(versionKey);
+                        return;
+                    }
+                    const rawValue = point.value;
+                    const normalized = point.primaryDirection > 0
+                        ? (rawValue / baselineValue) * 100
+                        : (baselineValue / rawValue) * 100;
+                    point.rawValue = rawValue;
+                    point.value = normalized;
+                    point.aggregate = {
+                        ...point.aggregate,
+                        value: normalized,
+                        min: null,
+                        max: null,
+                        std: null,
+                    };
+                });
+            });
+        }
 
         const candidateVersions = [...versionMap.values()].sort((left, right) => {
             if (left.baseline !== right.baseline) {
@@ -3847,7 +3968,7 @@
                 (series) => !state.hiddenTrendSeries.has(series.key)
             );
             const lines = visibleSeries.filter((series) => series.pointCount > 1).length;
-            return t('trendSeriesLeadershipSummary')
+            return t('trendSeriesStableSummary')
                 .replace('{lines}', String(lines))
                 .replace('{visible}', String(visible))
                 .replace('{total}', String(total));
@@ -4037,7 +4158,7 @@
             return;
         }
 
-        const metricConfig = getTrendMetricConfig(state.chartMetric) || getTrendMetricConfig('throughput_tps');
+        const metricConfig = getTrendMetricConfig(state.chartMetric) || getTrendMetricConfig('performance_index');
         state.chartMetric = metricConfig.key;
 
         const labelEl = document.getElementById('leaderboard-trend-label');

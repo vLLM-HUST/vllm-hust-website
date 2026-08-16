@@ -195,7 +195,7 @@ def test_recovered_history_is_kept_out_of_table_and_used_for_curated_trends() ->
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     data = json.loads((root / "data" / "leaderboard_historical.json").read_text())
 
-    assert len(data) == 282
+    assert len(data) == 235
     assert all(
         entry.get("historical_recovery", {}).get("admitted_for_historical_trend")
         is True
@@ -206,19 +206,24 @@ def test_recovered_history_is_kept_out_of_table_and_used_for_curated_trends() ->
     assert "function selectMonotonicMilestoneVersions" in text
 
 
-def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> None:
+def test_stable_trend_milestones_are_fixed_and_non_regressing_across_metrics() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     entries = json.loads((root / "data" / "leaderboard_historical.json").read_text())
-    milestones = [
-        "0e84e42c71",
-        "3b8e5cff01",  # pragma: allowlist secret
-        "e4ce33646f",
-    ]
+    milestone_plugins = {
+        "0657f3f2a6": "03a12f9bdd",
+        "73187bc8ba": "03a12f9bdd",
+        "1aa7cd10b7": "03ae1d03db",
+    }
+    milestones = list(milestone_plugins)
     versions = milestones
     directions = {"throughput_tps": 1, "ttft_ms": -1, "tbt_ms": -1}
+    tolerances = {"throughput_tps": 0.01, "ttft_ms": 0.10, "tbt_ms": 0.05}
 
     assert all(commit in text for commit in milestones)
+    assert "plugin: '03a12f9bdd'" in text
+    assert "plugin: '03ae1d03db'" in text
+    assert "pluginCommit !== milestone.plugin" in text
     assert "6f612fbedf" not in text
     assert "a46abb7ae6" not in text
     assert "ec4847981f" not in text
@@ -226,13 +231,19 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
     assert "f273f9c5e2" not in text
     assert "89334ef1f0" not in text
     assert "state.trendView !== 'checkpoint'" in text
-    assert "? 'historical-recovered'" in text
-    assert "const leadershipMilestone = state.trendView === 'checkpoint'" in text
+    assert "? 'historical-recovered'" not in text
+    assert "const stableTrendMilestone = state.trendView === 'checkpoint'" in text
     assert "const declaredSpecId = getSameSpecId(entry);" in text
     assert "? `spec:${declaredSpecId}`" in text
-    assert "function getLeadershipComparableSeriesKeys(entries)" in text
+    assert "function getStableTrendComparableSeriesKeys(entries)" in text
+    assert "? 'contract-admitted'" in text
     assert "expectedRanks.every((rank) => byRank.has(rank))" in text
-    assert "if ((values[index] - values[index - 1]) * direction < 0)" in text
+    assert "const STABLE_TREND_NON_REGRESSION_TOLERANCES" in text
+    assert "throughput_tps: 0.01" in text
+    assert "ttft_ms: 0.10" in text
+    assert "tbt_ms: 0.05" in text
+    assert "function isStableTrendMetricNonRegressing" in text
+    assert "values[index - 1], values[index], metricKey, direction" in text
 
     values: dict[tuple[object, ...], dict[str, dict[str, list[float]]]] = defaultdict(
         lambda: defaultdict(lambda: defaultdict(list))
@@ -246,12 +257,26 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
         )
         if version != "baseline" and version not in milestones:
             continue
+        plugin_commit = str(
+            ((metadata.get("runtime_provenance") or {}).get("plugin") or {}).get(
+                "commit"
+            )
+            or ""
+        )[:10]
+        if version != "baseline" and plugin_commit != milestone_plugins[version]:
+            continue
         workload = entry.get("workload") or {}
         model = entry.get("model") or {}
         hardware = entry.get("hardware") or {}
         spec_id = str((entry.get("same_spec") or {}).get("spec_id") or "")
         if not spec_id:
             continue
+        input_contract = "input:default"
+        if workload.get("name") == "visionarena-online":
+            contract = (entry.get("historical_recovery") or {}).get(
+                "input_contract"
+            ) or metadata.get("input_contract") or {}
+            input_contract = f"input:{contract.get('content_sha256') or 'unrecorded'}"
         series = (
             workload.get("name"),
             model.get("canonical_id") or model.get("display_name"),
@@ -260,6 +285,7 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
             (entry.get("cluster") or {}).get("node_count", 1),
             model.get("precision"),
             model.get("quantization") or "none",
+            input_contract,
             spec_id,
         )
         for metric in directions:
@@ -281,25 +307,81 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
                 valid = False
                 break
             medians = [statistics.median(by_version[version]) for version in versions]
-            if any(
-                (right - left) * direction < 0
+            regressions = (
+                (left - right) / abs(left)
+                if direction > 0
+                else (right - left) / abs(left)
                 for left, right in zip(medians, medians[1:])
-            ):
+            )
+            if any(regression > tolerances[metric] for regression in regressions):
                 valid = False
                 break
         if valid and measured_metrics:
             admitted.append(series)
 
     assert {series[0] for series in admitted} == {
+        "agent-research-online",
+        "instructcoder-online",
+        "prefix-repetition-online",
+        "random-latency",
         "random-online",
         "sharegpt-online",
         "sharegpt-throughput",
         "sonnet-throughput",
+        "visionarena-online",
     }
-    assert len(admitted) == 4
+    assert len(admitted) == 9
 
 
-def test_historical_only_tabs_have_a_leadership_ready_empty_state() -> None:
+def test_stable_trend_compares_same_910b2_contract_across_physical_machines() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    series_key = text.split("function getTrendSeriesKey", 1)[1].split(
+        "function getTrendSeriesLabel", 1
+    )[0]
+
+    assert "chip_model" in series_key
+    assert "chip_count" in series_key
+    assert "node_count" in series_key
+    assert "entry?.cluster?.hostname" not in series_key
+    assert "entry?.cluster?.rack" not in series_key
+    assert "entry?.cluster?.machine" not in series_key
+    assert "Physical-machine identity" in series_key
+
+
+def test_recovered_official_checkpoint_is_not_reclassified_as_targeted_pr() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    coverage = text.split("function getTrendCoverageClass", 1)[1].split(
+        "function getTrendPointRole", 1
+    )[0]
+
+    recovery_gate = coverage.index(
+        "entry?.historical_recovery?.admitted_for_historical_trend === true"
+    )
+    legacy_pr_heuristic = coverage.index("dataSource.includes('pr')")
+    assert recovery_gate < legacy_pr_heuristic
+    assert "return 'full-matrix';" in coverage[recovery_gate:legacy_pr_heuristic]
+
+
+def test_stable_trend_keeps_distinct_vision_input_contracts_separate() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    helper = text.split("function getTrendInputContractKey", 1)[1].split(
+        "function getTrendSeriesKey", 1
+    )[0]
+    series_key = text.split("function getTrendSeriesKey", 1)[1].split(
+        "function getTrendSeriesLabel", 1
+    )[0]
+
+    assert "visionarena-online" in helper
+    assert "input_contract" in helper
+    assert "content_sha256" in helper
+    assert "input:unrecorded" in helper
+    assert "inputContract" in series_key
+
+
+def test_historical_only_tabs_have_a_stable_trend_ready_empty_state() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
 
@@ -380,7 +462,7 @@ def test_trend_series_discloses_real_configuration_overrides() -> None:
     assert "待补同配置基线结果" not in text
     assert "showLine: series.pointCount > 1" in text
     assert "pointRadius: series.pointCount === 1 ? 5 : 3" in text
-    assert "trendSeriesLeadershipSummary" in text
+    assert "trendSeriesStableSummary" in text
     assert "item.evidenceLabel = formatTrendSeriesEvidence(item);" in text
     assert "evidence.className = 'trend-series-evidence';" in text
     assert "function getDifferingTrendConfigKeys(seriesGroup)" in text
@@ -567,9 +649,9 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     assert "function dispatchProgress(payload, onProgress)" in text
     assert "function startBackgroundSync()" in text
     assert "startBackgroundSync," in text
-    assert "llm_engine_hf_leaderboard_cache_v9_leadership" in text
+    assert "llm_engine_hf_leaderboard_cache_v10_stable_trend" in text
     assert (
-        "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-leadership-3';"
+        "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-stable-trend-1';"
         in text
     )
     assert (
@@ -1006,7 +1088,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=stable-trend-v1-20260816" in html_text
+    assert "assets/leaderboard.js?v=stable-trend-v2-20260817" in html_text
     assert ">Stable trend</button>" in html_text
     assert "trendViewCheckpoint: 'Stable trend'" in js_text
     assert "trendViewCheckpoint: '稳定趋势'" in js_text
@@ -1591,11 +1673,12 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         'id="leaderboard-table-details" class="leaderboard-table-details is-collapsed" hidden'
         in html_text
     )
+    assert 'data-trend-metric="performance_index"' in html_text
     assert 'data-trend-metric="throughput_tps"' in html_text
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "leadership-trends-v4-20260816" in html_text
+    assert "stable-trend-v2-20260817" in html_text
     assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
@@ -1623,7 +1706,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     )
     assert "const quantization = getEntryQuantization(entry);" in js_text
     assert (
-        "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, evidenceState, settingSignature].join('|');"
+        "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, inputContract, evidenceState, settingSignature].join('|');"
         in js_text
     )
     assert "同时通过吞吐、TTFT、TBT 不退化检查的里程碑" in js_text
@@ -1672,10 +1755,9 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     # Issue #150: buildTrendChartModel now resolves a canonical point per
     # (series, version) bucket instead of taking best-of; the measured value
     # is read into `measured` and the canonical aggregate drives the plotted y.
-    assert (
-        "const measured = getFiniteTrendMetricValue(entry, metricConfig.key);"
-        in js_text
-    )
+    assert "const measured = primary" in js_text
+    assert ": getFiniteTrendMetricValue(entry, metricConfig.key);" in js_text
+    assert "function getStableTrendPrimaryMeasurement(entry)" in js_text
     assert "function getCanonicalAggregateMetric(entry, metricKey)" in js_text
     assert "function shouldUseLogTrendAxis()" in js_text
     assert "trendAxisScale: 'auto'" in js_text
@@ -2419,7 +2501,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "leadership-trends-v4-20260816" in html_text
+    assert "stable-trend-v2-20260817" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:
@@ -3281,10 +3363,12 @@ def test_trend_evidence_state_contract() -> None:
     assert "const recoveredHistorical =" in text
     assert "&& (recoveredHistorical || isVerifiedEvidence(entry));" in text
 
-    # Evidence state participates in the series key so different evidence never
-    # gets connected.
+    # Evidence state participates in technical-view series keys; the checkpoint
+    # view normalizes only records that have already passed one of its admission
+    # contracts.
     assert "evidenceState" in text
-    assert "quantization, evidenceState, settingSignature" in text
+    assert "quantization, inputContract, evidenceState, settingSignature" in text
+    assert "? 'contract-admitted'" in text
 
     # The semantic signature must not inherit baseline defaults.
     assert "buildTrendSpecDefaults" not in text
@@ -3475,6 +3559,6 @@ def test_specialty_hardware_series_identity_encoded_in_source() -> None:
 
     # Hardware-aware series identity keeps 910B2 and 910B3 apart.
     assert (
-        "chipCount, nodeCount, precision, quantization, evidenceState, settingSignature"
+        "chipCount, nodeCount, precision, quantization, inputContract, evidenceState, settingSignature"
         in text
     )
