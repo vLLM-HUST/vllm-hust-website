@@ -2451,7 +2451,7 @@
 
     const TREND_MILESTONE_LABELS = {
         '0e84e42c71': { rank: 1, en: 'Prefix caching default', zh: '前缀缓存默认启用' },
-        '3b8e5cff01': { rank: 2, en: 'Logprobs batching checkpoint', zh: 'Logprobs 批处理检查点' },
+        '3b8e5cff01': { rank: 2, en: 'Logprobs batching checkpoint', zh: 'Logprobs 批处理检查点' }, // pragma: allowlist secret
         e4ce33646f: { rank: 3, en: 'Latest stable main', zh: '最新稳定主线' },
     };
 

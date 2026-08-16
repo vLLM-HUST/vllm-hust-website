@@ -210,7 +210,11 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     entries = json.loads((root / "data" / "leaderboard_historical.json").read_text())
-    milestones = ["0e84e42c71", "3b8e5cff01", "e4ce33646f"]
+    milestones = [
+        "0e84e42c71",
+        "3b8e5cff01",  # pragma: allowlist secret
+        "e4ce33646f",
+    ]
     versions = milestones
     directions = {"throughput_tps": 1, "ttft_ms": -1, "tbt_ms": -1}
 
