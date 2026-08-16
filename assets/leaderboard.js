@@ -1948,11 +1948,30 @@
             path: 'leaderboard-data/official-targets.json',
         },
         localPath: './data/official_targets.json',
+        requestTimeoutMs: 4500,
     };
 
     function buildEvidenceRegistryUrl() {
         const cfg = EVIDENCE_REGISTRY_CONFIG.github;
         return `https://raw.githubusercontent.com/${cfg.repo}/${cfg.branch}/${cfg.path}`;
+    }
+
+    async function fetchEvidenceRegistry(url) {
+        const controller = typeof AbortController === 'function' ? new AbortController() : null;
+        const timeoutId = controller
+            ? setTimeout(() => controller.abort(), EVIDENCE_REGISTRY_CONFIG.requestTimeoutMs)
+            : null;
+        try {
+            return await fetch(url, {
+                headers: { 'Accept': 'application/json' },
+                cache: 'no-cache',
+                ...(controller ? { signal: controller.signal } : {}),
+            });
+        } finally {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        }
     }
 
     // Load the fixed-target registry, remote GitHub first and the repo-hosted
@@ -1966,10 +1985,7 @@
         let lastError = null;
         for (const source of sources) {
             try {
-                const response = await fetch(source.url, {
-                    headers: { 'Accept': 'application/json' },
-                    cache: 'no-cache',
-                });
+                const response = await fetchEvidenceRegistry(source.url);
                 if (!response.ok) {
                     throw new Error(`registry ${source.name} error: ${response.status}`);
                 }
@@ -2063,7 +2079,12 @@
             return false;
         }
         const tNodeCount = Number(tHw.node_count);
-        if (Number.isFinite(tNodeCount) && Number(entry?.cluster?.node_count) !== tNodeCount) {
+        const entryNodeCount = Number(
+            entry?.cluster?.node_count
+                ?? entry?.same_spec?.node_count
+                ?? 1
+        );
+        if (Number.isFinite(tNodeCount) && entryNodeCount !== tNodeCount) {
             return false;
         }
         return true;
@@ -2129,7 +2150,33 @@
         );
     }
 
+    function getEntryCoreRuntimeCommit(entry) {
+        return String(
+            getVersionFieldCommit(entry, 'core')
+                || entry?.metadata?.runtime_provenance?.engine?.commit
+                || entry?.metadata?.git_commit
+                || ''
+        ).trim().toLowerCase();
+    }
+
+    function getTargetCoreRuntimeCommit(target) {
+        return String(
+            target?.baseline_runtime?.git_commit
+                || target?.baseline_runtime?.vllm_ref
+                || ''
+        ).trim().toLowerCase();
+    }
+
     function isTargetRuntimeCompatible(entry, target) {
+        const targetCommit = getTargetCoreRuntimeCommit(target);
+        const entryCommit = getEntryCoreRuntimeCommit(entry);
+        // An exact source revision is stronger than a package label. Some
+        // historical specialty targets retained an older engine_version label
+        // while pinning the correct full commit; rejecting those exact matches
+        // made the specialty view falsely empty.
+        if (targetCommit && entryCommit) {
+            return targetCommit === entryCommit;
+        }
         const targetVersion = normalizePackageVersion(
             target?.baseline_runtime?.engine_version || ''
         );
