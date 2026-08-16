@@ -3456,7 +3456,7 @@ def test_specialty_hardware_series_identity_encoded_in_source() -> None:
 
     # Dedicated specialty view button + admission gate.
     assert 'data-trend-view="specialty"' in html
-    assert '>Hardware configurations</button>' in html
+    assert ">Hardware configurations</button>" in html
     assert "trendViewSpecialty: 'Hardware configurations'" in text
     assert "trendViewSpecialty: '硬件配置'" in text
     assert "state.trendView === 'specialty'" in text
