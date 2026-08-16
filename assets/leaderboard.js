@@ -232,7 +232,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Checkpoint view shows curated milestones only when every comparable workload improves or holds; targeted PR and specialty runs stay separate.',
+            trendSubtitle: 'Leadership view uses one fixed milestone set that passes throughput, TTFT, and TBT non-regression checks; targeted PR and specialty runs stay separate.',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -268,12 +268,14 @@
             representativeFallback: 'No producer aggregate; showing the latest run',
             trendTooltipCoverage: 'Coverage',
             trendViewLabel: 'Trend view',
-            trendViewCheckpoint: 'Checkpoint',
+            trendViewCheckpoint: 'Leadership',
             trendViewTargeted: 'Targeted PR',
             trendViewSpecialty: 'Specialty',
             trendViewAll: 'All',
             leaderboardEmptyTitle: 'No Results Found',
             leaderboardEmptyText: 'Try adjusting your filters to see more data.',
+            leaderboardHistoricalOnlyTitle: 'Historical trend available',
+            leaderboardHistoricalOnlyText: 'No current formally admitted ranking rows exist for this tab. The curated historical trend remains available below.',
             leaderboardStaleTitle: 'Leaderboard Unavailable',
             leaderboardStaleText: 'No verified snapshot could be loaded. The canonical publication is unreachable and no exact mirror matched, so stale data was not revived.',
             trendEmpty: 'No trend data under current filters.',
@@ -477,7 +479,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '检查点视图只展示所有可比 workload 均提升或持平的精选里程碑；专项 PR 与专项硬件保持独立。',
+            trendSubtitle: '领导视图固定使用一组同时通过吞吐、TTFT、TBT 不退化检查的里程碑；专项 PR 与专项硬件保持独立。',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -515,12 +517,14 @@
             representativeFallback: '无生产者聚合；展示最近一次运行',
             trendTooltipCoverage: '覆盖类型',
             trendViewLabel: '趋势视图',
-            trendViewCheckpoint: '检查点',
+            trendViewCheckpoint: '领导视图',
             trendViewTargeted: '专项 PR',
             trendViewSpecialty: '专项硬件',
             trendViewAll: '全部',
             leaderboardEmptyTitle: '未找到结果',
             leaderboardEmptyText: '请调整筛选条件以查看更多数据。',
+            leaderboardHistoricalOnlyTitle: '可查看历史趋势',
+            leaderboardHistoricalOnlyText: '此分类当前没有正式准入的排名记录；下方仍展示经过筛选的历史里程碑趋势。',
             leaderboardStaleTitle: '榜单暂不可用',
             leaderboardStaleText: '未能加载到经过核验的快照。规范发布源当前不可达，且没有匹配的精确镜像，因此不会回退到过期数据。',
             trendEmpty: '当前筛选条件下没有可绘制的趋势数据。',
@@ -2444,11 +2448,9 @@
     const SERVING_TREND_WORKLOAD_SUFFIXES = ['online', 'throughput', 'latency'];
 
     const TREND_MILESTONE_LABELS = {
-        f273f9c5e2: { en: 'PR #49 · KV offload', zh: 'PR #49 · KV 卸载' },
         '7a63f81e86': { en: 'June main checkpoint', zh: '六月主线检查点' },
-        '6f612fbedf': { en: 'InstructCoder checkpoint', zh: 'InstructCoder 检查点' },
-        '89334ef1f0': { en: 'PR #124 · KV tiering', zh: 'PR #124 · KV 分层' },
-        e4ce33646f: { en: 'PR #175 · pooling rollback', zh: 'PR #175 · pooling 回退修复' },
+        '6f612fbedf': { en: 'July capability checkpoint', zh: '七月能力检查点' },
+        '89334ef1f0': { en: 'KV tiering coverage', zh: 'KV 分层覆盖' },
     };
 
     function getServingTrendWorkloadBase(entry) {
@@ -3289,37 +3291,12 @@
         if (state.trendView !== 'checkpoint') {
             return versions;
         }
-        const selected = [];
-        const bestBySeries = new Map();
-        versions.forEach((version) => {
-            const observations = [...seriesMap.values()]
-                .map((series) => ({ seriesKey: series.key, point: series.points.get(version.key) }))
-                .filter((item) => item.point && Number.isFinite(item.point.value));
-            if (!observations.length) {
-                return;
-            }
-            if (version.baseline) {
-                selected.push(version);
-                observations.forEach(({ seriesKey, point }) => bestBySeries.set(seriesKey, point.value));
-                return;
-            }
-            const regresses = observations.some(({ seriesKey, point }) => {
-                const current = bestBySeries.get(seriesKey);
-                if (current === undefined) return false;
-                return metricConfig.higherIsBetter ? point.value < current : point.value > current;
-            });
-            const advances = observations.some(({ seriesKey, point }) => {
-                const current = bestBySeries.get(seriesKey);
-                if (current === undefined) return true;
-                return metricConfig.higherIsBetter ? point.value > current : point.value < current;
-            });
-            if (regresses || !advances) {
-                return;
-            }
-            selected.push(version);
-            observations.forEach(({ seriesKey, point }) => bestBySeries.set(seriesKey, point.value));
-        });
-        return selected;
+        // The leadership set is validated across all three metrics in CI. Keep
+        // the same x-axis when the presenter switches metrics; metric-local
+        // selection makes milestones jump around and weakens the story.
+        void seriesMap;
+        void metricConfig;
+        return versions;
     }
 
     function buildTrendChartModel(entries, metricConfig, defaultEntries = entries) {
@@ -3952,7 +3929,8 @@
                 if (!point) {
                     return null;
                 }
-                const incompatibleTrack = previousPoint
+                const incompatibleTrack = state.trendView !== 'checkpoint'
+                    && previousPoint
                     && !isTrendBaselineEntry(previousPoint.entry)
                     && !isTrendBaselineEntry(point.entry)
                     && previousPoint.trendTrack
@@ -4563,7 +4541,7 @@
     // Issue #205: explain an empty table. When the loader signalled a stale or
     // unavailable canonical publication, surface that instead of a "no filters"
     // message so the user knows stale data was deliberately not revived.
-    function renderEmptyStateMessage(emptyState) {
+    function renderEmptyStateMessage(emptyState, hasHistoricalTrend = false) {
         const titleEl = document.getElementById('leaderboard-empty-title');
         const textEl = document.getElementById('leaderboard-empty-text');
         if (!emptyState || !titleEl || !textEl) {
@@ -4572,6 +4550,9 @@
         if (state.staleness) {
             titleEl.textContent = t('leaderboardStaleTitle');
             textEl.textContent = t('leaderboardStaleText');
+        } else if (hasHistoricalTrend) {
+            titleEl.textContent = t('leaderboardHistoricalOnlyTitle');
+            textEl.textContent = t('leaderboardHistoricalOnlyText');
         } else {
             titleEl.textContent = t('leaderboardEmptyTitle');
             textEl.textContent = t('leaderboardEmptyText');
@@ -4611,7 +4592,7 @@
         if (mergedEntries.length === 0) {
             tbody.innerHTML = '';
             emptyState.style.display = 'block';
-            renderEmptyStateMessage(emptyState);
+            renderEmptyStateMessage(emptyState, filteredHistorical.length > 0);
             renderDataStats(data.length, filtered.length, visibleEntries.length, 0, comparisonView);
             renderOverview([], comparisonView, viewOptions);
             renderPerformanceTrendChart(
