@@ -1,9 +1,0 @@
-{
-  "enabled": true,
-  "mode": "link",
-  "workstation_url": "https://ws.sage.org.ai",
-  "backend_url": "https://api.sage.org.ai",
-  "docs_url": "./docs/CLOUDFLARE_SETUP.md",
-  "label_zh": "vLLM-HUST 工作站",
-  "label_en": "vLLM-HUST Workstation"
-}

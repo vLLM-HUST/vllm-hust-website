@@ -132,6 +132,56 @@ body[data-page="home"] .lang-toggle {
 .execution-section-head > p { margin: 0; color: var(--exec-muted); font-size: 17px; }
 .execution-dark .execution-section-head > p, .execution-ecosystem .execution-section-head > p { color: #a9b8b6; }
 
+.execution-products { color: var(--exec-white); background: #111819; }
+.execution-products .execution-section-head > p { color: #a9b8b6; }
+.product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--exec-dark-line); border-left: 1px solid var(--exec-dark-line); }
+.product-card {
+  position: relative;
+  min-width: 0;
+  min-height: 560px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--exec-dark-line);
+  border-bottom: 1px solid var(--exec-dark-line);
+  background: #151f20;
+}
+.product-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: var(--product-accent); }
+.product-card::after { content: attr(data-code); position: absolute; right: 22px; bottom: 2px; color: rgba(255,255,255,.025); font: 900 180px/1 "Sora", "Inter", sans-serif; pointer-events: none; }
+.product-card-workstation { --product-accent: var(--exec-cyan); background: linear-gradient(145deg, rgba(57,198,202,.12), transparent 44%), #151f20; }
+.product-card-mate { --product-accent: var(--exec-amber); background: linear-gradient(145deg, rgba(240,179,65,.13), transparent 44%), #1b1e1c; }
+.product-card-topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; color: #839693; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.product-type { padding: 5px 8px; border: 1px solid color-mix(in srgb, var(--product-accent) 48%, transparent); border-radius: 3px; color: var(--product-accent); text-transform: uppercase; }
+.product-card h3 { margin: 82px 0 0; max-width: 560px; color: var(--exec-white); font-family: "Sora", "Inter", sans-serif; font-size: 42px; line-height: 1; }
+.product-positioning { margin: 18px 0 0; max-width: 620px; color: #c4d0cf; font-size: 18px; line-height: 1.5; }
+.product-features { margin: 34px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; list-style: none; }
+.product-features li { min-width: 0; padding-left: 18px; position: relative; color: #9fadaa; font-size: 13px; line-height: 1.5; }
+.product-features li::before { content: ""; position: absolute; top: .62em; left: 0; width: 7px; height: 2px; background: var(--product-accent); }
+.product-cta {
+  position: relative;
+  z-index: 1;
+  width: max-content;
+  max-width: 100%;
+  min-height: 48px;
+  margin-top: auto;
+  padding: 12px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 34px;
+  border: 1px solid var(--product-accent);
+  border-radius: 4px;
+  color: var(--exec-ink);
+  background: var(--product-accent);
+  font-weight: 850;
+  text-decoration: none;
+  transition: transform 140ms ease, color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+.product-cta:hover { color: var(--exec-white); background: transparent; }
+.product-cta:focus-visible { outline: 3px solid var(--exec-white); outline-offset: 4px; box-shadow: 0 0 0 6px color-mix(in srgb, var(--product-accent) 56%, transparent); }
+.product-cta:active { transform: translateY(2px); color: var(--exec-ink); background: color-mix(in srgb, var(--product-accent) 82%, white); }
+
 .plugin-path {
   margin-bottom: 38px;
   display: grid;
@@ -291,6 +341,11 @@ body[data-page="home"] .lang-toggle {
   .execution-section { padding: 74px 16px; }
   .execution-section-head { grid-template-columns: 1fr; gap: 22px; }
   .execution-section-head h2 { font-size: 40px; }
+  .product-grid { grid-template-columns: 1fr; }
+  .product-card { min-height: 0; padding: 24px 20px; }
+  .product-card h3 { margin-top: 56px; font-size: 34px; overflow-wrap: anywhere; }
+  .product-features { grid-template-columns: 1fr; gap: 11px; }
+  .product-cta { width: 100%; margin-top: 42px; }
   .plugin-path, .stack-grid, .execution-architecture { grid-template-columns: 1fr; }
   .plugin-path div:not(:last-child)::after {
     top: auto;

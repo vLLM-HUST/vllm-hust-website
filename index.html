@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=upstream-qwen-community-20260727" />
-  <link rel="stylesheet" href="./assets/home.css?v=integration-branches-20260727" />
+  <link rel="stylesheet" href="./assets/home.css?v=product-ecosystem-20260816" />
 </head>
 <body data-page="home">
   <nav class="site-nav">
@@ -64,6 +64,40 @@
       <span id="scope-compiler" data-code="03">Compiler + kernels</span>
       <span id="scope-kernels" data-code="04">Hardware adapters</span>
       <span id="scope-hardware" data-code="05">Benchmark evidence</span>
+    </section>
+
+    <section class="execution-section execution-products" id="products" aria-labelledby="products-title">
+      <div class="execution-section-head">
+        <div><p id="products-eyebrow" class="execution-eyebrow">Product ecosystem</p><h2 id="products-title">From inference infrastructure to trusted knowledge interaction.</h2></div>
+        <p id="products-summary">Two focused products share the same vLLM-HUST and SAGE ecosystem: one for operating the inference stack, one for turning workflows and knowledge into a personal AI presence.</p>
+      </div>
+      <div class="product-grid">
+        <article class="product-card product-card-workstation" data-code="01" aria-labelledby="product-workstation-name">
+          <div class="product-card-topline"><span>01 / INFER + OBSERVE</span><span id="product-workstation-type" class="product-type">Engineering workspace</span></div>
+          <h3 id="product-workstation-name">vLLM-HUST Workstation</h3>
+          <p id="product-workstation-positioning" class="product-positioning">An all-in-one large-model inference workstation for developers and researchers.</p>
+          <ul class="product-features">
+            <li id="product-workstation-feature-1">OpenAI-compatible inference experience</li>
+            <li id="product-workstation-feature-2">Model discovery, chat, deep thinking, and web search</li>
+            <li id="product-workstation-feature-3">Inference status, throughput, latency, and hardware monitoring</li>
+            <li id="product-workstation-feature-4">One interface for the vLLM-HUST and Ascend inference stack</li>
+          </ul>
+          <a id="product-workstation-cta" class="product-cta" data-product-id="workstation"><span id="product-workstation-cta-copy">Open Workstation</span><span aria-hidden="true">↗</span></a>
+        </article>
+
+        <article class="product-card product-card-mate" data-code="02" aria-labelledby="product-mate-name">
+          <div class="product-card-topline"><span>02 / KNOW + ENGAGE</span><span id="product-mate-type" class="product-type">Personal AI twin</span></div>
+          <h3 id="product-mate-name">Sage Mate</h3>
+          <p id="product-mate-positioning" class="product-positioning">A personal intelligent twin built with SAGE workflows, knowledge bases, and large models.</p>
+          <ul class="product-features">
+            <li id="product-mate-feature-1">Knowledge Q&amp;A for visitors, students, researchers, and partners</li>
+            <li id="product-mate-feature-2">Profiles, research directions, courses, and project knowledge</li>
+            <li id="product-mate-feature-3">Support and cited evidence for trustworthy answers</li>
+            <li id="product-mate-feature-4">Deep thinking, web search, and complex research workflows</li>
+          </ul>
+          <a id="product-mate-cta" class="product-cta" data-product-id="sage-mate"><span id="product-mate-cta-copy">Talk to Sage Mate</span><span aria-hidden="true">↗</span></a>
+        </article>
+      </div>
     </section>
 
     <section class="execution-section execution-dark" id="stack">
@@ -153,14 +187,6 @@
       </div>
     </section>
 
-    <section class="visually-hidden" id="workstation-section" aria-hidden="true">
-      <span class="workstation-pill" id="workstation-status-chip" data-state="pending">Pending</span>
-      <span id="workstation-status-detail">Pending</span><span id="workstation-backend-label">Serving Backend</span>
-      <span id="workstation-backend-value">Not configured</span><span id="workstation-url-label">Workstation URL</span>
-      <span id="workstation-target-value">Not configured</span><a id="workstation-open-link" href="#" target="_blank" rel="noreferrer">Open Workstation</a>
-      <a id="workstation-docs-link" href="./docs/DEPLOY.md" target="_blank" rel="noreferrer">Deployment Guide</a><span id="workstation-note">Workstation</span>
-      <span id="workstation-embed-mode" data-state="pending">Waiting</span><iframe id="workstation-embed-frame" title="vLLM-HUST workstation" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
-    </section>
   </main>
 
   <footer class="execution-footer">
@@ -179,6 +205,16 @@
         'home-fact-1-label': 'Engine', 'home-fact-2-label': 'Mechanisms', 'home-fact-3-label': 'Evidence',
         'home-fact-1-value': 'upstream-compatible runtime', 'home-fact-2-value': 'scheduling + state + execution', 'home-fact-3-value': 'multi-backend validation',
         'scope-runtime': 'Scheduling plugins', 'scope-cache': 'State + KV tools', 'scope-compiler': 'Compiler + kernels', 'scope-kernels': 'Hardware adapters', 'scope-hardware': 'Benchmark evidence',
+        'products-eyebrow': 'Product ecosystem', 'products-title': 'From inference infrastructure to trusted knowledge interaction.',
+        'products-summary': 'Two focused products share the same vLLM-HUST and SAGE ecosystem: one for operating the inference stack, one for turning workflows and knowledge into a personal AI presence.',
+        'product-workstation-type': 'Engineering workspace', 'product-workstation-positioning': 'An all-in-one large-model inference workstation for developers and researchers.',
+        'product-workstation-feature-1': 'OpenAI-compatible inference experience', 'product-workstation-feature-2': 'Model discovery, chat, deep thinking, and web search',
+        'product-workstation-feature-3': 'Inference status, throughput, latency, and hardware monitoring', 'product-workstation-feature-4': 'One interface for the vLLM-HUST and Ascend inference stack',
+        'product-workstation-cta-copy': 'Open Workstation',
+        'product-mate-type': 'Personal AI twin', 'product-mate-positioning': 'A personal intelligent twin built with SAGE workflows, knowledge bases, and large models.',
+        'product-mate-feature-1': 'Knowledge Q&A for visitors, students, researchers, and partners', 'product-mate-feature-2': 'Profiles, research directions, courses, and project knowledge',
+        'product-mate-feature-3': 'Support and cited evidence for trustworthy answers', 'product-mate-feature-4': 'Deep thinking, web search, and complex research workflows',
+        'product-mate-cta-copy': 'Talk to Sage Mate',
         'stack-eyebrow': 'Engine & proving ground', 'stack-title': 'Run the engine. Evolve mechanisms through clear interfaces.',
         'stack-summary': 'vLLM-HUST is an inference engine for domestic compute. Its upstream-compatible runtime also brings hardware backends, compiler stacks, and a fixed benchmark contract together for systems experimentation.',
         'path-mechanism-title': 'Mechanism', 'path-mechanism-copy': 'A focused scheduling, state, decoding, or execution idea',
@@ -220,6 +256,16 @@
         'home-fact-1-label': '引擎', 'home-fact-2-label': '机制', 'home-fact-3-label': '证据',
         'home-fact-1-value': '兼容上游的推理运行时', 'home-fact-2-value': '调度、状态与执行', 'home-fact-3-value': '跨后端系统验证',
         'scope-runtime': '调度插件', 'scope-cache': '状态与 KV 工具', 'scope-compiler': '编译与算子', 'scope-kernels': '硬件适配', 'scope-hardware': 'Benchmark 证据',
+        'products-eyebrow': '产品生态', 'products-title': '从推理基础设施，到可信的知识交互。',
+        'products-summary': '两个独立产品共享 vLLM-HUST 与 SAGE 生态：一个服务推理栈的操作与研究，一个把工作流和知识转化为个人智能分身。',
+        'product-workstation-type': '工程工作台', 'product-workstation-positioning': '面向开发者和研究人员的一站式大模型推理工作站。',
+        'product-workstation-feature-1': 'OpenAI-compatible 推理体验', 'product-workstation-feature-2': '模型发现、聊天、深度思考与联网检索',
+        'product-workstation-feature-3': '推理状态、吞吐、延迟与硬件监控', 'product-workstation-feature-4': '面向 vLLM-HUST / Ascend 推理栈的统一操作界面',
+        'product-workstation-cta-copy': '打开 Workstation',
+        'product-mate-type': '个人智能分身', 'product-mate-positioning': '基于 SAGE 工作流、知识库和大模型构建的个人智能分身。',
+        'product-mate-feature-1': '面向访客、学生、研究者和合作方的知识问答', 'product-mate-feature-2': '个人资料、研究方向、课程和项目知识库',
+        'product-mate-feature-3': 'Support 与引用依据，让回答可信可查', 'product-mate-feature-4': '深度思考、联网检索和复杂研究工作流',
+        'product-mate-cta-copy': '与分身对话',
         'stack-eyebrow': '推理引擎与试验场', 'stack-title': '运行推理引擎，通过清晰接口演进核心机制。',
         'stack-summary': 'vLLM-HUST 是面向国产算力的大模型推理引擎；兼容上游的运行时同时连接硬件后端、编译栈与固定 Benchmark 契约，承担系统创新试验场的作用。',
         'path-mechanism-title': '机制', 'path-mechanism-copy': '聚焦调度、状态、解码或执行的单一创新',
@@ -256,6 +302,6 @@
     };
   </script>
   <script src="./assets/site.js?v=engine-and-proving-ground-20260728"></script>
-  <script src="./assets/workstation-embed.js?v=workstation-public-copy-20260701"></script>
+  <script src="./assets/product-catalog.js?v=0.3.0"></script>
 </body>
 </html>
