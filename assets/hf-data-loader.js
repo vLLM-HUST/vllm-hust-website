@@ -26,8 +26,8 @@ const HF_CONFIG = {
     // 前端缓存，避免频繁刷新时重复全量拉取
     cacheTTLms: 5 * 60 * 1000,
 
-    // Remote-first mode keeps the visible leaderboard fresh. Marker checks run
-    // alongside data downloads so they do not add another network round trip.
+    // The atomic bundled snapshot paints immediately. Marker checks and remote
+    // refreshes run after first paint so a slow data host cannot blank the chart.
     validateWithMarker: true,
 
     // 首屏展示后，在后台校验远端快照是否更新。
@@ -45,7 +45,7 @@ const HF_CONFIG = {
 
     // When the first remote attempt already timed out, do not immediately
     // repeat the same requests behind a successfully rendered local snapshot.
-    offlineRetryDelayMs: 60 * 1000,
+    offlineRetryDelayMs: 2500,
 
     // Hugging Face 远端使用镜像，官方站点作为回退
     endpoints: [
@@ -53,8 +53,8 @@ const HF_CONFIG = {
         'https://huggingface.co'
     ],
 
-    // 数据源优先级：远端快照优先，站点内置快照作为兜底。
-    sources: ['github', 'local'],
+    // 数据源优先级：随站原子快照首屏展示，GitHub 在后台校验并刷新。
+    sources: ['local', 'github'],
 
     // GitHub 仓库配置（用于不依赖 HF 的数据发布方式）
     github: {
@@ -64,8 +64,8 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v10_stable_trend';
-const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-stable-trend-1';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v11_stable_trend';
+const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260817-stable-trend-2';
 const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';
 const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';
 let lastLoadedSource = null;
