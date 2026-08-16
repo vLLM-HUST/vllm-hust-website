@@ -1006,7 +1006,12 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=leadership-trends-v5-20260816" in html_text
+    assert "assets/leaderboard.js?v=stable-trend-v1-20260816" in html_text
+    assert ">Stable trend</button>" in html_text
+    assert "trendViewCheckpoint: 'Stable trend'" in js_text
+    assert "trendViewCheckpoint: '稳定趋势'" in js_text
+    assert "trendViewCheckpoint: 'Leadership'" not in js_text
+    assert "trendViewCheckpoint: '领导视图'" not in js_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 
