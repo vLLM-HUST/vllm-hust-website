@@ -210,13 +210,65 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     entries = json.loads((root / "data" / "leaderboard_historical.json").read_text())
-    milestones = ["7a63f81e86", "6f612fbedf", "89334ef1f0"]
+    milestones = ["6f612fbedf", "a46abb7ae6", "0e84e42c71", "e4ce33646f"]
     directions = {"throughput_tps": 1, "ttft_ms": -1, "tbt_ms": -1}
 
-    assert all(f"'{commit}'" in text for commit in milestones)
+    def normalize(value: object) -> object:
+        if not isinstance(value, str):
+            return value
+        stripped = value.strip()
+        if stripped.lower() in {"true", "false"}:
+            return stripped.lower() == "true"
+        try:
+            return float(stripped) if "." in stripped else int(stripped)
+        except ValueError:
+            return stripped
+
+    def semantic_signature(entry: dict[str, object]) -> str:
+        same_spec = entry.get("same_spec") or {}
+        workload = entry.get("workload") or {}
+        ignored = {"host", "port", "model"}
+        server = {
+            key: normalize(value)
+            for key, value in (
+                same_spec.get("resolved_server_parameters") or {}
+            ).items()
+            if key not in ignored
+        }
+        client = {
+            key: normalize(value)
+            for key, value in (
+                same_spec.get("resolved_client_parameters") or {}
+            ).items()
+            if key not in ignored
+        }
+        if client.get("input_len") == normalize(workload.get("input_length")):
+            client.pop("input_len", None)
+        if client.get("output_len") == normalize(workload.get("output_length")):
+            client.pop("output_len", None)
+        workload_signature = {
+            key: normalize(workload.get(key))
+            for key in (
+                "name",
+                "input_length",
+                "output_length",
+                "batch_size",
+                "concurrent_requests",
+            )
+            if workload.get(key) is not None
+        }
+        return json.dumps(
+            {"server": server, "client": client, "workload": workload_signature},
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+
+    assert all(commit in text for commit in milestones)
     assert "f273f9c5e2" not in text
-    assert "e4ce33646f" not in text
+    assert "89334ef1f0" not in text
     assert "state.trendView !== 'checkpoint'" in text
+    assert "? 'historical-recovered'" in text
+    assert "const leadershipMilestone = state.trendView === 'checkpoint'" in text
 
     values: dict[tuple[tuple[object, ...], str], dict[str, list[float]]] = defaultdict(
         lambda: defaultdict(list)
@@ -233,7 +285,6 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
         workload = entry.get("workload") or {}
         model = entry.get("model") or {}
         hardware = entry.get("hardware") or {}
-        same_spec = entry.get("same_spec") or {}
         series = (
             workload.get("name"),
             model.get("canonical_id") or model.get("repo_id"),
@@ -242,7 +293,7 @@ def test_leadership_milestones_are_fixed_and_non_regressing_across_metrics() -> 
             (entry.get("cluster") or {}).get("node_count", 1),
             model.get("precision"),
             model.get("quantization") or "none",
-            same_spec.get("resolved_spec_hash") or same_spec.get("spec_id"),
+            semantic_signature(entry),
         )
         for metric in directions:
             value = (entry.get("metrics") or {}).get(metric)
@@ -352,7 +403,9 @@ def test_trend_series_discloses_real_configuration_overrides() -> None:
     assert "add matching baseline result" not in text
     assert "待补同配置基线结果" not in text
     assert "showLine: series.pointCount > 1" in text
-    assert "pointRadius: series.pointCount === 1 ? 5 : 3" in text
+    assert "const milestoneOnly = state.trendView === 'checkpoint'" in text
+    assert "pointRadius: milestoneOnly ? 3 : 3" in text
+    assert "trendSeriesLeadershipSummary" in text
     assert "item.evidenceLabel = formatTrendSeriesEvidence(item);" in text
     assert "evidence.className = 'trend-series-evidence';" in text
     assert "function getDifferingTrendConfigKeys(seriesGroup)" in text
@@ -524,9 +577,15 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     )
     assert "return Array.isArray(compareSnapshot.groups);" in text
     assert "assertUsableLeaderboardPayload(result, source);" in text
-    assert "sources: ['github', 'hf', 'local']" in text
+    assert "sources: ['github', 'local']" in text
     assert "backgroundRemoteSync: true" in text
     assert "cacheMarkerTimeoutMs: 1200" in text
+    assert "remoteRequestTimeoutMs: 4500" in text
+    assert "canonicalIdentityTimeoutMs: 1200" in text
+    assert "offlineRetryDelayMs: 60 * 1000" in text
+    assert "async function fetchWithTimeout(" in text
+    assert "const fallbackSources = sourcePriority.slice(1).sort" in text
+    assert "const bundledMarker = await loadFromLocal" in text
     assert "const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';" in text
     assert "const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';" in text
     assert "const markerPromise = getLatestMarker(markerPriority);" in text
@@ -972,7 +1031,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=leadership-trends-v2-20260816" in html_text
+    assert "assets/leaderboard.js?v=leadership-trends-v3-20260816" in html_text
     assert "td:first-child:not(.version-table-cell)" in css_text
     assert "td.version-table-cell" in css_text
 
@@ -1556,7 +1615,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "leadership-trends-v2-20260816" in html_text
+    assert "leadership-trends-v3-20260816" in html_text
     assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
@@ -2380,7 +2439,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "leadership-trends-v2-20260816" in html_text
+    assert "leadership-trends-v3-20260816" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:

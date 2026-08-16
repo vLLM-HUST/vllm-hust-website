@@ -232,7 +232,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Leadership view uses one fixed milestone set that passes throughput, TTFT, and TBT non-regression checks; targeted PR and specialty runs stay separate.',
+            trendSubtitle: 'Leadership view uses one fixed milestone set that passes throughput, TTFT, and TBT non-regression checks. Lines connect only exact comparable workload specs; muted standalone dots show additional milestone coverage.',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -243,6 +243,7 @@
             trendAxisBreak: 'axis break',
             trendSeriesButton: 'Series',
             trendSeriesSummary: '{visible} of {total} series visible',
+            trendSeriesLeadershipSummary: 'Comparable lines: {lines} · Milestone-only workloads: {points} · Visible: {visible}/{total}',
             trendSeriesHint: 'Open the series panel to focus the chart.',
             trendSeriesSearch: 'Search series',
             trendSeriesShowAll: 'Show all',
@@ -479,7 +480,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '领导视图固定使用一组同时通过吞吐、TTFT、TBT 不退化检查的里程碑；专项 PR 与专项硬件保持独立。',
+            trendSubtitle: '领导视图固定使用一组同时通过吞吐、TTFT、TBT 不退化检查的里程碑。只有严格同规格 workload 才连线；淡色独立点表示其他里程碑覆盖。',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
             trendMetricTBT: 'TBT',
@@ -490,6 +491,7 @@
             trendAxisBreak: '断轴',
             trendSeriesButton: '系列',
             trendSeriesSummary: '已显示 {visible} / {total} 条系列',
+            trendSeriesLeadershipSummary: '{lines} 条可比较连线 · {points} 个仅里程碑点 workload · 已显示 {visible} / {total}',
             trendSeriesHint: '打开系列面板以聚焦图表。',
             trendSeriesSearch: '搜索系列',
             trendSeriesShowAll: '全部显示',
@@ -2448,9 +2450,10 @@
     const SERVING_TREND_WORKLOAD_SUFFIXES = ['online', 'throughput', 'latency'];
 
     const TREND_MILESTONE_LABELS = {
-        '7a63f81e86': { en: 'June main checkpoint', zh: '六月主线检查点' },
-        '6f612fbedf': { en: 'July capability checkpoint', zh: '七月能力检查点' },
-        '89334ef1f0': { en: 'KV tiering coverage', zh: 'KV 分层覆盖' },
+        '6f612fbedf': { rank: 1, en: 'June main checkpoint', zh: '六月主线检查点' },
+        a46abb7ae6: { rank: 2, en: 'Quantization compatibility', zh: '量化兼容检查点' },
+        '0e84e42c71': { rank: 3, en: 'Prefix caching default', zh: '前缀缓存默认启用' },
+        e4ce33646f: { rank: 4, en: 'Pooling hotpath stabilization', zh: 'Pooling 热路径稳定化' },
     };
 
     function getServingTrendWorkloadBase(entry) {
@@ -3116,7 +3119,14 @@
         // Issue #164: records with different config evidence must never share a
         // series, so a verified point is never connected to an unverified or
         // drifted one even in the "all" view.
-        const evidenceState = getEvidenceState(entry);
+        const recoveredHistorical = entry?.historical_recovery?.admitted_for_historical_trend === true;
+        // Leadership history is admitted by the recovery contract rather than
+        // the newer formal-entry verifier. Normalize both recovered baseline
+        // and recovered checkpoint evidence so exact semantic specs can form a
+        // continuous series; technical views retain the original evidence split.
+        const evidenceState = state.trendView === 'checkpoint' && recoveredHistorical
+            ? 'historical-recovered'
+            : getEvidenceState(entry);
         return [workload, model, hardware, chipCount, nodeCount, precision, quantization, evidenceState, settingSignature].join('|');
     }
 
@@ -3184,7 +3194,11 @@
                 || entry?.metadata?.runtime_provenance?.plugin?.commit
         );
         const version = getTrendVersionText(entry);
-        const revision = [coreCommit, backendCommit].filter(Boolean).join('+') || version;
+        const leadershipMilestone = state.trendView === 'checkpoint'
+            && Object.prototype.hasOwnProperty.call(TREND_MILESTONE_LABELS, coreCommit);
+        const revision = leadershipMilestone
+            ? coreCommit
+            : ([coreCommit, backendCommit].filter(Boolean).join('+') || version);
         // A runtime revision is the core/backend pair. Backend PRs often reuse the
         // same core commit and must still receive their own x-axis position.
         return `${isTrendBaselineEntry(entry) ? 'baseline' : 'current'}|${revision}`;
@@ -3404,6 +3418,15 @@
         const candidateVersions = [...versionMap.values()].sort((left, right) => {
             if (left.baseline !== right.baseline) {
                 return left.baseline ? -1 : 1;
+            }
+            if (state.trendView === 'checkpoint') {
+                const leftCommit = String(left.key || '').split('|').pop();
+                const rightCommit = String(right.key || '').split('|').pop();
+                const leftRank = TREND_MILESTONE_LABELS[leftCommit]?.rank;
+                const rightRank = TREND_MILESTONE_LABELS[rightCommit]?.rank;
+                if (Number.isFinite(leftRank) && Number.isFinite(rightRank) && leftRank !== rightRank) {
+                    return leftRank - rightRank;
+                }
             }
             if (left.timestamp !== right.timestamp) {
                 return left.timestamp - right.timestamp;
@@ -3656,6 +3679,18 @@
     }
 
     function formatTrendSeriesSummary(visible, total) {
+        if (state.trendView === 'checkpoint') {
+            const visibleSeries = state.trendSeries.filter(
+                (series) => !state.hiddenTrendSeries.has(series.key)
+            );
+            const lines = visibleSeries.filter((series) => series.pointCount > 1).length;
+            const points = visibleSeries.filter((series) => series.pointCount === 1).length;
+            return t('trendSeriesLeadershipSummary')
+                .replace('{lines}', String(lines))
+                .replace('{points}', String(points))
+                .replace('{visible}', String(visible))
+                .replace('{total}', String(total));
+        }
         return t('trendSeriesSummary')
             .replace('{visible}', String(visible))
             .replace('{total}', String(total));
@@ -3922,6 +3957,7 @@
         const labels = makeUniqueTrendLabels(model.versions.map((version) => version.label));
         let datasets = model.series.map((series, index) => {
             const colors = getTrendColors(index);
+            const milestoneOnly = state.trendView === 'checkpoint' && series.pointCount === 1;
             let previousPoint = null;
             const trackBreakIndices = new Set();
             const data = model.versions.map((version, versionIndex) => {
@@ -3963,11 +3999,11 @@
                 data,
                 pointDetails,
                 pointAggregates,
-                borderColor: colors.borderColor,
-                backgroundColor: colors.backgroundColor,
-                borderWidth: 2,
+                borderColor: milestoneOnly ? 'rgba(71, 85, 105, 0.55)' : colors.borderColor,
+                backgroundColor: milestoneOnly ? 'rgba(148, 163, 184, 0.28)' : colors.backgroundColor,
+                borderWidth: milestoneOnly ? 1 : 2,
                 showLine: series.pointCount > 1,
-                pointRadius: series.pointCount === 1 ? 5 : 3,
+                pointRadius: milestoneOnly ? 3 : 3,
                 pointHoverRadius: 6,
                 tension: 0.28,
                 spanGaps: allowSpanGaps,
