@@ -41,11 +41,11 @@ def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> Non
     for phrase in (
         "Turn domestic compute into usable, verifiable inference.",
         "One engine connects upstream compatibility, system innovation, and public evidence.",
-        "Two products. From infrastructure to impact.",
+        "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
-        "A cited AI twin that turns personal knowledge into an always-available service.",
+        "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
         "让国产算力成为可用、可验证的推理能力。",
-        "两款产品，让基础设施真正产生价值。",
+        "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
 
