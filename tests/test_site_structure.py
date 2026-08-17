@@ -835,9 +835,9 @@ def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
     assert ecosystem.count("<a ") == 4
     assert "<strong>RIDE Lab</strong>" in ecosystem
     assert "<strong>SAGE</strong>" not in ecosystem
-    assert "Agent-native research; SAGE is the flagship product" in ecosystem
+    assert "Agent-native research and SAGE core stewardship" in ecosystem
     assert (
-        "Sage Mate is a RIDE Lab application built with SAGE and backed by vLLM-HUST."
+        "Sage Mate is an application built with SAGE and backed by vLLM-HUST."
         in html_text
     )
 
