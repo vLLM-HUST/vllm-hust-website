@@ -232,7 +232,7 @@
             overviewCompareSnapshotNote: 'Hero deltas use the matched compare snapshot. Cards below show the highlighted visible sample for each engine.',
             trendLabel: 'Version Trend',
             trendTitle: 'Performance trend',
-            trendSubtitle: 'Stable trend uses one fixed milestone set that passes throughput, TTFT, and TBT non-regression checks. Only workloads with complete results at every milestone under the same declared benchmark contract are shown.',
+            trendSubtitle: 'Historical health line across three fixed July version checkpoints that pass throughput, TTFT, and TBT non-regression checks. These checkpoints are not capability milestones or current latest. Only complete same-contract workloads are shown.',
             trendMetricIndex: 'Stable index',
             trendMetricThroughput: 'Tokens/s',
             trendMetricTTFT: 'TTFT',
@@ -264,7 +264,7 @@
             evidenceValueOfficial: 'official default',
             evidenceValueMissing: 'not recorded',
             evidenceConfigSectionTitle: 'Config evidence',
-            trendDefaultVerifiedHint: 'The stable trend only shows complete same-contract milestone lines. Changes within the declared noise band (throughput 1%, TTFT 10%, TBT 5%) count as unchanged; tooltips keep the raw values.',
+            trendDefaultVerifiedHint: 'The historical health line only shows complete same-contract checkpoint series. Changes within the declared noise band (throughput 1%, TTFT 10%, TBT 5%) count as unchanged; this supports no-significant-regression, not continuous improvement. Tooltips keep the raw values.',
             trendTooltipBrokenAxis: 'shown on broken axis',
             trendTooltipAggregate: 'Aggregate',
             representativeFallback: 'No producer aggregate; showing the latest run',
@@ -481,7 +481,7 @@
             overviewCompareSnapshotNote: '顶部 Hero 的差距值来自当前命中的 compare snapshot；下方卡片展示每个引擎当前高亮样本。',
             trendLabel: '版本趋势',
             trendTitle: '性能趋势',
-            trendSubtitle: '稳定趋势固定使用一组同时通过吞吐、TTFT、TBT 不退化检查的里程碑。只展示在同一已声明 benchmark 合约下覆盖全部里程碑的 workload。',
+            trendSubtitle: '历史健康线固定使用三个通过吞吐、TTFT、TBT 不退化检查的 7 月版本检查点；它们不是能力里程碑，也不代表 current latest。只展示同一 benchmark 合约下完整覆盖三个检查点的 workload。',
             trendMetricIndex: '稳定指数',
             trendMetricThroughput: '吞吐',
             trendMetricTTFT: 'TTFT',
@@ -515,7 +515,7 @@
             evidenceValueOfficial: '官方默认值',
             evidenceValueMissing: '历史未记录',
             evidenceConfigSectionTitle: '配置证据',
-            trendDefaultVerifiedHint: '稳定趋势只展示同一契约且三个 milestone 数据点齐全的连线。落在声明噪声带内的变化（吞吐 1%、TTFT 10%、TBT 5%）视为持平；悬浮提示仍展示原始数值。',
+            trendDefaultVerifiedHint: '历史健康线只展示同一契约且三个版本检查点数据齐全的连线。落在声明噪声带内的变化（吞吐 1%、TTFT 10%、TBT 5%）视为持平；它支持“无显著回退”，不支持“持续提升”。悬浮提示保留原始数值。',
             trendTooltipBrokenAxis: '断轴显示',
             trendTooltipAggregate: '聚合',
             representativeFallback: '无生产者聚合；展示最近一次运行',
@@ -2499,9 +2499,9 @@
     const SERVING_TREND_WORKLOAD_SUFFIXES = ['online', 'throughput', 'latency'];
 
     const TREND_MILESTONE_LABELS = {
-        '0657f3f2a6': { rank: 1, plugin: '03a12f9bdd', en: 'Post-prefix-caching stable', zh: '前缀缓存后稳定点' }, // pragma: allowlist secret
-        '73187bc8ba': { rank: 2, plugin: '03a12f9bdd', en: 'Runtime lifecycle checkpoint', zh: '运行时生命周期检查点' }, // pragma: allowlist secret
-        '1aa7cd10b7': { rank: 3, plugin: '03ae1d03db', en: 'July stable main checkpoint', zh: '7 月稳定主线检查点' }, // pragma: allowlist secret
+        '0657f3f2a6': { rank: 1, plugin: '03a12f9bdd', en: 'July 13 health checkpoint', zh: '7 月 13 日健康检查点' }, // pragma: allowlist secret
+        '73187bc8ba': { rank: 2, plugin: '03a12f9bdd', en: 'July 16 health checkpoint', zh: '7 月 16 日健康检查点' }, // pragma: allowlist secret
+        '1aa7cd10b7': { rank: 3, plugin: '03ae1d03db', en: 'July 19 health checkpoint', zh: '7 月 19 日健康检查点' }, // pragma: allowlist secret
     };
 
     const STABLE_TREND_METRIC_DIRECTIONS = {
