@@ -784,6 +784,7 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
 
     assert "python scripts/sync_leaderboard_snapshots.py" in workflow
     assert "vLLM-HUST/vllm-hust-benchmark" in workflow
+    assert "docs/official-baselines" in workflow
     assert "SNAPSHOT_FILES = (" in script
     assert "--check" in script
 
