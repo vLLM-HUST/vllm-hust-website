@@ -87,8 +87,18 @@ body[data-page="home"] .lang-toggle {
   color: var(--exec-white);
   background: var(--exec-ink);
 }
-.execution-hero-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
-.execution-hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7,11,12,.98) 0%, rgba(7,11,12,.82) 34%, rgba(7,11,12,.16) 72%, rgba(7,11,12,.42) 100%); }
+.execution-hero::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 80% 48%, #302718 0, #171916 30%, var(--exec-ink) 68%); }
+.inference-fabric { position: absolute; inset: 0 0 0 35%; opacity: .94; }
+.inference-fabric svg { width: 100%; height: 100%; }
+.fabric-grid path { fill: none; stroke: #a38c63; stroke-width: 1; opacity: .1; }
+.fabric-traces { fill: none; stroke: #71857e; stroke-width: 1.5; stroke-dasharray: 4 9; opacity: .68; }
+.fabric-chip > rect { fill: rgba(12,17,18,.7); stroke: #806e4d; stroke-width: 2; }
+.fabric-chip .die { fill: rgba(23,29,27,.88); stroke: var(--exec-amber); stroke-width: 2; filter: drop-shadow(0 0 20px rgba(240,179,65,.16)); }
+.fabric-chip path { fill: none; stroke: #7f8d86; stroke-width: 1; opacity: .28; }
+.fabric-flow { fill: none; stroke-width: 3; filter: drop-shadow(0 0 6px rgba(240,179,65,.28)); }
+.fabric-nodes circle { fill: var(--exec-amber); stroke: rgba(240,179,65,.22); stroke-width: 14; }
+.fabric-labels { fill: #c3c4b9; font: 700 11px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 1px; }
+.execution-hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7,11,12,.99) 0%, rgba(7,11,12,.9) 38%, rgba(7,11,12,.18) 73%, rgba(7,11,12,.36) 100%); }
 .execution-hero-copy { position: relative; z-index: 2; max-width: 800px; }
 .execution-signal, .execution-eyebrow { margin: 0 0 18px; color: var(--exec-amber); font-size: 12px; font-weight: 850; text-transform: uppercase; }
 .execution-signal { display: flex; align-items: center; gap: 10px; }
@@ -393,7 +403,7 @@ body[data-page="home"] .lang-toggle {
   body[data-page="home"] .lang-toggle { top: 14px; right: 60px; }
   body[data-page="home"] .nav-toggle { right: 0; }
   .execution-hero { min-height: 780px; padding: 112px 16px 48px; }
-  .execution-hero-media { object-position: 62% center; }
+  .inference-fabric { left: 20%; opacity: .54; }
   .execution-hero-shade { background: rgba(7,11,12,.72); }
   .execution-hero h1 { font-size: 58px; line-height: .9; }
   .execution-kicker { font-size: 27px; }
