@@ -357,7 +357,7 @@ body[data-page="home"] .lang-toggle {
 .runtime-tag.slate { color: #344341; background: #dce4e1; }
 
 .execution-ecosystem { color: var(--exec-white); background: #111819; }
-.execution-architecture { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); border-top: 1px solid var(--exec-dark-line); border-left: 1px solid var(--exec-dark-line); }
+.execution-architecture { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border-top: 1px solid var(--exec-dark-line); border-left: 1px solid var(--exec-dark-line); }
 .execution-architecture a { min-height: 210px; padding: 22px; display: flex; flex-direction: column; border-right: 1px solid var(--exec-dark-line); border-bottom: 1px solid var(--exec-dark-line); text-decoration: none; }
 .execution-architecture a:hover, .execution-architecture .active { background: #1a2626; }
 .execution-architecture span { color: #778986; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
