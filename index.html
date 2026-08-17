@@ -39,7 +39,24 @@
 
   <main id="top" class="execution-home">
     <section class="execution-hero" aria-labelledby="home-title">
-      <img class="execution-hero-media" src="./assets/brand/ecosystem-infrastructure.png" alt="" width="1944" height="809" />
+      <div class="inference-fabric" aria-hidden="true">
+        <svg viewBox="0 0 1040 820" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="fabric-lane" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#39c6ca"/><stop offset=".56" stop-color="#f0b341"/><stop offset="1" stop-color="#ee765a"/></linearGradient>
+            <radialGradient id="fabric-core"><stop stop-color="#f0b341" stop-opacity=".26"/><stop offset="1" stop-color="#f0b341" stop-opacity="0"/></radialGradient>
+          </defs>
+          <g class="fabric-grid"><path d="M0 90H1040M0 190H1040M0 290H1040M0 390H1040M0 490H1040M0 590H1040M0 690H1040M120 0V820M220 0V820M320 0V820M420 0V820M520 0V820M620 0V820M720 0V820M820 0V820M920 0V820"/></g>
+          <circle cx="630" cy="410" r="340" fill="url(#fabric-core)"/>
+          <g class="fabric-traces"><path d="M80 190H318L382 254"/><path d="M80 630H318L382 566"/><path d="M958 190H822L758 254"/><path d="M958 630H822L758 566"/><path d="M80 410H358"/><path d="M782 410H958"/><path d="M570 70V198"/><path d="M570 622V750"/></g>
+          <g class="fabric-chip">
+            <rect x="370" y="210" width="400" height="400" rx="12"/><rect class="die" x="420" y="260" width="300" height="300" rx="5"/>
+            <path d="M450 302H690M450 356H690M450 410H690M450 464H690M450 518H690M470 282V538M530 282V538M590 282V538M650 282V538"/>
+          </g>
+          <g class="fabric-flow" stroke="url(#fabric-lane)"><path d="M438 328H698M438 410H698M438 492H698"/></g>
+          <g class="fabric-nodes"><circle cx="470" cy="328" r="6"/><circle cx="590" cy="410" r="9"/><circle cx="650" cy="492" r="6"/></g>
+          <g class="fabric-labels"><text x="92" y="172">REQUEST</text><text x="836" y="172">TOKENS</text><text x="454" y="238">INFERENCE FABRIC / 03</text><text x="468" y="388">SCHEDULE · EXECUTE · VERIFY</text></g>
+        </svg>
+      </div>
       <div class="execution-hero-shade"></div>
       <div class="execution-hero-copy">
         <p id="home-eyebrow" class="execution-signal"><span></span>Domestic compute · inference engine / 03</p>
