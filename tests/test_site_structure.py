@@ -829,8 +829,14 @@ def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
     assert 'class="cosmic-links"' not in html_text
     assert "home-card-leaderboard-title" not in html_text
     assert ".cosmic-links" not in css_text
+    assert 'href="https://ride-lab.github.io/"' in html_text
     assert 'href="https://sage.org.ai/"' in html_text
     assert 'href="https://datasys.sage.org.ai/"' in html_text
+    assert "RIDE Lab's flagship agent programming product" in html_text
+    assert (
+        "Sage Mate is a RIDE Lab application built with SAGE and backed by vLLM-HUST."
+        in html_text
+    )
 
 
 def test_conference_navigation_is_general_not_event_specific() -> None:
@@ -940,7 +946,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=leadership-value-20260816" in html_text
+    assert "assets/home.css?v=ride-ecosystem-20260817" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
