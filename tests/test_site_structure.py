@@ -1090,7 +1090,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=stable-trend-v3-20260817" in html_text
+    assert "assets/leaderboard.js?v=stable-trend-v4-20260817" in html_text
     assert ">Stable trend</button>" in html_text
     assert "trendViewCheckpoint: 'Stable trend'" in js_text
     assert "trendViewCheckpoint: '稳定趋势'" in js_text
@@ -1680,7 +1680,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "stable-trend-v3-20260817" in html_text
+    assert "stable-trend-v4-20260817" in html_text
     assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
@@ -1711,7 +1711,12 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, inputContract, evidenceState, settingSignature].join('|');"
         in js_text
     )
-    assert "同时通过吞吐、TTFT、TBT 不退化检查的里程碑" in js_text
+    assert (
+        "历史健康线固定使用三个通过吞吐、TTFT、TBT 不退化检查的 7 月版本检查点"
+        in js_text
+    )
+    assert "它们不是能力里程碑，也不代表 current latest" in js_text
+    assert "它支持“无显著回退”，不支持“持续提升”" in js_text
     assert "function getSelectOptionLabel(value, option, labelMapper = null)" in js_text
     assert "if (value === 'all')" in js_text
     assert "function isServingTrendWorkload(entry)" in js_text
@@ -2503,7 +2508,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "stable-trend-v3-20260817" in html_text
+    assert "stable-trend-v4-20260817" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:
