@@ -12,7 +12,7 @@ def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -
     for label in ("navProducts", "navEngine", "navProjects"):
         assert label in SITE_JS
     assert "pages: ['leaderboard', 'achievements']" in SITE_JS
-    assert "pages: ['contributors', 'conferences', 'courses']" in SITE_JS
+    assert "pages: ['members', 'contributors', 'conferences', 'courses']" in SITE_JS
     assert "pages: ['versions', 'issues']" in SITE_JS
     assert '<details class="nav-group"' in SITE_JS
 
@@ -54,6 +54,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
         "leaderboard.html",
         "achievements.html",
         "contributors.html",
+        "members.html",
         "conferences.html",
         "courses.html",
         "issues.html",
