@@ -5,6 +5,7 @@
             navLeaderboard: 'Leaderboard',
             navAchievements: 'Achievements',
             navContributors: 'Contributors',
+            navMembers: 'Members',
             navConferences: 'Conferences',
             navCourses: 'Courses',
             navIssues: 'Issues',
@@ -30,6 +31,7 @@
             navLeaderboard: '性能排行榜',
             navAchievements: '成果',
             navContributors: '核心成员',
+            navMembers: '组织成员',
             navConferences: '会议',
             navCourses: '课程',
             navIssues: '议题',
@@ -66,7 +68,11 @@
     function setText(id, text) {
         const node = document.getElementById(id);
         if (node && typeof text === 'string') {
-            node.textContent = text;
+            if (node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) {
+                node.placeholder = text;
+            } else {
+                node.textContent = text;
+            }
         }
     }
 
@@ -98,6 +104,7 @@
         setText('nav-leaderboard', common.navLeaderboard);
         setText('nav-achievements', common.navAchievements);
         setText('nav-contributors', common.navContributors);
+        setText('nav-members', common.navMembers);
         setText('nav-conferences', common.navConferences);
         setText('nav-courses', common.navCourses);
         setText('nav-issues', common.navIssues);
@@ -143,8 +150,9 @@
         {
             id: 'community',
             label: 'navCommunity',
-            pages: ['contributors', 'conferences', 'courses'],
+            pages: ['members', 'contributors', 'conferences', 'courses'],
             links: [
+                ['members', './members.html', 'navMembers'],
                 ['contributors', './contributors.html', 'navContributors'],
                 ['conferences', './conferences.html', 'navConferences'],
                 ['courses', './courses.html', 'navCourses'],
@@ -236,7 +244,7 @@
                 <nav class="site-directory-links" aria-label="Footer navigation">
                     <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
                     <div><strong data-i18n-common="footerEvidence">Evidence</strong><a href="./leaderboard.html" data-i18n-common="navLeaderboard">Leaderboard</a><a href="./achievements.html" data-i18n-common="navAchievements">Achievements</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
-                    <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
+                    <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
                 </nav>
             </div>`;
     }
