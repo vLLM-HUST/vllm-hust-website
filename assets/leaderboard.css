@@ -1119,6 +1119,59 @@
     height: 100% !important;
 }
 
+.pr-comparison {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid #dbe7e5;
+}
+
+.pr-comparison-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 12px;
+}
+
+.pr-comparison-head h4 {
+    margin: 4px 0 5px;
+    color: #25312f;
+    font-size: 1.05rem;
+}
+
+.pr-comparison-head p {
+    margin: 0;
+    color: #64706e;
+    font-size: 0.84rem;
+}
+
+.pr-comparison-count {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    border: 1px solid #cbd8d5;
+    border-radius: 999px;
+    background: #f5f8f7;
+    color: #52615f;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.pr-chart-wrap {
+    position: relative;
+    height: 300px;
+    min-height: 260px;
+    padding: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.56);
+    transition: height 0.18s ease;
+}
+
+.pr-chart-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 .trend-empty {
     position: absolute;
     inset: 0;
@@ -1903,6 +1956,14 @@
     .trend-chart-wrap {
         height: 340px;
         min-height: 320px;
+    }
+
+    .pr-comparison-head {
+        flex-direction: column;
+    }
+
+    .pr-comparison-count {
+        align-self: flex-start;
     }
 
     .leaderboard-table {

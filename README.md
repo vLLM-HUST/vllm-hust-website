@@ -90,11 +90,14 @@ The only supported leaderboard data chain is:
 1. Website sync workflow mirrors those benchmark snapshot files for offline/static fallback:
    - `data/leaderboard_single.json`
    - `data/leaderboard_multi.json`
+   - `data/leaderboard_historical.json`
    - `data/leaderboard_compare.json`
    - `data/last_updated.json`
 
 Leaderboard rendering consumes benchmark GitHub raw snapshots first, then HF, then the checked-in
 website mirror. `leaderboard_compare.json` provides neutral engine-vs-engine head-to-head views.
+`leaderboard_historical.json` is the auditable recovered trend projection; it is used by the trend
+and PR charts, not mixed into the formally admitted table rows.
 
 Leaderboard version rendering follows a split UI contract:
 

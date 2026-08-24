@@ -94,6 +94,39 @@
           </ul>
         </div>
 
+        <section class="research-member-group engineering-route-panel" aria-labelledby="contributors-engineering-route-title">
+          <h3 id="contributors-engineering-route-title">Engineering route</h3>
+          <p id="contributors-engineering-route-description">All current engineering-route members, with advisor scope kept separate from the route classification.</p>
+          <div class="metric-strip contributors-metric-strip">
+            <div class="metric-box"><span id="contributors-advised-count-label">张书豪当前指导成员</span><strong id="contributors-advised-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-all-current-count-label">全站当前成员</span><strong id="contributors-all-current-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-engineering-count-label">当前工程路线人数</span><strong id="contributors-engineering-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-advised-engineering-count-label">张书豪指导工程路线</span><strong id="contributors-advised-engineering-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-academic-count-label">当前学术路线人数</span><strong id="contributors-academic-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-other-engineering-count-label">其他指导工程路线</span><strong id="contributors-other-engineering-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-maoyancan-count-label">毛言粲当前指导成员</span><strong id="contributors-maoyancan-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-pending-advisor-count-label">指导老师待核验</span><strong id="contributors-pending-advisor-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-former-count-label">已离组 / 历史成员</span><strong id="contributors-former-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-confirmed-github-count-label">已确认 GitHub</span><strong id="contributors-confirmed-github-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-pending-github-count-label">GitHub 待确认</span><strong id="contributors-pending-github-count">0</strong></div>
+            <div class="metric-box"><span id="contributors-shuhao-pending-github-count-label">张书豪工程路线 GitHub 待确认</span><strong id="contributors-shuhao-pending-github-count">0</strong></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th id="contributors-engineering-col-member">Member</th>
+                  <th id="contributors-engineering-col-route">Current route</th>
+                  <th id="contributors-engineering-col-github">GitHub</th>
+                  <th id="contributors-engineering-col-direction">Research / engineering focus</th>
+                  <th id="contributors-engineering-col-history">Historical fields</th>
+                </tr>
+              </thead>
+              <tbody id="contributors-engineering-route-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
         <details class="research-members-menu">
           <summary>
             <span>
@@ -212,6 +245,25 @@
         'contributors-role-dean': 'Dean',
         'contributors-role-project-lead': 'Project Lead',
         'contributors-subproject-title': 'Subproject leads',
+        'contributors-engineering-route-title': 'Engineering route',
+        'contributors-engineering-route-description': 'All current engineering-route members, with advisor scope kept separate from the route classification.',
+        'contributors-engineering-col-member': 'Member',
+        'contributors-engineering-col-route': 'Current route',
+        'contributors-engineering-col-github': 'GitHub',
+        'contributors-engineering-col-direction': 'Research / engineering focus',
+        'contributors-engineering-col-history': 'Historical fields',
+        'contributors-advised-count-label': 'Current members advised by Shuhao Zhang',
+        'contributors-all-current-count-label': 'All current members',
+        'contributors-engineering-count-label': 'Current engineering-route members',
+        'contributors-advised-engineering-count-label': 'Shuhao-advised engineering route',
+        'contributors-academic-count-label': 'Current academic-route members',
+        'contributors-other-engineering-count-label': 'Engineering route advised by others',
+        'contributors-maoyancan-count-label': 'Current members advised by Yancan Mao',
+        'contributors-pending-advisor-count-label': 'Advisor pending',
+        'contributors-former-count-label': 'Former / historical members',
+        'contributors-confirmed-github-count-label': 'Confirmed GitHub IDs',
+        'contributors-pending-github-count-label': 'GitHub IDs pending',
+        'contributors-shuhao-pending-github-count-label': 'Shuhao engineering-route GitHub IDs pending',
         'contributors-members-menu-title': 'Contributor profiles',
         'contributors-members-menu-hint': 'Canonical identities classified by verified core-repository contributions',
         'contributors-members-loading': 'Loading verified contributor profiles…',
@@ -249,6 +301,25 @@
         'contributors-role-dean': '院长',
         'contributors-role-project-lead': '课题负责人',
         'contributors-subproject-title': '子课题负责人',
+        'contributors-engineering-route-title': '工程路线',
+        'contributors-engineering-route-description': '展示全站当前工程路线成员；指导老师范围与路线分类分别统计。',
+        'contributors-engineering-col-member': '成员',
+        'contributors-engineering-col-route': '当前路线',
+        'contributors-engineering-col-github': 'GitHub',
+        'contributors-engineering-col-direction': '研究 / 工程方向',
+        'contributors-engineering-col-history': '历史字段',
+        'contributors-advised-count-label': '张书豪当前指导成员',
+        'contributors-all-current-count-label': '全站当前成员',
+        'contributors-engineering-count-label': '当前工程路线人数',
+        'contributors-advised-engineering-count-label': '张书豪指导工程路线',
+        'contributors-academic-count-label': '当前学术路线人数',
+        'contributors-other-engineering-count-label': '其他指导工程路线',
+        'contributors-maoyancan-count-label': '毛言粲当前指导成员',
+        'contributors-pending-advisor-count-label': '指导老师待核验',
+        'contributors-former-count-label': '已离组 / 历史成员',
+        'contributors-confirmed-github-count-label': '已确认 GitHub',
+        'contributors-pending-github-count-label': 'GitHub 待确认',
+        'contributors-shuhao-pending-github-count-label': '张书豪工程路线 GitHub 待确认',
         'contributors-members-menu-title': '贡献成员档案',
         'contributors-members-menu-hint': '按真实核心仓库贡献统一归并身份并分类',
         'contributors-members-loading': '正在加载已验证贡献成员…',
@@ -277,7 +348,7 @@
     };
   </script>
   <script src="./assets/site.js?v=engine-and-proving-ground-20260728"></script>
-  <script src="./assets/contributors-page.js?v=member-interests-20260728-github-status"></script>
+  <script src="./assets/contributors-page.js?v=member-interests-20260728-github-status&engineering-route-20260812"></script>
 </body>
 
 </html>

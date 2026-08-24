@@ -14,6 +14,7 @@ from typing import Any
 SNAPSHOT_FILES = (
     "leaderboard_single.json",
     "leaderboard_multi.json",
+    "leaderboard_historical.json",
     "leaderboard_compare.json",
     "last_updated.json",
 )
@@ -145,6 +146,7 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
 
     single = load_json(source_dir / "leaderboard_single.json")
     multi = load_json(source_dir / "leaderboard_multi.json")
+    historical = load_json(source_dir / "leaderboard_historical.json")
     compare = load_json(source_dir / "leaderboard_compare.json")
     marker = load_json(source_dir / "last_updated.json")
     errors: list[str] = []
@@ -160,6 +162,23 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
                 errors.append(f"{name}: every entry must be an object")
                 continue
             errors.extend(require_public_entry_contract(entry, name, registry))
+    if not isinstance(historical, list):
+        errors.append("leaderboard_historical.json must be an array")
+    else:
+        for entry in historical:
+            if not isinstance(entry, dict):
+                errors.append(
+                    "leaderboard_historical.json: every entry must be an object"
+                )
+                continue
+            recovery = entry.get("historical_recovery")
+            if (
+                not isinstance(recovery, dict)
+                or recovery.get("admitted_for_historical_trend") is not True
+            ):
+                errors.append(
+                    "leaderboard_historical.json: every entry must carry an admitted historical_recovery record"
+                )
     errors.extend(validate_compare(compare))
     if not isinstance(marker, dict) or not marker.get("last_updated"):
         errors.append("last_updated.json must declare last_updated")
@@ -170,6 +189,7 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
     return {
         "single": len(single),
         "multi": len(multi),
+        "historical": len(historical) if isinstance(historical, list) else 0,
         "compare": len(compare["groups"]),
     }
 
@@ -207,6 +227,7 @@ def write_pr_body(
         "| --- | --- | ---: |",
         f"| Single-chip snapshot | passed | {counts['single']} |",
         f"| Multi-chip snapshot | passed | {counts['multi']} |",
+        f"| Historical trend snapshot | passed | {counts['historical']} |",
         f"| Compare snapshot | passed | {counts['compare']} groups |",
         "| Entry verification and fixed-target binding | passed | all entries |",
         "",

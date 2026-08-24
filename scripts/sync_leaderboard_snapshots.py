@@ -13,6 +13,7 @@ from pathlib import Path
 SNAPSHOT_FILES = (
     "leaderboard_single.json",
     "leaderboard_multi.json",
+    "leaderboard_historical.json",
     "leaderboard_compare.json",
     "last_updated.json",
 )
@@ -56,6 +57,7 @@ def validate_snapshot_set(source_dir: Path) -> None:
 
     single = load_json(source_dir / "leaderboard_single.json")
     multi = load_json(source_dir / "leaderboard_multi.json")
+    historical = load_json(source_dir / "leaderboard_historical.json")
     compare = load_json(source_dir / "leaderboard_compare.json")
     marker = load_json(source_dir / "last_updated.json")
 
@@ -63,6 +65,8 @@ def validate_snapshot_set(source_dir: Path) -> None:
         raise SystemExit("leaderboard_single.json must be a JSON array")
     if not isinstance(multi, list):
         raise SystemExit("leaderboard_multi.json must be a JSON array")
+    if not isinstance(historical, list):
+        raise SystemExit("leaderboard_historical.json must be a JSON array")
     if not isinstance(compare, dict) or "groups" not in compare:
         raise SystemExit("leaderboard_compare.json must contain groups")
     if not isinstance(marker, dict) or not marker.get("last_updated"):

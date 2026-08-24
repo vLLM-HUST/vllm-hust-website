@@ -172,7 +172,7 @@ def test_leaderboard_uses_normalized_model_identity_helpers() -> None:
     assert "function createCompareScopeKey(entry)" in text
 
 
-def test_trend_dataset_keeps_pr_and_historical_revisions() -> None:
+def test_trend_splits_pr_revisions_from_mainline_history() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
 
@@ -181,9 +181,65 @@ def test_trend_dataset_keeps_pr_and_historical_revisions() -> None:
     )[0]
 
     assert "return isServingTrendWorkload(entry);" in trend_filter
-    assert "github_pr_number" not in trend_filter
-    assert "github_pr_url" not in trend_filter
-    assert "isMainlineTrendEntry" not in text
+    assert (
+        "function getPullRequestInfo(entry, includePairedBase = false)" in trend_filter
+    )
+    assert "metadata.github_pr_number" in trend_filter
+    assert "metadata.github_pr_url" in trend_filter
+    assert "function getMainlineTrendEntries(entries)" in trend_filter
+    assert (
+        "Object.prototype.hasOwnProperty.call(TREND_MILESTONE_LABELS, commit)"
+        in trend_filter
+    )
+    assert "function getPullRequestTrendEntries(entries)" in trend_filter
+    assert (
+        "renderPerformanceTrendChart(getMainlineTrendEntries(performanceEntries));"
+        in text
+    )
+    assert "renderPullRequestComparison(performanceEntries);" in text
+
+
+def test_pr_comparison_uses_matched_scope_baselines() -> None:
+    root = Path(__file__).resolve().parents[1]
+    html = (root / "leaderboard.html").read_text(encoding="utf-8")
+    script = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    css = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
+
+    assert 'id="leaderboard-pr-chart"' in html
+    assert 'id="leaderboard-pr-empty"' in html
+    assert "function buildPullRequestComparisonModel(entries, metricConfig)" in script
+    assert "const scopeKey = getTrendSeriesKey(entry);" in script
+    assert "const pairedBaselineByPullRequestScope = new Map();" in script
+    assert "entries.filter(isPullRequestBaseEntry)" in script
+    assert "metricConfig.higherIsBetter ? rawDelta : -rawDelta" in script
+    assert "slice(0, 20)" in script
+    assert "indexAxis: 'y'" in script
+    assert ".pr-comparison" in css
+
+
+def test_mainline_trend_selects_non_regressing_milestones() -> None:
+    root = Path(__file__).resolve().parents[1]
+    script = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+
+    assert "const TREND_MILESTONE_LABELS = {" in script
+    assert "function selectMonotonicMilestoneVersions(" in script
+    assert "const regresses = observations.some" in script
+    assert "if (regresses || !advances)" in script
+    assert "const versions = selectMonotonicMilestoneVersions(" in script
+    assert "compareDisplayVersions(" in script
+    assert "所有可比 workload 均提升或持平的主线里程碑" in script
+
+
+def test_historical_recovery_data_feeds_performance_views_only() -> None:
+    root = Path(__file__).resolve().parents[1]
+    script = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    loader = (root / "assets" / "hf-data-loader.js").read_text(encoding="utf-8")
+
+    assert "historical: 'leaderboard_historical.json'" in loader
+    assert "state.historicalData = hasHistorical ? data.historical : [];" in script
+    assert "function getHistoricalPerformanceEntries(filters)" in script
+    assert "mergePerformanceEntries(" in script
+    assert "state.singleChipData = singleData.filter" in script
 
 
 def test_trend_version_key_includes_core_and_backend_commits() -> None:
@@ -273,7 +329,11 @@ def test_trend_series_discloses_real_configuration_overrides() -> None:
 def test_trend_defaults_collapse_omissions_but_keep_real_workload_drift() -> None:
     root = Path(__file__).resolve().parents[1]
     entries = []
-    for name in ("leaderboard_single.json", "leaderboard_multi.json"):
+    for name in (
+        "leaderboard_single.json",
+        "leaderboard_multi.json",
+        "leaderboard_historical.json",
+    ):
         entries.extend(json.loads((root / "data" / name).read_text(encoding="utf-8")))
 
     ignored = {"host", "port", "model"}
@@ -435,8 +495,11 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     assert "function dispatchProgress(payload, onProgress)" in text
     assert "function startBackgroundSync()" in text
     assert "startBackgroundSync," in text
-    assert "llm_engine_hf_leaderboard_cache_v6" in text
-    assert "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-3';" in text
+    assert "llm_engine_hf_leaderboard_cache_v7_historical" in text
+    assert (
+        "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-historical-1';"
+        in text
+    )
     assert (
         "const url = `${HF_CONFIG.localPath}${filename}${separator}v=${LOCAL_DATA_CACHE_BUST}`;"
         in text
@@ -1430,7 +1493,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
         "return [workload, model, hardware, chipCount, nodeCount, precision, quantization, settingSignature].join('|');"
         in js_text
     )
-    assert "展示当前范围内全部在线服务版本，包括 PR 与历史运行" in js_text
+    assert "所有可比 workload 均提升或持平的主线里程碑" in js_text
     assert "function getSelectOptionLabel(value, option, labelMapper = null)" in js_text
     assert "if (value === 'all')" in js_text
     assert "function isServingTrendWorkload(entry)" in js_text
@@ -1501,7 +1564,10 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert "function getPerformanceTrendEntries(entries, selectedWorkload)" in js_text
     assert "if (selectedWorkload !== 'all')" in js_text
     assert "return true;" in js_text
-    assert "getPerformanceTrendEntries(data, 'all')" in js_text
+    assert (
+        "const performanceEntries = getPerformanceViewEntries(data, filters);"
+        in js_text
+    )
     assert ".leaderboard-trend-panel {" in css_text
     assert ".trend-chart-wrap {" in css_text
     assert ".trend-axis-row {" in css_text
@@ -1511,7 +1577,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
 
 def test_single_chip_all_workload_auto_axis_uses_broken_axis_for_outliers() -> None:
     root = Path(__file__).resolve().parents[1]
-    data = json.loads((root / "data" / "leaderboard_single.json").read_text())
+    data = json.loads((root / "data" / "leaderboard_historical.json").read_text())
 
     values = [
         float(entry.get("metrics", {}).get("throughput_tps") or 0)
@@ -1539,7 +1605,9 @@ def test_single_chip_all_workload_auto_axis_uses_broken_axis_for_outliers() -> N
 def test_default_all_workload_trend_uses_sparse_version_union() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
-    data = json.loads((root / "data" / "leaderboard_single.json").read_text())
+    data = []
+    for name in ("leaderboard_single.json", "leaderboard_historical.json"):
+        data.extend(json.loads((root / "data" / name).read_text()))
 
     def workload(entry: dict) -> str:
         return entry.get("workload", {}).get("name", "")
@@ -1844,7 +1912,15 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 41
+    assert len(profiles["participants"]) == 43
+    pending_wang_chen = next(
+        item for item in profiles["participants"] if item["display_name"] == "王晨"
+    )
+    assert pending_wang_chen["github_login"] == "qingfengyuhuoda"
+    assert pending_wang_chen["advisor"]["zh"] == "万瑶"
+    assert pending_wang_chen["current_route"] is None
+    assert pending_wang_chen["is_current_member"] is False
+    assert pending_wang_chen["public_visibility"] == "public"
     assert len(profiles["staff_members"]) == 4
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
@@ -2046,6 +2122,12 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         people["何维"]["research_direction"]["zh"]
         == "性能优化；算法与硬件调优；方向适应性强"
     )
+    assert people["冯威"]["github_login"] == "fw1688"
+    assert people["冯威"]["role"]["zh"] == "2027 年待入学学生"
+    assert people["冯威"]["advisor"]["zh"] == "张书豪"
+    assert people["冯威"]["current_route"] is None
+    assert people["冯威"]["is_current_member"] is True
+    assert people["冯威"]["is_advised_by_shuhao"] is True
     assert people["董君瑶"]["research_direction"]["zh"] == "向量数据库"
     assert (
         people["路庆浩"]["research_direction"]["zh"]
@@ -2055,9 +2137,16 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         people["沈家乐"]["research_direction"]["zh"]
         == "KV Cache 复用；长上下文推理优化；多后端运行时适配"
     )
-    for name in ("李林浩", "余天成"):
+    for name in ("余天成",):
         assert people[name]["role"]["zh"] == "2027 年待入学学生"
         assert people[name]["advisor"]["zh"] == "张书豪"
+    assert people["李林浩"]["advisor"] is None
+    assert people["李林浩"]["is_current_member"] is False
+    assert people["李林浩"]["is_advised_by_shuhao"] is False
+    assert people["李庚"]["advisor"]["zh"] == "毛言粲"
+    assert people["李庚"]["current_route"] == "engineering"
+    assert people["李庚"]["is_current_member"] is True
+    assert people["李庚"]["is_advised_by_shuhao"] is False
     assert (
         people["余天成"]["research_direction"]["zh"]
         == "大模型推理方向待定；愿意根据课题安排探索相关研究"
@@ -2067,11 +2156,11 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["曹哲"]["advisor"]["zh"] == "张书豪"
     assert people["李庚"]["github_login"] == "Anjiangy"
     assert people["李庚"]["role"]["zh"] == "马上入学的华科研究生"
-    assert people["李庚"]["advisor"]["zh"] == "张书豪"
+    assert people["李庚"]["advisor"]["zh"] == "毛言粲"
     assert people["马俊豪"]["advisor"]["zh"] == "张书豪"
-    assert people["sunYangGitHub"]["github_login"] == "sunYangGitHub"
-    assert people["sunYangGitHub"]["role"]["zh"] == "外校实习生"
-    assert people["sunYangGitHub"]["advisor"]["zh"] == "张书豪"
+    assert people["孙杨"]["github_login"] == "sunYangGitHub"
+    assert people["孙杨"]["role"]["zh"] == "外校实习生"
+    assert people["孙杨"]["advisor"]["zh"] == "张书豪"
     assert people["杜忠承"]["github_login"] == "dzcixy"
     assert people["杜忠承"]["advisor"]["zh"] == "黄禹"
     assert people["徐晨曦"]["github_login"] == "xsun2001"

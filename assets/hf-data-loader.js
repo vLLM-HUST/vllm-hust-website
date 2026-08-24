@@ -14,6 +14,7 @@ const HF_CONFIG = {
     files: {
         single: 'leaderboard_single.json',
         multi: 'leaderboard_multi.json',
+        historical: 'leaderboard_historical.json',
         compare: 'leaderboard_compare.json',
         lastUpdated: 'last_updated.json'
     },
@@ -53,8 +54,8 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v6';
-const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260701-3';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v7_historical';
+const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-historical-1';
 const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';
 const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';
 let lastLoadedSource = null;
@@ -560,11 +561,13 @@ async function loadSnapshotFromSource(source, markerPriority = [source], options
     };
 
     const markerPromise = getLatestMarker(markerPriority);
-    const [singleData, multiData, compareData, marker] = await Promise.all([
+    const [singleData, multiData, historicalData, compareData, marker] = await Promise.all([
         loader(HF_CONFIG.files.single)
             .then((data) => notifyFileLoaded('single', normalizeEntryArray(data))),
         loader(HF_CONFIG.files.multi)
             .then((data) => notifyFileLoaded('multi', normalizeEntryArray(data))),
+        loadOptionalJson(loader, HF_CONFIG.files.historical)
+            .then((data) => notifyFileLoaded('historical', normalizeEntryArray(data))),
         loadOptionalJson(loader, HF_CONFIG.files.compare)
             .then((data) => notifyFileLoaded(
                 'compare',
@@ -576,6 +579,7 @@ async function loadSnapshotFromSource(source, markerPriority = [source], options
     const result = {
         single: singleData,
         multi: multiData,
+        historical: historicalData,
         compare: compareData,
     };
 
@@ -662,7 +666,7 @@ function startBackgroundSync() {
 
 /**
  * 加载 leaderboard 数据（远端优先，失败则本地）
- * @returns {Promise<{single: Array, multi: Array, compare: Object}>}
+ * @returns {Promise<{single: Array, multi: Array, historical: Array, compare: Object}>}
  */
 async function loadLeaderboardData(options = {}) {
     const cachedEnvelope = readCacheEnvelope();
@@ -696,7 +700,7 @@ async function loadLeaderboardData(options = {}) {
         }
     }
 
-    const result = { single: [], multi: [], compare: null };
+    const result = { single: [], multi: [], historical: [], compare: null };
 
     const loaders = {
         github: loadFromGitHub,
@@ -726,6 +730,7 @@ async function loadLeaderboardData(options = {}) {
             });
             result.single = snapshot.data.single;
             result.multi = snapshot.data.multi;
+            result.historical = snapshot.data.historical;
             result.compare = snapshot.data.compare;
 
             writeCache(result, snapshot.marker);
