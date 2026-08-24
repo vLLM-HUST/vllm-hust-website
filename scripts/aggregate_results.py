@@ -54,9 +54,11 @@ VALID_BASELINE_STATUSES = {
 }
 PUBLIC_BASELINE_ENGINE = "vllm"
 PUBLIC_BASELINE_VERSION = "0.18.0"
+PUBLIC_PRODUCTION_TRACE_BASELINE_VERSION = "0.22.1rc1"
 PUBLIC_CURRENT_ENGINE = "vllm-hust"
 RETIRED_BASELINE_TOKENS = ("v0.11.0", "v0110", "0.11.0")
 OFFICIAL_PUBLIC_WORKLOADS = {
+    "burstgpt-production-replay",
     "instructcoder-online",
     "prefix-repetition-online",
     "random-latency",
@@ -64,9 +66,15 @@ OFFICIAL_PUBLIC_WORKLOADS = {
     "sharegpt-online",
     "sharegpt-throughput",
     "sonnet-throughput",
+    "tracelab-coding-agent-replay",
     "visionarena-online",
 }
 OFFICIAL_V0180_SPEC_PREFIX = "official-ascend-jan-2026-v0.18.0-"
+OFFICIAL_PRODUCTION_TRACE_SPEC_PREFIX = "official-ascend-jan-2026-v0.22.1rc1-"
+OFFICIAL_CURRENT_SPEC_PREFIXES = (
+    OFFICIAL_V0180_SPEC_PREFIX,
+    OFFICIAL_PRODUCTION_TRACE_SPEC_PREFIX,
+)
 CANONICAL_MODEL_ID_PATTERN = re.compile(
     r"^(?P<registry>[a-z0-9][a-z0-9_-]*):(?P<repo_id>.+)$"
 )
@@ -75,7 +83,7 @@ GOAL_BASELINE_TARGET = {
     "id": "official-ascend-jan-2026-v0.18.0",
     "label": "Official vLLM 0.18.0 + vllm-ascend v0.18.0",
     "engine": "vllm",
-    "engine_version_prefix": "0.",
+    "engine_version": PUBLIC_BASELINE_VERSION,
     "github_repository": "vllm-project/vllm-ascend",
     "vllm_commit": "bcf2be96120005e9aea171927f85055a6a5c0cf6",  # pragma: allowlist secret
     "vllm_ascend_ref": "v0.18.0",
@@ -540,14 +548,14 @@ def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
     spec_id = str(same_spec.get("spec_id") or "")
     official_public_candidate = is_public_official_candidate(entry)
 
-    if (
-        official_public_candidate
-        and engine == PUBLIC_BASELINE_ENGINE
-        and engine_version != PUBLIC_BASELINE_VERSION
-    ):
-        return (
-            f"public vllm baseline is {engine_version!r}, not {PUBLIC_BASELINE_VERSION}"
+    if official_public_candidate and engine == PUBLIC_BASELINE_ENGINE:
+        expected_version = (
+            PUBLIC_PRODUCTION_TRACE_BASELINE_VERSION
+            if spec_id.startswith(OFFICIAL_PRODUCTION_TRACE_SPEC_PREFIX)
+            else PUBLIC_BASELINE_VERSION
         )
+        if engine_version != expected_version:
+            return f"public vllm baseline is {engine_version!r}, not {expected_version}"
 
     if contains_retired_baseline_token(engine_version):
         return f"retired baseline token in engine_version {engine_version!r}"
@@ -558,10 +566,10 @@ def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
     if engine == PUBLIC_CURRENT_ENGINE and official_public_candidate:
         if not spec_id:
             return "official vllm-hust workload is missing same_spec"
-        if not spec_id.startswith(OFFICIAL_V0180_SPEC_PREFIX):
-            return f"official vllm-hust workload uses non-v0.18.0 spec {spec_id!r}"
+        if not spec_id.startswith(OFFICIAL_CURRENT_SPEC_PREFIXES):
+            return f"official vllm-hust workload uses unadmitted spec {spec_id!r}"
 
-    if spec_id.startswith(OFFICIAL_V0180_SPEC_PREFIX):
+    if spec_id.startswith(OFFICIAL_CURRENT_SPEC_PREFIXES):
         expected_chip = "910B2" if spec_id.endswith("-910b2") else None
         entry_precision = str(model.get("precision") or "")
         spec_precision = str(same_spec.get("model_precision") or "")
@@ -569,14 +577,14 @@ def public_snapshot_rejection_reason(entry: dict[str, Any]) -> str | None:
         spec_chip = str(same_spec.get("hardware_chip_model") or "")
         if not spec_precision or entry_precision != spec_precision:
             return (
-                "official v0.18.0 precision mismatch: "
+                "official target precision mismatch: "
                 f"entry={entry_precision!r} same_spec={spec_precision!r}"
             )
         if expected_chip and (
             entry_chip != expected_chip or spec_chip != expected_chip
         ):
             return (
-                "official v0.18.0 hardware mismatch: "
+                "official target hardware mismatch: "
                 f"entry={entry_chip!r} same_spec={spec_chip!r} expected={expected_chip!r}"
             )
 
@@ -1024,6 +1032,9 @@ def build_compare_engine_summary(entry: dict[str, Any]) -> dict[str, Any]:
         "canonical_path": entry.get("canonical_path"),
         "github_repository": metadata.get("github_repository"),
         "git_commit": metadata.get("git_commit"),
+        "verified": metadata.get("verified") is True,
+        "official_admission_status": metadata.get("official_admission_status"),
+        "official_admission_reason": metadata.get("official_admission_reason"),
         "same_spec": {
             "spec_id": get_same_spec_id(entry),
             "resolved_spec_hash": get_same_spec_hash(entry),
@@ -1619,45 +1630,28 @@ def normalize_engine_name(entry: dict[str, Any]) -> str:
 
 
 def is_goal_baseline_entry(entry: dict[str, Any]) -> bool:
+    """Return True only for the exact active official goal baseline.
+
+    The goal-progress/headline numbers must be anchored to the single active
+    target declared in ``GOAL_BASELINE_TARGET``: exact engine, exact
+    ``engine_version`` (0.18.0), exact ancestry repository, and the exact
+    runtime provenance commit declared by that target.  Broad 0.x prefixes
+    (0.17.2rc0, 0.17.2.post1, future 0.x releases) and unbound historical
+    entries therefore never drive official goal/headline numbers.
+    """
     metadata = entry.get("metadata") or {}
     engine = (
         str(entry.get("engine") or metadata.get("engine") or "unknown").strip().lower()
     )
     engine_version = get_entry_engine_version(entry)
     github_repository = str(metadata.get("github_repository") or "").strip().lower()
+    git_commit = str(metadata.get("git_commit") or "").strip()
     return (
         engine == GOAL_BASELINE_TARGET["engine"]
-        and engine_version.startswith(GOAL_BASELINE_TARGET["engine_version_prefix"])
+        and engine_version == GOAL_BASELINE_TARGET["engine_version"]
         and github_repository == GOAL_BASELINE_TARGET["github_repository"]
+        and git_commit == GOAL_BASELINE_TARGET["vllm_ascend_commit"]
     )
-
-
-def build_goal_baseline_target(baseline_entry: dict[str, Any]) -> dict[str, Any]:
-    """Build a baseline target dict that reflects the actual baseline run.
-
-    The static ``GOAL_BASELINE_TARGET`` is only used as a match template. The
-    public goal-progress snapshot needs an ``id``/``label`` that names the
-    specific baseline version (e.g. ``official-ascend-2026-v0.17.2rc0``), so we
-    derive those fields from the matched baseline entry.
-    """
-    metadata = baseline_entry.get("metadata") or {}
-    engine_version = get_entry_engine_version(baseline_entry)
-    date_str = (
-        str(metadata.get("release_date") or "").strip()
-        or str(metadata.get("submitted_at") or "").strip()[:10]
-    )
-    year = date_str[:4] if len(date_str) >= 4 and date_str[:4].isdigit() else ""
-    if not year:
-        year = str(datetime.now(UTC).year)
-
-    return {
-        "id": f"official-ascend-{year}-v{engine_version}",
-        "label": (f"Official vLLM {engine_version} + vllm-ascend {engine_version}"),
-        "engine": GOAL_BASELINE_TARGET["engine"],
-        "engine_version": engine_version,
-        "github_repository": GOAL_BASELINE_TARGET["github_repository"],
-        "vllm_commit": str(metadata.get("git_commit") or "").strip() or None,
-    }
 
 
 def compute_remaining_gap(
@@ -1849,7 +1843,7 @@ def build_goal_progress_snapshot(entries: list[dict[str, Any]]) -> dict[str, Any
         current_entry, baseline_entry = goal_pair
         current_summary = build_compare_engine_summary(current_entry)
         baseline_summary = build_compare_engine_summary(baseline_entry)
-        baseline_target = build_goal_baseline_target(baseline_entry)
+        baseline_target = dict(GOAL_BASELINE_TARGET)
         baseline_targets.append(baseline_target)
         payload = {
             "scope_key": scope_key,

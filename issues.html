@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Issues - vllm-hust</title>
+  <meta name="description" content="Active benchmark issues and their pull-request progress across the vLLM-HUST benchmark repository." />
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/issues.html" />
+  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css?v=site-structure-20260816" />
+  <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816" />
+</head>
+
+<body data-page="issues">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small id="brand-tagline">Domestic-compute inference engine</small></span></a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
+        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
+        <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
+        <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
+        <a id="nav-issues" class="nav-link" data-nav-page="issues" href="./issues.html">Issues</a>
+      </div>
+    </div>
+  </nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+
+  <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
+
+  <main class="site-shell">
+    <section class="page-hero">
+      <div class="content-panel">
+        <span id="issues-eyebrow" class="eyebrow">Tracking</span>
+        <h1 id="issues-title" style="margin-top: 16px">Issues</h1>
+        <p id="issues-lede" class="hero-lede">Active benchmark issues and their pull-request progress across the vLLM-HUST benchmark repository.</p>
+      </div>
+    </section>
+
+    <div id="issues-loading" class="loading-state">Loading issues...</div>
+    <div id="issues-error" class="empty-state" style="display: none">Failed to load issues data.</div>
+
+    <div id="issues-content" style="display: none">
+      <section class="content-panel">
+        <div class="section-head">
+          <div>
+            <span id="issues-stats-kicker" class="eyebrow">Snapshot</span>
+            <h2 id="issues-stats-title">Current tracking snapshot</h2>
+          </div>
+        </div>
+        <div class="metric-strip">
+          <div class="metric-box"><span id="issue-stat-total-label">Total issues</span><strong id="issue-stat-total">0</strong></div>
+          <div class="metric-box"><span id="issue-stat-prs-label">Open PRs</span><strong id="issue-stat-prs">0</strong></div>
+          <div class="metric-box"><span id="issue-stat-blocked-label">Blocked</span><strong id="issue-stat-blocked">0</strong></div>
+          <div class="metric-box"><span id="issue-stat-draft-label">Draft</span><strong id="issue-stat-draft">0</strong></div>
+        </div>
+      </section>
+
+      <section class="content-panel" aria-labelledby="issues-list-title">
+        <div class="section-head">
+          <div>
+            <span id="issues-list-kicker" class="eyebrow">Tracked issues</span>
+            <h2 id="issues-list-title">Benchmark issues and PR progress</h2>
+          </div>
+        </div>
+        <div id="issue-list" class="issue-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer"><strong>vllm-hust</strong> · <span id="issues-footer-copy">Benchmark issue tracking and PR progress.</span></footer>
+
+  <script>
+    window.vllmHustPageDict = {
+      en: {
+        title: 'Issues - vllm-hust',
+        'brand-tagline': 'Domestic-compute inference engine',
+        'issues-eyebrow': 'Tracking',
+        'issues-title': 'Issues',
+        'issues-lede': 'Active benchmark issues and their pull-request progress across the vLLM-HUST benchmark repository.',
+        'issues-loading': 'Loading issues...',
+        'issues-error': 'Failed to load issues data.',
+        'issues-stats-kicker': 'Snapshot',
+        'issues-stats-title': 'Current tracking snapshot',
+        'issue-stat-total-label': 'Total issues',
+        'issue-stat-prs-label': 'Open PRs',
+        'issue-stat-blocked-label': 'Blocked',
+        'issue-stat-draft-label': 'Draft',
+        'issues-list-kicker': 'Tracked issues',
+        'issues-list-title': 'Benchmark issues and PR progress',
+        'issues-footer-copy': 'Benchmark issue tracking and PR progress.'
+      },
+      zh: {
+        title: '议题 - vllm-hust',
+        'brand-tagline': '面向国产算力的推理引擎',
+        'issues-eyebrow': '追踪',
+        'issues-title': '议题',
+        'issues-lede': 'vLLM-HUST benchmark 仓库中正在推进的议题及其 PR 进展。',
+        'issues-loading': '正在加载议题数据...',
+        'issues-error': '议题数据加载失败。',
+        'issues-stats-kicker': '快照',
+        'issues-stats-title': '当前追踪快照',
+        'issue-stat-total-label': '议题总数',
+        'issue-stat-prs-label': '开放 PR',
+        'issue-stat-blocked-label': '阻塞',
+        'issue-stat-draft-label': '草稿',
+        'issues-list-kicker': '追踪议题',
+        'issues-list-title': 'Benchmark 议题与 PR 进展',
+        'issues-footer-copy': 'Benchmark 议题追踪与 PR 进展。'
+      }
+    };
+    window.vllmHustIssuesDataUrl = './data/issues.json';
+  </script>
+  <script src="./assets/site.js?v=site-structure-20260816"></script>
+  <script src="./assets/issues-page.js?v=issue-tracking-page-20260804"></script>
+</body>
+
+</html>

@@ -90,14 +90,12 @@ The only supported leaderboard data chain is:
 1. Website sync workflow mirrors those benchmark snapshot files for offline/static fallback:
    - `data/leaderboard_single.json`
    - `data/leaderboard_multi.json`
-   - `data/leaderboard_historical.json`
+   - `data/leaderboard_historical.json` (recovered trend-only records)
    - `data/leaderboard_compare.json`
    - `data/last_updated.json`
 
 Leaderboard rendering consumes benchmark GitHub raw snapshots first, then HF, then the checked-in
 website mirror. `leaderboard_compare.json` provides neutral engine-vs-engine head-to-head views.
-`leaderboard_historical.json` is the auditable recovered trend projection; it is used by the trend
-and PR charts, not mixed into the formally admitted table rows.
 
 Leaderboard version rendering follows a split UI contract:
 
@@ -203,26 +201,3 @@ export WEBSITE_PORT=8000
 export WEBSITE_ROOT_DIR=/path/to/vllm-hust-website
 export WEBSITE_SYSTEMD_SERVICE_NAME=vllm-hust-website
 ```
-
-## Changzheng Public Download Sync
-
-`changzheng-desktop` 在 Windows 构建机完成安装包归档后，会先上传到 Hugging Face dataset，再由 website 定时拉取并发布：
-
-- `release/windows/LATEST.json`
-- `release/windows/RELEASES.json`
-- 版本化 `.msi` / `.exe`
-- 对应 `.sha256`
-
-website 仓库是 public，因此可直接把这些文件同步到站点静态目录：
-
-- Hugging Face 路径：`intellistream/llm-engine-benchmark-results/changzheng/windows`
-- 目标目录：`downloads/changzheng/windows/`
-- 首页摘要数据：`data/changzheng_release.json`
-- 本地同步脚本：`scripts/sync_changzheng_release.py`
-- 自动拉取 workflow：`.github/workflows/sync-changzheng-hf-release.yml`
-
-同步完成后：
-
-- 首页长征区块会直接指向公开 `.msi/.exe`
-- 独立下载页位于 `downloads/changzheng/windows/index.html`
-- 下载页会展示全部产物与 SHA256 校验信息

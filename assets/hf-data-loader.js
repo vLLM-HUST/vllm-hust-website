@@ -26,8 +26,8 @@ const HF_CONFIG = {
     // 前端缓存，避免频繁刷新时重复全量拉取
     cacheTTLms: 5 * 60 * 1000,
 
-    // Remote-first mode keeps the visible leaderboard fresh. Marker checks run
-    // alongside data downloads so they do not add another network round trip.
+    // The atomic bundled snapshot paints immediately. Marker checks and remote
+    // refreshes run after first paint so a slow data host cannot blank the chart.
     validateWithMarker: true,
 
     // 首屏展示后，在后台校验远端快照是否更新。
@@ -37,14 +37,24 @@ const HF_CONFIG = {
     // 再交给后台同步补齐最新远端数据。
     cacheMarkerTimeoutMs: 1200,
 
+    // A stalled remote must not leave the stable-trend screen on a spinner.
+    // The bundled snapshot is an atomic publication mirror and takes over once
+    // the remote request budget is exhausted.
+    remoteRequestTimeoutMs: 4500,
+    canonicalIdentityTimeoutMs: 1200,
+
+    // When the first remote attempt already timed out, do not immediately
+    // repeat the same requests behind a successfully rendered local snapshot.
+    offlineRetryDelayMs: 2500,
+
     // Hugging Face 远端使用镜像，官方站点作为回退
     endpoints: [
         'https://hf-mirror.com',
         'https://huggingface.co'
     ],
 
-    // 数据源优先级：远端快照优先，站点内置快照作为兜底。
-    sources: ['github', 'hf', 'local'],
+    // 数据源优先级：随站原子快照首屏展示，GitHub 在后台校验并刷新。
+    sources: ['local', 'github'],
 
     // GitHub 仓库配置（用于不依赖 HF 的数据发布方式）
     github: {
@@ -54,8 +64,8 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v7_historical';
-const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260816-historical-1';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v11_stable_trend';
+const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260817-stable-trend-2';
 const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';
 const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';
 let lastLoadedSource = null;
@@ -206,6 +216,24 @@ function withTimeout(promise, timeoutMs, label) {
     });
 }
 
+async function fetchWithTimeout(url, options = {}, label = 'Remote leaderboard request') {
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    const timeoutId = controller
+        ? setTimeout(() => controller.abort(), HF_CONFIG.remoteRequestTimeoutMs)
+        : null;
+    try {
+        return await withTimeout(
+            fetch(url, { ...options, ...(controller ? { signal: controller.signal } : {}) }),
+            HF_CONFIG.remoteRequestTimeoutMs,
+            label
+        );
+    } finally {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+    }
+}
+
 async function getLatestMarkerWithTimeout(sourcePriority, timeoutMs) {
     try {
         return await withTimeout(
@@ -285,7 +313,93 @@ function isCompareSnapshotUsable(compareSnapshot) {
     return Array.isArray(compareSnapshot.groups);
 }
 
+function isSnapshotEmpty(snapshot) {
+    const single = Array.isArray(snapshot?.single) ? snapshot.single : [];
+    const multi = Array.isArray(snapshot?.multi) ? snapshot.multi : [];
+    const historical = Array.isArray(snapshot?.historical) ? snapshot.historical : [];
+    return single.length === 0 && multi.length === 0 && historical.length === 0;
+}
+
+// -------------------------------------------------------------------------
+// Publication identity (issue #205)
+//
+// The canonical source's atomic publication marker is authoritative, including
+// an intentionally empty snapshot. A fallback source may only replace an
+// unavailable canonical source when it carries the exact same publication
+// identity (atomic marker + target-registry checksum) - never merely because it
+// is non-empty.
+// -------------------------------------------------------------------------
+
+function getEntryTargetRegistryHash(entry) {
+    return String(
+        entry?.target_registry_sha256
+            || entry?.metadata?.target_registry_sha256
+            || ''
+    ).trim();
+}
+
+// Consensus target-registry checksum across single/multi/compare of one
+// publication. Returns the shared hash, '' when no entry declares one, or null
+// when entries disagree (mixed generations - never mergeable).
+function getPublicationTargetRegistryFingerprint(result) {
+    const hashes = new Set();
+    const collect = (entries) => {
+        (Array.isArray(entries) ? entries : []).forEach((entry) => {
+            const hash = getEntryTargetRegistryHash(entry);
+            if (hash) {
+                hashes.add(hash);
+            }
+        });
+    };
+    collect(result?.single);
+    collect(result?.multi);
+    const groups = Array.isArray(result?.compare?.groups) ? result.compare.groups : [];
+    groups.forEach((group) => {
+        collect(group?.engines);
+    });
+    if (hashes.size > 1) {
+        return null;
+    }
+    return hashes.size === 1 ? [...hashes][0] : '';
+}
+
+function buildPublicationIdentity(result, marker) {
+    return {
+        marker: String(marker || '').trim(),
+        targetRegistry: getPublicationTargetRegistryFingerprint(result),
+    };
+}
+
+// Two identities match only when every declared component agrees. A marker
+// (atomic publication ID) or checksum present on either side must match; a
+// mixed-generation fingerprint (null) never matches because the files cannot
+// be atomically reconciled.
+function publicationIdentitiesMatch(a, b) {
+    if (!a || !b) {
+        return false;
+    }
+    if (a.targetRegistry === null || b.targetRegistry === null) {
+        return false;
+    }
+    if (a.marker && b.marker && a.marker !== b.marker) {
+        return false;
+    }
+    if (a.targetRegistry && b.targetRegistry && a.targetRegistry !== b.targetRegistry) {
+        return false;
+    }
+    return true;
+}
+
 function assertUsableLeaderboardPayload(result, source) {
+    // Issue #200: a snapshot with zero benchmark records cannot populate the
+    // leaderboard. Treat it as unusable so the loader falls through to the next
+    // source instead of returning an empty page while other sources still hold data.
+    if (isSnapshotEmpty(result)) {
+        const emptyError = new Error(`Empty leaderboard snapshot from ${source}: no benchmark records`);
+        emptyError.isEmptySnapshot = true;
+        throw emptyError;
+    }
+
     if (isCompareSnapshotUsable(result.compare)) {
         return;
     }
@@ -459,7 +573,7 @@ async function loadFromHuggingFace(filename) {
         const url = buildDatasetResolveUrl(endpoint, filename);
         console.log(`[HF Loader] Fetching: ${url}`);
         try {
-            const response = await fetch(url, {
+            const response = await fetchWithTimeout(url, {
                 headers: {
                     'Accept': 'application/json'
                 },
@@ -505,7 +619,7 @@ async function loadFromGitHub(filename) {
     const url = buildGitHubRawUrl(filename);
     console.log(`[HF Loader] Fetching GitHub raw: ${url}`);
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
         headers: {
             'Accept': 'application/json'
         },
@@ -655,6 +769,10 @@ function startBackgroundSync() {
     }
 
     const run = () => syncRemoteSnapshotInBackground();
+    if (getLastLoadedSource() === 'local') {
+        window.setTimeout(run, HF_CONFIG.offlineRetryDelayMs);
+        return backgroundSyncPromise || Promise.resolve(null);
+    }
     if (typeof window.requestIdleCallback === 'function') {
         window.requestIdleCallback(run, { timeout: 2500 });
         return backgroundSyncPromise || Promise.resolve(null);
@@ -700,52 +818,113 @@ async function loadLeaderboardData(options = {}) {
         }
     }
 
-    const result = { single: [], multi: [], historical: [], compare: null };
-
-    const loaders = {
-        github: loadFromGitHub,
-        hf: loadFromHuggingFace,
-        local: loadFromLocal,
-    };
-
     const sourcePriority = getSourcePriority();
-    let lastError = null;
+    const canonicalSource = sourcePriority[0];
 
-    for (const source of sourcePriority) {
-        const loader = loaders[source];
-        if (!loader) {
-            continue;
-        }
-        if (source === 'local' && !HF_CONFIG.fallbackToLocal) {
-            continue;
-        }
-
-        try {
-            console.log(`[HF Loader] Loading from ${source}...`);
-            const markerPriority = source === 'local'
-                ? ['local']
-                : [source, ...sourcePriority.filter((item) => item !== source)];
-            const snapshot = await loadSnapshotFromSource(source, markerPriority, {
-                onProgress: options.onProgress
-            });
-            result.single = snapshot.data.single;
-            result.multi = snapshot.data.multi;
-            result.historical = snapshot.data.historical;
-            result.compare = snapshot.data.compare;
-
-            writeCache(result, snapshot.marker);
-            setLastLoadedSource(source);
-            console.log(
-                `[HF Loader] ✅ Loaded from ${source}: ${result.single.length} single, ${result.multi.length} multi`
+    // 1. The canonical source is authoritative - even when it publishes an
+    // intentional empty snapshot. Never fall through to stale downstream data
+    // merely because it still holds records (issue #205).
+    try {
+        console.log(`[HF Loader] Loading canonical from ${canonicalSource}...`);
+        const canonical = await loadSnapshotFromSource(canonicalSource, sourcePriority, {
+            onProgress: options.onProgress
+        });
+        writeCache(canonical.data, canonical.marker);
+        setLastLoadedSource(canonicalSource);
+        console.log(
+            `[HF Loader] ✅ Loaded canonical from ${canonicalSource}: ` +
+            `${canonical.data.single.length} single, ${canonical.data.multi.length} multi`
+        );
+        return canonical.data;
+    } catch (canonicalError) {
+        if (canonicalError?.isEmptySnapshot) {
+            // Canonical is reachable but intentionally empty -> authoritative
+            // empty/admission state. Do not revive older HF/local records.
+            writeCache({ single: [], multi: [], historical: [], compare: null }, null);
+            setLastLoadedSource(canonicalSource);
+            console.warn(
+                `[HF Loader] ⚠️ Canonical ${canonicalSource} published an empty snapshot; ` +
+                'showing empty admission state'
             );
-            return result;
-        } catch (error) {
-            lastError = error;
-            console.warn(`[HF Loader] ⚠️ ${source} load failed:`, error?.message || error);
+            return { single: [], multi: [], historical: [], compare: null };
         }
+
+        // Canonical is network-unavailable. Fall back ONLY to an exact mirrored
+        // publication carrying the same atomic publication identity.
+        console.warn(`[HF Loader] ⚠️ Canonical ${canonicalSource} unavailable:`, canonicalError?.message || canonicalError);
+        const expectedIdentity = await getExpectedCanonicalIdentity(sourcePriority);
+        if (!expectedIdentity) {
+            console.warn('[HF Loader] ⚠️ Canonical publication identity unknown; cannot verify any fallback');
+            return { single: [], multi: [], historical: [], compare: null, staleness: 'no-verified-fallback' };
+        }
+
+        // The bundled site snapshot was copied from the canonical publication
+        // at build time. Prefer it over another network hop during an outage so
+        // the stable-trend screen has a bounded first paint.
+        const fallbackSources = sourcePriority.slice(1).sort((left, right) => {
+            if (left === 'local') return -1;
+            if (right === 'local') return 1;
+            return 0;
+        });
+        for (const source of fallbackSources) {
+            if (source === 'local' && !HF_CONFIG.fallbackToLocal) {
+                continue;
+            }
+            try {
+                console.log(`[HF Loader] Checking fallback ${source}...`);
+                const snapshot = await loadSnapshotFromSource(source, [source], {
+                    onProgress: options.onProgress
+                });
+                const actual = buildPublicationIdentity(snapshot.data, snapshot.marker);
+                if (publicationIdentitiesMatch(actual, expectedIdentity)) {
+                    writeCache(snapshot.data, snapshot.marker);
+                    setLastLoadedSource(source);
+                    console.log(
+                        `[HF Loader] ✅ Fallback ${source} matched canonical publication: ` +
+                        `${snapshot.data.single.length} single, ${snapshot.data.multi.length} multi`
+                    );
+                    return snapshot.data;
+                }
+                console.warn(`[HF Loader] ⚠️ Fallback ${source} identity mismatch; skipping`);
+            } catch (fallbackError) {
+                console.warn(`[HF Loader] ⚠️ Fallback ${source} unavailable:`, fallbackError?.message || fallbackError);
+            }
+        }
+
+        console.warn('[HF Loader] ⚠️ No fallback matched the canonical publication identity');
+        return { single: [], multi: [], historical: [], compare: null, staleness: 'no-verified-fallback' };
+    }
+}
+
+// Resolve the canonical source's atomic publication identity when its data files
+// are network-unavailable. Only an exact mirrored publication may be used as a
+// fallback, so we must know what the canonical publication is before trusting one.
+async function getExpectedCanonicalIdentity(sourcePriority) {
+    const canonical = sourcePriority[0];
+    const marker = await getLatestMarkerWithTimeout(
+        [canonical],
+        HF_CONFIG.canonicalIdentityTimeoutMs
+    );
+    if (marker) {
+        return { marker: String(marker || '').trim(), targetRegistry: '' };
     }
 
-    throw new Error(lastError?.message || 'Failed to load leaderboard data from all sources');
+    // The local marker is pinned together with all bundled JSON files in the
+    // same website release. It is therefore a trustworthy publication identity
+    // when the live canonical marker cannot be reached, unlike an arbitrary
+    // browser cache or an unversioned mirror.
+    try {
+        const bundledMarker = await loadFromLocal(HF_CONFIG.files.lastUpdated);
+        if (bundledMarker?.last_updated) {
+            return {
+                marker: String(bundledMarker.last_updated).trim(),
+                targetRegistry: '',
+            };
+        }
+    } catch (_e) {
+        // No pinned local publication is available; fail closed below.
+    }
+    return null;
 }
 
 /**
@@ -802,7 +981,7 @@ async function getLastUpdated() {
         // Fallback: HF Datasets API repo metadata
         for (const endpoint of getUniqueEndpoints()) {
             const url = buildDatasetApiUrl(endpoint);
-            const response = await fetch(url);
+            const response = await fetchWithTimeout(url);
             if (response.ok) {
                 const info = await response.json();
                 return info.lastModified || null;

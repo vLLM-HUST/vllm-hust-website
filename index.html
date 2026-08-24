@@ -4,18 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>vLLM-HUST | Inference Engine for Domestic Compute</title>
-  <meta name="description" content="An upstream-compatible inference engine for domestic compute and a proving ground for reusable serving mechanisms, tools, and integration branches." />
+  <meta name="description" content="A usable, verifiable inference platform for domestic compute—connecting upstream compatibility, system innovation, and public evidence." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="vLLM-HUST" />
-  <meta property="og:description" content="An inference engine for domestic compute and a proving ground for reusable serving mechanisms." />
+  <meta property="og:description" content="A usable, verifiable inference platform connecting domestic compute, system innovation, and public evidence." />
   <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/ecosystem-infrastructure.png" />
   <meta property="og:url" content="https://vllm-hust.sage.org.ai/" />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=upstream-qwen-community-20260727" />
-  <link rel="stylesheet" href="./assets/home.css?v=integration-branches-20260727" />
+  <link rel="stylesheet" href="./assets/site.css?v=site-structure-20260816" />
+  <link rel="stylesheet" href="./assets/home.css?v=ride-ecosystem-20260817-2" />
 </head>
 <body data-page="home">
   <nav class="site-nav">
@@ -31,6 +31,7 @@
         <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
         <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
         <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
+        <a id="nav-issues" class="nav-link" data-nav-page="issues" href="./issues.html">Issues</a>
       </div>
     </div>
   </nav>
@@ -38,92 +39,152 @@
 
   <main id="top" class="execution-home">
     <section class="execution-hero" aria-labelledby="home-title">
-      <img class="execution-hero-media" src="./assets/brand/ecosystem-infrastructure.png" alt="" width="1944" height="809" />
+      <div class="inference-fabric" aria-hidden="true">
+        <svg viewBox="0 0 1040 820" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="fabric-lane" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#39c6ca"/><stop offset=".56" stop-color="#f0b341"/><stop offset="1" stop-color="#ee765a"/></linearGradient>
+            <radialGradient id="fabric-core"><stop stop-color="#f0b341" stop-opacity=".26"/><stop offset="1" stop-color="#f0b341" stop-opacity="0"/></radialGradient>
+          </defs>
+          <g class="fabric-grid"><path d="M0 90H1040M0 190H1040M0 290H1040M0 390H1040M0 490H1040M0 590H1040M0 690H1040M120 0V820M220 0V820M320 0V820M420 0V820M520 0V820M620 0V820M720 0V820M820 0V820M920 0V820"/></g>
+          <circle cx="630" cy="410" r="340" fill="url(#fabric-core)"/>
+          <g class="fabric-traces"><path d="M80 190H318L382 254"/><path d="M80 630H318L382 566"/><path d="M958 190H822L758 254"/><path d="M958 630H822L758 566"/><path d="M80 410H358"/><path d="M782 410H958"/><path d="M570 70V198"/><path d="M570 622V750"/></g>
+          <g class="fabric-chip">
+            <rect x="370" y="210" width="400" height="400" rx="12"/><rect class="die" x="420" y="260" width="300" height="300" rx="5"/>
+            <path d="M450 302H690M450 356H690M450 410H690M450 464H690M450 518H690M470 282V538M530 282V538M590 282V538M650 282V538"/>
+          </g>
+          <g class="fabric-flow" stroke="url(#fabric-lane)"><path d="M438 328H698M438 410H698M438 492H698"/></g>
+          <g class="fabric-nodes"><circle cx="470" cy="328" r="6"/><circle cx="590" cy="410" r="9"/><circle cx="650" cy="492" r="6"/></g>
+          <g class="fabric-labels"><text x="92" y="172">REQUEST</text><text x="836" y="172">TOKENS</text><text x="454" y="238">INFERENCE FABRIC / 03</text><text x="468" y="388">SCHEDULE · EXECUTE · VERIFY</text></g>
+        </svg>
+      </div>
       <div class="execution-hero-shade"></div>
       <div class="execution-hero-copy">
         <p id="home-eyebrow" class="execution-signal"><span></span>Domestic compute · inference engine / 03</p>
         <h1 id="home-title">vLLM-HUST</h1>
-        <p id="home-kicker" class="execution-kicker">A domestic-compute inference engine—and a proving ground for reusable serving mechanisms.</p>
-        <p id="home-lede" class="execution-lede">vLLM-HUST provides the serving runtime. Scheduling, KV state, decoding, quantization, compiler, and hardware work is integrated here and kept behind clear boundaries for independent adoption.</p>
+        <p id="home-kicker" class="execution-kicker">Turn domestic compute into usable, verifiable inference.</p>
+        <p id="home-lede" class="execution-lede">One engine connects upstream compatibility, system innovation, and public evidence.</p>
         <div class="execution-actions">
-          <a id="home-primary-cta" class="execution-button primary" href="./leaderboard.html">Explore leaderboard <span aria-hidden="true">→</span></a>
+          <a id="home-primary-cta" class="execution-button primary" href="#products">Explore products <span aria-hidden="true">↓</span></a>
           <a id="home-github-cta" class="execution-button quiet" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">Open GitHub <span aria-hidden="true">↗</span></a>
         </div>
       </div>
       <dl class="execution-metrics" aria-label="vLLM-HUST overview">
-        <div><dt id="home-fact-1-label">Engine</dt><dd id="home-fact-1-value">upstream-compatible runtime</dd></div>
-        <div><dt id="home-fact-2-label">Mechanisms</dt><dd id="home-fact-2-value">scheduling + state + execution</dd></div>
-        <div><dt id="home-fact-3-label">Evidence</dt><dd id="home-fact-3-value">multi-backend validation</dd></div>
+        <div><dt id="home-fact-1-label">Usable</dt><dd id="home-fact-1-value">OpenAI-compatible entry</dd></div>
+        <div><dt id="home-fact-2-label">Evolvable</dt><dd id="home-fact-2-value">portable serving mechanisms</dd></div>
+        <div><dt id="home-fact-3-label">Verifiable</dt><dd id="home-fact-3-value">public benchmark evidence</dd></div>
       </dl>
     </section>
 
-    <section class="execution-scope" aria-label="vLLM-HUST technical scope">
-      <span id="scope-runtime" data-code="01">Scheduling plugins</span>
-      <span id="scope-cache" data-code="02">State + KV tools</span>
-      <span id="scope-compiler" data-code="03">Compiler + kernels</span>
-      <span id="scope-kernels" data-code="04">Hardware adapters</span>
-      <span id="scope-hardware" data-code="05">Benchmark evidence</span>
+    <nav class="execution-scope" aria-label="Homepage sections">
+      <a id="scope-products" data-code="01" href="#products">Products &amp; apps</a>
+      <a id="scope-engine" data-code="02" href="#stack">Engine</a>
+      <a id="scope-projects" data-code="03" href="#projects">Projects</a>
+      <a id="scope-ecosystem" data-code="04" href="#ecosystem">Ecosystem</a>
+    </nav>
+
+    <section class="execution-section execution-products" id="products" aria-labelledby="products-title">
+      <div class="execution-section-head">
+        <div><p id="products-eyebrow" class="execution-eyebrow">Products &amp; applications</p><h2 id="products-title">From inference operations to agent applications.</h2></div>
+        <p id="products-summary">Workstation operates vLLM-HUST. Sage Mate is an application built with SAGE and backed by vLLM-HUST.</p>
+      </div>
+      <div class="product-grid">
+        <article class="product-card product-card-workstation" data-code="01" aria-labelledby="product-workstation-name">
+          <div class="product-card-topline"><span>01 / INFER + OBSERVE</span><span id="product-workstation-type" class="product-type">Inference operations</span></div>
+          <h3 id="product-workstation-name">vLLM-HUST Workstation</h3>
+          <p id="product-workstation-positioning" class="product-positioning">One workspace to serve models, observe performance, and operate the Ascend inference stack.</p>
+          <a id="product-workstation-cta" class="product-cta" data-product-id="workstation"><span id="product-workstation-cta-copy">Open Workstation</span><span aria-hidden="true">↗</span></a>
+          <div class="product-visual workstation-visual" aria-hidden="true">
+            <div class="workstation-console-head"><span>ENGINE / LIVE</span><i></i></div>
+            <div class="workstation-pipeline"><span>MODEL</span><b></b><span>ENGINE</span><b></b><span>ASCEND</span></div>
+            <div class="workstation-metrics"><span><strong>OPENAI</strong><small>API</small></span><span><strong>LIVE</strong><small>METRICS</small></span><span><strong>ASCEND</strong><small>BACKEND</small></span></div>
+          </div>
+          <ul class="product-features">
+            <li><span>01</span><strong id="product-workstation-feature-1">OpenAI-compatible API</strong></li>
+            <li><span>02</span><strong id="product-workstation-feature-2">Models &amp; chat</strong></li>
+            <li><span>03</span><strong id="product-workstation-feature-3">Live metrics</strong></li>
+            <li><span>04</span><strong id="product-workstation-feature-4">Ascend stack</strong></li>
+          </ul>
+        </article>
+
+        <article class="product-card product-card-mate" data-code="02" aria-labelledby="product-mate-name">
+          <div class="product-card-topline"><span>02 / KNOW + ENGAGE</span><span id="product-mate-type" class="product-type">SAGE application</span></div>
+          <h3 id="product-mate-name">Sage Mate</h3>
+          <p id="product-mate-positioning" class="product-positioning">A cited AI twin built with SAGE that calls vLLM-HUST for model execution.</p>
+          <a id="product-mate-cta" class="product-cta" data-product-id="sage-mate"><span id="product-mate-cta-copy">Talk to Sage Mate</span><span aria-hidden="true">↗</span></a>
+          <div class="product-visual mate-visual" aria-hidden="true">
+            <span class="mate-node mate-node-profile">PROFILE</span><span class="mate-node mate-node-research">RESEARCH</span>
+            <span class="mate-core"><b>S</b><small>PERSONAL TWIN</small></span>
+            <span class="mate-node mate-node-courses">COURSES</span><span class="mate-node mate-node-cited">CITED / 04</span>
+          </div>
+          <ul class="product-features">
+            <li><span>01</span><strong id="product-mate-feature-1">Knowledge Q&amp;A</strong></li>
+            <li><span>02</span><strong id="product-mate-feature-2">Personal corpus</strong></li>
+            <li><span>03</span><strong id="product-mate-feature-3">Cited support</strong></li>
+            <li><span>04</span><strong id="product-mate-feature-4">Research flows</strong></li>
+          </ul>
+        </article>
+      </div>
     </section>
 
     <section class="execution-section execution-dark" id="stack">
       <div class="execution-section-head">
-        <div><p id="stack-eyebrow" class="execution-eyebrow">Engine &amp; proving ground</p><h2 id="stack-title">Run the engine. Evolve mechanisms through clear interfaces.</h2></div>
-        <p id="stack-summary">vLLM-HUST is an inference engine for domestic compute. Its upstream-compatible runtime also brings hardware backends, compiler stacks, and a fixed benchmark contract together for systems experimentation.</p>
+        <div><p id="stack-eyebrow" class="execution-eyebrow">Engine &amp; proving ground</p><h2 id="stack-title">Build, validate, and transfer serving mechanisms.</h2></div>
+        <p id="stack-summary">An upstream-compatible runtime connecting serving mechanisms to compilers, hardware backends, and fixed benchmarks.</p>
       </div>
       <div class="plugin-path" aria-label="Plugin portability path">
-        <div><span>01</span><strong id="path-mechanism-title">Mechanism</strong><small id="path-mechanism-copy">A focused scheduling, state, decoding, or execution idea</small></div>
-        <div><span>02</span><strong id="path-adapter-title">Adapter</strong><small id="path-adapter-copy">A narrow boundary to runtime and hardware hooks</small></div>
-        <div class="active"><span>03</span><strong id="path-prove-title">Prove</strong><small id="path-prove-copy">Correctness, performance, and hardware evidence in vLLM-HUST</small></div>
-        <div><span>04</span><strong id="path-transfer-title">Transfer</strong><small id="path-transfer-copy">Adapt the mechanism to upstream or another engine</small></div>
+        <div><span>01</span><strong id="path-mechanism-title">Mechanism</strong><small id="path-mechanism-copy">A serving-system idea</small></div>
+        <div><span>02</span><strong id="path-adapter-title">Adapter</strong><small id="path-adapter-copy">Runtime and hardware hooks</small></div>
+        <div class="active"><span>03</span><strong id="path-prove-title">Prove</strong><small id="path-prove-copy">Correctness and performance evidence</small></div>
+        <div><span>04</span><strong id="path-transfer-title">Transfer</strong><small id="path-transfer-copy">Upstream or another engine</small></div>
       </div>
       <div class="stack-grid">
-        <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / HOST</span><strong>Runtime Contract</strong><p id="stack-core-copy">The upstream-compatible integration host where plugins meet scheduler, state, cache, and execution interfaces.</p><em>Repository ↗</em></a>
-        <a href="#projects"><span>02 / CONNECT</span><strong>Plugin Interfaces</strong><p id="stack-ascend-copy">Narrow hooks keep scheduling, state, decoding, quantization, and execution mechanisms separable from one engine.</p><em id="stack-catalog-link">Explore catalog ↓</em></a>
-        <a href="./leaderboard.html"><span>03 / VALIDATE</span><strong>Validation Matrix</strong><p id="stack-triton-copy">The same mechanism is checked across available engine, compiler, and hardware adapters rather than one privileged backend.</p><em id="stack-leaderboard-link">Open leaderboard →</em></a>
-        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / MEASURE</span><strong>Benchmark Contract</strong><p id="stack-benchmark-copy">Fixed targets, comparable configurations, and public evidence for every claimed improvement.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / HOST</span><strong>Runtime Contract</strong><p id="stack-core-copy">Where plugins meet runtime interfaces.</p><em>Repository ↗</em></a>
+        <a href="#projects"><span>02 / CONNECT</span><strong>Plugin Interfaces</strong><p id="stack-ascend-copy">Narrow hooks keep mechanisms portable.</p><em id="stack-catalog-link">Explore catalog ↓</em></a>
+        <a href="./leaderboard.html"><span>03 / VALIDATE</span><strong>Validation Matrix</strong><p id="stack-triton-copy">Validate across engines, compilers, and hardware.</p><em id="stack-leaderboard-link">Open leaderboard →</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / MEASURE</span><strong>Benchmark Contract</strong><p id="stack-benchmark-copy">Fixed targets and public evidence.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
       </div>
     </section>
 
     <section class="execution-section execution-atlas" id="projects">
       <div class="execution-section-head">
-        <div><p id="atlas-eyebrow" class="execution-eyebrow">Portable mechanism catalog</p><h2 id="atlas-title">Core mechanisms by system position.</h2></div>
-        <p id="atlas-summary">Projects are organized by where they intervene in the inference path. Portable mechanisms and tools can be independently integrated, transferred, or licensed; HUST-maintained integration branches remain distinct as validation hosts.</p>
+        <div><p id="atlas-eyebrow" class="execution-eyebrow">Portable mechanism catalog</p><h2 id="atlas-title">Mechanisms by system layer.</h2></div>
+        <p id="atlas-summary">Portable mechanisms stay independent. Maintained integration branches provide validation backends.</p>
       </div>
       <div class="runtime-list">
         <section class="runtime-group" aria-labelledby="mechanism-control-title">
-          <div class="runtime-group-head"><span>01 / CONTROL + STATE</span><strong id="mechanism-control-title">Control &amp; state</strong><p id="mechanism-control-copy">Admission, scheduling, KV lifecycle, eviction, and preemption.</p></div>
+          <div class="runtime-group-head"><span>01 / CONTROL + STATE</span><strong id="mechanism-control-title">Control &amp; state</strong><p id="mechanism-control-copy">Admission, scheduling, and KV lifecycle.</p></div>
           <div class="runtime-group-items">
             <a href="https://github.com/vLLM-HUST/vllm-hust-bidkv"><span class="runtime-name">BidKV</span><span id="atlas-bidkv-role" class="runtime-role">KV-pressure eviction and preemption policy</span><span class="runtime-tag">plugin</span><span>↗</span></a>
           </div>
         </section>
         <section class="runtime-group" aria-labelledby="mechanism-execution-title">
-          <div class="runtime-group-head"><span>02 / DECODE + EXECUTE</span><strong id="mechanism-execution-title">Decoding &amp; execution</strong><p id="mechanism-execution-copy">Token generation, speculation, expert placement, and execution control.</p></div>
+          <div class="runtime-group-head"><span>02 / DECODE + EXECUTE</span><strong id="mechanism-execution-title">Decoding &amp; execution</strong><p id="mechanism-execution-copy">Decoding, expert placement, and execution.</p></div>
           <div class="runtime-group-items">
             <a href="https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec"><span class="runtime-name">DiffSpec</span><span id="atlas-diffspec-role" class="runtime-role">Differential speculative decoding for ultra-long sequences</span><span class="runtime-tag">plugin</span><span>↗</span></a>
             <a href="https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE"><span class="runtime-name">LatchMoE</span><span id="atlas-latchmoe-role" class="runtime-role">Address-stable, graph-compatible expert offloading</span><span class="runtime-tag">plugin</span><span>↗</span></a>
           </div>
         </section>
         <section class="runtime-group" aria-labelledby="mechanism-representation-title">
-          <div class="runtime-group-head"><span>03 / REPRESENT</span><strong id="mechanism-representation-title">Model representation</strong><p id="mechanism-representation-copy">Precision, quantization, storage cost, and accuracy tradeoffs.</p></div>
+          <div class="runtime-group-head"><span>03 / REPRESENT</span><strong id="mechanism-representation-title">Model representation</strong><p id="mechanism-representation-copy">Precision, quantization, and storage.</p></div>
           <div class="runtime-group-items">
             <a href="https://github.com/vLLM-HUST/vllm-ascend-quant-hust"><span class="runtime-name">Ascend Quant</span><span id="atlas-quant-role" class="runtime-role">Post-training and mixed-precision quantization</span><span class="runtime-tag amber">tool</span><span>↗</span></a>
           </div>
         </section>
         <section class="runtime-group" aria-labelledby="mechanism-compiler-title">
-          <div class="runtime-group-head"><span>04 / LOWER</span><strong id="mechanism-compiler-title">Compiler &amp; kernels</strong><p id="mechanism-compiler-copy">Graph lowering, operator generation, and hardware-aware kernels.</p></div>
+          <div class="runtime-group-head"><span>04 / LOWER</span><strong id="mechanism-compiler-title">Compiler &amp; kernels</strong><p id="mechanism-compiler-copy">Graph lowering, operators, and kernels.</p></div>
           <div class="runtime-group-items">
             <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="runtime-name">Triton Ascend HUST</span><span id="atlas-triton-role" class="runtime-role">HUST-maintained Triton Ascend adaptation for compiler and kernel validation</span><span class="runtime-tag slate">integration branch</span><span>↗</span></a>
           </div>
         </section>
         <section class="runtime-group" aria-labelledby="mechanism-adapters-title">
-          <div class="runtime-group-head"><span>05 / INTEGRATE</span><strong id="mechanism-adapters-title">Engine &amp; hardware integration branches</strong><p id="mechanism-adapters-copy">Maintained forks that connect the proving ground to different execution backends; these are not plugin artifacts.</p></div>
+          <div class="runtime-group-head"><span>05 / INTEGRATE</span><strong id="mechanism-adapters-title">Engine &amp; hardware integration branches</strong><p id="mechanism-adapters-copy">Maintained engine and hardware backends.</p></div>
           <div class="runtime-group-items">
             <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="runtime-name">vLLM Ascend HUST</span><span id="atlas-ascend-role" class="runtime-role">HUST-maintained vLLM adaptation branch for Ascend accelerators</span><span class="runtime-tag slate">integration branch</span><span>↗</span></a>
             <a href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="runtime-name">vLLM Metal HUST</span><span id="atlas-metal-role" class="runtime-role">HUST-maintained vLLM adaptation branch for Apple Silicon</span><span class="runtime-tag slate">integration branch</span><span>↗</span></a>
           </div>
         </section>
         <section class="runtime-group" aria-labelledby="mechanism-operations-title">
-          <div class="runtime-group-head"><span>06 / OPERATE</span><strong id="mechanism-operations-title">Operations &amp; observability</strong><p id="mechanism-operations-copy">Deployment, environment diagnosis, profiling, and performance attribution.</p></div>
+          <div class="runtime-group-head"><span>06 / OPERATE</span><strong id="mechanism-operations-title">Operations &amp; observability</strong><p id="mechanism-operations-copy">Deployment, profiling, and diagnosis.</p></div>
           <div class="runtime-group-items">
             <a href="https://github.com/vLLM-HUST/ascend-runtime-manager"><span class="runtime-name">Ascend Runtime Manager</span><span id="atlas-manager-role" class="runtime-role">Deployment diagnostics and setup</span><span class="runtime-tag amber">tooling</span><span>↗</span></a>
             <a href="https://github.com/vLLM-HUST/vllm-hust-perf-analyzer"><span class="runtime-name">Performance Analyzer</span><span id="atlas-perf-role" class="runtime-role">Serving performance analysis</span><span class="runtime-tag cyan">analysis</span><span>↗</span></a>
@@ -131,7 +192,7 @@
           </div>
         </section>
         <section class="runtime-group" aria-labelledby="mechanism-validation-title">
-          <div class="runtime-group-head"><span>07 / PROVE</span><strong id="mechanism-validation-title">Validation &amp; evidence</strong><p id="mechanism-validation-copy">Fixed targets, comparable configurations, regression gates, and public evidence.</p></div>
+          <div class="runtime-group-head"><span>07 / PROVE</span><strong id="mechanism-validation-title">Validation &amp; evidence</strong><p id="mechanism-validation-copy">Regression gates and benchmark evidence.</p></div>
           <div class="runtime-group-items">
             <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span class="runtime-name">Benchmark Suite</span><span id="atlas-benchmark-role" class="runtime-role">Fixed-target comparison and evidence pipeline</span><span class="runtime-tag amber">validation</span><span>↗</span></a>
           </div>
@@ -141,29 +202,21 @@
 
     <section class="execution-section execution-ecosystem" id="ecosystem">
       <div class="execution-section-head">
-        <div><p id="ecosystem-eyebrow" class="execution-eyebrow">Shared architecture</p><h2 id="ecosystem-title">Open layers. Shared progress.</h2></div>
-        <p id="ecosystem-summary">The ecosystem connects research incubation, application orchestration, evolving data systems, and open model-execution communities.</p>
+        <div><p id="ecosystem-eyebrow" class="execution-eyebrow">Collaborative ecosystem</p><h2 id="ecosystem-title">Clear roles. Shared progress.</h2></div>
+        <p id="ecosystem-summary">SAGE is the shared flagship product; each organization retains a clear technical boundary.</p>
       </div>
       <div class="execution-architecture">
         <a href="https://lab.sage.org.ai/"><span>00</span><strong>IntelliStream</strong><small id="ecosystem-intellistream">Cross-layer research incubator</small></a>
-        <a href="https://sage.org.ai/"><span>01</span><strong>SAGE</strong><small id="ecosystem-sage">Applications, agents, RAG, workflows</small></a>
+        <a href="https://ride-lab.github.io/"><span>01</span><strong>RIDE Lab</strong><small id="ecosystem-ride">Agent-native research and SAGE core stewardship</small></a>
         <a href="https://datasys.sage.org.ai/"><span>02</span><strong>DataSys</strong><small id="ecosystem-datasys">Streams, graphs, vectors, indexes</small></a>
-        <a class="active" href="#top"><span>03</span><strong>vLLM-HUST</strong><small id="ecosystem-vllm">Domestic-compute inference engine and validation platform</small></a>
+        <a class="active" href="#top"><span>03</span><strong>vLLM-HUST</strong><small id="ecosystem-vllm">Independent inference engine and hardware execution substrate</small></a>
       </div>
     </section>
 
-    <section class="visually-hidden" id="workstation-section" aria-hidden="true">
-      <span class="workstation-pill" id="workstation-status-chip" data-state="pending">Pending</span>
-      <span id="workstation-status-detail">Pending</span><span id="workstation-backend-label">Serving Backend</span>
-      <span id="workstation-backend-value">Not configured</span><span id="workstation-url-label">Workstation URL</span>
-      <span id="workstation-target-value">Not configured</span><a id="workstation-open-link" href="#" target="_blank" rel="noreferrer">Open Workstation</a>
-      <a id="workstation-docs-link" href="./docs/DEPLOY.md" target="_blank" rel="noreferrer">Deployment Guide</a><span id="workstation-note">Workstation</span>
-      <span id="workstation-embed-mode" data-state="pending">Waiting</span><iframe id="workstation-embed-frame" title="vLLM-HUST workstation" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
-    </section>
   </main>
 
   <footer class="execution-footer">
-    <div><strong>vLLM-HUST</strong><span id="footer-copy">An inference engine for domestic compute, with a proving ground for reusable mechanisms.</span></div>
+    <div><strong>vLLM-HUST</strong><span id="footer-copy">Inference for domestic compute.</span></div>
     <nav aria-label="Footer navigation"><a href="./leaderboard.html">Leaderboard</a><a href="./contributors.html">Contributors</a><a href="https://github.com/vLLM-HUST">GitHub</a></nav>
   </footer>
 
@@ -172,32 +225,42 @@
       en: {
         title: 'vLLM-HUST | Inference Engine for Domestic Compute',
         'home-eyebrow': 'Domestic compute · inference engine / 03',
-        'home-kicker': 'A domestic-compute inference engine—and a proving ground for reusable serving mechanisms.',
-        'home-lede': 'vLLM-HUST provides the serving runtime. Scheduling, KV state, decoding, quantization, compiler, and hardware work is integrated here and kept behind clear boundaries for independent adoption.',
-        'home-primary-cta': 'Explore leaderboard →', 'home-github-cta': 'Open GitHub ↗',
-        'home-fact-1-label': 'Engine', 'home-fact-2-label': 'Mechanisms', 'home-fact-3-label': 'Evidence',
-        'home-fact-1-value': 'upstream-compatible runtime', 'home-fact-2-value': 'scheduling + state + execution', 'home-fact-3-value': 'multi-backend validation',
-        'scope-runtime': 'Scheduling plugins', 'scope-cache': 'State + KV tools', 'scope-compiler': 'Compiler + kernels', 'scope-kernels': 'Hardware adapters', 'scope-hardware': 'Benchmark evidence',
-        'stack-eyebrow': 'Engine & proving ground', 'stack-title': 'Run the engine. Evolve mechanisms through clear interfaces.',
-        'stack-summary': 'vLLM-HUST is an inference engine for domestic compute. Its upstream-compatible runtime also brings hardware backends, compiler stacks, and a fixed benchmark contract together for systems experimentation.',
-        'path-mechanism-title': 'Mechanism', 'path-mechanism-copy': 'A focused scheduling, state, decoding, or execution idea',
-        'path-adapter-title': 'Adapter', 'path-adapter-copy': 'A narrow boundary to runtime and hardware hooks',
-        'path-prove-title': 'Prove', 'path-prove-copy': 'Correctness, performance, and hardware evidence in vLLM-HUST',
-        'path-transfer-title': 'Transfer', 'path-transfer-copy': 'Adapt the mechanism to upstream or another engine',
-        'stack-core-copy': 'The upstream-compatible integration host where plugins meet scheduler, state, cache, and execution interfaces.',
-        'stack-ascend-copy': 'Narrow hooks keep scheduling, state, decoding, quantization, and execution mechanisms separable from one engine.',
-        'stack-triton-copy': 'The same mechanism is checked across available engine, compiler, and hardware adapters rather than one privileged backend.',
+        'home-kicker': 'Turn domestic compute into usable, verifiable inference.',
+        'home-lede': 'One engine connects upstream compatibility, system innovation, and public evidence.',
+        'home-primary-cta': 'Explore products ↓', 'home-github-cta': 'Open GitHub ↗',
+        'home-fact-1-label': 'Usable', 'home-fact-2-label': 'Evolvable', 'home-fact-3-label': 'Verifiable',
+        'home-fact-1-value': 'OpenAI-compatible entry', 'home-fact-2-value': 'portable serving mechanisms', 'home-fact-3-value': 'public benchmark evidence',
+        'scope-products': 'Products & apps', 'scope-engine': 'Engine', 'scope-projects': 'Projects', 'scope-ecosystem': 'Ecosystem',
+        'products-eyebrow': 'Products & applications', 'products-title': 'From inference operations to agent applications.',
+        'products-summary': 'Workstation operates vLLM-HUST. Sage Mate is an application built with SAGE and backed by vLLM-HUST.',
+        'product-workstation-type': 'Inference operations', 'product-workstation-positioning': 'One workspace to serve models, observe performance, and operate the Ascend inference stack.',
+        'product-workstation-feature-1': 'OpenAI-compatible API', 'product-workstation-feature-2': 'Models & chat',
+        'product-workstation-feature-3': 'Live metrics', 'product-workstation-feature-4': 'Ascend stack',
+        'product-workstation-cta-copy': 'Open Workstation',
+        'product-mate-type': 'SAGE application', 'product-mate-positioning': 'A cited AI twin built with SAGE that calls vLLM-HUST for model execution.',
+        'product-mate-feature-1': 'Knowledge Q&A', 'product-mate-feature-2': 'Personal corpus',
+        'product-mate-feature-3': 'Cited support', 'product-mate-feature-4': 'Research flows',
+        'product-mate-cta-copy': 'Talk to Sage Mate',
+        'stack-eyebrow': 'Engine & proving ground', 'stack-title': 'Build, validate, and transfer serving mechanisms.',
+        'stack-summary': 'An upstream-compatible runtime connecting serving mechanisms to compilers, hardware backends, and fixed benchmarks.',
+        'path-mechanism-title': 'Mechanism', 'path-mechanism-copy': 'A serving-system idea',
+        'path-adapter-title': 'Adapter', 'path-adapter-copy': 'Runtime and hardware hooks',
+        'path-prove-title': 'Prove', 'path-prove-copy': 'Correctness and performance evidence',
+        'path-transfer-title': 'Transfer', 'path-transfer-copy': 'Upstream or another engine',
+        'stack-core-copy': 'Where plugins meet runtime interfaces.',
+        'stack-ascend-copy': 'Narrow hooks keep mechanisms portable.',
+        'stack-triton-copy': 'Validate across engines, compilers, and hardware.',
         'stack-catalog-link': 'Explore catalog ↓', 'stack-leaderboard-link': 'Open leaderboard →',
-        'stack-benchmark-copy': 'Fixed targets, comparable configurations, and public evidence for every claimed improvement.', 'stack-benchmark-link': 'Open benchmark ↗',
-        'atlas-eyebrow': 'Portable mechanism catalog', 'atlas-title': 'Core mechanisms by system position.',
-        'atlas-summary': 'Projects are organized by where they intervene in the inference path. Portable mechanisms and tools can be independently integrated, transferred, or licensed; HUST-maintained integration branches remain distinct as validation hosts.',
-        'mechanism-control-title': 'Control & state', 'mechanism-control-copy': 'Admission, scheduling, KV lifecycle, eviction, and preemption.',
-        'mechanism-execution-title': 'Decoding & execution', 'mechanism-execution-copy': 'Token generation, speculation, expert placement, and execution control.',
-        'mechanism-representation-title': 'Model representation', 'mechanism-representation-copy': 'Precision, quantization, storage cost, and accuracy tradeoffs.',
-        'mechanism-compiler-title': 'Compiler & kernels', 'mechanism-compiler-copy': 'Graph lowering, operator generation, and hardware-aware kernels.',
-        'mechanism-adapters-title': 'Engine & hardware integration branches', 'mechanism-adapters-copy': 'Maintained forks that connect the proving ground to different execution backends; these are not plugin artifacts.',
-        'mechanism-operations-title': 'Operations & observability', 'mechanism-operations-copy': 'Deployment, environment diagnosis, profiling, and performance attribution.',
-        'mechanism-validation-title': 'Validation & evidence', 'mechanism-validation-copy': 'Fixed targets, comparable configurations, regression gates, and public evidence.',
+        'stack-benchmark-copy': 'Fixed targets and public evidence.', 'stack-benchmark-link': 'Open benchmark ↗',
+        'atlas-eyebrow': 'Portable mechanism catalog', 'atlas-title': 'Mechanisms by system layer.',
+        'atlas-summary': 'Portable mechanisms stay independent. Maintained integration branches provide validation backends.',
+        'mechanism-control-title': 'Control & state', 'mechanism-control-copy': 'Admission, scheduling, and KV lifecycle.',
+        'mechanism-execution-title': 'Decoding & execution', 'mechanism-execution-copy': 'Decoding, expert placement, and execution.',
+        'mechanism-representation-title': 'Model representation', 'mechanism-representation-copy': 'Precision, quantization, and storage.',
+        'mechanism-compiler-title': 'Compiler & kernels', 'mechanism-compiler-copy': 'Graph lowering, operators, and kernels.',
+        'mechanism-adapters-title': 'Engine & hardware integration branches', 'mechanism-adapters-copy': 'Maintained engine and hardware backends.',
+        'mechanism-operations-title': 'Operations & observability', 'mechanism-operations-copy': 'Deployment, profiling, and diagnosis.',
+        'mechanism-validation-title': 'Validation & evidence', 'mechanism-validation-copy': 'Regression gates and benchmark evidence.',
         'atlas-bidkv-role': 'KV-pressure eviction and preemption policy', 'atlas-diffspec-role': 'Differential speculative decoding for ultra-long sequences',
         'atlas-latchmoe-role': 'Address-stable, graph-compatible expert offloading', 'atlas-quant-role': 'Post-training and mixed-precision quantization',
         'atlas-manager-role': 'Deployment diagnostics and setup', 'atlas-perf-role': 'Serving performance analysis',
@@ -205,40 +268,50 @@
         'atlas-triton-role': 'HUST-maintained Triton Ascend adaptation for compiler and kernel validation',
         'atlas-ascend-role': 'HUST-maintained vLLM adaptation branch for Ascend accelerators',
         'atlas-metal-role': 'HUST-maintained vLLM adaptation branch for Apple Silicon',
-        'ecosystem-eyebrow': 'Shared architecture', 'ecosystem-title': 'Open layers. Shared progress.',
-        'ecosystem-summary': 'The ecosystem connects research incubation, application orchestration, evolving data systems, and open model-execution communities.',
-        'ecosystem-intellistream': 'Cross-layer research incubator', 'ecosystem-sage': 'Applications, agents, RAG, workflows',
-        'ecosystem-datasys': 'Streams, graphs, vectors, indexes', 'ecosystem-vllm': 'Domestic-compute inference engine and validation platform',
-        'footer-copy': 'An inference engine for domestic compute, with a proving ground for reusable mechanisms.'
+        'ecosystem-eyebrow': 'Collaborative ecosystem', 'ecosystem-title': 'Clear roles. Shared progress.',
+        'ecosystem-summary': 'SAGE is the shared flagship product; each organization retains a clear technical boundary.',
+        'ecosystem-intellistream': 'Cross-layer research incubator', 'ecosystem-ride': 'Agent-native research and SAGE core stewardship',
+        'ecosystem-datasys': 'Streams, graphs, vectors, indexes', 'ecosystem-vllm': 'Independent inference engine and hardware execution substrate',
+        'footer-copy': 'Inference for domestic compute.'
       },
       zh: {
         title: 'vLLM-HUST | 面向国产算力的大模型推理引擎',
-        'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '面向国产算力的大模型推理引擎，也是推理系统创新的试验场。',
-        'home-lede': 'vLLM-HUST 提供完整的推理服务运行时；调度、KV 状态、解码、量化、编译与硬件优化在这里完成集成，并通过清晰边界支持独立采用。',
-        'home-primary-cta': '查看性能榜 →', 'home-github-cta': '打开 GitHub ↗',
-        'home-fact-1-label': '引擎', 'home-fact-2-label': '机制', 'home-fact-3-label': '证据',
-        'home-fact-1-value': '兼容上游的推理运行时', 'home-fact-2-value': '调度、状态与执行', 'home-fact-3-value': '跨后端系统验证',
-        'scope-runtime': '调度插件', 'scope-cache': '状态与 KV 工具', 'scope-compiler': '编译与算子', 'scope-kernels': '硬件适配', 'scope-hardware': 'Benchmark 证据',
-        'stack-eyebrow': '推理引擎与试验场', 'stack-title': '运行推理引擎，通过清晰接口演进核心机制。',
-        'stack-summary': 'vLLM-HUST 是面向国产算力的大模型推理引擎；兼容上游的运行时同时连接硬件后端、编译栈与固定 Benchmark 契约，承担系统创新试验场的作用。',
-        'path-mechanism-title': '机制', 'path-mechanism-copy': '聚焦调度、状态、解码或执行的单一创新',
-        'path-adapter-title': '适配', 'path-adapter-copy': '连接运行时与硬件钩子的窄接口',
-        'path-prove-title': '验证', 'path-prove-copy': '在 vLLM-HUST 中形成正确性、性能与硬件证据',
-        'path-transfer-title': '迁移', 'path-transfer-copy': '将机制适配到上游或其他推理引擎',
-        'stack-core-copy': '兼容上游的集成宿主，让插件接入调度器、状态、缓存与执行接口。',
-        'stack-ascend-copy': '通过窄接口使调度、状态、解码、量化与执行机制不与单一引擎绑定。',
-        'stack-triton-copy': '同一机制面向现有引擎、编译器与硬件适配器验证，不预设唯一后端。',
+        'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '让国产算力成为可用、可验证的推理能力。',
+        'home-lede': '以一个引擎贯通上游兼容、系统创新与公开验证。',
+        'home-primary-cta': '查看产品 ↓', 'home-github-cta': '打开 GitHub ↗',
+        'home-fact-1-label': '可用', 'home-fact-2-label': '可演进', 'home-fact-3-label': '可验证',
+        'home-fact-1-value': 'OpenAI-compatible 入口', 'home-fact-2-value': '推理机制可迁移', 'home-fact-3-value': '公开 Benchmark 证据',
+        'scope-products': '产品与应用', 'scope-engine': '引擎', 'scope-projects': '项目', 'scope-ecosystem': '生态',
+        'products-eyebrow': '产品与应用', 'products-title': '从推理运维到智能体应用。',
+        'products-summary': 'Workstation 运维推理栈；Sage Mate 基于 SAGE，调用 vLLM-HUST。',
+        'product-workstation-type': '推理运营工作台', 'product-workstation-positioning': '一个工作台完成模型服务、性能观测与昇腾推理栈操作。',
+        'product-workstation-feature-1': 'OpenAI-compatible API', 'product-workstation-feature-2': '模型与对话',
+        'product-workstation-feature-3': '实时推理指标', 'product-workstation-feature-4': 'Ascend 推理栈',
+        'product-workstation-cta-copy': '打开 Workstation',
+        'product-mate-type': 'SAGE 应用', 'product-mate-positioning': '基于 SAGE 构建，并调用 vLLM-HUST 执行模型推理。',
+        'product-mate-feature-1': '知识问答', 'product-mate-feature-2': '个人知识库',
+        'product-mate-feature-3': '引用依据', 'product-mate-feature-4': '研究工作流',
+        'product-mate-cta-copy': '体验 Sage Mate',
+        'stack-eyebrow': '推理引擎与试验场', 'stack-title': '开发、验证并迁移推理机制。',
+        'stack-summary': '兼容上游的运行时，连接推理机制、编译栈、硬件后端与固定 Benchmark。',
+        'path-mechanism-title': '机制', 'path-mechanism-copy': '一个推理系统想法',
+        'path-adapter-title': '适配', 'path-adapter-copy': '运行时与硬件钩子',
+        'path-prove-title': '验证', 'path-prove-copy': '正确性与性能证据',
+        'path-transfer-title': '迁移', 'path-transfer-copy': '上游或其他推理引擎',
+        'stack-core-copy': '插件接入运行时接口的位置。',
+        'stack-ascend-copy': '窄接口保持机制可迁移。',
+        'stack-triton-copy': '跨引擎、编译栈与硬件验证。',
         'stack-catalog-link': '查看目录 ↓', 'stack-leaderboard-link': '打开排行榜 →',
-        'stack-benchmark-copy': '以固定靶、可比配置和公开证据约束每项性能结论。', 'stack-benchmark-link': '打开 Benchmark ↗',
-        'atlas-eyebrow': '可迁移机制目录', 'atlas-title': '按系统位置组织核心机制。',
-        'atlas-summary': '项目按照其介入推理链路的位置归类。可迁移机制与工具可以独立集成、迁移或授权；HUST 适配分支则作为验证载体单独标识。',
-        'mechanism-control-title': '控制与状态', 'mechanism-control-copy': '请求准入、调度、KV 生命周期、驱逐与抢占。',
-        'mechanism-execution-title': '解码与执行', 'mechanism-execution-copy': 'Token 生成、投机解码、专家放置与执行控制。',
-        'mechanism-representation-title': '模型表示', 'mechanism-representation-copy': '精度、量化、存储成本与准确率权衡。',
-        'mechanism-compiler-title': '编译与算子', 'mechanism-compiler-copy': '计算图下沉、算子生成与硬件感知内核。',
-        'mechanism-adapters-title': '引擎与硬件适配分支', 'mechanism-adapters-copy': '连接试验场与不同执行后端的维护分支，不作为独立插件制品。',
-        'mechanism-operations-title': '运维与观测', 'mechanism-operations-copy': '部署、环境诊断、性能剖析与性能归因。',
-        'mechanism-validation-title': '验证与证据', 'mechanism-validation-copy': '固定靶、可比配置、回归门禁与公开证据。',
+        'stack-benchmark-copy': '固定靶与公开证据。', 'stack-benchmark-link': '打开 Benchmark ↗',
+        'atlas-eyebrow': '可迁移机制目录', 'atlas-title': '按系统层次组织机制。',
+        'atlas-summary': '可迁移机制保持独立，维护分支提供验证后端。',
+        'mechanism-control-title': '控制与状态', 'mechanism-control-copy': '请求准入、调度与 KV 生命周期。',
+        'mechanism-execution-title': '解码与执行', 'mechanism-execution-copy': '解码、专家放置与执行。',
+        'mechanism-representation-title': '模型表示', 'mechanism-representation-copy': '精度、量化与存储。',
+        'mechanism-compiler-title': '编译与算子', 'mechanism-compiler-copy': '计算图下沉、算子与内核。',
+        'mechanism-adapters-title': '引擎与硬件适配分支', 'mechanism-adapters-copy': '维护中的引擎与硬件后端。',
+        'mechanism-operations-title': '运维与观测', 'mechanism-operations-copy': '部署、剖析与诊断。',
+        'mechanism-validation-title': '验证与证据', 'mechanism-validation-copy': '回归门禁与 Benchmark 证据。',
         'atlas-bidkv-role': 'KV 压力感知驱逐与抢占策略', 'atlas-diffspec-role': '面向超长序列的差分投机解码',
         'atlas-latchmoe-role': '地址稳定、兼容计算图的专家卸载', 'atlas-quant-role': '训练后量化与混合精度量化',
         'atlas-manager-role': '部署诊断与环境配置', 'atlas-perf-role': '推理服务性能归因分析',
@@ -246,15 +319,15 @@
         'atlas-triton-role': '由 HUST 维护、用于编译与算子验证的 Triton Ascend 适配分支',
         'atlas-ascend-role': '由 HUST 维护、面向昇腾加速器的 vLLM 适配分支',
         'atlas-metal-role': '由 HUST 维护、面向 Apple Silicon 的 vLLM 适配分支',
-        'ecosystem-eyebrow': '共享架构', 'ecosystem-title': '开放分层，共同演进。',
-        'ecosystem-summary': '生态连接研究孵化、应用编排、演化数据系统与开放的模型执行社区。',
-        'ecosystem-intellistream': '跨层研究孵化器', 'ecosystem-sage': '应用、Agent、RAG 与工作流',
-        'ecosystem-datasys': '流、图、向量与索引', 'ecosystem-vllm': '面向国产算力的推理引擎与验证平台',
-        'footer-copy': '面向国产算力的推理引擎，也是可复用机制的创新试验场。'
+        'ecosystem-eyebrow': '协作生态', 'ecosystem-title': '角色清晰，共同演进。',
+        'ecosystem-summary': 'SAGE 是共同旗舰产品；各组织保持清晰的技术边界。',
+        'ecosystem-intellistream': '跨层研究孵化器', 'ecosystem-ride': '智能体原生研究与 SAGE 核心维护',
+        'ecosystem-datasys': '流、图、向量与索引', 'ecosystem-vllm': '独立的推理引擎与硬件执行底座',
+        'footer-copy': '面向国产算力的推理服务。'
       }
     };
   </script>
-  <script src="./assets/site.js?v=engine-and-proving-ground-20260728"></script>
-  <script src="./assets/workstation-embed.js?v=workstation-public-copy-20260701"></script>
+  <script src="./assets/site.js?v=site-structure-20260816"></script>
+  <script src="./assets/product-catalog.js?v=0.3.6"></script>
 </body>
 </html>

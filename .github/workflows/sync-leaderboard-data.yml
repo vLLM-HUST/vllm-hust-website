@@ -27,6 +27,7 @@ jobs:
             leaderboard-data/snapshots
             leaderboard-data/official-targets.json
             leaderboard-data/official-targets.sha256
+            docs/official-baselines
             schemas
             scripts/validate_public_leaderboard_snapshots.py
             src/vllm_hust_benchmark

@@ -71,28 +71,16 @@
     }
 
     function memberProfilesFor(payload) {
-        const pmcMembers = new Set((payload?.pmc_members || []).map((login) => String(login).toLowerCase()));
-        const withPmcRole = (members) => members.map((item) => (
-            pmcMembers.has(String(item.github_login || '').toLowerCase())
-                ? { ...item, pmc_member: true }
-                : item
-        ));
         if (payload?.member_profiles) {
             return {
                 ...payload.member_profiles,
-                core_members: Array.isArray(payload.member_profiles.core_members)
-                    ? withPmcRole(payload.member_profiles.core_members)
-                    : [],
-                participants: Array.isArray(payload.member_profiles.participants)
-                    ? withPmcRole(payload.member_profiles.participants)
-                    : [],
                 staff_members: Array.isArray(payload.member_profiles.staff_members)
-                    ? withPmcRole(payload.member_profiles.staff_members)
+                    ? payload.member_profiles.staff_members
                     : [],
                 external_contributors: Array.isArray(
                     payload.member_profiles.external_contributors,
                 )
-                    ? withPmcRole(payload.member_profiles.external_contributors)
+                    ? payload.member_profiles.external_contributors
                     : [],
             };
         }
@@ -135,6 +123,11 @@
         return String(value || '');
     }
 
+    function profileStatus(item, lang) {
+        return localized(item, 'profile_status', lang)
+            || localized(item, 'github_status', lang);
+    }
+
     function labels(lang) {
         return lang === 'zh'
             ? {
@@ -144,12 +137,8 @@
                 areas: '贡献领域',
                 main: '主要贡献',
                 advisor: '指导老师',
+                status: '状态',
                 pending: '身份待确认',
-                engineeringRoute: '工程路线',
-                engineeringGithub: 'GitHub',
-                engineeringDirection: '研究 / 工程方向',
-                engineeringHistory: '历史字段',
-                pendingGithub: '待确认',
                 commits: '次提交',
                 none: '—',
             }
@@ -160,12 +149,8 @@
                 areas: 'Contribution areas',
                 main: 'Main contributions',
                 advisor: 'Advisor',
+                status: 'Status',
                 pending: 'Identity pending',
-                engineeringRoute: 'Engineering route',
-                engineeringGithub: 'GitHub',
-                engineeringDirection: 'Research / engineering focus',
-                engineeringHistory: 'Historical fields',
-                pendingGithub: 'Pending confirmation',
                 commits: 'commits',
                 none: '—',
             };
@@ -173,13 +158,21 @@
 
     function displayName(item, lang) {
         const raw = item.display_name || item.chinese_name || item.name || item.github_login || '';
-        if (item.public_visibility === 'internal_pending') {
-            return `${labels(lang).pending}（${raw}）`;
-        }
         if (item.identity_confirmed === false) {
             return `${labels(lang).pending}（${raw}）`;
         }
         return raw;
+    }
+
+    // These contributors are students. Keep the public site from inferring
+    // different status from their engineering/academic contribution areas.
+    const studentContributorLogins = new Set(['wmaster123', 'sad-and-bad1231', 'iliujunn']);
+    function memberRole(item, lang) {
+        const login = String(item.github_login || '').toLowerCase();
+        if (studentContributorLogins.has(login)) {
+            return lang === 'zh' ? '学生' : 'Student';
+        }
+        return localized(item, 'role', lang);
     }
 
     function memberNameMarkup(item, lang) {
@@ -194,26 +187,17 @@
                     ? `<small>${escapeHtml(localized(item, 'github_status', lang))}</small>`
                     : ''
             );
-        const badges = [
-            item.server_admin ? (lang === 'zh' ? '服务器管理员' : 'Server administrator') : '',
-            item.pmc_member ? 'PMC' : '',
-        ].filter(Boolean);
-        const badgeMarkup = badges.length
-            ? `<small class="contributor-member-badges">${escapeHtml(badges.join(' · '))}</small>`
-            : '';
-        return `${main}${login}${badgeMarkup}`;
+        return `${main}${login}`;
     }
 
     function memberContextMarkup(item, lang) {
-        const role = localized(item, 'role', lang);
+        const role = memberRole(item, lang);
         const advisor = localized(item, 'advisor', lang);
         const parts = [
             role,
             advisor
                 ? `${labels(lang).advisor}${lang === 'zh' ? '：' : ': '}${advisor}`
                 : '',
-            item.server_admin ? (lang === 'zh' ? '服务器管理员' : 'Server administrator') : '',
-            item.pmc_member ? 'PMC' : '',
         ].filter(Boolean);
         return parts.length
             ? `<small class="contributor-member-context">${escapeHtml(parts.join(' · '))}</small>`
@@ -244,17 +228,18 @@
         if (!list) return;
         const lang = currentLang();
         const text = labels(lang);
-        list.innerHTML = members
-            .filter((item) => item.public_visibility !== 'internal_pending')
-            .map((item) => {
-            const role = localized(item, 'role', lang);
+        list.innerHTML = members.map((item) => {
+            const role = memberRole(item, lang);
             const research = localized(item, 'research_direction', lang);
             const participation = localized(item, 'participation_direction', lang);
             const areas = item.contribution_areas || item.key_contributions || '';
             const advisor = localized(item, 'advisor', lang);
             const rows = kind === 'core'
-                ? [
+                    ? [
                     detailRow(text.research, research),
+                    profileStatus(item, lang)
+                        ? detailRow(text.status, profileStatus(item, lang))
+                        : '',
                     detailRow(text.areas, areas),
                     detailRow(text.main, mainContribution(item, lang)),
                     advisor ? detailRow(text.advisor, advisor) : '',
@@ -263,6 +248,9 @@
                     ? [
                         role ? detailRow(text.role, role) : '',
                         research ? detailRow(text.research, research) : '',
+                        profileStatus(item, lang)
+                            ? detailRow(text.status, profileStatus(item, lang))
+                            : '',
                         participation ? detailRow(text.participation, participation) : '',
                         areas ? detailRow(text.areas, areas) : '',
                         mainContribution(item, lang)
@@ -272,6 +260,9 @@
                     : [
                         role ? detailRow(text.role, role) : '',
                         research ? detailRow(text.research, research) : '',
+                        profileStatus(item, lang)
+                            ? detailRow(text.status, profileStatus(item, lang))
+                            : '',
                         participation ? detailRow(text.participation, participation) : '',
                         areas ? detailRow(text.areas, areas) : '',
                         advisor ? detailRow(text.advisor, advisor) : '',
@@ -282,7 +273,7 @@
                     <span class="research-member-details">${rows.filter(Boolean).join('')}</span>
                 </li>
             `;
-            }).join('');
+        }).join('');
     }
 
     function renderMeta(payload, profiles) {
@@ -299,83 +290,6 @@
             profiles.external_contributors.length,
         );
         document.getElementById('contributors-repos').textContent = fmt(repoCount);
-    }
-
-    function renderEngineeringRoute(members, pmcMembers = []) {
-        const tbody = document.getElementById('contributors-engineering-route-tbody');
-        if (!tbody) return;
-        const lang = currentLang();
-        const text = labels(lang);
-        const pmcLogins = new Set(pmcMembers.map((login) => String(login).toLowerCase()));
-        const currentMembers = members.map((item) => ({
-            ...item,
-            display_name: item.name_zh || item.display_name,
-            english_name: item.name_en || item.english_name,
-            github_login: item.github_login || item.github || null,
-            github_url: item.github_url || null,
-            github_verification_status: item.github_verification_status
-                || (item.github_login || item.github ? 'confirmed' : 'pending'),
-            current_route: 'engineering',
-            current_route_zh: '工程路线',
-            route: '工程路线',
-            advisor: item.advisor || '张书豪',
-            is_advised_by_shuhao: true,
-            is_current_member: true,
-            is_engineering_route: true,
-            pmc_member: item.pmc_member === true
-                || pmcLogins.has(String(item.github_login || item.github || '').toLowerCase()),
-        }));
-        tbody.innerHTML = currentMembers.map((item) => {
-            const history = [
-                item.historical_route ? `${lang === 'zh' ? '历史路线' : 'Historical route'}: ${item.historical_route}` : '',
-                item.historical_role ? `${lang === 'zh' ? '历史身份' : 'Historical role'}: ${item.historical_role}` : '',
-            ].filter(Boolean).join(' · ');
-            const github = item.github_url
-                ? `<a href="${escapeHtml(item.github_url)}" target="_blank" rel="noreferrer">${escapeHtml(item.github_login || item.github)}</a>`
-                : `<span>${escapeHtml(localized(item, 'github_status', lang) || text.pendingGithub)}</span>`;
-            return `
-                <tr>
-                    <td><span class="contributor-table-member">${memberNameMarkup(item, lang)}</span></td>
-                    <td>${escapeHtml(item.route || text.engineeringRoute)}<br><small>${escapeHtml(`${text.advisor}${lang === 'zh' ? '：' : ': '}${item.advisor}`)}</small></td>
-                    <td>${github}</td>
-                    <td>${escapeHtml(item.research_interests || text.none)}</td>
-                    <td>${escapeHtml(history || text.none)}</td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    function renderScopeMetrics(payload) {
-        const records = Array.isArray(payload.member_audit) ? payload.member_audit : [];
-        const current = records.filter((item) => item.is_current_member === true);
-        const engineering = current.filter((item) => item.current_route === 'engineering');
-        const academic = current.filter((item) => item.current_route === 'academic');
-        const shuhao = current.filter((item) => item.is_advised_by_shuhao === true);
-        const shuhaoEngineering = shuhao.filter((item) => item.current_route === 'engineering');
-        const otherEngineering = engineering.filter((item) => item.is_advised_by_shuhao !== true);
-        const maoYancan = current.filter((item) => item.advisor === '毛言粲');
-        const advisorPending = records.filter((item) => item.advisor_verification_status === 'pending');
-        const former = records.filter((item) => item.current_status === 'former');
-        const githubPending = records.filter((item) => !item.github_login);
-        const setMetric = (id, value) => {
-            const node = document.getElementById(id);
-            if (node) node.textContent = fmt(value);
-        };
-        setMetric('contributors-advised-count', shuhao.length);
-        setMetric('contributors-all-current-count', current.length);
-        setMetric('contributors-engineering-count', engineering.length);
-        setMetric('contributors-advised-engineering-count', shuhaoEngineering.length);
-        setMetric('contributors-academic-count', academic.length);
-        setMetric('contributors-other-engineering-count', otherEngineering.length);
-        setMetric('contributors-maoyancan-count', maoYancan.length);
-        setMetric('contributors-pending-advisor-count', advisorPending.length);
-        setMetric('contributors-former-count', former.length);
-        setMetric('contributors-confirmed-github-count', records.length - githubPending.length);
-        setMetric('contributors-pending-github-count', githubPending.length);
-        setMetric(
-            'contributors-shuhao-pending-github-count',
-            shuhaoEngineering.filter((item) => !item.github_login).length,
-        );
     }
 
     function renderCoreTable(contributors) {
@@ -416,20 +330,6 @@
     function renderPayload(payload) {
         const profiles = memberProfilesFor(payload);
         renderMeta(payload, profiles);
-        renderScopeMetrics(payload);
-        const canonicalEngineering = Array.isArray(payload.engineering_route_members)
-            ? payload.engineering_route_members
-            : [];
-        const canonicalNames = new Set(canonicalEngineering.map((item) => item.name_zh));
-        const additionalEngineering = Array.isArray(payload.member_audit)
-            ? payload.member_audit.filter((item) => item.is_current_member === true
-                && item.current_route === 'engineering'
-                && !canonicalNames.has(item.name_zh))
-            : [];
-        renderEngineeringRoute(
-            [...canonicalEngineering, ...additionalEngineering],
-            payload.pmc_members,
-        );
         renderProfileList('contributors-core-member-list', profiles.core_members, 'core');
         renderProfileList('contributors-participant-list', profiles.participants, 'participant');
         renderProfileList('contributors-staff-list', profiles.staff_members, 'staff');

@@ -1,518 +1,5 @@
 {
   "updated_at": "2026-07-25",
-  "server_admins": [
-    "刘俊",
-    "彭浩然"
-  ],
-  "pmc_membership_status": "confirmed",
-  "pmc_members": [
-    "ShuhaoZhangTony",
-    "CubeLander",
-    "SuccinctPaul",
-    "Amber1qq",
-    "MingqiWang-coder",
-    "cybber695",
-    "junhuizhang-boop",
-    "Tkhkrnx"
-  ],
-  "engineering_route_members": [
-    {
-      "name_zh": "高西岭",
-      "name_en": "Xiling Gao",
-      "github_login": "XilingGao",
-      "github_url": "https://github.com/XilingGao",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "阮宏毅",
-      "name_en": "Hongyi Ruan",
-      "github_login": "Lan-Fa",
-      "github_url": "https://github.com/Lan-Fa",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "杜雨枫",
-      "name_en": "Yufeng Du",
-      "github_login": "LuckyWindovo",
-      "github_url": "https://github.com/LuckyWindovo",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true,
-      "historical_route": "学术路线"
-    },
-    {
-      "name_zh": "刘世峰",
-      "name_en": "Shifeng Liu",
-      "github_login": "Remygred",
-      "github_url": "https://github.com/Remygred",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "王明琪",
-      "name_en": "Mingqi Wang",
-      "github_login": "MingqiWang-coder",
-      "github_url": "https://github.com/MingqiWang-coder",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "陈彦博",
-      "name_en": "Yanbo Chen",
-      "github_login": "cybber695",
-      "github_url": "https://github.com/cybber695",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "杨锦昀",
-      "name_en": "Jinyun Yang",
-      "github_login": "Yang-YJY",
-      "github_url": "https://github.com/Yang-YJY",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "田景远",
-      "name_en": "Jingyuan Tian",
-      "github_login": "CubeLander",
-      "github_url": "https://github.com/CubeLander",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "陈子嘉",
-      "name_en": "chenzijia",
-      "github_login": "mynameisczj",
-      "github_url": "https://github.com/mynameisczj",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "匡明轩",
-      "name_en": "MingXuan Kuang",
-      "github_login": "sad-and-bad1231",
-      "github_url": "https://github.com/sad-and-bad1231",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "程月甲",
-      "name_en": "Yuejia Cheng",
-      "github_login": "SuccinctPaul",
-      "github_url": "https://github.com/SuccinctPaul",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "王子澳",
-      "name_en": "Ziao Wang",
-      "github_login": "ZeroJustMe",
-      "github_url": "https://github.com/ZeroJustMe",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "陈德斌",
-      "name_en": "Debin Chen",
-      "github_login": "pluviophile-chen",
-      "github_url": "https://github.com/pluviophile-chen",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "周升晖",
-      "name_en": "Shenghui Zhou",
-      "github_login": "keridone",
-      "github_url": "https://github.com/keridone",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "何维",
-      "name_en": "He Wei",
-      "github_login": "healer-positive",
-      "github_url": "https://github.com/healer-positive",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true,
-      "cohort": "2027",
-      "student_status": "incoming_student"
-    },
-    {
-      "name_zh": "陈稷",
-      "name_en": "Ji Chen",
-      "github_login": "KazzeMaru",
-      "github_url": "https://github.com/KazzeMaru",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "欧丹丹",
-      "name_en": "Ou Dandan",
-      "github_login": "oddod",
-      "github_url": "https://github.com/oddod",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "路庆浩",
-      "name_en": "Lu Qinghao",
-      "github_login": "Luqhhh",
-      "github_url": "https://github.com/Luqhhh",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "李佳乐",
-      "name_en": "Li Jiale",
-      "github_login": null,
-      "github_url": null,
-      "github_verification_status": "pending",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "张睿诚",
-      "name_en": "Ruicheng Zhang",
-      "github_login": "KimmoZAG",
-      "github_url": "https://github.com/KimmoZAG",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true,
-      "historical_role": "研究员"
-    },
-    {
-      "name_zh": "姚世文",
-      "name_en": "Shiwen Yao",
-      "github_login": "YWHUTER",
-      "github_url": "https://github.com/YWHUTER",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "孙杨",
-      "name_en": "Yang Sun",
-      "github_login": "sunYangGitHub",
-      "github_url": "https://github.com/sunYangGitHub",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "张森磊",
-      "name_en": "Senlei Zhang",
-      "github_login": "zslchase",
-      "github_url": "https://github.com/zslchase",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "沈家乐",
-      "name_en": "Jiale Shen",
-      "github_login": "Fuze1111",
-      "github_url": "https://github.com/Fuze1111",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "余天成",
-      "name_en": "Yu Tiancheng",
-      "github_login": "yutiantian0115",
-      "github_url": "https://github.com/yutiantian0115",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true,
-      "historical_route": "学术路线"
-    },
-    {
-      "name_zh": "王杰",
-      "name_en": "Wang Jie",
-      "github_login": "WMASTER123",
-      "github_url": "https://github.com/WMASTER123",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "张盛翔",
-      "name_en": "Zhang Shengxiang",
-      "github_login": "zhangshengxiang682",
-      "github_url": "https://github.com/zhangshengxiang682",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true
-    },
-    {
-      "name_zh": "裴方睿",
-      "name_en": "Fangrui Pei",
-      "github_login": "Apei-520",
-      "github_url": "https://github.com/Apei-520",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true,
-      "student_status": "intern"
-    },
-    {
-      "name_zh": "钱柯彤",
-      "name_en": "Ketong Qian",
-      "github_login": "Devilsssssss",
-      "github_url": "https://github.com/Devilsssssss",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true,
-      "cohort": "2027",
-      "student_status": "applicant"
-    },
-    {
-      "name_zh": "李欣妍",
-      "name_en": "Xinyan Li",
-      "github_login": "XinYanLi-0725",
-      "github_url": "https://github.com/XinYanLi-0725",
-      "github_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_route_zh": "工程路线",
-      "advisor": "张书豪",
-      "is_advised_by_shuhao": true,
-      "is_current_member": true,
-      "is_engineering_route": true,
-      "historical_name": [
-        "李心砚"
-      ]
-    }
-  ],
-  "excluded_from_current_statistics": [
-    {
-      "name_zh": "万瑞鹏",
-      "former_member": true,
-      "status": "former_member",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "exclude_from_current_statistics": true,
-      "source_evidence": [
-        "task:former-intern-confirmation"
-      ]
-    },
-    {
-      "name_zh": "周雨桐",
-      "former_member": true,
-      "status": "former_member",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "exclude_from_current_statistics": true,
-      "source_evidence": [
-        "task:former-intern-confirmation"
-      ]
-    },
-    {
-      "name_zh": "宋功轩",
-      "is_current_member": false,
-      "former_member": true,
-      "status": "former_member",
-      "is_advised_by_shuhao": false,
-      "exclude_from_current_statistics": true,
-      "source_evidence": [
-        "task:former-member"
-      ]
-    },
-    {
-      "name_zh": "彭芳睿",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "exclude_from_advised_student_count": true,
-      "source_evidence": [
-        "prior-roster:excluded"
-      ]
-    },
-    {
-      "name_zh": "李欣莹",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "exclude_from_advised_student_count": true,
-      "source_evidence": [
-        "prior-roster:excluded"
-      ]
-    },
-    {
-      "name_zh": "邱瑞杰",
-      "former_member": true,
-      "status": "former_member",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "exclude_from_current_statistics": true,
-      "source_evidence": [
-        "task:former-intern-confirmation"
-      ]
-    },
-    {
-      "name_zh": "钱柯睿",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "exclude_from_advised_student_count": true,
-      "source_evidence": [
-        "prior-roster:excluded"
-      ]
-    },
-    {
-      "name_zh": "雷欣妍",
-      "former_member": true,
-      "status": "former_member",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "exclude_from_current_statistics": true,
-      "source_evidence": [
-        "task:former-intern-confirmation"
-      ]
-    },
-    {
-      "name_zh": "高启东",
-      "is_current_member": false,
-      "former_member": true,
-      "status": "former_member",
-      "is_advised_by_shuhao": false,
-      "exclude_from_current_statistics": true,
-      "source_evidence": [
-        "task:former-member"
-      ]
-    }
-  ],
   "all_repos": {
     "scope_repos": [
       "vllm-hust",
@@ -616,8 +103,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "实习生",
-          "en": "Student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
@@ -1416,6 +903,10 @@
           "zh": "SLO 感知的 LLM Serving 调度；MLA 与 KV Cache 优化；张量并行与多 GPU 推理解码；延迟保障与资源分配；应用感知 Serving",
           "en": "SLO-aware LLM serving and scheduling; MLA and KV Cache optimization; tensor parallelism and multi-GPU decoding; latency guarantees and resource allocation; application-aware serving"
         },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
+        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -1539,15 +1030,15 @@
           "vllm-hust-perf-analyzer"
         ],
         "key_contributions": "tooling",
-        "display_name": "孙杨",
-        "chinese_name": "孙杨",
-        "english_name": "Yang Sun",
+        "display_name": "sunYangGitHub",
+        "chinese_name": "",
+        "english_name": "",
         "person_id": "github:sunyanggithub",
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "外校实习生",
-          "en": "Visiting student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -1638,8 +1129,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "华科大三实习生",
-          "en": "HUST third-year undergraduate intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
@@ -1910,12 +1401,16 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "即将入学的研究生",
-          "en": "Incoming graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
           "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
+        },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
         },
         "participation_direction": {
           "zh": "",
@@ -2468,8 +1963,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "实习生",
-          "en": "Student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
@@ -2788,8 +2283,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "华科大三实习生",
-          "en": "HUST third-year undergraduate intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
@@ -2833,8 +2328,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "即将入学的研究生",
-          "en": "Incoming graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
@@ -3048,20 +2543,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "张书豪",
-        "name_en": "Shuhao Zhang",
-        "website_category": "core",
-        "advisor_verification_status": "pending",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 2,
@@ -3108,20 +2590,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "陈彦博",
-        "name_en": "Yanbo Chen",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 3,
@@ -3166,20 +2635,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "郑凌峰",
-        "name_en": "",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 4,
@@ -3224,20 +2680,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "谷昌伟",
-        "name_en": "Gu Changwei",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 5,
@@ -3282,20 +2725,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "杜忠承",
-        "name_en": "Zhongcheng Du",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 6,
@@ -3340,20 +2770,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "马川湖",
-        "name_en": "",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 7,
@@ -3398,20 +2815,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "杨杰",
-        "name_en": "Jie Yang",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 8,
@@ -3435,8 +2839,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "实习生",
-          "en": "Student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
@@ -3457,20 +2861,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "田景远",
-        "name_en": "Jingyuan Tian",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 9,
@@ -3516,20 +2907,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "王杰",
-        "name_en": "",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 10,
@@ -3575,20 +2953,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "匡明轩",
-        "name_en": "MingXuan Kuang",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 11,
@@ -3619,6 +2984,10 @@
           "zh": "SLO 感知的 LLM Serving 调度；MLA 与 KV Cache 优化；张量并行与多 GPU 推理解码；延迟保障与资源分配；应用感知 Serving",
           "en": "SLO-aware LLM serving and scheduling; MLA and KV Cache optimization; tensor parallelism and multi-GPU decoding; latency guarantees and resource allocation; application-aware serving"
         },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
+        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -3634,23 +3003,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "刘俊",
-        "name_en": "Liu Jun",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": "academic",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "server_admin": true,
-        "server_admin_zh": "服务器管理员",
-        "pmc_member": false,
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 12,
@@ -3695,20 +3048,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "韦若皓",
-        "name_en": "",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 13,
@@ -3754,20 +3094,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "王鸿坤",
-        "name_en": "",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 14,
@@ -3813,20 +3140,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "王润泽",
-        "name_en": "",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 15,
@@ -3849,8 +3163,8 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "华科大三实习生",
-          "en": "HUST third-year undergraduate intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "请求调度；资源管理；KV Cache 优化；长上下文服务",
@@ -3871,20 +3185,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "刘世峰",
-        "name_en": "",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 16,
@@ -3907,12 +3208,16 @@
         "identity_confirmed": true,
         "core_member": true,
         "role": {
-          "zh": "即将入学的研究生",
-          "en": "Incoming graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
           "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
+        },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
         },
         "participation_direction": {
           "zh": "",
@@ -3929,20 +3234,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "曹哲",
-        "name_en": "Zhe Cao",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": "academic",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 17,
@@ -3987,20 +3279,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "马俊豪",
-        "name_en": "Junhao Ma",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 18,
@@ -4045,20 +3324,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "吴天宇",
-        "name_en": "",
-        "website_category": "core",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       }
     ],
     "participants": [
@@ -4075,15 +3341,15 @@
           "vllm-hust-perf-analyzer"
         ],
         "key_contributions": "tooling",
-        "display_name": "孙杨",
-        "chinese_name": "孙杨",
-        "english_name": "Yang Sun",
+        "display_name": "sunYangGitHub",
+        "chinese_name": "",
+        "english_name": "",
         "person_id": "github:sunyanggithub",
         "identity_confirmed": true,
         "core_member": false,
         "role": {
-          "zh": "外校实习生",
-          "en": "Visiting student intern"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "",
@@ -4105,19 +3371,7 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 22,
-        "name_zh": "孙杨",
-        "name_en": "Yang Sun",
-        "website_category": "other",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "task:confirmed-roster"
-        ]
+        "all_repos_rank": 22
       },
       {
         "name": "万瑞鹏",
@@ -4152,30 +3406,14 @@
           "en": ""
         },
         "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
+          "zh": "",
+          "en": ""
         },
         "github_status": {
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "万瑞鹏",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "former",
-        "is_current_member": false,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ],
-        "former_member": true,
-        "status": "former_member",
-        "exclude_from_current_statistics": true
+        "contribution_areas": ""
       },
       {
         "name": "He Wei",
@@ -4217,20 +3455,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "何维",
-        "name_en": "He Wei",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "fw1688",
@@ -4269,23 +3494,10 @@
           "en": "Shuhao Zhang"
         },
         "github_status": {
-          "zh": "负责人确认；公开账号已核验",
-          "en": "Confirmed by the advisor; public account verified"
+          "zh": "负责人确认；组织邀请待接受",
+          "en": "Confirmed by the advisor; organization invitation pending"
         },
-        "contribution_areas": "",
-        "name_zh": "冯威",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "advisor-confirmed:2026-08-24",
-          "github:public-profile"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "余天成",
@@ -4308,8 +3520,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "2027 年待入学学生",
-          "en": "Incoming student (2027 cohort)"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "大模型推理方向待定；愿意根据课题安排探索相关研究",
@@ -4327,20 +3539,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "余天成",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "刘子墨",
@@ -4370,6 +3569,10 @@
           "zh": "待定",
           "en": "To be determined"
         },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
+        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -4382,20 +3585,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "刘子墨",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Seas0",
@@ -4437,20 +3627,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "刘思辰",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "周升晖",
@@ -4492,20 +3669,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "周升晖",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "周雨桐",
@@ -4540,30 +3704,14 @@
           "en": ""
         },
         "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
+          "zh": "",
+          "en": ""
         },
         "github_status": {
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "周雨桐",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "former",
-        "is_current_member": false,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ],
-        "former_member": true,
-        "status": "former_member",
-        "exclude_from_current_statistics": true
+        "contribution_areas": ""
       },
       {
         "name": "姚世文",
@@ -4605,20 +3753,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "姚世文",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Gongxuan Song",
@@ -4653,30 +3788,14 @@
           "en": "LLM inference-system engineering"
         },
         "advisor": {
-          "zh": "",
-          "en": ""
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "github_status": {
           "zh": "GitHub ID 待确认",
           "en": "GitHub ID pending confirmation"
         },
-        "contribution_areas": "",
-        "former_member": true,
-        "is_current_member": false,
-        "is_advised_by_shuhao": false,
-        "status": "former_member",
-        "exclude_from_current_statistics": true,
-        "name_zh": "宋功轩",
-        "name_en": "Gongxuan Song",
-        "website_category": "participant",
-        "advisor_verification_status": "pending",
-        "current_route": null,
-        "current_status": "former",
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "hustcui",
@@ -4721,20 +3840,7 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 10,
-        "name_zh": "崔钰嘉",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "all_repos_rank": 10
       },
       {
         "name": "Senlei Zhang",
@@ -4776,20 +3882,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "张森磊",
-        "name_en": "Senlei Zhang",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Ruicheng Zhang",
@@ -4835,20 +3928,7 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 14,
-        "name_zh": "张睿诚",
-        "name_en": "Ruicheng Zhang",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "all_repos_rank": 14
       },
       {
         "name": "Cheng Peng",
@@ -4890,20 +3970,7 @@
           "zh": "GitHub ID 待确认",
           "en": "GitHub ID pending confirmation"
         },
-        "contribution_areas": "",
-        "name_zh": "彭成",
-        "name_en": "Cheng Peng",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Pharos Peng",
@@ -4916,9 +3983,9 @@
         "active_repos": 0,
         "repos": [],
         "key_contributions": "",
-      "display_name": "彭浩然",
-      "chinese_name": "彭浩然",
-      "english_name": "Pharos Peng",
+        "display_name": "彭浩然",
+        "chinese_name": "彭浩然",
+        "english_name": "Pharos Peng",
         "person_id": "github:tkhkrnx",
         "identity_confirmed": true,
         "external_contributor": false,
@@ -4933,6 +4000,10 @@
           "zh": "SLO-aware 调度；Workflow/Agent-aware Serving；程序感知调度；工作流状态管理",
           "en": "SLO-aware scheduling; workflow- and agent-aware serving; program-aware scheduling; workflow state management"
         },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
+        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -4945,23 +4016,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "彭浩然",
-        "name_en": "Pharos Peng",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "academic",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "server_admin": true,
-        "server_admin_zh": "服务器管理员",
-      "pmc_member": true,
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Xincai Zhu",
@@ -5006,20 +4061,7 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 29,
-        "name_zh": "朱鑫材",
-        "name_en": "Xincai Zhu",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "all_repos_rank": 29
       },
       {
         "name": "Geng Li",
@@ -5042,8 +4084,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "马上入学的华科研究生",
-          "en": "Incoming HUST graduate student"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "分布式推理加速",
@@ -5054,36 +4096,14 @@
           "en": ""
         },
         "advisor": {
-          "zh": "毛言粲",
-          "en": "Yancan Mao"
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
         "github_status": {
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "李庚",
-        "name_en": "Geng Li",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "task:confirmed-advisor"
-        ],
-        "current_route_zh": "工程路线",
-        "name_aliases": [
-          "李赓"
-        ],
-        "advisor_name": "毛言粲",
-        "cohort": "2026",
-        "student_status": "master",
-        "is_same_team": true,
-        "former_member": false
+        "contribution_areas": ""
       },
       {
         "name": "sssarrior",
@@ -5112,6 +4132,10 @@
           "zh": "KV Cache 跨请求与跨 Chunk 复用；共享选择层；缓存精度与存储权衡；vLLM、SGLang、Mooncake 与 CacheBlend",
           "en": "Cross-request and cross-chunk KV Cache reuse; shared selection layers; cache-accuracy and storage tradeoffs; vLLM, SGLang, Mooncake, and CacheBlend"
         },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
+        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -5128,20 +4152,7 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 32,
-        "name_zh": "李旭恒",
-        "name_en": "Xuheng Li",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "academic",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "all_repos_rank": 32
       },
       {
         "name": "Changwu Li",
@@ -5171,6 +4182,10 @@
           "zh": "大模型推理系统软硬件协同优化；动态 MoE 推理；AI 加速器执行效率优化；Ascend NPU Host–Device 协同优化",
           "en": "Hardware-software co-optimization for LLM inference systems; dynamic MoE inference; AI-accelerator execution-efficiency optimization; Host-Device co-optimization on Ascend NPUs"
         },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
+        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -5183,20 +4198,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "李昶吾",
-        "name_en": "Changwu Li",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "李林浩",
@@ -5219,8 +4221,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "2027 年待入学学生",
-          "en": "Incoming student (2027 cohort)"
+          "zh": "学生",
+          "en": "Student"
         },
         "research_direction": {
           "zh": "待定",
@@ -5230,27 +4232,15 @@
           "zh": "",
           "en": ""
         },
-        "advisor": null,
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
         "github_status": {
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "is_current_member": false,
-        "is_advised_by_shuhao": false,
-        "advisor_verification_status": "pending",
-        "status": "advisor_pending",
-        "public_visibility": "internal_pending",
-        "name_zh": "李林浩",
-        "name_en": "",
-        "website_category": "participant",
-        "current_route": null,
-        "current_status": "pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ],
-        "exclude_from_current_statistics": true
+        "contribution_areas": ""
       },
       {
         "name": "李欣妍",
@@ -5292,20 +4282,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "李欣妍",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Jinyun Yang",
@@ -5347,20 +4324,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "杨锦昀",
-        "name_en": "Jinyun Yang",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "欧丹丹",
@@ -5402,20 +4366,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "欧丹丹",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "段盈君",
@@ -5457,20 +4408,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "段盈君",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Yancan Mao",
@@ -5493,12 +4431,16 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "",
-          "en": ""
+          "zh": "教授",
+          "en": "Professor"
         },
         "research_direction": {
-          "zh": "待补充",
-          "en": "To be provided"
+          "zh": "分布式系统",
+          "en": "Distributed systems"
+        },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
         },
         "participation_direction": {
           "zh": "",
@@ -5512,20 +4454,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "毛言粲",
-        "name_en": "Yancan Mao",
-        "website_category": "participant",
-        "advisor_verification_status": "pending",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "沈家乐",
@@ -5567,20 +4496,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "沈家乐",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Ziao Wang",
@@ -5622,20 +4538,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "王子澳",
-        "name_en": "Ziao Wang",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "MingqiWang-coder",
@@ -5681,20 +4584,7 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 5,
-        "name_zh": "王明琪",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "all_repos_rank": 5
       },
       {
         "name": "董君瑶",
@@ -5736,20 +4626,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "董君瑶",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "裴方睿",
@@ -5791,20 +4668,7 @@
           "zh": "姓名和 GitHub ID 已确认；两个组织的普通成员邀请待接受",
           "en": "Name and GitHub ID confirmed; ordinary-member invitations to both organizations are pending"
         },
-        "contribution_areas": "",
-        "name_zh": "裴方睿",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "谢汉龙",
@@ -5834,6 +4698,10 @@
           "zh": "异构 GPU 推理分离；系统架构；资源调度；异构兼容；成本敏感型部署；自动并行",
           "en": "Heterogeneous GPU inference disaggregation; system architecture; resource scheduling; heterogeneous compatibility; cost-aware deployment; automatic parallelism"
         },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
+        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -5846,20 +4714,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "谢汉龙",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Jianjun Zhao",
@@ -5882,8 +4737,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "已毕业博士生，目前已入职高校",
-          "en": "PhD alumnus, now university faculty"
+          "zh": "已毕业",
+          "en": "Graduated"
         },
         "research_direction": {
           "zh": "",
@@ -5901,20 +4756,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "赵建军",
-        "name_en": "Jianjun Zhao",
-        "website_category": "participant",
-        "advisor_verification_status": "not_applicable",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "WenjuZhao",
@@ -5956,20 +4798,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "赵文举",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "路庆浩",
@@ -6011,20 +4840,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "路庆浩",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Ruijie Qiu",
@@ -6058,8 +4874,8 @@
           "en": ""
         },
         "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": "distributed, docs",
         "external_contributor": false,
@@ -6069,23 +4885,7 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 28,
-        "name_zh": "邱瑞杰",
-        "name_en": "Ruijie Qiu",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "former",
-        "is_current_member": false,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ],
-        "former_member": true,
-        "status": "former_member",
-        "exclude_from_current_statistics": true
+        "all_repos_rank": 28
       },
       {
         "name": "钱柯彤",
@@ -6127,20 +4927,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "钱柯彤",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "Zijia Chen",
@@ -6185,20 +4972,7 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 8,
-        "name_zh": "陈子嘉",
-        "name_en": "Zijia Chen",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "all_repos_rank": 8
       },
       {
         "name": "Debin Chen",
@@ -6240,20 +5014,7 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "陈德斌",
-        "name_en": "Debin Chen",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
         "name": "雷欣妍",
@@ -6288,30 +5049,14 @@
           "en": ""
         },
         "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
+          "zh": "",
+          "en": ""
         },
         "github_status": {
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "雷欣妍",
-        "name_en": "",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "former",
-        "is_current_member": false,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ],
-        "former_member": true,
-        "status": "former_member",
-        "exclude_from_current_statistics": true
+        "contribution_areas": ""
       },
       {
         "name": "Xiling Gao",
@@ -6356,20 +5101,7 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 9,
-        "name_zh": "高西岭",
-        "name_en": "Xiling Gao",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "all_repos_rank": 9
       },
       {
         "name": "Hongru Gao",
@@ -6399,6 +5131,10 @@
           "zh": "动态图系统；计算机系统结构；国产硬件运行时与推理引擎优化",
           "en": "Dynamic-graph systems; computer architecture; runtime and inference-engine optimization on domestic hardware"
         },
+        "profile_status": {
+          "zh": "GitHub 已确认",
+          "en": "GitHub confirmed"
+        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -6411,54 +5147,49 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "高鸿儒",
-        "name_en": "Hongru Gao",
-        "website_category": "participant",
-        "advisor_verification_status": "confirmed",
-        "current_route": "academic",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       },
       {
-      "display_name": "王晨",
-      "chinese_name": "王晨",
-      "english_name": "",
-        "github_login": "qingfengyuhuoda",
-        "github_url": "https://github.com/qingfengyuhuoda",
+        "name": "LuckyWindovo",
+        "github_login": "LuckyWindovo",
+        "github_url": "https://github.com/LuckyWindovo",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "杜雨枫",
+        "chinese_name": "杜雨枫",
+        "english_name": "",
+        "person_id": "github:luckywindovo",
         "identity_confirmed": true,
-        "person_id": "github:qingfengyuhuoda",
+        "core_member": false,
         "role": {
-          "zh": "待核验成员",
-          "en": "Pending member verification"
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "大模型推理系统与性能建模",
+          "en": "LLM inference systems and performance modeling"
+        },
+        "participation_direction": {
+          "zh": "Ascend Serving Roofline",
+          "en": "Ascend Serving Roofline"
         },
         "advisor": {
-          "zh": "万瑶",
-          "en": "Yao Wan"
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
         },
-      "github_status": {
-        "zh": "",
-        "en": ""
-      },
-      "repos": [],
-      "current_route": null,
-        "current_status": "pending",
-        "is_current_member": false,
-        "is_advised_by_shuhao": false,
-        "is_same_team": true,
-        "public_visibility": "public",
-        "server_admin": false,
-        "pmc_member": false,
+        "contribution_areas": "",
         "external_contributor": false,
         "staff_member": false,
-        "core_member": false,
-        "core_repository_contributor": false
+        "core_repository_contributor": false,
+        "github_status": {
+          "zh": "",
+          "en": ""
+        }
       }
     ],
     "staff_members": [
@@ -6506,20 +5237,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "luoxiaohei",
-        "name_en": "",
-        "website_category": "staff",
-        "advisor_verification_status": "not_applicable",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 3,
@@ -6565,20 +5283,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "张俊辉",
-        "name_en": "Junhui Zhang",
-        "website_category": "staff",
-        "advisor_verification_status": "not_applicable",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "rank": 21,
@@ -6624,20 +5329,7 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "name_zh": "程月甲",
-        "name_en": "",
-        "website_category": "staff",
-        "advisor_verification_status": "confirmed",
-        "current_route": "engineering",
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": true,
-        "public_visibility": "public",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        }
       },
       {
         "name": "Bin Long",
@@ -6679,20 +5371,7 @@
           "zh": "无 GitHub ID",
           "en": "No GitHub ID"
         },
-        "contribution_areas": "",
-        "name_zh": "龙斌",
-        "name_en": "Bin Long",
-        "website_category": "staff",
-        "advisor_verification_status": "not_applicable",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       }
     ],
     "external_contributors": [
@@ -6736,1496 +5415,9 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": "",
-        "name_zh": "徐晨曦",
-        "name_en": "Chenxi Xu",
-        "website_category": "external",
-        "advisor_verification_status": "not_applicable",
-        "current_route": null,
-        "current_status": "current",
-        "is_current_member": true,
-        "is_advised_by_shuhao": false,
-        "public_visibility": "internal_pending",
-        "source_evidence": [
-          "website:data/core_contributors.json",
-          "official:vLLM-HUST/.github"
-        ]
+        "contribution_areas": ""
       }
     ],
     "unresolved_contributors": []
-  },
-  "member_audit": [
-    {
-      "name_zh": "luoxiaohei",
-      "name_en": "",
-      "github_login": "luoxiaohei",
-      "github_url": "https://github.com/luoxiaohei",
-      "website_category": "staff",
-      "advisor": "",
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending"
-    },
-    {
-      "name_zh": "万瑞鹏",
-      "name_en": "",
-      "github_login": "wrp-wrp",
-      "github_url": "https://github.com/wrp-wrp",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "former",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public",
-      "former_member": true,
-      "status": "former_member",
-      "exclude_from_current_statistics": true
-    },
-    {
-      "name_zh": "何维",
-      "name_en": "He Wei",
-      "github_login": "healer-positive",
-      "github_url": "https://github.com/healer-positive",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "冯威",
-      "name_en": "",
-      "github_login": "fw1688",
-      "github_url": "https://github.com/fw1688",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "advisor-confirmed:2026-08-24",
-        "github:public-profile"
-      ],
-      "public_visibility": "public",
-      "cohort": "2027",
-      "student_status": "incoming_student",
-      "institution_zh": "华中科技大学",
-      "admission_type_zh": "保研"
-    },
-    {
-      "name_zh": "余天成",
-      "name_en": "",
-      "github_login": "yutiantian0115",
-      "github_url": "https://github.com/yutiantian0115",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "刘世峰",
-      "name_en": "",
-      "github_login": "Remygred",
-      "github_url": "https://github.com/Remygred",
-      "website_category": "core",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "刘俊",
-      "name_en": "Liu Jun",
-      "github_login": "iliujunn",
-      "github_url": "https://github.com/iliujunn",
-      "website_category": "core",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "academic",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public",
-      "server_admin": true,
-      "server_admin_zh": "服务器管理员",
-      "pmc_member": false
-    },
-    {
-      "name_zh": "刘子墨",
-      "name_en": "",
-      "github_login": "Liu-zimo-LZM",
-      "github_url": "https://github.com/Liu-zimo-LZM",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "刘思辰",
-      "name_en": "",
-      "github_login": "Seas0",
-      "github_url": "https://github.com/Seas0",
-      "website_category": "participant",
-      "advisor": "万瑶",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "匡明轩",
-      "name_en": "MingXuan Kuang",
-      "github_login": "sad-and-bad1231",
-      "github_url": "https://github.com/sad-and-bad1231",
-      "website_category": "core",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "吴天宇",
-      "name_en": "",
-      "github_login": "Raing5Days",
-      "github_url": "https://github.com/Raing5Days",
-      "website_category": "core",
-      "advisor": "郑龙",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "周升晖",
-      "name_en": "",
-      "github_login": "keridone",
-      "github_url": "https://github.com/keridone",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "周雨桐",
-      "name_en": "",
-      "github_login": "FirmamentumX",
-      "github_url": "https://github.com/FirmamentumX",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "former",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending",
-      "former_member": true,
-      "status": "former_member",
-      "exclude_from_current_statistics": true
-    },
-    {
-      "name_zh": "姚世文",
-      "name_en": "",
-      "github_login": "YWHUTER",
-      "github_url": "https://github.com/YWHUTER",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "孙杨",
-      "name_en": "Yang Sun",
-      "github_login": "sunYangGitHub",
-      "github_url": "https://github.com/sunYangGitHub",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "宋功轩",
-      "name_en": "Gongxuan Song",
-      "github_login": null,
-      "github_url": null,
-      "website_category": "participant",
-      "advisor": "",
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "former",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending"
-    },
-    {
-      "name_zh": "崔钰嘉",
-      "name_en": "",
-      "github_login": "hustcui",
-      "github_url": "https://github.com/hustcui",
-      "website_category": "participant",
-      "advisor": "姚鹏程",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "张书豪",
-      "name_en": "Shuhao Zhang",
-      "github_login": "ShuhaoZhangTony",
-      "github_url": "https://github.com/ShuhaoZhangTony",
-      "website_category": "core",
-      "advisor": "",
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending"
-    },
-    {
-      "name_zh": "张俊辉",
-      "name_en": "Junhui Zhang",
-      "github_login": "junhuizhang-boop",
-      "github_url": "https://github.com/junhuizhang-boop",
-      "website_category": "staff",
-      "advisor": "",
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending"
-    },
-    {
-      "name_zh": "张森磊",
-      "name_en": "Senlei Zhang",
-      "github_login": "zslchase",
-      "github_url": "https://github.com/zslchase",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "张盛翔",
-      "name_en": "Zhang Shengxiang",
-      "github_login": "zhangshengxiang682",
-      "github_url": "https://github.com/zhangshengxiang682",
-      "website_category": "other",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "task:confirmed-roster"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "张睿诚",
-      "name_en": "Ruicheng Zhang",
-      "github_login": "KimmoZAG",
-      "github_url": "https://github.com/KimmoZAG",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "彭成",
-      "name_en": "Cheng Peng",
-      "github_login": null,
-      "github_url": null,
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "彭浩然",
-      "name_en": "Pharos Peng",
-      "github_login": "Tkhkrnx",
-      "github_url": "https://github.com/Tkhkrnx",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "academic",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public",
-      "server_admin": true,
-      "server_admin_zh": "服务器管理员",
-      "pmc_member": true
-    },
-    {
-      "name_zh": "徐晨曦",
-      "name_en": "Chenxi Xu",
-      "github_login": "xsun2001",
-      "github_url": "https://github.com/xsun2001",
-      "website_category": "external",
-      "advisor": "",
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending"
-    },
-    {
-      "name_zh": "曹哲",
-      "name_en": "Zhe Cao",
-      "github_login": "xmdhb",
-      "github_url": "https://github.com/xmdhb",
-      "website_category": "core",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "academic",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "朱鑫材",
-      "name_en": "Xincai Zhu",
-      "github_login": "Pygone",
-      "github_url": "https://github.com/Pygone",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "李佳乐",
-      "name_en": "Li Jiale",
-      "github_login": null,
-      "github_url": null,
-      "website_category": "other",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "task:confirmed-roster"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "李庚",
-      "name_en": "Geng Li",
-      "github_login": "Anjiangy",
-      "github_url": "https://github.com/Anjiangy",
-      "website_category": "participant",
-      "advisor": "毛言粲",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "task:confirmed-advisor"
-      ],
-      "public_visibility": "public",
-      "name_aliases": [
-        "李赓"
-      ],
-      "is_same_team": true,
-      "former_member": false
-    },
-    {
-      "name_zh": "李旭恒",
-      "name_en": "Xuheng Li",
-      "github_login": "sssarrior",
-      "github_url": "https://github.com/sssarrior",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "academic",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "李昶吾",
-      "name_en": "Changwu Li",
-      "github_login": "Li-changwu",
-      "github_url": "https://github.com/Li-changwu",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "李林浩",
-      "name_en": "",
-      "github_login": "Sunshine-llh",
-      "github_url": "https://github.com/Sunshine-llh",
-      "website_category": "participant",
-      "advisor": null,
-      "advisor_verification_status": "pending",
-      "current_route": null,
-      "current_status": "pending",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending"
-    },
-    {
-      "name_zh": "李欣妍",
-      "name_en": "",
-      "github_login": "XinYanLi-0725",
-      "github_url": "https://github.com/XinYanLi-0725",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "杜忠承",
-      "name_en": "Zhongcheng Du",
-      "github_login": "dzcixy",
-      "github_url": "https://github.com/dzcixy",
-      "website_category": "core",
-      "advisor": "黄禹",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "杜雨枫",
-      "name_en": "Yufeng Du",
-      "github_login": "LuckyWindovo",
-      "github_url": "https://github.com/LuckyWindovo",
-      "website_category": "other",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "task:confirmed-roster"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "杨杰",
-      "name_en": "Jie Yang",
-      "github_login": "JieYang2001",
-      "github_url": "https://github.com/JieYang2001",
-      "website_category": "core",
-      "advisor": "赵进",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "杨锦昀",
-      "name_en": "Jinyun Yang",
-      "github_login": "Yang-YJY",
-      "github_url": "https://github.com/Yang-YJY",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "欧丹丹",
-      "name_en": "",
-      "github_login": "oddod",
-      "github_url": "https://github.com/oddod",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "段盈君",
-      "name_en": "",
-      "github_login": "qingwanruojun",
-      "github_url": "https://github.com/qingwanruojun",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "毛言粲",
-      "name_en": "Yancan Mao",
-      "github_login": "yancanmao",
-      "github_url": "https://github.com/yancanmao",
-      "website_category": "participant",
-      "advisor": "",
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "沈家乐",
-      "name_en": "",
-      "github_login": "Fuze1111",
-      "github_url": "https://github.com/Fuze1111",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "王子澳",
-      "name_en": "Ziao Wang",
-      "github_login": "ZeroJustMe",
-      "github_url": "https://github.com/ZeroJustMe",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "王明琪",
-      "name_en": "",
-      "github_login": "MingqiWang-coder",
-      "github_url": "https://github.com/MingqiWang-coder",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "王杰",
-      "name_en": "",
-      "github_login": "WMASTER123",
-      "github_url": "https://github.com/WMASTER123",
-      "website_category": "core",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "王润泽",
-      "name_en": "",
-      "github_login": "rzwang22",
-      "github_url": "https://github.com/rzwang22",
-      "website_category": "core",
-      "advisor": "王庆刚",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "王鸿坤",
-      "name_en": "",
-      "github_login": "aly16-k",
-      "github_url": "https://github.com/aly16-k",
-      "website_category": "core",
-      "advisor": "项翔",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "田景远",
-      "name_en": "Jingyuan Tian",
-      "github_login": "CubeLander",
-      "github_url": "https://github.com/CubeLander",
-      "website_category": "core",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "程月甲",
-      "name_en": "",
-      "github_login": "SuccinctPaul",
-      "github_url": "https://github.com/SuccinctPaul",
-      "website_category": "staff",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "董君瑶",
-      "name_en": "",
-      "github_login": "carsontung666",
-      "github_url": "https://github.com/carsontung666",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "裴方睿",
-      "name_en": "",
-      "github_login": "Apei-520",
-      "github_url": "https://github.com/Apei-520",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "谢汉龙",
-      "name_en": "",
-      "github_login": "xiehanlong834-gif",
-      "github_url": "https://github.com/xiehanlong834-gif",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "谷昌伟",
-      "name_en": "Gu Changwei",
-      "github_login": "GuMorming",
-      "github_url": "https://github.com/GuMorming",
-      "website_category": "core",
-      "advisor": "罗瑞坤",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "赵建军",
-      "name_en": "Jianjun Zhao",
-      "github_login": "curryzjj",
-      "github_url": "https://github.com/curryzjj",
-      "website_category": "participant",
-      "advisor": "",
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending"
-    },
-    {
-      "name_zh": "赵文举",
-      "name_en": "",
-      "github_login": "WenjuZhao",
-      "github_url": "https://github.com/WenjuZhao",
-      "website_category": "participant",
-      "advisor": "姚鹏程",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "路庆浩",
-      "name_en": "",
-      "github_login": "Luqhhh",
-      "github_url": "https://github.com/Luqhhh",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "邱瑞杰",
-      "name_en": "Ruijie Qiu",
-      "github_login": "Jerry01020",
-      "github_url": "https://github.com/Jerry01020",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "former",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending",
-      "former_member": true,
-      "status": "former_member",
-      "exclude_from_current_statistics": true
-    },
-    {
-      "name_zh": "郑凌峰",
-      "name_en": "",
-      "github_login": "Amber1qq",
-      "github_url": "https://github.com/Amber1qq",
-      "website_category": "core",
-      "advisor": "刘海坤",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "钱柯彤",
-      "name_en": "",
-      "github_login": "Devilsssssss",
-      "github_url": "https://github.com/Devilsssssss",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "阮宏毅",
-      "name_en": "Hongyi Ruan",
-      "github_login": "Lan-Fa",
-      "github_url": "https://github.com/Lan-Fa",
-      "website_category": "other",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "task:confirmed-roster"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "陈子嘉",
-      "name_en": "Zijia Chen",
-      "github_login": "mynameisczj",
-      "github_url": "https://github.com/mynameisczj",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "陈彦博",
-      "name_en": "Yanbo Chen",
-      "github_login": "cybber695",
-      "github_url": "https://github.com/cybber695",
-      "website_category": "core",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "陈德斌",
-      "name_en": "Debin Chen",
-      "github_login": "pluviophile-chen",
-      "github_url": "https://github.com/pluviophile-chen",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "陈稷",
-      "name_en": "Ji Chen",
-      "github_login": "KazzeMaru",
-      "github_url": "https://github.com/KazzeMaru",
-      "website_category": "other",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "task:confirmed-roster"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "雷欣妍",
-      "name_en": "",
-      "github_login": "leixy2004",
-      "github_url": "https://github.com/leixy2004",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "former",
-      "is_current_member": false,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending",
-      "former_member": true,
-      "status": "former_member",
-      "exclude_from_current_statistics": true
-    },
-    {
-      "name_zh": "韦若皓",
-      "name_en": "",
-      "github_login": "kotoriqaq0",
-      "github_url": "https://github.com/kotoriqaq0",
-      "website_category": "core",
-      "advisor": "万瑶",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "马俊豪",
-      "name_en": "Junhao Ma",
-      "github_login": "kms12425",
-      "github_url": "https://github.com/kms12425",
-      "website_category": "core",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "马川湖",
-      "name_en": "",
-      "github_login": "machuanhu",
-      "github_url": "https://github.com/machuanhu",
-      "website_category": "core",
-      "advisor": "王雄",
-      "advisor_verification_status": "confirmed",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "高西岭",
-      "name_en": "Xiling Gao",
-      "github_login": "XilingGao",
-      "github_url": "https://github.com/XilingGao",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "engineering",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "高鸿儒",
-      "name_en": "Hongru Gao",
-      "github_login": "hongrugao",
-      "github_url": "https://github.com/hongrugao",
-      "website_category": "participant",
-      "advisor": "张书豪",
-      "advisor_verification_status": "confirmed",
-      "current_route": "academic",
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": true,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "龙斌",
-      "name_en": "Bin Long",
-      "github_login": null,
-      "github_url": null,
-      "website_category": "staff",
-      "advisor": "",
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:data/core_contributors.json",
-        "official:vLLM-HUST/.github"
-      ],
-      "public_visibility": "internal_pending"
-    },
-    {
-      "name_zh": "王晨",
-      "name_en": null,
-      "github_login": "qingfengyuhuoda",
-        "github_url": "https://github.com/qingfengyuhuoda",
-        "website_category": "other",
-        "advisor": "万瑶",
-        "advisor_verification_status": "confirmed",
-        "current_route": null,
-        "current_status": "pending",
-        "is_current_member": false,
-        "is_advised_by_shuhao": false,
-        "is_same_team": true,
-        "server_admin": false,
-        "pmc_member": false,
-        "public_visibility": "public",
-      "source_evidence": [
-        "task:advisor-confirmation"
-      ]
-    }
-  ],
-  "role_audit": [
-    {
-      "name_zh": "金海",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "廖小飞",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "张书豪",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "王雄",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "郑龙",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "王庆刚",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "罗瑞坤",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "赵进",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "刘海坤",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "项翔",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "姚鹏程",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "name_zh": "万瑶",
-      "website_category": "other",
-      "advisor": null,
-      "advisor_verification_status": "not_applicable",
-      "current_route": null,
-      "current_status": "current",
-      "is_current_member": true,
-      "is_advised_by_shuhao": false,
-      "source_evidence": [
-        "website:contributors.html"
-      ],
-      "public_visibility": "public"
-    }
-  ]
+  }
 }
