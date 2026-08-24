@@ -2180,7 +2180,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 42
+    assert len(profiles["participants"]) == 43
     assert len(profiles["staff_members"]) == 4
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
@@ -2292,6 +2292,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         "钱柯彤": "Devilsssssss",
         "段盈君": "qingwanruojun",
         "何维": "healer-positive",
+        "冯威": "fw1688",
         "谢汉龙": "xiehanlong834-gif",
         "周升晖": "keridone",
         "姚世文": "YWHUTER",
@@ -2374,6 +2375,9 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         people["何维"]["research_direction"]["zh"]
         == "性能优化；算法与硬件调优；方向适应性强"
     )
+    assert people["冯威"]["role"]["zh"] == "2027 年待入学学生"
+    assert people["冯威"]["advisor"]["zh"] == "张书豪"
+    assert people["冯威"]["github_status"]["zh"] == "负责人确认；组织邀请待接受"
     assert people["董君瑶"]["research_direction"]["zh"] == "向量数据库"
     assert (
         people["路庆浩"]["research_direction"]["zh"]

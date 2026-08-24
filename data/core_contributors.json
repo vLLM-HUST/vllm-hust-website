@@ -3458,6 +3458,48 @@
         "contribution_areas": ""
       },
       {
+        "name": "fw1688",
+        "github_login": "fw1688",
+        "github_url": "https://github.com/fw1688",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "冯威",
+        "chinese_name": "冯威",
+        "english_name": "",
+        "person_id": "github:fw1688",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "2027 年待入学学生",
+          "en": "Incoming student (2027 cohort)"
+        },
+        "research_direction": {
+          "zh": "待补充",
+          "en": "To be determined"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "负责人确认；组织邀请待接受",
+          "en": "Confirmed by the advisor; organization invitation pending"
+        },
+        "contribution_areas": ""
+      },
+      {
         "name": "余天成",
         "github_login": "yutiantian0115",
         "github_url": "https://github.com/yutiantian0115",
