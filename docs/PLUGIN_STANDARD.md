@@ -1,8 +1,8 @@
 # vLLM-HUST Plugin Standard 1.0
 
-This specification defines the minimum development and operations contract for a vLLM-HUST
-plugin. It complements the plugin catalog: the catalog explains what extensions are planned or
-available, while this document explains how a conforming extension is built and operated.
+This specification defines the minimum development and operations contract for a vLLM-HUST plugin.
+It complements the plugin catalog: the catalog explains what extensions are planned or available,
+while this document explains how a conforming extension is built and operated.
 
 ## 1. Scope
 
@@ -17,12 +17,12 @@ analysis tools are adjacent assets unless they register a vLLM runtime entry poi
 
 Choose the narrowest supported group:
 
-| Group | Intended use | Process scope |
-| --- | --- | --- |
-| `vllm.general_plugins` | General runtime registration and extensions | API, engine-core, and worker processes |
-| `vllm.platform_plugins` | Out-of-tree hardware platforms | Platform initialization in all relevant processes |
-| `vllm.io_processor_plugins` | Input and output processors | API process |
-| `vllm.stat_logger_plugins` | Statistics loggers | API process in asynchronous serving mode |
+| Group                       | Intended use                                | Process scope                                     |
+| --------------------------- | ------------------------------------------- | ------------------------------------------------- |
+| `vllm.general_plugins`      | General runtime registration and extensions | API, engine-core, and worker processes            |
+| `vllm.platform_plugins`     | Out-of-tree hardware platforms              | Platform initialization in all relevant processes |
+| `vllm.io_processor_plugins` | Input and output processors                 | API process                                       |
+| `vllm.stat_logger_plugins`  | Statistics loggers                          | API process in asynchronous serving mode          |
 
 `vllm.platform_plugins` is reserved for hardware-platform implementations. A compiler, kernel
 library, model-preparation utility, or benchmark is not a platform plugin merely because a runtime
@@ -145,10 +145,10 @@ not be embedded in a plugin or in shared launch tooling.
 Activation requires all of the following:
 
 1. The intended entry point is discoverable in every serving environment.
-2. Registration logs identify the plugin ID and version without exposing secrets.
-3. The server reaches its readiness endpoint.
-4. At least one functional request completes correctly.
-5. Plugin-owned health, counters, or receipts are available when the plugin exposes them.
+1. Registration logs identify the plugin ID and version without exposing secrets.
+1. The server reaches its readiness endpoint.
+1. At least one functional request completes correctly.
+1. Plugin-owned health, counters, or receipts are available when the plugin exposes them.
 
 The standard readiness probe is:
 
@@ -167,10 +167,10 @@ To disable a plugin:
 
 1. Gracefully stop the owning service through its supervisor or send the foreground process its
    normal termination signal.
-2. Wait for API, engine-core, and worker processes to exit.
-3. Confirm plugin-owned threads, sockets, files, shared memory, and device resources are released.
-4. Remove the plugin ID from the explicit allowlist, or set `VLLM_PLUGINS=""` to load none.
-5. Restart and verify the baseline path.
+1. Wait for API, engine-core, and worker processes to exit.
+1. Confirm plugin-owned threads, sockets, files, shared memory, and device resources are released.
+1. Remove the plugin ID from the explicit allowlist, or set `VLLM_PLUGINS=""` to load none.
+1. Restart and verify the baseline path.
 
 Do not use broad process-name termination as a plugin shutdown mechanism.
 
@@ -181,8 +181,8 @@ kill -TERM "${SERVER_PID}"
 wait "${SERVER_PID}"
 ```
 
-For a supervised deployment, use the supervisor's scoped stop operation instead of signaling a
-child process behind the supervisor.
+For a supervised deployment, use the supervisor's scoped stop operation instead of signaling a child
+process behind the supervisor.
 
 ## 10. Remove and roll back
 
@@ -211,5 +211,5 @@ A plugin may be presented as **vLLM-HUST conforming** only when automated tests 
 - graceful shutdown and cleanup; and
 - baseline restart after disable or uninstall.
 
-The plugin README must contain exact build, install, enable, start, verify, stop, disable, uninstall,
-and rollback instructions for the released distribution.
+The plugin README must contain exact build, install, enable, start, verify, stop, disable,
+uninstall, and rollback instructions for the released distribution.
