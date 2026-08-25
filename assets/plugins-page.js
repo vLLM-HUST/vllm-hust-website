@@ -26,8 +26,8 @@
 
   function statusText(item) {
     const names = language() === "zh"
-      ? { accepted: "已接收", existing: "已有插件", active: "研究中", incubating: "孵化中", planned: "规划中", reframe: "重构中", stopped: "机制停止" }
-      : { accepted: "Accepted", existing: "Existing plugin", active: "Research", incubating: "Incubating", planned: "Planned", reframe: "Reframing", stopped: "Mechanism stopped" };
+      ? { accepted: "已接收", existing: "已有插件", active: "研究中", incubating: "孵化中", planned: "规划中", concept: "概念设计" }
+      : { accepted: "Accepted", existing: "Existing plugin", active: "Research", incubating: "Incubating", planned: "Planned", concept: "Concept" };
     return names[item.status] || item.status;
   }
 
