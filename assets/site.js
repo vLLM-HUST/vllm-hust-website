@@ -12,6 +12,7 @@
             navProducts: 'Products',
             navEngine: 'Engine',
             navProjects: 'Projects',
+            navPlugins: 'Plugins',
             navEvidence: 'Evidence',
             navCommunity: 'Community',
             navResources: 'Resources',
@@ -38,6 +39,7 @@
             navProducts: '产品',
             navEngine: '引擎',
             navProjects: '项目',
+            navPlugins: '插件',
             navEvidence: '成果',
             navCommunity: '社区',
             navResources: '资源',
@@ -111,6 +113,7 @@
         setText('nav-products', common.navProducts);
         setText('nav-engine', common.navEngine);
         setText('nav-projects', common.navProjects);
+        setText('nav-plugins', common.navPlugins);
         setText('nav-evidence', common.navEvidence);
         setText('nav-community', common.navCommunity);
         setText('nav-resources', common.navResources);
@@ -187,6 +190,7 @@
             navLink('', './index.html#products', 'navProducts'),
             navLink('', './index.html#stack', 'navEngine'),
             navLink('', './index.html#projects', 'navProjects'),
+            navLink('plugins', './plugins.html', 'navPlugins'),
             ...NAV_GROUPS.map((group) => `
                 <details class="nav-group" data-nav-group="${group.id}">
                     <summary class="nav-group-label" id="nav-${group.id}" data-i18n-common="${group.label}">${I18N.en[group.label]}</summary>
@@ -242,7 +246,7 @@
                     <span id="footer-copy">${summary}</span>
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
-                    <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
+                    <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
                     <div><strong data-i18n-common="footerEvidence">Evidence</strong><a href="./leaderboard.html" data-i18n-common="navLeaderboard">Leaderboard</a><a href="./achievements.html" data-i18n-common="navAchievements">Achievements</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
                     <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
                 </nav>
