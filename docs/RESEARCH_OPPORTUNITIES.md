@@ -73,8 +73,7 @@ ______________________________________________________________________
 
 ## A2. 拓扑感知的多卡并行与分阶段通信策略
 
-- **优先级/成熟度：**
-  P0；研究入口（链接未公开）， 直接回归证据见
+- **优先级/成熟度：** P0；研究入口（链接未公开）， 直接回归证据见
   [#145](https://github.com/vLLM-HUST/vllm-ascend-hust/issues/145)。
 - **现象：** 2 卡 online workload 曾出现 41.5%–47.7% 吞吐下降，4 卡 TTFT 达到数秒至数十秒；固定 TP 和 rank placement 很可能与实际
   HCCS/PCIe 拓扑、 消息尺寸和 prefill/decode 阶段不匹配。
@@ -87,8 +86,8 @@ ______________________________________________________________________
 
 ## A3. 分布式元数据的增量同步、压缩与计算重叠
 
-- **优先级/成熟度：** P0；研究入口（链接未公开），
-  相关入口包括 Ascend [PR #33](https://github.com/vLLM-HUST/vllm-ascend-hust/pull/33)。
+- **优先级/成熟度：** P0；研究入口（链接未公开）， 相关入口包括 Ascend
+  [PR #33](https://github.com/vLLM-HUST/vllm-ascend-hust/pull/33)。
 - **现象：** DP、scheduler、KV block table、EPLB 等小型控制元数据需要频繁同步； 它们带宽不大，却容易制造 host/device barrier 和尾延迟。
 - **研究问题：** 能否只同步变化量，并将序列化、传输和应用与 device execution 重叠，同时保持 rank 间一致性？
 - **核心机制：** versioned delta、结构化压缩、异步 apply、staleness budget 和 correctness invariant。
@@ -190,9 +189,8 @@ ______________________________________________________________________
 
 ## A11. Ascend 推测解码的 Draft/Verify/Accept 阶段协同
 
-- **优先级/成熟度：**
-  P0；Ngram 研究入口（链接未公开），
-  历史工程回归见 [core #58](https://github.com/vLLM-HUST/vllm-hust/issues/58)， 关联 core
+- **优先级/成熟度：** P0；Ngram 研究入口（链接未公开）， 历史工程回归见
+  [core #58](https://github.com/vLLM-HUST/vllm-hust/issues/58)， 关联 core
   [PR #121](https://github.com/vLLM-HUST/vllm-hust/pull/121)、 Ascend
   [PR #123](https://github.com/vLLM-HUST/vllm-ascend-hust/pull/123) 和
   [PR #135](https://github.com/vLLM-HUST/vllm-ascend-hust/pull/135)。
@@ -384,8 +382,7 @@ ______________________________________________________________________
 
 ## C2. 在线推理回归的因果阶段归因
 
-- **优先级/成熟度：**
-  P0；研究入口（链接未公开）。
+- **优先级/成熟度：** P0；研究入口（链接未公开）。
 - **问题：** commit 间 TTFT/TBT/吞吐变化可能来自 queue、prefill、decode、KV、 communication、client 或配置，而不是相邻 PR。
 - **假设/机制：** phase signature、change-point、controlled intervention 和 counterfactual replay 可以缩小归因范围。
 - **实验：** 用已知回归/伪回归做盲测，比较 bisect、trace rule 和 causal model。
@@ -393,8 +390,7 @@ ______________________________________________________________________
 
 ## C3. 稀疏、噪声性能历史的统计门禁
 
-- **优先级/成熟度：**
-  P0；研究入口（链接未公开）。
+- **优先级/成熟度：** P0；研究入口（链接未公开）。
 - **问题：** 单次点、不同重复数、设备噪声和历史 best-of 使固定百分比阈值不可靠。
 - **假设/机制：** 层次方差模型、SPRT/Bayesian sequential test、effect size 和 change-point 可减少误报及 NPU 小时。
 - **实验：** 历史 raw repeats、已知正常/回归提交、不同运行预算。
