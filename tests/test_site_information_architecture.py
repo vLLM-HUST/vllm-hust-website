@@ -16,6 +16,12 @@ def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -
     assert '<details class="nav-group"' in SITE_JS
 
 
+def test_homepage_has_a_cache_safe_static_plugin_navigation_entry() -> None:
+    assert 'id="nav-plugins"' in HOME
+    assert 'href="./plugins.html">Plugins</a>' in HOME
+    assert "assets/site.js?v=site-structure-20260816-plugin-nav-20260825" in HOME
+
+
 def test_mobile_navigation_uses_compact_accessible_disclosure() -> None:
     assert "button.setAttribute('aria-controls', links.id)" in SITE_JS
     assert "button.setAttribute('aria-expanded', 'false')" in SITE_JS
