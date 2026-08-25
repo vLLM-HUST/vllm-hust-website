@@ -8,7 +8,7 @@
   <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png">
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png"><link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/site.css?v=site-structure-20260816"><link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816"><link rel="stylesheet" href="./assets/plugins.css?v=plugin-ecosystem-v2">
+  <link rel="stylesheet" href="./assets/site.css?v=site-structure-20260816"><link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816"><link rel="stylesheet" href="./assets/plugins.css?v=plugin-standard-v1">
 </head>
 <body data-page="plugins">
   <nav class="site-nav"><div class="site-shell site-nav-inner"><a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a><div class="nav-links"><a id="nav-home" class="nav-link" href="./index.html">Home</a><a id="nav-plugins" class="nav-link nav-plugin-link active" href="./plugins.html">Plugins</a></div></div></nav>
@@ -16,7 +16,84 @@
   <main class="site-shell plugin-page">
     <section class="page-hero plugin-hero"><div class="content-panel"><span id="plugins-eyebrow" class="eyebrow">Inference-engine extension roadmap</span><h1 id="plugins-title">Plugin Ecosystem</h1><p id="plugins-lede" class="hero-lede">One engine with modular extension points across the inference stack.</p><div class="plugin-hero-facts"><span><strong data-plugin-count>59</strong><small id="plugins-fact-items">roadmap modules</small></span><span><strong>09</strong><small id="plugins-fact-layers">system layers</small></span><span><strong data-runtime-count>06</strong><small id="plugins-fact-runtime">runtime plugin repositories</small></span><span><strong data-adjacent-count>07</strong><small id="plugins-fact-adjacent">supporting projects</small></span></div></div></section>
     <section class="content-panel plugin-boundary"><div><span id="plugins-boundary-kicker" class="eyebrow">Packaging model</span><h2 id="plugins-boundary-title">Independent plugins, not permanent runtime forks.</h2></div><p id="plugins-boundary-copy">This catalog combines available plugins with the development roadmap. Maturity badges show what exists today and what remains under development; repository links are shown only when they are public.</p></section>
-    <section class="content-panel plugin-legend" aria-labelledby="plugins-legend-title"><div><span id="plugins-legend-kicker" class="eyebrow">Maturity guide</span><h2 id="plugins-legend-title">Read the roadmap at a glance.</h2></div><ul><li><strong id="plugins-legend-existing">Available code</strong><span id="plugins-legend-existing-copy">A repository exposes a native vLLM runtime entry point.</span></li><li><strong id="plugins-legend-active">Active development</strong><span id="plugins-legend-active-copy">Implementation work is underway.</span></li><li><strong id="plugins-legend-prototype">Research prototype</strong><span id="plugins-legend-prototype-copy">The mechanism is being validated.</span></li><li><strong id="plugins-legend-roadmap">Roadmap / concept</strong><span id="plugins-legend-roadmap-copy">Architecture is defined; implementation is not presented as delivered.</span></li></ul></section>
+    <nav class="plugin-section-nav" aria-label="Plugin page sections"><a href="#plugin-standard"><span class="lang-en">Plugin Standard</span><span class="lang-zh">插件规范</span><small>BUILD · OPERATE · REMOVE</small></a><a href="#plugin-catalog"><span class="lang-en">Plugin Catalog</span><span class="lang-zh">插件目录</span><small>09 LAYERS · 59 MODULES</small></a></nav>
+
+    <section id="plugin-standard" class="content-panel plugin-standard" aria-labelledby="plugin-standard-title">
+      <header class="standard-head"><div><span class="eyebrow"><span class="lang-en">vLLM-HUST Plugin Standard</span><span class="lang-zh">vLLM-HUST 插件标准</span></span><h2 id="plugin-standard-title"><span class="lang-en">One lifecycle contract for every plugin.</span><span class="lang-zh">所有插件遵循同一套生命周期规范。</span></h2></div><div class="standard-version"><strong>STANDARD 1.0</strong><span><span class="lang-en">Process-scoped · entry-point based</span><span class="lang-zh">进程级 · 基于 entry point</span></span></div></header>
+      <p class="standard-intro"><span class="lang-en">A conforming plugin can be packaged, discovered, explicitly enabled, verified, stopped, disabled, and removed without editing the vLLM-HUST source tree. The same contract applies on every node and in every worker process.</span><span class="lang-zh">合规插件无需修改 vLLM-HUST 源码，即可完成打包、发现、显式启用、验证、停止、停用和卸载；同一合同适用于每个节点和每个 worker 进程。</span></p>
+
+      <ol class="plugin-lifecycle" aria-label="Plugin lifecycle">
+        <li><span>01</span><strong><span class="lang-en">Create</span><span class="lang-zh">创建</span></strong><p><span class="lang-en">Isolate code, configuration, tests, and ownership in one package.</span><span class="lang-zh">在独立包中隔离代码、配置、测试和责任边界。</span></p></li>
+        <li><span>02</span><strong><span class="lang-en">Register</span><span class="lang-zh">注册</span></strong><p><span class="lang-en">Declare one stable Python entry point in the narrowest supported group.</span><span class="lang-zh">在最窄的受支持分组中声明一个稳定的 Python entry point。</span></p></li>
+        <li><span>03</span><strong><span class="lang-en">Package</span><span class="lang-zh">打包</span></strong><p><span class="lang-en">Build a versioned wheel with compatibility and configuration metadata.</span><span class="lang-zh">构建带兼容性与配置元数据的版本化 wheel。</span></p></li>
+        <li><span>04</span><strong><span class="lang-en">Install</span><span class="lang-zh">安装</span></strong><p><span class="lang-en">Install into the exact Python environment used by every server process.</span><span class="lang-zh">安装到所有服务进程实际使用的同一 Python 环境。</span></p></li>
+        <li><span>05</span><strong><span class="lang-en">Enable</span><span class="lang-zh">启用</span></strong><p><span class="lang-en">Select plugins with an explicit <code>VLLM_PLUGINS</code> allowlist.</span><span class="lang-zh">通过显式 <code>VLLM_PLUGINS</code> allowlist 选择插件。</span></p></li>
+        <li><span>06</span><strong><span class="lang-en">Start &amp; verify</span><span class="lang-zh">启动与验证</span></strong><p><span class="lang-en">Confirm discovery, registration logs, readiness, and one functional request.</span><span class="lang-zh">确认发现、注册日志、服务就绪和至少一个功能请求。</span></p></li>
+        <li><span>07</span><strong><span class="lang-en">Stop &amp; disable</span><span class="lang-zh">停止与停用</span></strong><p><span class="lang-en">Gracefully stop the server, change the allowlist, then restart.</span><span class="lang-zh">优雅停止服务，调整 allowlist，再重新启动。</span></p></li>
+        <li><span>08</span><strong><span class="lang-en">Remove</span><span class="lang-zh">卸载</span></strong><p><span class="lang-en">Uninstall only after all consuming processes have exited; verify the entry point is gone.</span><span class="lang-zh">所有使用进程退出后再卸载，并确认 entry point 已消失。</span></p></li>
+      </ol>
+
+      <div class="standard-rule-grid">
+        <article><span>ENTRY POINT</span><h3><span class="lang-en">Choose the correct group</span><span class="lang-zh">选择正确的入口分组</span></h3><p><code>vllm.general_plugins</code> for general runtime registration; <code>vllm.platform_plugins</code> only for hardware platforms; <code>vllm.io_processor_plugins</code> for IO processors; <code>vllm.stat_logger_plugins</code> for stat loggers.</p></article>
+        <article><span>PROCESS MODEL</span><h3><span class="lang-en">Registration is re-entrant</span><span class="lang-zh">注册逻辑必须可重入</span></h3><p><span class="lang-en">vLLM may load a plugin in API, engine-core, and worker processes. Repeated registration must not duplicate patches, threads, files, or global state.</span><span class="lang-zh">vLLM 可能在 API、engine core 和 worker 进程中加载插件；重复注册不得重复 patch、线程、文件或全局状态。</span></p></article>
+        <article><span>CONFIGURATION</span><h3><span class="lang-en">Namespaced and explicit</span><span class="lang-zh">命名隔离且显式配置</span></h3><p><span class="lang-en">Use plugin-prefixed variables, documented defaults, validation, and safe fallback. Do not embed machine paths, ports, device IDs, credentials, or model locations.</span><span class="lang-zh">使用插件前缀变量、明确默认值、校验与安全回退；不得嵌入机器路径、端口、设备 ID、凭据或模型位置。</span></p></article>
+        <article><span>COMPATIBILITY</span><h3><span class="lang-en">Declare the tested runtime</span><span class="lang-zh">声明已验证运行时</span></h3><p><span class="lang-en">Publish the distribution version, entry-point identity, supported vLLM range, tested vLLM-HUST commit, platform requirements, and incompatible combinations.</span><span class="lang-zh">公布发行版本、入口标识、支持的 vLLM 范围、已验证的 vLLM-HUST commit、平台要求与不兼容组合。</span></p></article>
+        <article><span>OBSERVABILITY</span><h3><span class="lang-en">Make activation visible</span><span class="lang-zh">让启用状态可观测</span></h3><p><span class="lang-en">Emit one registration record with plugin ID and version. Expose readiness or counters without secrets; startup failure must be visible and actionable.</span><span class="lang-zh">输出包含插件 ID 与版本的注册记录；就绪状态和计数器不得泄露秘密，启动失败必须清晰可定位。</span></p></article>
+        <article><span>SHUTDOWN</span><h3><span class="lang-en">Own every resource</span><span class="lang-zh">完整管理自身资源</span></h3><p><span class="lang-en">The plugin owns cleanup for its threads, sockets, files, shared memory, and device resources. Shutdown must be bounded and leave the baseline restartable.</span><span class="lang-zh">插件负责清理自身线程、socket、文件、共享内存和设备资源；关闭过程必须有界，并保证基线可重新启动。</span></p></article>
+      </div>
+
+      <div class="standard-implementation">
+        <article><div class="standard-code-head"><span>01 / PACKAGE</span><strong>pyproject.toml</strong></div><pre><code>[project]
+name = "&lt;distribution-name&gt;"
+version = "&lt;version&gt;"
+
+[project.entry-points."vllm.general_plugins"]
+&lt;plugin-id&gt; = "&lt;package&gt;.plugin:register"</code></pre></article>
+        <article><div class="standard-code-head"><span>02 / REGISTER</span><strong>plugin.py</strong></div><pre><code>_REGISTERED = False
+
+def register() -&gt; None:
+    global _REGISTERED
+    if _REGISTERED:
+        return
+    # Install one narrow runtime hook.
+    _REGISTERED = True</code></pre></article>
+        <article class="operations-example"><div class="standard-code-head"><span>03 / OPERATE</span><strong><span class="lang-en">Lifecycle commands</span><span class="lang-zh">生命周期命令</span></strong></div><pre><code># Deployment inputs
+export BUILD_PYTHON=/path/to/build/python
+export RUNTIME_PYTHON=/path/to/serving/python
+export PLUGIN_WHEEL=/path/to/plugin.whl
+export PLUGIN_ID=your-plugin-id
+export PLUGIN_DISTRIBUTION=your-distribution-name
+export MODEL=your-model
+export PORT=your-port
+
+# Build and install into the serving environment
+"${BUILD_PYTHON}" -m build
+"${RUNTIME_PYTHON}" -m pip install "${PLUGIN_WHEEL}"
+
+# Enable and start
+VLLM_PLUGINS="${PLUGIN_ID}" vllm serve "${MODEL}" --port "${PORT}"
+
+# Readiness
+curl --fail --silent "http://127.0.0.1:${PORT}/v1/models"
+
+# Stop a directly owned process gracefully
+kill -TERM "${SERVER_PID}"
+wait "${SERVER_PID}"
+
+# Disable all plugins on the next start
+VLLM_PLUGINS="" vllm serve "${MODEL}" --port "${PORT}"
+
+# Remove only after the server has stopped
+"${RUNTIME_PYTHON}" -m pip uninstall "${PLUGIN_DISTRIBUTION}"</code></pre></article>
+      </div>
+
+      <aside class="plugin-runtime-note"><strong><span class="lang-en">No hot-unload contract</span><span class="lang-zh">不承诺热卸载</span></strong><p><span class="lang-en">Plugins are process-scoped and may modify multiple vLLM processes. Stop the owning service gracefully before disabling or uninstalling. If <code>VLLM_PLUGINS</code> is unset, vLLM loads every discovered plugin; use an explicit allowlist in production, or an empty string to load none.</span><span class="lang-zh">插件属于进程级能力，可能修改多个 vLLM 进程。停用或卸载前必须优雅停止所属服务。若未设置 <code>VLLM_PLUGINS</code>，vLLM 会加载所有已发现插件；生产环境应使用显式 allowlist，设置为空字符串表示不加载任何插件。</span></p></aside>
+
+      <div class="standard-conformance"><div><span class="eyebrow"><span class="lang-en">Release checklist</span><span class="lang-zh">发布检查表</span></span><h3><span class="lang-en">What “vLLM-HUST conforming” means</span><span class="lang-zh">什么是“符合 vLLM-HUST 插件标准”</span></h3></div><ul><li><span class="lang-en">Wheel installs without editing the engine tree.</span><span class="lang-zh">无需修改引擎源码即可安装 wheel。</span></li><li><span class="lang-en">Entry point is discoverable and registration passes a double-call test.</span><span class="lang-zh">entry point 可发现，注册函数通过连续调用两次测试。</span></li><li><span class="lang-en">Explicit enabled and disabled startup paths both pass readiness.</span><span class="lang-zh">显式启用与停用两种启动路径均通过就绪检查。</span></li><li><span class="lang-en">Configuration, compatibility, logs, health, shutdown, and rollback are documented.</span><span class="lang-zh">配置、兼容性、日志、健康检查、关闭与回退均有文档。</span></li><li><span class="lang-en">Graceful shutdown releases plugin-owned resources and permits a clean baseline restart.</span><span class="lang-zh">优雅关闭释放插件资源，并可干净重启基线。</span></li><li><span class="lang-en">Smoke results validate lifecycle only; performance claims require a matched benchmark.</span><span class="lang-zh">smoke 结果只验证生命周期；性能结论必须来自 matched benchmark。</span></li></ul></div>
+      <a class="standard-document-link" href="https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/PLUGIN_STANDARD.md" target="_blank" rel="noopener noreferrer"><span class="lang-en">Read the versioned specification</span><span class="lang-zh">阅读版本化完整规范</span><span>PLUGIN_STANDARD.md ↗</span></a>
+    </section>
+
+    <section id="plugin-catalog" class="content-panel plugin-legend" aria-labelledby="plugins-legend-title"><div><span id="plugins-legend-kicker" class="eyebrow">Maturity guide</span><h2 id="plugins-legend-title">Read the roadmap at a glance.</h2></div><ul><li><strong id="plugins-legend-existing">Available code</strong><span id="plugins-legend-existing-copy">A repository exposes a native vLLM runtime entry point.</span></li><li><strong id="plugins-legend-active">Active development</strong><span id="plugins-legend-active-copy">Implementation work is underway.</span></li><li><strong id="plugins-legend-prototype">Research prototype</strong><span id="plugins-legend-prototype-copy">The mechanism is being validated.</span></li><li><strong id="plugins-legend-roadmap">Roadmap / concept</strong><span id="plugins-legend-roadmap-copy">Architecture is defined; implementation is not presented as delivered.</span></li></ul></section>
     <section class="plugin-controls" aria-label="Plugin filters"><label><span id="plugins-search-label">Search</span><input data-plugin-search type="search" placeholder="Search plugin, responsibility, or layer"></label><div data-plugin-filters></div></section>
     <p class="plugin-status" data-plugin-status aria-live="polite">Loading plugin plan…</p>
     <div class="plugin-layer-list" data-plugin-catalog data-source="./data/plugins.json?v=client-ready-v2"></div>
@@ -25,6 +102,6 @@
   </main>
   <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="footer-copy">Portable inference mechanisms for domestic compute.</span></footer>
   <script>window.vllmHustPageDict={en:{title:'Plugin Ecosystem | vLLM-HUST','plugins-eyebrow':'Inference-engine extension roadmap','plugins-title':'Plugin Ecosystem','plugins-lede':'One engine with modular extension points across the inference stack.','plugins-fact-items':'roadmap modules','plugins-fact-layers':'system layers','plugins-fact-runtime':'runtime plugin repositories','plugins-fact-adjacent':'supporting projects','plugins-boundary-kicker':'Packaging model','plugins-boundary-title':'Independent plugins, not permanent runtime forks.','plugins-boundary-copy':'This catalog combines available plugins with the development roadmap. Maturity badges show what exists today and what remains under development; repository links are shown only when they are public.','plugins-legend-kicker':'Maturity guide','plugins-legend-title':'Read the roadmap at a glance.','plugins-legend-existing':'Available code','plugins-legend-existing-copy':'A repository exposes a native vLLM runtime entry point.','plugins-legend-active':'Active development','plugins-legend-active-copy':'Implementation work is underway.','plugins-legend-prototype':'Research prototype','plugins-legend-prototype-copy':'The mechanism is being validated.','plugins-legend-roadmap':'Roadmap / concept','plugins-legend-roadmap-copy':'Architecture is defined; implementation is not presented as delivered.','plugins-search-label':'Search','plugins-search':'Search plugin, responsibility, or layer','plugins-adjacent-kicker':'Ecosystem boundary','plugins-adjacent-title':'Adjacent assets are not runtime plugins.','plugins-adjacent-copy':'They support model preparation, compilation, deployment, profiling, or evidence, but do not register a vLLM runtime extension point.','footer-copy':'Portable inference mechanisms for domestic compute.'},zh:{title:'插件生态 | vLLM-HUST','plugins-eyebrow':'推理引擎扩展路线图','plugins-title':'插件生态','plugins-lede':'一个引擎，以模块化扩展点覆盖推理系统各层。','plugins-fact-items':'个路线模块','plugins-fact-layers':'个系统层次','plugins-fact-runtime':'个运行时插件仓库','plugins-fact-adjacent':'个配套项目','plugins-boundary-kicker':'封装模型','plugins-boundary-title':'独立插件，而不是永久维护的运行时分叉。','plugins-boundary-copy':'本目录同时展示已有插件与开发路线。成熟度标签明确区分当前可用代码和后续工作；仅公开展示可访问的仓库链接。','plugins-legend-kicker':'成熟度说明','plugins-legend-title':'一眼读懂插件路线图。','plugins-legend-existing':'已有实现','plugins-legend-existing-copy':'仓库已经提供原生 vLLM 运行时入口。','plugins-legend-active':'开发中','plugins-legend-active-copy':'实现工作正在推进。','plugins-legend-prototype':'研究原型','plugins-legend-prototype-copy':'机制正在验证。','plugins-legend-roadmap':'路线规划 / 架构概念','plugins-legend-roadmap-copy':'架构方向已经定义，但不作为已交付能力展示。','plugins-search-label':'搜索','plugins-search':'搜索插件、职责或层次','plugins-adjacent-kicker':'生态边界','plugins-adjacent-title':'相邻资产不是运行时插件。','plugins-adjacent-copy':'它们支持模型准备、编译、部署、分析或证据，但没有注册 vLLM 运行时扩展点。','footer-copy':'面向国产算力的可移植推理机制。'}};</script>
-  <script src="./assets/site.js?v=site-shell-20260825"></script><script src="./assets/plugins-page.js?v=plugin-ecosystem-v2"></script>
+  <script src="./assets/site.js?v=site-shell-20260825"></script><script src="./assets/plugins-page.js?v=plugin-standard-v1"></script>
 </body>
 </html>
