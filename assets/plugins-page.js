@@ -20,19 +20,20 @@
 
   function labels() {
     return language() === "zh"
-      ? { all: "全部", repository: "仓库", withheld: "链接未公开", entries: "个条目", empty: "没有符合条件的插件。", existing: "现有生态" }
-      : { all: "All", repository: "Repository", withheld: "Link withheld", entries: "entries", empty: "No plugins match the current filters.", existing: "Existing ecosystem" };
+      ? { all: "全部", repository: "仓库", withheld: "链接未公开", entries: "个条目", empty: "没有符合条件的插件。", existing: "vLLM 运行时入口", searchPlaceholder: "搜索插件、职责或层次" }
+      : { all: "All", repository: "Repository", withheld: "Link not public", entries: "entries", empty: "No plugins match the current filters.", existing: "vLLM runtime entry point", searchPlaceholder: "Search plugin, responsibility, or layer" };
   }
 
   function statusText(item) {
     const names = language() === "zh"
-      ? { accepted: "已接收", existing: "已有插件", active: "研究中", incubating: "孵化中", planned: "规划中", concept: "概念设计" }
-      : { accepted: "Accepted", existing: "Existing plugin", active: "Research", incubating: "Incubating", planned: "Planned", concept: "Concept" };
+      ? { existing: "已有实现", active: "开发中", incubating: "研究原型", planned: "路线规划", concept: "架构概念" }
+      : { existing: "Available code", active: "Active development", incubating: "Research prototype", planned: "Roadmap", concept: "Architecture concept" };
     return names[item.status] || item.status;
   }
 
   function renderFilters() {
     const copy = labels();
+    search.placeholder = copy.searchPlaceholder;
     filters.replaceChildren();
     [{ id: "all", title_en: copy.all, title_zh: copy.all }, ...manifest.layers].forEach((layer) => {
       const button = element("button", `plugin-filter${selectedLayer === layer.id ? " active" : ""}`, local(layer, "title"));
@@ -125,6 +126,8 @@
       }
       manifest = payload;
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.plugins.length); });
+      const runtimeCount = payload.plugins.filter((item) => item.origin === "existing" && item.repository_url).length;
+      document.querySelectorAll("[data-runtime-count]").forEach((node) => { node.textContent = String(runtimeCount).padStart(2, "0"); });
       renderFilters();
       renderCatalog();
       renderAdjacent();
