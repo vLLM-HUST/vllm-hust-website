@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -86,6 +87,65 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
         assert "assets/site.js?v=site-shell-20260825" in text
         if name not in ("index.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
+
+
+def test_plugin_page_publishes_a_complete_lifecycle_standard() -> None:
+    page = (ROOT / "plugins.html").read_text(encoding="utf-8")
+    standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
+
+    assert 'id="plugin-standard"' in page
+    assert 'href="#plugin-standard"' in page
+    assert 'href="#plugin-catalog"' in page
+    assert "STANDARD 1.0" in page
+    assert "No hot-unload contract" in page
+    assert 'VLLM_PLUGINS=""' in page
+    assert 'VLLM_PLUGINS="${PLUGIN_ID}"' in page
+    assert "vllm.general_plugins" in page
+    assert "vllm.platform_plugins" in page
+    assert (
+        "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/PLUGIN_STANDARD.md"
+        in page
+    )
+    assert "plugin-standard-v1" in page
+
+    for section in (
+        "Required package structure",
+        "Registration contract",
+        "Build, install, and discovery",
+        "Enable and start",
+        "Stop and disable",
+        "Remove and roll back",
+        "Conformance tests",
+    ):
+        assert section in standard
+
+
+def test_plugin_standard_has_portable_allowlist_semantics() -> None:
+    standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
+
+    assert "If `VLLM_PLUGINS` is unset, vLLM loads every discovered" in standard
+    assert "set to an empty string, vLLM loads none" in standard
+    assert "does not define hot unload" in standard
+    for forbidden in (
+        "/home/shuhao",
+        "npu-smi",
+        "CUDA_VISIBLE_DEVICES=",
+        "ASCEND_RT_VISIBLE_DEVICES=",
+        "pkill",
+        "Qixin-Gaoke",
+    ):
+        assert forbidden not in standard
+
+
+def test_plugin_manifest_links_the_versioned_standard() -> None:
+    manifest = json.loads((ROOT / "data" / "plugins.json").read_text(encoding="utf-8"))
+
+    assert manifest["plugin_standard"] == {
+        "version": "1.0",
+        "url": "./docs/PLUGIN_STANDARD.md",
+        "discovery": "Python entry points",
+        "activation": "VLLM_PLUGINS",
+    }
 
 
 def test_versions_external_links_have_safe_new_tab_contract() -> None:
