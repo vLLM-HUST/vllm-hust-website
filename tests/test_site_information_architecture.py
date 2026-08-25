@@ -16,10 +16,24 @@ def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -
     assert '<details class="nav-group"' in SITE_JS
 
 
-def test_homepage_has_a_cache_safe_static_plugin_navigation_entry() -> None:
-    assert 'id="nav-plugins"' in HOME
-    assert 'href="./plugins.html">Plugins</a>' in HOME
-    assert "assets/site.js?v=site-structure-20260816-plugin-nav-20260825" in HOME
+def test_every_public_page_has_a_cache_safe_static_plugin_navigation_entry() -> None:
+    for name in (
+        "index.html",
+        "leaderboard.html",
+        "achievements.html",
+        "contributors.html",
+        "members.html",
+        "conferences.html",
+        "courses.html",
+        "issues.html",
+        "versions.html",
+        "plugins.html",
+    ):
+        text = (ROOT / name).read_text(encoding="utf-8")
+        assert 'id="nav-plugins"' in text, name
+        assert 'href="./plugins.html">Plugins</a>' in text, name
+        assert "assets/site.js?v=site-shell-20260825" in text, name
+    assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
 
 def test_mobile_navigation_uses_compact_accessible_disclosure() -> None:
@@ -49,7 +63,7 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
     assert "assets/site.css?v=site-structure-20260816" in versions
-    assert "assets/site.js?v=site-structure-20260816" in versions
+    assert "assets/site.js?v=site-shell-20260825" in versions
     assert "assets/versions.css?v=site-structure-20260816" in versions
 
 
@@ -69,7 +83,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=site-structure-20260816" in text
-        assert "assets/site.js?v=site-structure-20260816" in text
+        assert "assets/site.js?v=site-shell-20260825" in text
         if name not in ("index.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 

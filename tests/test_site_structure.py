@@ -836,11 +836,17 @@ def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
     assert ecosystem.count("<a ") == 4
     assert "<strong>RIDE Lab</strong>" in ecosystem
     assert "<strong>SAGE</strong>" not in ecosystem
-    assert "Agent-native research and SAGE core stewardship" in ecosystem
+    assert "Agent-native LLM control plane and SAGE core stewardship" in ecosystem
     assert (
         "Sage Mate is an application built with SAGE and backed by vLLM-HUST."
         in html_text
     )
+
+
+def test_leaderboard_hides_internal_automation_submitter_labels() -> None:
+    root = Path(__file__).resolve().parents[1]
+    script = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    assert "normalized.includes('codex')" in script
 
 
 def test_conference_navigation_is_general_not_event_specific() -> None:
@@ -942,7 +948,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=site-structure-20260816" in text
-        assert "assets/site.js?v=site-structure-20260816" in text
+        assert "assets/site.js?v=site-shell-20260825" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -1101,7 +1107,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=stable-trend-v5-20260817" in html_text
+    assert "assets/leaderboard.js?v=stable-trend-v6-20260825" in html_text
     assert ">Stable trend</button>" in html_text
     assert "trendViewCheckpoint: 'Stable trend'" in js_text
     assert "trendViewCheckpoint: '稳定趋势'" in js_text
@@ -1691,7 +1697,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "stable-trend-v5-20260817" in html_text
+    assert "stable-trend-v6-20260825" in html_text
     assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
@@ -2523,7 +2529,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "stable-trend-v5-20260817" in html_text
+    assert "stable-trend-v6-20260825" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:
@@ -2541,7 +2547,7 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert "assets/issues-page.js?v=" in html_text
     assert "assets/site.css?v=site-structure-20260816" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=site-structure-20260816" in html_text
+    assert "assets/site.js?v=site-shell-20260825" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js
