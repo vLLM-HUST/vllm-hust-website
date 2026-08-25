@@ -43,6 +43,23 @@ def test_existing_runtime_plugins_are_linked_and_marked() -> None:
         assert url is None or url.startswith("https://github.com/")
 
 
+def test_private_incubation_links_and_internal_governance_copy_are_not_public() -> None:
+    public_prefixes = (
+        "https://github.com/vLLM-HUST/",
+        "https://github.com/RIDE-Lab/",
+    )
+    assert all(
+        item["repository_url"] is None
+        or item["repository_url"].startswith(public_prefixes)
+        for item in MANIFEST["plugins"]
+    )
+    assert {item["status"] for item in MANIFEST["plugins"]}.isdisjoint(
+        {"stopped", "reframe"}
+    )
+    assert 'concept: "概念设计"' in SCRIPT
+    assert 'concept: "Concept"' in SCRIPT
+
+
 def test_quant_and_triton_are_adjacent_assets_not_plugins() -> None:
     plugin_names = {item["name"] for item in MANIFEST["plugins"]}
     adjacent = {item["name"]: item for item in MANIFEST["adjacent_assets"]}
@@ -62,7 +79,7 @@ def test_page_keeps_plugin_and_adjacent_catalogs_visibly_separate() -> None:
     assert 'data-page="plugins"' in PAGE
     assert 'data-source="./data/plugins.json"' in PAGE
     assert "Adjacent assets are not runtime plugins." in PAGE
-    assert "相邻资产不冒充运行时插件。" in PAGE
+    assert "相邻资产不是运行时插件。" in PAGE
     assert "manifest.adjacent_assets.forEach" in SCRIPT
     assert 'item.origin === "existing"' in SCRIPT
     assert "item.repository_url" in SCRIPT
