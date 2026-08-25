@@ -117,7 +117,7 @@
         "reproducible_cmd": "vllm bench serve --model meta-llama/Llama-3-70B --backend ascend --multi-node --nodes 2 --tp 4 --pp 2 --input-len 2048 --output-len 512 --batch-size 4 --concurrent 8",
         "git_commit": "a1b2c3d4e5f6789012345678901234567890abcd",
         "release_date": "2026-01-27",
-        "changelog_url": "https://github.com/intellistream/vllm-hust/blob/main/CHANGELOG.md#0233---2026-01-27",
+        "changelog_url": "https://github.com/vLLM-HUST/vllm-hust/blob/main/CHANGELOG.md#0233---2026-01-27",
         "notes": "Multi-node performance sample on a generic accelerator cluster with HCCL",
         "verified": true
     }
