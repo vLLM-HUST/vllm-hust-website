@@ -536,6 +536,23 @@ a {
     transition: background 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
+.nav-plugin-link::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    margin-right: 7px;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: #39c6ca;
+    box-shadow: 0 0 0 3px rgba(57, 198, 202, 0.15);
+}
+
+.nav-plugin-link:hover::before,
+.nav-plugin-link.active::before {
+    background: #a8d951;
+    box-shadow: 0 0 0 4px rgba(168, 217, 81, 0.18);
+}
+
 .nav-group {
     position: relative;
 }
