@@ -1,5 +1,11 @@
 {
   "schema_version": 1,
+  "plugin_standard": {
+    "version": "1.0",
+    "url": "./docs/PLUGIN_STANDARD.md",
+    "discovery": "Python entry points",
+    "activation": "VLLM_PLUGINS"
+  },
   "layers": [
     {"id":"scheduler","title_en":"Scheduler","title_zh":"调度与准入","summary_en":"Admission, batching, decode selection, speculation, and workflow-aware scheduler hooks.","summary_zh":"准入、批处理、解码选择、推测执行与工作流感知调度接口。"},
     {"id":"kv","title_en":"KV and State","title_zh":"KV 与状态","summary_en":"Reuse, validity, movement, tiering, compression, security, and lifecycle decisions.","summary_zh":"复用、有效性、搬移、分层、压缩、安全与生命周期机制。"},
