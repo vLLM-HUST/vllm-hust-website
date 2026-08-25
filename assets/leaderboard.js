@@ -2911,7 +2911,9 @@
 
     function isGenericSubmitter(value) {
         const normalized = String(value || '').trim().toLowerCase();
-        return !normalized || ['hust', 'same-spec-current', 'official-ascend-baseline'].includes(normalized);
+        return !normalized
+            || normalized.includes('codex')
+            || ['hust', 'same-spec-current', 'official-ascend-baseline'].includes(normalized);
     }
 
     function getProvenanceActor(meta) {

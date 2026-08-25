@@ -176,7 +176,8 @@
     function navLink(page, href, key, external) {
         const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : '';
         const pageAttr = page ? ` data-nav-page="${page}"` : '';
-        return `<a class="nav-link"${pageAttr} href="${href}" data-i18n-common="${key}"${attrs}>${I18N.en[key]}</a>`;
+        const emphasis = page === 'plugins' ? ' nav-plugin-link' : '';
+        return `<a class="nav-link${emphasis}"${pageAttr} href="${href}" data-i18n-common="${key}"${attrs}>${I18N.en[key]}</a>`;
     }
 
     function renderNavigation() {
