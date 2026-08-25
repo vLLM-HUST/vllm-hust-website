@@ -30,6 +30,7 @@ def test_existing_runtime_plugins_are_linked_and_marked() -> None:
         "BidKV",
         "DiffSpec",
         "LatchMoE",
+        "PegaFlow",
         "vLLM Ascend HUST",
         "vLLM Metal HUST",
     }
@@ -43,21 +44,33 @@ def test_existing_runtime_plugins_are_linked_and_marked() -> None:
         assert url is None or url.startswith("https://github.com/")
 
 
-def test_private_incubation_links_and_internal_governance_copy_are_not_public() -> None:
-    public_prefixes = (
-        "https://github.com/vLLM-HUST/",
-        "https://github.com/RIDE-Lab/",
-    )
+def test_only_public_plugin_repositories_are_linked() -> None:
+    public_prefixes = ("https://github.com/vLLM-HUST/",)
     assert all(
         item["repository_url"] is None
         or item["repository_url"].startswith(public_prefixes)
         for item in MANIFEST["plugins"]
     )
+    linked_runtime_plugins = [
+        item
+        for item in MANIFEST["plugins"]
+        if item["origin"] == "existing" and item["repository_url"]
+    ]
+    assert len(linked_runtime_plugins) == 6
     assert {item["status"] for item in MANIFEST["plugins"]}.isdisjoint(
-        {"stopped", "reframe"}
+        {"accepted", "stopped", "reframe"}
     )
-    assert 'concept: "概念设计"' in SCRIPT
-    assert 'concept: "Concept"' in SCRIPT
+    assert 'concept: "架构概念"' in SCRIPT
+    assert 'concept: "Architecture concept"' in SCRIPT
+
+
+def test_runtime_entrypoint_descriptions_match_repository_metadata() -> None:
+    plugins = {item["name"]: item for item in MANIFEST["plugins"]}
+    assert plugins["LatchMoE"]["kind_en"] == "vLLM platform plugin"
+    assert "vLLM platform plugin interface" in plugins["LatchMoE"]["summary_en"]
+    assert plugins["PegaFlow"]["origin"] == "existing"
+    assert "data-runtime-count" in PAGE
+    assert "runtimeCount" in SCRIPT
 
 
 def test_quant_and_triton_are_adjacent_assets_not_plugins() -> None:
@@ -77,7 +90,7 @@ def test_quant_and_triton_are_adjacent_assets_not_plugins() -> None:
 
 def test_page_keeps_plugin_and_adjacent_catalogs_visibly_separate() -> None:
     assert 'data-page="plugins"' in PAGE
-    assert 'data-source="./data/plugins.json"' in PAGE
+    assert 'data-source="./data/plugins.json?v=client-ready-v2"' in PAGE
     assert "Adjacent assets are not runtime plugins." in PAGE
     assert "相邻资产不是运行时插件。" in PAGE
     assert "manifest.adjacent_assets.forEach" in SCRIPT
