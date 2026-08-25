@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SITE_JS = (ROOT / "assets" / "site.js").read_text(encoding="utf-8")
 SITE_CSS = (ROOT / "assets" / "site.css").read_text(encoding="utf-8")
@@ -9,7 +8,7 @@ HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 
 
 def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -> None:
-    for label in ("navProducts", "navEngine", "navProjects"):
+    for label in ("navProducts", "navEngine", "navProjects", "navPlugins"):
         assert label in SITE_JS
     assert "pages: ['leaderboard', 'achievements']" in SITE_JS
     assert "pages: ['members', 'contributors', 'conferences', 'courses']" in SITE_JS
@@ -59,6 +58,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
         "courses.html",
         "issues.html",
         "versions.html",
+        "plugins.html",
     )
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")

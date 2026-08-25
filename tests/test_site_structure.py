@@ -19,6 +19,7 @@ def test_required_entry_files_exist() -> None:
         root / "conferences.html",
         root / "courses.html",
         root / "versions.html",
+        root / "plugins.html",
         root / "README.md",
         root / "CHANGELOG.md",
     ]
