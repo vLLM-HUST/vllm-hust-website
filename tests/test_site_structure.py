@@ -44,6 +44,7 @@ def test_site_uses_vllm_hust_brand_icon() -> None:
         "index.html",
         "leaderboard.html",
         "achievements.html",
+        "news.html",
         "contributors.html",
         "conferences.html",
         "versions.html",
@@ -941,7 +942,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=site-structure-20260816" in text
-        assert "assets/site.js?v=site-structure-20260816" in text
+        assert "assets/site.js?v=site-structure-20260826" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -1572,12 +1573,12 @@ def test_achievements_page_excludes_external_origin_work() -> None:
         in js_text
     )
     assert (
-        "Accepted papers by our team, owned project releases, and upstream "
-        "contributions merged from our contributors."
+        "Accepted papers, owned project releases, merged upstream contributions, "
+        "and externally verified member impact."
     ) in html_text
     assert (
-        "仅展示本团队已接收论文、自主项目正式发布，以及团队成员已合入的上游贡献。"
-        in html_text
+        "展示已接收论文、自主项目正式发布、已合入的上游贡献，"
+        "以及获外部验证的成员影响力。" in html_text
     )
     assert "Project releases" in html_text
     assert "technical: 'Project releases'" in js_text
@@ -2539,7 +2540,7 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert "assets/issues-page.js?v=" in html_text
     assert "assets/site.css?v=site-structure-20260816" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=site-structure-20260816" in html_text
+    assert "assets/site.js?v=site-structure-20260826" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js

@@ -7,10 +7,40 @@
         contributors: './data/core_contributors.json',
     };
 
-    // Inclusion policy: list only team-owned accepted publications and project
-    // releases, or merged upstream work authored by our contributors. External
-    // projects that we mirror, integrate, validate, or adapt are not achievements.
+    // Inclusion policy: list team-owned accepted publications and project releases,
+    // merged upstream work, and externally verified community or industry impact
+    // attributable to our members. External projects that we mirror, integrate, validate, or adapt are not achievements.
     const ACHIEVEMENTS = [
+        {
+            sortDate: '2026-08-25',
+            date: { en: 'Aug 25, 2026', zh: '2026 年 8 月 25 日' },
+            category: 'community',
+            kind: { en: 'Community recognition', zh: '社区认可' },
+            status: { en: 'Featured', zh: '已发布' },
+            title: {
+                en: 'Mao Yancan credited in Anyscale’s 10,000-node Ray scaling story',
+                zh: '毛言粲参与的 Ray 万卡规模优化获 Anyscale 社区博客报道',
+            },
+            body: {
+                en: 'Anyscale’s engineering blog thanked Mao Yancan (ByteDance) for contributions, benchmarks, and reviews behind Ray Core improvements for batch inference and training clusters scaling to 10,000 nodes and 40,000 actors.',
+                zh: 'Anyscale 工程博客明确致谢毛言粲（ByteDance）在 Ray Core 优化中的技术贡献、基准测试与评审；该项工作支撑批量推理与训练集群扩展到 10,000 节点、40,000 actors。',
+            },
+            tags: [
+                { en: 'Ray Core', zh: 'Ray Core' },
+                { en: '10,000 nodes', zh: '10,000 节点' },
+                { en: 'Large-scale AI systems', zh: '大规模 AI 系统' },
+            ],
+            links: [
+                {
+                    label: { en: 'Read the Anyscale blog', zh: '阅读 Anyscale 博客' },
+                    href: 'https://www.anyscale.com/blog/how-we-scaled-ray-from-batch-inference-to-10000-node-training-clusters',
+                },
+                {
+                    label: { en: 'Member profile', zh: '成员主页' },
+                    href: 'https://github.com/yancanmao',
+                },
+            ],
+        },
         {
             sortDate: '2026-07-25',
             date: { en: 'Jul 25, 2026', zh: '2026 年 7 月 25 日' },
