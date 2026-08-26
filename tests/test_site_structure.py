@@ -921,7 +921,9 @@ def test_language_toggle_is_integrated_into_the_enhanced_navigation() -> None:
         assert 'id="langToggle"' not in text[nav_start:nav_end]
 
     assert ".lang-toggle {" in css_text
-    assert "inner.appendChild(languageButton)" in (root / "assets" / "site.js").read_text(encoding="utf-8")
+    assert "inner.appendChild(languageButton)" in (
+        root / "assets" / "site.js"
+    ).read_text(encoding="utf-8")
     assert "position: static;" in css_text
     assert "top: 14px;" in css_text
     assert "right: 48px;" in css_text
@@ -1367,9 +1369,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=nav-polish-20260826" in html_text
-    assert (
-            "assets/achievements-page.js?v=community-impact-20260826" in html_text
-    )
+    assert "assets/achievements-page.js?v=community-impact-20260826" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -1517,9 +1517,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
-    assert (
-            "assets/achievements-page.js?v=community-impact-20260826" in html_text
-    )
+    assert "assets/achievements-page.js?v=community-impact-20260826" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
