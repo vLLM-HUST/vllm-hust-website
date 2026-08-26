@@ -1,0 +1,113 @@
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def load_profiles() -> tuple[dict, dict]:
+    roster = json.loads(
+        (ROOT / "data" / "member_roster.json").read_text(encoding="utf-8")
+    )
+    snapshot = json.loads(
+        (ROOT / "data" / "core_contributors.json").read_text(encoding="utf-8")
+    )
+    return roster, snapshot
+
+
+def test_member_snapshot_is_generated_from_audited_roster() -> None:
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "sync_member_roster.py"), "--check"],
+        cwd=ROOT,
+        check=True,
+    )
+
+
+def test_current_roster_is_unique_and_advisor_mappings_are_current() -> None:
+    roster, snapshot = load_profiles()
+    profiles = snapshot["member_profiles"]
+    current = [
+        *profiles["core_members"],
+        *profiles["participants"],
+        *profiles["staff_members"],
+        *profiles["external_contributors"],
+    ]
+    names = [item["display_name"] for item in current]
+    logins = [
+        item["github_login"].casefold() for item in current if item.get("github_login")
+    ]
+    assert len(names) == len(set(names))
+    assert len(logins) == len(set(logins))
+
+    by_name = {item["display_name"]: item for item in current}
+    expected = {
+        item["name_zh"]: (item.get("github_login"), item.get("advisor_zh"))
+        for item in roster["members"]
+        if item["status"] == "current"
+    }
+    for name, (login, advisor) in expected.items():
+        assert by_name[name]["github_login"] == login
+        assert by_name[name]["advisor"]["zh"] == (advisor or "")
+        assert by_name[name]["is_current_member"] is True
+
+
+def test_pending_github_identities_have_no_invented_login_or_link() -> None:
+    roster, snapshot = load_profiles()
+    profiles = snapshot["member_profiles"]
+    all_profiles = [
+        *profiles["core_members"],
+        *profiles["participants"],
+        *profiles["staff_members"],
+        *profiles["external_contributors"],
+        *profiles["former_members"],
+    ]
+    by_name = {item["display_name"]: item for item in all_profiles}
+    pending = {
+        item["name_zh"]
+        for item in roster["members"]
+        if item.get("github_status") == "pending"
+    }
+    assert pending == {"任天宇", "江勰东", "陈湘", "李佳乐", "宋功轩"}
+    for name in pending:
+        assert by_name[name]["github_login"] is None
+        assert by_name[name]["github_url"] is None
+        assert by_name[name]["github_status"]["zh"] == "GitHub ID 待确认"
+
+
+def test_only_verified_teacher_github_logins_are_published() -> None:
+    _, snapshot = load_profiles()
+    advisors = {item["name_zh"]: item for item in snapshot["advisor_profiles"]}
+    assert {name: item["github_login"] for name, item in advisors.items()} == {
+        "张书豪": "ShuhaoZhangTony",
+        "刘海坤": None,
+        "王庆刚": None,
+        "项翔": "eglxiang",
+        "姚鹏程": None,
+        "赵进": None,
+        "郑龙": None,
+        "万瑶": None,
+        "毛言粲": "yancanmao",
+    }
+
+
+def test_former_members_are_separate_and_rendered_as_history() -> None:
+    _, snapshot = load_profiles()
+    profiles = snapshot["member_profiles"]
+    current_names = {
+        item["display_name"]
+        for category in (
+            "core_members",
+            "participants",
+            "staff_members",
+            "external_contributors",
+        )
+        for item in profiles[category]
+    }
+    former = {item["display_name"]: item for item in profiles["former_members"]}
+    assert set(former) == {"李林浩", "宋功轩", "余天成"}
+    assert current_names.isdisjoint(former)
+    page = (ROOT / "contributors.html").read_text(encoding="utf-8")
+    script = (ROOT / "assets" / "contributors-page.js").read_text(encoding="utf-8")
+    assert 'id="contributors-former-list"' in page
+    assert "profiles.former_members" in script
