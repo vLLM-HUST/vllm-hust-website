@@ -5275,8 +5275,8 @@
       },
       {
         "name": "李佳乐",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "peter17-17",
+        "github_url": "https://github.com/peter17-17",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -5287,7 +5287,7 @@
         "display_name": "李佳乐",
         "chinese_name": "李佳乐",
         "english_name": "",
-        "person_id": "profile:李佳乐",
+        "person_id": "github:peter17-17",
         "identity_confirmed": true,
         "external_contributor": false,
         "staff_member": false,
@@ -5310,8 +5310,8 @@
           "en": "Shuhao Zhang"
         },
         "github_status": {
-          "zh": "GitHub ID 待确认",
-          "en": "GitHub ID pending confirmation"
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": "",
         "is_current_member": true,
@@ -5319,8 +5319,8 @@
       },
       {
         "name": "任天宇",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "Renty-0",
+        "github_url": "https://github.com/Renty-0",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -5331,7 +5331,7 @@
         "display_name": "任天宇",
         "chinese_name": "任天宇",
         "english_name": "",
-        "person_id": "profile:任天宇",
+        "person_id": "github:renty-0",
         "identity_confirmed": true,
         "external_contributor": false,
         "staff_member": false,
@@ -5354,8 +5354,8 @@
           "en": "Qinggang Wang"
         },
         "github_status": {
-          "zh": "GitHub ID 待确认",
-          "en": "GitHub ID pending confirmation"
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": "",
         "is_current_member": true,
@@ -5407,8 +5407,8 @@
       },
       {
         "name": "江勰东",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "jxd1111",
+        "github_url": "https://github.com/jxd1111",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -5419,7 +5419,7 @@
         "display_name": "江勰东",
         "chinese_name": "江勰东",
         "english_name": "",
-        "person_id": "profile:江勰东",
+        "person_id": "github:jxd1111",
         "identity_confirmed": true,
         "external_contributor": false,
         "staff_member": false,
@@ -5442,8 +5442,8 @@
           "en": "Xiang Xiang"
         },
         "github_status": {
-          "zh": "GitHub ID 待确认",
-          "en": "GitHub ID pending confirmation"
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": "",
         "is_current_member": true,
@@ -5495,8 +5495,8 @@
       },
       {
         "name": "陈湘",
-        "github_login": null,
-        "github_url": null,
+        "github_login": "mumu029",
+        "github_url": "https://github.com/mumu029",
         "commits": 0,
         "changed_lines": 0,
         "added": 0,
@@ -5507,7 +5507,7 @@
         "display_name": "陈湘",
         "chinese_name": "陈湘",
         "english_name": "",
-        "person_id": "profile:陈湘",
+        "person_id": "github:mumu029",
         "identity_confirmed": true,
         "external_contributor": false,
         "staff_member": false,
@@ -5530,8 +5530,8 @@
           "en": "Long Zheng"
         },
         "github_status": {
-          "zh": "GitHub ID 待确认",
-          "en": "GitHub ID pending confirmation"
+          "zh": "",
+          "en": ""
         },
         "contribution_areas": "",
         "is_current_member": true,

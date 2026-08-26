@@ -85,6 +85,8 @@ def apply_member(item: dict, member: dict, advisor_en: dict[str, str]) -> dict:
         updated["github_status"] = localized(
             "GitHub ID 待确认", "GitHub ID pending confirmation"
         )
+    else:
+        updated["github_status"] = localized("", "")
     if member["status"] == "former":
         updated["former_member"] = True
         updated["role"] = localized("历史成员", "Former member")
