@@ -20,8 +20,8 @@
 
   function labels() {
     return language() === "zh"
-      ? { all: "全部", papers: "论文成果", paper: "论文", repository: "仓库", withheld: "链接未公开", entries: "个条目", empty: "没有符合条件的插件。", existing: "vLLM 运行时入口", controlPlane: "RIDE-Lab 控制面", searchPlaceholder: "搜索插件、论文、职责或层次" }
-      : { all: "All", papers: "Publications", paper: "Paper", repository: "Repository", withheld: "Link not public", entries: "entries", empty: "No plugins match the current filters.", existing: "vLLM runtime entry point", controlPlane: "RIDE-Lab control plane", searchPlaceholder: "Search plugin, paper, responsibility, or layer" };
+      ? { all: "全部", papers: "论文成果", paper: "论文", repository: "仓库", withheld: "孵化仓库 · 链接未公开", entries: "个条目", empty: "没有符合条件的插件。", existing: "vLLM 运行时入口", controlPlane: "RIDE-Lab 控制面", searchPlaceholder: "搜索插件、论文、职责或层次" }
+      : { all: "All", papers: "Publications", paper: "Paper", repository: "Repository", withheld: "Incubation repository · link not public", entries: "entries", empty: "No plugins match the current filters.", existing: "vLLM runtime entry point", controlPlane: "RIDE-Lab control plane", searchPlaceholder: "Search plugin, paper, responsibility, or layer" };
   }
 
   function statusText(item) {
@@ -157,6 +157,8 @@
       const publicationCount = payload.plugins.reduce((count, item) => count + (Array.isArray(item.publications) ? item.publications.length : 0), 0);
       document.querySelectorAll("[data-runtime-count]").forEach((node) => { node.textContent = String(runtimeCount).padStart(2, "0"); });
       document.querySelectorAll("[data-publication-count]").forEach((node) => { node.textContent = String(publicationCount).padStart(2, "0"); });
+      const reviewTargetCount = document.querySelectorAll(".review-grid > article").length;
+      document.querySelectorAll("[data-review-target-count]").forEach((node) => { node.textContent = String(reviewTargetCount).padStart(2, "0"); });
       renderFilters();
       renderCatalog();
       renderAdjacent();
