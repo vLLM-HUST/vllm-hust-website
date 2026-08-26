@@ -977,8 +977,8 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "Turn domestic compute into usable, verifiable inference." in html_text
-    assert "让国产算力成为可用、可验证的推理能力。" in html_text
+    assert "A plugin-first inference engine for domestic compute." in html_text
+    assert "面向国产算力的插件化推理引擎。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
