@@ -54,6 +54,17 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
     assert ".execution-scope a:focus-visible" in HOME_CSS
 
 
+def test_homepage_leads_with_plugin_first_engine_positioning() -> None:
+    assert "A plugin-first inference engine for domestic compute." in HOME
+    assert "Not a heavier fork:" in HOME
+    assert (
+        "composable, reversible plugins connect scheduling, KV state, hardware, control, and evidence"
+        in HOME
+    )
+    assert "面向国产算力的插件化推理引擎。" in HOME
+    assert "可组合、可回退的插件连接调度、KV 状态、硬件、控制动作与证据链" in HOME
+
+
 def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert "function renderFooter()" in SITE_JS
     assert "site-directory-links" in SITE_JS
