@@ -893,7 +893,7 @@ def test_courses_page_exposes_course_materials_and_project_pointers() -> None:
     assert "https://github.com/vLLM-HUST" in courses_html
 
 
-def test_language_toggle_is_separate_from_primary_navigation() -> None:
+def test_language_toggle_is_integrated_into_the_enhanced_navigation() -> None:
     root = Path(__file__).resolve().parents[1]
     css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
 
@@ -914,11 +914,12 @@ def test_language_toggle_is_separate_from_primary_navigation() -> None:
         assert 'id="langToggle"' not in text[nav_start:nav_end]
 
     assert ".lang-toggle {" in css_text
-    assert "position: fixed;" in css_text
+    assert "inner.appendChild(languageButton)" in (root / "assets" / "site.js").read_text(encoding="utf-8")
+    assert "position: static;" in css_text
     assert "top: 14px;" in css_text
-    assert "right: max(" in css_text
+    assert "right: 48px;" in css_text
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
-    assert "langToggle: '中文'" in site_js
+    assert "langToggle: 'ZH'" in site_js
     assert "langToggle: 'EN'" in site_js
     assert "langToggleLabel: '切换为中文'" in site_js
     assert "langToggleLabel: 'Switch to English'" in site_js
@@ -941,8 +942,8 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=site-structure-20260816" in text
-        assert "assets/site.js?v=site-structure-20260826" in text
+        assert "assets/site.css?v=nav-polish-20260826" in text
+        assert "assets/site.js?v=nav-polish-20260826" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -1358,9 +1359,9 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=site-structure-20260816" in html_text
+    assert "assets/site.css?v=nav-polish-20260826" in html_text
     assert (
-        "assets/achievements-page.js?v=engine-and-proving-ground-20260728" in html_text
+            "assets/achievements-page.js?v=community-impact-20260826" in html_text
     )
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
@@ -1510,7 +1511,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
     assert (
-        "assets/achievements-page.js?v=engine-and-proving-ground-20260728" in html_text
+            "assets/achievements-page.js?v=community-impact-20260826" in html_text
     )
 
 
@@ -2538,9 +2539,9 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert 'id="issues-error"' in html_text
     assert 'id="issues-content"' in html_text
     assert "assets/issues-page.js?v=" in html_text
-    assert "assets/site.css?v=site-structure-20260816" in html_text
+    assert "assets/site.css?v=nav-polish-20260826" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=site-structure-20260826" in html_text
+    assert "assets/site.js?v=nav-polish-20260826" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js

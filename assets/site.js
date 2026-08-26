@@ -24,7 +24,7 @@
             footerEvidence: 'Evidence',
             footerCommunity: 'Community',
             brandSubtitle: 'Domestic-compute inference engine',
-            langToggle: '中文',
+            langToggle: 'ZH',
             langToggleLabel: '切换为中文',
         },
         zh: {
@@ -209,26 +209,52 @@
         button.setAttribute('aria-expanded', 'false');
         button.innerHTML = '<span></span><span></span><span></span>';
         inner.insertBefore(button, links);
+        const languageButton = document.getElementById('langToggle');
+        if (languageButton) inner.appendChild(languageButton);
         nav.classList.add('enhanced');
 
         const setOpen = (open) => {
             nav.classList.toggle('nav-open', open);
+            document.body.classList.toggle('nav-menu-open', open);
             button.setAttribute('aria-expanded', String(open));
             if (open && window.matchMedia('(max-width: 860px)').matches) {
-                links.querySelectorAll('.nav-group').forEach((group) => { group.open = true; });
+                links.querySelectorAll('.nav-group').forEach((group) => {
+                    group.open = group.classList.contains('active');
+                });
             }
             const common = I18N[getCurrentLang()] || I18N.en;
             button.setAttribute('aria-label', open ? common.navMenuClose : common.navMenu);
         };
         button.addEventListener('click', () => setOpen(!nav.classList.contains('nav-open')));
         links.addEventListener('click', (event) => {
-            if (event.target.closest('a')) setOpen(false);
+            if (event.target.closest('a')) {
+                setOpen(false);
+                links.querySelectorAll('.nav-group').forEach((group) => { group.open = false; });
+            }
+        });
+        links.querySelectorAll('.nav-group').forEach((group) => {
+            group.addEventListener('toggle', () => {
+                if (!group.open) return;
+                links.querySelectorAll('.nav-group').forEach((other) => {
+                    if (other !== group) other.open = false;
+                });
+            });
+        });
+        document.addEventListener('click', (event) => {
+            if (nav.contains(event.target)) return;
+            links.querySelectorAll('.nav-group').forEach((group) => { group.open = false; });
         });
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && nav.classList.contains('nav-open')) {
-                setOpen(false);
-                button.focus();
+            if (event.key !== 'Escape') return;
+            const openGroup = links.querySelector('.nav-group[open]');
+            if (openGroup && !nav.classList.contains('nav-open')) {
+                openGroup.open = false;
+                openGroup.querySelector('summary')?.focus();
+                return;
             }
+            if (!nav.classList.contains('nav-open')) return;
+            setOpen(false);
+            button.focus();
         });
     }
 
