@@ -977,8 +977,11 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "A plugin-first inference engine for domestic compute." in html_text
-    assert "面向国产算力的插件化推理引擎。" in html_text
+    assert (
+        "Programmable KV and scheduling. Graph-aware execution. "
+        "Portable hardware plugins."
+    ) in html_text
+    assert "KV 与调度可编程，模型执行感知计算图，硬件能力以插件接入。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
