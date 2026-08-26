@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News | vLLM-HUST</title>
+  <meta name="description" content="News from the vLLM-HUST community: people, engineering milestones, publications, and open-source impact.">
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/news.html">
+  <meta property="og:title" content="News | vLLM-HUST">
+  <meta property="og:description" content="People, engineering milestones, publications, and open-source impact from vLLM-HUST.">
+  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png">
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
+  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/site.css?v=site-structure-20260816">
+  <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816">
+  <link rel="stylesheet" href="./assets/news.css?v=20260826">
+</head>
+<body data-page="news">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a>
+      <div class="nav-links"><a id="nav-home" class="nav-link" href="./index.html">Home</a><a id="nav-news" class="nav-link active" href="./news.html">News</a></div>
+    </div>
+  </nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+  <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
+
+  <main class="site-shell">
+    <section class="page-hero">
+      <div class="content-panel news-intro-panel">
+        <span id="news-eyebrow" class="eyebrow">Community dispatches</span>
+        <h1 id="news-title" style="margin-top:16px">News</h1>
+        <p id="news-lede" class="hero-lede">People, engineering milestones, publications, and open-source impact from vLLM-HUST.</p>
+      </div>
+    </section>
+
+    <section class="content-panel news-feed-panel" data-news-feed data-source="./data/news.json">
+      <div class="section-head">
+        <div><span id="news-feed-kicker" class="eyebrow">Latest</span><h2 id="news-feed-title">From the community</h2></div>
+      </div>
+      <p class="news-status" data-news-status aria-live="polite">Loading news…</p>
+      <div class="news-list" data-news-list></div>
+      <noscript><p class="empty-state">JavaScript is required to load the news feed.</p></noscript>
+    </section>
+  </main>
+
+  <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="news-footer-copy">Building inference systems and sharing their impact.</span></footer>
+  <script>
+    window.vllmHustPageDict = {
+      en: {
+        title: 'News | vLLM-HUST',
+        'news-eyebrow': 'Community dispatches',
+        'news-title': 'News',
+        'news-lede': 'People, engineering milestones, publications, and open-source impact from vLLM-HUST.',
+        'news-feed-kicker': 'Latest',
+        'news-feed-title': 'From the community',
+        'news-footer-copy': 'Building inference systems and sharing their impact.'
+      },
+      zh: {
+        title: '新闻 | vLLM-HUST',
+        'news-eyebrow': '社区动态',
+        'news-title': '新闻',
+        'news-lede': '记录 vLLM-HUST 的成员动态、工程里程碑、学术成果与开源影响。',
+        'news-feed-kicker': '最新动态',
+        'news-feed-title': '来自社区',
+        'news-footer-copy': '构建推理系统，分享技术影响。'
+      }
+    };
+  </script>
+  <script src="./assets/site.js?v=site-structure-20260826"></script>
+  <script src="./assets/news-page.js?v=20260826"></script>
+</body>
+</html>

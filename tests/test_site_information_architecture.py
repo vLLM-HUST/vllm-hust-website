@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SITE_JS = (ROOT / "assets" / "site.js").read_text(encoding="utf-8")
 SITE_CSS = (ROOT / "assets" / "site.css").read_text(encoding="utf-8")
@@ -11,7 +10,7 @@ HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -> None:
     for label in ("navProducts", "navEngine", "navProjects"):
         assert label in SITE_JS
-    assert "pages: ['leaderboard', 'achievements']" in SITE_JS
+    assert "pages: ['leaderboard', 'achievements', 'news']" in SITE_JS
     assert "pages: ['members', 'contributors', 'conferences', 'courses']" in SITE_JS
     assert "pages: ['versions', 'issues']" in SITE_JS
     assert '<details class="nav-group"' in SITE_JS
@@ -44,7 +43,7 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
     assert "assets/site.css?v=site-structure-20260816" in versions
-    assert "assets/site.js?v=site-structure-20260816" in versions
+    assert "assets/site.js?v=site-structure-20260826" in versions
     assert "assets/versions.css?v=site-structure-20260816" in versions
 
 
@@ -53,6 +52,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
         "index.html",
         "leaderboard.html",
         "achievements.html",
+        "news.html",
         "contributors.html",
         "members.html",
         "conferences.html",
@@ -63,7 +63,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=site-structure-20260816" in text
-        assert "assets/site.js?v=site-structure-20260816" in text
+        assert "assets/site.js?v=site-structure-20260826" in text
         if name not in ("index.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 
