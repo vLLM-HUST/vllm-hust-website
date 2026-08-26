@@ -78,6 +78,19 @@ def test_pending_github_identities_have_no_invented_login_or_link() -> None:
 def test_only_verified_teacher_github_logins_are_published() -> None:
     _, snapshot = load_profiles()
     advisors = {item["name_zh"]: item for item in snapshot["advisor_profiles"]}
+    profiles = snapshot["member_profiles"]
+    current_advisor_names = {
+        item["advisor"]["zh"]
+        for category in (
+            "core_members",
+            "participants",
+            "staff_members",
+            "external_contributors",
+        )
+        for item in profiles[category]
+        if item["advisor"]["zh"]
+    }
+    assert set(advisors) == current_advisor_names
     assert {name: item["github_login"] for name, item in advisors.items()} == {
         "张书豪": "ShuhaoZhangTony",
         "刘海坤": None,
@@ -88,7 +101,13 @@ def test_only_verified_teacher_github_logins_are_published() -> None:
         "郑龙": None,
         "万瑶": None,
         "毛言粲": "yancanmao",
+        "罗瑞坤": None,
+        "黄禹": None,
+        "王雄": None,
     }
+    for name in ("罗瑞坤", "黄禹", "王雄"):
+        assert advisors[name]["name_en"] == ""
+        assert advisors[name]["github_url"] is None
 
 
 def test_former_members_are_separate_and_rendered_as_history() -> None:

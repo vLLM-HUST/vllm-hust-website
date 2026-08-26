@@ -6013,6 +6013,24 @@
       "name_en": "Yancan Mao",
       "github_login": "yancanmao",
       "github_url": "https://github.com/yancanmao"
+    },
+    {
+      "name_zh": "罗瑞坤",
+      "name_en": "",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "黄禹",
+      "name_en": "",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "王雄",
+      "name_en": "",
+      "github_login": null,
+      "github_url": null
     }
   ],
   "roster_source": "data/member_roster.json"

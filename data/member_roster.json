@@ -17,7 +17,10 @@
     {"name_zh": "赵进", "name_en": "Jin Zhao", "github_login": null},
     {"name_zh": "郑龙", "name_en": "Long Zheng", "github_login": null},
     {"name_zh": "万瑶", "name_en": "Yao Wan", "github_login": null},
-    {"name_zh": "毛言粲", "name_en": "Yancan Mao", "github_login": "yancanmao"}
+    {"name_zh": "毛言粲", "name_en": "Yancan Mao", "github_login": "yancanmao"},
+    {"name_zh": "罗瑞坤", "name_en": "", "github_login": null},
+    {"name_zh": "黄禹", "name_en": "", "github_login": null},
+    {"name_zh": "王雄", "name_en": "", "github_login": null}
   ],
   "members": [
     {"name_zh": "曹哲", "github_login": "xmdhb", "advisor_zh": "张书豪", "status": "current"},
