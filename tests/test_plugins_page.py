@@ -99,6 +99,8 @@ def test_page_keeps_plugin_and_adjacent_catalogs_visibly_separate() -> None:
     assert "manifest.adjacent_assets.forEach" in SCRIPT
     assert 'item.origin === "existing"' in SCRIPT
     assert "item.repository_url" in SCRIPT
+    assert "Incubation repository · link not public" in SCRIPT
+    assert "孵化仓库 · 链接未公开" in SCRIPT
 
 
 def test_published_plugins_link_verified_paper_records() -> None:
@@ -153,6 +155,11 @@ def test_technical_highlights_separate_shipped_evidence_from_open_prs() -> None:
     assert "KV state as a policy surface" in PAGE
     assert "Long-sequence speculative execution" in PAGE
     assert "Performance provenance as an engine deliverable" in PAGE
+    assert "Replaceable policy, state, execution, and hardware paths" in PAGE
+    assert "data-review-target-count" in PAGE
+    assert "reviewTargetCount" in SCRIPT
+    assert "09 LAYERS · 58 MODULES" not in PAGE
+    assert "LAYERED · LIVE MANIFEST" in PAGE
 
     for merged_pr in (160, 171, 173, 216, 229, 232, 246, 247):
         assert f"https://github.com/vLLM-HUST/vllm-hust/pull/{merged_pr}" in PAGE

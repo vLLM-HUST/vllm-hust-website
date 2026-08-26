@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>vLLM-HUST | Inference Engine for Domestic Compute</title>
-  <meta name="description" content="A plugin-first inference engine for domestic compute, with composable and reversible serving mechanisms backed by traceable evidence." />
+  <meta name="description" content="A plugin-first inference engine with programmable scheduling and KV state, graph-aware model execution, explicit hardware capabilities, and matched performance evidence." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="vLLM-HUST" />
-  <meta property="og:description" content="A plugin-first inference engine for domestic compute, with composable and reversible serving mechanisms backed by traceable evidence." />
+  <meta property="og:description" content="Programmable scheduling and KV state, graph-aware model execution, explicit hardware capabilities, and matched performance evidence." />
   <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/ecosystem-infrastructure.png" />
   <meta property="og:url" content="https://vllm-hust.sage.org.ai/" />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
@@ -63,17 +63,17 @@
       <div class="execution-hero-copy">
         <p id="home-eyebrow" class="execution-signal"><span></span>Domestic compute · inference engine / 03</p>
         <h1 id="home-title">vLLM-HUST</h1>
-        <p id="home-kicker" class="execution-kicker">A plugin-first inference engine for domestic compute.</p>
-        <p id="home-lede" class="execution-lede">Not a heavier fork: composable, reversible plugins connect scheduling, KV state, hardware, control, and evidence.</p>
+        <p id="home-kicker" class="execution-kicker">Programmable KV and scheduling. Graph-aware execution. Portable hardware plugins.</p>
+        <p id="home-lede" class="execution-lede">Replace serving policy, model execution, and hardware through reversible plugins, with matched evidence for every gain.</p>
         <div class="execution-actions">
-          <a id="home-primary-cta" class="execution-button primary" href="#products">Explore products <span aria-hidden="true">↓</span></a>
+          <a id="home-primary-cta" class="execution-button primary" href="./plugins.html#technical-highlights">See technical highlights <span aria-hidden="true">→</span></a>
           <a id="home-github-cta" class="execution-button quiet" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">Open GitHub <span aria-hidden="true">↗</span></a>
         </div>
       </div>
       <dl class="execution-metrics" aria-label="vLLM-HUST overview">
-        <div><dt id="home-fact-1-label">Usable</dt><dd id="home-fact-1-value">OpenAI-compatible entry</dd></div>
-        <div><dt id="home-fact-2-label">Evolvable</dt><dd id="home-fact-2-value">portable serving mechanisms</dd></div>
-        <div><dt id="home-fact-3-label">Verifiable</dt><dd id="home-fact-3-value">public benchmark evidence</dd></div>
+        <div><dt id="home-fact-1-label">State</dt><dd id="home-fact-1-value">KV · routing · deadlines</dd></div>
+        <div><dt id="home-fact-2-label">Execute</dt><dd id="home-fact-2-value">decode · MoE · precision</dd></div>
+        <div><dt id="home-fact-3-label">Prove</dt><dd id="home-fact-3-value">matched runs · provenance · rollback</dd></div>
       </dl>
     </section>
 
@@ -227,11 +227,11 @@
       en: {
         title: 'vLLM-HUST | Inference Engine for Domestic Compute',
         'home-eyebrow': 'Domestic compute · inference engine / 03',
-        'home-kicker': 'A plugin-first inference engine for domestic compute.',
-        'home-lede': 'Not a heavier fork: composable, reversible plugins connect scheduling, KV state, hardware, control, and evidence.',
-        'home-primary-cta': 'Explore products ↓', 'home-github-cta': 'Open GitHub ↗',
-        'home-fact-1-label': 'Usable', 'home-fact-2-label': 'Evolvable', 'home-fact-3-label': 'Verifiable',
-        'home-fact-1-value': 'OpenAI-compatible entry', 'home-fact-2-value': 'portable serving mechanisms', 'home-fact-3-value': 'public benchmark evidence',
+        'home-kicker': 'Programmable KV and scheduling. Graph-aware execution. Portable hardware plugins.',
+        'home-lede': 'Replace serving policy, model execution, and hardware through reversible plugins, with matched evidence for every gain.',
+        'home-primary-cta': 'See technical highlights →', 'home-github-cta': 'Open GitHub ↗',
+        'home-fact-1-label': 'State', 'home-fact-2-label': 'Execute', 'home-fact-3-label': 'Prove',
+        'home-fact-1-value': 'KV · routing · deadlines', 'home-fact-2-value': 'decode · MoE · precision', 'home-fact-3-value': 'matched runs · provenance · rollback',
         'scope-products': 'Products & apps', 'scope-engine': 'Engine', 'scope-projects': 'Projects', 'scope-ecosystem': 'Ecosystem',
         'products-eyebrow': 'Products & applications', 'products-title': 'From inference operations to agent applications.',
         'products-summary': 'Workstation operates vLLM-HUST. Sage Mate is an application built with SAGE and backed by vLLM-HUST.',
@@ -278,11 +278,11 @@
       },
       zh: {
         title: 'vLLM-HUST | 面向国产算力的大模型推理引擎',
-        'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '面向国产算力的插件化推理引擎。',
-        'home-lede': '不是更重的分叉：以可组合、可回退的插件连接调度、KV 状态、硬件、控制动作与证据链。',
-        'home-primary-cta': '查看产品 ↓', 'home-github-cta': '打开 GitHub ↗',
-        'home-fact-1-label': '可用', 'home-fact-2-label': '可演进', 'home-fact-3-label': '可验证',
-        'home-fact-1-value': 'OpenAI-compatible 入口', 'home-fact-2-value': '推理机制可迁移', 'home-fact-3-value': '公开 Benchmark 证据',
+        'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': 'KV 与调度可编程，模型执行感知计算图，硬件能力以插件接入。',
+        'home-lede': '以可回退插件替换服务策略、模型执行与硬件能力，并用 matched 对照和完整版本证据验证收益。',
+        'home-primary-cta': '查看技术亮点 →', 'home-github-cta': '打开 GitHub ↗',
+        'home-fact-1-label': '状态', 'home-fact-2-label': '执行', 'home-fact-3-label': '验证',
+        'home-fact-1-value': 'KV · 路由 · 截止时间', 'home-fact-2-value': '解码 · MoE · 精度', 'home-fact-3-value': '对照实验 · 版本 · 回退',
         'scope-products': '产品与应用', 'scope-engine': '引擎', 'scope-projects': '项目', 'scope-ecosystem': '生态',
         'products-eyebrow': '产品与应用', 'products-title': '从推理运维到智能体应用。',
         'products-summary': 'Workstation 运维推理栈；Sage Mate 基于 SAGE，调用 vLLM-HUST。',
