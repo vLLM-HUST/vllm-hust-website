@@ -126,3 +126,18 @@ def test_published_plugins_link_verified_paper_records() -> None:
     assert "data-publication-count" in PAGE
     assert "publicationCount" in SCRIPT
     assert "plugin-publications-v1" in PAGE
+
+
+def test_formal_plugin_standard_is_downloadable_and_reproducible() -> None:
+    latex = ROOT / "docs" / "PLUGIN_STANDARD.tex"
+    pdf = ROOT / "assets" / "documents" / "vllm-hust-plugin-standard-v1.0.pdf"
+
+    assert latex.is_file()
+    assert pdf.is_file()
+    assert pdf.read_bytes().startswith(b"%PDF-")
+    assert pdf.stat().st_size > 100_000
+    assert "Plugin Standard 1.0" in latex.read_text(encoding="utf-8")
+    assert "插件开发与运行标准" in latex.read_text(encoding="utf-8")
+    assert 'href="./assets/documents/vllm-hust-plugin-standard-v1.0.pdf"' in PAGE
+    assert "download" in PAGE
+    assert "PLUGIN_STANDARD.tex" in PAGE
