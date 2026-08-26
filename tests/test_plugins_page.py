@@ -90,7 +90,10 @@ def test_quant_and_triton_are_adjacent_assets_not_plugins() -> None:
 
 def test_page_keeps_plugin_and_adjacent_catalogs_visibly_separate() -> None:
     assert 'data-page="plugins"' in PAGE
-    assert 'data-source="./data/plugins.json?v=plugin-publications-v1"' in PAGE
+    assert (
+        'data-source="./data/plugins.json?v=plugin-publications-v1-control-plane-layer-v1"'
+        in PAGE
+    )
     assert "Adjacent assets are not runtime plugins." in PAGE
     assert "相邻资产不是运行时插件。" in PAGE
     assert "manifest.adjacent_assets.forEach" in SCRIPT
@@ -141,3 +144,84 @@ def test_formal_plugin_standard_is_downloadable_and_reproducible() -> None:
     assert 'href="./assets/documents/vllm-hust-plugin-standard-v1.0.pdf"' in PAGE
     assert "download" in PAGE
     assert "PLUGIN_STANDARD.tex" in PAGE
+
+
+def test_all_roadmap_modules_follow_the_declared_architecture_layer() -> None:
+    expected_prefixes = {
+        "scheduler": "SCH-",
+        "kv": "KV-",
+        "model": "MODEL-",
+        "kernels": "KERNEL-",
+        "compiler": "COMP-",
+        "platform": "PLAT-",
+        "observability": "OBS-",
+        "benchmarks": "BENCH-",
+        "connectors": "RIDE-",
+    }
+
+    assert len(MANIFEST["plugins"]) == 59
+    for plugin in MANIFEST["plugins"]:
+        assert plugin["code"].startswith(expected_prefixes[plugin["layer"]])
+
+
+def test_ride_topics_with_engine_actions_are_only_control_plane_connectors() -> None:
+    expected_connectors = {
+        "SLO-Aware Agent Serving Connector",
+        "Agentic KV Connector",
+        "VAMOS Connector",
+        "Token-Budget Governor Connector",
+        "Agent State Tiering Connector",
+        "Prefix Cache Routing Reliability Connector",
+        "FreshKV Connector",
+        "Quality-Bounded Inference Connector",
+        "Workflow-Aware Serving Connector",
+    }
+    connectors = {
+        plugin["name"]
+        for plugin in MANIFEST["plugins"]
+        if plugin["layer"] == "connectors"
+    }
+
+    assert connectors == expected_connectors
+    assert all(
+        plugin["origin"] == "connector"
+        for plugin in MANIFEST["plugins"]
+        if plugin["layer"] == "connectors"
+    )
+    assert not any(
+        plugin["name"] in {"Quality-Bounded Inference", "Workflow-Aware Serving"}
+        for plugin in MANIFEST["plugins"]
+    )
+    connector_layer = next(
+        layer for layer in MANIFEST["layers"] if layer["id"] == "connectors"
+    )
+    assert connector_layer["reference_url"] == "https://ride-lab.github.io/#portfolio"
+    assert 'item.origin === "connector"' in SCRIPT
+    assert "RIDE-Lab control plane" in SCRIPT
+    assert "connectorLayer.reference_url" in SCRIPT
+
+
+def test_signal_only_plugins_are_observability_modules() -> None:
+    signal_only_kinds = {
+        "Acceptance telemetry plugin",
+        "Profiling seam plugin",
+        "Lifecycle event plugin",
+        "Performance regression plugin",
+        "Phase-model telemetry plugin",
+        "Trace relation exporter",
+        "Resource-metering plugin",
+    }
+    signal_plugins = [
+        plugin
+        for plugin in MANIFEST["plugins"]
+        if plugin["kind_en"] in signal_only_kinds
+    ]
+
+    assert {plugin["kind_en"] for plugin in signal_plugins} == signal_only_kinds
+    assert all(plugin["layer"] == "observability" for plugin in signal_plugins)
+    acceptance = next(
+        plugin
+        for plugin in MANIFEST["plugins"]
+        if plugin["name"] == "Ascend Speculative Decoding Acceptance"
+    )
+    assert acceptance["code"] == "OBS-07"

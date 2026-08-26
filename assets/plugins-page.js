@@ -20,8 +20,8 @@
 
   function labels() {
     return language() === "zh"
-      ? { all: "全部", papers: "论文成果", paper: "论文", repository: "仓库", withheld: "链接未公开", entries: "个条目", empty: "没有符合条件的插件。", existing: "vLLM 运行时入口", searchPlaceholder: "搜索插件、论文、职责或层次" }
-      : { all: "All", papers: "Publications", paper: "Paper", repository: "Repository", withheld: "Link not public", entries: "entries", empty: "No plugins match the current filters.", existing: "vLLM runtime entry point", searchPlaceholder: "Search plugin, paper, responsibility, or layer" };
+      ? { all: "全部", papers: "论文成果", paper: "论文", repository: "仓库", withheld: "链接未公开", entries: "个条目", empty: "没有符合条件的插件。", existing: "vLLM 运行时入口", controlPlane: "RIDE-Lab 控制面", searchPlaceholder: "搜索插件、论文、职责或层次" }
+      : { all: "All", papers: "Publications", paper: "Paper", repository: "Repository", withheld: "Link not public", entries: "entries", empty: "No plugins match the current filters.", existing: "vLLM runtime entry point", controlPlane: "RIDE-Lab control plane", searchPlaceholder: "Search plugin, paper, responsibility, or layer" };
   }
 
   function statusText(item) {
@@ -57,6 +57,14 @@
     top.append(element("span", "plugin-code", item.code));
     const badges = element("div", "plugin-badges");
     if (item.origin === "existing") badges.append(element("span", "plugin-badge existing", copy.existing));
+    if (item.origin === "connector") {
+      const connectorLayer = manifest.layers.find((layer) => layer.id === "connectors");
+      const program = element("a", "plugin-badge connector", `${copy.controlPlane} ↗`);
+      program.href = connectorLayer.reference_url;
+      program.target = "_blank";
+      program.rel = "noopener noreferrer";
+      badges.append(program);
+    }
     if (publications.length) badges.append(element("span", "plugin-badge publication", `${publications.length} ${copy.paper}`));
     badges.append(element("span", `plugin-badge status-${item.status}`, statusText(item)));
     top.append(badges);
