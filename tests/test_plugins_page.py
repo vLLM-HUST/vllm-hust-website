@@ -90,9 +90,39 @@ def test_quant_and_triton_are_adjacent_assets_not_plugins() -> None:
 
 def test_page_keeps_plugin_and_adjacent_catalogs_visibly_separate() -> None:
     assert 'data-page="plugins"' in PAGE
-    assert 'data-source="./data/plugins.json?v=client-ready-v2"' in PAGE
+    assert 'data-source="./data/plugins.json?v=plugin-publications-v1"' in PAGE
     assert "Adjacent assets are not runtime plugins." in PAGE
     assert "相邻资产不是运行时插件。" in PAGE
     assert "manifest.adjacent_assets.forEach" in SCRIPT
     assert 'item.origin === "existing"' in SCRIPT
     assert "item.repository_url" in SCRIPT
+
+
+def test_published_plugins_link_verified_paper_records() -> None:
+    published = {
+        item["name"]: item["publications"]
+        for item in MANIFEST["plugins"]
+        if item.get("publications")
+    }
+
+    assert set(published) == {"BidKV", "DiffSpec"}
+    assert sum(len(records) for records in published.values()) == 2
+    assert published["BidKV"][0] == {
+        "title_en": "BidKV: Utility-Guided Preemption Scheduling for KV-Pressure LLM Serving",
+        "title_zh": "BidKV：KV 压力下大模型服务的效用引导抢占调度",
+        "venue": "SC",
+        "year": 2026,
+        "status_en": "Accepted paper",
+        "status_zh": "已接收论文",
+        "url": "./assets/papers/bidkv-sc2026.pdf",
+    }
+    assert published["DiffSpec"][0]["url"].endswith(
+        "/vllm-ascend-hust-diffspec#paper-reference"
+    )
+    assert (ROOT / "assets" / "papers" / "bidkv-sc2026.pdf").stat().st_size > 100_000
+
+    assert 'id: "publications"' in SCRIPT
+    assert "plugin-publications" in SCRIPT
+    assert "data-publication-count" in PAGE
+    assert "publicationCount" in SCRIPT
+    assert "plugin-publications-v1" in PAGE
