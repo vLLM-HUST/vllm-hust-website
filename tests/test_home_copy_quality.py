@@ -39,12 +39,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "Turn domestic compute into usable, verifiable inference.",
-        "One engine connects upstream compatibility, system innovation, and public evidence.",
+        "A plugin-first inference engine for domestic compute.",
+        "Not a heavier fork: composable, reversible plugins connect scheduling, KV state, hardware, control, and evidence.",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "让国产算力成为可用、可验证的推理能力。",
+        "面向国产算力的插件化推理引擎。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX

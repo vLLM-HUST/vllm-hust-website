@@ -157,12 +157,26 @@ def test_technical_highlights_separate_shipped_evidence_from_open_prs() -> None:
     for merged_pr in (160, 171, 173, 216, 229, 232, 246, 247):
         assert f"https://github.com/vLLM-HUST/vllm-hust/pull/{merged_pr}" in PAGE
 
-    for open_pr in (67, 133, 169, 181, 249, 250, 256, 258, 264):
+    for open_pr in (67, 123, 133, 169, 181, 249, 250, 256, 258, 260, 264):
         assert f"https://github.com/vLLM-HUST/vllm-hust/pull/{open_pr}" in PAGE
 
     assert "24.44% → 47.88%" in PAGE
     assert "223.80 → 174.80 ms" in PAGE
     assert "−0.01%" in PAGE
+    assert "Plugin targets in review" in PAGE
+    assert "Eight engine mechanisms designed as independent plugins" in PAGE
+    assert PAGE.count("PLUGIN TARGET") == 8
+    for target in (
+        "Full-Graph Parallel Replay Plugin",
+        "Load-Aware Prefix Router Plugin",
+        "Host-Control Batching Plugin",
+        "Low-Bit KV Precision Plugin",
+        "Deadline-Aware QoS Plugin",
+        "Activation Sparsity Plugin",
+        "Runner Extension Transport Plugin",
+        "KV Lifecycle Telemetry Plugin",
+    ):
+        assert target in PAGE
     assert "An open PR proves that code is reviewable" in PAGE
     assert "does not by itself prove production readiness or a speedup" in PAGE
     assert "Smoke, replay, simulation, and projected profiles" in PAGE
