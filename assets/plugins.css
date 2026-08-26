@@ -88,7 +88,9 @@ html[lang="zh"] .lang-zh { display: inline; }
 .plugin-code { color: #61706f; font: 10px ui-monospace,SFMono-Regular,Menlo,monospace; }
 .plugin-badges { display: flex; gap: 5px; flex-wrap: wrap; justify-content: end; }
 .plugin-badge { padding: 3px 6px; color: #105456; background: #c9e8e7; font: 9px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; }
+.plugin-badge:is(a) { text-decoration: none; }
 .plugin-badge.existing { color: #34560c; background: #dfeebf; }
+.plugin-badge.connector { color: #fff; background: #6744a5; }
 .plugin-badge.publication { color: #fff; background: #176f72; }
 .plugin-badge.status-concept { color: #4e5d5b; background: #e3e9e7; }
 .plugin-badge.status-incubating,.plugin-badge.status-planned { color: #694a05; background: #f4e1ae; }
