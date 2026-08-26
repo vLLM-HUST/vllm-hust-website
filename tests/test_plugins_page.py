@@ -146,6 +146,41 @@ def test_formal_plugin_standard_is_downloadable_and_reproducible() -> None:
     assert "PLUGIN_STANDARD.tex" in PAGE
 
 
+def test_technical_highlights_separate_shipped_evidence_from_open_prs() -> None:
+    assert 'id="technical-highlights"' in PAGE
+    assert 'href="#technical-highlights"' in PAGE
+    assert "Plugin-first, reversible extension" in PAGE
+    assert "KV state as a policy surface" in PAGE
+    assert "Long-sequence speculative execution" in PAGE
+    assert "Performance provenance as an engine deliverable" in PAGE
+
+    for merged_pr in (160, 171, 173, 216, 229, 232, 246, 247):
+        assert f"https://github.com/vLLM-HUST/vllm-hust/pull/{merged_pr}" in PAGE
+
+    for open_pr in (67, 133, 169, 181, 249, 250, 256, 258, 264):
+        assert f"https://github.com/vLLM-HUST/vllm-hust/pull/{open_pr}" in PAGE
+
+    assert "24.44% → 47.88%" in PAGE
+    assert "223.80 → 174.80 ms" in PAGE
+    assert "−0.01%" in PAGE
+    assert "An open PR proves that code is reviewable" in PAGE
+    assert "does not by itself prove production readiness or a speedup" in PAGE
+    assert "Smoke, replay, simulation, and projected profiles" in PAGE
+
+
+def test_public_highlights_do_not_expose_private_incubation_or_overclaim() -> None:
+    normalized = PAGE.lower()
+    assert "qixin-gaoke" not in normalized
+    assert "first agent-native" not in normalized
+    assert "faster than other engines" not in normalized
+    assert (
+        "triton ascend"
+        not in PAGE.split('id="technical-highlights"', 1)[1].split(
+            'id="plugin-standard"', 1
+        )[0]
+    )
+
+
 def test_all_roadmap_modules_follow_the_declared_architecture_layer() -> None:
     expected_prefixes = {
         "scheduler": "SCH-",
