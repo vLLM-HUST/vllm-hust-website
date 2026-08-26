@@ -1,0 +1,416 @@
+% Reproducible build:
+%   tectonic docs/PLUGIN_STANDARD.tex --outdir /tmp/plugin-standard-build
+%   install -m 0644 /tmp/plugin-standard-build/PLUGIN_STANDARD.pdf \
+%     assets/documents/vllm-hust-plugin-standard-v1.0.pdf
+\documentclass[11pt,a4paper,fontset=none]{ctexart}
+
+\usepackage[a4paper,margin=22mm,headheight=16pt]{geometry}
+\usepackage{array}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{longtable}
+\usepackage{microtype}
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+
+\setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
+\setCJKsansfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]
+\setCJKmonofont{FandolSong-Regular.otf}
+
+\definecolor{Ink}{HTML}{0C1112}
+\definecolor{Teal}{HTML}{176F72}
+\definecolor{Cyan}{HTML}{39C6CA}
+\definecolor{Lime}{HTML}{A8D951}
+\definecolor{Mist}{HTML}{E9EFEC}
+\definecolor{Slate}{HTML}{52615F}
+\definecolor{Amber}{HTML}{F4E1AE}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Teal,
+  urlcolor=Teal,
+  pdftitle={vLLM-HUST Plugin Standard 1.0},
+  pdfauthor={vLLM-HUST},
+  pdfsubject={Development and operations contract for vLLM runtime plugins},
+  pdfkeywords={vLLM, plugin, inference engine, lifecycle, conformance}
+}
+\Urlmuskip=0mu plus 2mu
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlist{nosep,leftmargin=2em}
+\renewcommand{\arraystretch}{1.25}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{Teal}{vLLM-HUST Plugin Standard}}
+\rhead{\textcolor{Slate}{Version 1.0}}
+\cfoot{\textcolor{Slate}{\thepage}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lstdefinestyle{standardcode}{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{Mist},
+  frame=single,
+  rulecolor=\color{Teal!35},
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  aboveskip=0.8em,
+  belowskip=0.8em
+}
+\lstset{style=standardcode}
+
+\newtcolorbox{normative}[1]{
+  colback=Mist,
+  colframe=Teal,
+  title=\textbf{#1},
+  fonttitle=\bfseries,
+  boxrule=0.8pt,
+  arc=0pt
+}
+\newcommand{\must}{\textbf{MUST / 必须}}
+\newcommand{\should}{\textbf{SHOULD / 应当}}
+\newcommand{\may}{\textbf{MAY / 可以}}
+
+\begin{document}
+
+\begin{titlepage}
+  \pagecolor{Ink}\color{white}
+  \vspace*{20mm}
+  {\color{Cyan}\bfseries\sffamily INFERENCE ENGINE EXTENSION CONTRACT\par}
+  \vspace{15mm}
+  {\fontsize{34}{40}\selectfont\bfseries\sffamily vLLM-HUST\par}
+  \vspace{3mm}
+  {\fontsize{27}{34}\selectfont\bfseries\sffamily Plugin Standard 1.0\par}
+  \vspace{5mm}
+  {\Large 插件开发与运行标准\par}
+  \vfill
+  \begin{tcolorbox}[colback=white!7!Ink,colframe=white!25,arc=0pt,boxrule=0.6pt]
+    \color{white}
+    本标准规定 vLLM-HUST 运行时插件的最小开发、集成、启动、验证、停止、卸载和回滚合同。\\
+    This standard defines the minimum development, integration, startup, verification,
+    shutdown, removal, and rollback contract for a vLLM-HUST runtime plugin.
+  \end{tcolorbox}
+  \vspace{12mm}
+  {\color{Lime}\bfseries Version 1.0}\hfill 2026-08-26
+  \vspace{8mm}
+\end{titlepage}
+\nopagecolor\color{Ink}
+
+\section*{Document status / 文档状态}
+\addcontentsline{toc}{section}{Document status / 文档状态}
+
+This is a stable public engineering standard. Conformance refers to a specific plugin release and
+its declared compatibility range; it does not imply performance superiority or endorsement of a
+research claim.
+
+本文件是稳定的公开工程标准。“符合本标准”仅针对某一插件版本及其声明的兼容范围，不代表性能
+优越，也不构成对研究结论的背书。
+
+\begin{longtable}{>{\bfseries}p{0.28\textwidth}p{0.64\textwidth}}
+Version / 版本 & 1.0 \\
+Status / 状态 & Public standard / 公开标准 \\
+Applies to / 适用对象 & Independently packaged vLLM runtime plugins / 独立封装的 vLLM 运行时插件 \\
+Canonical source / 权威源 & \url{https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/PLUGIN_STANDARD.tex} \\
+Project site / 项目网站 & \url{https://vllm-hust.sage.org.ai/plugins.html} \\
+\end{longtable}
+
+\tableofcontents
+\newpage
+
+\section{Normative language / 规范性语言}
+
+The key words \must, \should, and \may indicate requirement, recommendation, and permission.
+Where English and Chinese wording differ, the requirement with the stricter operational safety
+interpretation applies until the source is corrected.
+
+关键词 \must、\should、\may 分别表示强制要求、建议要求和允许事项。中英文出现差异时，在源文件
+修订前采用运行安全约束更严格的解释。
+
+\section{Scope and boundary / 范围与边界}
+
+A conforming plugin is an independently versioned Python distribution that extends vLLM through a
+supported Python entry-point group. It installs without modifying the vLLM-HUST source tree and has
+a documented enable, verify, disable, remove, and rollback path.
+
+合规插件是独立版本化的 Python 发行包，通过受支持的 Python entry point 扩展 vLLM。安装插件不得
+修改 vLLM-HUST 源码树，并且必须提供启用、验证、停用、卸载和回滚路径。
+
+Compiler backends, kernel libraries, model conversion, benchmark suites, deployment managers,
+profilers, and offline analysis tools are adjacent assets unless they register a vLLM runtime entry
+point. Being used by a plugin does not make an adjacent asset a plugin.
+
+编译器后端、算子库、模型转换工具、基准套件、部署管理器、性能分析器和离线分析工具属于相邻资产，
+除非它们注册了 vLLM 运行时入口。被插件使用并不会使相邻资产自动成为插件。
+
+\begin{normative}{Minimum boundary / 最小边界}
+  A plugin \must be independently installable, selectable at process startup, identifiable in
+  runtime evidence, and removable without editing the inference-engine source tree.
+
+  插件必须能够独立安装、在进程启动时显式选择、在运行证据中可识别，并可在不修改推理引擎源码树
+  的情况下卸载。
+\end{normative}
+
+\section{Supported entry-point groups / 支持的入口点组}
+
+Choose the narrowest supported group that matches the extension's responsibility.
+
+\begin{longtable}{>{\small\ttfamily\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}}
+\toprule
+\normalfont\bfseries Group & \bfseries Intended use / 用途 & \bfseries Process scope / 进程范围 \\
+\midrule
+\endhead
+vllm.general\_plugins & Runtime registration and general extensions / 通用运行时注册与扩展 & API, engine-core, worker \\
+vllm.platform\_plugins & Out-of-tree hardware platform / 树外硬件平台 & Relevant initialization processes / 相关初始化进程 \\
+vllm.io\_processor\_plugins & Input/output processors / 输入输出处理器 & API process \\
+vllm.stat\_logger\_plugins & Statistics loggers / 统计日志器 & Asynchronous API process / 异步 API 进程 \\
+\bottomrule
+\end{longtable}
+
+\texttt{vllm.platform\_plugins} is reserved for hardware-platform implementations. A compiler,
+kernel library, model-preparation utility, or benchmark is not a platform plugin merely because a
+runtime uses it.
+
+\section{Package and identity / 包结构与身份}
+
+\begin{lstlisting}
+<plugin-repository>/
+|-- pyproject.toml
+|-- README.md
+|-- CHANGELOG.md
+|-- src/<package>/
+|   |-- __init__.py
+|   `-- plugin.py
+`-- tests/
+    |-- test_entry_point.py
+    |-- test_registration.py
+    `-- test_lifecycle.py
+\end{lstlisting}
+
+The package \must declare one stable plugin identity. Distribution name, import package, and plugin
+ID may differ, but all three \must remain stable within a release line and be documented together.
+
+\begin{lstlisting}
+[project]
+name = "<distribution-name>"
+version = "<version>"
+
+[project.entry-points."vllm.general_plugins"]
+<plugin-id> = "<package>.plugin:register"
+\end{lstlisting}
+
+Every release \must record the distribution version, import package, plugin ID, entry-point group,
+entry callable, supported vLLM range, and tested vLLM-HUST commit.
+
+\section{Registration contract / 注册合同}
+
+Registration \must be re-entrant because vLLM may load plugins in multiple processes and may invoke
+the same registration path more than once.
+
+\begin{lstlisting}[language=Python]
+_REGISTERED = False
+
+def register() -> None:
+    global _REGISTERED
+    if _REGISTERED:
+        return
+    # Install one narrow runtime hook.
+    _REGISTERED = True
+\end{lstlisting}
+
+A conforming registration function:
+
+\begin{itemize}
+  \item \must install the narrowest practical hook and produce the same result on repeated calls;
+  \item \must not duplicate patches, threads, sockets, files, or global state;
+  \item \must validate required configuration before serving requests;
+  \item \must emit one activation record containing plugin ID and version;
+  \item \must fail visibly when a required hook or compatibility condition is unavailable;
+  \item \must not embed machine paths, ports, device IDs, credentials, or model locations; and
+  \item \should expose plugin-owned health, counters, or receipts when operationally relevant.
+\end{itemize}
+
+\section{Compatibility, configuration, and safety / 兼容、配置与安全}
+
+Each release \must document:
+
+\begin{itemize}
+  \item supported platform, Python, vLLM, and vLLM-HUST versions;
+  \item incompatible plugins and mutually exclusive runtime modes;
+  \item every plugin-owned configuration variable, type, default, and validation rule;
+  \item required external services or storage and their failure behavior; and
+  \item safe fallback and rollback behavior.
+\end{itemize}
+
+Configuration variables \must use a plugin-specific prefix. Secrets \must not appear in source,
+logs, manifests, command examples, or generated artifacts. A plugin \must fail closed when invalid
+configuration could compromise correctness, isolation, or data integrity.
+
+\section{Build, install, and discovery / 构建、安装与发现}
+
+Build a wheel and install it into the exact Python environment used by every serving process.
+Deployment-specific values remain external inputs.
+
+\begin{lstlisting}[language=bash]
+export BUILD_PYTHON=/path/to/build/python
+export RUNTIME_PYTHON=/path/to/serving/python
+export PLUGIN_WHEEL=/path/to/plugin.whl
+
+"${BUILD_PYTHON}" -m build
+"${RUNTIME_PYTHON}" -m pip install "${PLUGIN_WHEEL}"
+\end{lstlisting}
+
+Before startup, verify discovery using the same runtime interpreter:
+
+\begin{lstlisting}[language=bash]
+"${RUNTIME_PYTHON}" -c \
+  'from importlib.metadata import entry_points; \
+print([(e.name, e.value) for e in \
+entry_points(group="vllm.general_plugins")])'
+\end{lstlisting}
+
+Installation alone does not prove activation. Multi-node deployments \must install and verify the
+same plugin release in every applicable environment.
+
+\section{Enable and start / 启用与启动}
+
+Production services \must use an explicit allowlist.
+
+\begin{lstlisting}[language=bash]
+export PLUGIN_ID=your-plugin-id
+export MODEL=your-model
+export PORT=your-port
+
+VLLM_PLUGINS="${PLUGIN_ID}" \
+  vllm serve "${MODEL}" --port "${PORT}"
+\end{lstlisting}
+
+Multiple plugin IDs are comma-separated. If \texttt{VLLM\_PLUGINS} is unset, vLLM loads every
+discovered plugin. If set to an empty string, vLLM loads none. Service-manager, container, model,
+port, device, storage, and endpoint values \must remain deployment inputs.
+
+\section{Verification and evidence / 验证与证据}
+
+Activation requires all of the following:
+
+\begin{enumerate}
+  \item the intended entry point is discoverable in every serving environment;
+  \item registration logs identify plugin ID and version without exposing secrets;
+  \item the server reaches its readiness endpoint;
+  \item at least one functional request completes correctly; and
+  \item plugin-owned health, counters, or receipts are available when declared.
+\end{enumerate}
+
+\begin{lstlisting}[language=bash]
+curl --fail --silent \
+  "http://127.0.0.1:${PORT}/v1/models"
+\end{lstlisting}
+
+\begin{normative}{Evidence boundary / 证据边界}
+  A smoke test validates discovery and lifecycle only. A performance claim \must use a matched
+  baseline and treatment with the same model, request sequence, runtime, topology, and hardware
+  allocation. Evidence \must identify whether it is real-online, trace-driven, replay, fixture,
+  simulation, or projected; these labels are not interchangeable.
+
+  Smoke 仅验证发现与生命周期。性能声明必须采用模型、请求序列、运行时、拓扑和硬件分配一致的
+  matched 对照，并准确标记证据性质。
+\end{normative}
+
+\section{Stop and disable / 停止与停用}
+
+Plugins are process-scoped. Standard 1.0 does not define hot unload.
+
+\begin{enumerate}
+  \item Gracefully stop the owning service through its supervisor or normal termination signal.
+  \item Wait for API, engine-core, and worker processes to exit.
+  \item Confirm plugin-owned threads, sockets, files, shared memory, and device resources are released.
+  \item Remove the plugin ID from the explicit allowlist, or set \texttt{VLLM\_PLUGINS=""}.
+  \item Restart and verify the baseline path.
+\end{enumerate}
+
+Do not use broad process-name termination. For a directly owned process whose PID was recorded at
+startup, graceful termination is:
+
+\begin{lstlisting}[language=bash]
+kill -TERM "${SERVER_PID}"
+wait "${SERVER_PID}"
+\end{lstlisting}
+
+For supervised deployments, use the supervisor's scoped stop operation rather than signaling an
+unowned child process.
+
+\section{Remove and roll back / 卸载与回滚}
+
+Only uninstall after every consuming process has stopped:
+
+\begin{lstlisting}[language=bash]
+export PLUGIN_DISTRIBUTION=your-distribution-name
+"${RUNTIME_PYTHON}" -m pip uninstall \
+  "${PLUGIN_DISTRIBUTION}"
+\end{lstlisting}
+
+Then verify that the entry point is absent, restart the baseline with an explicit allowlist, run the
+readiness probe, and retain the previous wheel and configuration until rollback verification is
+complete. Rollback \must restore both software and plugin-owned state to a documented compatible
+version.
+
+\section{Conformance requirements / 符合性要求}
+
+A release may be presented as \textbf{vLLM-HUST Plugin Standard 1.0 conforming} only when automated
+tests cover every mandatory item below.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.07\textwidth}>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.42\textwidth}}
+\toprule
+\textbf{ID} & \textbf{Required evidence} & \textbf{验收证据} \\
+\midrule
+\endhead
+C01 & Wheel build and clean-environment installation & wheel 构建与干净环境安装 \\
+C02 & Entry-point discovery in every required process environment & 各必要进程环境中的入口点发现 \\
+C03 & Registration invoked twice without duplicate state & 重复注册不产生重复状态 \\
+C04 & Registration in declared process roles & 在声明的进程角色中完成注册 \\
+C05 & Enabled startup, readiness, and functional request & 启用后的启动、就绪与功能请求 \\
+C06 & Disabled startup, readiness, and baseline request & 停用后的启动、就绪与基线路径 \\
+C07 & Invalid configuration and compatibility rejection & 非法配置与不兼容条件拒绝 \\
+C08 & Graceful shutdown and complete resource cleanup & 优雅停止与完整资源清理 \\
+C09 & Baseline restart after disable or uninstall & 停用或卸载后的基线重启 \\
+C10 & Versioned evidence manifest with software and configuration identity & 含软件和配置身份的版本化证据 manifest \\
+\bottomrule
+\end{longtable}
+
+The plugin README \must contain exact build, install, discover, enable, start, verify, stop, disable,
+uninstall, and rollback instructions for the released distribution. A conformance statement
+\should link to the test run and immutable release artifact.
+
+\section{Release checklist / 发布检查清单}
+
+\begin{tcolorbox}[colback=white,colframe=Teal,arc=0pt,title=\textbf{Operator handoff / 运维交付}]
+\begin{itemize}[label=$\square$]
+  \item Stable package identity and entry point / 稳定的包身份与入口点
+  \item Compatibility matrix and configuration reference / 兼容矩阵与配置说明
+  \item Signed or hashed release artifact / 签名或哈希固定的发布产物
+  \item Explicit enable and disable commands / 明确的启用与停用命令
+  \item Readiness, correctness, and cleanup evidence / 就绪、正确性与清理证据
+  \item Rollback artifact and procedure / 回滚产物与操作流程
+  \item No credentials or deployment-specific constants / 不含凭据或部署专用常量
+\end{itemize}
+\end{tcolorbox}
+
+\section{References / 参考资料}
+
+\begin{itemize}
+  \item \href{https://docs.vllm.ai/en/latest/design/plugin_system/}{vLLM Plugin System}
+  \item \href{https://packaging.python.org/en/latest/specifications/entry-points/}{Python Packaging Entry Points Specification}
+  \item \href{https://vllm-hust.sage.org.ai/plugins.html}{vLLM-HUST Plugin Ecosystem}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{Slate}{\small End of vLLM-HUST Plugin Standard 1.0 / 标准正文结束}
+\end{center}
+
+\end{document}
