@@ -12,7 +12,7 @@ SCRIPT = (ROOT / "assets" / "plugins-page.js").read_text(encoding="utf-8")
 def test_plugin_manifest_has_the_governed_shape() -> None:
     assert MANIFEST["schema_version"] == 1
     assert len(MANIFEST["layers"]) == 9
-    assert len(MANIFEST["plugins"]) == 59
+    assert len(MANIFEST["plugins"]) == 58
     assert len(MANIFEST["adjacent_assets"]) == 7
 
     layer_ids = {layer["id"] for layer in MANIFEST["layers"]}
@@ -159,7 +159,7 @@ def test_all_roadmap_modules_follow_the_declared_architecture_layer() -> None:
         "connectors": "RIDE-",
     }
 
-    assert len(MANIFEST["plugins"]) == 59
+    assert len(MANIFEST["plugins"]) == 58
     for plugin in MANIFEST["plugins"]:
         assert plugin["code"].startswith(expected_prefixes[plugin["layer"]])
 
@@ -167,7 +167,6 @@ def test_all_roadmap_modules_follow_the_declared_architecture_layer() -> None:
 def test_ride_topics_with_engine_actions_are_only_control_plane_connectors() -> None:
     expected_connectors = {
         "SLO-Aware Agent Serving Connector",
-        "Agentic KV Connector",
         "VAMOS Connector",
         "Token-Budget Governor Connector",
         "Agent State Tiering Connector",
