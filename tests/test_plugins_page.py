@@ -173,9 +173,12 @@ def test_public_highlights_do_not_expose_private_incubation_or_overclaim() -> No
     assert "qixin-gaoke" not in normalized
     assert "first agent-native" not in normalized
     assert "faster than other engines" not in normalized
-    assert "triton ascend" not in PAGE.split('id="technical-highlights"', 1)[1].split(
-        'id="plugin-standard"', 1
-    )[0]
+    assert (
+        "triton ascend"
+        not in PAGE.split('id="technical-highlights"', 1)[1].split(
+            'id="plugin-standard"', 1
+        )[0]
+    )
 
 
 def test_all_roadmap_modules_follow_the_declared_architecture_layer() -> None:
