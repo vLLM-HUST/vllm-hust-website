@@ -4,6 +4,7 @@
             navHome: 'Home',
             navLeaderboard: 'Leaderboard',
             navAchievements: 'Achievements',
+            navNews: 'News',
             navContributors: 'Contributors',
             navMembers: 'Members',
             navConferences: 'Conferences',
@@ -24,13 +25,14 @@
             footerEvidence: 'Evidence',
             footerCommunity: 'Community',
             brandSubtitle: 'Domestic-compute inference engine',
-            langToggle: '中文',
+            langToggle: 'ZH',
             langToggleLabel: '切换为中文',
         },
         zh: {
             navHome: '首页',
             navLeaderboard: '性能排行榜',
             navAchievements: '成果',
+            navNews: '新闻',
             navContributors: '核心成员',
             navMembers: '组织成员',
             navConferences: '会议',
@@ -105,6 +107,7 @@
         setText('nav-home', common.navHome);
         setText('nav-leaderboard', common.navLeaderboard);
         setText('nav-achievements', common.navAchievements);
+        setText('nav-news', common.navNews);
         setText('nav-contributors', common.navContributors);
         setText('nav-members', common.navMembers);
         setText('nav-conferences', common.navConferences);
@@ -144,10 +147,11 @@
         {
             id: 'evidence',
             label: 'navEvidence',
-            pages: ['leaderboard', 'achievements'],
+            pages: ['leaderboard', 'achievements', 'news'],
             links: [
                 ['leaderboard', './leaderboard.html', 'navLeaderboard'],
                 ['achievements', './achievements.html', 'navAchievements'],
+                ['news', './news.html', 'navNews'],
             ],
         },
         {
@@ -210,26 +214,52 @@
         button.setAttribute('aria-expanded', 'false');
         button.innerHTML = '<span></span><span></span><span></span>';
         inner.insertBefore(button, links);
+        const languageButton = document.getElementById('langToggle');
+        if (languageButton) inner.appendChild(languageButton);
         nav.classList.add('enhanced');
 
         const setOpen = (open) => {
             nav.classList.toggle('nav-open', open);
+            document.body.classList.toggle('nav-menu-open', open);
             button.setAttribute('aria-expanded', String(open));
             if (open && window.matchMedia('(max-width: 860px)').matches) {
-                links.querySelectorAll('.nav-group').forEach((group) => { group.open = true; });
+                links.querySelectorAll('.nav-group').forEach((group) => {
+                    group.open = group.classList.contains('active');
+                });
             }
             const common = I18N[getCurrentLang()] || I18N.en;
             button.setAttribute('aria-label', open ? common.navMenuClose : common.navMenu);
         };
         button.addEventListener('click', () => setOpen(!nav.classList.contains('nav-open')));
         links.addEventListener('click', (event) => {
-            if (event.target.closest('a')) setOpen(false);
+            if (event.target.closest('a')) {
+                setOpen(false);
+                links.querySelectorAll('.nav-group').forEach((group) => { group.open = false; });
+            }
+        });
+        links.querySelectorAll('.nav-group').forEach((group) => {
+            group.addEventListener('toggle', () => {
+                if (!group.open) return;
+                links.querySelectorAll('.nav-group').forEach((other) => {
+                    if (other !== group) other.open = false;
+                });
+            });
+        });
+        document.addEventListener('click', (event) => {
+            if (nav.contains(event.target)) return;
+            links.querySelectorAll('.nav-group').forEach((group) => { group.open = false; });
         });
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && nav.classList.contains('nav-open')) {
-                setOpen(false);
-                button.focus();
+            if (event.key !== 'Escape') return;
+            const openGroup = links.querySelector('.nav-group[open]');
+            if (openGroup && !nav.classList.contains('nav-open')) {
+                openGroup.open = false;
+                openGroup.querySelector('summary')?.focus();
+                return;
             }
+            if (!nav.classList.contains('nav-open')) return;
+            setOpen(false);
+            button.focus();
         });
     }
 
@@ -248,7 +278,7 @@
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
                     <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
-                    <div><strong data-i18n-common="footerEvidence">Evidence</strong><a href="./leaderboard.html" data-i18n-common="navLeaderboard">Leaderboard</a><a href="./achievements.html" data-i18n-common="navAchievements">Achievements</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
+                    <div><strong data-i18n-common="footerEvidence">Evidence</strong><a href="./leaderboard.html" data-i18n-common="navLeaderboard">Leaderboard</a><a href="./achievements.html" data-i18n-common="navAchievements">Achievements</a><a href="./news.html" data-i18n-common="navNews">News</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
                     <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
                 </nav>
             </div>`;

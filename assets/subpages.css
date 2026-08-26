@@ -25,7 +25,7 @@ body:not([data-page="home"]) .site-nav {
   background: var(--sub-ink);
   backdrop-filter: none;
 }
-body:not([data-page="home"]) .site-nav-inner { min-height: 72px; padding-right: 82px; }
+body:not([data-page="home"]) .site-nav-inner { min-height: 72px; padding-right: 0; }
 body:not([data-page="home"]) .brand-mark {
   width: 34px;
   height: 34px;
@@ -47,6 +47,20 @@ body:not([data-page="home"]) .nav-links {
   box-shadow: none;
   backdrop-filter: none;
 }
+body:not([data-page="home"]) .nav-group-label {
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 9px;
+  color: #d7e0df;
+  font-size: 12px;
+}
+body:not([data-page="home"]) .nav-group.active > .nav-group-label,
+body:not([data-page="home"]) .nav-group-label:hover,
+body:not([data-page="home"]) .nav-group-label:focus-visible {
+  color: var(--sub-amber);
+  border-color: rgba(240, 179, 65, .24);
+  background: rgba(240, 179, 65, .08);
+}
 body:not([data-page="home"]) .nav-link {
   flex: 0 0 auto;
   min-height: 40px;
@@ -59,9 +73,7 @@ body:not([data-page="home"]) .nav-link {
 body:not([data-page="home"]) .nav-link:hover,
 body:not([data-page="home"]) .nav-link.active { color: var(--sub-amber); background: transparent; }
 body:not([data-page="home"]) .lang-toggle {
-  position: fixed;
-  top: 18px;
-  right: max(4vw, calc((100vw - var(--sub-max)) / 2));
+  position: static;
   min-width: 58px;
   min-height: 34px;
   margin: 0;
@@ -626,9 +638,9 @@ body[data-page="leaderboard"] .trend-chart-wrap { border-color: var(--sub-line);
 @media (max-width: 860px) {
   body:not([data-page="home"]) .site-nav-inner {
     min-height: 64px;
-    padding: 0 94px 0 0;
+    padding: 0 98px 0 0;
   }
-  body:not([data-page="home"]) .lang-toggle { position: fixed; top: 14px; right: 60px; margin: 0; }
+  body:not([data-page="home"]) .lang-toggle { position: absolute; top: 14px; right: 48px; margin: 0; }
 }
 @media (max-width: 680px) {
   body:not([data-page="home"]) .site-shell { width: calc(100% - 24px); }

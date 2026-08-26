@@ -1,0 +1,51 @@
+.news-intro-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.news-intro-panel::after {
+  content: "2026 / DISPATCH";
+  position: absolute;
+  right: 28px;
+  bottom: 20px;
+  color: rgba(8, 13, 14, 0.12);
+  font: 800 clamp(20px, 4vw, 48px) ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: -0.08em;
+  pointer-events: none;
+}
+
+.news-feed-panel { padding: clamp(24px, 4vw, 42px); }
+.news-status { margin: 0 0 18px; color: var(--sub-muted); font-size: 13px; }
+.news-list { display: grid; gap: 22px; }
+
+.news-card {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.28fr) minmax(0, 1fr);
+  border: 1px solid var(--sub-line);
+  background: #fff;
+}
+
+.news-card.is-featured { border-top: 4px solid var(--sub-amber); }
+.news-card-meta { padding: 24px; border-right: 1px solid var(--sub-line); background: var(--sub-paper); }
+.news-kind { display: block; color: #176f72; font-size: 11px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+.news-date { display: block; margin-top: 10px; color: var(--sub-muted); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; line-height: 1.5; }
+.news-card-content { padding: clamp(24px, 4vw, 42px); }
+.news-card-content h2 { max-width: 840px; margin: 0; color: var(--sub-ink); font-size: clamp(25px, 3.4vw, 42px); line-height: 1.08; }
+.news-summary { max-width: 860px; margin: 20px 0 0; color: var(--sub-muted); font-size: 16px; line-height: 1.75; }
+
+.news-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 30px; border-block: 1px solid var(--sub-line); }
+.news-metric { min-height: 108px; padding: 20px; border-right: 1px solid var(--sub-line); }
+.news-metric:last-child { border-right: 0; }
+.news-metric strong { display: block; color: var(--sub-ink); font: 900 clamp(27px, 4vw, 42px) Sora, Inter, sans-serif; letter-spacing: -0.05em; }
+.news-metric span { display: block; margin-top: 5px; color: var(--sub-muted); font-size: 12px; line-height: 1.4; }
+.news-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+
+@media (max-width: 720px) {
+  .news-intro-panel::after { display: none; }
+  .news-card { grid-template-columns: 1fr; }
+  .news-card-meta { padding: 18px 20px; border-right: 0; border-bottom: 1px solid var(--sub-line); }
+  .news-date { margin-top: 4px; }
+  .news-metrics { grid-template-columns: 1fr; }
+  .news-metric { min-height: auto; border-right: 0; border-bottom: 1px solid var(--sub-line); }
+  .news-metric:last-child { border-bottom: 0; }
+}

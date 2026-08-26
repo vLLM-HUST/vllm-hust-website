@@ -450,7 +450,7 @@ a {
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    padding-right: 74px;
+    padding-right: 0;
 }
 
 .brand-link {
@@ -603,9 +603,9 @@ a {
     display: grid;
     gap: 2px;
     border: 1px solid rgba(125, 211, 252, 0.22);
-    border-radius: 16px;
-    background: rgba(3, 7, 18, 0.96);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.34);
+    border-radius: 14px;
+    background: rgba(5, 10, 18, 0.98);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(20px);
 }
 
@@ -613,6 +613,7 @@ a {
     width: 100%;
     justify-content: flex-start;
     color: rgba(226, 242, 255, 0.82);
+    border-radius: 9px;
 }
 
 .nav-group.active > .nav-group-label,
@@ -633,10 +634,8 @@ a {
 }
 
 .lang-toggle {
-    position: fixed;
-    top: 88px;
-    right: max(22px, calc((100vw - 1240px) / 2));
-    z-index: 70;
+    position: static;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1969,6 +1968,8 @@ h1 {
 }
 
 @media (max-width: 860px) {
+    body.nav-menu-open { overflow: hidden; }
+
     .section-head {
         flex-direction: column;
         align-items: stretch;
@@ -1977,13 +1978,13 @@ h1 {
     .site-nav-inner {
         min-height: 64px;
         gap: 12px;
-        padding: 0 94px 0 0;
+        padding: 0 98px 0 0;
     }
 
     .lang-toggle {
-        position: fixed;
+        position: absolute;
         top: 14px;
-        right: 60px;
+        right: 48px;
         margin: 0;
         min-width: 50px;
         min-height: 36px;
@@ -2029,18 +2030,22 @@ h1 {
         top: 64px;
         left: 0;
         right: 0;
+        min-height: calc(100svh - 64px);
         max-height: calc(100svh - 64px);
         margin: 0;
         padding: 18px max(16px, calc((100vw - 1240px) / 2));
         display: none;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         align-items: start;
-        gap: 8px;
+        align-content: start;
+        gap: 10px;
         overflow-y: auto;
         border: 0;
         border-top: 1px solid rgba(125, 211, 252, 0.18);
         border-radius: 0;
-        background: rgba(3, 7, 18, 0.98);
+        background:
+            radial-gradient(circle at 82% 8%, rgba(14, 165, 233, 0.12), transparent 28%),
+            #050a12;
         box-shadow: 0 24px 64px rgba(0, 0, 0, 0.38);
     }
 
@@ -2052,27 +2057,35 @@ h1 {
         min-height: 46px;
         justify-content: flex-start;
         color: #fff;
-        background: rgba(15, 23, 42, 0.56);
+        border: 1px solid rgba(125, 211, 252, 0.12);
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.68);
     }
 
     .nav-group {
-        grid-column: span 1;
+        grid-column: 1 / -1;
+        border: 1px solid rgba(125, 211, 252, 0.12);
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.48);
+        overflow: hidden;
     }
 
     .nav-group > summary {
         width: 100%;
-        min-height: 42px;
-        padding: 0 10px;
-        color: #7dd3fc;
-        cursor: default;
+        min-height: 48px;
+        padding: 0 14px;
+        justify-content: space-between;
+        border-radius: 0;
+        color: #bae6fd;
+        cursor: pointer;
     }
 
-    .nav-group > summary::after { display: none; }
+    .nav-group > summary::after { display: block; }
 
     .nav-group-menu {
         position: static;
         min-width: 0;
-        padding: 0;
+        padding: 0 8px 8px;
         display: grid;
         border: 0;
         background: transparent;
@@ -2080,9 +2093,11 @@ h1 {
     }
 
     .nav-group-menu .nav-link {
-        min-height: 42px;
-        padding: 0 10px;
-        font-size: 0.83rem;
+        min-height: 44px;
+        padding: 0 12px;
+        border-top: 1px solid rgba(125, 211, 252, 0.08);
+        border-radius: 8px;
+        font-size: 0.86rem;
     }
 
     .site-directory-inner {

@@ -11,7 +11,7 @@ HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -> None:
     for label in ("navProducts", "navEngine", "navProjects", "navPlugins"):
         assert label in SITE_JS
-    assert "pages: ['leaderboard', 'achievements']" in SITE_JS
+    assert "pages: ['leaderboard', 'achievements', 'news']" in SITE_JS
     assert "pages: ['members', 'contributors', 'conferences', 'courses']" in SITE_JS
     assert "pages: ['versions', 'issues']" in SITE_JS
     assert '<details class="nav-group"' in SITE_JS
@@ -33,14 +33,14 @@ def test_every_public_page_has_a_cache_safe_static_plugin_navigation_entry() -> 
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'id="nav-plugins"' in text, name
         assert 'href="./plugins.html">Plugins</a>' in text, name
-        assert "assets/site.js?v=site-shell-20260825" in text, name
+        assert "assets/site.js?v=nav-polish-20260826" in text, name
     assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
 
 def test_mobile_navigation_uses_compact_accessible_disclosure() -> None:
     assert "button.setAttribute('aria-controls', links.id)" in SITE_JS
     assert "button.setAttribute('aria-expanded', 'false')" in SITE_JS
-    assert "event.key === 'Escape'" in SITE_JS
+    assert "event.key !== 'Escape'" in SITE_JS
     assert ".site-nav.enhanced.nav-open .nav-links" in SITE_CSS
     assert "min-height: 64px;" in SITE_CSS
     assert "min-height: 160px;" not in HOME_CSS
@@ -63,8 +63,8 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'data-page="versions"' in versions
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
-    assert "assets/site.css?v=site-structure-20260816" in versions
-    assert "assets/site.js?v=site-shell-20260825" in versions
+    assert "assets/site.css?v=nav-polish-20260826" in versions
+    assert "assets/site.js?v=nav-polish-20260826" in versions
     assert "assets/versions.css?v=site-structure-20260816" in versions
 
 
@@ -73,6 +73,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
         "index.html",
         "leaderboard.html",
         "achievements.html",
+        "news.html",
         "contributors.html",
         "members.html",
         "conferences.html",
@@ -83,8 +84,8 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     )
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=site-structure-20260816" in text
-        assert "assets/site.js?v=site-shell-20260825" in text
+        assert "assets/site.css?v=nav-polish-20260826" in text
+        assert "assets/site.js?v=nav-polish-20260826" in text
         if name not in ("index.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 
