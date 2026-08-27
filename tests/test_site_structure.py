@@ -14,6 +14,7 @@ def test_required_entry_files_exist() -> None:
     required = [
         root / "index.html",
         root / "leaderboard.html",
+        root / "dataset-validation.html",
         root / "achievements.html",
         root / "contributors.html",
         root / "conferences.html",
@@ -131,6 +132,18 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert ".research-member-detail-row" in css
     assert ".research-member-group + .research-member-group" in css
     assert "@media (max-width: 860px)" in css
+def test_dataset_validation_page_uses_versioned_contract() -> None:
+    root = Path(__file__).resolve().parents[1]
+    page = (root / "dataset-validation.html").read_text(encoding="utf-8")
+    script = (root / "assets" / "dataset-validation.js").read_text(encoding="utf-8")
+    fixture = root / "data" / "dataset_validation_v1.empty.json"
+
+    assert fixture.exists()
+    assert 'data-page="dataset-validation"' in page
+    assert "dataset-validation-v1" in page
+    assert "dataset-validation-v1" in script
+    assert "Empty cells are intentionally shown" in page
+    assert 'href="./dataset-validation.html"' in page
 
 
 def test_data_directory_has_sync_marker() -> None:

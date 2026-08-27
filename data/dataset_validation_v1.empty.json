@@ -1,0 +1,39 @@
+{
+  "contract_version": "dataset-validation-v1",
+  "generated_at": "2026-08-27T00:00:00Z",
+  "status": "not_started",
+  "source": {
+    "service": "dataset-validation-service",
+    "run_id": null,
+    "repository": "vLLM-HUST/vllm-hust",
+    "commit": null,
+    "artifact_url": null
+  },
+  "baseline": {
+    "id": "b0",
+    "label": "B0 reference",
+    "commit": null,
+    "generated_at": null
+  },
+  "scenario": {
+    "id": "acceptance-v4.6",
+    "label": "V4.6 dataset acceptance",
+    "model": null,
+    "hardware": null,
+    "precision": null
+  },
+  "datasets": [
+    { "id": "a1", "label": "A1", "description": "Short-context generation" },
+    { "id": "a2", "label": "A2", "description": "Long-context generation" },
+    { "id": "a3", "label": "A3", "description": "Concurrent serving" },
+    { "id": "a4", "label": "A4", "description": "Stability and error handling" }
+  ],
+  "metrics": [
+    { "id": "throughput", "label": "Throughput", "unit": "tokens/s", "direction": "higher" },
+    { "id": "ttft_p95", "label": "TTFT P95", "unit": "ms", "direction": "lower" },
+    { "id": "tpot_p95", "label": "TPOT P95", "unit": "ms", "direction": "lower" },
+    { "id": "error_rate", "label": "Error rate", "unit": "%", "direction": "lower" },
+    { "id": "pass_rate", "label": "Pass rate", "unit": "%", "direction": "higher" }
+  ],
+  "results": []
+}
