@@ -139,8 +139,12 @@ def test_dataset_validation_page_uses_versioned_contract() -> None:
     page = (root / "dataset-validation.html").read_text(encoding="utf-8")
     script = (root / "assets" / "dataset-validation.js").read_text(encoding="utf-8")
     fixture = root / "data" / "dataset_validation_v1.empty.json"
+    fixture_data = json.loads(fixture.read_text(encoding="utf-8"))
 
     assert fixture.exists()
+    assert len(fixture_data["datasets"]) == 44
+    assert fixture_data["datasets"][0]["id"] == "a01"
+    assert fixture_data["datasets"][-1]["id"] == "a44"
     assert 'data-page="dataset-validation"' in page
     assert "dataset-validation-v1" in page
     assert "dataset-validation-v1" in script
@@ -151,6 +155,13 @@ def test_dataset_validation_page_uses_versioned_contract() -> None:
     assert "Unsupported result status" in script
     assert "vllmHustDatasetValidationConfig?.dataUrl" in script
     assert 'id="validation-freshness"' in page
+    assert 'id="validation-dataset-search"' in page
+    assert 'id="validation-group-filter"' in page
+    assert 'id="validation-pagination"' in page
+    assert "pageSize: 20" in script
+    assert "position: sticky" in (root / "assets" / "dataset-validation.css").read_text(
+        encoding="utf-8"
+    )
 
 
 def test_data_directory_has_sync_marker() -> None:
