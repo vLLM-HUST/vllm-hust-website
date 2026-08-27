@@ -132,6 +132,8 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert ".research-member-detail-row" in css
     assert ".research-member-group + .research-member-group" in css
     assert "@media (max-width: 860px)" in css
+
+
 def test_dataset_validation_page_uses_versioned_contract() -> None:
     root = Path(__file__).resolve().parents[1]
     page = (root / "dataset-validation.html").read_text(encoding="utf-8")
