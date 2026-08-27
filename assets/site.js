@@ -3,6 +3,7 @@
         en: {
             navHome: 'Home',
             navLeaderboard: 'Leaderboard',
+            navDatasetValidation: 'Dataset validation',
             navAchievements: 'Achievements',
             navNews: 'News',
             navContributors: 'Contributors',
@@ -31,6 +32,7 @@
         zh: {
             navHome: '首页',
             navLeaderboard: '性能排行榜',
+            navDatasetValidation: '数据集验证',
             navAchievements: '成果',
             navNews: '新闻',
             navContributors: '核心成员',
@@ -106,6 +108,7 @@
 
         setText('nav-home', common.navHome);
         setText('nav-leaderboard', common.navLeaderboard);
+        setText('nav-dataset-validation', common.navDatasetValidation);
         setText('nav-achievements', common.navAchievements);
         setText('nav-news', common.navNews);
         setText('nav-contributors', common.navContributors);
