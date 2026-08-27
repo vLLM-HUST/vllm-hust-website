@@ -22,7 +22,9 @@ presenting zeros as measurements.
 
 The checked-in `data/dataset_validation_v1.empty.json` file is a schema-shaped empty fixture for
 local UI development. It is not a benchmark result and must be replaced by a signed or otherwise
-authenticated service artifact before production ingestion is enabled.
+authenticated service artifact before production ingestion is enabled. For visual smoke testing
+only, opening the page with `?demo=1` overlays the fixture's `_demo_results` and shows B0/B1
+comparison colors; this private fixture field is not part of the production contract.
 
 ## Integration boundary
 

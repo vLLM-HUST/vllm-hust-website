@@ -75,5 +75,13 @@
     { "id": "error_rate", "label": "Error rate", "unit": "%", "direction": "lower" },
     { "id": "pass_rate", "label": "Pass rate", "unit": "%", "direction": "higher" }
   ],
+  "_demo_results": [
+    { "dataset_id": "a01", "metric_id": "throughput", "status": "passed", "baseline_value": 7774.8, "value": 7824.9, "unit": "tokens/s", "delta_pct": 0.64, "comparison": { "direction": "higher_is_better", "trend": "improved", "improvement_pct": 0.64 } },
+    { "dataset_id": "a01", "metric_id": "ttft_p95", "status": "failed", "baseline_value": 518.5, "value": 598.0, "unit": "ms", "delta_pct": 15.33, "comparison": { "direction": "lower_is_better", "trend": "regressed", "improvement_pct": -15.33 } },
+    { "dataset_id": "a02", "metric_id": "throughput", "status": "passed", "baseline_value": 8433.8, "value": 8459.7, "unit": "tokens/s", "delta_pct": 0.31, "comparison": { "direction": "higher_is_better", "trend": "improved", "improvement_pct": 0.31 } },
+    { "dataset_id": "a12", "metric_id": "tpot_p95", "status": "passed", "baseline_value": 111.0, "value": 107.0, "unit": "ms", "delta_pct": -3.6, "comparison": { "direction": "lower_is_better", "trend": "improved", "improvement_pct": 3.6 } },
+    { "dataset_id": "a23", "metric_id": "error_rate", "status": "passed", "baseline_value": 2.4, "value": 1.1, "unit": "%", "delta_pct": -54.17, "comparison": { "direction": "lower_is_better", "trend": "improved", "improvement_pct": 54.17 } },
+    { "dataset_id": "a34", "metric_id": "pass_rate", "status": "passed", "baseline_value": 96.0, "value": 98.0, "unit": "%", "delta_pct": 2.08, "comparison": { "direction": "higher_is_better", "trend": "improved", "improvement_pct": 2.08 } }
+  ],
   "results": []
 }

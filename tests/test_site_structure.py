@@ -159,6 +159,12 @@ def test_dataset_validation_page_uses_versioned_contract() -> None:
     assert 'id="validation-group-filter"' in page
     assert 'id="validation-pagination"' in page
     assert "pageSize: 20" in script
+    assert "TREND_ORDER" in script
+    assert "formatBaselineValue" in script
+    assert "validation-cell-pair" in script
+    assert "?demo=1" in (root / "data" / "DATASET_VALIDATION_RESULTS.md").read_text(
+        encoding="utf-8"
+    )
     assert "position: sticky" in (root / "assets" / "dataset-validation.css").read_text(
         encoding="utf-8"
     )
