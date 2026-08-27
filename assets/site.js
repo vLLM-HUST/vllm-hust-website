@@ -150,10 +150,11 @@
         {
             id: 'evidence',
             label: 'navEvidence',
-            pages: ['leaderboard', 'achievements', 'news'],
+            pages: ['leaderboard', 'achievements', 'dataset-validation', 'news'],
             links: [
                 ['leaderboard', './leaderboard.html', 'navLeaderboard'],
                 ['achievements', './achievements.html', 'navAchievements'],
+                ['dataset-validation', './dataset-validation.html', 'navDatasetValidation'],
                 ['news', './news.html', 'navNews'],
             ],
         },
@@ -281,7 +282,7 @@
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
                     <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
-                    <div><strong data-i18n-common="footerEvidence">Evidence</strong><a href="./leaderboard.html" data-i18n-common="navLeaderboard">Leaderboard</a><a href="./achievements.html" data-i18n-common="navAchievements">Achievements</a><a href="./news.html" data-i18n-common="navNews">News</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
+                    <div><strong data-i18n-common="footerEvidence">Evidence</strong><a href="./leaderboard.html" data-i18n-common="navLeaderboard">Leaderboard</a><a href="./achievements.html" data-i18n-common="navAchievements">Achievements</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset validation</a><a href="./news.html" data-i18n-common="navNews">News</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
                     <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
                 </nav>
             </div>`;
