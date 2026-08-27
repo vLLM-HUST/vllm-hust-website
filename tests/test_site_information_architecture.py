@@ -11,10 +11,24 @@ HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -> None:
     for label in ("navProducts", "navEngine", "navProjects", "navPlugins"):
         assert label in SITE_JS
-    assert "pages: ['leaderboard', 'achievements', 'news']" in SITE_JS
+    assert (
+        "pages: ['leaderboard', 'achievements', 'dataset-validation', 'news']"
+        in SITE_JS
+    )
+    assert (
+        "['dataset-validation', './dataset-validation.html', 'navDatasetValidation']"
+        in SITE_JS
+    )
     assert "pages: ['members', 'contributors', 'conferences', 'courses']" in SITE_JS
     assert "pages: ['versions', 'issues']" in SITE_JS
     assert '<details class="nav-group"' in SITE_JS
+
+
+def test_dataset_validation_is_reachable_from_evidence_navigation() -> None:
+    assert (
+        'href="./dataset-validation.html" data-i18n-common="navDatasetValidation"'
+        in SITE_JS
+    )
 
 
 def test_every_public_page_has_a_cache_safe_static_plugin_navigation_entry() -> None:
