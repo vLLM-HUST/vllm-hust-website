@@ -1,13 +1,13 @@
 (function () {
-    const DATA_URL = './data/dataset_validation_v1.empty.json';
+    const DEFAULT_DATA_URL = './data/dataset_validation_v1.empty.json';
     const STATUS_ORDER = ['not_tested', 'queued', 'running', 'passed', 'failed', 'not_applicable'];
     const STATUS_LABELS = {
         en: { not_tested: 'Not tested', queued: 'Queued', running: 'Running', passed: 'Passed', failed: 'Failed', not_applicable: 'N/A' },
         zh: { not_tested: '未测试', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
     };
     const TEXT = {
-        en: { all: 'All statuses', noValue: 'No result', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', notProvided: 'Not provided' },
-        zh: { all: '全部状态', noValue: '暂无结果', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', notProvided: '未提供' },
+        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
+        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
     };
 
     const state = { data: null, status: 'all', selected: null };
@@ -24,10 +24,23 @@
         if (!data || data.contract_version !== 'dataset-validation-v1' || !Array.isArray(data.datasets) || !Array.isArray(data.metrics) || !Array.isArray(data.results)) {
             throw new Error('Unsupported dataset validation contract');
         }
+        const datasetIds = new Set();
+        data.datasets.forEach((dataset) => {
+            if (!dataset || typeof dataset.id !== 'string' || !dataset.id || datasetIds.has(dataset.id)) throw new Error('Invalid or duplicate dataset id');
+            datasetIds.add(dataset.id);
+        });
+        const metricIds = new Set();
+        data.metrics.forEach((metric) => {
+            if (!metric || typeof metric.id !== 'string' || !metric.id || metricIds.has(metric.id)) throw new Error('Invalid or duplicate metric id');
+            metricIds.add(metric.id);
+        });
         const results = new Map();
         data.results.forEach((item) => {
-            if (!item?.dataset_id || !item?.metric_id) return;
-            results.set(`${item.dataset_id}:${item.metric_id}`, { ...item, status: STATUS_ORDER.includes(item.status) ? item.status : 'not_tested' });
+            if (!item || !datasetIds.has(item.dataset_id) || !metricIds.has(item.metric_id)) throw new Error('Result references an undeclared dataset or metric');
+            if (item.status !== undefined && !STATUS_ORDER.includes(item.status)) throw new Error(`Unsupported result status: ${item.status}`);
+            const key = `${item.dataset_id}:${item.metric_id}`;
+            if (results.has(key)) throw new Error(`Duplicate result cell: ${key}`);
+            results.set(key, { ...item, status: item.status || 'not_tested' });
         });
         return { ...data, results };
     }
@@ -50,14 +63,14 @@
         return Number.isFinite(value) ? `${value > 0 ? '+' : ''}${value.toFixed(2)}%` : escapeHtml(cell.delta_pct);
     }
 
-    function visibleCells() {
+    function allCells() {
         const cells = [];
         state.data.datasets.forEach((dataset) => state.data.metrics.forEach((metric) => cells.push(getCell(dataset, metric))));
-        return state.status === 'all' ? cells : cells.filter((cell) => cell.status === state.status);
+        return cells;
     }
 
     function renderSummary() {
-        const cells = visibleCells();
+        const cells = allCells();
         const counts = Object.fromEntries(STATUS_ORDER.map((status) => [status, 0]));
         cells.forEach((cell) => { counts[cell.status] += 1; });
         $('validation-stat-total').textContent = cells.length;
@@ -75,7 +88,8 @@
             const delta = formatDelta(cell);
             const key = `${dataset.id}:${metric.id}`;
             const hidden = state.status !== 'all' && cell.status !== state.status;
-            return `<td class="validation-cell"${hidden ? ' data-filtered="true"' : ''}><button class="validation-cell-button" type="button" data-cell="${escapeHtml(key)}" aria-label="${escapeHtml(dataset.label)} ${escapeHtml(metric.label)}"><span class="validation-cell-value">${formatValue(cell, metric)}</span>${delta ? `<span class="validation-cell-delta">${delta}</span>` : ''}<span class="validation-status validation-status--${cell.status}">${statusLabel(cell.status)}</span></button></td>`;
+            if (hidden) return `<td class="validation-cell" data-filtered="true"><span class="validation-filtered-cell">${t('filtered')}</span></td>`;
+            return `<td class="validation-cell"><button class="validation-cell-button" type="button" data-cell="${escapeHtml(key)}" aria-label="${escapeHtml(dataset.label)} ${escapeHtml(metric.label)}"><span class="validation-cell-value">${formatValue(cell, metric)}</span>${delta ? `<span class="validation-cell-delta">${delta}</span>` : ''}<span class="validation-status validation-status--${cell.status}">${statusLabel(cell.status)}</span></button></td>`;
         }).join('')}</tr>`).join('');
         body.querySelectorAll('[data-cell]').forEach((button) => button.addEventListener('click', () => { state.selected = button.dataset.cell; renderDetail(); }));
     }
@@ -102,10 +116,24 @@
         const scenario = state.data.scenario || {};
         $('validation-scenario').textContent = scenario.label || scenario.id || t('notProvided');
         $('validation-source').innerHTML = state.data.source?.commit ? `${escapeHtml(state.data.source.service)} · <strong>${escapeHtml(state.data.source.commit)}</strong>` : t('sourcePending');
+        renderFreshness();
         renderSummary();
         renderMatrix();
         renderDetail();
         $('validation-empty').hidden = state.data.results.size !== 0;
+    }
+
+    function renderFreshness() {
+        const node = $('validation-freshness');
+        const timestamp = Date.parse(state.data.generated_at || '');
+        if (!Number.isFinite(timestamp)) {
+            node.textContent = t('timestampUnavailable');
+            node.dataset.state = 'unknown';
+            return;
+        }
+        const ageHours = Math.max(0, Date.now() - timestamp) / 3600000;
+        node.textContent = `${ageHours > 24 ? t('stalePrefix') : t('freshPrefix')}: ${new Date(timestamp).toISOString()}`;
+        node.dataset.state = ageHours > 24 ? 'stale' : 'fresh';
     }
 
     function init() {
@@ -113,7 +141,8 @@
         STATUS_ORDER.forEach((status) => { const option = document.createElement('option'); option.value = status; option.textContent = statusLabel(status); select.appendChild(option); });
         select.addEventListener('change', () => { state.status = select.value; render(); });
         document.addEventListener('click', (event) => { if (event.target.closest('[data-close-detail]')) { state.selected = null; renderDetail(); } });
-        fetch(DATA_URL).then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).then((data) => { state.data = normalize(data); $('validation-loading').hidden = true; $('validation-content').hidden = false; render(); }).catch((error) => { console.error(error); $('validation-loading').hidden = true; $('validation-error').hidden = false; });
+        const dataUrl = window.vllmHustDatasetValidationConfig?.dataUrl || DEFAULT_DATA_URL;
+        fetch(dataUrl).then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).then((data) => { state.data = normalize(data); $('validation-loading').hidden = true; $('validation-content').hidden = false; render(); }).catch((error) => { console.error(error); $('validation-loading').hidden = true; $('validation-error').hidden = false; $('validation-error-body').textContent = error.message || 'Unable to load validation artifact'; });
         window.addEventListener('vllm-hust:langchange', () => { if (state.data) { select.innerHTML = `<option value="all">${t('all')}</option>`; STATUS_ORDER.forEach((status) => { const option = document.createElement('option'); option.value = status; option.textContent = statusLabel(status); select.appendChild(option); }); select.value = state.status; render(); } });
     }
 
