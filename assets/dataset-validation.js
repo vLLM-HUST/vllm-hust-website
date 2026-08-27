@@ -1,6 +1,7 @@
 (function () {
     const DEFAULT_DATA_URL = './data/dataset_validation_v1.empty.json';
     const STATUS_ORDER = ['not_tested', 'queued', 'running', 'passed', 'failed', 'not_applicable'];
+    const TREND_ORDER = ['improved', 'regressed', 'unchanged', 'not_comparable'];
     const STATUS_LABELS = {
         en: { not_tested: 'Not tested', queued: 'Queued', running: 'Running', passed: 'Passed', failed: 'Failed', not_applicable: 'N/A' },
         zh: { not_tested: '未测试', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
@@ -38,6 +39,7 @@
         data.results.forEach((item) => {
             if (!item || !datasetIds.has(item.dataset_id) || !metricIds.has(item.metric_id)) throw new Error('Result references an undeclared dataset or metric');
             if (item.status !== undefined && !STATUS_ORDER.includes(item.status)) throw new Error(`Unsupported result status: ${item.status}`);
+            if (item.comparison?.trend !== undefined && !TREND_ORDER.includes(item.comparison.trend)) throw new Error(`Unsupported comparison trend: ${item.comparison.trend}`);
             const key = `${item.dataset_id}:${item.metric_id}`;
             if (results.has(key)) throw new Error(`Duplicate result cell: ${key}`);
             results.set(key, { ...item, status: item.status || 'not_tested' });
@@ -50,9 +52,19 @@
     }
 
     function formatValue(cell, metric) {
-        if (cell.value === null || cell.value === undefined || cell.value === '') return t('noValue');
-        const value = Number(cell.value);
-        if (!Number.isFinite(value)) return escapeHtml(cell.value);
+        const rawValue = cell.current_value ?? cell.value;
+        if (rawValue === null || rawValue === undefined || rawValue === '') return t('noValue');
+        const value = Number(rawValue);
+        if (!Number.isFinite(value)) return escapeHtml(rawValue);
+        const digits = metric.unit === '%' ? 2 : value >= 100 ? 1 : 2;
+        return `${value.toFixed(digits)} ${escapeHtml(cell.unit || metric.unit || '')}`.trim();
+    }
+
+    function formatBaselineValue(cell, metric) {
+        const rawValue = cell.baseline_value;
+        if (rawValue === null || rawValue === undefined || rawValue === '') return t('noValue');
+        const value = Number(rawValue);
+        if (!Number.isFinite(value)) return escapeHtml(rawValue);
         const digits = metric.unit === '%' ? 2 : value >= 100 ? 1 : 2;
         return `${value.toFixed(digits)} ${escapeHtml(cell.unit || metric.unit || '')}`.trim();
     }
@@ -103,7 +115,9 @@
             const key = `${dataset.id}:${metric.id}`;
             const hidden = state.status !== 'all' && cell.status !== state.status;
             if (hidden) return `<td class="validation-cell" data-filtered="true"><span class="validation-filtered-cell">${t('filtered')}</span></td>`;
-            return `<td class="validation-cell"><button class="validation-cell-button" type="button" data-cell="${escapeHtml(key)}" aria-label="${escapeHtml(dataset.label)} ${escapeHtml(metric.label)}"><span class="validation-cell-value">${formatValue(cell, metric)}</span>${delta ? `<span class="validation-cell-delta">${delta}</span>` : ''}<span class="validation-status validation-status--${cell.status}">${statusLabel(cell.status)}</span></button></td>`;
+            const trend = TREND_ORDER.includes(cell.comparison?.trend) ? cell.comparison.trend : 'not_comparable';
+            const trendText = cell.comparison?.trend ? `${cell.comparison.trend}${delta ? ` ${delta}` : ''}` : delta;
+            return `<td class="validation-cell"><button class="validation-cell-button" type="button" data-cell="${escapeHtml(key)}" aria-label="${escapeHtml(dataset.label)} ${escapeHtml(metric.label)}"><span class="validation-cell-pair"><span><small>B0</small>${formatBaselineValue(cell, metric)}</span><span><small>B1</small>${formatValue(cell, metric)}</span></span>${trendText ? `<span class="validation-cell-delta validation-trend--${trend}">${escapeHtml(trendText)}</span>` : ''}<span class="validation-status validation-status--${cell.status}">${statusLabel(cell.status)}</span></button></td>`;
         }).join('')}</tr>`).join('');
         body.querySelectorAll('[data-cell]').forEach((button) => button.addEventListener('click', () => { state.selected = button.dataset.cell; renderDetail(); }));
         renderPagination(datasets.length, pageCount);
@@ -132,7 +146,7 @@
         $('validation-detail-status').className = `validation-status validation-status--${cell.status}`;
         $('validation-detail-status').textContent = statusLabel(cell.status);
         $('validation-detail-description').textContent = `${dataset.description || ''} - ${metric.unit || ''}`;
-        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd><dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(cell.model || state.data.scenario.model || t('notProvided'))}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(cell.hardware || state.data.scenario.hardware || t('notProvided'))}</dd><dt>${t('provenance')}</dt><dd>${escapeHtml(provenance.job_url || provenance.artifact || state.data.source.artifact_url || t('notProvided'))}</dd>`;
+        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.current_value ?? cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd><dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(cell.model || state.data.scenario.model || t('notProvided'))}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(cell.hardware || state.data.scenario.hardware || t('notProvided'))}</dd><dt>${t('provenance')}</dt><dd>${escapeHtml(provenance.job_url || provenance.artifact || state.data.source.artifact_url || t('notProvided'))}</dd>`;
         panel.hidden = false;
     }
 
@@ -164,6 +178,10 @@
 
     function renderDatasetControls() {
         const groupSelect = $('validation-group-filter');
+        $('validation-legend-b0').textContent = lang() === 'zh' ? '基线' : 'Baseline';
+        $('validation-legend-b1').textContent = lang() === 'zh' ? '优化后' : 'Optimized';
+        $('validation-legend-improved').textContent = lang() === 'zh' ? '性能提升' : 'Improved';
+        $('validation-legend-regressed').textContent = lang() === 'zh' ? '性能回退' : 'Regressed';
         $('validation-group-label').textContent = lang() === 'zh' ? '分组' : 'Group';
         $('validation-search-label').textContent = lang() === 'zh' ? '数据集' : 'Dataset';
         $('validation-dataset-search').placeholder = t('searchDataset');
@@ -182,7 +200,7 @@
         $('validation-group-filter').addEventListener('change', (event) => { state.group = event.target.value; state.page = 1; render(); });
         document.addEventListener('click', (event) => { if (event.target.closest('[data-close-detail]')) { state.selected = null; renderDetail(); } });
         const dataUrl = window.vllmHustDatasetValidationConfig?.dataUrl || DEFAULT_DATA_URL;
-        fetch(dataUrl).then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).then((data) => { state.data = normalize(data); $('validation-loading').hidden = true; $('validation-content').hidden = false; render(); }).catch((error) => { console.error(error); $('validation-loading').hidden = true; $('validation-error').hidden = false; $('validation-error-body').textContent = error.message || 'Unable to load validation artifact'; });
+        fetch(dataUrl).then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).then((data) => { const demo = new URLSearchParams(window.location.search).get('demo') === '1'; const payload = demo && Array.isArray(data._demo_results) ? { ...data, results: data._demo_results } : data; state.data = normalize(payload); $('validation-loading').hidden = true; $('validation-content').hidden = false; render(); }).catch((error) => { console.error(error); $('validation-loading').hidden = true; $('validation-error').hidden = false; $('validation-error-body').textContent = error.message || 'Unable to load validation artifact'; });
         window.addEventListener('vllm-hust:langchange', () => { if (state.data) { select.innerHTML = `<option value="all">${t('all')}</option>`; STATUS_ORDER.forEach((status) => { const option = document.createElement('option'); option.value = status; option.textContent = statusLabel(status); select.appendChild(option); }); select.value = state.status; render(); } });
     }
 
