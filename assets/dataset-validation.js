@@ -6,11 +6,11 @@
         zh: { not_tested: '未测试', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
     };
     const TEXT = {
-        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
-        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
+        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
+        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
     };
 
-    const state = { data: null, status: 'all', selected: null };
+    const state = { data: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
     const $ = (id) => document.getElementById(id);
     const lang = () => window.vllmHustSite?.getCurrentLang?.() || 'en';
     const t = (key) => TEXT[lang()][key] || TEXT.en[key] || key;
@@ -69,6 +69,15 @@
         return cells;
     }
 
+    function filteredDatasets() {
+        const query = state.query.trim().toLowerCase();
+        return state.data.datasets.filter((dataset) => {
+            const matchesGroup = state.group === 'all' || dataset.group === state.group;
+            const haystack = `${dataset.label} ${dataset.description || ''}`.toLowerCase();
+            return matchesGroup && (!query || haystack.includes(query));
+        });
+    }
+
     function renderSummary() {
         const cells = allCells();
         const counts = Object.fromEntries(STATUS_ORDER.map((status) => [status, 0]));
@@ -82,8 +91,13 @@
     function renderMatrix() {
         const header = $('validation-table-head');
         const body = $('validation-table-body');
+        const datasets = filteredDatasets();
+        const pageCount = Math.max(1, Math.ceil(datasets.length / state.pageSize));
+        state.page = Math.min(state.page, pageCount);
+        const pageStart = (state.page - 1) * state.pageSize;
+        const pageDatasets = datasets.slice(pageStart, pageStart + state.pageSize);
         header.innerHTML = `<th scope="col">${lang() === 'zh' ? '数据集' : 'Dataset'}</th>${state.data.metrics.map((metric) => `<th scope="col">${escapeHtml(metric.label)}<small>${escapeHtml(metric.unit || '')}</small></th>`).join('')}`;
-        body.innerHTML = state.data.datasets.map((dataset) => `<tr><th scope="row" class="validation-dataset"><strong>${escapeHtml(dataset.label)}</strong><small>${escapeHtml(dataset.description || '')}</small></th>${state.data.metrics.map((metric) => {
+        body.innerHTML = pageDatasets.map((dataset) => `<tr><th scope="row" class="validation-dataset"><strong>${escapeHtml(dataset.label)}</strong><small>${escapeHtml(dataset.description || '')}</small></th>${state.data.metrics.map((metric) => {
             const cell = getCell(dataset, metric);
             const delta = formatDelta(cell);
             const key = `${dataset.id}:${metric.id}`;
@@ -92,6 +106,17 @@
             return `<td class="validation-cell"><button class="validation-cell-button" type="button" data-cell="${escapeHtml(key)}" aria-label="${escapeHtml(dataset.label)} ${escapeHtml(metric.label)}"><span class="validation-cell-value">${formatValue(cell, metric)}</span>${delta ? `<span class="validation-cell-delta">${delta}</span>` : ''}<span class="validation-status validation-status--${cell.status}">${statusLabel(cell.status)}</span></button></td>`;
         }).join('')}</tr>`).join('');
         body.querySelectorAll('[data-cell]').forEach((button) => button.addEventListener('click', () => { state.selected = button.dataset.cell; renderDetail(); }));
+        renderPagination(datasets.length, pageCount);
+    }
+
+    function renderPagination(total, pageCount) {
+        const node = $('validation-pagination');
+        if (!node) return;
+        const start = total ? ((state.page - 1) * state.pageSize) + 1 : 0;
+        const end = Math.min(state.page * state.pageSize, total);
+        node.innerHTML = `<span>${escapeHtml(`${start}-${end} / ${total}`)}</span><button type="button" class="action-button" data-page="prev" ${state.page <= 1 ? 'disabled' : ''}>${t('previous')}</button><span>${escapeHtml(`${t('page')} ${state.page} ${t('of')} ${pageCount}`)}</span><button type="button" class="action-button" data-page="next" ${state.page >= pageCount ? 'disabled' : ''}>${t('next')}</button>`;
+        node.querySelector('[data-page="prev"]')?.addEventListener('click', () => { state.page -= 1; render(); });
+        node.querySelector('[data-page="next"]')?.addEventListener('click', () => { state.page += 1; render(); });
     }
 
     function renderDetail() {
@@ -117,6 +142,7 @@
         $('validation-scenario').textContent = scenario.label || scenario.id || t('notProvided');
         $('validation-source').innerHTML = state.data.source?.commit ? `${escapeHtml(state.data.source.service)} · <strong>${escapeHtml(state.data.source.commit)}</strong>` : t('sourcePending');
         renderFreshness();
+        renderDatasetControls();
         renderSummary();
         renderMatrix();
         renderDetail();
@@ -136,10 +162,24 @@
         node.dataset.state = ageHours > 24 ? 'stale' : 'fresh';
     }
 
+    function renderDatasetControls() {
+        const groupSelect = $('validation-group-filter');
+        $('validation-group-label').textContent = lang() === 'zh' ? '分组' : 'Group';
+        $('validation-search-label').textContent = lang() === 'zh' ? '数据集' : 'Dataset';
+        $('validation-dataset-search').placeholder = t('searchDataset');
+        const groups = [...new Set(state.data.datasets.map((dataset) => dataset.group).filter(Boolean))];
+        groupSelect.innerHTML = `<option value="all">${t('allDatasets')}</option>${groups.map((group) => `<option value="${escapeHtml(group)}">${escapeHtml(group)}</option>`).join('')}`;
+        groupSelect.value = groups.includes(state.group) ? state.group : 'all';
+        state.group = groupSelect.value;
+        $('validation-dataset-count').textContent = `${filteredDatasets().length} / ${state.data.datasets.length}`;
+    }
+
     function init() {
         const select = $('validation-status-filter');
         STATUS_ORDER.forEach((status) => { const option = document.createElement('option'); option.value = status; option.textContent = statusLabel(status); select.appendChild(option); });
         select.addEventListener('change', () => { state.status = select.value; render(); });
+        $('validation-dataset-search').addEventListener('input', (event) => { state.query = event.target.value; state.page = 1; render(); });
+        $('validation-group-filter').addEventListener('change', (event) => { state.group = event.target.value; state.page = 1; render(); });
         document.addEventListener('click', (event) => { if (event.target.closest('[data-close-detail]')) { state.selected = null; renderDetail(); } });
         const dataUrl = window.vllmHustDatasetValidationConfig?.dataUrl || DEFAULT_DATA_URL;
         fetch(dataUrl).then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).then((data) => { state.data = normalize(data); $('validation-loading').hidden = true; $('validation-content').hidden = false; render(); }).catch((error) => { console.error(error); $('validation-loading').hidden = true; $('validation-error').hidden = false; $('validation-error-body').textContent = error.message || 'Unable to load validation artifact'; });

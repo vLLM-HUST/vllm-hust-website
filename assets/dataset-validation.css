@@ -73,6 +73,26 @@
     font: inherit;
 }
 
+.validation-filter input {
+    min-height: 38px;
+    min-width: 190px;
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    font: inherit;
+}
+
+.validation-dataset-count {
+    align-self: end;
+    padding-bottom: 9px;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
 .validation-source {
     max-width: 360px;
     color: #64748b;
@@ -99,7 +119,9 @@
 
 .validation-table-wrap {
     margin-top: 20px;
+    max-height: 700px;
     overflow-x: auto;
+    overflow-y: auto;
     border: 1px solid #dbe7f3;
     border-radius: 12px;
     background: #ffffff;
@@ -120,6 +142,9 @@
 }
 
 .validation-table th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
     background: #f8fbff;
     color: #475569;
     font-size: 0.76rem;
@@ -134,7 +159,16 @@
 }
 
 .validation-dataset {
+    position: sticky;
+    left: 0;
+    z-index: 2;
     min-width: 180px;
+    background: #f8fbff;
+}
+
+.validation-table thead th:first-child {
+    left: 0;
+    z-index: 4;
 }
 
 .validation-dataset strong {
@@ -156,7 +190,7 @@
 
 .validation-cell-button {
     width: 100%;
-    min-height: 66px;
+    min-height: 52px;
     padding: 8px;
     border: 1px solid #dbe7f3;
     border-radius: 8px;
@@ -164,6 +198,28 @@
     color: #334155;
     text-align: left;
     cursor: pointer;
+}
+
+.validation-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 12px;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.validation-pagination .action-button {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 0.78rem;
+}
+
+.validation-pagination .action-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
 }
 
 .validation-cell-button:hover,
@@ -321,5 +377,20 @@
 
     .validation-filter {
         min-width: 100%;
+    }
+
+    .validation-filter input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .validation-dataset-count {
+        align-self: start;
+        padding-bottom: 0;
+    }
+
+    .validation-pagination {
+        justify-content: space-between;
+        flex-wrap: wrap;
     }
 }
