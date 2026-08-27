@@ -7,21 +7,27 @@
   <meta name="description" content="Dataset validation results produced by the independent vLLM-HUST validation service." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/dataset-validation.html" />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
-  <link rel="stylesheet" href="./assets/site.css?v=public-copy-20260701" />
+  <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
+  <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816" />
   <link rel="stylesheet" href="./assets/dataset-validation.css?v=dataset-validation-v1" />
 </head>
 <body data-page="dataset-validation">
   <nav class="site-nav"><div class="site-shell site-nav-inner">
-    <a class="brand-link" href="./index.html"><span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span><span class="brand-copy">vllm-hust<small>vLLM serving</small></span></a>
+    <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a>
     <div class="nav-links">
       <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+      <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">Plugins</a>
       <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
-      <a id="nav-dataset-validation" class="nav-link active" data-nav-page="dataset-validation" href="./dataset-validation.html">Dataset validation</a>
       <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+      <a id="nav-dataset-validation" class="nav-link active" data-nav-page="dataset-validation" href="./dataset-validation.html">Dataset validation</a>
+      <a id="nav-news" class="nav-link" data-nav-page="news" href="./news.html">News</a>
       <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
-      <button id="langToggle" class="lang-toggle" type="button"><span id="langToggleText">中文</span></button>
+      <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
+      <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
+      <a id="nav-issues" class="nav-link" data-nav-page="issues" href="./issues.html">Issues</a>
     </div>
   </div></nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
   <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
   <main class="site-shell">
     <section class="page-hero"><div class="content-panel">
@@ -47,12 +53,12 @@
       </div>
     </section>
   </main>
-  <footer class="site-footer"><strong>vllm-hust</strong> · <span id="validation-footer">Dataset results are read-only website data.</span></footer>
+  <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="validation-footer">Dataset results are read-only website data.</span></footer>
   <script>
     window.vllmHustDatasetValidationConfig = { dataUrl: './data/dataset_validation_v1.empty.json' };
     window.vllmHustPageDict = { en: { title: 'Dataset Validation - vllm-hust', 'validation-eyebrow': 'Independent validation', 'validation-title': 'Dataset validation', 'validation-lede': 'Results published by the fixed-machine validation service, organized as a dataset by metric matrix.', 'validation-scenario-kicker': 'Scenario', 'validation-description': 'B0 and current values remain visible together for auditability.', 'validation-loading': 'Loading validation artifact...', 'validation-error-title': 'Validation artifact unavailable', 'validation-error-body': 'The result document could not be loaded.', 'validation-stat-total-label': 'Matrix cells', 'validation-stat-passed-label': 'Passed', 'validation-stat-failed-label': 'Failed', 'validation-stat-pending-label': 'Pending', 'validation-status-label': 'Status', 'validation-source-label': 'Source', 'validation-detail-close': 'Close', 'validation-empty-title': 'No dataset results yet', 'validation-empty-body': 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', 'validation-footer': 'Dataset results are read-only website data.' }, zh: { title: '数据集验证 - vllm-hust', 'validation-eyebrow': '独立验证', 'validation-title': '数据集验证', 'validation-lede': '展示固定机器验证服务发布的结果，并按数据集与指标组成矩阵。', 'validation-scenario-kicker': '验证场景', 'validation-description': '同时保留 B0 与当前值，便于核查。', 'validation-loading': '正在加载验证产物...', 'validation-error-title': '验证产物不可用', 'validation-error-body': '无法加载结果文档。', 'validation-stat-total-label': '矩阵单元格', 'validation-stat-passed-label': '通过', 'validation-stat-failed-label': '失败', 'validation-stat-pending-label': '待处理', 'validation-status-label': '状态', 'validation-source-label': '来源', 'validation-detail-close': '关闭', 'validation-empty-title': '当前还没有数据集结果', 'validation-empty-body': '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', 'validation-footer': '数据集结果为网站只读数据。' } };
   </script>
-  <script src="./assets/site.js?v=public-copy-20260701"></script>
+  <script src="./assets/site.js?v=nav-polish-20260826"></script>
   <script src="./assets/dataset-validation.js?v=dataset-validation-v1"></script>
 </body>
 </html>
