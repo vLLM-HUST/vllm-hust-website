@@ -242,6 +242,10 @@
     background: #eff6ff;
 }
 
+.validation-detail[hidden] {
+    display: none;
+}
+
 .validation-detail h3 {
     margin: 0;
     font-size: 1.12rem;
