@@ -26,6 +26,8 @@ authenticated service artifact before production ingestion is enabled.
 
 ## Integration boundary
 
-When the service contract is finalized, update the loader URL and authentication/provenance policy
-in `assets/dataset-validation.js`. Keep the adapter independent from `leaderboard_v1` and retain the
-empty, loading, error, and stale-source states.
+When the service contract is finalized, set `window.vllmHustDatasetValidationConfig.dataUrl` to the
+published artifact and update the authentication/provenance policy in
+`assets/dataset-validation.js`. The adapter rejects unknown statuses, dimensions, and duplicate
+cells. Keep it independent from `leaderboard_v1` and retain the empty, loading, error, and
+stale-source states.

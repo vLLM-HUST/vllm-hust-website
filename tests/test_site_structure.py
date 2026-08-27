@@ -144,6 +144,11 @@ def test_dataset_validation_page_uses_versioned_contract() -> None:
     assert "dataset-validation-v1" in script
     assert "Empty cells are intentionally shown" in page
     assert 'href="./dataset-validation.html"' in page
+    assert "Result references an undeclared dataset or metric" in script
+    assert "Duplicate result cell" in script
+    assert "Unsupported result status" in script
+    assert "vllmHustDatasetValidationConfig?.dataUrl" in script
+    assert 'id="validation-freshness"' in page
 
 
 def test_data_directory_has_sync_marker() -> None:
