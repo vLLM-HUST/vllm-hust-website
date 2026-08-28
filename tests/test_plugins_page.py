@@ -97,10 +97,15 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
 
 def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     control_plane = by_id("ride-control-plane")
+    bridge = by_id("ride-runtime-bridge")
     assert control_plane["artifact_type"] == "external_system"
     assert control_plane["system_role"] == "control_plane"
     assert control_plane["execution_planes"] == ["cluster_control"]
-    assert control_plane["integration_contracts"] == [
+    assert control_plane["integration_contracts"] == []
+    assert bridge["artifact_type"] == "bridge"
+    assert bridge["system_role"] == "control_plane_bridge"
+    assert bridge["execution_planes"] == ["bridge"]
+    assert bridge["integration_contracts"] == [
         "vllm.control.action.v1",
         "vllm.control.receipt.v1",
     ]
@@ -108,7 +113,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v4"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v5"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
