@@ -70,7 +70,8 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     lmcache_connectors = by_id("lmcache-vllm-connectors")
     pegaflow = by_id("pegaflow")
     pegaflow_connectors = by_id("pegaflow-vllm-connectors")
-    lmcache_ascend = by_id("lmcache-ascend")
+    lmcache_ascend_provider = by_id("lmcache-ascend-provider")
+    lmcache_ascend_adapter = by_id("lmcache-ascend-vllm-adapter")
 
     assert mooncake["artifact_type"] == "external_system"
     assert mooncake["integration_contracts"] == []
@@ -84,8 +85,10 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "vllm.kv_connector.scheduler.v1",
         "vllm.kv_connector.worker.v1",
     ]
-    assert lmcache_ascend["system_role"] == "kv_integration"
-    assert lmcache_ascend["artifact_type"] == "runtime_component"
+    assert lmcache_ascend_provider["system_role"] == "platform_backend"
+    assert lmcache_ascend_provider["artifact_type"] == "runtime_component"
+    assert lmcache_ascend_adapter["system_role"] == "kv_integration"
+    assert lmcache_ascend_adapter["artifact_type"] == "bridge"
 
     assert "KV connector" in PAGE
     assert "state system" in PAGE
@@ -105,7 +108,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v3"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v4"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -125,7 +128,15 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         if item["name"] == "LMCache-Ascend"
     )
     assert pegaflow["repository_role"] == "external_subsystem"
+    assert pegaflow["component_ids"] == [
+        "pegaflow",
+        "pegaflow-vllm-connectors",
+    ]
     assert lmcache_ascend["relation_to_runtime"] == "integrates_external_system"
+    assert lmcache_ascend["component_ids"] == [
+        "lmcache-ascend-provider",
+        "lmcache-ascend-vllm-adapter",
+    ]
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert 'data-source="./data/repository-portfolio.json?v=repository-portfolio-v1"' in PAGE
     assert "repository portfolio request failed" in SCRIPT
