@@ -51,6 +51,10 @@ def test_system_role_is_independent_from_delivery_model() -> None:
     bidkv = by_id("bidkv")
     assert bidkv["system_role"] == "scheduler_policy"
     assert bidkv["delivery_model"] == "plugin_bundle"
+    assert bidkv["integration_surfaces"] == [
+        "vllm.victim_selector",
+        "vllm.general_plugins",
+    ]
 
     ascend = by_id("vllm-ascend-hust")
     assert ascend["artifact_type"] == "platform_profile"
@@ -110,10 +114,14 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
         "vllm.operator.v1",
         "vllm.model_runner.v1",
     ]
-    assert metal["integration_surfaces"] == ["vllm.model_loader"]
+    assert metal["integration_surfaces"] == [
+        "vllm.platform_plugins",
+        "vllm.model_loader",
+    ]
     assert diffspec["integration_surfaces"] == ["vllm.speculative_decoding"]
     assert kvcompress["integration_contracts"] == []
     assert kvcompress["integration_surfaces"] == [
+        "vllm.general_plugins",
         "vllm.kv_compression.provider",
         "vllm.kv_lifecycle",
     ]
@@ -146,7 +154,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v5"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v6"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
