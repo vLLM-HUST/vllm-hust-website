@@ -158,6 +158,8 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     assert "RUNTIME_HEALTH_UNAVAILABLE" in PAGE
     assert "local transport-agnostic service" in PAGE
     assert "authoritative EngineClient health observations" in PAGE
+    assert "versioned key IDs" in PAGE
+    assert "rollback-safe generation replacement" in PAGE
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
