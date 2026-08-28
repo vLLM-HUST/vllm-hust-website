@@ -151,6 +151,8 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
         "vllm.control.receipt.v1",
     ]
     assert "control plane makes external decisions through a narrow bridge" in PAGE
+    assert "side-effect-free admission gate for a read-only health probe" in PAGE
+    assert "no process-isolated bridge executor" in PAGE
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
