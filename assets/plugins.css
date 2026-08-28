@@ -139,7 +139,10 @@ html[lang="zh"] .lang-zh { display: inline; }
 .plugin-component-facts dt { color: #61706f; font: 9px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; }
 .plugin-component-facts dd { margin: 0; color: #273432; font-size: 10px; }
 .plugin-contracts { margin-top: 16px; display: flex; gap: 5px; flex-wrap: wrap; }
+.plugin-interface-label { flex-basis: 100%; color: #61706f; font: 8px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: .08em; text-transform: uppercase; }
 .plugin-contracts code { padding: 4px 6px; color: #105456; background: #e4f1ef; font: 9px ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap: anywhere; }
+.integration-surfaces { margin-top: 9px; }
+.integration-surfaces code { color: #72520a; background: #f7edd0; }
 .plugin-card.has-publication { min-height: 440px; box-shadow: inset 0 4px #39c6ca; }
 .plugin-publications { margin-top: 22px; display: grid; gap: 8px; }
 .plugin-publication { padding: 14px; display: grid; gap: 7px; color: #0c1112; border: 1px solid #b8cfca; background: #edf6f3; text-decoration: none; }

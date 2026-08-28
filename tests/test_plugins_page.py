@@ -87,12 +87,45 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     ]
     assert lmcache_ascend_provider["system_role"] == "platform_backend"
     assert lmcache_ascend_provider["artifact_type"] == "runtime_component"
+    assert lmcache_ascend_provider["integration_contracts"] == []
+    assert lmcache_ascend_provider["integration_surfaces"] == [
+        "lmcache.storage_backend"
+    ]
     assert lmcache_ascend_adapter["system_role"] == "kv_integration"
     assert lmcache_ascend_adapter["artifact_type"] == "bridge"
 
     assert "KV connector" in PAGE
     assert "state system" in PAGE
     assert "KV 状态系统" in PAGE
+
+
+def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
+    ascend = by_id("vllm-ascend-hust")
+    metal = by_id("vllm-metal-hust")
+    diffspec = by_id("diffspec")
+    kvcompress = by_id("kvcompress-ascend")
+
+    assert ascend["integration_contracts"] == [
+        "vllm.platform.v1",
+        "vllm.operator.v1",
+        "vllm.model_runner.v1",
+    ]
+    assert metal["integration_surfaces"] == ["vllm.model_loader"]
+    assert diffspec["integration_surfaces"] == ["vllm.speculative_decoding"]
+    assert kvcompress["integration_contracts"] == []
+    assert kvcompress["integration_surfaces"] == [
+        "vllm.kv_compression.provider",
+        "vllm.kv_lifecycle",
+    ]
+    typed = {
+        contract
+        for item in REGISTRY["components"]
+        for contract in item["integration_contracts"]
+    }
+    assert "vllm.platform" not in typed
+    assert "vllm.operator" not in typed
+    assert "vllm.model_runner" not in typed
+    assert "integration_surfaces" in SCRIPT
 
 
 def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
