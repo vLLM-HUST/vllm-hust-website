@@ -6,6 +6,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = json.loads((ROOT / "data" / "ecosystem.json").read_text(encoding="utf-8"))
+PORTFOLIO = json.loads(
+    (ROOT / "data" / "repository-portfolio.json").read_text(encoding="utf-8")
+)
 PAGE = (ROOT / "plugins.html").read_text(encoding="utf-8")
 SCRIPT = (ROOT / "assets" / "plugins-page.js").read_text(encoding="utf-8")
 LEGACY_STANDARD = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
@@ -94,6 +97,26 @@ def test_page_consumes_the_docs_owned_registry() -> None:
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
+
+
+def test_repository_portfolio_is_separate_and_complete() -> None:
+    assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
+    assert len(PORTFOLIO["repositories"]) == 32
+    names = {item["name"] for item in PORTFOLIO["repositories"]}
+    assert {"vllm-hust", "pegaflow-hust", "LMCache-Ascend"} <= names
+
+    pegaflow = next(
+        item for item in PORTFOLIO["repositories"] if item["name"] == "pegaflow-hust"
+    )
+    lmcache_ascend = next(
+        item for item in PORTFOLIO["repositories"]
+        if item["name"] == "LMCache-Ascend"
+    )
+    assert pegaflow["repository_role"] == "external_subsystem"
+    assert lmcache_ascend["relation_to_runtime"] == "integrates_external_system"
+    assert "Repositories are governance boundaries, not runtime types." in PAGE
+    assert 'data-source="./data/repository-portfolio.json?v=repository-portfolio-v1"' in PAGE
+    assert "repository portfolio request failed" in SCRIPT
 
 
 def test_plugin_standard_is_explicitly_legacy() -> None:
