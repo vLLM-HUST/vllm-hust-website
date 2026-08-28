@@ -264,10 +264,13 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "missing-dependency materialization behavior" in PAGE
     assert "Real-run readiness is recorded separately" in PAGE
     assert "This is environment-readiness evidence" in PAGE
-    assert "Example cleanup is process-owned" in PAGE
-    assert "not Mooncake behavior evidence" in PAGE
-    assert "Mooncake preflight is topology-aware" in PAGE
-    assert "These are readiness blockers, not Mooncake failures" in PAGE
+    assert "Mooncake runs are process-owned and mode-exclusive" in PAGE
+    assert "legacy, typed, or rollback" in PAGE
+    assert "Typed manifest variables are absent from legacy and rollback" in PAGE
+    assert "Mooncake admission includes live resources" in PAGE
+    assert "target GPUs and minimum free memory" in PAGE
+    assert "unrelated 32B service occupied both GPUs and the proxy port" in PAGE
+    assert "not a Mooncake failure or real-online result" in PAGE
     assert "kv-systems-and-connector-materialization.md" in PAGE
     assert "control-plane-and-runtime-bridge.md" in PAGE
     assert "ecosystem-reorganization-release-candidate.json" in PAGE
