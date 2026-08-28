@@ -192,6 +192,8 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "BidKV remains on the compatibility path" in PAGE
     assert "kv-systems-and-connector-materialization.md" in PAGE
     assert "control-plane-and-runtime-bridge.md" in PAGE
+    assert "ecosystem-reorganization-release-candidate.json" in PAGE
+    assert "DRAFT EVIDENCE" in PAGE
     assert "plugin-standard-v1.0.pdf" not in PAGE
 
 
