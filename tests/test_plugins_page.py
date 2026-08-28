@@ -264,6 +264,8 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "missing-dependency materialization behavior" in PAGE
     assert "Real-run readiness is recorded separately" in PAGE
     assert "This is environment-readiness evidence" in PAGE
+    assert "rejects namespace-only imports" in PAGE
+    assert "exact core source, engine import, and runnable vLLM CLI" in PAGE
     assert "Mooncake runs are process-owned and mode-exclusive" in PAGE
     assert "legacy, typed, or rollback" in PAGE
     assert "Typed manifest variables are absent from legacy and rollback" in PAGE
