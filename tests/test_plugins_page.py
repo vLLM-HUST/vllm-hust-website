@@ -152,9 +152,10 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     ]
     assert "control plane makes external decisions through a narrow bridge" in PAGE
     assert "side-effect-free admission" in PAGE
-    assert "no process-isolated bridge executor" in PAGE
+    assert "fixed core-only spawned worker" in PAGE
     assert "exact-wire-byte HMAC verification" in PAGE
-    assert "durable idempotency/receipt ledger" in PAGE
+    assert "durable replay ledger" in PAGE
+    assert "RUNTIME_HEALTH_UNAVAILABLE" in PAGE
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
