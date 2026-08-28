@@ -199,10 +199,12 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert 'victim_selector_component="bundle-id/component-id"' in PAGE
     assert "BidKV remains on the compatibility path" in PAGE
     assert "explicit ordered composition" in PAGE
-    assert "declared HMA/piecewise capabilities" in PAGE
+    assert "declared HMA, piecewise, and cache-layout capabilities" in PAGE
+    assert "API-plane telemetry components" in PAGE
+    assert "Conflicting ordered layouts fail before import" in PAGE
     assert "KVTransferConfig normalizes that topology" in PAGE
     assert "forwards recovery lifecycle signals" in PAGE
-    assert "in-process capability verification are still pending" in PAGE
+    assert "owning-process declaration verification are still pending" in PAGE
     assert "kv-systems-and-connector-materialization.md" in PAGE
     assert "control-plane-and-runtime-bridge.md" in PAGE
     assert "ecosystem-reorganization-release-candidate.json" in PAGE
