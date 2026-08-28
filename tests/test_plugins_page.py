@@ -65,13 +65,25 @@ def test_system_role_is_independent_from_delivery_model() -> None:
 
 def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     mooncake = by_id("mooncake")
+    mooncake_connectors = by_id("mooncake-vllm-connectors")
     lmcache = by_id("lmcache")
+    lmcache_connectors = by_id("lmcache-vllm-connectors")
     pegaflow = by_id("pegaflow")
+    pegaflow_connectors = by_id("pegaflow-vllm-connectors")
     lmcache_ascend = by_id("lmcache-ascend")
 
     assert mooncake["artifact_type"] == "external_system"
+    assert mooncake["integration_contracts"] == []
+    assert mooncake_connectors["artifact_type"] == "bridge"
     assert lmcache["system_role"] == "kv_state_manager"
+    assert lmcache["integration_contracts"] == []
+    assert lmcache_connectors["system_role"] == "kv_integration"
     assert pegaflow["ownership"] == "hust_owned_subsystem"
+    assert pegaflow["integration_contracts"] == []
+    assert pegaflow_connectors["integration_contracts"] == [
+        "vllm.kv_connector.scheduler.v1",
+        "vllm.kv_connector.worker.v1",
+    ]
     assert lmcache_ascend["system_role"] == "kv_integration"
     assert lmcache_ascend["artifact_type"] == "runtime_component"
 
@@ -93,7 +105,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v2"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v3"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
