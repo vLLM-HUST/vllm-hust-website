@@ -80,14 +80,29 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert mooncake["artifact_type"] == "external_system"
     assert mooncake["integration_contracts"] == []
     assert mooncake_connectors["artifact_type"] == "bridge"
+    assert mooncake_connectors["canonical_repository"] == (
+        "https://github.com/vLLM-HUST/vllm-hust"
+    )
+    assert mooncake_connectors["upstream_repository"] == (
+        "https://github.com/kvcache-ai/Mooncake"
+    )
+    assert mooncake_connectors["integration_contracts"] == [
+        "vllm.kv_connector.scheduler.v1",
+        "vllm.kv_connector.worker.v1",
+        "vllm.kv_connector.telemetry.v1",
+    ]
     assert lmcache["system_role"] == "kv_state_manager"
     assert lmcache["integration_contracts"] == []
     assert lmcache_connectors["system_role"] == "kv_integration"
     assert lmcache_connectors["integration_contracts"] == [
         "vllm.kv_connector.scheduler.v1",
         "vllm.kv_connector.worker.v1",
+        "vllm.kv_connector.telemetry.v1",
     ]
-    assert lmcache_connectors["execution_planes"] == ["scheduler", "worker"]
+    assert lmcache_connectors["execution_planes"] == ["api", "scheduler", "worker"]
+    assert lmcache_connectors["canonical_repository"] == (
+        "https://github.com/vLLM-HUST/vllm-hust"
+    )
     assert pegaflow["ownership"] == "hust_owned_subsystem"
     assert pegaflow["integration_contracts"] == []
     assert pegaflow_connectors["integration_contracts"] == [
