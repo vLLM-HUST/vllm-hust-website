@@ -157,6 +157,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     assert "durable replay" in PAGE
     assert "RUNTIME_HEALTH_UNAVAILABLE" in PAGE
     assert "local transport-agnostic service" in PAGE
+    assert "authoritative EngineClient health observations" in PAGE
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
