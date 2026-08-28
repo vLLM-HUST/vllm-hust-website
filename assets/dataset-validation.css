@@ -1,0 +1,454 @@
+.dataset-validation-section {
+    margin: 32px 0 48px;
+}
+
+.validation-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.validation-stat {
+    min-height: 100px;
+    padding: 16px;
+    border: 1px solid #dbe7f3;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.validation-stat span {
+    display: block;
+    color: #64748b;
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.validation-stat strong {
+    display: block;
+    margin-top: 8px;
+    color: #0f172a;
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: 1.5rem;
+}
+
+.validation-toolbar {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.validation-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.validation-filter {
+    display: grid;
+    gap: 4px;
+    min-width: 150px;
+}
+
+.validation-filter label {
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.validation-filter select {
+    min-height: 38px;
+    padding: 7px 30px 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    font: inherit;
+}
+
+.validation-filter input {
+    min-height: 38px;
+    min-width: 190px;
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    font: inherit;
+}
+
+.validation-dataset-count {
+    align-self: end;
+    padding-bottom: 9px;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.validation-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.validation-legend strong {
+    color: #0f172a;
+}
+
+.validation-legend-improved {
+    color: #15803d;
+}
+
+.validation-legend-regressed {
+    color: #b91c1c;
+}
+
+.validation-source {
+    max-width: 360px;
+    color: #64748b;
+    font-size: 0.82rem;
+    text-align: right;
+}
+
+.validation-source strong {
+    color: #334155;
+    font-family: "Fira Code", monospace;
+    font-weight: 600;
+}
+
+.validation-freshness {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 0.76rem;
+}
+
+.validation-freshness[data-state="stale"] {
+    color: #b45309;
+    font-weight: 800;
+}
+
+.validation-table-wrap {
+    margin-top: 20px;
+    max-height: 700px;
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid #dbe7f3;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.validation-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+}
+
+.validation-table th,
+.validation-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.validation-table th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: #f8fbff;
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.validation-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.validation-dataset {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    min-width: 180px;
+    background: #f8fbff;
+}
+
+.validation-table thead th:first-child {
+    left: 0;
+    z-index: 4;
+}
+
+.validation-dataset strong {
+    display: block;
+    color: #0f172a;
+}
+
+.validation-dataset small {
+    display: block;
+    margin-top: 3px;
+    color: #64748b;
+}
+
+.validation-cell {
+    width: 132px;
+    min-width: 132px;
+    padding: 8px !important;
+}
+
+.validation-cell-button {
+    width: 100%;
+    min-height: 52px;
+    padding: 8px;
+    border: 1px solid #dbe7f3;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #334155;
+    text-align: left;
+    cursor: pointer;
+}
+
+.validation-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 12px;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.validation-pagination .action-button {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 0.78rem;
+}
+
+.validation-pagination .action-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.validation-cell-button:hover,
+.validation-cell-button:focus-visible {
+    border-color: #60a5fa;
+    outline: 3px solid rgba(96, 165, 250, 0.2);
+}
+
+.validation-filtered-cell {
+    display: block;
+    padding: 12px 8px;
+    color: #94a3b8;
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.validation-cell-value {
+    display: block;
+    min-height: 20px;
+    color: #0f172a;
+    font-size: 0.9rem;
+    font-weight: 900;
+}
+
+.validation-cell-pair {
+    display: grid;
+    gap: 2px;
+    color: #0f172a;
+    font-size: 0.78rem;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.validation-cell-pair > span {
+    display: flex;
+    gap: 5px;
+    align-items: baseline;
+    white-space: nowrap;
+}
+
+.validation-cell-pair small {
+    min-width: 18px;
+    color: #64748b;
+    font-size: 0.63rem;
+    font-weight: 900;
+}
+
+.validation-cell-delta {
+    display: block;
+    margin-top: 2px;
+    color: #64748b;
+    font-size: 0.72rem;
+}
+
+.validation-trend--improved {
+    color: #15803d;
+}
+
+.validation-trend--regressed {
+    color: #b91c1c;
+}
+
+.validation-trend--unchanged,
+.validation-trend--not_comparable {
+    color: #64748b;
+}
+
+.validation-status {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 5px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 900;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.validation-status--not_tested,
+.validation-status--queued,
+.validation-status--not_applicable {
+    color: #475569;
+    background: #f1f5f9;
+}
+
+.validation-status--running {
+    color: #1d4ed8;
+    background: #dbeafe;
+}
+
+.validation-status--passed {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.validation-status--failed {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+.validation-detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
+    gap: 18px;
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    background: #eff6ff;
+}
+
+.validation-detail[hidden] {
+    display: none;
+}
+
+.validation-detail h3 {
+    margin: 0;
+    font-size: 1.12rem;
+}
+
+.validation-detail p {
+    margin: 7px 0 0;
+    color: #475569;
+}
+
+.validation-detail dl {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 7px 14px;
+    margin: 0;
+    font-size: 0.84rem;
+}
+
+.validation-detail dt {
+    color: #64748b;
+    font-weight: 800;
+}
+
+.validation-detail dd {
+    min-width: 0;
+    margin: 0;
+    color: #0f172a;
+    overflow-wrap: anywhere;
+}
+
+.validation-empty {
+    margin-top: 20px;
+    padding: 32px 20px;
+    border: 1px dashed #94a3b8;
+    border-radius: 12px;
+    background: #f8fafc;
+    text-align: center;
+}
+
+.validation-empty h3 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.validation-empty p {
+    max-width: 560px;
+    margin: 8px auto 0;
+    color: #64748b;
+}
+
+@media (max-width: 860px) {
+    .validation-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .validation-toolbar,
+    .validation-detail {
+        align-items: stretch;
+        grid-template-columns: 1fr;
+        flex-direction: column;
+    }
+
+    .validation-source {
+        max-width: none;
+        text-align: left;
+    }
+}
+
+@media (max-width: 520px) {
+    .validation-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .validation-filter {
+        min-width: 100%;
+    }
+
+    .validation-filter input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .validation-dataset-count {
+        align-self: start;
+        padding-bottom: 0;
+    }
+
+    .validation-pagination {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+}
