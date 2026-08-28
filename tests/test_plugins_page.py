@@ -124,6 +124,10 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "former entry-point-based Plugin Standard 1.0" in PAGE
     assert "Domain contracts first; bundles second." in PAGE
     assert "先定义领域契约，再定义 bundle 交付。" in PAGE
+    assert "VLLM_EXTENSION_MANIFESTS" in PAGE
+    assert "VLLM_EXTENSION_BUNDLES" in PAGE
+    assert "Static admission is not runtime compatibility" in PAGE
+    assert "plugin-standard-v1.0.pdf" not in PAGE
 
 
 def test_public_copy_uses_ecosystem_language() -> None:
