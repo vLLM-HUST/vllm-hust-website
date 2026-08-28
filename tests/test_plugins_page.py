@@ -264,6 +264,8 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "missing-dependency materialization behavior" in PAGE
     assert "Real-run readiness is recorded separately" in PAGE
     assert "This is environment-readiness evidence" in PAGE
+    assert "Example cleanup is process-owned" in PAGE
+    assert "not Mooncake behavior evidence" in PAGE
     assert "kv-systems-and-connector-materialization.md" in PAGE
     assert "control-plane-and-runtime-bridge.md" in PAGE
     assert "ecosystem-reorganization-release-candidate.json" in PAGE
