@@ -152,9 +152,9 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     ]
     assert "control plane makes external decisions through a narrow bridge" in PAGE
     assert "admission" in PAGE
-    assert "fixed core-only spawned worker" in PAGE
-    assert "exact-wire-byte HMAC verification" in PAGE
-    assert "durable replay ledger" in PAGE
+    assert "fixed spawned worker" in PAGE
+    assert "exact-wire HMAC" in PAGE
+    assert "durable replay" in PAGE
     assert "RUNTIME_HEALTH_UNAVAILABLE" in PAGE
     assert "local transport-agnostic service" in PAGE
 
