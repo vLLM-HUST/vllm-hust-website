@@ -104,6 +104,16 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     ]
     assert lmcache_ascend_adapter["system_role"] == "kv_integration"
     assert lmcache_ascend_adapter["artifact_type"] == "bridge"
+    assert lmcache_ascend_adapter["integration_contracts"] == [
+        "vllm.kv_connector.scheduler.v1",
+        "vllm.kv_connector.worker.v1",
+        "vllm.kv_connector.telemetry.v1",
+    ]
+    assert lmcache_ascend_adapter["execution_planes"] == [
+        "api",
+        "scheduler",
+        "worker",
+    ]
 
     assert "KV connector" in PAGE
     assert "state system" in PAGE
