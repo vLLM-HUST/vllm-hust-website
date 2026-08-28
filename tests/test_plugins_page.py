@@ -198,6 +198,8 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "One materializer does not prove ecosystem compatibility" in PAGE
     assert 'victim_selector_component="bundle-id/component-id"' in PAGE
     assert "BidKV remains on the compatibility path" in PAGE
+    assert "explicit ordered composition" in PAGE
+    assert "KVConnectorFactory integration is still pending" in PAGE
     assert "kv-systems-and-connector-materialization.md" in PAGE
     assert "control-plane-and-runtime-bridge.md" in PAGE
     assert "ecosystem-reorganization-release-candidate.json" in PAGE
