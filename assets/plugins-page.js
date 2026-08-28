@@ -4,9 +4,12 @@
   const filters = document.querySelector("[data-plugin-filters]");
   const search = document.querySelector("[data-plugin-search]");
   const adjacent = document.querySelector("[data-adjacent-assets]");
+  const repositoryCatalog = document.querySelector("[data-repository-portfolio]");
+  const repositoryStatus = document.querySelector("[data-repository-status]");
   if (!catalog || !status || !filters || !search) return;
 
   let registry;
+  let portfolio;
   let selectedType = "all";
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
@@ -29,7 +32,11 @@
     ownership: "维护",
     planes: "执行面",
     delivery: "交付",
-    boundaries: "关键边界"
+    boundaries: "关键边界",
+    repositories: "个组织仓库",
+    repositoryEmpty: "没有符合当前搜索条件的仓库。",
+    artifacts: "规范制品",
+    relation: "与运行时关系"
   } : {
     all: "All",
     entries: "ecosystem components",
@@ -41,7 +48,11 @@
     ownership: "Ownership",
     planes: "Planes",
     delivery: "Delivery",
-    boundaries: "Key boundaries"
+    boundaries: "Key boundaries",
+    repositories: "organization repositories",
+    repositoryEmpty: "No repositories match the current search.",
+    artifacts: "Canonical artifacts",
+    relation: "Runtime relation"
   };
 
   const typeLabels = {
@@ -144,6 +155,77 @@
     });
   }
 
+  function renderPortfolio() {
+    if (!portfolio || !repositoryCatalog || !repositoryStatus) return;
+    const query = search.value.trim().toLowerCase();
+    const visible = portfolio.repositories.filter((repository) => [
+      repository.name,
+      repository.portfolio_domain,
+      repository.repository_role,
+      repository.relation_to_runtime,
+      repository.lifecycle,
+      repository.canonical_artifacts.join(" "),
+      repository.component_ids.join(" ")
+    ].join(" ").toLowerCase().includes(query));
+
+    repositoryCatalog.replaceChildren();
+    const domains = [...new Set(
+      portfolio.repositories.map((item) => item.portfolio_domain)
+    )];
+    domains.forEach((domain) => {
+      const repositories = visible.filter(
+        (item) => item.portfolio_domain === domain
+      );
+      if (!repositories.length) return;
+      const section = element("section", "repository-domain");
+      const heading = element("div", "repository-domain-head");
+      heading.append(
+        element("h3", "", valueLabel(domain)),
+        element("strong", "", String(repositories.length).padStart(2, "0"))
+      );
+      const grid = element("div", "repository-grid");
+      repositories.forEach((repository) => {
+        const card = element("article", "repository-card");
+        const top = element("div", "plugin-card-top");
+        top.append(element("span", "plugin-code", repository.repository_role));
+        const badges = element("div", "plugin-badges");
+        badges.append(
+          badge(valueLabel(repository.lifecycle), `status-${repository.lifecycle}`)
+        );
+        top.append(badges);
+
+        const name = element("a", "repository-name", repository.name);
+        name.href = repository.url;
+        name.target = "_blank";
+        name.rel = "noopener noreferrer";
+        const facts = element("dl", "plugin-component-facts");
+        [
+          [copy().relation, valueLabel(repository.relation_to_runtime)],
+          [copy().artifacts, repository.canonical_artifacts.join(" · ")]
+        ].forEach(([label, value]) => {
+          const row = element("div");
+          row.append(element("dt", "", label), element("dd", "", value));
+          facts.append(row);
+        });
+        card.append(top, name, facts);
+
+        if (repository.component_ids.length) {
+          const components = element("div", "plugin-contracts");
+          repository.component_ids.forEach((id) => {
+            components.append(element("code", "", id));
+          });
+          card.append(components);
+        }
+        grid.append(card);
+      });
+      section.append(heading, grid);
+      repositoryCatalog.append(section);
+    });
+    repositoryStatus.textContent = visible.length
+      ? `${visible.length} ${copy().repositories}`
+      : copy().repositoryEmpty;
+  }
+
   function renderCatalog() {
     const query = search.value.trim().toLowerCase();
     const visible = registry.components.filter((item) => {
@@ -173,7 +255,10 @@
     status.textContent = visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
   }
 
-  search.addEventListener("input", renderCatalog);
+  search.addEventListener("input", () => {
+    if (registry) renderCatalog();
+    renderPortfolio();
+  });
   search.placeholder = copy().searchPlaceholder;
 
   fetch(catalog.dataset.source)
@@ -204,11 +289,39 @@
       status.title = error.message;
     });
 
+  if (repositoryCatalog && repositoryStatus) {
+    fetch(repositoryCatalog.dataset.source)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`repository portfolio request failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((payload) => {
+        if (
+          payload.schema_version !== "1.0"
+          || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"
+          || !Array.isArray(payload.repositories)
+        ) {
+          throw new Error("unsupported repository portfolio");
+        }
+        portfolio = payload;
+        renderPortfolio();
+      })
+      .catch((error) => {
+        repositoryStatus.textContent = language() === "zh"
+          ? "仓库组合加载失败，请检查规范 registry。"
+          : "The repository portfolio could not be loaded. Check the canonical registry.";
+        repositoryStatus.title = error.message;
+      });
+  }
+
   window.addEventListener("vllm-hust-language-change", () => {
     if (!registry) return;
     search.placeholder = copy().searchPlaceholder;
     renderFilters();
     renderCatalog();
     renderBoundaries();
+    renderPortfolio();
   });
 })();
