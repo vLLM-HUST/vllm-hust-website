@@ -138,24 +138,36 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
 
 def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     control_plane = by_id("ride-control-plane")
-    bridge = by_id("ride-runtime-bridge")
+    remote_sidecar = by_id("ride-runtime-bridge")
+    local_host = by_id("vllm-local-control-host")
     assert control_plane["artifact_type"] == "external_system"
     assert control_plane["system_role"] == "control_plane"
     assert control_plane["execution_planes"] == ["cluster_control"]
     assert control_plane["integration_contracts"] == []
-    assert bridge["artifact_type"] == "bridge"
-    assert bridge["system_role"] == "control_plane_bridge"
-    assert bridge["execution_planes"] == ["bridge"]
-    assert bridge["integration_contracts"] == [
+    assert remote_sidecar["artifact_type"] == "bridge"
+    assert remote_sidecar["system_role"] == "control_plane_bridge"
+    assert remote_sidecar["deployment_topology"] == "sidecar"
+    assert remote_sidecar["delivery_model"] == "external_service"
+    assert remote_sidecar["maturity"] == "concept"
+    assert remote_sidecar["canonical_repository"] is None
+    assert local_host["artifact_type"] == "bridge"
+    assert local_host["system_role"] == "control_plane_bridge"
+    assert local_host["execution_planes"] == ["api", "bridge"]
+    assert local_host["delivery_model"] == "core_release"
+    assert local_host["maturity"] == "experimental"
+    assert local_host["canonical_repository"].endswith("/vllm-hust")
+    assert local_host["integration_contracts"] == [
         "vllm.control.action.v1",
         "vllm.control.receipt.v1",
     ]
+    assert remote_sidecar["evidence_level"] == "descriptor_only"
+    assert local_host["evidence_level"] == "integration_tested"
     assert "control plane makes external decisions through a narrow bridge" in PAGE
     assert "admission" in PAGE
     assert "fixed spawned worker" in PAGE
     assert "exact-wire HMAC" in PAGE
     assert "durable replay" in PAGE
-    assert "RUNTIME_HEALTH_UNAVAILABLE" in PAGE
+    assert "catalog now separates three layers" in PAGE
     assert "local same-UID, message-authenticated, bounded Unix-socket host" in PAGE
     assert "authoritative EngineClient health observations" in PAGE
     assert "versioned key IDs" in PAGE
