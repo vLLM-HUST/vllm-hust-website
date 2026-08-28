@@ -271,6 +271,7 @@
         throw new Error("unsupported ecosystem registry");
       }
       registry = payload;
+      search.placeholder = copy().searchPlaceholder;
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
       const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
       const incubating = payload.components.filter((item) => ["concept", "incubating", "experimental"].includes(item.maturity)).length;
@@ -306,6 +307,7 @@
           throw new Error("unsupported repository portfolio");
         }
         portfolio = payload;
+        search.placeholder = copy().searchPlaceholder;
         renderPortfolio();
       })
       .catch((error) => {
