@@ -6,42 +6,68 @@
   const adjacent = document.querySelector("[data-adjacent-assets]");
   if (!catalog || !status || !filters || !search) return;
 
-  let manifest = null;
-  let selectedLayer = "all";
+  let registry;
+  let selectedType = "all";
 
-  const language = () => (document.documentElement.lang.startsWith("zh") ? "zh" : "en");
-  const local = (record, key) => record[`${key}_${language()}`] || record[`${key}_en`] || "";
-  const element = (tag, className, text) => {
+  const language = () => document.documentElement.lang === "zh-CN" ? "zh" : "en";
+  const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
+  const element = (tag, className = "", text = "") => {
     const node = document.createElement(tag);
     if (className) node.className = className;
-    if (text !== undefined) node.textContent = text;
+    if (text) node.textContent = text;
     return node;
   };
 
-  function labels() {
-    return language() === "zh"
-      ? { all: "全部", papers: "论文成果", paper: "论文", repository: "仓库", withheld: "孵化仓库 · 链接未公开", entries: "个条目", empty: "没有符合条件的插件。", existing: "vLLM 运行时入口", controlPlane: "RIDE-Lab 控制面", searchPlaceholder: "搜索插件、论文、职责或层次" }
-      : { all: "All", papers: "Publications", paper: "Paper", repository: "Repository", withheld: "Incubation repository · link not public", entries: "entries", empty: "No plugins match the current filters.", existing: "vLLM runtime entry point", controlPlane: "RIDE-Lab control plane", searchPlaceholder: "Search plugin, paper, responsibility, or layer" };
-  }
+  const copy = () => language() === "zh" ? {
+    all: "全部",
+    entries: "个生态组件",
+    empty: "没有符合当前筛选条件的生态组件。",
+    repository: "规范仓库",
+    noRepository: "尚无公开主仓库",
+    searchPlaceholder: "搜索系统、职责、契约、执行面或仓库",
+    evidence: "证据",
+    ownership: "维护",
+    planes: "执行面",
+    delivery: "交付",
+    boundaries: "关键边界"
+  } : {
+    all: "All",
+    entries: "ecosystem components",
+    empty: "No ecosystem components match the current filters.",
+    repository: "Canonical repository",
+    noRepository: "No public canonical repository",
+    searchPlaceholder: "Search system, role, contract, execution plane, or repository",
+    evidence: "Evidence",
+    ownership: "Ownership",
+    planes: "Planes",
+    delivery: "Delivery",
+    boundaries: "Key boundaries"
+  };
 
-  function statusText(item) {
-    const names = language() === "zh"
-      ? { existing: "已有实现", active: "开发中", incubating: "研究原型", planned: "路线规划", concept: "架构概念" }
-      : { existing: "Available code", active: "Active development", incubating: "Research prototype", planned: "Roadmap", concept: "Architecture concept" };
-    return names[item.status] || item.status;
-  }
+  const typeLabels = {
+    runtime_core: { en: "Runtime core", zh: "运行时本体" },
+    platform_profile: { en: "Platform profiles", zh: "平台 profile" },
+    runtime_component: { en: "Runtime components", zh: "运行时组件" },
+    external_system: { en: "External systems", zh: "外部系统" },
+    bridge: { en: "Bridges", zh: "Bridge / Agent" },
+    tool: { en: "Engineering and evidence", zh: "工程与证据" },
+    application: { en: "Applications", zh: "应用与展示" }
+  };
+
+  const valueLabel = (value) => String(value).replaceAll("_", " ");
+  const typeTitle = (type) => (typeLabels[type] || { en: valueLabel(type), zh: valueLabel(type) })[language()];
 
   function renderFilters() {
-    const copy = labels();
-    search.placeholder = copy.searchPlaceholder;
+    const presentTypes = [...new Set(registry.components.map((item) => item.artifact_type))];
     filters.replaceChildren();
-    [{ id: "all", title_en: copy.all, title_zh: copy.all }, { id: "publications", title_en: copy.papers, title_zh: copy.papers }, ...manifest.layers].forEach((layer) => {
-      const button = element("button", `plugin-filter${selectedLayer === layer.id ? " active" : ""}`, local(layer, "title"));
+    ["all", ...presentTypes].forEach((type) => {
+      const title = type === "all" ? copy().all : typeTitle(type);
+      const button = element("button", `plugin-filter${selectedType === type ? " active" : ""}`, title);
       button.type = "button";
-      button.dataset.layer = layer.id;
-      button.setAttribute("aria-pressed", String(selectedLayer === layer.id));
+      button.dataset.layer = type;
+      button.setAttribute("aria-pressed", String(selectedType === type));
       button.addEventListener("click", () => {
-        selectedLayer = layer.id;
+        selectedType = type;
         renderFilters();
         renderCatalog();
       });
@@ -49,130 +75,140 @@
     });
   }
 
-  function cardFor(item) {
-    const copy = labels();
-    const publications = Array.isArray(item.publications) ? item.publications : [];
-    const card = element("article", `plugin-card${publications.length ? " has-publication" : ""}`);
-    const top = element("div", "plugin-card-top");
-    top.append(element("span", "plugin-code", item.code));
-    const badges = element("div", "plugin-badges");
-    if (item.origin === "existing") badges.append(element("span", "plugin-badge existing", copy.existing));
-    if (item.origin === "connector") {
-      const connectorLayer = manifest.layers.find((layer) => layer.id === "connectors");
-      const program = element("a", "plugin-badge connector", `${copy.controlPlane} ↗`);
-      program.href = connectorLayer.reference_url;
-      program.target = "_blank";
-      program.rel = "noopener noreferrer";
-      badges.append(program);
-    }
-    if (publications.length) badges.append(element("span", "plugin-badge publication", `${publications.length} ${copy.paper}`));
-    badges.append(element("span", `plugin-badge status-${item.status}`, statusText(item)));
-    top.append(badges);
-    card.append(top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
+  function badge(text, className = "") {
+    return element("span", `plugin-badge ${className}`.trim(), text);
+  }
 
-    if (publications.length) {
-      const list = element("div", "plugin-publications");
-      publications.forEach((publication) => {
-        const link = element("a", "plugin-publication");
-        link.href = publication.url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        const meta = element("span", "plugin-publication-meta", `${local(publication, "status")} · ${publication.venue} ${publication.year}`);
-        link.append(meta, element("strong", "", local(publication, "title")), element("span", "plugin-publication-open", `${copy.paper} ↗`));
-        list.append(link);
-      });
-      card.append(list);
+  function renderCard(item) {
+    const card = element("article", "plugin-card");
+    const top = element("div", "plugin-card-top");
+    top.append(element("span", "plugin-code", item.id));
+    const badges = element("div", "plugin-badges");
+    badges.append(
+      badge(typeTitle(item.artifact_type), "existing"),
+      badge(valueLabel(item.maturity), `status-${item.maturity}`)
+    );
+    top.append(badges);
+
+    card.append(top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
+    const facts = element("dl", "plugin-component-facts");
+    [
+      [copy().planes, item.execution_planes.map(valueLabel).join(" · ")],
+      [copy().delivery, valueLabel(item.delivery_model)],
+      [copy().ownership, valueLabel(item.ownership)],
+      [copy().evidence, valueLabel(item.evidence_level)]
+    ].forEach(([label, value]) => {
+      const row = element("div");
+      row.append(element("dt", "", label), element("dd", "", value));
+      facts.append(row);
+    });
+    card.append(facts);
+
+    if (item.integration_contracts.length) {
+      const contracts = element("div", "plugin-contracts");
+      item.integration_contracts.forEach((contract) => contracts.append(element("code", "", contract)));
+      card.append(contracts);
     }
 
     const footer = element("div", "plugin-card-footer");
-    footer.append(element("span", "plugin-kind", local(item, "kind")));
-    if (item.repository_url) {
-      const link = element("a", "plugin-repository", `${copy.repository} ↗`);
-      link.href = item.repository_url;
+    footer.append(element("span", "plugin-kind", valueLabel(item.system_role)));
+    if (item.canonical_repository) {
+      const link = element("a", "plugin-repository", `${copy().repository} ↗`);
+      link.href = item.canonical_repository;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
       footer.append(link);
     } else {
-      footer.append(element("span", "plugin-repository withheld", copy.withheld));
+      footer.append(element("span", "plugin-repository withheld", copy().noRepository));
     }
     card.append(footer);
     return card;
   }
 
-  function renderAdjacent() {
+  function renderBoundaries() {
+    if (!adjacent) return;
     adjacent.replaceChildren();
-    manifest.adjacent_assets.forEach((item) => {
-      const card = element("a", "adjacent-card");
-      card.href = item.repository_url;
-      card.target = "_blank";
-      card.rel = "noopener noreferrer";
-      card.append(element("span", "plugin-code", item.code), element("h3", "", item.name), element("p", "", local(item, "summary")), element("strong", "", `${labels().repository} ↗`));
+    const boundaries = language() === "zh" ? [
+      ["Plugin bundle", "负责交付、校验、启停与治理，不定义 scheduler、KV 或 platform 业务协议。"],
+      ["KV connector", "是 vLLM 与状态系统的 scheduler/worker 适配契约，不等于存储系统本身。"],
+      ["Control plane", "在 vLLM 进程外做跨实例决策，只通过版本化 action/receipt bridge 接入。"]
+    ] : [
+      ["Plugin bundle", "Owns delivery, validation, enablement, and governance; it does not redefine scheduler, KV, or platform protocols."],
+      ["KV connector", "Is the scheduler/worker adapter between vLLM and a state system, not the storage system itself."],
+      ["Control plane", "Makes cross-instance decisions outside vLLM and integrates only through versioned action/receipt bridges."]
+    ];
+    boundaries.forEach(([title, summary]) => {
+      const card = element("article", "adjacent-card");
+      card.append(element("span", "plugin-code", copy().boundaries), element("h3", "", title), element("p", "", summary));
       adjacent.append(card);
     });
-    document.querySelectorAll("[data-adjacent-count]").forEach((node) => { node.textContent = String(manifest.adjacent_assets.length).padStart(2, "0"); });
   }
 
   function renderCatalog() {
     const query = search.value.trim().toLowerCase();
-    const visible = manifest.plugins.filter((item) => {
-      const layer = manifest.layers.find((candidate) => candidate.id === item.layer);
-      const publications = Array.isArray(item.publications) ? item.publications : [];
-      const publicationText = publications.flatMap((publication) => [local(publication, "title"), local(publication, "status"), publication.venue, publication.year]).join(" ");
-      const text = [item.name, item.code, local(item, "summary"), local(item, "kind"), local(layer || {}, "title"), publicationText].join(" ").toLowerCase();
-      const matchesSelection = selectedLayer === "all" || item.layer === selectedLayer || (selectedLayer === "publications" && publications.length > 0);
-      return matchesSelection && (!query || text.includes(query));
+    const visible = registry.components.filter((item) => {
+      const text = [
+        item.id, item.name, local(item, "summary"), item.artifact_type,
+        item.system_role, item.delivery_model, item.ownership, item.maturity,
+        item.evidence_level, item.execution_planes.join(" "),
+        item.integration_contracts.join(" "), item.canonical_repository || ""
+      ].join(" ").toLowerCase();
+      return (selectedType === "all" || item.artifact_type === selectedType) && text.includes(query);
     });
 
     catalog.replaceChildren();
-    manifest.layers.forEach((layer, index) => {
-      const items = visible.filter((item) => item.layer === layer.id);
+    Object.keys(typeLabels).forEach((type, index) => {
+      const items = visible.filter((item) => item.artifact_type === type);
       if (!items.length) return;
       const section = element("section", "plugin-layer");
       const head = element("div", "plugin-layer-head");
       const identity = element("div", "plugin-layer-identity");
-      identity.append(element("span", "plugin-layer-index", String(index + 1).padStart(2, "0")), element("h2", "", local(layer, "title")));
-      head.append(identity, element("p", "", local(layer, "summary")), element("strong", "plugin-layer-count", String(items.length).padStart(2, "0")));
+      identity.append(element("span", "plugin-layer-index", String(index + 1).padStart(2, "0")), element("h2", "", typeTitle(type)));
+      head.append(identity, element("p"), element("strong", "plugin-layer-count", String(items.length).padStart(2, "0")));
       const grid = element("div", "plugin-grid");
-      items.forEach((item) => grid.append(cardFor(item)));
+      items.forEach((item) => grid.append(renderCard(item)));
       section.append(head, grid);
       catalog.append(section);
     });
-
-    const copy = labels();
-    status.textContent = visible.length ? `${visible.length} ${copy.entries}` : copy.empty;
+    status.textContent = visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
   }
+
+  search.addEventListener("input", renderCatalog);
+  search.placeholder = copy().searchPlaceholder;
 
   fetch(catalog.dataset.source)
     .then((response) => {
-      if (!response.ok) throw new Error(`plugin manifest request failed: ${response.status}`);
+      if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
       return response.json();
     })
     .then((payload) => {
-      if (payload.schema_version !== 1 || !Array.isArray(payload.layers) || !Array.isArray(payload.plugins) || !Array.isArray(payload.adjacent_assets)) {
-        throw new Error("unsupported plugin manifest");
+      if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
+        throw new Error("unsupported ecosystem registry");
       }
-      manifest = payload;
-      document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.plugins.length); });
-      const runtimeCount = payload.plugins.filter((item) => item.origin === "existing" && item.repository_url).length;
-      const publicationCount = payload.plugins.reduce((count, item) => count + (Array.isArray(item.publications) ? item.publications.length : 0), 0);
-      document.querySelectorAll("[data-runtime-count]").forEach((node) => { node.textContent = String(runtimeCount).padStart(2, "0"); });
-      document.querySelectorAll("[data-publication-count]").forEach((node) => { node.textContent = String(publicationCount).padStart(2, "0"); });
-      const reviewTargetCount = document.querySelectorAll(".review-grid > article").length;
-      document.querySelectorAll("[data-review-target-count]").forEach((node) => { node.textContent = String(reviewTargetCount).padStart(2, "0"); });
+      registry = payload;
+      document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
+      const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
+      const incubating = payload.components.filter((item) => ["concept", "incubating", "experimental"].includes(item.maturity)).length;
+      const evidence = payload.components.filter((item) => ["hardware_verified", "performance_verified", "production_observed"].includes(item.evidence_level)).length;
+      const external = payload.components.filter((item) => item.artifact_type === "external_system").length;
+      document.querySelectorAll("[data-runtime-count]").forEach((node) => { node.textContent = String(supported).padStart(2, "0"); });
+      document.querySelectorAll("[data-review-target-count]").forEach((node) => { node.textContent = String(incubating).padStart(2, "0"); });
+      document.querySelectorAll("[data-publication-count]").forEach((node) => { node.textContent = String(evidence).padStart(2, "0"); });
+      document.querySelectorAll("[data-adjacent-count]").forEach((node) => { node.textContent = String(external).padStart(2, "0"); });
       renderFilters();
       renderCatalog();
-      renderAdjacent();
+      renderBoundaries();
     })
     .catch((error) => {
-      status.textContent = language() === "zh" ? "插件清单加载失败，请打开版本化 manifest。" : "The plugin plan could not be loaded. Open the versioned manifest.";
+      status.textContent = language() === "zh" ? "生态目录加载失败，请检查规范 registry。" : "The ecosystem catalog could not be loaded. Check the canonical registry.";
       status.title = error.message;
     });
 
-  search.addEventListener("input", () => { if (manifest) renderCatalog(); });
-  window.addEventListener("vllm-hust:langchange", () => {
-    if (!manifest) return;
+  window.addEventListener("vllm-hust-language-change", () => {
+    if (!registry) return;
+    search.placeholder = copy().searchPlaceholder;
     renderFilters();
     renderCatalog();
-    renderAdjacent();
+    renderBoundaries();
   });
 })();
