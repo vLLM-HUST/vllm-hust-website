@@ -32,6 +32,8 @@
     ownership: "维护",
     planes: "执行面",
     delivery: "交付",
+    contracts: "版本化契约",
+    surfaces: "现有接入面",
     boundaries: "关键边界",
     repositories: "个组织仓库",
     repositoryEmpty: "没有符合当前搜索条件的仓库。",
@@ -48,6 +50,8 @@
     ownership: "Ownership",
     planes: "Planes",
     delivery: "Delivery",
+    contracts: "Versioned contracts",
+    surfaces: "Existing surfaces",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
     repositoryEmpty: "No repositories match the current search.",
@@ -128,9 +132,17 @@
     card.append(facts);
 
     if (item.integration_contracts.length) {
-      const contracts = element("div", "plugin-contracts");
+      const contracts = element("div", "plugin-contracts typed-contracts");
+      contracts.append(element("span", "plugin-interface-label", copy().contracts));
       item.integration_contracts.forEach((contract) => contracts.append(element("code", "", contract)));
       card.append(contracts);
+    }
+    const surfaces = item.integration_surfaces || [];
+    if (surfaces.length) {
+      const surfaceList = element("div", "plugin-contracts integration-surfaces");
+      surfaceList.append(element("span", "plugin-interface-label", copy().surfaces));
+      surfaces.forEach((surface) => surfaceList.append(element("code", "", surface)));
+      card.append(surfaceList);
     }
 
     const footer = element("div", "plugin-card-footer");
@@ -245,7 +257,9 @@
         item.id, item.name, local(item, "summary"), item.artifact_type,
         item.system_role, item.delivery_model, item.ownership, item.maturity,
         item.evidence_level, item.execution_planes.join(" "),
-        item.integration_contracts.join(" "), item.canonical_repository || ""
+        item.integration_contracts.join(" "),
+        (item.integration_surfaces || []).join(" "),
+        item.canonical_repository || ""
       ].join(" ").toLowerCase();
       return (selectedType === "all" || item.artifact_type === selectedType) && text.includes(query);
     });
