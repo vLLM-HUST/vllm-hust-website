@@ -75,6 +75,15 @@
         return Number.isFinite(value) ? `${value > 0 ? '+' : ''}${value.toFixed(2)}%` : escapeHtml(cell.delta_pct);
     }
 
+    function detailMetadata(cell, data) {
+        const provenance = cell.provenance || {};
+        return {
+            model: cell.model || data.scenario?.model || t('notProvided'),
+            hardware: cell.hardware || data.scenario?.hardware || t('notProvided'),
+            provenance: provenance.job_url || provenance.artifact || data.source?.artifact_url || t('notProvided'),
+        };
+    }
+
     function allCells() {
         const cells = [];
         state.data.datasets.forEach((dataset) => state.data.metrics.forEach((metric) => cells.push(getCell(dataset, metric))));
@@ -141,12 +150,12 @@
         const metric = state.data.metrics.find((item) => item.id === metricId);
         if (!dataset || !metric) { panel.hidden = true; return; }
         const cell = getCell(dataset, metric);
-        const provenance = cell.provenance || {};
+        const metadata = detailMetadata(cell, state.data);
         $('validation-detail-title').textContent = `${dataset.label} / ${metric.label}`;
         $('validation-detail-status').className = `validation-status validation-status--${cell.status}`;
         $('validation-detail-status').textContent = statusLabel(cell.status);
         $('validation-detail-description').textContent = `${dataset.description || ''} - ${metric.unit || ''}`;
-        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.current_value ?? cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd><dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(cell.model || state.data.scenario.model || t('notProvided'))}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(cell.hardware || state.data.scenario.hardware || t('notProvided'))}</dd><dt>${t('provenance')}</dt><dd>${escapeHtml(provenance.job_url || provenance.artifact || state.data.source.artifact_url || t('notProvided'))}</dd>`;
+        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.current_value ?? cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd><dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(metadata.model)}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(metadata.hardware)}</dd><dt>${t('provenance')}</dt><dd>${escapeHtml(metadata.provenance)}</dd>`;
         panel.hidden = false;
     }
 
