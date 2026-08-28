@@ -179,9 +179,11 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     assert remote_sidecar["artifact_type"] == "bridge"
     assert remote_sidecar["system_role"] == "control_plane_bridge"
     assert remote_sidecar["deployment_topology"] == "sidecar"
-    assert remote_sidecar["delivery_model"] == "external_service"
-    assert remote_sidecar["maturity"] == "concept"
-    assert remote_sidecar["canonical_repository"] is None
+    assert remote_sidecar["delivery_model"] == "python_distribution"
+    assert remote_sidecar["maturity"] == "experimental"
+    assert remote_sidecar["canonical_repository"] == (
+        "https://github.com/vLLM-HUST/vllm-hust"
+    )
     assert local_host["artifact_type"] == "bridge"
     assert local_host["system_role"] == "control_plane_bridge"
     assert local_host["execution_planes"] == ["api", "bridge"]
@@ -192,22 +194,17 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
         "vllm.control.action.v1",
         "vllm.control.receipt.v1",
     ]
-    assert remote_sidecar["evidence_level"] == "descriptor_only"
+    assert remote_sidecar["evidence_level"] == "integration_tested"
     assert local_host["evidence_level"] == "integration_tested"
     assert "control plane makes external decisions through a narrow bridge" in PAGE
     assert "admission" in PAGE
-    assert "fixed spawned worker" in PAGE
-    assert "exact-wire HMAC" in PAGE
-    assert "durable replay" in PAGE
-    assert "catalog now separates three layers" in PAGE
-    assert "local same-UID, message-authenticated, bounded Unix-socket host" in PAGE
-    assert "authoritative EngineClient health observations" in PAGE
-    assert "versioned key IDs" in PAGE
-    assert "serialized authority lane" in PAGE
-    assert "explicit, default-off configuration" in PAGE
-    assert "separate permission-protected files" in PAGE
-    assert "no production remote transport" in PAGE
-    assert "TLS/mTLS identity" in PAGE
+    assert "local host still owns HMAC, schemas, authorization, replay" in PAGE
+    assert "catalog separates three layers" in PAGE
+    assert "TLS 1.3 mutual-authentication sidecar" in PAGE
+    assert "allowlists client certificate fingerprints" in PAGE
+    assert "forwards exact bounded frames" in PAGE
+    assert "production certificate issuance, revocation, audit" in PAGE
+    assert "mutating action contracts remain release gates" in PAGE
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
