@@ -126,7 +126,9 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "先定义领域契约，再定义 bundle 交付。" in PAGE
     assert "VLLM_EXTENSION_MANIFESTS" in PAGE
     assert "VLLM_EXTENSION_BUNDLES" in PAGE
-    assert "Static admission is not runtime compatibility" in PAGE
+    assert "One materializer does not prove ecosystem compatibility" in PAGE
+    assert 'victim_selector_component="bundle-id/component-id"' in PAGE
+    assert "BidKV remains on the compatibility path" in PAGE
     assert "plugin-standard-v1.0.pdf" not in PAGE
 
 
