@@ -131,8 +131,8 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "Conflicting ordered layouts fail before import" in page
     assert "KVTransferConfig keeps typed and legacy paths mutually exclusive" in page
     assert "forwards recovery lifecycle signals" in page
-    assert "Typed single selections now materialize through KVConnectorFactory" in page
-    assert "typed ordered_multi construction remains explicitly unavailable" in page
+    assert "Typed single and ordered_multi selections now materialize" in page
+    assert "keyed by logical connector ID instead of class name" in page
     assert 'VLLM_EXTENSION_MANIFESTS="/opt/a.json:/opt/b.json"' in page
     assert 'VLLM_EXTENSION_BUNDLES="org.example.kv-adapter"' in page
     assert 'VLLM_PLUGINS="existing-legacy-plugin"' in page

@@ -204,8 +204,8 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "Conflicting ordered layouts fail before import" in PAGE
     assert "KVTransferConfig keeps typed and legacy paths mutually exclusive" in PAGE
     assert "forwards recovery lifecycle signals" in PAGE
-    assert "Typed single selections now materialize through KVConnectorFactory" in PAGE
-    assert "typed ordered_multi construction remains explicitly unavailable" in PAGE
+    assert "Typed single and ordered_multi selections now materialize" in PAGE
+    assert "keyed by logical connector ID instead of class name" in PAGE
     assert "kv-systems-and-connector-materialization.md" in PAGE
     assert "control-plane-and-runtime-bridge.md" in PAGE
     assert "ecosystem-reorganization-release-candidate.json" in PAGE
