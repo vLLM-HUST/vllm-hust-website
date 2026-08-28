@@ -1009,16 +1009,13 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     assert "font-size: clamp(" not in css_text
 
 
-def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
+def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert (
-        "Programmable KV and scheduling. Graph-aware execution. "
-        "Portable hardware plugins."
-    ) in html_text
-    assert "KV 与调度可编程，模型执行感知计算图，硬件能力以插件接入。" in html_text
+    assert "Typed runtime contracts. Platform profiles. Composable KV state systems." in html_text
+    assert "类型化运行时契约、平台 profile 与可组合 KV 状态系统。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
@@ -1044,8 +1041,8 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
         assert f"https://github.com/vLLM-HUST/{repository}" in html_text
 
     proving_ground = html_text.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
-    assert "Runtime Contract" in proving_ground
-    assert "Plugin Interfaces" in proving_ground
+    assert "Runtime Contracts" in proving_ground
+    assert "Ecosystem Interfaces" in proving_ground
     assert "Validation Matrix" in proving_ground
     assert "Benchmark Contract" in proving_ground
     assert "vllm-ascend-hust" not in proving_ground

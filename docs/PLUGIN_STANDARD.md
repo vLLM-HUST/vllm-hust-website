@@ -1,5 +1,13 @@
 # vLLM-HUST Plugin Standard 1.0
 
+> **Legacy compatibility profile.** This document describes the current
+> Python entry-point delivery mechanism. It is not the organization-wide
+> architecture for platform profiles, KV state systems, control planes,
+> device hot paths, or engineering tools. New classifications are sourced
+> from `vllm-hust-docs/registry/ecosystem-components.json`; the replacement
+> bundle specification and typed domain contracts are being introduced
+> separately.
+
 This specification defines the minimum development and operations contract for a vLLM-HUST plugin.
 It complements the plugin catalog: the catalog explains what extensions are planned or available,
 while this document explains how a conforming extension is built and operated.

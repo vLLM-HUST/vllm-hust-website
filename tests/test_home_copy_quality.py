@@ -38,12 +38,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "Programmable KV and scheduling. Graph-aware execution. Portable hardware plugins.",
-        "Replace serving policy, model execution, and hardware through reversible plugins, with matched evidence for every gain.",
+        "Typed runtime contracts. Platform profiles. Composable KV state systems.",
+        "Connect policies, platforms, KV systems, and control planes through typed boundaries, with matched support evidence.",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "KV 与调度可编程，模型执行感知计算图，硬件能力以插件接入。",
+        "类型化运行时契约、平台 profile 与可组合 KV 状态系统。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
