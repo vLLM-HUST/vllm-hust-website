@@ -126,8 +126,9 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "zero typed providers still use the legacy entry point" in page
     assert "Other domain materializers remain pending" in page
     assert "explicit ordered composition" in page
+    assert "declared HMA/piecewise capabilities" in page
     assert "forwards recovery lifecycle signals" in page
-    assert "KVConnectorFactory integration is still pending" in page
+    assert "in-process capability verification are still pending" in page
     assert 'VLLM_EXTENSION_MANIFESTS="/opt/a.json:/opt/b.json"' in page
     assert 'VLLM_EXTENSION_BUNDLES="org.example.kv-adapter"' in page
     assert 'VLLM_PLUGINS="existing-legacy-plugin"' in page
