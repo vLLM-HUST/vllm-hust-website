@@ -64,9 +64,21 @@
     tool: { en: "Engineering and evidence", zh: "工程与证据" },
     application: { en: "Applications", zh: "应用与展示" }
   };
+  const domainLabels = {
+    runtime_platform: { en: "Runtime and platform", zh: "运行时与平台" },
+    kv_state_data_path: { en: "KV state and data path", zh: "KV 状态与数据路径" },
+    compiler_runtime: { en: "Compiler and runtime substrate", zh: "编译器与运行时底座" },
+    development_operations: { en: "Development and operations", zh: "开发与运维" },
+    evidence_analysis: { en: "Evidence and analysis", zh: "评测与分析" },
+    documentation_product: { en: "Documentation and product", zh: "文档与产品" },
+    applications_research: { en: "Applications and research", zh: "应用与研究" }
+  };
 
   const valueLabel = (value) => String(value).replaceAll("_", " ");
   const typeTitle = (type) => (typeLabels[type] || { en: valueLabel(type), zh: valueLabel(type) })[language()];
+  const domainTitle = (domain) => (
+    domainLabels[domain] || { en: valueLabel(domain), zh: valueLabel(domain) }
+  )[language()];
 
   function renderFilters() {
     const presentTypes = [...new Set(registry.components.map((item) => item.artifact_type))];
@@ -180,7 +192,7 @@
       const section = element("section", "repository-domain");
       const heading = element("div", "repository-domain-head");
       heading.append(
-        element("h3", "", valueLabel(domain)),
+        element("h3", "", domainTitle(domain)),
         element("strong", "", String(repositories.length).padStart(2, "0"))
       );
       const grid = element("div", "repository-grid");

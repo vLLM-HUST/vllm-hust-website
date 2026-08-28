@@ -154,7 +154,7 @@ html[lang="zh"] .lang-zh { display: inline; }
 .plugin-repository { padding: 6px 8px; color: #0c1112; border: 1px solid #a8d951; background: #e7f2cc; font-size: 10px; font-weight: 800; text-decoration: none; text-transform: uppercase; }
 .plugin-repository:hover { color: #fff; background: #0c1112; border-color: #0c1112; }
 .plugin-repository.withheld { color: #7b5550; border-color: transparent; background: #f5e4df; }
-.repository-portfolio { margin-top: 42px !important; padding: 0 !important; overflow: hidden; }
+.repository-portfolio { margin-top: 42px !important; padding: 0 !important; overflow: hidden; scroll-margin-top: 88px; }
 .portfolio-head { padding: 32px; display: grid; grid-template-columns: minmax(0,1fr) minmax(280px,.9fr); gap: 42px; align-items: end; color: #fff; background: #101818; }
 .portfolio-head h2 { margin: 12px 0 0; color: #fff; font-size: clamp(30px,4vw,50px); line-height: 1; }
 .portfolio-head p { margin: 0; color: #b7c3c1; }
