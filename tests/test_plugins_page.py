@@ -57,6 +57,7 @@ def test_system_role_is_independent_from_delivery_model() -> None:
     assert "system_role" in SCRIPT
     assert "delivery_model" in SCRIPT
     assert "execution_planes" in SCRIPT
+    assert 'document.documentElement.lang.toLowerCase().startsWith("zh")' in SCRIPT
 
 
 def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:

@@ -9,7 +9,7 @@
   let registry;
   let selectedType = "all";
 
-  const language = () => document.documentElement.lang === "zh-CN" ? "zh" : "en";
+  const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
   const element = (tag, className = "", text = "") => {
     const node = document.createElement(tag);
