@@ -127,6 +127,7 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "Other domain materializers remain pending" in page
     assert "explicit ordered composition" in page
     assert "declared HMA/piecewise capabilities" in page
+    assert "KVTransferConfig normalizes that topology" in page
     assert "forwards recovery lifecycle signals" in page
     assert "in-process capability verification are still pending" in page
     assert 'VLLM_EXTENSION_MANIFESTS="/opt/a.json:/opt/b.json"' in page

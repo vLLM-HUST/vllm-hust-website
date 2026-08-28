@@ -200,6 +200,7 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "BidKV remains on the compatibility path" in PAGE
     assert "explicit ordered composition" in PAGE
     assert "declared HMA/piecewise capabilities" in PAGE
+    assert "KVTransferConfig normalizes that topology" in PAGE
     assert "forwards recovery lifecycle signals" in PAGE
     assert "in-process capability verification are still pending" in PAGE
     assert "kv-systems-and-connector-materialization.md" in PAGE
