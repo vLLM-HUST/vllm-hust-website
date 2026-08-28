@@ -14,6 +14,7 @@ def test_required_entry_files_exist() -> None:
     required = [
         root / "index.html",
         root / "leaderboard.html",
+        root / "dataset-validation.html",
         root / "achievements.html",
         root / "contributors.html",
         root / "conferences.html",
@@ -131,6 +132,42 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert ".research-member-detail-row" in css
     assert ".research-member-group + .research-member-group" in css
     assert "@media (max-width: 860px)" in css
+
+
+def test_dataset_validation_page_uses_versioned_contract() -> None:
+    root = Path(__file__).resolve().parents[1]
+    page = (root / "dataset-validation.html").read_text(encoding="utf-8")
+    script = (root / "assets" / "dataset-validation.js").read_text(encoding="utf-8")
+    fixture = root / "data" / "dataset_validation_v1.empty.json"
+    fixture_data = json.loads(fixture.read_text(encoding="utf-8"))
+
+    assert fixture.exists()
+    assert len(fixture_data["datasets"]) == 44
+    assert fixture_data["datasets"][0]["id"] == "a01"
+    assert fixture_data["datasets"][-1]["id"] == "a44"
+    assert 'data-page="dataset-validation"' in page
+    assert "dataset-validation-v1" in page
+    assert "dataset-validation-v1" in script
+    assert "Empty cells are intentionally shown" in page
+    assert 'href="./dataset-validation.html"' in page
+    assert "Result references an undeclared dataset or metric" in script
+    assert "Duplicate result cell" in script
+    assert "Unsupported result status" in script
+    assert "vllmHustDatasetValidationConfig?.dataUrl" in script
+    assert 'id="validation-freshness"' in page
+    assert 'id="validation-dataset-search"' in page
+    assert 'id="validation-group-filter"' in page
+    assert 'id="validation-pagination"' in page
+    assert "pageSize: 20" in script
+    assert "TREND_ORDER" in script
+    assert "formatBaselineValue" in script
+    assert "validation-cell-pair" in script
+    assert "?demo=1" in (root / "data" / "DATASET_VALIDATION_RESULTS.md").read_text(
+        encoding="utf-8"
+    )
+    assert "position: sticky" in (root / "assets" / "dataset-validation.css").read_text(
+        encoding="utf-8"
+    )
 
 
 def test_data_directory_has_sync_marker() -> None:

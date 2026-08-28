@@ -81,6 +81,15 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 
 website does not ingest raw compare directories and does not hand-edit benchmark rows.
 
+The dataset validation results surface is a separate, read-only path. The independent fixed-machine
+validation service runs after a PR, then publishes a versioned result artifact for the website to
+display at [`dataset-validation.html`](dataset-validation.html). The website does not trigger that
+service and does not perform evaluation, admission, publication, or merge-gate work. The frontend
+contract and empty local fixture are documented in
+[`data/DATASET_VALIDATION_RESULTS.md`](data/DATASET_VALIDATION_RESULTS.md). The existing leaderboard
+snapshot chain below remains a legacy compatibility surface until its replacement data contract is
+explicitly migrated; it must not be used as the dataset validation service contract.
+
 The only supported leaderboard data chain is:
 
 1. Any benchmark pipeline that exports standard leaderboard artifacts (`leaderboard_manifest.json` +
