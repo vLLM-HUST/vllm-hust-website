@@ -263,6 +263,9 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "This is materialization equivalence, not service" in PAGE
     assert "missing-dependency materialization behavior" in PAGE
     assert "Real-run readiness is recorded separately" in PAGE
+    assert "PegaFlow uses one controlled runtime" in PAGE
+    assert "root-owned hard-coded Conda activation is gone" in PAGE
+    assert "blocked only because pegaflow-server was not built" in PAGE
     assert "This is environment-readiness evidence" in PAGE
     assert "rejects namespace-only imports" in PAGE
     assert "exact core source, engine import, and runnable vLLM CLI" in PAGE
