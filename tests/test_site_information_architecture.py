@@ -122,16 +122,14 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "Domain contracts first; bundles second." in page
     assert "former entry-point-based Plugin Standard 1.0" in page
     assert "Legacy compatibility profile" in standard
-    assert "No hot-unload contract" in page
-    assert 'VLLM_PLUGINS=""' in page
-    assert 'VLLM_PLUGINS="${PLUGIN_ID}"' in page
-    assert "vllm.general_plugins" in page
-    assert "vllm.platform_plugins" in page
-    assert (
-        "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/PLUGIN_STANDARD.md"
-        in page
-    )
-    assert "plugin-standard-v1" in page
+    assert "Static admission is not runtime compatibility" in page
+    assert 'VLLM_EXTENSION_MANIFESTS="/opt/a.json:/opt/b.json"' in page
+    assert 'VLLM_EXTENSION_BUNDLES="org.example.kv-adapter"' in page
+    assert 'VLLM_PLUGINS="existing-legacy-plugin"' in page
+    assert "configured\n  -&gt; parsed" in page
+    assert "Legacy entry-point profile" in page
+    assert "extension-bundle-v1-migration.md" in page
+    assert "plugin-standard-v1.0.pdf" not in page
 
     for section in (
         "Required package structure",
