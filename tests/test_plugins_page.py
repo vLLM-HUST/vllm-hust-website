@@ -160,6 +160,8 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     assert "authoritative EngineClient health observations" in PAGE
     assert "versioned key IDs" in PAGE
     assert "serialized authority lane" in PAGE
+    assert "explicit, default-off configuration" in PAGE
+    assert "separate permission-protected files" in PAGE
     assert "no production remote transport" in PAGE
     assert "TLS/mTLS identity" in PAGE
 
