@@ -264,6 +264,10 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "keyed by logical connector ID instead of class name" in PAGE
     assert "This is materialization equivalence, not service" in PAGE
     assert "missing-dependency materialization behavior" in PAGE
+    assert "API-plane IO processors now use an explicit qualified typed selector" in PAGE
+    assert "Typed stat loggers fan out with distinct legacy providers" in PAGE
+    assert "Platform, operator, and model-runner materializers remain pending" in PAGE
+    assert "stat loggers use typed fan-out with legacy migration deduplication" in PAGE
     assert "Extension release and platform support are separate gates" in PAGE
     assert "17 of 96 upstream-identical fused-MoE BF16 vec cases" in PAGE
     assert "fast-exp alone and reference accumulation order" in PAGE

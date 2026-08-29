@@ -125,7 +125,7 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "One materializer does not prove ecosystem compatibility" in page
     assert "Zero typed providers retain legacy auto-discovery" in page
     assert "explicit victim_selector_plugin must select exactly one" in page
-    assert "Other domain materializers remain pending" in page
+    assert "Platform, operator, and model-runner materializers remain pending" in page
     assert "explicit ordered composition" in page
     assert "declared HMA, piecewise, and cache-layout capabilities" in page
     assert "API-plane telemetry components" in page
