@@ -1,12 +1,10 @@
 # vLLM-HUST Plugin Standard 1.0
 
-> **Legacy compatibility profile.** This document describes the current
-> Python entry-point delivery mechanism. It is not the organization-wide
-> architecture for platform profiles, KV state systems, control planes,
-> device hot paths, or engineering tools. New classifications are sourced
-> from `vllm-hust-docs/registry/ecosystem-components.json`; the replacement
-> bundle specification and typed domain contracts are being introduced
-> separately.
+> **Bundle v1 plus legacy compatibility profile.** New runtime components use
+> static installed-Bundle registration and typed domain contracts. Callable
+> Python entry points remain available for migration; they do not redefine
+> platform profiles, KV state systems, control planes, device hot paths, or
+> engineering tools.
 
 This specification defines the minimum development and operations contract for a vLLM-HUST plugin.
 It complements the plugin catalog: the catalog explains what extensions are planned or available,
@@ -15,13 +13,44 @@ while this document explains how a conforming extension is built and operated.
 ## 1. Scope
 
 A conforming plugin is an independently versioned Python distribution that extends vLLM through a
-supported Python entry-point group. It installs without modifying the vLLM-HUST source tree and can
+supported typed Bundle contract or legacy Python entry-point group. It installs without modifying the vLLM-HUST source tree and can
 be enabled, verified, disabled, and removed through a documented process.
 
 Compiler backends, model-conversion tools, benchmark suites, deployment managers, and offline
-analysis tools are adjacent assets unless they register a vLLM runtime entry point.
+analysis tools are adjacent assets unless they expose a vLLM runtime component.
 
-## 2. Entry-point groups
+## 2. Installed Bundle registration and activation
+
+A Bundle-capable wheel registers one or more static manifest directories:
+
+```toml
+[project.entry-points."vllm.extension_bundles"]
+"org.example.performance" = "example_plugin.manifests"
+```
+
+The directory contains exactly one `vllm-hust-extension-v1.json`; the legacy
+`extension-bundle-v1.json` filename remains accepted during migration. The
+entry-point value has no callable. vLLM reads wheel `RECORD` metadata—or the
+local `direct_url.json` of a PEP 660 editable install—without calling
+`EntryPoint.load()` or importing the plugin package.
+
+Installation registers availability but changes no serving behavior:
+
+```bash
+uv pip install example-performance-plugin
+vllm plugin list
+vllm plugin inspect org.example.performance
+vllm plugin validate org.example.performance
+vllm serve MODEL --extension org.example.performance
+```
+
+An unset selection scans no installed distributions. Only exact selected IDs
+are resolved. Unknown, duplicate, ambiguous, malformed, incompatible, or
+permission-denied registrations fail before implementation import. Explicit
+manifest paths remain available for development and take precedence for the
+same Bundle ID.
+
+## 3. Legacy callable entry-point groups
 
 Choose the narrowest supported group:
 
@@ -36,7 +65,7 @@ Choose the narrowest supported group:
 library, model-preparation utility, or benchmark is not a platform plugin merely because a runtime
 uses it.
 
-## 3. Required package structure
+## 4. Required package structure
 
 ```text
 <plugin-repository>/
@@ -66,7 +95,7 @@ version = "<version>"
 The distribution name, import package, and plugin ID may differ, but each must remain stable within
 a release line and must be documented together.
 
-## 4. Registration contract
+## 5. Registration contract
 
 Registration must be re-entrant because vLLM can load plugins in multiple processes and can invoke
 the same registration path more than once.
@@ -93,7 +122,7 @@ A conforming registration function:
 - fails visibly when a required hook or compatibility condition is unavailable; and
 - does not contain machine-specific paths, ports, device IDs, credentials, or model locations.
 
-## 5. Compatibility and configuration
+## 6. Compatibility and configuration
 
 Each release documents:
 
@@ -107,7 +136,7 @@ Each release documents:
 Configuration names must use a plugin-specific prefix. Secrets must not appear in source, logs,
 manifests, command examples, or generated artifacts.
 
-## 6. Build, install, and discovery
+## 7. Build, install, and discovery
 
 Build a wheel and install it into the exact Python environment used by the serving processes on
 every node:
@@ -130,7 +159,7 @@ Before startup, verify that the expected entry point is discoverable from that s
 
 Installation alone does not prove activation.
 
-## 7. Enable and start
+## 8. Enable and start
 
 Production services use an explicit allowlist:
 
@@ -148,7 +177,7 @@ plugin. If it is set to an empty string, vLLM loads none.
 All service-manager, container, model, port, and device values remain deployment inputs. They must
 not be embedded in a plugin or in shared launch tooling.
 
-## 8. Verify
+## 9. Verify
 
 Activation requires all of the following:
 
@@ -167,7 +196,7 @@ curl --fail --silent "http://127.0.0.1:${PORT}/v1/models"
 A smoke result validates discovery and lifecycle only. A performance claim requires a matched
 baseline and treatment with the same model, requests, runtime, topology, and hardware allocation.
 
-## 9. Stop and disable
+## 10. Stop and disable
 
 vLLM plugins are process-scoped; Standard 1.0 does not define hot unload.
 
@@ -192,7 +221,7 @@ wait "${SERVER_PID}"
 For a supervised deployment, use the supervisor's scoped stop operation instead of signaling a child
 process behind the supervisor.
 
-## 10. Remove and roll back
+## 11. Remove and roll back
 
 Only uninstall after every consuming process has stopped:
 
@@ -205,7 +234,7 @@ Then verify that the entry point is absent, restart the baseline with an explici
 readiness probe, and retain the previous wheel and configuration until rollback verification is
 complete.
 
-## 11. Conformance tests
+## 12. Conformance tests
 
 A plugin may be presented as **vLLM-HUST conforming** only when automated tests cover:
 

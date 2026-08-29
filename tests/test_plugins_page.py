@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = json.loads((ROOT / "data" / "ecosystem.json").read_text(encoding="utf-8"))
 PORTFOLIO = json.loads(
@@ -224,8 +223,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         item for item in PORTFOLIO["repositories"] if item["name"] == "pegaflow-hust"
     )
     lmcache_ascend = next(
-        item for item in PORTFOLIO["repositories"]
-        if item["name"] == "LMCache-Ascend"
+        item for item in PORTFOLIO["repositories"] if item["name"] == "LMCache-Ascend"
     )
     assert pegaflow["repository_role"] == "external_subsystem"
     assert pegaflow["component_ids"] == [
@@ -238,17 +236,20 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         "lmcache-ascend-vllm-adapter",
     ]
     assert "Repositories are governance boundaries, not runtime types." in PAGE
-    assert 'data-source="./data/repository-portfolio.json?v=repository-portfolio-v1"' in PAGE
+    assert (
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v1"'
+        in PAGE
+    )
     assert "repository portfolio request failed" in SCRIPT
 
 
-def test_plugin_standard_is_explicitly_legacy() -> None:
-    assert "Legacy compatibility profile" in LEGACY_STANDARD
+def test_plugin_standard_covers_bundle_v1_and_legacy_compatibility() -> None:
+    assert "Bundle v1 plus legacy compatibility profile" in LEGACY_STANDARD
     assert "former entry-point-based Plugin Standard 1.0" in PAGE
     assert "Domain contracts first; bundles second." in PAGE
     assert "先定义领域契约，再定义 bundle 交付。" in PAGE
     assert "VLLM_EXTENSION_MANIFESTS" in PAGE
-    assert "VLLM_EXTENSION_BUNDLES" in PAGE
+    assert "--extension org.example.kv-adapter" in PAGE
     assert "One materializer does not prove ecosystem compatibility" in PAGE
     assert 'victim_selector_component="bundle-id/component-id"' in PAGE
     assert "BidKV's installed legacy/typed contract replay now passes" in PAGE
@@ -264,7 +265,9 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "keyed by logical connector ID instead of class name" in PAGE
     assert "This is materialization equivalence, not service" in PAGE
     assert "missing-dependency materialization behavior" in PAGE
-    assert "API-plane IO processors now use an explicit qualified typed selector" in PAGE
+    assert (
+        "API-plane IO processors now use an explicit qualified typed selector" in PAGE
+    )
     assert "Typed stat loggers fan out with distinct legacy providers" in PAGE
     assert "Platform, operator, and model-runner materializers remain pending" in PAGE
     assert "stat loggers use typed fan-out with legacy migration deduplication" in PAGE
@@ -309,7 +312,7 @@ def test_candidate_architecture_links_use_the_published_docs_branch() -> None:
         "https://github.com/vLLM-HUST/vllm-hust-docs/blob/"
         "codex/ecosystem-architecture-reorganization/"
     )
-    assert f'{prefix}architecture/ecosystem-architecture.md' in PAGE
+    assert f"{prefix}architecture/ecosystem-architecture.md" in PAGE
     assert "vllm-hust-docs/blob/main/architecture/ecosystem-architecture.md" not in PAGE
     assert "PegaFlow is an external KV state system" in PAGE
     assert "multi-component platform profiles" in PAGE
