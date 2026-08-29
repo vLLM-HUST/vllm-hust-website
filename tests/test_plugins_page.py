@@ -264,6 +264,10 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "keyed by logical connector ID instead of class name" in PAGE
     assert "This is materialization equivalence, not service" in PAGE
     assert "missing-dependency materialization behavior" in PAGE
+    assert "Extension release and platform support are separate gates" in PAGE
+    assert "17 of 96 upstream-identical fused-MoE BF16 vec cases" in PAGE
+    assert "fast-exp alone and reference accumulation order" in PAGE
+    assert "instead of changing unrelated extension code" in PAGE
     assert "Real-run readiness is recorded separately" in PAGE
     assert "PegaFlow uses one controlled runtime" in PAGE
     assert "root-owned hard-coded Conda activation is gone" in PAGE
