@@ -69,7 +69,10 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
 
 
 def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
-    assert "Typed runtime contracts. Platform profiles. Composable KV state systems." in HOME
+    assert (
+        "Typed runtime contracts. Platform profiles. Composable KV state systems."
+        in HOME
+    )
     assert "matched support evidence" in HOME
     assert "类型化运行时契约、平台 profile 与可组合 KV 状态系统。" in HOME
     assert "matched 证据支撑支持声明" in HOME
@@ -121,7 +124,7 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "TRANSITION" in page
     assert "Domain contracts first; bundles second." in page
     assert "former entry-point-based Plugin Standard 1.0" in page
-    assert "Legacy compatibility profile" in standard
+    assert "Bundle v1 plus legacy compatibility profile" in standard
     assert "One materializer does not prove ecosystem compatibility" in page
     assert "Zero typed providers retain legacy auto-discovery" in page
     assert "explicit victim_selector_plugin must select exactly one" in page
@@ -135,7 +138,7 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "Typed single and ordered_multi selections now materialize" in page
     assert "keyed by logical connector ID instead of class name" in page
     assert 'VLLM_EXTENSION_MANIFESTS="/opt/a.json:/opt/b.json"' in page
-    assert 'VLLM_EXTENSION_BUNDLES="org.example.kv-adapter"' in page
+    assert "--extension org.example.kv-adapter" in page
     assert 'VLLM_PLUGINS="existing-legacy-plugin"' in page
     assert "configured\n  -&gt; parsed" in page
     assert "Legacy entry-point profile" in page
@@ -172,13 +175,15 @@ def test_plugin_standard_has_portable_allowlist_semantics() -> None:
 
 
 def test_ecosystem_registry_has_docs_as_its_canonical_owner() -> None:
-    registry = json.loads((ROOT / "data" / "ecosystem.json").read_text(encoding="utf-8"))
+    registry = json.loads(
+        (ROOT / "data" / "ecosystem.json").read_text(encoding="utf-8")
+    )
 
     assert registry["schema_version"] == "1.0"
     assert registry["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
     assert (ROOT / "data" / "plugins.legacy.json").is_file()
     standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
-    assert "Legacy compatibility profile" in standard
+    assert "Bundle v1 plus legacy compatibility profile" in standard
 
 
 def test_versions_external_links_have_safe_new_tab_contract() -> None:
