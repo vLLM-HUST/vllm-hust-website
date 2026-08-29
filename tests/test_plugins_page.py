@@ -291,5 +291,14 @@ def test_public_copy_uses_ecosystem_language() -> None:
     assert "推理生态系统架构" in PAGE
     assert "Classify the role before the delivery mechanism." in PAGE
     assert "Plugin, connector, and control plane are different concepts." in PAGE
+
+
+def test_candidate_architecture_links_use_the_published_docs_branch() -> None:
+    prefix = (
+        "https://github.com/vLLM-HUST/vllm-hust-docs/blob/"
+        "codex/ecosystem-architecture-reorganization/"
+    )
+    assert f'{prefix}architecture/ecosystem-architecture.md' in PAGE
+    assert "vllm-hust-docs/blob/main/architecture/ecosystem-architecture.md" not in PAGE
     assert "PegaFlow is an external KV state system" in PAGE
     assert "multi-component platform profiles" in PAGE
