@@ -123,7 +123,8 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "former entry-point-based Plugin Standard 1.0" in page
     assert "Legacy compatibility profile" in standard
     assert "One materializer does not prove ecosystem compatibility" in page
-    assert "zero typed providers still use the legacy entry point" in page
+    assert "Zero typed providers retain legacy auto-discovery" in page
+    assert "explicit victim_selector_plugin must select exactly one" in page
     assert "Other domain materializers remain pending" in page
     assert "explicit ordered composition" in page
     assert "declared HMA, piecewise, and cache-layout capabilities" in page
