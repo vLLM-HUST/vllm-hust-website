@@ -251,7 +251,9 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "VLLM_EXTENSION_BUNDLES" in PAGE
     assert "One materializer does not prove ecosystem compatibility" in PAGE
     assert 'victim_selector_component="bundle-id/component-id"' in PAGE
-    assert "BidKV remains on the compatibility path" in PAGE
+    assert "BidKV's installed legacy/typed contract replay now passes" in PAGE
+    assert "an explicit victim_selector_plugin must select exactly one" in PAGE
+    assert "deterministic contract replay, not real online workload" in PAGE
     assert "explicit ordered composition" in PAGE
     assert "declared HMA, piecewise, and cache-layout capabilities" in PAGE
     assert "API-plane telemetry components" in PAGE
