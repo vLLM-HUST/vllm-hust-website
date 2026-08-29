@@ -273,8 +273,11 @@ def test_plugin_standard_is_explicitly_legacy() -> None:
     assert "legacy, typed, or rollback" in PAGE
     assert "Typed manifest variables are absent from legacy and rollback" in PAGE
     assert "Mooncake admission includes live resources" in PAGE
-    assert "target GPUs and minimum free memory" in PAGE
-    assert "unrelated 32B service occupied both GPUs and the proxy port" in PAGE
+    assert "healthy real 7B prefill/decode services" in PAGE
+    assert "former harness expected a nonexistent proxy /health route" in PAGE
+    assert "missing HUP cleanup path" in PAGE
+    assert "unrelated 32B service reclaimed both GPUs and port 18000" in PAGE
+    assert "final-revision preflight correctly rejected both GPUs" in PAGE
     assert "not a Mooncake failure or real-online result" in PAGE
     assert "kv-systems-and-connector-materialization.md" in PAGE
     assert "control-plane-and-runtime-bridge.md" in PAGE
