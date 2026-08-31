@@ -78,6 +78,15 @@ endpoint. Production Stack Provider renders values and dry-run instructions.
 No Provider performs an implicit service start, Helm apply, uninstall, driver
 change, cache clear/eviction, or KV deletion.
 
+LMCache-Ascend is modeled separately as an LMCache-owned platform backend plus
+a vLLM connector adapter. It is not an external LMCache MP service. The
+`vllm-hust-lmcache-ascend-adapter` profile therefore has no required service,
+and renders either the vLLM-Ascend built-in `LMCacheAscendConnector` or the
+exact official dynamic pair
+`LMCacheAscendConnectorV1Dynamic` /
+`lmcache_ascend.integration.vllm.lmcache_ascend_connector_v1`.
+`LMCacheMPConnector` must not be paired with a fabricated Python module path.
+
 KV Providers delegate a declared `kv_transfer_config` capability to the vLLM
 launch path; dispatch is not hard-coded by Provider name. Because one vLLM
 process accepts only one such configuration, enabling Mooncake and LMCache for
@@ -108,3 +117,11 @@ Current evidence: the official Production Stack chart at commit
 generated resources pass a Kubernetes 1.34.11 server-side dry-run in an
 ephemeral kind cluster. No resources were applied; a real operator-owned
 rollout check remains a release gate.
+
+LMCache MP remains blocked on the current 91 Ascend environment. An isolated
+LMCache 0.4.3 probe built and imported its common `native_storage_ops`, but the
+MP server then required CuPy before `/healthcheck` could become ready. The
+checked LMCache-Ascend commit also leaves `NPUCacheContext` unimplemented and
+skips MP tests. This is recorded as an honest platform-support gap, not replaced
+with a stub health endpoint; CUDA MP health/recovery and Ascend in-process KV
+data-path acceptance remain separate release gates.
