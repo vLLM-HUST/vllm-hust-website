@@ -119,8 +119,21 @@ after a later reinstall.
 Current evidence: the official Production Stack chart at commit
 `1b87c11a24c144f6b63a64dbae4fc8c875059731` renders successfully, and all eight
 generated resources pass a Kubernetes 1.34.11 server-side dry-run in an
-ephemeral kind cluster. No resources were applied; a real operator-owned
-rollout check remains a release gate.
+ephemeral kind cluster. That earlier dry-run applied no resources.
+
+The next isolated test performed an actual operator-owned Helm lifecycle for
+the official `vllm-stack-0.1.12` chart: Router Deployment install at `1/1`,
+upgrade to `2/2`, explicit rollback to `1/1`, a missing-image upgrade that
+failed and automatically rolled back, then uninstall with no release-owned
+resources remaining. A lightweight `/health` OCI fixture avoided models and
+accelerators, so this proves chart/Deployment/rollback behavior—not real Router
+traffic or controller/autoscaler reconciliation. The temporary cluster and
+images were deleted afterward.
+
+The Manager still performs none of those mutations. Its rendered operator plan
+keeps install, upgrade, rollback, and uninstall as `null`; successful cluster
+and rollout states now require non-empty evidence instead of trusting bare
+booleans.
 
 LMCache MP remains blocked on the current 91 Ascend environment. An isolated
 LMCache 0.4.3 probe built and imported its common `native_storage_ops`, but the
