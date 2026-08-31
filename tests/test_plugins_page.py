@@ -145,6 +145,8 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
 def test_extension_manager_and_production_stack_keep_distinct_ownership() -> None:
     manager = by_id("vllm-hust-extension-manager")
     production_stack = by_id("vllm-production-stack")
+    assert production_stack["evidence_level"] == "integration_tested"
+    assert "metrics-backed scaling" in production_stack["summary_en"]
 
     assert manager["artifact_type"] == "tool"
     assert manager["system_role"] == "extension_management"
