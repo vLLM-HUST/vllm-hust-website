@@ -104,7 +104,9 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "https://github.com/vllm-project/vllm"
     )
     assert "experimental LMCache Host Provider" in lmcache_connectors["summary_en"]
+    assert "remote service version and health" in lmcache_connectors["summary_en"]
     assert "不接管 backend、KV 数据或服务生命周期" in lmcache_connectors["summary_zh"]
+    assert "CPU-SHM verified" in lmcache["summary_en"]
     assert pegaflow["ownership"] == "hust_owned_subsystem"
     assert pegaflow["integration_contracts"] == []
     assert pegaflow_connectors["integration_contracts"] == [
