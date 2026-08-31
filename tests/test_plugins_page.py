@@ -248,55 +248,18 @@ def test_plugin_standard_covers_bundle_v1_and_legacy_compatibility() -> None:
     assert "former entry-point-based Plugin Standard 1.0" in PAGE
     assert "Domain contracts first; bundles second." in PAGE
     assert "先定义领域契约，再定义 bundle 交付。" in PAGE
-    assert "VLLM_EXTENSION_MANIFESTS" in PAGE
-    assert "--extension org.example.kv-adapter" in PAGE
+    assert "uv pip install vllmhust" in PAGE
+    assert "vllmhust plugin enable org.example.kv-adapter" in PAGE
+    assert "vllmhust run -- vllm serve MODEL" in PAGE
+    assert "does not replace VLLM_PLUGINS" in PAGE
+    assert "Only explicit <code>vllmhust</code> lifecycle commands" in PAGE
+    assert '"activation": {' in PAGE
+    assert '"victim_selector_plugin": "example"' in PAGE
+    assert "Normal vLLM import and startup never invoke the manager" in PAGE
     assert "One materializer does not prove ecosystem compatibility" in PAGE
-    assert 'victim_selector_component="bundle-id/component-id"' in PAGE
-    assert "BidKV's installed legacy/typed contract replay now passes" in PAGE
-    assert "an explicit victim_selector_plugin must select exactly one" in PAGE
-    assert "deterministic contract replay, not real online workload" in PAGE
-    assert "explicit ordered composition" in PAGE
-    assert "declared HMA, piecewise, and cache-layout capabilities" in PAGE
-    assert "API-plane telemetry components" in PAGE
-    assert "Conflicting ordered layouts fail before import" in PAGE
-    assert "KVTransferConfig keeps typed and legacy paths mutually exclusive" in PAGE
-    assert "forwards recovery lifecycle signals" in PAGE
-    assert "Typed single and ordered_multi selections now materialize" in PAGE
-    assert "keyed by logical connector ID instead of class name" in PAGE
-    assert "This is materialization equivalence, not service" in PAGE
-    assert "missing-dependency materialization behavior" in PAGE
-    assert (
-        "API-plane IO processors now use an explicit qualified typed selector" in PAGE
-    )
-    assert "Typed stat loggers fan out with distinct legacy providers" in PAGE
-    assert "Platform, operator, and model-runner materializers remain pending" in PAGE
-    assert "stat loggers use typed fan-out with legacy migration deduplication" in PAGE
-    assert "Extension release and platform support are separate gates" in PAGE
-    assert "17 of 96 upstream-identical fused-MoE BF16 vec cases" in PAGE
-    assert "fast-exp alone and reference accumulation order" in PAGE
-    assert "instead of changing unrelated extension code" in PAGE
-    assert "Real-run readiness is recorded separately" in PAGE
-    assert "PegaFlow uses one controlled runtime" in PAGE
-    assert "root-owned hard-coded Conda activation is gone" in PAGE
-    assert "blocked only because pegaflow-server was not built" in PAGE
-    assert "This is environment-readiness evidence" in PAGE
-    assert "rejects namespace-only imports" in PAGE
-    assert "exact core source, engine import, and runnable vLLM CLI" in PAGE
-    assert "Mooncake runs are process-owned and mode-exclusive" in PAGE
-    assert "legacy, typed, or rollback" in PAGE
-    assert "Typed manifest variables are absent from legacy and rollback" in PAGE
-    assert "Mooncake admission includes live resources" in PAGE
-    assert "healthy real 7B prefill/decode services" in PAGE
-    assert "former harness expected a nonexistent proxy /health route" in PAGE
-    assert "missing HUP cleanup path" in PAGE
-    assert "unrelated 32B service reclaimed both GPUs and port 18000" in PAGE
-    assert "final-revision preflight correctly rejected both GPUs" in PAGE
-    assert "not a Mooncake failure or real-online result" in PAGE
     assert "kv-systems-and-connector-materialization.md" in PAGE
     assert "control-plane-and-runtime-bridge.md" in PAGE
     assert "platform-operator-model-runner-boundaries.md" in PAGE
-    assert "ecosystem-reorganization-release-candidate.json" in PAGE
-    assert "DRAFT EVIDENCE" in PAGE
     assert "plugin-standard-v1.0.pdf" not in PAGE
 
 
