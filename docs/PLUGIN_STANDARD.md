@@ -29,7 +29,9 @@ BidKV's current `vllm.victim_selector` adapter is legacy experimental evidence,
 not a contract present in the fresh vLLM-HUST 0.23 fork. New scheduler-policy
 integration must track upstream RFC #51608 and draft PR #51601's
 `vllm.scheduler_plugins`/PreemptionScore direction; the organization must not
-advertise a second private hook as current vLLM compatibility.
+advertise a second private hook as current vLLM compatibility. The main BidKV
+distribution therefore leaves the legacy adapter import-only, and Manager
+`run` rejects unverified or incompatible in-process scheduler policies.
 
 The initial Provider protocol has no apply or delete operation.
 
@@ -42,7 +44,8 @@ The initial Provider protocol has no apply or delete operation.
 
 The static manifest must explicitly distinguish `kind`, `host`, `runtime`,
 `lifecycle_owner`, required services, protocol/host ranges, and implementation
-carriers. Supported carriers include Python entry points, host built-ins,
+carriers. Supported carriers include registered Python entry points,
+unregistered/import-only Python modules, host built-ins,
 external services, OCI images, Helm values, Kubernetes manifests, CRDs, and
 controllers.
 

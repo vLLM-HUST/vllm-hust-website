@@ -51,8 +51,9 @@ def test_system_role_is_independent_from_delivery_model() -> None:
     assert bidkv["system_role"] == "scheduler_policy"
     assert bidkv["delivery_model"] == "plugin_bundle"
     assert bidkv["integration_surfaces"] == [
-        "vllm.victim_selector",
-        "vllm.general_plugins",
+        "legacy import-only vllm.victim_selector adapter",
+        "legacy experiment-only vllm.general_plugins",
+        "target upstream vllm.scheduler_plugins Preemption contract (not frozen)",
     ]
 
     ascend = by_id("vllm-ascend-hust")
