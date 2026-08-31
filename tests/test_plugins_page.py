@@ -243,20 +243,23 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert "repository portfolio request failed" in SCRIPT
 
 
-def test_plugin_standard_covers_bundle_v1_and_legacy_compatibility() -> None:
-    assert "Bundle v1 plus legacy compatibility profile" in LEGACY_STANDARD
+def test_extension_standard_covers_core_and_host_providers() -> None:
+    assert "Manifest `0.2-experimental`" in LEGACY_STANDARD
+    assert "Core + Host Provider" in LEGACY_STANDARD
+    assert "vllm_hust_ext.providers" in LEGACY_STANDARD
     assert "former entry-point-based Plugin Standard 1.0" in PAGE
     assert "Domain contracts first; bundles second." in PAGE
     assert "先定义领域契约，再定义 bundle 交付。" in PAGE
     assert "uv pip install vllm-hust-ext" in PAGE
     assert "vllm-hust-ext extension enable org.example.kv-adapter" in PAGE
+    assert "vllm-hust-ext extension plan org.example.kv-adapter" in PAGE
+    assert "vllm-hust-ext extension check org.example.kv-adapter" in PAGE
     assert "vllm-hust-ext run -- vllm serve MODEL" in PAGE
-    assert "does not replace VLLM_PLUGINS" in PAGE
     assert "Only explicit <code>vllm-hust-ext</code> extension commands" in PAGE
-    assert '"activation": {' in PAGE
-    assert '"victim_selector_plugin": "example"' in PAGE
+    assert "Release freeze: Core + Host Provider validation first" in PAGE
+    assert "Historical prototype evidence (superseded)" in PAGE
     assert "Normal vLLM import and startup never invoke the manager" in PAGE
-    assert "One materializer does not prove ecosystem compatibility" in PAGE
+    assert "external services and clusters remain operator-owned" in PAGE.lower()
     assert "kv-systems-and-connector-materialization.md" in PAGE
     assert "control-plane-and-runtime-bridge.md" in PAGE
     assert "platform-operator-model-runner-boundaries.md" in PAGE
