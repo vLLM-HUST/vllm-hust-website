@@ -91,6 +91,9 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "vllm.kv_connector.worker.v1",
         "vllm.kv_connector.telemetry.v1",
     ]
+    assert "0.3.12.post1 non-CUDA" in mooncake["summary_en"]
+    assert "Store object paths are verified" in mooncake["summary_en"]
+    assert "connector-hit evidence remains pending" in mooncake_connectors["summary_en"]
     assert lmcache["system_role"] == "kv_state_manager"
     assert lmcache["integration_contracts"] == []
     assert lmcache_connectors["system_role"] == "kv_integration"
