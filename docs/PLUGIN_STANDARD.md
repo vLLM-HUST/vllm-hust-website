@@ -72,6 +72,12 @@ endpoint. Production Stack Provider renders values and dry-run instructions.
 No Provider performs an implicit service start, Helm apply, uninstall, driver
 change, cache clear/eviction, or KV deletion.
 
+KV Providers delegate a declared `kv_transfer_config` capability to the vLLM
+launch path; dispatch is not hard-coded by Provider name. Because one vLLM
+process accepts only one such configuration, enabling Mooncake and LMCache for
+the same process is a fail-closed conflict. Experimental profile packages pin
+the exact Manager development version until the compatibility contract freezes.
+
 ## Acceptance before alpha
 
 1. BidKV must complete install, discover, configure, enable, real vLLM load,
