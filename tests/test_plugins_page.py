@@ -248,11 +248,11 @@ def test_plugin_standard_covers_bundle_v1_and_legacy_compatibility() -> None:
     assert "former entry-point-based Plugin Standard 1.0" in PAGE
     assert "Domain contracts first; bundles second." in PAGE
     assert "先定义领域契约，再定义 bundle 交付。" in PAGE
-    assert "uv pip install vllmhust" in PAGE
-    assert "vllmhust plugin enable org.example.kv-adapter" in PAGE
-    assert "vllmhust run -- vllm serve MODEL" in PAGE
+    assert "uv pip install vllm-hust-ext" in PAGE
+    assert "vllm-hust-ext extension enable org.example.kv-adapter" in PAGE
+    assert "vllm-hust-ext run -- vllm serve MODEL" in PAGE
     assert "does not replace VLLM_PLUGINS" in PAGE
-    assert "Only explicit <code>vllmhust</code> lifecycle commands" in PAGE
+    assert "Only explicit <code>vllm-hust-ext</code> extension commands" in PAGE
     assert '"activation": {' in PAGE
     assert '"victim_selector_plugin": "example"' in PAGE
     assert "Normal vLLM import and startup never invoke the manager" in PAGE
