@@ -80,7 +80,7 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert mooncake["integration_contracts"] == []
     assert mooncake_connectors["artifact_type"] == "bridge"
     assert mooncake_connectors["canonical_repository"] == (
-        "https://github.com/vLLM-HUST/vllm-hust"
+        "https://github.com/vllm-project/vllm"
     )
     assert mooncake_connectors["upstream_repository"] == (
         "https://github.com/kvcache-ai/Mooncake"
@@ -100,7 +100,7 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     ]
     assert lmcache_connectors["execution_planes"] == ["api", "scheduler", "worker"]
     assert lmcache_connectors["canonical_repository"] == (
-        "https://github.com/vLLM-HUST/vllm-hust"
+        "https://github.com/vllm-project/vllm"
     )
     assert pegaflow["ownership"] == "hust_owned_subsystem"
     assert pegaflow["integration_contracts"] == []
@@ -118,6 +118,21 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     ]
     assert lmcache_ascend_adapter["system_role"] == "kv_integration"
     assert lmcache_ascend_adapter["artifact_type"] == "bridge"
+
+
+def test_extension_manager_and_production_stack_keep_distinct_ownership() -> None:
+    manager = by_id("vllm-hust-extension-manager")
+    production_stack = by_id("vllm-production-stack")
+
+    assert manager["artifact_type"] == "tool"
+    assert manager["system_role"] == "extension_management"
+    assert manager["integration_surfaces"] == [
+        "vllm_hust.extension_bundles",
+        "vllm_hust_ext.providers",
+    ]
+    assert production_stack["artifact_type"] == "external_system"
+    assert production_stack["system_role"] == "control_plane"
+    assert production_stack["delivery_model"] == "helm_chart"
     assert lmcache_ascend_adapter["integration_contracts"] == [
         "vllm.kv_connector.scheduler.v1",
         "vllm.kv_connector.worker.v1",
