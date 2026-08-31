@@ -50,9 +50,9 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vllm-project/production-stack",
       "upstream_repository": null,
-      "summary_en": "Kubernetes deployment and control-plane system owning Helm, router, controller, autoscaler, CRD, and OCI resources.",
-      "summary_zh": "管理 Helm、router、controller、autoscaler、CRD 与 OCI 资源的 Kubernetes 部署和控制面系统。",
-      "evidence_level": "design_only"
+      "summary_en": "Kubernetes control plane owning Helm, router, controller, autoscaler, CRD, and OCI resources; official controller reconciliation, Router forwarding, and metrics-backed scaling are isolated-cluster verified.",
+      "summary_zh": "管理 Helm、router、controller、autoscaler、CRD 与 OCI 资源的 Kubernetes 控制面；官方 controller 调谐、Router 转发与 Metrics 扩容已在隔离集群验证。",
+      "evidence_level": "integration_tested"
     },
     {
       "id": "vllm-ascend-hust",

@@ -153,7 +153,23 @@ created an HPA whose scale target lookup succeeded. With no metrics-server,
 The official controller image registry timed out in this environment; its
 business reconciliation remains unverified. Helm uninstall removed
 release-owned resources but retained the chart CRD as expected, after which
-deleting the temporary cluster removed everything.
+deleting the temporary cluster removed everything. Those were deliberately
+limited historical probes.
+
+A subsequent isolated Kubernetes 1.34.11 run built the official Router and the
+official controller binary from exact commit `1b87c11a`. The controller
+reconciled a `VLLMRouter` into owned RBAC, Service, and Deployment resources;
+the Router forwarded an OpenAI-compatible completion request to an external
+test backend; and real metrics-server CPU drove a separately owned Router
+Deployment from one to three replicas. Removing the backend produced HTTP 500
+for a unique request, and restoring it recovered without Router reinstall.
+
+The HPA is separately owned for a reason. A negative test targeted the
+controller-owned Deployment: HPA desired two replicas, while the controller
+immediately restored the CR's one replica. Provider status must treat that
+two-writer replica ownership as `incompatible + degraded`; a rollout boolean
+cannot hide it. This proves control-plane reconciliation and Router forwarding,
+not model inference or a production image support matrix.
 
 These checks also corrected the manifest: the chart exposes `LoraAdapter`, not
 the previously listed `Model/Router` CRDs, and the successfully exercised Helm
@@ -162,7 +178,8 @@ the previously listed `Model/Router` CRDs, and the successfully exercised Helm
 The Manager still performs none of those mutations. Its rendered operator plan
 keeps install, upgrade, rollback, and uninstall as `null`; successful cluster
 and rollout states now require non-empty evidence instead of trusting bare
-booleans.
+booleans. A healthy claim additionally requires separate controller
+reconciliation, Router traffic, and autoscaler-decision evidence.
 
 LMCache MP now has a real 0.5.4 acceptance result on `a100-dev`. The immutable
 official `v0.5.4-cu129` image ran without a GPU device and its official CPU-SHM
