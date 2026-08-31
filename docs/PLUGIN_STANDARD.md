@@ -25,6 +25,12 @@ Each host keeps runtime authority:
   routers, autoscalers, OCI images, and cluster rollout;
 - Extension Manager calls Provider `plan`, `render`, and `check` operations.
 
+BidKV's current `vllm.victim_selector` adapter is legacy experimental evidence,
+not a contract present in the fresh vLLM-HUST 0.23 fork. New scheduler-policy
+integration must track upstream RFC #51608 and draft PR #51601's
+`vllm.scheduler_plugins`/PreemptionScore direction; the organization must not
+advertise a second private hook as current vLLM compatibility.
+
 The initial Provider protocol has no apply or delete operation.
 
 ## Manifest registration
