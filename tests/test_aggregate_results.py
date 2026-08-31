@@ -123,7 +123,7 @@ def _valid_entry() -> dict:
             "github_ref": "feature/bench-provenance",
             "github_event_name": "pull_request",
             "github_pr_number": 42,
-            "github_pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/42",
+            "github_pr_url": "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/42",
             "release_date": "2026-03-14",
             "changelog_url": "https://example.com/changelog",
             "notes": "Benchmark run: short",
