@@ -100,7 +100,11 @@ exact official dynamic pair
 
 Mooncake detection covers the official mutually exclusive CUDA, CUDA 13,
 non-CUDA, NPU, MUSA, and EFA package variants. Multiple installed variants are
-an incompatible/degraded environment rather than an arbitrary selection.
+an incompatible/degraded environment rather than an arbitrary selection. The
+experimental profile currently targets `>=0.3.12.post1,<0.4`. Mooncake Store
+REST and vLLM KV launch configuration have no separately published upstream
+protocol semver, so the manifest marks those surfaces unversioned instead of
+inventing a `1.0` compatibility claim.
 
 KV Providers delegate a declared `kv_transfer_config` capability to the vLLM
 launch path; dispatch is not hard-coded by Provider name. Because one vLLM
@@ -173,11 +177,21 @@ That result does not erase the separate 91 Ascend gap. The isolated LMCache
 LMCache-Ascend commit leaves `NPUCacheContext` unimplemented and skips MP tests.
 Ascend in-process connector/KV acceptance remains a separate release gate.
 
+Mooncake now also has two real, separate 0.3.12.post1 non-CUDA results on
+`a100-dev`: two official TransferEngine processes completed and verified a
+1 MiB TCP/P2PHANDSHAKE write, and an isolated official Master + HTTP metadata
++ Store REST service completed put, exist, byte-matching get, lease-aware
+remove, and missing-after-remove. The probe removed only its UUID-scoped key
+after the configured hard lease expired; it never used `remove_all` or force
+deletion. This validates TransferEngine and Store data paths, but not yet a
+real vLLM request's connector cache hit, so alpha remains frozen.
+
 On 180, an isolated official
 `mooncake-transfer-engine-npu==0.3.13.post1` master completed a real
 Manager-observed `healthy → unreachable/degraded → healthy` cycle. Disabling
 and forgetting the extension left the external master healthy, proving the
-Manager does not stop it. The connector KV data path remains a gate: all four
-NPUs in that production container were already occupied by vLLM workers, and a
-new store client could not create an ACL context. Existing inference processes
-were not interrupted for this test.
+Manager does not stop it. The NPU connector data path remains a separate gate:
+all four NPUs in that production container were already occupied by vLLM
+workers, and a new Store client could not create an ACL context. Existing
+inference processes were not interrupted. The CPU/non-CUDA Store result does
+not substitute for NPU or vLLM connector-hit evidence.

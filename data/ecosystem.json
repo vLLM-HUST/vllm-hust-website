@@ -103,8 +103,8 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/kvcache-ai/Mooncake",
       "upstream_repository": null,
-      "summary_en": "KV-centric infrastructure containing a transfer engine, distributed store, and metadata services.",
-      "summary_zh": "包含传输引擎、分布式存储与元数据服务的 KV-centric 基础设施。",
+      "summary_en": "KV-centric infrastructure containing a transfer engine, distributed store, and metadata services; official 0.3.12.post1 non-CUDA TransferEngine TCP and Store object paths are verified.",
+      "summary_zh": "包含传输引擎、分布式存储与元数据服务的 KV-centric 基础设施；官方 0.3.12.post1 non-CUDA TransferEngine TCP 与 Store 对象路径已验证。",
       "evidence_level": "integration_tested"
     },
     {
@@ -120,8 +120,8 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vllm-project/vllm",
       "upstream_repository": "https://github.com/kvcache-ai/Mooncake",
-      "summary_en": "Official vLLM MooncakeConnector and MooncakeStoreConnector, configured by a non-invasive Host Provider while Mooncake retains service ownership.",
-      "summary_zh": "官方 vLLM MooncakeConnector 与 MooncakeStoreConnector；无侵入 Host Provider 只生成配置，Mooncake 保留服务所有权。",
+      "summary_en": "Official vLLM MooncakeConnector and MooncakeStoreConnector, configured by a non-invasive Host Provider while Mooncake retains service ownership; real vLLM connector-hit evidence remains pending.",
+      "summary_zh": "官方 vLLM MooncakeConnector 与 MooncakeStoreConnector；无侵入 Host Provider 只生成配置，Mooncake 保留服务所有权；真实 vLLM connector 命中仍待验证。",
       "evidence_level": "integration_tested"
     },
     {
