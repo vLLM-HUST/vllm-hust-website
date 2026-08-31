@@ -87,6 +87,10 @@ exact official dynamic pair
 `lmcache_ascend.integration.vllm.lmcache_ascend_connector_v1`.
 `LMCacheMPConnector` must not be paired with a fabricated Python module path.
 
+Mooncake detection covers the official mutually exclusive CUDA, CUDA 13,
+non-CUDA, NPU, MUSA, and EFA package variants. Multiple installed variants are
+an incompatible/degraded environment rather than an arbitrary selection.
+
 KV Providers delegate a declared `kv_transfer_config` capability to the vLLM
 launch path; dispatch is not hard-coded by Provider name. Because one vLLM
 process accepts only one such configuration, enabling Mooncake and LMCache for
@@ -125,3 +129,12 @@ checked LMCache-Ascend commit also leaves `NPUCacheContext` unimplemented and
 skips MP tests. This is recorded as an honest platform-support gap, not replaced
 with a stub health endpoint; CUDA MP health/recovery and Ascend in-process KV
 data-path acceptance remain separate release gates.
+
+On 180, an isolated official
+`mooncake-transfer-engine-npu==0.3.13.post1` master completed a real
+Manager-observed `healthy → unreachable/degraded → healthy` cycle. Disabling
+and forgetting the extension left the external master healthy, proving the
+Manager does not stop it. The connector KV data path remains a gate: all four
+NPUs in that production container were already occupied by vLLM workers, and a
+new store client could not create an ACL context. Existing inference processes
+were not interrupted for this test.
