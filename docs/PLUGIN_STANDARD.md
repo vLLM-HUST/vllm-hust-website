@@ -133,6 +133,10 @@ after a later reinstall.
    conflicts, degraded health, rollback, and clean uninstall must be tested.
 5. The three cases must be repeated on the intended 112/91 environments.
 
+The canonical pinned version, carrier and rollback matrix is maintained in
+[`extension-manager-support-matrix-20260901.md`](https://github.com/vLLM-HUST/vllm-hust-docs/blob/codex/plugin-standardization-handoff/operations/extension-manager-support-matrix-20260901.md).
+A passing point does not imply support for an entire experimental range.
+
 Current evidence: the official Production Stack chart at commit
 `1b87c11a24c144f6b63a64dbae4fc8c875059731` renders successfully, and all eight
 generated resources pass a Kubernetes 1.34.11 server-side dry-run in an

@@ -140,6 +140,8 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert "KV connector" in PAGE
     assert "state system" in PAGE
     assert "KV 状态系统" in PAGE
+    assert "Read the pinned support and rollback matrix" in PAGE
+    assert "NO-GO MATRIX" in PAGE
 
 
 def test_extension_manager_and_production_stack_keep_distinct_ownership() -> None:
