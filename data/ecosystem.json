@@ -103,8 +103,8 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/kvcache-ai/Mooncake",
       "upstream_repository": null,
-      "summary_en": "KV-centric infrastructure containing a transfer engine, distributed store, and metadata services; official 0.3.12.post1 non-CUDA TransferEngine TCP and Store object paths are verified.",
-      "summary_zh": "包含传输引擎、分布式存储与元数据服务的 KV-centric 基础设施；官方 0.3.12.post1 non-CUDA TransferEngine TCP 与 Store 对象路径已验证。",
+      "summary_en": "KV-centric infrastructure containing a transfer engine, distributed store, and metadata services; non-CUDA TCP/Store paths and the 0.3.11.post1 Ascend transport path are verified.",
+      "summary_zh": "包含传输引擎、分布式存储与元数据服务的 KV-centric 基础设施；non-CUDA TCP/Store 与 0.3.11.post1 Ascend transport 路径均已验证。",
       "evidence_level": "integration_tested"
     },
     {
@@ -120,8 +120,8 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vllm-project/vllm",
       "upstream_repository": "https://github.com/kvcache-ai/Mooncake",
-      "summary_en": "Official vLLM MooncakeConnector and MooncakeStoreConnector, configured by a non-invasive Host Provider while Mooncake retains service ownership; real vLLM connector-hit evidence remains pending.",
-      "summary_zh": "官方 vLLM MooncakeConnector 与 MooncakeStoreConnector；无侵入 Host Provider 只生成配置，Mooncake 保留服务所有权；真实 vLLM connector 命中仍待验证。",
+      "summary_en": "Official vLLM MooncakeStoreConnector validated on Ascend with 9-key save/load and outage/recovery evidence; the non-invasive Host Provider checks NPU transport and operation evidence while Mooncake retains service ownership.",
+      "summary_zh": "官方 vLLM MooncakeStoreConnector 已在 Ascend 完成 9-key save/load 与故障恢复实测；无侵入 Host Provider 检查 NPU transport 和操作证据，Mooncake 仍保留服务所有权。",
       "evidence_level": "integration_tested"
     },
     {
