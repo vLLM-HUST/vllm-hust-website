@@ -65,18 +65,20 @@ For a vLLM-owned extension only, the manager can generate the launch command:
 vllm-hust-ext run -- vllm serve MODEL
 ```
 
-Mooncake Provider reuses `MooncakeConnector` or `MooncakeStoreConnector` and
-checks an externally operated service. Production Stack Provider renders
-values and dry-run instructions. Neither Provider performs an implicit service
-start, Helm apply, uninstall, driver change, or KV deletion.
+Mooncake Provider reuses `MooncakeConnector` or `MooncakeStoreConnector`.
+LMCache Provider independently renders `LMCacheMPConnector` or an explicitly
+selected official V1/dynamic connector and checks the external `/healthcheck`
+endpoint. Production Stack Provider renders values and dry-run instructions.
+No Provider performs an implicit service start, Helm apply, uninstall, driver
+change, cache clear/eviction, or KV deletion.
 
 ## Acceptance before alpha
 
 1. BidKV must complete install, discover, configure, enable, real vLLM load,
    disable, restart, and upstream fallback.
-2. Mooncake must complete official connector rendering and real service
-   healthy/outage/recovery checks without lifecycle takeover. LMCache must be
-   evaluated against the same boundary.
+2. Mooncake and LMCache must each complete official connector rendering and
+   real service healthy/outage/recovery checks without lifecycle takeover or
+   cache-data mutation.
 3. Production Stack must pass official-chart render, Kubernetes server dry-run,
    rollout checks, conflict tests, and proof of no apply/uninstall.
 4. Incompatible versions, missing required services, duplicate registrations,

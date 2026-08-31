@@ -154,8 +154,8 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vllm-project/vllm",
       "upstream_repository": "https://github.com/LMCache/LMCache",
-      "summary_en": "Official vLLM/LMCache connector surfaces; a future Host Provider will render configuration without taking over LMCache backends or services.",
-      "summary_zh": "官方 vLLM/LMCache connector 接口；后续 Host Provider 只生成配置，不接管 LMCache backend 或服务生命周期。",
+      "summary_en": "Official vLLM/LMCache connector surfaces; the experimental LMCache Host Provider renders MP or V1 connector configuration and checks service health without taking over backends, cache data, or services.",
+      "summary_zh": "官方 vLLM/LMCache connector 接口；实验性 LMCache Host Provider 生成 MP 或 V1 connector 配置并检查服务健康，但不接管 backend、KV 数据或服务生命周期。",
       "evidence_level": "integration_tested"
     },
     {
