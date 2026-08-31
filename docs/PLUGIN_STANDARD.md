@@ -30,25 +30,27 @@ A Bundle-capable wheel registers one or more static manifest directories:
 
 The directory contains exactly one `vllm-hust-extension-v1.json`; the legacy
 `extension-bundle-v1.json` filename remains accepted during migration. The
-entry-point value has no callable. vLLM reads wheel `RECORD` metadata—or the
-local `direct_url.json` of a PEP 660 editable install—without calling
-`EntryPoint.load()` or importing the plugin package.
+entry-point value has no callable. The standalone `vllmhust` manager reads
+wheel `RECORD` metadata—or the local `direct_url.json` of a PEP 660 editable
+install—without calling `EntryPoint.load()` or importing the plugin package.
 
 Installation registers availability but changes no serving behavior:
 
 ```bash
+uv pip install vllmhust
 uv pip install example-performance-plugin
-vllm plugin list
-vllm plugin inspect org.example.performance
-vllm plugin validate org.example.performance
-vllm serve MODEL --extension org.example.performance
+vllmhust plugin list
+vllmhust plugin inspect org.example.performance
+vllmhust plugin validate org.example.performance
+vllmhust plugin enable org.example.performance
+vllmhust run -- vllm serve MODEL
 ```
 
-An unset selection scans no installed distributions. Only exact selected IDs
-are resolved. Unknown, duplicate, ambiguous, malformed, incompatible, or
-permission-denied registrations fail before implementation import. Explicit
-manifest paths remain available for development and take precedence for the
-same Bundle ID.
+Only lifecycle-management commands scan installed Bundle registrations. Normal
+`import vllm` and an ordinary vLLM startup do not invoke `vllmhust`. Unknown,
+duplicate, ambiguous, malformed, incompatible, or permission-denied
+registrations fail before implementation import. Enablement is explicit and
+stored outside the vLLM source tree.
 
 ## 3. Legacy callable entry-point groups
 
@@ -161,18 +163,21 @@ Installation alone does not prove activation.
 
 ## 8. Enable and start
 
-Production services use an explicit allowlist:
+Production services use the explicit Bundle selection stored by `vllmhust`:
 
 ```bash
-export PLUGIN_ID=your-plugin-id
 export MODEL=your-model
 export PORT=your-port
 
-VLLM_PLUGINS="${PLUGIN_ID}" vllm serve "${MODEL}" --port "${PORT}"
+vllmhust plugin enable org.example.performance
+vllmhust run -- vllm serve "${MODEL}" --port "${PORT}"
 ```
 
-Multiple plugin IDs are comma-separated. If `VLLM_PLUGINS` is unset, vLLM loads every discovered
-plugin. If it is set to an empty string, vLLM loads none.
+The manager merges each Bundle's declared environment and `additional_config`
+and rejects conflicting keys. It must not replace the global `VLLM_PLUGINS`
+allowlist as a side effect: doing so could disable required platform plugins
+such as `ascend`. A Bundle that needs a native vLLM entry point declares that
+entry point and its narrow activation configuration in the manifest.
 
 All service-manager, container, model, port, and device values remain deployment inputs. They must
 not be embedded in a plugin or in shared launch tooling.
@@ -206,7 +211,7 @@ To disable a plugin:
    normal termination signal.
 1. Wait for API, engine-core, and worker processes to exit.
 1. Confirm plugin-owned threads, sockets, files, shared memory, and device resources are released.
-1. Remove the plugin ID from the explicit allowlist, or set `VLLM_PLUGINS=""` to load none.
+1. Run `vllmhust plugin disable <bundle-id>`.
 1. Restart and verify the baseline path.
 
 Do not use broad process-name termination as a plugin shutdown mechanism.

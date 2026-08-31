@@ -76,7 +76,7 @@
 
       <div class="standard-rule-grid">
         <article><span>BUNDLE ≠ ROLE</span><h3><span class="lang-en">Delivery stays separate</span><span class="lang-zh">交付与角色分离</span></h3><p><span class="lang-en">A bundle may contain multiple components. It does not turn a KV system, platform profile, or control plane into one generic plugin.</span><span class="lang-zh">一个 bundle 可以包含多个组件，但不会把 KV 系统、平台 profile 或 control plane 变成一种万能插件。</span></p></article>
-        <article><span>EXPLICIT DISCOVERY</span><h3><span class="lang-en">No ambient scan</span><span class="lang-zh">不做环境扫描</span></h3><p><span class="lang-en"><code>VLLM_EXTENSION_MANIFESTS</code> names exact files. Installed distributions, directories, and networks are not searched implicitly.</span><span class="lang-zh"><code>VLLM_EXTENSION_MANIFESTS</code> 指定精确文件；不会隐式搜索已安装分发、目录或网络。</span></p></article>
+        <article><span>EXPLICIT DISCOVERY</span><h3><span class="lang-en">No core-owned scan</span><span class="lang-zh">核心不扫描插件</span></h3><p><span class="lang-en">Only explicit <code>vllmhust</code> lifecycle commands inspect installed Bundle metadata. Normal vLLM import and startup never invoke the manager.</span><span class="lang-zh">只有显式的 <code>vllmhust</code> 生命周期命令检查已安装 Bundle metadata；普通 vLLM import 与启动不会调用管理器。</span></p></article>
         <article><span>FAIL CLOSED</span><h3><span class="lang-en">Reject before import</span><span class="lang-zh">在 import 前拒绝</span></h3><p><span class="lang-en">Unknown fields, contracts, permissions, isolation, duplicate identities, and incompatible API ranges stop startup.</span><span class="lang-zh">未知字段、契约、权限、隔离、重复标识和不兼容 API 范围都会阻止启动。</span></p></article>
         <article><span>PROCESS OWNERSHIP</span><h3><span class="lang-en">Materialize by domain</span><span class="lang-zh">按领域实例化</span></h3><p><span class="lang-en">Scheduler and worker connectors remain separate components. The generic loader never chooses provider precedence or invokes hot-path callbacks.</span><span class="lang-zh">scheduler 与 worker connector 保持为独立组件；通用加载器不选择 provider 优先级，也不调用热路径 callback。</span></p></article>
         <article><span>PERMISSIONS</span><h3><span class="lang-en">Declaration is not a sandbox</span><span class="lang-zh">声明不等于沙箱</span></h3><p><span class="lang-en">Non-empty permissions are denied by default. Trusted in-process code still has host authority; unsupported isolation cannot be claimed.</span><span class="lang-zh">非空权限默认拒绝；可信进程内代码仍拥有 host 权限，不能宣称未实现的隔离能力。</span></p></article>
@@ -98,25 +98,26 @@
     "isolation": "trusted_in_process",
     "implementation_ref": "example:Scheduler",
     "permissions": []
-  }]
+  }],
+  "activation": {
+    "additional_config": {
+      "victim_selector_plugin": "example"
+    }
+  }
 }</code></pre></article>
         <article><div class="standard-code-head"><span>02 / INSTALL + ENABLE</span><strong><span class="lang-en">Static registration, explicit activation</span><span class="lang-zh">静态注册，显式启用</span></strong></div><pre><code># The wheel registers static manifest metadata; it is not imported.
+uv pip install vllmhust
 uv pip install example-kv-adapter
-vllm plugin list
-vllm plugin inspect org.example.kv-adapter
-vllm plugin validate org.example.kv-adapter
+vllmhust plugin list
+vllmhust plugin inspect org.example.kv-adapter
+vllmhust plugin validate org.example.kv-adapter
 
 # Installation alone changes no runtime behavior.
-vllm serve MODEL --extension org.example.kv-adapter
+vllmhust plugin enable org.example.kv-adapter
+vllmhust run -- vllm serve MODEL
 
-# Explicit manifest paths remain available for local development.
-export VLLM_EXTENSION_MANIFESTS="/opt/a.json:/opt/b.json"
-
-# Scheduler policy ambiguity is resolved in additional_config with
-# victim_selector_component="bundle-id/component-id"
-
-# Legacy entry points remain separate
-export VLLM_PLUGINS="existing-legacy-plugin"</code></pre></article>
+# Activation merges narrow environment/additional_config declarations.
+# It does not replace VLLM_PLUGINS or disable platform plugins.</code></pre></article>
         <article class="operations-example"><div class="standard-code-head"><span>03 / ADMIT</span><strong><span class="lang-en">Current generic state machine</span><span class="lang-zh">当前通用状态机</span></strong></div><pre><code>configured
   -&gt; parsed
   -&gt; admitted | disabled | rejected
