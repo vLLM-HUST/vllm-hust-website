@@ -102,3 +102,9 @@ after a later reinstall.
 4. Incompatible versions, missing required services, duplicate registrations,
    conflicts, degraded health, rollback, and clean uninstall must be tested.
 5. The three cases must be repeated on the intended 112/91 environments.
+
+Current evidence: the official Production Stack chart at commit
+`1b87c11a24c144f6b63a64dbae4fc8c875059731` renders successfully, and all eight
+generated resources pass a Kubernetes 1.34.11 server-side dry-run in an
+ephemeral kind cluster. No resources were applied; a real operator-owned
+rollout check remains a release gate.
