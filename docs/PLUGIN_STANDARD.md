@@ -130,6 +130,20 @@ accelerators, so this proves chart/Deployment/rollback behavior—not real Route
 traffic or controller/autoscaler reconciliation. The temporary cluster and
 images were deleted afterward.
 
+A second isolated chart run established the official
+`LoraAdapter` CRD, accepted a valid custom resource with server-side dry-run,
+rolled out both Router and LoRA-controller probe Deployments at `1/1`, and
+created an HPA whose scale target lookup succeeded. With no metrics-server,
+`ScalingActive` correctly remained false, so no scaling decision is claimed.
+The official controller image registry timed out in this environment; its
+business reconciliation remains unverified. Helm uninstall removed
+release-owned resources but retained the chart CRD as expected, after which
+deleting the temporary cluster removed everything.
+
+These checks also corrected the manifest: the chart exposes `LoraAdapter`, not
+the previously listed `Model/Router` CRDs, and the successfully exercised Helm
+4.2.4 expands the experimental `helm-values` range to `>=3,<5`.
+
 The Manager still performs none of those mutations. Its rendered operator plan
 keeps install, upgrade, rollback, and uninstall as `null`; successful cluster
 and rollout states now require non-empty evidence instead of trusting bare
