@@ -160,13 +160,18 @@ keeps install, upgrade, rollback, and uninstall as `null`; successful cluster
 and rollout states now require non-empty evidence instead of trusting bare
 booleans.
 
-LMCache MP remains blocked on the current 91 Ascend environment. An isolated
-LMCache 0.4.3 probe built and imported its common `native_storage_ops`, but the
-MP server then required CuPy before `/healthcheck` could become ready. The
-checked LMCache-Ascend commit also leaves `NPUCacheContext` unimplemented and
-skips MP tests. This is recorded as an honest platform-support gap, not replaced
-with a stub health endpoint; CUDA MP health/recovery and Ascend in-process KV
-data-path acceptance remain separate release gates.
+LMCache MP now has a real 0.5.4 acceptance result on `a100-dev`. The immutable
+official `v0.5.4-cu129` image ran without a GPU device and its official CPU-SHM
+server benchmark completed LOOKUP, STORE, warm LOOKUP, RETRIEVE, and CHECKSUM
+with two successful checksums and no failures. The Manager read compatibility
+from the remote `/lmc_version`, projected healthy → enabled/degraded → healthy
+across an operator-owned stop/restart, and then disabled/forgot only its own
+intent. It never cleared KV data or controlled the service.
+
+That result does not erase the separate 91 Ascend gap. The isolated LMCache
+0.4.3 MP probe there still cannot reach `/healthcheck`, and the checked
+LMCache-Ascend commit leaves `NPUCacheContext` unimplemented and skips MP tests.
+Ascend in-process connector/KV acceptance remains a separate release gate.
 
 On 180, an isolated official
 `mooncake-transfer-engine-npu==0.3.13.post1` master completed a real
