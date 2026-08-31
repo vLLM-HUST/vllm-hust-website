@@ -233,7 +233,11 @@
       "artifact_type": "runtime_component",
       "system_role": "scheduler_policy",
       "integration_contracts": ["vllm.scheduler.policy.v1"],
-      "integration_surfaces": ["vllm.victim_selector", "vllm.general_plugins"],
+      "integration_surfaces": [
+        "legacy import-only vllm.victim_selector adapter",
+        "legacy experiment-only vllm.general_plugins",
+        "target upstream vllm.scheduler_plugins Preemption contract (not frozen)"
+      ],
       "execution_planes": ["scheduler"],
       "deployment_topology": "in_process",
       "delivery_model": "plugin_bundle",
@@ -241,8 +245,8 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
       "upstream_repository": null,
-      "summary_en": "Scheduler-local KV eviction and victim-selection policy component.",
-      "summary_zh": "在 scheduler 本地执行的 KV 淘汰与 victim-selection 策略组件。",
+      "summary_en": "Scheduler-local policy algorithm; fresh official-vLLM activation remains blocked pending a stable upstream Preemption contract.",
+      "summary_zh": "scheduler 本地策略算法；在上游 Preemption 契约稳定前，不允许在新的官方 vLLM 上激活。",
       "evidence_level": "performance_verified"
     },
     {
