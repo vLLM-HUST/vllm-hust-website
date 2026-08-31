@@ -50,8 +50,8 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vllm-project/production-stack",
       "upstream_repository": null,
-      "summary_en": "Kubernetes control plane owning Helm, router, controller, autoscaler, CRD, and OCI resources; official controller reconciliation, Router forwarding, and metrics-backed scaling are isolated-cluster verified.",
-      "summary_zh": "管理 Helm、router、controller、autoscaler、CRD 与 OCI 资源的 Kubernetes 控制面；官方 controller 调谐、Router 转发与 Metrics 扩容已在隔离集群验证。",
+      "summary_en": "Kubernetes control plane owning Helm, router, controller, autoscaler, CRD, and OCI resources; official controller reconciliation, metrics-backed scaling, and real GLM Router failure/recovery are verified. The v0.1.12 release image lacks arm64 support.",
+      "summary_zh": "管理 Helm、router、controller、autoscaler、CRD 与 OCI 资源的 Kubernetes 控制面；官方 controller 调谐、Metrics 扩容及真实 GLM Router 故障恢复已验证，但 v0.1.12 发布镜像缺少 arm64。",
       "evidence_level": "integration_tested"
     },
     {
