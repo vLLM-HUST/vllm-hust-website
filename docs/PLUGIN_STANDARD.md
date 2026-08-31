@@ -171,7 +171,17 @@ controller-owned Deployment: HPA desired two replicas, while the controller
 immediately restored the CR's one replica. Provider status must treat that
 two-writer replica ownership as `incompatible + degraded`; a rollout boolean
 cannot hide it. This proves control-plane reconciliation and Router forwarding,
-not model inference or a production image support matrix.
+but the earlier mock backend did not prove model inference or a production
+image support matrix.
+
+That model-data-plane gap is now closed separately on the arm64 host 180. A
+Router built from the same official commit first targeted an absent backend: its
+own `/health` stayed 200 while a valid chat request returned 500. Recreating
+only the isolated Router against the existing
+`zai-org/GLM-4-32B-0414` service returned 200 and `ROUTER_OK`; the production
+vLLM container retained its original start time. The official
+`router:v0.1.12` manifest has no `linux/arm64/v8`, so the source-built result is
+healthy data-plane evidence but remains degraded release-matrix evidence.
 
 These checks also corrected the manifest: the chart exposes `LoraAdapter`, not
 the previously listed `Model/Router` CRDs, and the successfully exercised Helm
@@ -181,7 +191,8 @@ The Manager still performs none of those mutations. Its rendered operator plan
 keeps install, upgrade, rollback, and uninstall as `null`; successful cluster
 and rollout states now require non-empty evidence instead of trusting bare
 booleans. A healthy claim additionally requires separate controller
-reconciliation, Router traffic, and autoscaler-decision evidence.
+reconciliation, Router traffic, autoscaler-decision, and structured real-model
+failure/recovery evidence. A mock backend can no longer claim healthy.
 
 LMCache MP now has a real 0.5.4 acceptance result on `a100-dev`. The immutable
 official `v0.5.4-cu129` image ran without a GPU device and its official CPU-SHM
