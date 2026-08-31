@@ -24,30 +24,31 @@ analysis tools are adjacent assets unless they expose a vLLM runtime component.
 A Bundle-capable wheel registers one or more static manifest directories:
 
 ```toml
-[project.entry-points."vllm.extension_bundles"]
+[project.entry-points."vllm_hust.extension_bundles"]
 "org.example.performance" = "example_plugin.manifests"
 ```
 
 The directory contains exactly one `vllm-hust-extension-v1.json`; the legacy
 `extension-bundle-v1.json` filename remains accepted during migration. The
-entry-point value has no callable. The standalone `vllmhust` manager reads
+entry-point value has no callable. The standalone vLLM-HUST Extension Manager
+(`vllm-hust-ext`) reads
 wheel `RECORD` metadata—or the local `direct_url.json` of a PEP 660 editable
 install—without calling `EntryPoint.load()` or importing the plugin package.
 
 Installation registers availability but changes no serving behavior:
 
 ```bash
-uv pip install vllmhust
+uv pip install vllm-hust-ext
 uv pip install example-performance-plugin
-vllmhust plugin list
-vllmhust plugin inspect org.example.performance
-vllmhust plugin validate org.example.performance
-vllmhust plugin enable org.example.performance
-vllmhust run -- vllm serve MODEL
+vllm-hust-ext extension list
+vllm-hust-ext extension inspect org.example.performance
+vllm-hust-ext extension validate org.example.performance
+vllm-hust-ext extension enable org.example.performance
+vllm-hust-ext run -- vllm serve MODEL
 ```
 
 Only lifecycle-management commands scan installed Bundle registrations. Normal
-`import vllm` and an ordinary vLLM startup do not invoke `vllmhust`. Unknown,
+`import vllm` and an ordinary vLLM startup do not invoke the manager. Unknown,
 duplicate, ambiguous, malformed, incompatible, or permission-denied
 registrations fail before implementation import. Enablement is explicit and
 stored outside the vLLM source tree.
@@ -163,14 +164,15 @@ Installation alone does not prove activation.
 
 ## 8. Enable and start
 
-Production services use the explicit Bundle selection stored by `vllmhust`:
+Production services use the explicit Bundle selection stored by
+`vllm-hust-ext`:
 
 ```bash
 export MODEL=your-model
 export PORT=your-port
 
-vllmhust plugin enable org.example.performance
-vllmhust run -- vllm serve "${MODEL}" --port "${PORT}"
+vllm-hust-ext extension enable org.example.performance
+vllm-hust-ext run -- vllm serve "${MODEL}" --port "${PORT}"
 ```
 
 The manager merges each Bundle's declared environment and `additional_config`
@@ -211,7 +213,7 @@ To disable a plugin:
    normal termination signal.
 1. Wait for API, engine-core, and worker processes to exit.
 1. Confirm plugin-owned threads, sockets, files, shared memory, and device resources are released.
-1. Run `vllmhust plugin disable <bundle-id>`.
+1. Run `vllm-hust-ext extension disable <bundle-id>`.
 1. Restart and verify the baseline path.
 
 Do not use broad process-name termination as a plugin shutdown mechanism.
