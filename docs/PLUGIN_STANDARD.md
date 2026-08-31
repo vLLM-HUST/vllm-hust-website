@@ -33,6 +33,14 @@ advertise a second private hook as current vLLM compatibility. The main BidKV
 distribution therefore leaves the legacy adapter import-only, and Manager
 `run` rejects unverified or incompatible in-process scheduler policies.
 
+At draft PR #51601 head `f8b7db61e446911e0d62fcb8220f863d6098c471`,
+code still provides one registry-only `PreemptionPlugin` over live requests,
+while its design document specifies future composable batched
+`PreemptionScore`, read-only features, descriptors, and out-of-tree discovery.
+BidKV therefore maps only its minimum victim-ranking semantics now; proactive
+preemption triggers, waiting-queue mutation, KV cleanup, and reinsertion remain
+core-owned and are not restored through monkey patches.
+
 The initial Provider protocol has no apply or delete operation.
 
 ## Manifest registration
