@@ -78,6 +78,12 @@ process accepts only one such configuration, enabling Mooncake and LMCache for
 the same process is a fail-closed conflict. Experimental profile packages pin
 the exact Manager development version until the compatibility contract freezes.
 
+Uninstall is a package-manager operation, not a Provider lifecycle action. The
+safe sequence is host rollback/restart, `extension disable`, `extension
+forget`, then `pip uninstall`. `forget` refuses enabled extensions and only
+removes Manager-owned configuration, preventing stale intent from reappearing
+after a later reinstall.
+
 ## Acceptance before alpha
 
 1. BidKV must complete install, discover, configure, enable, real vLLM load,
