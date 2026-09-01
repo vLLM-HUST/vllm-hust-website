@@ -37,6 +37,16 @@ def test_index_contains_expected_project_markers() -> None:
     assert "长征 Desktop 下载" not in text
 
 
+def test_versions_page_links_the_ascend_runtime_matrix() -> None:
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "versions.html").read_text(encoding="utf-8")
+
+    assert 'id="versions-ascend-title"' in text
+    assert 'id="versions-ascend-link"' in text
+    assert "ascend-official-runtime-support-matrix.zh-CN.md" in text
+    assert "官方 ARM64 运行环境矩阵" in text
+
+
 def test_site_uses_vllm_hust_brand_icon() -> None:
     root = Path(__file__).resolve().parents[1]
     icon = root / "assets" / "brand" / "vllm-hust-icon.png"
