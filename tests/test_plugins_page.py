@@ -293,7 +293,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "workshop-v1" in PAGE
+    assert "workshop-v4-owners-effects-20260901" in PAGE
 
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
@@ -377,6 +377,22 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
             for value in plugin["metrics"].values()
         )
 
+    bidkv = WORKSHOP_METADATA["plugins"]["bidkv"]["maintainers"]
+    diffspec = WORKSHOP_METADATA["plugins"]["diffspec"]["maintainers"]
+    assert [(person["name"], person["login"]) for person in bidkv] == [
+        ("王明琪", "MingqiWang-coder"),
+        ("陈彦博", "cybber695"),
+    ]
+    assert [(person["name"], person["login"]) for person in diffspec] == [
+        ("杜忠承", "dzcixy")
+    ]
+    assert WORKSHOP_METADATA["plugins"]["bidkv"]["advisors"] == [
+        {"name_zh": "张书豪", "name_en": "Shuhao Zhang"}
+    ]
+    assert WORKSHOP_METADATA["plugins"]["diffspec"]["advisors"] == [
+        {"name_zh": "黄禹", "name_en": "Yu Huang"}
+    ]
+
 
 def test_workshop_renders_synced_metadata_without_hardcoded_counts() -> None:
     assert 'data-metadata="./data/plugin-workshop-metadata.json?v=' in PAGE
@@ -386,8 +402,31 @@ def test_workshop_renders_synced_metadata_without_hardcoded_counts() -> None:
     assert "metadata.metrics.stars" in SCRIPT
     assert "metadata.metrics.open_pull_requests" in SCRIPT
     assert "metadata.metrics.forks" in SCRIPT
+    assert "metadata.advisors" in SCRIPT
     assert ".plugin-maintainer" in STYLES
+    assert ".plugin-advisors" in STYLES
     assert ".plugin-repo-metrics" in STYLES
+
+
+def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
+    workshop_mods = [
+        item
+        for item in REGISTRY["components"]
+        if item["artifact_type"] == "runtime_component"
+        and item["repository_relationship"] == "organization_native"
+        and item["delivery_model"]
+        in {"plugin_bundle", "python_distribution", "migration_scaffold"}
+        and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+    ]
+    assert workshop_mods
+    for item in workshop_mods:
+        assert item["public_effect_en"]
+        assert item["public_effect_zh"]
+        assert item["public_effect_status"] in {"measured", "validated", "preview"}
+        assert item["public_effect_url"].startswith("https://github.com/")
+    assert "function publicEffectPanel(item)" in SCRIPT
+    assert 'local(item, "public_effect")' in SCRIPT
+    assert ".plugin-public-effect" in STYLES
 
 
 def test_quantization_entries_preserve_runtime_boundaries() -> None:
@@ -416,7 +455,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=workshop-v1" in PAGE
+    assert "plugins.css?v=workshop-v2-effects-20260901" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -466,7 +505,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v1"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v2-effects"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE

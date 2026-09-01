@@ -39,3 +39,41 @@ def test_workshop_filter_excludes_connectors_and_systems() -> None:
     assert not MODULE.is_workshop_mod(
         {**base, "canonical_repository": "https://github.com/vllm-project/vllm"}
     )
+
+
+def test_verified_identity_names_prefers_confirmed_real_names() -> None:
+    payload = {
+        "people": [
+            {
+                "github_login": "alice",
+                "display_name": "艾丽丝",
+                "identity_confirmed": True,
+            },
+            {
+                "github_login": "bob",
+                "display_name": "Unverified Bob",
+                "identity_confirmed": False,
+            },
+        ]
+    }
+    assert MODULE.verified_identity_names(payload) == {"alice": "艾丽丝"}
+
+
+def test_verified_identity_advisors_keeps_public_relationships() -> None:
+    payload = {
+        "people": [
+            {
+                "github_login": "alice",
+                "identity_confirmed": True,
+                "advisor": {"zh": "张老师", "en": "Prof. Zhang"},
+            },
+            {
+                "github_login": "bob",
+                "identity_confirmed": False,
+                "advisor": {"zh": "不应显示", "en": "Hidden"},
+            },
+        ]
+    }
+    assert MODULE.verified_identity_advisors(payload) == {
+        "alice": [{"name_zh": "张老师", "name_en": "Prof. Zhang"}]
+    }
