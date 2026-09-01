@@ -1,6 +1,6 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-09-01T08:11:12+00:00",
+  "generated_at": "2026-09-01T08:17:24+00:00",
   "source": "GitHub API + canonical ownership and verified identity data",
   "plugins": {
     "bidkv": {
@@ -86,30 +86,6 @@
         }
       ],
       "maintainer_source": "README.md#maintainers"
-    },
-    "ascend-adaptive-quantized-kv": {
-      "repository": "vLLM-HUST/vllm-ascend-adaptive-quantized-kv-hust",
-      "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-adaptive-quantized-kv-hust",
-      "metrics": {
-        "stars": 0,
-        "forks": 0,
-        "open_pull_requests": 0
-      },
-      "maintainers": [
-        {
-          "login": "XilingGao",
-          "name": "高西岭",
-          "profile_url": "https://github.com/XilingGao",
-          "avatar_url": "https://avatars.githubusercontent.com/u/252187719?v=4"
-        }
-      ],
-      "advisors": [
-        {
-          "name_zh": "张书豪",
-          "name_en": "Shuhao Zhang"
-        }
-      ],
-      "maintainer_source": "ecosystem.json#component.maintainers"
     },
     "ascend-quant-runtime-descriptor": {
       "repository": "vLLM-HUST/vllm-ascend-quant-hust",

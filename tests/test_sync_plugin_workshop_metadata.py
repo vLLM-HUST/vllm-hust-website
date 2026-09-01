@@ -36,6 +36,7 @@ def test_workshop_filter_excludes_connectors_and_systems() -> None:
     }
     assert MODULE.is_workshop_mod(base)
     assert not MODULE.is_workshop_mod({**base, "artifact_type": "bridge"})
+    assert not MODULE.is_workshop_mod({**base, "public_surface": False})
     assert not MODULE.is_workshop_mod(
         {**base, "canonical_repository": "https://github.com/vllm-project/vllm"}
     )
