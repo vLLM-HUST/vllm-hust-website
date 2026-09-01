@@ -45,6 +45,9 @@ def test_versions_page_links_the_ascend_runtime_matrix() -> None:
     assert 'id="versions-ascend-link"' in text
     assert "ascend-official-runtime-support-matrix.zh-CN.md" in text
     assert "官方 ARM64 运行环境矩阵" in text
+    assert "stable v0.23.0 image set is pinned separately" in text
+    assert "HUST main 快照分开登记" in text
+    assert "不批准其用于部署" in text
 
 
 def test_site_uses_vllm_hust_brand_icon() -> None:
