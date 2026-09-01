@@ -330,7 +330,10 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
 
 def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert 'let selectedType = "extensions"' in SCRIPT
-    assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
+    assert 'const isWorkshopMod = (item)' in SCRIPT
+    assert 'item.artifact_type === "runtime_component"' in SCRIPT
+    assert 'item.repository_relationship === "organization_native"' in SCRIPT
+    assert '["plugin_bundle", "python_distribution", "migration_scaffold"]' in SCRIPT
     assert 'element("section", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert '"plugins-title": zh ? "扩展工坊" : "Extension Workshop"' in SCRIPT
@@ -338,6 +341,14 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
+
+
+def test_workshop_does_not_present_official_connectors_or_systems_as_mods() -> None:
+    assert 'isWorkshopMod(item) && matchesType' in SCRIPT
+    assert 'item.artifact_type === "runtime_component"' in SCRIPT
+    assert 'Only independent vLLM-HUST extension repositories appear here.' in PAGE
+    assert 'official connectors' in PAGE
+    assert '官方 Connector' in PAGE
 
 
 def test_quantization_entries_preserve_runtime_boundaries() -> None:
