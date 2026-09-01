@@ -50,8 +50,8 @@
       "maturity": "unsupported",
       "canonical_repository": "https://github.com/vLLM-HUST/production-stack-hust",
       "upstream_repository": "https://github.com/vllm-project/production-stack",
-      "summary_en": "Thin HUST fork of the upstream Kubernetes control plane, owning only the arm64 carrier and narrowly required integration fixes. Controller reconciliation, metrics-backed scaling, and real GLM Router failure/recovery are verified; amd64 is not required.",
-      "summary_zh": "官方 Kubernetes 控制面的 HUST 薄 fork，仅承载 arm64 发布载体和极少必要集成补丁；controller 调谐、Metrics 扩容及真实 GLM Router 故障恢复已验证，不要求 amd64。",
+      "summary_en": "Thin HUST fork of the upstream Kubernetes control plane, owning only the arm64 carrier and narrowly required integration fixes. Controller reconciliation, metrics-backed scaling, real GLM Router failure/recovery, and the GitHub-hosted arm64 build are verified; amd64 is not required; self-hosted runners are not required.",
+      "summary_zh": "官方 Kubernetes 控制面的 HUST 薄 fork，仅承载 arm64 发布载体和极少必要集成补丁；controller 调谐、Metrics 扩容、真实 GLM Router 故障恢复与 GitHub-hosted arm64 构建均已验证，不要求 amd64 或 self-hosted runner。",
       "evidence_level": "integration_tested"
     },
     {
