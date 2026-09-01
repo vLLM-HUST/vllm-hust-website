@@ -334,7 +334,7 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
 def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert 'let selectedType = "extensions"' in SCRIPT
     assert "const isWorkshopMod = (item)" in SCRIPT
-    assert 'item.artifact_type === "runtime_component"' in SCRIPT
+    assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
     assert 'item.repository_relationship === "organization_native"' in SCRIPT
     assert '["plugin_bundle", "python_distribution", "migration_scaffold"]' in SCRIPT
     assert 'element("section", "plugin-grid workshop-grid")' in SCRIPT
@@ -348,7 +348,7 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
 
 def test_workshop_does_not_present_official_connectors_or_systems_as_mods() -> None:
     assert "isWorkshopMod(item) && matchesType" in SCRIPT
-    assert 'item.artifact_type === "runtime_component"' in SCRIPT
+    assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
     assert "Only independent vLLM-HUST extension repositories appear here." in PAGE
     assert "official connectors" in PAGE
     assert "官方 Connector" in PAGE
@@ -359,7 +359,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
     workshop_mods = {
         item["id"]
         for item in REGISTRY["components"]
-        if item["artifact_type"] == "runtime_component"
+        if item["artifact_type"] in {"runtime_component", "bridge"}
         and item["repository_relationship"] == "organization_native"
         and item.get("public_surface", True) is not False
         and item["delivery_model"]
@@ -413,7 +413,7 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
     workshop_mods = [
         item
         for item in REGISTRY["components"]
-        if item["artifact_type"] == "runtime_component"
+        if item["artifact_type"] in {"runtime_component", "bridge"}
         and item["repository_relationship"] == "organization_native"
         and item.get("public_surface", True) is not False
         and item["delivery_model"]
@@ -507,7 +507,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v3-public-only"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v4-bridges"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -515,7 +515,7 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 49
+    assert len(PORTFOLIO["repositories"]) == 51
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {"extension-manager", "vllm-hust", "pegaflow-hust"} <= names
     assert "vllm-ascend" not in names
@@ -552,7 +552,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     ]
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v5"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v6"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
@@ -569,6 +569,8 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         "vllm-hust-activation-sparsity": "activation-sparsity-migration",
         "vllm-hust-pipeline-microbatch": "pipeline-microbatch-migration",
         "vllm-hust-qos-scheduler": "qos-scheduler-migration",
+        "vllm-ascend-mapped-kv-offload-hust": "mapped-host-kv-offload",
+        "vllm-hust-stateharbor": "stateharbor",
         "vllm-hust-scheduler-policy-lab": "scheduler-policy-lab",
     }
     repositories = {item["name"]: item for item in PORTFOLIO["repositories"]}
@@ -578,7 +580,12 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         assert repository["component_ids"] == [component_id]
         component = by_id(component_id)
         assert component["canonical_repository"] == repository["url"]
-        assert component["compatibility"]["status"] == "source_scaffold"
+        expected_status = (
+            "source_scaffold"
+            if component_id == "scheduler-policy-lab"
+            else "inspect_only"
+        )
+        assert component["compatibility"]["status"] == expected_status
         assert component["maturity"] == "incubating"
 
     assert "intellistream/vllm-hust-legacy" not in PAGE

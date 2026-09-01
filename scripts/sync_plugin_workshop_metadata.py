@@ -104,7 +104,7 @@ class GitHubClient:
 def is_workshop_mod(item: dict[str, Any]) -> bool:
     repository = str(item.get("canonical_repository") or "")
     return (
-        item.get("artifact_type") == "runtime_component"
+        item.get("artifact_type") in {"runtime_component", "bridge"}
         and item.get("repository_relationship") == "organization_native"
         and item.get("public_surface", True) is not False
         and item.get("delivery_model") in WORKSHOP_DELIVERY_MODELS

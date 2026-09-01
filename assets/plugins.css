@@ -261,6 +261,7 @@ body[data-page="plugins"] .workshop-card { min-height: 520px; overflow: visible;
 .workshop-cover-type { position: relative; z-index: 1; font: 800 10px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; }
 .workshop-cover-mark { position: relative; z-index: 1; color: rgba(255,255,255,.88); font: 900 42px "Sora",sans-serif; letter-spacing: -.08em; }
 .workshop-runtime_component .workshop-cover { background: linear-gradient(135deg,#12666a,#28a3a5); }
+.workshop-bridge .workshop-cover { background: linear-gradient(135deg,#315b9b,#6b8fd1); }
 .workshop-bridge .workshop-cover { background: linear-gradient(135deg,#51417e,#8267b4); }
 .workshop-external_system .workshop-cover { background: linear-gradient(135deg,#1c5678,#3f8fbd); }
 .workshop-tool .workshop-cover { background: linear-gradient(135deg,#5d631e,#9caa37); }

@@ -1,6 +1,6 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-09-01T08:17:24+00:00",
+  "generated_at": "2026-09-01T08:29:36+00:00",
   "source": "GitHub API + canonical ownership and verified identity data",
   "plugins": {
     "bidkv": {
@@ -257,6 +257,30 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
+    "unified-communication-migration": {
+      "repository": "vLLM-HUST/vllm-hust-unified-comm",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-unified-comm",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
+      },
+      "maintainers": [
+        {
+          "login": "machuanhu",
+          "name": "马川湖",
+          "profile_url": "https://github.com/machuanhu",
+          "avatar_url": "https://avatars.githubusercontent.com/u/52109545?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "王雄",
+          "name_en": "Xiong Wang"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
     "split-batch-full-graph-migration": {
       "repository": "vLLM-HUST/vllm-ascend-split-batch-hust",
       "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-split-batch-hust",
@@ -391,6 +415,54 @@
         }
       ],
       "advisors": [],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
+    "mapped-host-kv-offload": {
+      "repository": "vLLM-HUST/vllm-ascend-mapped-kv-offload-hust",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-mapped-kv-offload-hust",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
+      },
+      "maintainers": [
+        {
+          "login": "CubeLander",
+          "name": "田景远",
+          "profile_url": "https://github.com/CubeLander",
+          "avatar_url": "https://avatars.githubusercontent.com/u/49518565?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
+    "stateharbor": {
+      "repository": "vLLM-HUST/vllm-hust-stateharbor",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-stateharbor",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
+      },
+      "maintainers": [
+        {
+          "login": "CubeLander",
+          "name": "田景远",
+          "profile_url": "https://github.com/CubeLander",
+          "avatar_url": "https://avatars.githubusercontent.com/u/49518565?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang"
+        }
+      ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     }
   }

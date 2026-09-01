@@ -137,7 +137,7 @@
   };
 
   const isWorkshopMod = (item) => (
-    item.artifact_type === "runtime_component"
+    ["runtime_component", "bridge"].includes(item.artifact_type)
     && item.repository_relationship === "organization_native"
     && item.public_surface !== false
     && ["plugin_bundle", "python_distribution", "migration_scaffold"].includes(item.delivery_model)

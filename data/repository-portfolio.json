@@ -522,6 +522,28 @@
       "public_surface": true
     },
     {
+      "name": "vllm-ascend-mapped-kv-offload-hust",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-mapped-kv-offload-hust",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "provides_mapped_host_kv_offload_bridge",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["mapped-host KV offload import-only package", "legacy provenance ledger"],
+      "component_ids": ["mapped-host-kv-offload"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-stateharbor",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-stateharbor",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "provides_request_owned_state_bridge",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["request-owned state import-only package", "legacy provenance ledger"],
+      "component_ids": ["stateharbor"],
+      "public_surface": true
+    },
+    {
       "name": "vllm-hust-scheduler-policy-lab",
       "url": "https://github.com/vLLM-HUST/vllm-hust-scheduler-policy-lab",
       "portfolio_domain": "applications_research",
