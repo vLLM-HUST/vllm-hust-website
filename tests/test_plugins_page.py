@@ -293,7 +293,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "workshop-v5-public-only-20260901" in PAGE
+    assert "workshop-v6-polish-20260901" in PAGE
 
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
@@ -322,6 +322,7 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
         assert profile["requirements_zh"]
 
     assert "function compatibilityPanel(item)" in SCRIPT
+    assert "function compatibilityDetails(item)" in SCRIPT
     assert 'element("details", "plugin-technical-details")' in SCRIPT
     assert 'element("summary", "", copy().details)' in SCRIPT
     assert "copy().installRun" in SCRIPT
@@ -339,6 +340,8 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert '["plugin_bundle", "python_distribution", "migration_scaffold"]' in SCRIPT
     assert 'element("section", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
+    assert "function coverTone(item)" in SCRIPT
+    assert ".workshop-tone-lagoon .workshop-cover" in STYLES
     assert '"plugins-title": zh ? "扩展工坊" : "Extension Workshop"' in SCRIPT
     assert 'body[data-page="plugins"] .technical-highlights' in STYLES
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
@@ -472,7 +475,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=workshop-v2-effects-20260901" in PAGE
+    assert "plugins.css?v=workshop-v3-polish-20260901" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
