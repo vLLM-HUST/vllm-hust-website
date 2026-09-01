@@ -14,11 +14,13 @@ def test_required_entry_files_exist() -> None:
     required = [
         root / "index.html",
         root / "leaderboard.html",
+        root / "dataset-validation.html",
         root / "achievements.html",
         root / "contributors.html",
         root / "conferences.html",
         root / "courses.html",
         root / "versions.html",
+        root / "plugins.html",
         root / "README.md",
         root / "CHANGELOG.md",
     ]
@@ -130,6 +132,42 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     assert ".research-member-detail-row" in css
     assert ".research-member-group + .research-member-group" in css
     assert "@media (max-width: 860px)" in css
+
+
+def test_dataset_validation_page_uses_versioned_contract() -> None:
+    root = Path(__file__).resolve().parents[1]
+    page = (root / "dataset-validation.html").read_text(encoding="utf-8")
+    script = (root / "assets" / "dataset-validation.js").read_text(encoding="utf-8")
+    fixture = root / "data" / "dataset_validation_v1.empty.json"
+    fixture_data = json.loads(fixture.read_text(encoding="utf-8"))
+
+    assert fixture.exists()
+    assert len(fixture_data["datasets"]) == 44
+    assert fixture_data["datasets"][0]["id"] == "a01"
+    assert fixture_data["datasets"][-1]["id"] == "a44"
+    assert 'data-page="dataset-validation"' in page
+    assert "dataset-validation-v1" in page
+    assert "dataset-validation-v1" in script
+    assert "Empty cells are intentionally shown" in page
+    assert 'href="./dataset-validation.html"' in page
+    assert "Result references an undeclared dataset or metric" in script
+    assert "Duplicate result cell" in script
+    assert "Unsupported result status" in script
+    assert "vllmHustDatasetValidationConfig?.dataUrl" in script
+    assert 'id="validation-freshness"' in page
+    assert 'id="validation-dataset-search"' in page
+    assert 'id="validation-group-filter"' in page
+    assert 'id="validation-pagination"' in page
+    assert "pageSize: 20" in script
+    assert "TREND_ORDER" in script
+    assert "formatBaselineValue" in script
+    assert "validation-cell-pair" in script
+    assert "?demo=1" in (root / "data" / "DATASET_VALIDATION_RESULTS.md").read_text(
+        encoding="utf-8"
+    )
+    assert "position: sticky" in (root / "assets" / "dataset-validation.css").read_text(
+        encoding="utf-8"
+    )
 
 
 def test_data_directory_has_sync_marker() -> None:
@@ -836,11 +874,17 @@ def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
     assert ecosystem.count("<a ") == 4
     assert "<strong>RIDE Lab</strong>" in ecosystem
     assert "<strong>SAGE</strong>" not in ecosystem
-    assert "Agent-native research and SAGE core stewardship" in ecosystem
+    assert "Agent-native LLM control plane and SAGE core stewardship" in ecosystem
     assert (
         "Sage Mate is an application built with SAGE and backed by vLLM-HUST."
         in html_text
     )
+
+
+def test_leaderboard_hides_internal_automation_submitter_labels() -> None:
+    root = Path(__file__).resolve().parents[1]
+    script = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
+    assert "normalized.includes('codex')" in script
 
 
 def test_conference_navigation_is_general_not_event_specific() -> None:
@@ -914,7 +958,9 @@ def test_language_toggle_is_integrated_into_the_enhanced_navigation() -> None:
         assert 'id="langToggle"' not in text[nav_start:nav_end]
 
     assert ".lang-toggle {" in css_text
-    assert "inner.appendChild(languageButton)" in (root / "assets" / "site.js").read_text(encoding="utf-8")
+    assert "inner.appendChild(languageButton)" in (
+        root / "assets" / "site.js"
+    ).read_text(encoding="utf-8")
     assert "position: static;" in css_text
     assert "top: 14px;" in css_text
     assert "right: 48px;" in css_text
@@ -951,7 +997,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=ride-ecosystem-20260817-2" in html_text
+    assert "assets/home.css?v=upstream-forks-20260901" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
@@ -963,13 +1009,16 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     assert "font-size: clamp(" not in css_text
 
 
-def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
+def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "Turn domestic compute into usable, verifiable inference." in html_text
-    assert "让国产算力成为可用、可验证的推理能力。" in html_text
+    assert (
+        "Typed runtime contracts. Platform profiles. Composable KV state systems."
+        in html_text
+    )
+    assert "类型化运行时契约、平台 profile 与可组合 KV 状态系统。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
@@ -988,37 +1037,49 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
         "vllm-hust-profiling",
         "vllm-hust-benchmark",
         "vllm-ascend-hust",
+        "mooncake-hust",
+        "production-stack-hust",
         "triton-ascend-hust",
         "vllm-metal-hust",
+        "sglang-hust",
     )
     for repository in expected_repositories:
         assert f"https://github.com/vLLM-HUST/{repository}" in html_text
 
     proving_ground = html_text.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
-    assert "Runtime Contract" in proving_ground
-    assert "Plugin Interfaces" in proving_ground
+    assert "Runtime Contracts" in proving_ground
+    assert "Ecosystem Interfaces" in proving_ground
     assert "Validation Matrix" in proving_ground
     assert "Benchmark Contract" in proving_ground
     assert "vllm-ascend-hust" not in proving_ground
     assert "triton-ascend-hust" not in proving_ground
 
     catalog = html_text.split('id="projects"', 1)[1].split('id="ecosystem"', 1)[0]
-    ascend_adapter = catalog.index("vLLM Ascend HUST")
-    metal_adapter = catalog.index("vLLM Metal HUST")
-    assert ascend_adapter < metal_adapter
-    assert "Triton Ascend HUST" in catalog
-    assert "HUST-maintained Triton Ascend adaptation" in catalog
-    assert (
-        catalog.count('<span class="runtime-tag slate">integration branch</span>') == 3
-    )
+    forks_group = catalog.split('id="upstream-forks-title"', 1)[1].split(
+        'id="mechanism-control-title"', 1
+    )[0]
+    assert "They are not plugins." in catalog
+    assert "它们不是插件。" in html_text
+    for fork in (
+        "vllm-hust",
+        "vllm-ascend-hust",
+        "vllm-metal-hust",
+        "triton-ascend-hust",
+        "sglang-hust",
+        "mooncake-hust",
+        "production-stack-hust",
+    ):
+        assert fork in forks_group
+    assert forks_group.count('class="runtime-tag upstream">system fork</span>') == 7
+    assert "Triton Ascend HUST" in forks_group
+    assert "SGLang HUST" in forks_group
+    assert '<span class="runtime-tag slate">integration branch</span>' not in catalog
     assert '<span class="runtime-tag green">adapter</span>' not in catalog
 
     group_ids = (
         "mechanism-control-title",
         "mechanism-execution-title",
         "mechanism-representation-title",
-        "mechanism-compiler-title",
-        "mechanism-adapters-title",
         "mechanism-operations-title",
         "mechanism-validation-title",
     )
@@ -1031,21 +1092,17 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     execution_group = catalog.split('id="mechanism-execution-title"', 1)[1].split(
         'id="mechanism-representation-title"', 1
     )[0]
-    adapter_group = catalog.split('id="mechanism-adapters-title"', 1)[1].split(
-        'id="mechanism-operations-title"', 1
-    )[0]
     assert "vllm-hust-bidkv" in control_group
     assert "vllm-ascend-hust-diffspec" in execution_group
     assert "vllm-ascend-hust-LatchMoE" in execution_group
-    assert "vllm-ascend-hust" in adapter_group
-    assert "vllm-metal-hust" in adapter_group
-    assert '<span class="runtime-tag">plugin</span>' not in adapter_group
-    compiler_group = catalog.split('id="mechanism-compiler-title"', 1)[1].split(
-        'id="mechanism-adapters-title"', 1
-    )[0]
-    assert "triton-ascend-hust" in compiler_group
-    assert "integration branch" in compiler_group
-    assert '<span class="runtime-tag">plugin</span>' not in compiler_group
+    mechanisms = catalog.split('id="mechanism-control-title"', 1)[1]
+    for fork in (
+        "vllm-ascend-hust",
+        "vllm-metal-hust",
+        "triton-ascend-hust",
+        "sglang-hust",
+    ):
+        assert f'href="https://github.com/vLLM-HUST/{fork}"' not in mechanisms
 
     for internal_phrase in (
         "讲述口径",
@@ -1102,7 +1159,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=stable-trend-v5-20260817" in html_text
+    assert "assets/leaderboard.js?v=stable-trend-v6-20260825" in html_text
     assert ">Stable trend</button>" in html_text
     assert "trendViewCheckpoint: 'Stable trend'" in js_text
     assert "trendViewCheckpoint: '稳定趋势'" in js_text
@@ -1360,9 +1417,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=nav-polish-20260826" in html_text
-    assert (
-            "assets/achievements-page.js?v=community-impact-20260826" in html_text
-    )
+    assert "assets/achievements-page.js?v=community-impact-20260826" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -1510,9 +1565,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
-    assert (
-            "assets/achievements-page.js?v=community-impact-20260826" in html_text
-    )
+    assert "assets/achievements-page.js?v=community-impact-20260826" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
@@ -1692,7 +1745,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "stable-trend-v5-20260817" in html_text
+    assert "stable-trend-v6-20260825" in html_text
     assert "model-column-sync-20260724" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
@@ -2183,7 +2236,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 50
+    assert len(profiles["participants"]) == 51
     assert len(profiles["staff_members"]) == 4
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
@@ -2523,7 +2576,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "stable-trend-v5-20260817" in html_text
+    assert "stable-trend-v6-20260825" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:

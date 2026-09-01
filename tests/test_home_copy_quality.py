@@ -3,7 +3,6 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-
 INDEX = (Path(__file__).resolve().parents[1] / "index.html").read_text(encoding="utf-8")
 
 
@@ -39,17 +38,17 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "Turn domestic compute into usable, verifiable inference.",
-        "One engine connects upstream compatibility, system innovation, and public evidence.",
+        "Typed runtime contracts. Platform profiles. Composable KV state systems.",
+        "Connect policies, platforms, KV systems, and control planes through typed boundaries, with matched support evidence.",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "让国产算力成为可用、可验证的推理能力。",
+        "类型化运行时契约、平台 profile 与可组合 KV 状态系统。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
 
-    for advantage in ("Usable", "Evolvable", "Verifiable", "可用", "可演进", "可验证"):
+    for advantage in ("State", "Execute", "Prove", "状态", "执行", "验证"):
         assert advantage in INDEX
 
 

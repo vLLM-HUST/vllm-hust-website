@@ -330,6 +330,9 @@ body[data-page="home"] .lang-toggle {
 .execution-atlas { background: var(--exec-paper); }
 .runtime-list { display: grid; gap: 34px; }
 .runtime-group { border-top: 1px solid var(--exec-ink); }
+.upstream-fork-group { border-top: 3px solid var(--exec-amber); }
+.upstream-fork-group .runtime-group-head { background: #fff7e6; }
+.runtime-tag.upstream { color: var(--exec-ink); background: var(--exec-amber); }
 .runtime-group-head {
   min-height: 92px;
   padding: 16px 12px;
@@ -378,6 +381,19 @@ body[data-page="home"] .lang-toggle {
 
 .execution-footer { color: var(--exec-white); background: #080d0e; }
 
+/* The homepage is a front door, not a second documentation site. */
+.execution-hero { min-height: min(640px, 82svh); padding-top: 112px; padding-bottom: 42px; }
+.execution-hero h1 { font-size: 92px; }
+.execution-kicker { margin-top: 24px; font-size: 32px; }
+.execution-actions { margin-top: 26px; }
+.execution-metrics { bottom: 42px; }
+.execution-scope { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.execution-section { padding-top: 72px; padding-bottom: 72px; }
+.execution-section-head { margin-bottom: 32px; }
+.execution-section-head h2 { font-size: 54px; }
+.product-card { min-height: 590px; }
+.runtime-list { gap: 22px; }
+
 @media (max-width: 1120px) {
   body[data-page="home"] .nav-link { font-size: 11px; }
   .execution-metrics { position: relative; right: auto; bottom: auto; margin-top: 46px; }
@@ -402,7 +418,7 @@ body[data-page="home"] .lang-toggle {
   }
   body[data-page="home"] .lang-toggle { top: 14px; right: 60px; }
   body[data-page="home"] .nav-toggle { right: 0; }
-  .execution-hero { min-height: 780px; padding: 112px 16px 48px; }
+  .execution-hero { min-height: 650px; padding: 104px 16px 38px; }
   .inference-fabric { left: 20%; opacity: .54; }
   .execution-hero-shade { background: rgba(7,11,12,.72); }
   .execution-hero h1 { font-size: 58px; line-height: .9; }

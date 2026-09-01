@@ -69,7 +69,7 @@ progression.
           "label": "<public optimization keyword>",
           "pr_number": 123,
           "repository": "vLLM-HUST/vllm-hust",
-          "pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/123",
+          "pr_url": "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/123",
           "commit": "<full-40-hex-canonical-commit>",
           "attribution": {
             "kind": "checkpoint-cumulative",
@@ -88,7 +88,7 @@ progression.
           "label": "<public optimization keyword>",
           "pr_number": 124,
           "repository": "vLLM-HUST/vllm-hust",
-          "pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/124",
+          "pr_url": "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/124",
           "commit": "<full-40-hex-canonical-commit>",
           "attribution": {
             "kind": "checkpoint-cumulative",
@@ -107,7 +107,7 @@ progression.
           "label": "<public optimization keyword>",
           "pr_number": 125,
           "repository": "vLLM-HUST/vllm-hust",
-          "pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/125",
+          "pr_url": "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/125",
           "commit": "<full-40-hex-canonical-commit>",
           "attribution": {
             "kind": "checkpoint-cumulative",
