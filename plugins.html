@@ -737,12 +737,12 @@ vllm-hust-ext run -- vllm serve MODEL
 <span class="lang-en">The former single Python Bundle v1 design is frozen as an unstable experiment.
 Manifest 0.2 distinguishes kind, host, runtime, lifecycle owner, required services, compatibility ranges, and Python/service/OCI/Helm/Kubernetes carriers.
 MooncakeStoreConnector has passed a real Ascend save/load and outage/recovery gate.
-Production Stack has passed controller reconciliation, metrics-backed scaling, and a real GLM Router 500-to-200 recovery without restarting vLLM; however, the official v0.1.12 Router image has no arm64 manifest.
+Production Stack has passed controller reconciliation, metrics-backed scaling, and a real GLM Router 500-to-200 recovery without restarting vLLM. The release target is a reproducible vLLM-HUST arm64 carrier; amd64 is not required.
 BidKV's stable upstream scheduler contract and the remaining release/cross-version matrix are still open, so no alpha or stable-v1 claim is made.</span>
 <span class="lang-zh">原单一 Python Bundle v1 设计已冻结为不稳定实验。
 Manifest 0.2 显式区分 kind、host、runtime、lifecycle owner、required services、兼容范围以及 Python/service/OCI/Helm/Kubernetes 载体。
 MooncakeStoreConnector 已通过真实 Ascend save/load 与中断/恢复门禁。
-Production Stack 已通过 controller 调谐、Metrics 扩容，以及不重启 vLLM 的真实 GLM Router 500→200 恢复，但官方 v0.1.12 Router 镜像没有 arm64 manifest。
+Production Stack 已通过 controller 调谐、Metrics 扩容，以及不重启 vLLM 的真实 GLM Router 500→200 恢复。发布目标是可复现的 vLLM-HUST arm64 载体，不要求 amd64。
 BidKV 的稳定上游 scheduler 契约及发布/跨版本矩阵仍未完成，因此不会发布 alpha 或宣称 v1 稳定。
 </span>
 </p>

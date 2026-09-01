@@ -117,7 +117,7 @@ def test_extension_manager_and_production_stack_keep_distinct_ownership() -> Non
     assert production_stack["evidence_level"] == "integration_tested"
     assert "metrics-backed scaling" in production_stack["summary_en"]
     assert "real GLM Router failure/recovery" in production_stack["summary_en"]
-    assert "lacks arm64 support" in production_stack["summary_en"]
+    assert "amd64 is not required" in production_stack["summary_en"]
 
     assert manager["artifact_type"] == "tool"
     assert manager["system_role"] == "extension_management"
