@@ -253,6 +253,7 @@ body[data-page="plugins"] .plugin-hero h1 { max-width: 760px; font-size: clamp(4
 body[data-page="plugins"] .plugin-hero .hero-lede { max-width: 620px; }
 body[data-page="plugins"] .plugin-hero-facts { display: none; }
 body[data-page="plugins"] .plugin-controls { margin-top: 24px; }
+.workshop-scope-note { margin: -8px 0 22px; padding-left: 12px; border-left: 3px solid #f0b341; color: #52615f; font-size: 12px; line-height: 1.6; }
 body[data-page="plugins"] .workshop-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
 body[data-page="plugins"] .workshop-card { min-height: 520px; overflow: visible; border: 1px solid #c7d2cf; box-shadow: 0 8px 22px rgba(12,17,18,.06); }
 .workshop-cover { position: relative; height: 132px; margin: -22px -22px 20px; padding: 18px; overflow: hidden; display: flex; justify-content: space-between; align-items: flex-end; color: #fff; background: linear-gradient(135deg,#105456,#1f898b); }
