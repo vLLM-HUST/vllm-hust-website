@@ -124,7 +124,8 @@ def test_upstream_synchronized_hust_forks_are_a_separate_system_class() -> None:
     assert "Upstream-synchronized HUST forks are systems, not plugins." in PAGE
     assert "上游同步 HUST fork 是系统分支，不是插件。" in PAGE
     assert "upstream_sync_fork" in SCRIPT
-    assert 'item.repository_relationship !== "upstream_sync_fork"' in SCRIPT
+    assert 'let selectedType = "extensions"' in SCRIPT
+    assert 'badge(copy().forkBadge, "upstream-fork")' in SCRIPT
     assert "forksTitle" in SCRIPT
 
 
@@ -289,7 +290,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "mod-catalog-v4" in PAGE
+    assert "workshop-v1" in PAGE
 
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
@@ -327,6 +328,18 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
     assert ".mod-catalog-guide" in STYLES
 
 
+def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
+    assert 'let selectedType = "extensions"' in SCRIPT
+    assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
+    assert 'element("section", "plugin-grid workshop-grid")' in SCRIPT
+    assert 'element("div", "workshop-cover")' in SCRIPT
+    assert '"plugins-title": zh ? "扩展工坊" : "Extension Workshop"' in SCRIPT
+    assert 'body[data-page="plugins"] .technical-highlights' in STYLES
+    assert 'body[data-page="plugins"] .plugin-standard' in STYLES
+    assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
+    assert 'body[data-page="plugins"] .workshop-grid' in STYLES
+
+
 def test_quantization_entries_preserve_runtime_boundaries() -> None:
     adaptive = by_id("ascend-adaptive-quantized-kv")
     toolkit = by_id("ascend-quant-toolkit")
@@ -353,7 +366,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=readability-v12-independent-repos" in PAGE
+    assert "plugins.css?v=workshop-v1" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -403,7 +416,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=mod-catalog-v4"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v1"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE

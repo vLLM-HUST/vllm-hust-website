@@ -238,6 +238,39 @@ body[data-page="plugins"] .plugin-card h3 { margin: 26px 0 10px; color: #0c1112;
 @media (max-width: 680px) { .mod-catalog-guide { grid-template-columns: 1fr; }.mod-catalog-guide > div { min-height: 0; border-right: 0; border-bottom: 1px solid #d3dcd9; }.mod-catalog-guide > div:last-child { border-bottom: 0; } }
 @media (prefers-reduced-motion: reduce) { .plugin-launch-tooltip { transition: none; } }
 
+/* Workshop view: the catalog is the product; architecture lives in docs. */
+body[data-page="plugins"] .plugin-boundary,
+body[data-page="plugins"] .plugin-section-nav,
+body[data-page="plugins"] .technical-highlights,
+body[data-page="plugins"] .plugin-standard,
+body[data-page="plugins"] .plugin-legend,
+body[data-page="plugins"] .upstream-fork-notice,
+body[data-page="plugins"] .mod-catalog-guide,
+body[data-page="plugins"] .repository-portfolio,
+body[data-page="plugins"] main > .adjacent-section { display: none; }
+body[data-page="plugins"] .plugin-hero .content-panel { min-height: 190px; padding-top: 38px; padding-bottom: 30px; }
+body[data-page="plugins"] .plugin-hero h1 { max-width: 760px; font-size: clamp(46px,7vw,82px); }
+body[data-page="plugins"] .plugin-hero .hero-lede { max-width: 620px; }
+body[data-page="plugins"] .plugin-hero-facts { display: none; }
+body[data-page="plugins"] .plugin-controls { margin-top: 24px; }
+body[data-page="plugins"] .workshop-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+body[data-page="plugins"] .workshop-card { min-height: 520px; overflow: visible; border: 1px solid #c7d2cf; box-shadow: 0 8px 22px rgba(12,17,18,.06); }
+.workshop-cover { position: relative; height: 132px; margin: -22px -22px 20px; padding: 18px; overflow: hidden; display: flex; justify-content: space-between; align-items: flex-end; color: #fff; background: linear-gradient(135deg,#105456,#1f898b); }
+.workshop-cover::after { content: ""; position: absolute; width: 180px; height: 180px; top: -96px; right: -48px; border: 30px solid rgba(255,255,255,.12); border-radius: 50%; }
+.workshop-cover-type { position: relative; z-index: 1; font: 800 10px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; }
+.workshop-cover-mark { position: relative; z-index: 1; color: rgba(255,255,255,.88); font: 900 42px "Sora",sans-serif; letter-spacing: -.08em; }
+.workshop-runtime_component .workshop-cover { background: linear-gradient(135deg,#12666a,#28a3a5); }
+.workshop-bridge .workshop-cover { background: linear-gradient(135deg,#51417e,#8267b4); }
+.workshop-external_system .workshop-cover { background: linear-gradient(135deg,#1c5678,#3f8fbd); }
+.workshop-tool .workshop-cover { background: linear-gradient(135deg,#5d631e,#9caa37); }
+.workshop-platform_profile .workshop-cover { background: linear-gradient(135deg,#7a4c10,#cf8b2e); }
+.workshop-runtime_core .workshop-cover { background: linear-gradient(135deg,#192322,#425653); }
+.workshop-application .workshop-cover { background: linear-gradient(135deg,#774b46,#b66d62); }
+body[data-page="plugins"] .workshop-card h3 { margin-top: 22px; }
+body[data-page="plugins"] .workshop-card .plugin-summary { display: -webkit-box; overflow: hidden; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+@media (max-width: 1060px) { body[data-page="plugins"] .workshop-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 680px) { body[data-page="plugins"] .workshop-grid { grid-template-columns: 1fr; }.workshop-cover { height: 112px; }.workshop-cover-mark { font-size: 34px; } }
+
 /* Readability guardrails: subpages.css uses more specific generic content-panel
    selectors, so dark plugin surfaces need equally explicit color ownership. */
 body[data-page="plugins"] .content-panel .highlights-head h2,
