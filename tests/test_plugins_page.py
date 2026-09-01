@@ -352,6 +352,7 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
+    assert "const visibleLimit = pageSize;" in SCRIPT
 
 
 def test_workshop_supports_workload_guided_discovery() -> None:

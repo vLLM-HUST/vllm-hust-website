@@ -826,7 +826,7 @@ vllm-hust-ext extension check ${extensionId}`
     });
     catalog.replaceChildren();
     const grid = element("section", "plugin-grid workshop-grid");
-    const visibleLimit = window.matchMedia("(max-width: 680px)").matches ? 6 : pageSize;
+    const visibleLimit = pageSize;
     const displayed = query || expanded ? visible : visible.slice(0, visibleLimit);
     displayed.forEach((item) => grid.append(renderCard(item)));
     catalog.append(grid);
