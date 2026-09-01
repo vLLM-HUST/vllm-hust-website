@@ -111,6 +111,7 @@
     experimental: { en: "Experimental", zh: "实验性" },
     inspect_only: { en: "Inspect only", zh: "仅检查" },
     external_service: { en: "External service", zh: "外部服务" },
+    source_scaffold: { en: "Source scaffold", zh: "源码脚手架" },
     unsupported: { en: "Unsupported", zh: "不支持" }
   };
   const quickStarts = {
