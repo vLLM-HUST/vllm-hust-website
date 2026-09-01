@@ -10,6 +10,7 @@ PORTFOLIO = json.loads(
 )
 PAGE = (ROOT / "plugins.html").read_text(encoding="utf-8")
 SCRIPT = (ROOT / "assets" / "plugins-page.js").read_text(encoding="utf-8")
+STYLES = (ROOT / "assets" / "plugins.css").read_text(encoding="utf-8")
 LEGACY_STANDARD = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
 
 REQUIRED_FIELDS = {
@@ -220,6 +221,24 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     assert "vllm.operator" not in typed
     assert "vllm.model_runner" not in typed
     assert "integration_surfaces" in SCRIPT
+
+
+def test_bidkv_and_diffspec_cards_expose_accessible_launch_tooltips() -> None:
+    assert 'const quickStarts = {' in SCRIPT
+    assert 'bidkv: {' in SCRIPT
+    assert 'diffspec: {' in SCRIPT
+    assert "pip install vllm-hust-ext bidkv" in SCRIPT
+    assert "extension enable org.vllm-hust.bidkv" in SCRIPT
+    assert "pip install vllm-hust-ext vllm-diffspec" in SCRIPT
+    assert "extension configure org.vllm-hust.diffspec --file diffspec.json" in SCRIPT
+    assert "extension enable org.vllm-hust.diffspec" in SCRIPT
+    assert 'element("button", "plugin-launch-icon", ">_")' in SCRIPT
+    assert 'trigger.setAttribute("aria-describedby", tooltipId)' in SCRIPT
+    assert 'trigger.setAttribute("aria-expanded", "false")' in SCRIPT
+    assert 'if (event.key !== "Escape") return' in SCRIPT
+    assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
+    assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
+    assert "ecosystem-registry-v6" in PAGE
 
 
 def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
