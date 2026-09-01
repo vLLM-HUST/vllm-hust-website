@@ -4,6 +4,9 @@
   const filters = document.querySelector("[data-plugin-filters]");
   const search = document.querySelector("[data-plugin-search]");
   const more = document.querySelector("[data-plugin-more]");
+  const workloadNavigationRoot = document.querySelector("[data-workload-navigation]");
+  const workloadFilters = document.querySelector("[data-workload-filters]");
+  const workloadDescription = document.querySelector("[data-workload-description]");
   const adjacent = document.querySelector("[data-adjacent-assets]");
   const repositoryCatalog = document.querySelector("[data-repository-portfolio]");
   const repositoryStatus = document.querySelector("[data-repository-status]");
@@ -12,7 +15,9 @@
   let registry;
   let portfolio;
   let workshopMetadata = {};
+  let workloadNavigation = { traits: {}, plugins: {} };
   let selectedType = "extensions";
+  let selectedWorkload = "all";
   let expanded = false;
   const pageSize = 9;
 
@@ -59,6 +64,9 @@
     python: "Python",
     requirements: "前置条件",
     details: "兼容性与技术详情",
+    allWorkloads: "全部 Workload",
+    workloadTraits: "适用 Workload",
+    allWorkloadDescription: "展示所有公开 MOD；再结合兼容状态与公开效果判断是否适合生产使用。",
     installRun: "安装 / 启动",
     boundaries: "关键边界",
     repositories: "个组织仓库",
@@ -104,6 +112,9 @@
     python: "Python",
     requirements: "Requirements",
     details: "Compatibility & technical details",
+    allWorkloads: "All workloads",
+    workloadTraits: "Workload fit",
+    allWorkloadDescription: "Show every public MOD; use compatibility status and public results before considering production use.",
     installRun: "Install / run",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
@@ -248,6 +259,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
         selectedType = type;
         expanded = false;
         renderFilters();
+        renderWorkloadNavigation();
         renderCatalog();
       });
       filters.append(button);
@@ -256,6 +268,92 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
 
   function badge(text, className = "") {
     return element("span", `plugin-badge ${className}`.trim(), text);
+  }
+
+  function traitProfile(traitId) {
+    return workloadNavigation.traits[traitId] || {};
+  }
+
+  function traitLabel(traitId) {
+    const profile = traitProfile(traitId);
+    return local(profile, "label") || valueLabel(traitId);
+  }
+
+  function matchesSelectedType(item) {
+    const statusValue = item.compatibility?.status || "source_scaffold";
+    return selectedType === "extensions"
+      || (selectedType === "installable" && ["ready", "verified", "experimental"].includes(statusValue))
+      || (selectedType === "incubating" && !["ready", "verified", "experimental"].includes(statusValue));
+  }
+
+  function itemSearchText(item) {
+    const workloadText = (workloadNavigation.plugins[item.id] || []).flatMap((traitId) => {
+      const profile = traitProfile(traitId);
+      return [traitId, profile.label_en, profile.label_zh, profile.description_en, profile.description_zh];
+    });
+    return [
+      item.id, item.name, local(item, "summary"), item.artifact_type,
+      item.system_role, item.delivery_model, item.ownership, item.maturity,
+      item.repository_relationship, item.evidence_level, item.execution_planes.join(" "),
+      item.integration_contracts.join(" "), (item.integration_surfaces || []).join(" "),
+      item.canonical_repository || "", item.upstream_repository || "", ...workloadText
+    ].join(" ").toLowerCase();
+  }
+
+  function renderWorkloadNavigation() {
+    if (!workloadFilters || !workloadDescription || !registry) return;
+    workloadFilters.replaceChildren();
+    const options = ["all", ...Object.keys(workloadNavigation.traits)];
+    const query = search.value.trim().toLowerCase();
+    options.forEach((traitId) => {
+      const isAll = traitId === "all";
+      const count = registry.components.filter((item) => (
+        isWorkshopMod(item)
+        && matchesSelectedType(item)
+        && itemSearchText(item).includes(query)
+        && (isAll || (workloadNavigation.plugins[item.id] || []).includes(traitId))
+      )).length;
+      const button = element(
+        "button",
+        `workload-filter${selectedWorkload === traitId ? " active" : ""}`
+      );
+      button.type = "button";
+      button.dataset.workload = traitId;
+      button.setAttribute("aria-pressed", String(selectedWorkload === traitId));
+      button.append(
+        element("span", "", isAll ? copy().allWorkloads : traitLabel(traitId)),
+        element("strong", "", String(count))
+      );
+      button.addEventListener("click", () => {
+        selectedWorkload = traitId;
+        expanded = false;
+        renderWorkloadNavigation();
+        renderCatalog();
+      });
+      workloadFilters.append(button);
+    });
+    workloadDescription.textContent = selectedWorkload === "all"
+      ? copy().allWorkloadDescription
+      : local(traitProfile(selectedWorkload), "description");
+  }
+
+  function workloadTags(item) {
+    const traits = workloadNavigation.plugins[item.id] || [];
+    if (!traits.length) return null;
+    const panel = element("div", "plugin-workload-tags");
+    panel.append(element("span", "plugin-workload-label", copy().workloadTraits));
+    traits.forEach((traitId) => {
+      const tag = element("button", "plugin-workload-tag", traitLabel(traitId));
+      tag.type = "button";
+      tag.addEventListener("click", () => {
+        selectedWorkload = traitId;
+        expanded = false;
+        renderWorkloadNavigation();
+        renderCatalog();
+      });
+      panel.append(tag);
+    });
+    return panel;
   }
 
   function quickStart(item) {
@@ -455,6 +553,8 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     top.append(badges);
 
     card.append(cover, top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
+    const traits = workloadTags(item);
+    if (traits) card.append(traits);
     const publicEffect = publicEffectPanel(item);
     if (publicEffect) card.append(publicEffect);
     const community = communityPanel(item);
@@ -612,20 +712,9 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
   function renderCatalog() {
     const query = search.value.trim().toLowerCase();
     const visible = registry.components.filter((item) => {
-      const text = [
-        item.id, item.name, local(item, "summary"), item.artifact_type,
-        item.system_role, item.delivery_model, item.ownership, item.maturity,
-        item.repository_relationship,
-        item.evidence_level, item.execution_planes.join(" "),
-        item.integration_contracts.join(" "),
-        (item.integration_surfaces || []).join(" "),
-        item.canonical_repository || "", item.upstream_repository || ""
-      ].join(" ").toLowerCase();
-      const status = item.compatibility?.status || "source_scaffold";
-      const matchesType = selectedType === "extensions"
-        || (selectedType === "installable" && ["ready", "verified", "experimental"].includes(status))
-        || (selectedType === "incubating" && !["ready", "verified", "experimental"].includes(status));
-      return isWorkshopMod(item) && matchesType && text.includes(query);
+      const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
+      const matchesWorkload = selectedWorkload === "all" || itemWorkloadTraits.includes(selectedWorkload);
+      return isWorkshopMod(item) && matchesSelectedType(item) && matchesWorkload && itemSearchText(item).includes(query);
     });
 
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
@@ -648,7 +737,10 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
   }
 
   search.addEventListener("input", () => {
-    if (registry) renderCatalog();
+    if (registry) {
+      renderWorkloadNavigation();
+      renderCatalog();
+    }
     renderPortfolio();
   });
   more?.addEventListener("click", () => {
@@ -680,17 +772,25 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     fetch(catalog.dataset.metadata).then((response) => {
       if (!response.ok) throw new Error(`Workshop metadata request failed: ${response.status}`);
       return response.json();
+    }),
+    fetch(workloadNavigationRoot.dataset.source).then((response) => {
+      if (!response.ok) throw new Error(`Workload navigation request failed: ${response.status}`);
+      return response.json();
     })
   ])
-    .then(([payload, metadata]) => {
+    .then(([payload, metadata, navigation]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
       if (metadata.schema_version !== "plugin-workshop-metadata/v1" || !metadata.plugins) {
         throw new Error("unsupported Workshop metadata");
       }
+      if (navigation.schema_version !== "plugin-workload-navigation/v1" || !navigation.traits || !navigation.plugins) {
+        throw new Error("unsupported workload navigation");
+      }
       registry = payload;
       workshopMetadata = metadata.plugins;
+      workloadNavigation = navigation;
       renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
@@ -703,6 +803,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       document.querySelectorAll("[data-publication-count]").forEach((node) => { node.textContent = String(evidence).padStart(2, "0"); });
       document.querySelectorAll("[data-adjacent-count]").forEach((node) => { node.textContent = String(external).padStart(2, "0"); });
       renderFilters();
+      renderWorkloadNavigation();
       renderCatalog();
       renderBoundaries();
     })
@@ -744,6 +845,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     if (!registry) return;
     search.placeholder = copy().searchPlaceholder;
     renderFilters();
+    renderWorkloadNavigation();
     renderCatalog();
     renderBoundaries();
     renderPortfolio();
