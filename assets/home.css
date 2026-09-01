@@ -330,6 +330,9 @@ body[data-page="home"] .lang-toggle {
 .execution-atlas { background: var(--exec-paper); }
 .runtime-list { display: grid; gap: 34px; }
 .runtime-group { border-top: 1px solid var(--exec-ink); }
+.upstream-fork-group { border-top: 3px solid var(--exec-amber); }
+.upstream-fork-group .runtime-group-head { background: #fff7e6; }
+.runtime-tag.upstream { color: var(--exec-ink); background: var(--exec-amber); }
 .runtime-group-head {
   min-height: 92px;
   padding: 16px 12px;

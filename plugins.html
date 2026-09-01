@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826">
 <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816">
-<link rel="stylesheet" href="./assets/plugins.css?v=ecosystem-registry-v4">
+<link rel="stylesheet" href="./assets/plugins.css?v=ecosystem-registry-v5">
 </head>
 <body data-page="plugins">
   <nav class="site-nav">
@@ -89,7 +89,7 @@ A plugin, KV connector, Mooncake service, and control-plane resource retain dist
 <a href="#repository-portfolio">
 <span class="lang-en">Repository Portfolio</span>
 <span class="lang-zh">仓库组合</span>
-<small>32 REPOSITORIES</small>
+<small>33 REPOSITORIES</small>
 </a>
 </nav>
 
@@ -998,6 +998,33 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 </li>
 </ul>
 </section>
+    <section id="upstream-sync-forks" class="content-panel adjacent-section upstream-fork-notice" aria-labelledby="upstream-sync-forks-title">
+<div class="adjacent-head">
+<div>
+<span class="eyebrow">
+<span class="lang-en">Repository relationship</span>
+<span class="lang-zh">仓库与上游关系</span>
+</span>
+<h2 id="upstream-sync-forks-title">
+<span class="lang-en">Upstream-synchronized HUST forks are systems, not plugins.</span>
+<span class="lang-zh">上游同步 HUST fork 是系统分支，不是插件。</span>
+</h2>
+</div>
+<p>
+<span class="lang-en">They track an official project and carry only narrowly required HUST deltas. Runtime role and delivery type remain visible, but these repositories are grouped separately from installable extensions.</span>
+<span class="lang-zh">它们跟随官方项目演进，只承载 HUST 必需的窄幅差异。页面仍展示其运行时角色和交付方式，但会与可安装扩展分区呈现。</span>
+</p>
+</div>
+<div class="adjacent-grid upstream-fork-links">
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/vllm-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>vLLM-HUST</h3><p>fork of vllm-project/vllm</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>vLLM Ascend HUST</h3><p>fork of vllm-project/vllm-ascend</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>vLLM Metal HUST</h3><p>fork of vllm-project/vllm-metal</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>Triton Ascend HUST</h3><p>fork of triton-lang/triton-ascend</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/sglang-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>SGLang HUST</h3><p>fork of sgl-project/sglang</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/mooncake-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>Mooncake HUST</h3><p>fork of kvcache-ai/Mooncake</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/production-stack-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>Production Stack HUST</h3><p>fork of vllm-project/production-stack</p></a>
+</div>
+</section>
     <section class="plugin-controls" aria-label="Ecosystem filters">
 <label>
 <span id="plugins-search-label">Search</span>
@@ -1007,7 +1034,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 </div>
 </section>
     <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
-    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=ecosystem-registry-v6">
+    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=ecosystem-registry-v7">
 </div>
     <section id="repository-portfolio" class="content-panel repository-portfolio" aria-labelledby="repository-portfolio-title">
       <header class="portfolio-head">
@@ -1030,7 +1057,7 @@ It remains separate from the deployable component catalog above.</span>
 </p>
 </header>
       <p class="plugin-status" data-repository-status aria-live="polite">Loading repository portfolio…</p>
-      <div class="repository-domain-list" data-repository-portfolio data-source="./data/repository-portfolio.json?v=repository-portfolio-v1">
+      <div class="repository-domain-list" data-repository-portfolio data-source="./data/repository-portfolio.json?v=repository-portfolio-v2">
 </div>
     </section>
     <section class="content-panel adjacent-section">
@@ -1068,7 +1095,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
 "}};</script>
   <script src="./assets/site.js?v=nav-polish-20260826">
 </script>
-<script src="./assets/plugins-page.js?v=ecosystem-registry-v4">
+<script src="./assets/plugins-page.js?v=ecosystem-registry-v5">
 </script>
 </body>
 </html>
