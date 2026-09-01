@@ -58,7 +58,7 @@ entry-point groups inside `vllm.*`.
 ## Current commands
 
 ```bash
-uv pip install vllm-hust-ext
+uv pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
 uv pip install example-extension
 
 vllm-hust-ext extension list
@@ -70,6 +70,11 @@ vllm-hust-ext extension plan org.example.extension
 vllm-hust-ext extension render org.example.extension
 vllm-hust-ext extension check org.example.extension
 ```
+
+There is no public `vllm-hust-ext` PyPI alpha yet. Descriptors whose only implementation is
+`import_only` or `legacy_unregistered` are inspectable but not activatable: Manager reports the
+blocker and refuses `extension enable`. A new `run` also fails closed while a non-optional required
+service is not healthy.
 
 For a vLLM-owned extension only, the manager can generate the launch command:
 
@@ -112,7 +117,7 @@ reappearing after a later reinstall.
 1. The three cases must be repeated on the intended 112/91 environments.
 
 The canonical pinned version, carrier and rollback matrix is maintained in
-[`extension-manager-support-matrix-20260901.md`](https://github.com/vLLM-HUST/vllm-hust-docs/blob/codex/plugin-standardization-handoff/operations/extension-manager-support-matrix-20260901.md).
+[`extension-manager-support-matrix-20260901.md`](https://github.com/vLLM-HUST/vllm-hust-docs/blob/main/operations/extension-manager-support-matrix-20260901.md).
 A passing point does not imply support for an entire experimental range.
 
 Current evidence: the official Production Stack chart at commit
