@@ -3562,48 +3562,6 @@
         "current_status": "current"
       },
       {
-        "name": "余天成",
-        "github_login": "yutiantian0115",
-        "github_url": "https://github.com/yutiantian0115",
-        "commits": 0,
-        "changed_lines": 0,
-        "added": 0,
-        "deleted": 0,
-        "active_repos": 0,
-        "repos": [],
-        "key_contributions": "",
-        "display_name": "余天成",
-        "chinese_name": "余天成",
-        "english_name": "",
-        "person_id": "github:yutiantian0115",
-        "identity_confirmed": true,
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": false,
-        "core_member": false,
-        "role": {
-          "zh": "学生",
-          "en": "Student"
-        },
-        "research_direction": {
-          "zh": "大模型推理方向待定；愿意根据课题安排探索相关研究",
-          "en": "LLM inference direction to be determined; open to exploring research topics aligned with project needs"
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
-        },
-        "github_status": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": ""
-      },
-      {
         "name": "刘子墨",
         "github_login": "Liu-zimo-LZM",
         "github_url": "https://github.com/Liu-zimo-LZM",
@@ -5975,8 +5933,8 @@
           "en": "Former member"
         },
         "research_direction": {
-          "zh": "",
-          "en": ""
+          "zh": "大模型推理方向待定；愿意根据课题安排探索相关研究",
+          "en": "LLM inference direction to be determined; open to exploring research topics aligned with project needs"
         },
         "participation_direction": {
           "zh": "",

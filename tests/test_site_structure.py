@@ -2236,7 +2236,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 51
+    assert len(profiles["participants"]) == 50
     assert len(profiles["staff_members"]) == 4
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
