@@ -309,6 +309,17 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     assert "prefix cache disabled" in latchmoe["summary_en"]
 
 
+def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
+    assert "plugins.css?v=readability-v10" in PAGE
+    assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
+    assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
+    assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
+    assert "color: #c7d4d1" in STYLES
+    assert ".plugin-interface-label" in STYLES
+    assert "font-size: 10px" in STYLES
+    assert ".plugin-card:nth-child(3n) .plugin-launch-tooltip" in STYLES
+
+
 def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     control_plane = by_id("ride-control-plane")
     remote_sidecar = by_id("ride-runtime-bridge")

@@ -206,3 +206,82 @@ html[lang="zh"] .lang-zh { display: inline; }
 @media (max-width: 680px) { .portfolio-head,.repository-grid { grid-template-columns: 1fr; }.plugin-hero-facts span:last-child { grid-column: 1 / -1; } }
 @media (max-width: 680px) { .plugin-launch-tooltip { position: fixed; top: auto; right: 16px; bottom: 16px; left: 16px; width: auto; max-height: 70vh; overflow: auto; }.plugin-launch-tooltip code { white-space: pre-wrap; overflow-wrap: anywhere; } }
 @media (prefers-reduced-motion: reduce) { .plugin-launch-tooltip { transition: none; } }
+
+/* Readability guardrails: subpages.css uses more specific generic content-panel
+   selectors, so dark plugin surfaces need equally explicit color ownership. */
+body[data-page="plugins"] .content-panel .highlights-head h2,
+body[data-page="plugins"] .content-panel .highlight-lead h3,
+body[data-page="plugins"] .content-panel .review-mechanisms > header h3,
+body[data-page="plugins"] .content-panel .standard-head h2,
+body[data-page="plugins"] .content-panel .portfolio-head h2 {
+  color: #fff;
+}
+body[data-page="plugins"] .content-panel .highlights-head p,
+body[data-page="plugins"] .content-panel .highlight-lead p,
+body[data-page="plugins"] .content-panel .review-mechanisms > header p,
+body[data-page="plugins"] .content-panel .portfolio-head p {
+  color: #c7d4d1;
+}
+body[data-page="plugins"] .content-panel .eyebrow {
+  color: #7a5500;
+}
+body[data-page="plugins"] .page-hero .eyebrow,
+body[data-page="plugins"] .content-panel .highlights-head .eyebrow,
+body[data-page="plugins"] .content-panel .review-mechanisms > header .eyebrow,
+body[data-page="plugins"] .content-panel .standard-head .eyebrow,
+body[data-page="plugins"] .content-panel .portfolio-head .eyebrow {
+  color: #f4c463;
+}
+body[data-page="plugins"] .content-panel > p,
+body[data-page="plugins"] .content-panel .highlight-card:not(.highlight-lead) p,
+body[data-page="plugins"] .content-panel .review-grid p,
+body[data-page="plugins"] .content-panel .plugin-lifecycle p,
+body[data-page="plugins"] .content-panel .standard-rule-grid p,
+body[data-page="plugins"] .content-panel .plugin-legend span,
+body[data-page="plugins"] .content-panel .adjacent-card p,
+body[data-page="plugins"] .content-panel .plugin-summary {
+  color: #465754;
+}
+.review-grid p,
+.plugin-lifecycle p,
+.standard-rule-grid p,
+.plugin-legend span,
+.adjacent-card p {
+  font-size: 13px;
+}
+.plugin-code,
+.plugin-component-facts dt,
+.plugin-interface-label {
+  color: #465754;
+  font-size: 10px;
+}
+.plugin-component-facts dd,
+.plugin-kind,
+.plugin-filter,
+.plugin-controls label,
+.plugin-status {
+  font-size: 11px;
+}
+.plugin-badge,
+.plugin-contracts code,
+.integration-surfaces code {
+  font-size: 10px;
+  line-height: 1.35;
+}
+.plugin-launch-note {
+  color: #c7d4d1;
+  font-size: 11px;
+}
+.plugin-launch-tooltip {
+  width: min(440px,calc(100vw - 48px));
+}
+.plugin-launch-tooltip code {
+  font-size: 11px;
+  line-height: 1.7;
+}
+@media (min-width: 1061px) {
+  .plugin-card:nth-child(3n) .plugin-launch-tooltip { right: 0; left: auto; }
+}
+@media (min-width: 681px) and (max-width: 1060px) {
+  .plugin-card:nth-child(2n) .plugin-launch-tooltip { right: 0; left: auto; }
+}
