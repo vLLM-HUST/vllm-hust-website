@@ -52,7 +52,9 @@
     compatibility: "兼容性",
     maintainers: "负责人",
     advisors: "指导老师",
-    advisorUnknown: "暂未公开",
+    advisorUnknown: "规范元数据尚未记录指导关系",
+    externalAdvisor: "校外指导",
+    externalContributor: "项目外援",
     stars: "Stars",
     pullRequests: "开放 PR",
     forks: "Forks",
@@ -63,6 +65,7 @@
     platforms: "平台",
     python: "Python",
     requirements: "前置条件",
+    followup: "负责人跟进 Issue",
     details: "兼容性与技术详情",
     allWorkloads: "全部 Workload",
     workloadTraits: "适用 Workload",
@@ -100,7 +103,9 @@
     compatibility: "Compatibility",
     maintainers: "Maintainers",
     advisors: "Advisors",
-    advisorUnknown: "Not public",
+    advisorUnknown: "No advisor relationship is recorded in canonical metadata",
+    externalAdvisor: "External advisor",
+    externalContributor: "External contributor",
     stars: "Stars",
     pullRequests: "Open PRs",
     forks: "Forks",
@@ -111,6 +116,7 @@
     platforms: "Platforms",
     python: "Python",
     requirements: "Requirements",
+    followup: "Owner follow-up issue",
     details: "Compatibility & technical details",
     allWorkloads: "All workloads",
     workloadTraits: "Workload fit",
@@ -238,7 +244,36 @@ vllm-hust-ext extension check org.vllm-hust.ascend-adaptive-quantized-kv`
 pip install "git+https://github.com/vLLM-HUST/vllm-ascend-quant-hust.git#subdirectory=runtime-extension"
 vllm-hust-ext extension inspect org.vllm-hust.ascend-quant-runtime
 vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
+    },
+    "kvcompress-ascend": {
+      title_en: "Install and start Ascend KV Compression",
+      title_zh: "安装并启动昇腾 KV 压缩",
+      note_en: "Requires the paired vLLM-HUST and vLLM-Ascend-HUST source lines shown on this card; the full serving configuration remains mandatory.",
+      note_zh: "需要卡片所列的成对 vLLM-HUST 与 vLLM-Ascend-HUST 源码版本；启动时仍须提供完整服务配置。",
+      command: `uv pip install -e /path/to/vllm-ascend-kvcompress-hust
+export VLLM_PLUGINS=ascend_kvcompress
+export VLLM_KNORM_ENABLED=0
+vllm serve /path/to/model \\
+  --no-async-scheduling \\
+  --no-enable-prefix-caching \\
+  --block-size 128 \\
+  --max-model-len 12288 \\
+  --gpu-memory-utilization 0.8 \\
+  --kv-cache-compression-config '{"schema_version":1,"provider":"ascend_kvcompress","provider_config":{"method":"triattention","stats_path":"/path/to/stats.pt","kv_budget":2048,"recompute_window":128,"protected_recent_window":128,"score_aggregation":"mean","layer_aggregation":"mean","score_chunk_size":512,"score_layer_stride":4}}'`
     }
+  };
+  const inspectableBundles = {
+    "quantized-kv-cache-migration": "org.vllm-hust.quantized-kv-cache",
+    "simllm-migration": "org.vllm-hust.simllm",
+    "unified-communication-migration": "org.vllm-hust.unified-communication",
+    "split-batch-full-graph-migration": "org.vllm-hust.split-batch-full-graph",
+    "kv-transfer-observability-migration": "org.vllm-hust.kv-transfer-observability",
+    "layered-prefill-migration": "org.vllm-hust.layered-prefill",
+    "activation-sparsity-migration": "org.vllm-hust.activation-sparsity",
+    "pipeline-microbatch-migration": "org.vllm-hust.pipeline-microbatch",
+    "qos-scheduler-migration": "org.vllm-hust.qos-scheduler",
+    "mapped-host-kv-offload": "org.vllm-hust.ascend-mapped-kv-offload",
+    "stateharbor": "org.vllm-hust.stateharbor"
   };
 
   const valueLabel = (value) => String(value).replaceAll("_", " ");
@@ -291,12 +326,19 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       const profile = traitProfile(traitId);
       return [traitId, profile.label_en, profile.label_zh, profile.description_en, profile.description_zh];
     });
+    const metadata = workshopMetadata[item.id] || {};
+    const peopleText = [
+      ...(metadata.maintainers || []).flatMap((person) => [person.name, person.login]),
+      ...(metadata.advisors || []).flatMap((advisor) => [
+        advisor.name_en, advisor.name_zh, advisor.affiliation_en, advisor.affiliation_zh
+      ])
+    ].filter(Boolean);
     return [
-      item.id, item.name, local(item, "summary"), item.artifact_type,
+      item.id, item.name, item.name_en, item.name_zh, local(item, "summary"), item.artifact_type,
       item.system_role, item.delivery_model, item.ownership, item.maturity,
       item.repository_relationship, item.evidence_level, item.execution_planes.join(" "),
       item.integration_contracts.join(" "), (item.integration_surfaces || []).join(" "),
-      item.canonical_repository || "", item.upstream_repository || "", ...workloadText
+      item.canonical_repository || "", item.upstream_repository || "", ...workloadText, ...peopleText
     ].join(" ").toLowerCase();
   }
 
@@ -357,7 +399,19 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
   }
 
   function quickStart(item) {
-    const value = quickStarts[item.id];
+    const extensionId = inspectableBundles[item.id];
+    const value = quickStarts[item.id] || (extensionId ? {
+      title_en: `Install and inspect ${item.name_en}`,
+      title_zh: `安装并检查${item.name_zh}`,
+      action_en: "inspection commands",
+      action_zh: "检查命令",
+      note_en: "Import-only contract package: install, inspect, and check are supported; enablement and serving are intentionally unavailable.",
+      note_zh: "当前为 import-only 合同包：支持安装、inspect 与 check；明确不提供启用和启动命令。",
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+pip install "git+${item.canonical_repository}.git"
+vllm-hust-ext extension inspect ${extensionId}
+vllm-hust-ext extension check ${extensionId}`
+    } : null);
     if (!value) return null;
     const launcher = element("div", "plugin-launcher");
     const trigger = element("button", "plugin-launch-icon");
@@ -429,12 +483,30 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       list.append(link);
     });
     people.append(list);
+    const advisorRecords = Array.isArray(metadata.advisors) ? metadata.advisors : [];
+    const internalAdvisors = advisorRecords.filter((advisor) => advisor.relationship !== "external_contributor");
+    const externalAdvisors = advisorRecords.filter((advisor) => advisor.relationship === "external_contributor");
     const advisors = element("div", "plugin-advisors");
     advisors.append(element("span", "plugin-community-label", copy().advisors));
-    const advisorNames = Array.isArray(metadata.advisors)
-      ? metadata.advisors.map((advisor) => advisor[`name_${language()}`] || advisor.name_en).filter(Boolean)
-      : [];
-    advisors.append(element("strong", "plugin-advisor-names", advisorNames.join(" · ") || copy().advisorUnknown));
+    const advisorNames = internalAdvisors
+      .map((advisor) => advisor[`name_${language()}`] || advisor.name_en)
+      .filter(Boolean);
+    advisors.append(element("strong", "plugin-advisor-names", advisorNames.join(" · ") || (
+      externalAdvisors.length ? "—" : copy().advisorUnknown
+    )));
+
+    const externalRelationships = element("div", "plugin-external-advisors");
+    externalAdvisors.forEach((advisor) => {
+      const relationship = element("div", "plugin-external-advisor");
+      const name = advisor[`name_${language()}`] || advisor.name_en;
+      const affiliation = advisor[`affiliation_${language()}`] || advisor.affiliation_en;
+      relationship.append(
+        element("span", "plugin-community-label", copy().externalAdvisor),
+        element("strong", "plugin-advisor-names", [name, affiliation].filter(Boolean).join(" · ")),
+        badge(copy().externalContributor, "external-contributor")
+      );
+      externalRelationships.append(relationship);
+    });
 
     const metrics = element("div", "plugin-repo-metrics");
     [
@@ -449,7 +521,10 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       link.append(element("strong", "", String(value)), element("span", "", label));
       metrics.append(link);
     });
-    panel.append(people, advisors, metrics);
+    panel.append(people);
+    if (internalAdvisors.length || !externalAdvisors.length) panel.append(advisors);
+    if (externalAdvisors.length) panel.append(externalRelationships);
+    panel.append(metrics);
     return panel;
   }
 
@@ -476,6 +551,19 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       facts.append(row);
     });
     panel.append(head, facts);
+    const requirements = local(profile, "requirements");
+    if (requirements) {
+      const note = element("p", "plugin-compatibility-note");
+      note.append(element("strong", "", `${copy().requirements}: `), document.createTextNode(requirements));
+      panel.append(note);
+    }
+    if (profile.followup_url) {
+      const followup = element("a", "plugin-compatibility-followup", copy().followup);
+      followup.href = profile.followup_url;
+      followup.target = "_blank";
+      followup.rel = "noopener noreferrer";
+      panel.append(followup);
+    }
     return panel;
   }
 
@@ -528,6 +616,16 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     return panel;
   }
 
+  function installationStatus(item) {
+    if (item.compatibility?.status !== "source_scaffold") return null;
+    const panel = element("section", "plugin-install-state unavailable");
+    panel.append(
+      element("strong", "", copy().notInstallable),
+      element("p", "", copy().notInstallableReason)
+    );
+    return panel;
+  }
+
   function renderCard(item) {
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
     const card = element(
@@ -535,7 +633,8 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       `plugin-card workshop-card workshop-${item.artifact_type} workshop-tone-${coverTone(item)}${isUpstreamFork ? " upstream-fork-card" : ""}`
     );
     const cover = element("div", "workshop-cover");
-    const initials = item.name.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
+    const displayName = local(item, "name");
+    const initials = displayName.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
     cover.append(
       element("span", "workshop-cover-type", copy().mod),
       element("strong", "workshop-cover-mark", initials)
@@ -552,7 +651,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     if (isUpstreamFork) badges.prepend(badge(copy().forkBadge, "upstream-fork"));
     top.append(badges);
 
-    card.append(cover, top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
+    card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", local(item, "summary")));
     const traits = workloadTags(item);
     if (traits) card.append(traits);
     const publicEffect = publicEffectPanel(item);
@@ -561,6 +660,8 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
     if (compatibility) card.append(compatibility);
+    const installState = installationStatus(item);
+    if (installState) card.append(installState);
     const details = element("details", "plugin-technical-details");
     details.append(element("summary", "", copy().details));
     const detailBody = element("div", "plugin-technical-body");

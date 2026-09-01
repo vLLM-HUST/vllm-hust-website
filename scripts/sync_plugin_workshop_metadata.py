@@ -272,7 +272,11 @@ def verified_identity_advisors(payload: Any) -> dict[str, list[dict[str, str]]]:
             name_zh = str(advisor.get("zh") or "").strip()
             name_en = str(advisor.get("en") or "").strip()
             if name_zh or name_en:
-                record = {"name_zh": name_zh, "name_en": name_en or name_zh}
+                record = {
+                    "name_zh": name_zh,
+                    "name_en": name_en or name_zh,
+                    "relationship": "internal",
+                }
                 bucket = advisors.setdefault(login.casefold(), [])
                 if record not in bucket:
                     bucket.append(record)
@@ -291,6 +295,69 @@ def plugin_advisors(
         for advisor in identity_advisors.get(login.casefold(), []):
             if advisor not in result:
                 result.append(advisor)
+    return result
+
+
+def declared_advisors(item: dict[str, Any]) -> list[dict[str, str]] | None:
+    raw_advisors = item.get("advisors")
+    if raw_advisors is None:
+        return None
+    if not isinstance(raw_advisors, list) or not raw_advisors:
+        raise ValueError(f"{item.get('id')}: advisors must be a non-empty array")
+
+    result: list[dict[str, str]] = []
+    for raw in raw_advisors:
+        if not isinstance(raw, dict):
+            raise TypeError(f"{item.get('id')}: advisor entries must be objects")
+        name_zh = str(raw.get("name_zh") or "").strip()
+        name_en = str(raw.get("name_en") or "").strip()
+        relationship = str(raw.get("relationship") or "internal").strip()
+        if not name_zh or not name_en:
+            raise ValueError(f"{item.get('id')}: advisors require name_zh and name_en")
+        if relationship not in {"internal", "external_contributor"}:
+            raise ValueError(
+                f"{item.get('id')}: unsupported advisor relationship {relationship!r}"
+            )
+        record = {
+            "name_zh": name_zh,
+            "name_en": name_en,
+            "relationship": relationship,
+        }
+        for field in ("affiliation_en", "affiliation_zh"):
+            value = str(raw.get(field) or "").strip()
+            if value:
+                record[field] = value
+        if relationship == "external_contributor" and not (
+            record.get("affiliation_en") and record.get("affiliation_zh")
+        ):
+            raise ValueError(
+                f"{item.get('id')}: external contributors require bilingual affiliation"
+            )
+        result.append(record)
+    return result
+
+
+def declared_identity_names(item: dict[str, Any], handles: list[str]) -> dict[str, str]:
+    raw_profiles = item.get("maintainer_profiles")
+    if raw_profiles is None:
+        return {}
+    if not isinstance(raw_profiles, list):
+        raise TypeError(f"{item.get('id')}: maintainer_profiles must be an array")
+
+    allowed_handles = {login.casefold() for login in handles}
+    result: dict[str, str] = {}
+    for raw in raw_profiles:
+        if not isinstance(raw, dict):
+            raise TypeError(
+                f"{item.get('id')}: maintainer_profiles entries must be objects"
+            )
+        login = str(raw.get("login") or "").strip()
+        name = str(raw.get("name") or "").strip()
+        if not login or not name or login.casefold() not in allowed_handles:
+            raise ValueError(
+                f"{item.get('id')}: maintainer profile must match a declared login"
+            )
+        result[login.casefold()] = name
     return result
 
 
@@ -353,12 +420,18 @@ def build_snapshot(
             raw_repository, _ = client.get_json(f"/repos/{slug}")
             default_branch = str(raw_repository.get("default_branch") or "main")
             handles, source = maintainer_handles(client, slug, default_branch)
+        declared_names = declared_identity_names(item, handles)
+        plugin_identity_names = {**identity_names, **declared_names}
+        advisors = declared_advisors(item)
         plugins[plugin_id] = {
             **repository_cache[slug],
             "maintainers": [
-                maintainer_profile(client, login, identity_names) for login in handles
+                maintainer_profile(client, login, plugin_identity_names)
+                for login in handles
             ],
-            "advisors": plugin_advisors(handles, advisor_names),
+            "advisors": advisors
+            if advisors is not None
+            else plugin_advisors(handles, advisor_names),
             "maintainer_source": source,
         }
 

@@ -179,6 +179,7 @@ body[data-page="plugins"] .plugin-card h3 { margin: 26px 0 10px; color: #0c1112;
 .plugin-compatibility-facts dd { margin: 0; color: #172321; font-size: 9px; font-weight: 800; overflow-wrap: anywhere; }
 .plugin-compatibility-note { margin: 11px 0 0; padding-top: 9px; color: #566461; border-top: 1px solid rgba(23,111,114,.18); font-size: 10px; line-height: 1.45; }
 .plugin-compatibility-note strong { color: #263532; }
+.plugin-compatibility-followup { display: inline-flex; margin-top: 9px; color: #644f91; font-size: 10px; font-weight: 850; text-decoration: underline; text-underline-offset: 2px; }
 .plugin-technical-details { margin-top: 10px; border-top: 1px solid #d3dcd9; border-bottom: 1px solid #d3dcd9; }
 .plugin-technical-details summary { padding: 9px 2px; color: #176f72; font: 800 9px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; cursor: pointer; }
 .plugin-technical-details summary:hover,.plugin-technical-details summary:focus-visible { color: #0c1112; }
@@ -303,10 +304,17 @@ body[data-page="plugins"] .workshop-card .plugin-summary { min-height: 54px; dis
 .plugin-maintainer:hover strong { color: #8b6100; }
 .plugin-maintainer-avatar { flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%; object-fit: cover; background: #dce4e1; }
 .plugin-maintainer-identity { min-width: 0; display: grid; line-height: 1.1; }
-.plugin-maintainer-identity strong { max-width: 150px; overflow: hidden; color: #0c1112; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
-.plugin-maintainer-identity small { margin-top: 3px; color: #61706f; font-size: 10px; }
+.plugin-maintainer-identity strong { color: #0c1112; font-size: 11px; overflow-wrap: anywhere; }
+.plugin-maintainer-identity small { margin-top: 3px; color: #61706f; font-size: 10px; overflow-wrap: anywhere; }
 .plugin-advisors { min-width: 92px; display: grid; gap: 5px; justify-items: end; align-self: start; }
 .plugin-advisor-names { max-width: 125px; color: #293332; font-size: 10px; line-height: 1.35; text-align: right; }
+.plugin-external-advisors { grid-column: 1 / -1; display: grid; gap: 8px; }
+.plugin-external-advisor { padding: 10px; display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; border: 1px solid #c9d4d0; background: #eef6f4; }
+.plugin-external-advisor .plugin-advisor-names { max-width: none; overflow-wrap: anywhere; }
+.plugin-badge.external-contributor { color: #fff; background: #176f72; white-space: nowrap; }
+.plugin-install-state { margin-top: 10px; padding: 11px 12px; border: 1px solid #c7d0cd; background: #f4f6f5; }
+.plugin-install-state strong { color: #4d5957; font-size: 11px; }
+.plugin-install-state p { margin: 5px 0 0; color: #65716f; font-size: 10px; line-height: 1.45; }
 .plugin-repo-metrics { grid-column: 1 / -1; display: flex; gap: 14px; padding-top: 8px; border-top: 1px dashed #d6dfdc; }
 .plugin-repo-metric { display: inline-flex; align-items: baseline; gap: 4px; color: #52615f; text-decoration: none; }
 .plugin-repo-metric:last-child { border-right: 0; }
@@ -317,6 +325,7 @@ body[data-page="plugins"] .workshop-card .plugin-summary { min-height: 54px; dis
 .plugin-more:hover { background: #ffd477; }
 @media (max-width: 1060px) { body[data-page="plugins"] .workshop-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 680px) { .workload-navigation { padding: 17px; }.workload-navigation header { grid-template-columns: 1fr; gap: 9px; }.workload-filter-list { margin-right: -17px; padding-right: 17px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }.workload-filter-list::-webkit-scrollbar { display: none; }.workload-filter { flex: 0 0 auto; }body[data-page="plugins"] .workshop-grid { grid-template-columns: 1fr; }.workshop-cover { height: 84px; }.workshop-cover-mark { font-size: 30px; } }
+@media (max-width: 680px) { .plugin-external-advisor { grid-template-columns: 1fr; }.plugin-external-advisor .plugin-advisor-names { text-align: left; }.plugin-badge.external-contributor { width: fit-content; } }
 
 /* Readability guardrails: subpages.css uses more specific generic content-panel
    selectors, so dark plugin surfaces need equally explicit color ownership. */

@@ -1,6 +1,6 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-09-01T09:45:13+00:00",
+  "generated_at": "2026-09-01T12:55:23+00:00",
   "source": "GitHub API + canonical ownership and organization identity data",
   "plugins": {
     "bidkv": {
@@ -28,7 +28,8 @@
       "advisors": [
         {
           "name_zh": "张书豪",
-          "name_en": "Shuhao Zhang"
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -52,7 +53,8 @@
       "advisors": [
         {
           "name_zh": "黄禹",
-          "name_en": "Yu Huang"
+          "name_en": "Yu Huang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -82,7 +84,8 @@
       "advisors": [
         {
           "name_zh": "张书豪",
-          "name_en": "Shuhao Zhang"
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "README.md#maintainers"
@@ -106,7 +109,8 @@
       "advisors": [
         {
           "name_zh": "项翔",
-          "name_en": "Xiang Xiang"
+          "name_en": "Xiang Xiang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -130,7 +134,8 @@
       "advisors": [
         {
           "name_zh": "万瑶",
-          "name_en": "Yao Wan"
+          "name_en": "Yao Wan",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -154,7 +159,8 @@
       "advisors": [
         {
           "name_zh": "赵进",
-          "name_en": "Jin Zhao"
+          "name_en": "Jin Zhao",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -184,11 +190,13 @@
       "advisors": [
         {
           "name_zh": "万瑶",
-          "name_en": "Yao Wan"
+          "name_en": "Yao Wan",
+          "relationship": "internal"
         },
         {
           "name_zh": "张书豪",
-          "name_en": "Shuhao Zhang"
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -204,12 +212,18 @@
       "maintainers": [
         {
           "login": "Irisuko",
-          "name": "Irisuko",
+          "name": "毛潮云",
           "profile_url": "https://github.com/Irisuko",
           "avatar_url": "https://avatars.githubusercontent.com/u/247319942?v=4"
         }
       ],
-      "advisors": [],
+      "advisors": [
+        {
+          "name_zh": "罗瑞坤",
+          "name_en": "Ruikun Luo",
+          "relationship": "internal"
+        }
+      ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
     "quantized-kv-cache-migration": {
@@ -237,11 +251,13 @@
       "advisors": [
         {
           "name_zh": "姚鹏程",
-          "name_en": "Pengcheng Yao"
+          "name_en": "Pengcheng Yao",
+          "relationship": "internal"
         },
         {
           "name_zh": "张书豪",
-          "name_en": "Shuhao Zhang"
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -265,7 +281,8 @@
       "advisors": [
         {
           "name_zh": "罗瑞坤",
-          "name_en": "Ruikun Luo"
+          "name_en": "Ruikun Luo",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -289,7 +306,8 @@
       "advisors": [
         {
           "name_zh": "王雄",
-          "name_en": "Xiong Wang"
+          "name_en": "Xiong Wang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -311,7 +329,7 @@
         },
         {
           "login": "ilnnfover",
-          "name": "ilnnfover",
+          "name": "李上上",
           "profile_url": "https://github.com/ilnnfover",
           "avatar_url": "https://avatars.githubusercontent.com/u/107935089?v=4"
         }
@@ -319,7 +337,8 @@
       "advisors": [
         {
           "name_zh": "郑龙",
-          "name_en": "Long Zheng"
+          "name_en": "Long Zheng",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -349,7 +368,8 @@
       "advisors": [
         {
           "name_zh": "张书豪",
-          "name_en": "Shuhao Zhang"
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -365,12 +385,18 @@
       "maintainers": [
         {
           "login": "Yushuo-star",
-          "name": "Yushuo-star",
+          "name": "郁硕",
           "profile_url": "https://github.com/Yushuo-star",
           "avatar_url": "https://avatars.githubusercontent.com/u/178289951?v=4"
         }
       ],
-      "advisors": [],
+      "advisors": [
+        {
+          "name_zh": "王雄",
+          "name_en": "Xiong Wang",
+          "relationship": "internal"
+        }
+      ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
     "activation-sparsity-migration": {
@@ -389,7 +415,13 @@
           "avatar_url": "https://avatars.githubusercontent.com/u/87888496?v=4"
         }
       ],
-      "advisors": [],
+      "advisors": [
+        {
+          "name_zh": "万瑶",
+          "name_en": "Yao Wan",
+          "relationship": "internal"
+        }
+      ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
     "pipeline-microbatch-migration": {
@@ -408,7 +440,15 @@
           "avatar_url": "https://avatars.githubusercontent.com/u/14010993?v=4"
         }
       ],
-      "advisors": [],
+      "advisors": [
+        {
+          "name_zh": "Chen Xinyu",
+          "name_en": "Chen Xinyu",
+          "relationship": "external_contributor",
+          "affiliation_en": "HKUST (Guangzhou)",
+          "affiliation_zh": "香港科技大学（广州）"
+        }
+      ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
     "qos-scheduler-migration": {
@@ -422,12 +462,18 @@
       "maintainers": [
         {
           "login": "Yushuo-star",
-          "name": "Yushuo-star",
+          "name": "郁硕",
           "profile_url": "https://github.com/Yushuo-star",
           "avatar_url": "https://avatars.githubusercontent.com/u/178289951?v=4"
         }
       ],
-      "advisors": [],
+      "advisors": [
+        {
+          "name_zh": "王雄",
+          "name_en": "Xiong Wang",
+          "relationship": "internal"
+        }
+      ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
     "mapped-host-kv-offload": {
@@ -449,7 +495,8 @@
       "advisors": [
         {
           "name_zh": "张书豪",
-          "name_en": "Shuhao Zhang"
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -473,7 +520,8 @@
       "advisors": [
         {
           "name_zh": "张书豪",
-          "name_en": "Shuhao Zhang"
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
