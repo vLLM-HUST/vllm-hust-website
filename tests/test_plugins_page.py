@@ -224,9 +224,9 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
 
 
 def test_bidkv_and_diffspec_cards_expose_accessible_launch_tooltips() -> None:
-    assert 'const quickStarts = {' in SCRIPT
-    assert 'bidkv: {' in SCRIPT
-    assert 'diffspec: {' in SCRIPT
+    assert "const quickStarts = {" in SCRIPT
+    assert "bidkv: {" in SCRIPT
+    assert "diffspec: {" in SCRIPT
     assert "pip install vllm-hust-ext bidkv" in SCRIPT
     assert "extension enable org.vllm-hust.bidkv" in SCRIPT
     assert "pip install vllm-hust-ext vllm-diffspec" in SCRIPT
