@@ -64,12 +64,38 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v11_stable_trend';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v12_public_sanitized';
 const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260817-stable-trend-2';
 const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';
 const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';
 let lastLoadedSource = null;
 let backgroundSyncPromise = null;
+
+function sanitizePublicString(value) {
+    if (typeof value !== 'string' || !value.startsWith('/home/')) return value;
+    const markers = [
+        ['/vllm-hust-benchmark/', 'vllm-hust-benchmark/'],
+        ['/vllm-hust-benchmark-single-npu/', 'vllm-hust-benchmark-single-npu/'],
+        ['/.cache/huggingface/hub/', '<huggingface-cache>/'],
+    ];
+    for (const [marker, replacement] of markers) {
+        if (value.includes(marker)) return replacement + value.split(marker, 2)[1];
+    }
+    if (value.includes('/envs/') && value.endsWith('/bin/python')) {
+        return '<python-environment>/bin/python';
+    }
+    return `<local-path>/${value.split('/').pop()}`;
+}
+
+function sanitizePublicPayload(value) {
+    if (Array.isArray(value)) return value.map(sanitizePublicPayload);
+    if (value && typeof value === 'object') {
+        return Object.fromEntries(
+            Object.entries(value).map(([key, item]) => [key, sanitizePublicPayload(item)])
+        );
+    }
+    return sanitizePublicString(value);
+}
 
 function getUniqueEndpoints() {
     const configured = Array.isArray(HF_CONFIG.endpoints) ? HF_CONFIG.endpoints : [];
@@ -676,13 +702,15 @@ async function loadSnapshotFromSource(source, markerPriority = [source], options
 
     const markerPromise = getLatestMarker(markerPriority);
     const [singleData, multiData, historicalData, compareData, marker] = await Promise.all([
-        loader(HF_CONFIG.files.single)
+        loader(HF_CONFIG.files.single).then(sanitizePublicPayload)
             .then((data) => notifyFileLoaded('single', normalizeEntryArray(data))),
-        loader(HF_CONFIG.files.multi)
+        loader(HF_CONFIG.files.multi).then(sanitizePublicPayload)
             .then((data) => notifyFileLoaded('multi', normalizeEntryArray(data))),
         loadOptionalJson(loader, HF_CONFIG.files.historical)
+            .then(sanitizePublicPayload)
             .then((data) => notifyFileLoaded('historical', normalizeEntryArray(data))),
         loadOptionalJson(loader, HF_CONFIG.files.compare)
+            .then(sanitizePublicPayload)
             .then((data) => notifyFileLoaded(
                 'compare',
                 data && typeof data === 'object' ? data : null

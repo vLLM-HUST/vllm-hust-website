@@ -155,9 +155,9 @@ status must treat that two-writer replica ownership as `incompatible + degraded`
 cannot hide it. This proves control-plane reconciliation and Router forwarding, but the earlier mock
 backend did not prove model inference or a production image support matrix.
 
-That model-data-plane gap is now closed separately on the arm64 host 180. A Router built from the
-same official commit first targeted an absent backend: its own `/health` stayed 200 while a valid
-chat request returned 500. Recreating only the isolated Router against the existing
+That model-data-plane gap is now closed separately in an arm64 validation environment. A Router
+built from the same official commit first targeted an absent backend: its own `/health` stayed 200
+while a valid chat request returned 500. Recreating only the isolated Router against the existing
 `zai-org/GLM-4-32B-0414` service returned 200 and `ROUTER_OK`; the production vLLM container
 retained its original start time. The official `router:v0.1.12` manifest has no `linux/arm64/v8`, so
 the source-built result is healthy data-plane evidence but remains degraded release-matrix evidence.
@@ -172,22 +172,23 @@ non-empty evidence instead of trusting bare booleans. A healthy claim additional
 controller reconciliation, Router traffic, autoscaler-decision, and structured real-model
 failure/recovery evidence. A mock backend can no longer claim healthy.
 
-Mooncake now also has two real, separate 0.3.12.post1 non-CUDA results on `a100-dev`: two official
-TransferEngine processes completed and verified a 1 MiB TCP/P2PHANDSHAKE write, and an isolated
-official Master + HTTP metadata
+Mooncake now also has two real, separate 0.3.12.post1 non-CUDA results in an isolated validation
+environment: two official TransferEngine processes completed and verified a 1 MiB TCP/P2PHANDSHAKE
+write, and an isolated official Master + HTTP metadata
 
 - Store REST service completed put, exist, byte-matching get, lease-aware remove, and
   missing-after-remove. The probe removed only its UUID-scoped key after the configured hard lease
   expired; it never used `remove_all` or force deletion. This validates the standalone
   TransferEngine and Store data paths.
 
-On 180, an isolated official `mooncake-transfer-engine-npu==0.3.13.post1` master completed a real
-Manager-observed `healthy → unreachable/degraded → healthy` cycle. Disabling and forgetting the
-extension left the external master healthy, proving the Manager does not stop it. That earlier
-health-only run did not establish an NPU data path. A later isolated run on free NPU 4 used vLLM
-0.23, vLLM Ascend, Qwen3-0.6B and `mooncake-transfer-engine-npu==0.3.11.post1`. With local prefix
-caching off, the first request saved nine keys and the repeat loaded the same nine keys (133,191,072
-bytes each way, zero failed keys). Stopping the test master kept inference available but produced
-four partial save failures; restoring the master without restarting vLLM restored successful save
-and load. This is real connector evidence, while alpha remains frozen for BidKV's upstream scheduler
-contract and the remaining cross-version/support matrix.
+In an isolated arm64 validation environment, an official
+`mooncake-transfer-engine-npu==0.3.13.post1` master completed a real Manager-observed
+`healthy → unreachable/degraded → healthy` cycle. Disabling and forgetting the extension left the
+external master healthy, proving the Manager does not stop it. That earlier health-only run did not
+establish an NPU data path. A later isolated single-NPU run used vLLM 0.23, vLLM Ascend, Qwen3-0.6B
+and `mooncake-transfer-engine-npu==0.3.11.post1`. With local prefix caching off, the first request
+saved nine keys and the repeat loaded the same nine keys (133,191,072 bytes each way, zero failed
+keys). Stopping the test master kept inference available but produced four partial save failures;
+restoring the master without restarting vLLM restored successful save and load. This is real
+connector evidence, while alpha remains frozen for BidKV's upstream scheduler contract and the
+remaining cross-version/support matrix.

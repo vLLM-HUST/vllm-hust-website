@@ -703,7 +703,9 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     assert "function dispatchProgress(payload, onProgress)" in text
     assert "function startBackgroundSync()" in text
     assert "startBackgroundSync," in text
-    assert "llm_engine_hf_leaderboard_cache_v11_stable_trend" in text
+    assert "llm_engine_hf_leaderboard_cache_v12_public_sanitized" in text
+    assert "function sanitizePublicPayload(value)" in text
+    assert ".then(sanitizePublicPayload)" in text
     assert (
         "const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260817-stable-trend-2';"
         in text
@@ -806,6 +808,8 @@ def test_leaderboard_data_excludes_retired_v0110_baselines() -> None:
 
 
 def test_leaderboard_data_is_benchmark_snapshot_mirror() -> None:
+    from scripts.sync_leaderboard_snapshots import render_public_snapshot
+
     root = Path(__file__).resolve().parents[1]
     benchmark_snapshots = (
         root.parent / "vllm-hust-benchmark" / "leaderboard-data" / "snapshots"
@@ -820,9 +824,9 @@ def test_leaderboard_data_is_benchmark_snapshot_mirror() -> None:
         "leaderboard_compare.json",
         "last_updated.json",
     ):
-        assert (root / "data" / name).read_bytes() == (
+        assert (root / "data" / name).read_bytes() == render_public_snapshot(
             benchmark_snapshots / name
-        ).read_bytes(), f"{name} is not synced from benchmark snapshots"
+        ), f"{name} is not the sanitized benchmark snapshot projection"
 
 
 def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
@@ -838,7 +842,41 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
     assert "vLLM-HUST/vllm-hust-benchmark" in workflow
     assert "docs/official-baselines" in workflow
     assert "SNAPSHOT_FILES = (" in script
+    assert "sanitize_public_payload" in script
     assert "--check" in script
+
+
+def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
+    root = Path(__file__).resolve().parents[1]
+    paths = [
+        root / "plugins.html",
+        root / "data" / "ecosystem.json",
+        root / "data" / "issues.json",
+        root / "data" / "leaderboard_single.json",
+        root / "data" / "leaderboard_multi.json",
+        root / "data" / "leaderboard_historical.json",
+        root / "data" / "leaderboard_compare.json",
+        root / "docs" / "PLUGIN_STANDARD.md",
+        root / "docs" / "DEPLOY.md",
+        root / "roadmap.md",
+    ]
+    published = "\n".join(path.read_text(encoding="utf-8") for path in paths)
+    forbidden = (
+        "/home/shuhao",
+        "poy-180",
+        "a100-dev",
+        "host 180",
+        "on 180",
+        "server 91",
+        "host 91",
+        "hosts 91 and 112",
+        "91 服务器",
+        "91 与 112",
+        "91/Qwen",
+        "112/Qwen",
+    )
+    for marker in forbidden:
+        assert marker.casefold() not in published.casefold(), marker
 
 
 def test_index_cache_busts_leaderboard_script() -> None:

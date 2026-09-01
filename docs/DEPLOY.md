@@ -12,7 +12,7 @@
 ### 2. Push to GitHub
 
 ```bash
-cd /home/shuhao/vllm-hust-website
+cd /path/to/vllm-hust-website
 git remote add origin git@github.com:intellistream/vllm-hust-website.git
 git branch -M main
 git push -u origin main

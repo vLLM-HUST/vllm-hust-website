@@ -96,7 +96,8 @@ The only supported leaderboard data chain is:
    `*_leaderboard.json`)
 1. Snapshot publish in `vllm-hust-benchmark/leaderboard-data/snapshots`
 1. HF publish from the same benchmark snapshot files to `intellistream/vllm-hust-benchmark-results`
-1. Website sync workflow mirrors those benchmark snapshot files for offline/static fallback:
+1. Website sync workflow publishes a privacy-sanitized projection of those benchmark snapshots for
+   offline/static fallback; machine-specific absolute paths never cross the public boundary:
    - `data/leaderboard_single.json`
    - `data/leaderboard_multi.json`
    - `data/leaderboard_historical.json` (recovered trend-only records)
@@ -104,7 +105,7 @@ The only supported leaderboard data chain is:
    - `data/last_updated.json`
 
 Leaderboard rendering consumes benchmark GitHub raw snapshots first, then HF, then the checked-in
-website mirror. `leaderboard_compare.json` provides neutral engine-vs-engine head-to-head views.
+website projection. `leaderboard_compare.json` provides neutral engine-vs-engine head-to-head views.
 
 Leaderboard version rendering follows a split UI contract:
 

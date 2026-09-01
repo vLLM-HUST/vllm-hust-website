@@ -156,16 +156,16 @@
     {
       "number": 127,
       "title": {
-        "en": "Make Docker NPU jobs compatible with the poy-180 watchdog",
-        "zh": "使 Docker NPU 作业兼容 poy-180 watchdog"
+        "en": "Make Docker NPU jobs compatible with the self-hosted runner watchdog",
+        "zh": "使 Docker NPU 作业兼容自托管 runner watchdog"
       },
       "category": "infra",
       "priority": null,
       "state": "open",
       "created_at": "2026-07-31",
       "summary": {
-        "en": "Add runner ownership labels and single-card device mapping to every Docker NPU container launched via the host Docker socket, making them compatible with the poy-180 NPU watchdog.",
-        "zh": "为通过宿主机 Docker socket 启动的每个 Docker NPU 容器添加 runner 归属 label 和单卡设备映射，使其兼容 poy-180 NPU watchdog。"
+        "en": "Add runner ownership labels and single-card device mapping to every Docker NPU container launched via the host Docker socket, making them compatible with the self-hosted runner watchdog.",
+        "zh": "为通过宿主机 Docker socket 启动的每个 Docker NPU 容器添加 runner 归属 label 和单卡设备映射，使其兼容自托管 runner watchdog。"
       },
       "pr": {
         "number": 150,
@@ -181,8 +181,8 @@
         "zh": "草稿"
       },
       "progress_summary": {
-        "en": "Runner ownership resolution, docker create command construction with labels and device mapping, and inspect validation (fail-closed) implemented. 40 tests covering runner resolution, command construction, and inspect validation. Real runner validation on poy-180-21rc-npu* runners still pending.",
-        "zh": "实现了 runner 归属解析、带 label 和设备映射的 docker create 命令构造、以及 inspect 校验（fail-closed）。40 个测试覆盖 runner 解析、命令构造和 inspect 校验。在 poy-180-21rc-npu* runner 上的真实验证仍待完成。"
+        "en": "Runner ownership resolution, docker create command construction with labels and device mapping, and inspect validation (fail-closed) implemented. 40 tests cover runner resolution, command construction, and inspect validation. Validation on the intended self-hosted NPU runner class remains pending.",
+        "zh": "已实现 runner 归属解析、带 label 和设备映射的 docker create 命令构造，以及 inspect 校验（fail-closed）。40 个测试覆盖 runner 解析、命令构造和 inspect 校验；目标自托管 NPU runner 类型上的验证仍待完成。"
       },
       "acceptance_criteria": [
         {
