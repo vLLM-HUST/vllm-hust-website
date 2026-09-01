@@ -2,15 +2,13 @@
 
 ## Ecosystem catalog
 
-`ecosystem.json` is a published mirror of the canonical
-`vLLM-HUST/vllm-hust-docs` ecosystem registry. It classifies system role,
-integration contracts, execution planes, deployment topology, delivery model,
-ownership, maturity, and evidence independently.
+`ecosystem.json` is a published mirror of the canonical `vLLM-HUST/vllm-hust-docs` ecosystem
+registry. It classifies system role, integration contracts, execution planes, deployment topology,
+delivery model, ownership, maturity, and evidence independently.
 
-`plugins.legacy.json` is retained only for migration and historical links. Its
-entry-point-centric categories MUST NOT be used to classify platform profiles,
-external KV systems, control planes, or engineering tools. New website code
-must consume `ecosystem.json`.
+`plugins.legacy.json` is retained only for migration and historical links. Its entry-point-centric
+categories MUST NOT be used to classify platform profiles, external KV systems, control planes, or
+engineering tools. New website code must consume `ecosystem.json`.
 
 ## Source Of Truth
 

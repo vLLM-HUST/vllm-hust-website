@@ -206,9 +206,11 @@ ______________________________________________________________________
 
 ## A12. KV Transfer/Offload 的异步生命周期与调度协同
 
-- **优先级/成熟度：** P0；关联 core [PR #49](https://github.com/intellistream/vllm-hust-legacy-20260831/pull/49)、
+- **优先级/成熟度：** P0；关联 core
+  [PR #49](https://github.com/intellistream/vllm-hust-legacy-20260831/pull/49)、
   [PR #124](https://github.com/intellistream/vllm-hust-legacy-20260831/pull/124)，Ascend
-  [PR #67](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/67) 和 多个 transfer/offload PR。
+  [PR #67](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/67) 和 多个
+  transfer/offload PR。
 - **现象：** event 被跨 step 复用、后台异常不可见、shutdown 未 drain、状态传输 与调度互不知情，会造成陈旧状态、隐藏失败和不可预测 stall。
 - **研究问题：** 能否把 transfer event、ownership、completion、failure 和 reuse 统一成可观测状态机，并让 scheduler
   联合选择传输、重算和等待？
@@ -221,7 +223,8 @@ ______________________________________________________________________
 ## A13. Ascend MoE：EPLB 控制面、动态专家放置与图重放
 
 - **优先级/成熟度：** P0；有强组件证据和 draft upstream PR，关联 Ascend
-  [PR #36](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/36) 及 LatchMoE/专家卸载方向。
+  [PR #36](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/36) 及
+  LatchMoE/专家卸载方向。
 - **现象：** EPLB planner 和 `log2phy` 生成曾包含大量 Python/scalar 工作； tensorized 组件可获得数十倍提升，但端到端收益取决于
   rebalance 频率、专家迁移、 graph replay 和负载变化。
 - **研究问题：** 能否联合优化专家放置、迁移计划、控制面计算和图重放，使动态 MoE serving 在负载漂移下保持低尾延迟？
@@ -259,7 +262,8 @@ ______________________________________________________________________
 
 ## A16. 跨 Core/Ascend 的统一执行抽象与执行图建模
 
-- **优先级/成熟度：** P1；关联 core [PR #42](https://github.com/intellistream/vllm-hust-legacy-20260831/pull/42) 和统一通信/执行工作。
+- **优先级/成熟度：** P1；关联 core
+  [PR #42](https://github.com/intellistream/vllm-hust-legacy-20260831/pull/42) 和统一通信/执行工作。
 - **现象：** executor、worker、model runner、parallel backend、graph capture 和 state transfer 的接口分散；硬件插件需要
   patch 共享路径才能表达新执行机制。
 - **研究问题：** 能否建立显式 execution graph/contract，使设备能力、并行阶段、 状态依赖和异步事件成为可组合节点？
@@ -313,7 +317,8 @@ ______________________________________________________________________
 
 ## B4. Prefix/Chunk/共享状态索引与跨请求复用
 
-- **优先级/成熟度：** P0；关联 Ascend [PR #66](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/66)、
+- **优先级/成熟度：** P0；关联 Ascend
+  [PR #66](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/66)、
   [#70](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/70)、
   [#80](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/80)，以及 prefix 回归
   [core #163](https://github.com/vLLM-HUST/vllm-hust/issues/163)。
@@ -361,7 +366,8 @@ ______________________________________________________________________
 
 ## B9. 结构化输出的程序感知编译与缓存
 
-- **优先级/成熟度：** P1；关联 core [PR #37](https://github.com/intellistream/vllm-hust-legacy-20260831/pull/37) 等工作。
+- **优先级/成熟度：** P1；关联 core
+  [PR #37](https://github.com/intellistream/vllm-hust-legacy-20260831/pull/37) 等工作。
 - **问题：** grammar/schema compilation、prefix scan 和 cache key 在 tool-calling workload 中可能支配首请求延迟，并产生
   cache pollution。
 - **假设/机制：** 规范化 program IR、跨请求编译缓存、增量 grammar 和 workload-aware cache admission。
