@@ -106,6 +106,7 @@ def is_workshop_mod(item: dict[str, Any]) -> bool:
     return (
         item.get("artifact_type") == "runtime_component"
         and item.get("repository_relationship") == "organization_native"
+        and item.get("public_surface", True) is not False
         and item.get("delivery_model") in WORKSHOP_DELIVERY_MODELS
         and repository.startswith("https://github.com/vLLM-HUST/")
     )

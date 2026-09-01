@@ -139,6 +139,7 @@
   const isWorkshopMod = (item) => (
     item.artifact_type === "runtime_component"
     && item.repository_relationship === "organization_native"
+    && item.public_surface !== false
     && ["plugin_bundle", "python_distribution", "migration_scaffold"].includes(item.delivery_model)
     && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
   );

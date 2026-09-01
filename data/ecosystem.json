@@ -337,6 +337,7 @@
       "delivery_model": "python_distribution",
       "ownership": "hust_owned_subsystem",
       "repository_relationship": "organization_native",
+      "public_surface": false,
       "maturity": "experimental",
       "maintainers": ["XilingGao"],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-adaptive-quantized-kv-hust",
