@@ -3,6 +3,7 @@
   const status = document.querySelector("[data-plugin-status]");
   const filters = document.querySelector("[data-plugin-filters]");
   const search = document.querySelector("[data-plugin-search]");
+  const more = document.querySelector("[data-plugin-more]");
   const adjacent = document.querySelector("[data-adjacent-assets]");
   const repositoryCatalog = document.querySelector("[data-repository-portfolio]");
   const repositoryStatus = document.querySelector("[data-repository-status]");
@@ -11,6 +12,8 @@
   let registry;
   let portfolio;
   let selectedType = "extensions";
+  let expanded = false;
+  const pageSize = 9;
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -24,6 +27,7 @@
   const copy = () => language() === "zh" ? {
     all: "全部",
     extensions: "扩展",
+    more: "显示全部扩展",
     entries: "个生态组件",
     empty: "没有符合当前筛选条件的生态组件。",
     repository: "规范仓库",
@@ -57,6 +61,7 @@
   } : {
     all: "All",
     extensions: "Extensions",
+    more: "Show all extensions",
     entries: "ecosystem components",
     empty: "No ecosystem components match the current filters.",
     repository: "Canonical repository",
@@ -205,6 +210,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       button.setAttribute("aria-pressed", String(selectedType === type));
       button.addEventListener("click", () => {
         selectedType = type;
+        expanded = false;
         renderFilters();
         renderCatalog();
       });
@@ -493,14 +499,24 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     });
     catalog.replaceChildren();
     const grid = element("section", "plugin-grid workshop-grid");
-    visible.forEach((item) => grid.append(renderCard(item)));
+    const visibleLimit = window.matchMedia("(max-width: 680px)").matches ? 6 : pageSize;
+    const displayed = query || expanded ? visible : visible.slice(0, visibleLimit);
+    displayed.forEach((item) => grid.append(renderCard(item)));
     catalog.append(grid);
-    status.textContent = visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
+    status.textContent = visible.length ? `${displayed.length} / ${visible.length} ${copy().entries}` : copy().empty;
+    if (more) {
+      more.hidden = Boolean(query) || expanded || visible.length <= visibleLimit;
+      more.textContent = `${copy().more} (${visible.length})`;
+    }
   }
 
   search.addEventListener("input", () => {
     if (registry) renderCatalog();
     renderPortfolio();
+  });
+  more?.addEventListener("click", () => {
+    expanded = true;
+    renderCatalog();
   });
   function renderPageLabels() {
     const zh = language() === "zh";

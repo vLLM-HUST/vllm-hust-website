@@ -888,3 +888,52 @@ body[data-page="issues"] .issue-links {
     grid-template-columns: 1fr;
   }
 }
+
+[hidden] { display: none !important; }
+
+/* Public pages share one compact hierarchy: title, purpose, primary content. */
+body:not([data-page="home"]):not([data-page="plugins"]) .page-hero { padding-top: 32px; }
+body:not([data-page="home"]):not([data-page="plugins"]) .page-hero .content-panel {
+  min-height: 176px;
+  padding: 30px 32px;
+}
+body:not([data-page="home"]):not([data-page="plugins"]) .page-hero h1 {
+  margin-top: 9px !important;
+  font-size: 58px;
+  line-height: 1;
+}
+body:not([data-page="home"]):not([data-page="plugins"]) .page-hero .hero-lede {
+  max-width: 680px;
+  margin-top: 12px;
+  font-size: 15px;
+}
+body:not([data-page="home"]):not([data-page="plugins"]) main > .content-panel,
+body:not([data-page="home"]):not([data-page="plugins"]) main > div > .content-panel,
+body:not([data-page="home"]):not([data-page="plugins"]) .leaderboard-section {
+  margin: 20px 0;
+  padding: 26px;
+}
+body:not([data-page="home"]):not([data-page="plugins"]) .section-head { margin-bottom: 20px; }
+body:not([data-page="home"]):not([data-page="plugins"]) .section-head h2 { font-size: 36px; }
+
+body[data-page="versions"] .versions-hero { padding: 34px 0 22px; }
+body[data-page="versions"] .versions-hero-copy { padding: 28px 32px; }
+body[data-page="versions"] .versions-hero h1 { font-size: 58px; }
+body[data-page="leaderboard"] .leaderboard-section { padding: 26px; }
+body[data-page="leaderboard"] #official-target-perfgate,
+body[data-page="leaderboard"] #official-target-specialty { display: none; }
+body[data-page="dataset-validation"] .validation-page { gap: 20px; }
+
+@media (max-width: 760px) {
+  body:not([data-page="home"]):not([data-page="plugins"]) .page-hero { padding-top: 18px; }
+  body:not([data-page="home"]):not([data-page="plugins"]) .page-hero .content-panel {
+    min-height: 148px;
+    padding: 24px 20px;
+  }
+  body:not([data-page="home"]):not([data-page="plugins"]) .page-hero h1 { font-size: 38px; }
+  body:not([data-page="home"]):not([data-page="plugins"]) .section-head h2,
+  body[data-page="versions"] .versions-hero h1 { font-size: 32px; }
+  body:not([data-page="home"]):not([data-page="plugins"]) main > .content-panel,
+  body:not([data-page="home"]):not([data-page="plugins"]) main > div > .content-panel,
+  body:not([data-page="home"]):not([data-page="plugins"]) .leaderboard-section { padding: 20px 16px; }
+}
