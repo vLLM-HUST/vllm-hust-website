@@ -1028,17 +1028,16 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
     assert (
-        "Typed runtime contracts. Platform profiles. Composable KV state systems."
-        in html_text
+        "Typed runtime contracts. 19 audited MODs. Evidence before claims." in html_text
     )
-    assert "类型化运行时契约、平台 profile 与可组合 KV 状态系统。" in html_text
+    assert "类型化运行时契约、19 个已审计 MOD、证据先于结论。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
-    assert "Mechanisms by system layer." in html_text
-    assert "按系统层次组织机制。" in html_text
-    assert "Portable mechanisms stay independent." in html_text
-    assert "可迁移机制保持独立" in html_text
+    assert "19 MODs, with compatibility and evidence made explicit." in html_text
+    assert "19 个 MOD，明确展示兼容性与证据边界。" in html_text
+    assert "static checks never become runtime or NPU claims" in html_text
+    assert "不把静态检查写成运行时或 NPU 结论" in html_text
 
     expected_repositories = (
         "vllm-hust-bidkv",
@@ -2244,12 +2243,12 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     snapshot_path = root / "data" / "core_contributors.json"
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
-    assert payload["updated_at"] == "2026-08-26"
+    assert payload["updated_at"] == "2026-09-01"
     assert len(payload["all_repos"]["contributors"]) == 32
     assert len(payload["core_repos"]["contributors"]) == 21
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 50
+    assert len(profiles["participants"]) == 55
     assert len(profiles["staff_members"]) == 4
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
@@ -2550,8 +2549,8 @@ def test_core_contributor_stats_precede_all_repository_stats() -> None:
     all_index = html_text.index('id="contributors-all-tbody"')
 
     assert core_index < all_index
-    assert "推理引擎核心仓库与已接收插件" in html_text
-    assert "BidKV、DiffSpec" in html_text
+    assert "推理引擎核心仓库与已审计 MOD 项目组合" in html_text
+    assert "完整的 19 项目录" in html_text
 
 
 def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:

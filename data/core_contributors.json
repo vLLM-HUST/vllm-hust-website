@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26",
+  "updated_at": "2026-09-01",
   "all_repos": {
     "scope_repos": [
       "vllm-hust",
@@ -5580,6 +5580,226 @@
         "contribution_areas": "",
         "is_current_member": true,
         "current_status": "current"
+      },
+      {
+        "name": "李上上",
+        "github_login": "ilnnfover",
+        "github_url": "https://github.com/ilnnfover",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "李上上",
+        "chinese_name": "李上上",
+        "english_name": "",
+        "person_id": "github:ilnnfover",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "郑龙",
+          "en": "Long Zheng"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "雷翔麟",
+        "github_login": "llxler",
+        "github_url": "https://github.com/llxler",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "雷翔麟",
+        "chinese_name": "雷翔麟",
+        "english_name": "",
+        "person_id": "github:llxler",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "万瑶",
+          "en": "Yao Wan"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "张家万",
+        "github_login": "Jiawan23",
+        "github_url": "https://github.com/Jiawan23",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "张家万",
+        "chinese_name": "张家万",
+        "english_name": "",
+        "person_id": "github:jiawan23",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "万瑶",
+          "en": "Yao Wan"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "郁硕",
+        "github_login": "Yushuo-star",
+        "github_url": "https://github.com/Yushuo-star",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "郁硕",
+        "chinese_name": "郁硕",
+        "english_name": "",
+        "person_id": "github:yushuo-star",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "王雄",
+          "en": ""
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "毛潮云",
+        "github_login": "Irisuko",
+        "github_url": "https://github.com/Irisuko",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "毛潮云",
+        "chinese_name": "毛潮云",
+        "english_name": "",
+        "person_id": "github:irisuko",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "罗瑞坤",
+          "en": ""
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       }
     ],
     "staff_members": [
@@ -5800,6 +6020,10 @@
         "advisor": {
           "zh": "",
           "en": ""
+        },
+        "external_advisor": {
+          "zh": "Chen Xinyu · 香港科技大学（广州）",
+          "en": "Chen Xinyu · HKUST (Guangzhou)"
         },
         "github_status": {
           "zh": "",
