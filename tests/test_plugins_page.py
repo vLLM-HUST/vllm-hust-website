@@ -79,6 +79,12 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert mooncake["artifact_type"] == "external_system"
     assert mooncake["maturity"] == "supported"
     assert mooncake["integration_contracts"] == []
+    assert mooncake["canonical_repository"] == (
+        "https://github.com/vLLM-HUST/mooncake-hust"
+    )
+    assert mooncake["upstream_repository"] == (
+        "https://github.com/kvcache-ai/Mooncake"
+    )
     assert mooncake_connectors["artifact_type"] == "bridge"
     assert mooncake_connectors["maturity"] == "supported"
     assert mooncake_connectors["canonical_repository"] == (
@@ -115,6 +121,12 @@ def test_extension_manager_and_production_stack_keep_distinct_ownership() -> Non
     manager = by_id("vllm-hust-extension-manager")
     production_stack = by_id("vllm-production-stack")
     assert production_stack["evidence_level"] == "integration_tested"
+    assert production_stack["canonical_repository"] == (
+        "https://github.com/vLLM-HUST/production-stack-hust"
+    )
+    assert production_stack["upstream_repository"] == (
+        "https://github.com/vllm-project/production-stack"
+    )
     assert "metrics-backed scaling" in production_stack["summary_en"]
     assert "real GLM Router failure/recovery" in production_stack["summary_en"]
     assert "amd64 is not required" in production_stack["summary_en"]
