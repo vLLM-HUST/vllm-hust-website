@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import re
 import statistics
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -808,22 +810,38 @@ def test_leaderboard_data_excludes_retired_v0110_baselines() -> None:
 
 
 def test_leaderboard_data_is_benchmark_snapshot_mirror() -> None:
-    from scripts.sync_leaderboard_snapshots import render_public_snapshot
-
     root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "sync_leaderboard_snapshots",
+        root / "scripts" / "sync_leaderboard_snapshots.py",
+    )
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    render_public_snapshot = module.render_public_snapshot
+
     benchmark_snapshots = (
         root.parent / "vllm-hust-benchmark" / "leaderboard-data" / "snapshots"
     )
     if not benchmark_snapshots.is_dir():
         return
 
-    for name in (
+    snapshot_names = (
         "leaderboard_single.json",
         "leaderboard_multi.json",
         "leaderboard_historical.json",
         "leaderboard_compare.json",
         "last_updated.json",
+    )
+    if not all((benchmark_snapshots / name).is_file() for name in snapshot_names):
+        pytest.skip("local benchmark snapshot source is incomplete")
+    if not json.loads(
+        (benchmark_snapshots / "leaderboard_single.json").read_text(encoding="utf-8")
     ):
+        pytest.skip("local benchmark snapshot source is not populated")
+
+    for name in snapshot_names:
         assert (root / "data" / name).read_bytes() == render_public_snapshot(
             benchmark_snapshots / name
         ), f"{name} is not the sanitized benchmark snapshot projection"
