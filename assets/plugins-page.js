@@ -95,7 +95,8 @@
       title_zh: "安装并启动 BidKV",
       note_en: "Requires the compatible vLLM-HUST 0.23 host.",
       note_zh: "需要兼容的 vLLM-HUST 0.23 宿主。",
-      command: `pip install vllm-hust-ext bidkv
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+pip install bidkv
 vllm-hust-ext extension check org.vllm-hust.bidkv
 vllm-hust-ext extension enable org.vllm-hust.bidkv
 vllm-hust-ext run -- vllm serve /path/to/model`
@@ -105,7 +106,8 @@ vllm-hust-ext run -- vllm serve /path/to/model`
       title_zh: "配置并启动 DiffSpec",
       note_en: "Prepare diffspec.json with the draft model configuration first.",
       note_zh: "请先在 diffspec.json 中填写 draft model 配置。",
-      command: `pip install vllm-hust-ext vllm-diffspec
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+pip install "vllm-diffspec @ git+https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec.git"
 vllm-hust-ext extension configure org.vllm-hust.diffspec --file diffspec.json
 vllm-hust-ext extension check org.vllm-hust.diffspec
 vllm-hust-ext extension enable org.vllm-hust.diffspec
@@ -116,7 +118,7 @@ vllm-hust-ext run -- vllm serve /path/to/target-model`
       title_zh: "安装并启动 LatchMoE",
       note_en: "Requires the pinned vLLM 0.21 and hook-enabled vLLM Ascend HUST stack; one NPU, max-num-seqs 1, prefix cache off.",
       note_zh: "需要固定 vLLM 0.21 与带 hook 的 vLLM Ascend HUST；单 NPU、max-num-seqs=1、关闭 prefix cache。",
-      command: `pip install vllm-hust-ext
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
 pip install git+https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE.git
 latchmoe check
 latchmoe serve /path/to/model`
@@ -128,7 +130,7 @@ latchmoe serve /path/to/model`
       action_zh: "配置命令",
       note_en: "PegaFlow is operated separately; the Manager checks health and never starts, stops, or clears the service.",
       note_zh: "PegaFlow 服务由外部单独运维；Manager 只检查健康状态，不启动、停止或清空服务。",
-      command: `pip install vllm-hust-ext
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
 pip install "git+https://github.com/vLLM-HUST/pegaflow-hust.git#subdirectory=extension-provider"
 vllm-hust-ext extension configure org.vllm-hust.pegaflow --file pegaflow.json
 vllm-hust-ext extension check org.vllm-hust.pegaflow
@@ -141,7 +143,7 @@ vllm-hust-ext extension plan org.vllm-hust.pegaflow`
       action_zh: "检查命令",
       note_en: "Import-only descriptor: inspection is supported, enablement is intentionally refused.",
       note_zh: "当前为 import-only 描述包：支持检查，明确拒绝启用。",
-      command: `pip install vllm-hust-ext
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
 pip install git+https://github.com/vLLM-HUST/vllm-ascend-adaptive-quantized-kv-hust.git
 vllm-hust-ext extension inspect org.vllm-hust.ascend-adaptive-quantized-kv
 vllm-hust-ext extension check org.vllm-hust.ascend-adaptive-quantized-kv`
@@ -153,7 +155,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-adaptive-quantized-kv`
       action_zh: "检查命令",
       note_en: "Import-only validator: no model loading, kernel selection, or runtime activation.",
       note_zh: "当前为 import-only 校验器：不加载模型、不选择内核、不激活运行时。",
-      command: `pip install vllm-hust-ext
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
 pip install "git+https://github.com/vLLM-HUST/vllm-ascend-quant-hust.git#subdirectory=runtime-extension"
 vllm-hust-ext extension inspect org.vllm-hust.ascend-quant-runtime
 vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`

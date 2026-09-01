@@ -89,7 +89,7 @@ A plugin, KV connector, Mooncake service, and control-plane resource retain dist
 <a href="#repository-portfolio">
 <span class="lang-en">Repository Portfolio</span>
 <span class="lang-zh">仓库组合</span>
-<small>39 REPOSITORIES</small>
+<small>39 CURATED REPOSITORIES</small>
 </a>
 </nav>
 
@@ -680,22 +680,23 @@ A component graduates after domain behavior, failure, shutdown, and rollback tes
 </article>
         <article>
 <div class="standard-code-head">
-<span>02 / INSTALL + ENABLE</span>
+<span>02 / INSTALL + INSPECT</span>
 <strong>
 <span class="lang-en">Static registration, explicit activation</span>
 <span class="lang-zh">静态注册，显式启用</span>
 </strong>
 </div>
 <pre>
-<code># The wheel registers static manifest metadata; it is not imported.
-uv pip install vllm-hust-ext
+<code># No public vllm-hust-ext PyPI alpha exists yet; install the current source.
+uv pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
 uv pip install example-kv-adapter
 vllm-hust-ext extension list
 vllm-hust-ext extension inspect org.example.kv-adapter
 vllm-hust-ext extension validate org.example.kv-adapter
 vllm-hust-ext extension configure org.example.kv-adapter --file config.json
 
-# Installation alone changes no runtime behavior.
+# Installation alone changes no runtime behavior. import_only descriptors stop here:
+# Manager reports activation_ready=false and refuses extension enable.
 vllm-hust-ext extension enable org.example.kv-adapter
 vllm-hust-ext extension status org.example.kv-adapter
 vllm-hust-ext extension plan org.example.kv-adapter
@@ -705,7 +706,8 @@ vllm-hust-ext extension check org.example.kv-adapter
 # vLLM-owned extensions may additionally use:
 vllm-hust-ext run -- vllm serve MODEL
 
-# External services and clusters remain operator-owned.</code>
+# External services and clusters remain operator-owned.
+# A non-optional required service must be healthy before a new run.</code>
 </pre>
 </article>
         <article class="operations-example">
@@ -765,16 +767,14 @@ Official vLLM remains unsupported until its upstream scheduler contract is relea
 
       <aside class="plugin-runtime-note">
 <strong>
-<span class="lang-en">PegaFlow uses one controlled runtime</span>
-<span class="lang-zh">PegaFlow 使用同一个受控运行时</span>
+<span class="lang-en">PegaFlow remains an external service</span>
+<span class="lang-zh">PegaFlow 仍是外部服务</span>
 </strong>
 <p>
-<span class="lang-en">Preflight and every later vLLM service now use one explicit interpreter and exact core checkout; the root-owned hard-coded Conda activation is gone.
-Host 112 verified exact vLLM and PegaFlow sources, engine and connector imports, the real CLI, typed manifest, model, ports, and eight NPUs, then blocked only because pegaflow-server was not built.
-No service launched, so this remains readiness evidence rather than connector or hardware equivalence.</span>
-<span class="lang-zh">preflight 与之后的每个 vLLM 服务现在统一使用显式解释器和精确 core checkout，硬编码的 root Conda 激活已移除。
-host 112 已验证精确的 vLLM/PegaFlow 源码、engine/connector import、真实 CLI、typed manifest、模型、端口和 8 张 NPU，唯一阻塞是 pegaflow-server 尚未构建。
-由于没有服务启动，这仍是就绪度证据，而不是 connector 或硬件等价结论。
+<span class="lang-en">The standardized Provider is part of the vLLM-HUST PegaFlow repository and can register alongside the vLLM, Mooncake, and Production Stack Providers.
+It renders <code>PegaKVConnector</code> configuration and checks the operator-supplied health endpoint. A missing or unhealthy required service blocks a new Manager launch; Manager never starts, stops, clears, upgrades, or deletes PegaFlow or its KV data.</span>
+<span class="lang-zh">标准化 Provider 已进入 vLLM-HUST 的 PegaFlow 仓库，并可与 vLLM、Mooncake、Production Stack Provider 同时注册。
+它生成 <code>PegaKVConnector</code> 配置并检查运维方提供的健康端点；必需服务缺失或不健康时，Manager 会阻止新的启动，但绝不会启动、停止、清空、升级或删除 PegaFlow 及其 KV 数据。
 </span>
 </p>
 </aside>
