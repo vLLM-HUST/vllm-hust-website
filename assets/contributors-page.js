@@ -20,6 +20,7 @@
                 payload,
                 index,
                 updatedAt: String(payload?.updated_at || ''),
+                hasAuditedRoster: payload?.roster_source === 'data/member_roster.json',
                 hasMemberProfiles: Boolean(payload?.member_profiles),
             };
         } finally {
@@ -43,7 +44,8 @@
             throw new Error('Remote and local contributor data sources both failed');
         }
         candidates.sort((left, right) => (
-            right.updatedAt.localeCompare(left.updatedAt)
+            Number(right.hasAuditedRoster) - Number(left.hasAuditedRoster)
+            || right.updatedAt.localeCompare(left.updatedAt)
             || Number(right.hasMemberProfiles) - Number(left.hasMemberProfiles)
             || right.index - left.index
         ));
@@ -82,6 +84,9 @@
                 )
                     ? payload.member_profiles.external_contributors
                     : [],
+                former_members: Array.isArray(payload.member_profiles.former_members)
+                    ? payload.member_profiles.former_members
+                    : [],
             };
         }
         const coreMembers = contributorsFor(payload, 'core_repos');
@@ -94,6 +99,7 @@
             participants,
             staff_members: [],
             external_contributors: [],
+            former_members: [],
             unresolved_contributors: [],
         };
     }
@@ -338,6 +344,7 @@
             profiles.external_contributors,
             'external',
         );
+        renderProfileList('contributors-former-list', profiles.former_members, 'former');
         renderCoreTable(profiles.core_members);
         renderAllTable(contributorsFor(payload, 'all_repos'));
         const loading = document.getElementById('contributors-members-loading');

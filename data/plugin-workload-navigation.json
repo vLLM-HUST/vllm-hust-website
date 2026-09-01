@@ -1,0 +1,37 @@
+{
+  "schema_version": "plugin-workload-navigation/v1",
+  "updated_at": "2026-09-01",
+  "workloads": [
+    {"id": "long_context", "label_en": "Long context", "label_zh": "长上下文"},
+    {"id": "kv_pressure", "label_en": "KV pressure", "label_zh": "KV 压力"},
+    {"id": "speculative_decoding", "label_en": "Speculative decoding", "label_zh": "推测解码"},
+    {"id": "moe_inference", "label_en": "MoE inference", "label_zh": "MoE 推理"},
+    {"id": "quantized_inference", "label_en": "Quantized inference", "label_zh": "量化推理"},
+    {"id": "distributed_inference", "label_en": "Distributed inference", "label_zh": "分布式推理"},
+    {"id": "prefill", "label_en": "Prefill", "label_zh": "预填充"},
+    {"id": "latency_slo", "label_en": "Latency / SLO", "label_zh": "延迟 / SLO"},
+    {"id": "stateful_serving", "label_en": "Stateful serving", "label_zh": "有状态服务"},
+    {"id": "sparse_inference", "label_en": "Sparse inference", "label_zh": "稀疏推理"}
+  ],
+  "plugins": {
+    "bidkv": ["kv_pressure", "latency_slo"],
+    "diffspec": ["speculative_decoding", "long_context"],
+    "latchmoe": ["moe_inference"],
+    "ascend-quant-runtime-descriptor": ["quantized_inference"],
+    "kvcompress-ascend": ["long_context", "kv_pressure"],
+    "kv-tiering-migration": ["long_context", "kv_pressure", "stateful_serving"],
+    "knorm-migration": ["long_context", "kv_pressure"],
+    "pyramidkv-ascend-migration": ["long_context", "kv_pressure"],
+    "quantized-kv-cache-migration": ["quantized_inference", "long_context"],
+    "simllm-migration": ["stateful_serving"],
+    "unified-communication-migration": ["distributed_inference"],
+    "split-batch-full-graph-migration": ["distributed_inference", "latency_slo"],
+    "kv-transfer-observability-migration": ["distributed_inference", "stateful_serving"],
+    "layered-prefill-migration": ["prefill", "long_context"],
+    "activation-sparsity-migration": ["sparse_inference"],
+    "pipeline-microbatch-migration": ["distributed_inference", "latency_slo"],
+    "qos-scheduler-migration": ["latency_slo"],
+    "mapped-host-kv-offload": ["kv_pressure", "stateful_serving"],
+    "stateharbor": ["stateful_serving", "distributed_inference"]
+  }
+}

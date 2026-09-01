@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-25",
+  "updated_at": "2026-08-26",
   "all_repos": {
     "scope_repos": [
       "vllm-hust",
@@ -125,7 +125,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 3,
@@ -273,7 +275,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 6,
@@ -321,7 +325,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 7,
@@ -414,7 +420,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 9,
@@ -459,7 +467,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 10,
@@ -642,7 +652,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 14,
@@ -823,7 +835,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 18,
@@ -1105,7 +1119,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 24,
@@ -1151,7 +1167,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 25,
@@ -1242,7 +1260,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 27,
@@ -1288,7 +1308,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 28,
@@ -1408,10 +1430,6 @@
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
           "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
         },
-        "profile_status": {
-          "zh": "GitHub 已确认",
-          "en": "GitHub confirmed"
-        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -1427,7 +1445,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 31,
@@ -1472,7 +1492,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 32,
@@ -1621,7 +1643,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 3,
@@ -1759,7 +1783,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 6,
@@ -1939,7 +1965,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 10,
@@ -1985,7 +2013,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 11,
@@ -2031,7 +2061,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 12,
@@ -2214,7 +2246,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 16,
@@ -2260,7 +2294,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 17,
@@ -2305,7 +2341,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 18,
@@ -2350,7 +2388,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 19,
@@ -2440,7 +2480,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 21,
@@ -2590,7 +2632,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 3,
@@ -2635,7 +2679,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 4,
@@ -2815,7 +2861,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 8,
@@ -2861,7 +2909,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 9,
@@ -2907,7 +2957,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 10,
@@ -3094,7 +3146,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 14,
@@ -3140,7 +3194,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 15,
@@ -3185,7 +3241,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 16,
@@ -3215,10 +3273,6 @@
           "zh": "Prompt/KV Cache 复用；缓存驱逐；语义感知与在线自适应策略；Agent 场景缓存生命周期管理",
           "en": "Prompt and KV Cache reuse; cache eviction; semantic-aware and online-adaptive policies; cache lifecycle management for Agent workloads"
         },
-        "profile_status": {
-          "zh": "GitHub 已确认",
-          "en": "GitHub confirmed"
-        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -3234,7 +3288,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "rank": 17,
@@ -3324,7 +3380,9 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
       }
     ],
     "participants": [
@@ -3455,7 +3513,9 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": ""
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "fw1688",
@@ -3497,49 +3557,9 @@
           "zh": "负责人确认；组织邀请待接受",
           "en": "Confirmed by the advisor; organization invitation pending"
         },
-        "contribution_areas": ""
-      },
-      {
-        "name": "余天成",
-        "github_login": "yutiantian0115",
-        "github_url": "https://github.com/yutiantian0115",
-        "commits": 0,
-        "changed_lines": 0,
-        "added": 0,
-        "deleted": 0,
-        "active_repos": 0,
-        "repos": [],
-        "key_contributions": "",
-        "display_name": "余天成",
-        "chinese_name": "余天成",
-        "english_name": "",
-        "person_id": "github:yutiantian0115",
-        "identity_confirmed": true,
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": false,
-        "core_member": false,
-        "role": {
-          "zh": "学生",
-          "en": "Student"
-        },
-        "research_direction": {
-          "zh": "大模型推理方向待定；愿意根据课题安排探索相关研究",
-          "en": "LLM inference direction to be determined; open to exploring research topics aligned with project needs"
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
-        },
-        "github_status": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": ""
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "刘子墨",
@@ -3669,7 +3689,9 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": ""
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "周雨桐",
@@ -3752,48 +3774,6 @@
         "github_status": {
           "zh": "",
           "en": ""
-        },
-        "contribution_areas": ""
-      },
-      {
-        "name": "Gongxuan Song",
-        "github_login": null,
-        "github_url": null,
-        "commits": 0,
-        "changed_lines": 0,
-        "added": 0,
-        "deleted": 0,
-        "active_repos": 0,
-        "repos": [],
-        "key_contributions": "",
-        "display_name": "宋功轩",
-        "chinese_name": "宋功轩",
-        "english_name": "Gongxuan Song",
-        "person_id": "profile:宋功轩",
-        "identity_confirmed": true,
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": false,
-        "core_member": false,
-        "role": {
-          "zh": "工程成员",
-          "en": "Engineering member"
-        },
-        "research_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "participation_direction": {
-          "zh": "LLM推理系统工程化",
-          "en": "LLM inference-system engineering"
-        },
-        "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
-        },
-        "github_status": {
-          "zh": "GitHub ID 待确认",
-          "en": "GitHub ID pending confirmation"
         },
         "contribution_areas": ""
       },
@@ -4000,10 +3980,6 @@
           "zh": "SLO-aware 调度；Workflow/Agent-aware Serving；程序感知调度；工作流状态管理",
           "en": "SLO-aware scheduling; workflow- and agent-aware serving; program-aware scheduling; workflow state management"
         },
-        "profile_status": {
-          "zh": "GitHub 已确认",
-          "en": "GitHub confirmed"
-        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -4016,7 +3992,9 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": ""
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "Xincai Zhu",
@@ -4096,14 +4074,16 @@
           "en": ""
         },
         "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
+          "zh": "毛言粲",
+          "en": "Yancan Mao"
         },
         "github_status": {
           "zh": "",
           "en": ""
         },
-        "contribution_areas": ""
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "sssarrior",
@@ -4185,48 +4165,6 @@
         "profile_status": {
           "zh": "GitHub 已确认",
           "en": "GitHub confirmed"
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
-        },
-        "github_status": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": ""
-      },
-      {
-        "name": "李林浩",
-        "github_login": "Sunshine-llh",
-        "github_url": "https://github.com/Sunshine-llh",
-        "commits": 0,
-        "changed_lines": 0,
-        "added": 0,
-        "deleted": 0,
-        "active_repos": 0,
-        "repos": [],
-        "key_contributions": "",
-        "display_name": "李林浩",
-        "chinese_name": "李林浩",
-        "english_name": "",
-        "person_id": "github:sunshine-llh",
-        "identity_confirmed": true,
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": false,
-        "core_member": false,
-        "role": {
-          "zh": "学生",
-          "en": "Student"
-        },
-        "research_direction": {
-          "zh": "待定",
-          "en": "To be determined"
         },
         "participation_direction": {
           "zh": "",
@@ -4584,7 +4522,9 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 5
+        "all_repos_rank": 5,
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "董君瑶",
@@ -4698,10 +4638,6 @@
           "zh": "异构 GPU 推理分离；系统架构；资源调度；异构兼容；成本敏感型部署；自动并行",
           "en": "Heterogeneous GPU inference disaggregation; system architecture; resource scheduling; heterogeneous compatibility; cost-aware deployment; automatic parallelism"
         },
-        "profile_status": {
-          "zh": "GitHub 已确认",
-          "en": "GitHub confirmed"
-        },
         "participation_direction": {
           "zh": "",
           "en": ""
@@ -4714,7 +4650,9 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": ""
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "Jianjun Zhao",
@@ -4798,7 +4736,9 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": ""
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "路庆浩",
@@ -4927,7 +4867,9 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": ""
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "Zijia Chen",
@@ -4972,7 +4914,9 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 8
+        "all_repos_rank": 8,
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "Debin Chen",
@@ -5014,7 +4958,9 @@
           "zh": "",
           "en": ""
         },
-        "contribution_areas": ""
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "雷欣妍",
@@ -5101,7 +5047,9 @@
           "zh": "",
           "en": ""
         },
-        "all_repos_rank": 9
+        "all_repos_rank": 9,
+        "is_current_member": true,
+        "current_status": "current"
       },
       {
         "name": "Hongru Gao",
@@ -5189,7 +5137,449 @@
         "github_status": {
           "zh": "",
           "en": ""
-        }
+        },
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "陈稷",
+        "github_login": "KazzeMaru",
+        "github_url": "https://github.com/KazzeMaru",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "陈稷",
+        "chinese_name": "陈稷",
+        "english_name": "",
+        "person_id": "github:kazzemaru",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "阮宏毅",
+        "github_login": "Lan-Fa",
+        "github_url": "https://github.com/Lan-Fa",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "阮宏毅",
+        "chinese_name": "阮宏毅",
+        "english_name": "",
+        "person_id": "github:lan-fa",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "张盛翔",
+        "github_login": "zhangshengxiang682",
+        "github_url": "https://github.com/zhangshengxiang682",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "张盛翔",
+        "chinese_name": "张盛翔",
+        "english_name": "",
+        "person_id": "github:zhangshengxiang682",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "李佳乐",
+        "github_login": "peter17-17",
+        "github_url": "https://github.com/peter17-17",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "李佳乐",
+        "chinese_name": "李佳乐",
+        "english_name": "",
+        "person_id": "github:peter17-17",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "任天宇",
+        "github_login": "Renty-0",
+        "github_url": "https://github.com/Renty-0",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "任天宇",
+        "chinese_name": "任天宇",
+        "english_name": "",
+        "person_id": "github:renty-0",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "王庆刚",
+          "en": "Qinggang Wang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "桂彩玉",
+        "github_login": "AproAkk",
+        "github_url": "https://github.com/AproAkk",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "桂彩玉",
+        "chinese_name": "桂彩玉",
+        "english_name": "",
+        "person_id": "github:aproakk",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "项翔",
+          "en": "Xiang Xiang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "江勰东",
+        "github_login": "jxd1111",
+        "github_url": "https://github.com/jxd1111",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "江勰东",
+        "chinese_name": "江勰东",
+        "english_name": "",
+        "person_id": "github:jxd1111",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "项翔",
+          "en": "Xiang Xiang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "李佳润",
+        "github_login": "eljrte",
+        "github_url": "https://github.com/eljrte",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "李佳润",
+        "chinese_name": "李佳润",
+        "english_name": "",
+        "person_id": "github:eljrte",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "赵进",
+          "en": "Jin Zhao"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "陈湘",
+        "github_login": "mumu029",
+        "github_url": "https://github.com/mumu029",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "陈湘",
+        "chinese_name": "陈湘",
+        "english_name": "",
+        "person_id": "github:mumu029",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "郑龙",
+          "en": "Long Zheng"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
+      },
+      {
+        "name": "王晨",
+        "github_login": "qingfengyuhuoda",
+        "github_url": "https://github.com/qingfengyuhuoda",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "王晨",
+        "chinese_name": "王晨",
+        "english_name": "",
+        "person_id": "github:qingfengyuhuoda",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "万瑶",
+          "en": "Yao Wan"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": true,
+        "current_status": "current"
       }
     ],
     "staff_members": [
@@ -5418,6 +5808,230 @@
         "contribution_areas": ""
       }
     ],
-    "unresolved_contributors": []
-  }
+    "unresolved_contributors": [],
+    "former_members": [
+      {
+        "name": "李林浩",
+        "github_login": "Sunshine-llh",
+        "github_url": "https://github.com/Sunshine-llh",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "李林浩",
+        "chinese_name": "李林浩",
+        "english_name": "",
+        "person_id": "github:sunshine-llh",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "历史成员",
+          "en": "Former member"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": false,
+        "current_status": "former",
+        "former_member": true,
+        "profile_status": {
+          "zh": "考核淘汰",
+          "en": "Inactive after assessment"
+        }
+      },
+      {
+        "name": "宋功轩",
+        "github_login": null,
+        "github_url": null,
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "宋功轩",
+        "chinese_name": "宋功轩",
+        "english_name": "",
+        "person_id": "profile:宋功轩",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "历史成员",
+          "en": "Former member"
+        },
+        "research_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
+          "zh": "GitHub ID 待确认",
+          "en": "GitHub ID pending confirmation"
+        },
+        "contribution_areas": "",
+        "is_current_member": false,
+        "current_status": "former",
+        "former_member": true,
+        "profile_status": {
+          "zh": "已请离",
+          "en": "Departed"
+        }
+      },
+      {
+        "name": "余天成",
+        "github_login": "yutiantian0115",
+        "github_url": "https://github.com/yutiantian0115",
+        "commits": 0,
+        "changed_lines": 0,
+        "added": 0,
+        "deleted": 0,
+        "active_repos": 0,
+        "repos": [],
+        "key_contributions": "",
+        "display_name": "余天成",
+        "chinese_name": "余天成",
+        "english_name": "",
+        "person_id": "github:yutiantian0115",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": false,
+        "core_member": false,
+        "role": {
+          "zh": "历史成员",
+          "en": "Former member"
+        },
+        "research_direction": {
+          "zh": "大模型推理方向待定；愿意根据课题安排探索相关研究",
+          "en": "LLM inference direction to be determined; open to exploring research topics aligned with project needs"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "",
+          "en": ""
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "",
+        "is_current_member": false,
+        "current_status": "former",
+        "former_member": true,
+        "profile_status": {
+          "zh": "已退出",
+          "en": "Withdrawn"
+        }
+      }
+    ]
+  },
+  "advisor_profiles": [
+    {
+      "name_zh": "张书豪",
+      "name_en": "Shuhao Zhang",
+      "github_login": "ShuhaoZhangTony",
+      "github_url": "https://github.com/ShuhaoZhangTony"
+    },
+    {
+      "name_zh": "刘海坤",
+      "name_en": "Haikun Liu",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "王庆刚",
+      "name_en": "Qinggang Wang",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "项翔",
+      "name_en": "Xiang Xiang",
+      "github_login": "eglxiang",
+      "github_url": "https://github.com/eglxiang"
+    },
+    {
+      "name_zh": "姚鹏程",
+      "name_en": "Pengcheng Yao",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "赵进",
+      "name_en": "Jin Zhao",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "郑龙",
+      "name_en": "Long Zheng",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "万瑶",
+      "name_en": "Yao Wan",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "毛言粲",
+      "name_en": "Yancan Mao",
+      "github_login": "yancanmao",
+      "github_url": "https://github.com/yancanmao"
+    },
+    {
+      "name_zh": "罗瑞坤",
+      "name_en": "",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "黄禹",
+      "name_en": "",
+      "github_login": null,
+      "github_url": null
+    },
+    {
+      "name_zh": "王雄",
+      "name_en": "",
+      "github_login": null,
+      "github_url": null
+    }
+  ],
+  "roster_source": "data/member_roster.json"
 }

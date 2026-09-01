@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from jsonschema import Draft7Validator
+
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = json.loads((ROOT / "data" / "ecosystem.json").read_text(encoding="utf-8"))
 PORTFOLIO = json.loads(
@@ -13,6 +15,9 @@ SCRIPT = (ROOT / "assets" / "plugins-page.js").read_text(encoding="utf-8")
 STYLES = (ROOT / "assets" / "plugins.css").read_text(encoding="utf-8")
 WORKSHOP_METADATA = json.loads(
     (ROOT / "data" / "plugin-workshop-metadata.json").read_text(encoding="utf-8")
+)
+WORKLOAD_NAVIGATION = json.loads(
+    (ROOT / "data" / "plugin-workload-navigation.json").read_text(encoding="utf-8")
 )
 LEGACY_STANDARD = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
 
@@ -293,7 +298,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "workshop-v5-public-only-20260901" in PAGE
+    assert "workshop-v6-metadata-20260901" in PAGE
 
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
@@ -388,10 +393,18 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         ("杜忠承", "dzcixy")
     ]
     assert WORKSHOP_METADATA["plugins"]["bidkv"]["advisors"] == [
-        {"name_zh": "张书豪", "name_en": "Shuhao Zhang"}
+        {
+            "name_zh": "张书豪",
+            "name_en": "Shuhao Zhang",
+            "relationship": "internal",
+        }
     ]
     assert WORKSHOP_METADATA["plugins"]["diffspec"]["advisors"] == [
-        {"name_zh": "黄禹", "name_en": "Yu Huang"}
+        {
+            "name_zh": "黄禹",
+            "name_en": "Yu Huang",
+            "relationship": "internal",
+        }
     ]
 
 
@@ -457,7 +470,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=workshop-v2-effects-20260901" in PAGE
+    assert "plugins.css?v=workshop-v6-metadata-20260901" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -507,7 +520,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v4-bridges"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v6-metadata"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -582,7 +595,13 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         assert component["canonical_repository"] == repository["url"]
         expected_status = (
             "source_scaffold"
-            if component_id == "scheduler-policy-lab"
+            if component_id
+            in {
+                "kv-tiering-migration",
+                "knorm-migration",
+                "pyramidkv-ascend-migration",
+                "scheduler-policy-lab",
+            }
             else "inspect_only"
         )
         assert component["compatibility"]["status"] == expected_status
@@ -621,6 +640,157 @@ def test_extension_standard_covers_core_and_host_providers() -> None:
     assert "control-plane-and-runtime-bridge.md" in PAGE
     assert "platform-operator-model-runner-boundaries.md" in PAGE
     assert "plugin-standard-v1.0.pdf" not in PAGE
+
+
+def test_plugin_json_sources_match_their_schemas() -> None:
+    sources = {
+        "ecosystem_v1.schema.json": REGISTRY,
+        "plugin_workshop_metadata_v1.schema.json": WORKSHOP_METADATA,
+        "plugin_workload_navigation_v1.schema.json": WORKLOAD_NAVIGATION,
+    }
+    for schema_name, payload in sources.items():
+        schema = json.loads(
+            (ROOT / "data" / "schemas" / schema_name).read_text(encoding="utf-8")
+        )
+        Draft7Validator.check_schema(schema)
+        Draft7Validator(schema).validate(payload)
+
+
+def test_all_19_workshop_mods_have_complete_public_card_metadata() -> None:
+    workshop_mods = {
+        item["id"]: item
+        for item in REGISTRY["components"]
+        if item["artifact_type"] in {"runtime_component", "bridge"}
+        and item["repository_relationship"] == "organization_native"
+        and item.get("public_surface", True) is not False
+        and item["delivery_model"]
+        in {"plugin_bundle", "python_distribution", "migration_scaffold"}
+        and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+    }
+    assert len(workshop_mods) == 19
+    assert set(WORKSHOP_METADATA["plugins"]) == set(workshop_mods)
+    assert set(WORKLOAD_NAVIGATION["plugins"]) == set(workshop_mods)
+
+    workload_ids = {item["id"] for item in WORKLOAD_NAVIGATION["workloads"]}
+    for component_id, item in workshop_mods.items():
+        assert item["name_en"] and item["name_zh"]
+        assert item["summary_en"] and item["summary_zh"]
+        assert item["canonical_repository"]
+        compatibility = item["compatibility"]
+        assert {
+            "status",
+            "host",
+            "versions",
+            "platforms",
+            "requirements_en",
+            "requirements_zh",
+        } <= compatibility.keys()
+        assert compatibility["host"]
+        assert compatibility["versions"]
+        assert compatibility["platforms"]
+        assert compatibility["requirements_en"]
+        assert compatibility["requirements_zh"]
+        assert item["public_effect_en"] and item["public_effect_zh"]
+        assert item["public_effect_url"].startswith("https://github.com/")
+        metadata = WORKSHOP_METADATA["plugins"][component_id]
+        assert metadata["maintainers"]
+        assert metadata["advisors"]
+        assert all(
+            person["name"] != person["login"] for person in metadata["maintainers"]
+        )
+        assert set(WORKLOAD_NAVIGATION["plugins"][component_id]) <= workload_ids
+
+
+def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
+    expected = {
+        "kvcompress-ascend": ([("张家万", "Jiawan23")], "万瑶"),
+        "pyramidkv-ascend-migration": ([("毛潮云", "Irisuko")], "罗瑞坤"),
+        "split-batch-full-graph-migration": (
+            [("吴天宇", "Raing5Days"), ("李上上", "ilnnfover")],
+            "郑龙",
+        ),
+        "layered-prefill-migration": ([("郁硕", "Yushuo-star")], "王雄"),
+        "activation-sparsity-migration": ([("雷翔麟", "llxler")], "万瑶"),
+        "qos-scheduler-migration": ([("郁硕", "Yushuo-star")], "王雄"),
+    }
+    for component_id, (people, advisor_name) in expected.items():
+        metadata = WORKSHOP_METADATA["plugins"][component_id]
+        assert [
+            (person["name"], person["login"]) for person in metadata["maintainers"]
+        ] == people
+        assert metadata["advisors"] == [
+            next(
+                advisor
+                for advisor in metadata["advisors"]
+                if advisor["name_zh"] == advisor_name
+                and advisor["relationship"] == "internal"
+            )
+        ]
+
+    pipeline = WORKSHOP_METADATA["plugins"]["pipeline-microbatch-migration"]
+    assert [
+        (person["name"], person["login"]) for person in pipeline["maintainers"]
+    ] == [("徐晨曦", "xsun2001")]
+    assert pipeline["advisors"] == [
+        {
+            "name_zh": "Chen Xinyu",
+            "name_en": "Chen Xinyu",
+            "relationship": "external_contributor",
+            "affiliation_en": "HKUST (Guangzhou)",
+            "affiliation_zh": "香港科技大学（广州）",
+        }
+    ]
+    assert not [
+        advisor
+        for advisor in pipeline["advisors"]
+        if advisor["relationship"] == "internal"
+    ]
+
+
+def test_workload_navigation_and_external_advisor_rendering_are_interactive() -> None:
+    assert "data-plugin-workload-filter" in PAGE
+    assert (
+        'data-workloads="./data/plugin-workload-navigation.json?v=workload-navigation-v1"'
+        in PAGE
+    )
+    assert 'workloadFilter.addEventListener("change"' in SCRIPT
+    assert "workloadIds.includes(selectedWorkload)" in SCRIPT
+    assert 'badge(workloadLabel(workloadId), "workload-tag")' in SCRIPT
+    assert "copy().externalAdvisor" in SCRIPT
+    assert "copy().externalContributor" in SCRIPT
+    assert 'advisor.relationship === "external_contributor"' in SCRIPT
+    assert ".plugin-external-advisor" in STYLES
+    assert ".plugin-workload-tags" in STYLES
+    assert "text-overflow: ellipsis" not in STYLES
+
+
+def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
+    kvcompress = by_id("kvcompress-ascend")["compatibility"]
+    assert kvcompress["status"] == "verified"
+    assert kvcompress["versions"] == [
+        "vLLM-HUST >=0.23.1,<0.24",
+        "vLLM-Ascend-HUST >=0.19.1,<0.20",
+        "Extension 0.2.0",
+    ]
+    assert kvcompress["python"] == [">=3.10,<3.15"]
+    assert kvcompress["platforms"] == ["Single Ascend NPU", "Eager or ACL graph"]
+    assert "block size 128" in kvcompress["requirements_en"]
+
+    for component_id in (
+        "kv-tiering-migration",
+        "knorm-migration",
+        "pyramidkv-ascend-migration",
+    ):
+        compatibility = by_id(component_id)["compatibility"]
+        assert compatibility["status"] == "source_scaffold"
+        assert compatibility["versions"] == ["No installable or runnable release"]
+        assert "package or manifest" in compatibility["requirements_en"]
+
+    assert '"kvcompress-ascend": {' in SCRIPT
+    assert "uv pip install -e /path/to/vllm-ascend-kvcompress-hust" in SCRIPT
+    assert "function installationStatus(item)" in SCRIPT
+    assert 'item.compatibility?.status !== "source_scaffold"' in SCRIPT
+    assert "The repository publishes no package, manifest" in SCRIPT
 
 
 def test_public_copy_uses_ecosystem_language() -> None:

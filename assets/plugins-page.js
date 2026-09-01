@@ -3,16 +3,19 @@
   const status = document.querySelector("[data-plugin-status]");
   const filters = document.querySelector("[data-plugin-filters]");
   const search = document.querySelector("[data-plugin-search]");
+  const workloadFilter = document.querySelector("[data-plugin-workload-filter]");
   const more = document.querySelector("[data-plugin-more]");
   const adjacent = document.querySelector("[data-adjacent-assets]");
   const repositoryCatalog = document.querySelector("[data-repository-portfolio]");
   const repositoryStatus = document.querySelector("[data-repository-status]");
-  if (!catalog || !status || !filters || !search) return;
+  if (!catalog || !status || !filters || !search || !workloadFilter) return;
 
   let registry;
   let portfolio;
   let workshopMetadata = {};
+  let workloadNavigation = { workloads: [], plugins: {} };
   let selectedType = "extensions";
+  let selectedWorkload = "all";
   let expanded = false;
   const pageSize = 9;
 
@@ -47,7 +50,13 @@
     compatibility: "兼容性",
     maintainers: "负责人",
     advisors: "指导老师",
-    advisorUnknown: "暂未公开",
+    advisorUnknown: "规范元数据尚未记录指导关系",
+    externalAdvisor: "校外指导",
+    externalContributor: "项目外援",
+    workload: "Workload",
+    allWorkloads: "全部 Workload",
+    notInstallable: "尚不可安装",
+    notInstallableReason: "仓库未发布 package、manifest 或可靠安装路径。",
     stars: "Stars",
     pullRequests: "开放 PR",
     forks: "Forks",
@@ -92,7 +101,13 @@
     compatibility: "Compatibility",
     maintainers: "Maintainers",
     advisors: "Advisors",
-    advisorUnknown: "Not public",
+    advisorUnknown: "No advisor relationship is recorded in canonical metadata",
+    externalAdvisor: "External advisor",
+    externalContributor: "External contributor",
+    workload: "Workload",
+    allWorkloads: "All workloads",
+    notInstallable: "Not installable yet",
+    notInstallableReason: "The repository publishes no package, manifest, or reliable installation path.",
     stars: "Stars",
     pullRequests: "Open PRs",
     forks: "Forks",
@@ -227,6 +242,22 @@ vllm-hust-ext extension check org.vllm-hust.ascend-adaptive-quantized-kv`
 pip install "git+https://github.com/vLLM-HUST/vllm-ascend-quant-hust.git#subdirectory=runtime-extension"
 vllm-hust-ext extension inspect org.vllm-hust.ascend-quant-runtime
 vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
+    },
+    "kvcompress-ascend": {
+      title_en: "Install and start Ascend KV Compression",
+      title_zh: "安装并启动昇腾 KV 压缩",
+      note_en: "Requires the paired vLLM-HUST and vLLM-Ascend-HUST source lines shown on this card; the full serving configuration remains mandatory.",
+      note_zh: "需要卡片所列的成对 vLLM-HUST 与 vLLM-Ascend-HUST 源码版本；启动时仍须提供完整服务配置。",
+      command: `uv pip install -e /path/to/vllm-ascend-kvcompress-hust
+export VLLM_PLUGINS=ascend_kvcompress
+export VLLM_KNORM_ENABLED=0
+vllm serve /path/to/model \\
+  --no-async-scheduling \\
+  --no-enable-prefix-caching \\
+  --block-size 128 \\
+  --max-model-len 12288 \\
+  --gpu-memory-utilization 0.8 \\
+  --kv-cache-compression-config '{"schema_version":1,"provider":"ascend_kvcompress","provider_config":{"method":"triattention","stats_path":"/path/to/stats.pt","kv_budget":2048,"recompute_window":128,"protected_recent_window":128,"score_aggregation":"mean","layer_aggregation":"mean","score_chunk_size":512,"score_layer_stride":4}}'`
     }
   };
 
@@ -252,6 +283,27 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       });
       filters.append(button);
     });
+  }
+
+  const workloadDefinition = (workloadId) => (
+    workloadNavigation.workloads.find((item) => item.id === workloadId)
+  );
+  const workloadLabel = (workloadId) => {
+    const definition = workloadDefinition(workloadId);
+    return definition ? local(definition, "label") : valueLabel(workloadId);
+  };
+
+  function renderWorkloadFilter() {
+    workloadFilter.replaceChildren();
+    const all = element("option", "", copy().allWorkloads);
+    all.value = "all";
+    workloadFilter.append(all);
+    workloadNavigation.workloads.forEach((workload) => {
+      const option = element("option", "", local(workload, "label"));
+      option.value = workload.id;
+      workloadFilter.append(option);
+    });
+    workloadFilter.value = selectedWorkload;
   }
 
   function badge(text, className = "") {
@@ -331,12 +383,30 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       list.append(link);
     });
     people.append(list);
+    const advisorRecords = Array.isArray(metadata.advisors) ? metadata.advisors : [];
+    const internalAdvisors = advisorRecords.filter((advisor) => advisor.relationship !== "external_contributor");
+    const externalAdvisors = advisorRecords.filter((advisor) => advisor.relationship === "external_contributor");
     const advisors = element("div", "plugin-advisors");
     advisors.append(element("span", "plugin-community-label", copy().advisors));
-    const advisorNames = Array.isArray(metadata.advisors)
-      ? metadata.advisors.map((advisor) => advisor[`name_${language()}`] || advisor.name_en).filter(Boolean)
-      : [];
-    advisors.append(element("strong", "plugin-advisor-names", advisorNames.join(" · ") || copy().advisorUnknown));
+    const advisorNames = internalAdvisors
+      .map((advisor) => advisor[`name_${language()}`] || advisor.name_en)
+      .filter(Boolean);
+    advisors.append(element("strong", "plugin-advisor-names", advisorNames.join(" · ") || (
+      externalAdvisors.length ? "—" : copy().advisorUnknown
+    )));
+
+    const externalRelationships = element("div", "plugin-external-advisors");
+    externalAdvisors.forEach((advisor) => {
+      const relationship = element("div", "plugin-external-advisor");
+      const name = advisor[`name_${language()}`] || advisor.name_en;
+      const affiliation = advisor[`affiliation_${language()}`] || advisor.affiliation_en;
+      relationship.append(
+        element("span", "plugin-community-label", copy().externalAdvisor),
+        element("strong", "plugin-advisor-names", [name, affiliation].filter(Boolean).join(" · ")),
+        badge(copy().externalContributor, "external-contributor")
+      );
+      externalRelationships.append(relationship);
+    });
 
     const metrics = element("div", "plugin-repo-metrics");
     [
@@ -351,7 +421,10 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       link.append(element("strong", "", String(value)), element("span", "", label));
       metrics.append(link);
     });
-    panel.append(people, advisors, metrics);
+    panel.append(people);
+    if (internalAdvisors.length || !externalAdvisors.length) panel.append(advisors);
+    if (externalAdvisors.length) panel.append(externalRelationships);
+    panel.append(metrics);
     return panel;
   }
 
@@ -408,6 +481,28 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     return panel;
   }
 
+  function workloadPanel(item) {
+    const workloadIds = workloadNavigation.plugins[item.id] || [];
+    const panel = element("section", "plugin-workloads");
+    panel.append(element("span", "plugin-interface-label", copy().workload));
+    const tags = element("div", "plugin-workload-tags");
+    workloadIds.forEach((workloadId) => {
+      tags.append(badge(workloadLabel(workloadId), "workload-tag"));
+    });
+    panel.append(tags);
+    return panel;
+  }
+
+  function installationStatus(item) {
+    if (item.compatibility?.status !== "source_scaffold") return null;
+    const panel = element("section", "plugin-install-state unavailable");
+    panel.append(
+      element("strong", "", copy().notInstallable),
+      element("p", "", copy().notInstallableReason)
+    );
+    return panel;
+  }
+
   function renderCard(item) {
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
     const card = element(
@@ -415,7 +510,8 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       `plugin-card workshop-card workshop-${item.artifact_type}${isUpstreamFork ? " upstream-fork-card" : ""}`
     );
     const cover = element("div", "workshop-cover");
-    const initials = item.name.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
+    const displayName = local(item, "name");
+    const initials = displayName.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
     cover.append(
       element("span", "workshop-cover-type", copy().mod),
       element("strong", "workshop-cover-mark", initials)
@@ -432,13 +528,16 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     if (isUpstreamFork) badges.prepend(badge(copy().forkBadge, "upstream-fork"));
     top.append(badges);
 
-    card.append(cover, top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
+    card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", local(item, "summary")));
+    card.append(workloadPanel(item));
     const publicEffect = publicEffectPanel(item);
     if (publicEffect) card.append(publicEffect);
     const community = communityPanel(item);
     if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
     if (compatibility) card.append(compatibility);
+    const installState = installationStatus(item);
+    if (installState) card.append(installState);
     const details = element("details", "plugin-technical-details");
     details.append(element("summary", "", copy().details));
     const detailBody = element("div", "plugin-technical-body");
@@ -588,31 +687,44 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
   function renderCatalog() {
     const query = search.value.trim().toLowerCase();
     const visible = registry.components.filter((item) => {
+      const workloadIds = workloadNavigation.plugins[item.id] || [];
+      const metadata = workshopMetadata[item.id] || {};
+      const peopleText = [
+        ...(metadata.maintainers || []).flatMap((person) => [person.name, person.login]),
+        ...(metadata.advisors || []).flatMap((advisor) => [
+          advisor.name_en,
+          advisor.name_zh,
+          advisor.affiliation_en,
+          advisor.affiliation_zh
+        ])
+      ].filter(Boolean).join(" ");
       const text = [
-        item.id, item.name, local(item, "summary"), item.artifact_type,
+        item.id, item.name, local(item, "name"), local(item, "summary"), item.artifact_type,
         item.system_role, item.delivery_model, item.ownership, item.maturity,
         item.repository_relationship,
         item.evidence_level, item.execution_planes.join(" "),
         item.integration_contracts.join(" "),
         (item.integration_surfaces || []).join(" "),
-        item.canonical_repository || "", item.upstream_repository || ""
+        item.canonical_repository || "", item.upstream_repository || "",
+        workloadIds.join(" "), workloadIds.map(workloadLabel).join(" "), peopleText
       ].join(" ").toLowerCase();
       const status = item.compatibility?.status || "source_scaffold";
       const matchesType = selectedType === "extensions"
         || (selectedType === "installable" && ["ready", "verified", "experimental"].includes(status))
         || (selectedType === "incubating" && !["ready", "verified", "experimental"].includes(status));
-      return isWorkshopMod(item) && matchesType && text.includes(query);
+      const matchesWorkload = selectedWorkload === "all" || workloadIds.includes(selectedWorkload);
+      return isWorkshopMod(item) && matchesType && matchesWorkload && text.includes(query);
     });
 
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
     visible.sort((left, right) => {
       const leftRank = priority[left.compatibility?.status] ?? 6;
       const rightRank = priority[right.compatibility?.status] ?? 6;
-      return leftRank - rightRank || left.name.localeCompare(right.name);
+      return leftRank - rightRank || local(left, "name").localeCompare(local(right, "name"));
     });
     catalog.replaceChildren();
     const grid = element("section", "plugin-grid workshop-grid");
-    const visibleLimit = window.matchMedia("(max-width: 680px)").matches ? 6 : pageSize;
+    const visibleLimit = pageSize;
     const displayed = query || expanded ? visible : visible.slice(0, visibleLimit);
     displayed.forEach((item) => grid.append(renderCard(item)));
     catalog.append(grid);
@@ -627,6 +739,11 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     if (registry) renderCatalog();
     renderPortfolio();
   });
+  workloadFilter.addEventListener("change", () => {
+    selectedWorkload = workloadFilter.value;
+    expanded = false;
+    if (registry) renderCatalog();
+  });
   more?.addEventListener("click", () => {
     expanded = true;
     renderCatalog();
@@ -637,6 +754,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
       "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
       "plugins-lede": zh ? "只展示独立维护的 vLLM-HUST MOD，并按宿主版本、平台和成熟度选择。" : "Independent vLLM-HUST MODs, organized by host version, platform, and readiness.",
+      "plugins-workload-label": zh ? "Workload" : "Workload",
       "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
       "plugins-fact-runtime": zh ? "个已支持" : "supported"
     };
@@ -656,19 +774,32 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     fetch(catalog.dataset.metadata).then((response) => {
       if (!response.ok) throw new Error(`Workshop metadata request failed: ${response.status}`);
       return response.json();
+    }),
+    fetch(catalog.dataset.workloads).then((response) => {
+      if (!response.ok) throw new Error(`Workload navigation request failed: ${response.status}`);
+      return response.json();
     })
   ])
-    .then(([payload, metadata]) => {
+    .then(([payload, metadata, workloads]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
       if (metadata.schema_version !== "plugin-workshop-metadata/v1" || !metadata.plugins) {
         throw new Error("unsupported Workshop metadata");
       }
+      if (
+        workloads.schema_version !== "plugin-workload-navigation/v1"
+        || !Array.isArray(workloads.workloads)
+        || !workloads.plugins
+      ) {
+        throw new Error("unsupported workload navigation");
+      }
       registry = payload;
       workshopMetadata = metadata.plugins;
+      workloadNavigation = workloads;
       renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
+      renderWorkloadFilter();
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
       const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
       const incubating = payload.components.filter((item) => ["concept", "incubating", "experimental"].includes(item.maturity)).length;
@@ -720,6 +851,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     if (!registry) return;
     search.placeholder = copy().searchPlaceholder;
     renderFilters();
+    renderWorkloadFilter();
     renderCatalog();
     renderBoundaries();
     renderPortfolio();

@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -10,6 +9,7 @@ def test_verified_member_snapshot_is_minimized_and_unique() -> None:
     members = payload["members"]
 
     assert payload["organization"] == "vLLM-HUST"
+    assert payload["verified_at"] == "2026-08-26"
     assert payload["count"] == len(members) == 68
     assert len({member["login"].lower() for member in members}) == len(members)
     assert all(
