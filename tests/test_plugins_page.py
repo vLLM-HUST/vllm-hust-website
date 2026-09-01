@@ -159,12 +159,21 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert "outage/recovery evidence" in mooncake_connectors["summary_en"]
     assert pegaflow["ownership"] == "hust_owned_subsystem"
     assert pegaflow["integration_contracts"] == []
+    assert pegaflow["canonical_repository"] == (
+        "https://github.com/vLLM-HUST/pegaflow-hust"
+    )
     assert pegaflow_connectors["integration_contracts"] == [
-        "vllm.kv_connector.scheduler.v1",
-        "vllm.kv_connector.worker.v1",
-        "vllm.kv_connector.telemetry.v1",
+        "vllm_hust.extension_manifest.v0.2-experimental"
+    ]
+    assert pegaflow_connectors["integration_surfaces"] == [
+        "vllm_hust_ext.providers",
+        "vllm.general_plugins",
+        "vllm.kv_transfer_config",
     ]
     assert pegaflow_connectors["execution_planes"] == ["api", "scheduler", "worker"]
+    assert "external operator retains service lifecycle" in pegaflow_connectors[
+        "summary_en"
+    ]
 
     assert "KV connector" in PAGE
     assert "state system" in PAGE
@@ -244,7 +253,7 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     assert "integration_surfaces" in SCRIPT
 
 
-def test_bidkv_and_diffspec_cards_expose_accessible_launch_tooltips() -> None:
+def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert "const quickStarts = {" in SCRIPT
     assert "bidkv: {" in SCRIPT
     assert "diffspec: {" in SCRIPT
@@ -253,13 +262,50 @@ def test_bidkv_and_diffspec_cards_expose_accessible_launch_tooltips() -> None:
     assert "pip install vllm-hust-ext vllm-diffspec" in SCRIPT
     assert "extension configure org.vllm-hust.diffspec --file diffspec.json" in SCRIPT
     assert "extension enable org.vllm-hust.diffspec" in SCRIPT
+    assert "latchmoe: {" in SCRIPT
+    assert "latchmoe check" in SCRIPT
+    assert "latchmoe serve /path/to/model" in SCRIPT
+    assert '"pegaflow-vllm-connectors": {' in SCRIPT
+    assert "extension check org.vllm-hust.pegaflow" in SCRIPT
+    assert "Manager checks health and never starts, stops, or clears" in SCRIPT
+    assert '"ascend-adaptive-quantized-kv": {' in SCRIPT
+    assert "inspection is supported, enablement is intentionally refused" in SCRIPT
+    assert 'action_zh: "检查命令"' in SCRIPT
+    assert '"ascend-quant-runtime-descriptor": {' in SCRIPT
+    assert "no model loading, kernel selection, or runtime activation" in SCRIPT
+    assert 'trigger.setAttribute("aria-label", `${item.name} ${action}`)' in SCRIPT
     assert 'element("button", "plugin-launch-icon", ">_")' in SCRIPT
     assert 'trigger.setAttribute("aria-describedby", tooltipId)' in SCRIPT
     assert 'trigger.setAttribute("aria-expanded", "false")' in SCRIPT
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "ecosystem-registry-v7" in PAGE
+    assert "ecosystem-registry-v8" in PAGE
+
+
+def test_quantization_entries_preserve_runtime_boundaries() -> None:
+    adaptive = by_id("ascend-adaptive-quantized-kv")
+    toolkit = by_id("ascend-quant-toolkit")
+    runtime = by_id("ascend-quant-runtime-descriptor")
+    latchmoe = by_id("latchmoe")
+
+    assert adaptive["delivery_model"] == "python_distribution"
+    assert "import-only" in adaptive["summary_en"]
+    assert "refuses enablement" in adaptive["summary_en"]
+    assert toolkit["artifact_type"] == "tool"
+    assert toolkit["system_role"] == "offline_model_quantization"
+    assert "not a vLLM plugin" in toolkit["summary_en"]
+    assert runtime["artifact_type"] == "runtime_component"
+    assert runtime["delivery_model"] == "python_distribution"
+    assert "Import-only" in runtime["summary_en"]
+    assert "owner-approved value allowlist" in runtime["summary_en"]
+    assert latchmoe["integration_surfaces"] == [
+        "vllm.general_plugins",
+        "vllm-ascend-hust MoE offload seam v1",
+        "latchmoe validated launcher",
+    ]
+    assert "one NPU" in latchmoe["summary_en"]
+    assert "prefix cache disabled" in latchmoe["summary_en"]
 
 
 def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
@@ -302,7 +348,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v8"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v9"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -310,7 +356,7 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 38
+    assert len(PORTFOLIO["repositories"]) == 39
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {"vllm-hust", "pegaflow-hust"} <= names
     assert {
@@ -319,6 +365,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         "vllm-hust-knorm",
         "vllm-ascend-pyramidkv-hust",
         "vllm-hust-slicegpt",
+        "vllm-ascend-adaptive-quantized-kv-hust",
     } <= names
     upstream_forks = {
         item["name"]
@@ -345,7 +392,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     ]
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v3"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v4"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
