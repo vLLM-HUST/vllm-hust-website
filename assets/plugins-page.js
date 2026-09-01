@@ -26,13 +26,16 @@
 
   const copy = () => language() === "zh" ? {
     all: "全部",
-    extensions: "扩展",
+    extensions: "全部 MOD",
+    installable: "可安装",
+    incubating: "孵化中",
+    mod: "MOD",
     more: "显示全部扩展",
-    entries: "个生态组件",
-    empty: "没有符合当前筛选条件的生态组件。",
+    entries: "个 MOD",
+    empty: "没有符合当前筛选条件的 MOD。",
     repository: "规范仓库",
     noRepository: "尚无公开主仓库",
-    searchPlaceholder: "搜索系统、职责、契约、执行面或仓库",
+    searchPlaceholder: "搜索 MOD、宿主、平台或仓库",
     evidence: "证据",
     ownership: "维护",
     maintainers: "原负责人",
@@ -60,13 +63,16 @@
     forksCopy: "这些仓库跟随官方项目演进，只承载 HUST 必需的窄幅差异。它们是完整系统或平台发行分支，不是插件。"
   } : {
     all: "All",
-    extensions: "Extensions",
+    extensions: "All MODs",
+    installable: "Installable",
+    incubating: "Incubating",
+    mod: "MOD",
     more: "Show all extensions",
-    entries: "ecosystem components",
-    empty: "No ecosystem components match the current filters.",
+    entries: "MODs",
+    empty: "No MODs match the current filters.",
     repository: "Canonical repository",
     noRepository: "No public canonical repository",
-    searchPlaceholder: "Search system, role, contract, execution plane, or repository",
+    searchPlaceholder: "Search MOD, host, platform, or repository",
     evidence: "Evidence",
     ownership: "Ownership",
     maintainers: "Original maintainers",
@@ -112,6 +118,13 @@
     documentation_product: { en: "Documentation and product", zh: "文档与产品" },
     applications_research: { en: "Applications and research", zh: "应用与研究" }
   };
+
+  const isWorkshopMod = (item) => (
+    item.artifact_type === "runtime_component"
+    && item.repository_relationship === "organization_native"
+    && ["plugin_bundle", "python_distribution", "migration_scaffold"].includes(item.delivery_model)
+    && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
+  );
   const compatibilityLabels = {
     ready: { en: "Ready", zh: "可用" },
     verified: { en: "Verified", zh: "已验证" },
@@ -202,8 +215,8 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
 
   function renderFilters() {
     filters.replaceChildren();
-    ["extensions", "runtime_component", "bridge", "all"].forEach((type) => {
-      const title = type === "all" ? copy().all : type === "extensions" ? copy().extensions : typeTitle(type);
+    ["extensions", "installable", "incubating"].forEach((type) => {
+      const title = copy()[type];
       const button = element("button", `plugin-filter${selectedType === type ? " active" : ""}`, title);
       button.type = "button";
       button.dataset.layer = type;
@@ -309,7 +322,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     const cover = element("div", "workshop-cover");
     const initials = item.name.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
     cover.append(
-      element("span", "workshop-cover-type", typeTitle(item.artifact_type)),
+      element("span", "workshop-cover-type", copy().mod),
       element("strong", "workshop-cover-mark", initials)
     );
     const top = element("div", "plugin-card-top");
@@ -318,7 +331,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     if (launcher) top.append(launcher);
     const badges = element("div", "plugin-badges");
     badges.append(
-      badge(typeTitle(item.artifact_type), "existing"),
+      badge(copy().mod, "existing"),
       badge(valueLabel(item.maturity), `status-${item.maturity}`)
     );
     if (isUpstreamFork) badges.prepend(badge(copy().forkBadge, "upstream-fork"));
@@ -485,10 +498,11 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
         (item.integration_surfaces || []).join(" "),
         item.canonical_repository || "", item.upstream_repository || ""
       ].join(" ").toLowerCase();
-      const matchesType = selectedType === "all"
-        || item.artifact_type === selectedType
-        || (selectedType === "extensions" && ["runtime_component", "bridge"].includes(item.artifact_type));
-      return matchesType && text.includes(query);
+      const status = item.compatibility?.status || "source_scaffold";
+      const matchesType = selectedType === "extensions"
+        || (selectedType === "installable" && ["ready", "verified", "experimental"].includes(status))
+        || (selectedType === "incubating" && !["ready", "verified", "experimental"].includes(status));
+      return isWorkshopMod(item) && matchesType && text.includes(query);
     });
 
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
@@ -523,7 +537,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     const values = {
       "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
       "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
-      "plugins-lede": zh ? "按宿主版本和平台选择扩展。" : "Choose extensions by host version and platform.",
+      "plugins-lede": zh ? "只展示独立维护的 vLLM-HUST MOD，并按宿主版本、平台和成熟度选择。" : "Independent vLLM-HUST MODs, organized by host version, platform, and readiness.",
       "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
       "plugins-fact-runtime": zh ? "个已支持" : "supported"
     };
