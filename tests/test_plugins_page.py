@@ -14,6 +14,9 @@ STYLES = (ROOT / "assets" / "plugins.css").read_text(encoding="utf-8")
 WORKSHOP_METADATA = json.loads(
     (ROOT / "data" / "plugin-workshop-metadata.json").read_text(encoding="utf-8")
 )
+WORKLOAD_NAVIGATION = json.loads(
+    (ROOT / "data" / "plugin-workload-navigation.json").read_text(encoding="utf-8")
+)
 LEGACY_STANDARD = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
 
 REQUIRED_FIELDS = {
@@ -293,7 +296,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "workshop-v6-polish-20260901" in PAGE
+    assert "workshop-v7-workload-navigation-20260901" in PAGE
 
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
@@ -349,8 +352,43 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
 
 
+def test_workshop_supports_workload_guided_discovery() -> None:
+    assert WORKLOAD_NAVIGATION["schema_version"] == "plugin-workload-navigation/v1"
+    traits = WORKLOAD_NAVIGATION["traits"]
+    mappings = WORKLOAD_NAVIGATION["plugins"]
+    workshop_mods = {
+        item["id"]
+        for item in REGISTRY["components"]
+        if item["artifact_type"] in {"runtime_component", "bridge"}
+        and item["repository_relationship"] == "organization_native"
+        and item.get("public_surface", True) is not False
+        and item["delivery_model"]
+        in {"plugin_bundle", "python_distribution", "migration_scaffold"}
+        and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+    }
+    assert set(mappings) == workshop_mods
+    assert len(traits) >= 8
+    for profile in traits.values():
+        assert profile["label_en"] and profile["label_zh"]
+        assert profile["description_en"] and profile["description_zh"]
+    for plugin_traits in mappings.values():
+        assert plugin_traits
+        assert set(plugin_traits) <= set(traits)
+
+    assert "按 Workload 找 MOD" in PAGE
+    assert "This is capability matching, not a performance guarantee." in PAGE
+    assert 'data-source="./data/plugin-workload-navigation.json?v=' in PAGE
+    assert "function renderWorkloadNavigation()" in SCRIPT
+    assert "function workloadTags(item)" in SCRIPT
+    assert "function matchesSelectedType(item)" in SCRIPT
+    assert "renderWorkloadNavigation();\n        renderCatalog();" in SCRIPT
+    assert 'selectedWorkload === "all"' in SCRIPT
+    assert ".workload-filter.active" in STYLES
+    assert ".plugin-workload-tag" in STYLES
+
+
 def test_workshop_does_not_present_official_connectors_or_systems_as_mods() -> None:
-    assert "isWorkshopMod(item) && matchesType" in SCRIPT
+    assert "isWorkshopMod(item) && matchesSelectedType(item)" in SCRIPT
     assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
     assert "Only independent vLLM-HUST extension repositories appear here." in PAGE
     assert "official connectors" in PAGE
@@ -475,7 +513,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=workshop-v3-polish-20260901" in PAGE
+    assert "plugins.css?v=workshop-v4-workload-navigation-20260901" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES

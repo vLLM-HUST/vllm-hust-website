@@ -256,6 +256,18 @@ body[data-page="plugins"] .plugin-hero .hero-lede { max-width: 620px; }
 body[data-page="plugins"] .plugin-hero-facts { display: none; }
 body[data-page="plugins"] .plugin-controls { margin-top: 22px; border-radius: 8px; box-shadow: 0 8px 26px rgba(12,17,18,.07); }
 .workshop-scope-note { margin: -10px 0 20px; color: #52615f; font-size: 11px; line-height: 1.55; }
+.workload-navigation { margin: 0 0 22px; padding: 20px; overflow: hidden; color: #fff; border-radius: 8px; background: linear-gradient(125deg,#101818,#183330); box-shadow: 0 10px 30px rgba(12,17,18,.12); }
+.workload-navigation header { display: grid; grid-template-columns: minmax(0,1fr) minmax(260px,.75fr); gap: 28px; align-items: end; }
+.workload-navigation-kicker { color: #f4c463; font: 800 9px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: .08em; text-transform: uppercase; }
+.workload-navigation h2 { margin: 6px 0 0; color: #fff; font-size: clamp(20px,2.5vw,30px); line-height: 1.1; }
+.workload-navigation header p { margin: 0; color: #b7c7c3; font-size: 11px; line-height: 1.55; }
+.workload-filter-list { margin-top: 18px; display: flex; gap: 7px; flex-wrap: wrap; }
+.workload-filter { min-height: 35px; padding: 6px 8px 6px 11px; display: inline-flex; gap: 8px; align-items: center; color: #dce7e4; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.06); font-size: 10px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.workload-filter strong { min-width: 21px; height: 21px; padding: 0 5px; display: inline-grid; place-items: center; color: #172321; border-radius: 999px; background: #dce7e4; font-size: 9px; }
+.workload-filter:hover,.workload-filter:focus-visible { color: #fff; border-color: #39c6ca; outline: 0; background: rgba(57,198,202,.14); }
+.workload-filter.active { color: #172321; border-color: #f0b341; background: #f0b341; }
+.workload-filter.active strong { color: #fff; background: #172321; }
+.workload-filter-description { min-height: 16px; margin: 13px 0 0; color: #b7c7c3; font-size: 10px; line-height: 1.5; }
 body[data-page="plugins"] .workshop-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
 body[data-page="plugins"] .workshop-card { min-height: 0; padding: 18px; overflow: visible; border: 1px solid #c7d2cf; border-radius: 7px; background: #fff; box-shadow: 0 8px 22px rgba(12,17,18,.06); transition: border-color .18s ease,box-shadow .18s ease,transform .18s ease; }
 body[data-page="plugins"] .workshop-card:hover { border-color: #8fa9a3; box-shadow: 0 16px 38px rgba(12,17,18,.12); transform: translateY(-3px); }
@@ -273,6 +285,10 @@ body[data-page="plugins"] .workshop-card:hover { border-color: #8fa9a3; box-shad
 .workshop-tone-graphite .workshop-cover { background: linear-gradient(135deg,#293937,#60706d); }
 body[data-page="plugins"] .workshop-card h3 { margin: 17px 0 8px; font-size: 20px; }
 body[data-page="plugins"] .workshop-card .plugin-summary { min-height: 54px; display: -webkit-box; overflow: hidden; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-height: 1.4; }
+.plugin-workload-tags { min-height: 24px; margin-top: 9px; display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.plugin-workload-label { margin-right: 2px; color: #61706f; font: 800 8px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: .04em; text-transform: uppercase; }
+.plugin-workload-tag { padding: 4px 6px; color: #345854; border: 0; border-radius: 999px; background: #e8f0ed; font-size: 8px; font-weight: 800; cursor: pointer; }
+.plugin-workload-tag:hover,.plugin-workload-tag:focus-visible { color: #fff; outline: 0; background: #176f72; }
 .plugin-public-effect { margin-top: 12px; padding: 10px 11px; display: grid; gap: 6px; border: 1px solid #dfbd70; border-radius: 5px; background: #fff7e6; }
 .plugin-public-effect-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .plugin-public-effect-title { color: #554013; font: 850 10px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: .04em; text-transform: uppercase; }
@@ -300,7 +316,7 @@ body[data-page="plugins"] .workshop-card .plugin-summary { min-height: 54px; dis
 .plugin-more { width: 100%; min-height: 50px; margin: 18px 0 0; border: 1px solid #8b6100; border-radius: 4px; color: #0c1112; background: #f0b341; font-weight: 850; cursor: pointer; }
 .plugin-more:hover { background: #ffd477; }
 @media (max-width: 1060px) { body[data-page="plugins"] .workshop-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-@media (max-width: 680px) { body[data-page="plugins"] .workshop-grid { grid-template-columns: 1fr; }.workshop-cover { height: 84px; }.workshop-cover-mark { font-size: 30px; } }
+@media (max-width: 680px) { .workload-navigation { padding: 17px; }.workload-navigation header { grid-template-columns: 1fr; gap: 9px; }.workload-filter-list { margin-right: -17px; padding-right: 17px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }.workload-filter-list::-webkit-scrollbar { display: none; }.workload-filter { flex: 0 0 auto; }body[data-page="plugins"] .workshop-grid { grid-template-columns: 1fr; }.workshop-cover { height: 84px; }.workshop-cover-mark { font-size: 30px; } }
 
 /* Readability guardrails: subpages.css uses more specific generic content-panel
    selectors, so dark plugin surfaces need equally explicit color ownership. */
