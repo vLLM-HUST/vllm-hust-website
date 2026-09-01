@@ -583,9 +583,7 @@ def test_cumulative_story_requires_monotonic_prs_and_commit_ancestry(
     second = copy.deepcopy(milestones[0])
     second["entry_id"] = "entry-agent-second"
     second["pr_number"] = 20
-    second["pr_url"] = (
-        "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/20"
-    )
+    second["pr_url"] = "https://github.com/vLLM-HUST/vllm-hust/pull/20"
     second["commit"] = "a" * 40
     second["attribution"]["boundary_id"] = "checkpoint-agent-second"
     second["attribution"]["checkpoint_entry_id"] = second["entry_id"]
@@ -621,11 +619,11 @@ def test_cumulative_story_requires_monotonic_prs_and_commit_ancestry(
 
     story["series"][0]["milestones"][1]["pr_number"] = 1
     story["series"][0]["milestones"][1]["pr_url"] = (
-        "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/1"
+        "https://github.com/vLLM-HUST/vllm-hust/pull/1"
     )
     entries[second["entry_id"]]["metadata"]["github_pr_number"] = 1
     entries[second["entry_id"]]["metadata"]["github_pr_url"] = (
-        "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/1"
+        "https://github.com/vLLM-HUST/vllm-hust/pull/1"
     )
     dump(story_path, story)
     with pytest.raises(ValueError, match="strictly increasing"):

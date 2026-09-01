@@ -137,32 +137,22 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "forwards recovery lifecycle signals" in page
     assert "Typed single and ordered_multi selections now materialize" in page
     assert "keyed by logical connector ID instead of class name" in page
-    assert 'VLLM_EXTENSION_MANIFESTS="/opt/a.json:/opt/b.json"' in page
-    assert "--extension org.example.kv-adapter" in page
-    assert 'VLLM_PLUGINS="existing-legacy-plugin"' in page
-    assert "configured\n  -&gt; parsed" in page
     assert "Legacy entry-point profile" in page
-    assert "extension-bundle-v1-migration.md" in page
     assert "plugin-standard-v1.0.pdf" not in page
 
-    for section in (
-        "Required package structure",
-        "Registration contract",
-        "Build, install, and discovery",
-        "Enable and start",
-        "Stop and disable",
-        "Remove and roll back",
-        "Conformance tests",
-    ):
-        assert section in standard
+    assert '[project.entry-points."vllm_hust.extension_bundles"]' in standard
+    assert "## Current commands" in standard
+    assert "## Acceptance before alpha" in standard
+    assert "rollback/restart, `extension disable`, `extension forget`" in standard
 
 
-def test_plugin_standard_has_portable_allowlist_semantics() -> None:
+def test_plugin_standard_has_provider_owned_lifecycle_semantics() -> None:
     standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
 
-    assert "If `VLLM_PLUGINS` is unset, vLLM loads every discovered" in standard
-    assert "set to an empty string, vLLM loads none" in standard
-    assert "does not define hot unload" in standard
+    assert "Extension Manager calls Provider `plan`, `render`, and `check`" in standard
+    assert "The initial Provider protocol has no apply or delete operation." in standard
+    assert "No Provider performs an implicit service start" in standard
+    assert "Uninstall is a package-manager operation" in standard
     for forbidden in (
         "/home/shuhao",
         "npu-smi",
