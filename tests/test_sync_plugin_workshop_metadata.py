@@ -84,7 +84,13 @@ def test_verified_identity_advisors_keeps_public_relationships() -> None:
         ]
     }
     assert MODULE.verified_identity_advisors(payload) == {
-        "alice": [{"name_zh": "张老师", "name_en": "Prof. Zhang"}]
+        "alice": [
+            {
+                "name_zh": "张老师",
+                "name_en": "Prof. Zhang",
+                "relationship": "internal",
+            }
+        ]
     }
 
 
@@ -120,5 +126,29 @@ def test_identity_sources_can_merge_contributor_and_organization_people_data() -
         "bob": "鲍勃",
     }
     assert MODULE.verified_identity_advisors(sources) == {
-        "bob": [{"name_zh": "张老师", "name_en": "Prof. Zhang"}]
+        "bob": [
+            {
+                "name_zh": "张老师",
+                "name_en": "Prof. Zhang",
+                "relationship": "internal",
+            }
+        ]
     }
+
+
+def test_declared_people_and_external_advisor_override_inferred_metadata() -> None:
+    item = {
+        "id": "pipeline-microbatch-migration",
+        "maintainer_profiles": [{"login": "xsun2001", "name": "徐晨曦"}],
+        "advisors": [
+            {
+                "name_zh": "Chen Xinyu",
+                "name_en": "Chen Xinyu",
+                "affiliation_zh": "香港科技大学（广州）",
+                "affiliation_en": "HKUST (Guangzhou)",
+                "relationship": "external_contributor",
+            }
+        ],
+    }
+    assert MODULE.declared_identity_names(item, ["xsun2001"]) == {"xsun2001": "徐晨曦"}
+    assert MODULE.declared_advisors(item) == item["advisors"]
