@@ -245,8 +245,8 @@
       "maturity": "supported",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
       "upstream_repository": null,
-      "summary_en": "Scheduler-local policy supported on the pinned vLLM-HUST 0.23 typed host contract; official vLLM remains unsupported.",
-      "summary_zh": "scheduler 本地策略；已支持固定的 vLLM-HUST 0.23 typed 宿主契约，官方 vLLM 暂不支持。",
+      "summary_en": "Scheduler-local policy supported on vLLM-HUST 0.23; real Ascend KV-pressure selection and next-process rollback pass, while official vLLM remains unsupported.",
+      "summary_zh": "scheduler 本地策略；vLLM-HUST 0.23 上的真实 Ascend KV 压力选择与下次进程回退已通过，官方 vLLM 暂不支持。",
       "evidence_level": "performance_verified"
     },
     {

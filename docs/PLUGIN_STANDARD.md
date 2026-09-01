@@ -30,7 +30,10 @@ vLLM-HUST 0.23 now owns a minimal generic
 component and does not register the private `vllm.victim_selector` entry-point
 group. Manager renders the host-native manifest and rejects unverified or
 incompatible hosts. This is supported on pinned vLLM-HUST 0.23; official vLLM
-remains unsupported while RFC #51608 and draft PR #51601 are unsettled.
+remains unsupported while RFC #51608 and draft PR #51601 are unsettled. A real
+Qwen3-0.6B run on server 91 produced three BidKV victim selections at full KV
+pressure, completed every request, and restored the built-in path after
+disable and process restart.
 
 At draft PR #51601 head `f8b7db61e446911e0d62fcb8220f863d6098c471`,
 code still provides one registry-only `PreemptionPlugin` over live requests,
