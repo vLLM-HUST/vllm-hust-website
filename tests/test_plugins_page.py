@@ -171,9 +171,10 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "vllm.kv_transfer_config",
     ]
     assert pegaflow_connectors["execution_planes"] == ["api", "scheduler", "worker"]
-    assert "external operator retains service lifecycle" in pegaflow_connectors[
-        "summary_en"
-    ]
+    assert (
+        "external operator retains service lifecycle"
+        in pegaflow_connectors["summary_en"]
+    )
 
     assert "KV connector" in PAGE
     assert "state system" in PAGE
