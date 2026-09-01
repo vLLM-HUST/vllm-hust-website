@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826">
 <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816">
-<link rel="stylesheet" href="./assets/plugins.css?v=readability-v11-mod-catalog">
+<link rel="stylesheet" href="./assets/plugins.css?v=readability-v12-independent-repos">
 </head>
 <body data-page="plugins">
   <nav class="site-nav">
@@ -89,7 +89,7 @@ A plugin, KV connector, Mooncake service, and control-plane resource retain dist
 <a href="#repository-portfolio">
 <span class="lang-en">Repository Portfolio</span>
 <span class="lang-zh">仓库组合</span>
-<small>39 CURATED REPOSITORIES</small>
+<small>49 CURATED REPOSITORIES</small>
 </a>
 </nav>
 
@@ -155,8 +155,7 @@ Fresh official-vLLM activation is blocked until the upstream Preemption contract
 </p>
 <div class="highlight-links">
 <a href="https://github.com/vLLM-HUST/vllm-hust-bidkv">BidKV ↗</a>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/171">Legacy victim selector #171 ↗</a>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/232">Legacy compression lifecycle #232 ↗</a>
+<a href="https://github.com/vLLM-HUST/vllm-hust-bidkv/blob/main/PROVENANCE.md">Provenance ↗</a>
 </div>
 </article>
 
@@ -177,8 +176,6 @@ It uses the official general-plugin discovery entry point while declaring its un
 </p>
 <div class="highlight-links">
 <a href="https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec">DiffSpec ↗</a>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/246">Capability contract #246 ↗</a>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/247">Graph alignment #247 ↗</a>
 </div>
 </article>
 
@@ -210,9 +207,9 @@ It uses the official general-plugin discovery entry point while declaring its un
 <dd>−0.01%</dd>
 </div>
 </dl>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/173">
-<span class="lang-en">Matched protocol and raw-evidence link</span>
-<span class="lang-zh">查看 matched 协议与原始证据链接</span> ↗</a>
+<a href="https://github.com/vLLM-HUST/vllm-hust-prefix-router">
+<span class="lang-en">Prefix Router repository and provenance</span>
+<span class="lang-zh">Prefix Router 独立仓库与来源记录</span> ↗</a>
 </article>
 
         <article class="highlight-card">
@@ -296,124 +293,11 @@ sidecar 按客户端证书指纹准入并透明转发有界原始帧；HMAC、sc
 </span>
 </p>
 <div class="highlight-links">
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/160">Baselines #160 ↗</a>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/216">Provenance #216 ↗</a>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/229">Diagnostics #229 ↗</a>
+<a href="https://github.com/vLLM-HUST/vllm-hust-benchmark">Benchmark evidence ↗</a>
+<a href="https://github.com/vLLM-HUST/vllm-hust-dev-hub">Developer diagnostics ↗</a>
 </div>
 </article>
       </div>
-
-      <section class="review-mechanisms" aria-labelledby="review-mechanisms-title">
-        <header>
-<div>
-<span class="eyebrow">
-<span class="lang-en">Plugin targets in review</span>
-<span class="lang-zh">评审中的插件化目标</span>
-</span>
-<h3 id="review-mechanisms-title">
-<span class="lang-en">Eight engine mechanisms designed as independent plugins.</span>
-<span class="lang-zh">八项按独立插件形态设计的引擎机制。
-</span>
-</h3>
-</div>
-<p>
-<span class="lang-en">These cards show the intended plugin packaging.
-An open PR proves that code is reviewable; it does not by itself prove production readiness or a speedup.</span>
-<span class="lang-zh">这些卡片展示目标插件形态。
-开放 PR 说明代码已经可以审核，但它本身不等于生产就绪，也不等于已经获得性能提升。
-</span>
-</p>
-</header>
-        <div class="review-grid">
-          <article>
-<span>PLUGIN TARGET · OPEN PR</span>
-<h4>Full-Graph Parallel Replay Plugin</h4>
-<p>
-<span class="lang-en">A platform/compiler-control plugin for backend-owned streams, events, capture policy, and parallel replay over a narrow fail-closed core hook.</span>
-<span class="lang-zh">面向平台/编译控制的插件：在窄化、fail-closed 的 core hook 之上管理 stream、event、capture policy 与并行 replay。
-</span>
-</p>
-<div class="highlight-links">
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/264">#264 ↗</a>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/123">#123 ↗</a>
-</div>
-</article>
-          <article>
-<span>PLUGIN TARGET · OPEN PR</span>
-<h4>Load-Aware Prefix Router Plugin</h4>
-<p>
-<span class="lang-en">Owns node polling, TTL, failure isolation, and load-based tie-breaking while consuming generic prefix and load snapshots from the engine.</span>
-<span class="lang-zh">插件负责节点轮询、TTL、故障隔离与负载 tie-break，并消费引擎提供的通用前缀和负载快照。
-</span>
-</p>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/258">#258 ↗</a>
-</article>
-          <article>
-<span>PLUGIN TARGET · OPEN / DRAFT</span>
-<h4>Host-Control Batching Plugin</h4>
-<p>
-<span class="lang-en">Owns batching policy, pinned-output arenas, sampled-token handoff observation, and cleanup over core synchronization-domain safety contracts.</span>
-<span class="lang-zh">在 core 同步域安全合同之上管理 batching policy、pinned-output arena、sampled-token handoff 观测与清理。
-</span>
-</p>
-<div class="highlight-links">
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/250">#250 ↗</a>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/249">#249 ↗</a>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/256">#256 ↗</a>
-</div>
-</article>
-          <article>
-<span>PLUGIN TARGET · OPEN PR</span>
-<h4>Low-Bit KV Precision Plugin</h4>
-<p>
-<span class="lang-en">Registers executable KV formats and owns INT4/FP4 layouts, scales, quantize/dequantize paths, and backend dispatch behind a provider contract.</span>
-<span class="lang-zh">通过 provider 合同注册可执行 KV 格式，并管理 INT4/FP4 layout、scale、量化/反量化与 backend dispatch。
-</span>
-</p>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/181">#181 ↗</a>
-</article>
-          <article>
-<span>PLUGIN TARGET · RESEARCH DRAFT</span>
-<h4>Deadline-Aware QoS Plugin</h4>
-<p>
-<span class="lang-en">Owns service classes, deadline scoring, fairness and starvation policy, admission, and SLO receipts over versioned request metadata.</span>
-<span class="lang-zh">基于版本化请求 metadata 管理 service class、deadline score、公平与防饥饿策略、准入和 SLO 回执。
-</span>
-</p>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/169">#169 ↗</a>
-</article>
-          <article>
-<span>PLUGIN TARGET · RESEARCH DRAFT</span>
-<h4>Activation Sparsity Plugin</h4>
-<p>
-<span class="lang-en">Packages TEAL and La RoSA calibration, model injection, sparse kernel dispatch, quality policy, and guarded dense fallback.</span>
-<span class="lang-zh">封装 TEAL 与 La RoSA 的校准、模型注入、稀疏 kernel dispatch、质量策略与受控 dense fallback。
-</span>
-</p>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/67">#67 ↗</a>
-</article>
-          <article>
-<span>PLUGIN TARGET · API DRAFT</span>
-<h4>Runner Extension Transport Plugin</h4>
-<p>
-<span class="lang-en">Demonstrates a versioned, immutable, size-bounded metadata path from a plugin producer through scheduler IPC to a model-runner consumer.</span>
-<span class="lang-zh">验证版本化、immutable、大小有界的 metadata 从插件 producer 经 scheduler IPC 到 model-runner consumer 的完整路径。
-</span>
-</p>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/133">#133 ↗</a>
-</article>
-          <article>
-<span>PLUGIN TARGET · OPEN PR</span>
-<h4>KV Lifecycle Telemetry Plugin</h4>
-<p>
-<span class="lang-en">Owns event selection, bounded buffering, serialization, exporter lifecycle, and cleanup over a generic default-off runtime event seam.</span>
-<span class="lang-zh">在通用、默认关闭的 runtime event seam 之上管理事件选择、有界缓冲、序列化、exporter 生命周期与清理。
-</span>
-</p>
-<a href="https://github.com/intellistream/vllm-hust-legacy-20260831/pull/260">#260 ↗</a>
-</article>
-        </div>
-      </section>
 
       <aside class="evidence-boundary">
 <strong>
@@ -1048,7 +932,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
       </div>
     </aside>
     <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
-    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=mod-catalog-v3">
+    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=mod-catalog-v4">
 </div>
     <section id="repository-portfolio" class="content-panel repository-portfolio" aria-labelledby="repository-portfolio-title">
       <header class="portfolio-head">
@@ -1071,7 +955,7 @@ It remains separate from the deployable component catalog above.</span>
 </p>
 </header>
       <p class="plugin-status" data-repository-status aria-live="polite">Loading repository portfolio…</p>
-      <div class="repository-domain-list" data-repository-portfolio data-source="./data/repository-portfolio.json?v=repository-portfolio-v4">
+      <div class="repository-domain-list" data-repository-portfolio data-source="./data/repository-portfolio.json?v=repository-portfolio-v5">
 </div>
     </section>
     <section class="content-panel adjacent-section">
@@ -1098,7 +982,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
   <script>window.vllmHustPageDict={"en":{"title":"Serving Ecosystem Architecture | vLLM-HUST","plugins-eyebrow":"vLLM-HUST serving ecosystem","plugins-title":"Serving Ecosystem Architecture","plugins-lede":"A typed runtime core connected to platform profiles, KV state systems, control planes, runtime components, and an evidence chain—without calling every artifact a plugin.","plugins-fact-items":"classified components","plugins-fact-runtime":"supported components","plugins-fact-review":"incubating components","plugins-fact-publications":"hardware/performance evidence","plugins-fact-adjacent":"external systems","plugins-boundary-kicker":"Architecture rule","plugins-boundary-title":"Classify the role before the delivery mechanism.","plugins-boundary-copy":"A plugin bundle delivers components; a KV connector adapts vLLM to a state system; a control plane makes external decisions through a narrow bridge.","plugins-legend-kicker":"Canonical classification","plugins-legend-title":"What it is, where it runs, and how it is delivered.","plugins-legend-existing":"System role","plugins-legend-existing-copy":"Runtime, platform, policy, KV system, control plane, evidence, or application.","plugins-legend-active":"Integration contract","plugins-legend-active-copy":"The typed boundary used to connect to vLLM.","plugins-legend-prototype":"Execution and topology","plugins-legend-prototype-copy":"The process, device, service, and deployment boundaries.","plugins-legend-roadmap":"Ownership and evidence","plugins-legend-roadmap-copy":"Who maintains it and what level of support is actually verified.","plugins-search-label":"Search","plugins-adjacent-kicker":"Architecture boundaries","plugins-adjacent-title":"Plugin, connector, and control plane are different concepts.","plugins-adjacent-copy":"The catalog separates a component's system role from its integration contract, execution plane, deployment topology, and delivery model.","footer-copy":"A typed, evidence-backed serving ecosystem for domestic compute."},"zh":{"title":"推理生态系统架构 | vLLM-HUST","plugins-eyebrow":"vLLM-HUST 推理生态","plugins-title":"推理生态系统架构","plugins-lede":"以类型化运行时本体连接平台 profile、KV 状态系统、控制面、运行时组件与证据链，不再把所有制品统称为插件。","plugins-fact-items":"个已分类组件","plugins-fact-runtime":"个受支持组件","plugins-fact-review":"个孵化中组件","plugins-fact-publications":"项硬件/性能证据","plugins-fact-adjacent":"个外部系统","plugins-boundary-kicker":"架构原则","plugins-boundary-title":"先区分系统角色，再描述交付方式。","plugins-boundary-copy":"plugin bundle 负责交付组件；KV connector 把 vLLM 接到状态系统；control plane 通过窄 bridge 在外部做决策。","plugins-legend-kicker":"规范分类","plugins-legend-title":"它是什么、在哪里运行、怎样交付。","plugins-legend-existing":"系统角色","plugins-legend-existing-copy":"运行时、平台、策略、KV 系统、控制面、证据或应用。","plugins-legend-active":"集成契约","plugins-legend-active-copy":"连接 vLLM 时使用的类型化边界。","plugins-legend-prototype":"执行面与拓扑","plugins-legend-prototype-copy":"进程、设备、服务与部署边界。","plugins-legend-roadmap":"所有权与证据","plugins-legend-roadmap-copy":"由谁维护，以及实际验证到什么支持等级。","plugins-search-label":"搜索","plugins-adjacent-kicker":"架构边界","plugins-adjacent-title":"插件、connector 与 control plane 是不同概念。","plugins-adjacent-copy":"目录分别展示组件的系统角色、集成契约、执行面、部署拓扑与交付方式。","footer-copy":"面向国产算力、类型化且以证据支撑的推理生态。"}};</script>
   <script src="./assets/site.js?v=nav-polish-20260826">
 </script>
-<script src="./assets/plugins-page.js?v=mod-catalog-v3">
+<script src="./assets/plugins-page.js?v=mod-catalog-v4">
 </script>
 </body>
 </html>

@@ -423,6 +423,116 @@
       "public_surface": true
     },
     {
+      "name": "vllm-ascend-quantized-kv-cache-hust",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "proposes_kv_quantization_provider",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["quantized KV cache migration scaffold", "legacy provenance ledger"],
+      "component_ids": ["quantized-kv-cache-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-ascend-simllm-hust",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "proposes_kv_reuse_policy",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["SimLLM migration scaffold", "license-review gate", "legacy provenance ledger"],
+      "component_ids": ["simllm-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-unified-comm",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-unified-comm",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "proposes_communication_host_provider",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["device-neutral communication migration scaffold", "legacy provenance ledger"],
+      "component_ids": ["unified-communication-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-ascend-split-batch-hust",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-split-batch-hust",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "proposes_graph_execution_policy",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["split-batch and full-graph migration scaffold", "legacy provenance ledger"],
+      "component_ids": ["split-batch-full-graph-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-kv-transfer-observability",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "proposes_kv_telemetry_provider",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["KV transfer observability migration scaffold", "legacy provenance ledger"],
+      "component_ids": ["kv-transfer-observability-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-ascend-layered-prefill-hust",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-layered-prefill-hust",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "proposes_prefill_policy",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["layered-prefill migration scaffold", "upstream attribution", "legacy provenance ledger"],
+      "component_ids": ["layered-prefill-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-activation-sparsity",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-activation-sparsity",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "proposes_sparse_operator_provider",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["activation-sparsity research scaffold", "legacy provenance ledger"],
+      "component_ids": ["activation-sparsity-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-pipeline-microbatch",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "proposes_pipeline_scheduling_policy",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["pipeline-microbatch research scaffold", "legacy provenance ledger"],
+      "component_ids": ["pipeline-microbatch-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-qos-scheduler",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-qos-scheduler",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "proposes_scheduler_policy",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["QoS scheduler research scaffold", "legacy provenance ledger"],
+      "component_ids": ["qos-scheduler-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-scheduler-policy-lab",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-scheduler-policy-lab",
+      "portfolio_domain": "applications_research",
+      "repository_role": "research_workspace",
+      "relation_to_runtime": "compares_scheduler_policies",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["scheduler policy comparison workspace", "legacy provenance ledger"],
+      "component_ids": ["scheduler-policy-lab"],
+      "public_surface": true
+    },
+    {
       "name": "vllm-metal-hust",
       "url": "https://github.com/vLLM-HUST/vllm-metal-hust",
       "portfolio_domain": "runtime_platform",
