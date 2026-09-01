@@ -86,3 +86,39 @@ def test_verified_identity_advisors_keeps_public_relationships() -> None:
     assert MODULE.verified_identity_advisors(payload) == {
         "alice": [{"name_zh": "张老师", "name_en": "Prof. Zhang"}]
     }
+
+
+def test_identity_sources_can_merge_contributor_and_organization_people_data() -> None:
+    contributor_snapshot = {
+        "contributors": [
+            {
+                "github_login": "alice",
+                "display_name": "艾丽丝",
+                "identity_confirmed": True,
+            }
+        ]
+    }
+    organization_people = {
+        "people": {
+            "bob": {
+                "github_login": "bob",
+                "display_name": "鲍勃",
+                "public": True,
+                "needs_review": False,
+                "profiles": {
+                    "vllm_hust": {
+                        "advisor_zh": "张老师",
+                        "advisor_en": "Prof. Zhang",
+                    }
+                },
+            }
+        }
+    }
+    sources = [contributor_snapshot, organization_people]
+    assert MODULE.verified_identity_names(sources) == {
+        "alice": "艾丽丝",
+        "bob": "鲍勃",
+    }
+    assert MODULE.verified_identity_advisors(sources) == {
+        "bob": [{"name_zh": "张老师", "name_en": "Prof. Zhang"}]
+    }

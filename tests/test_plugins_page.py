@@ -393,6 +393,21 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
     assert WORKSHOP_METADATA["plugins"]["diffspec"]["advisors"] == [
         {"name_zh": "黄禹", "name_en": "Yu Huang"}
     ]
+    kvcompress = WORKSHOP_METADATA["plugins"]["kvcompress-ascend"]
+    assert [
+        (person["name"], person["login"]) for person in kvcompress["maintainers"]
+    ] == [("张家万", "Jiawan23")]
+    assert kvcompress["advisors"] == [{"name_zh": "万瑶", "name_en": "Yao Wan"}]
+    assert {
+        advisor["name_zh"]
+        for advisor in WORKSHOP_METADATA["plugins"]["knorm-migration"]["advisors"]
+    } == {"万瑶", "张书豪"}
+    assert {
+        advisor["name_zh"]
+        for advisor in WORKSHOP_METADATA["plugins"]["quantized-kv-cache-migration"][
+            "advisors"
+        ]
+    } == {"姚鹏程", "张书豪"}
 
 
 def test_workshop_renders_synced_metadata_without_hardcoded_counts() -> None:

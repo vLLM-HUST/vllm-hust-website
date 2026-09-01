@@ -1,7 +1,7 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-09-01T08:29:36+00:00",
-  "source": "GitHub API + canonical ownership and verified identity data",
+  "generated_at": "2026-09-01T09:45:13+00:00",
+  "source": "GitHub API + canonical ownership and organization identity data",
   "plugins": {
     "bidkv": {
       "repository": "vLLM-HUST/vllm-hust-bidkv",
@@ -122,12 +122,17 @@
       "maintainers": [
         {
           "login": "Jiawan23",
-          "name": "Jiawan Zhang",
+          "name": "张家万",
           "profile_url": "https://github.com/Jiawan23",
           "avatar_url": "https://avatars.githubusercontent.com/u/113904488?v=4"
         }
       ],
-      "advisors": [],
+      "advisors": [
+        {
+          "name_zh": "万瑶",
+          "name_en": "Yao Wan"
+        }
+      ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
     "kv-tiering-migration": {
@@ -180,6 +185,10 @@
         {
           "name_zh": "万瑶",
           "name_en": "Yao Wan"
+        },
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -229,6 +238,10 @@
         {
           "name_zh": "姚鹏程",
           "name_en": "Pengcheng Yao"
+        },
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -371,7 +384,7 @@
       "maintainers": [
         {
           "login": "llxler",
-          "name": "Lxler",
+          "name": "雷翔麟",
           "profile_url": "https://github.com/llxler",
           "avatar_url": "https://avatars.githubusercontent.com/u/87888496?v=4"
         }
