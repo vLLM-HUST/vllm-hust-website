@@ -118,6 +118,49 @@ def test_confirmed_github_identities_are_mapped_without_duplicates() -> None:
         assert len(scope_person_ids) == len(set(scope_person_ids))
 
 
+def test_confirmed_mod_owners_are_visible_with_internal_advisors() -> None:
+    roster, snapshot = load_profiles()
+    expected = {
+        "李上上": ("ilnnfover", "郑龙"),
+        "雷翔麟": ("llxler", "万瑶"),
+        "张家万": ("Jiawan23", "万瑶"),
+        "郁硕": ("Yushuo-star", "王雄"),
+        "毛潮云": ("Irisuko", "罗瑞坤"),
+    }
+    roster_by_name = {item["name_zh"]: item for item in roster["members"]}
+    profiles = snapshot["member_profiles"]
+    visible = [
+        *profiles["core_members"],
+        *profiles["participants"],
+        *profiles["staff_members"],
+    ]
+    profiles_by_name = {item["display_name"]: item for item in visible}
+    for name, (login, advisor) in expected.items():
+        assert roster_by_name[name]["github_login"] == login
+        assert roster_by_name[name]["advisor_zh"] == advisor
+        assert profiles_by_name[name]["github_login"] == login
+        assert profiles_by_name[name]["advisor"]["zh"] == advisor
+
+
+def test_pipeline_external_contributor_keeps_external_guidance_separate() -> None:
+    _, snapshot = load_profiles()
+    external = {
+        item["github_login"]: item
+        for item in snapshot["member_profiles"]["external_contributors"]
+    }["xsun2001"]
+    assert external["display_name"] == "徐晨曦"
+    assert external["external_contributor"] is True
+    assert external["advisor"] == {"zh": "", "en": ""}
+    assert external["external_advisor"] == {
+        "zh": "Chen Xinyu · 香港科技大学（广州）",
+        "en": "Chen Xinyu · HKUST (Guangzhou)",
+    }
+    assert external["role"] == {
+        "zh": "外部贡献者（港科大（广州））",
+        "en": "External contributor (HKUST(GZ))",
+    }
+
+
 def test_only_verified_teacher_github_logins_are_published() -> None:
     _, snapshot = load_profiles()
     advisors = {item["name_zh"]: item for item in snapshot["advisor_profiles"]}

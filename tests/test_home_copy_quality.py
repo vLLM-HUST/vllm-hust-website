@@ -38,18 +38,40 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "Typed runtime contracts. Platform profiles. Composable KV state systems.",
-        "Connect policies, platforms, KV systems, and control planes through typed boundaries, with matched support evidence.",
+        "Typed runtime contracts. 19 audited MODs. Evidence before claims.",
+        "every MOD publishes ownership, compatibility, workload fit, and evidence limits.",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "类型化运行时契约、平台 profile 与可组合 KV 状态系统。",
+        "类型化运行时契约、19 个已审计 MOD、证据先于结论。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
 
-    for advantage in ("State", "Execute", "Prove", "状态", "执行", "验证"):
+    for advantage in (
+        "Portfolio",
+        "Ownership",
+        "Evidence",
+        "项目组合",
+        "人员关系",
+        "公开证据",
+    ):
         assert advantage in INDEX
+
+
+def test_homepage_mod_summary_matches_canonical_catalog() -> None:
+    import json
+
+    root = Path(__file__).resolve().parents[1]
+    workload = json.loads(
+        (root / "data" / "plugin-workload-navigation.json").read_text(encoding="utf-8")
+    )
+    assert len(workload["plugins"]) == 19
+    assert "Explore all 19 MODs" in INDEX
+    assert "查看全部 19 个 MOD" in INDEX
+    assert 'href="./plugins.html#plugin-catalog"' in INDEX
+    assert "inspect-only" in INDEX
+    assert "仅可检查仓库" in INDEX
 
 
 def test_workstation_visual_uses_capabilities_not_unverified_metrics() -> None:
