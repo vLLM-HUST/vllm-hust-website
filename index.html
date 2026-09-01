@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
-  <link rel="stylesheet" href="./assets/home.css?v=ride-ecosystem-20260817-2" />
+  <link rel="stylesheet" href="./assets/home.css?v=upstream-forks-20260901" />
 </head>
 <body data-page="home">
   <nav class="site-nav">
@@ -26,7 +26,7 @@
       </a>
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
-        <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">Plugins</a>
+        <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">Ecosystem</a>
         <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
         <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
         <a id="nav-dataset-validation" class="nav-link" data-nav-page="dataset-validation" href="./dataset-validation.html">Dataset validation</a>
@@ -64,8 +64,8 @@
       <div class="execution-hero-copy">
         <p id="home-eyebrow" class="execution-signal"><span></span>Domestic compute · inference engine / 03</p>
         <h1 id="home-title">vLLM-HUST</h1>
-        <p id="home-kicker" class="execution-kicker">Programmable KV and scheduling. Graph-aware execution. Portable hardware plugins.</p>
-        <p id="home-lede" class="execution-lede">Replace serving policy, model execution, and hardware through reversible plugins, with matched evidence for every gain.</p>
+        <p id="home-kicker" class="execution-kicker">Typed runtime contracts. Platform profiles. Composable KV state systems.</p>
+        <p id="home-lede" class="execution-lede">Connect policies, platforms, KV systems, and control planes through typed boundaries, with matched support evidence.</p>
         <div class="execution-actions">
           <a id="home-primary-cta" class="execution-button primary" href="./plugins.html#technical-highlights">See technical highlights <span aria-hidden="true">→</span></a>
           <a id="home-github-cta" class="execution-button quiet" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">Open GitHub <span aria-hidden="true">↗</span></a>
@@ -134,15 +134,15 @@
         <div><p id="stack-eyebrow" class="execution-eyebrow">Engine &amp; proving ground</p><h2 id="stack-title">Build, validate, and transfer serving mechanisms.</h2></div>
         <p id="stack-summary">An upstream-compatible runtime connecting serving mechanisms to compilers, hardware backends, and fixed benchmarks.</p>
       </div>
-      <div class="plugin-path" aria-label="Plugin portability path">
+      <div class="plugin-path" aria-label="Extension and integration path">
         <div><span>01</span><strong id="path-mechanism-title">Mechanism</strong><small id="path-mechanism-copy">A serving-system idea</small></div>
         <div><span>02</span><strong id="path-adapter-title">Adapter</strong><small id="path-adapter-copy">Runtime and hardware hooks</small></div>
         <div class="active"><span>03</span><strong id="path-prove-title">Prove</strong><small id="path-prove-copy">Correctness and performance evidence</small></div>
         <div><span>04</span><strong id="path-transfer-title">Transfer</strong><small id="path-transfer-copy">Upstream or another engine</small></div>
       </div>
       <div class="stack-grid">
-        <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / HOST</span><strong>Runtime Contract</strong><p id="stack-core-copy">Where plugins meet runtime interfaces.</p><em>Repository ↗</em></a>
-        <a href="./plugins.html"><span>02 / CONNECT</span><strong>Plugin Interfaces</strong><p id="stack-ascend-copy">Narrow hooks keep mechanisms portable.</p><em id="stack-catalog-link">Open plugin plan →</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / HOST</span><strong>Runtime Contracts</strong><p id="stack-core-copy">Typed domain boundaries owned by the engine.</p><em>Repository ↗</em></a>
+        <a href="./plugins.html"><span>02 / CONNECT</span><strong>Ecosystem Interfaces</strong><p id="stack-ascend-copy">Platform profiles, KV adapters, bridges, and bundles keep distinct roles.</p><em id="stack-catalog-link">Open ecosystem catalog →</em></a>
         <a href="./leaderboard.html"><span>03 / VALIDATE</span><strong>Validation Matrix</strong><p id="stack-triton-copy">Validate across engines, compilers, and hardware.</p><em id="stack-leaderboard-link">Open leaderboard →</em></a>
         <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / MEASURE</span><strong>Benchmark Contract</strong><p id="stack-benchmark-copy">Fixed targets and public evidence.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
       </div>
@@ -154,6 +154,18 @@
         <p id="atlas-summary">Portable mechanisms stay independent. Maintained integration branches provide validation backends.</p>
       </div>
       <div class="runtime-list">
+        <section class="runtime-group upstream-fork-group" aria-labelledby="upstream-forks-title">
+          <div class="runtime-group-head"><span>00 / SYSTEM FORKS</span><strong id="upstream-forks-title">Upstream-synchronized HUST forks</strong><p id="upstream-forks-copy">Complete system distributions that track official upstream projects. They are not plugins.</p></div>
+          <div class="runtime-group-items">
+            <a href="https://github.com/vLLM-HUST/vllm-hust"><span class="runtime-name">vLLM-HUST</span><span class="runtime-role">fork of vllm-project/vllm</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="runtime-name">vLLM Ascend HUST</span><span class="runtime-role">fork of vllm-project/vllm-ascend</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="runtime-name">vLLM Metal HUST</span><span class="runtime-role">fork of vllm-project/vllm-metal</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="runtime-name">Triton Ascend HUST</span><span class="runtime-role">fork of triton-lang/triton-ascend</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/sglang-hust"><span class="runtime-name">SGLang HUST</span><span class="runtime-role">fork of sgl-project/sglang</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/mooncake-hust"><span class="runtime-name">Mooncake HUST</span><span class="runtime-role">fork of kvcache-ai/Mooncake</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/production-stack-hust"><span class="runtime-name">Production Stack HUST</span><span class="runtime-role">fork of vllm-project/production-stack</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+          </div>
+        </section>
         <section class="runtime-group" aria-labelledby="mechanism-control-title">
           <div class="runtime-group-head"><span>01 / CONTROL + STATE</span><strong id="mechanism-control-title">Control &amp; state</strong><p id="mechanism-control-copy">Admission, scheduling, and KV lifecycle.</p></div>
           <div class="runtime-group-items">
@@ -171,19 +183,6 @@
           <div class="runtime-group-head"><span>03 / REPRESENT</span><strong id="mechanism-representation-title">Model representation</strong><p id="mechanism-representation-copy">Precision, quantization, and storage.</p></div>
           <div class="runtime-group-items">
             <a href="https://github.com/vLLM-HUST/vllm-ascend-quant-hust"><span class="runtime-name">Ascend Quant</span><span id="atlas-quant-role" class="runtime-role">Post-training and mixed-precision quantization</span><span class="runtime-tag amber">tool</span><span>↗</span></a>
-          </div>
-        </section>
-        <section class="runtime-group" aria-labelledby="mechanism-compiler-title">
-          <div class="runtime-group-head"><span>04 / LOWER</span><strong id="mechanism-compiler-title">Compiler &amp; kernels</strong><p id="mechanism-compiler-copy">Graph lowering, operators, and kernels.</p></div>
-          <div class="runtime-group-items">
-            <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="runtime-name">Triton Ascend HUST</span><span id="atlas-triton-role" class="runtime-role">HUST-maintained Triton Ascend adaptation for compiler and kernel validation</span><span class="runtime-tag slate">integration branch</span><span>↗</span></a>
-          </div>
-        </section>
-        <section class="runtime-group" aria-labelledby="mechanism-adapters-title">
-          <div class="runtime-group-head"><span>05 / INTEGRATE</span><strong id="mechanism-adapters-title">Engine &amp; hardware integration branches</strong><p id="mechanism-adapters-copy">Maintained engine and hardware backends.</p></div>
-          <div class="runtime-group-items">
-            <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="runtime-name">vLLM Ascend HUST</span><span id="atlas-ascend-role" class="runtime-role">HUST-maintained vLLM adaptation branch for Ascend accelerators</span><span class="runtime-tag slate">integration branch</span><span>↗</span></a>
-            <a href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="runtime-name">vLLM Metal HUST</span><span id="atlas-metal-role" class="runtime-role">HUST-maintained vLLM adaptation branch for Apple Silicon</span><span class="runtime-tag slate">integration branch</span><span>↗</span></a>
           </div>
         </section>
         <section class="runtime-group" aria-labelledby="mechanism-operations-title">
@@ -228,8 +227,8 @@
       en: {
         title: 'vLLM-HUST | Inference Engine for Domestic Compute',
         'home-eyebrow': 'Domestic compute · inference engine / 03',
-        'home-kicker': 'Programmable KV and scheduling. Graph-aware execution. Portable hardware plugins.',
-        'home-lede': 'Replace serving policy, model execution, and hardware through reversible plugins, with matched evidence for every gain.',
+        'home-kicker': 'Typed runtime contracts. Platform profiles. Composable KV state systems.',
+        'home-lede': 'Connect policies, platforms, KV systems, and control planes through typed boundaries, with matched support evidence.',
         'home-primary-cta': 'See technical highlights →', 'home-github-cta': 'Open GitHub ↗',
         'home-fact-1-label': 'State', 'home-fact-2-label': 'Execute', 'home-fact-3-label': 'Prove',
         'home-fact-1-value': 'KV · routing · deadlines', 'home-fact-2-value': 'decode · MoE · precision', 'home-fact-3-value': 'matched runs · provenance · rollback',
@@ -250,27 +249,23 @@
         'path-adapter-title': 'Adapter', 'path-adapter-copy': 'Runtime and hardware hooks',
         'path-prove-title': 'Prove', 'path-prove-copy': 'Correctness and performance evidence',
         'path-transfer-title': 'Transfer', 'path-transfer-copy': 'Upstream or another engine',
-        'stack-core-copy': 'Where plugins meet runtime interfaces.',
-        'stack-ascend-copy': 'Narrow hooks keep mechanisms portable.',
+        'stack-core-copy': 'Typed domain boundaries owned by the engine.',
+        'stack-ascend-copy': 'Platform profiles, KV adapters, bridges, and bundles keep distinct roles.',
         'stack-triton-copy': 'Validate across engines, compilers, and hardware.',
-        'stack-catalog-link': 'Explore catalog ↓', 'stack-leaderboard-link': 'Open leaderboard →',
+        'stack-catalog-link': 'Open ecosystem catalog ↓', 'stack-leaderboard-link': 'Open leaderboard →',
         'stack-benchmark-copy': 'Fixed targets and public evidence.', 'stack-benchmark-link': 'Open benchmark ↗',
         'atlas-eyebrow': 'Portable mechanism catalog', 'atlas-title': 'Mechanisms by system layer.',
         'atlas-summary': 'Portable mechanisms stay independent. Maintained integration branches provide validation backends.',
         'mechanism-control-title': 'Control & state', 'mechanism-control-copy': 'Admission, scheduling, and KV lifecycle.',
         'mechanism-execution-title': 'Decoding & execution', 'mechanism-execution-copy': 'Decoding, expert placement, and execution.',
         'mechanism-representation-title': 'Model representation', 'mechanism-representation-copy': 'Precision, quantization, and storage.',
-        'mechanism-compiler-title': 'Compiler & kernels', 'mechanism-compiler-copy': 'Graph lowering, operators, and kernels.',
-        'mechanism-adapters-title': 'Engine & hardware integration branches', 'mechanism-adapters-copy': 'Maintained engine and hardware backends.',
+        'upstream-forks-title': 'Upstream-synchronized HUST forks', 'upstream-forks-copy': 'Complete system distributions that track official upstream projects. They are not plugins.',
         'mechanism-operations-title': 'Operations & observability', 'mechanism-operations-copy': 'Deployment, profiling, and diagnosis.',
         'mechanism-validation-title': 'Validation & evidence', 'mechanism-validation-copy': 'Regression gates and benchmark evidence.',
         'atlas-bidkv-role': 'KV-pressure eviction and preemption policy', 'atlas-diffspec-role': 'Differential speculative decoding for ultra-long sequences',
         'atlas-latchmoe-role': 'Address-stable, graph-compatible expert offloading', 'atlas-quant-role': 'Post-training and mixed-precision quantization',
         'atlas-manager-role': 'Deployment diagnostics and setup', 'atlas-perf-role': 'Serving performance analysis',
         'atlas-profiling-role': 'Repeatable profiling workflows for runtime and backend', 'atlas-benchmark-role': 'Fixed-target comparison and evidence pipeline',
-        'atlas-triton-role': 'HUST-maintained Triton Ascend adaptation for compiler and kernel validation',
-        'atlas-ascend-role': 'HUST-maintained vLLM adaptation branch for Ascend accelerators',
-        'atlas-metal-role': 'HUST-maintained vLLM adaptation branch for Apple Silicon',
         'ecosystem-eyebrow': 'Collaborative ecosystem', 'ecosystem-title': 'Clear roles. Shared progress.',
         'ecosystem-summary': 'SAGE is the shared flagship product; each organization retains a clear technical boundary.',
         'ecosystem-intellistream': 'Cross-layer research incubator', 'ecosystem-ride': 'Agent-native LLM control plane and SAGE core stewardship',
@@ -279,8 +274,8 @@
       },
       zh: {
         title: 'vLLM-HUST | 面向国产算力的大模型推理引擎',
-        'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': 'KV 与调度可编程，模型执行感知计算图，硬件能力以插件接入。',
-        'home-lede': '以可回退插件替换服务策略、模型执行与硬件能力，并用 matched 对照和完整版本证据验证收益。',
+        'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '类型化运行时契约、平台 profile 与可组合 KV 状态系统。',
+        'home-lede': '以类型化边界连接策略、平台、KV 系统与外部控制面，并用 matched 证据支撑支持声明。',
         'home-primary-cta': '查看技术亮点 →', 'home-github-cta': '打开 GitHub ↗',
         'home-fact-1-label': '状态', 'home-fact-2-label': '执行', 'home-fact-3-label': '验证',
         'home-fact-1-value': 'KV · 路由 · 截止时间', 'home-fact-2-value': '解码 · MoE · 精度', 'home-fact-3-value': '对照实验 · 版本 · 回退',
@@ -301,27 +296,23 @@
         'path-adapter-title': '适配', 'path-adapter-copy': '运行时与硬件钩子',
         'path-prove-title': '验证', 'path-prove-copy': '正确性与性能证据',
         'path-transfer-title': '迁移', 'path-transfer-copy': '上游或其他推理引擎',
-        'stack-core-copy': '插件接入运行时接口的位置。',
-        'stack-ascend-copy': '窄接口保持机制可迁移。',
+        'stack-core-copy': '由引擎拥有的类型化领域边界。',
+        'stack-ascend-copy': '平台 profile、KV 适配器、bridge 与 bundle 保持不同角色。',
         'stack-triton-copy': '跨引擎、编译栈与硬件验证。',
-        'stack-catalog-link': '查看目录 ↓', 'stack-leaderboard-link': '打开排行榜 →',
+        'stack-catalog-link': '查看生态目录 ↓', 'stack-leaderboard-link': '打开排行榜 →',
         'stack-benchmark-copy': '固定靶与公开证据。', 'stack-benchmark-link': '打开 Benchmark ↗',
         'atlas-eyebrow': '可迁移机制目录', 'atlas-title': '按系统层次组织机制。',
         'atlas-summary': '可迁移机制保持独立，维护分支提供验证后端。',
         'mechanism-control-title': '控制与状态', 'mechanism-control-copy': '请求准入、调度与 KV 生命周期。',
         'mechanism-execution-title': '解码与执行', 'mechanism-execution-copy': '解码、专家放置与执行。',
         'mechanism-representation-title': '模型表示', 'mechanism-representation-copy': '精度、量化与存储。',
-        'mechanism-compiler-title': '编译与算子', 'mechanism-compiler-copy': '计算图下沉、算子与内核。',
-        'mechanism-adapters-title': '引擎与硬件适配分支', 'mechanism-adapters-copy': '维护中的引擎与硬件后端。',
+        'upstream-forks-title': '上游同步 HUST 系统分支', 'upstream-forks-copy': '持续跟随官方上游的完整系统发行分支；它们不是插件。',
         'mechanism-operations-title': '运维与观测', 'mechanism-operations-copy': '部署、剖析与诊断。',
         'mechanism-validation-title': '验证与证据', 'mechanism-validation-copy': '回归门禁与 Benchmark 证据。',
         'atlas-bidkv-role': 'KV 压力感知驱逐与抢占策略', 'atlas-diffspec-role': '面向超长序列的差分投机解码',
         'atlas-latchmoe-role': '地址稳定、兼容计算图的专家卸载', 'atlas-quant-role': '训练后量化与混合精度量化',
         'atlas-manager-role': '部署诊断与环境配置', 'atlas-perf-role': '推理服务性能归因分析',
         'atlas-profiling-role': '面向运行时与后端的可复现性能剖析流程', 'atlas-benchmark-role': '固定靶对比与证据流水线',
-        'atlas-triton-role': '由 HUST 维护、用于编译与算子验证的 Triton Ascend 适配分支',
-        'atlas-ascend-role': '由 HUST 维护、面向昇腾加速器的 vLLM 适配分支',
-        'atlas-metal-role': '由 HUST 维护、面向 Apple Silicon 的 vLLM 适配分支',
         'ecosystem-eyebrow': '协作生态', 'ecosystem-title': '角色清晰，共同演进。',
         'ecosystem-summary': 'SAGE 是共同旗舰产品；各组织保持清晰的技术边界。',
         'ecosystem-intellistream': '跨层研究孵化器', 'ecosystem-ride': '智能体原生大模型控制平面与 SAGE 核心维护',

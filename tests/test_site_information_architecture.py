@@ -31,7 +31,7 @@ def test_dataset_validation_is_reachable_from_evidence_navigation() -> None:
     )
 
 
-def test_every_public_page_has_a_cache_safe_static_plugin_navigation_entry() -> None:
+def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() -> None:
     for name in (
         "index.html",
         "leaderboard.html",
@@ -46,7 +46,7 @@ def test_every_public_page_has_a_cache_safe_static_plugin_navigation_entry() -> 
     ):
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'id="nav-plugins"' in text, name
-        assert 'href="./plugins.html">Plugins</a>' in text, name
+        assert 'href="./plugins.html">Ecosystem</a>' in text, name
         assert "assets/site.js?v=nav-polish-20260826" in text, name
     assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
@@ -68,14 +68,14 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
     assert ".execution-scope a:focus-visible" in HOME_CSS
 
 
-def test_homepage_leads_with_plugin_first_engine_positioning() -> None:
+def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
     assert (
-        "Programmable KV and scheduling. Graph-aware execution. "
-        "Portable hardware plugins." in HOME
+        "Typed runtime contracts. Platform profiles. Composable KV state systems."
+        in HOME
     )
-    assert "matched evidence for every gain" in HOME
-    assert "KV 与调度可编程，模型执行感知计算图，硬件能力以插件接入。" in HOME
-    assert "matched 对照和完整版本证据验证收益" in HOME
+    assert "matched support evidence" in HOME
+    assert "类型化运行时契约、平台 profile 与可组合 KV 状态系统。" in HOME
+    assert "matched 证据支撑支持声明" in HOME
 
 
 def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
@@ -114,43 +114,45 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
             assert "assets/subpages.css?v=site-structure-20260816" in text
 
 
-def test_plugin_page_publishes_a_complete_lifecycle_standard() -> None:
+def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     page = (ROOT / "plugins.html").read_text(encoding="utf-8")
     standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
 
     assert 'id="plugin-standard"' in page
     assert 'href="#plugin-standard"' in page
     assert 'href="#plugin-catalog"' in page
-    assert "STANDARD 1.0" in page
-    assert "No hot-unload contract" in page
-    assert 'VLLM_PLUGINS=""' in page
-    assert 'VLLM_PLUGINS="${PLUGIN_ID}"' in page
-    assert "vllm.general_plugins" in page
-    assert "vllm.platform_plugins" in page
-    assert (
-        "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/PLUGIN_STANDARD.md"
-        in page
-    )
-    assert "plugin-standard-v1" in page
+    assert "TRANSITION" in page
+    assert "Domain contracts first; bundles second." in page
+    assert "former entry-point-based Plugin Standard 1.0" in page
+    assert "Manifest `0.2-experimental`" in standard
+    assert "One materializer does not prove ecosystem compatibility" in page
+    assert "Zero typed providers retain legacy auto-discovery" in page
+    assert "explicit victim_selector_plugin must select exactly one" in page
+    assert "Platform, operator, and model-runner materializers remain pending" in page
+    assert "explicit ordered composition" in page
+    assert "declared HMA, piecewise, and cache-layout capabilities" in page
+    assert "API-plane telemetry components" in page
+    assert "Conflicting ordered layouts fail before import" in page
+    assert "KVTransferConfig keeps typed and legacy paths mutually exclusive" in page
+    assert "forwards recovery lifecycle signals" in page
+    assert "Typed single and ordered_multi selections now materialize" in page
+    assert "keyed by logical connector ID instead of class name" in page
+    assert "Legacy entry-point profile" in page
+    assert "plugin-standard-v1.0.pdf" not in page
 
-    for section in (
-        "Required package structure",
-        "Registration contract",
-        "Build, install, and discovery",
-        "Enable and start",
-        "Stop and disable",
-        "Remove and roll back",
-        "Conformance tests",
-    ):
-        assert section in standard
+    assert '[project.entry-points."vllm_hust.extension_bundles"]' in standard
+    assert "## Current commands" in standard
+    assert "## Acceptance before alpha" in standard
+    assert "rollback/restart, `extension disable`, `extension forget`" in standard
 
 
-def test_plugin_standard_has_portable_allowlist_semantics() -> None:
+def test_plugin_standard_has_provider_owned_lifecycle_semantics() -> None:
     standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
 
-    assert "If `VLLM_PLUGINS` is unset, vLLM loads every discovered" in standard
-    assert "set to an empty string, vLLM loads none" in standard
-    assert "does not define hot unload" in standard
+    assert "Extension Manager calls Provider `plan`, `render`, and `check`" in standard
+    assert "The initial Provider protocol has no apply or delete operation." in standard
+    assert "No Provider performs an implicit service start" in standard
+    assert "Uninstall is a package-manager operation" in standard
     for forbidden in (
         "/home/shuhao",
         "npu-smi",
@@ -162,15 +164,16 @@ def test_plugin_standard_has_portable_allowlist_semantics() -> None:
         assert forbidden not in standard
 
 
-def test_plugin_manifest_links_the_versioned_standard() -> None:
-    manifest = json.loads((ROOT / "data" / "plugins.json").read_text(encoding="utf-8"))
+def test_ecosystem_registry_has_docs_as_its_canonical_owner() -> None:
+    registry = json.loads(
+        (ROOT / "data" / "ecosystem.json").read_text(encoding="utf-8")
+    )
 
-    assert manifest["plugin_standard"] == {
-        "version": "1.0",
-        "url": "./docs/PLUGIN_STANDARD.md",
-        "discovery": "Python entry points",
-        "activation": "VLLM_PLUGINS",
-    }
+    assert registry["schema_version"] == "1.0"
+    assert registry["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
+    assert not (ROOT / "data" / "plugins.legacy.json").exists()
+    standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
+    assert "Manifest `0.2-experimental`" in standard
 
 
 def test_versions_external_links_have_safe_new_tab_contract() -> None:
