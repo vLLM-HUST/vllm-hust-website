@@ -87,6 +87,29 @@
     documentation_product: { en: "Documentation and product", zh: "文档与产品" },
     applications_research: { en: "Applications and research", zh: "应用与研究" }
   };
+  const quickStarts = {
+    bidkv: {
+      title_en: "Install and start BidKV",
+      title_zh: "安装并启动 BidKV",
+      note_en: "Requires the compatible vLLM-HUST 0.23 host.",
+      note_zh: "需要兼容的 vLLM-HUST 0.23 宿主。",
+      command: `pip install vllm-hust-ext bidkv
+vllm-hust-ext extension check org.vllm-hust.bidkv
+vllm-hust-ext extension enable org.vllm-hust.bidkv
+vllm-hust-ext run -- vllm serve /path/to/model`
+    },
+    diffspec: {
+      title_en: "Configure and start DiffSpec",
+      title_zh: "配置并启动 DiffSpec",
+      note_en: "Prepare diffspec.json with the draft model configuration first.",
+      note_zh: "请先在 diffspec.json 中填写 draft model 配置。",
+      command: `pip install vllm-hust-ext vllm-diffspec
+vllm-hust-ext extension configure org.vllm-hust.diffspec --file diffspec.json
+vllm-hust-ext extension check org.vllm-hust.diffspec
+vllm-hust-ext extension enable org.vllm-hust.diffspec
+vllm-hust-ext run -- vllm serve /path/to/target-model`
+    }
+  };
 
   const valueLabel = (value) => String(value).replaceAll("_", " ");
   const typeTitle = (type) => (typeLabels[type] || { en: valueLabel(type), zh: valueLabel(type) })[language()];
@@ -116,6 +139,49 @@
     return element("span", `plugin-badge ${className}`.trim(), text);
   }
 
+  function quickStart(item) {
+    const value = quickStarts[item.id];
+    if (!value) return null;
+    const launcher = element("div", "plugin-launcher");
+    const trigger = element("button", "plugin-launch-icon", ">_");
+    const tooltip = element("div", "plugin-launch-tooltip");
+    const tooltipId = `plugin-launch-${item.id}`;
+    trigger.type = "button";
+    trigger.setAttribute(
+      "aria-label",
+      language() === "zh" ? `${item.name} 启动命令` : `${item.name} launch command`
+    );
+    trigger.setAttribute("aria-describedby", tooltipId);
+    trigger.setAttribute("aria-expanded", "false");
+    tooltip.id = tooltipId;
+    tooltip.setAttribute("role", "tooltip");
+    const pre = element("pre");
+    pre.append(element("code", "", value.command));
+    tooltip.append(
+      element("strong", "plugin-launch-title", local(value, "title")),
+      pre,
+      element("span", "plugin-launch-note", local(value, "note"))
+    );
+    trigger.addEventListener("click", () => {
+      const expanded = trigger.getAttribute("aria-expanded") === "true";
+      launcher.classList.toggle("open", !expanded);
+      trigger.setAttribute("aria-expanded", String(!expanded));
+    });
+    trigger.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      launcher.classList.remove("open");
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.blur();
+    });
+    launcher.addEventListener("focusout", (event) => {
+      if (event.relatedTarget && launcher.contains(event.relatedTarget)) return;
+      launcher.classList.remove("open");
+      trigger.setAttribute("aria-expanded", "false");
+    });
+    launcher.append(trigger, tooltip);
+    return launcher;
+  }
+
   function renderCard(item) {
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
     const card = element(
@@ -124,6 +190,8 @@
     );
     const top = element("div", "plugin-card-top");
     top.append(element("span", "plugin-code", item.id));
+    const launcher = quickStart(item);
+    if (launcher) top.append(launcher);
     const badges = element("div", "plugin-badges");
     badges.append(
       badge(typeTitle(item.artifact_type), "existing"),
