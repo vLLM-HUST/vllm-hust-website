@@ -38,7 +38,12 @@
     repositories: "个组织仓库",
     repositoryEmpty: "没有符合当前搜索条件的仓库。",
     artifacts: "规范制品",
-    relation: "与运行时关系"
+    relation: "与运行时关系",
+    repositoryRelationship: "仓库关系",
+    upstream: "官方上游",
+    forkBadge: "上游同步 fork",
+    forksTitle: "上游同步 HUST 分支系统",
+    forksCopy: "这些仓库跟随官方项目演进，只承载 HUST 必需的窄幅差异。它们是完整系统或平台发行分支，不是插件。"
   } : {
     all: "All",
     entries: "ecosystem components",
@@ -56,7 +61,12 @@
     repositories: "organization repositories",
     repositoryEmpty: "No repositories match the current search.",
     artifacts: "Canonical artifacts",
-    relation: "Runtime relation"
+    relation: "Runtime relation",
+    repositoryRelationship: "Repository relationship",
+    upstream: "Official upstream",
+    forkBadge: "Upstream-sync fork",
+    forksTitle: "Upstream-synchronized HUST forks",
+    forksCopy: "These repositories track official projects and carry only narrowly required HUST deltas. They are complete system or platform distributions, not plugins."
   };
 
   const typeLabels = {
@@ -107,7 +117,11 @@
   }
 
   function renderCard(item) {
-    const card = element("article", "plugin-card");
+    const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
+    const card = element(
+      "article",
+      `plugin-card${isUpstreamFork ? " upstream-fork-card" : ""}`
+    );
     const top = element("div", "plugin-card-top");
     top.append(element("span", "plugin-code", item.id));
     const badges = element("div", "plugin-badges");
@@ -115,6 +129,7 @@
       badge(typeTitle(item.artifact_type), "existing"),
       badge(valueLabel(item.maturity), `status-${item.maturity}`)
     );
+    if (isUpstreamFork) badges.prepend(badge(copy().forkBadge, "upstream-fork"));
     top.append(badges);
 
     card.append(top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
@@ -123,6 +138,7 @@
       [copy().planes, item.execution_planes.map(valueLabel).join(" · ")],
       [copy().delivery, valueLabel(item.delivery_model)],
       [copy().ownership, valueLabel(item.ownership)],
+      [copy().repositoryRelationship, valueLabel(item.repository_relationship)],
       [copy().evidence, valueLabel(item.evidence_level)]
     ].forEach(([label, value]) => {
       const row = element("div");
@@ -147,6 +163,13 @@
 
     const footer = element("div", "plugin-card-footer");
     footer.append(element("span", "plugin-kind", valueLabel(item.system_role)));
+    if (item.upstream_repository) {
+      const upstream = element("a", "plugin-repository upstream", `${copy().upstream} ↗`);
+      upstream.href = item.upstream_repository;
+      upstream.target = "_blank";
+      upstream.rel = "noopener noreferrer";
+      footer.append(upstream);
+    }
     if (item.canonical_repository) {
       const link = element("a", "plugin-repository", `${copy().repository} ↗`);
       link.href = item.canonical_repository;
@@ -256,17 +279,46 @@
       const text = [
         item.id, item.name, local(item, "summary"), item.artifact_type,
         item.system_role, item.delivery_model, item.ownership, item.maturity,
+        item.repository_relationship,
         item.evidence_level, item.execution_planes.join(" "),
         item.integration_contracts.join(" "),
         (item.integration_surfaces || []).join(" "),
-        item.canonical_repository || ""
+        item.canonical_repository || "", item.upstream_repository || ""
       ].join(" ").toLowerCase();
       return (selectedType === "all" || item.artifact_type === selectedType) && text.includes(query);
     });
 
     catalog.replaceChildren();
+    const upstreamForks = visible.filter(
+      (item) => item.repository_relationship === "upstream_sync_fork"
+    );
+    if (upstreamForks.length) {
+      const section = element("section", "plugin-layer upstream-fork-layer");
+      const head = element("div", "plugin-layer-head");
+      const identity = element("div", "plugin-layer-identity");
+      identity.append(
+        element("span", "plugin-layer-index", "00"),
+        element("h2", "", copy().forksTitle)
+      );
+      head.append(
+        identity,
+        element("p", "", copy().forksCopy),
+        element(
+          "strong",
+          "plugin-layer-count",
+          String(upstreamForks.length).padStart(2, "0")
+        )
+      );
+      const grid = element("div", "plugin-grid");
+      upstreamForks.forEach((item) => grid.append(renderCard(item)));
+      section.append(head, grid);
+      catalog.append(section);
+    }
     Object.keys(typeLabels).forEach((type, index) => {
-      const items = visible.filter((item) => item.artifact_type === type);
+      const items = visible.filter(
+        (item) => item.artifact_type === type
+          && item.repository_relationship !== "upstream_sync_fork"
+      );
       if (!items.length) return;
       const section = element("section", "plugin-layer");
       const head = element("div", "plugin-layer-head");

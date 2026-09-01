@@ -22,6 +22,7 @@ REQUIRED_FIELDS = {
     "deployment_topology",
     "delivery_model",
     "ownership",
+    "repository_relationship",
     "maturity",
     "canonical_repository",
     "summary_en",
@@ -68,6 +69,43 @@ def test_system_role_is_independent_from_delivery_model() -> None:
     assert "delivery_model" in SCRIPT
     assert "execution_planes" in SCRIPT
     assert 'document.documentElement.lang.toLowerCase().startsWith("zh")' in SCRIPT
+
+
+def test_upstream_synchronized_hust_forks_are_a_separate_system_class() -> None:
+    forks = {
+        item["id"]: item
+        for item in REGISTRY["components"]
+        if item["repository_relationship"] == "upstream_sync_fork"
+    }
+    assert set(forks) == {
+        "vllm-hust-runtime",
+        "vllm-production-stack",
+        "vllm-ascend-hust",
+        "vllm-metal-hust",
+        "triton-ascend-hust",
+        "sglang-hust",
+        "mooncake",
+    }
+    assert {
+        item["upstream_repository"] for item in forks.values()
+    } == {
+        "https://github.com/vllm-project/vllm",
+        "https://github.com/vllm-project/production-stack",
+        "https://github.com/vllm-project/vllm-ascend",
+        "https://github.com/vllm-project/vllm-metal",
+        "https://github.com/triton-lang/triton-ascend",
+        "https://github.com/sgl-project/sglang",
+        "https://github.com/kvcache-ai/Mooncake",
+    }
+    assert all(item["delivery_model"] != "plugin_bundle" for item in forks.values())
+    assert by_id("vllm-ascend-hust")["name"] == "vLLM Ascend HUST"
+    assert "it is not a HUST plugin" in by_id("vllm-ascend-hust")["summary_en"]
+
+    assert "Upstream-synchronized HUST forks are systems, not plugins." in PAGE
+    assert "上游同步 HUST fork 是系统分支，不是插件。" in PAGE
+    assert "upstream_sync_fork" in SCRIPT
+    assert "item.repository_relationship !== \"upstream_sync_fork\"" in SCRIPT
+    assert "forksTitle" in SCRIPT
 
 
 def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
@@ -218,7 +256,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v6"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v7"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -226,9 +264,23 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 31
+    assert len(PORTFOLIO["repositories"]) == 33
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {"vllm-hust", "pegaflow-hust"} <= names
+    upstream_forks = {
+        item["name"]
+        for item in PORTFOLIO["repositories"]
+        if item["repository_role"] == "upstream_sync_fork"
+    }
+    assert upstream_forks == {
+        "vllm-hust",
+        "vllm-ascend-hust",
+        "vllm-metal-hust",
+        "triton-ascend-hust",
+        "sglang-hust",
+        "mooncake-hust",
+        "production-stack-hust",
+    }
 
     pegaflow = next(
         item for item in PORTFOLIO["repositories"] if item["name"] == "pegaflow-hust"
@@ -240,7 +292,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     ]
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v1"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v2"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT

@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
-  <link rel="stylesheet" href="./assets/home.css?v=ride-ecosystem-20260817-2" />
+  <link rel="stylesheet" href="./assets/home.css?v=upstream-forks-20260901" />
 </head>
 <body data-page="home">
   <nav class="site-nav">
@@ -154,6 +154,18 @@
         <p id="atlas-summary">Portable mechanisms stay independent. Maintained integration branches provide validation backends.</p>
       </div>
       <div class="runtime-list">
+        <section class="runtime-group upstream-fork-group" aria-labelledby="upstream-forks-title">
+          <div class="runtime-group-head"><span>00 / SYSTEM FORKS</span><strong id="upstream-forks-title">Upstream-synchronized HUST forks</strong><p id="upstream-forks-copy">Complete system distributions that track official upstream projects. They are not plugins.</p></div>
+          <div class="runtime-group-items">
+            <a href="https://github.com/vLLM-HUST/vllm-hust"><span class="runtime-name">vLLM-HUST</span><span class="runtime-role">fork of vllm-project/vllm</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="runtime-name">vLLM Ascend HUST</span><span class="runtime-role">fork of vllm-project/vllm-ascend</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="runtime-name">vLLM Metal HUST</span><span class="runtime-role">fork of vllm-project/vllm-metal</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="runtime-name">Triton Ascend HUST</span><span class="runtime-role">fork of triton-lang/triton-ascend</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/sglang-hust"><span class="runtime-name">SGLang HUST</span><span class="runtime-role">fork of sgl-project/sglang</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/mooncake-hust"><span class="runtime-name">Mooncake HUST</span><span class="runtime-role">fork of kvcache-ai/Mooncake</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+            <a href="https://github.com/vLLM-HUST/production-stack-hust"><span class="runtime-name">Production Stack HUST</span><span class="runtime-role">fork of vllm-project/production-stack</span><span class="runtime-tag upstream">system fork</span><span>↗</span></a>
+          </div>
+        </section>
         <section class="runtime-group" aria-labelledby="mechanism-control-title">
           <div class="runtime-group-head"><span>01 / CONTROL + STATE</span><strong id="mechanism-control-title">Control &amp; state</strong><p id="mechanism-control-copy">Admission, scheduling, and KV lifecycle.</p></div>
           <div class="runtime-group-items">
@@ -171,19 +183,6 @@
           <div class="runtime-group-head"><span>03 / REPRESENT</span><strong id="mechanism-representation-title">Model representation</strong><p id="mechanism-representation-copy">Precision, quantization, and storage.</p></div>
           <div class="runtime-group-items">
             <a href="https://github.com/vLLM-HUST/vllm-ascend-quant-hust"><span class="runtime-name">Ascend Quant</span><span id="atlas-quant-role" class="runtime-role">Post-training and mixed-precision quantization</span><span class="runtime-tag amber">tool</span><span>↗</span></a>
-          </div>
-        </section>
-        <section class="runtime-group" aria-labelledby="mechanism-compiler-title">
-          <div class="runtime-group-head"><span>04 / LOWER</span><strong id="mechanism-compiler-title">Compiler &amp; kernels</strong><p id="mechanism-compiler-copy">Graph lowering, operators, and kernels.</p></div>
-          <div class="runtime-group-items">
-            <a href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="runtime-name">Triton Ascend HUST</span><span id="atlas-triton-role" class="runtime-role">HUST-maintained Triton Ascend adaptation for compiler and kernel validation</span><span class="runtime-tag slate">integration branch</span><span>↗</span></a>
-          </div>
-        </section>
-        <section class="runtime-group" aria-labelledby="mechanism-adapters-title">
-          <div class="runtime-group-head"><span>05 / INTEGRATE</span><strong id="mechanism-adapters-title">Engine &amp; hardware integration branches</strong><p id="mechanism-adapters-copy">Maintained engine and hardware backends.</p></div>
-          <div class="runtime-group-items">
-            <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="runtime-name">vLLM Ascend HUST</span><span id="atlas-ascend-role" class="runtime-role">HUST-maintained vLLM adaptation branch for Ascend accelerators</span><span class="runtime-tag slate">integration branch</span><span>↗</span></a>
-            <a href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="runtime-name">vLLM Metal HUST</span><span id="atlas-metal-role" class="runtime-role">HUST-maintained vLLM adaptation branch for Apple Silicon</span><span class="runtime-tag slate">integration branch</span><span>↗</span></a>
           </div>
         </section>
         <section class="runtime-group" aria-labelledby="mechanism-operations-title">
@@ -260,17 +259,13 @@
         'mechanism-control-title': 'Control & state', 'mechanism-control-copy': 'Admission, scheduling, and KV lifecycle.',
         'mechanism-execution-title': 'Decoding & execution', 'mechanism-execution-copy': 'Decoding, expert placement, and execution.',
         'mechanism-representation-title': 'Model representation', 'mechanism-representation-copy': 'Precision, quantization, and storage.',
-        'mechanism-compiler-title': 'Compiler & kernels', 'mechanism-compiler-copy': 'Graph lowering, operators, and kernels.',
-        'mechanism-adapters-title': 'Engine & hardware integration branches', 'mechanism-adapters-copy': 'Maintained engine and hardware backends.',
+        'upstream-forks-title': 'Upstream-synchronized HUST forks', 'upstream-forks-copy': 'Complete system distributions that track official upstream projects. They are not plugins.',
         'mechanism-operations-title': 'Operations & observability', 'mechanism-operations-copy': 'Deployment, profiling, and diagnosis.',
         'mechanism-validation-title': 'Validation & evidence', 'mechanism-validation-copy': 'Regression gates and benchmark evidence.',
         'atlas-bidkv-role': 'KV-pressure eviction and preemption policy', 'atlas-diffspec-role': 'Differential speculative decoding for ultra-long sequences',
         'atlas-latchmoe-role': 'Address-stable, graph-compatible expert offloading', 'atlas-quant-role': 'Post-training and mixed-precision quantization',
         'atlas-manager-role': 'Deployment diagnostics and setup', 'atlas-perf-role': 'Serving performance analysis',
         'atlas-profiling-role': 'Repeatable profiling workflows for runtime and backend', 'atlas-benchmark-role': 'Fixed-target comparison and evidence pipeline',
-        'atlas-triton-role': 'HUST-maintained Triton Ascend adaptation for compiler and kernel validation',
-        'atlas-ascend-role': 'HUST-maintained vLLM adaptation branch for Ascend accelerators',
-        'atlas-metal-role': 'HUST-maintained vLLM adaptation branch for Apple Silicon',
         'ecosystem-eyebrow': 'Collaborative ecosystem', 'ecosystem-title': 'Clear roles. Shared progress.',
         'ecosystem-summary': 'SAGE is the shared flagship product; each organization retains a clear technical boundary.',
         'ecosystem-intellistream': 'Cross-layer research incubator', 'ecosystem-ride': 'Agent-native LLM control plane and SAGE core stewardship',
@@ -311,17 +306,13 @@
         'mechanism-control-title': '控制与状态', 'mechanism-control-copy': '请求准入、调度与 KV 生命周期。',
         'mechanism-execution-title': '解码与执行', 'mechanism-execution-copy': '解码、专家放置与执行。',
         'mechanism-representation-title': '模型表示', 'mechanism-representation-copy': '精度、量化与存储。',
-        'mechanism-compiler-title': '编译与算子', 'mechanism-compiler-copy': '计算图下沉、算子与内核。',
-        'mechanism-adapters-title': '引擎与硬件适配分支', 'mechanism-adapters-copy': '维护中的引擎与硬件后端。',
+        'upstream-forks-title': '上游同步 HUST 系统分支', 'upstream-forks-copy': '持续跟随官方上游的完整系统发行分支；它们不是插件。',
         'mechanism-operations-title': '运维与观测', 'mechanism-operations-copy': '部署、剖析与诊断。',
         'mechanism-validation-title': '验证与证据', 'mechanism-validation-copy': '回归门禁与 Benchmark 证据。',
         'atlas-bidkv-role': 'KV 压力感知驱逐与抢占策略', 'atlas-diffspec-role': '面向超长序列的差分投机解码',
         'atlas-latchmoe-role': '地址稳定、兼容计算图的专家卸载', 'atlas-quant-role': '训练后量化与混合精度量化',
         'atlas-manager-role': '部署诊断与环境配置', 'atlas-perf-role': '推理服务性能归因分析',
         'atlas-profiling-role': '面向运行时与后端的可复现性能剖析流程', 'atlas-benchmark-role': '固定靶对比与证据流水线',
-        'atlas-triton-role': '由 HUST 维护、用于编译与算子验证的 Triton Ascend 适配分支',
-        'atlas-ascend-role': '由 HUST 维护、面向昇腾加速器的 vLLM 适配分支',
-        'atlas-metal-role': '由 HUST 维护、面向 Apple Silicon 的 vLLM 适配分支',
         'ecosystem-eyebrow': '协作生态', 'ecosystem-title': '角色清晰，共同演进。',
         'ecosystem-summary': 'SAGE 是共同旗舰产品；各组织保持清晰的技术边界。',
         'ecosystem-intellistream': '跨层研究孵化器', 'ecosystem-ride': '智能体原生大模型控制平面与 SAGE 核心维护',
