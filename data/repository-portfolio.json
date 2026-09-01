@@ -358,6 +358,61 @@
       "successor": "vLLM-HUST/vllm-hust-website"
     },
     {
+      "name": "vllm-hust-prefix-router",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-prefix-router",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "provides_external_control_plane",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["owner-led prefix-router migration scaffold", "legacy provenance ledger"],
+      "component_ids": ["prefix-router-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-kv-tiering",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "provides_kv_residency_provider",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["owner-led KV-tiering migration scaffold", "legacy provenance ledger"],
+      "component_ids": ["kv-tiering-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-knorm",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-knorm",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "provides_kv_compression_method",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["owner-led KNorm migration scaffold", "legacy provenance ledger"],
+      "component_ids": ["knorm-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-ascend-pyramidkv-hust",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "provides_kv_compression_provider",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["owner-led PyramidKV Ascend migration scaffold", "legacy provenance ledger"],
+      "component_ids": ["pyramidkv-ascend-migration"],
+      "public_surface": true
+    },
+    {
+      "name": "vllm-hust-slicegpt",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-slicegpt",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "extension_migration",
+      "relation_to_runtime": "prepares_and_loads_model_artifacts",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["owner-led SliceGPT migration scaffold", "legacy provenance ledger"],
+      "component_ids": ["slicegpt-migration"],
+      "public_surface": true
+    },
+    {
       "name": "vllm-metal-hust",
       "url": "https://github.com/vLLM-HUST/vllm-metal-hust",
       "portfolio_domain": "runtime_platform",

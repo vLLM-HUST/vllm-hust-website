@@ -50,6 +50,27 @@ def test_registry_is_canonical_and_multidimensional() -> None:
     assert by_id("vllm-production-stack")["maturity"] == "unsupported"
 
 
+def test_legacy_migration_cards_preserve_original_ownership() -> None:
+    expected = {
+        "prefix-router-migration": ["Amber1qq", "WMASTER123", "Adr1anZheng"],
+        "kv-tiering-migration": ["JieYang2001"],
+        "knorm-migration": ["kotoriqaq0", "SuccinctPaul"],
+        "pyramidkv-ascend-migration": ["Irisuko"],
+        "slicegpt-migration": ["qingfengyuhuoda"],
+    }
+    for component_id, maintainers in expected.items():
+        component = by_id(component_id)
+        assert component["ownership"] == "original_contributor_maintained"
+        assert component["maintainers"] == maintainers
+        assert component["delivery_model"] == "migration_scaffold"
+        assert component["maturity"] == "incubating"
+        assert "Repository scaffold only" in component["summary_en"]
+
+    assert "Original maintainers" in SCRIPT
+    assert "原负责人" in SCRIPT
+    assert "item.maintainers" in SCRIPT
+
+
 def test_system_role_is_independent_from_delivery_model() -> None:
     bidkv = by_id("bidkv")
     assert bidkv["system_role"] == "scheduler_policy"
@@ -238,7 +259,7 @@ def test_bidkv_and_diffspec_cards_expose_accessible_launch_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "ecosystem-registry-v6" in PAGE
+    assert "ecosystem-registry-v7" in PAGE
 
 
 def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
@@ -281,7 +302,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v7"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v8"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -289,9 +310,16 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 33
+    assert len(PORTFOLIO["repositories"]) == 38
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {"vllm-hust", "pegaflow-hust"} <= names
+    assert {
+        "vllm-hust-prefix-router",
+        "vllm-hust-kv-tiering",
+        "vllm-hust-knorm",
+        "vllm-ascend-pyramidkv-hust",
+        "vllm-hust-slicegpt",
+    } <= names
     upstream_forks = {
         item["name"]
         for item in PORTFOLIO["repositories"]
@@ -317,7 +345,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     ]
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v2"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v3"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
