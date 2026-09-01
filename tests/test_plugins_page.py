@@ -282,13 +282,49 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert '"ascend-quant-runtime-descriptor": {' in SCRIPT
     assert "no model loading, kernel selection, or runtime activation" in SCRIPT
     assert 'trigger.setAttribute("aria-label", `${item.name} ${action}`)' in SCRIPT
-    assert 'element("button", "plugin-launch-icon", ">_")' in SCRIPT
+    assert 'element("button", "plugin-launch-icon")' in SCRIPT
+    assert 'element("span", "plugin-launch-glyph", ">_")' in SCRIPT
     assert 'trigger.setAttribute("aria-describedby", tooltipId)' in SCRIPT
     assert 'trigger.setAttribute("aria-expanded", "false")' in SCRIPT
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "ecosystem-registry-v8" in PAGE
+    assert "mod-catalog-v3" in PAGE
+
+
+def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
+    expected = {
+        "bidkv": ("ready", "vLLM-HUST", ["0.23"]),
+        "diffspec": ("experimental", "vLLM Ascend", ["0.23"]),
+        "latchmoe": ("experimental", "vLLM Ascend HUST", ["vLLM 0.21"]),
+        "ascend-adaptive-quantized-kv": (
+            "inspect_only",
+            "vLLM Ascend",
+            ["Host contract pending"],
+        ),
+        "ascend-quant-runtime-descriptor": (
+            "inspect_only",
+            "vLLM Ascend",
+            ["Loader contract pending"],
+        ),
+    }
+    for component_id, (status, host, versions) in expected.items():
+        profile = by_id(component_id)["compatibility"]
+        assert profile["status"] == status
+        assert profile["host"] == host
+        assert profile["versions"] == versions
+        assert profile["platforms"]
+        assert profile["requirements_en"]
+        assert profile["requirements_zh"]
+
+    assert "function compatibilityPanel(item)" in SCRIPT
+    assert 'element("details", "plugin-technical-details")' in SCRIPT
+    assert 'element("summary", "", copy().details)' in SCRIPT
+    assert "copy().installRun" in SCRIPT
+    assert "Read it like a MOD catalog" in PAGE
+    assert "像查看 MOD 一样选择扩展" in PAGE
+    assert ".plugin-compatibility-facts" in STYLES
+    assert ".mod-catalog-guide" in STYLES
 
 
 def test_quantization_entries_preserve_runtime_boundaries() -> None:
@@ -367,7 +403,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecosystem-registry-v9"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=mod-catalog-v3"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
