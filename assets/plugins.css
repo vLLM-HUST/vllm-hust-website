@@ -181,6 +181,7 @@ body[data-page="plugins"] .plugin-card h3 { margin: 26px 0 10px; color: #0c1112;
 .plugin-compatibility-facts dd { margin: 3px 0 0; color: #172321; font-size: 11px; font-weight: 800; overflow-wrap: anywhere; }
 .plugin-compatibility-note { margin: 11px 0 0; padding-top: 9px; color: #566461; border-top: 1px solid rgba(23,111,114,.18); font-size: 10px; line-height: 1.45; }
 .plugin-compatibility-note strong { color: #263532; }
+.plugin-compatibility-followup { display: inline-flex; margin-top: 9px; color: #644f91; font-size: 10px; font-weight: 850; text-decoration: underline; text-underline-offset: 2px; }
 .plugin-install-state { margin-top: 10px; padding: 11px 12px; border: 1px solid #c7d0cd; background: #f4f6f5; }
 .plugin-install-state strong { color: #4d5957; font-size: 11px; }
 .plugin-install-state p { margin: 5px 0 0; color: #65716f; font-size: 10px; line-height: 1.45; }

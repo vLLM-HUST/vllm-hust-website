@@ -701,6 +701,61 @@ def test_all_19_workshop_mods_have_complete_public_card_metadata() -> None:
         assert set(WORKLOAD_NAVIGATION["plugins"][component_id]) <= workload_ids
 
 
+def test_unfinished_mods_have_owner_issues_and_safe_inspection_commands() -> None:
+    expected_followups = {
+        "ascend-quant-runtime-descriptor",
+        "kv-tiering-migration",
+        "knorm-migration",
+        "pyramidkv-ascend-migration",
+        "quantized-kv-cache-migration",
+        "simllm-migration",
+        "unified-communication-migration",
+        "split-batch-full-graph-migration",
+        "kv-transfer-observability-migration",
+        "layered-prefill-migration",
+        "activation-sparsity-migration",
+        "pipeline-microbatch-migration",
+        "qos-scheduler-migration",
+        "mapped-host-kv-offload",
+        "stateharbor",
+    }
+    actual_followups = {
+        item["id"]
+        for item in REGISTRY["components"]
+        if item.get("compatibility", {}).get("followup_url")
+    }
+    assert actual_followups == expected_followups
+    for component_id in expected_followups:
+        url = by_id(component_id)["compatibility"]["followup_url"]
+        assert url.startswith("https://github.com/vLLM-HUST/")
+        assert "/issues/" in url
+
+    inspectable_packages = expected_followups - {
+        "ascend-quant-runtime-descriptor",
+        "kv-tiering-migration",
+        "knorm-migration",
+        "pyramidkv-ascend-migration",
+    }
+    for component_id in inspectable_packages:
+        compatibility = by_id(component_id)["compatibility"]
+        assert compatibility["status"] == "inspect_only"
+        assert compatibility["python"] == [">=3.10"]
+        assert "Manifest 0.2-experimental" in compatibility["versions"]
+        assert f'"{component_id}"' in SCRIPT
+
+    assert "Import-only contract package" in SCRIPT
+    assert "明确不提供启用和启动命令" in SCRIPT
+    assert 'pip install "git+${item.canonical_repository}.git"' in SCRIPT
+    assert "vllm-hust-ext extension inspect ${extensionId}" in SCRIPT
+    assert "vllm-hust-ext extension check ${extensionId}" in SCRIPT
+    for component_id in (
+        "kv-tiering-migration",
+        "knorm-migration",
+        "pyramidkv-ascend-migration",
+    ):
+        assert f'"{component_id}": "org.' not in SCRIPT
+
+
 def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
     expected = {
         "kvcompress-ascend": ([("张家万", "Jiawan23")], "万瑶"),

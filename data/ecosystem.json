@@ -415,7 +415,8 @@
         "platforms": ["Ascend NPU"],
         "python": ["3.10", "3.12", "3.14"],
         "requirements_en": "Typed loader/operator contracts and an approved value allowlist are required before activation.",
-        "requirements_zh": "激活前需要 typed loader/operator 合同和批准后的值域白名单。"
+        "requirements_zh": "激活前需要 typed loader/operator 合同和批准后的值域白名单。",
+        "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-quant-hust/issues/2"
       },
       "evidence_level": "cpu_smoke"
     },
@@ -512,7 +513,8 @@
         "versions": ["No installable or runnable release"],
         "platforms": ["Device / CPU / filesystem tiers are targets only; unverified"],
         "requirements_en": "The repository contains README, provenance, and ownership records only. A versioned host contract, package or manifest, implementation, and platform validation are all required before installation.",
-        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需版本化宿主合同、package 或 manifest、实现代码与平台验证。"
+        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需版本化宿主合同、package 或 manifest、实现代码与平台验证。",
+        "followup_url": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering/issues/1"
       },
       "evidence_level": "legacy_evidence"
     },
@@ -546,7 +548,8 @@
         "versions": ["No installable or runnable release"],
         "platforms": ["Platform support unverified"],
         "requirements_en": "The repository contains README, provenance, and ownership records only. A package or manifest, implementation, and proof of safe composition with prefix caching and other KV block-table mutation owners are required before installation.",
-        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需 package 或 manifest、实现代码，并证明可与 prefix caching 及其他 KV block-table 修改方安全组合。"
+        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需 package 或 manifest、实现代码，并证明可与 prefix caching 及其他 KV block-table 修改方安全组合。",
+        "followup_url": "https://github.com/vLLM-HUST/vllm-hust-knorm/issues/1"
       },
       "evidence_level": "legacy_evidence"
     },
@@ -584,7 +587,8 @@
         "versions": ["No installable or runnable release"],
         "platforms": ["Ascend NPU target; hardware validation pending"],
         "requirements_en": "The repository contains README, provenance, and ownership records only. A package or manifest, implementation, preserved fail-closed capability matrix, prompt-admission guard, quality evidence, graph/model restrictions, and Ascend validation are required before installation.",
-        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需 package 或 manifest、实现代码，并保留 fail-closed 能力矩阵、prompt-admission guard、质量证据、graph/model 限制并完成昇腾验证。"
+        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需 package 或 manifest、实现代码，并保留 fail-closed 能力矩阵、prompt-admission guard、质量证据、graph/model 限制并完成昇腾验证。",
+        "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust/issues/1"
       },
       "evidence_level": "legacy_evidence"
     },
@@ -686,7 +690,7 @@
       "public_effect_zh": "能力预览：统一承载 INT8、KIVI INT4 与动态 KV Cache 量化；公开 benchmark 结果仍待迁移。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust",
-      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend contract pending", "versions": ["Extension 0.1.0.dev0"], "platforms": ["Ascend NPU target"], "requirements_en": "The wheel and manifest are installable and discoverable; implementation and device evidence are required before activation.", "requirements_zh": "wheel 与 manifest 可安装、可发现；激活前仍需迁移实现并补齐设备证据。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend (attachment contract pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Ascend NPU target; hardware unverified"], "python": [">=3.10"], "requirements_en": "The wheel, fail-closed dtype/layout resolver, and manifest are installable and inspectable; vLLM Ascend attachment, device kernels, and hardware evidence are required before activation.", "requirements_zh": "wheel、fail-closed dtype/layout resolver 与 manifest 可安装、可检查；激活前仍需补齐 vLLM Ascend 接入、设备 kernel 与硬件证据。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -713,7 +717,7 @@
       "public_effect_zh": "能力预览：在相似任务之间复用 KV 状态；在来源与许可证厘清前，不发布版本或性能声明。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust",
-      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend contract pending", "versions": ["Extension 0.1.0.dev0", "License review required"], "platforms": ["Ascend NPU target"], "requirements_en": "The scaffold wheel is discoverable; provenance and licensing must be resolved before implementation or activation.", "requirements_zh": "脚手架 wheel 可发现；实现迁移或激活前必须解决来源与许可证问题。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend (attachment contract pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental", "License review required"], "platforms": ["Ascend NPU target; hardware unverified"], "python": [">=3.10"], "requirements_en": "The host-contract and license-gate wheel is installable and inspectable; provenance and licensing must be resolved before a clean runtime implementation or activation.", "requirements_zh": "宿主合同与 license-gate wheel 可安装、可检查；洁净运行时实现或激活前必须解决来源与许可证问题。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -740,7 +744,7 @@
       "public_effect_zh": "能力预览：提供设备中立通信后端与窄 vLLM Host Provider 边界；运行时激活和性能证据仍待负责人完成。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-unified-comm",
-      "compatibility": {"status": "inspect_only", "host": "Host Provider contract pending", "versions": ["Extension 0.1.0.dev0"], "platforms": ["Device-neutral target"], "requirements_en": "The provider wheel is discoverable; define and implement the narrow backend contract before activation.", "requirements_zh": "Provider wheel 可发现；激活前需定义并实现窄通信后端合同。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM (collective Host Provider pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Device-neutral target; hardware unverified"], "python": [">=3.10"], "requirements_en": "The device-neutral registry and strategy wheel is installable and inspectable; backend packages, collective delegation, and hardware evidence are required before activation.", "requirements_zh": "设备中立的 registry 与策略 wheel 可安装、可检查；激活前仍需后端包、collective delegation 与硬件证据。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-unified-comm/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -774,7 +778,7 @@
       "public_effect_zh": "能力预览：split-batch 规划、双流 replay 与 full-graph 并行执行；尚无公开配对性能结果。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-split-batch-hust",
-      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend graph contract pending", "versions": ["Extension 0.1.0.dev0"], "platforms": ["Ascend NPU target"], "requirements_en": "The wheel is discoverable; typed graph-lifecycle seams and hardware validation are required before activation.", "requirements_zh": "wheel 可发现；激活前需要类型化 graph 生命周期 seam 和硬件验证。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend (graph/worker contract pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Ascend NPU target; hardware unverified"], "python": [">=3.10"], "requirements_en": "The default-off dual-pad planner and prechecks are installable and inspectable; graph/worker execution contracts and Ascend validation are required before activation.", "requirements_zh": "默认关闭的 dual-pad planner 与前置检查可安装、可检查；激活前仍需 graph/worker 执行合同与昇腾验证。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-split-batch-hust/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -801,7 +805,7 @@
       "public_effect_zh": "能力预览：为身份绑定 KV 传输、恢复、descriptor layout 与首次计算生成可审计回执；声明的是可观测性，不是加速。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability",
-      "compatibility": {"status": "inspect_only", "host": "Telemetry contract pending", "versions": ["Extension 0.1.0.dev0"], "platforms": ["Host-neutral target"], "requirements_en": "The wheel is discoverable; a bounded telemetry contract is required before runtime integration.", "requirements_zh": "wheel 可发现；运行时集成前需要有界 telemetry 合同。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM (KV-transfer observer attachment pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Host-neutral target; runtime integration unverified"], "python": [">=3.10"], "requirements_en": "Address-free event and descriptor sinks are installable and inspectable; bounded automatic vLLM attachment and runtime receipts are required before integration.", "requirements_zh": "无地址事件与 descriptor sink 可安装、可检查；集成前仍需有界的 vLLM 自动接入与运行回执。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -832,7 +836,7 @@
       "public_effect_zh": "能力预览：以显式、默认关闭的接入边界提供 layered prefill；尚无 HUST 集成专属公开 benchmark。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-layered-prefill-hust",
-      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend contract pending", "versions": ["Extension 0.1.0.dev0"], "platforms": ["Ascend NPU target"], "requirements_en": "The wheel is discoverable; preserve upstream attribution and prove opt-in behavior before activation.", "requirements_zh": "wheel 可发现；激活前需保留上游归属并验证 opt-in 行为。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend (partial-forward attachment pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Ascend NPU target; hardware unverified"], "python": [">=3.10"], "requirements_en": "Stage partitioning, request metadata, model-adapter declarations, and MoE cursor logic are installable and inspectable; partial-forward attachment, opt-in proof, and Ascend evidence are required before activation.", "requirements_zh": "阶段划分、请求 metadata、model-adapter 声明与 MoE cursor 逻辑可安装、可检查；激活前仍需 partial-forward 接入、opt-in 证明与昇腾证据。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-layered-prefill-hust/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -863,7 +867,7 @@
       "public_effect_zh": "研究预览：把 TEAL 与 LaRoSA 激活稀疏工作封装到扩展边界之后；尚不公开 kernel、质量、模型、硬件或加速声明。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-activation-sparsity",
-      "compatibility": {"status": "inspect_only", "host": "Operator contract pending", "versions": ["Extension 0.1.0.dev0"], "platforms": ["Hardware support unverified"], "requirements_en": "The wheel is discoverable; kernel, quality, model, and hardware evidence are required before activation.", "requirements_zh": "wheel 可发现；激活前需要补齐 kernel、质量、模型和硬件证据。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM (model/kernel attachment pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Hardware support unverified"], "python": [">=3.10"], "requirements_en": "Fail-closed TEAL/LaRoSA configuration validation is installable and inspectable; kernel, quality, model, attachment, and hardware evidence are required before activation.", "requirements_zh": "fail-closed TEAL/LaRoSA 配置校验可安装、可检查；激活前仍需 kernel、质量、模型、接入与硬件证据。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-activation-sparsity/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -900,7 +904,7 @@
       "public_effect_zh": "研究预览：跨 scheduler、executor、通信、KV 与 worker 边界进行校准式流水并行 microbatch 调度；公开配对结果待补。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch",
-      "compatibility": {"status": "inspect_only", "host": "Distributed host contracts pending", "versions": ["Extension 0.1.0.dev0"], "platforms": ["Platform-neutral target"], "requirements_en": "The wheel is discoverable; neutral scheduler, executor, communication, and KV contracts are required before activation.", "requirements_zh": "wheel 可发现；激活前需要中立的 scheduler、executor、通信与 KV 合同。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM (scheduler/worker attachment pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Platform-neutral target; distributed runtime unverified"], "python": [">=3.10"], "requirements_en": "Rank-local cost prediction and deterministic microbatch assignment are installable and inspectable; neutral scheduler, executor, communication, KV attachment, and matched performance evidence are required before activation.", "requirements_zh": "rank-local 成本预测与确定性 microbatch 分配可安装、可检查；激活前仍需中立的 scheduler、executor、通信、KV 接入与匹配性能证据。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -931,7 +935,7 @@
       "public_effect_zh": "能力预览：通过运行时策略扩展面向 TTFT、TBT 与 TTLT deadline 调度；公开 SLO 与吞吐结果待补。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-qos-scheduler",
-      "compatibility": {"status": "inspect_only", "host": "Scheduler policy contract pending", "versions": ["Extension 0.1.0.dev0"], "platforms": ["Host-neutral target"], "requirements_en": "The wheel is discoverable; typed request metadata, fairness, admission, and SLO receipt contracts are required before activation.", "requirements_zh": "wheel 可发现；激活前需要类型化请求 metadata、公平性、准入与 SLO 回执合同。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM (API/scheduler attachment pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Host-neutral target; runtime integration unverified"], "python": [">=3.10"], "requirements_en": "Request SLO validation, monotonic deadline tracking, and ordering keys are installable and inspectable; API/scheduler attachment, fairness, admission, and SLO receipts are required before activation.", "requirements_zh": "请求 SLO 校验、单调 deadline 跟踪与排序键可安装、可检查；激活前仍需 API/scheduler 接入、公平性、准入与 SLO 回执。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-qos-scheduler/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -958,7 +962,7 @@
       "public_effect_zh": "能力预览：通过有界 vLLM Ascend KV-offload 合同暴露映射宿主内存；硬件验证仍待完成。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-mapped-kv-offload-hust",
-      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend", "versions": [">=0.23,<0.24", "Extension 0.1.0.dev0"], "platforms": ["Ascend NPU target"], "requirements_en": "The package is discoverable but import-only; the owner must migrate implementation and hardware tests before activation.", "requirements_zh": "包可发现但仅支持 import-only；负责人需迁移实现并完成硬件测试后方可激活。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend", "versions": [">=0.23,<0.24", "Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Ascend NPU target; hardware unverified"], "python": [">=3.10"], "requirements_en": "The mapped-memory contract and validation package is installable and inspectable but import-only; a Worker adapter, native operator, reviewed host seam, and Ascend build/test receipt are required before activation.", "requirements_zh": "映射内存合同与校验包可安装、可检查，但仅支持 import-only；激活前仍需 Worker adapter、native operator、经评审的宿主 seam 与昇腾构建/测试回执。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-mapped-kv-offload-hust/issues/1"},
       "evidence_level": "cpu_smoke"
     },
     {
@@ -985,7 +989,7 @@
       "public_effect_zh": "能力预览：通过类型化 scheduler 合同，把 KV 恢复与输出传输状态绑定到请求所有权。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-stateharbor",
-      "compatibility": {"status": "inspect_only", "host": "vLLM", "versions": [">=0.23,<0.24", "Extension 0.1.0.dev0"], "platforms": ["Host-neutral target"], "requirements_en": "The package is discoverable but import-only; runtime ownership, rollback, and recovery tests remain owner work.", "requirements_zh": "包可发现但仅支持 import-only；运行时所有权、回滚与恢复测试仍待负责人完成。"},
+      "compatibility": {"status": "inspect_only", "host": "vLLM", "versions": [">=0.23,<0.24", "Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["CPU reference tests only; runtime platform unverified"], "python": [">=3.10"], "requirements_en": "The ownership and window-policy reference package is CPU-testable, installable, and inspectable but import-only; vLLM activation, runtime ownership, rollback, and recovery tests remain required.", "requirements_zh": "所有权与窗口策略参考包可在 CPU 测试、安装和检查，但仅支持 import-only；仍需补齐 vLLM 激活、运行时所有权、回滚与恢复测试。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-stateharbor/issues/1"},
       "evidence_level": "cpu_smoke"
     },
     {
