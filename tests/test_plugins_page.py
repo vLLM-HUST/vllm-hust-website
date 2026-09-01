@@ -11,6 +11,9 @@ PORTFOLIO = json.loads(
 PAGE = (ROOT / "plugins.html").read_text(encoding="utf-8")
 SCRIPT = (ROOT / "assets" / "plugins-page.js").read_text(encoding="utf-8")
 STYLES = (ROOT / "assets" / "plugins.css").read_text(encoding="utf-8")
+WORKSHOP_METADATA = json.loads(
+    (ROOT / "data" / "plugin-workshop-metadata.json").read_text(encoding="utf-8")
+)
 LEGACY_STANDARD = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
 
 REQUIRED_FIELDS = {
@@ -349,6 +352,42 @@ def test_workshop_does_not_present_official_connectors_or_systems_as_mods() -> N
     assert "Only independent vLLM-HUST extension repositories appear here." in PAGE
     assert "official connectors" in PAGE
     assert "官方 Connector" in PAGE
+
+
+def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> None:
+    assert WORKSHOP_METADATA["schema_version"] == "plugin-workshop-metadata/v1"
+    workshop_mods = {
+        item["id"]
+        for item in REGISTRY["components"]
+        if item["artifact_type"] == "runtime_component"
+        and item["repository_relationship"] == "organization_native"
+        and item["delivery_model"]
+        in {"plugin_bundle", "python_distribution", "migration_scaffold"}
+        and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+    }
+    assert set(WORKSHOP_METADATA["plugins"]) == workshop_mods
+    for plugin in WORKSHOP_METADATA["plugins"].values():
+        assert plugin["maintainers"]
+        assert all(
+            person["login"] and person["name"] for person in plugin["maintainers"]
+        )
+        assert set(plugin["metrics"]) == {"stars", "forks", "open_pull_requests"}
+        assert all(
+            isinstance(value, int) and value >= 0
+            for value in plugin["metrics"].values()
+        )
+
+
+def test_workshop_renders_synced_metadata_without_hardcoded_counts() -> None:
+    assert 'data-metadata="./data/plugin-workshop-metadata.json?v=' in PAGE
+    assert "fetch(catalog.dataset.metadata)" in SCRIPT
+    assert "function communityPanel(item)" in SCRIPT
+    assert "metadata.maintainers.forEach" in SCRIPT
+    assert "metadata.metrics.stars" in SCRIPT
+    assert "metadata.metrics.open_pull_requests" in SCRIPT
+    assert "metadata.metrics.forks" in SCRIPT
+    assert ".plugin-maintainer" in STYLES
+    assert ".plugin-repo-metrics" in STYLES
 
 
 def test_quantization_entries_preserve_runtime_boundaries() -> None:

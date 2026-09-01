@@ -11,6 +11,7 @@
 
   let registry;
   let portfolio;
+  let workshopMetadata = {};
   let selectedType = "extensions";
   let expanded = false;
   const pageSize = 9;
@@ -44,6 +45,10 @@
     contracts: "版本化契约",
     surfaces: "现有接入面",
     compatibility: "兼容性",
+    maintainers: "负责人",
+    stars: "Stars",
+    pullRequests: "开放 PR",
+    forks: "Forks",
     host: "宿主",
     versions: "适配版本",
     platforms: "平台",
@@ -81,6 +86,10 @@
     contracts: "Versioned contracts",
     surfaces: "Existing surfaces",
     compatibility: "Compatibility",
+    maintainers: "Maintainers",
+    stars: "Stars",
+    pullRequests: "Open PRs",
+    forks: "Forks",
     host: "Host",
     versions: "Versions",
     platforms: "Platforms",
@@ -280,6 +289,52 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     return launcher;
   }
 
+  function communityPanel(item) {
+    const metadata = workshopMetadata[item.id];
+    if (!metadata || !Array.isArray(metadata.maintainers) || !metadata.metrics) return null;
+
+    const panel = element("section", "plugin-community");
+    const people = element("div", "plugin-maintainers");
+    people.append(element("span", "plugin-community-label", copy().maintainers));
+    const list = element("div", "plugin-maintainer-list");
+    metadata.maintainers.forEach((maintainer) => {
+      const link = element("a", "plugin-maintainer");
+      link.href = maintainer.profile_url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      const avatar = element("img", "plugin-maintainer-avatar");
+      avatar.src = maintainer.avatar_url;
+      avatar.alt = "";
+      avatar.width = 28;
+      avatar.height = 28;
+      avatar.loading = "lazy";
+      const identity = element("span", "plugin-maintainer-identity");
+      identity.append(
+        element("strong", "", maintainer.name),
+        element("small", "", `@${maintainer.login}`)
+      );
+      link.append(avatar, identity);
+      list.append(link);
+    });
+    people.append(list);
+
+    const metrics = element("div", "plugin-repo-metrics");
+    [
+      [copy().stars, metadata.metrics.stars, `${metadata.repository_url}/stargazers`],
+      [copy().pullRequests, metadata.metrics.open_pull_requests, `${metadata.repository_url}/pulls`],
+      [copy().forks, metadata.metrics.forks, `${metadata.repository_url}/forks`]
+    ].forEach(([label, value, href]) => {
+      const link = element("a", "plugin-repo-metric");
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.append(element("strong", "", String(value)), element("span", "", label));
+      metrics.append(link);
+    });
+    panel.append(people, metrics);
+    return panel;
+  }
+
   function compatibilityPanel(item) {
     const profile = item.compatibility;
     if (!profile) return null;
@@ -338,6 +393,8 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     top.append(badges);
 
     card.append(cover, top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
+    const community = communityPanel(item);
+    if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
     if (compatibility) card.append(compatibility);
     const details = element("details", "plugin-technical-details");
@@ -549,16 +606,25 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
   renderPageLabels();
   search.placeholder = copy().searchPlaceholder;
 
-  fetch(catalog.dataset.source)
-    .then((response) => {
+  Promise.all([
+    fetch(catalog.dataset.source).then((response) => {
       if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
       return response.json();
+    }),
+    fetch(catalog.dataset.metadata).then((response) => {
+      if (!response.ok) throw new Error(`Workshop metadata request failed: ${response.status}`);
+      return response.json();
     })
-    .then((payload) => {
+  ])
+    .then(([payload, metadata]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
+      if (metadata.schema_version !== "plugin-workshop-metadata/v1" || !metadata.plugins) {
+        throw new Error("unsupported Workshop metadata");
+      }
       registry = payload;
+      workshopMetadata = metadata.plugins;
       renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
