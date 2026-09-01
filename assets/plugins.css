@@ -112,6 +112,11 @@ html[lang="zh"] .lang-zh { display: inline; }
 .plugin-filter { min-height: 36px; padding: 7px 10px; border: 1px solid #c1cbc8; color: #4e5d5b; background: #fff; font-size: 11px; font-weight: 800; cursor: pointer; }
 .plugin-filter:hover,.plugin-filter.active { color: #fff; border-color: #0c1112; background: #0c1112; }
 .plugin-status { margin: 0 0 12px; color: #61706f; font: 11px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; }
+.mod-catalog-guide { margin: -12px 0 22px; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); border: 1px solid #bfcac6; background: #fff; }
+.mod-catalog-guide > div { min-height: 88px; padding: 15px 17px; display: grid; gap: 6px; align-content: center; border-right: 1px solid #d3dcd9; }
+.mod-catalog-guide > div:last-child { border-right: 0; }
+.mod-catalog-guide strong { color: #172321; font-size: 11px; }
+.mod-catalog-guide span { color: #61706f; font-size: 10px; line-height: 1.45; }
 .plugin-layer-list { display: grid; gap: 28px; }
 .plugin-layer { border: 1px solid #bfcac6; background: #fff; }
 .plugin-layer-head { min-height: 142px; padding: 24px; display: grid; grid-template-columns: minmax(240px,.8fr) minmax(280px,1.2fr) 64px; gap: 30px; align-items: center; color: #fff; background: #101818; }
@@ -121,12 +126,14 @@ html[lang="zh"] .lang-zh { display: inline; }
 .plugin-layer-head p { margin: 0; color: #aebdbc; }
 .plugin-layer-count { color: #a8d951; font: 800 34px "Sora",sans-serif; text-align: right; }
 .plugin-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); }
-.plugin-card { position: relative; min-height: 260px; padding: 22px; display: flex; flex-direction: column; border-right: 1px solid #d3dcd9; border-bottom: 1px solid #d3dcd9; }
+.plugin-card { position: relative; min-height: 300px; padding: 22px; display: flex; flex-direction: column; border-right: 1px solid #d3dcd9; border-bottom: 1px solid #d3dcd9; }
 .plugin-card:hover,.plugin-card:focus-within { z-index: 3; }
 .plugin-card-top { display: flex; justify-content: space-between; gap: 12px; }
 .plugin-code { color: #61706f; font: 10px ui-monospace,SFMono-Regular,Menlo,monospace; }
 .plugin-launcher { position: relative; margin-right: auto; }
-.plugin-launch-icon { width: 30px; height: 26px; padding: 0; display: grid; place-items: center; color: #105456; border: 1px solid #7eb9b8; background: #e4f1ef; font: 800 10px ui-monospace,SFMono-Regular,Menlo,monospace; cursor: pointer; }
+.plugin-launch-icon { min-height: 28px; padding: 0 9px; display: flex; gap: 7px; align-items: center; color: #105456; border: 1px solid #7eb9b8; background: #e4f1ef; font: 800 9px ui-monospace,SFMono-Regular,Menlo,monospace; cursor: pointer; text-transform: uppercase; }
+.plugin-launch-glyph { color: #176f72; }
+.plugin-launch-icon:hover .plugin-launch-glyph,.plugin-launch-icon:focus-visible .plugin-launch-glyph,.plugin-launcher.open .plugin-launch-glyph { color: #dff1b8; }
 .plugin-launch-icon:hover,.plugin-launch-icon:focus-visible,.plugin-launcher.open .plugin-launch-icon { color: #fff; border-color: #176f72; outline: 0; background: #176f72; }
 .plugin-launch-icon:focus-visible { box-shadow: 0 0 0 3px rgba(57,198,202,.28); }
 .plugin-launch-tooltip { position: absolute; top: calc(100% + 10px); left: 0; z-index: 20; width: min(390px,calc(100vw - 48px)); padding: 15px; visibility: hidden; color: #eef7f4; border: 1px solid #39c6ca; background: #101818; box-shadow: 0 18px 45px rgba(6,22,22,.28); opacity: 0; pointer-events: none; transform: translateY(-5px); transition: opacity .16s ease,transform .16s ease,visibility .16s; }
@@ -144,7 +151,7 @@ html[lang="zh"] .lang-zh { display: inline; }
 .plugin-badge.publication { color: #fff; background: #176f72; }
 .plugin-badge.status-concept { color: #4e5d5b; background: #e3e9e7; }
 .plugin-badge.status-incubating,.plugin-badge.status-planned { color: #694a05; background: #f4e1ae; }
-.plugin-card h3 { margin: 36px 0 10px; font-size: 22px; line-height: 1.1; }
+body[data-page="plugins"] .plugin-card h3 { margin: 26px 0 10px; color: #0c1112; font-size: 22px; line-height: 1.1; }
 .upstream-fork-layer { border-color: #176f72; box-shadow: 0 0 0 3px rgba(23,111,114,.1); }
 .upstream-fork-layer .plugin-layer-head { background: #0d494b; }
 .upstream-fork-card { box-shadow: inset 0 4px #39c6ca; }
@@ -153,6 +160,26 @@ html[lang="zh"] .lang-zh { display: inline; }
 .upstream-fork-links a { color: inherit; text-decoration: none; }
 .upstream-fork-links .adjacent-card { box-shadow: inset 0 4px #39c6ca; }
 .plugin-summary { margin: 0; color: #61706f; font-size: 13px; }
+.plugin-compatibility { margin-top: 18px; padding: 13px; border: 1px solid #bed0cb; border-left: 4px solid #176f72; background: #f2f7f5; }
+.plugin-compatibility.compatibility-experimental { border-left-color: #d69822; background: #fff9e9; }
+.plugin-compatibility.compatibility-inspect_only { border-left-color: #7a65a8; background: #f5f1fb; }
+.plugin-compatibility.compatibility-external_service { border-left-color: #3978a8; background: #eef6fb; }
+.plugin-compatibility-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.plugin-compatibility-head .plugin-interface-label { flex-basis: auto; }
+.plugin-badge.compatibility-status { padding: 4px 7px; color: #fff; background: #176f72; }
+.plugin-badge.status-experimental { color: #654200; background: #f4d88c; }
+.plugin-badge.status-inspect_only { color: #fff; background: #6c5798; }
+.plugin-badge.status-external_service { color: #fff; background: #3978a8; }
+.plugin-compatibility-facts { margin: 11px 0 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px 14px; }
+.plugin-compatibility-facts div { min-width: 0; }
+.plugin-compatibility-facts dt { color: #647370; font: 8px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: .08em; text-transform: uppercase; }
+.plugin-compatibility-facts dd { margin: 3px 0 0; color: #172321; font-size: 11px; font-weight: 800; overflow-wrap: anywhere; }
+.plugin-compatibility-note { margin: 11px 0 0; padding-top: 9px; color: #566461; border-top: 1px solid rgba(23,111,114,.18); font-size: 10px; line-height: 1.45; }
+.plugin-compatibility-note strong { color: #263532; }
+.plugin-technical-details { margin-top: 14px; border-top: 1px solid #d3dcd9; border-bottom: 1px solid #d3dcd9; }
+.plugin-technical-details summary { padding: 9px 2px; color: #176f72; font: 800 9px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; cursor: pointer; }
+.plugin-technical-details summary:hover,.plugin-technical-details summary:focus-visible { color: #0c1112; }
+.plugin-technical-body { padding: 0 2px 14px; }
 .plugin-component-facts { margin: 20px 0 0; display: grid; gap: 7px; }
 .plugin-component-facts div { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 10px; }
 .plugin-component-facts dt { color: #61706f; font: 9px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; }
@@ -205,6 +232,8 @@ html[lang="zh"] .lang-zh { display: inline; }
 @media (max-width: 1060px) { .repository-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 680px) { .portfolio-head,.repository-grid { grid-template-columns: 1fr; }.plugin-hero-facts span:last-child { grid-column: 1 / -1; } }
 @media (max-width: 680px) { .plugin-launch-tooltip { position: fixed; top: auto; right: 16px; bottom: 16px; left: 16px; width: auto; max-height: 70vh; overflow: auto; }.plugin-launch-tooltip code { white-space: pre-wrap; overflow-wrap: anywhere; } }
+@media (max-width: 680px) { .plugin-card-top { flex-wrap: wrap; }.plugin-badges { width: 100%; justify-content: start; }.plugin-compatibility-facts { grid-template-columns: 1fr; }.plugin-launch-icon { min-height: 34px; }.plugin-card { min-height: 0; } }
+@media (max-width: 680px) { .mod-catalog-guide { grid-template-columns: 1fr; }.mod-catalog-guide > div { min-height: 0; border-right: 0; border-bottom: 1px solid #d3dcd9; }.mod-catalog-guide > div:last-child { border-bottom: 0; } }
 @media (prefers-reduced-motion: reduce) { .plugin-launch-tooltip { transition: none; } }
 
 /* Readability guardrails: subpages.css uses more specific generic content-panel

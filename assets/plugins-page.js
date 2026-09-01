@@ -35,6 +35,14 @@
     delivery: "交付",
     contracts: "版本化契约",
     surfaces: "现有接入面",
+    compatibility: "兼容性",
+    host: "宿主",
+    versions: "适配版本",
+    platforms: "平台",
+    python: "Python",
+    requirements: "前置条件",
+    details: "技术详情",
+    installRun: "安装 / 启动",
     boundaries: "关键边界",
     repositories: "个组织仓库",
     repositoryEmpty: "没有符合当前搜索条件的仓库。",
@@ -59,6 +67,14 @@
     delivery: "Delivery",
     contracts: "Versioned contracts",
     surfaces: "Existing surfaces",
+    compatibility: "Compatibility",
+    host: "Host",
+    versions: "Versions",
+    platforms: "Platforms",
+    python: "Python",
+    requirements: "Requirements",
+    details: "Technical details",
+    installRun: "Install / run",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
     repositoryEmpty: "No repositories match the current search.",
@@ -88,6 +104,14 @@
     evidence_analysis: { en: "Evidence and analysis", zh: "评测与分析" },
     documentation_product: { en: "Documentation and product", zh: "文档与产品" },
     applications_research: { en: "Applications and research", zh: "应用与研究" }
+  };
+  const compatibilityLabels = {
+    ready: { en: "Ready", zh: "可用" },
+    verified: { en: "Verified", zh: "已验证" },
+    experimental: { en: "Experimental", zh: "实验性" },
+    inspect_only: { en: "Inspect only", zh: "仅检查" },
+    external_service: { en: "External service", zh: "外部服务" },
+    unsupported: { en: "Unsupported", zh: "不支持" }
   };
   const quickStarts = {
     bidkv: {
@@ -194,13 +218,15 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     const value = quickStarts[item.id];
     if (!value) return null;
     const launcher = element("div", "plugin-launcher");
-    const trigger = element("button", "plugin-launch-icon", ">_");
+    const trigger = element("button", "plugin-launch-icon");
     const tooltip = element("div", "plugin-launch-tooltip");
     const tooltipId = `plugin-launch-${item.id}`;
     trigger.type = "button";
     const action = local(value, "action") || (
       language() === "zh" ? "启动命令" : "launch command"
     );
+    const buttonText = local(value, "action") || copy().installRun;
+    trigger.append(element("span", "plugin-launch-glyph", ">_"), element("span", "plugin-launch-action", buttonText));
     trigger.setAttribute("aria-label", `${item.name} ${action}`);
     trigger.setAttribute("aria-describedby", tooltipId);
     trigger.setAttribute("aria-expanded", "false");
@@ -233,6 +259,39 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     return launcher;
   }
 
+  function compatibilityPanel(item) {
+    const profile = item.compatibility;
+    if (!profile) return null;
+    const panel = element("section", `plugin-compatibility compatibility-${profile.status}`);
+    const head = element("div", "plugin-compatibility-head");
+    const statusLabel = compatibilityLabels[profile.status] || {
+      en: valueLabel(profile.status), zh: valueLabel(profile.status)
+    };
+    head.append(
+      element("span", "plugin-interface-label", copy().compatibility),
+      badge(statusLabel[language()], `compatibility-status status-${profile.status}`)
+    );
+    const facts = element("dl", "plugin-compatibility-facts");
+    [
+      [copy().host, profile.host],
+      [copy().versions, profile.versions?.join(" · ")],
+      [copy().platforms, profile.platforms?.join(" · ")],
+      ...(profile.python?.length ? [[copy().python, profile.python.join(" · ")]] : [])
+    ].filter(([, value]) => value).forEach(([label, value]) => {
+      const row = element("div");
+      row.append(element("dt", "", label), element("dd", "", value));
+      facts.append(row);
+    });
+    panel.append(head, facts);
+    const requirements = local(profile, "requirements");
+    if (requirements) {
+      const note = element("p", "plugin-compatibility-note");
+      note.append(element("strong", "", `${copy().requirements}: `), document.createTextNode(requirements));
+      panel.append(note);
+    }
+    return panel;
+  }
+
   function renderCard(item) {
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
     const card = element(
@@ -252,6 +311,11 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     top.append(badges);
 
     card.append(top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
+    const compatibility = compatibilityPanel(item);
+    if (compatibility) card.append(compatibility);
+    const details = element("details", "plugin-technical-details");
+    details.append(element("summary", "", copy().details));
+    const detailBody = element("div", "plugin-technical-body");
     const facts = element("dl", "plugin-component-facts");
     [
       [copy().planes, item.execution_planes.map(valueLabel).join(" · ")],
@@ -265,21 +329,23 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       row.append(element("dt", "", label), element("dd", "", value));
       facts.append(row);
     });
-    card.append(facts);
+    detailBody.append(facts);
 
     if (item.integration_contracts.length) {
       const contracts = element("div", "plugin-contracts typed-contracts");
       contracts.append(element("span", "plugin-interface-label", copy().contracts));
       item.integration_contracts.forEach((contract) => contracts.append(element("code", "", contract)));
-      card.append(contracts);
+      detailBody.append(contracts);
     }
     const surfaces = item.integration_surfaces || [];
     if (surfaces.length) {
       const surfaceList = element("div", "plugin-contracts integration-surfaces");
       surfaceList.append(element("span", "plugin-interface-label", copy().surfaces));
       surfaces.forEach((surface) => surfaceList.append(element("code", "", surface)));
-      card.append(surfaceList);
+      detailBody.append(surfaceList);
     }
+    details.append(detailBody);
+    card.append(details);
 
     const footer = element("div", "plugin-card-footer");
     footer.append(element("span", "plugin-kind", valueLabel(item.system_role)));
