@@ -997,7 +997,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=ride-ecosystem-20260817-2" in html_text
+    assert "assets/home.css?v=upstream-forks-20260901" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
@@ -1009,16 +1009,16 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     assert "font-size: clamp(" not in css_text
 
 
-def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
+def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
     assert (
-        "Programmable KV and scheduling. Graph-aware execution. "
-        "Portable hardware plugins."
-    ) in html_text
-    assert "KV 与调度可编程，模型执行感知计算图，硬件能力以插件接入。" in html_text
+        "Typed runtime contracts. Platform profiles. Composable KV state systems."
+        in html_text
+    )
+    assert "类型化运行时契约、平台 profile 与可组合 KV 状态系统。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
@@ -1037,37 +1037,49 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
         "vllm-hust-profiling",
         "vllm-hust-benchmark",
         "vllm-ascend-hust",
+        "mooncake-hust",
+        "production-stack-hust",
         "triton-ascend-hust",
         "vllm-metal-hust",
+        "sglang-hust",
     )
     for repository in expected_repositories:
         assert f"https://github.com/vLLM-HUST/{repository}" in html_text
 
     proving_ground = html_text.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
-    assert "Runtime Contract" in proving_ground
-    assert "Plugin Interfaces" in proving_ground
+    assert "Runtime Contracts" in proving_ground
+    assert "Ecosystem Interfaces" in proving_ground
     assert "Validation Matrix" in proving_ground
     assert "Benchmark Contract" in proving_ground
     assert "vllm-ascend-hust" not in proving_ground
     assert "triton-ascend-hust" not in proving_ground
 
     catalog = html_text.split('id="projects"', 1)[1].split('id="ecosystem"', 1)[0]
-    ascend_adapter = catalog.index("vLLM Ascend HUST")
-    metal_adapter = catalog.index("vLLM Metal HUST")
-    assert ascend_adapter < metal_adapter
-    assert "Triton Ascend HUST" in catalog
-    assert "HUST-maintained Triton Ascend adaptation" in catalog
-    assert (
-        catalog.count('<span class="runtime-tag slate">integration branch</span>') == 3
-    )
+    forks_group = catalog.split('id="upstream-forks-title"', 1)[1].split(
+        'id="mechanism-control-title"', 1
+    )[0]
+    assert "They are not plugins." in catalog
+    assert "它们不是插件。" in html_text
+    for fork in (
+        "vllm-hust",
+        "vllm-ascend-hust",
+        "vllm-metal-hust",
+        "triton-ascend-hust",
+        "sglang-hust",
+        "mooncake-hust",
+        "production-stack-hust",
+    ):
+        assert fork in forks_group
+    assert forks_group.count('class="runtime-tag upstream">system fork</span>') == 7
+    assert "Triton Ascend HUST" in forks_group
+    assert "SGLang HUST" in forks_group
+    assert '<span class="runtime-tag slate">integration branch</span>' not in catalog
     assert '<span class="runtime-tag green">adapter</span>' not in catalog
 
     group_ids = (
         "mechanism-control-title",
         "mechanism-execution-title",
         "mechanism-representation-title",
-        "mechanism-compiler-title",
-        "mechanism-adapters-title",
         "mechanism-operations-title",
         "mechanism-validation-title",
     )
@@ -1080,21 +1092,17 @@ def test_homepage_presents_a_verified_plugin_tool_ecosystem() -> None:
     execution_group = catalog.split('id="mechanism-execution-title"', 1)[1].split(
         'id="mechanism-representation-title"', 1
     )[0]
-    adapter_group = catalog.split('id="mechanism-adapters-title"', 1)[1].split(
-        'id="mechanism-operations-title"', 1
-    )[0]
     assert "vllm-hust-bidkv" in control_group
     assert "vllm-ascend-hust-diffspec" in execution_group
     assert "vllm-ascend-hust-LatchMoE" in execution_group
-    assert "vllm-ascend-hust" in adapter_group
-    assert "vllm-metal-hust" in adapter_group
-    assert '<span class="runtime-tag">plugin</span>' not in adapter_group
-    compiler_group = catalog.split('id="mechanism-compiler-title"', 1)[1].split(
-        'id="mechanism-adapters-title"', 1
-    )[0]
-    assert "triton-ascend-hust" in compiler_group
-    assert "integration branch" in compiler_group
-    assert '<span class="runtime-tag">plugin</span>' not in compiler_group
+    mechanisms = catalog.split('id="mechanism-control-title"', 1)[1]
+    for fork in (
+        "vllm-ascend-hust",
+        "vllm-metal-hust",
+        "triton-ascend-hust",
+        "sglang-hust",
+    ):
+        assert f'href="https://github.com/vLLM-HUST/{fork}"' not in mechanisms
 
     for internal_phrase in (
         "讲述口径",
