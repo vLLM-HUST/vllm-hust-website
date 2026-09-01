@@ -110,6 +110,53 @@ vllm-hust-ext extension configure org.vllm-hust.diffspec --file diffspec.json
 vllm-hust-ext extension check org.vllm-hust.diffspec
 vllm-hust-ext extension enable org.vllm-hust.diffspec
 vllm-hust-ext run -- vllm serve /path/to/target-model`
+    },
+    latchmoe: {
+      title_en: "Install and start LatchMoE",
+      title_zh: "安装并启动 LatchMoE",
+      note_en: "Requires the pinned vLLM 0.21 and hook-enabled vLLM Ascend HUST stack; one NPU, max-num-seqs 1, prefix cache off.",
+      note_zh: "需要固定 vLLM 0.21 与带 hook 的 vLLM Ascend HUST；单 NPU、max-num-seqs=1、关闭 prefix cache。",
+      command: `pip install vllm-hust-ext
+pip install git+https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE.git
+latchmoe check
+latchmoe serve /path/to/model`
+    },
+    "pegaflow-vllm-connectors": {
+      title_en: "Configure the PegaFlow connector",
+      title_zh: "配置 PegaFlow Connector",
+      action_en: "configuration commands",
+      action_zh: "配置命令",
+      note_en: "PegaFlow is operated separately; the Manager checks health and never starts, stops, or clears the service.",
+      note_zh: "PegaFlow 服务由外部单独运维；Manager 只检查健康状态，不启动、停止或清空服务。",
+      command: `pip install vllm-hust-ext
+pip install "git+https://github.com/vLLM-HUST/pegaflow-hust.git#subdirectory=extension-provider"
+vllm-hust-ext extension configure org.vllm-hust.pegaflow --file pegaflow.json
+vllm-hust-ext extension check org.vllm-hust.pegaflow
+vllm-hust-ext extension plan org.vllm-hust.pegaflow`
+    },
+    "ascend-adaptive-quantized-kv": {
+      title_en: "Install and inspect Adaptive Quantized KV",
+      title_zh: "安装并检查 Adaptive Quantized KV",
+      action_en: "inspection commands",
+      action_zh: "检查命令",
+      note_en: "Import-only descriptor: inspection is supported, enablement is intentionally refused.",
+      note_zh: "当前为 import-only 描述包：支持检查，明确拒绝启用。",
+      command: `pip install vllm-hust-ext
+pip install git+https://github.com/vLLM-HUST/vllm-ascend-adaptive-quantized-kv-hust.git
+vllm-hust-ext extension inspect org.vllm-hust.ascend-adaptive-quantized-kv
+vllm-hust-ext extension check org.vllm-hust.ascend-adaptive-quantized-kv`
+    },
+    "ascend-quant-runtime-descriptor": {
+      title_en: "Install and inspect Ascend Quant Runtime",
+      title_zh: "安装并检查 Ascend Quant Runtime",
+      action_en: "inspection commands",
+      action_zh: "检查命令",
+      note_en: "Import-only validator: no model loading, kernel selection, or runtime activation.",
+      note_zh: "当前为 import-only 校验器：不加载模型、不选择内核、不激活运行时。",
+      command: `pip install vllm-hust-ext
+pip install "git+https://github.com/vLLM-HUST/vllm-ascend-quant-hust.git#subdirectory=runtime-extension"
+vllm-hust-ext extension inspect org.vllm-hust.ascend-quant-runtime
+vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     }
   };
 
@@ -149,10 +196,10 @@ vllm-hust-ext run -- vllm serve /path/to/target-model`
     const tooltip = element("div", "plugin-launch-tooltip");
     const tooltipId = `plugin-launch-${item.id}`;
     trigger.type = "button";
-    trigger.setAttribute(
-      "aria-label",
-      language() === "zh" ? `${item.name} 启动命令` : `${item.name} launch command`
+    const action = local(value, "action") || (
+      language() === "zh" ? "启动命令" : "launch command"
     );
+    trigger.setAttribute("aria-label", `${item.name} ${action}`);
     trigger.setAttribute("aria-describedby", tooltipId);
     trigger.setAttribute("aria-expanded", "false");
     tooltip.id = tooltipId;
