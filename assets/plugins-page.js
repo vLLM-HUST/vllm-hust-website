@@ -3,17 +3,19 @@
   const status = document.querySelector("[data-plugin-status]");
   const filters = document.querySelector("[data-plugin-filters]");
   const search = document.querySelector("[data-plugin-search]");
-  const workloadFilter = document.querySelector("[data-plugin-workload-filter]");
   const more = document.querySelector("[data-plugin-more]");
+  const workloadNavigationRoot = document.querySelector("[data-workload-navigation]");
+  const workloadFilters = document.querySelector("[data-workload-filters]");
+  const workloadDescription = document.querySelector("[data-workload-description]");
   const adjacent = document.querySelector("[data-adjacent-assets]");
   const repositoryCatalog = document.querySelector("[data-repository-portfolio]");
   const repositoryStatus = document.querySelector("[data-repository-status]");
-  if (!catalog || !status || !filters || !search || !workloadFilter) return;
+  if (!catalog || !status || !filters || !search) return;
 
   let registry;
   let portfolio;
   let workshopMetadata = {};
-  let workloadNavigation = { workloads: [], plugins: {} };
+  let workloadNavigation = { traits: {}, plugins: {} };
   let selectedType = "extensions";
   let selectedWorkload = "all";
   let expanded = false;
@@ -53,10 +55,6 @@
     advisorUnknown: "规范元数据尚未记录指导关系",
     externalAdvisor: "校外指导",
     externalContributor: "项目外援",
-    workload: "Workload",
-    allWorkloads: "全部 Workload",
-    notInstallable: "尚不可安装",
-    notInstallableReason: "仓库未发布 package、manifest 或可靠安装路径。",
     stars: "Stars",
     pullRequests: "开放 PR",
     forks: "Forks",
@@ -68,7 +66,10 @@
     python: "Python",
     requirements: "前置条件",
     followup: "负责人跟进 Issue",
-    details: "技术详情",
+    details: "兼容性与技术详情",
+    allWorkloads: "全部 Workload",
+    workloadTraits: "适用 Workload",
+    allWorkloadDescription: "展示所有公开 MOD；再结合兼容状态与公开效果判断是否适合生产使用。",
     installRun: "安装 / 启动",
     boundaries: "关键边界",
     repositories: "个组织仓库",
@@ -105,10 +106,6 @@
     advisorUnknown: "No advisor relationship is recorded in canonical metadata",
     externalAdvisor: "External advisor",
     externalContributor: "External contributor",
-    workload: "Workload",
-    allWorkloads: "All workloads",
-    notInstallable: "Not installable yet",
-    notInstallableReason: "The repository publishes no package, manifest, or reliable installation path.",
     stars: "Stars",
     pullRequests: "Open PRs",
     forks: "Forks",
@@ -120,7 +117,10 @@
     python: "Python",
     requirements: "Requirements",
     followup: "Owner follow-up issue",
-    details: "Technical details",
+    details: "Compatibility & technical details",
+    allWorkloads: "All workloads",
+    workloadTraits: "Workload fit",
+    allWorkloadDescription: "Show every public MOD; use compatibility status and public results before considering production use.",
     installRun: "Install / run",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
@@ -294,35 +294,108 @@ vllm serve /path/to/model \\
         selectedType = type;
         expanded = false;
         renderFilters();
+        renderWorkloadNavigation();
         renderCatalog();
       });
       filters.append(button);
     });
   }
 
-  const workloadDefinition = (workloadId) => (
-    workloadNavigation.workloads.find((item) => item.id === workloadId)
-  );
-  const workloadLabel = (workloadId) => {
-    const definition = workloadDefinition(workloadId);
-    return definition ? local(definition, "label") : valueLabel(workloadId);
-  };
-
-  function renderWorkloadFilter() {
-    workloadFilter.replaceChildren();
-    const all = element("option", "", copy().allWorkloads);
-    all.value = "all";
-    workloadFilter.append(all);
-    workloadNavigation.workloads.forEach((workload) => {
-      const option = element("option", "", local(workload, "label"));
-      option.value = workload.id;
-      workloadFilter.append(option);
-    });
-    workloadFilter.value = selectedWorkload;
-  }
-
   function badge(text, className = "") {
     return element("span", `plugin-badge ${className}`.trim(), text);
+  }
+
+  function traitProfile(traitId) {
+    return workloadNavigation.traits[traitId] || {};
+  }
+
+  function traitLabel(traitId) {
+    const profile = traitProfile(traitId);
+    return local(profile, "label") || valueLabel(traitId);
+  }
+
+  function matchesSelectedType(item) {
+    const statusValue = item.compatibility?.status || "source_scaffold";
+    return selectedType === "extensions"
+      || (selectedType === "installable" && ["ready", "verified", "experimental"].includes(statusValue))
+      || (selectedType === "incubating" && !["ready", "verified", "experimental"].includes(statusValue));
+  }
+
+  function itemSearchText(item) {
+    const workloadText = (workloadNavigation.plugins[item.id] || []).flatMap((traitId) => {
+      const profile = traitProfile(traitId);
+      return [traitId, profile.label_en, profile.label_zh, profile.description_en, profile.description_zh];
+    });
+    const metadata = workshopMetadata[item.id] || {};
+    const peopleText = [
+      ...(metadata.maintainers || []).flatMap((person) => [person.name, person.login]),
+      ...(metadata.advisors || []).flatMap((advisor) => [
+        advisor.name_en, advisor.name_zh, advisor.affiliation_en, advisor.affiliation_zh
+      ])
+    ].filter(Boolean);
+    return [
+      item.id, item.name, item.name_en, item.name_zh, local(item, "summary"), item.artifact_type,
+      item.system_role, item.delivery_model, item.ownership, item.maturity,
+      item.repository_relationship, item.evidence_level, item.execution_planes.join(" "),
+      item.integration_contracts.join(" "), (item.integration_surfaces || []).join(" "),
+      item.canonical_repository || "", item.upstream_repository || "", ...workloadText, ...peopleText
+    ].join(" ").toLowerCase();
+  }
+
+  function renderWorkloadNavigation() {
+    if (!workloadFilters || !workloadDescription || !registry) return;
+    workloadFilters.replaceChildren();
+    const options = ["all", ...Object.keys(workloadNavigation.traits)];
+    const query = search.value.trim().toLowerCase();
+    options.forEach((traitId) => {
+      const isAll = traitId === "all";
+      const count = registry.components.filter((item) => (
+        isWorkshopMod(item)
+        && matchesSelectedType(item)
+        && itemSearchText(item).includes(query)
+        && (isAll || (workloadNavigation.plugins[item.id] || []).includes(traitId))
+      )).length;
+      const button = element(
+        "button",
+        `workload-filter${selectedWorkload === traitId ? " active" : ""}`
+      );
+      button.type = "button";
+      button.dataset.workload = traitId;
+      button.setAttribute("aria-pressed", String(selectedWorkload === traitId));
+      button.append(
+        element("span", "", isAll ? copy().allWorkloads : traitLabel(traitId)),
+        element("strong", "", String(count))
+      );
+      button.addEventListener("click", () => {
+        selectedWorkload = traitId;
+        expanded = false;
+        renderWorkloadNavigation();
+        renderCatalog();
+      });
+      workloadFilters.append(button);
+    });
+    workloadDescription.textContent = selectedWorkload === "all"
+      ? copy().allWorkloadDescription
+      : local(traitProfile(selectedWorkload), "description");
+  }
+
+  function workloadTags(item) {
+    const traits = workloadNavigation.plugins[item.id] || [];
+    if (!traits.length) return null;
+    const panel = element("div", "plugin-workload-tags");
+    panel.append(element("span", "plugin-workload-label", copy().workloadTraits));
+    traits.forEach((traitId) => {
+      const tag = element("button", "plugin-workload-tag", traitLabel(traitId));
+      tag.type = "button";
+      tag.addEventListener("click", () => {
+        selectedWorkload = traitId;
+        expanded = false;
+        renderWorkloadNavigation();
+        renderCatalog();
+      });
+      panel.append(tag);
+    });
+    return panel;
   }
 
   function quickStart(item) {
@@ -471,8 +544,7 @@ vllm-hust-ext extension check ${extensionId}`
     [
       [copy().host, profile.host],
       [copy().versions, profile.versions?.join(" · ")],
-      [copy().platforms, profile.platforms?.join(" · ")],
-      ...(profile.python?.length ? [[copy().python, profile.python.join(" · ")]] : [])
+      [copy().platforms, profile.platforms?.join(" · ")]
     ].filter(([, value]) => value).forEach(([label, value]) => {
       const row = element("div");
       row.append(element("dt", "", label), element("dd", "", value));
@@ -495,6 +567,35 @@ vllm-hust-ext extension check ${extensionId}`
     return panel;
   }
 
+  function compatibilityDetails(item) {
+    const profile = item.compatibility;
+    if (!profile) return null;
+    const block = element("section", "plugin-compatibility-details");
+    const facts = element("dl", "plugin-component-facts compatibility-detail-facts");
+    [
+      ...(profile.python?.length ? [[copy().python, profile.python.join(" · ")]] : []),
+      [copy().requirements, local(profile, "requirements")]
+    ].filter(([, value]) => value).forEach(([label, value]) => {
+      const row = element("div");
+      row.append(element("dt", "", label), element("dd", "", value));
+      facts.append(row);
+    });
+    if (!facts.children.length) return null;
+    block.append(facts);
+    return block;
+  }
+
+  function coverTone(item) {
+    const role = `${item.id || ""} ${item.system_role || ""}`;
+    if (/observ|telemetry|metric|trace/.test(role)) return "sky";
+    if (/moe|expert|operator/.test(role)) return "forest";
+    if (/quant|spars|compress|activation/.test(role)) return "violet";
+    if (/spec|decod/.test(role)) return "indigo";
+    if (/scheduler|qos|prefill|batch/.test(role)) return "ember";
+    if (/kv|cache|transfer|offload/.test(role)) return "lagoon";
+    return "graphite";
+  }
+
   function publicEffectPanel(item) {
     const result = local(item, "public_effect");
     if (!result || !item.public_effect_status || !item.public_effect_url) return null;
@@ -515,18 +616,6 @@ vllm-hust-ext extension check ${extensionId}`
     return panel;
   }
 
-  function workloadPanel(item) {
-    const workloadIds = workloadNavigation.plugins[item.id] || [];
-    const panel = element("section", "plugin-workloads");
-    panel.append(element("span", "plugin-interface-label", copy().workload));
-    const tags = element("div", "plugin-workload-tags");
-    workloadIds.forEach((workloadId) => {
-      tags.append(badge(workloadLabel(workloadId), "workload-tag"));
-    });
-    panel.append(tags);
-    return panel;
-  }
-
   function installationStatus(item) {
     if (item.compatibility?.status !== "source_scaffold") return null;
     const panel = element("section", "plugin-install-state unavailable");
@@ -541,7 +630,7 @@ vllm-hust-ext extension check ${extensionId}`
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
     const card = element(
       "article",
-      `plugin-card workshop-card workshop-${item.artifact_type}${isUpstreamFork ? " upstream-fork-card" : ""}`
+      `plugin-card workshop-card workshop-${item.artifact_type} workshop-tone-${coverTone(item)}${isUpstreamFork ? " upstream-fork-card" : ""}`
     );
     const cover = element("div", "workshop-cover");
     const displayName = local(item, "name");
@@ -563,7 +652,8 @@ vllm-hust-ext extension check ${extensionId}`
     top.append(badges);
 
     card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", local(item, "summary")));
-    card.append(workloadPanel(item));
+    const traits = workloadTags(item);
+    if (traits) card.append(traits);
     const publicEffect = publicEffectPanel(item);
     if (publicEffect) card.append(publicEffect);
     const community = communityPanel(item);
@@ -575,6 +665,8 @@ vllm-hust-ext extension check ${extensionId}`
     const details = element("details", "plugin-technical-details");
     details.append(element("summary", "", copy().details));
     const detailBody = element("div", "plugin-technical-body");
+    const compatibilityDetailsBlock = compatibilityDetails(item);
+    if (compatibilityDetailsBlock) detailBody.append(compatibilityDetailsBlock);
     const facts = element("dl", "plugin-component-facts");
     [
       [copy().planes, item.execution_planes.map(valueLabel).join(" · ")],
@@ -721,44 +813,20 @@ vllm-hust-ext extension check ${extensionId}`
   function renderCatalog() {
     const query = search.value.trim().toLowerCase();
     const visible = registry.components.filter((item) => {
-      const workloadIds = workloadNavigation.plugins[item.id] || [];
-      const metadata = workshopMetadata[item.id] || {};
-      const peopleText = [
-        ...(metadata.maintainers || []).flatMap((person) => [person.name, person.login]),
-        ...(metadata.advisors || []).flatMap((advisor) => [
-          advisor.name_en,
-          advisor.name_zh,
-          advisor.affiliation_en,
-          advisor.affiliation_zh
-        ])
-      ].filter(Boolean).join(" ");
-      const text = [
-        item.id, item.name, local(item, "name"), local(item, "summary"), item.artifact_type,
-        item.system_role, item.delivery_model, item.ownership, item.maturity,
-        item.repository_relationship,
-        item.evidence_level, item.execution_planes.join(" "),
-        item.integration_contracts.join(" "),
-        (item.integration_surfaces || []).join(" "),
-        item.canonical_repository || "", item.upstream_repository || "",
-        workloadIds.join(" "), workloadIds.map(workloadLabel).join(" "), peopleText
-      ].join(" ").toLowerCase();
-      const status = item.compatibility?.status || "source_scaffold";
-      const matchesType = selectedType === "extensions"
-        || (selectedType === "installable" && ["ready", "verified", "experimental"].includes(status))
-        || (selectedType === "incubating" && !["ready", "verified", "experimental"].includes(status));
-      const matchesWorkload = selectedWorkload === "all" || workloadIds.includes(selectedWorkload);
-      return isWorkshopMod(item) && matchesType && matchesWorkload && text.includes(query);
+      const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
+      const matchesWorkload = selectedWorkload === "all" || itemWorkloadTraits.includes(selectedWorkload);
+      return isWorkshopMod(item) && matchesSelectedType(item) && matchesWorkload && itemSearchText(item).includes(query);
     });
 
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
     visible.sort((left, right) => {
       const leftRank = priority[left.compatibility?.status] ?? 6;
       const rightRank = priority[right.compatibility?.status] ?? 6;
-      return leftRank - rightRank || local(left, "name").localeCompare(local(right, "name"));
+      return leftRank - rightRank || left.name.localeCompare(right.name);
     });
     catalog.replaceChildren();
     const grid = element("section", "plugin-grid workshop-grid");
-    const visibleLimit = pageSize;
+    const visibleLimit = window.matchMedia("(max-width: 680px)").matches ? 6 : pageSize;
     const displayed = query || expanded ? visible : visible.slice(0, visibleLimit);
     displayed.forEach((item) => grid.append(renderCard(item)));
     catalog.append(grid);
@@ -770,13 +838,11 @@ vllm-hust-ext extension check ${extensionId}`
   }
 
   search.addEventListener("input", () => {
-    if (registry) renderCatalog();
+    if (registry) {
+      renderWorkloadNavigation();
+      renderCatalog();
+    }
     renderPortfolio();
-  });
-  workloadFilter.addEventListener("change", () => {
-    selectedWorkload = workloadFilter.value;
-    expanded = false;
-    if (registry) renderCatalog();
   });
   more?.addEventListener("click", () => {
     expanded = true;
@@ -788,7 +854,6 @@ vllm-hust-ext extension check ${extensionId}`
       "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
       "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
       "plugins-lede": zh ? "只展示独立维护的 vLLM-HUST MOD，并按宿主版本、平台和成熟度选择。" : "Independent vLLM-HUST MODs, organized by host version, platform, and readiness.",
-      "plugins-workload-label": zh ? "Workload" : "Workload",
       "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
       "plugins-fact-runtime": zh ? "个已支持" : "supported"
     };
@@ -809,31 +874,26 @@ vllm-hust-ext extension check ${extensionId}`
       if (!response.ok) throw new Error(`Workshop metadata request failed: ${response.status}`);
       return response.json();
     }),
-    fetch(catalog.dataset.workloads).then((response) => {
+    fetch(workloadNavigationRoot.dataset.source).then((response) => {
       if (!response.ok) throw new Error(`Workload navigation request failed: ${response.status}`);
       return response.json();
     })
   ])
-    .then(([payload, metadata, workloads]) => {
+    .then(([payload, metadata, navigation]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
       if (metadata.schema_version !== "plugin-workshop-metadata/v1" || !metadata.plugins) {
         throw new Error("unsupported Workshop metadata");
       }
-      if (
-        workloads.schema_version !== "plugin-workload-navigation/v1"
-        || !Array.isArray(workloads.workloads)
-        || !workloads.plugins
-      ) {
+      if (navigation.schema_version !== "plugin-workload-navigation/v1" || !navigation.traits || !navigation.plugins) {
         throw new Error("unsupported workload navigation");
       }
       registry = payload;
       workshopMetadata = metadata.plugins;
-      workloadNavigation = workloads;
+      workloadNavigation = navigation;
       renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
-      renderWorkloadFilter();
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
       const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
       const incubating = payload.components.filter((item) => ["concept", "incubating", "experimental"].includes(item.maturity)).length;
@@ -844,6 +904,7 @@ vllm-hust-ext extension check ${extensionId}`
       document.querySelectorAll("[data-publication-count]").forEach((node) => { node.textContent = String(evidence).padStart(2, "0"); });
       document.querySelectorAll("[data-adjacent-count]").forEach((node) => { node.textContent = String(external).padStart(2, "0"); });
       renderFilters();
+      renderWorkloadNavigation();
       renderCatalog();
       renderBoundaries();
     })
@@ -885,7 +946,7 @@ vllm-hust-ext extension check ${extensionId}`
     if (!registry) return;
     search.placeholder = copy().searchPlaceholder;
     renderFilters();
-    renderWorkloadFilter();
+    renderWorkloadNavigation();
     renderCatalog();
     renderBoundaries();
     renderPortfolio();

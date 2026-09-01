@@ -1,7 +1,7 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-09-01T11:54:40+00:00",
-  "source": "GitHub API + canonical ownership and verified identity data",
+  "generated_at": "2026-09-01T12:55:23+00:00",
+  "source": "GitHub API + canonical ownership and organization identity data",
   "plugins": {
     "bidkv": {
       "repository": "vLLM-HUST/vllm-hust-bidkv",
@@ -192,6 +192,11 @@
           "name_zh": "万瑶",
           "name_en": "Yao Wan",
           "relationship": "internal"
+        },
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
         }
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
@@ -247,6 +252,11 @@
         {
           "name_zh": "姚鹏程",
           "name_en": "Pengcheng Yao",
+          "relationship": "internal"
+        },
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
           "relationship": "internal"
         }
       ],

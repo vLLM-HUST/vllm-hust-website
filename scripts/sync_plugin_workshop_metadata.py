@@ -18,6 +18,7 @@ DEFAULT_REGISTRY = ROOT / "data" / "ecosystem.json"
 DEFAULT_IDENTITIES = ROOT / "data" / "core_contributors.json"
 DEFAULT_OUTPUT = ROOT / "data" / "plugin-workshop-metadata.json"
 GITHUB_API = "https://api.github.com"
+CANONICAL_PEOPLE_PATH = "/repos/vLLM-HUST/.github/contents/profile/people.json"
 WORKSHOP_DELIVERY_MODELS = {
     "plugin_bundle",
     "python_distribution",
@@ -219,12 +220,14 @@ def verified_identity_names(payload: Any) -> dict[str, str]:
         if not isinstance(value, dict):
             return
         login = value.get("github_login")
-        confirmed = value.get("identity_confirmed")
-        display_name = value.get("display_name") or value.get("chinese_name")
+        confirmed = value.get("identity_confirmed") is True or (
+            value.get("public") is True and value.get("needs_review") is False
+        )
+        display_name = value.get("chinese_name") or value.get("display_name")
         if (
             isinstance(login, str)
             and login.strip()
-            and confirmed is True
+            and confirmed
             and isinstance(display_name, str)
             and display_name.strip()
             and display_name.casefold() != login.casefold()
@@ -249,10 +252,21 @@ def verified_identity_advisors(payload: Any) -> dict[str, list[dict[str, str]]]:
             return
         login = value.get("github_login")
         advisor = value.get("advisor")
+        profiles = value.get("profiles")
+        if not isinstance(advisor, dict) and isinstance(profiles, dict):
+            vllm_hust = profiles.get("vllm_hust")
+            if isinstance(vllm_hust, dict):
+                advisor = {
+                    "zh": vllm_hust.get("advisor_zh"),
+                    "en": vllm_hust.get("advisor_en"),
+                }
+        confirmed = value.get("identity_confirmed") is True or (
+            value.get("public") is True and value.get("needs_review") is False
+        )
         if (
             isinstance(login, str)
             and login.strip()
-            and value.get("identity_confirmed") is True
+            and confirmed
             and isinstance(advisor, dict)
         ):
             name_zh = str(advisor.get("zh") or "").strip()
@@ -427,7 +441,7 @@ def build_snapshot(
         "schema_version": "plugin-workshop-metadata/v1",
         "generated_at": generated_at
         or datetime.now(UTC).replace(microsecond=0).isoformat(),
-        "source": "GitHub API + canonical ownership and verified identity data",
+        "source": "GitHub API + canonical ownership and organization identity data",
         "plugins": plugins,
     }
 
@@ -443,9 +457,16 @@ def main() -> None:
 
     registry = json.loads(args.registry.read_text(encoding="utf-8"))
     identity_payload = json.loads(args.identities.read_text(encoding="utf-8"))
-    identities = verified_identity_names(identity_payload)
-    advisors = verified_identity_advisors(identity_payload)
     client = GitHubClient(os.environ.get("GITHUB_TOKEN"))
+    people_text = client.get_text_if_present(CANONICAL_PEOPLE_PATH)
+    if people_text is None:
+        raise RuntimeError(
+            "Canonical vLLM-HUST organization people data is unavailable"
+        )
+    organization_people = json.loads(people_text)
+    identity_sources = [identity_payload, organization_people]
+    identities = verified_identity_names(identity_sources)
+    advisors = verified_identity_advisors(identity_sources)
     snapshot = build_snapshot(
         registry, client, identities=identities, identity_advisors=advisors
     )

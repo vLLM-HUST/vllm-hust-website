@@ -1,37 +1,80 @@
 {
   "schema_version": "plugin-workload-navigation/v1",
-  "updated_at": "2026-09-01",
-  "workloads": [
-    {"id": "long_context", "label_en": "Long context", "label_zh": "长上下文"},
-    {"id": "kv_pressure", "label_en": "KV pressure", "label_zh": "KV 压力"},
-    {"id": "speculative_decoding", "label_en": "Speculative decoding", "label_zh": "推测解码"},
-    {"id": "moe_inference", "label_en": "MoE inference", "label_zh": "MoE 推理"},
-    {"id": "quantized_inference", "label_en": "Quantized inference", "label_zh": "量化推理"},
-    {"id": "distributed_inference", "label_en": "Distributed inference", "label_zh": "分布式推理"},
-    {"id": "prefill", "label_en": "Prefill", "label_zh": "预填充"},
-    {"id": "latency_slo", "label_en": "Latency / SLO", "label_zh": "延迟 / SLO"},
-    {"id": "stateful_serving", "label_en": "Stateful serving", "label_zh": "有状态服务"},
-    {"id": "sparse_inference", "label_en": "Sparse inference", "label_zh": "稀疏推理"}
-  ],
+  "traits": {
+    "long_context": {
+      "label_en": "Long context",
+      "label_zh": "长上下文",
+      "description_en": "Large prompts or histories that put sustained pressure on KV capacity and movement.",
+      "description_zh": "大输入或长历史持续占用 KV 容量，并增加数据搬运压力。"
+    },
+    "prefill_heavy": {
+      "label_en": "Prefill-heavy",
+      "label_zh": "Prefill 密集",
+      "description_en": "Workloads dominated by prompt ingestion, chunking, or prefill scheduling.",
+      "description_zh": "主要瓶颈位于提示词摄入、分块或 Prefill 调度。"
+    },
+    "decode_heavy": {
+      "label_en": "Decode-heavy",
+      "label_zh": "Decode 密集",
+      "description_en": "Long generation or compute-heavy decoding paths.",
+      "description_zh": "长输出或 Decode 阶段计算占比较高。"
+    },
+    "high_concurrency": {
+      "label_en": "High concurrency",
+      "label_zh": "高并发",
+      "description_en": "Many simultaneous requests competing for scheduler and execution resources.",
+      "description_zh": "大量并发请求竞争调度与执行资源。"
+    },
+    "latency_slo": {
+      "label_en": "Latency / SLO",
+      "label_zh": "时延 / SLO",
+      "description_en": "Interactive or multi-tenant serving constrained by TTFT, TBT, or end-to-end deadlines.",
+      "description_zh": "受 TTFT、TBT 或端到端 deadline 约束的交互式、多租户服务。"
+    },
+    "repeated_prefix_agent": {
+      "label_en": "Repeated prefix / Agent",
+      "label_zh": "重复前缀 / Agent",
+      "description_en": "Repeated prompts, reusable state, or multi-step agent sessions.",
+      "description_zh": "存在重复提示、可复用状态或多步 Agent 会话。"
+    },
+    "memory_kv_pressure": {
+      "label_en": "Memory / KV pressure",
+      "label_zh": "显存 / KV 压力",
+      "description_en": "KV capacity, residency, compression, quantization, or offload is the limiting factor.",
+      "description_zh": "KV 容量、驻留、压缩、量化或卸载成为主要限制。"
+    },
+    "moe": {
+      "label_en": "MoE",
+      "label_zh": "MoE",
+      "description_en": "Expert models constrained by expert placement, transfer, or offload.",
+      "description_zh": "受专家放置、搬运或卸载限制的 MoE 模型。"
+    },
+    "distributed_pipeline": {
+      "label_en": "Distributed / Pipeline",
+      "label_zh": "分布式 / 流水线",
+      "description_en": "Cross-device communication, pipeline scheduling, or transferred KV state.",
+      "description_zh": "涉及跨设备通信、流水线调度或 KV 状态传输。"
+    }
+  },
   "plugins": {
-    "bidkv": ["kv_pressure", "latency_slo"],
-    "diffspec": ["speculative_decoding", "long_context"],
-    "latchmoe": ["moe_inference"],
-    "ascend-quant-runtime-descriptor": ["quantized_inference"],
-    "kvcompress-ascend": ["long_context", "kv_pressure"],
-    "kv-tiering-migration": ["long_context", "kv_pressure", "stateful_serving"],
-    "knorm-migration": ["long_context", "kv_pressure"],
-    "pyramidkv-ascend-migration": ["long_context", "kv_pressure"],
-    "quantized-kv-cache-migration": ["quantized_inference", "long_context"],
-    "simllm-migration": ["stateful_serving"],
-    "unified-communication-migration": ["distributed_inference"],
-    "split-batch-full-graph-migration": ["distributed_inference", "latency_slo"],
-    "kv-transfer-observability-migration": ["distributed_inference", "stateful_serving"],
-    "layered-prefill-migration": ["prefill", "long_context"],
-    "activation-sparsity-migration": ["sparse_inference"],
-    "pipeline-microbatch-migration": ["distributed_inference", "latency_slo"],
-    "qos-scheduler-migration": ["latency_slo"],
-    "mapped-host-kv-offload": ["kv_pressure", "stateful_serving"],
-    "stateharbor": ["stateful_serving", "distributed_inference"]
+    "bidkv": ["memory_kv_pressure", "high_concurrency"],
+    "diffspec": ["decode_heavy", "latency_slo"],
+    "latchmoe": ["moe", "memory_kv_pressure"],
+    "ascend-quant-runtime-descriptor": ["memory_kv_pressure"],
+    "kvcompress-ascend": ["long_context", "memory_kv_pressure"],
+    "kv-tiering-migration": ["long_context", "memory_kv_pressure"],
+    "knorm-migration": ["long_context", "memory_kv_pressure"],
+    "pyramidkv-ascend-migration": ["long_context", "memory_kv_pressure"],
+    "quantized-kv-cache-migration": ["long_context", "memory_kv_pressure"],
+    "simllm-migration": ["repeated_prefix_agent"],
+    "unified-communication-migration": ["distributed_pipeline", "high_concurrency"],
+    "split-batch-full-graph-migration": ["high_concurrency", "prefill_heavy", "decode_heavy"],
+    "kv-transfer-observability-migration": ["distributed_pipeline"],
+    "layered-prefill-migration": ["prefill_heavy", "long_context"],
+    "activation-sparsity-migration": ["decode_heavy"],
+    "pipeline-microbatch-migration": ["distributed_pipeline", "high_concurrency"],
+    "qos-scheduler-migration": ["latency_slo", "high_concurrency"],
+    "mapped-host-kv-offload": ["long_context", "memory_kv_pressure"],
+    "stateharbor": ["repeated_prefix_agent"]
   }
 }

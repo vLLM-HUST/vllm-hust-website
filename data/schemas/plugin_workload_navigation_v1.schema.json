@@ -3,20 +3,20 @@
   "$id": "https://vllm-hust.sage.org.ai/data/schemas/plugin_workload_navigation_v1.schema.json",
   "title": "Plugin Workload navigation v1",
   "type": "object",
-  "required": ["schema_version", "updated_at", "workloads", "plugins"],
+  "required": ["schema_version", "traits", "plugins"],
   "properties": {
     "schema_version": {"const": "plugin-workload-navigation/v1"},
-    "updated_at": {"type": "string", "format": "date"},
-    "workloads": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
+    "traits": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
         "type": "object",
-        "required": ["id", "label_en", "label_zh"],
+        "required": ["label_en", "label_zh", "description_en", "description_zh"],
         "properties": {
-          "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
           "label_en": {"type": "string", "minLength": 1},
-          "label_zh": {"type": "string", "minLength": 1}
+          "label_zh": {"type": "string", "minLength": 1},
+          "description_en": {"type": "string", "minLength": 1},
+          "description_zh": {"type": "string", "minLength": 1}
         },
         "additionalProperties": false
       }

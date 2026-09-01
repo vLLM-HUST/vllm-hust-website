@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826">
 <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901">
-<link rel="stylesheet" href="./assets/plugins.css?v=workshop-v6-metadata-20260901">
+<link rel="stylesheet" href="./assets/plugins.css?v=workshop-v8-metadata-issues-20260901">
 </head>
 <body data-page="plugins">
   <nav class="site-nav">
@@ -916,15 +916,22 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 </label>
 <div data-plugin-filters>
 </div>
-<label class="plugin-workload-filter">
-<span id="plugins-workload-label">Workload</span>
-<select data-plugin-workload-filter aria-labelledby="plugins-workload-label"></select>
-</label>
 </section>
     <p class="workshop-scope-note">
       <span class="lang-en">Only independent vLLM-HUST extension repositories appear here. System forks, official connectors, external services, and control planes are not MODs.</span>
       <span class="lang-zh">这里只展示 vLLM-HUST 独立扩展仓库。系统分支、官方 Connector、外部服务和 Control Plane 都不是 MOD。</span>
     </p>
+    <section class="workload-navigation" data-workload-navigation data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v1" aria-labelledby="workload-navigation-title">
+      <header>
+        <div>
+          <span class="workload-navigation-kicker"><span class="lang-en">Find by workload</span><span class="lang-zh">按 Workload 找 MOD</span></span>
+          <h2 id="workload-navigation-title"><span class="lang-en">What does your serving workload look like?</span><span class="lang-zh">你的推理负载有什么特征？</span></h2>
+        </div>
+        <p><span class="lang-en">Choose one dominant trait. This is capability matching, not a performance guarantee.</span><span class="lang-zh">选择一个最主要的特征。这是能力匹配，不代表性能效果已经验证。</span></p>
+      </header>
+      <div class="workload-filter-list" data-workload-filters></div>
+      <p class="workload-filter-description" data-workload-description aria-live="polite"></p>
+    </section>
     <aside class="mod-catalog-guide" aria-label="Extension catalog reading guide">
       <div>
         <strong><span class="lang-en">Read it like a MOD catalog</span><span class="lang-zh">像查看 MOD 一样选择扩展</span></strong>
@@ -940,7 +947,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
       </div>
     </aside>
     <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
-    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=workshop-v6-metadata" data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v5" data-workloads="./data/plugin-workload-navigation.json?v=workload-navigation-v1">
+    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=workshop-v8-metadata-issues" data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v6">
 </div>
     <button class="plugin-more" data-plugin-more type="button" hidden>Show all extensions</button>
     <section id="repository-portfolio" class="content-panel repository-portfolio" aria-labelledby="repository-portfolio-title">
@@ -1005,7 +1012,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
   </script>
   <script src="./assets/site.js?v=nav-polish-20260826">
 </script>
-<script src="./assets/plugins-page.js?v=workshop-v6-metadata-20260901">
+<script src="./assets/plugins-page.js?v=workshop-v8-metadata-issues-20260901">
 </script>
 </body>
 </html>
