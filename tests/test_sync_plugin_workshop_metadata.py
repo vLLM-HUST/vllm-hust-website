@@ -27,7 +27,7 @@ def test_repository_slug_discards_subdirectory_paths() -> None:
     )
 
 
-def test_workshop_filter_excludes_connectors_and_systems() -> None:
+def test_workshop_filter_accepts_org_bridges_but_excludes_external_systems() -> None:
     base = {
         "artifact_type": "runtime_component",
         "repository_relationship": "organization_native",
@@ -35,7 +35,15 @@ def test_workshop_filter_excludes_connectors_and_systems() -> None:
         "canonical_repository": "https://github.com/vLLM-HUST/example-mod",
     }
     assert MODULE.is_workshop_mod(base)
-    assert not MODULE.is_workshop_mod({**base, "artifact_type": "bridge"})
+    assert MODULE.is_workshop_mod({**base, "artifact_type": "bridge"})
+    assert not MODULE.is_workshop_mod(
+        {
+            **base,
+            "artifact_type": "bridge",
+            "repository_relationship": "official_upstream",
+        }
+    )
+    assert not MODULE.is_workshop_mod({**base, "artifact_type": "external_system"})
     assert not MODULE.is_workshop_mod({**base, "public_surface": False})
     assert not MODULE.is_workshop_mod(
         {**base, "canonical_repository": "https://github.com/vllm-project/vllm"}
