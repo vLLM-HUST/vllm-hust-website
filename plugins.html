@@ -623,13 +623,13 @@ vllm-hust-ext run -- vllm serve MODEL
 <span class="lang-en">The former single Python Bundle v1 design is frozen as an unstable experiment.
 Manifest 0.2 distinguishes kind, host, runtime, lifecycle owner, required services, compatibility ranges, and Python/service/OCI/Helm/Kubernetes carriers.
 MooncakeStoreConnector has passed a real Ascend save/load and outage/recovery gate.
-Production Stack has passed controller reconciliation, metrics-backed scaling, and a real GLM Router 500-to-200 recovery without restarting vLLM. Its arm64 carrier was published by GitHub-hosted runners and pulled on host 91; amd64 and self-hosted infrastructure are not required.
-BidKV's same-hash clean carrier/wheel gate passed on both hosts 91 and 112, while the upstream scheduler contract and remaining cross-version matrix are still open, so no alpha or stable-v1 claim is made.</span>
+Production Stack has passed controller reconciliation, metrics-backed scaling, and a real GLM Router 500-to-200 recovery without restarting vLLM. Its arm64 carrier was published by GitHub-hosted runners, then pulled and entrypoint-tested in an arm64 validation environment; amd64 and self-hosted infrastructure are not required.
+BidKV's same-hash clean carrier/wheel gate passed in two independent Ascend validation environments, while the upstream scheduler contract and remaining cross-version matrix are still open, so no alpha or stable-v1 claim is made.</span>
 <span class="lang-zh">原单一 Python Bundle v1 设计已冻结为不稳定实验。
 Manifest 0.2 显式区分 kind、host、runtime、lifecycle owner、required services、兼容范围以及 Python/service/OCI/Helm/Kubernetes 载体。
 MooncakeStoreConnector 已通过真实 Ascend save/load 与中断/恢复门禁。
-Production Stack 已通过 controller 调谐、Metrics 扩容，以及不重启 vLLM 的真实 GLM Router 500→200 恢复；arm64 载体已由 GitHub-hosted runner 发布并在 91 拉取验收，不要求 amd64 或 self-hosted 基础设施。
-BidKV 的相同哈希干净 carrier/wheel 门禁已在 91 与 112 均通过，但稳定上游 scheduler 契约及跨版本矩阵仍未完成，因此不会发布 alpha 或宣称 v1 稳定。
+Production Stack 已通过 controller 调谐、Metrics 扩容，以及不重启 vLLM 的真实 GLM Router 500→200 恢复；arm64 载体已由 GitHub-hosted runner 发布，并在 arm64 验证环境完成拉取与入口验收，不要求 amd64 或 self-hosted 基础设施。
+BidKV 的相同哈希干净 carrier/wheel 门禁已在两个独立昇腾验证环境通过，但稳定上游 scheduler 契约及跨版本矩阵仍未完成，因此不会发布 alpha 或宣称 v1 稳定。
 </span>
 </p>
 </aside>
@@ -641,10 +641,10 @@ BidKV 的相同哈希干净 carrier/wheel 门禁已在 91 与 112 均通过，�
 </strong>
 <p>
 <span class="lang-en">The main BidKV distribution uses the typed <code>vllm.scheduler.policy.v1</code> host contract and does not register the private <code>vllm.victim_selector</code> entry point.
-A clean pushed-commit carrier/wheel run on host 91 produced three victim selections at full KV pressure, completed three 1,400-token requests, restored the built-in path after disable and restart, and removed registration on uninstall.
+A clean pushed-commit carrier/wheel run with Qwen3-0.6B produced three victim selections at full KV pressure, completed three 1,400-token requests, restored the built-in path after disable and restart, and removed registration on uninstall. An independent Qwen2.5-3B validation run reproduced the same lifecycle behavior.
 Official vLLM remains unsupported until its upstream scheduler contract is released.</span>
 <span class="lang-zh">BidKV 主发行包使用 typed <code>vllm.scheduler.policy.v1</code> 宿主契约，不注册私有 <code>vllm.victim_selector</code> entry point。
-91/Qwen3-0.6B 与 112/Qwen2.5-3B 使用相同 pushed-commit carrier/wheel，均在 KV 满载时完成三次 victim 选择和三路 1,400-token 请求，停用重启后恢复内置路径，卸载后注册消失；官方 vLLM 在上游 scheduler 契约发布前仍不支持。
+Qwen3-0.6B 与 Qwen2.5-3B 的独立验证运行使用相同 pushed-commit carrier/wheel，均在 KV 满载时完成三次 victim 选择和三路 1,400-token 请求，停用重启后恢复内置路径，卸载后注册消失；官方 vLLM 在上游 scheduler 契约发布前仍不支持。
 </span>
 </p>
 </aside>

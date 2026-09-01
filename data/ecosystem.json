@@ -53,8 +53,8 @@
       "maturity": "supported",
       "canonical_repository": "https://github.com/vLLM-HUST/production-stack-hust",
       "upstream_repository": "https://github.com/vllm-project/production-stack",
-      "summary_en": "Thin HUST fork of the upstream Kubernetes control plane, owning only the arm64 carrier and narrowly required integration fixes. Controller reconciliation, metrics-backed scaling, and real GLM Router failure/recovery are verified. Commit 7611dfa was built, smoke-tested, and published to GHCR by GitHub-hosted runners, then pulled and entrypoint-tested on arm64 host 91; amd64 is not required, and self-hosted infrastructure is not a dependency.",
-      "summary_zh": "官方 Kubernetes 控制面的 HUST 薄 fork，仅承载 arm64 发布载体和极少必要集成补丁；commit 7611dfa 已由 GitHub-hosted runner 构建、烟测并发布 GHCR，随后在 91 arm64 目标宿主完成拉取与入口验收，不要求 amd64 或 self-hosted 基础设施。",
+      "summary_en": "Thin HUST fork of the upstream Kubernetes control plane, owning only the arm64 carrier and narrowly required integration fixes. Controller reconciliation, metrics-backed scaling, and real GLM Router failure/recovery are verified. Commit 7611dfa was built, smoke-tested, and published to GHCR by GitHub-hosted runners, then pulled and entrypoint-tested in an arm64 validation environment; amd64 is not required, and self-hosted infrastructure is not a dependency.",
+      "summary_zh": "官方 Kubernetes 控制面的 HUST 薄 fork，仅承载 arm64 发布载体和极少必要集成补丁；commit 7611dfa 已由 GitHub-hosted runner 构建、烟测并发布 GHCR，随后在 arm64 验证环境完成拉取与入口验收，不要求 amd64 或 self-hosted 基础设施。",
       "evidence_level": "integration_tested"
     },
     {
@@ -246,8 +246,8 @@
       "upstream_repository": null,
       "summary_en": "Scheduler-local policy supported on vLLM-HUST 0.23; real Ascend KV-pressure selection and next-process rollback pass, while official vLLM remains unsupported.",
       "summary_zh": "scheduler 本地策略；vLLM-HUST 0.23 上的真实 Ascend KV 压力选择与下次进程回退已通过，官方 vLLM 暂不支持。",
-      "public_effect_en": "On vLLM-HUST 0.23, core contract tests plus real Qwen3-0.6B Ascend KV-pressure victim selection, request completion, disable, and next-process rollback passed on server 91; repetition from clean release artifacts remains pending.",
-      "public_effect_zh": "在 vLLM-HUST 0.23 上，core contract 测试以及真实 Qwen3-0.6B 昇腾 KV 压力 victim 选择、请求完成、禁用和下一进程回退已在 91 服务器通过；仍待使用干净发行制品复测。",
+      "public_effect_en": "On vLLM-HUST 0.23, core contract tests plus a documented Qwen3-0.6B Ascend validation run covered KV-pressure victim selection, request completion, disable, and next-process rollback; repetition from clean release artifacts remains pending.",
+      "public_effect_zh": "在 vLLM-HUST 0.23 上，core contract 测试及一组有记录的 Qwen3-0.6B 昇腾验证运行覆盖 KV 压力 victim 选择、请求完成、禁用和下一进程回退；仍待使用干净发行制品复测。",
       "public_effect_status": "validated",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-bidkv#vllm-hust-extension-manager-path",
       "compatibility": {
