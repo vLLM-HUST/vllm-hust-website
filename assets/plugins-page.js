@@ -58,7 +58,7 @@
     platforms: "平台",
     python: "Python",
     requirements: "前置条件",
-    details: "技术详情",
+    details: "兼容性与技术详情",
     installRun: "安装 / 启动",
     boundaries: "关键边界",
     repositories: "个组织仓库",
@@ -103,7 +103,7 @@
     platforms: "Platforms",
     python: "Python",
     requirements: "Requirements",
-    details: "Technical details",
+    details: "Compatibility & technical details",
     installRun: "Install / run",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
@@ -371,21 +371,43 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     [
       [copy().host, profile.host],
       [copy().versions, profile.versions?.join(" · ")],
-      [copy().platforms, profile.platforms?.join(" · ")],
-      ...(profile.python?.length ? [[copy().python, profile.python.join(" · ")]] : [])
+      [copy().platforms, profile.platforms?.join(" · ")]
     ].filter(([, value]) => value).forEach(([label, value]) => {
       const row = element("div");
       row.append(element("dt", "", label), element("dd", "", value));
       facts.append(row);
     });
     panel.append(head, facts);
-    const requirements = local(profile, "requirements");
-    if (requirements) {
-      const note = element("p", "plugin-compatibility-note");
-      note.append(element("strong", "", `${copy().requirements}: `), document.createTextNode(requirements));
-      panel.append(note);
-    }
     return panel;
+  }
+
+  function compatibilityDetails(item) {
+    const profile = item.compatibility;
+    if (!profile) return null;
+    const block = element("section", "plugin-compatibility-details");
+    const facts = element("dl", "plugin-component-facts compatibility-detail-facts");
+    [
+      ...(profile.python?.length ? [[copy().python, profile.python.join(" · ")]] : []),
+      [copy().requirements, local(profile, "requirements")]
+    ].filter(([, value]) => value).forEach(([label, value]) => {
+      const row = element("div");
+      row.append(element("dt", "", label), element("dd", "", value));
+      facts.append(row);
+    });
+    if (!facts.children.length) return null;
+    block.append(facts);
+    return block;
+  }
+
+  function coverTone(item) {
+    const role = `${item.id || ""} ${item.system_role || ""}`;
+    if (/observ|telemetry|metric|trace/.test(role)) return "sky";
+    if (/moe|expert|operator/.test(role)) return "forest";
+    if (/quant|spars|compress|activation/.test(role)) return "violet";
+    if (/spec|decod/.test(role)) return "indigo";
+    if (/scheduler|qos|prefill|batch/.test(role)) return "ember";
+    if (/kv|cache|transfer|offload/.test(role)) return "lagoon";
+    return "graphite";
   }
 
   function publicEffectPanel(item) {
@@ -412,7 +434,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
     const card = element(
       "article",
-      `plugin-card workshop-card workshop-${item.artifact_type}${isUpstreamFork ? " upstream-fork-card" : ""}`
+      `plugin-card workshop-card workshop-${item.artifact_type} workshop-tone-${coverTone(item)}${isUpstreamFork ? " upstream-fork-card" : ""}`
     );
     const cover = element("div", "workshop-cover");
     const initials = item.name.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
@@ -442,6 +464,8 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     const details = element("details", "plugin-technical-details");
     details.append(element("summary", "", copy().details));
     const detailBody = element("div", "plugin-technical-body");
+    const compatibilityDetailsBlock = compatibilityDetails(item);
+    if (compatibilityDetailsBlock) detailBody.append(compatibilityDetailsBlock);
     const facts = element("dl", "plugin-component-facts");
     [
       [copy().planes, item.execution_planes.map(valueLabel).join(" · ")],
