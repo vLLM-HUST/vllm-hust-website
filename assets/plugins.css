@@ -164,12 +164,14 @@ body[data-page="plugins"] .plugin-card h3 { margin: 26px 0 10px; color: #0c1112;
 .plugin-compatibility.compatibility-experimental { border-left-color: #d69822; background: #fff9e9; }
 .plugin-compatibility.compatibility-inspect_only { border-left-color: #7a65a8; background: #f5f1fb; }
 .plugin-compatibility.compatibility-external_service { border-left-color: #3978a8; background: #eef6fb; }
+.plugin-compatibility.compatibility-source_scaffold { border-left-color: #6f7b78; background: #f3f5f4; }
 .plugin-compatibility-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
 .plugin-compatibility-head .plugin-interface-label { flex-basis: auto; }
 .plugin-badge.compatibility-status { padding: 4px 7px; color: #fff; background: #176f72; }
 .plugin-badge.status-experimental { color: #654200; background: #f4d88c; }
 .plugin-badge.status-inspect_only { color: #fff; background: #6c5798; }
 .plugin-badge.status-external_service { color: #fff; background: #3978a8; }
+.plugin-badge.status-source_scaffold { color: #fff; background: #65716e; }
 .plugin-compatibility-facts { margin: 11px 0 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px 14px; }
 .plugin-compatibility-facts div { min-width: 0; }
 .plugin-compatibility-facts dt { color: #647370; font: 8px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: .08em; text-transform: uppercase; }

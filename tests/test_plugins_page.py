@@ -289,7 +289,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "mod-catalog-v3" in PAGE
+    assert "mod-catalog-v4" in PAGE
 
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
@@ -353,7 +353,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=readability-v11-mod-catalog" in PAGE
+    assert "plugins.css?v=readability-v12-independent-repos" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -403,7 +403,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=mod-catalog-v3"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=mod-catalog-v4"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -411,7 +411,7 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 39
+    assert len(PORTFOLIO["repositories"]) == 49
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {"extension-manager", "vllm-hust", "pegaflow-hust"} <= names
     assert "vllm-ascend" not in names
@@ -448,10 +448,40 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     ]
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v4"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v5"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
+
+
+def test_new_migration_repositories_replace_legacy_page_links() -> None:
+    expected = {
+        "vllm-ascend-quantized-kv-cache-hust": "quantized-kv-cache-migration",
+        "vllm-ascend-simllm-hust": "simllm-migration",
+        "vllm-hust-unified-comm": "unified-communication-migration",
+        "vllm-ascend-split-batch-hust": "split-batch-full-graph-migration",
+        "vllm-hust-kv-transfer-observability": "kv-transfer-observability-migration",
+        "vllm-ascend-layered-prefill-hust": "layered-prefill-migration",
+        "vllm-hust-activation-sparsity": "activation-sparsity-migration",
+        "vllm-hust-pipeline-microbatch": "pipeline-microbatch-migration",
+        "vllm-hust-qos-scheduler": "qos-scheduler-migration",
+        "vllm-hust-scheduler-policy-lab": "scheduler-policy-lab",
+    }
+    repositories = {item["name"]: item for item in PORTFOLIO["repositories"]}
+    for repository_name, component_id in expected.items():
+        repository = repositories[repository_name]
+        assert repository["url"] == f"https://github.com/vLLM-HUST/{repository_name}"
+        assert repository["component_ids"] == [component_id]
+        component = by_id(component_id)
+        assert component["canonical_repository"] == repository["url"]
+        assert component["compatibility"]["status"] == "source_scaffold"
+        assert component["maturity"] == "incubating"
+
+    assert "intellistream/vllm-hust-legacy" not in PAGE
+    assert "intellistream/vllm-ascend-hust-legacy" not in PAGE
+    assert "Host-Control Batching Plugin" not in PAGE
+    assert "Runner Extension Transport Plugin" not in PAGE
+    assert 'source_scaffold: { en: "Source scaffold", zh: "源码脚手架" }' in SCRIPT
 
 
 def test_extension_standard_covers_core_and_host_providers() -> None:
