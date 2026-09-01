@@ -58,6 +58,17 @@
       "public_surface": false
     },
     {
+      "name": "extension-manager",
+      "url": "https://github.com/vLLM-HUST/extension-manager",
+      "portfolio_domain": "development_operations",
+      "repository_role": "extension_manager",
+      "relation_to_runtime": "delegates_to_host_providers",
+      "lifecycle": "experimental",
+      "canonical_artifacts": ["vllm-hust-ext source distribution", "Manifest 0.2 parser", "Host Provider framework"],
+      "component_ids": ["vllm-hust-extension-manager"],
+      "public_surface": true
+    },
+    {
       "name": "EvoScientist",
       "url": "https://github.com/vLLM-HUST/EvoScientist",
       "portfolio_domain": "applications_research",
@@ -155,18 +166,6 @@
       "canonical_artifacts": ["Triton Ascend compiler and kernel substrate"],
       "component_ids": [],
       "public_surface": true
-    },
-    {
-      "name": "vllm-ascend",
-      "url": "https://github.com/vLLM-HUST/vllm-ascend",
-      "portfolio_domain": "runtime_platform",
-      "repository_role": "upstream_tracking_mirror",
-      "relation_to_runtime": "implements_core_contracts",
-      "lifecycle": "community",
-      "canonical_artifacts": ["upstream-tracking Ascend integration"],
-      "component_ids": [],
-      "public_surface": false,
-      "notes": "Not the canonical vLLM-HUST platform profile; retain an explicit synchronization purpose."
     },
     {
       "name": "vllm-ascend-hust",

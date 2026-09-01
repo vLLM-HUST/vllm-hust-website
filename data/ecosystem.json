@@ -35,8 +35,8 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/extension-manager",
       "upstream_repository": null,
-      "summary_en": "Provider-neutral discovery, compatibility, configuration, state, plan, render, and check layer; it does not own host runtimes.",
-      "summary_zh": "统一处理发现、兼容性、配置、状态、plan、render 与 check 的 Provider-neutral 管理层，不取得宿主运行时所有权。",
+      "summary_en": "Provider-neutral discovery, compatibility, configuration, state, plan, render, and check layer. The current source build rejects import-only descriptors and unhealthy required services; no public PyPI alpha exists yet.",
+      "summary_zh": "Provider-neutral 的发现、兼容性、配置、状态、plan、render 与 check 层。当前源码版会拒绝启用 import-only 描述包，也会阻止依赖服务不健康的新启动；尚未发布公开 PyPI alpha。",
       "evidence_level": "cpu_smoke"
     },
     {
@@ -50,7 +50,7 @@
       "delivery_model": "helm_chart",
       "ownership": "hust_maintained_external_integration",
       "repository_relationship": "upstream_sync_fork",
-      "maturity": "unsupported",
+      "maturity": "supported",
       "canonical_repository": "https://github.com/vLLM-HUST/production-stack-hust",
       "upstream_repository": "https://github.com/vllm-project/production-stack",
       "summary_en": "Thin HUST fork of the upstream Kubernetes control plane, owning only the arm64 carrier and narrowly required integration fixes. Controller reconciliation, metrics-backed scaling, and real GLM Router failure/recovery are verified. Commit 7611dfa was built, smoke-tested, and published to GHCR by GitHub-hosted runners, then pulled and entrypoint-tested on arm64 host 91; amd64 is not required, and self-hosted infrastructure is not a dependency.",

@@ -47,7 +47,7 @@ def test_registry_is_canonical_and_multidimensional() -> None:
         assert REQUIRED_FIELDS <= item.keys()
         assert item["execution_planes"]
 
-    assert by_id("vllm-production-stack")["maturity"] == "unsupported"
+    assert by_id("vllm-production-stack")["maturity"] == "supported"
 
 
 def test_legacy_migration_cards_preserve_original_ownership() -> None:
@@ -258,9 +258,16 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert "const quickStarts = {" in SCRIPT
     assert "bidkv: {" in SCRIPT
     assert "diffspec: {" in SCRIPT
-    assert "pip install vllm-hust-ext bidkv" in SCRIPT
+    assert (
+        "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+        in SCRIPT
+    )
+    assert "pip install bidkv" in SCRIPT
     assert "extension enable org.vllm-hust.bidkv" in SCRIPT
-    assert "pip install vllm-hust-ext vllm-diffspec" in SCRIPT
+    assert (
+        "vllm-diffspec @ git+https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec.git"
+        in SCRIPT
+    )
     assert "extension configure org.vllm-hust.diffspec --file diffspec.json" in SCRIPT
     assert "extension enable org.vllm-hust.diffspec" in SCRIPT
     assert "latchmoe: {" in SCRIPT
@@ -307,6 +314,17 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     ]
     assert "one NPU" in latchmoe["summary_en"]
     assert "prefix cache disabled" in latchmoe["summary_en"]
+
+
+def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
+    assert "plugins.css?v=readability-v10" in PAGE
+    assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
+    assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
+    assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
+    assert "color: #c7d4d1" in STYLES
+    assert ".plugin-interface-label" in STYLES
+    assert "font-size: 10px" in STYLES
+    assert ".plugin-card:nth-child(3n) .plugin-launch-tooltip" in STYLES
 
 
 def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
@@ -359,7 +377,8 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
     assert len(PORTFOLIO["repositories"]) == 39
     names = {item["name"] for item in PORTFOLIO["repositories"]}
-    assert {"vllm-hust", "pegaflow-hust"} <= names
+    assert {"extension-manager", "vllm-hust", "pegaflow-hust"} <= names
+    assert "vllm-ascend" not in names
     assert {
         "vllm-hust-prefix-router",
         "vllm-hust-kv-tiering",
@@ -406,7 +425,12 @@ def test_extension_standard_covers_core_and_host_providers() -> None:
     assert "former entry-point-based Plugin Standard 1.0" in PAGE
     assert "Domain contracts first; bundles second." in PAGE
     assert "先定义领域契约，再定义 bundle 交付。" in PAGE
-    assert "uv pip install vllm-hust-ext" in PAGE
+    assert (
+        'uv pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"'
+        in PAGE
+    )
+    assert "No public vllm-hust-ext PyPI alpha exists yet" in PAGE
+    assert "activation_ready=false" in PAGE
     assert "vllm-hust-ext extension enable org.example.kv-adapter" in PAGE
     assert "vllm-hust-ext extension plan org.example.kv-adapter" in PAGE
     assert "vllm-hust-ext extension check org.example.kv-adapter" in PAGE
