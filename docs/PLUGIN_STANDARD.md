@@ -20,7 +20,7 @@ Core understands static manifests and the states `installed`, `discovered`,
 Each host keeps runtime authority:
 
 - vLLM loads in-process plugins and policies;
-- Mooncake or LMCache owns its services, storage backends, and transports;
+- Mooncake owns its services, storage backends, and transports;
 - Production Stack and Kubernetes own Helm releases, CRDs, controllers,
   routers, autoscalers, OCI images, and cluster rollout;
 - Extension Manager calls Provider `plan`, `render`, and `check` operations.
@@ -85,25 +85,9 @@ vllm-hust-ext run -- vllm serve MODEL
 ```
 
 Mooncake Provider reuses `MooncakeConnector` or `MooncakeStoreConnector`.
-LMCache Provider independently renders `LMCacheMPConnector` or an explicitly
-selected official V1/dynamic connector and checks the external `/healthcheck`
-endpoint. HTTP liveness and the standalone CPU-SHM benchmark do not make the
-online MP connector healthy; that requires separate `vllm_mp_connector`
-store/hit/retrieve evidence. Production Stack Provider renders values and dry-run instructions.
+Production Stack Provider renders values and dry-run instructions.
 No Provider performs an implicit service start, Helm apply, uninstall, driver
 change, cache clear/eviction, or KV deletion.
-
-LMCache-Ascend is modeled separately as an LMCache-owned platform backend plus
-a vLLM connector adapter. It is not an external LMCache MP service. The
-`vllm-hust-lmcache-ascend-adapter` profile therefore has no required service,
-and renders either the vLLM-Ascend built-in `LMCacheAscendConnector` or the
-exact official dynamic pair
-`LMCacheAscendConnectorV1Dynamic` /
-`lmcache_ascend.integration.vllm.lmcache_ascend_connector_v1`.
-`LMCacheMPConnector` must not be paired with a fabricated Python module path.
-The Ascend profile checks vLLM-Ascend, LMCache, and LMCache-Ascend versions
-separately and accepts only `vllm_ascend_in_process` operation evidence. MP and
-Ascend evidence modes cannot satisfy each other's health gate.
 
 Mooncake detection covers the official mutually exclusive CUDA, CUDA 13,
 non-CUDA, NPU, MUSA, and EFA package variants. Multiple installed variants are
@@ -117,7 +101,7 @@ inventing a `1.0` compatibility claim.
 
 KV Providers delegate a declared `kv_transfer_config` capability to the vLLM
 launch path; dispatch is not hard-coded by Provider name. Because one vLLM
-process accepts only one such configuration, enabling Mooncake and LMCache for
+process accepts only one such configuration, enabling two connector profiles for
 the same process is a fail-closed conflict. Experimental profile packages pin
 the exact Manager development version until the compatibility contract freezes.
 
@@ -131,11 +115,8 @@ after a later reinstall.
 
 1. BidKV must complete install, discover, configure, enable, real vLLM load,
    disable, restart, and upstream fallback.
-2. Mooncake and each LMCache profile must complete connector rendering and a
-   real data path. LMCache MP additionally requires service
-   healthy/outage/recovery; LMCache-Ascend requires controlled backend
-   outage/recompute/recovery. No path may take over lifecycle or mutate cache
-   data implicitly.
+2. Mooncake must complete connector rendering and a real data path without
+   taking over lifecycle or mutating cache data implicitly.
 3. Production Stack must pass official-chart render, Kubernetes server dry-run,
    rollout checks, conflict tests, and proof of no apply/uninstall.
 4. Incompatible versions, missing required services, duplicate registrations,
@@ -206,25 +187,6 @@ and rollout states now require non-empty evidence instead of trusting bare
 booleans. A healthy claim additionally requires separate controller
 reconciliation, Router traffic, autoscaler-decision, and structured real-model
 failure/recovery evidence. A mock backend can no longer claim healthy.
-
-LMCache MP now has a real 0.5.4 acceptance result on `a100-dev`. The immutable
-official `v0.5.4-cu129` image ran without a GPU device and its official CPU-SHM
-server benchmark completed LOOKUP, STORE, warm LOOKUP, RETRIEVE, and CHECKSUM
-with two successful checksums and no failures. The Manager read compatibility
-from the remote `/lmc_version`, projected healthy → enabled/degraded → healthy
-across an operator-owned stop/restart, and then disabled/forgot only its own
-intent. It never cleared KV data or controlled the service.
-
-That result does not erase the separate 91 Ascend MP gap. The isolated LMCache
-0.4.3 MP probe there still cannot reach `/healthcheck`, and the checked
-LMCache-Ascend MP implementation leaves `NPUCacheContext` unimplemented and
-skips MP tests. A separate in-process path has since passed: on server 91 a
-pinned LMCache 0.4.3 plus LMCache-Ascend `v0.4.3-4-gc86fa99` combination used
-Qwen3-0.6B producer and consumer processes to store, hit, and retrieve all
-2,236 tokens with zero failed requests. The adapter is a four-commit CANN 9
-compatibility branch, not an unmodified upstream tag. Controlled backend
-outage/recompute/recovery, deterministic cross-process hashing, and a
-Prometheus metadata conflict remain release gates.
 
 Mooncake now also has two real, separate 0.3.12.post1 non-CUDA results on
 `a100-dev`: two official TransferEngine processes completed and verified a

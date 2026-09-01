@@ -73,12 +73,8 @@ def test_system_role_is_independent_from_delivery_model() -> None:
 def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     mooncake = by_id("mooncake")
     mooncake_connectors = by_id("mooncake-vllm-connectors")
-    lmcache = by_id("lmcache")
-    lmcache_connectors = by_id("lmcache-vllm-connectors")
     pegaflow = by_id("pegaflow")
     pegaflow_connectors = by_id("pegaflow-vllm-connectors")
-    lmcache_ascend_provider = by_id("lmcache-ascend-provider")
-    lmcache_ascend_adapter = by_id("lmcache-ascend-vllm-adapter")
 
     assert mooncake["artifact_type"] == "external_system"
     assert mooncake["maturity"] == "supported"
@@ -99,25 +95,6 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert "0.3.11.post1 Ascend transport" in mooncake["summary_en"]
     assert "9-key save/load" in mooncake_connectors["summary_en"]
     assert "outage/recovery evidence" in mooncake_connectors["summary_en"]
-    assert lmcache["system_role"] == "kv_state_manager"
-    assert lmcache["maturity"] == "unsupported"
-    assert lmcache["integration_contracts"] == []
-    assert lmcache_connectors["system_role"] == "kv_integration"
-    assert lmcache_connectors["maturity"] == "unsupported"
-    assert lmcache_connectors["integration_contracts"] == [
-        "vllm.kv_connector.scheduler.v1",
-        "vllm.kv_connector.worker.v1",
-        "vllm.kv_connector.telemetry.v1",
-    ]
-    assert lmcache_connectors["execution_planes"] == ["api", "scheduler", "worker"]
-    assert lmcache_connectors["canonical_repository"] == (
-        "https://github.com/vllm-project/vllm"
-    )
-    assert "experimental LMCache Host Provider" in lmcache_connectors["summary_en"]
-    assert "remote service version and health" in lmcache_connectors["summary_en"]
-    assert "online vLLM MP operation evidence" in lmcache_connectors["summary_en"]
-    assert "不接管 backend、KV 数据或服务生命周期" in lmcache_connectors["summary_zh"]
-    assert "CPU-SHM verified" in lmcache["summary_en"]
     assert pegaflow["ownership"] == "hust_owned_subsystem"
     assert pegaflow["integration_contracts"] == []
     assert pegaflow_connectors["integration_contracts"] == [
@@ -126,30 +103,6 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "vllm.kv_connector.telemetry.v1",
     ]
     assert pegaflow_connectors["execution_planes"] == ["api", "scheduler", "worker"]
-    assert lmcache_ascend_provider["system_role"] == "platform_backend"
-    assert lmcache_ascend_provider["artifact_type"] == "runtime_component"
-    assert lmcache_ascend_provider["maturity"] == "unsupported"
-    assert lmcache_ascend_provider["integration_contracts"] == []
-    assert lmcache_ascend_provider["integration_surfaces"] == [
-        "lmcache.storage_backend"
-    ]
-    assert lmcache_ascend_provider["evidence_level"] == "integration_tested"
-    assert "Qwen3-0.6B" in lmcache_ascend_provider["summary_en"]
-    assert lmcache_ascend_adapter["system_role"] == "kv_integration"
-    assert lmcache_ascend_adapter["artifact_type"] == "bridge"
-    assert lmcache_ascend_adapter["maturity"] == "unsupported"
-    assert lmcache_ascend_adapter["integration_contracts"] == [
-        "vllm.kv_connector.scheduler.v1",
-        "vllm.kv_connector.worker.v1",
-        "vllm.kv_connector.telemetry.v1",
-    ]
-    assert lmcache_ascend_adapter["execution_planes"] == [
-        "api",
-        "scheduler",
-        "worker",
-    ]
-    assert lmcache_ascend_adapter["evidence_level"] == "integration_tested"
-    assert "2,236 tokens" in lmcache_ascend_adapter["summary_en"]
 
     assert "KV connector" in PAGE
     assert "state system" in PAGE
@@ -258,25 +211,17 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 32
+    assert len(PORTFOLIO["repositories"]) == 31
     names = {item["name"] for item in PORTFOLIO["repositories"]}
-    assert {"vllm-hust", "pegaflow-hust", "LMCache-Ascend"} <= names
+    assert {"vllm-hust", "pegaflow-hust"} <= names
 
     pegaflow = next(
         item for item in PORTFOLIO["repositories"] if item["name"] == "pegaflow-hust"
-    )
-    lmcache_ascend = next(
-        item for item in PORTFOLIO["repositories"] if item["name"] == "LMCache-Ascend"
     )
     assert pegaflow["repository_role"] == "external_subsystem"
     assert pegaflow["component_ids"] == [
         "pegaflow",
         "pegaflow-vllm-connectors",
-    ]
-    assert lmcache_ascend["relation_to_runtime"] == "integrates_external_system"
-    assert lmcache_ascend["component_ids"] == [
-        "lmcache-ascend-provider",
-        "lmcache-ascend-vllm-adapter",
     ]
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
