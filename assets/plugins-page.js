@@ -30,6 +30,7 @@
     searchPlaceholder: "搜索系统、职责、契约、执行面或仓库",
     evidence: "证据",
     ownership: "维护",
+    maintainers: "原负责人",
     planes: "执行面",
     delivery: "交付",
     contracts: "版本化契约",
@@ -53,6 +54,7 @@
     searchPlaceholder: "Search system, role, contract, execution plane, or repository",
     evidence: "Evidence",
     ownership: "Ownership",
+    maintainers: "Original maintainers",
     planes: "Planes",
     delivery: "Delivery",
     contracts: "Versioned contracts",
@@ -206,6 +208,7 @@ vllm-hust-ext run -- vllm serve /path/to/target-model`
       [copy().planes, item.execution_planes.map(valueLabel).join(" · ")],
       [copy().delivery, valueLabel(item.delivery_model)],
       [copy().ownership, valueLabel(item.ownership)],
+      ...(item.maintainers?.length ? [[copy().maintainers, item.maintainers.map((name) => `@${name}`).join(" · ")]] : []),
       [copy().repositoryRelationship, valueLabel(item.repository_relationship)],
       [copy().evidence, valueLabel(item.evidence_level)]
     ].forEach(([label, value]) => {
