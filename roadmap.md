@@ -34,9 +34,8 @@ Observed on 2026-07-06:
   rerunning the Pages job has recovered the deployment.
 - Local `tests/test_site_structure.py` can fail on
   `test_leaderboard_data_is_benchmark_snapshot_mirror` when the sibling
-  `/home/shuhao/vllm-hust-benchmark/leaderboard-data/snapshots` tree is not synced with website
-  `data/`. GitHub CI does not hit that local-only mismatch unless the sibling benchmark checkout is
-  present.
+  `../vllm-hust-benchmark/leaderboard-data/snapshots` tree is not synced with website `data/`.
+  GitHub CI does not hit that local-only mismatch unless the sibling benchmark checkout is present.
 
 Known data and experiment issues to keep tracking:
 
@@ -179,8 +178,7 @@ Data quality and audit:
 - Keep suspect rows marked or excluded with written reasons instead of silently deleting or mixing
   incompatible specs.
 - Reconcile website `data/leaderboard_*.json` with benchmark snapshot files under
-  `/home/shuhao/vllm-hust-benchmark/leaderboard-data/snapshots` so the local mirror test can pass
-  again.
+  `../vllm-hust-benchmark/leaderboard-data/snapshots` so the local mirror test can pass again.
 
 Single-card backfill:
 
@@ -238,7 +236,7 @@ gh pr view 8958 --repo vllm-project/vllm-ascend --json mergeable,mergeStateStatu
 - After NPU capacity is available, start the engine and proxy through the project manager:
 
 ```bash
-cd /home/shuhao/sage-faculty-twin
+cd /path/to/sage-faculty-twin
 ./manage.sh start --with-vllm-engine --with-vllm-proxy
 ./manage.sh check-inference
 ```

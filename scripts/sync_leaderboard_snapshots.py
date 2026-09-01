@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import filecmp
 import json
 import shutil
 from pathlib import Path
@@ -53,6 +52,38 @@ def load_json(path: Path) -> object:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise SystemExit(f"invalid JSON: {path}: {exc}") from exc
+
+
+def sanitize_public_string(value: str) -> str:
+    """Remove workstation-specific absolute paths from published snapshots."""
+    if not value.startswith("/home/"):
+        return value
+    markers = (
+        ("/vllm-hust-benchmark/", "vllm-hust-benchmark/"),
+        ("/vllm-hust-benchmark-single-npu/", "vllm-hust-benchmark-single-npu/"),
+        ("/.cache/huggingface/hub/", "<huggingface-cache>/"),
+    )
+    for marker, replacement in markers:
+        if marker in value:
+            return replacement + value.split(marker, 1)[1]
+    if "/envs/" in value and value.endswith("/bin/python"):
+        return "<python-environment>/bin/python"
+    return f"<local-path>/{Path(value).name}"
+
+
+def sanitize_public_payload(value: object) -> object:
+    if isinstance(value, dict):
+        return {key: sanitize_public_payload(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [sanitize_public_payload(item) for item in value]
+    if isinstance(value, str):
+        return sanitize_public_string(value)
+    return value
+
+
+def render_public_snapshot(path: Path) -> bytes:
+    payload = sanitize_public_payload(load_json(path))
+    return (json.dumps(payload, indent=2, ensure_ascii=False) + "\n").encode()
 
 
 def validate_snapshot_set(source_dir: Path) -> None:
@@ -117,18 +148,19 @@ def sync_snapshots(source_dir: Path, target_dir: Path, *, check: bool) -> int:
     for name in SNAPSHOT_FILES:
         source = source_dir / name
         target = target_dir / name
-        if target.is_file() and filecmp.cmp(source, target, shallow=False):
+        rendered = render_public_snapshot(source)
+        if target.is_file() and target.read_bytes() == rendered:
             continue
         changed.append(name)
         if not check:
-            shutil.copy2(source, target)
+            target.write_bytes(rendered)
             target.chmod(0o644)
 
     registry_source_dir = get_registry_source_dir(source_dir)
     for source_name, target_name in REGISTRY_MIRROR.items():
         source = registry_source_dir / source_name
         target = target_dir / target_name
-        if target.is_file() and filecmp.cmp(source, target, shallow=False):
+        if target.is_file() and target.read_bytes() == source.read_bytes():
             continue
         changed.append(target_name)
         if not check:

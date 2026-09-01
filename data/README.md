@@ -37,8 +37,9 @@ Their Draft-07 schemas are `schemas/ecosystem_v1.schema.json`,
   `last_updated.json` files from the benchmark snapshot set.
 - Retired baseline data: `vllm 0.11.0` / `v0110` rows must not appear in the website mirror. The
   public baseline is `vllm 0.18.0` plus the matching `vllm-ascend 0.18.0` snapshot set.
-- Website `data/`: a compatibility cache for checked-in snapshots and offline development. It should
-  not be edited by hand and should not ingest raw compare directory layouts.
+- Website `data/`: a compatibility cache containing the privacy-sanitized public projection of
+  checked-in snapshots. It must not expose workstation usernames, absolute paths, raw compare
+  directory layouts, or other internal environment identifiers.
 
 ## Update Policy
 
@@ -46,7 +47,7 @@ Their Draft-07 schemas are `schemas/ecosystem_v1.schema.json`,
   `vllm-hust-benchmark/leaderboard-data/snapshots`.
 - Distribution path: upload the same benchmark snapshot files to HF.
 - Offline compatibility path: run `python scripts/sync_leaderboard_snapshots.py` from the website
-  repo to mirror benchmark snapshots into `data/`.
+  repo to sanitize benchmark snapshots into `data/` while retaining repository-relative provenance.
 - Fail-fast rule: invalid leaderboard entries or malformed manifests must be fixed at the benchmark
   export side; do not patch website data by hand.
 

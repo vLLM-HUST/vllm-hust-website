@@ -2150,17 +2150,24 @@ def write_outputs(
     multi: list[dict[str, Any]],
     compare: dict[str, Any],
 ) -> None:
+    try:
+        from scripts.sync_leaderboard_snapshots import sanitize_public_payload
+    except ModuleNotFoundError:
+        from sync_leaderboard_snapshots import sanitize_public_payload
+
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "leaderboard_single.json").write_text(
-        json.dumps(single, indent=2, ensure_ascii=False) + "\n",
+        json.dumps(sanitize_public_payload(single), indent=2, ensure_ascii=False)
+        + "\n",
         encoding="utf-8",
     )
     (output_dir / "leaderboard_multi.json").write_text(
-        json.dumps(multi, indent=2, ensure_ascii=False) + "\n",
+        json.dumps(sanitize_public_payload(multi), indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     (output_dir / "leaderboard_compare.json").write_text(
-        json.dumps(compare, indent=2, ensure_ascii=False) + "\n",
+        json.dumps(sanitize_public_payload(compare), indent=2, ensure_ascii=False)
+        + "\n",
         encoding="utf-8",
     )
     (output_dir / "last_updated.json").write_text(
