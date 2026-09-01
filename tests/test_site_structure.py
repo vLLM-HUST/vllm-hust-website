@@ -1014,7 +1014,10 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "Typed runtime contracts. Platform profiles. Composable KV state systems." in html_text
+    assert (
+        "Typed runtime contracts. Platform profiles. Composable KV state systems."
+        in html_text
+    )
     assert "类型化运行时契约、平台 profile 与可组合 KV 状态系统。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
@@ -1093,7 +1096,12 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     assert "vllm-ascend-hust-diffspec" in execution_group
     assert "vllm-ascend-hust-LatchMoE" in execution_group
     mechanisms = catalog.split('id="mechanism-control-title"', 1)[1]
-    for fork in ("vllm-ascend-hust", "vllm-metal-hust", "triton-ascend-hust", "sglang-hust"):
+    for fork in (
+        "vllm-ascend-hust",
+        "vllm-metal-hust",
+        "triton-ascend-hust",
+        "sglang-hust",
+    ):
         assert f'href="https://github.com/vLLM-HUST/{fork}"' not in mechanisms
 
     for internal_phrase in (

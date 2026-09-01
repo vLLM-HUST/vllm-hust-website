@@ -86,9 +86,7 @@ def test_upstream_synchronized_hust_forks_are_a_separate_system_class() -> None:
         "sglang-hust",
         "mooncake",
     }
-    assert {
-        item["upstream_repository"] for item in forks.values()
-    } == {
+    assert {item["upstream_repository"] for item in forks.values()} == {
         "https://github.com/vllm-project/vllm",
         "https://github.com/vllm-project/production-stack",
         "https://github.com/vllm-project/vllm-ascend",
@@ -104,7 +102,7 @@ def test_upstream_synchronized_hust_forks_are_a_separate_system_class() -> None:
     assert "Upstream-synchronized HUST forks are systems, not plugins." in PAGE
     assert "上游同步 HUST fork 是系统分支，不是插件。" in PAGE
     assert "upstream_sync_fork" in SCRIPT
-    assert "item.repository_relationship !== \"upstream_sync_fork\"" in SCRIPT
+    assert 'item.repository_relationship !== "upstream_sync_fork"' in SCRIPT
     assert "forksTitle" in SCRIPT
 
 
@@ -120,9 +118,7 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert mooncake["canonical_repository"] == (
         "https://github.com/vLLM-HUST/mooncake-hust"
     )
-    assert mooncake["upstream_repository"] == (
-        "https://github.com/kvcache-ai/Mooncake"
-    )
+    assert mooncake["upstream_repository"] == ("https://github.com/kvcache-ai/Mooncake")
     assert mooncake_connectors["artifact_type"] == "bridge"
     assert mooncake_connectors["maturity"] == "supported"
     assert mooncake_connectors["canonical_repository"] == (
@@ -168,9 +164,10 @@ def test_extension_manager_and_production_stack_keep_distinct_ownership() -> Non
     assert "metrics-backed scaling" in production_stack["summary_en"]
     assert "real GLM Router failure/recovery" in production_stack["summary_en"]
     assert "amd64 is not required" in production_stack["summary_en"]
-    assert "self-hosted infrastructure is not a dependency" in production_stack[
-        "summary_en"
-    ]
+    assert (
+        "self-hosted infrastructure is not a dependency"
+        in production_stack["summary_en"]
+    )
 
     assert manager["artifact_type"] == "tool"
     assert manager["system_role"] == "extension_management"
