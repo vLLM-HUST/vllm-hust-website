@@ -170,9 +170,9 @@ Fresh official-vLLM activation is blocked until the upstream Preemption contract
 <span class="lang-zh">面向长序列的推测执行</span>
 </h3>
 <p>
-<span class="lang-en">DiffSpec provides a public differential speculative-decoding plugin.
-The main engine also negotiates checkpoint-aware proposer capabilities and graph-shape compatibility before device allocation.</span>
-<span class="lang-zh">DiffSpec 提供公开的差分推测解码插件；主引擎还会在设备分配前协商 checkpoint 感知的 proposer 能力与图形状兼容性。
+<span class="lang-en">DiffSpec provides a managed 0.2-experimental differential speculative-decoding extension for vLLM Ascend 0.23.
+It uses the official general-plugin discovery entry point while declaring its unversioned in-process runner, attention, sampling, and device patch surfaces explicitly.</span>
+<span class="lang-zh">DiffSpec 提供面向 vLLM Ascend 0.23 的 0.2-experimental 可管理差分推测解码扩展；使用官方 general-plugin 发现入口，并明确声明未版本化的进程内 runner、attention、sampling 与设备补丁面。
 </span>
 </p>
 <div class="highlight-links">
