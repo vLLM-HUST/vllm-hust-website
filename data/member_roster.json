@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-26",
+  "updated_at": "2026-09-01",
   "source_priority": [
     "lead_confirmation_or_exit_record",
     "2026-08_weekly_report_direct_entry",
@@ -54,8 +54,13 @@
     {"name_zh": "杨杰", "github_login": "JieYang2001", "advisor_zh": "赵进", "status": "current"},
     {"name_zh": "陈湘", "github_login": "mumu029", "advisor_zh": "郑龙", "status": "current"},
     {"name_zh": "吴天宇", "github_login": "Raing5Days", "advisor_zh": "郑龙", "status": "current"},
+    {"name_zh": "李上上", "github_login": "ilnnfover", "advisor_zh": "郑龙", "status": "current"},
     {"name_zh": "李庚", "github_login": "Anjiangy", "advisor_zh": "毛言粲", "status": "current"},
     {"name_zh": "王晨", "github_login": "qingfengyuhuoda", "advisor_zh": "万瑶", "status": "current"},
+    {"name_zh": "雷翔麟", "github_login": "llxler", "advisor_zh": "万瑶", "status": "current"},
+    {"name_zh": "张家万", "github_login": "Jiawan23", "advisor_zh": "万瑶", "status": "current"},
+    {"name_zh": "郁硕", "github_login": "Yushuo-star", "advisor_zh": "王雄", "status": "current"},
+    {"name_zh": "毛潮云", "github_login": "Irisuko", "advisor_zh": "罗瑞坤", "status": "current"},
     {"name_zh": "李林浩", "github_login": "Sunshine-llh", "advisor_zh": null, "status": "former", "status_reason_zh": "考核淘汰", "status_reason_en": "Inactive after assessment"},
     {"name_zh": "宋功轩", "github_login": null, "advisor_zh": null, "status": "former", "github_status": "pending", "status_reason_zh": "已请离", "status_reason_en": "Departed"},
     {"name_zh": "余天成", "github_login": "yutiantian0115", "advisor_zh": null, "status": "former", "status_reason_zh": "已退出", "status_reason_en": "Withdrawn"}
