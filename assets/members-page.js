@@ -6,12 +6,15 @@
   const search = root.querySelector('[data-member-search]');
   const status = root.querySelector('[data-member-status]');
   const empty = root.querySelector('[data-member-empty]');
+  const more = root.querySelector('[data-member-more]');
   let members = [];
+  let expanded = false;
+  const pageSize = 24;
 
   const isChinese = () => document.documentElement.lang.toLowerCase().startsWith('zh');
   const copy = () => isChinese()
-    ? { member: '组织成员', profile: 'GitHub 公开主页', noBio: '组织成员 · 公开 GitHub 资料', visible: '位成员', noResults: '没有匹配的成员。', failed: '成员数据暂时无法加载。' }
-    : { member: 'Organization member', profile: 'Public GitHub profile', noBio: 'Organization member · public GitHub profile', visible: 'members', noResults: 'No members match this search.', failed: 'Member data is temporarily unavailable.' };
+    ? { member: '组织成员', profile: 'GitHub 公开主页', noBio: '组织成员 · 公开 GitHub 资料', visible: '位成员', more: '显示全部成员', noResults: '没有匹配的成员。', failed: '成员数据暂时无法加载。' }
+    : { member: 'Organization member', profile: 'Public GitHub profile', noBio: 'Organization member · public GitHub profile', visible: 'members', more: 'Show all members', noResults: 'No members match this search.', failed: 'Member data is temporarily unavailable.' };
 
   const card = (member) => {
     const article = document.createElement('article');
@@ -61,8 +64,14 @@
     const filtered = members.filter((member) =>
       [member.login, member.name, member.bio].join(' ').toLowerCase().includes(term)
     );
-    grid.replaceChildren(...filtered.map(card));
-    status.textContent = `${filtered.length} / ${members.length} ${copy().visible}`;
+    const visibleLimit = window.matchMedia('(max-width: 520px)').matches ? 12 : pageSize;
+    const visible = term || expanded ? filtered : filtered.slice(0, visibleLimit);
+    grid.replaceChildren(...visible.map(card));
+    status.textContent = `${visible.length} / ${filtered.length} ${copy().visible}`;
+    if (more) {
+      more.hidden = Boolean(term) || expanded || filtered.length <= visibleLimit;
+      more.textContent = `${copy().more} (${filtered.length})`;
+    }
     empty.hidden = filtered.length !== 0;
     empty.textContent = copy().noResults;
   };
@@ -85,6 +94,10 @@
     });
 
   search?.addEventListener('input', render);
+  more?.addEventListener('click', () => {
+    expanded = true;
+    render();
+  });
   window.addEventListener('vllm-hust:langchange', render);
   new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 })();

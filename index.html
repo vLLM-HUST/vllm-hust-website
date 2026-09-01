@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
-  <link rel="stylesheet" href="./assets/home.css?v=upstream-forks-20260901" />
+  <link rel="stylesheet" href="./assets/home.css?v=upstream-forks-20260901-page-focus-20260901" />
 </head>
 <body data-page="home">
   <nav class="site-nav">
@@ -80,9 +80,9 @@
 
     <nav class="execution-scope" aria-label="Homepage sections">
       <a id="scope-products" data-code="01" href="#products">Products &amp; apps</a>
-      <a id="scope-engine" data-code="02" href="#stack">Engine</a>
+      <a id="scope-engine" data-code="02" href="#stack" hidden>Engine</a>
       <a id="scope-projects" data-code="03" href="#projects">Projects</a>
-      <a id="scope-ecosystem" data-code="04" href="#ecosystem">Ecosystem</a>
+      <a id="scope-ecosystem" data-code="04" href="#ecosystem" hidden>Ecosystem</a>
     </nav>
 
     <section class="execution-section execution-products" id="products" aria-labelledby="products-title">
@@ -129,7 +129,7 @@
       </div>
     </section>
 
-    <section class="execution-section execution-dark" id="stack">
+    <section class="execution-section execution-dark" id="stack" hidden>
       <div class="execution-section-head">
         <div><p id="stack-eyebrow" class="execution-eyebrow">Engine &amp; proving ground</p><h2 id="stack-title">Build, validate, and transfer serving mechanisms.</h2></div>
         <p id="stack-summary">An upstream-compatible runtime connecting serving mechanisms to compilers, hardware backends, and fixed benchmarks.</p>
@@ -202,7 +202,7 @@
       </div>
     </section>
 
-    <section class="execution-section execution-ecosystem" id="ecosystem">
+    <section class="execution-section execution-ecosystem" id="ecosystem" hidden>
       <div class="execution-section-head">
         <div><p id="ecosystem-eyebrow" class="execution-eyebrow">Collaborative ecosystem</p><h2 id="ecosystem-title">Clear roles. Shared progress.</h2></div>
         <p id="ecosystem-summary">SAGE is the shared flagship product; each organization retains a clear technical boundary.</p>

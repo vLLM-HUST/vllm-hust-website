@@ -14,6 +14,8 @@
 .member-identity { margin-top: 23px; }.member-label { color: #8b6100; font: 700 10px ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
 .member-identity h2 { margin: 7px 0 2px; color: #0c1112; font-size: 20px; line-height: 1.08; overflow-wrap: anywhere; }.member-login { margin: 0; color: #61706f; font-size: 12px; overflow-wrap: anywhere; }
 .member-bio { margin: 17px 0; color: #4f5d5b; font-size: 13px; }.member-meta { margin-top: auto; display: flex; align-items: end; justify-content: space-between; gap: 12px; color: #61706f; font-size: 11px; }.member-meta a { color: #8b6100; font-weight: 850; text-decoration: none; }.member-meta a:hover { color: #0c1112; }.member-empty { padding: 28px; border: 1px solid #cbd5d1; color: #61706f; background: #f5f7f6; }.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.member-more { width: 100%; min-height: 48px; margin-top: 18px; border: 1px solid #8b6100; border-radius: 4px; color: #0c1112; background: #f0b341; font-weight: 850; cursor: pointer; }
+.member-more:hover { background: #ffd477; }
 @media (max-width: 1080px) { .member-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 780px) { .member-directory-head { grid-template-columns: 1fr; gap: 20px; }.member-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .member-grid { grid-template-columns: 1fr; }.member-card { min-height: 290px; } }
