@@ -195,7 +195,16 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
         "vllm.platform_plugins",
         "vllm.model_loader",
     ]
-    assert diffspec["integration_surfaces"] == ["vllm.speculative_decoding"]
+    assert diffspec["integration_contracts"] == []
+    assert diffspec["integration_surfaces"] == [
+        "vllm.general_plugins",
+        "vllm.speculative_config",
+        "vllm-ascend runtime patch surface",
+    ]
+    assert diffspec["execution_planes"] == ["scheduler", "worker", "native", "device"]
+    assert "0.2-experimental" in diffspec["summary_en"]
+    assert "vLLM Ascend 0.23" in diffspec["summary_en"]
+    assert "unversioned" in diffspec["summary_en"]
     assert kvcompress["integration_contracts"] == []
     assert kvcompress["integration_surfaces"] == [
         "vllm.general_plugins",
