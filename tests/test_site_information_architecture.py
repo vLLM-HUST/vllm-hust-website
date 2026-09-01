@@ -69,13 +69,13 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
 
 
 def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
+    assert "Typed runtime contracts. 19 audited MODs. Evidence before claims." in HOME
     assert (
-        "Typed runtime contracts. Platform profiles. Composable KV state systems."
+        "every MOD publishes ownership, compatibility, workload fit, and evidence limits"
         in HOME
     )
-    assert "matched support evidence" in HOME
-    assert "类型化运行时契约、平台 profile 与可组合 KV 状态系统。" in HOME
-    assert "matched 证据支撑支持声明" in HOME
+    assert "类型化运行时契约、19 个已审计 MOD、证据先于结论。" in HOME
+    assert "每个 MOD 明示负责人、兼容性、Workload 与证据边界" in HOME
 
 
 def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:

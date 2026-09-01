@@ -143,6 +143,7 @@
                 areas: '贡献领域',
                 main: '主要贡献',
                 advisor: '指导老师',
+                externalAdvisor: '校外指导',
                 status: '状态',
                 pending: '身份待确认',
                 commits: '次提交',
@@ -155,6 +156,7 @@
                 areas: 'Contribution areas',
                 main: 'Main contributions',
                 advisor: 'Advisor',
+                externalAdvisor: 'External advisor',
                 status: 'Status',
                 pending: 'Identity pending',
                 commits: 'commits',
@@ -240,6 +242,7 @@
             const participation = localized(item, 'participation_direction', lang);
             const areas = item.contribution_areas || item.key_contributions || '';
             const advisor = localized(item, 'advisor', lang);
+            const externalAdvisor = localized(item, 'external_advisor', lang);
             const rows = kind === 'core'
                     ? [
                     detailRow(text.research, research),
@@ -272,6 +275,9 @@
                         participation ? detailRow(text.participation, participation) : '',
                         areas ? detailRow(text.areas, areas) : '',
                         advisor ? detailRow(text.advisor, advisor) : '',
+                        externalAdvisor
+                            ? detailRow(text.externalAdvisor, externalAdvisor)
+                            : '',
                     ];
             return `
                 <li>

@@ -328,6 +328,24 @@ body[data-page="home"] .lang-toggle {
 .stack-grid em { margin-top: auto; padding-top: 24px; color: var(--exec-amber); font-size: 13px; font-style: normal; font-weight: 800; }
 
 .execution-atlas { background: var(--exec-paper); }
+.mod-portfolio-brief {
+  margin-bottom: 34px;
+  padding: 22px 24px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 22px;
+  align-items: center;
+  border: 1px solid var(--exec-ink);
+  border-top: 4px solid var(--exec-amber);
+  color: var(--exec-ink);
+  background: var(--exec-white);
+  text-decoration: none;
+}
+.mod-portfolio-brief:hover { background: #fff7e6; }
+.mod-portfolio-count { color: #7a590f; font: 900 44px/1 "Sora", "Inter", sans-serif; }
+.mod-portfolio-brief strong { display: block; font-size: 20px; }
+.mod-portfolio-brief small { display: block; margin-top: 6px; color: var(--exec-muted); font-size: 13px; line-height: 1.55; }
+.mod-portfolio-arrow { font-size: 24px; font-weight: 900; }
 .runtime-list { display: grid; gap: 34px; }
 .runtime-group { border-top: 1px solid var(--exec-ink); }
 .upstream-fork-group { border-top: 3px solid var(--exec-amber); }
@@ -403,6 +421,8 @@ body[data-page="home"] .lang-toggle {
 }
 
 @media (max-width: 760px) {
+  .mod-portfolio-brief { grid-template-columns: auto minmax(0, 1fr); padding: 18px; }
+  .mod-portfolio-arrow { display: none; }
   body[data-page="home"] .site-nav-inner {
     width: calc(100% - 32px);
     min-height: 64px;
