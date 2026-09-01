@@ -67,6 +67,7 @@
     platforms: "平台",
     python: "Python",
     requirements: "前置条件",
+    followup: "负责人跟进 Issue",
     details: "技术详情",
     installRun: "安装 / 启动",
     boundaries: "关键边界",
@@ -118,6 +119,7 @@
     platforms: "Platforms",
     python: "Python",
     requirements: "Requirements",
+    followup: "Owner follow-up issue",
     details: "Technical details",
     installRun: "Install / run",
     boundaries: "Key boundaries",
@@ -260,6 +262,19 @@ vllm serve /path/to/model \\
   --kv-cache-compression-config '{"schema_version":1,"provider":"ascend_kvcompress","provider_config":{"method":"triattention","stats_path":"/path/to/stats.pt","kv_budget":2048,"recompute_window":128,"protected_recent_window":128,"score_aggregation":"mean","layer_aggregation":"mean","score_chunk_size":512,"score_layer_stride":4}}'`
     }
   };
+  const inspectableBundles = {
+    "quantized-kv-cache-migration": "org.vllm-hust.quantized-kv-cache",
+    "simllm-migration": "org.vllm-hust.simllm",
+    "unified-communication-migration": "org.vllm-hust.unified-communication",
+    "split-batch-full-graph-migration": "org.vllm-hust.split-batch-full-graph",
+    "kv-transfer-observability-migration": "org.vllm-hust.kv-transfer-observability",
+    "layered-prefill-migration": "org.vllm-hust.layered-prefill",
+    "activation-sparsity-migration": "org.vllm-hust.activation-sparsity",
+    "pipeline-microbatch-migration": "org.vllm-hust.pipeline-microbatch",
+    "qos-scheduler-migration": "org.vllm-hust.qos-scheduler",
+    "mapped-host-kv-offload": "org.vllm-hust.ascend-mapped-kv-offload",
+    "stateharbor": "org.vllm-hust.stateharbor"
+  };
 
   const valueLabel = (value) => String(value).replaceAll("_", " ");
   const typeTitle = (type) => (typeLabels[type] || { en: valueLabel(type), zh: valueLabel(type) })[language()];
@@ -311,7 +326,19 @@ vllm serve /path/to/model \\
   }
 
   function quickStart(item) {
-    const value = quickStarts[item.id];
+    const extensionId = inspectableBundles[item.id];
+    const value = quickStarts[item.id] || (extensionId ? {
+      title_en: `Install and inspect ${item.name_en}`,
+      title_zh: `安装并检查${item.name_zh}`,
+      action_en: "inspection commands",
+      action_zh: "检查命令",
+      note_en: "Import-only contract package: install, inspect, and check are supported; enablement and serving are intentionally unavailable.",
+      note_zh: "当前为 import-only 合同包：支持安装、inspect 与 check；明确不提供启用和启动命令。",
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+pip install "git+${item.canonical_repository}.git"
+vllm-hust-ext extension inspect ${extensionId}
+vllm-hust-ext extension check ${extensionId}`
+    } : null);
     if (!value) return null;
     const launcher = element("div", "plugin-launcher");
     const trigger = element("button", "plugin-launch-icon");
@@ -457,6 +484,13 @@ vllm serve /path/to/model \\
       const note = element("p", "plugin-compatibility-note");
       note.append(element("strong", "", `${copy().requirements}: `), document.createTextNode(requirements));
       panel.append(note);
+    }
+    if (profile.followup_url) {
+      const followup = element("a", "plugin-compatibility-followup", copy().followup);
+      followup.href = profile.followup_url;
+      followup.target = "_blank";
+      followup.rel = "noopener noreferrer";
+      panel.append(followup);
     }
     return panel;
   }
