@@ -268,6 +268,8 @@ body[data-page="plugins"] .workshop-card { min-height: 520px; overflow: visible;
 .workshop-application .workshop-cover { background: linear-gradient(135deg,#774b46,#b66d62); }
 body[data-page="plugins"] .workshop-card h3 { margin-top: 22px; }
 body[data-page="plugins"] .workshop-card .plugin-summary { display: -webkit-box; overflow: hidden; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.plugin-more { width: 100%; min-height: 50px; margin: 18px 0 0; border: 1px solid #8b6100; border-radius: 4px; color: #0c1112; background: #f0b341; font-weight: 850; cursor: pointer; }
+.plugin-more:hover { background: #ffd477; }
 @media (max-width: 1060px) { body[data-page="plugins"] .workshop-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 680px) { body[data-page="plugins"] .workshop-grid { grid-template-columns: 1fr; }.workshop-cover { height: 112px; }.workshop-cover-mark { font-size: 34px; } }
 
