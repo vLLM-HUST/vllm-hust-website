@@ -103,7 +103,7 @@
     },
     {
       "name": "pegaflow-hust",
-      "url": "https://github.com/intellistream/pegaflow-hust",
+      "url": "https://github.com/vLLM-HUST/pegaflow-hust",
       "portfolio_domain": "kv_state_data_path",
       "repository_role": "external_subsystem",
       "relation_to_runtime": "provides_external_subsystem",
@@ -180,6 +180,17 @@
       "public_surface": true
     },
     {
+      "name": "vllm-ascend-adaptive-quantized-kv-hust",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-adaptive-quantized-kv-hust",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "runtime_component",
+      "relation_to_runtime": "proposes_runtime_contracts",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["import-only Adaptive Quantized KV descriptor", "host-contract proposal and compatibility receipts"],
+      "component_ids": ["ascend-adaptive-quantized-kv"],
+      "public_surface": true
+    },
+    {
       "name": "vllm-ascend-hust-bidkv",
       "url": "https://github.com/vLLM-HUST/vllm-ascend-hust-bidkv",
       "portfolio_domain": "kv_state_data_path",
@@ -231,8 +242,8 @@
       "repository_role": "runtime_component",
       "relation_to_runtime": "extends_runtime_behavior",
       "lifecycle": "incubating",
-      "canonical_artifacts": ["Ascend post-training quantization workflow"],
-      "component_ids": [],
+      "canonical_artifacts": ["offline Ascend post-training quantization workflow", "import-only runtime artifact validator"],
+      "component_ids": ["ascend-quant-toolkit", "ascend-quant-runtime-descriptor"],
       "public_surface": true
     },
     {
