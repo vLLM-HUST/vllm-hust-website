@@ -10,7 +10,7 @@
 
   let registry;
   let portfolio;
-  let selectedType = "all";
+  let selectedType = "extensions";
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -23,6 +23,7 @@
 
   const copy = () => language() === "zh" ? {
     all: "全部",
+    extensions: "扩展",
     entries: "个生态组件",
     empty: "没有符合当前筛选条件的生态组件。",
     repository: "规范仓库",
@@ -55,6 +56,7 @@
     forksCopy: "这些仓库跟随官方项目演进，只承载 HUST 必需的窄幅差异。它们是完整系统或平台发行分支，不是插件。"
   } : {
     all: "All",
+    extensions: "Extensions",
     entries: "ecosystem components",
     empty: "No ecosystem components match the current filters.",
     repository: "Canonical repository",
@@ -194,10 +196,9 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
   )[language()];
 
   function renderFilters() {
-    const presentTypes = [...new Set(registry.components.map((item) => item.artifact_type))];
     filters.replaceChildren();
-    ["all", ...presentTypes].forEach((type) => {
-      const title = type === "all" ? copy().all : typeTitle(type);
+    ["extensions", "runtime_component", "bridge", "all"].forEach((type) => {
+      const title = type === "all" ? copy().all : type === "extensions" ? copy().extensions : typeTitle(type);
       const button = element("button", `plugin-filter${selectedType === type ? " active" : ""}`, title);
       button.type = "button";
       button.dataset.layer = type;
@@ -297,7 +298,13 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
     const card = element(
       "article",
-      `plugin-card${isUpstreamFork ? " upstream-fork-card" : ""}`
+      `plugin-card workshop-card workshop-${item.artifact_type}${isUpstreamFork ? " upstream-fork-card" : ""}`
+    );
+    const cover = element("div", "workshop-cover");
+    const initials = item.name.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
+    cover.append(
+      element("span", "workshop-cover-type", typeTitle(item.artifact_type)),
+      element("strong", "workshop-cover-mark", initials)
     );
     const top = element("div", "plugin-card-top");
     top.append(element("span", "plugin-code", item.id));
@@ -311,7 +318,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     if (isUpstreamFork) badges.prepend(badge(copy().forkBadge, "upstream-fork"));
     top.append(badges);
 
-    card.append(top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
+    card.append(cover, top, element("h3", "", item.name), element("p", "plugin-summary", local(item, "summary")));
     const compatibility = compatibilityPanel(item);
     if (compatibility) card.append(compatibility);
     const details = element("details", "plugin-technical-details");
@@ -472,51 +479,22 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
         (item.integration_surfaces || []).join(" "),
         item.canonical_repository || "", item.upstream_repository || ""
       ].join(" ").toLowerCase();
-      return (selectedType === "all" || item.artifact_type === selectedType) && text.includes(query);
+      const matchesType = selectedType === "all"
+        || item.artifact_type === selectedType
+        || (selectedType === "extensions" && ["runtime_component", "bridge"].includes(item.artifact_type));
+      return matchesType && text.includes(query);
     });
 
-    catalog.replaceChildren();
-    const upstreamForks = visible.filter(
-      (item) => item.repository_relationship === "upstream_sync_fork"
-    );
-    if (upstreamForks.length) {
-      const section = element("section", "plugin-layer upstream-fork-layer");
-      const head = element("div", "plugin-layer-head");
-      const identity = element("div", "plugin-layer-identity");
-      identity.append(
-        element("span", "plugin-layer-index", "00"),
-        element("h2", "", copy().forksTitle)
-      );
-      head.append(
-        identity,
-        element("p", "", copy().forksCopy),
-        element(
-          "strong",
-          "plugin-layer-count",
-          String(upstreamForks.length).padStart(2, "0")
-        )
-      );
-      const grid = element("div", "plugin-grid");
-      upstreamForks.forEach((item) => grid.append(renderCard(item)));
-      section.append(head, grid);
-      catalog.append(section);
-    }
-    Object.keys(typeLabels).forEach((type, index) => {
-      const items = visible.filter(
-        (item) => item.artifact_type === type
-          && item.repository_relationship !== "upstream_sync_fork"
-      );
-      if (!items.length) return;
-      const section = element("section", "plugin-layer");
-      const head = element("div", "plugin-layer-head");
-      const identity = element("div", "plugin-layer-identity");
-      identity.append(element("span", "plugin-layer-index", String(index + 1).padStart(2, "0")), element("h2", "", typeTitle(type)));
-      head.append(identity, element("p"), element("strong", "plugin-layer-count", String(items.length).padStart(2, "0")));
-      const grid = element("div", "plugin-grid");
-      items.forEach((item) => grid.append(renderCard(item)));
-      section.append(head, grid);
-      catalog.append(section);
+    const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
+    visible.sort((left, right) => {
+      const leftRank = priority[left.compatibility?.status] ?? 6;
+      const rightRank = priority[right.compatibility?.status] ?? 6;
+      return leftRank - rightRank || left.name.localeCompare(right.name);
     });
+    catalog.replaceChildren();
+    const grid = element("section", "plugin-grid workshop-grid");
+    visible.forEach((item) => grid.append(renderCard(item)));
+    catalog.append(grid);
     status.textContent = visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
   }
 
@@ -524,6 +502,21 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     if (registry) renderCatalog();
     renderPortfolio();
   });
+  function renderPageLabels() {
+    const zh = language() === "zh";
+    const values = {
+      "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
+      "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
+      "plugins-lede": zh ? "按宿主版本和平台选择扩展。" : "Choose extensions by host version and platform.",
+      "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
+      "plugins-fact-runtime": zh ? "个已支持" : "supported"
+    };
+    Object.entries(values).forEach(([id, value]) => {
+      const node = document.getElementById(id);
+      if (node) node.textContent = value;
+    });
+  }
+  renderPageLabels();
   search.placeholder = copy().searchPlaceholder;
 
   fetch(catalog.dataset.source)
@@ -536,6 +529,7 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
         throw new Error("unsupported ecosystem registry");
       }
       registry = payload;
+      renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
       const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
@@ -583,12 +577,15 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
       });
   }
 
-  window.addEventListener("vllm-hust-language-change", () => {
+  const renderLanguage = () => {
+    renderPageLabels();
     if (!registry) return;
     search.placeholder = copy().searchPlaceholder;
     renderFilters();
     renderCatalog();
     renderBoundaries();
     renderPortfolio();
-  });
+  };
+  window.addEventListener("vllm-hust-language-change", renderLanguage);
+  window.addEventListener("vllm-hust:langchange", renderLanguage);
 })();
