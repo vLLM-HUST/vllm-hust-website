@@ -45,16 +45,19 @@ def test_registry_is_canonical_and_multidimensional() -> None:
         assert REQUIRED_FIELDS <= item.keys()
         assert item["execution_planes"]
 
+    assert by_id("vllm-production-stack")["maturity"] == "unsupported"
+
 
 def test_system_role_is_independent_from_delivery_model() -> None:
     bidkv = by_id("bidkv")
     assert bidkv["system_role"] == "scheduler_policy"
     assert bidkv["delivery_model"] == "plugin_bundle"
     assert bidkv["integration_surfaces"] == [
-        "legacy import-only vllm.victim_selector adapter",
+        "vLLM-HUST vllm.scheduler.policy.v1",
         "legacy experiment-only vllm.general_plugins",
-        "target upstream vllm.scheduler_plugins Preemption contract (not frozen)",
+        "official vLLM scheduler contract (not yet supported)",
     ]
+    assert bidkv["maturity"] == "supported"
 
     ascend = by_id("vllm-ascend-hust")
     assert ascend["artifact_type"] == "platform_profile"
@@ -78,8 +81,10 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     lmcache_ascend_adapter = by_id("lmcache-ascend-vllm-adapter")
 
     assert mooncake["artifact_type"] == "external_system"
+    assert mooncake["maturity"] == "supported"
     assert mooncake["integration_contracts"] == []
     assert mooncake_connectors["artifact_type"] == "bridge"
+    assert mooncake_connectors["maturity"] == "supported"
     assert mooncake_connectors["canonical_repository"] == (
         "https://github.com/vllm-project/vllm"
     )
@@ -95,8 +100,10 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert "9-key save/load" in mooncake_connectors["summary_en"]
     assert "outage/recovery evidence" in mooncake_connectors["summary_en"]
     assert lmcache["system_role"] == "kv_state_manager"
+    assert lmcache["maturity"] == "unsupported"
     assert lmcache["integration_contracts"] == []
     assert lmcache_connectors["system_role"] == "kv_integration"
+    assert lmcache_connectors["maturity"] == "unsupported"
     assert lmcache_connectors["integration_contracts"] == [
         "vllm.kv_connector.scheduler.v1",
         "vllm.kv_connector.worker.v1",
@@ -108,6 +115,7 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     )
     assert "experimental LMCache Host Provider" in lmcache_connectors["summary_en"]
     assert "remote service version and health" in lmcache_connectors["summary_en"]
+    assert "online vLLM MP operation evidence" in lmcache_connectors["summary_en"]
     assert "不接管 backend、KV 数据或服务生命周期" in lmcache_connectors["summary_zh"]
     assert "CPU-SHM verified" in lmcache["summary_en"]
     assert pegaflow["ownership"] == "hust_owned_subsystem"
@@ -120,12 +128,16 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert pegaflow_connectors["execution_planes"] == ["api", "scheduler", "worker"]
     assert lmcache_ascend_provider["system_role"] == "platform_backend"
     assert lmcache_ascend_provider["artifact_type"] == "runtime_component"
+    assert lmcache_ascend_provider["maturity"] == "unsupported"
     assert lmcache_ascend_provider["integration_contracts"] == []
     assert lmcache_ascend_provider["integration_surfaces"] == [
         "lmcache.storage_backend"
     ]
+    assert lmcache_ascend_provider["evidence_level"] == "integration_tested"
+    assert "Qwen3-0.6B" in lmcache_ascend_provider["summary_en"]
     assert lmcache_ascend_adapter["system_role"] == "kv_integration"
     assert lmcache_ascend_adapter["artifact_type"] == "bridge"
+    assert lmcache_ascend_adapter["maturity"] == "unsupported"
     assert lmcache_ascend_adapter["integration_contracts"] == [
         "vllm.kv_connector.scheduler.v1",
         "vllm.kv_connector.worker.v1",
@@ -136,6 +148,8 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "scheduler",
         "worker",
     ]
+    assert lmcache_ascend_adapter["evidence_level"] == "integration_tested"
+    assert "2,236 tokens" in lmcache_ascend_adapter["summary_en"]
 
     assert "KV connector" in PAGE
     assert "state system" in PAGE
