@@ -269,6 +269,30 @@ body[data-page="plugins"] .workshop-card { min-height: 520px; overflow: visible;
 .workshop-application .workshop-cover { background: linear-gradient(135deg,#774b46,#b66d62); }
 body[data-page="plugins"] .workshop-card h3 { margin-top: 22px; }
 body[data-page="plugins"] .workshop-card .plugin-summary { display: -webkit-box; overflow: hidden; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.plugin-public-effect { margin-top: 14px; padding: 11px 12px; display: grid; gap: 7px; border: 1px solid #dfbd70; border-radius: 4px; background: #fff7e6; }
+.plugin-public-effect-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.plugin-public-effect-title { color: #554013; font: 850 10px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: .04em; text-transform: uppercase; }
+.plugin-public-effect p { margin: 0; color: #293332; font-size: 12px; line-height: 1.5; }
+.plugin-public-effect-link { width: fit-content; color: #755000; font-size: 10px; font-weight: 800; text-decoration: none; }
+.plugin-public-effect-link:hover,.plugin-public-effect-link:focus-visible { text-decoration: underline; }
+.plugin-public-effect.effect-preview { border-color: #d6dfdc; background: #f4f7f6; }
+.plugin-community { margin-top: 16px; padding-top: 14px; display: grid; gap: 13px; border-top: 1px solid #d6dfdc; }
+.plugin-community-label { color: #52615f; font: 800 10px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; }
+.plugin-maintainer-list { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px 12px; }
+.plugin-maintainer { min-width: 0; display: inline-flex; align-items: center; gap: 8px; color: #0c1112; text-decoration: none; }
+.plugin-maintainer:hover strong { color: #8b6100; }
+.plugin-maintainer-avatar { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #dce4e1; }
+.plugin-maintainer-identity { min-width: 0; display: grid; line-height: 1.1; }
+.plugin-maintainer-identity strong { max-width: 150px; overflow: hidden; color: #0c1112; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.plugin-maintainer-identity small { margin-top: 3px; color: #61706f; font-size: 10px; }
+.plugin-advisors { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.plugin-advisor-names { color: #293332; font-size: 11px; text-align: right; }
+.plugin-repo-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); border: 1px solid #d6dfdc; }
+.plugin-repo-metric { min-height: 48px; padding: 8px; display: grid; align-content: center; border-right: 1px solid #d6dfdc; color: #52615f; text-align: center; text-decoration: none; }
+.plugin-repo-metric:last-child { border-right: 0; }
+.plugin-repo-metric:hover { background: #fff7e6; }
+.plugin-repo-metric strong { color: #0c1112; font-size: 15px; line-height: 1; }
+.plugin-repo-metric span { margin-top: 4px; font-size: 9px; text-transform: uppercase; }
 .plugin-more { width: 100%; min-height: 50px; margin: 18px 0 0; border: 1px solid #8b6100; border-radius: 4px; color: #0c1112; background: #f0b341; font-weight: 850; cursor: pointer; }
 .plugin-more:hover { background: #ffd477; }
 @media (max-width: 1060px) { body[data-page="plugins"] .workshop-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
