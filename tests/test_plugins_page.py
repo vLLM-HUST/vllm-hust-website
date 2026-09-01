@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from jsonschema import Draft7Validator
@@ -732,6 +733,27 @@ def test_plugin_json_sources_match_their_schemas() -> None:
         )
         Draft7Validator.check_schema(schema)
         Draft7Validator(schema).validate(payload)
+
+
+def test_public_plugin_evidence_never_exposes_internal_machine_ids() -> None:
+    published = "\n".join(
+        (
+            PAGE,
+            LEGACY_STANDARD,
+            json.dumps(REGISTRY, ensure_ascii=False),
+        )
+    )
+    forbidden = (
+        r"\b(?:server|host)\s*(?:91|112)\b",
+        r"\b(?:91|112)\s*(?:server|host)\b",
+        r"(?:服务器|宿主)\s*(?:91|112)\b",
+        r"\b(?:91|112)\s*(?:服务器|宿主)",
+        r"\b(?:91/112|112/91)\b",
+        r"\b91\s*(?:and|与)\s*112\b",
+        r"\b(?:91|112)/Qwen",
+    )
+    for pattern in forbidden:
+        assert re.search(pattern, published, flags=re.IGNORECASE) is None, pattern
 
 
 def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:

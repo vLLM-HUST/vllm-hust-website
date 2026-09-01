@@ -27,9 +27,9 @@ vLLM-HUST 0.23 now owns a minimal generic `vllm.scheduler.policy.v1` materialize
 active typed policy component and does not register the private `vllm.victim_selector` entry-point
 group. Manager renders the host-native manifest and rejects unverified or incompatible hosts. This
 is supported on pinned vLLM-HUST 0.23; official vLLM remains unsupported while RFC #51608 and draft
-PR #51601 are unsettled. A real Qwen3-0.6B run on server 91 produced three BidKV victim selections
-at full KV pressure, completed every request, and restored the built-in path after disable and
-process restart.
+PR #51601 are unsettled. A documented Qwen3-0.6B Ascend validation run produced three BidKV victim
+selections at full KV pressure, completed every request, and restored the built-in path after
+disable and process restart.
 
 At draft PR #51601 head `f8b7db61e446911e0d62fcb8220f863d6098c471`, code still provides one
 registry-only `PreemptionPlugin` over live requests, while its design document specifies future
@@ -114,7 +114,8 @@ reappearing after a later reinstall.
    conflict tests, and proof of no apply/uninstall.
 1. Incompatible versions, missing required services, duplicate registrations, conflicts, degraded
    health, rollback, and clean uninstall must be tested.
-1. The three cases must be repeated on the intended 112/91 environments.
+1. The three cases must be repeated in the declared Ascend validation environments, with hardware,
+   software versions, carrier hashes, and commands recorded in public evidence.
 
 The canonical pinned version, carrier and rollback matrix is maintained in
 [`extension-manager-support-matrix-20260901.md`](https://github.com/vLLM-HUST/vllm-hust-docs/blob/main/operations/extension-manager-support-matrix-20260901.md).
