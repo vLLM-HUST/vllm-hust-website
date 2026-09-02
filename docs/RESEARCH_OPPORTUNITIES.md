@@ -74,7 +74,7 @@ ______________________________________________________________________
 ## A2. 拓扑感知的多卡并行与分阶段通信策略
 
 - **优先级/成熟度：** P0；研究入口（链接未公开）， 直接回归证据见
-  [#145](https://github.com/vLLM-HUST/vllm-ascend-hust/issues/145)。
+  [#145](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/issues/145)。
 - **现象：** 2 卡 online workload 曾出现 41.5%–47.7% 吞吐下降，4 卡 TTFT 达到数秒至数十秒；固定 TP 和 rank placement 很可能与实际
   HCCS/PCIe 拓扑、 消息尺寸和 prefill/decode 阶段不匹配。
 - **研究问题：** 能否按硬件拓扑、消息规模和请求阶段动态选择 TP/PP/DP、rank placement、collective 与 overlap 策略？
@@ -190,7 +190,7 @@ ______________________________________________________________________
 ## A11. Ascend 推测解码的 Draft/Verify/Accept 阶段协同
 
 - **优先级/成熟度：** P0；Ngram 研究入口（链接未公开）， 历史工程回归见
-  [core #58](https://github.com/vLLM-HUST/vllm-hust/issues/58)， 关联 core
+  [core #58](https://github.com/intellistream/vllm-hust-legacy-20260831/issues/58)， 关联 core
   [PR #121](https://github.com/intellistream/vllm-hust-legacy-20260831/pull/121)、 Ascend
   [PR #123](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/123) 和
   [PR #135](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/135)。
@@ -276,7 +276,8 @@ ______________________________________________________________________
 ## A17. 能力感知的图重写与算子可用性治理
 
 - **优先级/成熟度：** P1；AddRMSNormBias 故障和
-  [Ascend issue #149](https://github.com/vLLM-HUST/vllm-ascend-hust/issues/149) 提供直接证据。
+  [Ascend issue #149](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/issues/149)
+  提供直接证据。
 - **现象：** 编译 pass 可能注册当前 CANN/opapi 不支持的 pattern；失败后不能用 eager fallback 掩盖。版本号本身也不能准确表达符号、custom
   extension 和 shape 能力。
 - **研究问题：** 能否用细粒度 capability graph 驱动 pattern registration、 fusion selection 和安全降级？
@@ -321,7 +322,7 @@ ______________________________________________________________________
   [PR #66](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/66)、
   [#70](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/70)、
   [#80](https://github.com/intellistream/vllm-ascend-hust-legacy-20260831/pull/80)，以及 prefix 回归
-  [core #163](https://github.com/vLLM-HUST/vllm-hust/issues/163)。
+  [core #163](https://github.com/intellistream/vllm-hust-legacy-20260831/issues/163)。
 - **问题：** exact full-prefix hash 难以表达 chunk reuse、分支共享、跨节点 ownership 和语义相关但非完全相同的上下文。
 - **假设/机制：** 分层索引（exact block/chunk/semantic candidate）与成本感知验证， 可扩大安全复用范围。
 - **实验：** repeated prefix、RAG chunks、agent branches、跨节点 routing；hit rate、 false reuse、验证成本、TTFT 和吞吐。

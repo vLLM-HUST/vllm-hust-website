@@ -1,287 +1,87 @@
-# vLLM-HUST Website / Upstream / Twin Roadmap
+# vLLM-HUST Website Roadmap
 
-Last updated: 2026-07-07 10:35 CST
+Last reviewed: 2026-09-02
 
-## Current Status
+This roadmap covers the public website, its published data contracts, and evidence-backed project
+reporting. Machine-specific operations, private service state, credentials, resource allocation, and
+personal workspace details do not belong in this repository.
 
-### Website and Achievements Page
+## Publishing principles
 
-- The achievements page has been updated and pushed with upstream PR links and current status
-  labels. The 2026-07-07 update records the new vLLM #47793 and Triton-Ascend
-  #918/#919/#920/#922/#923 upstream PRs.
-- Latest pushed website commit observed locally before this update:
-  `f91b2b2 Update upstream PR statuses on achievements page`.
-- Local working tree still has unrelated, uncommitted local data:
-  - `data/core_contributors.json`
-  - `reports/`
-- Do not include those local data/report changes in unrelated commits unless they are intentionally
-  reviewed.
+- Treat structured data as the source of truth and generate page content from it.
+- Keep Chinese and English content semantically aligned.
+- Publish only claims supported by a directly accessible repository, manifest, test, report,
+  benchmark, paper, pull request, or release.
+- Distinguish executable compatibility from source scaffolds and inspection-only repositories.
+- Never infer maturity or performance from repository names, commit counts, simulated results, or
+  static checks.
+- Publish privacy-sanitized benchmark projections while retaining traceable repository-relative
+  evidence paths.
+- Do not publish machine identifiers, internal runner names, personal absolute paths, local service
+  state, process identifiers, credentials, or private infrastructure details.
 
-### Leaderboard and Benchmark Data
+## Website and navigation
 
-Observed on 2026-07-06:
+- Keep the home page, achievements, contributors, versions, plugins, issues, dataset validation, and
+  leaderboard pages consistent about project scope and evidence standards.
+- Maintain responsive desktop and narrow-screen layouts in both languages.
+- Verify navigation, search, filters, expandable sections, and external links before each release.
+- Show a specific reason when public data is unavailable or still awaiting verification; never
+  render an empty label, `undefined`, or an unsupported generic claim.
 
-- The leaderboard now includes serving trend workloads in the default all-workload view, including
-  `*-online`, `*-throughput`, `*-latency`, and multi-chip `*-2chip` / `*-4chip` variants.
-- Filter labels were localized so the Chinese page should consistently show `全部` instead of a
-  mixture of `all` and Chinese labels.
-- The default throughput trend chart uses an automatic broken Y-axis when high-throughput workloads
-  would otherwise flatten the lower-throughput series.
-- Missing trend points are intentionally represented as missing values, not as `0.0 tok/s`.
-- Online deployment for the latest null-value fix was verified against
-  `leaderboard-public-20260706-broken-axis2`.
-- GitHub Pages deployments have intermittently failed with `Deployment failed, try again later.`;
-  rerunning the Pages job has recovered the deployment.
-- Local `tests/test_site_structure.py` can fail on
-  `test_leaderboard_data_is_benchmark_snapshot_mirror` when the sibling
-  `../vllm-hust-benchmark/leaderboard-data/snapshots` tree is not synced with website `data/`.
-  GitHub CI does not hit that local-only mismatch unless the sibling benchmark checkout is present.
+## Plugin ecosystem
 
-Known data and experiment issues to keep tracking:
+- Maintain one canonical record for every displayed MOD, including repository, maintainers, guidance
+  relationships, maturity, compatibility, prerequisites, workload tags, public effect, and evidence.
+- Keep internal advisors distinct from external advisors and external contributors.
+- Require an explicit host, version range, platform scope, and prerequisites before describing a
+  plugin as installable or available.
+- Show inspection commands only for repositories that support inspection; do not present a launch
+  command for an inspection-only or source-scaffold repository.
+- Recheck repository accessibility, manifests, releases, and evidence links as part of scheduled
+  metadata refreshes.
 
-- `prefix-repetition-online @ 7fa0e3ed4b` was previously flagged as suspect because recorded
-  workload metadata and same-spec client parameters did not match the official 4096/256 workload. It
-  should remain excluded or be rerun with the official same-spec configuration.
-- Early `random-online` W8A8/`dtype=auto` points should not be mixed into the FP16 trend line.
-- Multi-chip current-main data around `ceec19` / `e068` showed high error rate or severe TTFT
-  regression and needs root-cause analysis before it is interpreted as a stable performance result.
-- Some right-side multi-chip workloads, especially current sonnet-throughput variants, still need
-  explicit completeness checks before concluding that data is final.
-- Future benchmark backfill should use an isolated vLLM-HUST checkout and explicit NPU allocation.
-  Do not switch PRs in the user's active optimization checkout.
+## Leaderboard and benchmark data
 
-### Official Upstream PRs
+- Preserve the benchmark repository as the canonical source and publish a deterministic,
+  privacy-sanitized projection on the website.
+- Keep valid measurements, missing coverage, rejected runs, and true zero/error results as distinct
+  states.
+- Admit performance claims only when workload, engine revision, plugin revision, model, precision,
+  hardware scope, runtime parameters, and evidence are sufficient for reproduction.
+- Do not turn CPU smoke tests, replay, simulation, projection, or static validation into hardware
+  performance claims.
+- Continue automated checks for stale targets, incompatible same-spec groups, missing trend points,
+  and accidental exposure of local environment metadata.
 
-vLLM:
+## Contributors and achievements
 
-- [vLLM #41449](https://github.com/vllm-project/vllm/pull/41449)
-  - Head: `14f3feec1d6adfc5b84fb7dda165686f5fa22be5`
-  - State: mergeable, non-draft, review required.
-  - Checks: DCO, Meta check, and Mergify Summary are green.
-  - Blocker: official `pre-run-check` requires `ready` or `verified` label.
-- [vLLM #41507](https://github.com/vllm-project/vllm/pull/41507)
-  - Head: `877c3ddc96082311c04aed2b98a112a7a5d5953a`
-  - State: mergeable, non-draft, review required.
-  - Checks: DCO, Meta check, and Mergify Summary are green.
-  - Blocker: official `pre-run-check` requires `ready` or `verified` label.
-- [vLLM #47622](https://github.com/vllm-project/vllm/pull/47622)
-  - State: mergeable but still draft.
-  - Blocker: official `pre-run-check` requires `ready` or `verified` label.
-- [vLLM #47623](https://github.com/vllm-project/vllm/pull/47623)
-  - State: mergeable but still draft.
-  - Blocker: official `pre-run-check` requires `ready` or `verified` label.
-- [vLLM #47793](https://github.com/vllm-project/vllm/pull/47793)
-  - State: mergeable, non-draft, review required.
-  - Scope: tolerate missing installed-package metadata when probing a Triton source checkout.
-  - Checks: DCO, Meta check, and Mergify Summary are green.
-  - Blocker: official `pre-run-check` requires `ready` or `verified` label.
+- Refresh public repository metrics from their authoritative sources.
+- Keep people, GitHub identities, affiliations, and advisor relationships explicit and avoid merging
+  identities without confirmation.
+- Link achievement claims to current upstream pull requests, releases, papers, reports, or other
+  direct evidence rather than duplicating time-sensitive status text in this roadmap.
+- Preserve previously verified BidKV, DiffSpec, LatchMoE, and other project records unless newer
+  evidence explicitly supersedes them.
 
-vLLM-Ascend:
+## Release validation
 
-- [vLLM-Ascend #8958](https://github.com/vllm-project/vllm-ascend/pull/8958)
-- [vLLM-Ascend #10735](https://github.com/vllm-project/vllm-ascend/pull/10735)
-- [vLLM-Ascend #11417](https://github.com/vllm-project/vllm-ascend/pull/11417)
-- [vLLM-Ascend #11422](https://github.com/vllm-project/vllm-ascend/pull/11422)
-- [vLLM-Ascend #11449](https://github.com/vllm-project/vllm-ascend/pull/11449)
+Before merging a website release:
 
-All five vLLM-Ascend PRs are mergeable, have DCO/lint/docs checks passing, and are mainly waiting
-for official review.
+1. Validate every JSON file against its schema and run the full page-specific test suite.
+1. Confirm expected item counts and required fields in all structured collections.
+1. Exercise both languages, search, filters, workload navigation, and expandable content.
+1. Render every main page at desktop and narrow-screen widths and check for clipping or overflow.
+1. Check canonical repositories and evidence links for accessibility.
+1. Scan published HTML, Markdown, JSON, and generated assets for internal environment identifiers,
+   personal paths, empty display values, and unsupported claims.
+1. Verify the deployed assets and data with cache bypassing after publication.
 
-Triton-Ascend:
+## Follow-up policy
 
-- [Triton-Ascend #918](https://github.com/triton-lang/triton-ascend/pull/918)
-  - Scope: skip missing backend entry points during runtime backend discovery.
-  - Status: Build-Wheels, pre-commit, integration py3.10/py3.11, and Ascend950 Pipeline Tests pass;
-    one stale title-check failure remains in the historical rollup from before the title was fixed.
-- [Triton-Ascend #919](https://github.com/triton-lang/triton-ascend/pull/919)
-  - Scope: disambiguate dependent `getDefiningOp` template calls in Ascend block pointer analysis.
-  - Status: Build-Wheels, pre-commit, and integration py3.10/py3.11 pass; Ascend950 Pipeline Tests
-    were still pending at last check.
-- [Triton-Ascend #920](https://github.com/triton-lang/triton-ascend/pull/920)
-  - Scope: allow MemAccOp factory specializations in the unstructure conversion pass.
-  - Status: Build-Wheels, pre-commit, and integration py3.10/py3.11 pass; Ascend950 Pipeline Tests
-    were still pending at last check.
-- [Triton-Ascend #922](https://github.com/triton-lang/triton-ascend/pull/922)
-  - Scope: fix Python module CMake build dependencies.
-  - Status: integration py3.10/py3.11 pass; Build-Wheels failed because the GitHub runner pod was
-    unschedulable due to insufficient CPU/memory. A rerun attempt was rejected by GitHub Actions.
-- [Triton-Ascend #923](https://github.com/triton-lang/triton-ascend/pull/923)
-  - Scope: trim optional test dialect/pass registrations from production tools.
-  - Status: Build-Wheels, pre-commit, and integration py3.10/py3.11 pass; Ascend950 Pipeline Tests
-    were still pending at last check.
-
-Closed split PRs:
-
-- [Triton-Ascend #921](https://github.com/triton-lang/triton-ascend/pull/921) was closed because
-  dropping test libraries without removing the corresponding registrations caused unresolved
-  `mlir::test::*` symbols. The valid independent cleanup is #923.
-- [Triton-Ascend #924](https://github.com/triton-lang/triton-ascend/pull/924) was closed because the
-  NVWS target split caused duplicate `add_subdirectory` binary directories.
-- [Triton-Ascend #925](https://github.com/triton-lang/triton-ascend/pull/925) was closed because
-  gating Proton backend dependencies left the Python extension with an unresolved
-  `init_triton_proton` symbol.
-
-### Faculty Twin / Slack Runtime
-
-Observed on 2026-07-06:
-
-- `sage-faculty-twin-app.service`
-  - Active and serving on `127.0.0.1:55601`.
-- `sage-faculty-twin-vllm-openai-proxy.service`
-  - Active and serving on `127.0.0.1:18001`.
-- `vllm-hust-auth-proxy.service`
-  - Active and serving on `127.0.0.1:18080`.
-- `sage-faculty-twin-vllm-engine.service`
-  - Inactive/dead since 2026-06-30.
-  - This matches the intended pause because the Qwen3-32B twin engine needs NPU capacity.
-- Direct upstream engine endpoint `127.0.0.1:8000` is not listening.
-- Current inference check fails:
-  - `check_twin_inference.py --mode completion` returns HTTP 500 through the proxy.
-- `sage-faculty-twin-inference-monitor.service`
-  - Failed.
-- `sage-faculty-twin-inference-monitor.timer`
-  - Enabled but inactive/dead; last trigger was 2026-06-24.
-- Slack routes are registered in the app:
-  - `/slack/commands/twin`
-  - `/slack/events`
-  - Unsigned local probes return Slack signature/timestamp errors, which means the FastAPI routes
-    exist.
-- Slack monitor notification configuration exists in `.env`:
-  - bot token is set
-  - target user id is set
-  - token values were intentionally not recorded here.
-- Codex Slack MCP reminder creation failed twice with MCP startup timeout, so the Codex-side Slack
-  connector is not currently usable.
-- `sage-faculty-twin-site.service` is inactive.
-- `sage-faculty-twin-tunnel.service` is inactive/disabled.
-- `cloudflared-sage-local-235b.service` is active, so at least one Cloudflare tunnel process is
-  running.
-
-NPU/resource snapshot:
-
-- `npu-smi info` reported NPU0 with about 53 GB HBM used by `VLLMEngineCor` PID `3268768`.
-- NPU1-7 showed only low baseline HBM in `npu-smi`, but many vLLM-related Docker containers and user
-  services are present.
-- Do not restart the Qwen3-32B twin vLLM engine until NPU allocation is intentionally decided.
-
-## Next Actions
-
-### Leaderboard / Benchmark Follow-up
-
-Data quality and audit:
-
-- Build or run a repeatable coverage audit that checks every visible x-axis version against every
-  displayed series. The audit should distinguish three states explicitly: valid point, missing
-  point, and true zero/error result.
-- Generate a short report from that audit before each data PR, especially for all-workload and
-  multi-chip views.
-- Keep suspect rows marked or excluded with written reasons instead of silently deleting or mixing
-  incompatible specs.
-- Reconcile website `data/leaderboard_*.json` with benchmark snapshot files under
-  `../vllm-hust-benchmark/leaderboard-data/snapshots` so the local mirror test can pass again.
-
-Single-card backfill:
-
-- Use only NPU0 for single-card reruns unless the user explicitly approves wider allocation.
-- Run backfill only from an isolated checkout dedicated to benchmark work.
-- Rerun `prefix-repetition-online @ 7fa0e3ed4b` with the official 4096/256 same-spec setup or keep
-  the old row marked suspect/invalid.
-- Recheck `random-online`, `sharegpt-online`, `instructcoder-online`, `agent-research-online`,
-  `visionarena-online`, `sonnet-throughput`, `sharegpt-throughput`, and `random-latency` from left
-  to right by x-axis version after every backfill import.
-
-Multi-chip analysis:
-
-- Do not start new 2-chip or 4-chip runs while the active constraint is NPU0-only.
-- When multi-chip capacity is approved, prioritize reproducing the `ceec19` / `e068` high error or
-  TTFT regression before adding more broad coverage.
-- For each multi-chip regression claim, record workload, chip count, commit/version, error rate,
-  TTFT, TPOT/TBT, throughput, `enforce_eager`, `gpu_memory_utilization`, `max_model_len`,
-  `max_num_seqs`, model path, and tensor-parallel size.
-- Missing current sonnet-throughput 2-chip/4-chip points should be treated as missing coverage, not
-  performance conclusions, until rerun or explicitly waived.
-
-Frontend and release validation:
-
-- Add an automated trend-chart smoke check that catches missing values becoming `0.0`, all-workload
-  data disappearing, and broken-axis mapping regressions.
-- Before merging chart changes, verify at least these views: single-chip all workloads, single-chip
-  each workload, multi-chip all workloads, and sonnet-throughput multi-chip.
-- After deployment, verify the live `leaderboard.html` cache token and live `assets/leaderboard.js`
-  content with no-cache requests.
-- If Pages returns `Deployment failed, try again later.`, rerun the Pages workflow and verify the
-  live asset token after success.
-
-### Upstream PR Follow-up
-
-- Ask vLLM maintainers to add `ready` or `verified` to #41449 and #41507 so official CI can run.
-- Decide when #47622 and #47623 should leave draft state.
-- After #47622/#47623 are ready, ask for `ready` or `verified` there as well.
-- Continue tracking vLLM-Ascend #8958/#10735/#11417/#11422/#11449 for review feedback.
-
-Useful commands:
-
-```bash
-gh pr view 41449 --repo vllm-project/vllm --json mergeable,mergeStateStatus,statusCheckRollup,labels,reviewDecision
-gh pr view 41507 --repo vllm-project/vllm --json mergeable,mergeStateStatus,statusCheckRollup,labels,reviewDecision
-gh pr view 8958 --repo vllm-project/vllm-ascend --json mergeable,mergeStateStatus,statusCheckRollup,labels,reviewDecision
-```
-
-### Twin Inference Recovery
-
-- Decide whether to free the NPUs required by the Qwen3-32B twin engine or temporarily retarget twin
-  to a smaller model.
-- If using the current Qwen3-32B config, verify `VLLM_ENGINE_TP_SIZE=4` and reserve four intended
-  Ascend devices before starting.
-- After NPU capacity is available, start the engine and proxy through the project manager:
-
-```bash
-cd /path/to/sage-faculty-twin
-./manage.sh start --with-vllm-engine --with-vllm-proxy
-./manage.sh check-inference
-```
-
-- If inference is healthy, re-enable the monitor:
-
-```bash
-systemctl --user reset-failed sage-faculty-twin-inference-monitor.service
-systemctl --user start sage-faculty-twin-inference-monitor.timer
-systemctl --user status sage-faculty-twin-inference-monitor.timer --no-pager
-```
-
-- Keep the monitor timer disabled/inactive while the twin engine is intentionally paused, otherwise
-  it may repeatedly attempt recovery.
-
-### Slack / Public Entry
-
-- The app-side Slack routes exist. The remaining question is the external path from Slack to the
-  app.
-- Confirm whether the active `cloudflared-sage-local-235b.service` already routes
-  `https://twin.sage.org.ai/slack/commands/twin` to the app or to the local site proxy.
-- If the Cloudflare route expects the local site proxy, start it:
-
-```bash
-systemctl --user start sage-faculty-twin-site.service
-systemctl --user status sage-faculty-twin-site.service --no-pager
-```
-
-- If using the older `sage-faculty-twin-tunnel.service`, confirm it is still the intended tunnel
-  before enabling it, because another Cloudflare tunnel is already active.
-- For Slack notifications from the monitor, test only after the intended Slack target is confirmed.
-  Avoid printing bot tokens in logs.
-- For Codex-side Slack reminders, retry only after the Slack MCP connector is available again;
-  current error was MCP startup timeout.
-
-### Cleanup / Hygiene
-
-- There are many old vLLM containers and some defunct engine/worker processes. Do not bulk-kill them
-  without checking which benchmark or paper run owns each one.
-- If NPU memory is unexpectedly occupied, identify the owning process/container first:
-
-```bash
-npu-smi info
-ps -fp <pid>
-sudo -n docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
-```
-
-- Keep tokens and API keys out of logs, markdown files, Git commits, and screenshots.
+- Fix complete, evidence-supported work in the main branch rather than leaving it in a long-lived
+  task branch.
+- Open an issue only when reliable public evidence, owner confirmation, or an external repository
+  change is still required.
+- Each follow-up issue should name the affected record, the exact missing contract or evidence, and
+  the person or repository best placed to resolve it.

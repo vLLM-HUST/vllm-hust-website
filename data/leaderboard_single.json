@@ -105,7 +105,7 @@
       "idempotency_key": "6ad408b9b348d66a84901e9676f77b6bc8674e337de3db7c5d055c60c63437f7",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "main",
@@ -146,7 +146,7 @@
         "port": 8025,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -158,7 +158,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8025,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "05e08764f0853bcb19e84c3dc604018d567773fd6d7942d385190266c21a04cb"
     }
@@ -269,7 +269,7 @@
       "idempotency_key": "dbc3876dbd241edc8975198b08ce798a1d9e8369a9c59d84f1aba6bdb0f3cfbb",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "pr-69-ec4847981f",
@@ -312,7 +312,7 @@
         "port": 8069,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -324,7 +324,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8069,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "05e08764f0853bcb19e84c3dc604018d567773fd6d7942d385190266c21a04cb"
     }
@@ -435,7 +435,7 @@
       "idempotency_key": "fd89111b5cbeea72bdd1f152bef776c7d0171bd5c60c8d3a022e1c86ca1e2ca7",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "rerun-pr77-agent-perfgate-l2-scenario-registry",
@@ -478,7 +478,7 @@
         "port": 8077,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -490,7 +490,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8077,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "05e08764f0853bcb19e84c3dc604018d567773fd6d7942d385190266c21a04cb"
     }
@@ -642,7 +642,7 @@
         "port": 28102,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -655,7 +655,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 28102,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -807,7 +807,7 @@
         "port": 28301,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -820,7 +820,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 28301,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -972,7 +972,7 @@
         "port": 28403,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -985,7 +985,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 28403,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -1137,7 +1137,7 @@
         "port": 28651,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -1150,7 +1150,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 28651,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -1302,7 +1302,7 @@
         "port": 28673,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -1315,7 +1315,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 28673,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -1467,7 +1467,7 @@
         "port": 30005,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -1480,7 +1480,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 30005,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -1632,7 +1632,7 @@
         "port": 30003,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -1645,7 +1645,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 30003,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -1797,7 +1797,7 @@
         "port": 30004,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -1810,7 +1810,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 30004,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -1962,7 +1962,7 @@
         "port": 30001,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -1975,7 +1975,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 30001,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -2127,7 +2127,7 @@
         "port": 30002,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -2140,7 +2140,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 30002,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -2292,7 +2292,7 @@
         "port": 30007,
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -2305,7 +2305,7 @@
         "ignore_eos": true,
         "host": "127.0.0.1",
         "port": 30007,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"
     }
@@ -2416,7 +2416,7 @@
       "idempotency_key": "23aa84ad1d984a187f86a4bb0b95bf822ed93aedcd9ac4864e8044d5de35cfb7",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "main-hotpath-restore-after-174-176-175",
@@ -2455,7 +2455,7 @@
         "disable_log_requests": "",
         "host": "0.0.0.0",
         "port": 8025,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16",
         "gpu_memory_utilization": 0.6,
         "max_model_len": 32768
@@ -2469,7 +2469,7 @@
         "logprobs": 20,
         "host": "127.0.0.1",
         "port": 8025,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -2566,7 +2566,7 @@
       "data_source": "real-online-historical-pr-backfill",
       "engine": "vllm-hust",
       "engine_version": "v0.17.2.post1-3628-ge4ce33646",
-      "reproducible_cmd": "# Server: cd /root/vllm/vllm-hust && git checkout e4ce33646f2e && cd /root/vllm/vllm-ascend-hust && git checkout 52f923884b9a\n# Launch: vllm serve /data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
+      "reproducible_cmd": "# Server: cd vllm-hust && git checkout e4ce33646f2e && cd vllm-ascend-hust && git checkout 52f923884b9a\n# Launch: vllm serve <model-cache>/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
       "git_commit": "e4ce33646f2ef1781289e6dc651fad0d00177c55",
       "github_user": "SuccinctPaul",
       "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/e4ce33646f2ef1781289e6dc651fad0d00177c55",
@@ -2582,7 +2582,7 @@
       "idempotency_key": "f0f7e9890c0623ea2421ebba26d34a0b6aff6b2e7e57b207d8470550f5840866",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/root/miniconda3/envs/vllm-hust-dev/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "pr130-latest-logprobs-online",
@@ -2603,7 +2603,7 @@
       "schema_version": "benchmark-same-spec/v1",
       "spec_id": "official-ascend-jan-2026-v0.18.0-logprobs-online-qwen25-14b-910b2",
       "spec_label": "Official Ascend Jan 2026 logprobs stress baseline for vllm-hust goal tracking",
-      "spec_source": "/root/vllm/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
+      "spec_source": "vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
       "scenario": "logprobs-online",
       "model": "Qwen/Qwen2.5-14B-Instruct",
       "model_parameters": "14B",
@@ -2621,7 +2621,7 @@
         "disable_log_requests": "",
         "host": "0.0.0.0",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -2633,7 +2633,7 @@
         "logprobs": 20,
         "host": "127.0.0.1",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -2730,7 +2730,7 @@
       "data_source": "real-online-historical-pr-backfill",
       "engine": "vllm-hust",
       "engine_version": "v0.17.2.post1-3526-g611bcabeb",
-      "reproducible_cmd": "# Server: cd /root/vllm/vllm-hust && git checkout 611bcabeb730 && cd /root/vllm/vllm-ascend-hust && git checkout 52f923884b9a\n# Launch: vllm serve /data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
+      "reproducible_cmd": "# Server: cd vllm-hust && git checkout 611bcabeb730 && cd vllm-ascend-hust && git checkout 52f923884b9a\n# Launch: vllm serve <model-cache>/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
       "git_commit": "611bcabeb730ebcd0a44881236bfead67830625a",
       "github_user": "SuccinctPaul",
       "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/611bcabeb730ebcd0a44881236bfead67830625a",
@@ -2746,7 +2746,7 @@
       "idempotency_key": "179fb20f8a5fd57f2930f091f92087127cfbd428068e5bbb0590f510562e8fb0",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/root/miniconda3/envs/vllm-hust-dev/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "pr130-base-logprobs-online",
@@ -2767,7 +2767,7 @@
       "schema_version": "benchmark-same-spec/v1",
       "spec_id": "official-ascend-jan-2026-v0.18.0-logprobs-online-qwen25-14b-910b2",
       "spec_label": "Official Ascend Jan 2026 logprobs stress baseline for vllm-hust goal tracking",
-      "spec_source": "/root/vllm/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
+      "spec_source": "vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
       "scenario": "logprobs-online",
       "model": "Qwen/Qwen2.5-14B-Instruct",
       "model_parameters": "14B",
@@ -2785,7 +2785,7 @@
         "disable_log_requests": "",
         "host": "0.0.0.0",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -2797,7 +2797,7 @@
         "logprobs": 20,
         "host": "127.0.0.1",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -2894,7 +2894,7 @@
       "data_source": "real-online-historical-pr-backfill",
       "engine": "vllm-hust",
       "engine_version": "v0.17.2.post1-3527-ga2ff5cd98",
-      "reproducible_cmd": "# Server: cd /root/vllm/vllm-hust && git checkout a2ff5cd9855f && cd /root/vllm/vllm-ascend-hust && git checkout 52f923884b9a\n# Launch: vllm serve /data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
+      "reproducible_cmd": "# Server: cd vllm-hust && git checkout a2ff5cd9855f && cd vllm-ascend-hust && git checkout 52f923884b9a\n# Launch: vllm serve <model-cache>/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
       "git_commit": "a2ff5cd9855fd5b445d0e810313a1250f9f9f179",
       "github_user": "SuccinctPaul",
       "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/a2ff5cd9855fd5b445d0e810313a1250f9f9f179",
@@ -2910,7 +2910,7 @@
       "idempotency_key": "534e713245b94951321b1adbb34b502f001c3de093998f466d6a2542052e17bd",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/root/miniconda3/envs/vllm-hust-dev/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "pr130-head-logprobs-online",
@@ -2931,7 +2931,7 @@
       "schema_version": "benchmark-same-spec/v1",
       "spec_id": "official-ascend-jan-2026-v0.18.0-logprobs-online-qwen25-14b-910b2",
       "spec_label": "Official Ascend Jan 2026 logprobs stress baseline for vllm-hust goal tracking",
-      "spec_source": "/root/vllm/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
+      "spec_source": "vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
       "scenario": "logprobs-online",
       "model": "Qwen/Qwen2.5-14B-Instruct",
       "model_parameters": "14B",
@@ -2949,7 +2949,7 @@
         "disable_log_requests": "",
         "host": "0.0.0.0",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -2961,7 +2961,7 @@
         "logprobs": 20,
         "host": "127.0.0.1",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -3058,7 +3058,7 @@
       "data_source": "real-online-historical-pr-backfill",
       "engine": "vllm-hust",
       "engine_version": "v0.17.2.post1-1184-g262d9e810",
-      "reproducible_cmd": "# Server: cd /root/vllm/vllm-hust && git checkout 262d9e810b6f && cd /root/vllm/vllm-ascend-hust && git checkout 7bce23cc0572\n# Launch: vllm serve /data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
+      "reproducible_cmd": "# Server: cd vllm-hust && git checkout 262d9e810b6f && cd vllm-ascend-hust && git checkout 7bce23cc0572\n# Launch: vllm serve <model-cache>/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
       "git_commit": "262d9e810b6f6f256d6c37c47a1585818a20a4e7",
       "github_user": "SuccinctPaul",
       "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/262d9e810b6f6f256d6c37c47a1585818a20a4e7",
@@ -3074,7 +3074,7 @@
       "idempotency_key": "cd3eda7042cc96b083a2b28cf645c4a0340a00ef88474939238c251173c130c4",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/root/miniconda3/envs/vllm-hust-dev/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "pr46-head-logprobs-online",
@@ -3095,7 +3095,7 @@
       "schema_version": "benchmark-same-spec/v1",
       "spec_id": "official-ascend-jan-2026-v0.18.0-logprobs-online-qwen25-14b-910b2",
       "spec_label": "Official Ascend Jan 2026 logprobs stress baseline for vllm-hust goal tracking",
-      "spec_source": "/root/vllm/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
+      "spec_source": "vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
       "scenario": "logprobs-online",
       "model": "Qwen/Qwen2.5-14B-Instruct",
       "model_parameters": "14B",
@@ -3113,7 +3113,7 @@
         "disable_log_requests": "",
         "host": "0.0.0.0",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -3125,7 +3125,7 @@
         "logprobs": 20,
         "host": "127.0.0.1",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -3222,7 +3222,7 @@
       "data_source": "real-online-historical-pr-backfill",
       "engine": "vllm-hust",
       "engine_version": "v0.17.2.post1-1186-g40dfe0e1f",
-      "reproducible_cmd": "# Server: cd /root/vllm/vllm-hust && git checkout 40dfe0e1fc29 && cd /root/vllm/vllm-ascend-hust && git checkout 7bce23cc0572\n# Launch: vllm serve /data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
+      "reproducible_cmd": "# Server: cd vllm-hust && git checkout 40dfe0e1fc29 && cd vllm-ascend-hust && git checkout 7bce23cc0572\n# Launch: vllm serve <model-cache>/Qwen2.5-14B-Instruct --dtype float16 -tp 1 --port 8001 --enforce-eager\n# Bench: benchmark random --num-prompts 200 --input-len 1024 --output-len 256",
       "git_commit": "40dfe0e1fc29abc60ea81e4398cda87d9d9b06f5",
       "github_user": "SuccinctPaul",
       "github_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/40dfe0e1fc29abc60ea81e4398cda87d9d9b06f5",
@@ -3238,7 +3238,7 @@
       "idempotency_key": "fca43526fb2cf530a78ed489fa50ca4729e8068d2d29da3696e0739ee14661a1",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/root/miniconda3/envs/vllm-hust-dev/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "pr46-base-logprobs-online",
@@ -3259,7 +3259,7 @@
       "schema_version": "benchmark-same-spec/v1",
       "spec_id": "official-ascend-jan-2026-v0.18.0-logprobs-online-qwen25-14b-910b2",
       "spec_label": "Official Ascend Jan 2026 logprobs stress baseline for vllm-hust goal tracking",
-      "spec_source": "/root/vllm/vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
+      "spec_source": "vllm-hust-benchmark/docs/official-baselines/official-ascend-jan-2026-v0180-logprobs-online-qwen25-14b-910b2.json",
       "scenario": "logprobs-online",
       "model": "Qwen/Qwen2.5-14B-Instruct",
       "model_parameters": "14B",
@@ -3277,7 +3277,7 @@
         "disable_log_requests": "",
         "host": "0.0.0.0",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -3289,7 +3289,7 @@
         "logprobs": 20,
         "host": "127.0.0.1",
         "port": 8001,
-        "model": "/data/vllm-hust-benchmark-issue97/models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -3402,7 +3402,7 @@
       "idempotency_key": "00fedddaf65fd600fe7b5aecb979ffe8d14e1e49027cb4a27964b30e620a9122",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "main",
@@ -3443,7 +3443,7 @@
         "host": "0.0.0.0",
         "port": 8020,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -3455,7 +3455,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8020,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -3615,7 +3615,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -3628,7 +3628,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28607,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -3788,7 +3788,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -3801,7 +3801,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28605,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -3961,7 +3961,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -3974,7 +3974,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28606,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -4134,7 +4134,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -4147,7 +4147,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28676,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -4307,7 +4307,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -4320,7 +4320,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30001,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -4480,7 +4480,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -4493,7 +4493,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30002,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -4653,7 +4653,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -4666,7 +4666,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30007,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -4826,7 +4826,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -4839,7 +4839,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30005,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -4999,7 +4999,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -5012,7 +5012,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30004,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -5172,7 +5172,7 @@
         "no_enable_chunked_prefill": true,
         "max_num_seqs": 16,
         "max_num_batched_tokens": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -5185,7 +5185,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30003,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "prefix_repetition_output_len": 256,
         "prefix_repetition_num_prefixes": 10,
         "prefix_repetition_suffix_len": 256,
@@ -5338,7 +5338,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -5348,7 +5348,7 @@
         "batch_size": 8,
         "num_iters_warmup": 10,
         "num_iters": 30,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "3e81e3e00639f882933d45f5420a8e0813225bc6d7370a6f318cb207417c8f6a"
     }
@@ -5497,7 +5497,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -5507,7 +5507,7 @@
         "batch_size": 8,
         "num_iters_warmup": 10,
         "num_iters": 30,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "3e81e3e00639f882933d45f5420a8e0813225bc6d7370a6f318cb207417c8f6a"
     }
@@ -5656,7 +5656,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -5666,7 +5666,7 @@
         "batch_size": 8,
         "num_iters_warmup": 10,
         "num_iters": 30,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "3e81e3e00639f882933d45f5420a8e0813225bc6d7370a6f318cb207417c8f6a"
     }
@@ -5815,7 +5815,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -5825,7 +5825,7 @@
         "batch_size": 8,
         "num_iters_warmup": 10,
         "num_iters": 30,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "3e81e3e00639f882933d45f5420a8e0813225bc6d7370a6f318cb207417c8f6a"
     }
@@ -5974,7 +5974,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -5984,7 +5984,7 @@
         "batch_size": 8,
         "num_iters_warmup": 10,
         "num_iters": 30,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "3e81e3e00639f882933d45f5420a8e0813225bc6d7370a6f318cb207417c8f6a"
     }
@@ -6133,7 +6133,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -6143,7 +6143,7 @@
         "batch_size": 8,
         "num_iters_warmup": 10,
         "num_iters": 30,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "3e81e3e00639f882933d45f5420a8e0813225bc6d7370a6f318cb207417c8f6a"
     }
@@ -6292,7 +6292,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -6302,7 +6302,7 @@
         "batch_size": 8,
         "num_iters_warmup": 10,
         "num_iters": 30,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "3e81e3e00639f882933d45f5420a8e0813225bc6d7370a6f318cb207417c8f6a"
     }
@@ -6451,7 +6451,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -6461,7 +6461,7 @@
         "batch_size": 8,
         "num_iters_warmup": 10,
         "num_iters": 30,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "3e81e3e00639f882933d45f5420a8e0813225bc6d7370a6f318cb207417c8f6a"
     }
@@ -6610,7 +6610,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -6620,7 +6620,7 @@
         "batch_size": 8,
         "num_iters_warmup": 10,
         "num_iters": 30,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "3e81e3e00639f882933d45f5420a8e0813225bc6d7370a6f318cb207417c8f6a"
     }
@@ -6731,7 +6731,7 @@
       "idempotency_key": "ce0225a2041ef72f57c69b61ab220138f4d97a6c65245bea1442273e57bf577b",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "main",
@@ -6772,7 +6772,7 @@
         "host": "0.0.0.0",
         "port": 8020,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -6784,7 +6784,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8020,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -6897,7 +6897,7 @@
       "idempotency_key": "b8a4f47f3a661ff841ae3eb5aa1f8b363c6ca91cfd3860e23e567a873fa82ee6",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "hotpath-base-5536d087-before-pr174-175-176",
@@ -6938,7 +6938,7 @@
         "host": "0.0.0.0",
         "port": 8028,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -6950,7 +6950,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8028,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -7104,7 +7104,7 @@
         "host": "0.0.0.0",
         "port": 28406,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -7116,7 +7116,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28406,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -7270,7 +7270,7 @@
         "host": "0.0.0.0",
         "port": 28631,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -7282,7 +7282,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28631,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -7436,7 +7436,7 @@
         "host": "0.0.0.0",
         "port": 28644,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -7448,7 +7448,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28644,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -7602,7 +7602,7 @@
         "host": "0.0.0.0",
         "port": 28674,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -7614,7 +7614,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28674,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -7768,7 +7768,7 @@
         "host": "0.0.0.0",
         "port": 30004,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -7780,7 +7780,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30004,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -7934,7 +7934,7 @@
         "host": "0.0.0.0",
         "port": 30005,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -7946,7 +7946,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30005,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -8100,7 +8100,7 @@
         "host": "0.0.0.0",
         "port": 30007,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -8112,7 +8112,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30007,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -8266,7 +8266,7 @@
         "host": "0.0.0.0",
         "port": 30016,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -8278,7 +8278,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30016,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -8432,7 +8432,7 @@
         "host": "0.0.0.0",
         "port": 30001,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -8444,7 +8444,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30001,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -8598,7 +8598,7 @@
         "host": "0.0.0.0",
         "port": 30002,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -8610,7 +8610,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30002,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -8764,7 +8764,7 @@
         "host": "0.0.0.0",
         "port": 30016,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -8776,7 +8776,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30016,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "random_input_len": 1024,
         "random_output_len": 256
       },
@@ -8889,7 +8889,7 @@
       "idempotency_key": "440e9a283f0a3a94f075dadb6255a93b31606b553159664ef20f948edfff9700",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "main",
@@ -8930,7 +8930,7 @@
         "host": "0.0.0.0",
         "port": 8020,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -8943,7 +8943,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8020,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -9054,7 +9054,7 @@
       "idempotency_key": "527f3b6ccb473833af664ce752e662cc19cd8753cde0fd06660dc2d5d70e6ffe",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "hotpath-base-5536d087-before-pr174-175-176",
@@ -9095,7 +9095,7 @@
         "host": "0.0.0.0",
         "port": 8027,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -9108,7 +9108,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8027,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -9219,7 +9219,7 @@
       "idempotency_key": "9d8e4d0fda9e6d12a14b25c84322d3d353b299a9dc7ccc1999afbc312b6c9f6a",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "",
@@ -9260,7 +9260,7 @@
         "host": "0.0.0.0",
         "port": 8051,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -9273,7 +9273,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8051,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -9384,7 +9384,7 @@
       "idempotency_key": "deb103f0b9ba7c3bcf177c8b4d627eb80d06c9d240aedff7604e901fb00044a4",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "",
@@ -9425,7 +9425,7 @@
         "host": "0.0.0.0",
         "port": 8050,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -9438,7 +9438,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8050,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -9590,7 +9590,7 @@
         "host": "0.0.0.0",
         "port": 28407,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -9603,7 +9603,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28407,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -9755,7 +9755,7 @@
         "host": "0.0.0.0",
         "port": 28512,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -9768,7 +9768,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28512,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -9920,7 +9920,7 @@
         "host": "0.0.0.0",
         "port": 28645,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -9933,7 +9933,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28645,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -10085,7 +10085,7 @@
         "host": "0.0.0.0",
         "port": 28675,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -10098,7 +10098,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28675,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -10250,7 +10250,7 @@
         "host": "0.0.0.0",
         "port": 30003,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -10263,7 +10263,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30003,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -10415,7 +10415,7 @@
         "host": "0.0.0.0",
         "port": 30004,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -10428,7 +10428,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30004,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -10580,7 +10580,7 @@
         "host": "0.0.0.0",
         "port": 30007,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -10593,7 +10593,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30007,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -10745,7 +10745,7 @@
         "host": "0.0.0.0",
         "port": 30005,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -10758,7 +10758,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30005,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -10910,7 +10910,7 @@
         "host": "0.0.0.0",
         "port": 30001,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -10923,7 +10923,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30001,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -11075,7 +11075,7 @@
         "host": "0.0.0.0",
         "port": 30002,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -11088,7 +11088,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30002,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "66100e24033a9724a65e6e245d1e33a0e933fbfdcd850558428ac095ae5b4ded"
     }
@@ -11199,7 +11199,7 @@
       "idempotency_key": "53d68d8a9e62882deaa9a65fb93f03836e9a9f722b30f4a8b988ce7c43a88f4f",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "latest-main-e4ce",
@@ -11237,7 +11237,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -11247,7 +11247,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "max_model_len": 32768
       },
       "resolved_spec_hash": "16e9b1b513fa24906e1bc5ef49cbd1caaf9ecb91ce76e26cc92bfdda356c8a9c"
@@ -11397,7 +11397,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -11407,7 +11407,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "c611658f1d2189d7d267df78bfcf3ba572429d815ec680fe4e8d1313912198fd"
     }
@@ -11556,7 +11556,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -11566,7 +11566,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "c611658f1d2189d7d267df78bfcf3ba572429d815ec680fe4e8d1313912198fd"
     }
@@ -11715,7 +11715,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -11725,7 +11725,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "c611658f1d2189d7d267df78bfcf3ba572429d815ec680fe4e8d1313912198fd"
     }
@@ -11874,7 +11874,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -11884,7 +11884,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "c611658f1d2189d7d267df78bfcf3ba572429d815ec680fe4e8d1313912198fd"
     }
@@ -12033,7 +12033,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -12043,7 +12043,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "c611658f1d2189d7d267df78bfcf3ba572429d815ec680fe4e8d1313912198fd"
     }
@@ -12192,7 +12192,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -12202,7 +12202,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "c611658f1d2189d7d267df78bfcf3ba572429d815ec680fe4e8d1313912198fd"
     }
@@ -12351,7 +12351,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -12361,7 +12361,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "c611658f1d2189d7d267df78bfcf3ba572429d815ec680fe4e8d1313912198fd"
     }
@@ -12510,7 +12510,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -12520,7 +12520,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "c611658f1d2189d7d267df78bfcf3ba572429d815ec680fe4e8d1313912198fd"
     }
@@ -12669,7 +12669,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -12679,7 +12679,7 @@
         "dataset_path": "ShareGPT_V3_unfiltered_cleaned_split.json",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "c611658f1d2189d7d267df78bfcf3ba572429d815ec680fe4e8d1313912198fd"
     }
@@ -12790,7 +12790,7 @@
       "idempotency_key": "17359bde5abc46eeecbc181660032f0b82b43fd89137f2019154a42fca9375df",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "latest-main-e4ce",
@@ -12828,7 +12828,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -12838,7 +12838,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen--Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen--Qwen2.5-14B-Instruct",
         "max_model_len": 32768
       },
       "resolved_spec_hash": "52fe0ad2b86b519fe7806fc7bc2b561d05eed219ccfeb5755213ba01e76fbb0b"
@@ -12988,7 +12988,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -12998,7 +12998,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -13147,7 +13147,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -13157,7 +13157,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -13306,7 +13306,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -13316,7 +13316,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -13465,7 +13465,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -13475,7 +13475,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -13624,7 +13624,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -13634,7 +13634,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -13783,7 +13783,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -13793,7 +13793,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -13942,7 +13942,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -13952,7 +13952,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -14101,7 +14101,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -14111,7 +14111,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -14260,7 +14260,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -14270,7 +14270,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -14419,7 +14419,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -14429,7 +14429,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -14578,7 +14578,7 @@
         "trust_remote_code": "",
         "disable_log_stats": "",
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -14588,7 +14588,7 @@
         "dataset_path": "benchmarks/sonnet.txt",
         "num_prompts": 200,
         "num_warmups": 0,
-        "model": "/data/shared_models/Qwen2.5-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-14B-Instruct"
       },
       "resolved_spec_hash": "ecaff7738d2288c97fd8f41df61e62480a1706ea157cd0ed9a6093d805514cd1"
     }
@@ -14699,7 +14699,7 @@
       "idempotency_key": "eb3b6c3946f793800b151d4b9404d8b680483a7a47bd83ea0caca23919c82160",
       "manifest_source": "generated-by-vllm-hust-benchmark/0.1.0",
       "runtime_provenance": {
-        "python": "/data/conda-envs/vllm-hust-main-tf5-backfill/bin/python",
+        "python": "<python-environment>/bin/python",
         "engine": {
           "repository": "vLLM-HUST/vllm-hust",
           "ref": "main",
@@ -14738,7 +14738,7 @@
         "disable_log_requests": "",
         "host": "0.0.0.0",
         "port": 8021,
-        "model": "/data/shared_models/Qwen2.5-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -14750,7 +14750,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 8021,
-        "model": "/data/shared_models/Qwen2.5-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-7B-Instruct"
       },
       "resolved_spec_hash": "4ce9164b27336795b835d85423c6d6353e704af9b73254cb3d54bc3a95fb89ef"
     }
@@ -14902,7 +14902,7 @@
         "host": "0.0.0.0",
         "port": 28404,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -14915,7 +14915,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28404,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -15067,7 +15067,7 @@
         "host": "0.0.0.0",
         "port": 28501,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -15080,7 +15080,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28501,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -15232,7 +15232,7 @@
         "host": "0.0.0.0",
         "port": 28514,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -15245,7 +15245,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28514,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -15397,7 +15397,7 @@
         "host": "0.0.0.0",
         "port": 28671,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -15410,7 +15410,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28671,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -15562,7 +15562,7 @@
         "host": "0.0.0.0",
         "port": 30001,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -15575,7 +15575,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30001,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -15727,7 +15727,7 @@
         "host": "0.0.0.0",
         "port": 30004,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -15740,7 +15740,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30004,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -15892,7 +15892,7 @@
         "host": "0.0.0.0",
         "port": 30002,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -15905,7 +15905,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30002,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -16057,7 +16057,7 @@
         "host": "0.0.0.0",
         "port": 30003,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -16070,7 +16070,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30003,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -16222,7 +16222,7 @@
         "host": "0.0.0.0",
         "port": 30007,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -16235,7 +16235,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30007,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -16387,7 +16387,7 @@
         "host": "0.0.0.0",
         "port": 30005,
         "max_model_len": 32768,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct",
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -16400,7 +16400,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 30005,
-        "model": "/data/shared_models/Qwen2.5-Coder-14B-Instruct"
+        "model": "<model-cache>/Qwen2.5-Coder-14B-Instruct"
       },
       "resolved_spec_hash": "8b0eda0c27055ec8449469dde022d9b37bd7efb201622c811e1add76dd9ffc10"
     }
@@ -16555,7 +16555,7 @@
         },
         "host": "0.0.0.0",
         "port": 28503,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -16569,7 +16569,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28503,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -16724,7 +16724,7 @@
         },
         "host": "0.0.0.0",
         "port": 28525,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -16738,7 +16738,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28525,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -16893,7 +16893,7 @@
         },
         "host": "0.0.0.0",
         "port": 28521,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -16907,7 +16907,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28521,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -17062,7 +17062,7 @@
         },
         "host": "0.0.0.0",
         "port": 28533,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -17076,7 +17076,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28533,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -17231,7 +17231,7 @@
         },
         "host": "0.0.0.0",
         "port": 28641,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -17245,7 +17245,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28641,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -17400,7 +17400,7 @@
         },
         "host": "0.0.0.0",
         "port": 28645,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -17414,7 +17414,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28645,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -17569,7 +17569,7 @@
         },
         "host": "0.0.0.0",
         "port": 28613,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -17583,7 +17583,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28613,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -17738,7 +17738,7 @@
         },
         "host": "0.0.0.0",
         "port": 28621,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -17752,7 +17752,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28621,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -17907,7 +17907,7 @@
         },
         "host": "0.0.0.0",
         "port": 28625,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -17921,7 +17921,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28625,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -18076,7 +18076,7 @@
         },
         "host": "0.0.0.0",
         "port": 28672,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -18090,7 +18090,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28672,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -18245,7 +18245,7 @@
         },
         "host": "0.0.0.0",
         "port": 28676,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -18259,7 +18259,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28676,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
@@ -18414,7 +18414,7 @@
         },
         "host": "0.0.0.0",
         "port": 28674,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct",
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct",
         "dtype": "float16"
       },
       "resolved_client_parameters": {
@@ -18428,7 +18428,7 @@
         "request_rate": 1,
         "host": "127.0.0.1",
         "port": 28674,
-        "model": "/data/shared_models/Qwen2.5-VL-7B-Instruct"
+        "model": "<model-cache>/Qwen2.5-VL-7B-Instruct"
       },
       "resolved_spec_hash": "22e4a99de4a4f3ee7daf9ae01d443809ac9486bc22dd84ecf21396474622d6b5"
     }
