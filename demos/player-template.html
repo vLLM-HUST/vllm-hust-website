@@ -6,6 +6,15 @@
   - asciinema-player js (CDN)
 -->
 
+<meta charset="UTF-8" />
+<style>
+    #demo-player,
+    #demo-player .ap-wrapper {
+        width: 100%;
+        min-width: 0;
+    }
+</style>
+
 <!-- 1. Add to <head> -->
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/asciinema-player@3.8.0/dist/bundle/asciinema-player.css" />
 
@@ -13,7 +22,7 @@
 <div class="demo-container" style="border: 1px solid #333; border-radius: 8px; overflow: hidden; background: #000;">
     <!-- Title Bar -->
     <div style="padding: 12px 16px; border-bottom: 1px solid #333; background: rgba(255,255,255,0.05); color: #fff;">
-        <span style="font-family: monospace;">📺 Live Demo: vllm-hust Serving Engine</span>
+        <span style="font-family: monospace;">DEMO / vllm-hust Serving Engine</span>
     </div>
 
     <!-- Player Element -->
@@ -42,7 +51,7 @@
                 // Formatting
                 cols: 100,
                 rows: 24,
-                fit: "none",
+                fit: "width",
                 terminalLineHeight: 1.5,
 
                 // Behavior
