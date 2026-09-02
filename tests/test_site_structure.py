@@ -866,7 +866,7 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
 
 def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
     root = Path(__file__).resolve().parents[1]
-    paths = sorted(root.glob("*.html"))
+    paths = sorted(root.rglob("*.html"))
     paths += sorted(root.glob("*.md"))
     paths += sorted((root / "docs").rglob("*.md"))
     paths += sorted((root / "data").rglob("*.json"))
