@@ -58,11 +58,9 @@ def _render_readme_block(meta: dict[str, Any]) -> str:
         "vllm-hust 围绕上游 vLLM 展开，聚焦国产算力适配、AGI4S 服务场景和 benchmark 驱动验证。",
     )
     quickstart_title = quickstart.get("title_zh", "🚀 Quick Start")
-    install_command = quickstart.get("install_command", "pip install vllm-hust")
-    setup_command = quickstart.get(
-        "setup_command", "vllm serve Qwen/Qwen2.5-1.5B-Instruct --port 8000"
-    )
-    run_command = quickstart.get("run_command", 'vllm chat --quick "Hello AI"')
+    install_command = quickstart["install_command"]
+    description = quickstart["description_zh"]
+    runbook_url = quickstart["runbook_url"]
 
     return "\n".join(
         [
@@ -79,16 +77,14 @@ def _render_readme_block(meta: dict[str, Any]) -> str:
             "",
             f"## {quickstart_title.replace('🚀 ', '')}",
             "",
+            description,
+            "",
             "```bash",
-            "# 安装",
+            "# 获取部署工具（并不直接安装运行时）",
             install_command,
-            "",
-            "# 启动 OpenAI 兼容服务器",
-            setup_command,
-            "",
-            "# 发起一次聊天请求",
-            run_command,
             "```",
+            "",
+            f"[部署运维指南]({runbook_url})",
             "",
             "_该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_version_meta.py` 自动更新。_",
         ]
@@ -128,6 +124,9 @@ def sync_version_meta() -> bool:
     changed = False
     for package in packages:
         if not isinstance(package, dict):
+            continue
+        if package.get("source_branch"):
+            # A registry release must never overwrite an exact source snapshot.
             continue
 
         pypi_name = package.get("pypi_name")

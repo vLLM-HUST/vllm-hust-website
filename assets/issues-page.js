@@ -16,6 +16,10 @@
             draftPr: 'Draft',
             openPr: 'Open',
             closedPr: 'Closed',
+            mergedPr: 'Merged',
+            noActive: 'No active items in this curated snapshot. For all current issues, check GitHub below.',
+            archive: 'Closed items · historical evidence',
+            historical: 'Progress and checkboxes below preserve the original review, not a new acceptance verdict. A merged PR alone does not prove every criterion passed.',
             noCriteria: 'No acceptance criteria recorded.',
         },
         zh: {
@@ -32,6 +36,10 @@
             draftPr: '草稿',
             openPr: '开放',
             closedPr: '已关闭',
+            mergedPr: '已合并',
+            noActive: '这份精选快照中已无开放项。全部当前议题请查看下方 GitHub 链接。',
+            archive: '已关闭议题 · 历史记录',
+            historical: '下方进展与勾选保留原始评审记录，不是新一轮验收结论。PR 合并不等于所有验收项均已通过。',
             noCriteria: '暂无验收标准。',
         },
     };
@@ -77,7 +85,7 @@
     }
 
     function renderStats(data, lang) {
-        const issues = (data && data.issues) || [];
+        const issues = ((data && data.issues) || []).filter((issue) => issue.state === 'open');
         const openPrs = issues.filter((issue) => issue.pr && issue.pr.state === 'open').length;
         const blocked = issues.filter((issue) => issue.status === 'blocked').length;
         const draft = issues.filter((issue) => issue.status === 'draft').length;
@@ -97,6 +105,7 @@
     function prStateLabel(pr, lang) {
         const text = ui(lang);
         if (!pr) return '';
+        if (pr.merged_at) return text.mergedPr;
         if (pr.draft) return text.draftPr;
         if (pr.state === 'open') return text.openPr;
         if (pr.state === 'closed') return text.closedPr;
@@ -173,6 +182,7 @@
             </header>
             <p class="issue-summary">${escapeHtml(summary)}</p>
             ${prHtml}
+            ${issue.state === 'closed' ? `<p class="issue-history-note">${escapeHtml(text.historical)}</p>` : ''}
             ${progress ? `<p class="issue-progress"><span class="issue-progress-label">${escapeHtml(text.progressLabel)}</span><span class="issue-progress-text">${escapeHtml(progress)}</span></p>` : ''}
             ${criteriaHtml}
             ${tagsHtml}
@@ -185,7 +195,14 @@
         const target = document.getElementById('issue-list');
         if (!target || !state.data) return;
         const issues = state.data.issues || [];
-        target.innerHTML = issues.map((issue) => renderIssue(issue, lang)).join('');
+        const active = issues.filter((issue) => issue.state === 'open');
+        const closed = issues.filter((issue) => issue.state === 'closed');
+        target.innerHTML = active.length ? active.map((issue) => renderIssue(issue, lang)).join('')
+            : `<p class="issue-empty">${escapeHtml(ui(lang).noActive)}</p>`;
+        document.getElementById('issue-archive-list').innerHTML = closed.map((issue) => renderIssue(issue, lang)).join('');
+        document.getElementById('issue-archive-label').textContent = `${ui(lang).archive} (${closed.length})`;
+        document.getElementById('issue-archive').hidden = !closed.length;
+        window.vllmHustSnapshot.render(document.getElementById('issues-verified'), state.data.last_updated, lang);
     }
 
     function renderDynamic(lang = currentLang()) {

@@ -1,12 +1,4 @@
 (function () {
-    const DATA_URLS = {
-        versionMeta: './data/version_meta.json',
-        single: './data/leaderboard_single.json',
-        multi: './data/leaderboard_multi.json',
-        compare: './data/leaderboard_compare.json',
-        contributors: './data/core_contributors.json',
-    };
-
     // Inclusion policy: list team-owned accepted publications and project releases,
     // merged upstream work, and externally verified community or industry impact
     // attributable to our members. External projects that we mirror, integrate, validate, or adapt are not achievements.
@@ -323,19 +315,6 @@
 
     const UI = {
         en: {
-            throughputUnit: 'tok/s',
-            workloadFallback: 'Other',
-            modelFallback: 'Unknown model',
-            milestoneBenchmarkTitle: 'Benchmark results',
-            milestoneBenchmarkBody: (groups, pairs) => `${groups} comparison groups and ${pairs} preferred comparisons are available on the leaderboard.`,
-            milestoneHardTitle: 'Validation coverage',
-            milestoneHardBody: (scopes) => `${scopes} validation scopes are tracked with status and regression context.`,
-            milestoneBaselineTitle: 'Baseline comparison',
-            milestoneBaselineBody: (pairs) => `${pairs} comparisons show vllm-hust results against the vLLM baseline.`,
-            milestoneWorkstationTitle: 'Workstation access',
-            milestoneWorkstationBody: 'The website can link to the live vllm-hust workstation used for serving workflows.',
-            currentDate: 'Current',
-            milestoneKind: 'Project',
             latestLabel: 'Latest',
             repositoryLabel: 'Explore repository',
             teamLabel: 'Project team',
@@ -370,19 +349,6 @@
             releaseLineLabel: 'Achievement release line',
         },
         zh: {
-            throughputUnit: 'token/s',
-            workloadFallback: '其他',
-            modelFallback: '未知模型',
-            milestoneBenchmarkTitle: 'Benchmark 结果',
-            milestoneBenchmarkBody: (groups, pairs) => `排行榜目前展示 ${groups} 个对比组和 ${pairs} 个优选对比。`,
-            milestoneHardTitle: '验证覆盖',
-            milestoneHardBody: (scopes) => `当前展示 ${scopes} 个验证范围，并保留状态和回归上下文。`,
-            milestoneBaselineTitle: '基线对比',
-            milestoneBaselineBody: (pairs) => `${pairs} 个对比用于展示 vllm-hust 与 vLLM 基线的差异。`,
-            milestoneWorkstationTitle: 'Workstation 入口',
-            milestoneWorkstationBody: '网站可以链接到用于推理服务流程的 vllm-hust workstation。',
-            currentDate: '当前',
-            milestoneKind: '项目',
             latestLabel: '最新',
             repositoryLabel: '查看优化仓库',
             teamLabel: '项目团队',
@@ -418,18 +384,8 @@
         },
     };
 
-    const state = {
-        versionMeta: null,
-        entries: [],
-        compare: null,
-    };
-
     let expandedUpstreamRepository = null;
     let activeAchievementFilter = 'all';
-
-    function fmt(value) {
-        return Number(value || 0).toLocaleString();
-    }
 
     function currentLang() {
         return window.vllmHustSite?.getCurrentLang?.() || 'en';
@@ -442,98 +398,6 @@
 
     function ui(lang = currentLang()) {
         return UI[lang] || UI.en;
-    }
-
-    function getEngine(entry) {
-        return String(entry?.engine || entry?.metadata?.engine || 'unknown').trim();
-    }
-
-    function getWorkload(entry, lang = currentLang()) {
-        return String(entry?.workload?.name || entry?.metadata?.workload || ui(lang).workloadFallback).trim();
-    }
-
-    function getModel(entry, lang = currentLang()) {
-        return String(entry?.model?.display_name || entry?.model?.name || ui(lang).modelFallback).trim();
-    }
-
-    async function loadJson(url) {
-        const response = await fetch(url, { cache: 'no-cache' });
-        if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
-        return response.json();
-    }
-
-    function setText(id, value) {
-        const node = document.getElementById(id);
-        if (node) node.textContent = value;
-    }
-
-    function renderStats(entries, compare, contributors) {
-        setText('achievement-stat-runs', fmt(entries.length));
-        setText('achievement-stat-models', fmt(new Set(entries.map((entry) => getModel(entry))).size));
-        setText('achievement-stat-workloads', fmt(new Set(entries.map((entry) => getWorkload(entry))).size));
-        setText('achievement-stat-contributors', fmt(contributors?.all_repos?.contributors?.length || 0));
-        setText('achievement-stat-groups', fmt(compare?.group_count || 0));
-        setText('achievement-stat-hard', fmt(compare?.hard_constraints?.scope_count || 0));
-    }
-
-    function buildMilestones(compare, lang = currentLang()) {
-        const text = ui(lang);
-        const hard = compare?.hard_constraints || {};
-        const goal = compare?.goal_progress || {};
-        const groupCount = fmt(compare?.group_count || 0);
-        const preferredPairCount = fmt(compare?.preferred_pair_count || 0);
-        const hardScopeCount = fmt(hard.scope_count || 0);
-        const goalPairCount = fmt(goal.pair_count || (goal.pairs || []).length || 0);
-        return [
-            {
-                sortDate: '2026-07-01',
-                date: text.currentDate,
-                kind: text.milestoneKind,
-                title: text.milestoneBenchmarkTitle,
-                body: text.milestoneBenchmarkBody(groupCount, preferredPairCount),
-                tags: [
-                    { en: 'Leaderboard', zh: '排行榜' },
-                    { en: 'JSON snapshots', zh: 'JSON 快照' },
-                ],
-                links: [],
-            },
-            {
-                sortDate: '2026-07-01',
-                date: text.currentDate,
-                kind: text.milestoneKind,
-                title: text.milestoneHardTitle,
-                body: text.milestoneHardBody(hardScopeCount),
-                tags: [
-                    { en: 'Validation', zh: '验证' },
-                    { en: 'Regression context', zh: '回归上下文' },
-                ],
-                links: [],
-            },
-            {
-                sortDate: '2026-07-01',
-                date: text.currentDate,
-                kind: text.milestoneKind,
-                title: text.milestoneBaselineTitle,
-                body: text.milestoneBaselineBody(goalPairCount),
-                tags: [
-                    { en: 'Baseline', zh: '基线' },
-                    { en: 'vLLM', zh: 'vLLM' },
-                ],
-                links: [],
-            },
-            {
-                sortDate: '2026-07-01',
-                date: text.currentDate,
-                kind: text.milestoneKind,
-                title: text.milestoneWorkstationTitle,
-                body: text.milestoneWorkstationBody,
-                tags: [
-                    { en: 'Workstation', zh: 'Workstation' },
-                    { en: 'Operator workflow', zh: '操作工作流' },
-                ],
-                links: [],
-            },
-        ];
     }
 
     function normalizeAchievement(item, lang) {
@@ -770,23 +634,11 @@
         });
     }
 
-    async function init() {
+    function init() {
         const loading = document.getElementById('achievements-loading');
         const content = document.getElementById('achievements-content');
         const error = document.getElementById('achievements-error');
         try {
-            const [versionMeta, single, multi, compare, contributors] = await Promise.all([
-                loadJson(DATA_URLS.versionMeta),
-                loadJson(DATA_URLS.single),
-                loadJson(DATA_URLS.multi),
-                loadJson(DATA_URLS.compare),
-                loadJson(DATA_URLS.contributors),
-            ]);
-            const entries = [...single, ...multi];
-            state.versionMeta = versionMeta;
-            state.entries = entries;
-            state.compare = compare;
-            renderStats(entries, compare, contributors);
             renderDynamic();
             if (loading) loading.style.display = 'none';
             if (error) error.style.display = 'none';

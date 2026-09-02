@@ -1,0 +1,23 @@
+name: Public snapshot drift check
+
+on:
+  schedule:
+    - cron: '23 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compare curated public snapshots to GitHub and PyPI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/refresh_site_status.py --check

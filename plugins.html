@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826">
 <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901">
-<link rel="stylesheet" href="./assets/plugins.css?v=workshop-v8-metadata-issues-20260901">
+<link rel="stylesheet" href="./assets/plugins.css?v=0.3.7">
 </head>
 <body data-page="plugins">
   <nav class="site-nav">
@@ -929,7 +929,8 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
         </div>
         <p><span class="lang-en">Choose one dominant trait. This is capability matching, not a performance guarantee.</span><span class="lang-zh">选择一个最主要的特征。这是能力匹配，不代表性能效果已经验证。</span></p>
       </header>
-      <div class="workload-filter-list" data-workload-filters></div>
+      <p id="workload-scroll-hint" class="workload-filter-description"><span class="lang-en">Swipe horizontally or focus this row and use arrow keys; Tab selects a filter.</span><span class="lang-zh">可横向滑动；键盘聚焦此行后用方向键滚动，Tab 选择筛选项。</span></p>
+      <div class="workload-filter-list" data-workload-filters tabindex="0" role="group" aria-labelledby="workload-navigation-title" aria-describedby="workload-scroll-hint"></div>
       <p class="workload-filter-description" data-workload-description aria-live="polite"></p>
     </section>
     <aside class="mod-catalog-guide" aria-label="Extension catalog reading guide">
@@ -1012,7 +1013,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
   </script>
   <script src="./assets/site.js?v=nav-polish-20260826">
 </script>
-<script src="./assets/plugins-page.js?v=workshop-v8-metadata-issues-20260901">
+<script src="./assets/plugins-page.js?v=0.3.7">
 </script>
 </body>
 </html>

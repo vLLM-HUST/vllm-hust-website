@@ -929,7 +929,7 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     assert 'id="products"' in text
     assert 'data-product-id="workstation"' in text
     assert 'data-product-id="sage-mate"' in text
-    assert "./assets/product-catalog.js?v=0.3.6" in text
+    assert "./assets/product-catalog.js?v=0.3.7" in text
     assert 'id="workstation-section"' not in text
     assert "workstation-embed.js" not in text
 
@@ -1076,7 +1076,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
-    assert "assets/home.css?v=upstream-forks-20260901" in html_text
+    assert "assets/home.css?v=0.3.7" in html_text
     assert "assets/brand/ecosystem-infrastructure.png" in html_text
     assert 'class="execution-hero"' in html_text
     assert 'class="execution-architecture"' in html_text
@@ -1503,7 +1503,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=nav-polish-20260826" in html_text
-    assert "assets/achievements-page.js?v=upstream-pr-cleanup-20260902" in html_text
+    assert "assets/achievements-page.js?v=0.3.7" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -1662,10 +1662,10 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
-    assert "assets/achievements-page.js?v=upstream-pr-cleanup-20260902" in html_text
+    assert "assets/achievements-page.js?v=0.3.7" in html_text
 
 
-def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
+def test_published_result_repository_sits_between_hero_and_upstream() -> None:
     root = Path(__file__).resolve().parents[1]
     html_text = (root / "achievements.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "achievements-page.js").read_text(encoding="utf-8")
@@ -1675,7 +1675,7 @@ def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
     repositories_index = html_text.index(
         'class="content-panel result-repositories-panel"'
     )
-    snapshot_index = html_text.index('id="achievements-stats-kicker"')
+    snapshot_index = html_text.index('id="upstream-pr-kicker"')
     assert hero_index < repositories_index < snapshot_index
 
     assert "https://github.com/vLLM-HUST/vllm-hust-bidkv" in js_text
@@ -1780,12 +1780,16 @@ def test_version_metadata_excludes_sagellm_package_family() -> None:
     assert any(
         package.get("name") == "triton-ascend-hust"
         and package.get("group") == "core"
-        and package.get("version") == "3.5.0-line"
+        and package.get("source_branch") == "main"
+        and package.get("source_commit_url", "").startswith(
+            package["repo"] + "/commit/"
+        )
         for package in meta.get("packages", [])
     )
     assert "vllm-hust-protocol" not in package_names
     assert "ivllm-hust" not in meta_text
-    assert "0.17.2.post1" not in meta_text
+    assert all(package["version"].startswith("main@") for package in meta["packages"])
+    assert meta["registry"]["approved_for_current_stack"] is False
 
 
 def test_public_docs_do_not_use_ivllm_hust_prefix() -> None:

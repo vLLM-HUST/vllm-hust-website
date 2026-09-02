@@ -371,6 +371,7 @@ vllm serve /path/to/model \\
         expanded = false;
         renderWorkloadNavigation();
         renderCatalog();
+        workloadFilters.querySelector(`[data-workload="${traitId}"]`)?.focus({ preventScroll: true });
       });
       workloadFilters.append(button);
     });

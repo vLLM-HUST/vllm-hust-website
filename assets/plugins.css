@@ -263,6 +263,7 @@ body[data-page="plugins"] .plugin-controls { margin-top: 22px; border-radius: 8p
 .workload-navigation h2 { margin: 6px 0 0; color: #fff; font-size: clamp(20px,2.5vw,30px); line-height: 1.1; }
 .workload-navigation header p { margin: 0; color: #b7c7c3; font-size: 11px; line-height: 1.55; }
 .workload-filter-list { margin-top: 18px; display: flex; gap: 7px; flex-wrap: wrap; }
+.workload-filter-list:focus-visible { outline: 3px solid #39c6ca; outline-offset: 4px; }
 .workload-filter { min-height: 35px; padding: 6px 8px 6px 11px; display: inline-flex; gap: 8px; align-items: center; color: #dce7e4; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.06); font-size: 10px; font-weight: 800; cursor: pointer; white-space: nowrap; }
 .workload-filter strong { min-width: 21px; height: 21px; padding: 0 5px; display: inline-grid; place-items: center; color: #172321; border-radius: 999px; background: #dce7e4; font-size: 9px; }
 .workload-filter:hover,.workload-filter:focus-visible { color: #fff; border-color: #39c6ca; outline: 0; background: rgba(57,198,202,.14); }

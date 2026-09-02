@@ -2,8 +2,8 @@
     'use strict';
 
     const SITE_RELEASE = Object.freeze({
-        version: '0.3.6',
-        releasedAt: '2026-08-16',
+        version: '0.3.7',
+        releasedAt: '2026-09-03',
     });
 
     const PRODUCTS = Object.freeze({

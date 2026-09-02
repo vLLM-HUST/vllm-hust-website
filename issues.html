@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Issues - vllm-hust</title>
-  <meta name="description" content="Active benchmark issues and their pull-request progress across the vLLM-HUST benchmark repository." />
+  <meta name="description" content="A verified, curated snapshot of benchmark issues, with closed items archived separately from active work." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/issues.html" />
   <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
@@ -41,7 +41,7 @@
       <div class="content-panel">
         <span id="issues-eyebrow" class="eyebrow">Tracking</span>
         <h1 id="issues-title" style="margin-top: 16px">Issues</h1>
-        <p id="issues-lede" class="hero-lede">Active benchmark issues and their pull-request progress across the vLLM-HUST benchmark repository.</p>
+        <p id="issues-lede" class="hero-lede">A curated benchmark issue snapshot, not a live view of every repository issue.</p>
       </div>
     </section>
 
@@ -53,15 +53,17 @@
         <div class="section-head">
           <div>
             <span id="issues-stats-kicker" class="eyebrow">Snapshot</span>
-            <h2 id="issues-stats-title">Current tracking snapshot</h2>
+            <h2 id="issues-stats-title">Active items in this snapshot</h2>
           </div>
         </div>
         <div class="metric-strip">
-          <div class="metric-box"><span id="issue-stat-total-label">Total issues</span><strong id="issue-stat-total">0</strong></div>
+          <div class="metric-box"><span id="issue-stat-total-label">Open issues</span><strong id="issue-stat-total">0</strong></div>
           <div class="metric-box"><span id="issue-stat-prs-label">Open PRs</span><strong id="issue-stat-prs">0</strong></div>
           <div class="metric-box"><span id="issue-stat-blocked-label">Blocked</span><strong id="issue-stat-blocked">0</strong></div>
           <div class="metric-box"><span id="issue-stat-draft-label">Draft</span><strong id="issue-stat-draft">0</strong></div>
         </div>
+        <p id="issues-verified" class="snapshot-status" role="status"></p>
+        <a id="issues-source-link" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/issues">View all current issues on GitHub</a>
       </section>
 
       <section class="content-panel" aria-labelledby="issues-list-title">
@@ -72,6 +74,10 @@
           </div>
         </div>
         <div id="issue-list" class="issue-list"></div>
+        <details id="issue-archive" class="issue-archive">
+          <summary id="issue-archive-label">Closed items · historical evidence</summary>
+          <div id="issue-archive-list" class="issue-list"></div>
+        </details>
       </section>
     </div>
   </main>
@@ -85,12 +91,13 @@
         'brand-tagline': 'Domestic-compute inference engine',
         'issues-eyebrow': 'Tracking',
         'issues-title': 'Issues',
-        'issues-lede': 'Active benchmark issues and their pull-request progress across the vLLM-HUST benchmark repository.',
+        'issues-lede': 'A curated benchmark issue snapshot, not a live view of every repository issue.',
+        'issues-source-link': 'View all current issues on GitHub',
         'issues-loading': 'Loading issues...',
         'issues-error': 'Failed to load issues data.',
         'issues-stats-kicker': 'Snapshot',
-        'issues-stats-title': 'Current tracking snapshot',
-        'issue-stat-total-label': 'Total issues',
+        'issues-stats-title': 'Active items in this snapshot',
+        'issue-stat-total-label': 'Open issues',
         'issue-stat-prs-label': 'Open PRs',
         'issue-stat-blocked-label': 'Blocked',
         'issue-stat-draft-label': 'Draft',
@@ -103,12 +110,13 @@
         'brand-tagline': '面向国产算力的推理引擎',
         'issues-eyebrow': '追踪',
         'issues-title': '议题',
-        'issues-lede': 'vLLM-HUST benchmark 仓库中正在推进的议题及其 PR 进展。',
+        'issues-lede': '精选 benchmark 议题快照，不代表仓库全部议题的实时状态。',
+        'issues-source-link': '在 GitHub 查看全部当前议题',
         'issues-loading': '正在加载议题数据...',
         'issues-error': '议题数据加载失败。',
         'issues-stats-kicker': '快照',
-        'issues-stats-title': '当前追踪快照',
-        'issue-stat-total-label': '议题总数',
+        'issues-stats-title': '本快照中的开放项',
+        'issue-stat-total-label': '开放议题',
         'issue-stat-prs-label': '开放 PR',
         'issue-stat-blocked-label': '阻塞',
         'issue-stat-draft-label': '草稿',
@@ -120,7 +128,8 @@
     window.vllmHustIssuesDataUrl = './data/issues.json';
   </script>
   <script src="./assets/site.js?v=nav-polish-20260826"></script>
-  <script src="./assets/issues-page.js?v=issue-tracking-page-20260804"></script>
+  <script src="./assets/snapshot-status.js?v=0.3.7"></script>
+  <script src="./assets/issues-page.js?v=0.3.7"></script>
 </body>
 
 </html>

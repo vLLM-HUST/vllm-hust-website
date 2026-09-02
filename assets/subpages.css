@@ -680,6 +680,35 @@ body[data-page="leaderboard"] .trend-chart-wrap { border-color: var(--sub-line);
   }
 }
 
+/* Snapshot notices are opaque in both system color schemes. */
+body:not([data-page="home"]) .snapshot-status,
+body[data-page="issues"] .issue-history-note {
+  padding: 12px 16px;
+  border: 1px solid #738b98;
+  border-radius: 6px;
+  color: #163744;
+  background: #edf4f7;
+  font-size: .85rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+body:not([data-page="home"]) .snapshot-status[data-stale="true"] {
+  color: #693b06;
+  background: #fff2d8;
+  border-color: #997035;
+}
+body[data-page="issues"] .issue-archive { margin-top: 24px; }
+body[data-page="issues"] .issue-archive summary {
+  padding: 16px;
+  border: 1px solid #738b98;
+  border-radius: 6px;
+  color: #163744;
+  background: #edf4f7;
+  font-weight: 700;
+  cursor: pointer;
+}
+body[data-page="issues"] .issue-archive summary:focus-visible { outline: 3px solid #075b72; outline-offset: 3px; }
+
 /* Issue tracking page styles */
 body[data-page="issues"] .issue-list {
   display: grid;

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-04T12:00:00Z",
+  "last_updated": "2026-09-02T23:22:20Z",
   "source_repo": "vLLM-HUST/vllm-hust-benchmark",
   "issues": [
     {
@@ -10,7 +10,7 @@
       },
       "category": "benchmark",
       "priority": "P0",
-      "state": "open",
+      "state": "closed",
       "created_at": "2026-08-02",
       "summary": {
         "en": "Build a reproducible, publishable production readiness and burst SLO benchmark that clearly separates cold/warm startup costs, steady-state serving capacity, and burst recovery capability.",
@@ -18,16 +18,18 @@
       },
       "pr": {
         "number": 154,
-        "state": "open",
+        "state": "closed",
         "draft": false,
         "head_branch": "feat/issue-135-readiness-slo-matrix",
-        "title": "feat(issue-135): readiness SLO matrix schema, validator, aggregator and matrix runner",
-        "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/pull/154"
+        "title": "feat(issue-135): readiness SLO matrix schema, validator, aggregator a…",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/pull/154",
+        "merged_at": "2026-08-10T01:56:25Z",
+        "updated_at": "2026-08-10T01:56:27Z"
       },
-      "status": "in-progress",
+      "status": "completed",
       "status_label": {
-        "en": "In progress",
-        "zh": "进行中"
+        "en": "Completed",
+        "zh": "已完成"
       },
       "progress_summary": {
         "en": "Schema + semantic validator enforce fail-closed constraints. The aggregator combines N >= 3 repetitions with median/IQR + 1.5*IQR outlier mask. The shell runner orchestrates the workload x load_profile x repetition matrix. 70 new tests added.",
@@ -35,38 +37,71 @@
       },
       "acceptance_criteria": [
         {
-          "label": { "en": "random/sharegpt/prefix complete 1 RPS, 1.2 RPS, burst tiers", "zh": "random/sharegpt/prefix 完成 1 RPS、1.2 RPS、burst 三档" },
+          "label": {
+            "en": "random/sharegpt/prefix complete 1 RPS, 1.2 RPS, burst tiers",
+            "zh": "random/sharegpt/prefix 完成 1 RPS、1.2 RPS、burst 三档"
+          },
           "met": false
         },
         {
-          "label": { "en": "BurstGPT forms current-main single-card credible baseline", "zh": "BurstGPT 至少形成 current-main 单卡可信基线" },
+          "label": {
+            "en": "BurstGPT forms current-main single-card credible baseline",
+            "zh": "BurstGPT 至少形成 current-main 单卡可信基线"
+          },
           "met": false
         },
         {
-          "label": { "en": "Capacity/SLO inflection points and burst recovery time identified", "zh": "给出各 workload 的容量/SLO 拐点和 burst recovery 时间" },
+          "label": {
+            "en": "Capacity/SLO inflection points and burst recovery time identified",
+            "zh": "给出各 workload 的容量/SLO 拐点和 burst recovery 时间"
+          },
           "met": false
         },
         {
-          "label": { "en": "cold/warm restart, compile cache, graph capture, first-request TTFT pass schema/validator", "zh": "cold/warm restart、compile cache、graph capture、first-request TTFT 字段通过 schema/validator" },
+          "label": {
+            "en": "cold/warm restart, compile cache, graph capture, first-request TTFT pass schema/validator",
+            "zh": "cold/warm restart、compile cache、graph capture、first-request TTFT 字段通过 schema/validator"
+          },
           "met": false
         }
       ],
       "tags": [
-        { "en": "P0", "zh": "P0" },
-        { "en": "Benchmark", "zh": "Benchmark" },
-        { "en": "SLO", "zh": "SLO" },
-        { "en": "Cold-start", "zh": "冷启动" }
+        {
+          "en": "P0",
+          "zh": "P0"
+        },
+        {
+          "en": "Benchmark",
+          "zh": "Benchmark"
+        },
+        {
+          "en": "SLO",
+          "zh": "SLO"
+        },
+        {
+          "en": "Cold-start",
+          "zh": "冷启动"
+        }
       ],
       "links": [
         {
-          "label": { "en": "Issue #135", "zh": "Issue #135" },
+          "label": {
+            "en": "Issue #135",
+            "zh": "Issue #135"
+          },
           "href": "https://github.com/vLLM-HUST/vllm-hust-benchmark/issues/135"
         },
         {
-          "label": { "en": "PR #154", "zh": "PR #154" },
+          "label": {
+            "en": "PR #154",
+            "zh": "PR #154"
+          },
           "href": "https://github.com/vLLM-HUST/vllm-hust-benchmark/pull/154"
         }
-      ]
+      ],
+      "state_reason": "completed",
+      "closed_at": "2026-08-28T13:56:02Z",
+      "github_updated_at": "2026-08-28T13:56:02Z"
     },
     {
       "number": 134,
@@ -76,7 +111,7 @@
       },
       "category": "performance",
       "priority": "P0",
-      "state": "open",
+      "state": "closed",
       "created_at": "2026-08-02",
       "summary": {
         "en": "Produce the KV capacity scan (4 capacities x 3 workloads x 3 reps = 36 runs) and tiering state machine comparison (3 configs x 3 reps = 9 runs, 6 completed). Results linked to #89.",
@@ -84,16 +119,18 @@
       },
       "pr": {
         "number": 152,
-        "state": "open",
-        "draft": true,
+        "state": "closed",
+        "draft": false,
         "head_branch": "feat/issue-134-formal-evidence",
         "title": "feat(issue-134): formal KV capacity scan evidence and preempt timeline analysis",
-        "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/pull/152"
+        "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/pull/152",
+        "merged_at": "2026-08-10T07:45:11Z",
+        "updated_at": "2026-08-10T07:45:13Z"
       },
-      "status": "blocked",
+      "status": "completed",
       "status_label": {
-        "en": "Blocked",
-        "zh": "阻塞"
+        "en": "Completed",
+        "zh": "已完成"
       },
       "progress_summary": {
         "en": "Part A KV capacity scan completed (36 runs, inflection points identified). Part B tiering-enabled blocked by SimpleCPUOffloadConnector Ascend incompatibility. Preempt timeline incomplete (vLLM log limitation). 4/7 acceptance criteria met. 389 raw artifact files published.",
@@ -101,57 +138,111 @@
       },
       "acceptance_criteria": [
         {
-          "label": { "en": "8/16/24/32 GiB capacity curves produced", "zh": "产出 8/16/24/32 GiB 容量曲线" },
+          "label": {
+            "en": "8/16/24/32 GiB capacity curves produced",
+            "zh": "产出 8/16/24/32 GiB 容量曲线"
+          },
           "met": false,
-          "note": { "en": "32 GiB blocked: actual ~29.1 GiB deviates >2 GiB from target", "zh": "32 GiB 阻塞：实际 ~29.1 GiB 偏差 >2 GiB" }
+          "note": {
+            "en": "32 GiB blocked: actual ~29.1 GiB deviates >2 GiB from target",
+            "zh": "32 GiB 阻塞：实际 ~29.1 GiB 偏差 >2 GiB"
+          }
         },
         {
-          "label": { "en": "Clear service rate/tail latency inflection points identified", "zh": "明确的吞吐/尾延迟拐点" },
+          "label": {
+            "en": "Clear service rate/tail latency inflection points identified",
+            "zh": "明确的吞吐/尾延迟拐点"
+          },
           "met": true
         },
         {
-          "label": { "en": "At least one complete preempt→restore→admission 6-stage timeline", "zh": "至少一个完整 preempt→restore→admission 6 阶段时间线" },
+          "label": {
+            "en": "At least one complete preempt→restore→admission 6-stage timeline",
+            "zh": "至少一个完整 preempt→restore→admission 6 阶段时间线"
+          },
           "met": false,
-          "note": { "en": "vLLM does not emit per-stage log lines", "zh": "vLLM 不输出分阶段日志" }
+          "note": {
+            "en": "vLLM does not emit per-stage log lines",
+            "zh": "vLLM 不输出分阶段日志"
+          }
         },
         {
-          "label": { "en": "Tiering disabled/enabled/HBM-only comparison completed", "zh": "完成 tiering disabled/enabled/HBM-only 对照" },
+          "label": {
+            "en": "Tiering disabled/enabled/HBM-only comparison completed",
+            "zh": "完成 tiering disabled/enabled/HBM-only 对照"
+          },
           "met": false,
-          "note": { "en": "tiering-enabled blocked by Ascend KV cache layout incompatibility", "zh": "tiering-enabled 被 Ascend KV cache 布局不兼容阻塞" }
+          "note": {
+            "en": "tiering-enabled blocked by Ascend KV cache layout incompatibility",
+            "zh": "tiering-enabled 被 Ascend KV cache 布局不兼容阻塞"
+          }
         },
         {
-          "label": { "en": "All formal points have >=3 independent restarts", "zh": "所有正式点 >=3 次独立重启" },
+          "label": {
+            "en": "All formal points have >=3 independent restarts",
+            "zh": "所有正式点 >=3 次独立重启"
+          },
           "met": true
         },
         {
-          "label": { "en": "Environment manifest (provenance) complete", "zh": "环境清单（溯源）完整" },
+          "label": {
+            "en": "Environment manifest (provenance) complete",
+            "zh": "环境清单（溯源）完整"
+          },
           "met": true
         },
         {
-          "label": { "en": "Per-rep env-manifest binding: every run has its own manifest", "zh": "每次运行绑定独立 env-manifest" },
+          "label": {
+            "en": "Per-rep env-manifest binding: every run has its own manifest",
+            "zh": "每次运行绑定独立 env-manifest"
+          },
           "met": true
         }
       ],
       "tags": [
-        { "en": "P0", "zh": "P0" },
-        { "en": "Performance", "zh": "性能" },
-        { "en": "KV Cache", "zh": "KV Cache" },
-        { "en": "Preemption", "zh": "抢占" }
+        {
+          "en": "P0",
+          "zh": "P0"
+        },
+        {
+          "en": "Performance",
+          "zh": "性能"
+        },
+        {
+          "en": "KV Cache",
+          "zh": "KV Cache"
+        },
+        {
+          "en": "Preemption",
+          "zh": "抢占"
+        }
       ],
       "links": [
         {
-          "label": { "en": "Issue #134", "zh": "Issue #134" },
+          "label": {
+            "en": "Issue #134",
+            "zh": "Issue #134"
+          },
           "href": "https://github.com/vLLM-HUST/vllm-hust-benchmark/issues/134"
         },
         {
-          "label": { "en": "PR #152", "zh": "PR #152" },
+          "label": {
+            "en": "PR #152",
+            "zh": "PR #152"
+          },
           "href": "https://github.com/vLLM-HUST/vllm-hust-benchmark/pull/152"
         },
         {
-          "label": { "en": "Refs #89", "zh": "回链 #89" },
+          "label": {
+            "en": "Refs #89",
+            "zh": "回链 #89"
+          },
           "href": "https://github.com/vLLM-HUST/vllm-hust-benchmark/issues/89"
         }
-      ]
+      ],
+      "state_reason": "completed",
+      "closed_at": "2026-08-10T07:45:12Z",
+      "github_updated_at": "2026-08-10T07:45:12Z"
     },
     {
       "number": 127,
@@ -161,7 +252,7 @@
       },
       "category": "infra",
       "priority": null,
-      "state": "open",
+      "state": "closed",
       "created_at": "2026-07-31",
       "summary": {
         "en": "Add runner ownership labels and single-card device mapping to every Docker NPU container launched via the host Docker socket, making them compatible with the self-hosted runner watchdog.",
@@ -169,16 +260,18 @@
       },
       "pr": {
         "number": 150,
-        "state": "open",
-        "draft": true,
+        "state": "closed",
+        "draft": false,
         "head_branch": "feat/issue-127-watchdog-docker-ownership",
         "title": "feat(infra): enforce watchdog ownership for Docker NPU jobs",
-        "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/pull/150"
+        "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/pull/150",
+        "merged_at": "2026-08-10T02:05:17Z",
+        "updated_at": "2026-08-10T02:05:18Z"
       },
-      "status": "draft",
+      "status": "completed",
       "status_label": {
-        "en": "Draft",
-        "zh": "草稿"
+        "en": "Completed",
+        "zh": "已完成"
       },
       "progress_summary": {
         "en": "Runner ownership resolution, docker create command construction with labels and device mapping, and inspect validation (fail-closed) implemented. 40 tests cover runner resolution, command construction, and inspect validation. Validation on the intended self-hosted NPU runner class remains pending.",
@@ -186,38 +279,72 @@
       },
       "acceptance_criteria": [
         {
-          "label": { "en": "Correctly labeled container survives two watchdog scans", "zh": "正确标记的容器连续经过两轮 watchdog 扫描仍正常运行" },
+          "label": {
+            "en": "Correctly labeled container survives two watchdog scans",
+            "zh": "正确标记的容器连续经过两轮 watchdog 扫描仍正常运行"
+          },
           "met": false
         },
         {
-          "label": { "en": "Unlabeled or mis-mapped containers rejected or cleaned", "zh": "无 label、label 错误或映射到其他卡的容器被拒绝或清理" },
+          "label": {
+            "en": "Unlabeled or mis-mapped containers rejected or cleaned",
+            "zh": "无 label、label 错误或映射到其他卡的容器被拒绝或清理"
+          },
           "met": false
         },
         {
-          "label": { "en": "Preflight outputs runner, physical device, container logical device", "zh": "Preflight 输出 runner、物理设备和容器逻辑设备" },
+          "label": {
+            "en": "Preflight outputs runner, physical device, container logical device",
+            "zh": "Preflight 输出 runner、物理设备和容器逻辑设备"
+          },
           "met": true
         },
         {
-          "label": { "en": "At least one success, failure, and cancel path CI validation", "zh": "至少完成一次成功、失败和取消路径的真实 CI 验证" },
+          "label": {
+            "en": "At least one success, failure, and cancel path CI validation",
+            "zh": "至少完成一次成功、失败和取消路径的真实 CI 验证"
+          },
           "met": false
         }
       ],
       "tags": [
-        { "en": "Infra", "zh": "基础设施" },
-        { "en": "Docker", "zh": "Docker" },
-        { "en": "NPU", "zh": "NPU" },
-        { "en": "Watchdog", "zh": "Watchdog" }
+        {
+          "en": "Infra",
+          "zh": "基础设施"
+        },
+        {
+          "en": "Docker",
+          "zh": "Docker"
+        },
+        {
+          "en": "NPU",
+          "zh": "NPU"
+        },
+        {
+          "en": "Watchdog",
+          "zh": "Watchdog"
+        }
       ],
       "links": [
         {
-          "label": { "en": "Issue #127", "zh": "Issue #127" },
+          "label": {
+            "en": "Issue #127",
+            "zh": "Issue #127"
+          },
           "href": "https://github.com/vLLM-HUST/vllm-hust-benchmark/issues/127"
         },
         {
-          "label": { "en": "PR #150", "zh": "PR #150" },
+          "label": {
+            "en": "PR #150",
+            "zh": "PR #150"
+          },
           "href": "https://github.com/vLLM-HUST/vllm-hust-benchmark/pull/150"
         }
-      ]
+      ],
+      "state_reason": "completed",
+      "closed_at": "2026-08-10T11:59:35Z",
+      "github_updated_at": "2026-08-10T11:59:35Z"
     }
-  ]
+  ],
+  "curated_at": "2026-08-04T12:00:00Z"
 }

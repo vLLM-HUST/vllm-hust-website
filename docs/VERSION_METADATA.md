@@ -34,8 +34,15 @@
 
 ## Update Flow
 
-1. Edit `data/version_meta.json` (copy fields under `release` / `quickstart`, repository list under
-   `packages`).
+1. Refresh the curated public snapshot with `python scripts/refresh_site_status.py --refresh`. Set
+   `GH_TOKEN` through the environment for authenticated GitHub rate limits; never put it in files.
+   All requests must succeed before either data file is written. Review both resulting diffs.
+
+1. Edit copy fields under `release` / `quickstart` only when guidance changes. The seven source
+   repositories are explicitly allowlisted in the refresh script; do not infer runtime compatibility
+   from their independent `main` heads. `source_commit_url` contains the full immutable commit;
+   `version` is its short display label. `source_updated_at` is the commit date, while `updated_at`
+   is the API verification time. `registry` is historical PyPI identity, not deployment approval.
 
 1. Run sync script:
 
@@ -49,22 +56,61 @@
    bash scripts/check_stale_versions.sh
    ```
 
-1. Commit generated updates (`data/version_meta.json`, `README.md`).
+1. Run `python scripts/refresh_site_status.py --check` and the regression tests, then commit the
+   reviewed updates (`data/issues.json`, `data/version_meta.json`, `README.md`). Push to main for
+   Pages.
+
+## Curated issue history and freshness
+
+- `data/issues.json` is a curated subset, not a complete live issue tracker. Open issues alone count
+  in active metrics. Closed records remain in a collapsed archive with GitHub state and merge dates.
+- `curated_at` records when the historical progress/acceptance evidence was assembled; refreshes
+  preserve those fields. GitHub closure or PR merge does not mark acceptance criteria as met.
+- `last_updated` is the latest successful GitHub verification. Both Issues and Versions warn when
+  their timestamp is invalid, in the future, or more than seven days old. Follow source links for
+  real-time status. API failure leaves the previous snapshot intact rather than publishing zeros.
+- Refresh does not mutate upstream issues, PRs, production receipts, or runtime deployments.
 
 ## Automation
 
 - Workflow: `.github/workflows/sync-version-meta.yml`
 
   - Runs on schedule and manual dispatch
-  - Pulls latest versions from PyPI
-  - Updates `data/version_meta.json` and generated README block
+  - Renders the README block from reviewed metadata
+  - Never replaces source snapshots with PyPI versions
   - Commits only when file content changes
+
+- Workflow: `.github/workflows/site-status-check.yml`
+
+  - Daily read-only API comparison plus seven-day age guard; failure is an actionable drift alert
+  - Never auto-approves a new registry release or publishes a new production compatibility pair
+  - Maintainers run the refresh command above, review, test and push; the browser warns meanwhile
 
 - Workflow: `.github/workflows/check-stale-versions.yml`
 
   - Blocks stale version rollback and metadata inconsistency in CI
 
-## Allowlist
+## Browser regression
+
+The `ci` browser job serves the exact checkout and checks five pages at 1440×1000 and 390×844, under
+both system color preferences. It checks real composed text contrast, visible anchors, keyboard
+disclosure/filter focus, language persistence, archived issue metrics, and Versions error, empty and
+stale states. Those failure cases use explicit request fault injection; normal screenshots use the
+unmodified page data. Achievements must not request leaderboard or contributor datasets.
+
+To repeat against the deployed site, install Playwright and its Chromium, then run:
+
+```bash
+python -m pip install playwright
+python -m playwright install chromium
+python scripts/verify_site_browser.py --url https://vllm-hust.sage.org.ai/
+```
+
+Screenshots and computed values go under `output/playwright/site-repair/` (ignored runtime output).
+`--browser` can select an existing Chromium executable. Each navigation and assertion has a bounded
+timeout; no `networkidle` wait is used.
+
+## Stale-reference allowlist
 
 - File: `scripts/stale_version_allowlist.txt`
 - Add one regex per line for known exceptions when stale check should ignore a line.

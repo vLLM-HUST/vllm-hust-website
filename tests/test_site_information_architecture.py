@@ -89,7 +89,7 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'class="site-footer"' in versions
     assert "assets/site.css?v=nav-polish-20260826" in versions
     assert "assets/site.js?v=nav-polish-20260826" in versions
-    assert "assets/versions.css?v=site-structure-20260816" in versions
+    assert "assets/versions.css?v=0.3.7" in versions
 
 
 def test_all_public_pages_use_the_same_shared_shell_release() -> None:
@@ -178,6 +178,11 @@ def test_ecosystem_registry_has_docs_as_its_canonical_owner() -> None:
 
 def test_versions_external_links_have_safe_new_tab_contract() -> None:
     script = (ROOT / "assets" / "versions-page.js").read_text(encoding="utf-8")
-    assert script.count('target="_blank" rel="noopener noreferrer"') == 2
-    assert "lang === 'zh' && typeof pkg.version_note_zh" in script
+    assert 'target="_blank" rel="noopener noreferrer"' in script
+    assert "function sourceLink(url, label)" in script
+    assert "sourceLink(pkg.repo, 'GitHub')" in script
+    assert "sourceLink(pkg.source_commit_url, text.commit)" in script
+    assert "parsed.protocol !== 'https:'" in script
+    assert "const text = COPY[lang]" in script
+    assert "仓库 main 快照；不代表该组合已通过生产兼容性验证。" in script
     assert "window.addEventListener('vllm-hust:langchange'" in script
