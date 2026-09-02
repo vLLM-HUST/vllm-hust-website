@@ -207,22 +207,43 @@
         },
     ];
 
+    // Refreshed from the GitHub Pull Request API. Internal synchronization PRs
+    // are intentionally excluded; every entry below links to an upstream repo.
+    const UPSTREAM_VERIFIED_AT = '2026-09-02T13:34:00Z';
     const UPSTREAM_PULL_REQUESTS = [
-        { repository: 'vLLM', number: 47793, title: 'Handle missing vLLM metadata in Triton import', status: 'needs-label', href: 'https://github.com/vllm-project/vllm/pull/47793' },
-        { repository: 'vLLM', number: 49034, title: 'fix(v1): avoid false shutdown failures on clean exit', status: 'needs-label', href: 'https://github.com/vllm-project/vllm/pull/49034' },
-        { repository: 'vLLM', number: 49035, title: 'fix: handle missing parent modules in _has_module', status: 'needs-label', href: 'https://github.com/vllm-project/vllm/pull/49035' },
-        { repository: 'vLLM-Ascend', number: 12316, title: '[BugFix] Fix packaged custom opapi lookup', status: 'draft', href: 'https://github.com/vllm-project/vllm-ascend/pull/12316' },
-        { repository: 'vLLM-Ascend', number: 12317, title: '[Performance][Worker] Reuse DP metadata sync buffers', status: 'review-requested', href: 'https://github.com/vllm-project/vllm-ascend/pull/12317' },
-        { repository: 'vLLM-Ascend', number: 12342, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', status: 'review-requested', href: 'https://github.com/vllm-project/vllm-ascend/pull/12342' },
-        { repository: 'vLLM-Ascend', number: 12343, title: '[Ops][BugFix] Fix Qwen2 compiled-path outputs on Ascend', status: 'evidence-pending', href: 'https://github.com/vllm-project/vllm-ascend/pull/12343' },
-        { repository: 'vLLM-Ascend', number: 12344, title: '[Ops][BugFix] Fix NPU memory profiling on Python 3.12', status: 'ready-evidence', href: 'https://github.com/vllm-project/vllm-ascend/pull/12344' },
-        { repository: 'Triton-Ascend', number: 918, title: '[runtime](fix) skip missing backend entry points', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/918' },
-        { repository: 'Triton-Ascend', number: 919, title: '[ascend](fix) disambiguate dependent getDefiningOp calls', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/919' },
-        { repository: 'Triton-Ascend', number: 920, title: '[ascend](fix) allow MemAccOp factory specializations', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/920' },
-        { repository: 'Triton-Ascend', number: 922, title: '[build](fix) fix Python module build dependencies', status: 'review-requested', href: 'https://github.com/triton-lang/triton-ascend/pull/922' },
-        { repository: 'Triton-Ascend', number: 923, title: '[tools](fix) trim optional dialect registrations', status: 'ci-retry', href: 'https://github.com/triton-lang/triton-ascend/pull/923' },
-        { repository: 'Qwen Code', number: 5185, title: 'fix(plan-gate): isolate gate agent AbortSignal from parent signal chain', status: 'merged', href: 'https://github.com/QwenLM/qwen-code/pull/5185' },
-        { repository: 'Qwen Code', number: 7701, title: 'fix(cli): align inline math recognition', status: 'merged', href: 'https://github.com/QwenLM/qwen-code/pull/7701' },
+        { repository: 'vLLM', number: 47793, title: 'Handle missing vLLM metadata in Triton import', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-01T12:14:12Z', headRepository: 'intellistream/vllm-hust-legacy-20260831', href: 'https://github.com/vllm-project/vllm/pull/47793' },
+        { repository: 'vLLM', number: 49034, title: 'fix(v1): avoid false shutdown failures on clean exit', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-25T22:52:40Z', headRepository: 'intellistream/vllm-hust-legacy-20260831', href: 'https://github.com/vllm-project/vllm/pull/49034' },
+        { repository: 'vLLM', number: 49035, title: 'fix: handle missing parent modules in _has_module', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-25T22:52:38Z', headRepository: 'ShuhaoZhangTony/vllm', href: 'https://github.com/vllm-project/vllm/pull/49035' },
+        { repository: 'vLLM-Ascend', number: 12316, title: '[BugFix] Fix packaged custom opapi lookup', status: 'draft', author: 'ShuhaoZhangTony', updatedAt: '2026-07-22T09:35:02Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12316' },
+        { repository: 'vLLM-Ascend', number: 12317, title: '[Performance][Worker] Reuse DP metadata sync buffers', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-08-29T01:43:39Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12317' },
+        { repository: 'vLLM-Ascend', number: 12342, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-08-05T04:34:03Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12342' },
+        { repository: 'vLLM-Ascend', number: 12343, title: '[Ops][BugFix] Fix Qwen2 compiled-path outputs on Ascend', status: 'draft', author: 'ShuhaoZhangTony', updatedAt: '2026-08-12T06:19:46Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12343' },
+        { repository: 'vLLM-Ascend', number: 12344, title: '[Ops][BugFix] Fix NPU memory profiling on Python 3.12', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-22T09:34:58Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12344' },
+        { repository: 'vLLM-Ascend', number: 15543, title: '[BugFix] Preserve native Triton Gluon on Triton 3.6+', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:34Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: 'd1995a1f2bd26bc1bfd4afeaffc64bbfd29f86aa', href: 'https://github.com/vllm-project/vllm-ascend/pull/15543' },
+        { repository: 'vLLM-Ascend', number: 15544, title: '[CI] Read Torch version from package metadata', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:48Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: '671a2f2fc803f244e25a8eb67611bdd23efc3866', href: 'https://github.com/vllm-project/vllm-ascend/pull/15544' },
+        { repository: 'vLLM-Ascend', number: 15545, title: '[BugFix] Scope PyTorch AOT cache override to npugraph_ex', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:42Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: 'f23e64bcd587405e1d5e5729921781640a18fc88', href: 'https://github.com/vllm-project/vllm-ascend/pull/15545' },
+        {
+            repository: 'vLLM-Ascend',
+            number: 15585,
+            title: '[Bugfix] Support standardized KV-cache layouts on current vLLM main',
+            status: 'needs-label',
+            author: 'ShuhaoZhangTony',
+            updatedAt: '2026-09-02T13:33:50Z',
+            headRepository: 'ShuhaoZhangTony/vllm-ascend',
+            headSha: '58741b32398a8d66646c1f06aeb838b21bfea5e2',
+            checkSummary: {
+                en: 'Open · pre-commit and Python 3.10–3.12 mypy passed · awaiting maintainer ready-precise label',
+                zh: '正式开放 · pre-commit 与 Python 3.10–3.12 mypy 已通过 · 等待维护者添加 ready-precise 标签',
+            },
+            href: 'https://github.com/vllm-project/vllm-ascend/pull/15585',
+        },
+        { repository: 'Triton-Ascend', number: 918, title: '[runtime](fix) skip missing backend entry points', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-21T11:40:49Z', headRepository: 'vLLM-HUST/triton-ascend-hust', href: 'https://github.com/triton-lang/triton-ascend/pull/918' },
+        { repository: 'Triton-Ascend', number: 919, title: '[ascend](fix) disambiguate dependent getDefiningOp calls', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-21T11:40:51Z', headRepository: 'vLLM-HUST/triton-ascend-hust', href: 'https://github.com/triton-lang/triton-ascend/pull/919' },
+        { repository: 'Triton-Ascend', number: 920, title: '[ascend](fix) allow MemAccOp factory specializations', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-21T11:40:52Z', headRepository: 'vLLM-HUST/triton-ascend-hust', href: 'https://github.com/triton-lang/triton-ascend/pull/920' },
+        { repository: 'Triton-Ascend', number: 922, title: '[build](fix) fix Python module build dependencies', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-21T11:40:54Z', headRepository: 'vLLM-HUST/triton-ascend-hust', href: 'https://github.com/triton-lang/triton-ascend/pull/922' },
+        { repository: 'Triton-Ascend', number: 923, title: '[tools](fix) trim optional dialect registrations', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-21T11:40:56Z', headRepository: 'vLLM-HUST/triton-ascend-hust', href: 'https://github.com/triton-lang/triton-ascend/pull/923' },
+        { repository: 'Qwen Code', number: 5185, title: 'fix(plan-gate): isolate gate agent AbortSignal from parent signal chain', status: 'merged', author: 'CubeLander', updatedAt: '2026-06-18T23:37:50Z', mergedAt: '2026-06-18T23:37:50Z', href: 'https://github.com/QwenLM/qwen-code/pull/5185' },
+        { repository: 'Qwen Code', number: 7701, title: 'fix(cli): align inline math recognition', status: 'merged', author: 'CubeLander', updatedAt: '2026-07-28T18:16:14Z', mergedAt: '2026-07-25T08:30:50Z', href: 'https://github.com/QwenLM/qwen-code/pull/7701' },
     ];
 
     const UPSTREAM_REPOSITORIES = [
@@ -325,6 +346,10 @@
             openStatus: 'Open',
             mergedStatus: 'Merged',
             draftStatus: 'Draft',
+            closedStatus: 'Closed',
+            readyToSubmitStatus: 'Ready to submit',
+            verifiedAt: (date) => `GitHub API verified ${date}`,
+            pullRequestMeta: (author, date, source) => `@${author} · updated ${date}${source ? ` · ${source}` : ''}`,
             needsLabelStatus: 'Needs label',
             reviewRequestedStatus: 'Review requested',
             readyEvidenceStatus: 'Real-NPU evidence added',
@@ -368,6 +393,10 @@
             openStatus: '开放',
             mergedStatus: '已合入',
             draftStatus: '草稿',
+            closedStatus: '已关闭',
+            readyToSubmitStatus: '准备提交',
+            verifiedAt: (date) => `GitHub API 核验于 ${date}`,
+            pullRequestMeta: (author, date, source) => `@${author} · 更新于 ${date}${source ? ` · ${source}` : ''}`,
             needsLabelStatus: '待上游标签',
             reviewRequestedStatus: '已请求评审',
             readyEvidenceStatus: '实机证据已补',
@@ -643,6 +672,13 @@
     function renderUpstreamPRs(lang = currentLang()) {
         const target = document.getElementById('upstream-repository-browser');
         if (!target) return;
+        const verified = document.getElementById('upstream-pr-verified');
+        const verifiedDate = new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 'en', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+            timeZone: 'UTC',
+        }).format(new Date(UPSTREAM_VERIFIED_AT));
+        if (verified) verified.textContent = ui(lang).verifiedAt(verifiedDate);
         const repositories = UPSTREAM_REPOSITORIES.map((repository) => ({
             ...repository,
             pullRequests: UPSTREAM_PULL_REQUESTS.filter((pullRequest) => pullRequest.repository === repository.name),
@@ -658,12 +694,26 @@
                 'evidence-pending': ui(lang).evidencePendingStatus,
                 'ci-retry': ui(lang).ciRetryStatus,
                 merged: ui(lang).mergedStatus,
+                open: ui(lang).openStatus,
+                closed: ui(lang).closedStatus,
+                'ready-to-submit': ui(lang).readyToSubmitStatus,
             };
             const status = statusLabels[pullRequest.status] || ui(lang).openStatus;
+            const updatedDate = new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 'en', {
+                dateStyle: 'medium',
+                timeZone: 'UTC',
+            }).format(new Date(pullRequest.updatedAt));
+            const source = pullRequest.headSha
+                ? `${pullRequest.headRepository}@${pullRequest.headSha.slice(0, 9)}`
+                : pullRequest.headRepository;
             return `
                 <a class="upstream-pr-row" href="${pullRequest.href}" target="_blank" rel="noreferrer">
                     <span class="upstream-pr-number">#${pullRequest.number}</span>
-                    <span class="upstream-pr-title">${pullRequest.title}</span>
+                    <span class="upstream-pr-copy">
+                        <span class="upstream-pr-title">${pullRequest.title}</span>
+                        <small>${ui(lang).pullRequestMeta(pullRequest.author, updatedDate, source)}</small>
+                        ${pullRequest.checkSummary ? `<small>${pullRequest.checkSummary[lang]}</small>` : ''}
+                    </span>
                     <strong data-status="${pullRequest.status || 'open'}">${status}</strong>
                     <span class="upstream-pr-link" aria-hidden="true">↗</span>
                 </a>

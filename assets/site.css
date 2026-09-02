@@ -1503,6 +1503,36 @@ h1 {
     white-space: nowrap;
 }
 
+.upstream-pr-copy {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.upstream-pr-copy small,
+.upstream-pr-verified {
+    color: var(--muted);
+    font-size: 0.76rem;
+    line-height: 1.35;
+}
+
+.upstream-pr-verified {
+    margin: 0;
+    text-align: right;
+}
+
+.upstream-pr-row > strong[data-status="open"] {
+    color: #166534;
+    background: #ecfdf3;
+    border-color: #86efac;
+}
+
+.upstream-pr-row > strong[data-status="closed"] {
+    color: #6b3346;
+    background: #fff1f4;
+    border-color: #fecdd8;
+}
+
 .upstream-pr-row > strong {
     padding: 4px 8px;
     border-radius: 999px;

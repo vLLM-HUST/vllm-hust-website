@@ -1495,7 +1495,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=nav-polish-20260826" in html_text
-    assert "assets/achievements-page.js?v=community-impact-20260826" in html_text
+    assert "assets/achievements-page.js?v=upstream-pr-15585-20260902" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -1505,21 +1505,23 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "number: 49034" in js_text
     assert "number: 49035" in js_text
     assert "number: 12343" in js_text
-    assert "status: 'needs-label'" in js_text
-    assert "status: 'review-requested'" in js_text
-    assert "status: 'ready-evidence'" in js_text
-    assert "status: 'evidence-pending'" in js_text
-    assert "status: 'ci-retry'" in js_text
+    assert "number: 15543" in js_text
+    assert "number: 15544" in js_text
+    assert "number: 15545" in js_text
+    assert "number: 15585" in js_text
+    assert "const UPSTREAM_VERIFIED_AT = '2026-09-02T13:34:00Z'" in js_text
+    assert "Support standardized KV-cache layouts on current vLLM main" in js_text
+    assert "58741b32398a8d66646c1f06aeb838b21bfea5e2" in js_text
+    assert "awaiting maintainer ready-precise label" in js_text
+    assert "等待维护者添加 ready-precise 标签" in js_text
+    assert "status: 'open'" in js_text
+    assert "status: 'draft'" in js_text
     assert "status: 'merged'" in js_text
     assert "[Performance][Worker] Reuse DP metadata sync buffers" in js_text
-    assert "待上游标签" in js_text
-    assert "已请求评审" in js_text
-    assert "实机证据已补" in js_text
-    assert "Draft · 待复现问题" in js_text
-    assert "待重跑 CI" in js_text
-    assert 'strong[data-status="review-requested"]' in css_text
-    assert 'strong[data-status="ready-evidence"]' in css_text
-    assert 'strong[data-status="evidence-pending"]' in css_text
+    assert "GitHub API 核验于" in js_text
+    assert "vLLM-HUST/vllm-ascend-hust" in js_text
+    assert 'strong[data-status="open"]' in css_text
+    assert 'strong[data-status="closed"]' in css_text
     assert 'strong[data-status="merged"]' in css_text
 
     assert js_text.count("owner: 'vllm-project'") == 2
@@ -1541,6 +1543,10 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
         "https://github.com/vllm-project/vllm-ascend/pull/12342",
         "https://github.com/vllm-project/vllm-ascend/pull/12343",
         "https://github.com/vllm-project/vllm-ascend/pull/12344",
+        "https://github.com/vllm-project/vllm-ascend/pull/15543",
+        "https://github.com/vllm-project/vllm-ascend/pull/15544",
+        "https://github.com/vllm-project/vllm-ascend/pull/15545",
+        "https://github.com/vllm-project/vllm-ascend/pull/15585",
         "https://github.com/triton-lang/triton-ascend/pull/918",
         "https://github.com/triton-lang/triton-ascend/pull/919",
         "https://github.com/triton-lang/triton-ascend/pull/920",
@@ -1643,7 +1649,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
-    assert "assets/achievements-page.js?v=community-impact-20260826" in html_text
+    assert "assets/achievements-page.js?v=upstream-pr-15585-20260902" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
