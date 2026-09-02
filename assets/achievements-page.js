@@ -219,9 +219,9 @@
         { repository: 'vLLM-Ascend', number: 12342, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-08-05T04:34:03Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12342' },
         { repository: 'vLLM-Ascend', number: 12343, title: '[Ops][BugFix] Fix Qwen2 compiled-path outputs on Ascend', status: 'draft', author: 'ShuhaoZhangTony', updatedAt: '2026-08-12T06:19:46Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12343' },
         { repository: 'vLLM-Ascend', number: 12344, title: '[Ops][BugFix] Fix NPU memory profiling on Python 3.12', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-22T09:34:58Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12344' },
-        { repository: 'vLLM-Ascend', number: 15543, title: '[BugFix] Preserve native Triton Gluon on Triton 3.6+', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:34Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: 'd1995a1f2bd26bc1bfd4afeaffc64bbfd29f86aa', href: 'https://github.com/vllm-project/vllm-ascend/pull/15543' },
-        { repository: 'vLLM-Ascend', number: 15544, title: '[CI] Read Torch version from package metadata', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:48Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: '671a2f2fc803f244e25a8eb67611bdd23efc3866', href: 'https://github.com/vllm-project/vllm-ascend/pull/15544' },
-        { repository: 'vLLM-Ascend', number: 15545, title: '[BugFix] Scope PyTorch AOT cache override to npugraph_ex', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:42Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: 'f23e64bcd587405e1d5e5729921781640a18fc88', href: 'https://github.com/vllm-project/vllm-ascend/pull/15545' },
+        { repository: 'vLLM-Ascend', number: 15543, title: '[BugFix] Preserve native Triton Gluon on Triton 3.6+', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:34Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: 'd1995a1f', href: 'https://github.com/vllm-project/vllm-ascend/pull/15543' },
+        { repository: 'vLLM-Ascend', number: 15544, title: '[CI] Read Torch version from package metadata', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:48Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: '671a2f2f', href: 'https://github.com/vllm-project/vllm-ascend/pull/15544' },
+        { repository: 'vLLM-Ascend', number: 15545, title: '[BugFix] Scope PyTorch AOT cache override to npugraph_ex', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:42Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: 'f23e64bc', href: 'https://github.com/vllm-project/vllm-ascend/pull/15545' },
         {
             repository: 'vLLM-Ascend',
             number: 15585,
@@ -230,7 +230,7 @@
             author: 'ShuhaoZhangTony',
             updatedAt: '2026-09-02T13:33:50Z',
             headRepository: 'ShuhaoZhangTony/vllm-ascend',
-            headSha: '58741b32398a8d66646c1f06aeb838b21bfea5e2',
+            headSha: '58741b32',
             checkSummary: {
                 en: 'Open · pre-commit and Python 3.10–3.12 mypy passed · awaiting maintainer ready-precise label',
                 zh: '正式开放 · pre-commit 与 Python 3.10–3.12 mypy 已通过 · 等待维护者添加 ready-precise 标签',
