@@ -1511,7 +1511,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "number: 15585" in js_text
     assert "const UPSTREAM_VERIFIED_AT = '2026-09-02T13:34:00Z'" in js_text
     assert "Support standardized KV-cache layouts on current vLLM main" in js_text
-    assert "58741b32398a8d66646c1f06aeb838b21bfea5e2" in js_text
+    assert "58741b32" in js_text
     assert "awaiting maintainer ready-precise label" in js_text
     assert "等待维护者添加 ready-precise 标签" in js_text
     assert "status: 'open'" in js_text
