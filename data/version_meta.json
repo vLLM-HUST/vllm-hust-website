@@ -5,43 +5,96 @@
     "core_feature_zh": "当前重点包括保持上游兼容接口、补齐国产硬件能力、优化真实服务场景，并通过 benchmark 结果持续验证。"
   },
   "quickstart": {
-    "title_zh": "🚀 Quick Start",
-    "description_zh": "安装后直接使用标准 vllm CLI 启动服务并发起请求。",
-    "install_step_label_zh": "📦 1. 安装",
-    "setup_step_label_zh": "🚀 2. 启动服务",
-    "run_step_label_zh": "💬 3. 发起请求",
-    "smart_detection_zh": "安装 vllm-hust 后，默认使用标准 vllm 命令入口。",
-    "smart_command": "vllm --help",
-    "install_command": "pip install vllm-hust",
-    "setup_command": "vllm serve Qwen/Qwen2.5-1.5B-Instruct --port 8000",
-    "run_command": "vllm chat --quick \"Hello AI\"",
-    "setup_hint": "# choose a local or HF model"
+    "title_zh": "Quick Start",
+    "description_zh": "请勿用历史 PyPI 包安装当前服务栈；先查阅维护中的部署指南，选择经过验证的 core/plugin/镜像组合。",
+    "install_command": "git clone https://github.com/vLLM-HUST/vllm-hust-dev-hub.git",
+    "runbook_url": "https://github.com/vLLM-HUST/vllm-hust-dev-hub/blob/main/docs/sage-mate-production-runtime.md"
   },
   "packages": [
     {
       "name": "vllm-hust",
       "repo": "https://github.com/vLLM-HUST/vllm-hust",
-      "version": "pending-republish",
-      "version_display_label": "PyPI release pending",
-      "version_note_zh": "当前 PyPI 包需要重新打包上传；网站不再把旧发布包版本当作 vllm-hust 当前版本。",
-      "group": "core"
+      "group": "core",
+      "version": "main@a08888f2",
+      "source_branch": "main",
+      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/a08888f294774a5c9d4c8a7db9ad6b322f9df1e2",
+      "source_updated_at": "2026-09-02T21:02:14Z",
+      "version_display_label": "Repository snapshot; not a production compatibility approval",
+      "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     },
     {
       "name": "vllm-ascend-hust",
       "repo": "https://github.com/vLLM-HUST/vllm-ascend-hust",
-      "version": "repository",
-      "version_display_label": "Repository maintained with vllm-hust",
-      "version_note_zh": "Ascend 后端适配仓库修订，用于配合 vllm-hust 的国产算力服务链路。",
-      "group": "core"
+      "group": "core",
+      "version": "main@744dec6f",
+      "source_branch": "main",
+      "source_commit_url": "https://github.com/vLLM-HUST/vllm-ascend-hust/commit/744dec6f91c5976b122a0d1e06bcc4f70dc968b0",
+      "source_updated_at": "2026-09-02T13:22:01Z",
+      "version_display_label": "Repository snapshot; not a production compatibility approval",
+      "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     },
     {
       "name": "triton-ascend-hust",
       "repo": "https://github.com/vLLM-HUST/triton-ascend-hust",
-      "version": "3.5.0-line",
-      "version_display_label": "Synced with triton-lang/triton-ascend main",
-      "version_note_zh": "Triton Ascend 编译后端核心库，已对齐官方 main 的 3.5.0 线，并通过 vllm-ascend-hust 兼容性 PR 接入当前服务栈。",
-      "group": "core"
+      "group": "core",
+      "version": "main@b52af7fc",
+      "source_branch": "main",
+      "source_commit_url": "https://github.com/vLLM-HUST/triton-ascend-hust/commit/b52af7fc9a0377c6ed527a88a30df719874eeba9",
+      "source_updated_at": "2026-09-01T19:56:11Z",
+      "version_display_label": "Repository snapshot; not a production compatibility approval",
+      "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
+    },
+    {
+      "name": "vllm-hust-dev-hub",
+      "repo": "https://github.com/vLLM-HUST/vllm-hust-dev-hub",
+      "group": "infrastructure",
+      "version": "main@97bf3152",
+      "source_branch": "main",
+      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust-dev-hub/commit/97bf31522da01478b6ed40c1ac17f3f95d1fb1b0",
+      "source_updated_at": "2026-09-02T12:07:42Z",
+      "version_display_label": "Repository snapshot; not a production compatibility approval",
+      "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
+    },
+    {
+      "name": "ascend-runtime-manager",
+      "repo": "https://github.com/vLLM-HUST/ascend-runtime-manager",
+      "group": "infrastructure",
+      "version": "main@17af8942",
+      "source_branch": "main",
+      "source_commit_url": "https://github.com/vLLM-HUST/ascend-runtime-manager/commit/17af8942b55154fcc912dd8c8749b12c94d0cdbf",
+      "source_updated_at": "2026-08-19T09:56:43Z",
+      "version_display_label": "Repository snapshot; not a production compatibility approval",
+      "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
+    },
+    {
+      "name": "vllm-hust-workstation",
+      "repo": "https://github.com/vLLM-HUST/vllm-hust-workstation",
+      "group": "infrastructure",
+      "version": "main@17e2cc5c",
+      "source_branch": "main",
+      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust-workstation/commit/17e2cc5c247bb57562519450106053b9b9b05ff8",
+      "source_updated_at": "2026-09-01T14:04:37Z",
+      "version_display_label": "Repository snapshot; not a production compatibility approval",
+      "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
+    },
+    {
+      "name": "vllm-hust-benchmark",
+      "repo": "https://github.com/vLLM-HUST/vllm-hust-benchmark",
+      "group": "infrastructure",
+      "version": "main@e8a68923",
+      "source_branch": "main",
+      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/commit/e8a68923768adffb85c2d0fa255b2cec79af8ab5",
+      "source_updated_at": "2026-08-28T14:10:13Z",
+      "version_display_label": "Repository snapshot; not a production compatibility approval",
+      "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     }
   ],
-  "updated_at": "2026-07-06"
+  "updated_at": "2026-09-02T23:22:20Z",
+  "registry": {
+    "name": "vllm-hust",
+    "version": "0.17.2.post1",
+    "url": "https://pypi.org/project/vllm-hust/",
+    "uploaded_at": "2026-04-19T02:21:59.982802Z",
+    "approved_for_current_stack": false
+  }
 }

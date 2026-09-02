@@ -346,7 +346,12 @@ body[data-page="home"] .lang-toggle {
 .mod-portfolio-brief strong { display: block; font-size: 20px; }
 .mod-portfolio-brief small { display: block; margin-top: 6px; color: var(--exec-muted); font-size: 13px; line-height: 1.55; }
 .mod-portfolio-arrow { font-size: 24px; font-weight: 900; }
+.execution-section { scroll-margin-top: 90px; }
 .runtime-list { display: grid; gap: 34px; }
+.runtime-list[hidden], .runtime-disclosure[hidden] { display: none; }
+.runtime-disclosure { width: 100%; margin: 0 0 20px; padding: 16px; color: #163744; background: #edf4f7; border: 1px solid #738b98; border-radius: 6px; font: inherit; font-weight: 700; text-align: left; cursor: pointer; }
+.runtime-disclosure:hover { background: #dcebf0; }
+.runtime-disclosure:focus-visible { outline: 3px solid #075b72; outline-offset: 3px; }
 .runtime-group { border-top: 1px solid var(--exec-ink); }
 .upstream-fork-group { border-top: 3px solid var(--exec-amber); }
 .upstream-fork-group .runtime-group-head { background: #fff7e6; }
