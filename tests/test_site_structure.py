@@ -1481,6 +1481,14 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
 
     assert 'id="upstream-repository-browser"' in html_text
+    assert (
+        '<section class="content-panel upstream-pr-panel" '
+        'aria-labelledby="upstream-pr-title">'
+    ) in html_text
+    assert (
+        '<section class="content-panel upstream-pr-panel" '
+        'aria-labelledby="upstream-pr-title" hidden>'
+    ) not in html_text
     assert "upstream-pr-prev" not in html_text
     assert "upstream-pr-next" not in html_text
     assert "const UPSTREAM_PULL_REQUESTS = [" in js_text
