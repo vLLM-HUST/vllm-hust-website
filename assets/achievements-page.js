@@ -207,19 +207,18 @@
         },
     ];
 
-    // Refreshed from the GitHub Pull Request API. Internal synchronization PRs
-    // are intentionally excluded; every entry below links to an upstream repo.
-    const UPSTREAM_VERIFIED_AT = '2026-09-02T13:34:00Z';
+    // Refreshed from the GitHub Pull Request API. Keep merged history and
+    // relevant open/draft work; exclude closed-unmerged, superseded, internal
+    // synchronization, and legacy-source entries from this current list.
+    const UPSTREAM_VERIFIED_AT = '2026-09-02T13:55:25Z';
     const UPSTREAM_PULL_REQUESTS = [
-        { repository: 'vLLM', number: 47793, title: 'Handle missing vLLM metadata in Triton import', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-01T12:14:12Z', headRepository: 'intellistream/vllm-hust-legacy-20260831', href: 'https://github.com/vllm-project/vllm/pull/47793' },
-        { repository: 'vLLM', number: 49034, title: 'fix(v1): avoid false shutdown failures on clean exit', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-25T22:52:40Z', headRepository: 'intellistream/vllm-hust-legacy-20260831', href: 'https://github.com/vllm-project/vllm/pull/49034' },
         { repository: 'vLLM', number: 49035, title: 'fix: handle missing parent modules in _has_module', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-25T22:52:38Z', headRepository: 'ShuhaoZhangTony/vllm', href: 'https://github.com/vllm-project/vllm/pull/49035' },
         { repository: 'vLLM-Ascend', number: 12316, title: '[BugFix] Fix packaged custom opapi lookup', status: 'draft', author: 'ShuhaoZhangTony', updatedAt: '2026-07-22T09:35:02Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12316' },
         { repository: 'vLLM-Ascend', number: 12317, title: '[Performance][Worker] Reuse DP metadata sync buffers', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-08-29T01:43:39Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12317' },
         { repository: 'vLLM-Ascend', number: 12342, title: '[BugFix] Persist enable_npugraph_ex override for worker processes', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-08-05T04:34:03Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12342' },
         { repository: 'vLLM-Ascend', number: 12343, title: '[Ops][BugFix] Fix Qwen2 compiled-path outputs on Ascend', status: 'draft', author: 'ShuhaoZhangTony', updatedAt: '2026-08-12T06:19:46Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12343' },
         { repository: 'vLLM-Ascend', number: 12344, title: '[Ops][BugFix] Fix NPU memory profiling on Python 3.12', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-22T09:34:58Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12344' },
-        { repository: 'vLLM-Ascend', number: 15543, title: '[BugFix] Preserve native Triton Gluon on Triton 3.6+', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:34Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: 'd1995a1f', href: 'https://github.com/vllm-project/vllm-ascend/pull/15543' },
+        { repository: 'vLLM-Ascend', number: 15543, title: '[BugFix] Preserve native Triton Gluon on Triton 3.6+', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:55:56Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: '980b1c83', href: 'https://github.com/vllm-project/vllm-ascend/pull/15543' },
         { repository: 'vLLM-Ascend', number: 15544, title: '[CI] Read Torch version from package metadata', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:48Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: '671a2f2f', href: 'https://github.com/vllm-project/vllm-ascend/pull/15544' },
         { repository: 'vLLM-Ascend', number: 15545, title: '[BugFix] Scope PyTorch AOT cache override to npugraph_ex', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-09-02T05:44:42Z', headRepository: 'vLLM-HUST/vllm-ascend-hust', headSha: 'f23e64bc', href: 'https://github.com/vllm-project/vllm-ascend/pull/15545' },
         {
