@@ -64,7 +64,7 @@ const HF_CONFIG = {
     }
 };
 
-const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v12_public_sanitized';
+const CACHE_KEY = 'llm_engine_hf_leaderboard_cache_v13_public_sanitized';
 const LOCAL_DATA_CACHE_BUST = 'leaderboard-data-20260817-stable-trend-2';
 const BACKGROUND_SYNC_EVENT = 'vllm-hust:leaderboard-data-updated';
 const PROGRESS_EVENT = 'vllm-hust:leaderboard-data-progress';
@@ -72,19 +72,43 @@ let lastLoadedSource = null;
 let backgroundSyncPromise = null;
 
 function sanitizePublicString(value) {
-    if (typeof value !== 'string' || !value.startsWith('/home/')) return value;
-    const markers = [
-        ['/vllm-hust-benchmark/', 'vllm-hust-benchmark/'],
-        ['/vllm-hust-benchmark-single-npu/', 'vllm-hust-benchmark-single-npu/'],
-        ['/.cache/huggingface/hub/', '<huggingface-cache>/'],
-    ];
-    for (const [marker, replacement] of markers) {
-        if (value.includes(marker)) return replacement + value.split(marker, 2)[1];
-    }
-    if (value.includes('/envs/') && value.endsWith('/bin/python')) {
-        return '<python-environment>/bin/python';
-    }
-    return `<local-path>/${value.split('/').pop()}`;
+    if (typeof value !== 'string') return value;
+    return value.replace(/\/(?:home|root|data|workspace|mnt|opt)\/[^\s"'`]+/g, (path) => {
+        const replaceAfter = (marker, replacement) => (
+            replacement + path.slice(path.indexOf(marker) + marker.length)
+        );
+        if (path.includes('/.cache/huggingface/hub/')) {
+            return replaceAfter('/.cache/huggingface/hub/', '<huggingface-cache>/');
+        }
+        if (path.includes('/.cache/modelscope/hub/')) {
+            return replaceAfter('/.cache/modelscope/hub/', '<model-cache>/');
+        }
+        for (const [marker, replacement] of [
+            ['/shared_models/', '<model-cache>/'],
+            ['/shared_datasets/', '<dataset-cache>/'],
+        ]) {
+            if (path.includes(marker)) return replaceAfter(marker, replacement);
+        }
+        if (path.includes('/models/')) return replaceAfter('/models/', '<model-cache>/');
+        if (
+            ['/envs/', '/conda-envs/', '/.venv/'].some((marker) => path.includes(marker))
+            && /\/bin\/python(?:[0-9.]*)?$/.test(path)
+        ) {
+            return '<python-environment>/bin/python';
+        }
+        for (const repository of [
+            'vllm-hust-benchmark-single-npu',
+            'vllm-hust-benchmark',
+            'vllm-ascend-hust',
+            'vllm-hust',
+        ]) {
+            const marker = `/${repository}`;
+            if (path.includes(marker)) {
+                return repository + path.slice(path.indexOf(marker) + marker.length);
+            }
+        }
+        return `<local-path>/${path.split('/').pop()}`;
+    });
 }
 
 function sanitizePublicPayload(value) {

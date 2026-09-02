@@ -52,8 +52,8 @@
 - 6 月 official baseline 与 7 月 vllm-hust 单卡记录的 `resolved_spec_hash` 有差异，主要来自模型路径、端口和部分 server
   参数显式性变化：
   - 6 月 baseline 常见模型路径是 HuggingFace cache snapshot，并显式包含 `gpu_memory_utilization=0.6`。
-  - 7 月 vllm-hust 常见模型路径是 `/data/shared_models/Qwen--Qwen2.5-14B-Instruct`，`gpu_memory_utilization`
-    在 resolved server 参数中未出现。
+  - 7 月 vllm-hust 记录的模型是 `Qwen/Qwen2.5-14B-Instruct`，`gpu_memory_utilization` 在 resolved server
+    参数中未出现。
   - 结论：client token 参数通常一致，但 server 参数记录不完全一致。单卡 baseline-vs-current 结论需要补一组同一 dev-hub 环境、同一模型路径、同一
     server 参数显式化的复测。
 

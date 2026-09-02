@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -23,6 +24,10 @@ REGISTRY_MIRROR = {
     "official-targets.json": "official_targets.json",
     "official-targets.sha256": "official_targets.sha256",
 }
+
+ABSOLUTE_ENVIRONMENT_PATH = re.compile(
+    r"/(?:home|root|data|workspace|mnt|opt)/[^\s\"'`]+"
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -56,19 +61,37 @@ def load_json(path: Path) -> object:
 
 def sanitize_public_string(value: str) -> str:
     """Remove workstation-specific absolute paths from published snapshots."""
-    if not value.startswith("/home/"):
-        return value
-    markers = (
-        ("/vllm-hust-benchmark/", "vllm-hust-benchmark/"),
-        ("/vllm-hust-benchmark-single-npu/", "vllm-hust-benchmark-single-npu/"),
-        ("/.cache/huggingface/hub/", "<huggingface-cache>/"),
-    )
-    for marker, replacement in markers:
-        if marker in value:
-            return replacement + value.split(marker, 1)[1]
-    if "/envs/" in value and value.endswith("/bin/python"):
-        return "<python-environment>/bin/python"
-    return f"<local-path>/{Path(value).name}"
+
+    def replace_path(match: re.Match[str]) -> str:
+        path = match.group(0)
+        if "/.cache/huggingface/hub/" in path:
+            return "<huggingface-cache>/" + path.split("/.cache/huggingface/hub/", 1)[1]
+        if "/.cache/modelscope/hub/" in path:
+            return "<model-cache>/" + path.split("/.cache/modelscope/hub/", 1)[1]
+        for marker, replacement in (
+            ("/shared_models/", "<model-cache>/"),
+            ("/shared_datasets/", "<dataset-cache>/"),
+        ):
+            if marker in path:
+                return replacement + path.split(marker, 1)[1]
+        if "/models/" in path:
+            return "<model-cache>/" + path.split("/models/", 1)[1]
+        if any(
+            marker in path for marker in ("/envs/", "/conda-envs/", "/.venv/")
+        ) and re.search(r"/bin/python(?:[0-9.]*)?$", path):
+            return "<python-environment>/bin/python"
+        for repository in (
+            "vllm-hust-benchmark-single-npu",
+            "vllm-hust-benchmark",
+            "vllm-ascend-hust",
+            "vllm-hust",
+        ):
+            marker = f"/{repository}"
+            if marker in path:
+                return repository + path.split(marker, 1)[1]
+        return f"<local-path>/{Path(path).name}"
+
+    return ABSOLUTE_ENVIRONMENT_PATH.sub(replace_path, value)
 
 
 def sanitize_public_payload(value: object) -> object:

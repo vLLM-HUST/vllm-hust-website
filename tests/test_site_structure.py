@@ -705,7 +705,7 @@ def test_hf_loader_accepts_declared_empty_compare_snapshots() -> None:
     assert "function dispatchProgress(payload, onProgress)" in text
     assert "function startBackgroundSync()" in text
     assert "startBackgroundSync," in text
-    assert "llm_engine_hf_leaderboard_cache_v12_public_sanitized" in text
+    assert "llm_engine_hf_leaderboard_cache_v13_public_sanitized" in text
     assert "function sanitizePublicPayload(value)" in text
     assert ".then(sanitizePublicPayload)" in text
     assert (
@@ -866,21 +866,22 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
 
 def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
     root = Path(__file__).resolve().parents[1]
-    paths = [
-        root / "plugins.html",
-        root / "data" / "ecosystem.json",
-        root / "data" / "issues.json",
-        root / "data" / "leaderboard_single.json",
-        root / "data" / "leaderboard_multi.json",
-        root / "data" / "leaderboard_historical.json",
-        root / "data" / "leaderboard_compare.json",
-        root / "docs" / "PLUGIN_STANDARD.md",
-        root / "docs" / "DEPLOY.md",
-        root / "roadmap.md",
-    ]
+    paths = sorted(root.glob("*.html"))
+    paths += sorted(root.glob("*.md"))
+    paths += sorted((root / "docs").rglob("*.md"))
+    paths += sorted((root / "data").rglob("*.json"))
+    paths += sorted((root / "reports").rglob("*.md"))
+    paths += sorted((root / "reports").rglob("*.json"))
     published = "\n".join(path.read_text(encoding="utf-8") for path in paths)
     forbidden = (
         "/home/shuhao",
+        "/root/vllm",
+        "/root/miniconda",
+        "/workspace/shuhao",
+        "/workspace/vllm-hust",
+        "/data/conda-envs",
+        "/data/shared_models",
+        "/data/shared_datasets",
         "poy-180",
         "a100-dev",
         "host 180",
@@ -888,6 +889,15 @@ def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
         "server 91",
         "host 91",
         "hosts 91 and 112",
+        "sage-faculty-twin-app.service",
+        "cloudflared-sage-local",
+        "VLLMEngineCor PID",
+        "vLLM-HUST/vllm-hust-bidkv/blob/main/PROVENANCE.md",
+        "codex/plugin-standardization-handoff/operations/extension-manager-support-matrix",
+        "vLLM-HUST/vllm-ascend-hust/issues/145",
+        "vLLM-HUST/vllm-ascend-hust/issues/149",
+        "vLLM-HUST/vllm-hust/issues/58",
+        "vLLM-HUST/vllm-hust/issues/163",
         "91 服务器",
         "91 与 112",
         "91/Qwen",

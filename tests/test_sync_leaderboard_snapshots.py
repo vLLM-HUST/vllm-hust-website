@@ -39,6 +39,24 @@ def test_public_snapshot_sanitizer_preserves_traceable_relative_identity() -> No
     assert sanitize_public_string("Qwen/Qwen2.5-14B-Instruct") == (
         "Qwen/Qwen2.5-14B-Instruct"
     )
+    assert sanitize_public_string(
+        "cd /root/vllm/vllm-hust && "
+        "/data/conda-envs/runtime/bin/python --model "
+        "/data/shared_models/Qwen2.5-14B-Instruct"
+    ) == (
+        "cd vllm-hust && <python-environment>/bin/python --model "
+        "<model-cache>/Qwen2.5-14B-Instruct"
+    )
+    assert (
+        sanitize_public_string(
+            "/workspace/actions/_work/project/vllm-hust-benchmark/docs/spec.json"
+        )
+        == "vllm-hust-benchmark/docs/spec.json"
+    )
+    assert (
+        sanitize_public_string("/data/shared_datasets/ShareGPT.json")
+        == "<dataset-cache>/ShareGPT.json"
+    )
 
 
 def test_public_snapshot_sanitizer_recurses_without_mutating_input() -> None:
