@@ -1495,21 +1495,22 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=nav-polish-20260826" in html_text
-    assert "assets/achievements-page.js?v=upstream-pr-15585-20260902" in html_text
+    assert "assets/achievements-page.js?v=upstream-pr-cleanup-20260902" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
     )
     assert "number: 49018" not in js_text
     assert "number: 49017" not in js_text
-    assert "number: 49034" in js_text
+    assert "number: 47793" not in js_text
+    assert "number: 49034" not in js_text
     assert "number: 49035" in js_text
     assert "number: 12343" in js_text
     assert "number: 15543" in js_text
     assert "number: 15544" in js_text
     assert "number: 15545" in js_text
     assert "number: 15585" in js_text
-    assert "const UPSTREAM_VERIFIED_AT = '2026-09-02T13:34:00Z'" in js_text
+    assert "const UPSTREAM_VERIFIED_AT = '2026-09-02T13:55:25Z'" in js_text
     assert "Support standardized KV-cache layouts on current vLLM main" in js_text
     assert "58741b32" in js_text
     assert "awaiting maintainer ready-precise label" in js_text
@@ -1534,9 +1535,13 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "'upstream-pr-title': '开放与已合入贡献'" in html_text
     assert "pullRequestCount(repository.pullRequests.length)" in js_text
 
+    published_prs = js_text.split("const UPSTREAM_PULL_REQUESTS = [", 1)[1].split(
+        "const UPSTREAM_REPOSITORIES = [", 1
+    )[0]
+    assert "legacy" not in published_prs.lower()
+    assert "status: 'closed'" not in published_prs
+
     open_urls = (
-        "https://github.com/vllm-project/vllm/pull/47793",
-        "https://github.com/vllm-project/vllm/pull/49034",
         "https://github.com/vllm-project/vllm/pull/49035",
         "https://github.com/vllm-project/vllm-ascend/pull/12316",
         "https://github.com/vllm-project/vllm-ascend/pull/12317",
@@ -1649,7 +1654,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
-    assert "assets/achievements-page.js?v=upstream-pr-15585-20260902" in html_text
+    assert "assets/achievements-page.js?v=upstream-pr-cleanup-20260902" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_snapshot() -> None:
