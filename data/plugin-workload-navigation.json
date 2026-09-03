@@ -58,6 +58,7 @@
   },
   "plugins": {
     "bidkv": ["memory_kv_pressure", "high_concurrency"],
+    "clm-lifecycle": ["long_context", "memory_kv_pressure", "latency_slo"],
     "diffspec": ["decode_heavy", "latency_slo"],
     "latchmoe": ["moe", "memory_kv_pressure"],
     "ascend-quant-runtime-descriptor": ["memory_kv_pressure"],

@@ -261,6 +261,54 @@
       "evidence_level": "performance_verified"
     },
     {
+      "id": "clm-lifecycle",
+      "name": "CLM Lifecycle",
+      "name_en": "CLM Lifecycle",
+      "name_zh": "CLM 生命周期",
+      "artifact_type": "runtime_component",
+      "system_role": "context_lifecycle_management",
+      "integration_contracts": ["vllm.request-lifecycle.v1"],
+      "integration_surfaces": ["vLLM-HUST vllm.request-lifecycle.v1 (PR pending)", "vllm.general_plugins (legacy experiment-only)"],
+      "execution_planes": ["scheduler"],
+      "deployment_topology": "in_process",
+      "delivery_model": "plugin_bundle",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "incubating",
+      "maintainers": ["xiehanlong834-gif"],
+      "maintainer_profiles": [
+        {
+          "login": "xiehanlong834-gif",
+          "name": "谢汉龙"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
+        }
+      ],
+      "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-clm-lifecycle",
+      "upstream_repository": null,
+      "summary_en": "Context Lifecycle Management perception layer: consumes request lifecycle events and reports session KV growth to an out-of-tree CLM controller; a context compaction scheduler for long conversations that bounds decode cost.",
+      "summary_zh": "上下文生命周期管理感知层：消费请求生命周期事件并向树外 CLM 控制器上报会话 KV 增长；服务于约束长会话 decode 成本的上下文压缩调度器。",
+      "public_effect_en": "Code available with CI green (ruff + pytest 6/6 + extension inspect across Python 3.10/3.12/3.14); sink logic covers per-session KV aggregation, threshold reporting, KV-pressure preempt reporting, and re-entrant registration. No cluster run yet: end-to-end serving validation is blocked on the vllm.request-lifecycle.v1 hook (vllm-hust PR) merging and an Ascend 910B2 run.",
+      "public_effect_zh": "代码可用且 CI 全绿（ruff + pytest 6/6 + extension inspect，覆盖 Python 3.10/3.12/3.14）；sink 逻辑覆盖会话级 KV 聚合、阈值上报、KV 压力抢占上报与幂等注册。尚无集群实测：端到端 serving 验证取决于 vllm.request-lifecycle.v1 钩子（vllm-hust PR）合入并在 Ascend 910B2 上运行。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-clm-lifecycle",
+      "compatibility": {
+        "status": "inspect_only",
+        "host": "vLLM-HUST",
+        "versions": ["vllm-hust main + request-lifecycle events (PR #6, not merged)"],
+        "platforms": ["Ascend NPU (planned)"],
+        "python": [">=3.10,<3.15"],
+        "requirements_en": "Host must expose vllm.request-lifecycle.v1 (RequestFinished/RequestPreempted on the scheduler EventBus); without it the plugin skips registration and reports nothing. E2E serving validation pending on cluster.",
+        "requirements_zh": "宿主必须暴露 vllm.request-lifecycle.v1（scheduler EventBus 上的 RequestFinished/RequestPreempted）；缺失时插件跳过注册且不上报。端到端 serving 验证待集群实测。"
+      },
+      "evidence_level": "code_available"
+    },
+    {
       "id": "diffspec",
       "name": "DiffSpec",
       "name_en": "DiffSpec",
