@@ -1094,14 +1094,14 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
     assert (
-        "Typed runtime contracts. 19 audited MODs. Evidence before claims." in html_text
+        "Typed runtime contracts. 20 audited MODs. Evidence before claims." in html_text
     )
-    assert "类型化运行时契约、19 个已审计 MOD、证据先于结论。" in html_text
+    assert "类型化运行时契约、20 个已审计 MOD、证据先于结论。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
-    assert "19 MODs, with compatibility and evidence made explicit." in html_text
-    assert "19 个 MOD，明确展示兼容性与证据边界。" in html_text
+    assert "20 MODs, with compatibility and evidence made explicit." in html_text
+    assert "20 个 MOD，明确展示兼容性与证据边界。" in html_text
     assert "static checks never become runtime or NPU claims" in html_text
     assert "不把静态检查写成运行时或 NPU 结论" in html_text
 
@@ -2639,7 +2639,7 @@ def test_core_contributor_stats_precede_all_repository_stats() -> None:
 
     assert core_index < all_index
     assert "推理引擎核心仓库与已审计 MOD 项目组合" in html_text
-    assert "完整的 19 项目录" in html_text
+    assert "完整的 20 项目录" in html_text
 
 
 def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
