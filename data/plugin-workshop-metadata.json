@@ -1,15 +1,15 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-09-03T01:42:16+00:00",
+  "generated_at": "2026-09-03T14:42:09+00:00",
   "source": "GitHub API + canonical ownership and organization identity data",
   "plugins": {
     "bidkv": {
       "repository": "vLLM-HUST/vllm-hust-bidkv",
-      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
+      "repository_url": "https://github.com/Qixin-Gaoke/vllm-hust-bidkv",
       "metrics": {
         "stars": 1,
         "forks": 0,
-        "open_pull_requests": 2
+        "open_pull_requests": 1
       },
       "maintainers": [
         {
@@ -90,7 +90,7 @@
       "metrics": {
         "stars": 2,
         "forks": 0,
-        "open_pull_requests": 1
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -232,7 +232,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 1
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -374,7 +374,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 0
+        "open_pull_requests": 2
       },
       "maintainers": [
         {

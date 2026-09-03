@@ -8,8 +8,8 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
-  <link rel="stylesheet" href="./assets/versions.css?v=site-structure-20260816" />
   <link rel="stylesheet" href="./assets/subpages.css?v=page-focus-20260901" />
+  <link rel="stylesheet" href="./assets/versions.css?v=0.3.7" />
 </head>
 <body data-page="versions">
   <nav class="site-nav">
@@ -48,12 +48,14 @@
       <section class="content-panel versions-install" aria-labelledby="versions-install-title">
         <div>
           <p id="versions-install-kicker" class="eyebrow">Get started</p>
-          <h2 id="versions-install-title">Install the serving stack</h2>
-          <p id="versions-install-note" class="versions-note">The repository is the source of truth while the next PyPI package is prepared.</p>
+          <h2 id="versions-install-title">Start from the maintained deployment guide</h2>
+          <p id="versions-install-note" class="versions-note">Do not install the current stack from the historical PyPI package. Select a verified core/plugin/image combination in the dev-hub runbook; cloning alone does not install a runtime.</p>
+          <a id="versions-runbook-link" href="https://github.com/vLLM-HUST/vllm-hust-dev-hub/blob/main/docs/sage-mate-production-runtime.md">Open the deployment runbook</a>
         </div>
-        <pre><code>pip install vllm-hust
-
-vllm-hust <span id="versions-install-version">latest</span></code></pre>
+        <div>
+          <pre><code>git clone https://github.com/vLLM-HUST/vllm-hust-dev-hub.git</code></pre>
+          <p id="versions-registry" class="versions-note"></p>
+        </div>
       </section>
 
       <section class="content-panel versions-section" aria-labelledby="versions-ascend-title">
@@ -74,7 +76,8 @@ vllm-hust <span id="versions-install-version">latest</span></code></pre>
         <p class="loading-note" id="infra-loading">Loading integration versions…</p>
       </section>
 
-      <p class="versions-updated"><span id="versions-updated-label">Last updated</span>: <span id="versions-updated-at">-</span></p>
+      <p id="versions-verified" class="snapshot-status" role="status"></p>
+      <p class="versions-updated"><span id="versions-updated-label">Last verified</span>: <span id="versions-updated-at">-</span></p>
     </div>
   </main>
 
@@ -86,31 +89,34 @@ vllm-hust <span id="versions-install-version">latest</span></code></pre>
         title: 'Versions - vLLM-HUST',
         'versions-eyebrow': 'Release directory', 'versions-title': 'Runtime and integration versions',
         'versions-lede': 'One status page for the engine, backends, and maintained extension repositories.',
-        'versions-install-kicker': 'Get started', 'versions-install-title': 'Install the serving stack',
-        'versions-install-note': 'The repository is the source of truth while the next PyPI package is prepared.',
+        'versions-install-kicker': 'Get started', 'versions-install-title': 'Start from the maintained deployment guide',
+        'versions-install-note': 'Do not install the current stack from the historical PyPI package. Select a verified core/plugin/image combination in the dev-hub runbook; cloning alone does not install a runtime.',
+        'versions-runbook-link': 'Open the deployment runbook',
         'versions-ascend-kicker': 'Ascend baseline', 'versions-ascend-title': 'Official ARM64 runtime matrix',
         'versions-ascend-note': 'The stable v0.23.0 image set is pinned separately from the rebuilt, moving HUST main snapshots. The matrix also records mutable nightly architecture gaps without approving them for deployment.',
         'versions-ascend-link': 'Open the maintained support matrix',
         'versions-core-kicker': 'Engine', 'versions-core-title': 'Project repositories',
         'versions-infra-kicker': 'Integrations', 'versions-infra-title': 'Extension repositories',
-        'versions-updated-label': 'Last updated', 'footer-copy': 'Release status across the inference stack.'
+        'versions-updated-label': 'Last verified', 'footer-copy': 'Release status across the inference stack.'
       },
       zh: {
         title: '版本目录 - vLLM-HUST',
         'versions-eyebrow': '版本目录', 'versions-title': '运行时与集成版本',
         'versions-lede': '集中查看推理引擎、后端与维护中扩展仓库的版本状态。',
-        'versions-install-kicker': '开始使用', 'versions-install-title': '安装推理服务栈',
-        'versions-install-note': '下一版 PyPI 包发布前，以项目仓库为准。',
+        'versions-install-kicker': '开始使用', 'versions-install-title': '从维护中的部署指南开始',
+        'versions-install-note': '请勿用历史 PyPI 包安装当前服务栈。先在 dev-hub 运维文档选择经过验证的 core/plugin/镜像组合；克隆仓库本身并不会安装运行时。',
+        'versions-runbook-link': '打开部署运维文档',
         'versions-ascend-kicker': '昇腾基线', 'versions-ascend-title': '官方 ARM64 运行环境矩阵',
         'versions-ascend-note': 'v0.23.0 稳定镜像与重建后持续移动的 HUST main 快照分开登记；同时记录 nightly 架构缺口，但不批准其用于部署。',
         'versions-ascend-link': '打开维护中的支持矩阵',
         'versions-core-kicker': '引擎', 'versions-core-title': '项目仓库',
         'versions-infra-kicker': '集成', 'versions-infra-title': '扩展仓库',
-        'versions-updated-label': '最后更新', 'footer-copy': '推理栈版本状态。'
+        'versions-updated-label': '最近核验', 'footer-copy': '推理栈版本状态。'
       }
     };
   </script>
   <script src="./assets/site.js?v=nav-polish-20260826"></script>
-  <script src="./assets/versions-page.js?v=site-structure-20260816"></script>
+  <script src="./assets/snapshot-status.js?v=0.3.7"></script>
+  <script src="./assets/versions-page.js?v=0.3.7"></script>
 </body>
 </html>

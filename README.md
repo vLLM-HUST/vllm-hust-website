@@ -15,16 +15,14 @@
 
 ## Quick Start
 
+请勿用历史 PyPI 包安装当前服务栈；先查阅维护中的部署指南，选择经过验证的 core/plugin/镜像组合。
+
 ```bash
-# 安装
-pip install vllm-hust
-
-# 启动 OpenAI 兼容服务器
-vllm serve Qwen/Qwen2.5-1.5B-Instruct --port 8000
-
-# 发起一次聊天请求
-vllm chat --quick "Hello AI"
+# 获取部署工具（并不直接安装运行时）
+git clone https://github.com/vLLM-HUST/vllm-hust-dev-hub.git
 ```
+
+[部署运维指南](https://github.com/vLLM-HUST/vllm-hust-dev-hub/blob/main/docs/sage-mate-production-runtime.md)
 
 _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_version_meta.py` 自动更新。_
 
@@ -33,8 +31,11 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 ## Version Metadata Maintenance
 
 - Source of truth: `data/version_meta.json`
-- Sync command: `python scripts/sync_version_meta.py`
-- Auto sync workflow: `.github/workflows/sync-version-meta.yml`
+- Refresh public GitHub/PyPI facts: `python scripts/refresh_site_status.py --refresh`
+- Render README from reviewed metadata: `python scripts/sync_version_meta.py`
+- Read-only daily drift/age check: `.github/workflows/site-status-check.yml`
+- README consistency workflow: `.github/workflows/sync-version-meta.yml` (does not refresh source
+  SHAs)
 - Consistency/stale check: `bash scripts/check_stale_versions.sh`
 - 维护说明：`docs/VERSION_METADATA.md`
 
