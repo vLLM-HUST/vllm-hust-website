@@ -1519,7 +1519,10 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "number: 15545" in js_text
     assert "number: 15585" in js_text
     assert "const UPSTREAM_VERIFIED_AT = '2026-09-04T02:21:03Z'" in js_text
-    assert js_text.count("selected tests await the maintainer-only ready-precise label") == 3
+    assert (
+        js_text.count("selected tests await the maintainer-only ready-precise label")
+        == 3
+    )
     assert js_text.count("选定测试等待仅维护者可添加的 ready-precise 标签") == 3
     assert "Support standardized KV-cache layouts on current vLLM main" in js_text
     assert "58741b32" in js_text
