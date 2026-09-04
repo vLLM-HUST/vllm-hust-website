@@ -249,8 +249,14 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     assert "DiffSpec 9986978" in diffspec["summary_en"]
     assert "Ascend 4e57439e" in diffspec["summary_en"]
     assert "Eagle3 draft" in diffspec["summary_en"]
-    assert "Qwen3.8-27B — verified functional, performance degraded" in diffspec["compatibility"]["models"]
-    assert "VirVen/Qwen3.5-27B-EAGLE3-v2 — required draft" in diffspec["compatibility"]["models"]
+    assert (
+        "Qwen3.8-27B — verified functional, performance degraded"
+        in diffspec["compatibility"]["models"]
+    )
+    assert (
+        "VirVen/Qwen3.5-27B-EAGLE3-v2 — required draft"
+        in diffspec["compatibility"]["models"]
+    )
     assert "19.29%" in diffspec["public_effect_en"]
     assert kvcompress["integration_contracts"] == []
     assert kvcompress["integration_surfaces"] == [
@@ -310,8 +316,16 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
     expected = {
         "bidkv": ("verified", "vLLM-HUST", ["0.28.1rc1.dev319 @ 762f85b3"]),
-        "diffspec": ("verified", "vLLM Ascend", ["Core 762f85b3 + Ascend 4e57439e + DiffSpec 9986978"]),
-        "latchmoe": ("verified", "vLLM Ascend HUST", ["Core 762f85b3 + Ascend 4e57439e/seam-v2"]),
+        "diffspec": (
+            "verified",
+            "vLLM Ascend",
+            ["Core 762f85b3 + Ascend 4e57439e + DiffSpec 9986978"],
+        ),
+        "latchmoe": (
+            "verified",
+            "vLLM Ascend HUST",
+            ["Core 762f85b3 + Ascend 4e57439e/seam-v2"],
+        ),
         "ascend-adaptive-quantized-kv": (
             "inspect_only",
             "vLLM Ascend",
@@ -525,7 +539,10 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     ]
     assert "not applicable to dense Qwen3.8-27B" in latchmoe["summary_en"]
     assert "TP4 graph" in latchmoe["summary_en"]
-    assert "Qwen3-30B-A3B — verified functional, performance degraded" in latchmoe["compatibility"]["models"]
+    assert (
+        "Qwen3-30B-A3B — verified functional, performance degraded"
+        in latchmoe["compatibility"]["models"]
+    )
     assert "Qwen3.8-27B — not applicable (dense)" in latchmoe["compatibility"]["models"]
 
 
