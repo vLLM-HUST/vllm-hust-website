@@ -1503,7 +1503,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
     assert "assets/site.css?v=nav-polish-20260826" in html_text
-    assert "assets/achievements-page.js?v=0.3.7" in html_text
+    assert "assets/achievements-page.js?v=upstream-20260904T022103Z" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
         not in js_text
@@ -1667,7 +1667,7 @@ def test_diffspec_is_presented_as_an_sc2026_result_repository() -> None:
     ) < result_repositories.index("repositoryName: 'vllm-ascend-hust-diffspec'")
     assert "artifact: { en: 'Decoding system', zh: '解码系统' }" in js_text
     assert "boundary: { en: 'Draft + verify + decode hooks'" in js_text
-    assert "assets/achievements-page.js?v=0.3.7" in html_text
+    assert "assets/achievements-page.js?v=upstream-20260904T022103Z" in html_text
 
 
 def test_published_result_repository_sits_between_hero_and_upstream() -> None:
