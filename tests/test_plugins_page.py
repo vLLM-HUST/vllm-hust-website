@@ -246,9 +246,12 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
         "vllm-ascend runtime patch surface",
     ]
     assert diffspec["execution_planes"] == ["scheduler", "worker", "native", "device"]
-    assert "0.3 source candidate" in diffspec["summary_en"]
+    assert "DiffSpec 9986978" in diffspec["summary_en"]
     assert "Ascend 4e57439e" in diffspec["summary_en"]
     assert "Eagle3 draft" in diffspec["summary_en"]
+    assert "Qwen3.8-27B — verified functional, performance degraded" in diffspec["compatibility"]["models"]
+    assert "VirVen/Qwen3.5-27B-EAGLE3-v2 — required draft" in diffspec["compatibility"]["models"]
+    assert "19.29%" in diffspec["public_effect_en"]
     assert kvcompress["integration_contracts"] == []
     assert kvcompress["integration_surfaces"] == [
         "vllm.general_plugins",
@@ -307,7 +310,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
     expected = {
         "bidkv": ("verified", "vLLM-HUST", ["0.28.1rc1.dev319 @ 762f85b3"]),
-        "diffspec": ("experimental", "vLLM Ascend", ["Core 762f85b3 + Ascend 4e57439e candidate"]),
+        "diffspec": ("verified", "vLLM Ascend", ["Core 762f85b3 + Ascend 4e57439e + DiffSpec 9986978"]),
         "latchmoe": ("verified", "vLLM Ascend HUST", ["Core 762f85b3 + Ascend 4e57439e/seam-v2"]),
         "ascend-adaptive-quantized-kv": (
             "inspect_only",
