@@ -63,6 +63,7 @@
     host: "宿主",
     versions: "适配版本",
     platforms: "平台",
+    models: "模型资格",
     python: "Python",
     requirements: "前置条件",
     followup: "负责人跟进 Issue",
@@ -114,6 +115,7 @@
     host: "Host",
     versions: "Versions",
     platforms: "Platforms",
+    models: "Model qualification",
     python: "Python",
     requirements: "Requirements",
     followup: "Owner follow-up issue",
@@ -545,7 +547,8 @@ vllm-hust-ext extension check ${extensionId}`
     [
       [copy().host, profile.host],
       [copy().versions, profile.versions?.join(" · ")],
-      [copy().platforms, profile.platforms?.join(" · ")]
+      [copy().platforms, profile.platforms?.join(" · ")],
+      [copy().models, profile.models?.join(" · ")]
     ].filter(([, value]) => value).forEach(([label, value]) => {
       const row = element("div");
       row.append(element("dt", "", label), element("dd", "", value));

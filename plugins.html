@@ -148,8 +148,8 @@ Research code can evolve without permanent forks or a universal plugin abstracti
 <span class="lang-zh">把 KV 状态变成可编程策略面</span>
 </h3>
 <p>
-<span class="lang-en">BidKV has a Core 762f85b3 source candidate using preemption-policy API v1 instead of the removed private victim selector. Qwen3.8 TP4 graph runtime qualification and human upstream review remain pending.</span>
-<span class="lang-zh">BidKV 已形成基于 Core 762f85b3、使用 preemption-policy API v1 的源码候选，不再依赖已移除的私有 victim selector；Qwen3.8 TP4 graph 运行资格与上游人工审查仍待完成。
+<span class="lang-en">BidKV 463f798 uses preemption-policy API v1 instead of the removed private victim selector and has passed Qwen3.8-27B TP4 graph runtime qualification on Core 762f85b3 and Ascend 4e57439e. Human upstream review remains pending.</span>
+<span class="lang-zh">BidKV 463f798 已使用 preemption-policy API v1 取代被移除的私有 victim selector，并在 Core 762f85b3、Ascend 4e57439e、Qwen3.8-27B TP4 graph 上通过运行资格验证；上游人工审查仍待完成。
 </span>
 </p>
 <div class="highlight-links">
@@ -220,10 +220,10 @@ Research code can evolve without permanent forks or a universal plugin abstracti
 <span class="lang-zh">设备机制与外部 KV 状态</span>
 </h3>
 <p>
-<span class="lang-en">LatchMoE is not applicable to dense Qwen3.8-27B. Its separate Qwen3-30B-A3B TP4 graph candidate is unqualified.
+<span class="lang-en">LatchMoE is not applicable to dense Qwen3.8-27B. Qwen3-30B-A3B passed functional TP4 PIECEWISE graph qualification, but throughput was about 2.91 tok/s versus 23.57 tok/s without the plugin, so it is not a speedup claim or production recommendation.
 PegaFlow is an external KV state system; its non-invasive Host Provider renders PegaKVConnector configuration and health checks without owning the service lifecycle.
 Their shared delivery does not make the system, bridge, and operator the same kind of plugin.</span>
-<span class="lang-zh">LatchMoE 不适用于 dense Qwen3.8-27B；独立的 Qwen3-30B-A3B TP4 graph 候选尚未取得资格。PegaFlow 是外部 KV 状态系统，其无侵入 Host Provider 只生成 PegaKVConnector 配置并执行健康检查，不接管服务生命周期。
+<span class="lang-zh">LatchMoE 不适用于 dense Qwen3.8-27B；Qwen3-30B-A3B 已通过 TP4 PIECEWISE graph 功能资格验证，但吞吐约为 2.91 tok/s，显著低于无插件基线的 23.57 tok/s，因此不构成加速声明或生产推荐。PegaFlow 是外部 KV 状态系统，其无侵入 Host Provider 只生成 PegaKVConnector 配置并执行健康检查，不接管服务生命周期。
 共同交付不会使系统、桥接层与算子成为同一种插件。
 </span>
 </p>
@@ -622,27 +622,24 @@ vllm-hust-ext run -- vllm serve MODEL
 Manifest 0.2 distinguishes kind, host, runtime, lifecycle owner, required services, compatibility ranges, and Python/service/OCI/Helm/Kubernetes carriers.
 MooncakeStoreConnector has passed a real Ascend save/load and outage/recovery gate.
 Production Stack has passed controller reconciliation, metrics-backed scaling, and a real GLM Router 500-to-200 recovery without restarting vLLM. Its arm64 carrier was published by GitHub-hosted runners, then pulled and entrypoint-tested in an arm64 validation environment; amd64 and self-hosted infrastructure are not required.
-BidKV's same-hash clean carrier/wheel gate passed in two independent Ascend validation environments, while the upstream scheduler contract and remaining cross-version matrix are still open, so no alpha or stable-v1 claim is made.</span>
+BidKV's current artifact also passed real Qwen3.8-27B TP4 graph KV-pressure invocation, metrics, rollback and output checks. The upstream scheduler contract and remaining cross-version matrix are still open, so no stable-v1 claim is made.</span>
 <span class="lang-zh">原单一 Python Bundle v1 设计已冻结为不稳定实验。
 Manifest 0.2 显式区分 kind、host、runtime、lifecycle owner、required services、兼容范围以及 Python/service/OCI/Helm/Kubernetes 载体。
 MooncakeStoreConnector 已通过真实 Ascend save/load 与中断/恢复门禁。
 Production Stack 已通过 controller 调谐、Metrics 扩容，以及不重启 vLLM 的真实 GLM Router 500→200 恢复；arm64 载体已由 GitHub-hosted runner 发布，并在 arm64 验证环境完成拉取与入口验收，不要求 amd64 或 self-hosted 基础设施。
-BidKV 的相同哈希干净 carrier/wheel 门禁已在两个独立昇腾验证环境通过，但稳定上游 scheduler 契约及跨版本矩阵仍未完成，因此不会发布 alpha 或宣称 v1 稳定。
+BidKV 当前制品还通过了真实 Qwen3.8-27B TP4 graph 的 KV 压力调用、指标、回滚与输出检查；稳定上游 scheduler 契约及跨版本矩阵仍未完成，因此不会宣称 v1 稳定。
 </span>
 </p>
 </aside>
 
       <aside class="plugin-runtime-note">
 <strong>
-<span class="lang-en">BidKV is supported on vLLM-HUST 0.23</span>
-<span class="lang-zh">BidKV 已支持 vLLM-HUST 0.23</span>
+<span class="lang-en">BidKV is qualified on the Sage Mate 0.28.1 candidate lane</span>
+<span class="lang-zh">BidKV 已在 Sage Mate 0.28.1 候选通道通过验证</span>
 </strong>
 <p>
-<span class="lang-en">The main BidKV distribution uses the typed <code>vllm.scheduler.policy.v1</code> host contract and does not register the private <code>vllm.victim_selector</code> entry point.
-A clean pushed-commit carrier/wheel run with Qwen3-0.6B produced three victim selections at full KV pressure, completed three 1,400-token requests, restored the built-in path after disable and restart, and removed registration on uninstall. An independent Qwen2.5-3B validation run reproduced the same lifecycle behavior.
-Official vLLM remains unsupported until its upstream scheduler contract is released.</span>
-<span class="lang-zh">BidKV 主发行包使用 typed <code>vllm.scheduler.policy.v1</code> 宿主契约，不注册私有 <code>vllm.victim_selector</code> entry point。
-Qwen3-0.6B 与 Qwen2.5-3B 的独立验证运行使用相同 pushed-commit carrier/wheel，均在 KV 满载时完成三次 victim 选择和三路 1,400-token 请求，停用重启后恢复内置路径，卸载后注册消失；官方 vLLM 在上游 scheduler 契约发布前仍不支持。
+<span class="lang-en">The current BidKV distribution uses <code>vllm.preemption_policy.v1</code> and does not register or monkey-patch the removed private victim selector. On Qwen3.8-27B, Core 762f85b3, Ascend 4e57439e, TP4 graph, four concurrent long requests completed and the policy ran 187 times with zero selector failures. Disable/restart restored the built-in policy. Qwen3-0.6B and Qwen2.5-3B remain historical 0.23-lane evidence only. Official vLLM remains unsupported until the upstream contract is merged.</span>
+<span class="lang-zh">当前 BidKV 使用 <code>vllm.preemption_policy.v1</code>，不再注册或 monkey-patch 被移除的私有 victim selector。在 Qwen3.8-27B、Core 762f85b3、Ascend 4e57439e、TP4 graph 上，四路并发长请求全部完成，策略调用 187 次且选择器失败为 0；停用重启后恢复内置策略。Qwen3-0.6B 与 Qwen2.5-3B 仅保留为历史 0.23 通道证据。官方 vLLM 仍需等待上游契约合并。
 </span>
 </p>
 </aside>

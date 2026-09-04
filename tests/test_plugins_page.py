@@ -90,6 +90,8 @@ def test_system_role_is_independent_from_delivery_model() -> None:
         "official vLLM preemption-policy proposal (human review pending)",
     ]
     assert bidkv["maturity"] == "experimental"
+    assert bidkv["compatibility"]["status"] == "verified"
+    assert "Qwen3.8-27B — verified" in bidkv["compatibility"]["models"]
 
     ascend = by_id("vllm-ascend-hust")
     assert ascend["artifact_type"] == "platform_profile"
@@ -304,9 +306,9 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
     expected = {
-        "bidkv": ("experimental", "vLLM-HUST", ["0.28.1rc1.dev319 @ 762f85b3 candidate"]),
+        "bidkv": ("verified", "vLLM-HUST", ["0.28.1rc1.dev319 @ 762f85b3"]),
         "diffspec": ("experimental", "vLLM Ascend", ["Core 762f85b3 + Ascend 4e57439e candidate"]),
-        "latchmoe": ("experimental", "vLLM Ascend HUST", ["Core 762f85b3 + Ascend 4e57439e/seam-v2 candidate"]),
+        "latchmoe": ("verified", "vLLM Ascend HUST", ["Core 762f85b3 + Ascend 4e57439e/seam-v2"]),
         "ascend-adaptive-quantized-kv": (
             "inspect_only",
             "vLLM Ascend",
@@ -520,6 +522,8 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     ]
     assert "not applicable to dense Qwen3.8-27B" in latchmoe["summary_en"]
     assert "TP4 graph" in latchmoe["summary_en"]
+    assert "Qwen3-30B-A3B — verified functional, performance degraded" in latchmoe["compatibility"]["models"]
+    assert "Qwen3.8-27B — not applicable (dense)" in latchmoe["compatibility"]["models"]
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
