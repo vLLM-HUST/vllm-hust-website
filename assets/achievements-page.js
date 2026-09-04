@@ -202,7 +202,7 @@
     // Refreshed from the GitHub Pull Request API. Keep merged history and
     // relevant open/draft work; exclude closed-unmerged, superseded, internal
     // synchronization, and legacy-source entries from this current list.
-    const UPSTREAM_VERIFIED_AT = '2026-09-04T01:26:23Z';
+    const UPSTREAM_VERIFIED_AT = '2026-09-04T02:21:03Z';
     const UPSTREAM_PULL_REQUESTS = [
         { repository: 'vLLM', number: 49035, title: 'fix: handle missing parent modules in _has_module', status: 'open', author: 'ShuhaoZhangTony', updatedAt: '2026-07-25T22:52:38Z', headRepository: 'ShuhaoZhangTony/vllm', href: 'https://github.com/vllm-project/vllm/pull/49035' },
         { repository: 'vLLM-Ascend', number: 12316, title: '[BugFix] Fix packaged custom opapi lookup', status: 'draft', author: 'ShuhaoZhangTony', updatedAt: '2026-07-22T09:35:02Z', headRepository: 'ShuhaoZhangTony/vllm-ascend', href: 'https://github.com/vllm-project/vllm-ascend/pull/12316' },
@@ -216,12 +216,12 @@
             title: '[BugFix] Preserve native Triton Gluon on Triton 3.6+',
             status: 'open',
             author: 'ShuhaoZhangTony',
-            updatedAt: '2026-09-02T05:55:56Z',
+            updatedAt: '2026-09-04T02:20:59Z',
             headRepository: 'vLLM-HUST/vllm-ascend-hust',
             headSha: '980b1c83',
             checkSummary: {
-                en: 'Open and mergeable · pre-commit and DCO passed · aggregate ci-gate failed; selected test jobs were skipped',
-                zh: '正式开放且可合并 · pre-commit 与 DCO 已通过 · 汇总 ci-gate 失败；选定测试任务被跳过',
+                en: 'Open and mergeable · pre-commit and DCO passed · selected tests await the maintainer-only ready-precise label',
+                zh: '正式开放且可合并 · pre-commit 与 DCO 已通过 · 选定测试等待仅维护者可添加的 ready-precise 标签',
             },
             href: 'https://github.com/vllm-project/vllm-ascend/pull/15543',
         },
@@ -231,12 +231,12 @@
             title: '[CI] Read Torch version from package metadata',
             status: 'open',
             author: 'ShuhaoZhangTony',
-            updatedAt: '2026-09-02T05:44:48Z',
+            updatedAt: '2026-09-04T02:21:01Z',
             headRepository: 'vLLM-HUST/vllm-ascend-hust',
             headSha: '671a2f2f',
             checkSummary: {
-                en: 'Open and mergeable · pre-commit and DCO passed · aggregate ci-gate failed; selected test jobs were skipped',
-                zh: '正式开放且可合并 · pre-commit 与 DCO 已通过 · 汇总 ci-gate 失败；选定测试任务被跳过',
+                en: 'Open and mergeable · pre-commit and DCO passed · selected tests await the maintainer-only ready-precise label',
+                zh: '正式开放且可合并 · pre-commit 与 DCO 已通过 · 选定测试等待仅维护者可添加的 ready-precise 标签',
             },
             href: 'https://github.com/vllm-project/vllm-ascend/pull/15544',
         },
@@ -246,12 +246,12 @@
             title: '[BugFix] Scope PyTorch AOT cache override to npugraph_ex',
             status: 'open',
             author: 'ShuhaoZhangTony',
-            updatedAt: '2026-09-02T05:44:42Z',
+            updatedAt: '2026-09-04T02:21:03Z',
             headRepository: 'vLLM-HUST/vllm-ascend-hust',
             headSha: 'f23e64bc',
             checkSummary: {
-                en: 'Open and mergeable · pre-commit and DCO passed · aggregate ci-gate failed; selected test jobs were skipped',
-                zh: '正式开放且可合并 · pre-commit 与 DCO 已通过 · 汇总 ci-gate 失败；选定测试任务被跳过',
+                en: 'Open and mergeable · pre-commit and DCO passed · selected tests await the maintainer-only ready-precise label',
+                zh: '正式开放且可合并 · pre-commit 与 DCO 已通过 · 选定测试等待仅维护者可添加的 ready-precise 标签',
             },
             href: 'https://github.com/vllm-project/vllm-ascend/pull/15545',
         },
