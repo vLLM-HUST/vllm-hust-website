@@ -244,19 +244,20 @@
       "maintainers": ["MingqiWang-coder", "cybber695"],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
       "upstream_repository": null,
-      "summary_en": "Source candidate for Core 762f85b3 migrates BidKV from the removed private victim-selector/monkey patch to preemption-policy API v1. It is not runtime-qualified on Qwen3.8-27B Ascend TP4 graph.",
-      "summary_zh": "面向 Core 762f85b3 的源码候选已将 BidKV 从移除的私有 victim-selector/monkey patch 迁移到 preemption-policy API v1；尚未在 Qwen3.8-27B 昇腾 TP4 graph 上取得运行资格。",
-      "public_effect_en": "Historical vLLM-HUST 0.23/Qwen3-0.6B evidence covered KV-pressure selection and next-process rollback. It does not qualify the current Sage Mate candidate.",
-      "public_effect_zh": "历史 vLLM-HUST 0.23/Qwen3-0.6B 证据覆盖 KV 压力选择和下一进程回退，但不能作为当前 Sage Mate 候选的资格证据。",
+      "summary_en": "BidKV 463f798 migrates the removed private victim-selector/monkey patch to preemption-policy API v1 and is runtime-qualified with Qwen3.8-27B on Core 762f85b3, Ascend 4e57439e, TP4 graph.",
+      "summary_zh": "BidKV 463f798 已从移除的私有 victim-selector/monkey patch 迁移到 preemption-policy API v1，并在 Core 762f85b3、Ascend 4e57439e、Qwen3.8-27B、TP4 graph 上完成运行资格验证。",
+      "public_effect_en": "Four concurrent 12,517-token prompts plus 2,048-token generations all returned 200. The selected policy ran 187 times under KV pressure with zero selector failures; disable/restart restored the built-in policy and output checks passed.",
+      "public_effect_zh": "四路并发的 12,517-token prompt 加 2,048-token generation 均返回 200；KV 压力下目标策略实际调用 187 次且选择器失败为 0，停用重启恢复内置策略，输出检查通过。",
       "public_effect_status": "validated",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-bidkv#vllm-hust-extension-manager-path",
       "compatibility": {
-        "status": "experimental",
+        "status": "verified",
         "host": "vLLM-HUST",
-        "versions": ["0.28.1rc1.dev319 @ 762f85b3 candidate"],
+        "versions": ["0.28.1rc1.dev319 @ 762f85b3"],
         "platforms": ["Ascend NPU · TP4 · graph"],
-        "requirements_en": "Candidate 9fc611b1 plus Manager a8586ab1; independent TP4 graph invocation, metrics, rollback and output evidence required.",
-        "requirements_zh": "需要候选 9fc611b1 与 Manager a8586ab1，并补齐独立 TP4 graph 调用、指标、回滚和输出证据。"
+        "models": ["Qwen3.8-27B — verified", "Qwen3-0.6B — historical 0.23 lane", "Qwen2.5-3B — historical 0.23 lane"],
+        "requirements_en": "Qualified artifact 463f798b with Manager 24036c11. Compatibility is model/topology/artifact-specific; installed, configured, enabled and runtime-effective remain separate states.",
+        "requirements_zh": "已验证制品 463f798b，Manager 24036c11。兼容性绑定模型、拓扑和制品；installed、configured、enabled 与 runtime-effective 仍是独立状态。"
       },
       "evidence_level": "performance_verified"
     },
@@ -292,9 +293,10 @@
         "status": "experimental",
         "host": "vLLM Ascend",
         "versions": ["Core 762f85b3 + Ascend 4e57439e candidate"],
-        "platforms": ["Ascend NPU · TP4 · graph"],
-        "requirements_en": "Candidate af00892c requires an architecture-, vocab- and tokenizer-compatible Eagle3 draft plus multi-rank correctness and recovery evidence.",
-        "requirements_zh": "候选 af00892c 需要架构、vocab、tokenizer 均匹配的 Eagle3 draft，以及多 rank 正确性和恢复证据。"
+        "platforms": ["Ascend NPU · TP4 · graph target (blocked)"],
+        "models": ["Qwen3.8-27B — blocked; no compatible Eagle3 draft", "Llama-3.1-8B — historical batch-1 lane only"],
+        "requirements_en": "Candidate 96188b99 requires an architecture-, vocab- and tokenizer-compatible Eagle3 draft plus TP4 correctness, acceptance, latency, cancellation, recovery and concurrency evidence.",
+        "requirements_zh": "候选 96188b99 仍需要架构、vocab、tokenizer 均匹配的 Eagle3 draft，以及 TP4 正确性、接受率、延迟、取消、恢复和并发证据。"
       },
       "evidence_level": "hardware_verified"
     },
@@ -315,19 +317,20 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE",
       "upstream_repository": null,
-      "summary_en": "LatchMoE is not applicable to dense Qwen3.8-27B. A separate Qwen3-30B-A3B source candidate targets Core 762f85b3, Ascend 4e57439e, TP4 graph and MoE seam v2, but has not completed NPU qualification.",
-      "summary_zh": "LatchMoE 不适用于 dense Qwen3.8-27B。独立的 Qwen3-30B-A3B 源码候选面向 Core 762f85b3、Ascend 4e57439e、TP4 graph 与 MoE seam v2，但尚未完成 NPU 资格验证。",
-      "public_effect_en": "Historical one-NPU Qwen3-30B-A3B evidence measured 16.70 ± 0.27 tok/s with 14 GiB offload. It does not qualify the new TP4 graph candidate.",
-      "public_effect_zh": "历史单 NPU Qwen3-30B-A3B 证据测得 16.70 ± 0.27 tok/s 与 14 GiB offload；它不能作为新 TP4 graph 候选的资格证据。",
+      "summary_en": "LatchMoE is not applicable to dense Qwen3.8-27B. Qwen3-30B-A3B is functionally qualified on Core 762f85b3, Ascend 4e57439e/seam v2, TP4 graph (PIECEWISE), but performance is substantially degraded.",
+      "summary_zh": "LatchMoE 不适用于 dense Qwen3.8-27B。Qwen3-30B-A3B 已在 Core 762f85b3、Ascend 4e57439e/seam v2、TP4 PIECEWISE graph 上通过功能资格验证，但性能明显退化。",
+      "public_effect_en": "All four ranks exercised expert mapping, host/device movement and graph replay with 48/48 stable-address checks. Four concurrent outputs, cancellation and exception recovery passed; output throughput was about 2.91 tok/s versus 23.57 tok/s without the plugin.",
+      "public_effect_zh": "四个 rank 均实际执行专家映射、主机/设备换入换出与 graph replay，48/48 地址稳定性检查通过；四路并发输出、取消与异常恢复通过，但输出吞吐约 2.91 tok/s，显著低于无插件基线的 23.57 tok/s。",
       "public_effect_status": "measured",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE#qualified-graph-result",
       "compatibility": {
-        "status": "experimental",
+        "status": "verified",
         "host": "vLLM Ascend HUST",
-        "versions": ["Core 762f85b3 + Ascend 4e57439e/seam-v2 candidate"],
+        "versions": ["Core 762f85b3 + Ascend 4e57439e/seam-v2"],
         "platforms": ["Ascend NPU · TP4 · graph"],
-        "requirements_en": "Qwen3.8-27B: not applicable. Candidate 39259709 requires Qwen3-30B-A3B TP4 expert mapping, swap and graph-address evidence.",
-        "requirements_zh": "Qwen3.8-27B：不适用。候选 39259709 需补齐 Qwen3-30B-A3B TP4 专家映射、换入换出和 graph 地址证据。"
+        "models": ["Qwen3-30B-A3B — verified functional, performance degraded", "Qwen3.8-27B — not applicable (dense)", "GLM-4.7-Flash — historical single-NPU lane", "Qwen3-Next-80B-A3B-Instruct — historical single-NPU lane"],
+        "requirements_en": "Qualified artifact 63781f3d on Qwen3-30B-A3B BF16 TP4 PIECEWISE graph, max_num_seqs=4. Functional compatibility does not imply a speedup or production recommendation.",
+        "requirements_zh": "已验证制品 63781f3d：Qwen3-30B-A3B BF16、TP4 PIECEWISE graph、max_num_seqs=4。功能兼容不代表加速效果或生产推荐。"
       },
       "evidence_level": "hardware_verified"
     },
