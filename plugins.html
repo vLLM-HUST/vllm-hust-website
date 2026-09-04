@@ -148,9 +148,8 @@ Research code can evolve without permanent forks or a universal plugin abstracti
 <span class="lang-zh">把 KV 状态变成可编程策略面</span>
 </h3>
 <p>
-<span class="lang-en">BidKV preserves its scheduler-policy algorithm and archived integration evidence.
-Fresh official-vLLM activation is blocked until the upstream Preemption contract stabilizes; the old private hook is not part of the new core.</span>
-<span class="lang-zh">BidKV 保留 scheduler policy 算法与归档集成证据；上游 Preemption 契约稳定前，不允许在新的官方 vLLM 上激活，旧私有 hook 也不进入新核心。
+<span class="lang-en">BidKV has a Core 762f85b3 source candidate using preemption-policy API v1 instead of the removed private victim selector. Qwen3.8 TP4 graph runtime qualification and human upstream review remain pending.</span>
+<span class="lang-zh">BidKV 已形成基于 Core 762f85b3、使用 preemption-policy API v1 的源码候选，不再依赖已移除的私有 victim selector；Qwen3.8 TP4 graph 运行资格与上游人工审查仍待完成。
 </span>
 </p>
 <div class="highlight-links">
@@ -169,9 +168,8 @@ Fresh official-vLLM activation is blocked until the upstream Preemption contract
 <span class="lang-zh">面向长序列的推测执行</span>
 </h3>
 <p>
-<span class="lang-en">DiffSpec provides a managed 0.2-experimental differential speculative-decoding extension for vLLM Ascend 0.23.
-It uses the official general-plugin discovery entry point while declaring its unversioned in-process runner, attention, sampling, and device patch surfaces explicitly.</span>
-<span class="lang-zh">DiffSpec 提供面向 vLLM Ascend 0.23 的 0.2-experimental 可管理差分推测解码扩展；使用官方 general-plugin 发现入口，并明确声明未版本化的进程内 runner、attention、sampling 与设备补丁面。
+<span class="lang-en">DiffSpec has a 0.3 source candidate for Core 762f85b3 and Ascend 4e57439e with TP4 graph admission. Qualification remains blocked until a Qwen3.8-compatible Eagle3 draft and multi-rank evidence exist.</span>
+<span class="lang-zh">DiffSpec 已形成面向 Core 762f85b3 与 Ascend 4e57439e、按 TP4 graph 准入的 0.3 源码候选；兼容 Qwen3.8 的 Eagle3 draft 和多 rank 证据就绪前，资格验证仍受阻。
 </span>
 </p>
 <div class="highlight-links">
@@ -222,10 +220,10 @@ It uses the official general-plugin discovery entry point while declaring its un
 <span class="lang-zh">设备机制与外部 KV 状态</span>
 </h3>
 <p>
-<span class="lang-en">LatchMoE is a pinned vLLM 0.21 Ascend MoE runtime extension with explicit first-release limits.
+<span class="lang-en">LatchMoE is not applicable to dense Qwen3.8-27B. Its separate Qwen3-30B-A3B TP4 graph candidate is unqualified.
 PegaFlow is an external KV state system; its non-invasive Host Provider renders PegaKVConnector configuration and health checks without owning the service lifecycle.
 Their shared delivery does not make the system, bridge, and operator the same kind of plugin.</span>
-<span class="lang-zh">LatchMoE 是固定 vLLM 0.21 的 Ascend MoE 运行时扩展，并明确保留首版约束；PegaFlow 是外部 KV 状态系统，其无侵入 Host Provider 只生成 PegaKVConnector 配置并执行健康检查，不接管服务生命周期。
+<span class="lang-zh">LatchMoE 不适用于 dense Qwen3.8-27B；独立的 Qwen3-30B-A3B TP4 graph 候选尚未取得资格。PegaFlow 是外部 KV 状态系统，其无侵入 Host Provider 只生成 PegaKVConnector 配置并执行健康检查，不接管服务生命周期。
 共同交付不会使系统、桥接层与算子成为同一种插件。
 </span>
 </p>

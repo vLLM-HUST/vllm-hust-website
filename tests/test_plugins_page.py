@@ -85,11 +85,11 @@ def test_system_role_is_independent_from_delivery_model() -> None:
     assert bidkv["system_role"] == "scheduler_policy"
     assert bidkv["delivery_model"] == "plugin_bundle"
     assert bidkv["integration_surfaces"] == [
-        "vLLM-HUST vllm.scheduler.policy.v1",
+        "vLLM-HUST preemption-policy API v1 candidate",
         "legacy experiment-only vllm.general_plugins",
-        "official vLLM scheduler contract (not yet supported)",
+        "official vLLM preemption-policy proposal (human review pending)",
     ]
-    assert bidkv["maturity"] == "supported"
+    assert bidkv["maturity"] == "experimental"
 
     ascend = by_id("vllm-ascend-hust")
     assert ascend["artifact_type"] == "platform_profile"
@@ -244,9 +244,9 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
         "vllm-ascend runtime patch surface",
     ]
     assert diffspec["execution_planes"] == ["scheduler", "worker", "native", "device"]
-    assert "0.2-experimental" in diffspec["summary_en"]
-    assert "vLLM Ascend 0.23" in diffspec["summary_en"]
-    assert "unversioned" in diffspec["summary_en"]
+    assert "0.3 source candidate" in diffspec["summary_en"]
+    assert "Ascend 4e57439e" in diffspec["summary_en"]
+    assert "Eagle3 draft" in diffspec["summary_en"]
     assert kvcompress["integration_contracts"] == []
     assert kvcompress["integration_surfaces"] == [
         "vllm.general_plugins",
@@ -304,9 +304,9 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
     expected = {
-        "bidkv": ("ready", "vLLM-HUST", ["0.23"]),
-        "diffspec": ("experimental", "vLLM Ascend", ["0.23"]),
-        "latchmoe": ("experimental", "vLLM Ascend HUST", ["vLLM 0.21"]),
+        "bidkv": ("experimental", "vLLM-HUST", ["0.28.1rc1.dev319 @ 762f85b3 candidate"]),
+        "diffspec": ("experimental", "vLLM Ascend", ["Core 762f85b3 + Ascend 4e57439e candidate"]),
+        "latchmoe": ("experimental", "vLLM Ascend HUST", ["Core 762f85b3 + Ascend 4e57439e/seam-v2 candidate"]),
         "ascend-adaptive-quantized-kv": (
             "inspect_only",
             "vLLM Ascend",
@@ -515,11 +515,11 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     assert "owner-approved value allowlist" in runtime["summary_en"]
     assert latchmoe["integration_surfaces"] == [
         "vllm.general_plugins",
-        "vllm-ascend-hust MoE offload seam v1",
+        "vllm-ascend-hust MoE offload seam v2 candidate",
         "latchmoe validated launcher",
     ]
-    assert "one NPU" in latchmoe["summary_en"]
-    assert "prefix cache disabled" in latchmoe["summary_en"]
+    assert "not applicable to dense Qwen3.8-27B" in latchmoe["summary_en"]
+    assert "TP4 graph" in latchmoe["summary_en"]
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
