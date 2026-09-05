@@ -148,8 +148,8 @@ Research code can evolve without permanent forks or a universal plugin abstracti
 <span class="lang-zh">把 KV 状态变成可编程策略面</span>
 </h3>
 <p>
-<span class="lang-en">BidKV ba700cb uses the merged vLLM-HUST preemption-policy API v1 with bounded safe abstention. Runtime tree 199e0bd passed functional compatibility on Qwen3.8-27B, Ascend TP4 FULL_DECODE_ONLY graph, Core a4d6aa0 and Ascend 2c8c722. Ascending mixed is inconclusive; interactive c=8 is not beneficial in the tested cell.</span>
-<span class="lang-zh">BidKV ba700cb 使用已合并的 vLLM-HUST preemption-policy API v1 与有界安全弃权。运行树 199e0bd 在 Core a4d6aa0、Ascend 2c8c722、Qwen3.8-27B Ascend TP4 FULL_DECODE_ONLY graph 上通过功能兼容性验收；ascending mixed 为 inconclusive，interactive c=8 在已测单元不具收益。
+<span class="lang-en">BidKV ba700cb uses the merged vLLM-HUST preemption-policy API v1 with bounded safe abstention. Runtime tree 199e0bd passed artifact functional qualification on Qwen3.8-27B, Ascend TP4 FULL_DECODE_ONLY graph, Core a4d6aa0 and Ascend 2c8c722. Only 5/13 Stage-1 effectiveness cells have real runs; ascending mixed is inconclusive and interactive c=8 is not beneficial in the tested cell.</span>
+<span class="lang-zh">BidKV ba700cb 使用已合并的 vLLM-HUST preemption-policy API v1 与有界安全弃权。运行树 199e0bd 在 Core a4d6aa0、Ascend 2c8c722、Qwen3.8-27B Ascend TP4 FULL_DECODE_ONLY graph 上通过制品功能资格验收；Stage-1 效果矩阵仅 5/13 个单元有真实运行，ascending mixed 为 inconclusive，interactive c=8 在已测单元不具收益。
 </span>
 </p>
 <div class="highlight-links">
@@ -622,12 +622,12 @@ vllm-hust-ext run -- vllm serve MODEL
 Manifest 0.2 distinguishes kind, host, runtime, lifecycle owner, required services, compatibility ranges, and Python/service/OCI/Helm/Kubernetes carriers.
 MooncakeStoreConnector has passed a real Ascend save/load and outage/recovery gate.
 Production Stack has passed controller reconciliation, metrics-backed scaling, and a real GLM Router 500-to-200 recovery without restarting vLLM. Its arm64 carrier was published by GitHub-hosted runners, then pulled and entrypoint-tested in an arm64 validation environment; amd64 and self-hosted infrastructure are not required.
-BidKV's current artifact passed five paired functional cells, repeated trigger/effectiveness cells, exact output checks, cancellation/recovery, and rollback on Qwen3.8-27B TP4 graph. The generic scheduler contract is merged in vLLM-HUST organization PR #11; qualification remains model-, artifact-, and workload-specific.</span>
+BidKV's current artifact passed startup, four-rank graph, policy-safety, cancellation/recovery, and rollback gates in five paired cells on Qwen3.8-27B TP4 graph. Eight of thirteen Stage-1 cells remain pending. The legacy short workload leaked special tokens in both arms and long artifacts retained prefixes only, so corrected exact/semantic output gates require a fresh run. The generic scheduler contract is merged in vLLM-HUST organization PR #11; qualification remains model-, artifact-, and workload-specific.</span>
 <span class="lang-zh">原单一 Python Bundle v1 设计已冻结为不稳定实验。
 Manifest 0.2 显式区分 kind、host、runtime、lifecycle owner、required services、兼容范围以及 Python/service/OCI/Helm/Kubernetes 载体。
 MooncakeStoreConnector 已通过真实 Ascend save/load 与中断/恢复门禁。
 Production Stack 已通过 controller 调谐、Metrics 扩容，以及不重启 vLLM 的真实 GLM Router 500→200 恢复；arm64 载体已由 GitHub-hosted runner 发布，并在 arm64 验证环境完成拉取与入口验收，不要求 amd64 或 self-hosted 基础设施。
-BidKV 当前制品在 Qwen3.8-27B TP4 graph 上通过五组配对功能单元、重复触发/效果单元、输出精确校验、取消/恢复和回滚；通用 scheduler 契约已通过 vLLM-HUST 组织 PR #11 合并，资格仍按模型、制品与 workload 单独判定。
+BidKV 当前制品在 Qwen3.8-27B TP4 graph 的五组配对单元中通过启动、四 rank graph、策略安全、取消/恢复和回滚门槛；十三个 Stage-1 单元仍有八个待测。旧短输出负载在两臂都泄漏特殊 token，旧长输出制品只保留前缀，因此修正后的精确/语义输出门槛仍需新运行；通用 scheduler 契约已通过 vLLM-HUST 组织 PR #11 合并，资格仍按模型、制品与 workload 单独判定。
 </span>
 </p>
 </aside>
@@ -638,8 +638,8 @@ BidKV 当前制品在 Qwen3.8-27B TP4 graph 上通过五组配对功能单元、
 <span class="lang-zh">BidKV 已在 Sage Mate 0.28.1 候选通道通过验证</span>
 </strong>
 <p>
-<span class="lang-en">The current BidKV distribution uses <code>vllm.preemption_policy.v1</code> and does not register or monkey-patch the removed private victim selector. On Qwen3.8-27B, Core a4d6aa0, Ascend 2c8c722, Ascend TP4 FULL_DECODE_ONLY graph, all five functional pairs passed with zero policy failures or invalid selections. Ascending mixed is inconclusive because one of three repeats did not invoke the policy. Interactive c=8 invoked it in every repeat but was not beneficial in that tested cell: mean throughput -25.31% (95% CI -26.66% to -23.96%) and P95 latency +34.57% (95% CI +31.96% to +37.17%). Qwen3-0.6B and Qwen2.5-3B remain historical 0.23-lane evidence only.</span>
-<span class="lang-zh">当前 BidKV 使用 <code>vllm.preemption_policy.v1</code>，不再注册或 monkey-patch 被移除的私有 victim selector。在 Qwen3.8-27B、Core a4d6aa0、Ascend 2c8c722、Ascend TP4 FULL_DECODE_ONLY graph 上，五组功能配对全部通过，策略失败和无效选择均为 0。ascending mixed 三轮中有一轮未触发策略，因此为 inconclusive。interactive c=8 每轮都触发，但在该已测单元不具收益：吞吐均值 -25.31%（95% CI -26.66% 至 -23.96%），P95 延迟 +34.57%（95% CI +31.96% 至 +37.17%）。Qwen3-0.6B 与 Qwen2.5-3B 仅保留为历史 0.23 通道证据。
+<span class="lang-en">The current BidKV distribution uses <code>vllm.preemption_policy.v1</code> and does not register or monkey-patch the removed private victim selector. On Qwen3.8-27B, Core a4d6aa0, Ascend 2c8c722, Ascend TP4 FULL_DECODE_ONLY graph, five paired cells passed runtime/policy-safety gates with zero policy failures or invalid selections; eight Stage-1 cells and corrected output gates remain pending. Ascending mixed is inconclusive because one of three repeats did not invoke the policy. Interactive c=8 invoked it in every repeat but was not beneficial in that tested cell: mean throughput -25.31% (95% CI -26.66% to -23.96%) and P95 latency +34.57% (95% CI +31.96% to +37.17%). Qwen3-0.6B and Qwen2.5-3B remain historical 0.23-lane evidence only.</span>
+<span class="lang-zh">当前 BidKV 使用 <code>vllm.preemption_policy.v1</code>，不再注册或 monkey-patch 被移除的私有 victim selector。在 Qwen3.8-27B、Core a4d6aa0、Ascend 2c8c722、Ascend TP4 FULL_DECODE_ONLY graph 上，五组配对单元通过运行/策略安全门槛，策略失败和无效选择均为 0；Stage-1 仍有八个单元待测，修正后的输出门槛也待新运行。ascending mixed 三轮中有一轮未触发策略，因此为 inconclusive。interactive c=8 每轮都触发，但在该已测单元不具收益：吞吐均值 -25.31%（95% CI -26.66% 至 -23.96%），P95 延迟 +34.57%（95% CI +31.96% 至 +37.17%）。Qwen3-0.6B 与 Qwen2.5-3B 仅保留为历史 0.23 通道证据。
 </span>
 </p>
 </aside>

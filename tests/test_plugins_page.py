@@ -90,7 +90,10 @@ def test_system_role_is_independent_from_delivery_model() -> None:
     ]
     assert bidkv["maturity"] == "experimental"
     assert bidkv["compatibility"]["status"] == "verified"
-    assert "Qwen3.8-27B — verified" in bidkv["compatibility"]["models"]
+    assert (
+        "Qwen3.8-27B — artifact functional qualified; effectiveness matrix incomplete"
+        in bidkv["compatibility"]["models"]
+    )
     assert bidkv["functional_compatibility"]["status"] == "passed"
     assert {item["status"] for item in bidkv["effectiveness_qualifications"]} == {
         "inconclusive",
