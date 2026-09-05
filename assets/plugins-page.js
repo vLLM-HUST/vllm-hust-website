@@ -825,7 +825,7 @@ vllm-hust-ext extension check ${extensionId}`
       return isWorkshopMod(item) && matchesSelectedType(item) && matchesWorkload && itemSearchText(item).includes(query);
     });
 
-    const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
+    const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, unsupported: 4, inspect_only: 5, source_scaffold: 6 };
     visible.sort((left, right) => {
       const leftRank = priority[left.compatibility?.status] ?? 6;
       const rightRank = priority[right.compatibility?.status] ?? 6;
