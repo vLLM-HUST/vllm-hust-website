@@ -692,16 +692,47 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         expected_status = (
             "source_scaffold"
             if component_id == "scheduler-policy-lab"
-            else "inspect_only"
+            else (
+                "unsupported"
+                if component_id == "pipeline-microbatch-migration"
+                else "inspect_only"
+            )
         )
         assert component["compatibility"]["status"] == expected_status
-        assert component["maturity"] == "incubating"
+        expected_maturity = (
+            "experimental"
+            if component_id == "pipeline-microbatch-migration"
+            else "incubating"
+        )
+        assert component["maturity"] == expected_maturity
 
     assert "intellistream/vllm-hust-legacy" not in PAGE
     assert "intellistream/vllm-ascend-hust-legacy" not in PAGE
     assert "Host-Control Batching Plugin" not in PAGE
     assert "Runner Extension Transport Plugin" not in PAGE
     assert 'source_scaffold: { en: "Source scaffold", zh: "源码脚手架" }' in SCRIPT
+
+
+def test_pipeline_microbatch_reports_hardware_result_without_compatibility_claim() -> (
+    None
+):
+    pipeline = by_id("pipeline-microbatch-migration")
+
+    assert pipeline["integration_contracts"] == ["vllm.batch_admission_policy.v1.1"]
+    assert pipeline["functional_compatibility"]["status"] == "passed"
+    assert pipeline["compatibility"]["status"] == "unsupported"
+    assert pipeline["runtime_state_dimensions"] == [
+        "installed",
+        "configured",
+        "enabled",
+        "runtimeEffective",
+    ]
+    assert (
+        "Qwen3.8-27B — functional passed, performance failed"
+        in pipeline["compatibility"]["models"]
+    )
+    assert "-26.33%" in pipeline["public_effect_en"]
+    assert "+80.16%" in pipeline["public_effect_en"]
 
 
 def test_extension_standard_covers_core_and_host_providers() -> None:
@@ -845,7 +876,6 @@ def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> Non
         "kv-transfer-observability-migration",
         "layered-prefill-migration",
         "activation-sparsity-migration",
-        "pipeline-microbatch-migration",
         "qos-scheduler-migration",
         "mapped-host-kv-offload",
         "stateharbor",
