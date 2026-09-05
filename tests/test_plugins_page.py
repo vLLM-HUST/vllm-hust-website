@@ -713,12 +713,12 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
     assert 'source_scaffold: { en: "Source scaffold", zh: "源码脚手架" }' in SCRIPT
 
 
-def test_pipeline_microbatch_reports_hardware_result_without_compatibility_claim() -> None:
+def test_pipeline_microbatch_reports_hardware_result_without_compatibility_claim() -> (
+    None
+):
     pipeline = by_id("pipeline-microbatch-migration")
 
-    assert pipeline["integration_contracts"] == [
-        "vllm.batch_admission_policy.v1.1"
-    ]
+    assert pipeline["integration_contracts"] == ["vllm.batch_admission_policy.v1.1"]
     assert pipeline["functional_compatibility"]["status"] == "passed"
     assert pipeline["compatibility"]["status"] == "unsupported"
     assert pipeline["runtime_state_dimensions"] == [
@@ -727,9 +727,10 @@ def test_pipeline_microbatch_reports_hardware_result_without_compatibility_claim
         "enabled",
         "runtimeEffective",
     ]
-    assert "Qwen3.8-27B — functional passed, performance failed" in pipeline[
-        "compatibility"
-    ]["models"]
+    assert (
+        "Qwen3.8-27B — functional passed, performance failed"
+        in pipeline["compatibility"]["models"]
+    )
     assert "-26.33%" in pipeline["public_effect_en"]
     assert "+80.16%" in pipeline["public_effect_en"]
 
