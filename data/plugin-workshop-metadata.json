@@ -5,7 +5,7 @@
   "plugins": {
     "bidkv": {
       "repository": "vLLM-HUST/vllm-hust-bidkv",
-      "repository_url": "https://github.com/Qixin-Gaoke/vllm-hust-bidkv",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
       "metrics": {
         "stars": 1,
         "forks": 0,

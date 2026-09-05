@@ -85,13 +85,23 @@ def test_system_role_is_independent_from_delivery_model() -> None:
     assert bidkv["system_role"] == "scheduler_policy"
     assert bidkv["delivery_model"] == "plugin_bundle"
     assert bidkv["integration_surfaces"] == [
-        "vLLM-HUST preemption-policy API v1 candidate",
-        "legacy experiment-only vllm.general_plugins",
-        "official vLLM preemption-policy proposal (human review pending)",
+        "vLLM-HUST preemption-policy API v1 (organization PR #11 merged)",
+        "vLLM-HUST Extension Manager bundle",
     ]
     assert bidkv["maturity"] == "experimental"
     assert bidkv["compatibility"]["status"] == "verified"
     assert "Qwen3.8-27B — verified" in bidkv["compatibility"]["models"]
+    assert bidkv["functional_compatibility"]["status"] == "passed"
+    assert {item["status"] for item in bidkv["effectiveness_qualifications"]} == {
+        "inconclusive",
+        "not-beneficial-in-tested-cell",
+    }
+    assert bidkv["runtime_state_dimensions"] == [
+        "installed",
+        "configured",
+        "enabled",
+        "runtimeEffective",
+    ]
 
     ascend = by_id("vllm-ascend-hust")
     assert ascend["artifact_type"] == "platform_profile"
@@ -258,6 +268,7 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
         in diffspec["compatibility"]["models"]
     )
     assert "19.29%" in diffspec["public_effect_en"]
+    assert diffspec["public_effect_status"] == "not-beneficial-in-tested-cell"
     assert kvcompress["integration_contracts"] == []
     assert kvcompress["integration_surfaces"] == [
         "vllm.general_plugins",
@@ -509,7 +520,14 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
     for item in workshop_mods:
         assert item["public_effect_en"]
         assert item["public_effect_zh"]
-        assert item["public_effect_status"] in {"measured", "validated", "preview"}
+        assert item["public_effect_status"] in {
+            "measured",
+            "validated",
+            "preview",
+            "inconclusive",
+            "not-beneficial-in-tested-cell",
+            "beneficial",
+        }
         assert item["public_effect_url"].startswith("https://github.com/")
     assert "function publicEffectPanel(item)" in SCRIPT
     assert 'local(item, "public_effect")' in SCRIPT
@@ -534,7 +552,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     assert "owner-approved value allowlist" in runtime["summary_en"]
     assert latchmoe["integration_surfaces"] == [
         "vllm.general_plugins",
-        "vllm-ascend-hust MoE offload seam v2 candidate",
+        "vllm-ascend-hust MoE offload seam v2 (organization PR #9 merged)",
         "latchmoe validated launcher",
     ]
     assert "not applicable to dense Qwen3.8-27B" in latchmoe["summary_en"]
@@ -544,6 +562,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
         in latchmoe["compatibility"]["models"]
     )
     assert "Qwen3.8-27B — not applicable (dense)" in latchmoe["compatibility"]["models"]
+    assert latchmoe["public_effect_status"] == "not-beneficial-in-tested-cell"
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:

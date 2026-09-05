@@ -174,14 +174,17 @@
   const publicEffectLabels = {
     measured: { en: "Measured", zh: "公开实测" },
     validated: { en: "Validated", zh: "已验证" },
+    inconclusive: { en: "Inconclusive", zh: "效果未定" },
+    "not-beneficial-in-tested-cell": { en: "Not beneficial in tested cell", zh: "已测单元不具收益" },
+    beneficial: { en: "Beneficial", zh: "有收益" },
     preview: { en: "Preview", zh: "能力预览" }
   };
   const quickStarts = {
     bidkv: {
       title_en: "Install and start BidKV",
       title_zh: "安装并启动 BidKV",
-      note_en: "Requires the compatible vLLM-HUST 0.23 host.",
-      note_zh: "需要兼容的 vLLM-HUST 0.23 宿主。",
+      note_en: "Qualified on vLLM-HUST 0.28.1rc1.dev319 / Ascend 0.25.1rc1, Qwen3.8-27B, TP4 graph; verify exact artifacts before enabling.",
+      note_zh: "已在 vLLM-HUST 0.28.1rc1.dev319 / Ascend 0.25.1rc1、Qwen3.8-27B、TP4 graph 验证；启用前须核对精确制品。",
       command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
 pip install bidkv
 vllm-hust-ext extension check org.vllm-hust.bidkv
@@ -203,8 +206,8 @@ vllm-hust-ext run -- vllm serve /path/to/target-model`
     latchmoe: {
       title_en: "Install and start LatchMoE",
       title_zh: "安装并启动 LatchMoE",
-      note_en: "Requires the pinned vLLM 0.21 and hook-enabled vLLM Ascend HUST stack; one NPU, max-num-seqs 1, prefix cache off.",
-      note_zh: "需要固定 vLLM 0.21 与带 hook 的 vLLM Ascend HUST；单 NPU、max-num-seqs=1、关闭 prefix cache。",
+      note_en: "Qwen3.8-27B is not applicable. Qwen3-30B-A3B is functionally qualified on the exact Core 762f85b3 / Ascend 4e57439e TP4 PIECEWISE graph lane.",
+      note_zh: "不适用于 Qwen3.8-27B；Qwen3-30B-A3B 已在精确 Core 762f85b3 / Ascend 4e57439e TP4 PIECEWISE graph 通道通过功能验证。",
       command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
 pip install git+https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE.git
 latchmoe check
