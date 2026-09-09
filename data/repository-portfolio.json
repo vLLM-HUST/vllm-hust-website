@@ -552,7 +552,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["scheduler policy comparison workspace", "legacy provenance ledger"],
       "component_ids": ["scheduler-policy-lab"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-hust-request-lifecycle-profiler",

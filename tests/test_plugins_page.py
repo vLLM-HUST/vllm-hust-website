@@ -619,7 +619,10 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v8-metadata-issues"' in PAGE
+    assert (
+        'data-source="./data/ecosystem.json?v=workshop-v9-scheduler-unpublished"'
+        in PAGE
+    )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -664,7 +667,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     ]
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v6"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v7-scheduler-unpublished"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
@@ -699,6 +702,9 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         )
         assert component["compatibility"]["status"] == expected_status
         assert component["maturity"] == "incubating"
+
+    assert repositories["vllm-hust-scheduler-policy-lab"]["public_surface"] is False
+    assert by_id("scheduler-policy-lab")["public_surface"] is False
 
     assert "intellistream/vllm-hust-legacy" not in PAGE
     assert "intellistream/vllm-ascend-hust-legacy" not in PAGE

@@ -1028,6 +1028,7 @@
       "ownership": "original_contributor_maintained",
       "maintainers": ["Tkhkrnx"],
       "repository_relationship": "organization_native",
+      "public_surface": false,
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-scheduler-policy-lab",
       "upstream_repository": null,
