@@ -627,7 +627,7 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 51
+    assert len(PORTFOLIO["repositories"]) == 53
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {"extension-manager", "vllm-hust", "pegaflow-hust"} <= names
     assert "vllm-ascend" not in names

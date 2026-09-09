@@ -1,6 +1,6 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-09-08T08:19:40+00:00",
+  "generated_at": "2026-09-09T13:13:47+00:00",
   "source": "GitHub API + canonical ownership and organization identity data",
   "plugins": {
     "bidkv": {
@@ -88,7 +88,32 @@
           "relationship": "internal"
         }
       ],
-      "maintainer_source": "README.md#maintainers"
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
+    "ascend-adaptive-quantized-kv": {
+      "repository": "vLLM-HUST/vllm-ascend-adaptive-quantized-kv-hust",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-adaptive-quantized-kv-hust",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 1
+      },
+      "maintainers": [
+        {
+          "login": "XilingGao",
+          "name": "高西岭",
+          "profile_url": "https://github.com/XilingGao",
+          "avatar_url": "https://avatars.githubusercontent.com/u/252187719?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
     },
     "ascend-quant-runtime-descriptor": {
       "repository": "vLLM-HUST/vllm-ascend-quant-hust",
@@ -515,6 +540,56 @@
           "name": "田景远",
           "profile_url": "https://github.com/CubeLander",
           "avatar_url": "https://avatars.githubusercontent.com/u/49518565?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
+    "request-lifecycle-profiler": {
+      "repository": "vLLM-HUST/vllm-hust-request-lifecycle-profiler",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-request-lifecycle-profiler",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 2
+      },
+      "maintainers": [
+        {
+          "login": "Remygred",
+          "name": "刘世峰",
+          "profile_url": "https://github.com/Remygred",
+          "avatar_url": "https://avatars.githubusercontent.com/u/153624059?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
+    "kv-materialization-arrival-control": {
+      "repository": "vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 1
+      },
+      "maintainers": [
+        {
+          "login": "healer-positive",
+          "name": "何维",
+          "profile_url": "https://github.com/healer-positive",
+          "avatar_url": "https://avatars.githubusercontent.com/u/172738710?v=4"
         }
       ],
       "advisors": [

@@ -60,6 +60,7 @@
     "bidkv": ["memory_kv_pressure", "high_concurrency"],
     "diffspec": ["decode_heavy", "latency_slo"],
     "latchmoe": ["moe", "memory_kv_pressure"],
+    "ascend-adaptive-quantized-kv": ["long_context", "memory_kv_pressure"],
     "ascend-quant-runtime-descriptor": ["memory_kv_pressure"],
     "kvcompress-ascend": ["long_context", "memory_kv_pressure"],
     "kv-tiering-migration": ["long_context", "memory_kv_pressure"],
@@ -75,6 +76,8 @@
     "pipeline-microbatch-migration": ["distributed_pipeline", "high_concurrency"],
     "qos-scheduler-migration": ["latency_slo", "high_concurrency"],
     "mapped-host-kv-offload": ["long_context", "memory_kv_pressure"],
-    "stateharbor": ["repeated_prefix_agent"]
+    "stateharbor": ["repeated_prefix_agent"],
+    "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
+    "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"]
   }
 }
