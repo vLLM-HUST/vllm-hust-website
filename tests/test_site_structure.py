@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import json
 import importlib.util
+import json
 import re
 import statistics
 import sys
 from collections import defaultdict
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -367,7 +368,7 @@ def test_stable_trend_milestones_are_fixed_and_non_regressing_across_metrics() -
                 (left - right) / abs(left)
                 if direction > 0
                 else (right - left) / abs(left)
-                for left, right in zip(medians, medians[1:])
+                for left, right in pairwise(medians)
             )
             if any(regression > tolerances[metric] for regression in regressions):
                 valid = False
@@ -1011,8 +1012,15 @@ def test_courses_page_exposes_course_materials_and_project_pointers() -> None:
     assert 'data-page="courses"' in courses_html
     assert "大模型推理系统与实践" in courses_html
     assert "LLM Inference Systems and Practice" in courses_html
-    assert "https://me.sage.org.ai/intro-to-llm-inference-engines.html" in courses_html
-    assert "案例与练习" in courses_html
+    assert "'course-main-kicker': '2027'" in courses_html
+    assert "https://courses.sage.org.ai/" in courses_html
+    assert "https://courses.sage.org.ai/downloads/" in courses_html
+    assert "https://courses.sage.org.ai/downloads/#overview" in courses_html
+    assert "https://courses.sage.org.ai/downloads/#experiments" in courses_html
+    assert "me.sage.org.ai" not in courses_html
+    assert "全部课件" in courses_html
+    assert "快速介绍" in courses_html
+    assert "实验材料" in courses_html
     assert "https://github.com/vLLM-HUST" in courses_html
 
 
@@ -3029,7 +3037,7 @@ def _classify_coverage_class(entry: dict) -> str:
         pr_number = float(pr_number)
     except (TypeError, ValueError):
         pr_number = float("nan")
-    if pr_number == pr_number and pr_number > 0:  # NaN check: NaN != NaN
+    if pr_number > 0:
         return "targeted-pair"
     if str(entry.get("github_pr_url") or "").strip():
         return "targeted-pair"
@@ -3325,9 +3333,7 @@ def _specialty_hardware_compatible(entry, target):
         or (entry.get("same_spec") or {}).get("node_count")
         or 1
     )
-    if t_node_count is not None and entry_node_count != t_node_count:
-        return False
-    return True
+    return t_node_count is None or entry_node_count == t_node_count
 
 
 def _is_runtime_compatible(entry, target):
