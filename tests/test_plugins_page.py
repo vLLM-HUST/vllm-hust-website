@@ -642,9 +642,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert (
-        'data-source="./data/ecosystem.json?v=workshop-v12-betterscale-public"' in PAGE
-    )
+    assert 'data-source="./data/ecosystem.json?v=workshop-v13-vspec"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -652,9 +650,15 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 54
+    assert len(PORTFOLIO["repositories"]) == 55
     names = {item["name"] for item in PORTFOLIO["repositories"]}
-    assert {"extension-manager", "vllm-hust", "pegaflow-hust", "vllm-hust-dla"} <= names
+    assert {
+        "extension-manager",
+        "vllm-hust",
+        "pegaflow-hust",
+        "vllm-hust-dla",
+        "vllm-hust-vSpec",
+    } <= names
     assert "vllm-ascend" not in names
     assert {
         "vllm-hust-prefix-router",
@@ -693,9 +697,15 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert dla["url"] == "https://github.com/vLLM-HUST/vllm-hust-dla"
     assert dla["component_ids"] == ["dla"]
     assert dla["public_surface"] is True
+    vspec = next(
+        item for item in PORTFOLIO["repositories"] if item["name"] == "vllm-hust-vSpec"
+    )
+    assert vspec["url"] == "https://github.com/vLLM-HUST/vllm-hust-vSpec"
+    assert vspec["component_ids"] == ["vspec"]
+    assert vspec["public_surface"] is True
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v8-dla"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v9-vspec"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
@@ -928,7 +938,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 23
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 24
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
