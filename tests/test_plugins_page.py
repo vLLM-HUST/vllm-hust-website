@@ -987,21 +987,15 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 25
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 24
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
 
 
-def test_compact_greedy_is_a_source_preview_owned_by_its_author():
-    component = next(
-        item for item in REGISTRY["components"] if item["id"] == "ascend-compact-greedy"
-    )
-    metadata = WORKSHOP_METADATA["plugins"][component["id"]]
-    assert component["delivery_model"] == "source_patch"
-    assert component["maintainers"] == ["ShuhaoZhangTony"]
-    assert component["advisors"] == metadata["advisors"] == []
-    assert metadata["maintainers"][0]["name"] == "张书豪"
-    assert component["public_effect_status"] == "preview"
-    assert component["evidence_level"] == "cpu_smoke"
-    assert component["compatibility"]["status"] == "inspect_only"
+def test_compact_greedy_incubator_is_not_in_public_catalog():
+    assert "ascend-compact-greedy" not in {
+        item["id"] for item in REGISTRY["components"]
+    }
+    assert "ascend-compact-greedy" not in WORKSHOP_METADATA["plugins"]
+    assert "ascend-compact-greedy" not in WORKLOAD_NAVIGATION["plugins"]
