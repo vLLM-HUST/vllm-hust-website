@@ -672,9 +672,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         "pegaflow-vllm-connectors",
     ]
     dla = next(
-        item
-        for item in PORTFOLIO["repositories"]
-        if item["name"] == "vllm-hust-dla"
+        item for item in PORTFOLIO["repositories"] if item["name"] == "vllm-hust-dla"
     )
     assert dla["url"] == "https://github.com/vLLM-HUST/vllm-hust-dla"
     assert dla["component_ids"] == ["dla"]
