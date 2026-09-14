@@ -185,7 +185,7 @@
       title_zh: "安装 BetterScale",
       note_en: "Existing pinned vLLM 0.25.1 / Ascend 0.25.1rc1 environment. Replace the old strengthen-dsv4 distribution if installed. See project details for complete TP8 / DP8 launch commands.",
       note_zh: "使用已有的 pinned vLLM 0.25.1 / Ascend 0.25.1rc1 环境；若装有旧 strengthen-dsv4 包，请先卸载旧包。完整 TP8 / DP8 启动命令见项目介绍。",
-      command: `python -m pip install --no-deps vllm-betterscale==0.3.0
+      command: `python -m pip install --no-deps vllm-betterscale==0.3.1
 # Add to your qualified native vllm serve command:
 # --worker-cls betterscale.worker.Worker
 # TP8 / DP8: https://vllm-hust.sage.org.ai/betterscale.html#integration`

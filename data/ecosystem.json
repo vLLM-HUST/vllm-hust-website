@@ -1241,7 +1241,7 @@
         "host": "vLLM Ascend",
         "versions": [
           "vLLM 0.25.1 + vLLM-Ascend 0.25.1rc1",
-          "vllm-betterscale 0.3.0 / betterscale.worker.Worker"
+          "vllm-betterscale 0.3.1 / betterscale.worker.Worker"
         ],
         "platforms": [
           "8 × Ascend 910B2 / HCCS · TP8 + EP or TP1 / DP8 / EP8"
@@ -1252,8 +1252,8 @@
         "python": [
           ">=3.12"
         ],
-        "requirements_en": "Native Worker entry; qualified TP8 four-seat and DP8 two-seats-per-rank K5 configurations only. No Extension Manager bundle contract. vllm-betterscale 0.3.0 is public on PyPI; the development repository is public under Apache-2.0. Full shapes, KV budgets and quality limits are in the project page.",
-        "requirements_zh": "通过原生 Worker 接入；仅验收 TP8 四席位、DP8 每 rank 两席位的 K5 配置。不是 Extension Manager bundle。vllm-betterscale 0.3.0 已在 PyPI 公开，开发仓库以 Apache-2.0 开源；完整形状、KV 预算及质量边界见项目介绍。"
+        "requirements_en": "Native Worker entry; qualified TP8 four-seat and DP8 two-seats-per-rank K5 configurations only. No Extension Manager bundle contract. vllm-betterscale 0.3.1 is public on PyPI; the development repository is public under Apache-2.0. Full shapes, KV budgets and quality limits are in the project page.",
+        "requirements_zh": "通过原生 Worker 接入；仅验收 TP8 四席位、DP8 每 rank 两席位的 K5 配置。不是 Extension Manager bundle。vllm-betterscale 0.3.1 已在 PyPI 公开，开发仓库以 Apache-2.0 开源；完整形状、KV 预算及质量边界见项目介绍。"
       },
       "evidence_level": "hardware_verified"
     }
