@@ -65,3 +65,22 @@ jobs:
             output/playwright/site-repair/
             output/playwright/betterscale/
             output/playwright/compact-greedy/
+
+  betterscale-package:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the public BetterScale wheel without changing donor dependencies
+        run: python -m pip install --no-deps vllm-betterscale==0.3.1
+      - name: Verify wheel and displayed TP8 / DP8 launch contracts (CPU only)
+        run: python scripts/check_betterscale_install.py --output betterscale-launch-commands.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: betterscale-checked-launch-commands
+          path: betterscale-launch-commands.json

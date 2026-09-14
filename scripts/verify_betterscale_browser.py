@@ -99,6 +99,12 @@ def main():
                             assert (
                                 abs(percent - repeat[side + "_ms"] / 70 * 100) < 0.001
                             )
+                for row in evidence["service_http"]["rows"]:
+                    rendered = page.locator(
+                        f'[data-service-layout="{row["layout"]}"]'
+                    ).inner_text()
+                    for key in ("native_tps", "candidate_tps", "gain_percent"):
+                        assert f"{row[key]:.2f}" in rendered
                 page.screenshot(path=str(output / f"opening-{label}-{language}.png"))
                 page.screenshot(
                     path=str(output / f"{label}-{language}.png"), full_page=True
@@ -128,6 +134,15 @@ def main():
             '.plugin-card-footer a[href="https://github.com/vLLM-HUST/BetterScale"]'
         ).is_visible()
         assert page.locator("#betterscale.bs-feature").count() == 0
+        card.locator(".plugin-launch-icon").click()
+        tooltip = card.locator(".plugin-launch-tooltip")
+        tooltip.wait_for(state="visible")
+        assert (
+            "--data-parallel-size-local 8" in tooltip.locator("pre").first.inner_text()
+        )
+        tooltip.locator("summary").click()
+        assert "--tensor-parallel-size 8" in tooltip.locator("details pre").inner_text()
+        card.locator(".plugin-launch-icon").click()
         assert card.locator(".plugin-workload-tag").count() == 1
         page.locator("[data-plugin-search]").fill("BetterScale")
         assert page.locator(".workshop-card").count() == 1

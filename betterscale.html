@@ -38,13 +38,13 @@
  <h1>BetterScale<span class="bs-period">.</span></h1>
  <p class="bs-statement"><span lang="en">Less host waiting.<br>More device execution.</span><span lang="zh">让设备少等调度。<br>多做推理。</span></p>
  <p class="bs-lede"><span lang="en">Fast kernels still wait when the next wave is not ready. BetterScale combines FULL graphs, ordered replay, and device-side metadata preparation to shorten the host dependencies between inference steps.</span><span lang="zh">算子已经很快，设备却仍可能等不到下一波工作。BetterScale 通过 FULL graph、有序 replay 和 device 侧元数据准备，缩短相邻推理波次之间的 host 依赖与等待。</span></p>
- <div class="bs-actions"><a class="bs-button" href="#measurements"><span lang="en">Explore the measurements ↓</span><span lang="zh">看实测结果 ↓</span></a><a href="#integration"><span lang="en">See how it fits →</span><span lang="zh">了解如何接入 →</span></a><a href="https://github.com/vLLM-HUST/BetterScale" target="_blank" rel="noopener noreferrer"><span lang="en">Source on GitHub ↗</span><span lang="zh">GitHub 开源代码 ↗</span></a></div>
+ <div class="bs-actions"><a class="bs-button" href="#service-throughput"><span lang="en">Explore the measurements ↓</span><span lang="zh">看实测结果 ↓</span></a><a href="#integration"><span lang="en">See how it fits →</span><span lang="zh">了解如何接入 →</span></a><a href="https://github.com/vLLM-HUST/BetterScale" target="_blank" rel="noopener noreferrer"><span lang="en">Source on GitHub ↗</span><span lang="zh">GitHub 开源代码 ↗</span></a></div>
  <div class="bs-config">DeepSeek V4 Flash <span>W8A8</span> <span>8 × Ascend 910B2 / HCCS</span> <span>vLLM 0.25.1 + Ascend 0.25.1rc1</span></div>
  </div>
 </header>
 <section class="bs-metrics bs-wrap" aria-label="Measured highlights">
- <div><span class="bs-kicker">TP8 / DRAFT GRAPH</span><strong>20–21<small>%</small></strong><p><span lang="en">shorter matched K5 cycles</span><span lang="zh">等工作量 K5 周期缩短</span></p><a href="#tp-draft"><span lang="en">vs. native eager draft ↗</span><span lang="zh">对比原生 eager draft ↗</span></a></div>
- <div><span class="bs-kicker">DP8 / DEVICE PREPARATION</span><strong>15.4–15.9<small>%</small></strong><p><span lang="en">shorter matched K5 cycles</span><span lang="zh">等工作量 K5 周期缩短</span></p><a href="#dp-metadata"><span lang="en">vs. dual graph endpoints ↗</span><span lang="zh">对比双 graph 端点 ↗</span></a></div>
+ <div><span class="bs-kicker">DP8 / HTTP THROUGHPUT</span><strong>+39.63<small>%</small></strong><p><span lang="en">aggregate output throughput · 16 clients</span><span lang="zh">合计输出吞吐 · 16 并发</span></p><a href="#service-throughput"><span lang="en">Versus corresponding native baseline ↗</span><span lang="zh">相对对应原生基线 ↗</span></a></div>
+ <div><span class="bs-kicker">TP8 / HTTP THROUGHPUT</span><strong>+35.17<small>%</small></strong><p><span lang="en">aggregate output throughput · 4 clients</span><span lang="zh">合计输出吞吐 · 4 并发</span></p><a href="#service-throughput"><span lang="en">Versus corresponding native baseline ↗</span><span lang="zh">相对对应原生基线 ↗</span></a></div>
  <div><span class="bs-kicker">QUALITY / RETRIEVAL SUBSET</span><strong>32<small>/32</small></strong><p><span lang="en">retained retrieval questions passed</span><span lang="zh">保留的检索题全部通过</span></p><a href="#quality"><span lang="en">OpenCompass subset, not the full suite ↗</span><span lang="zh">OpenCompass 子集，非完整套件 ↗</span></a></div>
 </section>
 <section class="bs-section bs-wrap" id="mechanism">
@@ -71,9 +71,20 @@
  <div class="bs-interval"><div><span class="bs-kicker">DP8 / DRAFT → TARGET</span><h3>9.42 → 1.24 <small>ms</small></h3></div><p><span lang="en">Repeat 1 cross-step interval; repeat 2: 9.49 → 1.23 ms. This interval includes useful work, not just idle time. Separate profiled waves still exhibit gaps: this is not a claim of universally bubble-free replay.</span><span lang="zh">第一次重复测量的跨步区间；第二次为 9.49 → 1.23 ms。区间内包含有效工作，不等于纯空闲时间。独立采集的 profile 仍存在气泡，不代表所有波次都已无缝执行。</span></p></div>
  <details class="bs-mixed"><summary><span lang="en">What about prefill and short mixed waves?</span><span lang="zh">Prefill 和短 mixed 波次呢？</span></summary><p><span lang="en">Separating context ingestion from query graphs helps the observed short waves. Large prefill is essentially unchanged. Both arms already use an optimized FULL-target path; this is not stock vLLM.</span><span lang="zh">分离 context 摄入与 query graph 改善了观察到的短波次，大 prefill 则基本不变。两组都已使用优化后的 FULL target，并非与原版 vLLM 对比。</span></p><div class="bs-table-scroll"><table><caption><span lang="en">Warm all-rank median observations, runs 041 / 046</span><span lang="zh">热态全 rank 中位数观测，实验 041 / 046</span></caption><thead><tr><th><span lang="en">Scheduled rows</span><span lang="zh">调度行数</span></th><th><span lang="en">Prior optimized control</span><span lang="zh">已优化对照</span></th><th>Split candidate</th></tr></thead><tbody><tr><td>6 + 17</td><td>63.96 ms</td><td>46.37 ms</td></tr><tr><td>7</td><td>63.05 ms</td><td>49.55 ms</td></tr><tr><td>64</td><td>202.92 ms</td><td>204.03 ms</td></tr><tr><td>1025</td><td>219.96 ms</td><td>221.15 ms</td></tr><tr><td>4112</td><td>259.65 ms</td><td>262.16 ms</td></tr></tbody></table></div><p class="bs-caption"><span lang="en">A single paired shape observation, not a replicated universal speedup. Full configuration is in the downloadable evidence snapshot.</span><span lang="zh">单组配对形状观测，不是经重复验证的普遍加速结论。完整配置见可下载的数据摘要。</span></p></details>
 </div></section>
+<section class="bs-section bs-wrap" id="service-throughput">
+ <span class="bs-number">HTTP / RELEASE 0.3.1</span>
+ <h2><span lang="en">More completed work.<br>Measured at the HTTP boundary.</span><span lang="zh">更多完成的工作。<br>在 HTTP 边界测量。</span></h2>
+ <p><span lang="en">DeepSeek V4 Flash W8A8 · 8 × Ascend 910B2 / HCCS · DSpark K5. Nine synthetic HTTP cohorts: occupied decode, balanced prefill and queued turnover, each repeated three times.</span><span lang="zh">DeepSeek V4 Flash W8A8 · 8 × Ascend 910B2 / HCCS · DSpark K5。九组合成 HTTP 负载：稳态 decode、均衡 prefill、排队轮换，各三轮。</span></p>
+ <div class="bs-table-scroll"><table><caption><span lang="en">Aggregate output tokens/s · separate native comparator for each layout</span><span lang="zh">合计输出 tokens/s · 每种拓扑使用各自的原生对照</span></caption><thead><tr><th><span lang="en">Layout / concurrency</span><span lang="zh">拓扑 / 并发</span></th><th>Native</th><th>BetterScale</th><th><span lang="en">Throughput gain</span><span lang="zh">吞吐提升</span></th></tr></thead><tbody>
+ <tr data-service-layout="DP8"><td>DP8 / 16</td><td>268.89</td><td>375.45</td><td><strong>+39.63%</strong></td></tr>
+ <tr data-service-layout="TP8"><td>TP8 / 4</td><td>155.13</td><td>209.68</td><td><strong>+35.17%</strong></td></tr>
+ </tbody></table></div>
+ <p class="bs-caption"><span lang="en">0.3.1 ships the already-qualified DP startup preparation; TP is unchanged. These reuse runs 155/158/160/161, not a new wheel benchmark. All measured arms pass the retained 32-question retrieval gate. TP decode latency tails worsened; these are not universal latency or maximum-concurrency gains. Loading and startup are excluded, but all nine timed cohorts are retained.</span><span lang="zh">0.3.1 发布已验收的 DP 启动预热，TP 路径不变。沿用 155/158/160/161 的测量，不冒充新 wheel 重测；各组均通过保留的 32 道检索题。TP decode 延迟尾部变差，不声称普遍延迟或最大并发增益。加载和启动不计时，但九组计时轮次完整保留。</span></p>
+ <p><a href="https://github.com/vLLM-HUST/BetterScale/blob/fbfa963/docs/E2E-20260914.zh-CN.md"><span lang="en">All repeats, latency tails, configurations and release provenance →</span><span lang="zh">全部轮次、延迟尾部、配置与发布来源 →</span></a></p>
+</section>
 <section class="bs-section bs-wrap bs-bottom-grid" id="quality">
  <div><span class="bs-number">03 / VALIDATION</span><h2><span lang="en">Performance, with<br>the checks beside it.</span><span lang="zh">性能旁边，<br>就是验收结果。</span></h2><p><span lang="en">Both TP comparison arms pass the retained 32 original-input LongBench English retrieval questions through OpenCompass. The packaged DP Worker also passes 32/32.</span><span lang="zh">TP 对照与候选两组均通过 OpenCompass 中保留的 32 道 LongBench 英文检索题；打包后的 DP Worker 同样通过 32/32。</span></p><p class="bs-caption"><span lang="en">TP quality inputs: 9,921–14,997 tokens; 32-token output cap; 12 GiB KV/rank. This is a retrieval subset, not a complete quality certification.</span><span lang="zh">TP 质量输入为 9,921–14,997 tokens，输出上限 32 tokens，KV 为每 rank 12 GiB。这是检索子集验收，不是完整质量认证。</span></p></div>
- <div class="bs-boundary"><h3><span lang="en">What these results do not establish</span><span lang="zh">这些结果尚不意味着</span></h3><ul><li><span lang="en">Stable end-to-end throughput or TTFT improvement</span><span lang="zh">稳定的端到端吞吐或 TTFT 改进</span></li><li><span lang="en">Higher maximum concurrency or KV capacity</span><span lang="zh">更高的最大并发或 KV 容量</span></li><li><span lang="en">Universal large-prefill speedups</span><span lang="zh">大 prefill 的普遍加速</span></li><li><span lang="en">All-mode N+2 scheduling or bubble-free execution</span><span lang="zh">全模式 N+2 调度或完全无气泡执行</span></li></ul></div>
+ <div class="bs-boundary"><h3><span lang="en">What these results do not establish</span><span lang="zh">这些结果尚不意味着</span></h3><ul><li><span lang="en">Universal end-to-end throughput or TTFT improvement</span><span lang="zh">普遍的端到端吞吐或 TTFT 改进</span></li><li><span lang="en">Higher maximum concurrency or KV capacity</span><span lang="zh">更高的最大并发或 KV 容量</span></li><li><span lang="en">Universal large-prefill speedups</span><span lang="zh">大 prefill 的普遍加速</span></li><li><span lang="en">All-mode N+2 scheduling or bubble-free execution</span><span lang="zh">全模式 N+2 调度或完全无气泡执行</span></li></ul></div>
 </section>
 <section class="bs-install" id="integration"><div class="bs-wrap bs-section"><span class="bs-number">04 / INTEGRATION</span><h2><span lang="en">Your engine. Your command.<br>One explicit entry.</span><span lang="zh">你的引擎，你的命令。<br>一个显式接入点。</span></h2><p><span lang="en">Install the patch package into an existing, working vLLM Ascend environment. The Worker composes independently scoped patches through the native lifecycle. It does not rebuild the engine or rewrite its environment.</span><span lang="zh">将补丁包装入已有、可工作的 vLLM Ascend 环境。Worker 通过原生生命周期组合职责独立的补丁，不重编引擎，也不重写运行环境。</span></p>
  <pre><code>python -m pip install --no-deps vllm-betterscale==0.3.1
@@ -85,6 +96,7 @@
   --worker-cls betterscale.worker.Worker \
   --tensor-parallel-size 8 --enable-expert-parallel \
   --quantization ascend --dtype bfloat16 \
+  --distributed-executor-backend mp --async-scheduling \
   --max-num-seqs 4 --max-num-batched-tokens 4128 --max-model-len 15104 \
   --kv-cache-memory-bytes 12884901888 --no-enable-prefix-caching \
   --speculative-config &#x27;{&quot;method&quot;:&quot;dspark&quot;,&quot;num_speculative_tokens&quot;:5,&quot;enforce_eager&quot;:true}&#x27; \
@@ -93,8 +105,9 @@
   --host 127.0.0.1 --port 8000 --served-model-name dsv4</code></pre></details>
  <details><summary><span lang="en">TP1 / DP8 / EP8 · two active requests per rank</span><span lang="zh">TP1 / DP8 / EP8 · 每 rank 两个活跃请求</span></summary><pre><code>vllm serve /models/DeepSeek-V4-Flash \
   --worker-cls betterscale.worker.Worker \
-  --tensor-parallel-size 1 --data-parallel-size 8 --enable-expert-parallel \
+  --tensor-parallel-size 1 --data-parallel-size 8 --data-parallel-size-local 8 --enable-expert-parallel \
   --quantization ascend --dtype bfloat16 \
+  --distributed-executor-backend mp --async-scheduling \
   --max-num-seqs 2 --max-num-batched-tokens 1026 --max-model-len 16384 \
   --kv-cache-memory-bytes 8589934592 --no-enable-prefix-caching \
   --speculative-config &#x27;{&quot;method&quot;:&quot;dspark&quot;,&quot;num_speculative_tokens&quot;:5,&quot;enforce_eager&quot;:true}&#x27; \

@@ -17,8 +17,8 @@ site navigation.
   for other components; do not remove it.
 - `data/betterscale-results.json` is the curated public measurement snapshot; `docs/BETTERSCALE.md`
   explains comparators, methods and provenance. Keep chart numbers and scope consistent with the
-  snapshot. Both repeat observations are visible, not averaged into one flattering number. The chart
-  axis is 0–70 ms.
+  snapshot. Both repeat observations are visible, not averaged into one flattering number. The
+  matched-cycle chart axis is 0–70 ms; `service_http` separately owns the reused HTTP results.
 - The MOD catalog registration is explicitly requested by Fletcher. It does not admit these
   measurements to the official fixed-target leaderboard. The website is a renderer, not
   classification authority; see `.vllm-hust/repository-profile.json`.
@@ -48,3 +48,18 @@ reuses qualified run155 (+39.63% vs native DP), while TP retains the 0.3.0 path 
 TP). `docs/BETTERSCALE.md` links the versioned source report. Do not rewrite the existing
 cycle-study snapshot as a new HTTP benchmark or claim a fresh wheel NPU run; Fletcher stopped that
 redundant rerun.
+
+## Keep the installation panel executable
+
+The BetterScale quickstart in `assets/plugins-page.js` includes the complete DP8 command and an
+expandable TP8 alternative, not just a Worker flag. The only shared renderer change is an optional
+alternative block; other MODs keep their existing commands. `scripts/check_betterscale_install.py`
+checks both panel/page command copies against the installed public package's CPU admission. The
+separate `betterscale-package` CI job installs the PyPI wheel with --no-deps on Python3.12 and
+exports the checked argv. CPU CI never claims an NPU service boot.
+
+For a real startup-only check use `scripts/smoke_betterscale_service.py` with that argv artifact, an
+explicit model path and the normal Ascend environment, under the home lease and existing
+selected-card/descendant supervisor. It verifies health and one short completion, not throughput or
+retrieval quality. Do not reuse an old performance matrix to claim this HTTP smoke is a new
+benchmark.
