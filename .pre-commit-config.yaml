@@ -46,7 +46,8 @@ repos:
     additional_dependencies:
     - mdformat-gfm
     args: [--wrap=100]
-    exclude: ^CHANGELOG.md$
+    # SKILL.md has YAML frontmatter; plain mdformat does not preserve it.
+    exclude: (^CHANGELOG\.md$|(^|/)SKILL\.md$)
 
 - repo: https://github.com/Yelp/detect-secrets
   rev: v1.5.0

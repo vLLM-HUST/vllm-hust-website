@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## name: repo-knowledge description: Read this skill before beginning any task in this repository and whenever current work needs repository-specific knowledge or prior experimental observations. It is the scenario-oriented home for accepted understanding, bounded observations, instructions, and executable helpers that prevent repeated discovery; use it again when work earns reusable knowledge or capability that belongs here.
+---
+name: repo-knowledge
+description: Read this skill before repository work to find scenario-specific knowledge and reusable evidence.
+---
 
 # Repo Knowledge
 
