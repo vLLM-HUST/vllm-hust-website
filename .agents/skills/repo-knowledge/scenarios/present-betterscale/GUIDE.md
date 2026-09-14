@@ -23,8 +23,8 @@ site navigation.
   measurements to the official fixed-target leaderboard. The website is a renderer, not
   classification authority; see `.vllm-hust/repository-profile.json`.
 - The implementation repository is now `vLLM-HUST/BetterScale` (public), renamed from
-  `strengthen-dsv4`. Public `vllm-betterscale==0.3.1` is on PyPI; `betterscale.worker.Worker`
-  aliases the same qualified `strengthen_dsv4` class. The card quickstart and detail page own
+  `strengthen-dsv4`. Public `vllm-betterscale==0.3.2` is on PyPI; `betterscale.worker.Worker` is
+  defined directly in `src/betterscale/worker.py`. The card quickstart and detail page own
   installation and bounded TP8/DP8 commands. Link source evidence to its original measurement
   commit, not a moving main branch. The first rename attempt lacked admin permission; Fletcher
   completed the rename and the canonical URL was verified through GitHub.
@@ -71,3 +71,9 @@ absent under native logging; use native readiness plus HTTP evidence, not a requ
 count. Native peer-disconnect errors occurred during supervised teardown after success. The source
 snapshot and current smoke script have identical ASTs (format-only difference). No new TP8 boot or
 quality/performance qualification is implied.
+
+BetterScale is the public product name from its first release. The0.3.2 package uses only
+`betterscale`; do not reintroduce a former-name banner, alias explanation or private-prototype
+migration instructions in installation copy. Historical measurement commits and capsule IDs retain
+their real identities. Namespace consolidation does not reset release numbers or generate new
+performance claims.

@@ -363,7 +363,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "plugins-page.js?v=betterscale-launch-031" in PAGE
+    assert "plugins-page.js?v=betterscale-launch-032" in PAGE
 
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
@@ -683,7 +683,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v15-betterscale-http"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v16-betterscale-name"' in PAGE
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v9-vspec"'
         in PAGE

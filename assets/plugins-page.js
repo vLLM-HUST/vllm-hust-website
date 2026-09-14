@@ -183,9 +183,9 @@
     betterscale: {
       title_en: "Install and start BetterScale · DP8",
       title_zh: "安装并启动 BetterScale · DP8",
-      note_en: "Run ONE configuration in your existing pinned vLLM 0.25.1 / Ascend 0.25.1rc1 environment. Replace /models/DeepSeek-V4-Flash with your W8A8 checkpoint; eight free 910B2 cards are required. Stop and uninstall the old strengthen-dsv4 distribution first if present. Health: curl --fail http://127.0.0.1:8000/health",
-      note_zh: "选择一种配置运行，使用已有 pinned vLLM 0.25.1 / Ascend 0.25.1rc1 环境。替换 /models/DeepSeek-V4-Flash 为 W8A8 权重路径，需要八张空闲 910B2；若装有旧 strengthen-dsv4 包，先停服卸载。健康检查：curl --fail http://127.0.0.1:8000/health",
-      command: String.raw`python -m pip install --no-deps vllm-betterscale==0.3.1
+      note_en: "Run ONE configuration in your existing pinned vLLM 0.25.1 / Ascend 0.25.1rc1 environment. Replace /models/DeepSeek-V4-Flash with your W8A8 checkpoint; eight free 910B2 cards are required. Health: curl --fail http://127.0.0.1:8000/health",
+      note_zh: "选择一种配置运行，使用已有 pinned vLLM 0.25.1 / Ascend 0.25.1rc1 环境。替换 /models/DeepSeek-V4-Flash 为 W8A8 权重路径，需要八张空闲 910B2。健康检查：curl --fail http://127.0.0.1:8000/health",
+      command: String.raw`python -m pip install --no-deps vllm-betterscale==0.3.2
 vllm serve /models/DeepSeek-V4-Flash \
   --worker-cls betterscale.worker.Worker \
   --tensor-parallel-size 1 --data-parallel-size 8 --data-parallel-size-local 8 --enable-expert-parallel \
@@ -200,7 +200,7 @@ vllm serve /models/DeepSeek-V4-Flash \
       alternative: {
         title_en: "Alternatively: TP8 · four active requests",
         title_zh: "另一种配置：TP8 · 四个活跃请求",
-        command: String.raw`python -m pip install --no-deps vllm-betterscale==0.3.1
+        command: String.raw`python -m pip install --no-deps vllm-betterscale==0.3.2
 vllm serve /models/DeepSeek-V4-Flash \
   --worker-cls betterscale.worker.Worker \
   --tensor-parallel-size 8 --enable-expert-parallel \

@@ -4,16 +4,16 @@ Fast kernels can still wait for the host to prepare and submit the next inferenc
 shortens those cross-step dependencies through graph coverage, ordered replay, and device-side
 preparation. Remaining host coordination gaps are not claimed solved.
 
-BetterScale is the new project name for `strengthen-dsv4`. It is an opt-in collection of execution
-optimizations, integrated through vLLM's native Worker lifecycle rather than a replacement serving
-engine. The public `betterscale.worker.Worker` entry is an identity alias of the qualified
-`strengthen_dsv4.worker.Worker` implementation.
+BetterScale is an opt-in collection of execution optimizations, integrated through vLLM's native
+Worker lifecycle. `betterscale.worker.Worker` is defined directly in `src/betterscale/worker.py`;
+independently scoped patches live beside it.
 [The development repository](https://github.com/vLLM-HUST/BetterScale) is public under Apache-2.0;
-[`vllm-betterscale==0.3.1`](https://pypi.org/project/vllm-betterscale/0.3.1/) and its Python source
+[`vllm-betterscale==0.3.2`](https://pypi.org/project/vllm-betterscale/0.3.2/) and its Python source
 are public on PyPI. [Installation and native TP8 / DP8 commands](../betterscale.html#integration)
 use the existing pinned runtime without upgrading dependencies. Packaging was verified separately
-with 55 CPU tests and a clean install. Version 0.3.1 prepares the DP auxiliary graph catalog before
-READY; TP's existing path is unchanged. Its DP throughput result reuses the qualified
+with 55 CPU tests and a clean install. Version 0.3.2 consolidates the package namespace only;
+measured execution behavior is unchanged. Version 0.3.1 prepares the DP auxiliary graph catalog
+before READY; TP's existing path is unchanged. Its DP throughput result reuses the qualified
 startup-prepared implementation, rather than claiming a fresh wheel benchmark.
 [The HTTP acceptance report](https://github.com/vLLM-HUST/BetterScale/blob/fbfa963/docs/E2E-20260914.zh-CN.md)
 records DP +39.63% and TP +35.17% against their respective native baselines, all repeats and latency
@@ -136,5 +136,5 @@ model path substituted), all eight native DP engines initialized, HTTP health200
 completion. The supervisor exited0 and all eight cards were reclaimed. Native peer-disconnect
 messages followed supervised teardown; they are retained in the log, not hidden as a clean graceful
 shutdown. This is not a new TP8 boot, throughput measurement or model-quality gate. The compact
-receipt is `startup_smoke` in the measurement snapshot; local full evidence is retained in
-`/workspace/strengthen-dsv4/runs/tp-continuation-20260914/163-hw3-dp8-mod-startup031/`.
+receipt is `startup_smoke` in the measurement snapshot; local full evidence is retained in the
+original `163-hw3-dp8-mod-startup031` capsule.

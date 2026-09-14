@@ -32,14 +32,14 @@ def commands(root):
     assert len(copies) == 2
     for block in copies:
         install, command = block.split("\n", 1)
-        assert install == "python -m pip install --no-deps vllm-betterscale==0.3.1"
+        assert install == "python -m pip install --no-deps vllm-betterscale==0.3.2"
         argv = shlex.split(command.replace("\\\n", ""))
         assert argv in result.values(), "MOD and detail-page commands drifted"
     return result
 
 
 def check(argv, layout):
-    from strengthen_dsv4.config import validate_worker_config
+    from betterscale.config import validate_worker_config
 
     def option(name, default=None):
         return argv[argv.index(name) + 1] if name in argv else default
@@ -105,10 +105,10 @@ def main():
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     import betterscale
-    from strengthen_dsv4.compat import pins
+    from betterscale.compat import pins
 
     dist = importlib.metadata.distribution("vllm-betterscale")
-    assert dist.version == betterscale.__version__ == "0.3.1"
+    assert dist.version == betterscale.__version__ == "0.3.2"
     assert not dist.requires and not dist.entry_points
     assert pins()["source_files"]
     root = Path(__file__).resolve().parents[1]
