@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BetterScale — Keep the engine. Improve the execution.</title>
+  <title>BetterScale — Less host waiting. More device execution.</title>
   <meta name="description" content="Modular execution optimizations for vLLM Ascend. DeepSeek V4 Flash TP8 and DP8 matched-cycle measurements, mechanisms, and quality checks." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/betterscale.html" />
-  <meta property="og:title" content="BetterScale — Keep the engine. Improve the execution." />
+  <meta property="og:title" content="BetterScale — Less host waiting. More device execution." />
   <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
   <link rel="icon" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
@@ -36,8 +36,8 @@
 <header class="bs-hero">
  <div class="bs-wrap"><p class="bs-eyebrow">VLLM-HUST / ENGINEERING STUDY 01</p>
  <h1>BetterScale<span class="bs-period">.</span></h1>
- <p class="bs-statement"><span lang="en">Keep the engine.<br>Improve the execution.</span><span lang="zh">保留成熟引擎。<br>让执行更进一步。</span></p>
- <p class="bs-lede"><span lang="en">Focused, modular optimizations for vLLM Ascend. We bring more work into graphs and move preparation off the critical path—without replacing the serving stack.</span><span lang="zh">面向 vLLM Ascend 的模块化执行优化。让更多工作进入计算图，让准备工作离开关键路径，而不替换整个服务栈。</span></p>
+ <p class="bs-statement"><span lang="en">Less host waiting.<br>More device execution.</span><span lang="zh">让设备少等调度。<br>多做推理。</span></p>
+ <p class="bs-lede"><span lang="en">Fast kernels still wait when the next wave is not ready. BetterScale combines FULL graphs, ordered replay, and device-side metadata preparation to shorten the host dependencies between inference steps.</span><span lang="zh">算子已经很快，设备却仍可能等不到下一波工作。BetterScale 通过 FULL graph、有序 replay 和 device 侧元数据准备，缩短相邻推理波次之间的 host 依赖与等待。</span></p>
  <div class="bs-actions"><a class="bs-button" href="#measurements"><span lang="en">Explore the measurements ↓</span><span lang="zh">看实测结果 ↓</span></a><a href="#integration"><span lang="en">See how it fits →</span><span lang="zh">了解如何接入 →</span></a></div>
  <div class="bs-config">DeepSeek V4 Flash <span>W8A8</span> <span>8 × Ascend 910B2 / HCCS</span> <span>vLLM 0.25.1 + Ascend 0.25.1rc1</span></div>
  </div>
