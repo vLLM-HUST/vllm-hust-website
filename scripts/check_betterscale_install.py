@@ -32,7 +32,7 @@ def commands(root):
     assert len(copies) == 2
     for block in copies:
         install, command = block.split("\n", 1)
-        assert install == "python -m pip install --no-deps vllm-betterscale==0.3.2"
+        assert install == "python -m pip install --no-deps vllm-betterscale==0.4.0"
         argv = shlex.split(command.replace("\\\n", ""))
         assert argv in result.values(), "MOD and detail-page commands drifted"
     return result
@@ -55,7 +55,9 @@ def check(argv, layout):
     assert option("--host") == "127.0.0.1" and option("--port") == "8000"
     assert option("--served-model-name") == "dsv4"
     assert option("--dtype") == "bfloat16"
-    assert int(option("--kv-cache-memory-bytes")) == (8 if dp else 12) * 1024**3
+    assert option("--kv-cache-memory-bytes") is None
+    assert option("--gpu-memory-utilization") is None
+    assert int(option("--max-model-len")) == 524288
     assert graph["cudagraph_capture_sizes"] == (
         [6, 12, 132, 264, 516, 1026] if dp else [24, 4128]
     )
@@ -108,7 +110,7 @@ def main():
     from betterscale.compat import pins
 
     dist = importlib.metadata.distribution("vllm-betterscale")
-    assert dist.version == betterscale.__version__ == "0.3.2"
+    assert dist.version == betterscale.__version__ == "0.4.0"
     assert not dist.requires and not dist.entry_points
     assert pins()["source_files"]
     root = Path(__file__).resolve().parents[1]

@@ -168,3 +168,7 @@ body[data-page="betterscale"] .nav-links { background: transparent; box-shadow: 
 body[data-page="betterscale"] .nav-group.active > .nav-group-label { color: #f0b341; }
 body[data-page="betterscale"] .brand-copy { color: #f3f5f1; }
 body[data-page="betterscale"] .brand-copy small { color: #bacac4; }
+
+#capacity .bs-study-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+#capacity .bs-study { padding: 24px; }
+@media (max-width: 760px) { #capacity .bs-study-grid { grid-template-columns: 1fr; } }
