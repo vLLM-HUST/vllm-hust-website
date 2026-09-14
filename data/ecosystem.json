@@ -1308,67 +1308,6 @@
         "requirements_zh": "需 vllm-HUST/vllm-hust#8 合入后 main 才存在 victim-selector 组与 predicted_length 通道。仅安装 Bundle 不改变任何行为（两层显式选择）。"
       },
       "evidence_level": "cpu_smoke"
-    },
-    {
-      "id": "ascend-compact-greedy",
-      "name": "Ascend Compact Greedy",
-      "name_en": "Ascend Compact Greedy",
-      "name_zh": "Ascend 紧凑采样",
-      "artifact_type": "runtime_component",
-      "system_role": "sampling_policy",
-      "integration_contracts": [],
-      "integration_surfaces": [
-        "Pinned Ascend source patch",
-        "additional_config.stateaxis_compact_greedy"
-      ],
-      "execution_planes": [
-        "worker",
-        "device"
-      ],
-      "deployment_topology": "in_process",
-      "delivery_model": "source_patch",
-      "ownership": "hust_owned_subsystem",
-      "maintainers": [
-        "ShuhaoZhangTony"
-      ],
-      "maintainer_profiles": [
-        {
-          "login": "ShuhaoZhangTony",
-          "name": "张书豪"
-        }
-      ],
-      "advisors": [],
-      "repository_relationship": "organization_native",
-      "maturity": "experimental",
-      "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-compact-greedy-hust",
-      "repository_visibility": "public",
-      "upstream_repository": null,
-      "summary_en": "Default-off source MOD that exchanges shard maxima for plain greedy decode and preserves full-logits sampling for unsupported batches.",
-      "summary_zh": "默认关闭的源码 MOD：普通 greedy decode 仅交换分片最大值，其他批次保留完整 logits 采样。",
-      "public_effect_en": "Source preview: five-file reconstruction and CPU checks pass. Actual worker activation, NPU/API correctness and matched end-to-end gains remain unqualified.",
-      "public_effect_zh": "源码预览：五文件重建与 CPU 检查通过；实际 worker 激活、NPU/API 正确性及匹配端到端收益尚未验收。",
-      "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-compact-greedy-hust/blob/main/docs/evidence.md",
-      "compatibility": {
-        "status": "inspect_only",
-        "host": "vLLM-HUST + vLLM-Ascend-HUST",
-        "versions": [
-          "Source MOD 0.1.0.dev2 / StateAxis integration 0.1.0.dev9",
-          "vLLM c8d7449de / Ascend 5d3849215"
-        ],
-        "platforms": [
-          "Ascend NPU target; TP2 / PP2"
-        ],
-        "models": [
-          "Audited Qwen3.5 language-only delegate"
-        ],
-        "python": [
-          ">=3.12"
-        ],
-        "requirements_en": "Exact baseline restoration bundles are included. Source patch only, not an Extension Manager activation bundle. Full-worker, NPU and API qualification is pending; no inherited legacy reduce-sample speedup.",
-        "requirements_zh": "提供精确底座恢复 bundle。通过源码补丁接入，不是 Extension Manager 激活包；完整 worker、NPU 与 API 资格待验收，不继承旧 reduce-sample 开关收益。"
-      },
-      "evidence_level": "cpu_smoke"
     }
   ]
 }

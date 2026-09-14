@@ -80,7 +80,6 @@
     "mapped-host-kv-offload": ["long_context", "memory_kv_pressure"],
     "betterscale": ["distributed_pipeline"],
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
-    "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"],
-    "ascend-compact-greedy": ["decode_heavy", "distributed_pipeline"]
+    "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"]
   }
 }

@@ -1,4 +1,4 @@
-"""Verify author-owned source MOD rendering in both languages and viewport sizes."""
+"""Verify the incubating sampling project stays off the public MOD catalog."""
 
 from __future__ import annotations
 
@@ -18,8 +18,7 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
             for width in (1440, 390):
                 page = browser.new_page(viewport={"width": width, "height": 1000})
                 page.goto(f"{url.rstrip('/')}/plugins.html", wait_until="networkidle")
-                card = page.locator("#ascend-compact-greedy")
-                card.wait_for(state="attached")
+                page.locator("#betterscale").wait_for(state="attached")
                 for language in ("en", "zh"):
                     if (
                         not page.locator("html")
@@ -31,28 +30,22 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                         "lang => document.documentElement.lang.startsWith(lang)",
                         arg=language,
                     )
-                    assert card.locator(".plugin-maintainer").count() == 1
-                    author = card.locator(".plugin-maintainer")
+                    assert page.locator("#ascend-compact-greedy").count() == 0
                     assert (
-                        author.get_attribute("href")
-                        == "https://github.com/ShuhaoZhangTony"
-                    )
-                    assert "张书豪" in author.inner_text()
-                    assert card.locator(".plugin-advisors").count() == 0
-                    assert card.locator(".plugin-external-advisor").count() == 0
-                    assert page.locator("#bidkv .plugin-advisors").count() == 1
-                    assert "4.42" not in card.inner_text()
-                    assert (
-                        card.locator(
-                            "a[href='https://github.com/vLLM-HUST/vllm-ascend-compact-greedy-hust']"
+                        page.locator(
+                            "a[href*='vllm-ascend-compact-greedy-hust']"
                         ).count()
-                        >= 1
+                        == 0
                     )
+                    assert page.locator("#betterscale").count() == 1
+                    assert page.locator("#bidkv .plugin-advisors").count() == 1
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= window.innerWidth + 1"
                     )
-                    card.screenshot(
-                        path=str(output / f"compact-greedy-{width}-{language}.png")
+                    page.screenshot(
+                        path=str(
+                            output / f"incubation-delisting-{width}-{language}.png"
+                        )
                     )
                     results.append(
                         {"width": width, "language": language, "passed": True}
@@ -68,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument("--url", required=True)
     parser.add_argument("--executable")
     parser.add_argument(
-        "--output", type=Path, default=Path("output/playwright/compact-greedy")
+        "--output", type=Path, default=Path("output/playwright/incubation-delisting")
     )
     args = parser.parse_args()
     verify(args.url, args.output, args.executable)
