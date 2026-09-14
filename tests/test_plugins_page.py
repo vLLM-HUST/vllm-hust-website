@@ -415,7 +415,10 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert "const isWorkshopMod = (item)" in SCRIPT
     assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
     assert 'item.repository_relationship === "organization_native"' in SCRIPT
-    assert '["plugin_bundle", "python_distribution", "migration_scaffold"]' in SCRIPT
+    assert (
+        '["plugin_bundle", "python_distribution", "migration_scaffold", "source_patch"]'
+        in SCRIPT
+    )
     assert 'element("section", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert "function coverTone(item)" in SCRIPT
@@ -439,7 +442,12 @@ def test_workshop_supports_workload_guided_discovery() -> None:
         and item["repository_relationship"] == "organization_native"
         and item.get("public_surface", True) is not False
         and item["delivery_model"]
-        in {"plugin_bundle", "python_distribution", "migration_scaffold"}
+        in {
+            "plugin_bundle",
+            "python_distribution",
+            "migration_scaffold",
+            "source_patch",
+        }
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
     }
     assert set(mappings) == workshop_mods
@@ -480,7 +488,12 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         and item["repository_relationship"] == "organization_native"
         and item.get("public_surface", True) is not False
         and item["delivery_model"]
-        in {"plugin_bundle", "python_distribution", "migration_scaffold"}
+        in {
+            "plugin_bundle",
+            "python_distribution",
+            "migration_scaffold",
+            "source_patch",
+        }
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
     }
     assert set(WORKSHOP_METADATA["plugins"]) == workshop_mods
@@ -559,7 +572,12 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
         and item["repository_relationship"] == "organization_native"
         and item.get("public_surface", True) is not False
         and item["delivery_model"]
-        in {"plugin_bundle", "python_distribution", "migration_scaffold"}
+        in {
+            "plugin_bundle",
+            "python_distribution",
+            "migration_scaffold",
+            "source_patch",
+        }
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
     ]
     assert workshop_mods
@@ -969,7 +987,21 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 24
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 25
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
+
+
+def test_compact_greedy_is_a_source_preview_owned_by_its_author():
+    component = next(
+        item for item in REGISTRY["components"] if item["id"] == "ascend-compact-greedy"
+    )
+    metadata = WORKSHOP_METADATA["plugins"][component["id"]]
+    assert component["delivery_model"] == "source_patch"
+    assert component["maintainers"] == ["ShuhaoZhangTony"]
+    assert component["advisors"] == metadata["advisors"] == []
+    assert metadata["maintainers"][0]["name"] == "张书豪"
+    assert component["public_effect_status"] == "preview"
+    assert component["evidence_level"] == "cpu_smoke"
+    assert component["compatibility"]["status"] == "inspect_only"

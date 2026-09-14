@@ -179,3 +179,42 @@ def test_private_repository_preserves_public_identity_without_repo_api():
         "forks": None,
         "open_pull_requests": None,
     }
+
+
+def test_explicit_no_advisor_overrides_inferred_relationships():
+    class PublicIdentityClient:
+        def get_json(self, path):
+            raise AssertionError(f"No repository lookup expected: {path}")
+
+        def user(self, login):
+            return {
+                "name": "Shuhao Zhang",
+                "avatar_url": "https://example.org/avatar.png",
+            }
+
+    item = {
+        "id": "faculty-owned-mod",
+        "artifact_type": "runtime_component",
+        "repository_relationship": "organization_native",
+        "delivery_model": "source_patch",
+        "canonical_repository": "https://github.com/vLLM-HUST/example",
+        "repository_visibility": "private",
+        "maintainers": ["ShuhaoZhangTony"],
+        "advisors": [],
+    }
+    inferred = {
+        "shuhaozhangtony": [
+            {"name_zh": "错误推断", "name_en": "Wrong", "relationship": "internal"}
+        ]
+    }
+    result = MODULE.build_snapshot(
+        {"components": [item]}, PublicIdentityClient(), identity_advisors=inferred
+    )
+    assert result["plugins"][item["id"]]["advisors"] == []
+    assert MODULE.declared_advisors(item) == []
+    del item["advisors"]
+    assert MODULE.declared_advisors(item) is None
+    result = MODULE.build_snapshot(
+        {"components": [item]}, PublicIdentityClient(), identity_advisors=inferred
+    )
+    assert result["plugins"][item["id"]]["advisors"] == inferred["shuhaozhangtony"]

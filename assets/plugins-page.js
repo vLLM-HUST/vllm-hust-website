@@ -159,7 +159,7 @@
     ["runtime_component", "bridge"].includes(item.artifact_type)
     && item.repository_relationship === "organization_native"
     && item.public_surface !== false
-    && ["plugin_bundle", "python_distribution", "migration_scaffold"].includes(item.delivery_model)
+    && ["plugin_bundle", "python_distribution", "migration_scaffold", "source_patch"].includes(item.delivery_model)
     && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
   );
   const compatibilityLabels = {
@@ -512,7 +512,8 @@ vllm-hust-ext extension check ${extensionId}`
       list.append(link);
     });
     people.append(list);
-    const advisorRecords = Array.isArray(metadata.advisors) ? metadata.advisors : [];
+    const noAdvisor = Array.isArray(item.advisors) && item.advisors.length === 0;
+    const advisorRecords = noAdvisor ? [] : (Array.isArray(metadata.advisors) ? metadata.advisors : []);
     const internalAdvisors = advisorRecords.filter((advisor) => advisor.relationship !== "external_contributor");
     const externalAdvisors = advisorRecords.filter((advisor) => advisor.relationship === "external_contributor");
     const advisors = element("div", "plugin-advisors");
@@ -551,7 +552,7 @@ vllm-hust-ext extension check ${extensionId}`
       metrics.append(link);
     });
     panel.append(people);
-    if (internalAdvisors.length || !externalAdvisors.length) panel.append(advisors);
+    if (!noAdvisor && (internalAdvisors.length || !externalAdvisors.length)) panel.append(advisors);
     if (externalAdvisors.length) panel.append(externalRelationships);
     panel.append(metrics);
     return panel;

@@ -23,6 +23,7 @@ WORKSHOP_DELIVERY_MODELS = {
     "plugin_bundle",
     "python_distribution",
     "migration_scaffold",
+    "source_patch",
 }
 MAINTAINER_FILES = (
     "MAINTAINERS.md",
@@ -302,8 +303,8 @@ def declared_advisors(item: dict[str, Any]) -> list[dict[str, str]] | None:
     raw_advisors = item.get("advisors")
     if raw_advisors is None:
         return None
-    if not isinstance(raw_advisors, list) or not raw_advisors:
-        raise ValueError(f"{item.get('id')}: advisors must be a non-empty array")
+    if not isinstance(raw_advisors, list):
+        raise TypeError(f"{item.get('id')}: advisors must be an array")
 
     result: list[dict[str, str]] = []
     for raw in raw_advisors:

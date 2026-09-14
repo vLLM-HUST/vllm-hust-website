@@ -19,7 +19,12 @@ def main():
         and item["repository_relationship"] == "organization_native"
         and item.get("public_surface", True) is not False
         and item["delivery_model"]
-        in {"plugin_bundle", "python_distribution", "migration_scaffold"}
+        in {
+            "plugin_bundle",
+            "python_distribution",
+            "migration_scaffold",
+            "source_patch",
+        }
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
         for item in ecosystem["components"]
     )
@@ -31,7 +36,9 @@ def main():
             for language in ("en", "zh"):
                 page = browser.new_page(viewport={"width": width, "height": 1000})
                 errors = []
-                page.on("pageerror", lambda error: errors.append(str(error)))
+                page.on(
+                    "pageerror", lambda error, errors=errors: errors.append(str(error))
+                )
                 page.add_init_script(
                     f"localStorage.setItem('vllm-hust_lang', '{language}');"
                 )
