@@ -313,6 +313,48 @@
       "evidence_level": "hardware_verified"
     },
     {
+      "id": "vspec",
+      "name": "vSpec",
+      "name_en": "vSpec",
+      "name_zh": "vSpec 投机解码",
+      "artifact_type": "runtime_component",
+      "system_role": "decoding_mechanism",
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.2-experimental"],
+      "integration_surfaces": [
+        "vllm.general_plugins",
+        "vllm_hust.extension_bundles",
+        "ModelRegistry.register_model"
+      ],
+      "execution_planes": ["scheduler", "worker", "native", "device"],
+      "deployment_topology": "in_process",
+      "delivery_model": "plugin_bundle",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "maintainers": ["Renty-0"],
+      "advisors": [{"name_zh": "王庆刚", "name_en": "Qinggang Wang", "relationship": "internal"}],
+      "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-vSpec",
+      "upstream_repository": null,
+      "summary_en": "vSpec is an in-process speculative-decoding MOD for vLLM-HUST and vLLM-Ascend-HUST. It exposes Draft and EAGLE launchers, dynamic gamma, and online/profile adaptive control while keeping the host model registry unchanged through delayed plugin registration.",
+      "summary_zh": "vSpec 是面向 vLLM-HUST 与 vLLM-Ascend-HUST 的进程内投机解码 MOD，提供 Draft / EAGLE 启动器、动态 gamma 与 online/profile 自适应控制，并通过延迟插件注册保持宿主模型注册表不变。",
+      "public_effect_en": "The repository reports a same-card GSM8K B128 recovery result of 1.518x. That result is specific to the published Qwen2.5 configuration; adaptive control does not guarantee a gain for other models, batch sizes, or request distributions.",
+      "public_effect_zh": "仓库公开了同卡 GSM8K B128 的 1.518x 恢复验证；该结果仅适用于已发布的 Qwen2.5 配置，自适应控制不保证其他模型、batch 或请求分布同样获益。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-vSpec/blob/main/docs/gsm8k_b128_recovery_and_arc_easy_20260913.md",
+      "runtime_state_dimensions": ["installed", "configured", "enabled", "runtimeEffective"],
+      "compatibility": {
+        "status": "verified",
+        "host": "vLLM-HUST + vLLM-Ascend-HUST",
+        "versions": ["vLLM-HUST 762f85b3", "vLLM-Ascend-HUST 4e57439e", "vSpec 0.13.2"],
+        "platforms": ["Ascend NPU", "Eager or graph"],
+        "models": ["Qwen2.5-14B-Instruct — verified target", "Qwen2.5-0.5B-Instruct — Draft", "Eagle-Qwen2.5-14B-Instruct — EAGLE"],
+        "python": ["3.11"],
+        "requirements_en": "Use the published model pair and verify the host ABI with vllm-hust-vspec-doctor before enablement. Manager discovery is static; enabling requires an explicit compatibility check, and runtime effectiveness must be verified from live speculative-decoding counters.",
+        "requirements_zh": "请使用已发布的模型组合，并在启用前通过 vllm-hust-vspec-doctor 核对宿主 ABI。Manager 仅作静态发现；启用前必须显式完成兼容性检查，运行时是否生效还需查看真实投机解码计数器。"
+      },
+      "evidence_level": "hardware_verified"
+    },
+    {
       "id": "latchmoe",
       "name": "LatchMoE",
       "name_en": "LatchMoE",

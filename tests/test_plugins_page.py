@@ -20,6 +20,9 @@ WORKSHOP_METADATA = json.loads(
 WORKLOAD_NAVIGATION = json.loads(
     (ROOT / "data" / "plugin-workload-navigation.json").read_text(encoding="utf-8")
 )
+CORE_CONTRIBUTORS = json.loads(
+    (ROOT / "data" / "core_contributors.json").read_text(encoding="utf-8")
+)
 LEGACY_STANDARD = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
 
 REQUIRED_FIELDS = {
@@ -241,6 +244,7 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     ascend = by_id("vllm-ascend-hust")
     metal = by_id("vllm-metal-hust")
     diffspec = by_id("diffspec")
+    vspec = by_id("vspec")
     kvcompress = by_id("kvcompress-ascend")
 
     assert ascend["integration_contracts"] == [
@@ -272,6 +276,18 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     )
     assert "19.29%" in diffspec["public_effect_en"]
     assert diffspec["public_effect_status"] == "not-beneficial-in-tested-cell"
+    assert vspec["integration_contracts"] == [
+        "vllm_hust.extension_manifest.v0.2-experimental"
+    ]
+    assert vspec["integration_surfaces"] == [
+        "vllm.general_plugins",
+        "vllm_hust.extension_bundles",
+        "ModelRegistry.register_model",
+    ]
+    assert vspec["execution_planes"] == ["scheduler", "worker", "native", "device"]
+    assert vspec["compatibility"]["status"] == "verified"
+    assert "1.518x" in vspec["public_effect_en"]
+    assert vspec["public_effect_status"] == "measured"
     assert kvcompress["integration_contracts"] == []
     assert kvcompress["integration_surfaces"] == [
         "vllm.general_plugins",
@@ -287,6 +303,26 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     assert "vllm.operator" not in typed
     assert "vllm.model_runner" not in typed
     assert "integration_surfaces" in SCRIPT
+
+
+def test_vspec_maintainer_uses_the_canonical_contributor_identity() -> None:
+    canonical_names = {
+        person["github_login"].casefold(): person["display_name"]
+        for people in CORE_CONTRIBUTORS["member_profiles"].values()
+        if isinstance(people, list)
+        for person in people
+        if isinstance(person, dict)
+        and person.get("identity_confirmed") is True
+        and person.get("github_login")
+    }
+    vspec = by_id("vspec")
+    maintainer = WORKSHOP_METADATA["plugins"]["vspec"]["maintainers"][0]
+
+    assert canonical_names["renty-0"] == "任天宇"
+    assert vspec["maintainers"] == ["Renty-0"]
+    assert "maintainer_profiles" not in vspec
+    assert maintainer["login"] == "Renty-0"
+    assert maintainer["name"] == canonical_names[maintainer["login"].casefold()]
 
 
 def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
@@ -305,6 +341,9 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     )
     assert "extension configure org.vllm-hust.diffspec --file diffspec.json" in SCRIPT
     assert "extension enable org.vllm-hust.diffspec" in SCRIPT
+    assert "vspec: {" in SCRIPT
+    assert "extension enable org.vllm-hust.vspec" in SCRIPT
+    assert "vllm-hust-vspec-doctor --method eagle" in SCRIPT
     assert "latchmoe: {" in SCRIPT
     assert "latchmoe check" in SCRIPT
     assert "latchmoe serve /path/to/model" in SCRIPT
@@ -626,8 +665,14 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
+    assert 'data-source="./data/ecosystem.json?v=workshop-v13-vspec"' in PAGE
     assert (
-        'data-source="./data/ecosystem.json?v=workshop-v12-betterscale-public"' in PAGE
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v9-vspec"'
+        in PAGE
+    )
+    assert (
+        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v3-vspec"'
+        in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
@@ -636,9 +681,15 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 54
+    assert len(PORTFOLIO["repositories"]) == 55
     names = {item["name"] for item in PORTFOLIO["repositories"]}
-    assert {"extension-manager", "vllm-hust", "pegaflow-hust", "vllm-hust-dla"} <= names
+    assert {
+        "extension-manager",
+        "vllm-hust",
+        "pegaflow-hust",
+        "vllm-hust-dla",
+        "vllm-hust-vSpec",
+    } <= names
     assert "vllm-ascend" not in names
     assert {
         "vllm-hust-prefix-router",
@@ -677,9 +728,15 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert dla["url"] == "https://github.com/vLLM-HUST/vllm-hust-dla"
     assert dla["component_ids"] == ["dla"]
     assert dla["public_surface"] is True
+    vspec = next(
+        item for item in PORTFOLIO["repositories"] if item["name"] == "vllm-hust-vSpec"
+    )
+    assert vspec["url"] == "https://github.com/vLLM-HUST/vllm-hust-vSpec"
+    assert vspec["component_ids"] == ["vspec"]
+    assert vspec["public_surface"] is True
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v8-dla"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v9-vspec"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
@@ -912,7 +969,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 23
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 24
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE

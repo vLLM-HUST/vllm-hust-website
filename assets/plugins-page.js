@@ -213,6 +213,19 @@ vllm-hust-ext extension check org.vllm-hust.diffspec
 vllm-hust-ext extension enable org.vllm-hust.diffspec
 vllm-hust-ext run -- vllm serve /path/to/target-model`
     },
+    vspec: {
+      title_en: "Install and start vSpec",
+      title_zh: "安装并启动 vSpec",
+      note_en: "Use the published Qwen2.5 target/drafter pair, then check the host ABI before enabling the plugin.",
+      note_zh: "请使用已发布的 Qwen2.5 target/drafter 组合，并在启用插件前检查宿主 ABI。",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@main"
+python -m pip install /path/to/vllm_hust_vspec-0.13.2-py3-none-any.whl
+vllm-hust-vspec-models
+vllm-hust-ext extension inspect org.vllm-hust.vspec
+vllm-hust-vspec-doctor --method eagle
+vllm-hust-ext extension enable org.vllm-hust.vspec
+vllm-hust-ext run -- vllm-hust-vspec --method eagle --target-model /path/to/Qwen2.5-14B-Instruct --gamma 2 --graph-mode full`
+    },
     latchmoe: {
       title_en: "Install and start LatchMoE",
       title_zh: "安装并启动 LatchMoE",
