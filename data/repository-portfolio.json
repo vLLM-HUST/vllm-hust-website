@@ -301,6 +301,20 @@
       "public_surface": true
     },
     {
+      "name": "vllm-hust-vSpec",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-vSpec",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "runtime_component",
+      "relation_to_runtime": "extends_runtime_behavior",
+      "lifecycle": "experimental",
+      "canonical_artifacts": [
+        "vSpec speculative-decoding MOD",
+        "Draft and EAGLE adaptive-control launchers"
+      ],
+      "component_ids": ["vspec"],
+      "public_surface": true
+    },
+    {
       "name": "vllm-hust-docs",
       "url": "https://github.com/vLLM-HUST/vllm-hust-docs",
       "portfolio_domain": "documentation_product",
