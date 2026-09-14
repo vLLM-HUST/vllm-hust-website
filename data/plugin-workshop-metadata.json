@@ -526,13 +526,13 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
-    "stateharbor": {
-      "repository": "vLLM-HUST/vllm-hust-stateharbor",
-      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-stateharbor",
+    "betterscale": {
+      "repository": "vLLM-HUST/BetterScale",
+      "repository_url": "https://github.com/vLLM-HUST/BetterScale",
       "metrics": {
-        "stars": 0,
-        "forks": 0,
-        "open_pull_requests": 0
+        "stars": null,
+        "forks": null,
+        "open_pull_requests": null
       },
       "maintainers": [
         {

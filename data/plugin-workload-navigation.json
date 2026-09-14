@@ -50,8 +50,8 @@
       "description_zh": "受专家放置、搬运或卸载限制的 MoE 模型。"
     },
     "distributed_pipeline": {
-      "label_en": "Distributed / Pipeline",
-      "label_zh": "分布式 / 流水线",
+      "label_en": "Distributed",
+      "label_zh": "分布式",
       "description_en": "Cross-device communication, pipeline scheduling, or transferred KV state.",
       "description_zh": "涉及跨设备通信、流水线调度或 KV 状态传输。"
     }
@@ -76,7 +76,7 @@
     "pipeline-microbatch-migration": ["distributed_pipeline", "high_concurrency"],
     "qos-scheduler-migration": ["latency_slo", "high_concurrency"],
     "mapped-host-kv-offload": ["long_context", "memory_kv_pressure"],
-    "stateharbor": ["repeated_prefix_agent"],
+    "betterscale": ["distributed_pipeline"],
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
     "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"]
   }

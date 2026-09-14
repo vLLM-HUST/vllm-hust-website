@@ -990,6 +990,8 @@
     },
     {
       "id": "stateharbor",
+      "public_surface": false,
+      "retirement_note": "Historical prototype; withdrawn from the public MOD catalog at the maintainer’s request.",
       "name": "StateHarbor",
       "name_en": "StateHarbor",
       "name_zh": "StateHarbor",
@@ -1146,6 +1148,72 @@
       "summary_en": "Public renderer of canonical ecosystem metadata and benchmark evidence.",
       "summary_zh": "规范生态元数据与评测证据的公开展示层。",
       "evidence_level": "descriptor_only"
+    },
+    {
+      "id": "betterscale",
+      "name": "BetterScale",
+      "name_en": "BetterScale",
+      "name_zh": "BetterScale",
+      "artifact_type": "runtime_component",
+      "system_role": "graph_execution_policy",
+      "integration_contracts": [],
+      "integration_surfaces": [
+        "vLLM --worker-cls / native Worker lifecycle",
+        "Pinned vLLM-Ascend runtime hooks"
+      ],
+      "execution_planes": [
+        "worker",
+        "native",
+        "device"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "python_distribution",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "maintainers": [
+        "CubeLander"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "CubeLander",
+          "name": "田景远"
+        }
+      ],
+      "canonical_repository": "https://github.com/vLLM-HUST/BetterScale",
+      "repository_visibility": "private",
+      "upstream_repository": null,
+      "documentation_url": "./betterscale.html",
+      "summary_en": "Less host waiting. More device execution. FULL graphs, ordered replay and device-side metadata preparation shorten cross-step dependencies in DeepSeek V4 Flash.",
+      "summary_zh": "让设备少等调度，多做推理。通过 FULL graph、有序 replay 与 device 侧元数据准备，缩短 DeepSeek V4 Flash 波次之间的依赖与等待。",
+      "public_effect_en": "Matched K5 cycles: TP draft graph 20–21% shorter; DP device preparation 15.4–15.9% shorter versus dual graph endpoints. Separate comparisons, not end-to-end throughput gains. Retained OpenCompass retrieval subset: 32/32.",
+      "public_effect_zh": "等工作量 K5 周期：TP draft graph 缩短 20–21%；DP device 准备相对双 graph 端点缩短 15.4–15.9%。两项为独立对照，并非端到端吞吐增益。保留的 OpenCompass 检索子集通过 32/32。",
+      "public_effect_status": "measured",
+      "public_effect_url": "./betterscale.html#measurements",
+      "functional_compatibility": {
+        "status": "passed",
+        "scope": "DeepSeek-V4-Flash-0731-w8a8 · Ascend 910B2 TP8 / TP1-DP8-EP8, bounded K5 configurations"
+      },
+      "compatibility": {
+        "status": "verified",
+        "host": "vLLM Ascend",
+        "versions": [
+          "vLLM 0.25.1 + vLLM-Ascend 0.25.1rc1",
+          "BetterScale / legacy strengthen_dsv4 Worker"
+        ],
+        "platforms": [
+          "8 × Ascend 910B2 / HCCS · TP8 + EP or TP1 / DP8 / EP8"
+        ],
+        "models": [
+          "DeepSeek-V4-Flash-0731-w8a8 · W8A8 / BF16 activations"
+        ],
+        "python": [
+          ">=3.12"
+        ],
+        "requirements_en": "Native Worker entry; qualified TP8 four-seat and DP8 two-seats-per-rank K5 configurations only. No Extension Manager bundle contract. Implementation repository is private; no public package install is advertised. Full shapes, KV budgets and quality limits are in the project page.",
+        "requirements_zh": "通过原生 Worker 接入；仅验收 TP8 四席位、DP8 每 rank 两席位的 K5 配置。不是 Extension Manager bundle。实现仓库私有，未提供公开包安装承诺；完整形状、KV 预算及质量边界见项目介绍。"
+      },
+      "evidence_level": "hardware_verified"
     }
   ]
 }

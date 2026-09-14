@@ -397,6 +397,18 @@ def build_snapshot(
             continue
         plugin_id = str(item["id"])
         slug = repository_slug(str(item["canonical_repository"]))
+        if item.get("repository_visibility") == "private":
+            # Public CI cannot read a private repo. Unknown metrics are not zero;
+            # retain the declared public identity without querying private APIs.
+            if not item.get("maintainers"):
+                raise ValueError(
+                    f"{plugin_id}: private repositories require declared maintainers"
+                )
+            repository_cache[slug] = {
+                "repository": slug,
+                "repository_url": str(item["canonical_repository"]),
+                "metrics": {"stars": None, "forks": None, "open_pull_requests": None},
+            }
         if slug not in repository_cache:
             repository_payload, _ = client.get_json(f"/repos/{slug}")
             if not isinstance(repository_payload, dict):

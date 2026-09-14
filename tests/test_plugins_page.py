@@ -324,7 +324,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "plugins-page.js?v=0.3.7" in PAGE
+    assert "plugins-page.js?v=betterscale-20260914" in PAGE
 
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
@@ -445,14 +445,18 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
     }
     assert set(WORKSHOP_METADATA["plugins"]) == workshop_mods
-    for plugin in WORKSHOP_METADATA["plugins"].values():
+    for plugin_id, plugin in WORKSHOP_METADATA["plugins"].items():
         assert plugin["maintainers"]
         assert all(
             person["login"] and person["name"] for person in plugin["maintainers"]
         )
         assert set(plugin["metrics"]) == {"stars", "forks", "open_pull_requests"}
         assert all(
-            isinstance(value, int) and value >= 0
+            (
+                value is None
+                and by_id(plugin_id).get("repository_visibility") == "private"
+            )
+            or (isinstance(value, int) and value >= 0)
             for value in plugin["metrics"].values()
         )
 
@@ -531,7 +535,10 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
             "not-beneficial-in-tested-cell",
             "beneficial",
         }
-        assert item["public_effect_url"].startswith("https://github.com/")
+        assert item["public_effect_url"].startswith("https://github.com/") or (
+            item["public_effect_url"].startswith("./")
+            and (ROOT / item["public_effect_url"].split("#")[0]).is_file()
+        )
     assert "function publicEffectPanel(item)" in SCRIPT
     assert 'local(item, "public_effect")' in SCRIPT
     assert ".plugin-public-effect" in STYLES
@@ -619,10 +626,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert (
-        'data-source="./data/ecosystem.json?v=workshop-v9-scheduler-unpublished"'
-        in PAGE
-    )
+    assert 'data-source="./data/ecosystem.json?v=workshop-v10-betterscale"' in PAGE
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
@@ -892,3 +896,15 @@ def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
         compatibility = by_id(component_id)["compatibility"]
         assert compatibility["status"] == "source_scaffold"
         assert compatibility["versions"] == ["No installable or runnable release"]
+
+
+def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
+    assert by_id("stateharbor")["public_surface"] is False
+    assert "stateharbor" not in WORKLOAD_NAVIGATION["plugins"]
+    assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
+    assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
+    assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 22
+    assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
+    assert by_id("betterscale")["repository_visibility"] == "private"
+    assert 'id="betterscale" class="bs-feature"' not in PAGE
