@@ -520,11 +520,11 @@ vllm-hust-ext extension check ${extensionId}`
       [copy().pullRequests, metadata.metrics.open_pull_requests, `${metadata.repository_url}/pulls`],
       [copy().forks, metadata.metrics.forks, `${metadata.repository_url}/forks`]
     ].forEach(([label, value, href]) => {
-      const link = element("a", "plugin-repo-metric");
-      link.href = href;
+      const link = element(value == null ? "span" : "a", "plugin-repo-metric");
+      if (value != null) link.href = href;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      link.append(element("strong", "", String(value)), element("span", "", label));
+      link.append(element("strong", "", value == null ? "—" : String(value)), element("span", "", label));
       metrics.append(link);
     });
     panel.append(people);
@@ -639,6 +639,7 @@ vllm-hust-ext extension check ${extensionId}`
       "article",
       `plugin-card workshop-card workshop-${item.artifact_type} workshop-tone-${coverTone(item)}${isUpstreamFork ? " upstream-fork-card" : ""}`
     );
+    card.id = item.id;
     const cover = element("div", "workshop-cover");
     const displayName = local(item, "name");
     const initials = displayName.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
@@ -714,7 +715,14 @@ vllm-hust-ext extension check ${extensionId}`
       upstream.rel = "noopener noreferrer";
       footer.append(upstream);
     }
-    if (item.canonical_repository) {
+    if (item.documentation_url) {
+      const detailsLink = element("a", "plugin-repository", language() === "zh" ? "项目介绍 →" : "Project details →");
+      detailsLink.href = item.documentation_url;
+      footer.append(detailsLink);
+    }
+    if (item.repository_visibility === "private") {
+      footer.append(element("span", "plugin-repository withheld", language() === "zh" ? "私有仓库" : "Private repository"));
+    } else if (item.canonical_repository) {
       const link = element("a", "plugin-repository", `${copy().repository} ↗`);
       link.href = item.canonical_repository;
       link.target = "_blank";

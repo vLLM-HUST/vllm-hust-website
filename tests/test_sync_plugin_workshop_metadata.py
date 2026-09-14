@@ -152,3 +152,30 @@ def test_declared_people_and_external_advisor_override_inferred_metadata() -> No
     }
     assert MODULE.declared_identity_names(item, ["xsun2001"]) == {"xsun2001": "徐晨曦"}
     assert MODULE.declared_advisors(item) == item["advisors"]
+
+
+def test_private_repository_preserves_public_identity_without_repo_api():
+    class PublicIdentityClient:
+        def get_json(self, path):
+            raise AssertionError(f"Private repository must not be queried: {path}")
+
+        def user(self, login):
+            return {"name": login, "avatar_url": "https://example.org/avatar.png"}
+
+    item = {
+        "id": "private-mod",
+        "artifact_type": "runtime_component",
+        "repository_relationship": "organization_native",
+        "delivery_model": "python_distribution",
+        "canonical_repository": "https://github.com/vLLM-HUST/private-mod",
+        "repository_visibility": "private",
+        "maintainers": ["maintainer"],
+    }
+    result = MODULE.build_snapshot({"components": [item]}, PublicIdentityClient())
+    plugin = result["plugins"]["private-mod"]
+    assert plugin["maintainers"][0]["login"] == "maintainer"
+    assert plugin["metrics"] == {
+        "stars": None,
+        "forks": None,
+        "open_pull_requests": None,
+    }

@@ -21,9 +21,9 @@
             "type": "object",
             "required": ["stars", "forks", "open_pull_requests"],
             "properties": {
-              "stars": {"type": "integer", "minimum": 0},
-              "forks": {"type": "integer", "minimum": 0},
-              "open_pull_requests": {"type": "integer", "minimum": 0}
+              "stars": {"type": ["integer", "null"], "minimum": 0},
+              "forks": {"type": ["integer", "null"], "minimum": 0},
+              "open_pull_requests": {"type": ["integer", "null"], "minimum": 0}
             },
             "additionalProperties": false
           },

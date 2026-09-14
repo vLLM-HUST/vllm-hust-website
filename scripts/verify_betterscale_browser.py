@@ -87,9 +87,27 @@ def main():
                 assert not errors, errors
                 page.close()
         page = browser.new_page()
-        for name in ("plugins",):
-            page.goto(f"{args.url}/{name}.html")
-            assert page.locator('.bs-feature a[href="./betterscale.html"]').is_visible()
+        page.goto(f"{args.url}/plugins.html")
+        page.locator("#betterscale.workshop-card").wait_for()
+        card = page.locator("#betterscale.workshop-card")
+        assert card.locator(
+            '.plugin-card-footer a[href="./betterscale.html"]'
+        ).is_visible()
+        assert page.locator("#betterscale.bs-feature").count() == 0
+        assert card.locator(".plugin-workload-tag").count() == 1
+        page.locator("[data-plugin-search]").fill("BetterScale")
+        assert page.locator(".workshop-card").count() == 1
+        card.locator(".plugin-workload-tag").click()
+        assert card.is_visible()
+        page.locator("[data-plugin-search]").fill("StateHarbor")
+        assert page.locator(".workshop-card").count() == 0
+        page.locator("[data-plugin-search]").fill("")
+        page.locator("[data-workload-filters] button").first.click()
+        page.locator("[data-plugin-more]").click()
+        assert page.locator(".workshop-card").count() == 22
+        assert page.locator("#stateharbor.workshop-card").count() == 0
+        page.locator("#betterscale .plugin-card-footer a").click()
+        page.wait_for_url("**/betterscale.html")
         for name in ("index", "achievements"):
             page.goto(f"{args.url}/{name}.html")
             assert page.locator('.bs-feature a[href="./betterscale.html"]').count() == 0
