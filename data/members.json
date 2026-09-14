@@ -1,6 +1,6 @@
 {
   "organization": "vLLM-HUST",
-  "verified_at": "2026-09-01",
+  "verified_at": "2026-09-14",
   "source": "GitHub organization membership with lead-confirmed display names",
   "members": [
     {
@@ -86,6 +86,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/151722810?u=bb982397859883cbf564b788788d93d66f1742d0&v=4",
       "profile_url": "https://github.com/Fuze1111",
       "bio": "An 0rd1nary CS student."
+    },
+    {
+      "login": "fw1688",
+      "name": "Hudson Hornet",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71558437?v=4",
+      "profile_url": "https://github.com/fw1688",
+      "bio": ""
     },
     {
       "login": "GuMorming",
@@ -480,5 +487,5 @@
       "bio": ""
     }
   ],
-  "count": 68
+  "count": 69
 }

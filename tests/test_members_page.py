@@ -9,8 +9,8 @@ def test_verified_member_snapshot_is_minimized_and_unique() -> None:
     members = payload["members"]
 
     assert payload["organization"] == "vLLM-HUST"
-    assert payload["verified_at"] == "2026-09-01"
-    assert payload["count"] == len(members) == 68
+    assert payload["verified_at"] == "2026-09-14"
+    assert payload["count"] == len(members) == 69
     assert len({member["login"].lower() for member in members}) == len(members)
     assert all(
         set(member) == {"login", "name", "avatar_url", "profile_url", "bio"}

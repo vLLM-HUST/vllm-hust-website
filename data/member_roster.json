@@ -41,7 +41,7 @@
     {"name_zh": "周升晖", "github_login": "keridone", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "阮宏毅", "github_login": "Lan-Fa", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "张盛翔", "github_login": "zhangshengxiang682", "advisor_zh": "张书豪", "status": "current"},
-    {"name_zh": "冯威", "github_login": "fw1688", "advisor_zh": "张书豪", "status": "current", "github_status_zh": "负责人确认；组织邀请待接受", "github_status_en": "Confirmed by the advisor; organization invitation pending"},
+    {"name_zh": "冯威", "github_login": "fw1688", "advisor_zh": "张书豪", "status": "current", "github_status_zh": "已核验为vLLM-HUST组织成员", "github_status_en": "Verified vLLM-HUST organization member"},
     {"name_zh": "李佳乐", "github_login": "peter17-17", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "郑凌峰", "github_login": "Amber1qq", "advisor_zh": "刘海坤", "status": "current"},
     {"name_zh": "任天宇", "github_login": "Renty-0", "advisor_zh": "王庆刚", "status": "current"},
