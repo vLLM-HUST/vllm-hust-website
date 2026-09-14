@@ -23,7 +23,7 @@ site navigation.
   measurements to the official fixed-target leaderboard. The website is a renderer, not
   classification authority; see `.vllm-hust/repository-profile.json`.
 - The implementation repository is now `vLLM-HUST/BetterScale` (public), renamed from
-  `strengthen-dsv4`. Public `vllm-betterscale==0.3.2` is on PyPI; `betterscale.worker.Worker` is
+  `strengthen-dsv4`. Public `vllm-betterscale==0.4.0` is on PyPI; `betterscale.worker.Worker` is
   defined directly in `src/betterscale/worker.py`. The card quickstart and detail page own
   installation and bounded TP8/DP8 commands. Link source evidence to its original measurement
   commit, not a moving main branch. The first rename attempt lacked admin permission; Fletcher
@@ -77,3 +77,15 @@ BetterScale is the public product name from its first release. The0.3.2 package 
 migration instructions in installation copy. Historical measurement commits and capsule IDs retain
 their real identities. Namespace consolidation does not reset release numbers or generate new
 performance claims.
+
+## Physical capacity release 0.4
+
+Capacity is a separate section/data object, not a new throughput comparison. Commands omit fixed KV
+bytes and fractions and admit a 512Ki input+output ceiling. TP ~14.94GiB/rank and DP ~7.9GiB/rank
+are different native layouts. The 96.84% pressure observation is **TP dummy**; three running
+requests include partial prefill, not three complete 448Ki histories resident. Real quality is 32
+retained retrieval items; DP heavy pressure timed out. APC and preemption recovery are not qualified
+by that capacity result. Keep these distinctions in both languages.
+
+The final package passes the displayed-command checker. Browser checks include the capacity section
+in both languages and desktop/mobile viewports; no need for another NPU run for site edits.

@@ -64,8 +64,15 @@ def main():
                 assert page.evaluate(
                     "document.documentElement.scrollWidth <= window.innerWidth"
                 ), f"Horizontal page overflow: {label}/{language}"
+                capacity = page.locator("#capacity")
+                assert "96.84%" in capacity.inner_text()
+                assert "TP8" in capacity.inner_text() and "DP8" in capacity.inner_text()
+                assert "512Ki" in capacity.inner_text()
+                capacity.screenshot(
+                    path=str(output / f"capacity-{label}-{language}.png")
+                )
                 integration = page.locator("#integration")
-                assert "vllm-betterscale==0.3.2" in integration.inner_text()
+                assert "vllm-betterscale==0.4.0" in integration.inner_text()
                 assert integration.locator("details").count() == 2
                 for details in integration.locator("details").all():
                     details.locator("summary").click()

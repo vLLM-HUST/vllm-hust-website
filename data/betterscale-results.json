@@ -249,5 +249,32 @@
     "all_cards_released": true,
     "scope": "Actual public-wheel installation and DP8 startup/one short HTTP completion. Not a throughput or quality rerun; TP8 launch has CPU contract and retained prior path evidence, not a new TP8 service smoke.",
     "teardown_note": "Native peer-disconnect messages followed supervised termination after the successful response; all eight cards were reclaimed."
+  },
+  "capacity": {
+    "release": "0.4.0",
+    "context_ceiling_tokens": 524288,
+    "safety_gib_per_rank": 1,
+    "tp8": {
+      "kv_gib_per_rank_approx": 14.94,
+      "real_quality_correct": 32,
+      "real_quality_total": 32,
+      "real_quality_run": 190,
+      "dummy_peak_kv_usage_percent": 96.84010590537585,
+      "dummy_pressure_run": 189,
+      "dummy_prompt_tokens": 458752,
+      "dummy_offered_requests": 4,
+      "dummy_max_running": 3,
+      "dummy_preemptions": 0
+    },
+    "dp8": {
+      "kv_gib_per_rank_approx": 7.9,
+      "real_runs": [
+        170,
+        171,
+        174
+      ],
+      "long_pressure_saturation_qualified": false
+    },
+    "boundary": "No new throughput comparison; running includes partial prefill; no preemption recovery claim; APC disabled"
   }
 }

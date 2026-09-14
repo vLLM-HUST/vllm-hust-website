@@ -8,13 +8,11 @@ BetterScale is an opt-in collection of execution optimizations, integrated throu
 Worker lifecycle. `betterscale.worker.Worker` is defined directly in `src/betterscale/worker.py`;
 independently scoped patches live beside it.
 [The development repository](https://github.com/vLLM-HUST/BetterScale) is public under Apache-2.0;
-[`vllm-betterscale==0.3.2`](https://pypi.org/project/vllm-betterscale/0.3.2/) and its Python source
+[`vllm-betterscale==0.4.0`](https://pypi.org/project/vllm-betterscale/0.4.0/) and its Python source
 are public on PyPI. [Installation and native TP8 / DP8 commands](../betterscale.html#integration)
-use the existing pinned runtime without upgrading dependencies. Packaging was verified separately
-with 55 CPU tests and a clean install. Version 0.3.2 consolidates the package namespace only;
-measured execution behavior is unchanged. Version 0.3.1 prepares the DP auxiliary graph catalog
-before READY; TP's existing path is unchanged. Its DP throughput result reuses the qualified
-startup-prepared implementation, rather than claiming a fresh wheel benchmark.
+use the existing pinned runtime without upgrading dependencies. Version0.4.0 adds physical KV sizing
+and the shared target/draft startup catalog. The retained throughput results below keep their
+original versions and configurations; they are not a new0.4.0 throughput benchmark.
 [The HTTP acceptance report](https://github.com/vLLM-HUST/BetterScale/blob/fbfa963/docs/E2E-20260914.zh-CN.md)
 records DP +39.63% and TP +35.17% against their respective native baselines, all repeats and latency
 limitations. These HTTP results are separate from the matched-cycle charts below.
@@ -138,3 +136,22 @@ messages followed supervised teardown; they are retained in the log, not hidden 
 shutdown. This is not a new TP8 boot, throughput measurement or model-quality gate. The compact
 receipt is `startup_smoke` in the measurement snapshot; local full evidence is retained in the
 original `163-hw3-dp8-mod-startup031` capsule.
+
+## Physical capacity (0.4.0)
+
+`data/betterscale-results.json.capacity` is separate from the old cycle/HTTP measurements. Both
+launch examples use a524288-token request ceiling and omit fixed KV bytes and fractional ceilings.
+Automatic sizing retains1GiB/rank safety headroom. TP assigns about14.94GiB/rank; DP's retained
+physical-fit results assign about7.9GiB/rank.
+
+The new TP program passes the real32-item quality gate (run190). Dummy run189 reaches96.84%KV usage
+with four448Ki-input requests, at most three running; a running request can still have partial
+prefill, so this is NOT three full448Ki prefixes resident simultaneously. All four complete, then16
+short turnover requests complete. No preemption occurred. DP's long-pressure cohort did not finish
+before its bound; do not transfer TP's near-full result to DP.
+
+Source evidence:
+[capacity ledger](https://github.com/vLLM-HUST/BetterScale/blob/main/docs/CAPACITY-0.4.zh-CN.md),
+[TP real quality](https://github.com/vLLM-HUST/BetterScale/blob/f86e59f/docs/evidence/auto-kv-run190.json),
+[TP dummy pressure](https://github.com/vLLM-HUST/BetterScale/blob/9ec9d24/docs/evidence/auto-kv-run189.json).
+APC remains off; no preemption-recovery fix or new throughput gain is claimed.
