@@ -7,7 +7,8 @@ preparation. Remaining host coordination gaps are not claimed solved.
 BetterScale is the new project name for `strengthen-dsv4`. It is an opt-in collection of execution
 optimizations, integrated through vLLM's native Worker lifecycle rather than a replacement serving
 engine. The public `betterscale.worker.Worker` entry is an identity alias of the qualified
-`strengthen_dsv4.worker.Worker` implementation. The development repository remains private;
+`strengthen_dsv4.worker.Worker` implementation.
+[The development repository](https://github.com/vLLM-HUST/BetterScale) is public under Apache-2.0;
 [`vllm-betterscale==0.3.0`](https://pypi.org/project/vllm-betterscale/0.3.0/) and its Python source
 are public on PyPI. [Installation and native TP8 / DP8 commands](../betterscale.html#integration)
 use the existing pinned runtime without upgrading dependencies. Packaging was verified separately
@@ -25,11 +26,15 @@ torch_npu 2.10.0.post2. The release pins are vLLM v0.25.1
 rebuild of every historical installed package.
 
 The source report is `RESULTS.md` and the DP receipt is `evidence/dp-continuation-20260913.json` at
-implementation commit `7f7bda350471bab47decc45b64264280b9c4d4d7`. These are provenance identifiers,
-not publicly downloadable source artifacts. The accompanying JSON is a curated, public measurement
-summary; it contains every repeat shown on the page and comparator and selection definitions. Raw
-traces are not bundled. This case study is separate from the website's fixed-target leaderboard and
-does not claim admission to it.
+implementation commit `7f7bda350471bab47decc45b64264280b9c4d4d7`. These are immutable provenance
+identifiers; the
+[source report](https://github.com/vLLM-HUST/BetterScale/blob/7f7bda350471bab47decc45b64264280b9c4d4d7/RESULTS.md)
+and
+[DP receipt](https://github.com/vLLM-HUST/BetterScale/blob/7f7bda350471bab47decc45b64264280b9c4d4d7/evidence/dp-continuation-20260913.json)
+are publicly accessible. The accompanying JSON is a curated, public measurement summary; it contains
+every repeat shown on the page and comparator and selection definitions. Raw traces are not bundled.
+This case study is separate from the website's fixed-target leaderboard and does not claim admission
+to it.
 
 ## What changed
 

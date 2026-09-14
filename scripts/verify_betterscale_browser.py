@@ -107,6 +107,9 @@ def main():
         assert card.locator(
             '.plugin-card-footer a[href="./betterscale.html"]'
         ).is_visible()
+        assert card.locator(
+            '.plugin-card-footer a[href="https://github.com/vLLM-HUST/BetterScale"]'
+        ).is_visible()
         assert page.locator("#betterscale.bs-feature").count() == 0
         assert card.locator(".plugin-workload-tag").count() == 1
         page.locator("[data-plugin-search]").fill("BetterScale")
@@ -120,7 +123,9 @@ def main():
         page.locator("[data-plugin-more]").click()
         assert page.locator(".workshop-card").count() == 22
         assert page.locator("#stateharbor.workshop-card").count() == 0
-        page.locator("#betterscale .plugin-card-footer a").click()
+        page.locator(
+            '#betterscale .plugin-card-footer a[href="./betterscale.html"]'
+        ).click()
         page.wait_for_url("**/betterscale.html")
         for name in ("index", "achievements"):
             page.goto(f"{args.url}/{name}.html")
