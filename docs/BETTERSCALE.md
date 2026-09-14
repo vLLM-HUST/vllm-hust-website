@@ -9,10 +9,15 @@ optimizations, integrated through vLLM's native Worker lifecycle rather than a r
 engine. The public `betterscale.worker.Worker` entry is an identity alias of the qualified
 `strengthen_dsv4.worker.Worker` implementation.
 [The development repository](https://github.com/vLLM-HUST/BetterScale) is public under Apache-2.0;
-[`vllm-betterscale==0.3.0`](https://pypi.org/project/vllm-betterscale/0.3.0/) and its Python source
+[`vllm-betterscale==0.3.1`](https://pypi.org/project/vllm-betterscale/0.3.1/) and its Python source
 are public on PyPI. [Installation and native TP8 / DP8 commands](../betterscale.html#integration)
 use the existing pinned runtime without upgrading dependencies. Packaging was verified separately
-with 51 CPU tests and a clean install; the alias does not constitute new hardware qualification.
+with 55 CPU tests and a clean install. Version 0.3.1 prepares the DP auxiliary graph catalog before
+READY; TP's existing path is unchanged. Its DP throughput result reuses the qualified
+startup-prepared implementation, rather than claiming a fresh wheel benchmark.
+[The HTTP acceptance report](https://github.com/vLLM-HUST/BetterScale/blob/fbfa963/docs/E2E-20260914.zh-CN.md)
+records DP +39.63% and TP +35.17% against their respective native baselines, all repeats and latency
+limitations. These HTTP results are separate from the matched-cycle charts below.
 
 [Visual case study](../betterscale.html) · [Measurement snapshot](../data/betterscale-results.json)
 

@@ -9,8 +9,8 @@ site navigation.
   detail page. Its sole workload tag is `distributed_pipeline` (displayed as 分布式 / Distributed).
 - Fletcher replaced the old StateHarbor prototype: `stateharbor.public_surface` is false and its
   workload/community entries are removed. Historical registry identity remains, but it must not
-  appear in the public MOD grid or search. There are still 22 visible MODs. Do not add a homepage or
-  achievements entry.
+  appear in the public MOD grid or search. Keep the other MOD entries intact. Do not add a homepage
+  or achievements entry.
 - BetterScale is public under Apache-2.0 as of 2026-09-14. The normal card footer links to GitHub;
   the detail page also links source from its hero and integration section. Public metadata refresh
   may query the repository and display observed metrics. Keep generic private-repository handling
@@ -23,7 +23,7 @@ site navigation.
   measurements to the official fixed-target leaderboard. The website is a renderer, not
   classification authority; see `.vllm-hust/repository-profile.json`.
 - The implementation repository is now `vLLM-HUST/BetterScale` (public), renamed from
-  `strengthen-dsv4`. Public `vllm-betterscale==0.3.0` is on PyPI; `betterscale.worker.Worker`
+  `strengthen-dsv4`. Public `vllm-betterscale==0.3.1` is on PyPI; `betterscale.worker.Worker`
   aliases the same qualified `strengthen_dsv4` class. The card quickstart and detail page own
   installation and bounded TP8/DP8 commands. Link source evidence to its original measurement
   commit, not a moving main branch. The first rename attempt lacked admin permission; Fletcher
@@ -42,3 +42,9 @@ languages and viewport widths, visible repeated values, bar scales and entry lin
 screenshots under `output/playwright/betterscale/`. These screenshots are QA evidence, not site
 assets. Run the repository's Python tests and applicable pre-commit checks. Do not install website
 dependencies into an inference runtime.
+
+0.3.1 adds only DP startup preparation; installation links follow that version. Its HTTP result
+reuses qualified run155 (+39.63% vs native DP), while TP retains the 0.3.0 path (+35.17% vs native
+TP). `docs/BETTERSCALE.md` links the versioned source report. Do not rewrite the existing
+cycle-study snapshot as a new HTTP benchmark or claim a fresh wheel NPU run; Fletcher stopped that
+redundant rerun.

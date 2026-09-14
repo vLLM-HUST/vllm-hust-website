@@ -65,7 +65,7 @@ def main():
                     "document.documentElement.scrollWidth <= window.innerWidth"
                 ), f"Horizontal page overflow: {label}/{language}"
                 integration = page.locator("#integration")
-                assert "vllm-betterscale==0.3.0" in integration.inner_text()
+                assert "vllm-betterscale==0.3.1" in integration.inner_text()
                 assert integration.locator("details").count() == 2
                 for details in integration.locator("details").all():
                     details.locator("summary").click()
