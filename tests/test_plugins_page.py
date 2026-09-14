@@ -241,6 +241,7 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     ascend = by_id("vllm-ascend-hust")
     metal = by_id("vllm-metal-hust")
     diffspec = by_id("diffspec")
+    vspec = by_id("vspec")
     kvcompress = by_id("kvcompress-ascend")
 
     assert ascend["integration_contracts"] == [
@@ -272,6 +273,18 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     )
     assert "19.29%" in diffspec["public_effect_en"]
     assert diffspec["public_effect_status"] == "not-beneficial-in-tested-cell"
+    assert vspec["integration_contracts"] == [
+        "vllm_hust.extension_manifest.v0.2-experimental"
+    ]
+    assert vspec["integration_surfaces"] == [
+        "vllm.general_plugins",
+        "vllm_hust.extension_bundles",
+        "ModelRegistry.register_model",
+    ]
+    assert vspec["execution_planes"] == ["scheduler", "worker", "native", "device"]
+    assert vspec["compatibility"]["status"] == "verified"
+    assert "1.518x" in vspec["public_effect_en"]
+    assert vspec["public_effect_status"] == "measured"
     assert kvcompress["integration_contracts"] == []
     assert kvcompress["integration_surfaces"] == [
         "vllm.general_plugins",
@@ -305,6 +318,9 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     )
     assert "extension configure org.vllm-hust.diffspec --file diffspec.json" in SCRIPT
     assert "extension enable org.vllm-hust.diffspec" in SCRIPT
+    assert "vspec: {" in SCRIPT
+    assert "extension enable org.vllm-hust.vspec" in SCRIPT
+    assert "vllm-hust-vspec-doctor --method eagle" in SCRIPT
     assert "latchmoe: {" in SCRIPT
     assert "latchmoe check" in SCRIPT
     assert "latchmoe serve /path/to/model" in SCRIPT

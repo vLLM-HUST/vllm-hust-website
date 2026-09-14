@@ -59,6 +59,31 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
+    "vspec": {
+      "repository": "vLLM-HUST/vllm-hust-vSpec",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-vSpec",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
+      },
+      "maintainers": [
+        {
+          "login": "Renty-0",
+          "name": "王润泽",
+          "profile_url": "https://github.com/Renty-0",
+          "avatar_url": "https://avatars.githubusercontent.com/u/290501286?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "王庆刚",
+          "name_en": "Qinggang Wang",
+          "relationship": "internal"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
     "latchmoe": {
       "repository": "vLLM-HUST/vllm-ascend-hust-LatchMoE",
       "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE",
