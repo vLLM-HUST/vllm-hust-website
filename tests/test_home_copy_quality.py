@@ -66,9 +66,9 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     workload = json.loads(
         (root / "data" / "plugin-workload-navigation.json").read_text(encoding="utf-8")
     )
-    assert len(workload["plugins"]) == 23
-    assert "Explore all 23 MODs" in INDEX
-    assert "查看全部 23 个 MOD" in INDEX
+    mod_count = len(workload["plugins"])
+    assert f"Explore all {mod_count} MODs" in INDEX
+    assert f"查看全部 {mod_count} 个 MOD" in INDEX
     assert 'href="./plugins.html#plugin-catalog"' in INDEX
     assert "inspect-only" in INDEX
     assert "仅可检查仓库" in INDEX
