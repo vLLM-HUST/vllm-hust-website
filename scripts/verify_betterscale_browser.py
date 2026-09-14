@@ -36,7 +36,9 @@ def main():
             for language in ("en", "zh"):
                 page = browser.new_page(viewport={"width": width, "height": 1000})
                 errors = []
-                page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
+                page.on(
+                    "pageerror", lambda error, errors=errors: errors.append(str(error))
+                )
                 page.add_init_script(
                     f"localStorage.setItem('vllm-hust_lang', '{language}');"
                 )
