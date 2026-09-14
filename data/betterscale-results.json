@@ -2,7 +2,7 @@
   "title": "BetterScale · DeepSeek V4 Flash execution study",
   "date": "2026-09-13",
   "source": {
-    "repository": "vLLM-HUST/strengthen-dsv4 (BetterScale; private at publication preparation)",
+    "repository": "vLLM-HUST/BetterScale (formerly strengthen-dsv4; private)",
     "commit": "7f7bda350471bab47decc45b64264280b9c4d4d7",
     "documents": [
       "RESULTS.md",
