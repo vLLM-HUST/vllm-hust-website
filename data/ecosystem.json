@@ -332,7 +332,6 @@
       "repository_relationship": "organization_native",
       "maturity": "experimental",
       "maintainers": ["Renty-0"],
-      "maintainer_profiles": [{"login": "Renty-0", "name": "王润泽"}],
       "advisors": [{"name_zh": "王庆刚", "name_en": "Qinggang Wang", "relationship": "internal"}],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-vSpec",
       "upstream_repository": null,
