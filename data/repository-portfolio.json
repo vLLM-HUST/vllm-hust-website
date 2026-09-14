@@ -290,6 +290,17 @@
       "public_surface": false
     },
     {
+      "name": "vllm-hust-dla",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-dla",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "runtime_component",
+      "relation_to_runtime": "extends_runtime_behavior",
+      "lifecycle": "incubating",
+      "canonical_artifacts": ["DLA decode-length-aware admission and preemption scheduler policy"],
+      "component_ids": ["dla"],
+      "public_surface": true
+    },
+    {
       "name": "vllm-hust-docs",
       "url": "https://github.com/vLLM-HUST/vllm-hust-docs",
       "portfolio_domain": "documentation_product",

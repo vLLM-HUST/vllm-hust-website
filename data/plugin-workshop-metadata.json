@@ -1,6 +1,6 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-09-09T13:13:47+00:00",
+  "generated_at": "2026-09-09T14:25:08+00:00",
   "source": "GitHub API + canonical ownership and organization identity data",
   "plugins": {
     "bidkv": {
@@ -590,6 +590,31 @@
           "name": "何维",
           "profile_url": "https://github.com/healer-positive",
           "avatar_url": "https://avatars.githubusercontent.com/u/172738710?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
+    "dla": {
+      "repository": "vLLM-HUST/vllm-hust-dla",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-dla",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
+      },
+      "maintainers": [
+        {
+          "login": "xiehanlong834-gif",
+          "name": "谢汉龙",
+          "profile_url": "https://github.com/xiehanlong834-gif",
+          "avatar_url": "https://avatars.githubusercontent.com/u/292786496?v=4"
         }
       ],
       "advisors": [
