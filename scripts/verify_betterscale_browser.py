@@ -87,9 +87,12 @@ def main():
                 assert not errors, errors
                 page.close()
         page = browser.new_page()
-        for name in ("index", "achievements"):
+        for name in ("plugins",):
             page.goto(f"{args.url}/{name}.html")
             assert page.locator('.bs-feature a[href="./betterscale.html"]').is_visible()
+        for name in ("index", "achievements"):
+            page.goto(f"{args.url}/{name}.html")
+            assert page.locator('.bs-feature a[href="./betterscale.html"]').count() == 0
         for name in ("data/betterscale-results.json", "docs/BETTERSCALE.md"):
             assert page.request.get(f"{args.url}/{name}").status == 200
         browser.close()

@@ -4,8 +4,11 @@ Enter here when updating BetterScale's case study, importing new measurements, o
 site navigation.
 
 - `betterscale.html` is a bilingual, static case study; `assets/betterscale.css` provides its visual
-  language. Native `assets/site.js` owns language selection. Home and achievements link to it
-  through a separate case-study feature.
+  language. Native `assets/site.js` owns language selection. Only `plugins.html#betterscale` links
+  to it through a featured plugin card, identifying its native Worker integration (not an Extension
+  Manager bundle). Fletcher explicitly restricted this work to the plugin page and detail page: do
+  not add BetterScale to the homepage or achievements page. Earlier entries there were withdrawn;
+  access to push does not grant editorial authority.
 - `data/betterscale-results.json` is the curated public measurement snapshot; `docs/BETTERSCALE.md`
   explains comparators, methods and provenance. Keep chart numbers and scope consistent with the
   snapshot. Both repeat observations are visible, not averaged into one flattering number. The chart
