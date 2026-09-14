@@ -1,5 +1,9 @@
 # BetterScale: execution improvements on vLLM Ascend
 
+Fast kernels can still wait for the host to prepare and submit the next inference wave. BetterScale
+shortens those cross-step dependencies through graph coverage, ordered replay, and device-side
+preparation. Remaining host coordination gaps are not claimed solved.
+
 BetterScale is the new project name for `strengthen-dsv4`. It is an opt-in collection of execution
 optimizations, integrated through vLLM's native Worker lifecycle rather than a replacement serving
 engine. The validated Python entry still uses the historical `strengthen_dsv4.worker.Worker`
