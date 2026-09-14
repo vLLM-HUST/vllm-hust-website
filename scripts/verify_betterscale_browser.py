@@ -47,6 +47,20 @@ def main():
                 assert page.evaluate(
                     "document.documentElement.scrollWidth <= window.innerWidth"
                 ), f"Horizontal page overflow: {label}/{language}"
+                integration = page.locator("#integration")
+                assert "vllm-betterscale==0.3.0" in integration.inner_text()
+                assert integration.locator("details").count() == 2
+                for details in integration.locator("details").all():
+                    details.locator("summary").click()
+                    assert (
+                        "--worker-cls betterscale.worker.Worker" in details.inner_text()
+                    )
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= window.innerWidth"
+                ), f"Expanded install commands overflow: {label}/{language}"
+                integration.screenshot(
+                    path=str(output / f"install-{label}-{language}.png")
+                )
                 for study in evidence["studies"]:
                     card = page.locator(f"#{study['id']}")
                     rows = card.locator(".bs-repeat")

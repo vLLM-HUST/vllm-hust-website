@@ -112,6 +112,8 @@ html[lang="zh"] .bs-feature [lang="zh"] { display: inline; }
 .bs-install p { max-width: 850px; font-size: 16px; line-height: 1.85; margin-top: 24px; color: #bacac4; }
 .bs-install .bs-caption { color: #a5bab1; }
 .bs-install pre { background: #1b2926; border: 1px solid #3a4d44; border-left: 3px solid #f0b341; margin: 30px 0; padding: 25px; overflow-x: auto; color: #f3f5f1; font-size: 14px; line-height: 1.9; }
+.bs-install details { border-top: 1px solid #3a4d44; padding: 20px 0; }
+.bs-install summary { cursor: pointer; font-size: 16px; }
 .bs-install code { background: transparent; color: inherit; }
 .bs-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding-block: 32px; font-size: 12px; color: var(--bs-muted); }
 .bs-footer a { color: inherit; }
