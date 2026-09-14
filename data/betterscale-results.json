@@ -222,5 +222,32 @@
       "TP decode chunk-gap P99 worsened; no universal latency win.",
       "These are synthetic HTTP workloads, not full agent traces, maximum concurrency or SLO capacity."
     ]
+  },
+  "startup_smoke": {
+    "date": "2026-09-14",
+    "package": "vllm-betterscale==0.3.1",
+    "run": "163-hw3-dp8-mod-startup031",
+    "command_source_commit": "a698b2a",
+    "layout": "DP8 / EP8, TP1",
+    "model": "DeepSeek-V4-Flash-0731-w8a8",
+    "hardware": "8xAscend 910B2 / HCCS",
+    "command_matches_display": true,
+    "command_substitution": "Model filesystem path only; native CANN/HCCL environment provided externally.",
+    "initialized_dp_ranks": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "health_http_status": 200,
+    "completion_tokens": 32,
+    "exit_code": 0,
+    "all_cards_released": true,
+    "scope": "Actual public-wheel installation and DP8 startup/one short HTTP completion. Not a throughput or quality rerun; TP8 launch has CPU contract and retained prior path evidence, not a new TP8 service smoke.",
+    "teardown_note": "Native peer-disconnect messages followed supervised termination after the successful response; all eight cards were reclaimed."
   }
 }

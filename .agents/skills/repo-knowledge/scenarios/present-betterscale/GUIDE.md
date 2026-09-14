@@ -63,3 +63,11 @@ explicit model path and the normal Ascend environment, under the home lease and 
 selected-card/descendant supervisor. It verifies health and one short completion, not throughput or
 retrieval quality. Do not reuse an old performance matrix to claim this HTTP smoke is a new
 benchmark.
+
+DP8 startup smoke163 passed with the public0.3.1 wheel and the exported MOD command (only model path
+replaced). All8 native EngineCore_DP initialization records, HTTP200 and32 output tokens were
+present; exit0, no collision and8-card release. Python custom READY/prepared info messages were
+absent under native logging; use native readiness plus HTTP evidence, not a required custom-log
+count. Native peer-disconnect errors occurred during supervised teardown after success. The source
+snapshot and current smoke script have identical ASTs (format-only difference). No new TP8 boot or
+quality/performance qualification is implied.

@@ -130,3 +130,11 @@ replaces only the model path, starts the chosen server, waits at most900s for he
 short HTTP completion. It records the command, server log and result, then shuts down the owned
 service. The caller must hold the existing eight-card lease and supervise descendants; this is not a
 cluster scheduler. It does not benchmark throughput or repeat the retrieval quality set.
+
+Startup smoke163 passed on 2026-09-14: the public0.3.1 wheel, the displayed DP8 command (only the
+model path substituted), all eight native DP engines initialized, HTTP health200 and a32-token
+completion. The supervisor exited0 and all eight cards were reclaimed. Native peer-disconnect
+messages followed supervised teardown; they are retained in the log, not hidden as a clean graceful
+shutdown. This is not a new TP8 boot, throughput measurement or model-quality gate. The compact
+receipt is `startup_smoke` in the measurement snapshot; local full evidence is retained in
+`/workspace/strengthen-dsv4/runs/tp-continuation-20260914/163-hw3-dp8-mod-startup031/`.
