@@ -13,10 +13,10 @@ site navigation.
 - This page is not an entry in the official fixed-target leaderboard or canonical MOD registry.
   Adding a case study does not authorize changing their counters or importing incompatible results.
   The website is a renderer, not classification authority; see `.vllm-hust/repository-profile.json`.
-- At initial publication preparation, the implementation repo is private and named
-  `strengthen-dsv4`; BetterScale is the project name. The qualified Python namespace remains
-  `strengthen_dsv4`. Do not advertise an unshipped package or create public links to inaccessible
-  source. The rename was blocked by absent admin permission.
+- The implementation repository is now `vLLM-HUST/BetterScale` (private), renamed from
+  `strengthen-dsv4`. The qualified Python namespace remains `strengthen_dsv4`. Do not advertise an
+  unshipped package or create public links to inaccessible source. The first rename attempt lacked
+  admin permission; Fletcher completed the rename and the canonical URL was verified through GitHub.
 - TP draft and receipt studies isolate different increments. Never add their percentages or label
   the combined progression a direct stock-to-final A/B. DP compares dual endpoints against
   producer/metadata inside a DP FULL engine; its draft remains eager. Unprofiled cycle gains are not
