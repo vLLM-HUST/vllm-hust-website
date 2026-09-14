@@ -76,9 +76,33 @@
  <div class="bs-boundary"><h3><span lang="en">What these results do not establish</span><span lang="zh">这些结果尚不意味着</span></h3><ul><li><span lang="en">Stable end-to-end throughput or TTFT improvement</span><span lang="zh">稳定的端到端吞吐或 TTFT 改进</span></li><li><span lang="en">Higher maximum concurrency or KV capacity</span><span lang="zh">更高的最大并发或 KV 容量</span></li><li><span lang="en">Universal large-prefill speedups</span><span lang="zh">大 prefill 的普遍加速</span></li><li><span lang="en">All-mode N+2 scheduling or bubble-free execution</span><span lang="zh">全模式 N+2 调度或完全无气泡执行</span></li></ul></div>
 </section>
 <section class="bs-install" id="integration"><div class="bs-wrap bs-section"><span class="bs-number">04 / INTEGRATION</span><h2><span lang="en">Your engine. Your command.<br>One explicit entry.</span><span lang="zh">你的引擎，你的命令。<br>一个显式接入点。</span></h2><p><span lang="en">Install the patch package into an existing, working vLLM Ascend environment. The Worker composes independently scoped patches through the native lifecycle. It does not rebuild the engine or rewrite its environment.</span><span lang="zh">将补丁包装入已有、可工作的 vLLM Ascend 环境。Worker 通过原生生命周期组合职责独立的补丁，不重编引擎，也不重写运行环境。</span></p>
- <pre><code>vllm serve /models/DeepSeek-V4-Flash &lt;your-native-arguments&gt; \
-  --worker-cls strengthen_dsv4.worker.Worker</code></pre>
- <p class="bs-caption"><span lang="en">BetterScale is the project name. The currently validated Python entry retains the legacy strengthen_dsv4 namespace. The implementation repository is private; this is an integration illustration, not a public package-install instruction. Qualified TP and DP shapes are bounded, not arbitrary configurations.</span><span lang="zh">BetterScale 是项目名称；当前已验收的 Python 入口仍保留 strengthen_dsv4 旧命名空间。实现仓库暂为私有，此处展示接入形式，不是公开包的安装指令。TP 与 DP 均有明确的验收形状范围，并非任意配置。</span></p>
+ <pre><code>python -m pip install --no-deps vllm-betterscale==0.3.0
+# Add to your qualified native vllm serve command:
+# --worker-cls betterscale.worker.Worker</code></pre>
+ <p class="bs-caption"><span lang="en">Python 3.12+, vLLM 0.25.1, vLLM-Ascend 0.25.1rc1, torch-npu 2.10.0.post2. Selected upstream source files are checked at startup; matching version strings alone are not enough. Installation does not upgrade your runtime. The public Worker is an identity alias of the qualified implementation.</span><span lang="zh">需要 Python 3.12+、vLLM 0.25.1、vLLM-Ascend 0.25.1rc1、torch-npu 2.10.0.post2。启动时还会核对选定上游源文件，版本号一致并不足够。安装不会升级你的运行环境；公开 Worker 就是已验收实现的同一类。</span></p>
+ <p class="bs-caption"><span lang="en">Already using the old strengthen-dsv4 distribution? Stop the service and uninstall it first: the two distributions share implementation files. The development repository remains private; the Python package and its source are public on PyPI.</span><span lang="zh">若已安装旧 strengthen-dsv4 包，请先停服并卸载旧包：两个发行包共享实现文件，不能同时安装。开发仓库仍为私有，Python 包及其源码已在 PyPI 公开。</span></p>
+ <details><summary><span lang="en">TP8 + EP · four active requests</span><span lang="zh">TP8 + EP · 四个活跃请求</span></summary><pre><code>vllm serve /models/DeepSeek-V4-Flash \
+  --worker-cls betterscale.worker.Worker \
+  --tensor-parallel-size 8 --enable-expert-parallel \
+  --quantization ascend --dtype bfloat16 \
+  --max-num-seqs 4 --max-num-batched-tokens 4128 --max-model-len 15104 \
+  --kv-cache-memory-bytes 12884901888 --no-enable-prefix-caching \
+  --speculative-config &#x27;{&quot;method&quot;:&quot;dspark&quot;,&quot;num_speculative_tokens&quot;:5,&quot;enforce_eager&quot;:true}&#x27; \
+  --compilation-config &#x27;{&quot;cudagraph_mode&quot;:&quot;FULL&quot;,&quot;cudagraph_capture_sizes&quot;:[24,4128],&quot;max_cudagraph_capture_size&quot;:4128}&#x27; \
+  --additional-config &#x27;{&quot;enable_dsa_cp&quot;:true,&quot;multistream_overlap_shared_expert&quot;:true,&quot;ascend_compilation_config&quot;:{&quot;enable_npugraph_ex&quot;:true,&quot;enable_static_kernel&quot;:false}}&#x27; \
+  --host 127.0.0.1 --port 8000 --served-model-name dsv4</code></pre></details>
+ <details><summary><span lang="en">TP1 / DP8 / EP8 · two active requests per rank</span><span lang="zh">TP1 / DP8 / EP8 · 每 rank 两个活跃请求</span></summary><pre><code>vllm serve /models/DeepSeek-V4-Flash \
+  --worker-cls betterscale.worker.Worker \
+  --tensor-parallel-size 1 --data-parallel-size 8 --enable-expert-parallel \
+  --quantization ascend --dtype bfloat16 \
+  --max-num-seqs 2 --max-num-batched-tokens 1026 --max-model-len 16384 \
+  --kv-cache-memory-bytes 8589934592 --no-enable-prefix-caching \
+  --speculative-config &#x27;{&quot;method&quot;:&quot;dspark&quot;,&quot;num_speculative_tokens&quot;:5,&quot;enforce_eager&quot;:true}&#x27; \
+  --compilation-config &#x27;{&quot;cudagraph_mode&quot;:&quot;FULL&quot;,&quot;cudagraph_capture_sizes&quot;:[6,12,132,264,516,1026],&quot;max_cudagraph_capture_size&quot;:1026}&#x27; \
+  --additional-config &#x27;{&quot;enable_dsa_cp&quot;:false,&quot;multistream_overlap_shared_expert&quot;:true,&quot;ascend_compilation_config&quot;:{&quot;enable_npugraph_ex&quot;:true,&quot;enable_static_kernel&quot;:false}}&#x27; \
+  --host 127.0.0.1 --port 8000 --served-model-name dsv4</code></pre></details>
+ <p class="bs-caption"><span lang="en">Replace the model path with your Ascend W8A8 checkpoint. These are bounded, single-node K5 examples, not arbitrary configurations. KV budgets are workload settings, not reservations made by the package. Services bind to loopback; use your normal authentication and access controls before exposing them. Roll back by restarting with a known-working native configuration, not by hot-unpatching.</span><span lang="zh">请将模型路径替换成自己的 Ascend W8A8 权重。这是有明确范围的单机 K5 示例，不代表任意配置均可用。KV 预算属于工作负载配置，并非补丁强行预留的内存。服务默认仅监听本机；对外开放前请配置认证和访问控制。回退时用已知可用的原生配置重启，不要在线卸载补丁。</span></p>
+ <p><a href="https://pypi.org/project/vllm-betterscale/0.3.0/"><span lang="en">PyPI package, source and full instructions →</span><span lang="zh">PyPI 包、源码与完整使用说明 →</span></a></p>
  <div class="bs-actions"><a class="bs-button" href="./data/betterscale-results.json" download><span lang="en">Download measurement snapshot ↓</span><span lang="zh">下载测量摘要 ↓</span></a><a href="./docs/BETTERSCALE.md"><span lang="en">Read methods &amp; provenance →</span><span lang="zh">查看方法与来源 →</span></a></div>
 </div></section>
 </main>

@@ -13,7 +13,8 @@ site navigation.
   achievements entry.
 - BetterScale's repository is private. Public metadata refresh must not query its repository API;
   use declared maintainer identity and null metrics, rendered as unavailable rather than zero. No
-  public install command is promised.
+  public repository access is promised. The public PyPI distribution is separate from repository
+  visibility.
 - `data/betterscale-results.json` is the curated public measurement snapshot; `docs/BETTERSCALE.md`
   explains comparators, methods and provenance. Keep chart numbers and scope consistent with the
   snapshot. Both repeat observations are visible, not averaged into one flattering number. The chart
@@ -22,9 +23,11 @@ site navigation.
   measurements to the official fixed-target leaderboard. The website is a renderer, not
   classification authority; see `.vllm-hust/repository-profile.json`.
 - The implementation repository is now `vLLM-HUST/BetterScale` (private), renamed from
-  `strengthen-dsv4`. The qualified Python namespace remains `strengthen_dsv4`. Do not advertise an
-  unshipped package or create public links to inaccessible source. The first rename attempt lacked
-  admin permission; Fletcher completed the rename and the canonical URL was verified through GitHub.
+  `strengthen-dsv4`. Public `vllm-betterscale==0.3.0` is on PyPI; `betterscale.worker.Worker`
+  aliases the same qualified `strengthen_dsv4` class. The card quickstart and detail page own
+  installation and bounded TP8/DP8 commands. Do not create public links to inaccessible development
+  source. The first rename attempt lacked admin permission; Fletcher completed the rename and the
+  canonical URL was verified through GitHub.
 - TP draft and receipt studies isolate different increments. Never add their percentages or label
   the combined progression a direct stock-to-final A/B. DP compares dual endpoints against
   producer/metadata inside a DP FULL engine; its draft remains eager. Unprofiled cycle gains are not

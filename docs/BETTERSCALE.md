@@ -6,9 +6,12 @@ preparation. Remaining host coordination gaps are not claimed solved.
 
 BetterScale is the new project name for `strengthen-dsv4`. It is an opt-in collection of execution
 optimizations, integrated through vLLM's native Worker lifecycle rather than a replacement serving
-engine. The validated Python entry still uses the historical `strengthen_dsv4.worker.Worker`
-namespace. The implementation repository is currently private. The public case study does not imply
-public package availability.
+engine. The public `betterscale.worker.Worker` entry is an identity alias of the qualified
+`strengthen_dsv4.worker.Worker` implementation. The development repository remains private;
+[`vllm-betterscale==0.3.0`](https://pypi.org/project/vllm-betterscale/0.3.0/) and its Python source
+are public on PyPI. [Installation and native TP8 / DP8 commands](../betterscale.html#integration)
+use the existing pinned runtime without upgrading dependencies. Packaging was verified separately
+with 51 CPU tests and a clean install; the alias does not constitute new hardware qualification.
 
 [Visual case study](../betterscale.html) · [Measurement snapshot](../data/betterscale-results.json)
 
