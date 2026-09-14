@@ -2547,7 +2547,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     )
     assert people["冯威"]["role"]["zh"] == "2027 年待入学学生"
     assert people["冯威"]["advisor"]["zh"] == "张书豪"
-    assert people["冯威"]["github_status"]["zh"] == "负责人确认；组织邀请待接受"
+    assert people["冯威"]["github_status"]["zh"] == "已核验为vLLM-HUST组织成员"
     assert people["董君瑶"]["research_direction"]["zh"] == "向量数据库"
     assert (
         people["路庆浩"]["research_direction"]["zh"]
