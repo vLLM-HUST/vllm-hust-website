@@ -112,3 +112,21 @@ This is a retrieval subset, not the complete OpenCompass suite. Deterministic st
 separate from normal-HCCL timing. A faster matched cycle does not by itself establish a stable
 service-throughput, TTFT, maximum-concurrency or KV-capacity gain. No mapped C4, PCP or all-mode N+2
 scheduler improvement is included here.
+
+## Installation and startup checks
+
+The normal MOD installation panel contains the complete DP8 command and an expandable TP8
+alternative, including the MP executor and async scheduler. Run one configuration at a time in the
+existing pinned Ascend environment; replace the model path. The same commands appear in the detail
+page.
+
+The website CI job `betterscale-package` installs the actual public PyPI wheel on Python 3.12
+without dependencies, loads its pins, checks both displayed command copies and runs the package's
+CPU admission on the parsed settings. It exports the checked commands as an artifact. This CPU job
+does **not** claim to boot an NPU model.
+
+On an admitted Ascend machine, `scripts/smoke_betterscale_service.py` consumes that artifact,
+replaces only the model path, starts the chosen server, waits at most900s for health, and makes one
+short HTTP completion. It records the command, server log and result, then shuts down the owned
+service. The caller must hold the existing eight-card lease and supervise descendants; this is not a
+cluster scheduler. It does not benchmark throughput or repeat the retrieval quality set.

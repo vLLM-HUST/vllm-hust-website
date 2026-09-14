@@ -406,3 +406,5 @@ body[data-page="plugins"] .content-panel .plugin-summary {
 @media (min-width: 681px) and (max-width: 1060px) {
   .plugin-card:nth-child(2n) .plugin-launch-tooltip { right: 0; left: auto; }
 }
+
+#plugin-launch-betterscale { max-height: 70vh; overflow: auto; }

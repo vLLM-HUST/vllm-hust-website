@@ -184,5 +184,43 @@
     "Short mixed gains do not imply a general large-prefill speedup.",
     "DP unprofiled intervals do not imply every profiled wave is bubble-free; a separate aligned profile retains an approximately 10 ms gap.",
     "No KV capacity, mapped C4, PCP or all-mode N+2 scheduler claim is included."
-  ]
+  ],
+  "service_http": {
+    "date": "2026-09-14",
+    "release": "0.3.1",
+    "source": "https://github.com/vLLM-HUST/BetterScale/blob/fbfa963/docs/E2E-20260914.zh-CN.md",
+    "method": "Total output tokens divided by total duration of nine synthetic HTTP cohorts (three workloads, three repeats), excluding startup, separately logged prelude and quality. No slow repeat removed.",
+    "scope": "Same hw3, 8x910B2 HCCS, DSV4 W8A8 K5. DP and TP have different concurrency and separate native comparators. Reused qualified measurements, not a new 0.3.1 wheel benchmark.",
+    "rows": [
+      {
+        "layout": "DP8",
+        "concurrency": 16,
+        "kv_gib_per_rank": 8,
+        "baseline_run": 158,
+        "candidate_run": 155,
+        "native_tps": 268.89,
+        "candidate_tps": 375.45,
+        "gain_percent": 39.63,
+        "quality": "32/32",
+        "provenance": "Qualified startup program carried into 0.3.1; 0.3.0 measured -6.11% and is retained in source report."
+      },
+      {
+        "layout": "TP8",
+        "concurrency": 4,
+        "kv_gib_per_rank": 12,
+        "baseline_run": 160,
+        "candidate_run": 161,
+        "native_tps": 155.13,
+        "candidate_tps": 209.68,
+        "gain_percent": 35.17,
+        "quality": "32/32",
+        "provenance": "0.3.0 measured TP path is unchanged in 0.3.1; native comparator includes only LCM startup compatibility."
+      }
+    ],
+    "limits": [
+      "One process per arm, sequential runs; not randomized independent replications.",
+      "TP decode chunk-gap P99 worsened; no universal latency win.",
+      "These are synthetic HTTP workloads, not full agent traces, maximum concurrency or SLO capacity."
+    ]
+  }
 }
