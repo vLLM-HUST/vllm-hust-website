@@ -1215,5 +1215,57 @@
       },
       "evidence_level": "hardware_verified"
     }
+,
+    {
+      "id": "dla",
+      "name": "DLA",
+      "name_en": "DLA",
+      "name_zh": "DLA（解码长度感知准入/预占）",
+      "artifact_type": "runtime_component",
+      "system_role": "scheduler_policy",
+      "integration_contracts": [
+        "vllm.preemption_policy.v1"
+      ],
+      "integration_surfaces": [
+        "vLLM-HUST victim-selector plugin group (core PR #8: pluggable victim selector + predicted_length, pending merge)",
+        "vLLM-HUST Extension Manager bundle"
+      ],
+      "execution_planes": [
+        "scheduler"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "plugin_bundle",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "incubating",
+      "maintainers": [
+        "xiehanlong834-gif"
+      ],
+      "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-dla",
+      "upstream_repository": null,
+      "summary_en": "DLA predicts each request's decode (output) length and feeds it into the scheduler's admission gate and preemption victim choice: requests carry predicted_length, the full-sequence admission reserve covers prompt + predicted output while prefilling, and preemption picks the request with the largest predicted remaining output. Offline block-pool simulation on a real BurstGPT trace shows JCT p50 -47~-54% and preemptions -81% at pool saturation, robust to prediction error (sigma=1xL still -34%); EGTP length predictor reproduced within +-5% (Qwen2.5-7B x ForeLen, 3 scenarios). No real serving runs yet.",
+      "summary_zh": "DLA 预测每个请求的解码（输出）长度并接入调度器的准入闸门与预占受害者选择：请求携带 predicted_length，预填期完整序列预留覆盖 prompt+预测输出，预占选择预测剩余最长的请求。BurstGPT 真实 trace 块池模拟显示池饱和时 JCT p50 −47~−54%、预占次数 −81%，且对预测误差鲁棒（σ=1×L 仍有 −34%）；EGTP 预测器复现对表 ±5%（Qwen2.5-7B×ForeLen 三场景）。尚无真实 serving 实测。",
+      "public_effect_en": "Offline block-pool simulation (10k real BurstGPT requests, 3 seeds): JCT p50 102s -> 54s (-47%) and preemptions 2183 -> 412 (-81%) vs LIFO baseline at util~0.92; -54% at lower load. Prediction noise sigma=1xL keeps -34~-47%; systematic overestimate has zero effect (order-only use). Simulator-level evidence only; serving experiments pending core alignment.",
+      "public_effect_zh": "离线块池模拟（BurstGPT 真实 1 万请求，3 seeds）：util≈0.92 时 JCT p50 102s→54s（−47%）、预占 2183→412（−81%），低负载仍有 −54%；预测噪声 σ=1×L 仍保 −34~−47%；系统性高估零影响（仅用相对排序）。证据停留在模拟器层，serving 实测待 core 对齐。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-dla",
+      "compatibility": {
+        "status": "inspect_only",
+        "host": "vLLM-HUST",
+        "versions": [
+          "0.23 line — needs core PR #8 (victim_selector + predicted_length) merged"
+        ],
+        "platforms": [
+          "Ascend NPU (planned)",
+          "scheduler logic is device-agnostic"
+        ],
+        "models": [
+          "Qwen2.5-7B-Instruct — length predictor (EGTP head) reproduced on ForeLen"
+        ],
+        "requirements_en": "Core PR vllm-HUST/vllm-hust#8 must merge for the victim-selector group and predicted_length channel to exist in main. Installing the bundle alone changes nothing (explicit two-layer selection).",
+        "requirements_zh": "需 vllm-HUST/vllm-hust#8 合入后 main 才存在 victim-selector 组与 predicted_length 通道。仅安装 Bundle 不改变任何行为（两层显式选择）。"
+      },
+      "evidence_level": "cpu_smoke"
+    }
   ]
 }
