@@ -636,9 +636,9 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 53
+    assert len(PORTFOLIO["repositories"]) == 54
     names = {item["name"] for item in PORTFOLIO["repositories"]}
-    assert {"extension-manager", "vllm-hust", "pegaflow-hust"} <= names
+    assert {"extension-manager", "vllm-hust", "pegaflow-hust", "vllm-hust-dla"} <= names
     assert "vllm-ascend" not in names
     assert {
         "vllm-hust-prefix-router",
@@ -671,9 +671,13 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         "pegaflow",
         "pegaflow-vllm-connectors",
     ]
+    dla = next(item for item in PORTFOLIO["repositories"] if item["name"] == "vllm-hust-dla")
+    assert dla["url"] == "https://github.com/vLLM-HUST/vllm-hust-dla"
+    assert dla["component_ids"] == ["dla"]
+    assert dla["public_surface"] is True
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v7-scheduler-unpublished"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v8-dla"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
