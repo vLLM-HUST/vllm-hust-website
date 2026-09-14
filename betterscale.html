@@ -38,7 +38,7 @@
  <h1>BetterScale<span class="bs-period">.</span></h1>
  <p class="bs-statement"><span lang="en">Less host waiting.<br>More device execution.</span><span lang="zh">让设备少等调度。<br>多做推理。</span></p>
  <p class="bs-lede"><span lang="en">Fast kernels still wait when the next wave is not ready. BetterScale combines FULL graphs, ordered replay, and device-side metadata preparation to shorten the host dependencies between inference steps.</span><span lang="zh">算子已经很快，设备却仍可能等不到下一波工作。BetterScale 通过 FULL graph、有序 replay 和 device 侧元数据准备，缩短相邻推理波次之间的 host 依赖与等待。</span></p>
- <div class="bs-actions"><a class="bs-button" href="#measurements"><span lang="en">Explore the measurements ↓</span><span lang="zh">看实测结果 ↓</span></a><a href="#integration"><span lang="en">See how it fits →</span><span lang="zh">了解如何接入 →</span></a></div>
+ <div class="bs-actions"><a class="bs-button" href="#measurements"><span lang="en">Explore the measurements ↓</span><span lang="zh">看实测结果 ↓</span></a><a href="#integration"><span lang="en">See how it fits →</span><span lang="zh">了解如何接入 →</span></a><a href="https://github.com/vLLM-HUST/BetterScale" target="_blank" rel="noopener noreferrer"><span lang="en">Source on GitHub ↗</span><span lang="zh">GitHub 开源代码 ↗</span></a></div>
  <div class="bs-config">DeepSeek V4 Flash <span>W8A8</span> <span>8 × Ascend 910B2 / HCCS</span> <span>vLLM 0.25.1 + Ascend 0.25.1rc1</span></div>
  </div>
 </header>
@@ -80,7 +80,7 @@
 # Add to your qualified native vllm serve command:
 # --worker-cls betterscale.worker.Worker</code></pre>
  <p class="bs-caption"><span lang="en">Python 3.12+, vLLM 0.25.1, vLLM-Ascend 0.25.1rc1, torch-npu 2.10.0.post2. Selected upstream source files are checked at startup; matching version strings alone are not enough. Installation does not upgrade your runtime. The public Worker is an identity alias of the qualified implementation.</span><span lang="zh">需要 Python 3.12+、vLLM 0.25.1、vLLM-Ascend 0.25.1rc1、torch-npu 2.10.0.post2。启动时还会核对选定上游源文件，版本号一致并不足够。安装不会升级你的运行环境；公开 Worker 就是已验收实现的同一类。</span></p>
- <p class="bs-caption"><span lang="en">Already using the old strengthen-dsv4 distribution? Stop the service and uninstall it first: the two distributions share implementation files. The development repository remains private; the Python package and its source are public on PyPI.</span><span lang="zh">若已安装旧 strengthen-dsv4 包，请先停服并卸载旧包：两个发行包共享实现文件，不能同时安装。开发仓库仍为私有，Python 包及其源码已在 PyPI 公开。</span></p>
+ <p class="bs-caption"><span lang="en">Already using the old strengthen-dsv4 distribution? Stop the service and uninstall it first: the two distributions share implementation files. The project is open source under Apache-2.0; both GitHub source and the PyPI package are public.</span><span lang="zh">若已安装旧 strengthen-dsv4 包，请先停服并卸载旧包：两个发行包共享实现文件，不能同时安装。项目以 Apache-2.0 开源，GitHub 源码与 PyPI 包均已公开。</span></p>
  <details><summary><span lang="en">TP8 + EP · four active requests</span><span lang="zh">TP8 + EP · 四个活跃请求</span></summary><pre><code>vllm serve /models/DeepSeek-V4-Flash \
   --worker-cls betterscale.worker.Worker \
   --tensor-parallel-size 8 --enable-expert-parallel \
@@ -103,7 +103,7 @@
   --host 127.0.0.1 --port 8000 --served-model-name dsv4</code></pre></details>
  <p class="bs-caption"><span lang="en">Replace the model path with your Ascend W8A8 checkpoint. These are bounded, single-node K5 examples, not arbitrary configurations. KV budgets are workload settings, not reservations made by the package. Services bind to loopback; use your normal authentication and access controls before exposing them. Roll back by restarting with a known-working native configuration, not by hot-unpatching.</span><span lang="zh">请将模型路径替换成自己的 Ascend W8A8 权重。这是有明确范围的单机 K5 示例，不代表任意配置均可用。KV 预算属于工作负载配置，并非补丁强行预留的内存。服务默认仅监听本机；对外开放前请配置认证和访问控制。回退时用已知可用的原生配置重启，不要在线卸载补丁。</span></p>
  <p><a href="https://pypi.org/project/vllm-betterscale/0.3.0/"><span lang="en">PyPI package, source and full instructions →</span><span lang="zh">PyPI 包、源码与完整使用说明 →</span></a></p>
- <div class="bs-actions"><a class="bs-button" href="./data/betterscale-results.json" download><span lang="en">Download measurement snapshot ↓</span><span lang="zh">下载测量摘要 ↓</span></a><a href="./docs/BETTERSCALE.md"><span lang="en">Read methods &amp; provenance →</span><span lang="zh">查看方法与来源 →</span></a></div>
+ <div class="bs-actions"><a class="bs-button" href="./data/betterscale-results.json" download><span lang="en">Download measurement snapshot ↓</span><span lang="zh">下载测量摘要 ↓</span></a><a href="./docs/BETTERSCALE.md"><span lang="en">Read methods &amp; provenance →</span><span lang="zh">查看方法与来源 →</span></a><a href="https://github.com/vLLM-HUST/BetterScale" target="_blank" rel="noopener noreferrer"><span lang="en">Source on GitHub ↗</span><span lang="zh">GitHub 开源代码 ↗</span></a></div>
 </div></section>
 </main>
 <footer class="bs-footer bs-wrap"><a href="./index.html">vLLM-HUST</a><span>BetterScale / <span lang="en">Measurements: September 2026</span><span lang="zh">测量时间：2026 年 9 月</span></span><a href="#"><span lang="en">Back to top ↑</span><span lang="zh">返回顶部 ↑</span></a></footer>

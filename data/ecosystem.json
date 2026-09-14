@@ -1181,7 +1181,7 @@
         }
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/BetterScale",
-      "repository_visibility": "private",
+      "repository_visibility": "public",
       "upstream_repository": null,
       "documentation_url": "./betterscale.html",
       "summary_en": "Less host waiting. More device execution. FULL graphs, ordered replay and device-side metadata preparation shorten cross-step dependencies in DeepSeek V4 Flash.",
@@ -1210,8 +1210,8 @@
         "python": [
           ">=3.12"
         ],
-        "requirements_en": "Native Worker entry; qualified TP8 four-seat and DP8 two-seats-per-rank K5 configurations only. No Extension Manager bundle contract. vllm-betterscale 0.3.0 is public on PyPI; the development repository remains private. Full shapes, KV budgets and quality limits are in the project page.",
-        "requirements_zh": "通过原生 Worker 接入；仅验收 TP8 四席位、DP8 每 rank 两席位的 K5 配置。不是 Extension Manager bundle。vllm-betterscale 0.3.0 已在 PyPI 公开，开发仓库仍为私有；完整形状、KV 预算及质量边界见项目介绍。"
+        "requirements_en": "Native Worker entry; qualified TP8 four-seat and DP8 two-seats-per-rank K5 configurations only. No Extension Manager bundle contract. vllm-betterscale 0.3.0 is public on PyPI; the development repository is public under Apache-2.0. Full shapes, KV budgets and quality limits are in the project page.",
+        "requirements_zh": "通过原生 Worker 接入；仅验收 TP8 四席位、DP8 每 rank 两席位的 K5 配置。不是 Extension Manager bundle。vllm-betterscale 0.3.0 已在 PyPI 公开，开发仓库以 Apache-2.0 开源；完整形状、KV 预算及质量边界见项目介绍。"
       },
       "evidence_level": "hardware_verified"
     }

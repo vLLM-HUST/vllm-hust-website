@@ -627,7 +627,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=workshop-v11-betterscale-install"' in PAGE
+        'data-source="./data/ecosystem.json?v=workshop-v12-betterscale-public"' in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
     assert "ecosystem registry request failed" in SCRIPT
@@ -908,5 +908,5 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
     assert len(WORKLOAD_NAVIGATION["plugins"]) == 22
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
-    assert by_id("betterscale")["repository_visibility"] == "private"
+    assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
