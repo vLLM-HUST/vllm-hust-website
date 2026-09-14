@@ -343,8 +343,8 @@ ______________________________________________________________________
 
 ### Explicit ownership without an advisor
 
-A component may declare `advisors: []` to state that no advisor role applies.
-The sync preserves this explicit choice instead of inferring a relationship from people data.
-The plugin page hides the advisor field for that component. Omitting `advisors` keeps the existing
-inference and unknown-metadata behavior. `source_patch` delivery denotes a source mod, without
-claiming an installable Python distribution or Extension Manager activation contract.
+A component may declare `advisors: []` to state that no advisor role applies. The sync preserves
+this explicit choice instead of inferring a relationship from people data. The plugin page hides the
+advisor field for that component. Omitting `advisors` keeps the existing inference and
+unknown-metadata behavior. `source_patch` delivery denotes a source mod, without claiming an
+installable Python distribution or Extension Manager activation contract.
