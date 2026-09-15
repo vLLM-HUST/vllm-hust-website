@@ -8,7 +8,7 @@ BetterScale is an opt-in collection of execution optimizations, integrated throu
 Worker lifecycle. `betterscale.worker.Worker` is defined directly in `src/betterscale/worker.py`;
 independently scoped patches live beside it.
 [The development repository](https://github.com/vLLM-HUST/BetterScale) is public under Apache-2.0;
-[`vllm-betterscale==0.4.0`](https://pypi.org/project/vllm-betterscale/0.4.0/) and its Python source
+[`vllm-betterscale==0.4.1`](https://pypi.org/project/vllm-betterscale/0.4.1/) and its Python source
 are public on PyPI. [Installation and native TP8 / DP8 commands](../betterscale.html#integration)
 use the existing pinned runtime without upgrading dependencies. Version0.4.0 adds physical KV sizing
 and the shared target/draft startup catalog. The retained throughput results below keep their
@@ -155,3 +155,12 @@ Source evidence:
 [TP real quality](https://github.com/vLLM-HUST/BetterScale/blob/f86e59f/docs/evidence/auto-kv-run190.json),
 [TP dummy pressure](https://github.com/vLLM-HUST/BetterScale/blob/9ec9d24/docs/evidence/auto-kv-run189.json).
 APC remains off; no preemption-recovery fix or new throughput gain is claimed.
+
+## Native prefix reuse (0.4.1)
+
+Runs194 (TP8) and195 (DP8) each pass32/32 cold and32/32 warm original retrieval items; every warm
+request hits and output tokens match. DP additionally passes16 repeated requests, two per engine.
+The native X-data-parallel-rank header pins each cold/warm pair to the same engine. No global cache
+or new execution hook is added. `data/betterscale-results.json.prefix_reuse` keeps these
+observations separate from historical capacity and throughput. Older APC-off capacity runs remain
+APC-off.

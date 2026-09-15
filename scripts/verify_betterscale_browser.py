@@ -71,8 +71,9 @@ def main():
                 capacity.screenshot(
                     path=str(output / f"capacity-{label}-{language}.png")
                 )
+                assert "32/32" in page.locator("#prefix-reuse").inner_text()
                 integration = page.locator("#integration")
-                assert "vllm-betterscale==0.4.0" in integration.inner_text()
+                assert "vllm-betterscale==0.4.1" in integration.inner_text()
                 assert integration.locator("details").count() == 2
                 for details in integration.locator("details").all():
                     details.locator("summary").click()
