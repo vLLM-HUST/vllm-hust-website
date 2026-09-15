@@ -276,5 +276,22 @@
       "long_pressure_saturation_qualified": false
     },
     "boundary": "No new throughput comparison; running includes partial prefill; no preemption recovery claim; APC disabled"
+  },
+  "prefix_reuse": {
+    "release": "0.4.1",
+    "tp_run": 194,
+    "dp_run": 195,
+    "quality_each_layout": {
+      "cold_correct": 32,
+      "warm_correct": 32,
+      "positive_warm_hits": 32,
+      "identical_output_sequences": 32
+    },
+    "dp_balanced": {
+      "requests": 16,
+      "per_engine": 2,
+      "warm_hits": 16
+    },
+    "scope": "native APC compatibility, retained retrieval subset; engine-local DP; no new throughput or preemption claim"
   }
 }

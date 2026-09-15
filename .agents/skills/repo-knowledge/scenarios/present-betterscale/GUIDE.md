@@ -23,7 +23,7 @@ site navigation.
   measurements to the official fixed-target leaderboard. The website is a renderer, not
   classification authority; see `.vllm-hust/repository-profile.json`.
 - The implementation repository is now `vLLM-HUST/BetterScale` (public), renamed from
-  `strengthen-dsv4`. Public `vllm-betterscale==0.4.0` is on PyPI; `betterscale.worker.Worker` is
+  `strengthen-dsv4`. Public `vllm-betterscale==0.4.1` is on PyPI; `betterscale.worker.Worker` is
   defined directly in `src/betterscale/worker.py`. The card quickstart and detail page own
   installation and bounded TP8/DP8 commands. Link source evidence to its original measurement
   commit, not a moving main branch. The first rename attempt lacked admin permission; Fletcher
@@ -89,3 +89,13 @@ by that capacity result. Keep these distinctions in both languages.
 
 The final package passes the displayed-command checker. Browser checks include the capacity section
 in both languages and desktop/mobile viewports; no need for another NPU run for site edits.
+
+## Native prefix reuse 0.4.1
+
+The normal TP/DP commands now enable prefix caching. The separate prefix-reuse section and JSON
+object own runs194/195: each layout cold32/32 and warm32/32, positive warm hits and identical output
+sequences; DP also passes16 repeated requests, two per engine. This is existing native APC
+compatibility, not a new cache implementation or throughput comparison. DP uses engine-local caches:
+the qualified cold/warm pairs used the native X-data-parallel-rank header. Explain session affinity
+instead of promising cache hits under arbitrary load balancing. Historical0.4 capacity measurements
+remain APC-off; preemption remains unresolved.
