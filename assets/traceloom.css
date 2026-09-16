@@ -55,3 +55,21 @@ html[lang="zh"] .tl-page [lang="zh"], html[lang="zh"] .tl-footer [lang="zh"] { d
 /* Override the shared dark-site heading rule on this light project surface. */
 body[data-page="traceloom"] .tl-section h2,
 body[data-page="traceloom"] .tl-section h3 { color: #142b2a; }
+/* Presentation path: evidence first, installation after the two distinct cases. */
+.tl-story-nav { display: flex; flex-wrap: wrap; gap: 12px 30px; padding: 24px 0; border-bottom: 1px solid #c7d5cf; font: 600 13px/1.7 ui-monospace, monospace; }
+.tl-story-nav a { text-decoration: none; }
+.tl-story-nav a:hover { text-decoration: underline; }
+.tl-story-figure { margin-top: 28px !important; }
+.tl-plot-scroll { overflow-x: auto; border: 1px solid #c7d5cf; background: #fafcf9; }
+.tl-plot-scroll img { min-width: 720px; border: 0; }
+.tl-source { color: #49615c !important; font-size: 13px !important; }
+.tl-query-result { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; align-items: start; }
+.tl-query-result table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.tl-query-result caption { text-align: left; padding: 12px 0; font-weight: 650; }
+.tl-query-result th, .tl-query-result td { text-align: left; padding: 12px; border-bottom: 1px solid #c7d5cf; }
+.tl-query-result th { background: #e4eee7; }
+.tl-eager-details .tl-section { padding: 30px 0; }
+@media (max-width: 680px) {
+  .tl-query-result { grid-template-columns: 1fr; gap: 8px; }
+  .tl-story-nav { gap: 12px 20px; }
+}

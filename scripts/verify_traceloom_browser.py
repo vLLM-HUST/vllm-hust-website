@@ -40,6 +40,15 @@ def main():
                     )
                     == "rgb(20, 43, 42)"
                 )
+                for figure in page.locator(".tl-story-figure img").all():
+                    figure.scroll_into_view_if_needed()
+                    expect(figure).to_be_visible()
+                    assert figure.evaluate(
+                        "image => image.complete && image.naturalWidth > 0"
+                    )
+                assert "276" in page.locator("#deepseek").inner_text()
+                assert page.locator("#query tbody tr").count() == 6
+                page.locator(".tl-eager-details > summary").click()
                 assert "14,144" in page.locator("#evidence").inner_text()
                 assert page.locator("#capture img").evaluate(
                     "image => image.complete && image.naturalWidth > 0"

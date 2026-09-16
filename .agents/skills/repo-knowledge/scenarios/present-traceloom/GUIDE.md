@@ -40,3 +40,27 @@ Official torch-npu graph reconstruction needs the original capture directory and
 capture-stream mapping, not merely its exported monolithic DB. Scheduler-only injection still cannot
 provide step/device identity. Preserve these distinctions when presenting the now-supported
 step/replay integration.
+
+## Present the two-case evidence story
+
+The front-page story now leads with DeepSeek marked structure, then Qwen graph identity, then an
+actual layer-definition query. Do not combine these into a claim that one capture supports every
+capability. The older eager figure and its coverage counts remain a separate, collapsed
+supplementary case. Both language variants and mobile layouts must stay usable.
+
+`data/traceloom-story.json` is a sanitized measured-interval subset. Rebuild its three SVGs with
+`python scripts/build_traceloom_story.py` (no private capture required). Refreshing data requires
+explicit `--deepseek`, `--qwen`, and `--graph-db` inputs. The Qwen join uses
+`traceloom_v_context_replay_launch`, not the synthetic graph event's direct device-work row; that
+synthetic row need not itself carry the runtime link. Keep original identities private; the public
+snapshot retains step ordinals, local launch labels, relative times and member counts.
+
+Accepted source artifacts, outside this repository: `/root/my-ascend-workspace/runs/`
+`traceloom-dsv4-014/rank3.perfetto.json.gz` and `rank3.db`; Qwen lives in
+`traceloom-qwen-graph-step/20260916T0444Z-device1/overlap-packed-public.perfetto.json.gz` with
+`exact-step.db`. DeepSeek figures use identical selected structural events and time axes, not all
+raw profiler rows. The chosen three-layer window has three visible stream identities; the
+four-stream headline refers to the full capture. All figure widths use real durations. The Qwen
+launch row is an explicit evidence comparison, not a restored replay display lane. The layer query
+was executed against the DeepSeek AugDB: six exact definitions, frequencies 120/119/18/12/6/1 and
+53/71/52/54/75/72 anchors per instance.
