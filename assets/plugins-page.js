@@ -336,7 +336,6 @@ vllm serve /path/to/model \\
     "activation-sparsity-migration": "org.vllm-hust.activation-sparsity",
     "pipeline-microbatch-migration": "org.vllm-hust.pipeline-microbatch",
     "qos-scheduler-migration": "org.vllm-hust.qos-scheduler",
-    "mapped-host-kv-offload": "org.vllm-hust.ascend-mapped-kv-offload",
     "stateharbor": "org.vllm-hust.stateharbor"
   };
 

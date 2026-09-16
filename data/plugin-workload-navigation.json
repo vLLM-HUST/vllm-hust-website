@@ -84,7 +84,6 @@
     "activation-sparsity-migration": ["decode_heavy"],
     "pipeline-microbatch-migration": ["distributed_pipeline", "high_concurrency"],
     "qos-scheduler-migration": ["latency_slo", "high_concurrency"],
-    "mapped-host-kv-offload": ["long_context", "memory_kv_pressure"],
     "betterscale": ["distributed_pipeline"],
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
     "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"]

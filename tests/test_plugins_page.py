@@ -699,7 +699,7 @@ def test_page_consumes_the_docs_owned_registry() -> None:
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 55
+    assert len(PORTFOLIO["repositories"]) == 54
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "extension-manager",
@@ -771,7 +771,6 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         "vllm-hust-activation-sparsity": "activation-sparsity-migration",
         "vllm-hust-pipeline-microbatch": "pipeline-microbatch-migration",
         "vllm-hust-qos-scheduler": "qos-scheduler-migration",
-        "vllm-ascend-mapped-kv-offload-hust": "mapped-host-kv-offload",
         "vllm-hust-stateharbor": "stateharbor",
         "vllm-hust-scheduler-policy-lab": "scheduler-policy-lab",
     }
@@ -852,7 +851,7 @@ def test_graduation_followups_and_external_advisors_are_visible() -> None:
         for item in REGISTRY["components"]
         if item.get("compatibility", {}).get("followup_url")
     ]
-    assert len(followups) == 15
+    assert len(followups) == 14
     assert all(url.startswith("https://github.com/vLLM-HUST/") for url in followups)
     assert "profile.followup_url" in SCRIPT
     assert "plugin-compatibility-followup" in SCRIPT
@@ -943,7 +942,6 @@ def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> Non
         "activation-sparsity-migration",
         "pipeline-microbatch-migration",
         "qos-scheduler-migration",
-        "mapped-host-kv-offload",
         "stateharbor",
     }
     for component_id in inspectable:
@@ -987,7 +985,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 25
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 24
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
