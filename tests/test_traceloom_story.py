@@ -29,13 +29,18 @@ def test_deepseek_window_preserves_structure_and_overlap():
             a["start_us"] + a["duration_us"] <= b["start_us"] + 1e-6
             for a, b in pairwise(lane)
         )
-    # Both figures contain exactly the same measured device intervals.
+    # Every measured event is rendered once, alongside its structural context.
     ns = {"svg": "http://www.w3.org/2000/svg"}
-    counts = []
-    for name in ["before", "after"]:
-        svg = ET.parse(ROOT / f"assets/traceloom-deepseek-{name}.svg")
-        counts.append(len(svg.findall(".//svg:rect/svg:title", ns)))
-    assert counts == [len(data["events"]), len(data["events"]) + len(data["structure"])]
+    svg = ET.parse(ROOT / "assets/traceloom-deepseek-structure.svg")
+    rects = svg.findall(".//svg:rect", ns)
+    labels = [r for r in rects if r.find("svg:title", ns) is not None]
+    assert len(labels) == len(data["events"]) + len(data["structure"])
+    colors = defaultdict(set)
+    for rect in labels[len(data["structure"]) :]:
+        title = rect.find("svg:title", ns).text
+        colors[title.rsplit(": ", 1)[0]].add(rect.attrib["fill"])
+    assert all(len(fills) == 1 for fills in colors.values())
+    assert len({next(iter(fills)) for fills in colors.values()}) > 10
 
 
 def test_replay_sample_is_separate_and_has_exact_member_populations():

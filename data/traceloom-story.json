@@ -8,7 +8,7 @@
     "span_us": 31540.20000000007,
     "layer_count_full_capture": 276,
     "rules": "deepseekv4.yaml + host-launch ordering",
-    "boundary": "YAML-marked units, not scheduler steps. Same selected structural-event population in both panels, not the entire raw profiler.",
+    "boundary": "YAML-marked units, not scheduler steps. Selected structural-event population, not the entire raw profiler.",
     "events": [
       {
         "label": "HcPre",

@@ -6,6 +6,8 @@ scheduler identifiers, prompts, absolute clocks, or local paths are published.
 """
 
 import argparse
+import colorsys
+import hashlib
 import gzip
 import html
 import json
@@ -67,7 +69,7 @@ def extract(deepseek, qwen, database):
         "span_us": end - start,
         "layer_count_full_capture": len(layers),
         "rules": "deepseekv4.yaml + host-launch ordering",
-        "boundary": "YAML-marked units, not scheduler steps. Same selected structural-event population in both panels, not the entire raw profiler.",
+        "boundary": "YAML-marked units, not scheduler steps. Selected structural-event population, not the entire raw profiler.",
         "events": [
             interval(e, start, stream=e["args"]["stream_id"], lane=e["tid"] - 900000)
             for e in members
@@ -151,6 +153,22 @@ def extract(deepseek, qwen, database):
     return {"schema_version": "traceloom-story/v1", "deepseek": deep, "qwen": replay}
 
 
+def event_color(name):
+    """Perfetto-style name-based coloring, independent of stream or occurrence.
+
+    Our static figures use an independent HSL mapping, not a promise of exact
+    RGB parity with Perfetto versions, themes, or feature flags.
+    """
+    seed = hashlib.blake2s(name.encode(), digest_size=4).digest()
+    hue = int.from_bytes(seed[:2], "big") % 360
+    saturation = 55 + seed[2] % 21
+    lightness = 43 + seed[3] % 17
+    rgb = colorsys.hls_to_rgb(hue / 360, lightness / 100, saturation / 100)
+    fill = "#" + "".join(f"{round(c * 255):02x}" for c in rgb)
+    brightness = sum(c * w for c, w in zip(rgb, (0.299, 0.587, 0.114)))
+    return fill, "#152426" if brightness > 0.57 else "#ffffff"
+
+
 def render(snapshot):
     palette = {"layer": "#146c70", "attention": "#8054b0", "moe": "#bd7536"}
 
@@ -175,7 +193,11 @@ def render(snapshot):
                 x = left + e["start_us"] * scale
                 w = e["duration_us"] * scale
                 text = e["label"].split(" · ")[0]
-                fill = palette.get(text, color)
+                fill, ink = (
+                    event_color(e["label"])
+                    if color is None
+                    else (palette.get(text, color), "#ffffff")
+                )
                 tip = html.escape(f"{e['label']}: {e['duration_us']:.3f} us")
                 out.append(
                     f'<rect x="{x:.4f}" y="{y}" width="{w:.4f}" height="28" rx="1" fill="{fill}"><title>{tip}</title></rect>'
@@ -187,18 +209,13 @@ def render(snapshot):
                         else text[: max(1, int(w / 8) - 2)] + "…"
                     )
                     out.append(
-                        f'<text x="{x + 7:.4f}" y="{y + 19}" style="fill:white;font-size:12px">{html.escape(short)}</text>'
+                        f'<text x="{x + 7:.4f}" y="{y + 19}" style="fill:{ink};font-size:12px">{html.escape(short)}</text>'
                     )
         out.append("</svg>")
         return "".join(out) + "\n"
 
     d = snapshot["deepseek"]
-    streams = sorted({e["stream"] for e in d["events"]})
-    before = [
-        (f"Stream {s}", [e for e in d["events"] if e["stream"] == s], "#537d83")
-        for s in streams
-    ]
-    after = [
+    organized = [
         (
             "Layer",
             [e for e in d["structure"] if e["label"].startswith("layer ·")],
@@ -210,11 +227,11 @@ def render(snapshot):
             "#8054b0",
         ),
     ]
-    after += [
+    organized += [
         (
             f"Events · lane {lane + 1}",
             [e for e in d["events"] if e["lane"] == lane],
-            "#537d83",
+            None,
         )
         for lane in sorted({e["lane"] for e in d["events"]})
     ]
@@ -223,15 +240,14 @@ def render(snapshot):
         ("Step evidence", q["steps"], "#146c70"),
         ("Launch evidence", q["launches"], "#bd7536"),
         ("Repeat bodies", q["bodies"], "#8054b0"),
-        ("Exact members", q["members"], "#537d83"),
+        ("Exact members", q["members"], None),
     ]
     for filename, title, span, rows in [
-        ("deepseek-before", "DeepSeek: stream-grouped events", d["span_us"], before),
         (
-            "deepseek-after",
-            "DeepSeek: the same events, with marked structure",
+            "deepseek-structure",
+            "DeepSeek: layers, sublayers and name-colored device events",
             d["span_us"],
-            after,
+            organized,
         ),
         (
             "qwen-replay",
