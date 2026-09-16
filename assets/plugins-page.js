@@ -180,6 +180,18 @@
     preview: { en: "Preview", zh: "能力预览" }
   };
   const quickStarts = {
+    traceloom: {
+      title_en: "Install the TraceLoom runtime plugin",
+      title_zh: "安装 TraceLoom 运行时插件",
+      note_en: "Use an existing compatible vLLM environment. This patch-free mode records scheduler context only, not device associations. See the project page for standalone analysis and execution-linked capture.",
+      note_zh: "在已有的兼容 vLLM 环境中运行。此无补丁模式仅记录 scheduler 上下文，不建立设备关联。独立分析与 execution-linked 采集见项目页。",
+      command: String.raw`python -m pip install traceloom==0.1.0
+export TRACELOOM_CONTEXT_DIR=./traceloom-context
+export TRACELOOM_RUN_ID=inference-study-001
+vllm serve /path/to/model --async-scheduling \
+  --scheduler-cls traceloom.vllm.TracingAsyncScheduler \
+  --host 127.0.0.1 --port 8000`
+    },
     betterscale: {
       title_en: "Install and start BetterScale · DP8",
       title_zh: "安装并启动 BetterScale · DP8",

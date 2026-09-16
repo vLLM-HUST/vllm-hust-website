@@ -343,9 +343,15 @@
       "repository_role": "analysis_tool",
       "relation_to_runtime": "produces_runtime_evidence",
       "lifecycle": "incubating",
-      "canonical_artifacts": ["performance analysis tooling"],
-      "component_ids": [],
-      "public_surface": false
+      "canonical_artifacts": [
+        "TraceLoom native timeline analyzer",
+        "traceloom-vllm-context runtime observer",
+        "Queryable analysis database and Perfetto projection"
+      ],
+      "component_ids": [
+        "traceloom"
+      ],
+      "public_surface": true
     },
     {
       "name": "vllm-hust-profiling",
