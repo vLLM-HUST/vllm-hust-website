@@ -1010,7 +1010,7 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
     assert item["compatibility"]["status"] == "experimental"
     assert WORKLOAD_NAVIGATION["plugins"]["traceloom"] == ["profiling_analysis"]
     project = (ROOT / "traceloom.html").read_text()
-    assert "pip install traceloom==0.1.0" in project
+    assert "pip install traceloom==0.1.1" in project
     assert "traceloom.vllm.TracingAsyncScheduler" in project
     assert "traceloom.analyze" in project
     assert "result.query" in project
