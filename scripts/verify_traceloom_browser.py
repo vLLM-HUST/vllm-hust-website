@@ -44,7 +44,7 @@ def main():
                 assert page.locator("#capture img").evaluate(
                     "image => image.complete && image.naturalWidth > 0"
                 )
-                assert "traceloom==0.1.2" in page.locator("#integration").inner_text()
+                assert "traceloom==0.1.3" in page.locator("#integration").inner_text()
                 assert "result.query" in page.locator("#integration").inner_text()
                 page.locator("#integration summary").click()
                 assert (
@@ -69,7 +69,7 @@ def main():
                 assert card.locator('a[href="./traceloom.html"]').count() == 1
                 card.locator(".plugin-launch-icon").click()
                 expect(card.locator("pre")).to_contain_text(
-                    "pip install traceloom==0.1.2", use_inner_text=True
+                    "pip install traceloom==0.1.3", use_inner_text=True
                 )
                 expect(card.locator("pre")).to_contain_text(
                     "traceloom.vllm.TracingAsyncScheduler", use_inner_text=True
