@@ -363,7 +363,7 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert 'if (event.key !== "Escape") return' in SCRIPT
     assert ".plugin-launcher:hover .plugin-launch-tooltip" in STYLES
     assert ".plugin-launcher:focus-within .plugin-launch-tooltip" in STYLES
-    assert "plugins-page.js?v=betterscale-launch-032" in PAGE
+    assert "plugins-page.js?v=traceloom-launch-010" in PAGE
 
 
 def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None:
@@ -683,13 +683,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v16-betterscale-name"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v17-traceloom"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v9-vspec"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v10-traceloom"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v3-vspec"'
+        'data-source="./data/plugin-workload-navigation.json?v=traceloom-workload-navigation-v3-vspec"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -754,7 +754,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert vspec["public_surface"] is True
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v9-vspec"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v10-traceloom"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
@@ -987,7 +987,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 24
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 25
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -999,3 +999,29 @@ def test_compact_greedy_incubator_is_not_in_public_catalog():
     }
     assert "ascend-compact-greedy" not in WORKSHOP_METADATA["plugins"]
     assert "ascend-compact-greedy" not in WORKLOAD_NAVIGATION["plugins"]
+
+
+def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
+    item = by_id("traceloom")
+    assert item["artifact_type"] == "runtime_component"
+    assert item["system_role"] == "profiling_analysis"
+    assert item["delivery_model"] == "python_distribution"
+    assert item["documentation_url"] == "./traceloom.html"
+    assert item["compatibility"]["status"] == "experimental"
+    assert WORKLOAD_NAVIGATION["plugins"]["traceloom"] == ["profiling_analysis"]
+    project = (ROOT / "traceloom.html").read_text()
+    assert "pip install traceloom==0.1.0" in project
+    assert "traceloom.vllm.TracingAsyncScheduler" in project
+    assert "traceloom.analyze" in project
+    assert "result.query" in project
+    assert "result.export_perfetto" in project
+    assert "transport-worker.patch" in project
+    assert "not device busy time" in project
+    snapshot = json.loads((ROOT / "data/traceloom-capture.json").read_text())
+    assert len(snapshot["lanes"][0]["intervals"]) == 4
+    assert len(snapshot["lanes"][1]["intervals"]) == 4
+    assert all(
+        0 <= interval["start_us"] < snapshot["span_us"] and interval["duration_us"] > 0
+        for lane in snapshot["lanes"]
+        for interval in lane["intervals"]
+    )

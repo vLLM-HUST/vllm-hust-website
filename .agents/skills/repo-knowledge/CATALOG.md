@@ -15,3 +15,6 @@ lifecycle state, or chronology.
 
 - **Present BetterScale execution results:** before updating the case study or importing
   measurements, read [present-betterscale](scenarios/present-betterscale/GUIDE.md).
+
+- **Present TraceLoom analysis and runtime observation:** before updating the project page, MOD
+  entry or measured timeline image, read [present-traceloom](scenarios/present-traceloom/GUIDE.md).

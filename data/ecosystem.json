@@ -1308,6 +1308,68 @@
         "requirements_zh": "需 vllm-HUST/vllm-hust#8 合入后 main 才存在 victim-selector 组与 predicted_length 通道。仅安装 Bundle 不改变任何行为（两层显式选择）。"
       },
       "evidence_level": "cpu_smoke"
+    },
+    {
+      "id": "traceloom",
+      "name": "TraceLoom",
+      "artifact_type": "runtime_component",
+      "system_role": "profiling_analysis",
+      "integration_contracts": [],
+      "integration_surfaces": [
+        "vLLM --scheduler-cls / Scheduler and AsyncScheduler",
+        "Optional explicit SchedulerOutput transport and worker profiler-marker patch",
+        "Native offline profiler SQLite and scheduler JSONL analysis"
+      ],
+      "execution_planes": [
+        "scheduler",
+        "worker",
+        "offline"
+      ],
+      "deployment_topology": "mixed",
+      "delivery_model": "python_distribution",
+      "ownership": "hust_owned_subsystem",
+      "maturity": "experimental",
+      "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-perf-analyzer",
+      "summary_en": "Standalone timeline analysis and an opt-in vLLM runtime plugin. Organize profiler events into reusable structures, join supplied scheduler steps, and query or visualize the captured execution.",
+      "summary_zh": "独立时间线分析工具与可选的 vLLM 运行时插件。将 profiler 事件组织成可复用结构，关联采集到的 scheduler step，以查询和可视化理解推理执行。",
+      "evidence_level": "hardware_verified",
+      "name_en": "TraceLoom",
+      "name_zh": "TraceLoom",
+      "repository_relationship": "organization_native",
+      "public_surface": true,
+      "documentation_url": "./traceloom.html",
+      "maintainers": [
+        "CubeLander"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "CubeLander",
+          "name": "田景远"
+        }
+      ],
+      "public_effect_en": "A bounded Qwen3-0.6B Ascend TP1/eager capture associates 14,144 / 14,178 captured device events with supplied steps. Step-constrained recovery yields 32 nonempty-step macro instances; this is analysis validation, not a speedup or universal coverage claim.",
+      "public_effect_zh": "Qwen3-0.6B Ascend TP1/eager 有界采集：14,144 / 14,178 个设备事件关联到已记录 step；step 约束恢复得到 32 个非空 step 宏实例。这是分析功能验证，不是加速或普适完整性声明。",
+      "public_effect_status": "validated",
+      "public_effect_url": "./traceloom.html#evidence",
+      "compatibility": {
+        "status": "experimental",
+        "host": "vLLM + standalone native analyzer",
+        "versions": [
+          "traceloom 0.1.0 · native analyzer + Python API + runtime observer",
+          "vLLM 0fc695fc / vLLM-Ascend f4a08bdd"
+        ],
+        "platforms": [
+          "Ascend · TP1 / eager / in-process V1 capture"
+        ],
+        "models": [
+          "Qwen3-0.6B · bounded capture validation"
+        ],
+        "python": [
+          ">=3.10 (observer package)"
+        ],
+        "requirements_en": "Scheduler injection is patch-free. Step/device correlation additionally requires the explicit transport-worker patch and supported profiler evidence. Not an Extension Manager bundle. Different runtime revisions need a source audit; graph/distributed capture coverage and overhead are not qualified.",
+        "requirements_zh": "Scheduler 注入无需源码补丁；step/device 关联另需显式 transport-worker 补丁及受支持的 profiler 证据。不是 Extension Manager bundle。其他运行时版本需源代码审计；graph/分布式采集覆盖与记录开销尚未验收。"
+      }
     }
   ]
 }

@@ -1,6 +1,12 @@
 {
   "schema_version": "plugin-workload-navigation/v1",
   "traits": {
+    "profiling_analysis": {
+      "label_en": "Profiling / Analysis",
+      "label_zh": "性能剖析 / 分析",
+      "description_en": "Understand captured inference structure and correlate scheduling context with supported device evidence.",
+      "description_zh": "理解采集到的推理执行结构，将调度上下文与受支持的设备证据关联。"
+    },
     "long_context": {
       "label_en": "Long context",
       "label_zh": "长上下文",
@@ -57,6 +63,7 @@
     }
   },
   "plugins": {
+    "traceloom": ["profiling_analysis"],
     "bidkv": ["memory_kv_pressure", "high_concurrency"],
     "dla": ["memory_kv_pressure", "high_concurrency"],
     "diffspec": ["decode_heavy", "latency_slo"],

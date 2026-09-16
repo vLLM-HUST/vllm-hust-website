@@ -1,0 +1,57 @@
+/* TraceLoom: a peer project page using the site's shared navigation. */
+body[data-page="traceloom"] { margin: 0; background: #f3f5f1; color: #142b2a; font-family: Inter, system-ui, sans-serif; }
+body[data-page="traceloom"]::before { display: none; }
+html { scroll-padding-top: 95px; }
+.tl-page [lang="zh"], .tl-footer [lang="zh"] { display: none; }
+html[lang="zh"] .tl-page [lang="en"], html[lang="zh"] .tl-footer [lang="en"] { display: none; }
+html[lang="zh"] .tl-page [lang="zh"], html[lang="zh"] .tl-footer [lang="zh"] { display: inline; }
+.tl-wrap { width: min(1160px, calc(100% - 80px)); margin-inline: auto; }
+.tl-page h1, .tl-page h2, .tl-page h3, .tl-page p { margin: 0; color: inherit; }
+.tl-page a, .tl-footer a { color: #096f74; text-underline-offset: 4px; }
+.tl-hero { padding: 90px 0 64px; background: #112e30; color: #f3f5f1; }
+.tl-kicker { font: 600 12px/1.5 ui-monospace, monospace; letter-spacing: .13em; }
+.tl-hero h1 { margin-top: 20px; font-size: clamp(58px, 10vw, 116px); letter-spacing: -.07em; line-height: 1; }
+.tl-hero h1 > span { color: #80d3b1; }
+.tl-statement { margin-top: 32px !important; font-size: clamp(30px, 4.8vw, 58px); font-weight: 650; line-height: 1.14; letter-spacing: -.025em; }
+.tl-lede { max-width: 760px; margin-top: 28px !important; color: #c9ddda !important; font-size: 19px; line-height: 1.75; }
+.tl-actions { display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: center; margin-top: 28px; }
+.tl-hero a { color: #d1f3e6; }
+.tl-button { display: inline-block; padding: 13px 19px; background: #a8dfbb; color: #122d2b !important; border-radius: 3px; font-weight: 700; text-decoration: none; }
+.tl-stamp { margin-top: 34px !important; font: 12px/1.8 ui-monospace, monospace; color: #bed2cf !important; }
+.tl-section { padding: 62px 0; border-bottom: 1px solid #c7d5cf; }
+.tl-section > .tl-kicker { color: #506a67; }
+.tl-section h2 { margin: 14px 0 28px; font-size: clamp(28px, 4vw, 44px); letter-spacing: -.03em; line-height: 1.25; }
+.tl-section h3 { margin: 10px 0 18px; font-size: 23px; line-height: 1.35; }
+.tl-section p { font-size: 16px; line-height: 1.85; margin-top: 18px; }
+.tl-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.tl-cards article { min-width: 0; padding: 26px; border: 1px solid #c7d5cf; background: #fff; }
+.tl-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #bfd2c9; }
+.tl-flow > div { display: grid; gap: 10px; padding: 24px; background: #e4eee7; border-right: 1px solid #bfd2c9; }
+.tl-flow b { color: #096f74; }
+.tl-page figure { margin: 0; }
+.tl-page img { display: block; width: 100%; height: auto; border: 1px solid #c7d5cf; }
+.tl-page figcaption { font-size: 13px; color: #49615c; line-height: 1.7; margin-top: 16px; }
+.tl-metrics { display: grid; grid-template-columns: 1fr 1.6fr 1fr; gap: 24px; }
+.tl-metrics > div { display: grid; gap: 12px; padding: 25px 0; border-top: 3px solid #167c78; }
+.tl-metrics strong { font-size: clamp(30px, 4vw, 46px); color: #0c5f60; }
+.tl-metrics small { font-size: 18px; font-weight: 500; }
+.tl-metrics span { font-size: 14px; }
+.tl-boundary { margin-top: 24px; padding: 22px; border-left: 3px solid #ab7428; background: #f0eadb; line-height: 1.8; font-size: 14px; }
+.tl-page pre { max-width: 100%; overflow-x: auto; padding: 18px; color: #e7f4ed; background: #153432; font-size: 12px; line-height: 1.85; border-radius: 3px; }
+.tl-page code { font-family: ui-monospace, monospace; overflow-wrap: anywhere; }
+.tl-page pre code { overflow-wrap: normal; }
+.tl-page details { margin-top: 26px; padding: 24px; border: 1px solid #b5c8bf; background: #e8eee9; }
+.tl-page summary { cursor: pointer; font-size: 18px; font-weight: 650; }
+.tl-footer { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; padding-block: 32px; font-size: 13px; }
+@media (max-width: 680px) {
+  .tl-wrap { width: calc(100% - 36px); }
+  .tl-hero { padding: 60px 0 40px; }
+  .tl-section { padding: 38px 0; }
+  .tl-cards, .tl-metrics { grid-template-columns: 1fr; }
+  .tl-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tl-cards article, .tl-flow > div { padding: 18px; }
+  .tl-lede { font-size: 17px; }
+}
+/* Override the shared dark-site heading rule on this light project surface. */
+body[data-page="traceloom"] .tl-section h2,
+body[data-page="traceloom"] .tl-section h3 { color: #142b2a; }
