@@ -8,7 +8,7 @@
 <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/traceloom-capture.svg" />
 <link rel="icon" href="./assets/brand/vllm-hust-icon.png" />
 <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
-<link rel="stylesheet" href="./assets/traceloom.css?v=evidence-story-014?v=1" />
+<link rel="stylesheet" href="./assets/traceloom.css?v=event-colors-014?v=1" />
 </head><body data-page="traceloom">
 <nav class="site-nav">
     <div class="site-shell site-nav-inner">
@@ -49,10 +49,10 @@
 <nav class="tl-story-nav" aria-label="TraceLoom presentation"><a href="#deepseek">01 · DeepSeek</a><a href="#replay">02 · Qwen replay</a><a href="#query">03 · <span lang="en">Query</span><span lang="zh">查询</span></a><a href="#integration">04 · <span lang="en">Use it</span><span lang="zh">使用</span></a>
 </nav>
 <section id="deepseek" class="tl-section">
-<p class="tl-kicker">01 / DEEPSEEK · SEE THE DIFFERENCE</p>
-<h2><span lang="en">From event texture to model structure.</span><span lang="zh">从事件纹理，走进模型结构。</span>
+<p class="tl-kicker">01 / DEEPSEEK · EXECUTION STRUCTURE</p>
+<h2><span lang="en">Layers, sublayers, and the work inside.</span><span lang="zh">Layer、子层，以及其中的真实执行。</span>
 </h2>
-<p><span lang="en">A measured DeepSeek V4 Flash window, shown two ways. The timestamps and selected events are identical. Only their organization changes.</span><span lang="zh">同一段实测 DeepSeek V4 Flash，用两种方式观看。时间戳相同，选中的事件相同；改变的是组织方式。</span>
+<p><span lang="en">A measured DeepSeek V4 Flash timeline, organized as layers, attention / MoE sublayers and device events. Structure gives the overview; consistent event colors reveal the recurring execution texture.</span><span lang="zh">把实测 DeepSeek V4 Flash 时间线组织成 layer、attention／MoE 子层与设备事件。结构呈现全貌，稳定的事件颜色让重复的执行纹理清晰可辨。</span>
 </p>
 <div class="tl-metrics">
 <div><strong>276</strong><span lang="en">marked layer instances</span><span lang="zh">识别出的 layer 实例</span>
@@ -63,19 +63,13 @@
 </div>
 </div>
 <figure class="tl-story-figure">
-<h3><span lang="en">Before · events grouped by stream</span><span lang="zh">之前 · 按 stream 分散的事件</span>
+<h3><span lang="en">Layers above a shared event plane</span><span lang="zh">公共事件平面之上的层次结构</span>
 </h3>
-<div class="tl-plot-scroll"><img src="./assets/traceloom-deepseek-before.svg" alt="Measured DeepSeek events grouped by their original stream identities" loading="lazy" />
+<div class="tl-plot-scroll"><img src="./assets/traceloom-deepseek-structure.svg" alt="DeepSeek layer, attention and MoE structure with name-colored events and overlap-only lanes" loading="lazy" />
 </div>
-</figure>
-<figure class="tl-story-figure">
-<h3><span lang="en">After · layers above a shared event plane</span><span lang="zh">之后 · 公共事件平面之上的层次结构</span>
-</h3>
-<div class="tl-plot-scroll"><img src="./assets/traceloom-deepseek-after.svg" alt="The same DeepSeek events with layer, attention and MoE structure and overlap-only lanes" loading="lazy" />
-</div>
-<figcaption><span lang="en">Three consecutive complete layers. Both panels use the same selected structural-event population and time axis, not every raw profiler event. Figures preserve measured intervals; narrow events may be subpixel. Full rank-3 capture totals are shown above.</span><span lang="zh">展示三个连续完整 layer。上下图采用相同的结构事件集合与时间轴，不是 profiler 的全部原始事件。图形保留实测区间，极短事件可能小于一个像素。上方数字统计完整 rank 3 采集。</span>
+<figcaption><span lang="en">Three consecutive complete layers. The figure shows selected structural events at their measured times, not every raw profiler event. Figures preserve measured intervals; narrow events may be subpixel. Full rank-3 capture totals are shown above.</span><span lang="zh">展示三个连续完整 layer。图中结构事件按实测时间展示，不是 profiler 的全部原始事件。图形保留实测区间，极短事件可能小于一个像素。上方数字统计完整 rank 3 采集。</span>
 </figcaption>
-</figure>
+</figure><p class="tl-color-key"><span lang="en">Read the colors: teal layers · purple attention · amber MoE. Device events use stable name-based colors (Perfetto style), not stream colors or a duration heatmap. Labels remain the identity reference.</span><span lang="zh">颜色语言：青色为 layer，紫色为 attention，琥珀色为 MoE。设备事件按名称稳定着色（Perfetto 风格），不按 stream 分色，也不是耗时热力图；事件名称仍是身份依据。</span></p>
 <p><span lang="en">Layer → attention / MoE → operators. Four stream identities remain queryable, but only actual concurrency needs another event lane. Six distinct layer signatures remain distinct: a shared label does not erase a real structural difference.</span><span lang="zh">Layer → attention / MoE → 算子。四个 stream 身份仍然可查，但只有真实并发才增加事件泳道。六种不同的 layer 结构仍分别保留：相同标签不抹平真实差异。</span>
 </p>
 <div class="tl-boundary"><span lang="en">Model knowledge, explicitly supplied: HcPre/HcPost mark sublayers; SparseAttnSharedkv and MoeInitRoutingV3 classify attention/MoE; adjacent attention→MoE units form layers. This uses deepseekv4.yaml and host-launch ordering. It is not unsupervised layer discovery. This older capture has no recorded scheduler-step identity or exact reconstructed replay bodies.</span><span lang="zh">模型知识是显式输入：HcPre/HcPost 圈定子层，SparseAttnSharedkv 与 MoeInitRoutingV3 区分 attention／MoE，相邻 attention→MoE 组成 layer。使用 deepseekv4.yaml 与 host-launch 排序，不宣称无监督层次发现。这份旧采集没有已记录的 scheduler step 身份，也没有精确重建的 replay body。</span>
@@ -88,7 +82,7 @@
 <h2><span lang="en">A replay is not a black box.</span><span lang="zh">Replay，不止一个黑盒。</span>
 </h2>
 <figure class="tl-story-figure">
-<div class="tl-plot-scroll"><img src="./assets/traceloom-qwen-replay.svg" alt="Three measured Qwen graph launches with linked scheduler-step envelopes, repeat bodies and exact operator members" loading="lazy" />
+<div class="tl-plot-scroll"><img src="./assets/traceloom-qwen-replay.svg?v=event-colors-014" alt="Three measured Qwen graph launches with linked scheduler-step envelopes, repeat bodies and exact operator members" loading="lazy" />
 </div>
 <figcaption><span lang="en">A separate Qwen graph capture: the first three exact replays, joined through recorded identity, not nearest timestamps. Step bars are associated-device envelopes, not host scheduling duration or busy time. The launch row compares source evidence; it is not an extra replay lane in the exported timeline.</span><span lang="zh">独立的 Qwen graph 采集：前三次精确 replay，按已记录的身份关联，而非最近时间匹配。Step 条带是关联设备事件的外包络，不是 host 调度耗时或设备忙碌时间。Launch 行用于对照原始证据，不是导出 timeline 额外增加的 replay 泳道。</span>
 </figcaption>

@@ -48,7 +48,7 @@ actual layer-definition query. Do not combine these into a claim that one captur
 capability. The older eager figure and its coverage counts remain a separate, collapsed
 supplementary case. Both language variants and mobile layouts must stay usable.
 
-`data/traceloom-story.json` is a sanitized measured-interval subset. Rebuild its three SVGs with
+`data/traceloom-story.json` is a sanitized measured-interval subset. Rebuild its two SVGs with
 `python scripts/build_traceloom_story.py` (no private capture required). Refreshing data requires
 explicit `--deepseek`, `--qwen`, and `--graph-db` inputs. The Qwen join uses
 `traceloom_v_context_replay_launch`, not the synthetic graph event's direct device-work row; that
@@ -58,9 +58,16 @@ snapshot retains step ordinals, local launch labels, relative times and member c
 Accepted source artifacts, outside this repository: `/root/my-ascend-workspace/runs/`
 `traceloom-dsv4-014/rank3.perfetto.json.gz` and `rank3.db`; Qwen lives in
 `traceloom-qwen-graph-step/20260916T0444Z-device1/overlap-packed-public.perfetto.json.gz` with
-`exact-step.db`. DeepSeek figures use identical selected structural events and time axes, not all
-raw profiler rows. The chosen three-layer window has three visible stream identities; the
-four-stream headline refers to the full capture. All figure widths use real durations. The Qwen
-launch row is an explicit evidence comparison, not a restored replay display lane. The layer query
-was executed against the DeepSeek AugDB: six exact definitions, frequencies 120/119/18/12/6/1 and
+`exact-step.db`. DeepSeek displays selected structural events at their measured times, not all raw
+profiler rows. The chosen three-layer window has three visible stream identities; the four-stream
+headline refers to the full capture. All figure widths use real durations. The Qwen launch row is an
+explicit evidence comparison, not a restored replay display lane. The layer query was executed
+against the DeepSeek AugDB: six exact definitions, frequencies 120/119/18/12/6/1 and
 53/71/52/54/75/72 anchors per instance.
+
+Fletcher chose direct organized-timeline presentation, not before/after marketing. Preserve event
+color as an analytical language: a name maps deterministically to the same color across stream lanes
+and both cases. The static renderer uses its own HSL mapping inspired by Perfetto's name-based
+coloring, not exact RGB parity with Perfetto versions/themes. Structure colors stay semantic; event
+colors are not a duration heatmap. Upstream reference:
+https://github.com/google/perfetto/blob/main/ui/src/components/colorizer.ts.
