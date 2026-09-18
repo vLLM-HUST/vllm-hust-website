@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BetterScale — Less host waiting. More device execution.</title>
-  <meta name="description" content="Modular execution optimizations for vLLM Ascend. DeepSeek V4 Flash TP8 and DP8 matched-cycle measurements, mechanisms, and quality checks." />
+  <meta name="description" content="Modular execution optimizations for vLLM Ascend. Qwen3.8-27B TP2 multi-turn serving and DeepSeek V4 Flash TP8/DP8 measurements, mechanisms, and validation." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/betterscale.html" />
   <meta property="og:title" content="BetterScale — Less host waiting. More device execution." />
   <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
@@ -38,7 +38,7 @@
  <h1>BetterScale<span class="bs-period">.</span></h1>
  <p class="bs-statement"><span lang="en">Less host waiting.<br>More device execution.</span><span lang="zh">让设备少等调度。<br>多做推理。</span></p>
  <p class="bs-lede"><span lang="en">Fast kernels still wait when the next wave is not ready. BetterScale combines FULL graphs, ordered replay, and device-side metadata preparation to shorten the host dependencies between inference steps.</span><span lang="zh">算子已经很快，设备却仍可能等不到下一波工作。BetterScale 通过 FULL graph、有序 replay 和 device 侧元数据准备，缩短相邻推理波次之间的 host 依赖与等待。</span></p>
- <div class="bs-actions"><a class="bs-button" href="#service-throughput"><span lang="en">Explore the measurements ↓</span><span lang="zh">看实测结果 ↓</span></a><a href="#integration"><span lang="en">See how it fits →</span><span lang="zh">了解如何接入 →</span></a><a href="https://github.com/vLLM-HUST/BetterScale" target="_blank" rel="noopener noreferrer"><span lang="en">Source on GitHub ↗</span><span lang="zh">GitHub 开源代码 ↗</span></a></div>
+ <div class="bs-actions"><a class="bs-button" href="#qwen-swe"><span lang="en">Qwen TP2 measurements ↓</span><span lang="zh">看 Qwen TP2 实测 ↓</span></a><a href="#integration"><span lang="en">See how it fits →</span><span lang="zh">了解如何接入 →</span></a><a href="https://github.com/vLLM-HUST/BetterScale" target="_blank" rel="noopener noreferrer"><span lang="en">Source on GitHub ↗</span><span lang="zh">GitHub 开源代码 ↗</span></a></div>
  <div class="bs-config">DeepSeek V4 Flash <span>W8A8</span> <span>8 × Ascend 910B2 / HCCS</span> <span>vLLM 0.25.1 + Ascend 0.25.1rc1</span></div>
  </div>
 </header>
@@ -71,6 +71,42 @@
  <div class="bs-interval"><div><span class="bs-kicker">DP8 / DRAFT → TARGET</span><h3>9.42 → 1.24 <small>ms</small></h3></div><p><span lang="en">Repeat 1 cross-step interval; repeat 2: 9.49 → 1.23 ms. This interval includes useful work, not just idle time. Separate profiled waves still exhibit gaps: this is not a claim of universally bubble-free replay.</span><span lang="zh">第一次重复测量的跨步区间；第二次为 9.49 → 1.23 ms。区间内包含有效工作，不等于纯空闲时间。独立采集的 profile 仍存在气泡，不代表所有波次都已无缝执行。</span></p></div>
  <details class="bs-mixed"><summary><span lang="en">What about prefill and short mixed waves?</span><span lang="zh">Prefill 和短 mixed 波次呢？</span></summary><p><span lang="en">Separating context ingestion from query graphs helps the observed short waves. Large prefill is essentially unchanged. Both arms already use an optimized FULL-target path; this is not stock vLLM.</span><span lang="zh">分离 context 摄入与 query graph 改善了观察到的短波次，大 prefill 则基本不变。两组都已使用优化后的 FULL target，并非与原版 vLLM 对比。</span></p><div class="bs-table-scroll"><table><caption><span lang="en">Warm all-rank median observations, runs 041 / 046</span><span lang="zh">热态全 rank 中位数观测，实验 041 / 046</span></caption><thead><tr><th><span lang="en">Scheduled rows</span><span lang="zh">调度行数</span></th><th><span lang="en">Prior optimized control</span><span lang="zh">已优化对照</span></th><th>Split candidate</th></tr></thead><tbody><tr><td>6 + 17</td><td>63.96 ms</td><td>46.37 ms</td></tr><tr><td>7</td><td>63.05 ms</td><td>49.55 ms</td></tr><tr><td>64</td><td>202.92 ms</td><td>204.03 ms</td></tr><tr><td>1025</td><td>219.96 ms</td><td>221.15 ms</td></tr><tr><td>4112</td><td>259.65 ms</td><td>262.16 ms</td></tr></tbody></table></div><p class="bs-caption"><span lang="en">A single paired shape observation, not a replicated universal speedup. Full configuration is in the downloadable evidence snapshot.</span><span lang="zh">单组配对形状观测，不是经重复验证的普遍加速结论。完整配置见可下载的数据摘要。</span></p></details>
 </div></section>
+<section class="bs-section bs-wrap" id="qwen-swe">
+<span class="bs-number">QWEN3.8-27B / TP2 / SWE TRACES</span>
+<h2><span lang="en">Keep prefix reuse.<br>Accelerate multi-turn serving.</span><span lang="zh">保留前缀复用，<br>加速多轮服务。</span></h2>
+<p><span lang="en">Qwen3.8-27B BF16 · 2 × Ascend 910B2 / HCCS. Both arms enable prefix caching and native AIV communication, without MTP. BetterScale uses elastic mixed FULL graphs, pooled GDN state and one FIA metadata plan per wave; the native scheduler and prefix cache remain in use.</span><span lang="zh">Qwen3.8-27B BF16 · 2 × Ascend 910B2 / HCCS。双方均开启前缀缓存与原生 AIV 通信，不用 MTP。BetterScale 使用弹性 mixed FULL graph、池化 GDN 状态和每波共享的 FIA 元数据计划；保留原生调度器与前缀缓存。</span></p>
+<p class="bs-scope"><span lang="en">Eight complete NVIDIA Open-SWE-Traces trajectories, 78 requests and 20,648 output tokens per cohort. This measures HTTP serving, <strong>not SWE-bench task-solving accuracy</strong>.</span><span lang="zh">每组回放 NVIDIA Open-SWE-Traces 中 8 条完整轨迹，共 78 个请求、20,648 个输出 token。这是 HTTP 服务测量，<strong>不是 SWE-bench 解题成绩</strong>。</span></p>
+<div class="bs-table-scroll"><table><caption><span lang="en">Same-pair ABBA · pooled output tokens/s across two repeats</span><span lang="zh">同一双卡 ABBA · 两轮合并的输出 tokens/s</span></caption><thead><tr><th><span lang="en">Concurrent sessions</span><span lang="zh">并发会话</span></th><th>Native</th><th>BetterScale</th><th><span lang="en">Throughput gain</span><span lang="zh">吞吐提升</span></th></tr></thead><tbody>
+<tr data-qwen-concurrency="1"><td>C1</td><td>30.23</td><td>34.21</td><td><strong>+13.15%</strong></td></tr>
+<tr data-qwen-concurrency="2"><td>C2</td><td>51.71</td><td>59.41</td><td><strong>+14.89%</strong></td></tr>
+<tr data-qwen-concurrency="4"><td>C4</td><td>86.03</td><td>101.38</td><td><strong>+17.85%</strong></td></tr>
+<tr data-qwen-concurrency="8"><td>C8</td><td>122.78</td><td>149.01</td><td><strong>+21.36%</strong></td></tr>
+</tbody></table></div>
+<p class="bs-caption"><span lang="en">All eight sessions run at every concurrency limit. Prefix caches start empty for each cohort, then accumulate reuse naturally. Both arms reuse the same number of prompt tokens: 69.0% at C1/C2/C4 and 66.4% at C8. Loading, graph capture and warmup are excluded; no profiling or state oracle runs during timing.</span><span lang="zh">每档并发都跑完同样的 8 个会话。每组从空缓存开始，随后自然积累前缀复用。双方实际复用 token 数一致：C1/C2/C4 为 69.0%，C8 为 66.4%。加载、录图和预热不计时；计时期间不运行 profiler 或状态对照。</span></p>
+<details id="qwen-repeats"><summary><span lang="en">Both repetitions — no hidden slow run</span><span lang="zh">展开两轮结果，不隐藏慢轮次</span></summary><div class="bs-table-scroll"><table><caption><span lang="en">Output tokens/s · R1: baseline then candidate; R2: candidate then baseline</span><span lang="zh">输出 tokens/s · R1：先基线后候选；R2：先候选后基线</span></caption><thead><tr><th><span lang="en">Concurrency / repeat</span><span lang="zh">并发 / 轮次</span></th><th>Native</th><th>BetterScale</th></tr></thead><tbody>
+<tr data-qwen-repeat="1-0"><td>C1 / R1</td><td>30.34</td><td>34.19</td></tr>
+<tr data-qwen-repeat="1-1"><td>C1 / R2</td><td>30.12</td><td>34.22</td></tr>
+<tr data-qwen-repeat="2-0"><td>C2 / R1</td><td>51.63</td><td>59.35</td></tr>
+<tr data-qwen-repeat="2-1"><td>C2 / R2</td><td>51.79</td><td>59.46</td></tr>
+<tr data-qwen-repeat="4-0"><td>C4 / R1</td><td>85.59</td><td>101.44</td></tr>
+<tr data-qwen-repeat="4-1"><td>C4 / R2</td><td>86.48</td><td>101.33</td></tr>
+<tr data-qwen-repeat="8-0"><td>C8 / R1</td><td>119.74</td><td>149.06</td></tr>
+<tr data-qwen-repeat="8-1"><td>C8 / R2</td><td>125.99</td><td>148.97</td></tr>
+</tbody></table></div></details>
+<details id="qwen-latency"><summary><span lang="en">First-token and per-output-token latency</span><span lang="zh">展开首 token 与平均单输出 token 延迟</span></summary><div class="bs-table-scroll"><table><caption><span lang="en">Milliseconds · mean / p95 across requests</span><span lang="zh">毫秒 · 请求间均值 / p95</span></caption><thead><tr><th><span lang="en">Concurrency / arm</span><span lang="zh">并发 / 配置</span></th><th>TTFT</th><th>HTTP TPOT</th></tr></thead><tbody>
+<tr data-qwen-latency="1-Native"><td>C1 / Native</td><td>617.85 / 901.60</td><td>30.82 / 31.39</td></tr>
+<tr data-qwen-latency="1-BetterScale"><td>C1 / BetterScale</td><td>390.69 / 591.75</td><td>27.82 / 28.36</td></tr>
+<tr data-qwen-latency="2-Native"><td>C2 / Native</td><td>702.21 / 1008.98</td><td>34.42 / 39.23</td></tr>
+<tr data-qwen-latency="2-BetterScale"><td>C2 / BetterScale</td><td>479.43 / 740.08</td><td>30.40 / 33.27</td></tr>
+<tr data-qwen-latency="4-Native"><td>C4 / Native</td><td>759.26 / 1066.94</td><td>40.68 / 50.46</td></tr>
+<tr data-qwen-latency="4-BetterScale"><td>C4 / BetterScale</td><td>520.53 / 758.46</td><td>34.63 / 40.94</td></tr>
+<tr data-qwen-latency="8-Native"><td>C8 / Native</td><td>981.78 / 2184.27</td><td>51.52 / 75.90</td></tr>
+<tr data-qwen-latency="8-BetterScale"><td>C8 / BetterScale</td><td>694.87 / 1892.76</td><td>42.38 / 54.38</td></tr>
+</tbody></table></div><p class="bs-caption"><span lang="en">TPOT = (HTTP completion time − first-content time) / (output tokens − 1). These are per-request averages, not individual token-gap percentiles.</span><span lang="zh">TPOT =（HTTP 完成时间 − 首内容时间）/（输出 token 数 − 1）。这是每请求平均值，不是逐 token 间隔的分位数。</span></p></details>
+<p class="bs-caption"><span lang="en">Bounded to eight selected ≤8K trajectories, fixed recorded response-token budgets and zero tool waiting. Original recorded history is replayed; generated text is not fed into later turns. Two repetitions are not a confidence interval or a universal speedup claim. These Qwen results are separate from the DeepSeek V4 studies below.</span><span lang="zh">范围限定于 8 条选定的 ≤8K 轨迹、固定的原始响应 token 预算和零工具等待。后续轮次使用原始记录历史，不回灌本次生成文本。两轮观测不是置信区间，也不代表普遍加速；这些 Qwen 结果与下方 DeepSeek V4 研究分开。</span></p>
+<p><span lang="en">Use the source-qualified <code>betterscale.qwen_worker.MixedWorker</code> entry and its native-library build/preload instructions. This is not a claim that the Qwen path is included in the older DSV4 PyPI command below.</span><span lang="zh">通过源代码验收的 <code>betterscale.qwen_worker.MixedWorker</code> 接入，并遵循原生库构建与 preload 说明；不声称下方较早的 DSV4 PyPI 安装命令已包含这条 Qwen 路径。</span></p>
+<div class="bs-actions"><a class="bs-button" href="./data/betterscale-qwen-swe.json" download><span lang="en">Download all Qwen measurements ↓</span><span lang="zh">下载完整 Qwen 测量 ↓</span></a><a href="./docs/BETTERSCALE-QWEN-SWE.md"><span lang="en">Methods and provenance →</span><span lang="zh">方法与来源 →</span></a><a href="https://github.com/vLLM-HUST/BetterScale/tree/4d08136163b1f3751ac5dfb622e2007f1fecd023/src/betterscale/patches/qwen_gdn"><span lang="en">Qualified source and deployment →</span><span lang="zh">验收源码与部署说明 →</span></a></div>
+</section>
 <section class="bs-section bs-wrap" id="service-throughput">
  <span class="bs-number">HTTP / RELEASE 0.3.1</span>
  <h2><span lang="en">More completed work.<br>Measured at the HTTP boundary.</span><span lang="zh">更多完成的工作。<br>在 HTTP 边界测量。</span></h2>

@@ -99,3 +99,24 @@ compatibility, not a new cache implementation or throughput comparison. DP uses 
 the qualified cold/warm pairs used the native X-data-parallel-rank header. Explain session affinity
 instead of promising cache hits under arbitrary load balancing. Historical0.4 capacity measurements
 remain APC-off; preemption remains unresolved.
+
+## Qwen27 mixed serving study (September 18)
+
+The separate `#qwen-swe` section, `data/betterscale-qwen-swe.json` and
+`docs/BETTERSCALE-QWEN-SWE.md` own the Qwen3.8-27B TP2 study. Do not put these measurements into the
+DSV4 snapshot, PyPI0.4.1 availability claim, official leaderboard, homepage or achievements.
+Fletcher confirmed the checkpoint's public name; `qwen3_5_text` describes its architecture, not a
+different name.
+
+Source4d08136, same-pair ABBA, eight selected complete Open-SWE-Traces sessions, 78 requests /20,648
+output tokens at every C1/C2/C4/C8 limit. Both arms enable APC and native AIV; MTP off. Clear cache
+after warmup/before every cohort and record actual cached tokens. The cancelled APC-off run is not
+the control. Both APCon arms reused247,296 tokens at C1/C2/C4 and238,080 at C8, in each repeat.
+Pooled gains13.15/14.89/17.85/21.36%; both observations, including native C8's119.74/125.99
+variance, remain visible. HTTP TPOT summarizes per-request averages, not token-gap percentiles. This
+is serving, not SWE task accuracy.
+
+The browser checker compares all rendered Qwen throughput, repeated and latency values against the
+separate snapshot, including mobile/desktop and both languages. Source deployment needs the
+qualified native libraries; do not replace the DSV4 installation instructions with an unqualified
+Qwen PyPI command. Public website publication still requires approval of the exact prepared copy.
