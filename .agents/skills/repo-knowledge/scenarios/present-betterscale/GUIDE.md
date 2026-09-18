@@ -120,3 +120,14 @@ The browser checker compares all rendered Qwen throughput, repeated and latency 
 separate snapshot, including mobile/desktop and both languages. Source deployment needs the
 qualified native libraries; do not replace the DSV4 installation instructions with an unqualified
 Qwen PyPI command. Public website publication still requires approval of the exact prepared copy.
+
+Deployment observation: the public host injects a Cloudflare analytics script before `</body>`, so
+raw HTML byte equality can fail even when all source content is live. Preserve a diff and exclude
+only that identified hosting injection when comparing; do not broadly ignore script differences. The
+observed CSS CDN cache lifetime was four hours; version changed stylesheet URLs in the HTML. During
+Pages rollout, poll with a disposable query nonce rather than warming the final public version URL
+with old content. Then verify the final entry URL itself. The Qwen rollout uses
+`betterscale.html?v=152dac8#qwen-swe`; published HTML, CSS, JSON and methods match approved source.
+Local rendered desktop/mobile EN/ZH tests passed; direct remote Chromium hit ERR_EMPTY_RESPONSE in
+this environment, so live verification used HTTP content identity instead of claiming a live-browser
+pass.
