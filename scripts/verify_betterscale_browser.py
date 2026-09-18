@@ -13,6 +13,7 @@ def main():
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     evidence = json.loads((root / "data/betterscale-results.json").read_text())
+    qwen = json.loads((root / "data/betterscale-qwen-swe.json").read_text())
     ecosystem = json.loads((root / "data/ecosystem.json").read_text())
     workshop_mod_count = sum(
         item["artifact_type"] in {"runtime_component", "bridge"}
@@ -72,6 +73,49 @@ def main():
                     path=str(output / f"capacity-{label}-{language}.png")
                 )
                 assert "32/32" in page.locator("#prefix-reuse").inner_text()
+                qwen_section = page.locator("#qwen-swe")
+                assert "Qwen3.8-27B" in qwen_section.inner_text()
+                for concurrency, gain in qwen["throughput_gain_percent"].items():
+                    cells = page.locator(
+                        f'[data-qwen-concurrency="{concurrency}"] td'
+                    ).all_text_contents()
+                    assert cells == [
+                        f"C{concurrency}",
+                        f"{qwen['pooled']['baseline'][concurrency]['tokens_per_s']:.2f}",
+                        f"{qwen['pooled']['candidate'][concurrency]['tokens_per_s']:.2f}",
+                        f"+{gain:.2f}%",
+                    ]
+                for detail_id in ("qwen-repeats", "qwen-latency"):
+                    page.locator(f"#{detail_id} summary").click()
+                for row in qwen["rounds"]:
+                    text = page.locator(
+                        f'[data-qwen-repeat="{row["concurrency"]}-{row["repeat"]}"]'
+                    ).inner_text()
+                    assert f"{row['tokens_per_s']:.2f}" in text
+                for arm, label_name in (
+                    ("baseline", "Native"),
+                    ("candidate", "BetterScale"),
+                ):
+                    for concurrency, metrics in qwen["pooled"][arm].items():
+                        text = page.locator(
+                            f'[data-qwen-latency="{concurrency}-{label_name}"]'
+                        ).inner_text()
+                        for field in (
+                            "mean_ttft_ms",
+                            "p95_ttft_ms",
+                            "mean_tpot_ms",
+                            "p95_tpot_ms",
+                        ):
+                            assert f"{metrics[field]:.2f}" in text
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= window.innerWidth"
+                ), f"Qwen tables overflow page: {label}/{language}"
+                qwen_section.screenshot(
+                    path=str(output / f"qwen-{label}-{language}.png"),
+                    style=".site-nav, .lang-toggle { visibility: hidden; }",
+                )
+                for detail_id in ("qwen-repeats", "qwen-latency"):
+                    page.locator(f"#{detail_id} summary").click()
                 integration = page.locator("#integration")
                 assert "vllm-betterscale==0.4.1" in integration.inner_text()
                 assert integration.locator("details").count() == 2
@@ -170,7 +214,12 @@ def main():
         for name in ("index", "achievements"):
             page.goto(f"{args.url}/{name}.html")
             assert page.locator('.bs-feature a[href="./betterscale.html"]').count() == 0
-        for name in ("data/betterscale-results.json", "docs/BETTERSCALE.md"):
+        for name in (
+            "data/betterscale-results.json",
+            "docs/BETTERSCALE.md",
+            "data/betterscale-qwen-swe.json",
+            "docs/BETTERSCALE-QWEN-SWE.md",
+        ):
             assert page.request.get(f"{args.url}/{name}").status == 200
         browser.close()
     print(

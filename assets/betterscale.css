@@ -101,6 +101,10 @@ html[lang="zh"] .bs-feature [lang="zh"] { display: inline; }
 .bs-page table { border-collapse: collapse; width: 100%; font-size: 13px; }
 .bs-page th, .bs-page td { text-align: left; padding: 12px; border-bottom: 1px solid #bccbbb; }
 .bs-page caption { text-align: left; padding-bottom: 14px; font-size: 12px; }
+.bs-page #qwen-swe > p { margin-top: 22px; max-width: 950px; line-height: 1.8; }
+#qwen-swe details { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--bs-line); }
+#qwen-swe details .bs-table-scroll { margin-top: 16px; }
+#qwen-swe td strong { color: var(--bs-cyan); }
 .bs-bottom-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 75px; align-items: center; }
 .bs-bottom-grid p { font-size: 15px; line-height: 1.85; margin-top: 22px; color: var(--bs-muted); }
 .bs-boundary { border-top: 3px solid #c68c27; background: #ebece1; padding: 30px; }
