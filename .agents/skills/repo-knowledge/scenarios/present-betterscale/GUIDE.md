@@ -131,3 +131,22 @@ with old content. Then verify the final entry URL itself. The Qwen rollout uses
 Local rendered desktop/mobile EN/ZH tests passed; direct remote Chromium hit ERR_EMPTY_RESPONSE in
 this environment, so live verification used HTTP content identity instead of claiming a live-browser
 pass.
+
+## Unified step-efficiency presentation (September 19)
+
+The leading `#step-efficiency` table and Qwen/DSV4 SVGs use the separate
+`data/betterscale-{qwen,dsv4}-steps.json` snapshots. `docs/BETTERSCALE-STEPS.md` owns methods,
+configuration and exclusions. Headline numbers are decode **step rate** gains, not output token/s.
+Qwen has22actual points; DSV4 has19TP +14DP. DSV4's two hollow-square candidate points have only
+2valid cohorts from one startup; other arm/points have at least4. Preserve those limits and the37
+excluded staggered derived cohorts. No historical snapshot was relabeled or service experiment
+rerun.
+
+`#graph-execution` distinguishes Qwen's mostly inside-forward decode improvement from DSV4's
+between-target-forward improvement, which includes useful draft/sampling and is not pure idle.
+Legacy incremental studies and service/quality/capacity sections remain in collapsed archives.
+`assets/betterscale.js` opens enclosing details for old hash links; do not break published anchors.
+The browser checker verifies headline ranges against the snapshots, loads both SVGs, checks old hash
+reveal and validates all retained evidence on desktop/mobile in both languages. Full vector figures
+open separately for small-screen inspection. This is source-result evidence, not a new Qwen PyPI
+installation claim or official leaderboard entry.

@@ -15,6 +15,10 @@ def main():
     evidence = json.loads((root / "data/betterscale-results.json").read_text())
     qwen = json.loads((root / "data/betterscale-qwen-swe.json").read_text())
     mechanism = json.loads((root / "data/betterscale-qwen-mechanism.json").read_text())
+    steps = {
+        key: json.loads((root / f"data/betterscale-{key}-steps.json").read_text())
+        for key in ("qwen", "dsv4")
+    }
     ecosystem = json.loads((root / "data/ecosystem.json").read_text())
     workshop_mod_count = sum(
         item["artifact_type"] in {"runtime_component", "bridge"}
@@ -48,6 +52,36 @@ def main():
                 assert response.status == 200
                 page.wait_for_function(
                     "lang => document.documentElement.lang === lang", arg=language
+                )
+                for key, data in steps.items():
+                    for topology in ("tp", "dp") if key == "dsv4" else ("qwen",):
+                        points = [
+                            point
+                            for point in data["points"]
+                            if point["case"]["kind"] == "decode"
+                            and (key == "qwen" or point["topology"] == topology)
+                        ]
+                        gains = [point["step_rate_gain_pct"] for point in points]
+                        assert page.locator(
+                            f'[data-step-model="{topology}"] strong'
+                        ).inner_text() == (f"+{min(gains):.2f}–{max(gains):.2f}%")
+                assert page.locator(".bs-archive[open]").count() == 0
+                for img in page.locator(".bs-step-figure img").all():
+                    img.scroll_into_view_if_needed()
+                    img.evaluate("e => e.decode()")
+                    assert img.evaluate("e => e.naturalWidth > 0")
+                assert "37" in page.locator("#step-efficiency").inner_text()
+                page.locator("#step-efficiency").screenshot(
+                    path=str(output / f"steps-{label}-{language}.png"),
+                    style=".site-nav, .lang-toggle { visibility: hidden; }",
+                )
+                # Previously shared hash links must open their enclosing archive.
+                page.evaluate("location.hash = 'qwen-mechanism'")
+                page.wait_for_function(
+                    "document.querySelector('#qwen-mechanism').closest('details').open"
+                )
+                page.locator(".bs-archive").evaluate_all(
+                    "nodes => nodes.forEach(n => n.open = true)"
                 )
                 assert (
                     page.locator("#measurements h2").evaluate(
@@ -233,6 +267,9 @@ def main():
             "docs/BETTERSCALE.md",
             "data/betterscale-qwen-swe.json",
             "docs/BETTERSCALE-QWEN-SWE.md",
+            "docs/BETTERSCALE-STEPS.md",
+            "data/betterscale-qwen-steps.json",
+            "data/betterscale-dsv4-steps.json",
         ):
             assert page.request.get(f"{args.url}/{name}").status == 200
         browser.close()
