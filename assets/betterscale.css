@@ -205,3 +205,12 @@ body[data-page="betterscale"] .brand-copy small { color: #bacac4; }
   .bs-qwen-counts > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .bs-qwen-counts dd { margin: 0; white-space: nowrap; }
 }
+
+/* Step evidence leads; historical controls remain discoverable, not competing heroes. */
+.bs-step-figure { margin: 36px 0; }
+.bs-step-figure img { display: block; width: 100%; height: auto; background: white; }
+.bs-step-figure figcaption { margin-top: 14px; font-size: 13px; line-height: 1.8; color: var(--bs-muted); }
+.bs-archive { border-top: 1px solid var(--bs-line); }
+.bs-archive > summary { padding-block: 26px; cursor: pointer; font-weight: 650; font-size: 18px; }
+.bs-archive[open] > summary { color: var(--bs-cyan); }
+#graph-execution .bs-qwen-flow p { margin-top: 12px; font-size: 14px; line-height: 1.75; }
