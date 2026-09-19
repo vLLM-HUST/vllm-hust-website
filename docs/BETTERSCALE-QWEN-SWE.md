@@ -100,3 +100,43 @@ rank-steps, 8,772 hidden/cache checks, maximum absolute difference 0. Three cold
 1536/1536/3072 tokens; eight shared-prefix branches each reused 1536 tokens. Their greedy
 eight-token output matched independent cold requests. This is bounded state/reuse evidence, not a
 language-quality or SWE task-solving evaluation.
+
+## Why the implementation can be faster
+
+The website's mechanism schematic follows the native request path rather than listing patch names.
+Native scheduling, cache-page ownership, input preparation, sampling and output collection remain.
+The changed region is model execution: GDN core and metadata, and the FULL FIA wave protocol.
+
+1. **Mixed graph coverage and direct state access.** The native GDN prefill branch gathers indexed
+   recurrent state, transposes it for chunk computation and writes it back. Owned GDN works directly
+   in its persistent K-V pool; request lengths and slots are metadata values in capacity-keyed FULL
+   graphs. This is not a claim that every intermediate layout conversion has disappeared.
+1. **Less surrounding kernel work.** Fused preprocessing combines Q/K/V preparation, normalization
+   and gating. Shared intermediate layouts and empty-task guards reduce work around chunk GDN.
+1. **Less repeated host protocol work.** The native FULL FIA update path is replaced, within the
+   qualified owned wave, by one native plan and banked metadata publication. Upload/consume events
+   protect reuse; caller-ordered replay no longer needs the old task-update host barrier. Native
+   tiling decisions, numerical FIA kernels and graph submission remain.
+
+The [diagnostic snapshot](../data/betterscale-qwen-mechanism.json) preserves both ranks' six-step
+observations from `aiv-service-profile1` and `fia-wave-primed-profile1`, processed by TraceLoom
+`c2a6920`. Each rank changes from 96 to 6 FIA host calls, 96 to 0 task-update pairs, and 6 to 0 old
+host stream barriers. Each graph body still contains 16 numerical FIA kernels. A task-update pair
+means one begin/end pair, not the sum of the two counts.
+
+This is an **earlier BetterScale versus later BetterScale, APC-off diagnostic**. It is not the
+native-versus-final APC-on SWE experiment above, and not a complete ablation. Both diagnostic arms
+use AIV. Profile perturbation and different bank phases limit timing attribution; no per-mechanism
+percentage contribution is assigned to the combined HTTP gain. Startup priming moves first-use setup
+before traffic rather than eliminating the work. The public diagram is a call-path schematic, not a
+measured or time-proportional timeline.
+
+Current source consolidates the entry as `betterscale.worker.Worker`; old Qwen names are aliases.
+The measured source remains `4d08136` and is not relabelled. The consolidation's separate
+[correctness record](https://github.com/vLLM-HUST/BetterScale/blob/7b72f05/docs/evidence/worker-unification.json)
+is not a fresh performance result. Read the
+[GDN native-path and hook map](https://github.com/vLLM-HUST/BetterScale/blob/98f5071/src/betterscale/patches/qwen_gdn/README.md)
+and
+[FIA protocol boundary](https://github.com/vLLM-HUST/BetterScale/blob/98f5071/src/betterscale/patches/qwen_fia/README.md)
+for the execution details. These source changes do not establish Qwen availability in the older DSV4
+PyPI installation command.
