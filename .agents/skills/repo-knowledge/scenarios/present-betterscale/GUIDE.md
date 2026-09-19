@@ -150,3 +150,18 @@ The browser checker verifies headline ranges against the snapshots, loads both S
 reveal and validates all retained evidence on desktop/mobile in both languages. Full vector figures
 open separately for small-screen inspection. This is source-result evidence, not a new Qwen PyPI
 installation claim or official leaderboard entry.
+
+## Direct installation commands (0.5.0)
+
+The integration section now separates DSV4 and Qwen installation, complete launch, and request
+checks. Both use PyPI0.5.0; Qwen's `python -m betterscale serve-qwen` launcher supplies packaged
+native paths and pre-startup FIA preload. Do not restore source-only/manual-library instructions as
+the normal user route. A pinned existing Linux/aarch64 Ascend runtime and local model weights remain
+prerequisites. Historical performance numbers are not new0.5.0 measurements.
+
+The MOD panel links directly to `#install-qwen`; DSV4 still has both full commands. Website CPU CI
+assembles the sdist's prebuilt ARM payload and explicitly cross-installs its local wheel into a
+target directory for Python/config inspection only. It never loads native ARM code. Actual
+installed-service qualification belongs to BetterScale. Keep displayed command/version checks and
+the browser checker aligned; cache-version assertions should require a versioned asset URL, not
+freeze an obsolete nonce.

@@ -1225,8 +1225,8 @@
         "python": [
           ">=3.12"
         ],
-        "requirements_en": "Native Worker entry; qualified TP8 four-seat and DP8 two-seats-per-rank K5 configurations only. No Extension Manager bundle contract. vllm-betterscale 0.3.2 is public on PyPI; the development repository is public under Apache-2.0. Full shapes, KV budgets and quality limits are in the project page.",
-        "requirements_zh": "通过原生 Worker 接入；仅验收 TP8 四席位、DP8 每 rank 两席位的 K5 配置。不是 Extension Manager bundle。vllm-betterscale 0.3.2 已在 PyPI 公开，开发仓库以 Apache-2.0 开源；完整形状、KV 预算及质量边界见项目介绍。"
+        "requirements_en": "One native Worker entry: DSV4 TP8/DP8 K5 or Qwen27 BF16 TP2 FULL without MTP. vllm-betterscale 0.5.0 includes qualified Linux/aarch64 native libraries; an existing pinned Ascend runtime and model weights are required. No Extension Manager bundle contract. Native third-party license terms and bounded configurations are documented on the project page.",
+        "requirements_zh": "统一原生 Worker：DSV4 TP8／DP8 K5，或 Qwen27 BF16 TP2 FULL、无 MTP。vllm-betterscale 0.5.0 包含已验收 Linux/aarch64 原生库，仍需已有固定 Ascend 运行时和模型权重。不是 Extension Manager bundle；原生第三方许可与配置边界见项目页。"
       },
       "evidence_level": "hardware_verified"
     }

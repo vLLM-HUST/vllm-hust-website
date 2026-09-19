@@ -165,10 +165,13 @@ def main():
                 for detail_id in ("qwen-repeats", "qwen-latency"):
                     page.locator(f"#{detail_id} summary").click()
                 integration = page.locator("#integration")
-                assert "vllm-betterscale==0.4.1" in integration.inner_text()
+                assert "vllm-betterscale==0.5.0" in integration.inner_text()
+                assert "python -m betterscale serve-qwen" in integration.inner_text()
+                assert "BETTERSCALE_GDN_LIBRARY=" not in integration.inner_text()
                 assert integration.locator("details").count() == 2
                 for details in integration.locator("details").all():
-                    details.locator("summary").click()
+                    if not details.evaluate("e => e.open"):
+                        details.locator("summary").click()
                     assert (
                         "--worker-cls betterscale.worker.Worker" in details.inner_text()
                     )
