@@ -1225,8 +1225,8 @@
         "python": [
           ">=3.12"
         ],
-        "requirements_en": "One native Worker entry: DSV4 TP8/DP8 K5 or Qwen27 BF16 TP2 FULL without MTP. vllm-betterscale 0.5.0 includes qualified Linux/aarch64 native libraries; an existing pinned Ascend runtime and model weights are required. No Extension Manager bundle contract. Native third-party license terms and bounded configurations are documented on the project page.",
-        "requirements_zh": "统一原生 Worker：DSV4 TP8／DP8 K5，或 Qwen27 BF16 TP2 FULL、无 MTP。vllm-betterscale 0.5.0 包含已验收 Linux/aarch64 原生库，仍需已有固定 Ascend 运行时和模型权重。不是 Extension Manager bundle；原生第三方许可与配置边界见项目页。"
+        "requirements_en": "One native Worker entry: DSV4 TP8/DP8 K5 or Qwen27 BF16 TP2 FULL without MTP. vllm-betterscale 0.5.1 includes qualified Linux/aarch64 native libraries; an existing pinned Ascend runtime and model weights are required. No Extension Manager bundle contract. Native third-party license terms and bounded configurations are documented on the project page.",
+        "requirements_zh": "统一原生 Worker：DSV4 TP8／DP8 K5，或 Qwen27 BF16 TP2 FULL、无 MTP。vllm-betterscale 0.5.1 包含已验收 Linux/aarch64 原生库，仍需已有固定 Ascend 运行时和模型权重。不是 Extension Manager bundle；原生第三方许可与配置边界见项目页。"
       },
       "evidence_level": "hardware_verified"
     }

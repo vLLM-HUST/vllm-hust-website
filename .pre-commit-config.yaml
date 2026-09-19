@@ -54,7 +54,7 @@ repos:
   hooks:
   - id: detect-secrets
     # BetterScale snapshot carries public Git object IDs, like the other evidence JSON.
-    exclude: ^(\.env\.template|tests/fixtures/|data/examples/.*\.json|data/leaderboard_.*\.json|data/leadership_performance_targets\.json|data/official_targets\.json|data/changzheng_release\.json|data/betterscale-(results|qwen-swe|qwen-steps|dsv4-steps)\.json|data/backups/|reports/prefix_repetition_wrong_gpu_mem_removed_20260726\.json)$
+    exclude: ^(\.env\.template|tests/fixtures/|data/examples/.*\.json|data/leaderboard_.*\.json|data/leadership_performance_targets\.json|data/official_targets\.json|data/changzheng_release\.json|data/betterscale-(results|qwen-swe|qwen-steps|qwen-mc2|dsv4-steps)\.json|data/backups/|reports/prefix_repetition_wrong_gpu_mem_removed_20260726\.json)$
 
 - repo: local
   hooks:

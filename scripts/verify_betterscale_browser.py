@@ -100,6 +100,25 @@ def main():
                 assert page.evaluate(
                     "document.documentElement.scrollWidth <= window.innerWidth"
                 ), f"Horizontal page overflow: {label}/{language}"
+                mc2 = json.loads((root / "data/betterscale-qwen-mc2.json").read_text())
+                rows = page.locator("#qwen-mc2 tbody tr")
+                for i, tokens in enumerate((1024, 1536)):
+                    point = next(
+                        p
+                        for p in mc2["points"]
+                        if p["rank"] == 0
+                        and p["kind"] == "prefill"
+                        and p["tokens"] == tokens
+                    )
+                    assert rows.nth(i).locator("td").all_text_contents() == [
+                        str(tokens),
+                        f"{point['split']['forward_ms']:.2f}",
+                        f"{point['mc2']['forward_ms']:.2f}",
+                        f"{point['forward_reduction_percent']:.2f}%",
+                    ]
+                page.locator("#qwen-mc2").screenshot(
+                    path=str(output / f"mc2-{label}-{language}.png")
+                )
                 capacity = page.locator("#capacity")
                 assert "96.84%" in capacity.inner_text()
                 assert "TP8" in capacity.inner_text() and "DP8" in capacity.inner_text()
@@ -165,7 +184,7 @@ def main():
                 for detail_id in ("qwen-repeats", "qwen-latency"):
                     page.locator(f"#{detail_id} summary").click()
                 integration = page.locator("#integration")
-                assert "vllm-betterscale==0.5.0" in integration.inner_text()
+                assert "vllm-betterscale==0.5.1" in integration.inner_text()
                 assert "python -m betterscale serve-qwen" in integration.inner_text()
                 assert "BETTERSCALE_GDN_LIBRARY=" not in integration.inner_text()
                 assert integration.locator("details").count() == 2
