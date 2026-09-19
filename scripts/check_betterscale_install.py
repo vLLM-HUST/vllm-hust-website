@@ -32,9 +32,13 @@ def commands(root):
     assert len(copies) == 2
     for block in copies:
         install, command = block.split("\n", 1)
-        assert install == "python -m pip install --no-deps vllm-betterscale==0.4.1"
+        assert install == "python -m pip install --no-deps vllm-betterscale==0.5.0"
         argv = shlex.split(command.replace("\\\n", ""))
         assert argv in result.values(), "MOD and detail-page commands drifted"
+    assert (
+        "python -m betterscale serve-qwen /models/Qwen3.8-27B --devices 0,1 --port 8000"
+        in page
+    )
     return result
 
 
@@ -108,7 +112,7 @@ def main():
     from betterscale.compat import pins
 
     dist = importlib.metadata.distribution("vllm-betterscale")
-    assert dist.version == betterscale.__version__ == "0.4.1"
+    assert dist.version == betterscale.__version__ == "0.5.0"
     assert not dist.requires and not dist.entry_points
     assert pins()["source_files"]
     root = Path(__file__).resolve().parents[1]
