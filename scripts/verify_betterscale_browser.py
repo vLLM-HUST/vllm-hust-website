@@ -14,6 +14,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     evidence = json.loads((root / "data/betterscale-results.json").read_text())
     qwen = json.loads((root / "data/betterscale-qwen-swe.json").read_text())
+    mechanism = json.loads((root / "data/betterscale-qwen-mechanism.json").read_text())
     ecosystem = json.loads((root / "data/ecosystem.json").read_text())
     workshop_mod_count = sum(
         item["artifact_type"] in {"runtime_component", "bridge"}
@@ -75,6 +76,19 @@ def main():
                 assert "32/32" in page.locator("#prefix-reuse").inner_text()
                 qwen_section = page.locator("#qwen-swe")
                 assert "Qwen3.8-27B" in qwen_section.inner_text()
+                for key, counts in mechanism["display_counts"].items():
+                    actual = page.locator(
+                        f'[data-qwen-mechanism="{key}"] dd'
+                    ).inner_text()
+                    assert actual == f"{counts[0]} → {counts[1]}"
+                mechanism_section = page.locator("#qwen-mechanism")
+                assert mechanism_section.locator(".bs-qwen-cards article").count() == 3
+                assert "APC-off" in mechanism_section.inner_text()
+                assert "FULL_AND_PIECEWISE" in mechanism_section.inner_text()
+                mechanism_section.screenshot(
+                    path=str(output / f"qwen-mechanism-{label}-{language}.png"),
+                    style=".site-nav, .lang-toggle { visibility: hidden; }",
+                )
                 for concurrency, gain in qwen["throughput_gain_percent"].items():
                     cells = page.locator(
                         f'[data-qwen-concurrency="{concurrency}"] td'

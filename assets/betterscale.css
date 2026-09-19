@@ -176,3 +176,32 @@ body[data-page="betterscale"] .brand-copy small { color: #bacac4; }
 #capacity .bs-study-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
 #capacity .bs-study { padding: 24px; }
 @media (max-width: 760px) { #capacity .bs-study-grid { grid-template-columns: 1fr; } }
+
+/* Qwen: native call path first, then changed work and its bounded evidence. */
+.bs-qwen-mechanism { margin: 32px 0; padding: 28px; border: 1px solid var(--bs-line); background: #fff; }
+.bs-qwen-mechanism h3 { margin: 10px 0 16px; font-size: clamp(25px, 3vw, 36px); line-height: 1.2; }
+.bs-qwen-flow { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 12px; margin: 24px 0 12px; }
+.bs-qwen-flow > div { padding: 16px; background: var(--bs-paper); color: var(--bs-muted); font-size: 12px; }
+.bs-qwen-flow strong { display: block; margin-top: 8px; color: var(--bs-ink); font-size: 16px; }
+.bs-qwen-flow .changed { background: #daf0e9; border-left: 4px solid var(--bs-cyan); }
+.bs-qwen-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 28px 0; }
+.bs-qwen-cards article { min-width: 0; border-top: 3px solid var(--bs-ink); padding-top: 16px; }
+.bs-qwen-mechanism h4 { margin: 12px 0; font-size: 20px; line-height: 1.35; }
+.bs-qwen-cards .bs-kicker { font-size: 11px; overflow-wrap: anywhere; }
+.bs-qwen-cards p { font-size: 14px; line-height: 1.75; }
+.bs-qwen-cards .bs-qwen-after { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--bs-line); }
+.bs-qwen-diagnostic { padding: 24px; margin: 24px 0; background: var(--bs-paper); }
+.bs-qwen-diagnostic h4 { margin-top: 0; }
+.bs-qwen-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 24px 0; }
+.bs-qwen-counts dt { font-size: 13px; color: var(--bs-muted); }
+.bs-qwen-counts dd { margin: 6px 0 0; font-size: clamp(26px, 3vw, 38px); font-weight: 750; font-variant-numeric: tabular-nums; }
+.bs-qwen-counts dd span { color: var(--bs-cyan); }
+.bs-page .bs-qwen-result-heading { margin: 32px 0 12px; font-size: 25px; }
+@media (max-width: 760px) {
+  .bs-qwen-mechanism { padding: 20px 16px; }
+  .bs-qwen-flow, .bs-qwen-cards { grid-template-columns: 1fr; }
+  .bs-qwen-diagnostic { padding: 16px; }
+  .bs-qwen-counts { grid-template-columns: 1fr; gap: 14px; }
+  .bs-qwen-counts > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .bs-qwen-counts dd { margin: 0; white-space: nowrap; }
+}
