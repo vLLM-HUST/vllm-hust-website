@@ -133,6 +133,24 @@ def main():
                 page.locator("#qwen-mtp-apc").screenshot(
                     path=str(output / f"mtp-apc-{label}-{language}.png")
                 )
+                async_data = json.loads(
+                    (root / "data/betterscale-qwen-mtp-async.json").read_text()
+                )["end_to_end"]
+                for concurrency in async_data["concurrencies"]:
+                    c = str(concurrency)
+                    cells = page.locator(f'[data-mtp-async-c="{c}"] td')
+                    assert cells.all_text_contents() == [
+                        c,
+                        f"{async_data['pooled']['baseline'][c]['tokens_per_s']:.2f}",
+                        f"{async_data['pooled']['candidate'][c]['tokens_per_s']:.2f}",
+                        f"+{async_data['throughput_gain_percent'][c]:.2f}%",
+                    ]
+                async_section = page.locator("#qwen-mtp-async")
+                assert "8.95 → 1.04" in async_section.inner_text()
+                assert "99.56" in async_section.inner_text()
+                async_section.screenshot(
+                    path=str(output / f"mtp-async-{label}-{language}.png")
+                )
                 capacity = page.locator("#capacity")
                 assert "96.84%" in capacity.inner_text()
                 assert "TP8" in capacity.inner_text() and "DP8" in capacity.inner_text()
@@ -306,6 +324,8 @@ def main():
             "docs/BETTERSCALE-STEPS.md",
             "data/betterscale-qwen-mtp-apc.json",
             "docs/BETTERSCALE-QWEN-MTP-APC.md",
+            "data/betterscale-qwen-mtp-async.json",
+            "docs/BETTERSCALE-QWEN-MTP-ASYNC.md",
             "data/betterscale-qwen-steps.json",
             "data/betterscale-dsv4-steps.json",
         ):
