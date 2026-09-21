@@ -182,3 +182,22 @@ boundaries, not exhaustive state equivalence. Explicit MTP2 prototype only; K3 F
 unresolved. Keep product install commands unchanged. Browser QA checks rendered values against the
 snapshot and captures the new section in both languages at desktop/mobile widths. Exact public copy
 still needs Fletcher's approval before publication; this entry is not proof of deployment.
+
+## MTP2 device-continuation SWE acceptance (September21, prepared copy)
+
+`#qwen-mtp-async` adds one collapsed increment beside the previous MTP APC study.
+`data/betterscale-qwen-mtp-async.json` separates E2E evidence from short-profile attribution;
+`docs/BETTERSCALE-QWEN-MTP-ASYNC.md` explains original dependencies, interventions, full repeats,
+latency and limits. E2E is same hw3 pair ABBA, eight original SWE sessions /78requests
+/20,648outputs per cohort, C1/2/4/8, TP2/BF16/MTP2/APC/AIV,6GiB KV/2048budget/8192context. Native
+includes only the required Mamba ABI bridge; candidate includes all owned leaves plus lookahead APC.
+Gains35.70/45.54/58.24/30.92% are FULL-STACK gains, not isolated async gains. Prefix hits differ.
+All1248timed requests and four server exits passed.
+
+The separate synthetic profile compares APC-only versus device-length prototypes, not native: rank0
+postdraft decode8.947→1.042ms, mixed8.972→1.121ms. Both ranks' seams and graph durations are
+retained. Do not add profile and E2E percentages or claim a monolithic sampler-inclusive graph,
+released wheel, K3/K4 or accuracy. C8 hits decrease in both arms; candidate throughput falls versus
+C4, native repeats99.56/116.63vary. Eviction/rescheduling without restored cache is an unverified
+hypothesis. Fletcher explicitly deferred that investigation. Exact-copy approval/public deployment
+remain separate from preparing this entry.
