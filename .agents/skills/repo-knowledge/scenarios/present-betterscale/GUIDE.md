@@ -165,3 +165,20 @@ target directory for Python/config inspection only. It never loads native ARM co
 installed-service qualification belongs to BetterScale. Keep displayed command/version checks and
 the browser checker aligned; cache-version assertions should require a versioned asset URL, not
 freeze an obsolete nonce.
+
+## MTP2 APC boundary increment (September 20, publication draft)
+
+`#qwen-mtp-apc` is a compact collapsed increment beside Qwen MC2, not a replacement for the main
+step curves. `data/betterscale-qwen-mtp-apc.json` and `docs/BETTERSCALE-QWEN-MTP-APC.md` retain all
+measured cohorts and the shifted-input cache mechanism. Both arms are BetterScale MTP2, not native
+vLLM. Same pair, same-day sequential runs, not ABBA; synthetic shared-prefix3073–3129 input /64
+output tokens, APC on,6GiB KV. Output throughput includes prefill. C8 104.38→305.92tok/s (2.93×),
+TTFT2.51→0.27s; do not relabel these as SWE, step-rate, released-wheel, or official-leaderboard
+claims.
+
+The lookahead-aware hash restores3072 rather than1536 cached tokens when the next token matches.
+Changed lookahead still retreats a checkpoint. Cold/warm text and branch checks cover1536/3072
+boundaries, not exhaustive state equivalence. Explicit MTP2 prototype only; K3 FIA failure remains
+unresolved. Keep product install commands unchanged. Browser QA checks rendered values against the
+snapshot and captures the new section in both languages at desktop/mobile widths. Exact public copy
+still needs Fletcher's approval before publication; this entry is not proof of deployment.

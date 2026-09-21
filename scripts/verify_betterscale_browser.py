@@ -119,6 +119,20 @@ def main():
                 page.locator("#qwen-mc2").screenshot(
                     path=str(output / f"mc2-{label}-{language}.png")
                 )
+                mtp = json.loads(
+                    (root / "data/betterscale-qwen-mtp-apc.json").read_text()
+                )
+                mtp_rows = page.locator("#qwen-mtp-apc tbody tr")
+                for i, point in enumerate(mtp["results"]):
+                    assert mtp_rows.nth(i).locator("td").all_text_contents() == [
+                        str(point["concurrency"]),
+                        f"{point['before']['output_tps']:.2f}",
+                        f"{point['after']['output_tps']:.2f}",
+                        f"{point['ratio']:.2f}×",
+                    ]
+                page.locator("#qwen-mtp-apc").screenshot(
+                    path=str(output / f"mtp-apc-{label}-{language}.png")
+                )
                 capacity = page.locator("#capacity")
                 assert "96.84%" in capacity.inner_text()
                 assert "TP8" in capacity.inner_text() and "DP8" in capacity.inner_text()
@@ -290,6 +304,8 @@ def main():
             "data/betterscale-qwen-swe.json",
             "docs/BETTERSCALE-QWEN-SWE.md",
             "docs/BETTERSCALE-STEPS.md",
+            "data/betterscale-qwen-mtp-apc.json",
+            "docs/BETTERSCALE-QWEN-MTP-APC.md",
             "data/betterscale-qwen-steps.json",
             "data/betterscale-dsv4-steps.json",
         ):
