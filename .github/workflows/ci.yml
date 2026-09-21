@@ -80,7 +80,7 @@ jobs:
           python-version: "3.12"
       - name: Assemble and inspect the public ARM package on CPU (no native loading)
         run: |
-          python -m pip wheel --no-deps vllm-betterscale==0.5.0 --wheel-dir /tmp/betterscale-wheels
+          python -m pip wheel --no-deps vllm-betterscale==0.5.1 --wheel-dir /tmp/betterscale-wheels
           python -m pip install --no-deps --target /tmp/betterscale-package --platform linux_aarch64 --only-binary=:all: /tmp/betterscale-wheels/*.whl
           echo "PYTHONPATH=/tmp/betterscale-package" >> "$GITHUB_ENV"
       - name: Verify wheel and displayed TP8 / DP8 launch contracts (CPU only)
