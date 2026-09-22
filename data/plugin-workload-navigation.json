@@ -86,6 +86,7 @@
     "qos-scheduler-migration": ["latency_slo", "high_concurrency"],
     "betterscale": ["distributed_pipeline"],
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
+    "clm-lifecycle": ["long_context", "memory_kv_pressure", "latency_slo"],
     "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"]
   }
 }
