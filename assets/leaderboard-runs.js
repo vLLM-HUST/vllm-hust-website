@@ -1,0 +1,195 @@
+/* Review-only controller. The legacy leaderboard and its publication data stay untouched. */
+(() => {
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const words = {
+        en: {
+            title: 'One workload. Every run.', lede: 'Model × parallel configuration → task → MOD. Real measurements, with the configuration beside each run.',
+            review: 'REVIEW PREVIEW', old: 'Existing leaderboard ↗', model: 'Model / parallel', task: 'Task tag', mod: 'MOD',
+            all: 'All', native: 'Native', current: 'Current publication', historical: 'Historical evidence', records: 'Records',
+            hardware: 'Hardware', unknown: 'Not recorded', results: 'Measurements', tasks: 'Task definitions',
+            taskHint: 'A tag identifies the recorded workload contract, not a server implementation. Click a tag to inspect its definition.',
+            hint: 'TTFT / TPOT are request means in ms; P95 is per run. No SLO thresholds. Missing measurements stay blank (—). Repeats are separate rows, not best-run selections.',
+            historyHint: 'Historical rows are retained evidence, not newly verified targets. Different run prefixes need not be a controlled comparison.',
+            config: 'Run configuration', open: 'Expand', close: 'Collapse', raw: 'Raw result ↗', manifest: 'Repeat evidence ↗',
+            source: 'Source ↗', empty: 'No runs match these filters.', reset: 'Reset', previous: 'Previous', next: 'Next',
+            rows: 'rows', runs: 'runs / records', tags: 'task tags', observed: 'sealed individual repeats',
+            dataset: 'Dataset / sampler', input: 'Input tokens', output: 'Output tokens', concurrency: 'Concurrency / batch',
+            rate: 'Request rate', count: 'Requests / iterations', parameters: 'Full sampling parameters', variable: 'Variable',
+            server: 'Effective server parameters', client: 'Recorded client parameters', provenance: 'Provenance',
+            repeat: 'Repeat', batch: 'Batch latency (ms)', aggregate: 'Aggregate only', aggregateHint: 'Individual repeat evidence unavailable here; no pooled P95 is claimed.',
+            loading: 'Loading published evidence…', error: 'Could not load the published snapshot. Reload to retry.',
+            supplementMissing: 'Per-run evidence supplement unavailable; showing original published records without inventing repeats or P95.',
+            snapshot: 'Published snapshot', throughput: 'Throughput (tok/s)', prefix: 'Run prefix', scope: 'Evidence scope',
+            throughputHint: 'Output tokens/s where declared. Legacy token-count basis may be unspecified; inspect run configuration.',
+            legacyLength: 'Variable; recorded summary', reviewNote: 'Independent review entry. The existing leaderboard and benchmark artifacts are unchanged.'
+        },
+        zh: {
+            title: '同一任务，看清每一次运行。', lede: '模型 × 并行配置 → 任务 → MOD。实测成绩与每次运行的配置，放在同一张表里。',
+            review: '评审预览', old: '现有排行榜 ↗', model: '模型 / 并行配置', task: '任务 tag', mod: 'MOD',
+            all: '全部', native: '原生', current: '当前发布', historical: '历史证据', records: '记录范围',
+            hardware: '硬件', unknown: '未记录', results: '成绩主表', tasks: '任务定义表',
+            taskHint: 'tag 标识已记录的负载口径，不包含服务端实现。点击 tag 可查看任务定义。',
+            hint: 'TTFT / TPOT 为请求均值，单位 ms；P95 按单次 run 展示，不设 SLO 门槛。未测量保留 —，重复运行逐条保留，不挑最好的一次。',
+            historyHint: '历史记录是保留证据，不是重新核验的官方目标。不同 run prefix 的成绩不自动构成控制变量对照。',
+            config: 'Run 配置', open: '展开', close: '收起', raw: '原始结果 ↗', manifest: '重复运行证据 ↗',
+            source: '来源 ↗', empty: '没有符合当前筛选条件的运行。', reset: '重置', previous: '上一页', next: '下一页',
+            rows: '条', runs: '次运行 / 记录', tags: '个任务 tag', observed: '条原始重复成绩',
+            dataset: '数据集 / 采样器', input: '输入 token', output: '输出 token', concurrency: '并发 / batch',
+            rate: '请求速率', count: '请求数 / 迭代数', parameters: '完整采样参数', variable: '变长',
+            server: '实际服务端参数', client: '已记录的客户端参数', provenance: '来源与版本',
+            repeat: '重复', batch: '批次延迟（ms）', aggregate: '仅有汇总值', aggregateHint: '此处没有单次重复证据，不宣称整体 P95。',
+            loading: '正在读取已发布证据……', error: '无法读取已发布快照，请刷新重试。',
+            supplementMissing: '逐 run 补充证据暂不可用；保留原发布记录，不补造重复运行或 P95。',
+            snapshot: '发布快照', throughput: '吞吐（tok/s）', prefix: 'Run prefix', scope: '证据范围',
+            throughputHint: '已明确声明时为输出 tokens/s；旧记录可能未说明 token 统计范围，请查看 run 配置。',
+            legacyLength: '变长；记录摘要', reviewNote: '独立评审入口，现有排行榜及 benchmark 原始工件保持不变。'
+        }
+    };
+    const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
+    const t = key => words[lang()][key] || key;
+    const fmt = value => value === null || value === undefined ? '—' : new Intl.NumberFormat(lang(), { maximumFractionDigits: 2 }).format(value);
+    const state = { rows: [], tasks: [], page: 0, expanded: new Set(), selectedTask: '', ready: false,
+        filters: { hardware: '', modelKey: '', mod: '', taskId: '', source: 'current' }, missingSupplement: false };
+    const pageSize = 40;
+    const link = (url, label) => url ? `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a>` : '';
+    function options(id, values, selected, label = value => value) {
+        $(id).innerHTML = `<option value="">${t('all')}</option>` + [...new Set(values)].map(value => `<option value="${escape(value)}" ${value === selected ? 'selected' : ''}>${escape(label(value))}</option>`).join('');
+    }
+    function renderFilters() {
+        const f = state.filters;
+        options('runs-hardware', state.rows.map(r => r.hardware), f.hardware);
+        $('runs-hardware').querySelector('option[value=""]').remove();
+        $('runs-hardware-context').textContent = f.hardware;
+        const models = new Map(state.rows.filter(r => !f.hardware || r.hardware === f.hardware).map(r => [r.modelKey, `${r.model} · ${r.parallel.label} · ${r.precision} · ${r.parallel.chips ?? '?'} NPU`]));
+        options('runs-model', [...models.keys()], f.modelKey, key => models.get(key));
+        options('runs-mod', state.rows.map(r => r.mod), f.mod, value => value === 'native' ? t('native') : value);
+        options('runs-task', state.tasks.map(task => task.id), f.taskId, value => state.tasks.find(task => task.id === value).label);
+        $('runs-source').innerHTML = ['', 'current', 'historical'].map(value => `<option value="${value}" ${f.source === value ? 'selected' : ''}>${t(value || 'all')}</option>`).join('');
+    }
+    function matches(row) {
+        return Object.entries(state.filters).every(([key, value]) => !value || row[key] === value);
+    }
+    function details(row) {
+        const entry = row.entry, meta = entry.metadata || {};
+        const provenance = { engine: entry.engine, engine_version: entry.engine_version, submitted_at: row.date,
+            git_commit: meta.git_commit, runtime: meta.runtime_provenance,
+            evidence_scope: meta.official_admission_status || row.source, verified: meta.verified,
+            throughput_token_basis: meta.throughput_token_basis || 'unspecified',
+            note: meta.notes, repeat_index: row.repeat, parent_aggregate: row.parentId };
+        return `<tr id="config-${escape(row.id)}" class="run-detail" ${state.expanded.has(row.id) ? '' : 'hidden'}><td colspan="10">
+            <div class="run-detail-head"><strong>${escape(row.prefix)}</strong><span>${link(row.evidence, meta.raw_evidence_url ? t('raw') : t('source'))} ${link(row.manifest, t('manifest'))}</span></div>
+            ${row.aggregate ? `<p>${t('aggregateHint')}</p>` : ''}
+            ${row.metrics.batchLatency !== null ? `<p class="batch-value">${t('batch')}: <strong>${fmt(row.metrics.batchLatency)}</strong> — not TTFT</p>` : ''}
+            <div class="run-config-grid">${[[t('server'), entry.same_spec?.resolved_server_parameters || {}],
+                [t('client'), entry.same_spec?.resolved_client_parameters || {}], [t('provenance'), provenance]]
+                .map(([title, data]) => `<section><h4>${escape(title)}</h4><pre>${escape(JSON.stringify(data, null, 2))}</pre></section>`).join('')}</div>
+        </td></tr>`;
+    }
+    function renderRows() {
+        const filtered = state.rows.filter(matches), maxPage = Math.max(0, Math.ceil(filtered.length / pageSize) - 1);
+        state.page = Math.min(state.page, maxPage);
+        const visible = filtered.slice(state.page * pageSize, (state.page + 1) * pageSize);
+        let previousGroup = '';
+        $('runs-body').innerHTML = visible.map(row => {
+            const group = `${row.modelKey}/${row.taskId}`, boundary = group !== previousGroup;
+            previousGroup = group;
+            return `<tr class="run-row ${boundary ? 'group-start' : ''}" data-run-id="${escape(row.id)}">
+                <td><strong>${escape(row.model)}</strong><small>${escape(row.parallel.label)} · ${escape(row.precision)} · ${row.parallel.chips ?? '?'} NPU</small></td>
+                <td><button type="button" class="task-tag" data-task="${row.taskId}">${escape(row.taskLabel)}</button></td>
+                <td><strong class="mod-label ${row.mod === 'native' ? 'native' : ''}">${escape(row.mod === 'native' ? t('native') : row.mod)}</strong><small>${escape(row.version)}</small></td>
+                ${['ttft', 'tpot', 'ttftP95', 'tpotP95', 'throughput'].map(key => `<td class="metric" data-metric="${key}">${fmt(row.metrics[key])}</td>`).join('')}
+                <td class="run-id"><span>${escape(row.date.slice(0, 10) || '—')}</span><small>${row.aggregate ? `${t('aggregate')} · ${row.aggregate.count}` : row.repeat !== null ? `${t('repeat')} ${row.repeat}` : escape(row.id.slice(0, 8))}</small><small>${t(row.source)}</small></td>
+                <td><button type="button" class="run-toggle" data-run="${escape(row.id)}" aria-expanded="${state.expanded.has(row.id)}" aria-controls="config-${escape(row.id)}">${state.expanded.has(row.id) ? t('close') : t('open')}</button><small class="run-prefix">${escape(row.prefix)}</small></td>
+            </tr>${details(row)}`;
+        }).join('');
+        $('runs-empty').hidden = Boolean(filtered.length);
+        $('runs-count').textContent = `${filtered.length} ${t('runs')} · ${new Set(filtered.map(r => r.taskId)).size} ${t('tags')}`;
+        $('runs-page').textContent = `${state.page + 1} / ${maxPage + 1}`;
+        $('runs-previous').disabled = state.page === 0;
+        $('runs-next').disabled = state.page >= maxPage;
+        renderTasks(filtered);
+    }
+    function lengths(definition, key) {
+        const variable = ['sharegpt', 'custom', 'hf'].includes(definition.dataset);
+        const value = definition[key];
+        return variable ? `${t('variable')}${value !== null ? ` (${t('legacyLength')}: ${value})` : ''}` : value ?? '—';
+    }
+    function renderTasks(rows) {
+        const active = new Set(rows.map(row => row.taskId));
+        if (state.selectedTask) active.add(state.selectedTask);
+        $('tasks-body').innerHTML = state.tasks.filter(task => active.has(task.id)).map(task => {
+            const d = task.definition, p = d.parameters;
+            return `<tr id="${task.id}" tabindex="-1" class="${state.selectedTask === task.id ? 'selected-task' : ''}">
+                <td><strong>${escape(task.label)}</strong></td><td>${escape(p.hf_name || p.dataset_path || d.dataset || '—')}</td>
+                <td>${escape(lengths(d, 'input_length'))}</td><td>${escape(lengths(d, 'output_length'))}</td>
+                <td>${d.concurrency ?? '—'} / ${d.batch_size ?? '—'}</td><td>${escape(p.request_rate ?? '—')}</td>
+                <td>${escape(p.num_prompts ?? p.max_requests ?? p.num_iters ?? '—')}</td>
+                <td><details><summary>${t('parameters')}</summary><pre>${escape(JSON.stringify(d, null, 2))}</pre></details></td>
+            </tr>`;
+        }).join('');
+    }
+    function translate() {
+        for (const node of document.querySelectorAll('[data-runs-i18n]')) node.textContent = t(node.dataset.runsI18n);
+        document.title = lang() === 'zh' ? '统一成绩表 · 评审预览 - vLLM-HUST' : 'Unified runs · Review preview - vLLM-HUST';
+        if (state.ready) { renderFilters(); renderRows(); }
+    }
+    async function initialize() {
+        translate();
+        try {
+            // Existing loader owns atomic snapshots and local/GitHub fallback.
+            // The supplement is optional and only joins by published aggregate ID.
+            const [payload, supplement] = await Promise.all([
+                window.HFDataLoader.loadLeaderboardData(),
+                fetch('./data/leaderboard_run_observations.json').then(response => {
+                    if (!response.ok) throw new Error('Missing run observations');
+                    return response.json();
+                }).catch(() => { state.missingSupplement = true; return {}; })
+            ]);
+            const built = window.LeaderboardRunsModel.build(payload, supplement);
+            Object.assign(state, built, { ready: true });
+            const hardware = [...new Set(state.rows.map(r => r.hardware))];
+            state.filters.hardware = hardware.find(value => value.includes('910B2')) || hardware[0] || '';
+            $('runs-hardware-context').textContent = hardware.join(' / ');
+            $('runs-supplement-warning').hidden = !state.missingSupplement;
+            $('runs-loading').hidden = true;
+            $('runs-content').hidden = false;
+            renderFilters(); renderRows();
+        } catch (error) {
+            $('runs-loading').hidden = true;
+            $('runs-error').hidden = false;
+            console.error('[Unified runs]', error);
+        }
+    }
+    for (const [id, key] of [['runs-hardware', 'hardware'], ['runs-model', 'modelKey'], ['runs-mod', 'mod'], ['runs-task', 'taskId'], ['runs-source', 'source']]) {
+        $(id).addEventListener('change', () => {
+            state.filters[key] = $(id).value; state.page = 0;
+            if (key === 'hardware') { state.filters.modelKey = ''; renderFilters(); }
+            renderRows();
+        });
+    }
+    $('runs-reset').addEventListener('click', () => {
+        Object.keys(state.filters).filter(key => key !== 'hardware').forEach(key => { state.filters[key] = ''; });
+        state.filters.source = 'current'; state.page = 0; renderFilters(); renderRows();
+    });
+    $('runs-previous').addEventListener('click', () => { state.page--; renderRows(); });
+    $('runs-next').addEventListener('click', () => { state.page++; renderRows(); });
+    $('runs-body').addEventListener('click', event => {
+        const run = event.target.closest('[data-run]'), task = event.target.closest('[data-task]');
+        if (run) {
+            const id = run.dataset.run;
+            state.expanded.has(id) ? state.expanded.delete(id) : state.expanded.add(id);
+            renderRows();
+            document.querySelector(`[data-run="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+        }
+        if (task) {
+            state.selectedTask = task.dataset.task;
+            renderTasks(state.rows.filter(matches));
+            $(state.selectedTask).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            $(state.selectedTask).focus({ preventScroll: true });
+        }
+    });
+    window.addEventListener('vllm-hust:langchange', translate);
+    initialize();
+})();
