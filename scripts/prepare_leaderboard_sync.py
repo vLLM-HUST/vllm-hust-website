@@ -267,6 +267,38 @@ def require_historical_unverified_marker(
     return errors
 
 
+def require_dataset_matched_marker(
+    entry: dict[str, Any], source: str, registry: RegistryInfo
+) -> list[str]:
+    """Retain explicitly non-target results without attesting official equivalence."""
+    metadata = entry.get("metadata") or {}
+    same_spec = entry.get("same_spec") or {}
+    prefix = f"{source}:{entry.get('entry_id') or '<missing-entry-id>'}"
+    errors: list[str] = []
+    if metadata.get("verified") is not False:
+        errors.append(f"{prefix}: outside-fixed-target requires verified=false")
+    if metadata.get("measurement_scope") != "dataset-matched":
+        errors.append(f"{prefix}: outside-fixed-target requires dataset-matched scope")
+    for field in (
+        "target_id",
+        "target_version",
+        "profile_id",
+        "target_registry_sha256",
+    ):
+        if metadata.get(field):
+            errors.append(f"{prefix}: outside-fixed-target cannot declare {field}")
+    spec_id = str(same_spec.get("spec_id") or "")
+    if not spec_id or spec_id.startswith("official-") or spec_id in registry.targets:
+        errors.append(
+            f"{prefix}: outside-fixed-target requires a non-official unregistered spec"
+        )
+    if not str(metadata.get("official_admission_reason") or "").strip():
+        errors.append(
+            f"{prefix}: outside-fixed-target requires official_admission_reason"
+        )
+    return errors
+
+
 def validate_compare(payload: Any) -> list[str]:
     if not isinstance(payload, dict):
         return ["leaderboard_compare.json must be an object"]
@@ -294,6 +326,7 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
     marker = load_json(source_dir / "last_updated.json")
     errors: list[str] = []
     historical_unverified = 0
+    outside_fixed_target = 0
     for name, payload in (
         ("leaderboard_single.json", single),
         ("leaderboard_multi.json", multi),
@@ -311,6 +344,9 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
             if metadata.get("official_admission_status") == "historical-unverified":
                 historical_unverified += 1
                 errors.extend(require_historical_unverified_marker(entry, name))
+            elif metadata.get("official_admission_status") == "outside-fixed-target":
+                outside_fixed_target += 1
+                errors.extend(require_dataset_matched_marker(entry, name, registry))
             else:
                 errors.extend(require_public_entry_contract(entry, name, registry))
     historical_admitted = 0
@@ -357,6 +393,7 @@ def validate_snapshot_set(source_dir: Path, registry: RegistryInfo) -> dict[str,
         "compare": len(compare["groups"]),
         "historical": historical_admitted,
         "historical_unverified": historical_unverified,
+        "outside_fixed_target": outside_fixed_target,
     }
 
 
@@ -443,6 +480,7 @@ def write_pr_body(
         f"| Recovered historical snapshot | passed | {counts['historical']} |",
         "| Official entry verification and fixed-target binding | passed | all target-bound entries |",
         f"| Explicit historical-unverified retention markers | passed | {counts['historical_unverified']} |",
+        f"| Explicit dataset-matched, outside-fixed-target records | passed | {counts['outside_fixed_target']} |",
         "",
         "## Checksums",
         "",
