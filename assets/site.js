@@ -3,6 +3,7 @@
         en: {
             navHome: 'Home',
             navLeaderboard: 'Leaderboard',
+            navLeaderboardV2: 'Leaderboard v2',
             navDatasetValidation: 'Dataset validation',
             navAchievements: 'Achievements',
             navNews: 'News',
@@ -32,6 +33,7 @@
         zh: {
             navHome: '首页',
             navLeaderboard: '性能排行榜',
+            navLeaderboardV2: '排行榜 v2',
             navDatasetValidation: '数据集验证',
             navAchievements: '成果',
             navNews: '新闻',
@@ -200,6 +202,7 @@
             navLink('', './index.html#stack', 'navEngine'),
             navLink('', './index.html#projects', 'navProjects'),
             navLink('plugins', './plugins.html', 'navPlugins'),
+            navLink('leaderboard-v2', './leaderboard-runs.html', 'navLeaderboardV2'),
             ...NAV_GROUPS.map((group) => `
                 <details class="nav-group" data-nav-group="${group.id}">
                     <summary class="nav-group-label" id="nav-${group.id}" data-i18n-common="${group.label}">${I18N.en[group.label]}</summary>
