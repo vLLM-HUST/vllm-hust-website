@@ -52,6 +52,10 @@ def main():
             model = next(x["value"] for x in options if "Qwen3.8-27B" in x["label"])
             page.locator("#runs-model").select_option(model)
             assert page.locator(".run-row").count() == 32
+            assert "Leaderboards" in page.locator("#view-runs").inner_text()
+            assert "Tasks" in page.locator("#view-tasks").inner_text()
+            assert page.locator("#view-runs-count").inner_text() == "32"
+            assert page.locator("#view-tasks-count").inner_text() == "8"
             # Verify every visible per-run mean and P95 against real sealed evidence.
             measured = page.locator(".run-row").evaluate_all("""rows=>rows.map(row=>({
                 id:row.dataset.runId, cells:Object.fromEntries([...row.querySelectorAll('[data-metric]')].map(c=>[c.dataset.metric,c.textContent]))

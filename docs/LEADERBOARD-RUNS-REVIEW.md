@@ -7,9 +7,9 @@ navigation, publication schema and snapshots are unchanged.
 
 ## Reading the page
 
-- Use the **Measurements / Task definitions** buttons to switch views; only one table is visible.
-  Clicking a task tag switches to its definition and highlights the row. Returning preserves the
-  result filters, sorting and page.
+- Use the **Leaderboards / Tasks** tabs to switch views; only one table is visible. Clicking a task
+  tag switches to its definition and highlights the row. Returning preserves the result filters,
+  sorting and page.
 - Click a measurement column title to toggle ascending/descending sorting; its separate small arrow
   opens a dropdown with searchable checkboxes. Selections combine OR within a column and AND across
   columns, over all pages. Apply commits checkbox changes; Cancel / Escape discard them. Clear

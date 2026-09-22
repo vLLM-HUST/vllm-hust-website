@@ -222,6 +222,8 @@
             </tr>${details(row)}`;
         }).join('');
         $('runs-empty').hidden = Boolean(filtered.length);
+        $('view-runs-count').textContent = filtered.length;
+        $('view-tasks-count').textContent = new Set(filtered.map(r => r.taskId)).size;
         $('runs-count').textContent = `${filtered.length} ${t('runs')} · ${new Set(filtered.map(r => r.taskId)).size} ${t('tags')}`;
         $('runs-page').textContent = `${state.page + 1} / ${maxPage + 1}`;
         $('runs-previous').disabled = state.page === 0;
