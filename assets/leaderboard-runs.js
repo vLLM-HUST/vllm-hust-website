@@ -249,7 +249,7 @@
     }
     function translate() {
         for (const node of document.querySelectorAll('[data-runs-i18n]')) node.textContent = t(node.dataset.runsI18n);
-        document.title = lang() === 'zh' ? '统一成绩表 · 评审预览 - vLLM-HUST' : 'Unified runs · Review preview - vLLM-HUST';
+        document.title = lang() === 'zh' ? '排行榜 v2 - vLLM-HUST' : 'Leaderboard v2 - vLLM-HUST';
         if (state.ready) { renderHeaders(); renderRows(); }
     }
     async function initialize() {
