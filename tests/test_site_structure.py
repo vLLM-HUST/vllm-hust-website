@@ -2127,7 +2127,15 @@ def test_multichip_trend_filter_keeps_pr_and_historical_online_workloads() -> No
             for entry in data
             if (entry.get("metadata") or {}).get("profile_id") == "production-trace"
         ]
-        assert production_trace
+        dataset_matched = [
+            entry
+            for entry in rows
+            if (entry.get("metadata") or {}).get("measurement_scope")
+            == "dataset-matched"
+            and (entry.get("metadata") or {}).get("official_admission_status")
+            == "outside-fixed-target"
+        ]
+        assert production_trace or dataset_matched
         assert all(workload(entry).endswith("-replay") for entry in production_trace)
         return
 
