@@ -129,6 +129,7 @@ def test_valid_snapshot_and_declared_empty_compare_pass(tmp_path: Path) -> None:
         "compare": 0,
         "historical": 0,
         "historical_unverified": 0,
+        "outside_fixed_target": 0,
     }
 
 
@@ -295,3 +296,50 @@ def test_pr_body_contains_provenance_counts_and_checksums(tmp_path: Path) -> Non
     assert f"Target registry SHA256: `{info.sha256}`" in text
     assert "Single-chip snapshot | passed | 1" in text
     assert "Previous SHA256" in text
+
+
+def dataset_matched_entry() -> dict:
+    return {
+        "entry_id": "dataset-matched-entry",
+        "metadata": {
+            "verified": False,
+            "measurement_scope": "dataset-matched",
+            "official_admission_status": "outside-fixed-target",
+            "official_admission_reason": "No fixed-target equivalence claimed.",
+        },
+        "same_spec": {"spec_id": "new-tp2-deployment"},
+    }
+
+
+def test_dataset_matched_snapshot_is_retained_without_official_admission(tmp_path):
+    _, _, info = registry(tmp_path)
+    source = snapshot_dir(tmp_path, info)
+    dump(source / "leaderboard_single.json", [dataset_matched_entry()])
+    assert MODULE.validate_snapshot_set(source, info)["outside_fixed_target"] == 1
+    assert MODULE.admitted_entry_ids(source, info) == set()
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        {"verified": True},
+        {"measurement_scope": "fixed-target"},
+        {"target_id": "official-target"},
+        {"official_admission_reason": ""},
+    ],
+)
+def test_dataset_matched_marker_rejects_ambiguous_or_official_claims(
+    tmp_path, mutation
+):
+    _, _, info = registry(tmp_path)
+    payload = dataset_matched_entry()
+    payload["metadata"].update(mutation)
+    assert MODULE.require_dataset_matched_marker(payload, "test", info)
+
+
+@pytest.mark.parametrize("spec_id", ["official-target", "official-unregistered", ""])
+def test_dataset_matched_marker_cannot_bypass_registered_targets(tmp_path, spec_id):
+    _, _, info = registry(tmp_path)
+    payload = dataset_matched_entry()
+    payload["same_spec"]["spec_id"] = spec_id
+    assert MODULE.require_dataset_matched_marker(payload, "test", info)

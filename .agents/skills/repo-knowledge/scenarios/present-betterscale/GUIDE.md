@@ -201,3 +201,19 @@ released wheel, K3/K4 or accuracy. C8 hits decrease in both arms; candidate thro
 C4, native repeats99.56/116.63vary. Eviction/rescheduling without restored cache is an unverified
 hypothesis. Fletcher explicitly deferred that investigation. Exact-copy approval/public deployment
 remain separate from preparing this entry.
+
+## Official-dataset TP2 submissions (September22, preparation)
+
+The new Qwen27 graph campaign is dataset-matched, not an old fixed-target result.
+`leaderboard_entry_policy.py` owns normalization and public scope classification; explicit official
+target IDs retain the old checks. The producer marks new, unregistered dataset-matched deployments
+`outside-fixed-target`, verified false. `prepare_leaderboard_sync.py` validates this explicit marker
+separately: no target attestation fields, no registered or official-prefixed spec, and a required
+scope and reason. It never admits these rows as verified targets or protects them under the
+official-target removal guard. Keep all strict target checks intact.
+
+Use the native producer's complete merged snapshot set for browser preview, and then the standard
+snapshot sync (including path sanitization) for the mirror. Rendered throughput rounds to one
+decimal: 218.268 displays as218.3, not218.27. Preserve source-qualified version/commit evidence even
+when the table shortens a version string. This note records local QA, not proof of public
+deployment.
