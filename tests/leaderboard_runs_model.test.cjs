@@ -35,6 +35,7 @@ test('hardware and precision separate model scopes; parallelism is never inferre
 test('offline EngineArgs are run knobs, not distinct tasks',()=>{
     const a=fixture('a'),b=fixture('b');b.same_spec=structuredClone(a.same_spec);b.same_spec.resolved_client_parameters.worker_cls='owned.Worker';
     b.same_spec.resolved_client_parameters.compilation_config='FULL';
+    b.same_spec.resolved_client_parameters.scheduler_cls='apc_boundary.BoundaryScheduler';
     assert.deepEqual(model.taskDefinition(a),model.taskDefinition(b));
 });
 test('unrecorded flags are unknown and unsafe URLs are rejected',()=>{

@@ -18,7 +18,7 @@
         'host', 'port', 'model', 'tokenizer', 'served_model_name', 'result_dir', 'result_filename',
         'output_json', 'save_result', 'save_detailed', 'percentile_metrics', 'metric_percentiles',
         'tensor_parallel_size', 'pipeline_parallel_size', 'data_parallel_size', 'enable_expert_parallel',
-        'worker_cls', 'distributed_executor_backend', 'dtype', 'max_model_len', 'max_num_seqs',
+        'worker_cls', 'scheduler_cls', 'distributed_executor_backend', 'dtype', 'max_model_len', 'max_num_seqs',
         'max_num_batched_tokens', 'kv_cache_memory_bytes', 'gpu_memory_utilization', 'enable_prefix_caching',
         'no_enable_prefix_caching', 'mamba_cache_mode', 'async_scheduling', 'shutdown_timeout',
         'additional_config', 'limit_mm_per_prompt', 'compilation_config', 'speculative_config', 'enforce_eager',

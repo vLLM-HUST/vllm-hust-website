@@ -23,6 +23,8 @@ def main():
     expected = {
         r["entry_id"]: r for runs in supplement["observations"].values() for r in runs
     }
+    total_runs = len(expected)
+    arm_runs = sum(r["engine"] == "betterscale" for r in expected.values())
     reports = []
     with sync_playwright() as p:
         browser = p.chromium.launch()
@@ -57,15 +59,22 @@ def main():
             page.locator("#column-search").fill("Qwen3.8-27B")
             page.locator("#column-values input").check()
             page.locator("#column-apply").click()
-            assert page.locator(".run-row").count() == 32
+            assert page.locator(".run-row").count() == min(40, total_runs)
             assert "Leaderboards" in page.locator("#view-runs").inner_text()
             assert "Tasks" in page.locator("#view-tasks").inner_text()
-            assert page.locator("#view-runs-count").inner_text() == "32"
+            assert page.locator("#view-runs-count").inner_text() == str(total_runs)
             assert page.locator("#view-tasks-count").inner_text() == "8"
             # Verify every visible per-run mean and P95 against real sealed evidence.
             measured = page.locator(".run-row").evaluate_all("""rows=>rows.map(row=>({
                 id:row.dataset.runId, cells:Object.fromEntries([...row.querySelectorAll('[data-metric]')].map(c=>[c.dataset.metric,c.textContent]))
             }))""")
+            if total_runs > 40:
+                page.locator("#runs-next").click()
+                measured += page.locator(".run-row").evaluate_all("""rows=>rows.map(row=>({
+                    id:row.dataset.runId, cells:Object.fromEntries([...row.querySelectorAll('[data-metric]')].map(c=>[c.dataset.metric,c.textContent]))
+                }))""")
+                page.locator("#runs-previous").click()
+            assert len(measured) == total_runs
             for row in measured:
                 entry = expected[row["id"]]
                 for key, metric in [
@@ -124,11 +133,11 @@ def main():
             bounds = page.locator("#column-menu").bounding_box()
             assert bounds["x"] >= 0 and bounds["x"] + bounds["width"] <= width + 1
             page.locator("#column-apply").click()
-            assert page.locator(".run-row").count() == 16
+            assert page.locator(".run-row").count() == arm_runs
             page.locator('[data-column="mod"]').click()
             page.locator("#column-none").click()
             page.keyboard.press("Escape")
-            assert page.locator(".run-row").count() == 16
+            assert page.locator(".run-row").count() == arm_runs
             assert page.locator('[data-column="mod"]').evaluate(
                 "(el)=>el === document.activeElement"
             )
@@ -146,14 +155,14 @@ def main():
             assert values[-1] == "—"
             page.locator("#view-tasks").click()
             page.locator("#view-runs").click()
-            assert page.locator(".run-row").count() == 16
+            assert page.locator(".run-row").count() == arm_runs
             page.locator('[data-column="mod"]').click()
             page.locator("#column-none").click()
             page.locator("#column-apply").click()
             assert page.locator("#runs-empty").is_visible()
             page.locator('[data-column="mod"]').click()
             page.locator("#column-clear").click()
-            assert page.locator(".run-row").count() == 32
+            assert page.locator(".run-row").count() == min(40, total_runs)
             # Filters, empty states, pagination, and language switches stay functional.
             page.locator('[data-column="mod"]').click()
             page.locator("#column-none").click()
@@ -161,10 +170,10 @@ def main():
                 has_text="Native" if language == "en" else "原生"
             ).locator("input").check()
             page.locator("#column-apply").click()
-            assert page.locator(".run-row").count() == 16
+            assert page.locator(".run-row").count() == arm_runs
             page.locator("#langToggle").click()
             assert document_language(page) != language
-            assert page.locator(".run-row").count() == 16
+            assert page.locator(".run-row").count() == arm_runs
             page.locator('[data-column="run"]').click()
             page.locator("#column-scope-select").select_option("historical")
             page.locator("#column-cancel").click()
