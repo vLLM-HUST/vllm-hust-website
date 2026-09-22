@@ -1343,6 +1343,70 @@
         "requirements_en": "Scheduler injection is patch-free. Step/device correlation additionally requires the explicit transport-worker patch and supported profiler evidence. Not an Extension Manager bundle. Different runtime revisions need a source audit; graph/distributed capture coverage and overhead are not qualified.",
         "requirements_zh": "Scheduler 注入无需源码补丁；step/device 关联另需显式 transport-worker 补丁及受支持的 profiler 证据。不是 Extension Manager bundle。其他运行时版本需源代码审计；graph/分布式采集覆盖与记录开销尚未验收。"
       }
+    },
+    {
+      "id": "clm-lifecycle",
+      "name": "CLM Lifecycle",
+      "name_en": "CLM Lifecycle",
+      "name_zh": "CLM 生命周期",
+      "artifact_type": "runtime_component",
+      "system_role": "context_lifecycle_management",
+      "integration_contracts": [
+        "vllm.request-lifecycle.v1"
+      ],
+      "integration_surfaces": [
+        "vLLM-HUST vllm.request-lifecycle.v1 (PR pending)",
+        "vllm.extension_bundles (Bundle v1, PyPI)",
+        "vllm.general_plugins (runtime registration)"
+      ],
+      "execution_planes": [
+        "scheduler"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "plugin_bundle",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "incubating",
+      "maintainers": [
+        "xiehanlong834-gif"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "xiehanlong834-gif",
+          "name": "谢汉龙"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
+        }
+      ],
+      "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-clm-lifecycle",
+      "upstream_repository": null,
+      "summary_en": "Context Lifecycle Management perception layer: consumes request lifecycle events and reports session KV growth to an out-of-tree CLM controller; a context compaction scheduler for long conversations that bounds decode cost.",
+      "summary_zh": "上下文生命周期管理感知层：消费请求生命周期事件并向树外 CLM 控制器上报会话 KV 增长；服务于约束长会话 decode 成本的上下文压缩调度器。",
+      "public_effect_en": "Published to PyPI (vllm-hust-clm-lifecycle 0.1.0, Extension Bundle v1 manifest). CI green (ruff + pytest 11/11 across Python 3.10/3.12/3.14). Sink logic covers per-session KV aggregation (engine-side session_id or __default__ bucket), threshold reporting, KV-pressure preempt reporting, env-parse fallbacks and re-entrant registration. Host integration depends on vllm-hust PR #6 (request-lifecycle events) and is not yet verified on standard host: the Ascend serving path is currently blocked by vllm-ascend-hust#34 (engine core fails to initialize against current vllm-hust main).",
+      "public_effect_zh": "已发布 PyPI（vllm-hust-clm-lifecycle 0.1.0，Extension Bundle v1 manifest）。CI 全绿（ruff + pytest 11/11，覆盖 Python 3.10/3.12/3.14）；sink 逻辑覆盖会话级 KV 聚合（engine 侧 session_id 或 __default__ 桶）、阈值上报、KV 压力抢占上报、env 解析容错与幂等注册。宿主集成依赖 vllm-hust PR #6（request-lifecycle 事件），尚未在标准宿主上验证：Ascend serving 路径当前被 vllm-ascend-hust#34 阻塞（引擎核心无法对当前 vllm-hust main 完成初始化）。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-clm-lifecycle",
+      "compatibility": {
+        "status": "inspect_only",
+        "host": "vLLM-HUST",
+        "versions": [
+          "vllm-hust main + request-lifecycle events (PR #6, not merged)"
+        ],
+        "platforms": [
+          "Ascend NPU (910B2, serving path blocked)"
+        ],
+        "python": [
+          ">=3.10,<3.15"
+        ],
+        "requirements_en": "Host must expose vllm.request-lifecycle.v1 (RequestFinished/RequestPreempted on the scheduler EventBus); without it the plugin skips registration and reports nothing. Ascend end-to-end serving is currently blocked by vllm-ascend-hust#34, which prevents any engine from initializing against current vllm-hust main.",
+        "requirements_zh": "宿主必须暴露 vllm.request-lifecycle.v1（scheduler EventBus 上的 RequestFinished/RequestPreempted）；缺失时插件跳过注册且不上报。Ascend 端到端 serving 当前被 vllm-ascend-hust#34 阻塞——该问题导致任何引擎都无法对当前 vllm-hust main 完成初始化。"
+      },
+      "evidence_level": "code_available"
     }
   ]
 }
