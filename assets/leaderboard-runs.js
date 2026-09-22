@@ -5,7 +5,7 @@
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const words = {
         en: {
-            ascending: '↑ Sort ascending', descending: '↓ Sort descending', searchValues: 'Search values', selectAll: 'Select visible', selectNone: 'Deselect visible', clearColumn: 'Clear filter', cancel: 'Cancel', apply: 'Apply', noValues: 'No matching values', filterColumn: 'Filter', filtered: 'filtered',
+            readingNotes: 'About these measurements', ascending: '↑ Sort ascending', descending: '↓ Sort descending', searchValues: 'Search values', selectAll: 'Select visible', selectNone: 'Deselect visible', clearColumn: 'Clear filter', cancel: 'Cancel', apply: 'Apply', noValues: 'No matching values', filterColumn: 'Filter', filtered: 'filtered',
             title: 'One workload. Every run.', lede: 'Model × parallel configuration → task → MOD. Real measurements, with the configuration beside each run.',
             review: 'REVIEW PREVIEW', old: 'Existing leaderboard ↗', model: 'Model / parallel', task: 'Task tag', mod: 'MOD',
             all: 'All', native: 'Native', current: 'Current publication', historical: 'Historical evidence', records: 'Records',
@@ -27,7 +27,7 @@
             legacyLength: 'Variable; recorded summary', reviewNote: 'Independent review entry. The existing leaderboard and benchmark artifacts are unchanged.'
         },
         zh: {
-            ascending: '↑ 升序排列', descending: '↓ 降序排列', searchValues: '搜索选项', selectAll: '勾选可见项', selectNone: '取消可见项', clearColumn: '清除此列筛选', cancel: '取消', apply: '应用', noValues: '没有匹配的选项', filterColumn: '筛选', filtered: '已筛选',
+            readingNotes: '数据口径说明', ascending: '↑ 升序排列', descending: '↓ 降序排列', searchValues: '搜索选项', selectAll: '勾选可见项', selectNone: '取消可见项', clearColumn: '清除此列筛选', cancel: '取消', apply: '应用', noValues: '没有匹配的选项', filterColumn: '筛选', filtered: '已筛选',
             title: '同一任务，看清每一次运行。', lede: '模型 × 并行配置 → 任务 → MOD。实测成绩与每次运行的配置，放在同一张表里。',
             review: '评审预览', old: '现有排行榜 ↗', model: '模型 / 并行配置', task: '任务 tag', mod: 'MOD',
             all: '全部', native: '原生', current: '当前发布', historical: '历史证据', records: '记录范围',
@@ -54,12 +54,9 @@
     const fmt = value => value === null || value === undefined ? '—' : new Intl.NumberFormat(lang(), { maximumFractionDigits: 2 }).format(value);
     const state = { rows: [], tasks: [], page: 0, expanded: new Set(), selectedTask: '', ready: false,
         view: 'runs', columnFilters: {}, sort: null,
-        filters: { hardware: '', modelKey: '', mod: '', taskId: '', source: 'current' }, missingSupplement: false };
+        filters: { hardware: '', source: 'current' }, missingSupplement: false };
     const pageSize = 40;
     const link = (url, label) => url ? `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a>` : '';
-    function options(id, values, selected, label = value => value) {
-        $(id).innerHTML = `<option value="">${t('all')}</option>` + [...new Set(values)].map(value => `<option value="${escape(value)}" ${value === selected ? 'selected' : ''}>${escape(label(value))}</option>`).join('');
-    }
     const columns = [
         ['model', () => t('model')], ['task', () => t('task')], ['mod', () => t('mod')],
         ['ttft', () => 'TTFT', 'mean · ms'], ['tpot', () => 'TPOT', 'mean · ms'],
@@ -127,6 +124,13 @@
         }).map((choice, index) => ({ ...choice, index }));
         menu = { key, choices, selected: new Set(state.columnFilters[key] ?? choices.map(c => c.value)) };
         $('column-menu-title').textContent = columns.find(c => c[0] === key)[1]();
+        const scopeKey = key === 'model' ? 'hardware' : key === 'run' ? 'source' : null;
+        $('column-scope').hidden = !scopeKey;
+        if (scopeKey) {
+            $('column-scope-label').textContent = t(scopeKey === 'source' ? 'records' : 'hardware');
+            const values = scopeKey === 'hardware' ? [...new Set(state.rows.map(r => r.hardware))] : ['current', 'historical', ''];
+            $('column-scope-select').innerHTML = values.map(value => `<option value="${escape(value)}" ${state.filters[scopeKey] === value ? 'selected' : ''}>${escape(scopeKey === 'hardware' ? value : t(value || 'all'))}</option>`).join('');
+        }
         $('column-search').value = '';
         renderChoices();
         const trigger = document.querySelector(`[data-column="${key}"]`);
@@ -147,6 +151,12 @@
             state.page = 0; renderHeaders(); renderRows();
             document.querySelector(`[data-order="${key}"]`)?.focus({ preventScroll: true });
         }
+    });
+    $('column-scope-select').addEventListener('change', () => {
+        const key = menu.key;
+        state.filters[key === 'model' ? 'hardware' : 'source'] = $('column-scope-select').value;
+        state.columnFilters = {}; state.page = 0; state.selectedTask = '';
+        closeMenu(); renderHeaders(); renderRows(); openMenu(key);
     });
     $('column-search').addEventListener('input', renderChoices);
     $('column-values').addEventListener('change', event => {
@@ -174,24 +184,13 @@
         }
     });
     for (const view of ['runs', 'tasks']) $(`view-${view}`).addEventListener('click', () => setView(view));
-    function renderFilters() {
-        const f = state.filters;
-        options('runs-hardware', state.rows.map(r => r.hardware), f.hardware);
-        $('runs-hardware').querySelector('option[value=""]').remove();
-        $('runs-hardware-context').textContent = f.hardware;
-        const models = new Map(state.rows.filter(r => !f.hardware || r.hardware === f.hardware).map(r => [r.modelKey, `${r.model} · ${r.parallel.label} · ${r.precision} · ${r.parallel.chips ?? '?'} NPU`]));
-        options('runs-model', [...models.keys()], f.modelKey, key => models.get(key));
-        options('runs-mod', state.rows.map(r => r.mod), f.mod, value => value === 'native' ? t('native') : value);
-        options('runs-task', state.tasks.map(task => task.id), f.taskId, value => state.tasks.find(task => task.id === value).label);
-        $('runs-source').innerHTML = ['', 'current', 'historical'].map(value => `<option value="${value}" ${f.source === value ? 'selected' : ''}>${t(value || 'all')}</option>`).join('');
-    }
     function matches(row) {
         return Object.entries(state.filters).every(([key, value]) => !value || row[key] === value);
     }
     function details(row) {
         const entry = row.entry, meta = entry.metadata || {};
         const provenance = { entry_id: row.id, engine: entry.engine, engine_version: entry.engine_version, submitted_at: row.date,
-            git_commit: meta.git_commit, runtime: meta.runtime_provenance,
+            git_commit: meta.git_commit, runtime: meta.runtime_provenance, hardware: entry.hardware,
             evidence_scope: meta.official_admission_status || row.source, verified: meta.verified,
             throughput_token_basis: meta.throughput_token_basis || 'unspecified',
             note: meta.notes, repeat_index: row.repeat, parent_aggregate: row.parentId };
@@ -224,7 +223,6 @@
         $('runs-empty').hidden = Boolean(filtered.length);
         $('view-runs-count').textContent = filtered.length;
         $('view-tasks-count').textContent = new Set(filtered.map(r => r.taskId)).size;
-        $('runs-count').textContent = `${filtered.length} ${t('runs')} · ${new Set(filtered.map(r => r.taskId)).size} ${t('tags')}`;
         $('runs-page').textContent = `${state.page + 1} / ${maxPage + 1}`;
         $('runs-previous').disabled = state.page === 0;
         $('runs-next').disabled = state.page >= maxPage;
@@ -252,7 +250,7 @@
     function translate() {
         for (const node of document.querySelectorAll('[data-runs-i18n]')) node.textContent = t(node.dataset.runsI18n);
         document.title = lang() === 'zh' ? '统一成绩表 · 评审预览 - vLLM-HUST' : 'Unified runs · Review preview - vLLM-HUST';
-        if (state.ready) { renderFilters(); renderHeaders(); renderRows(); }
+        if (state.ready) { renderHeaders(); renderRows(); }
     }
     async function initialize() {
         translate();
@@ -270,29 +268,20 @@
             Object.assign(state, built, { ready: true });
             const hardware = [...new Set(state.rows.map(r => r.hardware))];
             state.filters.hardware = hardware.find(value => value.includes('910B2')) || hardware[0] || '';
-            $('runs-hardware-context').textContent = hardware.join(' / ');
             $('runs-supplement-warning').hidden = !state.missingSupplement;
             $('runs-loading').hidden = true;
             $('runs-content').hidden = false;
-            renderFilters(); renderHeaders(); renderRows();
+            renderHeaders(); renderRows();
         } catch (error) {
             $('runs-loading').hidden = true;
             $('runs-error').hidden = false;
             console.error('[Unified runs]', error);
         }
     }
-    for (const [id, key] of [['runs-hardware', 'hardware'], ['runs-model', 'modelKey'], ['runs-mod', 'mod'], ['runs-task', 'taskId'], ['runs-source', 'source']]) {
-        $(id).addEventListener('change', () => {
-            state.filters[key] = $(id).value; state.page = 0; state.selectedTask = '';
-            state.columnFilters = {}; renderHeaders();
-            if (key === 'hardware') { state.filters.modelKey = ''; renderFilters(); }
-            renderRows();
-        });
-    }
     $('runs-reset').addEventListener('click', () => {
         Object.keys(state.filters).filter(key => key !== 'hardware').forEach(key => { state.filters[key] = ''; });
         state.filters.source = 'current'; state.page = 0; state.selectedTask = '';
-        state.columnFilters = {}; state.sort = null; renderFilters(); renderHeaders(); renderRows();
+        state.columnFilters = {}; state.sort = null; renderHeaders(); renderRows();
     });
     $('runs-previous').addEventListener('click', () => { state.page--; renderRows(); });
     $('runs-next').addEventListener('click', () => { state.page++; renderRows(); });

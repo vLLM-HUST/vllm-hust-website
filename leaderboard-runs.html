@@ -16,7 +16,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
-  <link rel="stylesheet" href="./assets/leaderboard-runs.css?v=review-20260922-table-v2" />
+  <link rel="stylesheet" href="./assets/leaderboard-runs.css?v=review-20260922-table-v3" />
   <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901" />
 </head>
 
@@ -46,25 +46,10 @@
   <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
 
   <main class="site-shell runs-shell">
-    <header class="runs-hero">
-      <div class="runs-review"><span data-runs-i18n="review">REVIEW PREVIEW</span><a href="./leaderboard.html" data-runs-i18n="old">Existing leaderboard ↗</a></div>
-      <h1 data-runs-i18n="title">One workload. Every run.</h1>
-      <p data-runs-i18n="lede"></p>
-      <p class="review-note" data-runs-i18n="reviewNote"></p>
-    </header>
     <p id="runs-loading" role="status" data-runs-i18n="loading"></p>
     <p id="runs-error" role="alert" data-runs-i18n="error" hidden></p>
     <div id="runs-content" hidden>
-      <div class="hardware-context"><span data-runs-i18n="hardware"></span><strong id="runs-hardware-context"></strong></div>
       <p id="runs-supplement-warning" class="warning" data-runs-i18n="supplementMissing" hidden></p>
-      <div class="runs-filters">
-        <label><span data-runs-i18n="model"></span><select id="runs-model"><option value="">All</option></select></label>
-        <label><span data-runs-i18n="task"></span><select id="runs-task"><option value="">All</option></select></label>
-        <label><span data-runs-i18n="mod"></span><select id="runs-mod"><option value="">All</option></select></label>
-        <label><span data-runs-i18n="hardware"></span><select id="runs-hardware"><option value="">All</option></select></label>
-        <label><span data-runs-i18n="records"></span><select id="runs-source"><option value="">All</option></select></label>
-        <button id="runs-reset" type="button" data-runs-i18n="reset">Reset</button>
-      </div>
       <div class="runs-view-switch" role="group" aria-label="Table view">
         <button id="view-runs" type="button" aria-pressed="true" aria-controls="runs-panel">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10h5v10M9 20V4h6v16M15 20v-7h5v7M3 20h18" /></svg>
@@ -75,26 +60,26 @@
           <span>Tasks</span><span id="view-tasks-count" class="view-count">0</span>
         </button>
       </div>
-      <section id="runs-panel" aria-labelledby="runs-title">
-        <div class="runs-section-head"><h2 id="runs-title" data-runs-i18n="results"></h2><span id="runs-count" aria-live="polite"></span></div>
-        <p class="runs-note" data-runs-i18n="hint"></p>
-        <p class="runs-note" data-runs-i18n="throughputHint"></p>
+      <section id="runs-panel" aria-label="Leaderboards">
         <div class="runs-table-scroll" tabindex="0" role="region" aria-label="Measurements">
           <table class="runs-table"><thead><tr id="runs-headers"></tr></thead><tbody id="runs-body"></tbody></table>
         </div>
         <p id="runs-empty" data-runs-i18n="empty" hidden></p>
-        <div class="runs-pagination"><button id="runs-previous" type="button" data-runs-i18n="previous"></button><span id="runs-page"></span><button id="runs-next" type="button" data-runs-i18n="next"></button></div>
-        <p class="runs-note" data-runs-i18n="historyHint"></p>
+        <div class="runs-pagination"><button id="runs-reset" type="button" data-runs-i18n="reset"></button><button id="runs-previous" type="button" data-runs-i18n="previous"></button><span id="runs-page"></span><button id="runs-next" type="button" data-runs-i18n="next"></button></div>
+        <details class="runs-reading"><summary data-runs-i18n="readingNotes"></summary>
+          <p class="runs-note" data-runs-i18n="hint"></p>
+          <p class="runs-note" data-runs-i18n="throughputHint"></p>
+          <p class="runs-note" data-runs-i18n="historyHint"></p>
+        </details>
       </section>
-      <section id="tasks-panel" class="tasks-section" aria-labelledby="tasks-title" hidden>
-        <div class="runs-section-head"><h2 id="tasks-title" data-runs-i18n="tasks"></h2></div>
-        <p class="runs-note" data-runs-i18n="taskHint"></p>
+      <section id="tasks-panel" class="tasks-section" aria-label="Tasks" hidden>
         <div class="runs-table-scroll" tabindex="0" role="region" aria-label="Task definitions">
           <table class="runs-table task-table"><thead><tr>
 <th data-runs-i18n="task"></th><th data-runs-i18n="dataset"></th><th data-runs-i18n="input"></th><th data-runs-i18n="output"></th><th data-runs-i18n="concurrency"></th><th data-runs-i18n="rate"></th><th data-runs-i18n="count"></th><th data-runs-i18n="parameters"></th></tr></thead><tbody id="tasks-body"></tbody></table></div>
       </section>
       <dialog id="column-menu" class="column-menu" aria-labelledby="column-menu-title">
         <h3 id="column-menu-title"></h3>
+        <label id="column-scope" class="column-search" hidden><span id="column-scope-label"></span><select id="column-scope-select"></select></label>
         <label class="column-search"><span data-runs-i18n="searchValues"></span><input id="column-search" type="search" autocomplete="off"></label>
         <div class="column-selection">
           <button id="column-all" type="button" data-runs-i18n="selectAll"></button>
@@ -112,7 +97,7 @@
   <footer class="site-footer"><strong>vLLM-HUST</strong> · Evidence before rankings.</footer>
   <script src="./assets/site.js?v=nav-polish-20260826"></script>
   <script src="./assets/hf-data-loader.js?v=stable-trend-v5-public-sanitized-20260902"></script>
-  <script src="./assets/leaderboard-runs-model.js?v=review-20260922-table-v2"></script>
-  <script src="./assets/leaderboard-runs.js?v=review-20260922-table-v2"></script>
+  <script src="./assets/leaderboard-runs-model.js?v=review-20260922-table-v3"></script>
+  <script src="./assets/leaderboard-runs.js?v=review-20260922-table-v3"></script>
 </body>
 </html>
