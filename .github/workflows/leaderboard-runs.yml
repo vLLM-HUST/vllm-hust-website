@@ -1,0 +1,52 @@
+name: leaderboard-runs-review
+
+on:
+  push:
+    branches: [main, codex/unified-leaderboard]
+    paths:
+      - 'leaderboard-runs.html'
+      - 'assets/leaderboard-runs*'
+      - 'data/leaderboard_*.json'
+      - 'scripts/*leaderboard_run*'
+      - 'tests/*leaderboard_run*'
+      - '.github/workflows/leaderboard-runs.yml'
+  pull_request:
+    paths:
+      - 'leaderboard-runs.html'
+      - 'assets/leaderboard-runs*'
+      - 'data/leaderboard_*.json'
+      - 'scripts/*leaderboard_run*'
+      - 'tests/*leaderboard_run*'
+      - '.github/workflows/leaderboard-runs.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/leaderboard_runs_model.test.cjs
+      - run: |
+          python -m pip install pytest playwright
+          python -m playwright install --with-deps chromium
+          pytest tests/test_leaderboard_run_observations.py -q
+      - name: Check real evidence and responsive interactions
+        run: |
+          python -m http.server 8774 --bind 127.0.0.1 > /tmp/leaderboard-runs-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          python scripts/verify_leaderboard_runs_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leaderboard-runs-review
+          path: output/playwright/leaderboard-runs/

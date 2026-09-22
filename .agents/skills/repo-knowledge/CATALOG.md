@@ -18,3 +18,7 @@ lifecycle state, or chronology.
 
 - **Present TraceLoom analysis and runtime observation:** before updating the project page, MOD
   entry or measured timeline image, read [present-traceloom](scenarios/present-traceloom/GUIDE.md).
+
+- **Review the run-oriented leaderboard:** before changing the independent review entry, task
+  definitions or per-run P95 evidence, read
+  [review-run-leaderboard](scenarios/review-run-leaderboard/GUIDE.md).

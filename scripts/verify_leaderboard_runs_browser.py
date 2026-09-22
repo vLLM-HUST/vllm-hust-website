@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+"""Render the independent leaderboard with real bundled evidence, in EN/ZH."""
+
+import argparse
+import json
+from pathlib import Path
+
+from playwright.sync_api import sync_playwright
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--url", default="http://127.0.0.1:8774")
+    parser.add_argument(
+        "--output", type=Path, default=Path("output/playwright/leaderboard-runs")
+    )
+    args = parser.parse_args()
+    args.output.mkdir(parents=True, exist_ok=True)
+    site = Path(__file__).resolve().parents[1]
+    supplement = json.loads(
+        (site / "data/leaderboard_run_observations.json").read_text()
+    )
+    expected = {
+        r["entry_id"]: r for runs in supplement["observations"].values() for r in runs
+    }
+    reports = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        for width, language, scheme in [
+            (1440, "en", "light"),
+            (390, "zh", "light"),
+            (1440, "zh", "dark"),
+            (390, "en", "dark"),
+        ]:
+            context = browser.new_context(
+                viewport={"width": width, "height": 1000}, color_scheme=scheme
+            )
+            context.add_init_script(
+                f"localStorage.setItem('vllm-hust_lang', '{language}')"
+            )
+            page = context.new_page()
+            errors = []
+            page.on("pageerror", lambda error: errors.append(str(error)))
+            response = page.goto(
+                f"{args.url}/leaderboard-runs.html", wait_until="domcontentloaded"
+            )
+            assert response.status == 200
+            page.locator("#runs-content").wait_for(state="visible", timeout=30000)
+            options = page.locator("#runs-model option").evaluate_all(
+                "(xs)=>xs.map(x=>({value:x.value,label:x.textContent}))"
+            )
+            model = next(x["value"] for x in options if "Qwen3.8-27B" in x["label"])
+            page.locator("#runs-model").select_option(model)
+            assert page.locator(".run-row").count() == 32
+            # Verify every visible per-run mean and P95 against real sealed evidence.
+            measured = page.locator(".run-row").evaluate_all("""rows=>rows.map(row=>({
+                id:row.dataset.runId, cells:Object.fromEntries([...row.querySelectorAll('[data-metric]')].map(c=>[c.dataset.metric,c.textContent]))
+            }))""")
+            for row in measured:
+                entry = expected[row["id"]]
+                for key, metric in [
+                    ("ttft", "ttft_ms"),
+                    ("tpot", "tbt_ms"),
+                    ("ttftP95", "ttft_p95_ms"),
+                    ("tpotP95", "tpot_p95_ms"),
+                    ("throughput", "throughput_tps"),
+                ]:
+                    actual = row["cells"][key]
+                    value = entry["metrics"].get(metric)
+                    if value is None:
+                        assert actual == "—", (row["id"], key, actual)
+                    else:
+                        assert abs(float(actual.replace(",", "")) - value) <= 0.0051, (
+                            key,
+                            actual,
+                            value,
+                        )
+            assert page.locator("#tasks-body > tr").count() == 8
+            page.screenshot(
+                path=str(args.output / f"table-{width}-{language}-{scheme}.png")
+            )
+            first = page.locator("[data-run]").first
+            first.focus()
+            page.keyboard.press("Enter")
+            assert first.get_attribute("aria-expanded") == "true"
+            detail = page.locator("#" + first.get_attribute("aria-controls"))
+            assert detail.is_visible()
+            assert "max_model_len" in detail.inner_text()
+            assert detail.locator("a").count() >= 1
+            first.click()
+            tag = page.locator("[data-task]").first
+            tag.click()
+            selected = page.locator(".selected-task")
+            assert selected.is_visible()
+            assert "Agent Research" in selected.inner_text()
+            # Filters, empty states, pagination, and language switches stay functional.
+            page.locator("#runs-mod").select_option("native")
+            assert page.locator(".run-row").count() == 16
+            page.locator("#langToggle").click()
+            assert document_language(page) != language
+            assert page.locator(".run-row").count() == 16
+            page.locator("#runs-source").select_option("historical")
+            assert page.locator("#runs-empty").is_visible()
+            page.locator("#runs-reset").click()
+            assert page.locator(".run-row").count() == 40
+            page.locator("#runs-next").click()
+            assert page.locator("#runs-page").inner_text().startswith("2 /")
+            assert page.evaluate(
+                "document.documentElement.scrollWidth <= window.innerWidth + 1"
+            )
+            assert not errors, errors
+            reports.append(
+                {
+                    "width": width,
+                    "language": language,
+                    "scheme": scheme,
+                    "status": "PASS",
+                }
+            )
+            context.close()
+        # No supplement: visible missing-data notice; never silently invent P95.
+        context = browser.new_context()
+        page = context.new_page()
+        page.route("**/leaderboard_run_observations.json", lambda route: route.abort())
+        page.goto(f"{args.url}/leaderboard-runs.html", wait_until="domcontentloaded")
+        page.locator("#runs-content").wait_for(state="visible", timeout=30000)
+        assert page.locator("#runs-supplement-warning").is_visible()
+        assert all(
+            t == "—"
+            for t in page.locator('[data-metric="ttftP95"]').all_text_contents()
+        )
+        context.close()
+        browser.close()
+    (args.output / "report.json").write_text(json.dumps(reports, indent=2) + "\n")
+    print(json.dumps(reports))
+
+
+def document_language(page):
+    return page.locator("html").get_attribute("lang")
+
+
+if __name__ == "__main__":
+    main()
