@@ -64,3 +64,25 @@
 .runs-hero p, .runs-review a, .hardware-context, .runs-note,
 .runs-section-head > span, .runs-pagination { color: #b4c2d6; }
 .runs-review { color: #9cb4ff; }
+.runs-view-switch { display: flex; gap: 8px; margin-top: 24px; }
+.runs-view-switch button, .column-menu button { padding: 9px 12px; border: 1px solid var(--run-border); border-radius: 6px; color: var(--run-accent); background: var(--run-bg); }
+.runs-view-switch button[aria-pressed="true"], #column-apply { background: var(--run-accent); color: var(--run-bg); }
+.runs-table th:has(.column-heading) { padding: 0; }
+.column-heading { display: flex; align-items: stretch; }
+.column-title { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex: 1; padding: 14px 8px 14px 12px; border: 0; background: transparent; color: inherit; text-align: left; }
+.column-trigger { display: flex; align-items: center; justify-content: center; gap: 2px; min-width: 30px; padding: 8px; border: 0; border-left: 1px solid var(--run-border); background: transparent; color: inherit; }
+.column-title:hover, .column-trigger:hover, .column-trigger.is-filtered { background: var(--run-border); color: var(--run-accent); }
+.column-chevron { width: 0; height: 0; border: 4px solid transparent; border-top-color: currentColor; transform: translateY(2px); }
+.column-menu { position: fixed; inset: auto; margin: 0; width: 340px; max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); box-sizing: border-box; overflow: auto; padding: 16px; border: 1px solid var(--run-border); border-radius: 10px; background: var(--run-bg); color: var(--run-ink); box-shadow: 0 12px 50px #0006; }
+.column-menu::backdrop { background: #0003; }
+.column-menu h3 { font-size: 15px; margin: 0 0 12px; }
+.column-search { display: grid; gap: 6px; margin: 14px 0 8px; font-size: 12px; }
+.column-search input { width: 100%; box-sizing: border-box; padding: 9px; border: 1px solid var(--run-border); border-radius: 4px; background: var(--run-bg); color: var(--run-ink); }
+.column-selection { display: flex; flex-wrap: wrap; gap: 4px; }
+.column-selection button { padding: 6px; font-size: 11px; }
+.column-values { max-height: 220px; overflow-y: auto; margin-top: 10px; border-block: 1px solid var(--run-border); }
+.column-values label { display: flex; align-items: start; gap: 8px; padding: 8px 4px; font-size: 12px; overflow-wrap: anywhere; cursor: pointer; }
+.column-values input { flex: 0 0 auto; accent-color: var(--run-accent); }
+.column-values label:hover { background: var(--run-tint); }
+.column-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.runs-shell .column-menu h3 { color: var(--run-ink); }

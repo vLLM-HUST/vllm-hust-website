@@ -129,7 +129,28 @@
             || a.taskLabel.localeCompare(b.taskLabel) || Number(b.mod === 'native') - Number(a.mod === 'native') || a.mod.localeCompare(b.mod) || b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
         return { rows, tasks: [...tasks.values()].sort((a, b) => a.label.localeCompare(b.label)) };
     }
-    const api = { build, taskDefinition, parallel, stable, graphPrefix, safeURL };
+    // Column filters use exact underlying values, never rounded display strings.
+    function columnValue(row, key) {
+        if (key in row.metrics) return row.metrics[key];
+        return ({ model: row.modelKey, task: row.taskId, mod: row.mod,
+            run: row.id, config: row.prefix })[key] ?? null;
+    }
+    function selectRows(rows, filters = {}, sort = null) {
+        const result = rows.filter(row => Object.entries(filters).every(([key, values]) =>
+            values.includes(columnValue(row, key))));
+        if (sort) result.sort((a, b) => {
+            const sortValue = row => sort.key === 'model' ? `${row.model} ${row.parallel.label} ${row.precision}`
+                : sort.key === 'task' ? row.taskLabel : sort.key === 'run' ? `${row.date} ${row.id}` : columnValue(row, sort.key);
+            const av = sortValue(a), bv = sortValue(b);
+            // Missing observations always follow measured values in either direction.
+            if (av === null || bv === null) return av === bv ? 0 : av === null ? 1 : -1;
+            const compare = typeof av === 'number' && typeof bv === 'number' ? av - bv
+                : String(av).localeCompare(String(bv), undefined, { numeric: true });
+            return compare * (sort.direction === 'desc' ? -1 : 1);
+        });
+        return result;
+    }
+    const api = { build, taskDefinition, parallel, stable, graphPrefix, safeURL, columnValue, selectRows };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardRunsModel = api;
 })(globalThis);

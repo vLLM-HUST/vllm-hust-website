@@ -16,7 +16,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
-  <link rel="stylesheet" href="./assets/leaderboard-runs.css?v=review-20260922" />
+  <link rel="stylesheet" href="./assets/leaderboard-runs.css?v=review-20260922-table-v2" />
   <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901" />
 </head>
 
@@ -65,35 +65,48 @@
         <label><span data-runs-i18n="records"></span><select id="runs-source"><option value="">All</option></select></label>
         <button id="runs-reset" type="button" data-runs-i18n="reset">Reset</button>
       </div>
-      <section aria-labelledby="runs-title">
+      <div class="runs-view-switch" role="group" aria-label="Table view">
+        <button id="view-runs" type="button" aria-pressed="true" aria-controls="runs-panel" data-runs-i18n="results"></button>
+        <button id="view-tasks" type="button" aria-pressed="false" aria-controls="tasks-panel" data-runs-i18n="tasks"></button>
+      </div>
+      <section id="runs-panel" aria-labelledby="runs-title">
         <div class="runs-section-head"><h2 id="runs-title" data-runs-i18n="results"></h2><span id="runs-count" aria-live="polite"></span></div>
         <p class="runs-note" data-runs-i18n="hint"></p>
         <p class="runs-note" data-runs-i18n="throughputHint"></p>
         <div class="runs-table-scroll" tabindex="0" role="region" aria-label="Measurements">
-          <table class="runs-table"><thead><tr>
-            <th data-runs-i18n="model"></th><th data-runs-i18n="task"></th><th data-runs-i18n="mod"></th>
-            <th>TTFT<br><small>mean · ms</small></th><th>TPOT<br><small>mean · ms</small></th>
-            <th>TTFT P95<br><small>ms</small></th><th>TPOT P95<br><small>ms</small></th>
-            <th data-runs-i18n="throughput"></th><th>Run</th><th data-runs-i18n="config"></th>
-          </tr></thead><tbody id="runs-body"></tbody></table>
+          <table class="runs-table"><thead><tr id="runs-headers"></tr></thead><tbody id="runs-body"></tbody></table>
         </div>
         <p id="runs-empty" data-runs-i18n="empty" hidden></p>
         <div class="runs-pagination"><button id="runs-previous" type="button" data-runs-i18n="previous"></button><span id="runs-page"></span><button id="runs-next" type="button" data-runs-i18n="next"></button></div>
         <p class="runs-note" data-runs-i18n="historyHint"></p>
       </section>
-      <section class="tasks-section" aria-labelledby="tasks-title">
+      <section id="tasks-panel" class="tasks-section" aria-labelledby="tasks-title" hidden>
         <div class="runs-section-head"><h2 id="tasks-title" data-runs-i18n="tasks"></h2></div>
         <p class="runs-note" data-runs-i18n="taskHint"></p>
         <div class="runs-table-scroll" tabindex="0" role="region" aria-label="Task definitions">
           <table class="runs-table task-table"><thead><tr>
 <th data-runs-i18n="task"></th><th data-runs-i18n="dataset"></th><th data-runs-i18n="input"></th><th data-runs-i18n="output"></th><th data-runs-i18n="concurrency"></th><th data-runs-i18n="rate"></th><th data-runs-i18n="count"></th><th data-runs-i18n="parameters"></th></tr></thead><tbody id="tasks-body"></tbody></table></div>
       </section>
+      <dialog id="column-menu" class="column-menu" aria-labelledby="column-menu-title">
+        <h3 id="column-menu-title"></h3>
+        <label class="column-search"><span data-runs-i18n="searchValues"></span><input id="column-search" type="search" autocomplete="off"></label>
+        <div class="column-selection">
+          <button id="column-all" type="button" data-runs-i18n="selectAll"></button>
+          <button id="column-none" type="button" data-runs-i18n="selectNone"></button>
+          <button id="column-clear" type="button" data-runs-i18n="clearColumn"></button>
+        </div>
+        <div id="column-values" class="column-values"></div>
+        <div class="column-actions">
+          <button id="column-cancel" type="button" data-runs-i18n="cancel"></button>
+          <button id="column-apply" type="button" data-runs-i18n="apply"></button>
+        </div>
+      </dialog>
     </div>
   </main>
   <footer class="site-footer"><strong>vLLM-HUST</strong> · Evidence before rankings.</footer>
   <script src="./assets/site.js?v=nav-polish-20260826"></script>
   <script src="./assets/hf-data-loader.js?v=stable-trend-v5-public-sanitized-20260902"></script>
-  <script src="./assets/leaderboard-runs-model.js?v=review-20260922"></script>
-  <script src="./assets/leaderboard-runs.js?v=review-20260922"></script>
+  <script src="./assets/leaderboard-runs-model.js?v=review-20260922-table-v2"></script>
+  <script src="./assets/leaderboard-runs.js?v=review-20260922-table-v2"></script>
 </body>
 </html>

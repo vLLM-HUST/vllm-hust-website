@@ -41,3 +41,21 @@ test('unrecorded flags are unknown and unsafe URLs are rejected',()=>{
     assert.match(model.graphPrefix(fixture('a',{same_spec:{}})),/graph \?/);
     assert.equal(model.safeURL('javascript:alert(1)'),null);assert.equal(model.safeURL('https://github.com/a/b'),'https://github.com/a/b');
 });
+test('column filters combine OR within columns and AND across columns; empty means none',()=>{
+    const a=fixture('a'),b=fixture('b',{engine:'betterscale'}),c=fixture('c');
+    c.metrics.ttft_ms=100;
+    const rows=model.build({multi:[a,b,c]}).rows;
+    assert.equal(model.selectRows(rows,{mod:['native','betterscale'],ttft:[0]}).length,2);
+    assert.deepEqual(model.selectRows(rows,{mod:['native'],ttft:[0]}).map(r=>r.id),['a']);
+    assert.equal(model.selectRows(rows,{mod:[]}).length,0);
+});
+test('numeric sorting uses raw values, is stable, leaves missing values last in both directions',()=>{
+    const rows=[2,10,null,0,2].map((value,index)=>({id:String(index),metrics:{ttft:value}}));
+    assert.deepEqual(model.selectRows(rows,{}, {key:'ttft',direction:'asc'}).map(r=>r.id),['3','0','4','1','2']);
+    assert.deepEqual(model.selectRows(rows,{}, {key:'ttft',direction:'desc'}).map(r=>r.id),['1','0','4','3','2']);
+    assert.deepEqual(rows.map(r=>r.id),['0','1','2','3','4']);
+});
+test('text sorting follows task labels rather than opaque task identities',()=>{
+    const rows=[{taskId:'z',taskLabel:'Alpha',metrics:{}},{taskId:'a',taskLabel:'Beta',metrics:{}}];
+    assert.equal(model.selectRows(rows,{}, {key:'task',direction:'asc'})[0].taskLabel,'Alpha');
+});
