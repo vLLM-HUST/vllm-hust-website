@@ -73,7 +73,7 @@
     }
     function details(row) {
         const entry = row.entry, meta = entry.metadata || {};
-        const provenance = { engine: entry.engine, engine_version: entry.engine_version, submitted_at: row.date,
+        const provenance = { entry_id: row.id, engine: entry.engine, engine_version: entry.engine_version, submitted_at: row.date,
             git_commit: meta.git_commit, runtime: meta.runtime_provenance,
             evidence_scope: meta.official_admission_status || row.source, verified: meta.verified,
             throughput_token_basis: meta.throughput_token_basis || 'unspecified',
@@ -96,11 +96,11 @@
             const group = `${row.modelKey}/${row.taskId}`, boundary = group !== previousGroup;
             previousGroup = group;
             return `<tr class="run-row ${boundary ? 'group-start' : ''}" data-run-id="${escape(row.id)}">
-                <td><strong>${escape(row.model)}</strong><small>${escape(row.parallel.label)} · ${escape(row.precision)} · ${row.parallel.chips ?? '?'} NPU</small></td>
+                <td><strong>${escape(row.model)}</strong><small>${escape(row.parallel.label)} · ${escape(row.precision)} · ${escape(row.parallel.chips ?? '?')} NPU</small></td>
                 <td><button type="button" class="task-tag" data-task="${row.taskId}">${escape(row.taskLabel)}</button></td>
                 <td><strong class="mod-label ${row.mod === 'native' ? 'native' : ''}">${escape(row.mod === 'native' ? t('native') : row.mod)}</strong><small>${escape(row.version)}</small></td>
                 ${['ttft', 'tpot', 'ttftP95', 'tpotP95', 'throughput'].map(key => `<td class="metric" data-metric="${key}">${fmt(row.metrics[key])}</td>`).join('')}
-                <td class="run-id"><span>${escape(row.date.slice(0, 10) || '—')}</span><small>${row.aggregate ? `${t('aggregate')} · ${row.aggregate.count}` : row.repeat !== null ? `${t('repeat')} ${row.repeat}` : escape(row.id.slice(0, 8))}</small><small>${t(row.source)}</small></td>
+                <td class="run-id"><span>${escape(row.date.slice(0, 10) || '—')}</span><small>${row.aggregate ? `${t('aggregate')} · ${escape(row.aggregate.count)}` : row.repeat !== null ? `${t('repeat')} ${escape(row.repeat)}` : escape(row.id.slice(0, 8))}</small><small>${t(row.source)}</small></td>
                 <td><button type="button" class="run-toggle" data-run="${escape(row.id)}" aria-expanded="${state.expanded.has(row.id)}" aria-controls="config-${escape(row.id)}">${state.expanded.has(row.id) ? t('close') : t('open')}</button><small class="run-prefix">${escape(row.prefix)}</small></td>
             </tr>${details(row)}`;
         }).join('');
@@ -124,7 +124,7 @@
             return `<tr id="${task.id}" tabindex="-1" class="${state.selectedTask === task.id ? 'selected-task' : ''}">
                 <td><strong>${escape(task.label)}</strong></td><td>${escape(p.hf_name || p.dataset_path || d.dataset || '—')}</td>
                 <td>${escape(lengths(d, 'input_length'))}</td><td>${escape(lengths(d, 'output_length'))}</td>
-                <td>${d.concurrency ?? '—'} / ${d.batch_size ?? '—'}</td><td>${escape(p.request_rate ?? '—')}</td>
+                <td>${escape(d.concurrency ?? '—')} / ${escape(d.batch_size ?? '—')}</td><td>${escape(p.request_rate ?? '—')}</td>
                 <td>${escape(p.num_prompts ?? p.max_requests ?? p.num_iters ?? '—')}</td>
                 <td><details><summary>${t('parameters')}</summary><pre>${escape(JSON.stringify(d, null, 2))}</pre></details></td>
             </tr>`;
@@ -164,14 +164,14 @@
     }
     for (const [id, key] of [['runs-hardware', 'hardware'], ['runs-model', 'modelKey'], ['runs-mod', 'mod'], ['runs-task', 'taskId'], ['runs-source', 'source']]) {
         $(id).addEventListener('change', () => {
-            state.filters[key] = $(id).value; state.page = 0;
+            state.filters[key] = $(id).value; state.page = 0; state.selectedTask = '';
             if (key === 'hardware') { state.filters.modelKey = ''; renderFilters(); }
             renderRows();
         });
     }
     $('runs-reset').addEventListener('click', () => {
         Object.keys(state.filters).filter(key => key !== 'hardware').forEach(key => { state.filters[key] = ''; });
-        state.filters.source = 'current'; state.page = 0; renderFilters(); renderRows();
+        state.filters.source = 'current'; state.page = 0; state.selectedTask = ''; renderFilters(); renderRows();
     });
     $('runs-previous').addEventListener('click', () => { state.page--; renderRows(); });
     $('runs-next').addEventListener('click', () => { state.page++; renderRows(); });
