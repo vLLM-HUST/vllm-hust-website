@@ -48,6 +48,24 @@ def main():
             )
             assert response.status == 200
             page.locator("#runs-content").wait_for(state="visible", timeout=30000)
+            nav = page.locator('.site-nav [data-nav-page="leaderboard-v2"]')
+            assert nav.count() == 1
+            assert nav.inner_text() == (
+                "排行榜 v2" if language == "zh" else "Leaderboard v2"
+            )
+            assert nav.get_attribute("href") == "./leaderboard-runs.html"
+            assert "active" in nav.get_attribute("class")
+            assert (
+                page.locator('.site-nav [data-nav-page="leaderboard"].active').count()
+                == 0
+            )
+            if width < 860:
+                page.locator("#navToggle").click()
+                assert nav.is_visible()
+                page.locator("#navToggle").click()
+            else:
+                assert nav.is_visible()
+
             assert (
                 page.locator(
                     ".runs-hero, .runs-filters, .hardware-context, #runs-title"
