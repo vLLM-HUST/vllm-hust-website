@@ -49,18 +49,17 @@ tasks. Missing client contracts stay separately identified. Task labels gain a s
 only when otherwise ambiguous. The expanded run preserves the recorded configuration for audit; this
 adapter does not claim to standardize all historical workload formats.
 
-`data/leaderboard_run_observations.json` supplements the existing 16 TP2 publication aggregates with
-32 sealed original observations. It joins by publication entry ID; current publication wins over
-historical duplicates. Raw evidence is pinned to benchmark commit
-`0793bfa9d0bad7ad4752d908889a9863480bed09`.
+`data/leaderboard_run_observations.json` supplements the 30 TP2 publication aggregates (16 non-MTP
+and 14 MTP2) with 60 sealed original observations. It joins by publication entry ID; current
+publication wins over historical duplicates. Raw evidence is pinned to benchmark commit `56f78b5`.
 
 Rebuild the supplement with a checkout of that benchmark revision:
 
 ```bash
 python scripts/build_leaderboard_run_observations.py \
   --benchmark-repo /path/to/vllm-hust-benchmark \
-  --revision 0793bfa9d0bad7ad4752d908889a9863480bed09 \
-  --pattern 'betterscale-qwen27-tp2-20260922-*' \
+  --revision 56f78b5 \
+  --pattern 'betterscale-qwen27-tp2*-20260922-*' \
   --output data/leaderboard_run_observations.json
 ```
 
@@ -80,7 +79,7 @@ python scripts/verify_leaderboard_runs_browser.py
 ```
 
 The browser check compares every displayed TP2 metric with the sealed supplement, checks 8 task
-definitions / 32 run rows, filtering, pagination, keyboard expansion, exclusive table views, header
+definitions / 60 run rows, filtering, pagination, keyboard expansion, exclusive table views, header
 multi-selection, numeric ordering, tag navigation, missing evidence, and desktop/mobile EN/ZH in
 both OS color schemes. The dedicated review workflow retains screenshots.
 
