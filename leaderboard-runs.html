@@ -66,8 +66,14 @@
         <button id="runs-reset" type="button" data-runs-i18n="reset">Reset</button>
       </div>
       <div class="runs-view-switch" role="group" aria-label="Table view">
-        <button id="view-runs" type="button" aria-pressed="true" aria-controls="runs-panel" data-runs-i18n="results"></button>
-        <button id="view-tasks" type="button" aria-pressed="false" aria-controls="tasks-panel" data-runs-i18n="tasks"></button>
+        <button id="view-runs" type="button" aria-pressed="true" aria-controls="runs-panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10h5v10M9 20V4h6v16M15 20v-7h5v7M3 20h18" /></svg>
+          <span>Leaderboards</span><span id="view-runs-count" class="view-count">0</span>
+        </button>
+        <button id="view-tasks" type="button" aria-pressed="false" aria-controls="tasks-panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 6 1.5 1.5L8 5M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9" /></svg>
+          <span>Tasks</span><span id="view-tasks-count" class="view-count">0</span>
+        </button>
       </div>
       <section id="runs-panel" aria-labelledby="runs-title">
         <div class="runs-section-head"><h2 id="runs-title" data-runs-i18n="results"></h2><span id="runs-count" aria-live="polite"></span></div>

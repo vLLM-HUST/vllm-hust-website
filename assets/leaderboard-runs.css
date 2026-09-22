@@ -64,9 +64,17 @@
 .runs-hero p, .runs-review a, .hardware-context, .runs-note,
 .runs-section-head > span, .runs-pagination { color: #b4c2d6; }
 .runs-review { color: #9cb4ff; }
-.runs-view-switch { display: flex; gap: 8px; margin-top: 24px; }
-.runs-view-switch button, .column-menu button { padding: 9px 12px; border: 1px solid var(--run-border); border-radius: 6px; color: var(--run-accent); background: var(--run-bg); }
-.runs-view-switch button[aria-pressed="true"], #column-apply { background: var(--run-accent); color: var(--run-bg); }
+/* Compact judge-style navigation, distinct from the table's form controls. */
+.runs-view-switch { display: inline-flex; gap: 4px; margin-top: 26px; padding: 5px; border: 1px solid #344158; border-radius: 13px; background: #101b2ddd; box-shadow: 0 6px 20px #0002; max-width: 100%; box-sizing: border-box; }
+.runs-view-switch svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.runs-view-switch .view-count { font-size: 11px; font-variant-numeric: tabular-nums; line-height: 1; padding: 4px 6px; border-radius: 6px; background: #ffffff10; color: #aebcd0; }
+.runs-shell .runs-view-switch button { display: flex; align-items: center; gap: 9px; border: 1px solid transparent; border-radius: 9px; padding: 11px 16px; font-size: 14px; font-weight: 650; letter-spacing: .01em; color: #aebcd0; background: transparent; transition: background .15s, color .15s; }
+.runs-shell .runs-view-switch button:hover { color: #fff; background: #ffffff0c; }
+.runs-shell .runs-view-switch button[aria-pressed="true"] { color: #fff; background: #3155c4; border-color: #6584e9; box-shadow: 0 2px 8px #0003, inset 0 1px #ffffff14; }
+.runs-view-switch button[aria-pressed="true"] .view-count { color: #edf2ff; background: #ffffff20; }
+@media (max-width: 600px) { .runs-shell .runs-view-switch button { padding: 10px 11px; gap: 7px; font-size: 13px; } }
+.column-menu button { padding: 9px 12px; border: 1px solid var(--run-border); border-radius: 6px; color: var(--run-accent); background: var(--run-bg); }
+#column-apply { background: var(--run-accent); color: var(--run-bg); }
 .runs-table th:has(.column-heading) { padding: 0; }
 .column-heading { display: flex; align-items: stretch; }
 .column-title { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex: 1; padding: 14px 8px 14px 12px; border: 0; background: transparent; color: inherit; text-align: left; }
