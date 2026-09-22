@@ -44,7 +44,7 @@ def build(repo: Path, revision: str, pattern: str) -> dict:
                 raise ValueError("Evidence path escapes sealed submission")
             if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
                 raise ValueError(f"Evidence checksum mismatch: {path.name}")
-            covered.add(name)
+            covered.add(path.relative_to(directory.resolve()).as_posix())
         if not {"repeats.json", "run_leaderboard.json"} <= covered:
             raise ValueError("Unsealed repeat manifest")
         aggregate = json.loads((directory / "run_leaderboard.json").read_text())

@@ -17,8 +17,8 @@ def git(repo, *args):
     return subprocess.check_output(["git", "-C", str(repo), *args], text=True).strip()
 
 
-@pytest.fixture
-def sealed_repo(tmp_path):
+@pytest.fixture(params=["", "./"])
+def sealed_repo(tmp_path, request):
     git(tmp_path, "init", "-q")
     directory = tmp_path / "submissions" / "campaign"
     directory.mkdir(parents=True)
@@ -53,7 +53,7 @@ def sealed_repo(tmp_path):
     )
     (directory / "checksums.sha256").write_text(
         "".join(
-            f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}\n"
+            f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {request.param}{p.name}\n"
             for p in sorted(directory.iterdir())
         )
     )
