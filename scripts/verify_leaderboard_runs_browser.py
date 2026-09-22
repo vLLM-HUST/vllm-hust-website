@@ -93,6 +93,57 @@ def main():
             selected = page.locator(".selected-task")
             assert selected.is_visible()
             assert "Agent Research" in selected.inner_text()
+            assert page.locator("#tasks-panel").is_visible()
+            assert page.locator("#runs-panel").is_hidden()
+            assert page.locator("table:visible").count() == 1
+            page.screenshot(
+                path=str(args.output / f"tasks-{width}-{language}-{scheme}.png")
+            )
+            page.locator("#view-runs").click()
+            assert page.locator("#tasks-panel").is_hidden()
+            assert page.locator("table:visible").count() == 1
+            # Exact-value multi-selection, cancel, search, and numeric ordering.
+            page.locator('[data-column="mod"]').click()
+            assert page.locator("#column-menu").is_visible()
+            page.locator("#column-none").click()
+            page.locator("#column-search").fill("betterscale")
+            page.locator("#column-values input").check()
+            page.screenshot(
+                path=str(args.output / f"column-menu-{width}-{language}-{scheme}.png")
+            )
+            bounds = page.locator("#column-menu").bounding_box()
+            assert bounds["x"] >= 0 and bounds["x"] + bounds["width"] <= width + 1
+            page.locator("#column-apply").click()
+            assert page.locator(".run-row").count() == 16
+            page.locator('[data-column="mod"]').click()
+            page.locator("#column-none").click()
+            page.keyboard.press("Escape")
+            assert page.locator(".run-row").count() == 16
+            assert page.locator('[data-column="mod"]').evaluate(
+                "(el)=>el === document.activeElement"
+            )
+            page.locator('[data-order="ttft"]').focus()
+            page.keyboard.press("Enter")
+            assert page.locator("#column-menu").is_hidden()
+            values = page.locator('[data-metric="ttft"]').all_text_contents()
+            numeric = [float(v.replace(",", "")) for v in values if v != "—"]
+            assert numeric == sorted(numeric)
+            page.locator('[data-order="ttft"]').click()
+            assert page.locator("#column-menu").is_hidden()
+            values = page.locator('[data-metric="ttft"]').all_text_contents()
+            numeric = [float(v.replace(",", "")) for v in values if v != "—"]
+            assert numeric == sorted(numeric, reverse=True)
+            assert values[-1] == "—"
+            page.locator("#view-tasks").click()
+            page.locator("#view-runs").click()
+            assert page.locator(".run-row").count() == 16
+            page.locator('[data-column="mod"]').click()
+            page.locator("#column-none").click()
+            page.locator("#column-apply").click()
+            assert page.locator("#runs-empty").is_visible()
+            page.locator('[data-column="mod"]').click()
+            page.locator("#column-clear").click()
+            assert page.locator(".run-row").count() == 32
             # Filters, empty states, pagination, and language switches stay functional.
             page.locator("#runs-mod").select_option("native")
             assert page.locator(".run-row").count() == 16

@@ -7,6 +7,16 @@ navigation, publication schema and snapshots are unchanged.
 
 ## Reading the page
 
+- Use the **Measurements / Task definitions** buttons to switch views; only one table is visible.
+  Clicking a task tag switches to its definition and highlights the row. Returning preserves the
+  result filters, sorting and page.
+- Click a measurement column title to toggle ascending/descending sorting; its separate small arrow
+  opens a dropdown with searchable checkboxes. Selections combine OR within a column and AND across
+  columns, over all pages. Apply commits checkbox changes; Cancel / Escape discard them. Clear
+  filter restores one column; Reset restores grouped order. Missing numbers remain last in either
+  sort direction. Options cover the current top-level scope, not just the other column filters.
+  Changing that top-level scope clears column selections; Reset clears selections and sorting
+  together.
 - The flat table is organized by **(model, parallel configuration), task tag, MOD**.
 - Hardware is selected once above the table; different hardware is never silently combined. The new
   TP2 campaign uses 910B2; older publications also contain 910B3.
@@ -68,9 +78,9 @@ python scripts/verify_leaderboard_runs_browser.py
 ```
 
 The browser check compares every displayed TP2 metric with the sealed supplement, checks 8 task
-definitions / 32 run rows, filtering, pagination, keyboard expansion, tag navigation, missing
-evidence, and desktop/mobile EN/ZH in both OS color schemes. The dedicated review workflow retains
-screenshots.
+definitions / 32 run rows, filtering, pagination, keyboard expansion, exclusive table views, header
+multi-selection, numeric ordering, tag navigation, missing evidence, and desktop/mobile EN/ZH in
+both OS color schemes. The dedicated review workflow retains screenshots.
 
 Tutor review should focus on whether the flat hierarchy is clear, whether task tags make comparisons
 sufficiently explicit, and whether the configuration prefix and expanded evidence provide enough

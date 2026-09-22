@@ -5,6 +5,7 @@
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const words = {
         en: {
+            ascending: '↑ Sort ascending', descending: '↓ Sort descending', searchValues: 'Search values', selectAll: 'Select visible', selectNone: 'Deselect visible', clearColumn: 'Clear filter', cancel: 'Cancel', apply: 'Apply', noValues: 'No matching values', filterColumn: 'Filter', filtered: 'filtered',
             title: 'One workload. Every run.', lede: 'Model × parallel configuration → task → MOD. Real measurements, with the configuration beside each run.',
             review: 'REVIEW PREVIEW', old: 'Existing leaderboard ↗', model: 'Model / parallel', task: 'Task tag', mod: 'MOD',
             all: 'All', native: 'Native', current: 'Current publication', historical: 'Historical evidence', records: 'Records',
@@ -26,6 +27,7 @@
             legacyLength: 'Variable; recorded summary', reviewNote: 'Independent review entry. The existing leaderboard and benchmark artifacts are unchanged.'
         },
         zh: {
+            ascending: '↑ 升序排列', descending: '↓ 降序排列', searchValues: '搜索选项', selectAll: '勾选可见项', selectNone: '取消可见项', clearColumn: '清除此列筛选', cancel: '取消', apply: '应用', noValues: '没有匹配的选项', filterColumn: '筛选', filtered: '已筛选',
             title: '同一任务，看清每一次运行。', lede: '模型 × 并行配置 → 任务 → MOD。实测成绩与每次运行的配置，放在同一张表里。',
             review: '评审预览', old: '现有排行榜 ↗', model: '模型 / 并行配置', task: '任务 tag', mod: 'MOD',
             all: '全部', native: '原生', current: '当前发布', historical: '历史证据', records: '记录范围',
@@ -51,12 +53,127 @@
     const t = key => words[lang()][key] || key;
     const fmt = value => value === null || value === undefined ? '—' : new Intl.NumberFormat(lang(), { maximumFractionDigits: 2 }).format(value);
     const state = { rows: [], tasks: [], page: 0, expanded: new Set(), selectedTask: '', ready: false,
+        view: 'runs', columnFilters: {}, sort: null,
         filters: { hardware: '', modelKey: '', mod: '', taskId: '', source: 'current' }, missingSupplement: false };
     const pageSize = 40;
     const link = (url, label) => url ? `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a>` : '';
     function options(id, values, selected, label = value => value) {
         $(id).innerHTML = `<option value="">${t('all')}</option>` + [...new Set(values)].map(value => `<option value="${escape(value)}" ${value === selected ? 'selected' : ''}>${escape(label(value))}</option>`).join('');
     }
+    const columns = [
+        ['model', () => t('model')], ['task', () => t('task')], ['mod', () => t('mod')],
+        ['ttft', () => 'TTFT', 'mean · ms'], ['tpot', () => 'TPOT', 'mean · ms'],
+        ['ttftP95', () => 'TTFT P95', 'ms'], ['tpotP95', () => 'TPOT P95', 'ms'],
+        ['throughput', () => t('throughput')], ['run', () => 'Run'], ['config', () => t('config')]
+    ];
+    const model = window.LeaderboardRunsModel;
+    let menu = null;
+    function filteredRows() { return model.selectRows(state.rows.filter(matches), state.columnFilters, state.sort); }
+    function setView(view) {
+        state.view = view;
+        for (const name of ['runs', 'tasks']) {
+            $(`${name}-panel`).hidden = view !== name;
+            $(`view-${name}`).setAttribute('aria-pressed', String(view === name));
+        }
+    }
+    function renderHeaders() {
+        $('runs-headers').innerHTML = columns.map(([key, label, unit]) => {
+            const direction = state.sort?.key === key ? state.sort.direction : '';
+            const filtered = key in state.columnFilters;
+            return `<th scope="col" aria-sort="${direction === 'asc' ? 'ascending' : direction === 'desc' ? 'descending' : 'none'}"><div class="column-heading"><button type="button" class="column-title" data-order="${key}" aria-label="${escape(label())}: ${t(direction === 'asc' ? 'descending' : 'ascending')}"><span>${escape(label())}${unit ? `<small>${unit}</small>` : ''}</span><span aria-hidden="true">${direction === 'asc' ? '↑' : direction === 'desc' ? '↓' : ''}</span></button><button type="button" data-column="${key}" aria-haspopup="dialog" aria-controls="column-menu" aria-expanded="false" class="column-trigger ${filtered ? 'is-filtered' : ''}" aria-label="${escape(label())}: ${t('filterColumn')}${filtered ? ` (${t('filtered')})` : ''}"><span class="column-chevron" aria-hidden="true"></span>${filtered ? '<span aria-hidden="true">•</span>' : ''}</button></div></th>`;
+        }).join('');
+    }
+    function valueLabel(row, key) {
+        if (key in row.metrics) return row.metrics[key] === null ? '—' : String(row.metrics[key]);
+        if (key === 'model') return `${row.model} · ${row.parallel.label} · ${row.precision} · ${row.parallel.chips ?? '?'} NPU`;
+        if (key === 'task') return row.taskLabel;
+        if (key === 'mod') return row.mod === 'native' ? t('native') : row.mod;
+        return String(model.columnValue(row, key) ?? '—');
+    }
+    function visibleChoices() {
+        const query = $('column-search').value.toLocaleLowerCase();
+        return menu.choices.filter(choice => choice.label.toLocaleLowerCase().includes(query));
+    }
+    function renderChoices() {
+        const visible = visibleChoices();
+        $('column-values').innerHTML = visible.length ? visible.map(choice =>
+            `<label><input type="checkbox" data-choice="${choice.index}" ${menu.selected.has(choice.value) ? 'checked' : ''}><span>${escape(choice.label)}</span></label>`
+        ).join('') : `<p>${t('noValues')}</p>`;
+    }
+    function closeMenu() {
+        const key = menu?.key;
+        $('column-menu').close(); menu = null;
+        const trigger = document.querySelector(`[data-column="${key}"]`);
+        trigger?.setAttribute('aria-expanded', 'false');
+        trigger?.focus({ preventScroll: true });
+    }
+    function applyMenuChange() {
+        const key = menu.key;
+        state.page = 0; state.selectedTask = '';
+        closeMenu(); renderHeaders(); renderRows();
+        document.querySelector(`[data-column="${key}"]`)?.focus({ preventScroll: true });
+    }
+    function openMenu(key) {
+        const unique = new Map();
+        // Options span the selected global scope, not just the current page or
+        // other column filters, so a filtered-out value can always be restored.
+        for (const row of state.rows.filter(matches)) {
+            const value = model.columnValue(row, key);
+            if (!unique.has(value)) unique.set(value, { value, label: valueLabel(row, key) });
+        }
+        const choices = [...unique.values()].sort((a, b) => {
+            if (a.value === null || b.value === null) return a.value === b.value ? 0 : a.value === null ? 1 : -1;
+            return typeof a.value === 'number' ? a.value - b.value : a.label.localeCompare(b.label, lang(), { numeric: true });
+        }).map((choice, index) => ({ ...choice, index }));
+        menu = { key, choices, selected: new Set(state.columnFilters[key] ?? choices.map(c => c.value)) };
+        $('column-menu-title').textContent = columns.find(c => c[0] === key)[1]();
+        $('column-search').value = '';
+        renderChoices();
+        const trigger = document.querySelector(`[data-column="${key}"]`);
+        trigger.setAttribute('aria-expanded', 'true');
+        $('column-menu').showModal();
+        const rect = trigger.getBoundingClientRect(), dialog = $('column-menu');
+        dialog.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - dialog.offsetWidth - 8))}px`;
+        dialog.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - dialog.offsetHeight - 8))}px`;
+        $('column-search').focus({ preventScroll: true });
+    }
+    $('runs-headers').addEventListener('click', event => {
+        const button = event.target.closest('[data-column]');
+        if (button) openMenu(button.dataset.column);
+        const title = event.target.closest('[data-order]');
+        if (title) {
+            const key = title.dataset.order;
+            state.sort = { key, direction: state.sort?.key === key && state.sort.direction === 'asc' ? 'desc' : 'asc' };
+            state.page = 0; renderHeaders(); renderRows();
+            document.querySelector(`[data-order="${key}"]`)?.focus({ preventScroll: true });
+        }
+    });
+    $('column-search').addEventListener('input', renderChoices);
+    $('column-values').addEventListener('change', event => {
+        const choice = menu.choices[Number(event.target.dataset.choice)];
+        if (choice) event.target.checked ? menu.selected.add(choice.value) : menu.selected.delete(choice.value);
+    });
+    for (const [id, checked] of [['column-all', true], ['column-none', false]]) $(id).addEventListener('click', () => {
+        for (const choice of visibleChoices()) checked ? menu.selected.add(choice.value) : menu.selected.delete(choice.value);
+        renderChoices();
+    });
+    $('column-apply').addEventListener('click', () => {
+        if (menu.choices.every(c => menu.selected.has(c.value))) delete state.columnFilters[menu.key];
+        else state.columnFilters[menu.key] = [...menu.selected];
+        applyMenuChange();
+    });
+    $('column-clear').addEventListener('click', () => {
+        delete state.columnFilters[menu.key]; applyMenuChange();
+    });
+    $('column-cancel').addEventListener('click', closeMenu);
+    $('column-menu').addEventListener('cancel', event => { event.preventDefault(); closeMenu(); });
+    $('column-menu').addEventListener('click', event => {
+        if (event.target === $('column-menu')) {
+            const rect = event.target.getBoundingClientRect();
+            if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeMenu();
+        }
+    });
+    for (const view of ['runs', 'tasks']) $(`view-${view}`).addEventListener('click', () => setView(view));
     function renderFilters() {
         const f = state.filters;
         options('runs-hardware', state.rows.map(r => r.hardware), f.hardware);
@@ -88,7 +205,7 @@
         </td></tr>`;
     }
     function renderRows() {
-        const filtered = state.rows.filter(matches), maxPage = Math.max(0, Math.ceil(filtered.length / pageSize) - 1);
+        const filtered = filteredRows(), maxPage = Math.max(0, Math.ceil(filtered.length / pageSize) - 1);
         state.page = Math.min(state.page, maxPage);
         const visible = filtered.slice(state.page * pageSize, (state.page + 1) * pageSize);
         let previousGroup = '';
@@ -133,7 +250,7 @@
     function translate() {
         for (const node of document.querySelectorAll('[data-runs-i18n]')) node.textContent = t(node.dataset.runsI18n);
         document.title = lang() === 'zh' ? '统一成绩表 · 评审预览 - vLLM-HUST' : 'Unified runs · Review preview - vLLM-HUST';
-        if (state.ready) { renderFilters(); renderRows(); }
+        if (state.ready) { renderFilters(); renderHeaders(); renderRows(); }
     }
     async function initialize() {
         translate();
@@ -155,7 +272,7 @@
             $('runs-supplement-warning').hidden = !state.missingSupplement;
             $('runs-loading').hidden = true;
             $('runs-content').hidden = false;
-            renderFilters(); renderRows();
+            renderFilters(); renderHeaders(); renderRows();
         } catch (error) {
             $('runs-loading').hidden = true;
             $('runs-error').hidden = false;
@@ -165,13 +282,15 @@
     for (const [id, key] of [['runs-hardware', 'hardware'], ['runs-model', 'modelKey'], ['runs-mod', 'mod'], ['runs-task', 'taskId'], ['runs-source', 'source']]) {
         $(id).addEventListener('change', () => {
             state.filters[key] = $(id).value; state.page = 0; state.selectedTask = '';
+            state.columnFilters = {}; renderHeaders();
             if (key === 'hardware') { state.filters.modelKey = ''; renderFilters(); }
             renderRows();
         });
     }
     $('runs-reset').addEventListener('click', () => {
         Object.keys(state.filters).filter(key => key !== 'hardware').forEach(key => { state.filters[key] = ''; });
-        state.filters.source = 'current'; state.page = 0; state.selectedTask = ''; renderFilters(); renderRows();
+        state.filters.source = 'current'; state.page = 0; state.selectedTask = '';
+        state.columnFilters = {}; state.sort = null; renderFilters(); renderHeaders(); renderRows();
     });
     $('runs-previous').addEventListener('click', () => { state.page--; renderRows(); });
     $('runs-next').addEventListener('click', () => { state.page++; renderRows(); });
@@ -185,7 +304,8 @@
         }
         if (task) {
             state.selectedTask = task.dataset.task;
-            renderTasks(state.rows.filter(matches));
+            renderTasks(filteredRows());
+            setView('tasks');
             $(state.selectedTask).scrollIntoView({ behavior: 'smooth', block: 'center' });
             $(state.selectedTask).focus({ preventScroll: true });
         }
