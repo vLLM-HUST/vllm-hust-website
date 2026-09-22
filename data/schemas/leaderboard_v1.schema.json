@@ -438,7 +438,8 @@
                 "representative_model_band": {
                   "type": "string",
                   "enum": [
-                    "7B-13B"
+                    "7B-13B",
+                    "27B"
                   ]
                 },
                 "representative_business_scenario": {
