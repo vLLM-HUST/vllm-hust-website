@@ -3,7 +3,8 @@
 Review entry: <https://vllm-hust.sage.org.ai/leaderboard-runs.html>.
 
 This is the additive **Leaderboard v2 / 排行榜 v2** entry, linked directly from the shared top
-navigation. The existing leaderboard, its scripts, publication schema and snapshots remain unchanged.
+navigation. The existing leaderboard, its scripts, publication schema and snapshots remain
+unchanged.
 
 ## Reading the page
 
