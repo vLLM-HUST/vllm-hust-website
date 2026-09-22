@@ -46,11 +46,17 @@ def main():
             )
             assert response.status == 200
             page.locator("#runs-content").wait_for(state="visible", timeout=30000)
-            options = page.locator("#runs-model option").evaluate_all(
-                "(xs)=>xs.map(x=>({value:x.value,label:x.textContent}))"
+            assert (
+                page.locator(
+                    ".runs-hero, .runs-filters, .hardware-context, #runs-title"
+                ).count()
+                == 0
             )
-            model = next(x["value"] for x in options if "Qwen3.8-27B" in x["label"])
-            page.locator("#runs-model").select_option(model)
+            page.locator('[data-column="model"]').click()
+            page.locator("#column-none").click()
+            page.locator("#column-search").fill("Qwen3.8-27B")
+            page.locator("#column-values input").check()
+            page.locator("#column-apply").click()
             assert page.locator(".run-row").count() == 32
             assert "Leaderboards" in page.locator("#view-runs").inner_text()
             assert "Tasks" in page.locator("#view-tasks").inner_text()
@@ -149,13 +155,24 @@ def main():
             page.locator("#column-clear").click()
             assert page.locator(".run-row").count() == 32
             # Filters, empty states, pagination, and language switches stay functional.
-            page.locator("#runs-mod").select_option("native")
+            page.locator('[data-column="mod"]').click()
+            page.locator("#column-none").click()
+            page.locator("#column-values label").filter(
+                has_text="Native" if language == "en" else "原生"
+            ).locator("input").check()
+            page.locator("#column-apply").click()
             assert page.locator(".run-row").count() == 16
             page.locator("#langToggle").click()
             assert document_language(page) != language
             assert page.locator(".run-row").count() == 16
-            page.locator("#runs-source").select_option("historical")
-            assert page.locator("#runs-empty").is_visible()
+            page.locator('[data-column="run"]').click()
+            page.locator("#column-scope-select").select_option("historical")
+            page.locator("#column-cancel").click()
+            assert page.locator(".run-row").count() > 0
+            assert all(
+                ("Historical" in text or "历史" in text)
+                for text in page.locator(".run-id").all_text_contents()
+            )
             page.locator("#runs-reset").click()
             assert page.locator(".run-row").count() == 40
             page.locator("#runs-next").click()

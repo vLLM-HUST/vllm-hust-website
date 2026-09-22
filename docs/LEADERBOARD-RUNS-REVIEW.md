@@ -18,8 +18,10 @@ navigation, publication schema and snapshots are unchanged.
   Changing that top-level scope clears column selections; Reset clears selections and sorting
   together.
 - The flat table is organized by **(model, parallel configuration), task tag, MOD**.
-- Hardware is selected once above the table; different hardware is never silently combined. The new
-  TP2 campaign uses 910B2; older publications also contain 910B3.
+- The page starts directly with the view tabs and table, without a hero or filter panel. Hardware is
+  selected inside the model-column filter menu; publication scope is inside the Run menu; different
+  hardware is never silently combined. The new TP2 campaign uses 910B2; older publications also
+  contain 910B3.
 - TTFT and TPOT are request means in milliseconds. Each P95 is the corresponding **individual run's
   request distribution**, not an average of repeated percentiles. There are no latency thresholds or
   SLO gates.

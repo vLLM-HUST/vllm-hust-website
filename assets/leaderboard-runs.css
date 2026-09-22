@@ -1,23 +1,8 @@
 /* Scoped review surface: no selectors or dependencies from the legacy leaderboard. */
 .runs-shell { --run-border: #dce3ef; --run-muted: #59677c; --run-bg: #fff; --run-tint: #f3f6fc; --run-ink: #18283e; --run-accent: #365bd6; color: var(--run-ink); padding-bottom: 64px; }
-.runs-hero { padding: 48px 0 30px; max-width: 1000px; }
-.runs-review { display: flex; align-items: center; gap: 24px; color: var(--run-accent); font-size: 12px; font-weight: 750; letter-spacing: .06em; }
-.runs-review a { color: var(--run-muted); font-weight: 500; letter-spacing: 0; }
-.runs-hero h1 { font-size: 38px; line-height: 1.25; margin: 18px 0 16px; }
-.runs-hero p { color: var(--run-muted); max-width: 800px; line-height: 1.7; }
-.runs-hero .review-note { font-size: 12px; }
-.hardware-context { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--run-muted); margin-bottom: 18px; }
-.runs-filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; padding: 18px; background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 12px; }
-.runs-filters label { display: flex; flex: 1 1 160px; min-width: 0; flex-direction: column; gap: 7px; color: var(--run-muted); font-size: 12px; }
-.runs-filters label:first-child { flex-basis: 250px; }
-.runs-filters select { width: 100%; min-width: 0; padding: 10px 28px 10px 10px; border: 1px solid var(--run-border); background: var(--run-bg); color: var(--run-ink); border-radius: 6px; font: inherit; }
 .runs-shell button { cursor: pointer; font: inherit; }
-.runs-filters > button, .runs-pagination button, .run-toggle { background: var(--run-bg); color: var(--run-accent); border: 1px solid var(--run-border); border-radius: 6px; padding: 8px 12px; }
 .runs-shell button:disabled { opacity: .4; cursor: default; }
 .runs-shell :focus-visible { outline: 2px solid var(--run-accent); outline-offset: 3px; }
-.runs-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 34px; }
-.runs-section-head h2 { font-size: 22px; margin: 0; }
-.runs-section-head > span { font-size: 12px; color: var(--run-muted); }
 .runs-note { font-size: 12px; color: var(--run-muted); line-height: 1.65; margin: 10px 0; }
 .runs-table-scroll { width: 100%; overflow-x: auto; border: 1px solid var(--run-border); border-radius: 10px; background: var(--run-bg); margin-top: 16px; }
 .runs-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
@@ -40,7 +25,6 @@
 .run-config-grid h4 { font-size: 12px; margin: 0 0 10px; }
 .runs-table pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11px; line-height: 1.6; margin: 0; max-height: 300px; overflow: auto; }
 .runs-pagination { display: flex; justify-content: flex-end; gap: 16px; align-items: center; padding: 16px 0; font-size: 12px; }
-.tasks-section { margin-top: 36px; }
 .task-table { min-width: 1050px; }
 .task-table details { max-width: 340px; }
 .task-table summary { cursor: pointer; color: var(--run-accent); }
@@ -53,17 +37,8 @@
     .selected-task td { background: #293d66; }
 }
 @media (max-width: 600px) {
-    .runs-hero { padding-top: 30px; }
-    .runs-hero h1 { font-size: 29px; }
-    .runs-filters { padding: 12px; gap: 12px; }
-    .runs-filters label, .runs-filters label:first-child { flex-basis: 100%; }
-    .runs-section-head { align-items: start; flex-direction: column; gap: 8px; }
     .run-config-grid { grid-template-columns: 1fr; max-width: 330px; }
 }
-/* The shared site backdrop is dark in both OS themes; keep its captions legible. */
-.runs-hero p, .runs-review a, .hardware-context, .runs-note,
-.runs-section-head > span, .runs-pagination { color: #b4c2d6; }
-.runs-review { color: #9cb4ff; }
 /* Compact judge-style navigation, distinct from the table's form controls. */
 .runs-view-switch { display: inline-flex; gap: 4px; margin-top: 26px; padding: 5px; border: 1px solid #344158; border-radius: 13px; background: #101b2ddd; box-shadow: 0 6px 20px #0002; max-width: 100%; box-sizing: border-box; }
 .runs-view-switch svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
@@ -94,3 +69,9 @@
 .column-values label:hover { background: var(--run-tint); }
 .column-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 .runs-shell .column-menu h3 { color: var(--run-ink); }
+
+.runs-note, .runs-pagination, .runs-reading { color: #b4c2d6; }
+.runs-reading { font-size: 12px; margin-top: 12px; }
+.runs-reading summary { cursor: pointer; }
+.column-search select { width: 100%; padding: 8px; border: 1px solid var(--run-border); border-radius: 4px; background: var(--run-bg); color: var(--run-ink); }
+.runs-pagination button, .run-toggle { background: var(--run-bg); color: var(--run-accent); border: 1px solid var(--run-border); border-radius: 6px; padding: 8px 12px; }
