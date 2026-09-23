@@ -127,15 +127,15 @@ test('missing identity evidence or catalog does not guess MOD from engine, branc
 test('legacy attribution evidence pins match the recorded source and activation facts',()=>{
     const {rows}=model.build(realPayload,supplement,catalog,attributions);
     for(const row of rows.filter(r=>r.mod==='simllm-migration')) {
-        assert(['e0686f12d1af74e6df97dfdaf7d314b4b3de10f7',
-            '312ca80a90cbd28438bce3b59e3fbaad749451f3',
-            'a05a9efe54c783cd4030d9aae8c8341b8c5e0d4b'].includes(row.entry.metadata.runtime_provenance.plugin.commit));
+        assert(['e0686f12d1af74e6df97dfdaf7d314b4b3de10f7', // pragma: allowlist secret — public Git commit, not a credential
+            '312ca80a90cbd28438bce3b59e3fbaad749451f3', // pragma: allowlist secret — public Git commit, not a credential
+            'a05a9efe54c783cd4030d9aae8c8341b8c5e0d4b'].includes(row.entry.metadata.runtime_provenance.plugin.commit)); // pragma: allowlist secret — public Git commit, not a credential
     }
     const prefix=rows.find(r=>r.mod==='prefix-router-migration');
     assert.equal(prefix.entry.same_spec.resolved_server_parameters.enable_prefix_routing,true);
     const split=rows.find(r=>r.mod==='split-batch-full-graph-migration');
-    assert.equal(split.entry.metadata.runtime_provenance.plugin.commit,'cd29480d9699616adf6808fb6ccc3107bc9f1384');
+    assert.equal(split.entry.metadata.runtime_provenance.plugin.commit,'cd29480d9699616adf6808fb6ccc3107bc9f1384'); // pragma: allowlist secret — public Git commit, not a credential
     const base=rows.find(r=>r.mod==='kv-tiering-migration'&&r.modStatus==='baseline');
-    assert.equal(base.entry.metadata.git_commit,'e0c0ce8e37e0fcd0f7a133c5c8eee68110295445');
+    assert.equal(base.entry.metadata.git_commit,'e0c0ce8e37e0fcd0f7a133c5c8eee68110295445'); // pragma: allowlist secret — public Git commit, not a credential
     assert(rows.filter(r=>/pr49-kv-offload-worker|current-main-cpu-offload-kv/.test(r.entry.metadata.github_ref)).every(r=>r.mod==='unknown'));
 });
