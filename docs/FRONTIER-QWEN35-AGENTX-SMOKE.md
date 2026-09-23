@@ -10,7 +10,7 @@ quality score, or proof of a globally optimal frontier.** Published at Fletcher'
 | ---------------------------------------------------- | --------------: | -----------------------: |
 | Output tokens/s/chip                                 |         29.2968 |                  42.3122 |
 | Total output tokens/s                                |         58.5936 |                  84.6243 |
-| **P90 per-request decode tokens/s (default X)**      |     **83.9964** |              **97.6618** |
+| **P90 per-request decode tokens/s (fixed X)**        |     **83.9964** |              **97.6618** |
 | Interactivity: 1000 / mean request TPOT (tok/s/user) |         63.2970 |                  67.6906 |
 | TTFT median (ms)                                     |       1384.2884 |                 806.4078 |
 | TTFT P95 (ms)                                        |       4022.7425 |                4189.5071 |
@@ -22,13 +22,13 @@ The ordinate is **total measured output tokens/s divided by all allocated chips*
 accelerators in each configuration. It is resource productivity, not revenue, cost, or task value.
 No price assumptions are attached.
 
-The default X coordinate is **P90 per-request decode tokens/s**, taken directly from the official
+The fixed X coordinate is **P90 per-request decode tokens/s**, taken directly from the official
 `output_token_throughput_per_user.p90` statistic. It is the 90th percentile of inverse request TPOT,
 not `1000 / P90 TPOT`, not median speed and not inverse mean TPOT. Higher is faster; this upper
 speed percentile is not a slow-tail guarantee. The pinned harness's `inter_token_latency` is
 request-level `(request latency − TTFT) / (output length − 1)`, i.e. TPOT. Its P95 is not a
-percentile of individual streaming token gaps. Alternative chart projections retain inverse mean
-TPOT and P95 latency metrics.
+percentile of individual streaming token gaps. Inverse mean TPOT and P95 latency metrics remain in
+the downloadable details, not as selectable chart axes.
 
 Output throughput is copied from the official `output_token_throughput.avg`, preserving the
 harness's observation/drain accounting. The configured **sending window** is 900 seconds after

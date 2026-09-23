@@ -10,7 +10,7 @@
       },
       "precision": {
         "id": "bf16-weights-compute-kv",
-        "label": "BF16 weights / compute / KV"
+        "label": "BF16"
       },
       "context_tokens": 262144,
       "workload": {

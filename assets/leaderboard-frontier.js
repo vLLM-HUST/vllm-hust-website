@@ -1,156 +1,162 @@
-/* Frontier is an independent, static-snapshot consumer. No benchmark execution. */
+/* Fixed comparison charts. Full configuration travels with the downloaded point. */
 (() => {
     'use strict';
     const $ = id => document.getElementById(id), M = window.LeaderboardFrontierModel;
+    const X = 'decode_p90_tps', Y = 'output_tps_per_chip';
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const words = {
         en: {
-            title: 'Find the configuration frontier.', subtitle: 'One fixed workload. Many ways to serve it. Compare measured configurations—not just MOD names.',
-            model: 'Model', precision: 'Precision', workload: 'Workload', context: 'Required context', hardware: 'Hardware', mod: 'MOD combination',
-            x: 'X axis', y: 'Y axis', all: 'All', none: 'No MOD', pending: 'Awaiting measurements', loading: 'Loading evidence', error: 'Snapshot unavailable',
-            empty: 'The frontier starts with evidence.', emptyHint: 'The page is ready. Publish fixed-workload measurements to populate this view. No legacy results or invented points are substituted.',
-            noMatch: 'No comparable points in this view.', noMatchHint: 'Change the filters or axes. Cost requires a recorded full-deployment USD/hour rate; missing metrics are not estimated.',
-            failed: 'Could not load Frontier evidence.', failedHint: 'The snapshot is missing or invalid. Leaderboards and Tasks remain independent. Reload to retry.',
-            decode_p90_tps: 'P90 decode speed', interactivity: 'Interactivity', ttft_p95_ms: 'P95 TTFT', tpot_p95_ms: 'P95 TPOT', e2e_p95_ms: 'P95 end-to-end',
-            output_tps: 'Output throughput', output_tps_per_chip: 'Output throughput / chip', cost_per_million: 'Cost / 1M output tokens',
-            showAll: 'Show non-frontier points', points: 'Measured points', frontier: 'Frontier points', excluded: 'Missing selected metrics',
-            table: 'Configurations', tableHint: 'Select a point or configuration to inspect its evidence.', configuration: 'Engine / configuration',
-            concurrency: 'Concurrency', status: 'Position', onFrontier: 'On frontier', dominated: 'Dominated', detail: 'Configuration evidence', source: 'Open measurement evidence ↗',
-            methodology: 'How to read this frontier', notes: 'A point is one measured deployment at one load level. The frontier contains points that are not worse on both selected axes and strictly better on at least one. Equal points are retained. Lines are visual guides, not interpolated measurements. Only the selected workload/model/precision/context cohort is compared.',
-            costNote: 'Default X = P90 of per-request decode tokens/s (higher is faster), not the inverse of P90 TPOT. Interactivity = 1000 / mean TPOT in ms, excluding prefill. USD / 1M output tokens = full deployment USD/hour × 1,000,000 / (3,600 × measured output tokens/s). Per-chip throughput is resource efficiency, not a price. No costs are inferred from chip counts.',
-            contract: 'Workload contract', contractHint: 'Dataset and cache/arrival policy are fixed by the incoming workload contract. Engine, MOD combinations, parallelism and serving parameters may vary while satisfying the selected requirements.',
-            smoke: '15-minute smoke · tuning incomplete', smokeNote: 'Short development measurements, not one-hour formal results. One run per configuration; closed-loop replay may reach different request mixes. Output tokens/s/chip divides total measured output throughput by every allocated accelerator. This is productivity, not revenue or a quality score.',
-            direction: 'Better direction', larger: 'higher', smaller: 'lower', available: 'configurations', unknown: 'Not recorded'
+            title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload',
+            x: 'P90 decode speed', y: 'Output throughput / chip', native: 'Native baseline',
+            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration',
+            loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
+            missing: 'Missing axis metrics', points: 'points', context: 'context',
+            download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Session trees',
+            unknown: 'Not recorded', draft: 'MTP draft tokens'
         },
         zh: {
-            title: '找到值得选择的推理配置。', subtitle: '固定负载，开放配置。比较实测配置的前沿，而不只是 MOD 的名字。',
-            model: '模型', precision: '精度', workload: '固定 Workload', context: '所需上下文', hardware: '硬件', mod: 'MOD 组合',
-            x: '横轴', y: '纵轴', all: '全部', none: '无 MOD', pending: '等待实测数据', loading: '正在读取证据', error: '快照暂不可用',
-            empty: '前沿，从真实测量开始。', emptyHint: '页面已就绪，等待固定 workload 的测量数据接入。不挪用旧榜单，也不填入虚构成绩。',
-            noMatch: '当前条件下没有可比较的点。', noMatchHint: '请调整筛选或坐标轴。成本需要完整部署的美元时价；缺失指标不会估算补齐。',
-            failed: '暂时无法读取 Frontier 证据。', failedHint: '数据快照缺失或格式无效；不影响 Leaderboards 和 Tasks。可刷新重试。',
-            decode_p90_tps: 'P90 解码速度', interactivity: '单用户解码速度', ttft_p95_ms: 'P95 首 token 延迟', tpot_p95_ms: 'P95 TPOT', e2e_p95_ms: 'P95 端到端延迟',
-            output_tps: '总输出吞吐', output_tps_per_chip: '单卡输出吞吐', cost_per_million: '每百万输出 token 成本',
-            showAll: '显示非前沿点', points: '实测点', frontier: '前沿点', excluded: '缺少所选指标',
-            table: '推理配置', tableHint: '点击点或配置，查看完整参数和原始证据。', configuration: 'Engine / 配置',
-            concurrency: '并发', status: '位置', onFrontier: '位于前沿', dominated: '被支配', detail: '配置与证据', source: '查看测量证据 ↗',
-            methodology: '如何阅读这条前沿', notes: '一个点代表某套部署在一个负载水平下的实测。若没有其他点在两项所选指标上都不差、且至少一项更好，该点就在前沿上。相等的点全部保留。连线仅为视觉引导，不代表插值配置的实测。只比较同一 workload、模型、精度和上下文要求下的配置。',
-            costNote: '默认横轴 = 每个请求解码速度的 P90（越高越快），不是 P90 TPOT 的倒数。单用户解码速度 = 1000 ÷ 平均 TPOT（毫秒），不包含 prefill。每百万输出 token 美元成本 = 完整部署美元时价 × 1,000,000 ÷（3,600 × 实测输出 tokens/s）。单卡吞吐代表资源效率，不等于性价比；不会用卡数虚构价格。',
-            contract: '固定负载口径', contractHint: '数据集、缓存与到达策略由接入的 workload 合同固定。满足所选要求的 Engine、MOD 组合、并行度和服务端参数均可参与比较。',
-            smoke: '15 分钟 smoke · 尚未完成调优', smokeNote: '短窗口开发测量，不是一小时正式成绩。每套配置各测一次；闭环回放实际走到的请求组合可能不同。Output tokens/s/chip = 实测总输出吞吐 ÷ 全部已分配加速卡数。衡量产出效率，不代表收入或模型质量。',
-            direction: '更优方向', larger: '更高', smaller: '更低', available: '套配置', unknown: '未记录'
+            title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload',
+            x: 'P90 解码速度', y: '每卡输出吞吐', native: '原生 Baseline',
+            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置',
+            loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
+            missing: '缺少坐标指标', points: '个点', context: '上下文',
+            download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发会话树',
+            unknown: '未记录', draft: 'MTP draft token 数'
         }
     };
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
-    const t = key => words[lang()][key] || key;
-    const fmt = n => n === null || n === undefined ? '—' : new Intl.NumberFormat(lang(), {maximumFractionDigits: 2}).format(n);
-    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false,
-        model:'', precision:'', workload:'', context:'', hardware:'', mod:'', x:'decode_p90_tps', y:'output_tps_per_chip', showAll:true, selected:''};
-    const colors = ['#4263eb','#008c78','#ad5c00','#965bd3','#d14469','#177baf','#6b7e16','#ba572d'];
-    const modLabel = p => p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('none');
-    const cohortFields = ['model','precision','workload','context'];
-    const fieldValue = (c,key) => key === 'context' ? String(c.context_tokens) : c[key].id;
-    function selectedCohort() { return state.data.cohorts.find(c => cohortFields.every(k => fieldValue(c,k) === state[k])); }
-    function cohortPoints() { return state.data.points.filter(p => p.cohort_id === selectedCohort()?.id); }
-    function select(id, choices, current, emptyLabel) {
-        const node = $(id);
-        node.innerHTML = choices.length ? choices.map(([value,label]) => `<option value="${escape(value)}">${escape(label)}</option>`).join('') : `<option value="">${escape(emptyLabel || t('pending'))}</option>`;
-        node.disabled = !choices.length;
-        node.value = choices.some(c => c[0] === current) ? current : choices[0]?.[0] || '';
-        return node.value;
-    }
-    function renderControls() {
-        let candidates = state.data.cohorts;
-        for (const key of cohortFields) {
-            const choices = new Map(candidates.map(c => [fieldValue(c,key),key === 'context' ? `${fmt(c.context_tokens)} tokens` : c[key].label]));
-            state[key] = select(`frontier-${key}`, [...choices],state[key]);
-            candidates = candidates.filter(c => fieldValue(c,key) === state[key]);
-        }
-        const points = cohortPoints();
-        state.hardware = select('frontier-hardware', [['',t('all')], ...[...new Set(points.map(p=>p.configuration.hardware.label))].sort().map(v=>[v,v])],state.hardware);
-        state.mod = select('frontier-mod', [['',t('all')], ...new Map(points.map(p=>[M.modKey(p),modLabel(p)]))],state.mod);
-        const axis = keys => keys.map(k=>[k,`${t(k)} · ${M.metrics[k].unit}`]);
-        select('frontier-x',axis(['decode_p90_tps','interactivity','ttft_p95_ms','tpot_p95_ms','e2e_p95_ms']),state.x);
-        select('frontier-y',axis(['output_tps_per_chip','output_tps','cost_per_million']),state.y);
-        $('frontier-show-all').checked=state.showAll;
+    const t = key => words[lang()][key];
+    const fmt = n => n == null ? '—' : new Intl.NumberFormat(lang(), {maximumFractionDigits: 2}).format(n);
+    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:''};
+    const colors = ['#4263eb','#008c78','#ad5c00','#965bd3','#d14469','#177baf'];
+    const tagKey = c => JSON.stringify([c.model.id,c.precision.id]);
+    const cohort = () => state.data.cohorts.find(c => c.id === state.cohort);
+    const points = () => state.data.points.filter(p => p.cohort_id === state.cohort);
+    const label = p => p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native');
+    const parallel = p => {
+        const params = p.configuration.parameters;
+        return [['TP',params.tensor_parallel_size],['PP',params.pipeline_parallel_size],['DP',params.data_parallel_size]]
+            .filter(([key,value]) => value != null && (key === 'TP' || value > 1)).map(([key,value]) => `${key}${value}`).join(' / ') || t('unknown');
+    };
+    function reconcile() {
+        if (!state.data.cohorts.some(c => tagKey(c) === state.tag)) state.tag = state.data.cohorts[0] ? tagKey(state.data.cohorts[0]) : '';
+        const available = state.data.cohorts.filter(c => tagKey(c) === state.tag);
+        if (!available.some(c => c.id === state.cohort)) state.cohort = available[0]?.id || '';
     }
     function shell() {
-        const control = key => `<label>${t(key)}<select id="frontier-${key}"></select></label>`;
+        reconcile();
+        const tags = [...new Map(state.data.cohorts.map(c => [tagKey(c),c])).values()];
+        const choices = state.data.cohorts.filter(c => tagKey(c) === state.tag);
         $('frontier-panel').innerHTML = `
-            <header class="frontier-heading"><div><span class="frontier-eyebrow">Measured configuration frontier</span><h1>${t('title')}</h1><p>${t('subtitle')}</p></div><span class="frontier-status" id="frontier-status" role="status"></span></header>
-            <aside id="frontier-measurement-note" class="frontier-measurement-note" hidden></aside>
-            <div class="frontier-card"><div class="frontier-contract">${cohortFields.map(control).join('')}</div>
-                <div class="frontier-toolbar">${['x','y','hardware','mod'].map(control).join('')}<label class="frontier-checkbox"><input type="checkbox" id="frontier-show-all">${t('showAll')}</label></div>
-                <div class="frontier-plot"><svg id="frontier-chart" viewBox="0 0 1000 460" role="group" aria-label="Pareto frontier"></svg><div id="frontier-blank" class="frontier-blank"><strong></strong><p></p></div></div>
-                <div class="frontier-legend" id="frontier-legend"></div><div class="frontier-summary" id="frontier-summary" aria-live="polite"></div>
-            </div>
-            <div class="frontier-table-heading"><h2>${t('table')}</h2><span>${t('tableHint')}</span></div>
-            <div class="runs-table-scroll"><table class="runs-table frontier-table"><thead><tr>${['configuration','mod','hardware','concurrency','decode_p90_tps','output_tps_per_chip','cost_per_million','status'].map(k=>`<th scope="col">${t(k)}</th>`).join('')}</tr></thead><tbody id="frontier-rows"></tbody></table></div>
-            <section id="frontier-detail" class="frontier-card frontier-detail" hidden></section>
-            <details class="frontier-notes"><summary>${t('contract')}</summary><p>${t('contractHint')}</p><pre id="frontier-contract-detail" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre></details>
-            <details class="frontier-notes"><summary>${t('methodology')}</summary><p>${t('notes')}</p><p>${t('costNote')}</p><a href="https://inferencex.semianalysis.com/inference/kimi-k3" target="_blank" rel="noopener noreferrer">Inspired by InferenceX ↗</a></details>`;
-        for (const key of [...cohortFields,'x','y','hardware','mod']) $(`frontier-${key}`).addEventListener('change', event=>{
-            state[key]=event.target.value; state.selected='';
-            if(cohortFields.includes(key)) {state.hardware='';state.mod='';}
-            renderControls();render();
-        });
-        $('frontier-show-all').addEventListener('change',event=>{state.showAll=event.target.checked;render();});
-        $('frontier-rows').addEventListener('click',choose);
+            <header class="frontier-heading"><div><h1>${t('title')}</h1><p>${t('subtitle')}</p></div><span id="frontier-status" class="frontier-status" role="status"></span></header>
+            <div class="frontier-card">
+                <div class="frontier-picker">
+                    <div class="frontier-model-tags" role="group" aria-label="${t('model')}">${tags.map(c=>`<button type="button" class="frontier-model-tag" data-model-tag="${escape(tagKey(c))}" aria-pressed="${tagKey(c)===state.tag}">${escape(c.model.label)}<span>${escape(c.precision.label)}</span></button>`).join('')}</div>
+                    <label class="frontier-workload">${t('workload')}<select id="frontier-workload" ${choices.length<2?'disabled':''}>${choices.length?choices.map(c=>`<option value="${escape(c.id)}" ${c.id===state.cohort?'selected':''}>${escape(c.workload.label)} · ${fmt(c.context_tokens)} ${t('context')}</option>`).join(''):`<option>${t('empty')}</option>`}</select></label>
+                </div>
+                <div class="frontier-plot" id="frontier-plot">
+                    <svg id="frontier-chart" viewBox="0 0 1000 480" role="group" aria-label="${t('x')} × ${t('y')}"></svg>
+                    <div id="frontier-blank" class="frontier-blank" role="status"></div>
+                    <section id="frontier-popover" class="frontier-popover" role="dialog" aria-modal="false" aria-labelledby="frontier-popover-title" hidden></section>
+                </div>
+                <footer class="frontier-footer"><div class="frontier-legend" id="frontier-legend"></div><span id="frontier-hint">${t('hint')}</span></footer>
+            </div>`;
+        $('frontier-panel').querySelectorAll('[data-model-tag]').forEach(button=>button.addEventListener('click',()=>{
+            state.tag=button.dataset.modelTag;state.cohort='';state.selected='';shell();
+        }));
+        $('frontier-workload').addEventListener('change',event=>{state.cohort=event.target.value;state.selected='';render();});
         $('frontier-chart').addEventListener('click',choose);
-        $('frontier-chart').addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)&&event.target.closest('[data-point]')){event.preventDefault();choose(event);}});
-        renderControls(); render();
+        $('frontier-chart').addEventListener('keydown',event=>{
+            if(['Enter',' '].includes(event.key)&&event.target.closest('[data-point]')){event.preventDefault();choose(event);}
+        });
+        $('frontier-popover').addEventListener('click',event=>{
+            if(event.target.closest('[data-close]'))close(true);
+            if(event.target.closest('[data-download]'))download();
+        });
+        render();
     }
     function choose(event) {
         const id=event.target.closest('[data-point]')?.dataset.point;
-        if(id){state.selected=id;render();$('frontier-detail').scrollIntoView({block:'nearest',behavior:'smooth'});}
+        if(!id)return;
+        state.selected=id;popup();
+        if(event.type==='keydown')$('frontier-popover').querySelector('[data-download]').focus();
+    }
+    function close(restoreFocus=false) {
+        const id=state.selected;state.selected='';popup();
+        if(restoreFocus&&id)$('frontier-chart').querySelector(`[data-point="${CSS.escape(id)}"]`)?.focus();
+    }
+    function download() {
+        const point=points().find(p=>p.id===state.selected);
+        if(!point)return;
+        const payload={schema_version:'frontier-configuration/v1',cohort:cohort(),point,
+            chart:{x:X,y:Y,x_unit:M.metrics[X].unit,y_unit:M.metrics[Y].unit}};
+        const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'}));
+        const a=document.createElement('a');a.href=url;a.download=`${point.id.replace(/[^a-z0-9_.-]/gi,'_')}.json`;
+        document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
     }
     function render() {
-        const cohort=selectedCohort(), points=cohortPoints().filter(p => (!state.hardware||p.configuration.hardware.label===state.hardware)&&(!state.mod||M.modKey(p)===state.mod));
-        const result=M.project(points,state.x,state.y), visible=state.showAll?result.measured:result.frontier;
-        const groups=[...new Set(cohortPoints().map(M.modKey))].sort(), color=p=>colors[groups.indexOf(M.modKey(p))%colors.length];
-        if(!visible.some(p=>p.point.id===state.selected))state.selected='';
+        const measured=M.project(points(),X,Y), current=cohort();
         $('view-frontier-count').textContent=state.data.points.length;
-        $('frontier-status').dataset.state=state.error?'error':state.ready?'ready':'loading';
-        $('frontier-status').textContent=state.error?t('error'):!state.ready?t('loading'):!state.data.points.length?t('pending'):`${points.length} ${t('available')}`;
-        $('frontier-summary').innerHTML=`<span>${t('points')} <strong>${result.measured.length}</strong> · ${t('frontier')} <strong>${result.frontier.length}</strong> · ${t('excluded')} <strong>${result.excluded}</strong></span><span>${t('direction')}: X ${t(M.metrics[state.x].direction==='max'?'larger':'smaller')} / Y ${t(M.metrics[state.y].direction==='max'?'larger':'smaller')}</span>`;
-        $('frontier-contract-detail').textContent=cohort?JSON.stringify(cohort,null,2):'—';
-        const note=$('frontier-measurement-note'); note.hidden=cohort?.workload.contract.profile!=='smoke';
-        note.innerHTML=`<strong>${t('smoke')}</strong><p>${t('smokeNote')}</p>`;
-        const blank=$('frontier-blank'); blank.hidden=!!result.measured.length;
-        blank.querySelector('strong').textContent=t(state.error?'failed':state.data.points.length?'noMatch':'empty');
-        blank.querySelector('p').textContent=t(state.error?'failedHint':state.data.points.length?'noMatchHint':'emptyHint');
-        chart(result,visible,color);
-        $('frontier-legend').innerHTML=[...new Map(visible.map(({point:p})=>[M.modKey(p),p])).values()].map(p=>`<span><i style="background:${color(p)}"></i>${escape(modLabel(p))}</span>`).join('');
-        $('frontier-rows').innerHTML=visible.slice().sort((a,b)=>Number(b.frontier)-Number(a.frontier)||a.point.id.localeCompare(b.point.id)).map(({point:p,frontier})=>`<tr data-config-id="${escape(p.id)}" class="${p.id===state.selected?'is-selected':''}"><td><button type="button" data-point="${escape(p.id)}">${escape(p.label||p.id)}</button><small>${escape(p.configuration.engine)} · ${escape(p.configuration.engine_version)}</small></td><td>${escape(modLabel(p))}</td><td>${escape(p.configuration.hardware.label)}<small>× ${p.configuration.hardware.accelerator_count}</small></td><td>${fmt(p.load.concurrency)}</td><td>${fmt(M.value(p,'decode_p90_tps'))}</td><td>${fmt(M.value(p,'output_tps_per_chip'))}</td><td>${fmt(M.value(p,'cost_per_million'))}</td><td class="frontier-badge">${t(frontier?'onFrontier':'dominated')}</td></tr>`).join('') || `<tr><td colspan="8">${t(state.error?'failed':state.data.points.length?'noMatch':'pending')}</td></tr>`;
-        const selected=visible.find(p=>p.point.id===state.selected)?.point, detail=$('frontier-detail');detail.hidden=!selected;
-        if(selected)detail.innerHTML=`<h3>${t('detail')} · ${escape(selected.label||selected.id)}</h3><a href="${escape(M.safeURL(selected.evidence.url))}" target="_blank" rel="noopener noreferrer">${t('source')}</a><pre>${escape(JSON.stringify(selected,null,2))}</pre>`;
+        const status=$('frontier-status');status.dataset.state=state.error?'error':state.ready?'ready':'loading';
+        status.textContent=state.error?t('error'):!state.ready?t('loading'):current?.workload.contract.profile==='smoke'?t('smoke'):t('formal');
+        const blank=$('frontier-blank');blank.hidden=measured.measured.length>0;
+        blank.textContent=state.error?t('error'):!state.ready?t('loading'):t('empty');
+        const groups=[...new Map(points().map(p=>[M.modKey(p),p])).values()];
+        const color=p=>colors[groups.findIndex(g=>M.modKey(g)===M.modKey(p))%colors.length];
+        $('frontier-legend').innerHTML=groups.map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}</span>`).join('');
+        $('frontier-hint').textContent=t('hint')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
+        chart(measured,color);popup();
     }
-    function chart(result,visible,color) {
-        const width=Math.max(340,$('frontier-chart').clientWidth||1000),height=width<600?360:460,left=80,right=24,top=26,bottom=74;
+    function popup() {
+        const point=points().find(p=>p.id===state.selected), panel=$('frontier-popover');
+        $('frontier-chart').querySelectorAll('[data-point]').forEach(node=>{
+            node.classList.toggle('is-selected',node.dataset.point===state.selected);
+            node.setAttribute('aria-expanded',String(node.dataset.point===state.selected));
+        });
+        panel.hidden=!point;if(!point)return;
+        const params=point.configuration.parameters;
+        panel.innerHTML=`<button type="button" class="frontier-popup-close" data-close aria-label="${t('close')}">×</button>
+            <h2 id="frontier-popover-title">${escape(label(point))}</h2>
+            <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
+            <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,X))}</strong><span>${t('x')}<br>tokens/s/user</span></div><div><strong>${fmt(M.value(point,Y))}</strong><span>${t('y')}<br>tokens/s/chip</span></div></div>
+            <p class="frontier-popup-load">${t('concurrency')}: ${fmt(point.load.concurrency)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}</p>
+            <button type="button" class="frontier-download" data-download>${t('download')} ↓</button>`;
+        const anchor=$('frontier-chart').querySelector(`[data-point="${CSS.escape(point.id)}"]`);
+        if(!anchor){panel.hidden=true;return;}
+        const plot=$('frontier-plot').getBoundingClientRect(), spot=anchor.getBoundingClientRect();
+        const width=panel.offsetWidth,height=panel.offsetHeight;
+        let left=spot.right-plot.left+12;
+        if(left+width>plot.width-12)left=spot.left-plot.left-width-12;
+        panel.style.left=`${Math.max(12,Math.min(left,plot.width-width-12))}px`;
+        panel.style.top=`${Math.max(12,Math.min(spot.top-plot.top-24,plot.height-height-12))}px`;
+    }
+    function chart(result,color) {
+        const width=Math.max(300,$('frontier-chart').clientWidth||1000),height=width<600?420:480,left=76,right=28,top=32,bottom=80;
         $('frontier-chart').setAttribute('viewBox',`0 0 ${width} ${height}`);
-        const bounds=key=>{const values=result.measured.map(p=>p[key]);if(!values.length)return [0,1];let min=Math.min(...values),max=Math.max(...values);const pad=(max-min||Math.abs(max)||1)*.12;return [Math.max(0,min-pad),max+pad];};
+        const bounds=key=>{const values=result.measured.map(p=>p[key]);if(!values.length)return[0,1];const min=Math.min(...values),max=Math.max(...values),pad=(max-min||Math.abs(max)||1)*.18;return[Math.max(0,min-pad),max+pad];};
         const [xmin,xmax]=bounds('x'),[ymin,ymax]=bounds('y');
         const x=v=>left+(v-xmin)/(xmax-xmin)*(width-left-right),y=v=>height-bottom-(v-ymin)/(ymax-ymin)*(height-top-bottom);
-        let svg=`<title>${escape(t(state.x))} / ${escape(t(state.y))}</title>`;
-        for(let i=0;i<=5;i++){const xv=xmin+(xmax-xmin)*i/5,yv=ymin+(ymax-ymin)*i/5;
+        let svg=`<title>${t('x')} / ${t('y')}</title>`;
+        for(let i=0;i<=4;i++){
+            const xv=xmin+(xmax-xmin)*i/4,yv=ymin+(ymax-ymin)*i/4;
             svg+=`<line class="frontier-grid" x1="${x(xv)}" y1="${top}" x2="${x(xv)}" y2="${height-bottom}"/><line class="frontier-grid" x1="${left}" y1="${y(yv)}" x2="${width-right}" y2="${y(yv)}"/>`;
             if(result.measured.length)svg+=`<text text-anchor="middle" x="${x(xv)}" y="${height-bottom+24}">${fmt(xv)}</text><text text-anchor="end" x="${left-12}" y="${y(yv)+4}">${fmt(yv)}</text>`;
         }
-        svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-18}">${escape(t(state.x))}<tspan x="${(width+left-right)/2}" dy="15">${M.metrics[state.x].unit}</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${escape(t(state.y))}<tspan x="0" dy="15">${M.metrics[state.y].unit}</tspan></text>`;
+        svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${t('x')}<tspan x="${(width+left-right)/2}" dy="16">output tokens/s/user</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${t('y')}<tspan x="0" dy="16">output tokens/s/chip</tspan></text>`;
         if(result.frontier.length>1)svg+=`<polyline class="frontier-envelope" points="${result.frontier.map(p=>`${x(p.x)},${y(p.y)}`).join(' ')}"/>`;
-        for(const p of visible){const label=`${p.point.label||p.point.id}: ${t(state.x)} ${fmt(p.x)}, ${t(state.y)} ${fmt(p.y)} · ${t(p.frontier?'onFrontier':'dominated')}`;
-            svg+=`<circle role="button" tabindex="0" aria-label="${escape(label)}" data-point="${escape(p.point.id)}" class="frontier-point ${state.selected===p.point.id?'is-selected':''}" cx="${x(p.x)}" cy="${y(p.y)}" r="${p.frontier?7:5}" fill="${color(p.point)}" opacity="${p.frontier?1:.35}"><title>${escape(label)}</title></circle>`;}
+        for(const row of result.measured){const p=row.point,text=`${label(p)} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
+            svg+=`<g role="button" tabindex="0" aria-haspopup="dialog" aria-controls="frontier-popover" aria-expanded="false" aria-label="${escape(text)}" data-point="${escape(p.id)}" class="frontier-point"><circle class="frontier-hit" cx="${x(row.x)}" cy="${y(row.y)}" r="18"/><circle class="frontier-dot" cx="${x(row.x)}" cy="${y(row.y)}" r="7" fill="${color(p)}"/><title>${escape(text)}</title></g>`;
+        }
         $('frontier-chart').innerHTML=svg;
     }
+    document.addEventListener('pointerdown',event=>{if(state.selected&&!event.target.closest('#frontier-popover,[data-point]'))close();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&state.selected){event.preventDefault();close(true);}});
     window.addEventListener('vllm-hust:langchange',shell);
-    let resize;
-    window.addEventListener('resize',()=>{cancelAnimationFrame(resize);resize=requestAnimationFrame(render);});
+    let resize;window.addEventListener('resize',()=>{cancelAnimationFrame(resize);resize=requestAnimationFrame(render);});
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
-    // Keep Frontier usable even if the independent legacy snapshot loader fails.
-    $('runs-content').hidden=false;
-    shell();
+    $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=qwen35-smoke-p90-20260923', {cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Frontier snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=qwen35-smoke-compact-20260923',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

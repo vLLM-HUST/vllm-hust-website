@@ -40,11 +40,11 @@ the contract without using accelerator capacity.
 AgentX metric import uses the official output throughput field, not a reconstructed token count /
 900 seconds or the separately exported benchmark-duration statistic: native observation/drain
 accounting differs. Its request `inter_token_latency` is TPOT; Fletcher selected P90 request decode
-speed as default X, taken from `output_token_throughput_per_user.p90`, not inverse P90 TPOT. Inverse
-mean TPOT remains an alternative projection, not a substitute for this percentile. Keep smoke/formal
-in distinct workload IDs, retain all allocated chips in the Y denominator, and preserve both TTFT
-tails. Public evidence is a curated metric-only extract, not a claim that full private logs/source
-capsules were published.
+speed as fixed X, taken from `output_token_throughput_per_user.p90`, not inverse P90 TPOT. Inverse
+mean TPOT remains only in downloaded metrics, not as another selectable chart axis. Keep
+smoke/formal in distinct workload IDs, retain all allocated chips in the Y denominator, and preserve
+both TTFT tails. Public evidence is a curated metric-only extract, not a claim that full private
+logs/source capsules were published.
 
 When publishing a Frontier snapshot, update its fetch URL revision and the HTML asset versions
 alongside the data. The public HTML response advertises a ten-minute cache lifetime; a source-side
@@ -52,3 +52,10 @@ match does not prove an existing browser has discarded the initial empty JSON. T
 uses revalidation too. The browser test deliberately serves an empty unversioned URL to protect this
 boundary. For a rollout handoff, link a versioned page URL before `#frontier` so an old HTML cache
 cannot keep loading the old scripts.
+
+Fletcher simplified Frontier after reviewing the first points: model + precision is one tag,
+workload/context is one fixed contract, and P90 decode speed / per-chip output are fixed axes. Do
+not restore hardware/MOD/axis selectors, the lower configuration table or long evidence text. Point
+clicks open a compact anchored popover; its download preserves the complete cohort/point JSON, so
+removing visual clutter does not discard provenance. Browser QA checks exact downloaded values,
+keyboard/outside dismissal and mobile popup bounds.
