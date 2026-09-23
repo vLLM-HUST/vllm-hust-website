@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const model=require('../assets/leaderboard-frontier-model.js');
 const fixture=require('./fixtures/leaderboard_frontier.json');
-test('empty production snapshot is valid and supplies no invented points',()=>{
+test('production and empty snapshots validate without inventing points',()=>{
     const data=require('../data/leaderboard_frontier.json');
     model.validate(data);
     assert.deepEqual(model.validate({schema_version:'leaderboard-frontier/v1',cohorts:[],points:[]}).points,[]);
@@ -40,4 +40,40 @@ test('zero TPOT, missing metrics and prices never become infinite or free',()=>{
 test('MOD combinations are order independent and no-MOD is a distinct group',()=>{
     assert.equal(model.modKey({configuration:{mods:['b','a']}}),'a+b');
     assert.equal(model.modKey({configuration:{mods:[]}}),'none');
+});
+test('published smoke points preserve official metrics and all allocated chips',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const evidence=require('../data/leaderboard_frontier_evidence.json');
+    model.validate(data);
+    assert.equal(data.points.length,2);
+    assert.equal(data.cohorts[0].workload.contract.profile,'smoke');
+    for(const p of data.points){
+        const run=evidence.runs.find(r=>r.run_id===p.evidence.run_ids[0]);
+        assert.ok(run);
+        assert.equal(p.evidence.measurement_seconds,900);
+        assert.equal(p.evidence.tuning_complete,false);
+        assert.equal(run.official_metrics.metadata.submission_valid,true);
+        assert.equal(p.metrics.output_tps,run.official_metrics.output_token_throughput.avg);
+        assert.equal(model.value(p,'decode_p90_tps'),run.official_metrics.output_token_throughput_per_user.p90);
+        assert.notEqual(model.value(p,'decode_p90_tps'),1000/run.official_metrics.inter_token_latency.p90);
+        assert.equal(p.metrics.tpot_ms,run.official_metrics.inter_token_latency.avg);
+        assert.equal(p.metrics.ttft_p95_ms,run.official_metrics.time_to_first_token.p95);
+        assert.equal(model.value(p,'output_tps_per_chip'),p.metrics.output_tps/2);
+        assert.equal(model.value(p,'interactivity'),1000/run.official_metrics.inter_token_latency.avg);
+        assert.equal(model.value(p,'cost_per_million'),null);
+        assert.equal(p.configuration.parameters.tensor_parallel_size,2);
+        assert.equal(p.load.concurrency,4);
+        assert.ok(p.label.includes('smoke'));
+    }
+    // Better mean interactivity does not conceal the slightly worse TTFT tail.
+    assert.equal(model.project(data.points,'ttft_p95_ms','output_tps_per_chip').frontier.length,2);
+});
+
+test('P90 decode speed projects the recorded percentile, never a TPOT reciprocal fallback',()=>{
+    const p=structuredClone(fixture.points[0]);
+    p.metrics.decode_p90_tps=90;p.metrics.tpot_p95_ms=50;
+    assert.equal(model.value(p,'decode_p90_tps'),90);
+    delete p.metrics.decode_p90_tps;
+    assert.equal(model.value(p,'decode_p90_tps'),null);
+    assert.equal(model.project([p],'decode_p90_tps','output_tps_per_chip').excluded,1);
 });

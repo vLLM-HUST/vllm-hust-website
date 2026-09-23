@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the empty production surface and deterministic test-only Frontier data."""
+"""Verify real production points, empty state and test-only Frontier interactions."""
 
 import argparse
 import json
@@ -57,8 +57,32 @@ def main():
             if not production["cohorts"]:
                 assert page.locator(".frontier-point").count() == 0
                 assert page.locator("#frontier-model").is_disabled()
+            else:
+                assert page.locator(".frontier-point").count() == 2
+                assert page.locator("#frontier-x").input_value() == "decode_p90_tps"
+                assert page.locator("#frontier-measurement-note").is_visible()
+                assert (
+                    "smoke" in page.locator("#frontier-measurement-note").inner_text()
+                )
+                for point in production["points"]:
+                    row = page.locator(f'tr[data-config-id="{point["id"]}"]')
+                    assert row.is_visible()
+                    assert "smoke" in row.inner_text()
+                    expected = f"{point['metrics']['output_tps'] / 2:.2f}".rstrip(
+                        "0"
+                    ).rstrip(".")
+                    assert expected in row.inner_text()
+                    assert (
+                        f"{point['metrics']['decode_p90_tps']:.2f}".rstrip("0").rstrip(
+                            "."
+                        )
+                        in row.inner_text()
+                    )
+                page.locator("#frontier-x").select_option("ttft_p95_ms")
+                assert page.locator(".frontier-envelope").count() == 1
+                page.locator("#frontier-x").select_option("decode_p90_tps")
             page.screenshot(
-                path=str(args.output / f"empty-{width}-{language}-{scheme}.png")
+                path=str(args.output / f"production-{width}-{language}-{scheme}.png")
             )
             # Fixture only: never shipped as production measurements.
             page.route(
@@ -133,13 +157,29 @@ def main():
         page = context.new_page()
         page.route(
             "**/data/leaderboard_frontier.json",
+            lambda route: route.fulfill(
+                json={
+                    "schema_version": "leaderboard-frontier/v1",
+                    "cohorts": [],
+                    "points": [],
+                }
+            ),
+        )
+        page.goto(f"{args.url}/leaderboard-runs.html#frontier")
+        page.wait_for_function(
+            "document.querySelector('#frontier-status').dataset.state === 'ready'"
+        )
+        assert page.locator("#frontier-model").is_disabled()
+        assert page.locator(".frontier-point").count() == 0
+        assert page.locator("#frontier-measurement-note").is_hidden()
+        page.unroute("**/data/leaderboard_frontier.json")
+        page.route(
+            "**/data/leaderboard_frontier.json",
             lambda route: route.fulfill(json={"invalid": True}),
         )
-        page.goto(
-            f"{args.url}/leaderboard-runs.html#frontier", wait_until="domcontentloaded"
-        )
+        page.reload(wait_until="domcontentloaded")
         page.wait_for_function(
-            "document.querySelector('#frontier-status').textContent === 'Snapshot unavailable'"
+            "document.querySelector('#frontier-status').dataset.state === 'error'"
         )
         assert page.locator(".frontier-point").count() == 0
         page.locator("#view-runs").click()
