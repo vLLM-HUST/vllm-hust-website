@@ -25,6 +25,25 @@ def main():
     }
     total_runs = len(expected)
     arm_runs = sum(r["engine"] == "betterscale" for r in expected.values())
+    entries = {}
+    for kind in ("single", "multi", "historical"):
+        for entry in json.loads((site / f"data/leaderboard_{kind}.json").read_text()):
+            if (
+                kind != "historical"
+                or entry.get("historical_recovery", {}).get(
+                    "admitted_for_historical_trend"
+                )
+                is True
+            ):
+                entries.setdefault(entry["entry_id"], entry)
+    all_runs = {
+        run["entry_id"]: run
+        for entry in entries.values()
+        for run in supplement["observations"].get(entry["entry_id"], [entry])
+    }
+    b3_runs = {
+        key for key, run in all_runs.items() if run["hardware"]["chip_model"] == "910B3"
+    }
     reports = []
     with sync_playwright() as p:
         browser = p.chromium.launch()
@@ -72,6 +91,43 @@ def main():
                 ).count()
                 == 0
             )
+            # Default scope covers every published record, across hardware and history.
+            assert page.locator("#view-runs-count").inner_text() == str(len(all_runs))
+            assert page.locator("#runs-headers th").count() == 11
+            seen = set()
+            while True:
+                for row in page.locator(".run-row").evaluate_all("""rows => rows.map(row => ({
+                    id: row.dataset.runId, hardware: row.querySelector('.run-hardware').textContent
+                }))"""):
+                    assert row["id"] not in seen
+                    seen.add(row["id"])
+                    assert (
+                        all_runs[row["id"]]["hardware"]["chip_model"] in row["hardware"]
+                    )
+                if page.locator("#runs-next").is_disabled():
+                    break
+                page.locator("#runs-next").click()
+            assert seen == set(all_runs)
+            page.locator("#runs-reset").click()
+            page.screenshot(
+                path=str(args.output / f"all-records-{width}-{language}-{scheme}.png")
+            )
+            page.locator('[data-column="hardware"]').click()
+            assert page.locator("#column-scope").is_hidden()
+            page.locator("#column-none").click()
+            page.locator("#column-search").fill("910B3")
+            page.locator("#column-values input").check()
+            page.locator("#column-apply").click()
+            assert (
+                set(
+                    page.locator(".run-row").evaluate_all(
+                        "rows => rows.map(r => r.dataset.runId)"
+                    )
+                )
+                == b3_runs
+            )
+            page.locator("#runs-reset").click()
+            assert page.locator("#view-runs-count").inner_text() == str(len(all_runs))
             page.locator('[data-column="model"]').click()
             page.locator("#column-none").click()
             page.locator("#column-search").fill("Qwen3.8-27B")
@@ -122,6 +178,7 @@ def main():
             assert first.get_attribute("aria-expanded") == "true"
             detail = page.locator("#" + first.get_attribute("aria-controls"))
             assert detail.is_visible()
+            assert detail.locator("td").get_attribute("colspan") == "11"
             assert "max_model_len" in detail.inner_text()
             assert detail.locator("a").count() >= 1
             first.click()
@@ -202,6 +259,7 @@ def main():
             )
             page.locator("#runs-reset").click()
             assert page.locator(".run-row").count() == 40
+            assert page.locator("#view-runs-count").inner_text() == str(len(all_runs))
             page.locator("#runs-next").click()
             assert page.locator("#runs-page").inner_text().startswith("2 /")
             assert page.evaluate(

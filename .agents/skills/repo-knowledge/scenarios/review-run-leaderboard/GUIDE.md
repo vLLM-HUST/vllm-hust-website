@@ -17,6 +17,6 @@ constraints and averaged repeat P95 are not request-distribution percentiles. `t
 producer's TPOT alias, whereas offline batch latency is not TTFT. Missing old metrics must remain
 missing.
 
-Although the new campaign shares hardware, historical publications include B3 as well as B2. A
-single global hardware selector prevents accidental comparison; parallel configuration must not be
-inferred from accelerator count alone.
+Although the new campaign shares hardware, historical publications include B3 as well as B2. Fletcher chose a single flat table on 2026-09-23: include current and historical records by
+default, with an explicit hardware column instead of a global hardware selector. Hardware remains
+part of model identity; parallel configuration must not be inferred from accelerator count alone.

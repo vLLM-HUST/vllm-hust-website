@@ -54,11 +54,11 @@
     const fmt = value => value === null || value === undefined ? '—' : new Intl.NumberFormat(lang(), { maximumFractionDigits: 2 }).format(value);
     const state = { rows: [], tasks: [], page: 0, expanded: new Set(), selectedTask: '', ready: false,
         view: 'runs', columnFilters: {}, sort: null,
-        filters: { hardware: '', source: 'current' }, missingSupplement: false };
+        filters: { source: '' }, missingSupplement: false };
     const pageSize = 40;
     const link = (url, label) => url ? `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a>` : '';
     const columns = [
-        ['model', () => t('model')], ['task', () => t('task')], ['mod', () => t('mod')],
+        ['model', () => t('model')], ['hardware', () => t('hardware')], ['task', () => t('task')], ['mod', () => t('mod')],
         ['ttft', () => 'TTFT', 'mean · ms'], ['tpot', () => 'TPOT', 'mean · ms'],
         ['ttftP95', () => 'TTFT P95', 'ms'], ['tpotP95', () => 'TPOT P95', 'ms'],
         ['throughput', () => t('throughput')], ['run', () => 'Run'], ['config', () => t('config')]
@@ -124,12 +124,12 @@
         }).map((choice, index) => ({ ...choice, index }));
         menu = { key, choices, selected: new Set(state.columnFilters[key] ?? choices.map(c => c.value)) };
         $('column-menu-title').textContent = columns.find(c => c[0] === key)[1]();
-        const scopeKey = key === 'model' ? 'hardware' : key === 'run' ? 'source' : null;
+        const scopeKey = key === 'run' ? 'source' : null;
         $('column-scope').hidden = !scopeKey;
         if (scopeKey) {
-            $('column-scope-label').textContent = t(scopeKey === 'source' ? 'records' : 'hardware');
-            const values = scopeKey === 'hardware' ? [...new Set(state.rows.map(r => r.hardware))] : ['current', 'historical', ''];
-            $('column-scope-select').innerHTML = values.map(value => `<option value="${escape(value)}" ${state.filters[scopeKey] === value ? 'selected' : ''}>${escape(scopeKey === 'hardware' ? value : t(value || 'all'))}</option>`).join('');
+            $('column-scope-label').textContent = t('records');
+            const values = ['', 'current', 'historical'];
+            $('column-scope-select').innerHTML = values.map(value => `<option value="${escape(value)}" ${state.filters[scopeKey] === value ? 'selected' : ''}>${escape(t(value || 'all'))}</option>`).join('');
         }
         $('column-search').value = '';
         renderChoices();
@@ -154,7 +154,7 @@
     });
     $('column-scope-select').addEventListener('change', () => {
         const key = menu.key;
-        state.filters[key === 'model' ? 'hardware' : 'source'] = $('column-scope-select').value;
+        state.filters.source = $('column-scope-select').value;
         state.columnFilters = {}; state.page = 0; state.selectedTask = '';
         closeMenu(); renderHeaders(); renderRows(); openMenu(key);
     });
@@ -194,7 +194,7 @@
             evidence_scope: meta.official_admission_status || row.source, verified: meta.verified,
             throughput_token_basis: meta.throughput_token_basis || 'unspecified',
             note: meta.notes, repeat_index: row.repeat, parent_aggregate: row.parentId };
-        return `<tr id="config-${escape(row.id)}" class="run-detail" ${state.expanded.has(row.id) ? '' : 'hidden'}><td colspan="10">
+        return `<tr id="config-${escape(row.id)}" class="run-detail" ${state.expanded.has(row.id) ? '' : 'hidden'}><td colspan="${columns.length}">
             <div class="run-detail-head"><strong>${escape(row.prefix)}</strong><span>${link(row.evidence, meta.raw_evidence_url ? t('raw') : t('source'))} ${link(row.manifest, t('manifest'))}</span></div>
             ${row.aggregate ? `<p>${t('aggregateHint')}</p>` : ''}
             ${row.metrics.batchLatency !== null ? `<p class="batch-value">${t('batch')}: <strong>${fmt(row.metrics.batchLatency)}</strong> — not TTFT</p>` : ''}
@@ -213,6 +213,7 @@
             previousGroup = group;
             return `<tr class="run-row ${boundary ? 'group-start' : ''}" data-run-id="${escape(row.id)}">
                 <td><strong>${escape(row.model)}</strong><small>${escape(row.parallel.label)} · ${escape(row.precision)} · ${escape(row.parallel.chips ?? '?')} NPU</small></td>
+                <td class="run-hardware">${escape(row.hardware || '—')}</td>
                 <td><button type="button" class="task-tag" data-task="${row.taskId}">${escape(row.taskLabel)}</button></td>
                 <td><strong class="mod-label ${row.mod === 'native' ? 'native' : ''}">${escape(row.mod === 'native' ? t('native') : row.mod)}</strong><small>${escape(row.version)}</small></td>
                 ${['ttft', 'tpot', 'ttftP95', 'tpotP95', 'throughput'].map(key => `<td class="metric" data-metric="${key}">${fmt(row.metrics[key])}</td>`).join('')}
@@ -266,8 +267,6 @@
             ]);
             const built = window.LeaderboardRunsModel.build(payload, supplement);
             Object.assign(state, built, { ready: true });
-            const hardware = [...new Set(state.rows.map(r => r.hardware))];
-            state.filters.hardware = hardware.find(value => value.includes('910B2')) || hardware[0] || '';
             $('runs-supplement-warning').hidden = !state.missingSupplement;
             $('runs-loading').hidden = true;
             $('runs-content').hidden = false;
@@ -279,8 +278,7 @@
         }
     }
     $('runs-reset').addEventListener('click', () => {
-        Object.keys(state.filters).filter(key => key !== 'hardware').forEach(key => { state.filters[key] = ''; });
-        state.filters.source = 'current'; state.page = 0; state.selectedTask = '';
+        state.filters.source = ''; state.page = 0; state.selectedTask = '';
         state.columnFilters = {}; state.sort = null; renderHeaders(); renderRows();
     });
     $('runs-previous').addEventListener('click', () => { state.page--; renderRows(); });
