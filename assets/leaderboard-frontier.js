@@ -150,7 +150,7 @@
     $('runs-content').hidden=false;
     shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json').then(r=>{if(!r.ok)throw new Error('Frontier snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=qwen35-smoke-p90-20260923', {cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Frontier snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});
