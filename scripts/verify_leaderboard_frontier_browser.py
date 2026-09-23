@@ -85,6 +85,12 @@ def main():
             assert "smoke" in page.locator("#frontier-status").inner_text()
             assert page.locator(".frontier-point").count() == len(production["points"])
             assert page.locator("#frontier-popover").is_hidden()
+            curves = production["cohorts"][0]["workload"]["contract"].get(
+                "concurrency_curves_url"
+            )
+            assert page.locator("#frontier-curves").is_visible() == bool(curves)
+            if curves:
+                assert page.locator("#frontier-curves").get_attribute("href") == curves
             for point in production["points"]:
                 dot = page.locator(f'[data-point="{point["id"]}"]')
                 dot.click()
@@ -102,6 +108,12 @@ def main():
                 assert "TP2" in text and "MTP2" in text
                 assert point["configuration"]["engine"] in text
                 assert point["configuration"]["engine_version"] in text
+                params = point["configuration"]["parameters"]
+                if params.get("kv_cache_memory_bytes"):
+                    assert (
+                        f"{params['kv_cache_memory_bytes'] / 1024**3:g} GiB/chip"
+                        in text
+                    )
                 assert popup.locator("pre").count() == 0
                 box, plot = (
                     popup.bounding_box(),
@@ -146,7 +158,7 @@ def main():
             page.locator("#view-frontier").click()
             assert page.locator("table:visible").count() == 0
             page.locator("#langToggle").click()
-            assert page.locator(".frontier-point").count() == 2
+            assert page.locator(".frontier-point").count() == len(production["points"])
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= window.innerWidth + 1"
             )
@@ -177,6 +189,12 @@ def main():
         c["workload"]["id"] = "test-other-workload"
         c["workload"]["label"] = "Another workload"
         fixture["cohorts"].append(c)
+        fixture["cohorts"][0]["workload"]["contract"]["concurrency_curves_url"] = (
+            "./assets/frontier-qwen35-concurrency.svg"
+        )
+        fixture["cohorts"][-1]["workload"]["contract"]["concurrency_curves_url"] = (
+            "javascript:alert(1)"
+        )
         context = browser.new_context()
         page = context.new_page()
         page.route(
@@ -188,7 +206,10 @@ def main():
         assert page.locator("#frontier-workload option").count() == 2
         assert page.locator(".frontier-point").count() == 4
         assert page.locator(".frontier-envelope").count() == 1
+        assert page.locator("#frontier-curves").is_visible()
         page.locator("#frontier-workload").select_option("test-other-workload")
+        assert page.locator("#frontier-curves").is_hidden()
+        assert page.locator("#frontier-curves").get_attribute("href") is None
         assert page.locator(".frontier-point").count() == 0
         page.locator(".frontier-model-tag").nth(1).click()
         assert page.locator("#frontier-workload option").count() == 1

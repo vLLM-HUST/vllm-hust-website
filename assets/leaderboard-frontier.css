@@ -19,11 +19,14 @@
 .frontier-grid { stroke: var(--run-border); stroke-dasharray: 3 5; }
 .frontier-point { cursor: pointer; outline: none; }
 .frontier-hit { fill: transparent; }
-.frontier-dot { stroke: var(--run-bg); stroke-width: 2px; }
-.frontier-point:hover .frontier-dot, .frontier-point:focus .frontier-dot, .frontier-point.is-selected .frontier-dot { stroke: var(--run-ink); stroke-width: 3px; }
+.frontier-dot { pointer-events: none; stroke: var(--run-bg); stroke-width: 2px; }
+.frontier-point:hover .frontier-dot, .frontier-point:focus .frontier-dot, .frontier-point.is-selected .frontier-dot { pointer-events: none; stroke: var(--run-ink); stroke-width: 3px; }
 .frontier-envelope { fill: none; stroke: var(--run-accent); stroke-width: 2px; stroke-dasharray: 5 5; opacity: .6; }
 .frontier-blank { position: absolute; inset: 18% 12% 22%; display: grid; place-content: center; text-align: center; pointer-events: none; color: var(--run-muted); font-size: 14px; }
 .frontier-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 16px 24px; border-top: 1px solid var(--run-border); color: var(--run-muted); font-size: 11px; }
+.frontier-footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
+.frontier-footer-links a { color: var(--run-accent); text-underline-offset: 3px; }
+.frontier-footer-links a[hidden] { display: none; }
 .frontier-legend { display: flex; flex-wrap: wrap; gap: 18px; }
 .frontier-legend span { display: inline-flex; align-items: center; gap: 7px; }
 .frontier-legend i { width: 9px; height: 9px; border-radius: 50%; }

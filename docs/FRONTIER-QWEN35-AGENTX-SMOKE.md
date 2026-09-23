@@ -4,7 +4,10 @@
 quality score, or proof of a globally optimal frontier.** Published at Fletcher's request on
 2026-09-23. No one-hour window will be run until tuning is accepted.
 
-## Measured points
+The later [C1/C2/C4/C8/C16 capacity sweep and curves](FRONTIER-QWEN35-CONCURRENCY.md) retain these
+initial points separately.
+
+## Initial C4 pair
 
 | Metric                                               | Native baseline | BetterScale experimental |
 | ---------------------------------------------------- | --------------: | -----------------------: |

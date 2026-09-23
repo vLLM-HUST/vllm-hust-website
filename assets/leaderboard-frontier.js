@@ -12,7 +12,7 @@
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Session trees',
-            unknown: 'Not recorded', draft: 'MTP draft tokens', experimental: 'BetterScale experimental'
+            curves: 'Concurrency curves', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', experimental: 'BetterScale experimental'
         },
         zh: {
             title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload',
@@ -21,7 +21,7 @@
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发会话树',
-            unknown: '未记录', draft: 'MTP draft token 数', experimental: 'BetterScale 实验版本'
+            curves: '并发曲线', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', experimental: 'BetterScale 实验版本'
         }
     };
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
@@ -59,7 +59,7 @@
                     <div id="frontier-blank" class="frontier-blank" role="status"></div>
                     <section id="frontier-popover" class="frontier-popover" role="dialog" aria-modal="false" aria-labelledby="frontier-popover-title" hidden></section>
                 </div>
-                <footer class="frontier-footer"><div class="frontier-legend" id="frontier-legend"></div><span id="frontier-hint">${t('hint')}</span></footer>
+                <footer class="frontier-footer"><div class="frontier-legend" id="frontier-legend"></div><div class="frontier-footer-links"><a id="frontier-curves" target="_blank" rel="noopener" hidden>${t('curves')} ↗</a><span id="frontier-hint">${t('hint')}</span></div></footer>
             </div>`;
         $('frontier-panel').querySelectorAll('[data-model-tag]').forEach(button=>button.addEventListener('click',()=>{
             state.tag=button.dataset.modelTag;state.cohort='';state.selected='';shell();
@@ -76,7 +76,16 @@
         render();
     }
     function choose(event) {
-        const id=event.target.closest('[data-point]')?.dataset.point;
+        let id=event.target.closest('[data-point]')?.dataset.point;
+        if(event.type==='click'){
+            // Dense mobile points must not be selected by SVG paint order.
+            const hits=[...$('frontier-chart').querySelectorAll('[data-point]')].map(node=>{
+                const box=node.querySelector('.frontier-dot').getBoundingClientRect();
+                return {id:node.dataset.point,distance:Math.hypot(event.clientX-box.x-box.width/2,event.clientY-box.y-box.height/2)};
+            }).sort((a,b)=>a.distance-b.distance);
+            const nearest=hits[0];
+            id=nearest?.distance<=18?(hits.find(hit=>hit.id===id&&Math.abs(hit.distance-nearest.distance)<.01)?.id||nearest.id):'';
+        }
         if(!id)return;
         state.selected=id;popup();
         if(event.type==='keydown')$('frontier-popover').querySelector('[data-download]').focus();
@@ -105,6 +114,9 @@
         const color=p=>colors[groups.findIndex(g=>M.modKey(g)===M.modKey(p))%colors.length];
         $('frontier-legend').innerHTML=groups.map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}</span>`).join('');
         $('frontier-hint').textContent=t('hint')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
+        const curves=$('frontier-curves'), curveUrl=current?.workload.contract.concurrency_curves_url;
+        curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
+        if(!curves.hidden)curves.href=curveUrl;else curves.removeAttribute('href');
         chart(measured,color);popup();
     }
     function popup() {
@@ -120,7 +132,7 @@
             <p class="frontier-popup-engine">${escape(point.configuration.engine)} ${escape(point.configuration.engine_version)}${point.configuration.mods.includes('betterscale')?`<br>${t('experimental')}`:''}</p>
             <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
             <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,X))}</strong><span>${t('x')}<br>tokens/s/user</span></div><div><strong>${fmt(M.value(point,Y))}</strong><span>${t('y')}<br>tokens/s/chip</span></div></div>
-            <p class="frontier-popup-load">${t('concurrency')}: ${fmt(point.load.concurrency)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}</p>
+            <p class="frontier-popup-load">${t('concurrency')}: ${fmt(point.load.concurrency)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}${params.max_num_seqs!=null?`<br>${t('capacity')}: ${fmt(params.max_num_seqs)}`:''}${params.kv_cache_memory_bytes!=null?` · KV ${fmt(params.kv_cache_memory_bytes/1024**3)} GiB/chip`:''}</p>
             <button type="button" class="frontier-download" data-download>${t('download')} ↓</button>`;
         const anchor=$('frontier-chart').querySelector(`[data-point="${CSS.escape(point.id)}"]`);
         if(!anchor){panel.hidden=true;return;}
@@ -145,8 +157,11 @@
         }
         svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${t('x')}<tspan x="${(width+left-right)/2}" dy="16">output tokens/s/user</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${t('y')}<tspan x="0" dy="16">output tokens/s/chip</tspan></text>`;
         if(result.frontier.length>1)svg+=`<polyline class="frontier-envelope" points="${result.frontier.map(p=>`${x(p.x)},${y(p.y)}`).join(' ')}"/>`;
-        for(const row of result.measured){const p=row.point,text=`${label(p)} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
-            svg+=`<g role="button" tabindex="0" aria-haspopup="dialog" aria-controls="frontier-popover" aria-expanded="false" aria-label="${escape(text)}" data-point="${escape(p.id)}" class="frontier-point"><circle class="frontier-hit" cx="${x(row.x)}" cy="${y(row.y)}" r="18"/><circle class="frontier-dot" cx="${x(row.x)}" cy="${y(row.y)}" r="7" fill="${color(p)}"/><title>${escape(text)}</title></g>`;
+        for(const row of result.measured){
+            const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);
+            const hitRadius=Math.max(2,Math.min(18,...neighbors));
+            const p=row.point,text=`${label(p)} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
+            svg+=`<g role="button" tabindex="0" aria-haspopup="dialog" aria-controls="frontier-popover" aria-expanded="false" aria-label="${escape(text)}" data-point="${escape(p.id)}" class="frontier-point"><circle class="frontier-hit" cx="${x(row.x)}" cy="${y(row.y)}" r="${hitRadius}"/><circle class="frontier-dot" cx="${x(row.x)}" cy="${y(row.y)}" r="7" fill="${color(p)}"/><title>${escape(text)}</title></g>`;
         }
         $('frontier-chart').innerHTML=svg;
     }
@@ -157,7 +172,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=qwen35-smoke-compact-20260923',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=qwen35-capacity-20260923',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

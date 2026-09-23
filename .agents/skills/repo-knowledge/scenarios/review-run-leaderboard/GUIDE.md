@@ -59,3 +59,16 @@ not restore hardware/MOD/axis selectors, the lower configuration table or long e
 clicks open a compact anchored popover; its download preserves the complete cohort/point JSON, so
 removing visual clutter does not discard provenance. Browser QA checks exact downloaded values,
 keyboard/outside dismissal and mobile popup bounds.
+
+The capacity16 concurrency sweep adds nine valid observations; BetterScale C1 failed only official
+metric-duration coverage and stays out of Frontier. Preserve the two initial max-seqs8 C4 points,
+but do not mix them into the new curves. The arms use individually tuned explicit KV budgets
+(native24.25 / FULL20.25GiB per chip), not equal-KV controls; source and native C16 functional
+limitations stay in the downloadable parameters and `FRONTIER-QWEN35-CONCURRENCY.md`.
+
+A compact curves link accepts a local, optionally versioned SVG path in the workload contract;
+absence/unsafe paths hide it. The popup shows request limit and explicit KV beside C/MTP. With11
+points, the old18px invisible hit circles intercepted nearby mobile points: adaptive nonoverlapping
+hit circles plus nearest-dot click selection remove SVG paint-order bias, without moving data. Keep
+keyboard access and exact downloaded-point checks; never bypass interception with forced QA clicks.
+Static curves use official metrics, separate P50/P95 TTFT/TPOT, and label excluded coverage.
