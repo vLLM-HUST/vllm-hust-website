@@ -100,6 +100,8 @@ def main():
                 ]:
                     assert f"{metric:.2f}".rstrip("0").rstrip(".") in text
                 assert "TP2" in text and "MTP2" in text
+                assert point["configuration"]["engine"] in text
+                assert point["configuration"]["engine_version"] in text
                 assert popup.locator("pre").count() == 0
                 box, plot = (
                     popup.bounding_box(),
