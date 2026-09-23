@@ -119,3 +119,11 @@ separates benchmark requirements from chart axes and hardware configuration. Its
 [dashboard README](https://github.com/SemiAnalysisAI/InferenceX-app) describes sweeps over tensor
 parallelism and concurrency. We borrow that comparison structure, not its GPL dashboard code or
 Next.js/database deployment. This site remains a static snapshot consumer with native SVG.
+
+## Workload source
+
+The [AgentX workload repository](https://github.com/vLLM-HUST/agentx-bench)
+pins the official replay harness and corpus and records the smoke protocol.
+Current comparison runs use 15-minute measured windows after full warmup; this
+is an evolving smoke protocol, not one-hour formal certification. The Frontier
+footer links the workload repository directly.
