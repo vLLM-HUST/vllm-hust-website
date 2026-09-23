@@ -29,3 +29,9 @@ activation. Missing activation stays unknown/related, never silently native. Leg
 were archived under `intellistream/*-legacy-20260831`; current MOD `PROVENANCE.md` resolves their
 old PR identities. In particular, PR #49 offload compatibility is not KV Tiering, and the native
 MTP2 arm's BetterScale worker bridge is not evidence that it ran the BetterScale treatment.
+
+
+For the sibling Frontier view, read [the Frontier handoff](../../../../../docs/LEADERBOARD-FRONTIER.md).
+It consumes a separate, deliberately empty production snapshot until the workload owner supplies
+measurements. Do not derive Frontier admission, prices, or MOD activation from the historical run
+table. The pure model and browser checks exercise the contract without using accelerator capacity.

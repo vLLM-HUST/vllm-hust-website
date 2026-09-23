@@ -68,7 +68,8 @@
     function filteredRows() { return model.selectRows(state.rows.filter(matches), state.columnFilters, state.sort); }
     function setView(view) {
         state.view = view;
-        for (const name of ['runs', 'tasks']) {
+        history.replaceState(null, '', `${location.pathname}${location.search}${view === 'frontier' ? '#frontier' : ''}`);
+        for (const name of ['runs', 'tasks', 'frontier']) {
             $(`${name}-panel`).hidden = view !== name;
             $(`view-${name}`).setAttribute('aria-pressed', String(view === name));
         }
@@ -183,7 +184,7 @@
             if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeMenu();
         }
     });
-    for (const view of ['runs', 'tasks']) $(`view-${view}`).addEventListener('click', () => setView(view));
+    for (const view of ['runs', 'tasks', 'frontier']) $(`view-${view}`).addEventListener('click', () => setView(view));
     function matches(row) {
         return Object.entries(state.filters).every(([key, value]) => !value || row[key] === value);
     }
@@ -309,5 +310,6 @@
         }
     });
     window.addEventListener('vllm-hust:langchange', translate);
+    if (location.hash === '#frontier') setView('frontier');
     initialize();
 })();

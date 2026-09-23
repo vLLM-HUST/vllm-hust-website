@@ -1,0 +1,228 @@
+{
+  "schema_version": "leaderboard-frontier/v1",
+  "cohorts": [
+    {
+      "id": "test-contract",
+      "model": {
+        "id": "test-model-rev1",
+        "label": "Test model (fixture only)",
+        "revision": "test-revision"
+      },
+      "precision": {
+        "id": "test-bf16",
+        "label": "BF16"
+      },
+      "workload": {
+        "id": "test-workload-v1",
+        "label": "Synthetic UI fixture \u2014 not benchmark evidence",
+        "contract": {
+          "fixture_only": true
+        }
+      },
+      "context_tokens": 8192
+    }
+  ],
+  "points": [
+    {
+      "id": "test-fast",
+      "label": "Test fast",
+      "cohort_id": "test-contract",
+      "configuration": {
+        "engine": "test-engine",
+        "engine_version": "test-version",
+        "mods": [],
+        "hardware": {
+          "label": "Test accelerator",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 16384,
+        "parameters": {
+          "fixture_only": true
+        }
+      },
+      "load": {
+        "concurrency": 8
+      },
+      "metrics": {
+        "tpot_ms": 20,
+        "output_tps": 200,
+        "ttft_p95_ms": 100,
+        "tpot_p95_ms": 20,
+        "e2e_p95_ms": null
+      },
+      "cost": {
+        "usd_per_hour": 10,
+        "source": "Synthetic UI fixture, not a price quote",
+        "scope": "test full deployment"
+      },
+      "evidence": {
+        "status": "measured",
+        "run_ids": [
+          "synthetic-test-only"
+        ],
+        "aggregation": "fixture-only; never publish as a measurement",
+        "url": "https://example.com/synthetic-fixture"
+      }
+    },
+    {
+      "id": "test-efficient",
+      "label": "Test efficient",
+      "cohort_id": "test-contract",
+      "configuration": {
+        "engine": "test-engine",
+        "engine_version": "test-version",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Test accelerator",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 16384,
+        "parameters": {
+          "fixture_only": true
+        }
+      },
+      "load": {
+        "concurrency": 8
+      },
+      "metrics": {
+        "tpot_ms": 40,
+        "output_tps": 400,
+        "ttft_p95_ms": 200,
+        "tpot_p95_ms": 40,
+        "e2e_p95_ms": null
+      },
+      "cost": {
+        "usd_per_hour": 10,
+        "source": "Synthetic UI fixture, not a price quote",
+        "scope": "test full deployment"
+      },
+      "evidence": {
+        "status": "measured",
+        "run_ids": [
+          "synthetic-test-only"
+        ],
+        "aggregation": "fixture-only; never publish as a measurement",
+        "url": "https://example.com/synthetic-fixture"
+      }
+    },
+    {
+      "id": "test-dominated",
+      "label": "Test dominated",
+      "cohort_id": "test-contract",
+      "configuration": {
+        "engine": "test-engine",
+        "engine_version": "test-version",
+        "mods": [],
+        "hardware": {
+          "label": "Test accelerator",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 16384,
+        "parameters": {
+          "fixture_only": true
+        }
+      },
+      "load": {
+        "concurrency": 8
+      },
+      "metrics": {
+        "tpot_ms": 40,
+        "output_tps": 100,
+        "ttft_p95_ms": 300,
+        "tpot_p95_ms": 40,
+        "e2e_p95_ms": null
+      },
+      "cost": {
+        "usd_per_hour": 10,
+        "source": "Synthetic UI fixture, not a price quote",
+        "scope": "test full deployment"
+      },
+      "evidence": {
+        "status": "measured",
+        "run_ids": [
+          "synthetic-test-only"
+        ],
+        "aggregation": "fixture-only; never publish as a measurement",
+        "url": "https://example.com/synthetic-fixture"
+      }
+    },
+    {
+      "id": "test-tie",
+      "label": "Test tie",
+      "cohort_id": "test-contract",
+      "configuration": {
+        "engine": "test-engine",
+        "engine_version": "test-version",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Test accelerator",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 16384,
+        "parameters": {
+          "fixture_only": true
+        }
+      },
+      "load": {
+        "concurrency": 8
+      },
+      "metrics": {
+        "tpot_ms": 40,
+        "output_tps": 400,
+        "ttft_p95_ms": 200,
+        "tpot_p95_ms": 40,
+        "e2e_p95_ms": null
+      },
+      "cost": null,
+      "evidence": {
+        "status": "measured",
+        "run_ids": [
+          "synthetic-test-only"
+        ],
+        "aggregation": "fixture-only; never publish as a measurement",
+        "url": "https://example.com/synthetic-fixture"
+      }
+    },
+    {
+      "id": "test-missing",
+      "label": "Test missing",
+      "cohort_id": "test-contract",
+      "configuration": {
+        "engine": "test-engine",
+        "engine_version": "test-version",
+        "mods": [],
+        "hardware": {
+          "label": "Test accelerator",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 16384,
+        "parameters": {
+          "fixture_only": true
+        }
+      },
+      "load": {
+        "concurrency": 8
+      },
+      "metrics": {
+        "tpot_ms": null,
+        "output_tps": 200,
+        "ttft_p95_ms": null,
+        "tpot_p95_ms": null,
+        "e2e_p95_ms": null
+      },
+      "cost": null,
+      "evidence": {
+        "status": "measured",
+        "run_ids": [
+          "synthetic-test-only"
+        ],
+        "aggregation": "fixture-only; never publish as a measurement",
+        "url": "https://example.com/synthetic-fixture"
+      }
+    }
+  ]
+}
