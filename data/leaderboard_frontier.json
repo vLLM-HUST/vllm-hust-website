@@ -2,6 +2,67 @@
   "schema_version": "leaderboard-frontier/v1",
   "cohorts": [
     {
+      "id": "qwen35-msbf16-agentx256k-nospec-smoke-20260923",
+      "model": {
+        "id": "qwen35-35b-a3b-ms-1ad9f5f7",
+        "label": "Qwen3.5-35B-A3B \u00b7 ModelScope snapshot",
+        "revision": "sha256-manifest:1ad9f5f76ce02ffe2df0512f6a187b9b65737cf62264fbbf780054922f14abe3"
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "agentx256k-8fecd2fc-nospec-smoke900-v1",
+        "label": "AgentX 256K \u00b7 no speculation \u00b7 15 min smoke",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "protocol": {
+            "methodology_url": "https://inferencex.semianalysis.com/agentx/methodology",
+            "methodology_checked_utc": "2026-09-23",
+            "harness_repository": "https://github.com/SemiAnalysisAI/agentx-harness",
+            "harness_commit": "56a0cf70f4c0359454ee4bd15a17770b541a3e3e",
+            "dataset": "semianalysisai/cc-traces-weka-062126-256k",
+            "dataset_revision": "8fecd2fc56694469f758f0afbbb6335ad3043740",
+            "dataset_alias": "semianalysis_cc_traces_weka_062126_256k",
+            "dataset_sessions": 393,
+            "scenario": "inferencex-agentx-mvp",
+            "seed": 20260923,
+            "trajectory_start_min_ratio": 0.25,
+            "trajectory_start_max_ratio": 0.75,
+            "warmup_requests_per_lane": 10,
+            "profiles": {
+              "formal": {
+                "measurement_seconds": 3600
+              },
+              "smoke": {
+                "measurement_seconds": 900
+              }
+            }
+          },
+          "workload_repository": "https://github.com/vLLM-HUST/agentx-bench",
+          "wrapper_revision": "e0c34de525246c98d14df590f9864d7be7a25075",
+          "source_pool": {
+            "sessions": 393,
+            "requests": 68266,
+            "filtering": "None; full official corpus, original outputs and DAGs"
+          },
+          "tokenizer_revision": "sha256-manifest:1ad9f5f76ce02ffe2df0512f6a187b9b65737cf62264fbbf780054922f14abe3",
+          "chat_template": "Model-native; enable_thinking=false",
+          "arrival": "Official closed-loop session DAG replay; original delays; concurrency counts session trees, not HTTP requests",
+          "warmup": "Mandatory snapshot primers + ten requests/lane, excluded; fresh deployment per point",
+          "output_policy": "Full requested outputs; ignore_eos=true; temperature=0; no MTP or synthetic acceptance",
+          "acceptance": "Official submission_valid=true, no request errors or output-length mismatches; clean deployment drain",
+          "aggregation": "One C16 run per configuration on the same eight physical chips; no repeats or confidence intervals. Reached closed-loop mixes differ. Official throughput is not reconstructed tokens/900.",
+          "status": "Provisional smoke protocol; not one-hour formal certification or a tuned capacity frontier",
+          "checkpoint_provenance": "Same completed BF16 ModelScope checkpoint for all five arms. Original downloader did not retain upstream commit; revision is an immutable SHA-256 content-manifest identity. Equality to earlier HF snapshot was not established.",
+          "cost": "Unpriced; denominator includes all eight attention and expert chips"
+        }
+      }
+    },
+    {
       "id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
       "model": {
         "id": "qwen35-35b-a3b-712cf743",
@@ -15,7 +76,7 @@
       "context_tokens": 262144,
       "workload": {
         "id": "agentx256k-8fecd2fc-smoke900-v1",
-        "label": "AgentX 256K · 15 min smoke",
+        "label": "AgentX 256K \u00b7 15 min smoke",
         "contract": {
           "profile": "smoke",
           "measurement_seconds": 900,
@@ -66,7 +127,7 @@
     {
       "id": "qwen35-agentx-smoke-native-tp2-c4-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native baseline · TP2 / C4 · 15 min smoke",
+      "label": "Native baseline \u00b7 TP2 / C4 \u00b7 15 min smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -141,7 +202,7 @@
     {
       "id": "qwen35-agentx-smoke-betterscale-tp2-c4-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale (experimental) · TP2 / C4 · 15 min smoke",
+      "label": "BetterScale (experimental) \u00b7 TP2 / C4 \u00b7 15 min smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -228,7 +289,7 @@
     {
       "id": "qwen35-agentx-capacity16-full-tp2-c2-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale · C2 · KV20.25GiB",
+      "label": "BetterScale \u00b7 C2 \u00b7 KV20.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -323,7 +384,7 @@
     {
       "id": "qwen35-agentx-capacity16-full-tp2-c4-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale · C4 · KV20.25GiB",
+      "label": "BetterScale \u00b7 C4 \u00b7 KV20.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -418,7 +479,7 @@
     {
       "id": "qwen35-agentx-capacity16-full-tp2-c8-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale · C8 · KV20.25GiB",
+      "label": "BetterScale \u00b7 C8 \u00b7 KV20.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -513,7 +574,7 @@
     {
       "id": "qwen35-agentx-capacity16-full-tp2-c16-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale · C16 · KV20.25GiB",
+      "label": "BetterScale \u00b7 C16 \u00b7 KV20.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -608,7 +669,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c1-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native · C1 · KV24.25GiB",
+      "label": "Native \u00b7 C1 \u00b7 KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -690,7 +751,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c2-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native · C2 · KV24.25GiB",
+      "label": "Native \u00b7 C2 \u00b7 KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -772,7 +833,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c4-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native · C4 · KV24.25GiB",
+      "label": "Native \u00b7 C4 \u00b7 KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -854,7 +915,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c8-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native · C8 · KV24.25GiB",
+      "label": "Native \u00b7 C8 \u00b7 KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -936,7 +997,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c16-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native · C16 · KV24.25GiB",
+      "label": "Native \u00b7 C16 \u00b7 KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -1013,6 +1074,411 @@
           "20260923T133331Z-smoke-c16-3ec6c66a"
         ],
         "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
+      }
+    },
+    {
+      "id": "qwen35-agentx-expert-tp8-c16-20260923",
+      "cohort_id": "qwen35-msbf16-agentx256k-nospec-smoke-20260923",
+      "label": "TP8 \u00b7 C16 \u00b7 15 min smoke \u00b7 no speculation",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0 / 0.23.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel_size": null,
+          "expert_parallel": false,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "max_num_seqs_scope": "per attention/DP rank; total scheduling capacities differ by topology",
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "mtp_draft_tokens": 0,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            24,
+            32
+          ],
+          "thinking": false,
+          "generation_temperature": 0,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 2011.597957611084,
+          "runtime_revision": "vllm:0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665;vllm-ascend:f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db;betterscale:cfda9c24bfe40e36396325c70e7ceb0cf333dde0",
+          "transport": "Identical loopback streaming relay and fixed SSH tunnel for all arms; unchanged request/SSE bodies",
+          "routing": "New X-Correlation-ID sessions round-robin; sticky subsequent turns; children independently placed",
+          "availability": "Fresh shared-lease admission, foreign-process guard, HTTP generation gate and clean release",
+          "worker_class": "native_graph_worker.NativeGraphWorker",
+          "native_worker_bridge": "Explicit native FULL decode activation; native EP receipt hook where applicable. Separated candidates additionally override routed experts only."
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 89.93499509138823,
+        "decode_p90_tps": 29.71557142671267,
+        "decode_per_user_p50_tps": 26.389465187981802,
+        "tpot_ms": 41.6566500782254,
+        "ttft_p50_ms": 1373.0655645,
+        "ttft_p95_ms": 3250.465057949998,
+        "ttft_p99_ms": 6751.588930539983,
+        "tpot_p95_ms": 46.43582732392962,
+        "e2e_p95_ms": 125849.30800584967,
+        "completed_requests": 122.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-EXPERT-SMOKE.md",
+        "run_ids": [
+          "20260923T162234Z-smoke-c16-dbf41eac"
+        ],
+        "aggregation": "One unpooled official smoke run; not formal or a tuned frontier"
+      }
+    },
+    {
+      "id": "qwen35-agentx-expert-dp8ep8-c16-20260923",
+      "cohort_id": "qwen35-msbf16-agentx256k-nospec-smoke-20260923",
+      "label": "DP8EP8 \u00b7 C16 \u00b7 15 min smoke \u00b7 no speculation",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0 / 0.23.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "expert_parallel": true,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "max_num_seqs_scope": "per attention/DP rank; total scheduling capacities differ by topology",
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "mtp_draft_tokens": 0,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            24,
+            32
+          ],
+          "thinking": false,
+          "generation_temperature": 0,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 2011.597957611084,
+          "runtime_revision": "vllm:0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665;vllm-ascend:f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db;betterscale:cfda9c24bfe40e36396325c70e7ceb0cf333dde0",
+          "transport": "Identical loopback streaming relay and fixed SSH tunnel for all arms; unchanged request/SSE bodies",
+          "routing": "New X-Correlation-ID sessions round-robin; sticky subsequent turns; children independently placed",
+          "availability": "Fresh shared-lease admission, foreign-process guard, HTTP generation gate and clean release",
+          "worker_class": "native_ep_worker.NativeEPWorker",
+          "native_worker_bridge": "Explicit native FULL decode activation; native EP receipt hook where applicable. Separated candidates additionally override routed experts only."
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 72.51696732258343,
+        "decode_p90_tps": 23.070782879588837,
+        "decode_per_user_p50_tps": 21.641627348422908,
+        "tpot_ms": 47.44406348491957,
+        "ttft_p50_ms": 1229.838823,
+        "ttft_p95_ms": 3888.2601727999986,
+        "ttft_p99_ms": 8285.069152519993,
+        "tpot_p95_ms": 56.712033494654406,
+        "e2e_p95_ms": 126880.5424761999,
+        "completed_requests": 93.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-EXPERT-SMOKE.md",
+        "run_ids": [
+          "20260923T164551Z-smoke-c16-a0bf77f2"
+        ],
+        "aggregation": "One unpooled official smoke run; not formal or a tuned frontier"
+      }
+    },
+    {
+      "id": "qwen35-agentx-expert-tp8ep8-c16-20260923",
+      "cohort_id": "qwen35-msbf16-agentx256k-nospec-smoke-20260923",
+      "label": "TP8EP8 \u00b7 C16 \u00b7 15 min smoke \u00b7 no speculation",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0 / 0.23.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "expert_parallel": true,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "max_num_seqs_scope": "per attention/DP rank; total scheduling capacities differ by topology",
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "mtp_draft_tokens": 0,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            24,
+            32
+          ],
+          "thinking": false,
+          "generation_temperature": 0,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 2011.597957611084,
+          "runtime_revision": "vllm:0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665;vllm-ascend:f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db;betterscale:cfda9c24bfe40e36396325c70e7ceb0cf333dde0",
+          "transport": "Identical loopback streaming relay and fixed SSH tunnel for all arms; unchanged request/SSE bodies",
+          "routing": "New X-Correlation-ID sessions round-robin; sticky subsequent turns; children independently placed",
+          "availability": "Fresh shared-lease admission, foreign-process guard, HTTP generation gate and clean release",
+          "worker_class": "native_ep_worker.NativeEPWorker",
+          "native_worker_bridge": "Explicit native FULL decode activation; native EP receipt hook where applicable. Separated candidates additionally override routed experts only."
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 90.34340561011477,
+        "decode_p90_tps": 30.529435421547202,
+        "decode_per_user_p50_tps": 27.270258151434554,
+        "tpot_ms": 40.56671084242557,
+        "ttft_p50_ms": 1364.64914,
+        "ttft_p95_ms": 2965.7193526999968,
+        "ttft_p99_ms": 6921.891723760002,
+        "tpot_p95_ms": 46.715923275221186,
+        "e2e_p95_ms": 118732.19641769979,
+        "completed_requests": 123.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-EXPERT-SMOKE.md",
+        "run_ids": [
+          "20260923T170801Z-smoke-c16-d010f92b"
+        ],
+        "aggregation": "One unpooled official smoke run; not formal or a tuned frontier"
+      }
+    },
+    {
+      "id": "qwen35-agentx-expert-a4e4-c16-20260923",
+      "cohort_id": "qwen35-msbf16-agentx256k-nospec-smoke-20260923",
+      "label": "A4E4 \u00b7 C16 \u00b7 15 min smoke \u00b7 no speculation",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0 / 0.23.0rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel_size": null,
+          "expert_parallel": false,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "max_num_seqs_scope": "per attention/DP rank; total scheduling capacities differ by topology",
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "mtp_draft_tokens": 0,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            24,
+            32
+          ],
+          "thinking": false,
+          "generation_temperature": 0,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 2011.597957611084,
+          "runtime_revision": "vllm:0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665;vllm-ascend:f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db;betterscale:bf32672ec0340472f280f3aaef8f3777337a868b",
+          "transport": "Identical loopback streaming relay and fixed SSH tunnel for all arms; unchanged request/SSE bodies",
+          "routing": "New X-Correlation-ID sessions round-robin; sticky subsequent turns; children independently placed",
+          "availability": "Fresh shared-lease admission, foreign-process guard, HTTP generation gate and clean release",
+          "attention_ranks": 4,
+          "expert_ranks": 4,
+          "expert_placement": "Whole layers, all 256 routed experts per owned layer",
+          "expert_service": "BF16 persistent device client/server; no host-forward RPC; shared MLP overlapped; 4096-row combined push return",
+          "persistent_lifetime_seconds": 10800,
+          "kernel_timeout": "disabled with explicit zero launch attribute; external 11000-second supervisor",
+          "expert_server_launch": "two direct asynchronous persistent kernels; attention FULL graphs retained",
+          "mod_activation": "BetterScale separated-expert prototype, not the earlier FULL-compiler treatment",
+          "worker_class": "native_client_worker.NativeClientWorker",
+          "native_worker_bridge": "Explicit native FULL decode activation; native EP receipt hook where applicable. Separated candidates additionally override routed experts only."
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 95.01791909855486,
+        "decode_p90_tps": 43.599571653584974,
+        "decode_per_user_p50_tps": 32.755525836642725,
+        "tpot_ms": 30.756615011793073,
+        "ttft_p50_ms": 1270.363364,
+        "ttft_p95_ms": 4498.67336595,
+        "ttft_p99_ms": 9257.341713159956,
+        "tpot_p95_ms": 39.59306054191339,
+        "e2e_p95_ms": 79452.84025634994,
+        "completed_requests": 134.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-EXPERT-SMOKE.md",
+        "run_ids": [
+          "20260923T190437Z-smoke-c16-2e66e99e"
+        ],
+        "aggregation": "One unpooled official smoke run; not formal or a tuned frontier"
+      }
+    },
+    {
+      "id": "qwen35-agentx-expert-a6e2-c16-20260923",
+      "cohort_id": "qwen35-msbf16-agentx256k-nospec-smoke-20260923",
+      "label": "A6E2 \u00b7 C16 \u00b7 15 min smoke \u00b7 no speculation",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0 / 0.23.0rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel_size": null,
+          "expert_parallel": false,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "max_num_seqs_scope": "per attention/DP rank; total scheduling capacities differ by topology",
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "mtp_draft_tokens": 0,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            24,
+            32
+          ],
+          "thinking": false,
+          "generation_temperature": 0,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 2011.597957611084,
+          "runtime_revision": "vllm:0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665;vllm-ascend:f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db;betterscale:bf32672ec0340472f280f3aaef8f3777337a868b",
+          "transport": "Identical loopback streaming relay and fixed SSH tunnel for all arms; unchanged request/SSE bodies",
+          "routing": "New X-Correlation-ID sessions round-robin; sticky subsequent turns; children independently placed",
+          "availability": "Fresh shared-lease admission, foreign-process guard, HTTP generation gate and clean release",
+          "attention_ranks": 6,
+          "expert_ranks": 2,
+          "expert_placement": "Whole layers, all 256 routed experts per owned layer",
+          "expert_service": "BF16 persistent device client/server; no host-forward RPC; shared MLP overlapped; 4096-row combined push return",
+          "persistent_lifetime_seconds": 10800,
+          "kernel_timeout": "disabled with explicit zero launch attribute; external 11000-second supervisor",
+          "expert_server_launch": "two direct asynchronous persistent kernels; attention FULL graphs retained",
+          "mod_activation": "BetterScale separated-expert prototype, not the earlier FULL-compiler treatment",
+          "worker_class": "native_client_worker.NativeClientWorker",
+          "native_worker_bridge": "Explicit native FULL decode activation; native EP receipt hook where applicable. Separated candidates additionally override routed experts only."
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 94.67000902713457,
+        "decode_p90_tps": 40.133911240678714,
+        "decode_per_user_p50_tps": 32.18438301793686,
+        "tpot_ms": 31.785710690350673,
+        "ttft_p50_ms": 1243.8234559999999,
+        "ttft_p95_ms": 3653.2064993999998,
+        "ttft_p99_ms": 7688.164709739998,
+        "tpot_p95_ms": 41.79926250448801,
+        "e2e_p95_ms": 75277.0247105,
+        "completed_requests": 135.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-EXPERT-SMOKE.md",
+        "run_ids": [
+          "20260923T192642Z-smoke-c16-3947e959"
+        ],
+        "aggregation": "One unpooled official smoke run; not formal or a tuned frontier"
       }
     }
   ]
