@@ -45,7 +45,8 @@ test('published smoke points preserve official metrics and all allocated chips',
     const data=require('../data/leaderboard_frontier.json');
     const evidence=require('../data/leaderboard_frontier_evidence.json');
     model.validate(data);
-    assert.equal(data.points.length,2);
+    assert.equal(data.points.length,evidence.runs.length);
+    assert.equal(new Set(data.points.map(p=>p.evidence.run_ids[0])).size,data.points.length);
     assert.equal(data.cohorts[0].workload.contract.profile,'smoke');
     for(const p of data.points){
         const run=evidence.runs.find(r=>r.run_id===p.evidence.run_ids[0]);
@@ -62,11 +63,22 @@ test('published smoke points preserve official metrics and all allocated chips',
         assert.equal(model.value(p,'interactivity'),1000/run.official_metrics.inter_token_latency.avg);
         assert.equal(model.value(p,'cost_per_million'),null);
         assert.equal(p.configuration.parameters.tensor_parallel_size,2);
-        assert.equal(p.load.concurrency,4);
-        assert.ok(p.label.includes('smoke'));
+        assert.ok([1,2,4,8,16].includes(p.load.concurrency));
+        assert.equal(p.evidence.profile,'smoke');
     }
     // Better mean interactivity does not conceal the slightly worse TTFT tail.
-    assert.equal(model.project(data.points,'ttft_p95_ms','output_tps_per_chip').frontier.length,2);
+    const initial=data.points.filter(p=>p.configuration.parameters.max_num_seqs===8);
+    assert.equal(initial.length,2);
+    assert.equal(model.project(initial,'ttft_p95_ms','output_tps_per_chip').frontier.length,2);
+    const capacity=data.points.filter(p=>p.configuration.parameters.max_num_seqs===16);
+    assert.equal(capacity.length,9);
+    for(const p of capacity){
+        const arm=p.configuration.mods.length?'full':'native';
+        assert.equal(p.configuration.parameters.kv_cache_memory_bytes,evidence.capacity_series.kv_cache_bytes_per_chip[arm]);
+    }
+    for(const invalid of evidence.capacity_series.invalid){
+        assert.ok(!data.points.some(p=>p.evidence.run_ids.includes(invalid.run_id)));
+    }
 });
 
 test('P90 decode speed projects the recorded percentile, never a TPOT reciprocal fallback',()=>{

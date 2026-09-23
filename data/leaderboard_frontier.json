@@ -54,9 +54,10 @@
           "warmup": "Mandatory snapshot primers + 10 requests/lane; excluded from measurement; fresh server per arm; per-play prefix cache busting",
           "output_policy": "Full requested outputs; ignore_eos=true; greedy benchmark-only synthetic MTP2 with matched SPEED-Bench AL2.63",
           "acceptance": "Official harness submission_valid=true, no request errors or output-length mismatches; not model answer-quality evaluation",
-          "aggregation": "One run per arm, sequential same shared-host TP2 pair; not ABBA or a repeatability estimate. Official output_token_throughput includes its native observation/drain accounting; never recomputed as tokens/900. Closed-loop request mixes can differ.",
+          "aggregation": "One unpooled run per point; arm comparisons use same shared-host physical pair at each load. Pair/host/configuration may differ across series or loads; consult each point. Official output throughput preserves native observation/drain accounting. Closed-loop reached mixes differ; not ABBA or repeatability evidence.",
           "status": "Short smoke; tuning incomplete; no one-hour formal result",
-          "cost": "Not priced; output tokens/s/chip is resource productivity, not revenue"
+          "cost": "Not priced; output tokens/s/chip is resource productivity, not revenue",
+          "concurrency_curves_url": "./assets/frontier-qwen35-concurrency.svg?v=capacity16-20260923"
         }
       }
     }
@@ -222,6 +223,796 @@
           "20260923T103407Z-smoke-c4-90c340f1"
         ],
         "aggregation": "One unpooled run; official AIPerf metrics; 900s sending window plus official drain/observation accounting; not formal or tuned frontier"
+      }
+    },
+    {
+      "id": "qwen35-agentx-capacity16-full-tp2-c2-20260923",
+      "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
+      "label": "BetterScale · C2 · KV20.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 502.89949131011963,
+          "host_memory_policy": "Proportional 2/8 host allocation; no host KV offload; shared-host colocation, not isolated hardware ceiling",
+          "mtp_draft_tokens": 2,
+          "synthetic_acceptance_length": 2.63,
+          "thinking": false,
+          "generation_temperature": 0,
+          "task_queue_enable": 0,
+          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            16,
+            24,
+            32,
+            40,
+            48,
+            64,
+            128,
+            256,
+            512,
+            1024,
+            1536,
+            2048,
+            4096
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "moe-capacity16-1 / local-candidate-runtime1",
+          "availability": "Experimental source capsule, not a released wheel qualification",
+          "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
+          "kv_cache_memory_bytes": 21743271936,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Validated provisional per-arm KV budget, not a capacity maximum or equal-KV control",
+          "comparison_group": "local-shared-pair-low",
+          "comparison_scope": "Validated provisional per-arm KV budgets, not proven maxima; known draft padding remains unoptimized. Same host/physical pair, TP2/BF16/MTP2/262144/query4096/max-seqs16. Not a same-KV-budget or isolated MOD-only comparison.",
+          "functional_limit": "Capacity16 real retrieval24/24 through262080 and16 concurrent; bounded functional evidence, not broad quality evaluation"
+        }
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 76.26904401664578,
+        "decode_p90_tps": 97.00860950537772,
+        "tpot_ms": 13.732343544210751,
+        "ttft_p95_ms": 5606.585515500001,
+        "tpot_p95_ms": 21.89888809823515,
+        "e2e_p95_ms": 54556.841590300006,
+        "ttft_p50_ms": 940.904988,
+        "decode_per_user_p50_tps": 78.89189934866893,
+        "completed_requests": 87.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-CONCURRENCY.md",
+        "run_ids": [
+          "20260923T144906Z-smoke-c2-70627096"
+        ],
+        "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
+      }
+    },
+    {
+      "id": "qwen35-agentx-capacity16-full-tp2-c4-20260923",
+      "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
+      "label": "BetterScale · C4 · KV20.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 502.89949131011963,
+          "host_memory_policy": "Proportional 2/8 host allocation; no host KV offload; shared-host colocation, not isolated hardware ceiling",
+          "mtp_draft_tokens": 2,
+          "synthetic_acceptance_length": 2.63,
+          "thinking": false,
+          "generation_temperature": 0,
+          "task_queue_enable": 0,
+          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            16,
+            24,
+            32,
+            40,
+            48,
+            64,
+            128,
+            256,
+            512,
+            1024,
+            1536,
+            2048,
+            4096
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "moe-capacity16-1 / local-candidate-runtime1",
+          "availability": "Experimental source capsule, not a released wheel qualification",
+          "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
+          "kv_cache_memory_bytes": 21743271936,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Validated provisional per-arm KV budget, not a capacity maximum or equal-KV control",
+          "comparison_group": "local-shared-pair-mid",
+          "comparison_scope": "Validated provisional per-arm KV budgets, not proven maxima; known draft padding remains unoptimized. Same host/physical pair, TP2/BF16/MTP2/262144/query4096/max-seqs16. Not a same-KV-budget or isolated MOD-only comparison.",
+          "functional_limit": "Capacity16 real retrieval24/24 through262080 and16 concurrent; bounded functional evidence, not broad quality evaluation"
+        }
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 87.67619037900664,
+        "decode_p90_tps": 113.12462046335322,
+        "tpot_ms": 13.688016832245886,
+        "ttft_p95_ms": 4289.4279552,
+        "tpot_p95_ms": 19.79864198422727,
+        "e2e_p95_ms": 48891.07514995,
+        "ttft_p50_ms": 684.6812095,
+        "decode_per_user_p50_tps": 86.10313726951144,
+        "completed_requests": 130.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-CONCURRENCY.md",
+        "run_ids": [
+          "20260923T135858Z-smoke-c4-3ff4d864"
+        ],
+        "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
+      }
+    },
+    {
+      "id": "qwen35-agentx-capacity16-full-tp2-c8-20260923",
+      "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
+      "label": "BetterScale · C8 · KV20.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 502.89949131011963,
+          "host_memory_policy": "Proportional 2/8 host allocation; no host KV offload; shared-host colocation, not isolated hardware ceiling",
+          "mtp_draft_tokens": 2,
+          "synthetic_acceptance_length": 2.63,
+          "thinking": false,
+          "generation_temperature": 0,
+          "task_queue_enable": 0,
+          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            16,
+            24,
+            32,
+            40,
+            48,
+            64,
+            128,
+            256,
+            512,
+            1024,
+            1536,
+            2048,
+            4096
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "moe-capacity16-1 / local-candidate-runtime1",
+          "availability": "Experimental source capsule, not a released wheel qualification",
+          "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
+          "kv_cache_memory_bytes": 21743271936,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Validated provisional per-arm KV budget, not a capacity maximum or equal-KV control",
+          "comparison_group": "local-shared-pair-mid",
+          "comparison_scope": "Validated provisional per-arm KV budgets, not proven maxima; known draft padding remains unoptimized. Same host/physical pair, TP2/BF16/MTP2/262144/query4096/max-seqs16. Not a same-KV-budget or isolated MOD-only comparison.",
+          "functional_limit": "Capacity16 real retrieval24/24 through262080 and16 concurrent; bounded functional evidence, not broad quality evaluation"
+        }
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 70.4139242908933,
+        "decode_p90_tps": 108.50147176886188,
+        "tpot_ms": 12.98209121834562,
+        "ttft_p95_ms": 3075.117838899999,
+        "tpot_p95_ms": 17.853046978397284,
+        "e2e_p95_ms": 46231.97381789998,
+        "ttft_p50_ms": 908.7773609999999,
+        "decode_per_user_p50_tps": 77.82581583002087,
+        "completed_requests": 42.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-CONCURRENCY.md",
+        "run_ids": [
+          "20260923T144939Z-smoke-c8-9a7fa589"
+        ],
+        "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
+      }
+    },
+    {
+      "id": "qwen35-agentx-capacity16-full-tp2-c16-20260923",
+      "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
+      "label": "BetterScale · C16 · KV20.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 502.89949131011963,
+          "host_memory_policy": "Proportional 2/8 host allocation; no host KV offload; shared-host colocation, not isolated hardware ceiling",
+          "mtp_draft_tokens": 2,
+          "synthetic_acceptance_length": 2.63,
+          "thinking": false,
+          "generation_temperature": 0,
+          "task_queue_enable": 0,
+          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            16,
+            24,
+            32,
+            40,
+            48,
+            64,
+            128,
+            256,
+            512,
+            1024,
+            1536,
+            2048,
+            4096
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "moe-capacity16-1 / local-candidate-runtime1",
+          "availability": "Experimental source capsule, not a released wheel qualification",
+          "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
+          "kv_cache_memory_bytes": 21743271936,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Validated provisional per-arm KV budget, not a capacity maximum or equal-KV control",
+          "comparison_group": "local-shared-pair-high",
+          "comparison_scope": "Validated provisional per-arm KV budgets, not proven maxima; known draft padding remains unoptimized. Same host/physical pair, TP2/BF16/MTP2/262144/query4096/max-seqs16. Not a same-KV-budget or isolated MOD-only comparison.",
+          "functional_limit": "Capacity16 real retrieval24/24 through262080 and16 concurrent; bounded functional evidence, not broad quality evaluation"
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 112.56051696925033,
+        "decode_p90_tps": 59.832689331351204,
+        "tpot_ms": 25.799753037692287,
+        "ttft_p95_ms": 13607.867379599984,
+        "tpot_p95_ms": 38.21542246025957,
+        "e2e_p95_ms": 77453.4359705999,
+        "ttft_p50_ms": 1032.630707,
+        "decode_per_user_p50_tps": 48.95281955927419,
+        "completed_requests": 145.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-CONCURRENCY.md",
+        "run_ids": [
+          "20260923T142739Z-smoke-c16-3e9731e8"
+        ],
+        "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
+      }
+    },
+    {
+      "id": "qwen35-agentx-capacity16-native-tp2-c1-20260923",
+      "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
+      "label": "Native · C1 · KV24.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 502.89949131011963,
+          "host_memory_policy": "Proportional 2/8 host allocation; no host KV offload; shared-host colocation, not isolated hardware ceiling",
+          "mtp_draft_tokens": 2,
+          "synthetic_acceptance_length": 2.63,
+          "thinking": false,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "local-native-runtime1",
+          "availability": "Native engine plus required Mamba ABI bridge; no BetterScale treatment",
+          "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Validated provisional per-arm KV budget, not a capacity maximum or equal-KV control",
+          "comparison_group": "local-shared-pair-low",
+          "comparison_scope": "Validated provisional per-arm KV budgets, not proven maxima; known draft padding remains unoptimized. Same host/physical pair, TP2/BF16/MTP2/262144/query4096/max-seqs16. Not a same-KV-budget or isolated MOD-only comparison.",
+          "functional_limit": "Native C16 cold retrieval divergences retained with and without MTP; not quality-certified"
+        }
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 51.950470493732254,
+        "decode_p90_tps": 76.63489075402654,
+        "tpot_ms": 18.123744360853234,
+        "ttft_p95_ms": 3551.853015099999,
+        "tpot_p95_ms": 23.555412948777164,
+        "e2e_p95_ms": 80060.40097129997,
+        "ttft_p50_ms": 1607.4109509999998,
+        "decode_per_user_p50_tps": 61.20254982063062,
+        "completed_requests": 67.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-CONCURRENCY.md",
+        "run_ids": [
+          "20260923T133425Z-smoke-c1-c15a7489"
+        ],
+        "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
+      }
+    },
+    {
+      "id": "qwen35-agentx-capacity16-native-tp2-c2-20260923",
+      "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
+      "label": "Native · C2 · KV24.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 502.89949131011963,
+          "host_memory_policy": "Proportional 2/8 host allocation; no host KV offload; shared-host colocation, not isolated hardware ceiling",
+          "mtp_draft_tokens": 2,
+          "synthetic_acceptance_length": 2.63,
+          "thinking": false,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "local-native-runtime1",
+          "availability": "Native engine plus required Mamba ABI bridge; no BetterScale treatment",
+          "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Validated provisional per-arm KV budget, not a capacity maximum or equal-KV control",
+          "comparison_group": "local-shared-pair-low",
+          "comparison_scope": "Validated provisional per-arm KV budgets, not proven maxima; known draft padding remains unoptimized. Same host/physical pair, TP2/BF16/MTP2/262144/query4096/max-seqs16. Not a same-KV-budget or isolated MOD-only comparison.",
+          "functional_limit": "Native C16 cold retrieval divergences retained with and without MTP; not quality-certified"
+        }
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 55.99455689113522,
+        "decode_p90_tps": 78.04853278662664,
+        "tpot_ms": 15.311615857639875,
+        "ttft_p95_ms": 6584.143362099997,
+        "tpot_p95_ms": 20.875112361227053,
+        "e2e_p95_ms": 56721.04514499999,
+        "ttft_p50_ms": 1338.346386,
+        "decode_per_user_p50_tps": 69.15518719086998,
+        "completed_requests": 50.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-CONCURRENCY.md",
+        "run_ids": [
+          "20260923T142342Z-smoke-c2-342b6cd8"
+        ],
+        "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
+      }
+    },
+    {
+      "id": "qwen35-agentx-capacity16-native-tp2-c4-20260923",
+      "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
+      "label": "Native · C4 · KV24.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 502.89949131011963,
+          "host_memory_policy": "Proportional 2/8 host allocation; no host KV offload; shared-host colocation, not isolated hardware ceiling",
+          "mtp_draft_tokens": 2,
+          "synthetic_acceptance_length": 2.63,
+          "thinking": false,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "local-native-runtime1",
+          "availability": "Native engine plus required Mamba ABI bridge; no BetterScale treatment",
+          "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Validated provisional per-arm KV budget, not a capacity maximum or equal-KV control",
+          "comparison_group": "local-shared-pair-mid",
+          "comparison_scope": "Validated provisional per-arm KV budgets, not proven maxima; known draft padding remains unoptimized. Same host/physical pair, TP2/BF16/MTP2/262144/query4096/max-seqs16. Not a same-KV-budget or isolated MOD-only comparison.",
+          "functional_limit": "Native C16 cold retrieval divergences retained with and without MTP; not quality-certified"
+        }
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 60.97539807778688,
+        "decode_p90_tps": 90.74782506782104,
+        "tpot_ms": 16.117993612674503,
+        "ttft_p95_ms": 4190.141579549992,
+        "tpot_p95_ms": 20.346794583561817,
+        "e2e_p95_ms": 50430.14301909996,
+        "ttft_p50_ms": 1104.7610075,
+        "decode_per_user_p50_tps": 74.74421551181078,
+        "completed_requests": 94.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-CONCURRENCY.md",
+        "run_ids": [
+          "20260923T133326Z-smoke-c4-a6f5e4a0"
+        ],
+        "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
+      }
+    },
+    {
+      "id": "qwen35-agentx-capacity16-native-tp2-c8-20260923",
+      "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
+      "label": "Native · C8 · KV24.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 502.89949131011963,
+          "host_memory_policy": "Proportional 2/8 host allocation; no host KV offload; shared-host colocation, not isolated hardware ceiling",
+          "mtp_draft_tokens": 2,
+          "synthetic_acceptance_length": 2.63,
+          "thinking": false,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "local-native-runtime1",
+          "availability": "Native engine plus required Mamba ABI bridge; no BetterScale treatment",
+          "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Validated provisional per-arm KV budget, not a capacity maximum or equal-KV control",
+          "comparison_group": "local-shared-pair-mid",
+          "comparison_scope": "Validated provisional per-arm KV budgets, not proven maxima; known draft padding remains unoptimized. Same host/physical pair, TP2/BF16/MTP2/262144/query4096/max-seqs16. Not a same-KV-budget or isolated MOD-only comparison.",
+          "functional_limit": "Native C16 cold retrieval divergences retained with and without MTP; not quality-certified"
+        }
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 67.25903240025993,
+        "decode_p90_tps": 86.37608014454777,
+        "tpot_ms": 14.808411403060797,
+        "ttft_p95_ms": 3802.9043450999943,
+        "tpot_p95_ms": 19.53800689461464,
+        "e2e_p95_ms": 104886.21217209952,
+        "ttft_p50_ms": 1130.0292239999999,
+        "decode_per_user_p50_tps": 71.29406225106435,
+        "completed_requests": 35.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-CONCURRENCY.md",
+        "run_ids": [
+          "20260923T142314Z-smoke-c8-7a565891"
+        ],
+        "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
+      }
+    },
+    {
+      "id": "qwen35-agentx-capacity16-native-tp2-c16-20260923",
+      "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
+      "label": "Native · C16 · KV24.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_allocation_gib": 502.89949131011963,
+          "host_memory_policy": "Proportional 2/8 host allocation; no host KV offload; shared-host colocation, not isolated hardware ceiling",
+          "mtp_draft_tokens": 2,
+          "synthetic_acceptance_length": 2.63,
+          "thinking": false,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "local-native-runtime1",
+          "availability": "Native engine plus required Mamba ABI bridge; no BetterScale treatment",
+          "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Validated provisional per-arm KV budget, not a capacity maximum or equal-KV control",
+          "comparison_group": "local-shared-pair-high",
+          "comparison_scope": "Validated provisional per-arm KV budgets, not proven maxima; known draft padding remains unoptimized. Same host/physical pair, TP2/BF16/MTP2/262144/query4096/max-seqs16. Not a same-KV-budget or isolated MOD-only comparison.",
+          "functional_limit": "Native C16 cold retrieval divergences retained with and without MTP; not quality-certified"
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "live agent session trees (not HTTP requests)"
+      },
+      "metrics": {
+        "output_tps": 87.26900446743947,
+        "decode_p90_tps": 51.45191898046849,
+        "tpot_ms": 39.73996664889762,
+        "ttft_p95_ms": 28646.273427,
+        "tpot_p95_ms": 156.1031541492105,
+        "e2e_p95_ms": 110370.2552225,
+        "ttft_p50_ms": 2025.6346015,
+        "decode_per_user_p50_tps": 40.87033608405507,
+        "completed_requests": 116.0
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-CONCURRENCY.md",
+        "run_ids": [
+          "20260923T133331Z-smoke-c16-3ec6c66a"
+        ],
+        "aggregation": "One unpooled 900s smoke per arm/load; same physical pair within each load; separate parallel pairs across loads. Provisional per-arm KV budgets differ. Official native drain accounting; no isolated MOD speedup, quality or formal claim."
       }
     }
   ]

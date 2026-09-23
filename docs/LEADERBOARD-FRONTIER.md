@@ -19,13 +19,16 @@ workload identities; never silently mix them.
 - All points with both coordinates are shown, including dominated observations. The observed Pareto
   envelope is a visual guide, not a globally optimal or statistically certified curve.
 - Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
-  session concurrency, MTP and the two coordinate values. Escape, outside-click or the close button
-  dismisses it. The card stays inside the chart on mobile too.
+  session concurrency, MTP, request limit, explicit KV budget and the two coordinate values. Escape,
+  outside-click or the close button dismisses it. The card stays inside the chart on mobile too.
 - **Download configuration** exports a JSON containing the complete point and cohort, including
   original metrics, protocol, configuration and evidence references. The page does not dump JSON,
   show a configuration table, or display lengthy evidence/methodology sections.
 - A compact **15 min smoke** badge identifies the current short-run cohort. Full limitations stay in
   its download and linked report, not in a large page banner.
+- A small **Concurrency curves** link opens the current cohort's static diagnostic SVG; it does not
+  introduce additional selectors. `workload.contract.concurrency_curves_url` accepts only a local
+  `./assets/*.svg` path with an optional version query. Invalid/absent links stay hidden.
 - Missing axis values are not fabricated. Known MOD names still use the workshop catalog for
   legend/point labels, never as a filter or as proof of runtime activation.
 
@@ -92,7 +95,7 @@ to add a cohort or measured point.
 ## Implementation and checks
 
 - `assets/leaderboard-frontier-model.js`: data checks, axes and strict Pareto projection.
-- `assets/leaderboard-frontier.js`: independent controls, accessible SVG, table, EN/ZH and failure
+- `assets/leaderboard-frontier.js`: independent controls, accessible SVG/popover, EN/ZH and failure
   UI.
 - `assets/leaderboard-frontier.css`: scoped responsive presentation.
 - Existing run controller owns the three-way view switch; it does not supply Frontier points.
