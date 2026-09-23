@@ -683,13 +683,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v17-traceloom"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v18-opset"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v10-traceloom"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v11-opset"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=traceloom-workload-navigation-v3-vspec"'
+        'data-source="./data/plugin-workload-navigation.json?v=opset-workload-navigation-v1"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -985,7 +985,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 24
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 25
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -997,6 +997,25 @@ def test_compact_greedy_incubator_is_not_in_public_catalog():
     }
     assert "ascend-compact-greedy" not in WORKSHOP_METADATA["plugins"]
     assert "ascend-compact-greedy" not in WORKLOAD_NAVIGATION["plugins"]
+
+
+def test_opset_is_a_bounded_operator_mod_with_install_instructions():
+    item = by_id("vllm-hust-opset")
+    assert item["artifact_type"] == "runtime_component"
+    assert item["system_role"] == "operator_runtime"
+    assert item["delivery_model"] == "python_distribution"
+    assert (
+        item["canonical_repository"] == "https://github.com/vLLM-HUST/vllm-hust-opset"
+    )
+    assert item["compatibility"]["status"] == "verified"
+    assert "batch-invariant" in item["summary_en"]
+    assert "CANN 9.0.0" in item["public_effect_en"]
+    assert WORKLOAD_NAVIGATION["plugins"]["vllm-hust-opset"] == [
+        "decode_heavy",
+        "prefill_heavy",
+    ]
+    assert "vllm-hust-opset==0.3.2" in SCRIPT
+    assert "org.vllm-hust.operator-optimizations" in SCRIPT
 
 
 def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():

@@ -180,6 +180,19 @@
     preview: { en: "Preview", zh: "能力预览" }
   };
   const quickStarts = {
+    "vllm-hust-opset": {
+      title_en: "Install and check OPset",
+      title_zh: "安装并检查 OPset",
+      action_en: "installation and checks",
+      action_zh: "安装与检查命令",
+      note_en: "Use the pinned Ascend 910B2 Graph environment and source revisions documented by OPset. Enable only after compatibility checks; this is not a general ACLNN or eager optimization.",
+      note_zh: "须使用 OPset 文档中的 Ascend 910B2 Graph 固定环境与源码版本，通过兼容性检查后再启用；不适用于普通 ACLNN 或 eager 路径。",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+python -m pip install vllm-hust-opset==0.3.2
+vllm-hust-opset --vllm-src /path/to/vllm --vllm-ascend-src /path/to/vllm-ascend-hust
+vllm-hust-ext extension check org.vllm-hust.operator-optimizations
+vllm-hust-ext extension enable org.vllm-hust.operator-optimizations`
+    },
     traceloom: {
       title_en: "Install the TraceLoom runtime plugin",
       title_zh: "安装 TraceLoom 运行时插件",
