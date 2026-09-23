@@ -10,24 +10,24 @@ workload identities; never silently mix them.
 
 ## UI contract
 
-- Select a single model, precision, fixed workload and required context cohort. IDs are versioned
-  identities, not cosmetic labels. Different requirements never silently share a frontier.
+- Model + precision is one combined tag. The only other choice is a fixed workload/context cohort; a
+  single available workload is displayed without inviting an unnecessary selection.
+- Axes are fixed: **X = P90 per-request decode speed (output tokens/s/user)**; **Y = total output
+  tokens/s / all allocated chips**. No axis, hardware or MOD filters.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
-  other deployment parameters may differ, provided the selected requirements remain satisfied.
-  Context capacity may exceed the required context; a smaller allocation is rejected.
-- Default X: P90 per-request decode speed (`decode_p90_tps`, output tokens/s/user). It is not the
-  inverse of P90 TPOT. Alternatives: interactivity (`1000 / mean TPOT_ms`, excludes prefill), P95
-  TTFT, P95 TPOT or P95 E2E.
-- Y: output tokens/s/chip, total output tokens/s, or USD / million output tokens.
-- Hardware and MOD-combination filters recompute the frontier **within the selected scope**.
-- A point is Pareto-dominated when another is no worse on both selected axes and strictly better on
-  at least one. Equal points are retained. This is an observed frontier, not proof of global
-  optimality or statistical significance. Lines are guides, not interpolated measurements.
-- Missing metrics are excluded from that projection and counted. Missing prices never become zero.
-  Complete configuration and evidence remain inspectable through chart or table selection.
-- Names of known MOD IDs come from the same `data/ecosystem.json` as the workshop. An empty MOD list
-  means an explicitly measured no-MOD treatment, not missing attribution. Do not publish unknown
-  activation as no MOD.
+  other deployment parameters may differ while satisfying the selected comparison contract.
+- All points with both coordinates are shown, including dominated observations. The observed Pareto
+  envelope is a visual guide, not a globally optimal or statistically certified curve.
+- Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
+  session concurrency, MTP and the two coordinate values. Escape, outside-click or the close button
+  dismisses it. The card stays inside the chart on mobile too.
+- **Download configuration** exports a JSON containing the complete point and cohort, including
+  original metrics, protocol, configuration and evidence references. The page does not dump JSON,
+  show a configuration table, or display lengthy evidence/methodology sections.
+- A compact **15 min smoke** badge identifies the current short-run cohort. Full limitations stay in
+  its download and linked report, not in a large page banner.
+- Missing axis values are not fabricated. Known MOD names still use the workshop catalog for
+  legend/point labels, never as a filter or as proof of runtime activation.
 
 ## Data handoff
 
@@ -74,7 +74,7 @@ accelerators, including draft/prefill/decode resources when applicable. Cost inc
 deployment; do not charge only active chips while excluding CPU, external KV services or mandatory
 network resources. Omit cost when unknown.
 
-Cost projection:
+Historical model utility (not exposed by the fixed chart):
 
 `USD / million output tokens = usd_per_hour * 1e6 / (3600 * output_tps)`.
 
@@ -104,9 +104,10 @@ python scripts/verify_leaderboard_frontier_browser.py
 python scripts/verify_leaderboard_runs_browser.py
 ```
 
-The Frontier browser check covers empty production state, test-only scatter/selection, both axis
-orientations, missing cost/metrics, toggles, tab/state isolation, EN/ZH, mobile/desktop, dark/light,
-and invalid-data failure. No NPU access is involved.
+The Frontier browser check covers production values, fixed axes, combined model/precision tags,
+workload isolation, point popovers, downloaded configuration equality, keyboard/outside-click
+dismissal, stale-cache isolation, EN/ZH, mobile/desktop, dark/light and empty/error states. No NPU
+access is involved.
 
 ## Design reference, not code dependency
 
