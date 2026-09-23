@@ -6,17 +6,25 @@ on:
     paths:
       - 'leaderboard-runs.html'
       - 'assets/leaderboard-runs*'
+      - 'assets/leaderboard-frontier*'
       - 'data/leaderboard_*.json'
       - 'scripts/*leaderboard_run*'
+      - 'scripts/*leaderboard_frontier*'
       - 'tests/*leaderboard_run*'
+      - 'tests/*leaderboard_frontier*'
+      - 'tests/fixtures/leaderboard_frontier.json'
       - '.github/workflows/leaderboard-runs.yml'
   pull_request:
     paths:
       - 'leaderboard-runs.html'
       - 'assets/leaderboard-runs*'
+      - 'assets/leaderboard-frontier*'
       - 'data/leaderboard_*.json'
       - 'scripts/*leaderboard_run*'
+      - 'scripts/*leaderboard_frontier*'
       - 'tests/*leaderboard_run*'
+      - 'tests/*leaderboard_frontier*'
+      - 'tests/fixtures/leaderboard_frontier.json'
       - '.github/workflows/leaderboard-runs.yml'
 
 permissions:
@@ -34,7 +42,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test tests/leaderboard_runs_model.test.cjs
+      - run: node --test tests/leaderboard_runs_model.test.cjs tests/leaderboard_frontier_model.test.cjs
       - run: |
           python -m pip install pytest playwright
           python -m playwright install --with-deps chromium
@@ -45,6 +53,7 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           python scripts/verify_leaderboard_runs_browser.py
+          python scripts/verify_leaderboard_frontier_browser.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

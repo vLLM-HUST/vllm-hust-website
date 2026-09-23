@@ -16,7 +16,8 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
-  <link rel="stylesheet" href="./assets/leaderboard-runs.css?v=engine-mod-20260923" />
+  <link rel="stylesheet" href="./assets/leaderboard-runs.css?v=frontier-20260923" />
+  <link rel="stylesheet" href="./assets/leaderboard-frontier.css?v=frontier-20260923" />
   <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901" />
 </head>
 
@@ -60,7 +61,12 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 6 1.5 1.5L8 5M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9" /></svg>
           <span>Tasks</span><span id="view-tasks-count" class="view-count">0</span>
         </button>
+        <button id="view-frontier" type="button" aria-pressed="false" aria-controls="frontier-panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16M6 16l4-6 4 2 5-7" /><circle cx="10" cy="10" r="1" /><circle cx="14" cy="12" r="1" /><circle cx="19" cy="5" r="1" /></svg>
+          <span>Frontier</span><span id="view-frontier-count" class="view-count">0</span>
+        </button>
       </div>
+      <section id="frontier-panel" class="frontier" aria-label="Frontier" hidden></section>
       <section id="runs-panel" aria-label="Leaderboards">
         <div class="runs-table-scroll" tabindex="0" role="region" aria-label="Measurements">
           <table class="runs-table"><thead><tr id="runs-headers"></tr></thead><tbody id="runs-body"></tbody></table>
@@ -98,7 +104,9 @@
   <footer class="site-footer"><strong>vLLM-HUST</strong> · Evidence before rankings.</footer>
   <script src="./assets/site.js?v=leaderboard-v2-20260922"></script>
   <script src="./assets/hf-data-loader.js?v=stable-trend-v5-public-sanitized-20260902"></script>
-  <script src="./assets/leaderboard-runs-model.js?v=engine-mod-20260923"></script>
-  <script src="./assets/leaderboard-runs.js?v=engine-mod-20260923"></script>
+  <script src="./assets/leaderboard-runs-model.js?v=frontier-20260923"></script>
+  <script src="./assets/leaderboard-frontier-model.js?v=frontier-20260923"></script>
+  <script src="./assets/leaderboard-runs.js?v=frontier-20260923"></script>
+  <script src="./assets/leaderboard-frontier.js?v=frontier-20260923"></script>
 </body>
 </html>
