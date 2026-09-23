@@ -74,7 +74,38 @@
             : p.enable_prefix_caching === true || p.enable_prefix_caching === '' ? 'APC on' : 'APC ?';
         return `${graph} · ${mtp} · ${apc}`;
     }
-    function build(payload, supplement = {}) {
+    function identity(entry, attribution, components) {
+        const meta = entry.metadata || {}, runtime = meta.runtime_provenance || {};
+        const host = runtime.engine || {};
+        // BetterScale was published in the engine slot; preserve that original
+        // field in evidence, but display the independently recorded host here.
+        const engine = entry.engine === 'betterscale'
+            ? (host.repository === 'vllm-project/vllm' ? 'vllm'
+                : host.repository === 'vLLM-HUST/vllm-hust' ? 'vllm-hust' : 'unknown')
+            : entry.engine || 'unknown';
+        const component = components.get(attribution?.component_id);
+        const known = attribution && (!attribution.component_id || component);
+        return { engine, engineVersion: entry.engine === 'betterscale' ? host.ref || '' : entry.engine_version || '',
+            backend: runtime.plugin?.engine || '',
+            mod: known ? component?.id || 'none' : 'unknown',
+            modName: known ? component?.name || '' : '',
+            modStatus: known ? attribution.status : 'unknown',
+            modVersion: known && component?.id === 'betterscale' ? entry.engine_version || '' : '',
+            modMaintainers: known ? component?.maintainers || [] : [],
+            modRepository: known ? safeURL(component?.canonical_repository) : null,
+            modReason: known ? attribution.reason : 'No reviewed per-run MOD identity or activation evidence.',
+            modEvidence: known ? (attribution.evidence_urls || []).map(safeURL).filter(Boolean) : [] };
+    }
+    function build(payload, supplement = {}, catalog = {}, attributions = {}) {
+        const components = new Map((catalog.components || []).map(c => [c.id, c]));
+        const identities = new Map();
+        for (const group of attributions.groups || []) {
+            if (!['enabled', 'baseline', 'related'].includes(group.status)) throw new Error('Invalid MOD evidence status');
+            for (const id of group.entry_ids || []) {
+                if (identities.has(id)) throw new Error('Duplicate MOD attribution');
+                identities.set(id, group);
+            }
+        }
         const entries = new Map();
         // Current publications take precedence over the same historical entry ID.
         for (const [source, list] of [['current', [...(payload.single || []), ...(payload.multi || [])]], ['historical', payload.historical || []]]) {
@@ -106,7 +137,7 @@
                 const metric = run.metrics || {};
                 const aggregate = runs.length === 1 && entry.canonical_aggregate?.count > 1 ? entry.canonical_aggregate : null;
                 rows.push({ id, taskId, taskLabel, model, modelKey, parallel: par, precision: m.precision || '—',
-                    hardware, mod: run.engine === 'vllm' ? 'native' : run.engine || 'unknown', source,
+                    hardware, ...identity(run, identities.get(entry.entry_id), components), source,
                     aggregate, repeat: run.repeat_index ?? null, prefix: graphPrefix(run),
                     date: meta.submitted_at || '', version: run.engine_version || '',
                     metrics: { ttft: number(metric.ttft_ms), tpot: number(metric.tpot_ms ?? metric.tbt_ms),
@@ -126,13 +157,13 @@
         const newest = new Map();
         for (const row of rows) newest.set(row.modelKey, [newest.get(row.modelKey) || '', row.date].sort().at(-1));
         rows.sort((a, b) => newest.get(b.modelKey).localeCompare(newest.get(a.modelKey)) || a.modelKey.localeCompare(b.modelKey)
-            || a.taskLabel.localeCompare(b.taskLabel) || Number(b.mod === 'native') - Number(a.mod === 'native') || a.mod.localeCompare(b.mod) || b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+            || a.taskLabel.localeCompare(b.taskLabel) || Number(b.modStatus === 'baseline') - Number(a.modStatus === 'baseline') || a.mod.localeCompare(b.mod) || b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
         return { rows, tasks: [...tasks.values()].sort((a, b) => a.label.localeCompare(b.label)) };
     }
     // Column filters use exact underlying values, never rounded display strings.
     function columnValue(row, key) {
         if (key in row.metrics) return row.metrics[key];
-        return ({ model: row.modelKey, hardware: row.hardware, task: row.taskId, mod: row.mod,
+        return ({ model: row.modelKey, hardware: row.hardware, task: row.taskId, engine: row.engine, mod: stable([row.mod, row.modStatus]),
             run: row.id, config: row.prefix })[key] ?? null;
     }
     function selectRows(rows, filters = {}, sort = null) {
@@ -140,7 +171,7 @@
             values.includes(columnValue(row, key))));
         if (sort) result.sort((a, b) => {
             const sortValue = row => sort.key === 'model' ? `${row.model} ${row.parallel.label} ${row.precision}`
-                : sort.key === 'task' ? row.taskLabel : sort.key === 'run' ? `${row.date} ${row.id}` : columnValue(row, sort.key);
+                : sort.key === 'task' ? row.taskLabel : sort.key === 'run' ? `${row.date} ${row.id}` : sort.key === 'mod' ? `${row.modName || row.mod} ${row.modStatus}` : columnValue(row, sort.key);
             const av = sortValue(a), bv = sortValue(b);
             // Missing observations always follow measured values in either direction.
             if (av === null || bv === null) return av === bv ? 0 : av === null ? 1 : -1;
@@ -150,7 +181,7 @@
         });
         return result;
     }
-    const api = { build, taskDefinition, parallel, stable, graphPrefix, safeURL, columnValue, selectRows };
+    const api = { identity, build, taskDefinition, parallel, stable, graphPrefix, safeURL, columnValue, selectRows };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardRunsModel = api;
 })(globalThis);

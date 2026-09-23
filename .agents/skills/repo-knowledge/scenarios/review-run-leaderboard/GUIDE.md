@@ -20,3 +20,12 @@ missing.
 Although the new campaign shares hardware, historical publications include B3 as well as B2. Fletcher chose a single flat table on 2026-09-23: include current and historical records by
 default, with an explicit hardware column instead of a global hardware selector. Hardware remains
 part of model identity; parallel configuration must not be inferred from accelerator count alone.
+
+
+Before changing MOD attribution, read the audit section in the review handoff. Resolve canonical
+names/maintainers from the workshop's `data/ecosystem.json`; reviewed publication-ID associations
+live in `data/leaderboard_mod_attributions.json`. A legacy PR checkpoint proves lineage, not runtime
+activation. Missing activation stays unknown/related, never silently native. Legacy repositories
+were archived under `intellistream/*-legacy-20260831`; current MOD `PROVENANCE.md` resolves their
+old PR identities. In particular, PR #49 offload compatibility is not KV Tiering, and the native
+MTP2 arm's BetterScale worker bridge is not evidence that it ran the BetterScale treatment.

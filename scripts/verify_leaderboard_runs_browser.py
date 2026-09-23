@@ -61,7 +61,7 @@ def main():
             )
             page = context.new_page()
             errors = []
-            page.on("pageerror", lambda error: errors.append(str(error)))
+            page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             response = page.goto(
                 f"{args.url}/leaderboard-runs.html", wait_until="domcontentloaded"
             )
@@ -93,7 +93,30 @@ def main():
             )
             # Default scope covers every published record, across hardware and history.
             assert page.locator("#view-runs-count").inner_text() == str(len(all_runs))
-            assert page.locator("#runs-headers th").count() == 11
+            assert page.locator("#runs-headers th").count() == 12
+            page.locator('[data-column="mod"]').click()
+            page.locator("#column-none").click()
+            page.locator("#column-search").fill("SimLLM")
+            page.locator("#column-values input").check()
+            page.locator("#column-apply").click()
+            assert page.locator("#view-runs-count").inner_text() == "26"
+            assert page.locator('.run-mod[data-mod-status="related"]').count() == 26
+            assert all(
+                "vllm-hust" in text
+                for text in page.locator(".run-engine").all_text_contents()
+            )
+            assert all(
+                "GuMorming" in text
+                for text in page.locator(".run-mod").all_text_contents()
+            )
+            assert (
+                page.locator(".run-mod a").first.get_attribute("href")
+                == "./plugins.html#simllm-migration"
+            )
+            page.screenshot(
+                path=str(args.output / f"simllm-{width}-{language}-{scheme}.png")
+            )
+            page.locator("#runs-reset").click()
             seen = set()
             while True:
                 for row in page.locator(".run-row").evaluate_all("""rows => rows.map(row => ({
@@ -178,7 +201,7 @@ def main():
             assert first.get_attribute("aria-expanded") == "true"
             detail = page.locator("#" + first.get_attribute("aria-controls"))
             assert detail.is_visible()
-            assert detail.locator("td").get_attribute("colspan") == "11"
+            assert detail.locator("td").get_attribute("colspan") == "12"
             assert "max_model_len" in detail.inner_text()
             assert detail.locator("a").count() >= 1
             first.click()
@@ -242,7 +265,7 @@ def main():
             page.locator('[data-column="mod"]').click()
             page.locator("#column-none").click()
             page.locator("#column-values label").filter(
-                has_text="Native" if language == "en" else "原生"
+                has_text="No MOD" if language == "en" else "无 MOD"
             ).locator("input").check()
             page.locator("#column-apply").click()
             assert page.locator(".run-row").count() == arm_runs
@@ -286,6 +309,16 @@ def main():
             t == "—"
             for t in page.locator('[data-metric="ttftP95"]').all_text_contents()
         )
+        context.close()
+        # Unavailable attribution must not erase records or claim a native MOD.
+        context = browser.new_context()
+        page = context.new_page()
+        page.route("**/leaderboard_mod_attributions.json", lambda route: route.abort())
+        page.goto(f"{args.url}/leaderboard-runs.html", wait_until="domcontentloaded")
+        page.locator("#runs-content").wait_for(state="visible", timeout=30000)
+        assert page.locator("#runs-identity-warning").is_visible()
+        assert page.locator("#view-runs-count").inner_text() == str(len(all_runs))
+        assert page.locator('.run-mod[data-mod="unknown"]').count() == 40
         context.close()
         browser.close()
     (args.output / "report.json").write_text(json.dumps(reports, indent=2) + "\n")
