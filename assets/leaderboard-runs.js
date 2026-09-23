@@ -9,7 +9,7 @@
             title: 'One workload. Every run.', lede: 'Model × parallel configuration → task → MOD. Real measurements, with the configuration beside each run.',
             review: 'REVIEW PREVIEW', old: 'Existing leaderboard ↗', model: 'Model / parallel', task: 'Task tag', mod: 'MOD',
             all: 'All', native: 'Native', current: 'Current publication', historical: 'Historical evidence', records: 'Records',
-            hardware: 'Hardware', unknown: 'Not recorded', results: 'Measurements', tasks: 'Task definitions',
+            engine: 'Engine', enabled: 'Enabled', baseline: 'Baseline', related: 'Related experiment · activation unverified', noMod: 'No MOD', identityMissing: 'MOD identity evidence unavailable; unknown identities remain unassigned.', hardware: 'Hardware', unknown: 'Not recorded', results: 'Measurements', tasks: 'Task definitions',
             taskHint: 'A tag identifies the recorded workload contract, not a server implementation. Click a tag to inspect its definition.',
             hint: 'TTFT / TPOT are request means in ms; P95 is per run. No SLO thresholds. Missing measurements stay blank (—). Repeats are separate rows, not best-run selections.',
             historyHint: 'Historical rows are retained evidence, not newly verified targets. Different run prefixes need not be a controlled comparison.',
@@ -31,7 +31,7 @@
             title: '同一任务，看清每一次运行。', lede: '模型 × 并行配置 → 任务 → MOD。实测成绩与每次运行的配置，放在同一张表里。',
             review: '评审预览', old: '现有排行榜 ↗', model: '模型 / 并行配置', task: '任务 tag', mod: 'MOD',
             all: '全部', native: '原生', current: '当前发布', historical: '历史证据', records: '记录范围',
-            hardware: '硬件', unknown: '未记录', results: '成绩主表', tasks: '任务定义表',
+            engine: '引擎', enabled: '已启用', baseline: '基线', related: '相关实验 · 启用未核实', noMod: '无 MOD', identityMissing: 'MOD 身份证据暂不可用；未知身份不作归属。', hardware: '硬件', unknown: '未记录', results: '成绩主表', tasks: '任务定义表',
             taskHint: 'tag 标识已记录的负载口径，不包含服务端实现。点击 tag 可查看任务定义。',
             hint: 'TTFT / TPOT 为请求均值，单位 ms；P95 按单次 run 展示，不设 SLO 门槛。未测量保留 —，重复运行逐条保留，不挑最好的一次。',
             historyHint: '历史记录是保留证据，不是重新核验的官方目标。不同 run prefix 的成绩不自动构成控制变量对照。',
@@ -58,7 +58,7 @@
     const pageSize = 40;
     const link = (url, label) => url ? `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a>` : '';
     const columns = [
-        ['model', () => t('model')], ['hardware', () => t('hardware')], ['task', () => t('task')], ['mod', () => t('mod')],
+        ['model', () => t('model')], ['hardware', () => t('hardware')], ['task', () => t('task')], ['engine', () => t('engine')], ['mod', () => t('mod')],
         ['ttft', () => 'TTFT', 'mean · ms'], ['tpot', () => 'TPOT', 'mean · ms'],
         ['ttftP95', () => 'TTFT P95', 'ms'], ['tpotP95', () => 'TPOT P95', 'ms'],
         ['throughput', () => t('throughput')], ['run', () => 'Run'], ['config', () => t('config')]
@@ -84,7 +84,7 @@
         if (key in row.metrics) return row.metrics[key] === null ? '—' : String(row.metrics[key]);
         if (key === 'model') return `${row.model} · ${row.parallel.label} · ${row.precision} · ${row.parallel.chips ?? '?'} NPU`;
         if (key === 'task') return row.taskLabel;
-        if (key === 'mod') return row.mod === 'native' ? t('native') : row.mod;
+        if (key === 'mod') return `${row.modName || t(row.mod === 'none' ? 'noMod' : 'unknown')} · ${t(row.modStatus)}`;
         return String(model.columnValue(row, key) ?? '—');
     }
     function visibleChoices() {
@@ -193,9 +193,11 @@
             git_commit: meta.git_commit, runtime: meta.runtime_provenance, hardware: entry.hardware,
             evidence_scope: meta.official_admission_status || row.source, verified: meta.verified,
             throughput_token_basis: meta.throughput_token_basis || 'unspecified',
-            note: meta.notes, repeat_index: row.repeat, parent_aggregate: row.parentId };
+            note: meta.notes, repeat_index: row.repeat, parent_aggregate: row.parentId,
+            mod_identity: { component: row.mod, status: row.modStatus, reason: row.modReason,
+                maintainers: row.modMaintainers, repository: row.modRepository, evidence: row.modEvidence } };
         return `<tr id="config-${escape(row.id)}" class="run-detail" ${state.expanded.has(row.id) ? '' : 'hidden'}><td colspan="${columns.length}">
-            <div class="run-detail-head"><strong>${escape(row.prefix)}</strong><span>${link(row.evidence, meta.raw_evidence_url ? t('raw') : t('source'))} ${link(row.manifest, t('manifest'))}</span></div>
+            <div class="run-detail-head"><strong>${escape(row.prefix)}</strong><span>${link(row.evidence, meta.raw_evidence_url ? t('raw') : t('source'))} ${link(row.manifest, t('manifest'))} ${row.modEvidence.map((url, index) => link(url, `MOD ${index + 1} ↗`)).join(' ')}</span></div>
             ${row.aggregate ? `<p>${t('aggregateHint')}</p>` : ''}
             ${row.metrics.batchLatency !== null ? `<p class="batch-value">${t('batch')}: <strong>${fmt(row.metrics.batchLatency)}</strong> — not TTFT</p>` : ''}
             <div class="run-config-grid">${[[t('server'), entry.same_spec?.resolved_server_parameters || {}],
@@ -215,7 +217,8 @@
                 <td><strong>${escape(row.model)}</strong><small>${escape(row.parallel.label)} · ${escape(row.precision)} · ${escape(row.parallel.chips ?? '?')} NPU</small></td>
                 <td class="run-hardware">${escape(row.hardware || '—')}</td>
                 <td><button type="button" class="task-tag" data-task="${row.taskId}">${escape(row.taskLabel)}</button></td>
-                <td><strong class="mod-label ${row.mod === 'native' ? 'native' : ''}">${escape(row.mod === 'native' ? t('native') : row.mod)}</strong><small>${escape(row.version)}</small></td>
+                <td class="run-engine"><strong>${escape(row.engine)}</strong><small>${escape(row.engineVersion)}</small><small>${escape(row.backend)}</small></td>
+                <td class="run-mod" data-mod="${escape(row.mod)}" data-mod-status="${escape(row.modStatus)}"><strong class="mod-label">${row.modName ? `<a href="./plugins.html#${encodeURIComponent(row.mod)}">${escape(row.modName)}</a>` : t(row.mod === 'none' ? 'noMod' : 'unknown')}</strong><small>${t(row.modStatus)}</small><small>${escape(row.modVersion)}</small><small>${escape(row.modMaintainers.join(', '))}</small></td>
                 ${['ttft', 'tpot', 'ttftP95', 'tpotP95', 'throughput'].map(key => `<td class="metric" data-metric="${key}">${fmt(row.metrics[key])}</td>`).join('')}
                 <td class="run-id"><span>${escape(row.date.slice(0, 10) || '—')}</span><small>${row.aggregate ? `${t('aggregate')} · ${escape(row.aggregate.count)}` : row.repeat !== null ? `${t('repeat')} ${escape(row.repeat)}` : escape(row.id.slice(0, 8))}</small><small>${t(row.source)}</small></td>
                 <td><button type="button" class="run-toggle" data-run="${escape(row.id)}" aria-expanded="${state.expanded.has(row.id)}" aria-controls="config-${escape(row.id)}">${state.expanded.has(row.id) ? t('close') : t('open')}</button><small class="run-prefix">${escape(row.prefix)}</small></td>
@@ -258,16 +261,22 @@
         try {
             // Existing loader owns atomic snapshots and local/GitHub fallback.
             // The supplement is optional and only joins by published aggregate ID.
-            const [payload, supplement] = await Promise.all([
+            const [payload, supplement, identityData] = await Promise.all([
                 window.HFDataLoader.loadLeaderboardData(),
                 fetch('./data/leaderboard_run_observations.json').then(response => {
                     if (!response.ok) throw new Error('Missing run observations');
                     return response.json();
-                }).catch(() => { state.missingSupplement = true; return {}; })
+                }).catch(() => { state.missingSupplement = true; return {}; }),
+                Promise.all(['ecosystem.json', 'leaderboard_mod_attributions.json'].map(async file => {
+                    const response = await fetch(`./data/${file}`);
+                    if (!response.ok) throw new Error('Missing MOD identity evidence');
+                    return response.json();
+                })).catch(() => { state.identityMissing = true; return [{}, {}]; })
             ]);
-            const built = window.LeaderboardRunsModel.build(payload, supplement);
+            const built = window.LeaderboardRunsModel.build(payload, supplement, ...identityData);
             Object.assign(state, built, { ready: true });
             $('runs-supplement-warning').hidden = !state.missingSupplement;
+            $('runs-identity-warning').hidden = !state.identityMissing;
             $('runs-loading').hidden = true;
             $('runs-content').hidden = false;
             renderHeaders(); renderRows();
