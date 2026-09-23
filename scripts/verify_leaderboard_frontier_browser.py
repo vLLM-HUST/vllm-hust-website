@@ -90,6 +90,9 @@ def main():
                 dot.click()
                 popup = page.locator("#frontier-popover")
                 assert popup.is_visible()
+                assert popup.locator("h2").evaluate(
+                    "node => getComputedStyle(node).color"
+                ) == popup.evaluate("node => getComputedStyle(node).color")
                 text = popup.inner_text()
                 for metric in [
                     point["metrics"]["decode_p90_tps"],
