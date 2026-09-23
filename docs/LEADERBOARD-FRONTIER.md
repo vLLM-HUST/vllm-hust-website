@@ -2,9 +2,11 @@
 
 Entry: `leaderboard-runs.html#frontier`, alongside **Leaderboards / Tasks**.
 
-Fletcher requested the page first on 2026-09-23. The production snapshot deliberately contains **no
-cohorts and no points**. Workload selection and benchmark execution belong to a separate assignment.
-Do not backfill this surface from the legacy leaderboard or publish illustrative values.
+Fletcher requested the page first on 2026-09-23. The initial production snapshot was empty. Fletcher
+subsequently authorized the two measured Qwen3.5-35B-A3B AgentX smoke points on 2026-09-23; see
+[their measurement notes](FRONTIER-QWEN35-AGENTX-SMOKE.md). Do not backfill this surface from the
+legacy leaderboard or publish illustrative values. Smoke and formal windows require separate
+workload identities; never silently mix them.
 
 ## UI contract
 
@@ -13,7 +15,9 @@ Do not backfill this surface from the legacy leaderboard or publish illustrative
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
   other deployment parameters may differ, provided the selected requirements remain satisfied.
   Context capacity may exceed the required context; a smaller allocation is rejected.
-- X: interactivity (`1000 / mean TPOT_ms`, excludes prefill), P95 TTFT, P95 TPOT or P95 E2E.
+- Default X: P90 per-request decode speed (`decode_p90_tps`, output tokens/s/user). It is not the
+  inverse of P90 TPOT. Alternatives: interactivity (`1000 / mean TPOT_ms`, excludes prefill), P95
+  TTFT, P95 TPOT or P95 E2E.
 - Y: output tokens/s/chip, total output tokens/s, or USD / million output tokens.
 - Hardware and MOD-combination filters recompute the frontier **within the selected scope**.
 - A point is Pareto-dominated when another is no worse on both selected axes and strictly better on
@@ -62,12 +66,13 @@ not choose datasets, perform admission tests, or impose an arbitrary SLO.
 | `evidence: {status, url, run_ids, aggregation}`      | `status: "measured"`, HTTPS evidence link, original run IDs and declared repeat aggregation                                                    |
 | Optional `cost: {usd_per_hour, source, scope}`       | Positive **full-deployment** USD/hour, pricing basis/date/source and complete accounting scope                                                 |
 
-Recognized metrics: `output_tps`, `tpot_ms` (request-mean TPOT), `ttft_p95_ms`, `tpot_p95_ms`,
-`e2e_p95_ms`. Unmeasured metrics are omitted or null, never invented zeros. Output TPS counts
-measured output tokens over the stated measured duration, not input+output or requests/s. Per-chip
-efficiency divides by **all** allocated accelerators, including draft/prefill/decode resources when
-applicable. Cost includes the complete deployment; do not charge only active chips while excluding
-CPU, external KV services or mandatory network resources. Omit cost when unknown.
+Recognized metrics: `decode_p90_tps` (P90 of per-request inverse TPOT), `output_tps`, `tpot_ms`
+(request-mean TPOT), `ttft_p95_ms`, `tpot_p95_ms`, `e2e_p95_ms`. Unmeasured metrics are omitted or
+null, never invented zeros. Output TPS counts measured output tokens over the stated measured
+duration, not input+output or requests/s. Per-chip efficiency divides by **all** allocated
+accelerators, including draft/prefill/decode resources when applicable. Cost includes the complete
+deployment; do not charge only active chips while excluding CPU, external KV services or mandatory
+network resources. Omit cost when unknown.
 
 Cost projection:
 
@@ -81,8 +86,8 @@ percentiles and describe them as a pooled request percentile.
 
 The exact machine consumer is `assets/leaderboard-frontier-model.js::validate`. For formatting only,
 `tests/fixtures/leaderboard_frontier.json` is explicitly synthetic test data, **not measurement
-input**. Publication replaces only the production JSON after measurement review; no JS edits are
-needed to add a cohort or measured point.
+input**. Publication replaces the production JSON after measurement review; no JS edits are needed
+to add a cohort or measured point.
 
 ## Implementation and checks
 

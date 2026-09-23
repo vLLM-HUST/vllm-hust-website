@@ -14,7 +14,7 @@
       },
       "workload": {
         "id": "test-workload-v1",
-        "label": "Synthetic UI fixture \u2014 not benchmark evidence",
+        "label": "Synthetic UI fixture — not benchmark evidence",
         "contract": {
           "fixture_only": true
         }
@@ -48,7 +48,8 @@
         "output_tps": 200,
         "ttft_p95_ms": 100,
         "tpot_p95_ms": 20,
-        "e2e_p95_ms": null
+        "e2e_p95_ms": null,
+        "decode_p90_tps": 50.0
       },
       "cost": {
         "usd_per_hour": 10,
@@ -91,7 +92,8 @@
         "output_tps": 400,
         "ttft_p95_ms": 200,
         "tpot_p95_ms": 40,
-        "e2e_p95_ms": null
+        "e2e_p95_ms": null,
+        "decode_p90_tps": 25.0
       },
       "cost": {
         "usd_per_hour": 10,
@@ -132,7 +134,8 @@
         "output_tps": 100,
         "ttft_p95_ms": 300,
         "tpot_p95_ms": 40,
-        "e2e_p95_ms": null
+        "e2e_p95_ms": null,
+        "decode_p90_tps": 25.0
       },
       "cost": {
         "usd_per_hour": 10,
@@ -175,7 +178,8 @@
         "output_tps": 400,
         "ttft_p95_ms": 200,
         "tpot_p95_ms": 40,
-        "e2e_p95_ms": null
+        "e2e_p95_ms": null,
+        "decode_p90_tps": 25.0
       },
       "cost": null,
       "evidence": {
@@ -212,7 +216,8 @@
         "output_tps": 200,
         "ttft_p95_ms": null,
         "tpot_p95_ms": null,
-        "e2e_p95_ms": null
+        "e2e_p95_ms": null,
+        "decode_p90_tps": null
       },
       "cost": null,
       "evidence": {

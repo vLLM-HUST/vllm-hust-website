@@ -6,6 +6,7 @@
     const object = v => v !== null && typeof v === 'object' && !Array.isArray(v);
     const metrics = {
         interactivity: { direction: 'max', unit: 'output tok/s/user' },
+        decode_p90_tps: { direction: 'max', unit: 'output tok/s/user' },
         ttft_p95_ms: { direction: 'min', unit: 'ms' },
         tpot_p95_ms: { direction: 'min', unit: 'ms' },
         e2e_p95_ms: { direction: 'min', unit: 'ms' },

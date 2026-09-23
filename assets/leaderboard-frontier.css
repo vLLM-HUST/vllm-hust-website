@@ -59,3 +59,6 @@
   .runs-shell .runs-view-switch button { padding: 9px 7px; gap: 4px; font-size: 12px; }
   .runs-view-switch svg { width: 15px; height: 15px; }
 }
+
+.frontier-measurement-note { margin: 0 0 18px; padding: 14px 18px; border-left: 3px solid #789aff; background: #12213b; color: #d8e5ff; border-radius: 8px; }
+.frontier-measurement-note p { margin: 6px 0 0; line-height: 1.6; }

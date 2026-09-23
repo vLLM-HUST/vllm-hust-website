@@ -31,7 +31,17 @@ old PR identities. In particular, PR #49 offload compatibility is not KV Tiering
 MTP2 arm's BetterScale worker bridge is not evidence that it ran the BetterScale treatment.
 
 For the sibling Frontier view, read
-[the Frontier handoff](../../../../../docs/LEADERBOARD-FRONTIER.md). It consumes a separate,
-deliberately empty production snapshot until the workload owner supplies measurements. Do not derive
-Frontier admission, prices, or MOD activation from the historical run table. The pure model and
-browser checks exercise the contract without using accelerator capacity.
+[the Frontier handoff](../../../../../docs/LEADERBOARD-FRONTIER.md). It consumes a separate
+production snapshot. Fletcher authorized the first native/BetterScale Qwen35 AgentX points as
+explicitly labeled 15-minute smoke results, not formal results. Do not derive Frontier admission,
+prices, or MOD activation from the historical run table. The pure model and browser checks exercise
+the contract without using accelerator capacity.
+
+AgentX metric import uses the official output throughput field, not a reconstructed token count /
+900 seconds or the separately exported benchmark-duration statistic: native observation/drain
+accounting differs. Its request `inter_token_latency` is TPOT; Fletcher selected P90 request decode
+speed as default X, taken from `output_token_throughput_per_user.p90`, not inverse P90 TPOT. Inverse
+mean TPOT remains an alternative projection, not a substitute for this percentile. Keep smoke/formal
+in distinct workload IDs, retain all allocated chips in the Y denominator, and preserve both TTFT
+tails. Public evidence is a curated metric-only extract, not a claim that full private logs/source
+capsules were published.
