@@ -63,6 +63,7 @@
     }
   },
   "plugins": {
+    "vllm-hust-opset": ["decode_heavy", "prefill_heavy"],
     "traceloom": ["profiling_analysis"],
     "bidkv": ["memory_kv_pressure", "high_concurrency"],
     "dla": ["memory_kv_pressure", "high_concurrency"],
