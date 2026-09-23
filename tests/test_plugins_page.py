@@ -1004,12 +1004,15 @@ def test_opset_is_a_bounded_operator_mod_with_install_instructions():
     assert item["artifact_type"] == "runtime_component"
     assert item["system_role"] == "operator_runtime"
     assert item["delivery_model"] == "python_distribution"
-    assert item["canonical_repository"] == "https://github.com/vLLM-HUST/vllm-hust-opset"
+    assert (
+        item["canonical_repository"] == "https://github.com/vLLM-HUST/vllm-hust-opset"
+    )
     assert item["compatibility"]["status"] == "verified"
     assert "batch-invariant" in item["summary_en"]
     assert "CANN 9.0.0" in item["public_effect_en"]
     assert WORKLOAD_NAVIGATION["plugins"]["vllm-hust-opset"] == [
-        "decode_heavy", "prefill_heavy"
+        "decode_heavy",
+        "prefill_heavy",
     ]
     assert "vllm-hust-opset==0.3.2" in SCRIPT
     assert "org.vllm-hust.operator-optimizations" in SCRIPT
