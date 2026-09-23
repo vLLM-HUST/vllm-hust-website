@@ -39,6 +39,18 @@ def main():
                 f"localStorage.setItem('vllm-hust_lang', '{language}')"
             )
             page = context.new_page()
+            # An old unversioned URL may still serve the initial empty snapshot.
+            # Production must request its versioned snapshot instead.
+            page.route(
+                "**/data/leaderboard_frontier.json",
+                lambda route: route.fulfill(
+                    json={
+                        "schema_version": "leaderboard-frontier/v1",
+                        "cohorts": [],
+                        "points": [],
+                    }
+                ),
+            )
             errors = []
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(
@@ -86,7 +98,7 @@ def main():
             )
             # Fixture only: never shipped as production measurements.
             page.route(
-                "**/data/leaderboard_frontier.json",
+                "**/data/leaderboard_frontier.json*",
                 lambda route: route.fulfill(json=fixture),
             )
             page.reload(wait_until="domcontentloaded")
@@ -156,7 +168,7 @@ def main():
         context = browser.new_context()
         page = context.new_page()
         page.route(
-            "**/data/leaderboard_frontier.json",
+            "**/data/leaderboard_frontier.json*",
             lambda route: route.fulfill(
                 json={
                     "schema_version": "leaderboard-frontier/v1",
@@ -172,9 +184,9 @@ def main():
         assert page.locator("#frontier-model").is_disabled()
         assert page.locator(".frontier-point").count() == 0
         assert page.locator("#frontier-measurement-note").is_hidden()
-        page.unroute("**/data/leaderboard_frontier.json")
+        page.unroute("**/data/leaderboard_frontier.json*")
         page.route(
-            "**/data/leaderboard_frontier.json",
+            "**/data/leaderboard_frontier.json*",
             lambda route: route.fulfill(json={"invalid": True}),
         )
         page.reload(wait_until="domcontentloaded")

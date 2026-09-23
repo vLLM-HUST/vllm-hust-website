@@ -45,3 +45,10 @@ mean TPOT remains an alternative projection, not a substitute for this percentil
 in distinct workload IDs, retain all allocated chips in the Y denominator, and preserve both TTFT
 tails. Public evidence is a curated metric-only extract, not a claim that full private logs/source
 capsules were published.
+
+When publishing a Frontier snapshot, update its fetch URL revision and the HTML asset versions
+alongside the data. The public HTML response advertises a ten-minute cache lifetime; a source-side
+match does not prove an existing browser has discarded the initial empty JSON. The snapshot fetch
+uses revalidation too. The browser test deliberately serves an empty unversioned URL to protect this
+boundary. For a rollout handoff, link a versioned page URL before `#frontier` so an old HTML cache
+cannot keep loading the old scripts.
