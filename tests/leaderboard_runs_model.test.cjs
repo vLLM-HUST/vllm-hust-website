@@ -60,3 +60,13 @@ test('text sorting follows task labels rather than opaque task identities',()=>{
     const rows=[{taskId:'z',taskLabel:'Alpha',metrics:{}},{taskId:'a',taskLabel:'Beta',metrics:{}}];
     assert.equal(model.selectRows(rows,{}, {key:'task',direction:'asc'})[0].taskLabel,'Alpha');
 });
+
+test('hardware is an ordinary filterable and sortable column, without dropping history', () => {
+    const a=fixture('a'), b=fixture('b', {hardware:{vendor:'Huawei',chip_model:'910B3',chip_count:2},
+        historical_recovery:{admitted_for_historical_trend:true}});
+    const {rows}=model.build({single:[a],historical:[b]});
+    assert.equal(rows.length,2);
+    assert.deepEqual(model.selectRows(rows,{hardware:['Huawei · 910B3']}).map(r=>r.id),['b']);
+    assert.deepEqual(model.selectRows(rows,{}, {key:'hardware',direction:'asc'}).map(r=>r.id),['a','b']);
+    assert.deepEqual(model.selectRows(rows,{}, {key:'hardware',direction:'desc'}).map(r=>r.id),['b','a']);
+});

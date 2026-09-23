@@ -132,7 +132,7 @@
     // Column filters use exact underlying values, never rounded display strings.
     function columnValue(row, key) {
         if (key in row.metrics) return row.metrics[key];
-        return ({ model: row.modelKey, task: row.taskId, mod: row.mod,
+        return ({ model: row.modelKey, hardware: row.hardware, task: row.taskId, mod: row.mod,
             run: row.id, config: row.prefix })[key] ?? null;
     }
     function selectRows(rows, filters = {}, sort = null) {
