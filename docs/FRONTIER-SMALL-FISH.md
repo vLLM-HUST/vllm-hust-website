@@ -58,7 +58,7 @@ a27B before/after ablation; the matched35B profiles establish the structural-rem
 The native27B deployment passed all8 serial cold/warm retrievals through262080 prompt tokens, but5
 of16 concurrent requests returned `cobalt-seven-` followed by EOS instead of `cobalt-seven-42`.
 Retain this failed correctness boundary; neither its cause nor harmless numerical variation has been
-established. Native throughput admission is pending the explicit choice to show a failed-correctness
+established. Native chart admission is pending the explicit choice to show a failed-correctness
 reference or omit that reference. Candidate performance can proceed independently. Neither arm's
 protocol-valid performance is a SWE answer-quality score.
 
