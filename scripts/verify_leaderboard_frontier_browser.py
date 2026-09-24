@@ -59,6 +59,20 @@ def assert_concurrency_lines(page, points):
             )
 
 
+def assert_parallel(text, params, language):
+    if params.get("attention_tensor_parallel_size") is not None:
+        attention = "DP2" if params["attention_data_parallel_size"] == 2 else "TP2"
+        expert = "EP2" if params["expert_parallel_size"] == 2 else "TP2"
+        assert f"{'注意力' if language == 'zh' else 'Attention'} {attention}" in text
+        assert f"{'专家' if language == 'zh' else 'Experts'} {expert}" in text
+    elif params.get("attention_ranks"):
+        assert f"A{params['attention_ranks']} / E{params['expert_ranks']}" in text
+    else:
+        assert f"TP{params['tensor_parallel_size']}" in text
+        if params.get("expert_parallel_size"):
+            assert f"EP{params['expert_parallel_size']}" in text
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="http://127.0.0.1:8774")
@@ -272,15 +286,7 @@ def main():
                 ]:
                     assert f"{metric:.2f}".rstrip("0").rstrip(".") in text
                 params = point["configuration"]["parameters"]
-                if params.get("attention_ranks"):
-                    assert (
-                        f"A{params['attention_ranks']} / E{params['expert_ranks']}"
-                        in text
-                    )
-                else:
-                    assert f"TP{params['tensor_parallel_size']}" in text
-                    if params.get("expert_parallel_size"):
-                        assert f"EP{params['expert_parallel_size']}" in text
+                assert_parallel(text, params, language)
                 if params.get("mtp_draft_tokens") is not None:
                     assert f"MTP{params['mtp_draft_tokens']}" in text
                 protocol = (
@@ -384,15 +390,7 @@ def main():
                     popup = page.locator("#frontier-popover")
                     text = popup.inner_text()
                     params = point["configuration"]["parameters"]
-                    if params.get("attention_ranks"):
-                        assert (
-                            f"A{params['attention_ranks']} / E{params['expert_ranks']}"
-                            in text
-                        )
-                    else:
-                        assert f"TP{params['tensor_parallel_size']}" in text
-                        if params.get("expert_parallel_size"):
-                            assert f"EP{params['expert_parallel_size']}" in text
+                    assert_parallel(text, params, language)
                     box = popup.bounding_box()
                     assert box["x"] >= 0 and box["x"] + box["width"] <= width
                     with page.expect_download() as download:
