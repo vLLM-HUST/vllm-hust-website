@@ -16,6 +16,8 @@ def render(snapshot):
         for p in snapshot["points"]
         if p["cohort_id"] == COHORT
         and p["configuration"]["parameters"].get("max_num_seqs") == 16
+        and p["load"].get("concurrency_series")
+        in ("swe-capacity16-native", "swe-capacity16-full")
         and p["configuration"]["hardware"]["accelerator_count"] == 2
     ]
     if not points:
