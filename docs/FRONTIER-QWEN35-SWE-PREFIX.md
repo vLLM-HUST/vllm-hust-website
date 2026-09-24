@@ -148,8 +148,19 @@ running requests. Maximum observed prompt length was30,064 tokens.
 
 This point retains MTP0, the pinned vLLM0.23 / vLLM-Ascend0.23 runtime and the original graph
 settings. It does not join either TP2 capacity16 curve or pool with the repaired MTP2 observations
-below. The subsequent DP8EP8 attempt lost its host connection before completing its window and
-supplies no score.
+below. The interrupted hw0 DP8EP8 attempt supplies no score. After the administrator reclaimed hw0,
+DP8EP8 and TP8EP8 were rerun serially on the local host with fresh all-eight-card admission,
+continuous ownership guards and verified release. Both completed900-second windows with zero request
+failures:
+
+| Configuration          | Output tokens/s/chip | Decode P90 tokens/s |
+| ---------------------- | -------------------: | ------------------: |
+| DP8 / EP8 / C64 / MTP0 |                73.19 |               17.99 |
+| TP8 / EP8 / C64 / MTP0 |                43.56 |               19.42 |
+
+These use the accepted-equivalent HF checkpoint rather than the hw0 ModelScope copy. The actual
+host/checkpoint and reached context lengths remain in each download. They are configuration
+observations across shared hosts, not isolated estimates of a causal EP speedup.
 
 ## Repaired MTP2 expert separation: eight-chip C64
 
