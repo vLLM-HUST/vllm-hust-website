@@ -39,6 +39,16 @@ workload identities; never silently mix them.
 
 ## Data handoff
 
+The main chart connects explicitly declared concurrency sweeps with solid, series-colored lines,
+ordered by C. `point.load.concurrency_series` identifies a fixed serving configuration within its
+cohort: only client concurrency may change. The measurement producer must hold engine/MOD revisions,
+topology, precision, context, graph, batching, KV budget and workload policy constant within that
+series. Missing declarations stay as unconnected points; never infer a sweep from MOD color alone.
+Filters remove hidden points from lines, and singleton series have no line. The dashed Pareto
+envelope remains distinct from these measured sweeps. Point clicks and downloads retain the original
+data. The SWE capacity16 renderer and tests check that its serving settings remain constant,
+excluding legacy max-seqs8 C4 and eight-chip configurations.
+
 The website reads `data/leaderboard_frontier.json` independently of the legacy run snapshot. Schema:
 `leaderboard-frontier/v1`. Two arrays: `cohorts` and `points`.
 

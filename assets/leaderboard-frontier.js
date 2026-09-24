@@ -8,7 +8,7 @@
         en: {
             title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', native: 'Native baseline',
-            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration',
+            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Solid: concurrency sweep · Dashed: Pareto envelope',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
@@ -17,7 +17,7 @@
         zh: {
             title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', native: '原生 Baseline',
-            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置',
+            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '实线：同配置并发扫描 · 虚线：Pareto 边界',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
@@ -133,10 +133,11 @@
         const blank=$('frontier-blank');blank.hidden=measured.measured.length>0;
         blank.textContent=state.error?t('error'):!state.ready?t('loading'):cohortPoints().length?t('noMatch'):t('empty');
         $('frontier-filter-count').textContent=`${points().length} / ${cohortPoints().length} ${t('points')}`;
-        const groups=[...new Map(cohortPoints().map(p=>[M.modKey(p),p])).values()];
+        const groups=[...new Map(cohortPoints().map(p=>[M.modKey(p),p])).values()].sort((a,b)=>
+            Number(M.modKey(b)==='none')-Number(M.modKey(a)==='none')||M.modKey(a).localeCompare(M.modKey(b)));
         const color=p=>colors[groups.findIndex(g=>M.modKey(g)===M.modKey(p))%colors.length];
         $('frontier-legend').innerHTML=groups.filter(g=>points().some(p=>M.modKey(p)===M.modKey(g))).map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}</span>`).join('');
-        $('frontier-hint').textContent=t('hint')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
+        $('frontier-hint').textContent=(M.concurrencySeries(measured.measured).length?t('lineHint'):t('hint'))+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         const curves=$('frontier-curves'), curveUrl=current?.workload.contract.concurrency_curves_url;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
         if(!curves.hidden)curves.href=curveUrl;else curves.removeAttribute('href');
@@ -194,11 +195,19 @@
         }
         svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${t('x')}<tspan x="${(width+left-right)/2}" dy="16">output tokens/s/user</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${t('y')}<tspan x="0" dy="16">output tokens/s/chip</tspan></text>`;
         if(result.frontier.length>1)svg+=`<polyline class="frontier-envelope" points="${result.frontier.map(p=>`${x(p.x)},${y(p.y)}`).join(' ')}"/>`;
+        const series=M.concurrencySeries(result.measured), connected=new Set(series.flat().map(row=>row.point.id));
+        for(const rows of series){
+            const id=rows[0].point.load.concurrency_series;
+            svg+=`<polyline class="frontier-concurrency-line" data-series="${escape(id)}" data-series-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(rows[0].point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
+        }
         for(const row of result.measured){
             const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);
             const hitRadius=Math.max(2,Math.min(18,...neighbors));
             const p=row.point,text=`${label(p)} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
             svg+=`<g role="button" tabindex="0" aria-haspopup="dialog" aria-controls="frontier-popover" aria-expanded="false" aria-label="${escape(text)}" data-point="${escape(p.id)}" class="frontier-point"><circle class="frontier-hit" cx="${x(row.x)}" cy="${y(row.y)}" r="${hitRadius}"/><circle class="frontier-dot" cx="${x(row.x)}" cy="${y(row.y)}" r="7" fill="${color(p)}"/><title>${escape(text)}</title></g>`;
+        }
+        for(const row of result.measured.filter(row=>connected.has(row.point.id))){
+            svg+=`<text class="frontier-concurrency-label" style="fill:${color(row.point)}" x="${x(row.x)+9}" y="${y(row.y)-10}">C${row.point.load.concurrency}</text>`;
         }
         $('frontier-chart').innerHTML=svg;
     }

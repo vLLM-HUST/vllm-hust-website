@@ -1047,6 +1047,86 @@
       },
       "requests_artifact_sha256": "b571154f973c1694720e30b13f325ac966a8459b7689c38bae39b590931e3bdf",
       "scope": "Metric-only public extract; full output-token logs, admission/ownership, source capsules and server counters retained by measurement owner"
+    },
+    {
+      "run_id": "e52aadd2f98746d2b7da71ccd235ebb9",
+      "old_point_id": "qwen35-agentx-capacity16-native-tp2-c16-20260923",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 688,
+        "max_prompt_tokens_observed": 65581,
+        "prompt_tokens_p50": 18209.0,
+        "max_turn_index_reached": 44,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 14,
+        "requests_completed_in_window": 672,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 399517,
+        "output_tokens_per_second": 443.90777777777777,
+        "output_tokens_per_second_per_chip": 221.95388888888888,
+        "decode_tokens_per_second_p90": 38.93415177865642,
+        "decode_speed_samples": 672,
+        "ttft_seconds_p95": 2.0049147347948737,
+        "client_inflight_seconds": {
+          "0": 0.00016421801410615444,
+          "1": 0.0007661159907002002,
+          "2": 0.000522965012351051,
+          "3": 0.0004466109967324883,
+          "4": 0.00044964198605157435,
+          "5": 0.0004567720170598477,
+          "6": 0.000445580983068794,
+          "7": 0.000475552020361647,
+          "8": 0.00047378300223499537,
+          "9": 0.0004225399752613157,
+          "10": 0.003248614026233554,
+          "11": 0.00044042099034413695,
+          "12": 0.0004433110007084906,
+          "13": 0.000455222005257383,
+          "14": 0.00047220298438332975,
+          "15": 1.771640105987899,
+          "16": 898.2186763430072
+        },
+        "mean_client_inflight": 15.997943813433134,
+        "full_concurrency_fraction": 0.9980207514922302,
+        "drain_seconds": 59.20485324499896,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.1",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "e52aadd2f98746d2b7da71ccd235ebb9",
+        "started_at_unix": 1790242480.9101515,
+        "model": "swe-native16-c16-retry1",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 443.90777777777777,
+        "decode_p90_tps": 38.93415177865642,
+        "ttft_p95_ms": 2004.9147347948738,
+        "ttft_p50_ms": 929.1666704957606,
+        "tpot_ms": 38.19517177127504,
+        "tpot_p95_ms": 73.71798552716808,
+        "e2e_p95_ms": 72277.08793284834,
+        "completed_requests": 672
+      },
+      "requests_artifact_sha256": "6cf9bf73883a09ad447c73b8d50b65ed6d8cf40e84c159c99b88b1f5f01ffd8e",
+      "scope": "Metric-only public extract; full output-token logs, admission/ownership, source capsules and server counters retained by measurement owner"
     }
   ]
 }

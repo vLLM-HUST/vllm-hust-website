@@ -37,6 +37,8 @@
                 || !Array.isArray(e.run_ids) || !e.run_ids.length || !e.aggregation
                 || !safeURL(e.url)) throw new Error(`Invalid measured configuration: ${p.id || '?'}`);
             if (Object.values(p.metrics).some(v => v !== null && (!finite(v) || v < 0))) throw new Error(`Invalid metric: ${p.id}`);
+            if (p.load.concurrency_series != null && (typeof p.load.concurrency_series !== 'string' || !p.load.concurrency_series
+                || !Number.isInteger(p.load.concurrency) || p.load.concurrency < 1)) throw new Error(`Invalid concurrency series: ${p.id}`);
             if (p.cost != null && (!positive(p.cost.usd_per_hour) || !p.cost.source || !p.cost.scope)) throw new Error(`Invalid deployment cost: ${p.id}`);
             pointIds.add(p.id);
         }
@@ -71,7 +73,19 @@
         const tokens = point.configuration.parameters.mtp_draft_tokens;
         return Number.isFinite(tokens) && tokens >= 0 ? (tokens > 0 ? 'on' : 'off') : 'unknown';
     }
-    const api = { validate, metrics, value, modKey, project, safeURL, mtpState };
+    function concurrencySeries(rows) {
+        const groups = new Map();
+        for (const row of rows) {
+            const p = row.point, series = p.load.concurrency_series;
+            if (!series) continue;
+            const key = JSON.stringify([p.cohort_id, series]);
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(row);
+        }
+        return [...groups.values()].filter(rows => rows.length > 1)
+            .map(rows => [...rows].sort((a, b) => a.point.load.concurrency - b.point.load.concurrency));
+    }
+    const api = { validate, metrics, value, modKey, project, safeURL, mtpState, concurrencySeries };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);

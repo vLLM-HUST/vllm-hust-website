@@ -29,6 +29,36 @@ def click_point(page, dot):
     assert dot.get_attribute("aria-expanded") == "true"
 
 
+def assert_concurrency_lines(page, points):
+    groups = {}
+    for point in points:
+        series = point["load"].get("concurrency_series")
+        if series:
+            groups.setdefault(series, []).append(point)
+    expected = {
+        key: sorted(rows, key=lambda p: p["load"]["concurrency"])
+        for key, rows in groups.items()
+        if len(rows) > 1
+    }
+    lines = page.locator(".frontier-concurrency-line")
+    assert lines.count() == len(expected)
+    for line in lines.all():
+        rows = expected[line.get_attribute("data-series")]
+        assert json.loads(line.get_attribute("data-series-points")) == [
+            p["id"] for p in rows
+        ]
+        vertices = [
+            tuple(map(float, pair.split(",")))
+            for pair in line.get_attribute("points").split()
+        ]
+        for point, vertex in zip(rows, vertices, strict=True):
+            dot = page.locator(f'[data-point="{point["id"]}"] .frontier-dot')
+            assert vertex == (
+                float(dot.get_attribute("cx")),
+                float(dot.get_attribute("cy")),
+            )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="http://127.0.0.1:8774")
@@ -130,6 +160,7 @@ def main():
                 assert page.locator("#frontier-workload-tag").is_visible()
             assert "smoke" in page.locator("#frontier-status").inner_text()
             assert page.locator(".frontier-point").count() == len(default_points)
+            assert_concurrency_lines(page, default_points)
             assert page.locator("#frontier-popover").is_hidden()
             curves = production["cohorts"][0]["workload"]["contract"].get(
                 "concurrency_curves_url"
@@ -160,6 +191,7 @@ def main():
                     "nodes => nodes.map(n => n.dataset.point)"
                 )
                 assert set(ids) == {p["id"] for p in expected}
+                assert_concurrency_lines(page, expected)
                 assert (
                     f"{len(expected)} / {len(default_points)}"
                     in page.locator("#frontier-filter-count").inner_text()
@@ -213,6 +245,7 @@ def main():
                 checkbox.uncheck()
             assert page.locator(".frontier-point").count() == 0
             assert page.locator("#frontier-blank").is_visible()
+            assert page.locator(".frontier-concurrency-line").count() == 0
             for checkbox in page.locator("[data-filter]").all():
                 checkbox.check()
             side = page.locator(".frontier-filters").bounding_box()
@@ -345,6 +378,7 @@ def main():
                     p for p in production["points"] if p["cohort_id"] == cohort["id"]
                 ]
                 assert page.locator(".frontier-point").count() == len(members)
+                assert_concurrency_lines(page, members)
                 for point in members:
                     click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
                     popup = page.locator("#frontier-popover")
