@@ -311,7 +311,14 @@ def main():
                     point["metrics"]["output_tps"]
                     / point["configuration"]["hardware"]["accelerator_count"],
                 ]:
-                    assert f"{metric:.2f}".rstrip("0").rstrip(".") in text
+                    # Browser Intl uses half-up rounding (147.125 ->147.13),
+                    # unlike Python's half-even formatting. Preserve locale grouping.
+                    formatted = page.evaluate(
+                        "([value, locale]) => new Intl.NumberFormat(locale, "
+                        "{maximumFractionDigits: 2}).format(value)",
+                        [metric, language],
+                    )
+                    assert formatted in text, (point["id"], formatted, text)
                 params = point["configuration"]["parameters"]
                 assert_parallel(text, params, language)
                 if params.get("mtp_draft_tokens") is not None:
