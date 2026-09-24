@@ -18,7 +18,9 @@ def ready(page):
 
 def click_point(page, dot):
     """Click actual chart coordinates, then disambiguate overlapping real points."""
-    dot.evaluate("node => node.scrollIntoView({block: 'center', inline: 'nearest', behavior: 'instant'})")
+    dot.evaluate(
+        "node => node.scrollIntoView({block: 'center', inline: 'nearest', behavior: 'instant'})"
+    )
     point_id = dot.get_attribute("data-point")
     box = dot.locator(".frontier-dot").bounding_box()
     page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
@@ -39,8 +41,16 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     site = Path(__file__).resolve().parents[1]
     production = json.loads((site / "data/leaderboard_frontier.json").read_text())
-    default_points = [p for p in production['points'] if p['cohort_id'] == production['cohorts'][0]['id']]
-    tag_keys = list(dict.fromkeys((c['model']['id'], c['precision']['id']) for c in production['cohorts']))
+    default_points = [
+        p
+        for p in production["points"]
+        if p["cohort_id"] == production["cohorts"][0]["id"]
+    ]
+    tag_keys = list(
+        dict.fromkeys(
+            (c["model"]["id"], c["precision"]["id"]) for c in production["cohorts"]
+        )
+    )
     fixture = json.loads(
         (site / "tests/fixtures/leaderboard_frontier.json").read_text()
     )
@@ -74,7 +84,10 @@ def main():
             ready(page)
             assert page.locator("#runs-panel").is_hidden()
             assert page.locator("#tasks-panel").is_hidden()
-            assert page.locator("#frontier-panel select").count() == 0
+            assert (
+                page.locator("#frontier-panel select:not(#frontier-workload)").count()
+                == 0
+            )
             assert (
                 page.locator(
                     "#frontier-panel table, #frontier-panel pre, #frontier-panel details"
@@ -92,10 +105,29 @@ def main():
             ]:
                 assert page.locator(f"#{removed}").count() == 0
             assert page.locator(".frontier-model-tag").count() == len(tag_keys)
-            assert "Qwen3.5-35B-A3B" in page.locator(".frontier-model-tag").first.inner_text()
+            assert (
+                "Qwen3.5-35B-A3B"
+                in page.locator(".frontier-model-tag").first.inner_text()
+            )
             assert "BF16" in page.locator(".frontier-model-tag").first.inner_text()
-            assert page.locator("#frontier-workload").count() == 0
-            assert page.locator("#frontier-workload-tag").is_visible()
+            default_tag = (
+                production["cohorts"][0]["model"]["id"],
+                production["cohorts"][0]["precision"]["id"],
+            )
+            choices = [
+                c
+                for c in production["cohorts"]
+                if (c["model"]["id"], c["precision"]["id"]) == default_tag
+            ]
+            if len(choices) > 1:
+                assert page.locator("#frontier-workload option").count() == len(choices)
+                assert (
+                    page.locator("#frontier-workload").input_value()
+                    == production["cohorts"][0]["id"]
+                )
+            else:
+                assert page.locator("#frontier-workload").count() == 0
+                assert page.locator("#frontier-workload-tag").is_visible()
             assert "smoke" in page.locator("#frontier-status").inner_text()
             assert page.locator(".frontier-point").count() == len(default_points)
             assert page.locator("#frontier-popover").is_hidden()
@@ -106,42 +138,90 @@ def main():
             if curves:
                 assert page.locator("#frontier-curves").get_attribute("href") == curves
             # Real control changes filter points and the derived envelope, not data.
-            for setting in ('on', 'off', 'all'):
-                page.locator('[data-filter=mtp][value=on]').set_checked(setting in ('on','all'))
-                page.locator('[data-filter=mtp][value=off]').set_checked(setting in ('off','all'))
-                expected = [p for p in default_points if setting == 'all' or
-                            (p['configuration']['parameters'].get('mtp_draft_tokens', -1) > 0 if setting == 'on' else
-                             p['configuration']['parameters'].get('mtp_draft_tokens') == 0)]
-                ids = page.locator('[data-point]').evaluate_all('nodes => nodes.map(n => n.dataset.point)')
-                assert set(ids) == {p['id'] for p in expected}
-                assert f"{len(expected)} / {len(default_points)}" in page.locator('#frontier-filter-count').inner_text()
-                assert page.locator('#frontier-popover').is_hidden()
-                front = [p for p in expected if not any(
-                    q['metrics']['decode_p90_tps'] >= p['metrics']['decode_p90_tps'] and
-                    q['metrics']['output_tps'] / q['configuration']['hardware']['accelerator_count'] >= p['metrics']['output_tps'] / p['configuration']['hardware']['accelerator_count'] and
-                    (q['metrics']['decode_p90_tps'] > p['metrics']['decode_p90_tps'] or
-                     q['metrics']['output_tps'] / q['configuration']['hardware']['accelerator_count'] > p['metrics']['output_tps'] / p['configuration']['hardware']['accelerator_count']) for q in expected)]
-                envelope = page.locator('.frontier-envelope')
+            for setting in ("on", "off", "all"):
+                page.locator("[data-filter=mtp][value=on]").set_checked(
+                    setting in ("on", "all")
+                )
+                page.locator("[data-filter=mtp][value=off]").set_checked(
+                    setting in ("off", "all")
+                )
+                expected = [
+                    p
+                    for p in default_points
+                    if setting == "all"
+                    or (
+                        p["configuration"]["parameters"].get("mtp_draft_tokens", -1) > 0
+                        if setting == "on"
+                        else p["configuration"]["parameters"].get("mtp_draft_tokens")
+                        == 0
+                    )
+                ]
+                ids = page.locator("[data-point]").evaluate_all(
+                    "nodes => nodes.map(n => n.dataset.point)"
+                )
+                assert set(ids) == {p["id"] for p in expected}
+                assert (
+                    f"{len(expected)} / {len(default_points)}"
+                    in page.locator("#frontier-filter-count").inner_text()
+                )
+                assert page.locator("#frontier-popover").is_hidden()
+                front = [
+                    p
+                    for p in expected
+                    if not any(
+                        q["metrics"]["decode_p90_tps"] >= p["metrics"]["decode_p90_tps"]
+                        and q["metrics"]["output_tps"]
+                        / q["configuration"]["hardware"]["accelerator_count"]
+                        >= p["metrics"]["output_tps"]
+                        / p["configuration"]["hardware"]["accelerator_count"]
+                        and (
+                            q["metrics"]["decode_p90_tps"]
+                            > p["metrics"]["decode_p90_tps"]
+                            or q["metrics"]["output_tps"]
+                            / q["configuration"]["hardware"]["accelerator_count"]
+                            > p["metrics"]["output_tps"]
+                            / p["configuration"]["hardware"]["accelerator_count"]
+                        )
+                        for q in expected
+                    )
+                ]
+                envelope = page.locator(".frontier-envelope")
                 assert envelope.count() == (1 if len(front) > 1 else 0)
                 if len(front) > 1:
-                    assert len(envelope.get_attribute('points').split()) == len(front)
+                    assert len(envelope.get_attribute("points").split()) == len(front)
                 if expected:
-                    click_point(page, page.locator(f'[data-point="{expected[0]["id"]}"]'))
-            for checkbox in page.locator('[data-filter=mtp]').all(): checkbox.check()
+                    click_point(
+                        page, page.locator(f'[data-point="{expected[0]["id"]}"]')
+                    )
+            for checkbox in page.locator("[data-filter=mtp]").all():
+                checkbox.check()
             # MOD union within its row intersects the MTP row; empty means hide all.
-            page.locator('[data-filter=mods][value=none]').uncheck()
-            page.locator('[data-filter=mtp][value=on]').uncheck()
-            expected = [p for p in default_points if p['configuration']['mods'] and p['configuration']['parameters'].get('mtp_draft_tokens') == 0]
-            assert set(page.locator('[data-point]').evaluate_all('nodes=>nodes.map(n=>n.dataset.point)')) == {p['id'] for p in expected}
-            for checkbox in page.locator('[data-filter=mods]').all(): checkbox.uncheck()
-            assert page.locator('.frontier-point').count() == 0
-            assert page.locator('#frontier-blank').is_visible()
-            for checkbox in page.locator('[data-filter]').all(): checkbox.check()
-            side = page.locator('.frontier-filters').bounding_box()
-            card = page.locator('.frontier-card').bounding_box()
-            assert page.locator('.frontier-card .frontier-filters').count() == 0
-            if width > 900: assert side['x'] >= card['x'] + card['width']
-            else: assert side['y'] >= card['y'] + card['height']
+            page.locator("[data-filter=mods][value=none]").uncheck()
+            page.locator("[data-filter=mtp][value=on]").uncheck()
+            expected = [
+                p
+                for p in default_points
+                if p["configuration"]["mods"]
+                and p["configuration"]["parameters"].get("mtp_draft_tokens") == 0
+            ]
+            assert set(
+                page.locator("[data-point]").evaluate_all(
+                    "nodes=>nodes.map(n=>n.dataset.point)"
+                )
+            ) == {p["id"] for p in expected}
+            for checkbox in page.locator("[data-filter=mods]").all():
+                checkbox.uncheck()
+            assert page.locator(".frontier-point").count() == 0
+            assert page.locator("#frontier-blank").is_visible()
+            for checkbox in page.locator("[data-filter]").all():
+                checkbox.check()
+            side = page.locator(".frontier-filters").bounding_box()
+            card = page.locator(".frontier-card").bounding_box()
+            assert page.locator(".frontier-card .frontier-filters").count() == 0
+            if width > 900:
+                assert side["x"] >= card["x"] + card["width"]
+            else:
+                assert side["y"] >= card["y"] + card["height"]
 
             for point in default_points:
                 dot = page.locator(f'[data-point="{point["id"]}"]')
@@ -154,20 +234,34 @@ def main():
                 text = popup.inner_text()
                 for metric in [
                     point["metrics"]["decode_p90_tps"],
-                    point["metrics"]["output_tps"] / point["configuration"]["hardware"]["accelerator_count"],
+                    point["metrics"]["output_tps"]
+                    / point["configuration"]["hardware"]["accelerator_count"],
                 ]:
                     assert f"{metric:.2f}".rstrip("0").rstrip(".") in text
-                params = point['configuration']['parameters']
-                if params.get('attention_ranks'):
-                    assert f"A{params['attention_ranks']} / E{params['expert_ranks']}" in text
+                params = point["configuration"]["parameters"]
+                if params.get("attention_ranks"):
+                    assert (
+                        f"A{params['attention_ranks']} / E{params['expert_ranks']}"
+                        in text
+                    )
                 else:
                     assert f"TP{params['tensor_parallel_size']}" in text
-                    if params.get('expert_parallel_size'):
+                    if params.get("expert_parallel_size"):
                         assert f"EP{params['expert_parallel_size']}" in text
-                if params.get('mtp_draft_tokens') is not None:
+                if params.get("mtp_draft_tokens") is not None:
                     assert f"MTP{params['mtp_draft_tokens']}" in text
-                primers = point['evidence'].get('benchmark_protocol', {}).get('protocol_id') == 'agentx256k-snapshot-primers-v2'
-                assert ('初始上下文填充' if language == 'zh' else 'Snapshot primers') in text if primers else ('每路 10 次' if language == 'zh' else '10/lane') in text
+                protocol = (
+                    point["evidence"].get("benchmark_protocol", {}).get("protocol_id")
+                )
+                warmup = {
+                    "agentx256k-snapshot-primers-v2": (
+                        "初始上下文填充",
+                        "Snapshot primers",
+                    ),
+                    "agentx256k-pressure10-v1": ("每路 10 次", "10/lane"),
+                    "swe-prefix-reuse/v1": ("测量会话冷 KV", "fresh session KV"),
+                }.get(protocol, ("未记录", "Not recorded"))
+                assert warmup[0 if language == "zh" else 1] in text
                 assert point["configuration"]["engine"] in text
                 assert point["configuration"]["engine_version"] in text
                 params = point["configuration"]["parameters"]
@@ -229,37 +323,51 @@ def main():
                 path=str(args.output / f"production-{width}-{language}-{scheme}.png"),
                 full_page=True,
             )
-            assert page.locator('#frontier-workload-repo').get_attribute('href') == 'https://github.com/vLLM-HUST/agentx-bench'
+            assert page.locator("#frontier-workload-repo").get_attribute(
+                "href"
+            ) == production["cohorts"][0]["workload"]["contract"].get(
+                "repository_url", "https://github.com/vLLM-HUST/agentx-bench"
+            )
             # Additional checkpoint/workload cohorts keep topology and exact
             # downloadable evidence distinct from the original MTP2 series.
-            for cohort in production['cohorts'][1:]:
-                tag = (cohort['model']['id'], cohort['precision']['id'])
-                page.locator('.frontier-model-tag').nth(tag_keys.index(tag)).click()
-                picker = page.locator('#frontier-workload')
+            for cohort in production["cohorts"][1:]:
+                tag = (cohort["model"]["id"], cohort["precision"]["id"])
+                page.locator(".frontier-model-tag").nth(tag_keys.index(tag)).click()
+                picker = page.locator("#frontier-workload")
                 if picker.count():
-                    picker.select_option(cohort['id'])
-                members = [p for p in production['points'] if p['cohort_id'] == cohort['id']]
-                assert page.locator('.frontier-point').count() == len(members)
+                    picker.select_option(cohort["id"])
+                assert page.locator("#frontier-workload-repo").get_attribute(
+                    "href"
+                ) == cohort["workload"]["contract"].get(
+                    "repository_url", "https://github.com/vLLM-HUST/agentx-bench"
+                )
+                members = [
+                    p for p in production["points"] if p["cohort_id"] == cohort["id"]
+                ]
+                assert page.locator(".frontier-point").count() == len(members)
                 for point in members:
                     click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
-                    popup = page.locator('#frontier-popover')
+                    popup = page.locator("#frontier-popover")
                     text = popup.inner_text()
-                    params = point['configuration']['parameters']
-                    if params.get('attention_ranks'):
-                        assert f"A{params['attention_ranks']} / E{params['expert_ranks']}" in text
+                    params = point["configuration"]["parameters"]
+                    if params.get("attention_ranks"):
+                        assert (
+                            f"A{params['attention_ranks']} / E{params['expert_ranks']}"
+                            in text
+                        )
                     else:
                         assert f"TP{params['tensor_parallel_size']}" in text
-                        if params.get('expert_parallel_size'):
+                        if params.get("expert_parallel_size"):
                             assert f"EP{params['expert_parallel_size']}" in text
                     box = popup.bounding_box()
-                    assert box['x'] >= 0 and box['x'] + box['width'] <= width
+                    assert box["x"] >= 0 and box["x"] + box["width"] <= width
                     with page.expect_download() as download:
-                        popup.locator('[data-download]').click()
+                        popup.locator("[data-download]").click()
                     file = args.output / f"{width}-{language}-{point['id']}.json"
                     download.value.save_as(file)
                     payload = json.loads(file.read_text())
-                    assert payload['point'] == point and payload['cohort'] == cohort
-                    popup.locator('[data-close]').click()
+                    assert payload["point"] == point and payload["cohort"] == cohort
+                    popup.locator("[data-close]").click()
             assert not errors, errors
             reports.append(
                 {
@@ -300,11 +408,11 @@ def main():
         assert page.locator(".frontier-point").count() == 4
         assert page.locator(".frontier-envelope").count() == 1
         assert page.locator("#frontier-curves").is_visible()
-        page.locator('[data-filter=mtp][value=unknown]').uncheck()
-        assert page.locator('.frontier-point').count() == 0
-        assert page.locator('#frontier-blank').is_visible()
-        page.locator('[data-filter=mtp][value=unknown]').check()
-        assert page.locator('.frontier-point').count() == 4
+        page.locator("[data-filter=mtp][value=unknown]").uncheck()
+        assert page.locator(".frontier-point").count() == 0
+        assert page.locator("#frontier-blank").is_visible()
+        page.locator("[data-filter=mtp][value=unknown]").check()
+        assert page.locator(".frontier-point").count() == 4
         page.locator("#frontier-workload").select_option("test-other-workload")
         assert page.locator("#frontier-curves").is_hidden()
         assert page.locator("#frontier-curves").get_attribute("href") is None

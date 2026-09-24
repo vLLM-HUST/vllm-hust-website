@@ -2,11 +2,48 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const model=require('../assets/leaderboard-frontier-model.js');
 const fixture=require('./fixtures/leaderboard_frontier.json');
+function agentxData() {
+    const all=require('../data/leaderboard_frontier.json');
+    const cohorts=all.cohorts.filter(c=>c.workload.id.startsWith('agentx'));
+    const ids=new Set(cohorts.map(c=>c.id));
+    return {...all,cohorts,points:all.points.filter(p=>ids.has(p.cohort_id))};
+}
 test('production and empty snapshots validate without inventing points',()=>{
     const data=require('../data/leaderboard_frontier.json');
     model.validate(data);
     assert.deepEqual(model.validate({schema_version:'leaderboard-frontier/v1',cohorts:[],points:[]}).points,[]);
     assert.equal(model.project([], 'interactivity','output_tps_per_chip').frontier.length,0);
+});
+test('SWE observations keep their fixed-window protocol and real MTP separate from AgentX',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const evidence=require('../data/leaderboard_frontier_swe_evidence.json');
+    const cohort=data.cohorts.find(c=>c.workload.id==='sweprefix-qwen35-eight-traces-900s-v1');
+    assert.ok(cohort);
+    assert.equal(cohort.workload.contract.repository_url,'https://github.com/vLLM-HUST/swe-prefix-reuse');
+    const points=data.points.filter(p=>p.cohort_id===cohort.id);
+    assert.ok(points.length>0);
+    assert.equal(points.length,evidence.runs.length);
+    assert.equal(agentxData().points.length,16);
+    for(const p of points){
+        const run=evidence.runs.find(r=>r.run_id===p.evidence.run_ids[0]);
+        assert.ok(run);
+        assert.equal(run.summary.valid,true);
+        assert.equal(run.summary.aborted,false);
+        assert.equal(run.summary.failed_requests,0);
+        assert.equal(run.summary.measurement_seconds,900);
+        assert.deepEqual(p.metrics,run.metrics);
+        assert.equal(p.metrics.output_tps,run.summary.observed_output_tokens_in_window/900);
+        assert.equal(model.value(p,'output_tps_per_chip'),run.summary.output_tokens_per_second_per_chip);
+        assert.equal(p.configuration.hardware.accelerator_count,run.client.chips);
+        assert.equal(p.metrics.decode_p90_tps,run.summary.decode_tokens_per_second_p90);
+        assert.equal(p.load.concurrency,run.client.concurrency);
+        assert.equal(p.configuration.parameters.synthetic_acceptance_length,undefined);
+        assert.equal(p.evidence.benchmark_protocol.protocol_id,'swe-prefix-reuse/v1');
+        assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,cohort.workload.contract.prepared_workload_sha256);
+        assert.ok(agentxData().points.some(old=>old.id===run.old_point_id));
+        assert.equal(run.client.endpoint,undefined);
+        assert.equal(run.client.server_metadata,undefined);
+    }
 });
 test('contract validates fixture, rejects unknown cohort, duplicate IDs and unsupported context',()=>{
     assert.equal(model.validate(fixture).points.length,5);
@@ -42,7 +79,7 @@ test('MOD combinations are order independent and no-MOD is a distinct group',()=
     assert.equal(model.modKey({configuration:{mods:[]}}),'none');
 });
 test('published smoke points preserve official metrics and all allocated chips',()=>{
-    const data=require('../data/leaderboard_frontier.json');
+    const data=agentxData();
     const evidence=require('../data/leaderboard_frontier_evidence.json');
     model.validate(data);
     const points=data.points.filter(p=>p.configuration.hardware.accelerator_count===2);
@@ -93,7 +130,7 @@ test('P90 decode speed projects the recorded percentile, never a TPOT reciprocal
 
 
 test('C64 expert observations share one view and preserve point-specific protocols',()=>{
-    const data=require('../data/leaderboard_frontier.json');
+    const data=agentxData();
     const evidence=require('../data/leaderboard_frontier_expert_evidence.json');
     assert.equal(data.cohorts.length,1);
     assert.equal(data.points.length,16);
@@ -127,7 +164,7 @@ test('MTP filter classifies explicit settings without treating missing as off',(
     assert.equal(model.mtpState(point(0)),'off');
     assert.equal(model.mtpState(point(2)),'on');
     for(const value of [undefined,null,-1,'0',NaN])assert.equal(model.mtpState(point(value)),'unknown');
-    const data=require('../data/leaderboard_frontier.json');
+    const data=agentxData();
     assert.equal(data.points.filter(p=>model.mtpState(p)==='on').length,11);
     assert.equal(data.points.filter(p=>model.mtpState(p)==='off').length,5);
 });

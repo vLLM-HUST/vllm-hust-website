@@ -12,7 +12,7 @@
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Session trees',
-            workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', experimental: 'BetterScale experimental'
+            workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', experimental: 'BetterScale experimental'
         },
         zh: {
             title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
@@ -21,7 +21,7 @@
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发会话树',
-            workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', experimental: 'BetterScale 实验版本'
+            workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', experimental: 'BetterScale 实验版本'
         }
     };
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
@@ -140,6 +140,8 @@
         const curves=$('frontier-curves'), curveUrl=current?.workload.contract.concurrency_curves_url;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
         if(!curves.hidden)curves.href=curveUrl;else curves.removeAttribute('href');
+        const workloadRepo=current?.workload.contract.repository_url;
+        $('frontier-workload-repo').href=typeof workloadRepo==='string'&&/^https:\/\/github\.com\/vLLM-HUST\/[a-z0-9-]+$/i.test(workloadRepo)?workloadRepo:'https://github.com/vLLM-HUST/agentx-bench';
         chart(measured,color);popup();
     }
     function popup() {
@@ -150,6 +152,7 @@
         });
         panel.hidden=!point;if(!point)return;
         const params=point.configuration.parameters;
+        const warmupKey=({'agentx256k-snapshot-primers-v2':'primers','agentx256k-pressure10-v1':'pressure','swe-prefix-reuse/v1':'sweWarmup'})[point.evidence.benchmark_protocol?.protocol_id]||'unknown';
         const selectedDot=$('frontier-chart').querySelector(`[data-point="${CSS.escape(point.id)}"] .frontier-dot`);
         const center=node=>{const b=node.getBoundingClientRect();return [b.x+b.width/2,b.y+b.height/2];};
         const at=selectedDot?center(selectedDot):null;
@@ -163,7 +166,7 @@
             <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
             <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,X))}</strong><span>${t('x')}<br>tokens/s/user</span></div><div><strong>${fmt(M.value(point,Y))}</strong><span>${t('y')}<br>tokens/s/chip</span></div></div>
             <p class="frontier-popup-load">${t('concurrency')}: ${fmt(point.load.concurrency)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}${params.max_num_seqs!=null?`<br>${t('capacity')}: ${fmt(params.max_num_seqs)}${params.max_num_seqs_per_rank!=null?' / rank':''}`:''}${params.kv_cache_memory_bytes!=null?` · KV ${fmt(params.kv_cache_memory_bytes/1024**3)} GiB/chip`:''}</p>
-            <p class="frontier-popup-load">${t('warmup')}: ${t(point.evidence.benchmark_protocol?.protocol_id==='agentx256k-snapshot-primers-v2'?'primers':'pressure')}</p>
+            <p class="frontier-popup-load">${t('warmup')}: ${t(warmupKey)}</p>
             ${nearby.length>1?`<div class="frontier-nearby"><span>${t('nearby')}</span>${nearby.map(p=>`<button type="button" data-nearby="${escape(p.id)}" aria-pressed="${p.id===point.id}">${escape(parallel(p))} · C${fmt(p.load.concurrency)} · MTP${p.configuration.parameters.mtp_draft_tokens??'—'} · ${fmt(p.configuration.parameters.max_num_seqs)}</button>`).join('')}</div>`:''}
             <button type="button" class="frontier-download" data-download>${t('download')} ↓</button>`;
         const anchor=$('frontier-chart').querySelector(`[data-point="${CSS.escape(point.id)}"]`);
@@ -206,7 +209,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=qwen35-c64-20260924',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=sweprefix-20260924-1',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.mods=null;state.mtp=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

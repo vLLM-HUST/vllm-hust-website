@@ -2,6 +2,51 @@
   "schema_version": "leaderboard-frontier/v1",
   "cohorts": [
     {
+      "id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45"
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-eight-traces-900s-v1",
+        "label": "SWE prefix reuse · 15 min smoke",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject if enabled; never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes; one request per session; no original tool/human delays; cyclic whole-session queue",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Small deterministic size-spread sample; cold-start/finite-window request mixes and reached context differ across loads/engines. Shared-host single observations; natural MTP output content may differ. Historical AgentX results are a separate workload.",
+          "status": "15-minute smoke, tuning incomplete; retained historical native C16 functional caveats apply; not SWE task solving"
+        }
+      }
+    },
+    {
       "id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
       "model": {
         "id": "qwen35-35b-a3b-712cf743",
@@ -15,7 +60,7 @@
       "context_tokens": 262144,
       "workload": {
         "id": "agentx256k-8fecd2fc-smoke900-v1",
-        "label": "AgentX 256K \u00b7 15 min smoke",
+        "label": "AgentX 256K · 15 min smoke",
         "contract": {
           "profile": "smoke",
           "measurement_seconds": 900,
@@ -45,7 +90,7 @@
     {
       "id": "qwen35-agentx-smoke-native-tp2-c4-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native baseline \u00b7 TP2 / C4 \u00b7 15 min smoke",
+      "label": "Native baseline · TP2 / C4 · 15 min smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -146,7 +191,7 @@
     {
       "id": "qwen35-agentx-smoke-betterscale-tp2-c4-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale (experimental) \u00b7 TP2 / C4 \u00b7 15 min smoke",
+      "label": "BetterScale (experimental) · TP2 / C4 · 15 min smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -259,7 +304,7 @@
     {
       "id": "qwen35-agentx-capacity16-full-tp2-c2-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale \u00b7 C2 \u00b7 KV20.25GiB",
+      "label": "BetterScale · C2 · KV20.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -380,7 +425,7 @@
     {
       "id": "qwen35-agentx-capacity16-full-tp2-c4-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale \u00b7 C4 \u00b7 KV20.25GiB",
+      "label": "BetterScale · C4 · KV20.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -501,7 +546,7 @@
     {
       "id": "qwen35-agentx-capacity16-full-tp2-c8-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale \u00b7 C8 \u00b7 KV20.25GiB",
+      "label": "BetterScale · C8 · KV20.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -622,7 +667,7 @@
     {
       "id": "qwen35-agentx-capacity16-full-tp2-c16-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "BetterScale \u00b7 C16 \u00b7 KV20.25GiB",
+      "label": "BetterScale · C16 · KV20.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -743,7 +788,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c1-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native \u00b7 C1 \u00b7 KV24.25GiB",
+      "label": "Native · C1 · KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -851,7 +896,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c2-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native \u00b7 C2 \u00b7 KV24.25GiB",
+      "label": "Native · C2 · KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -959,7 +1004,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c4-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native \u00b7 C4 \u00b7 KV24.25GiB",
+      "label": "Native · C4 · KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -1067,7 +1112,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c8-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native \u00b7 C8 \u00b7 KV24.25GiB",
+      "label": "Native · C8 · KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -1175,7 +1220,7 @@
     {
       "id": "qwen35-agentx-capacity16-native-tp2-c16-20260923",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "Native \u00b7 C16 \u00b7 KV24.25GiB",
+      "label": "Native · C16 · KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1 / 0.25.1rc1",
@@ -1283,7 +1328,7 @@
     {
       "id": "qwen35-agentx-expert-tp8-c64-primers-20260924",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "TP8 \u00b7 C64 \u00b7 MTP0 \u00b7 snapshot primers",
+      "label": "TP8 · C64 · MTP0 · snapshot primers",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.23.0 / 0.23.0rc1",
@@ -1397,7 +1442,7 @@
     {
       "id": "qwen35-agentx-expert-dp8ep8-c64-primers-20260924",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "DP8EP8 \u00b7 C64 \u00b7 MTP0 \u00b7 snapshot primers",
+      "label": "DP8EP8 · C64 · MTP0 · snapshot primers",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.23.0 / 0.23.0rc1",
@@ -1511,7 +1556,7 @@
     {
       "id": "qwen35-agentx-expert-tp8ep8-c64-primers-20260924",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "TP8EP8 \u00b7 C64 \u00b7 MTP0 \u00b7 snapshot primers",
+      "label": "TP8EP8 · C64 · MTP0 · snapshot primers",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.23.0 / 0.23.0rc1",
@@ -1625,7 +1670,7 @@
     {
       "id": "qwen35-agentx-expert-a4e4-c64-primers-20260924",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "A4E4 \u00b7 C64 \u00b7 MTP0 \u00b7 snapshot primers",
+      "label": "A4E4 · C64 · MTP0 · snapshot primers",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.23.0 / 0.23.0rc1",
@@ -1749,7 +1794,7 @@
     {
       "id": "qwen35-agentx-expert-a6e2-c64-primers-20260924",
       "cohort_id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
-      "label": "A6E2 \u00b7 C64 \u00b7 MTP0 \u00b7 snapshot primers",
+      "label": "A6E2 · C64 · MTP0 · snapshot primers",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.23.0 / 0.23.0rc1",
@@ -1867,6 +1912,320 @@
           "cancelled_requests": 0,
           "errors": 0,
           "elapsed_seconds": 373.17
+        }
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-smoke-native-tp2-c4-20260924",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native baseline · TP2 / C4 · SWE smoke",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.9,
+          "host_kv_budget_gib": 0,
+          "host_memory_policy": "No host KV offload; opportunistic shared-host execution; no claimed RAM reservation",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "baseline-source",
+          "availability": "Native engine plus required Mamba ABI bridge; no BetterScale treatment",
+          "sampler": "Native real accept/reject MTP2",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "comparison_scope": "One serial 900s observation of this configuration; not a repeatability estimate, equal-KV ablation or certified capacity peak",
+          "observed_max_prompt_tokens": 80630,
+          "measured_mean_client_inflight": 3.9985059830753986,
+          "full_client_concurrency_fraction": 0.9985087591043298,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "execution_host": "local",
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "server_command": [
+            "python",
+            "-m",
+            "vllm.entrypoints.cli.main",
+            "serve",
+            "$MODEL",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "33781",
+            "--served-model-name",
+            "swe-native8",
+            "--tensor-parallel-size",
+            "2",
+            "--distributed-executor-backend",
+            "mp",
+            "--worker-cls",
+            "native_worker.Worker",
+            "--dtype",
+            "bfloat16",
+            "--kv-cache-dtype",
+            "auto",
+            "--max-model-len",
+            "262144",
+            "--max-num-seqs",
+            "8",
+            "--max-num-batched-tokens",
+            "4096",
+            "--gpu-memory-utilization",
+            "0.90",
+            "--seed",
+            "17",
+            "--enable-prefix-caching",
+            "--mamba-cache-mode",
+            "align",
+            "--enable-prompt-tokens-details",
+            "--async-scheduling",
+            "--shutdown-timeout",
+            "60",
+            "--additional-config",
+            "{\"enable_cpu_binding\":false}",
+            "--limit-mm-per-prompt",
+            "{\"image\":0,\"video\":0}",
+            "--compilation-config",
+            "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24], \"max_cudagraph_capture_size\": 24}",
+            "--speculative-config",
+            "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+            "--generation-config",
+            "vllm",
+            "--override-generation-config",
+            "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+            "--default-chat-template-kwargs",
+            "{\"enable_thinking\":true}"
+          ],
+          "worker_class": "native_worker.Worker"
+        }
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes"
+      },
+      "metrics": {
+        "output_tps": 243.56666666666666,
+        "decode_p90_tps": 85.63126330766188,
+        "ttft_p95_ms": 1281.103659182554,
+        "ttft_p50_ms": 735.5037950037513,
+        "tpot_ms": 15.293445391879908,
+        "tpot_p95_ms": 21.378976147961133,
+        "e2e_p95_ms": 31477.678303580607,
+        "completed_requests": 363
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-SWE-PREFIX.md",
+        "run_ids": [
+          "072d3c8f27d5407188313bf02fd76f6d"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation; fixed window streamed-token accounting, in-flight drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "old_point_id": "qwen35-agentx-smoke-native-tp2-c4-20260923"
+        }
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-smoke-betterscale-tp2-c4-20260924",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "BetterScale (experimental) · TP2 / C4 · SWE smoke",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.9,
+          "host_kv_budget_gib": 0,
+          "host_memory_policy": "No host KV offload; opportunistic shared-host execution; no claimed RAM reservation",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 0,
+          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            16,
+            24,
+            32,
+            64,
+            128,
+            256,
+            512,
+            1024,
+            1536,
+            2048,
+            4096
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "moe-full5",
+          "availability": "Experimental source capsule, not a released wheel qualification",
+          "sampler": "Native real accept/reject MTP2",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "comparison_scope": "One serial 900s observation of this configuration; not a repeatability estimate, equal-KV ablation or certified capacity peak",
+          "observed_max_prompt_tokens": 108984,
+          "measured_mean_client_inflight": 3.9978448308369194,
+          "full_client_concurrency_fraction": 0.9978478236713757,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "execution_host": "local",
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "server_command": [
+            "python",
+            "-m",
+            "vllm.entrypoints.cli.main",
+            "serve",
+            "$MODEL",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "33781",
+            "--served-model-name",
+            "swe-full8",
+            "--tensor-parallel-size",
+            "2",
+            "--distributed-executor-backend",
+            "mp",
+            "--worker-cls",
+            "betterscale.worker.Worker",
+            "--dtype",
+            "bfloat16",
+            "--kv-cache-dtype",
+            "auto",
+            "--max-model-len",
+            "262144",
+            "--max-num-seqs",
+            "8",
+            "--max-num-batched-tokens",
+            "4096",
+            "--gpu-memory-utilization",
+            "0.90",
+            "--seed",
+            "17",
+            "--enable-prefix-caching",
+            "--mamba-cache-mode",
+            "align",
+            "--enable-prompt-tokens-details",
+            "--async-scheduling",
+            "--shutdown-timeout",
+            "60",
+            "--additional-config",
+            "{\"enable_cpu_binding\":false}",
+            "--limit-mm-per-prompt",
+            "{\"image\":0,\"video\":0}",
+            "--compilation-config",
+            "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [3, 6, 12, 16, 24, 32, 64, 128, 256, 512, 1024, 1536, 2048, 4096], \"max_cudagraph_capture_size\": 4096}",
+            "--speculative-config",
+            "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+            "--scheduler-cls",
+            "apc_boundary.BoundaryScheduler",
+            "--generation-config",
+            "vllm",
+            "--override-generation-config",
+            "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+            "--default-chat-template-kwargs",
+            "{\"enable_thinking\":true}"
+          ],
+          "worker_class": "betterscale.worker.Worker"
+        }
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes"
+      },
+      "metrics": {
+        "output_tps": 325.00666666666666,
+        "decode_p90_tps": 106.26696594164699,
+        "ttft_p95_ms": 674.5513833928267,
+        "ttft_p50_ms": 319.29916501394473,
+        "tpot_ms": 11.779149505371102,
+        "tpot_p95_ms": 15.095211337212898,
+        "e2e_p95_ms": 23694.60652044071,
+        "completed_requests": 474
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-SWE-PREFIX.md",
+        "run_ids": [
+          "38a43c94aa8d4b94af88db76f9a882de"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation; fixed window streamed-token accounting, in-flight drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "old_point_id": "qwen35-agentx-smoke-betterscale-tp2-c4-20260923"
         }
       }
     }
