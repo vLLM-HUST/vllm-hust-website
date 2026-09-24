@@ -61,6 +61,13 @@
 
 .frontier-identity { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0; }
 .frontier-workload-tag { display: inline-block; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--run-accent); background: var(--run-tint); color: var(--run-accent); font-size: 11px; }
-.frontier-filters { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 12px; }
-.frontier-filters select { padding: 7px 10px; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 6px; font: inherit; }
-#frontier-filter-count { color: var(--run-muted); font-size: 11px; white-space: nowrap; }
+.frontier-layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 18px; align-items: start; }
+.frontier-filters { padding: 18px; background: var(--run-bg); color: var(--run-ink); border: 1px solid var(--run-border); border-radius: 12px; }
+.frontier .frontier-filters h2 { margin: 0 0 18px; font-size: 14px; color: var(--run-ink); }
+.frontier-filters fieldset { min-width: 0; margin: 0 0 18px; padding: 0; border: 0; }
+.frontier-filters legend { margin-bottom: 10px; font-size: 11px; font-weight: 600; color: var(--run-muted); }
+.frontier-checks { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+.frontier-checks label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
+.frontier-checks input { margin: 0; width: 15px; height: 15px; accent-color: var(--run-accent); }
+#frontier-filter-count { display: block; border-top: 1px solid var(--run-border); padding-top: 12px; color: var(--run-muted); font-size: 11px; }
+@media (max-width: 900px) { .frontier-layout { grid-template-columns: minmax(0, 1fr); } }

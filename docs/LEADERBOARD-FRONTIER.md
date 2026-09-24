@@ -12,8 +12,11 @@ workload identities; never silently mix them.
 
 - Model + precision is one combined tag. The only other choice is a fixed workload/context cohort; a
   single available workload is displayed without inviting an unnecessary selection.
-- MTP filtering (all/on/off; unknown when present) lives at the right of the picker.
-  It hides points and recomputes the observed envelope without changing measurements.
+- An external right sidebar has checkbox rows for MOD and MTP (on/off; unknown
+  when present). All options start checked; no separate “all” choice. Options
+  within a row are OR, rows intersect, and unchecking a whole row hides all points.
+  It recomputes the observed envelope without changing measurements; mobile stacks
+  the sidebar below the chart.
   A single workload is a selected-style static tag; multiple workloads use a selector.
 - Axes are fixed: **X = P90 per-request decode speed (output tokens/s/user)**; **Y = total output
   tokens/s / all allocated chips**. No axis, hardware or MOD filters.
