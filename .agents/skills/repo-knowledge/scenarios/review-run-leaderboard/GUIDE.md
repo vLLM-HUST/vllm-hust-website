@@ -92,8 +92,11 @@ measurements. Browser QA clicks real chart coordinates and uses that user-visibl
 chooser when needed, never forced clicks or hidden direct state changes.
 
 
-Fletcher added right-side MTP filtering on 2026-09-24: all/on/off, with unknown
-kept separate from explicit0. Recompute the envelope from visible points, close
+Fletcher clarified right-side filtering on 2026-09-24: a separate sidebar outside
+the white chart card, with MOD and MTP checkbox rows. All choices start checked,
+no “all” option; choices within rows union and rows intersect. Empty selection
+means no points. Unknown remains separate from explicit MTP0. Mobile places it
+below the chart, not inside the top picker. Recompute the envelope from visible points, close
 hidden selections, retain stable series colors and show visible/total counts.
 Single workload is a static selected-style pill, not a disabled select or a
 long-press-only interaction; show the selector only with multiple choices.

@@ -18,7 +18,7 @@ def ready(page):
 
 def click_point(page, dot):
     """Click actual chart coordinates, then disambiguate overlapping real points."""
-    dot.scroll_into_view_if_needed()
+    dot.evaluate("node => node.scrollIntoView({block: 'center', inline: 'nearest', behavior: 'instant'})")
     point_id = dot.get_attribute("data-point")
     box = dot.locator(".frontier-dot").bounding_box()
     page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
@@ -74,7 +74,7 @@ def main():
             ready(page)
             assert page.locator("#runs-panel").is_hidden()
             assert page.locator("#tasks-panel").is_hidden()
-            assert page.locator("#frontier-panel select").count() == 1
+            assert page.locator("#frontier-panel select").count() == 0
             assert (
                 page.locator(
                     "#frontier-panel table, #frontier-panel pre, #frontier-panel details"
@@ -107,7 +107,8 @@ def main():
                 assert page.locator("#frontier-curves").get_attribute("href") == curves
             # Real control changes filter points and the derived envelope, not data.
             for setting in ('on', 'off', 'all'):
-                page.locator('#frontier-mtp').select_option(setting)
+                page.locator('[data-filter=mtp][value=on]').set_checked(setting in ('on','all'))
+                page.locator('[data-filter=mtp][value=off]').set_checked(setting in ('off','all'))
                 expected = [p for p in default_points if setting == 'all' or
                             (p['configuration']['parameters'].get('mtp_draft_tokens', -1) > 0 if setting == 'on' else
                              p['configuration']['parameters'].get('mtp_draft_tokens') == 0)]
@@ -126,7 +127,22 @@ def main():
                     assert len(envelope.get_attribute('points').split()) == len(front)
                 if expected:
                     click_point(page, page.locator(f'[data-point="{expected[0]["id"]}"]'))
-            page.locator('#frontier-mtp').select_option('all')
+            for checkbox in page.locator('[data-filter=mtp]').all(): checkbox.check()
+            # MOD union within its row intersects the MTP row; empty means hide all.
+            page.locator('[data-filter=mods][value=none]').uncheck()
+            page.locator('[data-filter=mtp][value=on]').uncheck()
+            expected = [p for p in default_points if p['configuration']['mods'] and p['configuration']['parameters'].get('mtp_draft_tokens') == 0]
+            assert set(page.locator('[data-point]').evaluate_all('nodes=>nodes.map(n=>n.dataset.point)')) == {p['id'] for p in expected}
+            for checkbox in page.locator('[data-filter=mods]').all(): checkbox.uncheck()
+            assert page.locator('.frontier-point').count() == 0
+            assert page.locator('#frontier-blank').is_visible()
+            for checkbox in page.locator('[data-filter]').all(): checkbox.check()
+            side = page.locator('.frontier-filters').bounding_box()
+            card = page.locator('.frontier-card').bounding_box()
+            assert page.locator('.frontier-card .frontier-filters').count() == 0
+            if width > 900: assert side['x'] >= card['x'] + card['width']
+            else: assert side['y'] >= card['y'] + card['height']
+
             for point in default_points:
                 dot = page.locator(f'[data-point="{point["id"]}"]')
                 click_point(page, dot)
@@ -284,10 +300,10 @@ def main():
         assert page.locator(".frontier-point").count() == 4
         assert page.locator(".frontier-envelope").count() == 1
         assert page.locator("#frontier-curves").is_visible()
-        page.locator('#frontier-mtp').select_option('off')
+        page.locator('[data-filter=mtp][value=unknown]').uncheck()
         assert page.locator('.frontier-point').count() == 0
         assert page.locator('#frontier-blank').is_visible()
-        page.locator('#frontier-mtp').select_option('unknown')
+        page.locator('[data-filter=mtp][value=unknown]').check()
         assert page.locator('.frontier-point').count() == 4
         page.locator("#frontier-workload").select_option("test-other-workload")
         assert page.locator("#frontier-curves").is_hidden()
