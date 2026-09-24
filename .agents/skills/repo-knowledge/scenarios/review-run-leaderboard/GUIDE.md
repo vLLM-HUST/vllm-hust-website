@@ -111,3 +111,18 @@ content/deployment delay before waiting on Pages. Confirm Pages status and the v
 not merely HTTP access. The same update found existing mdformat drift in three Frontier guides; full
 CI checks all files, unlike a changed-file hook run. Formatting those guides changes no protocol or
 measured values.
+
+Fletcher explicitly requested the fixed-configuration concurrency tradeoff lines in the Frontier
+main chart, not only a separate SVG. Declare `load.concurrency_series` only for points whose serving
+settings are held constant; solid lines connect visible C levels in order, while the dashed Pareto
+envelope remains distinct. Never join by MOD color alone: legacy max-seqs8 C4 and capacity16 C4 are
+different configurations. `render_swe_frontier_curves.py` checks the capacity16 settings and
+produces the linked standalone plot. Browser QA checks line vertices against actual point
+coordinates and filtering, alongside normal popover/download behavior.
+
+Independent authorized campaigns can add points to the same SWE cohort. Import by point/run ID and
+preserve unrelated points, metric evidence and accepted prepared-file variants; replacing the whole
+cohort with one campaign's local inventory loses published results. Fetch before publication and
+resolve concurrent updates additively. A later interrupted window does not supply a score: preserve
+earlier completed windows only with a verified timing boundary, continuous ownership guard evidence
+and owned cleanup, and record the later interruption separately.

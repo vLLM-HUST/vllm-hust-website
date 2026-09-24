@@ -8,6 +8,20 @@ function agentxData() {
     const ids=new Set(cohorts.map(c=>c.id));
     return {...all,cohorts,points:all.points.filter(p=>ids.has(p.cohort_id))};
 }
+test('concurrency lines connect only declared same-cohort series in C order',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const projected=model.project(data.points,'decode_p90_tps','output_tps_per_chip');
+    const lines=model.concurrencySeries(projected.measured);
+    const native=lines.find(rows=>rows[0].point.load.concurrency_series==='swe-capacity16-native');
+    assert.ok(native.length>=4);
+    assert.deepEqual(native.map(row=>row.point.load.concurrency),[...native.map(row=>row.point.load.concurrency)].sort((a,b)=>a-b));
+    assert.ok(lines.flat().every(row=>row.point.configuration.parameters.max_num_seqs===16));
+    assert.equal(model.concurrencySeries(native.slice(0,1)).length,0);
+    const other={...native[0],point:{...native[0].point,cohort_id:'other-workload'}};
+    assert.equal(model.concurrencySeries([native[0],other]).length,0);
+    const hidden=model.concurrencySeries(native.filter(row=>row.point.load.concurrency!==2));
+    assert.ok(hidden.flat().every(row=>row.point.load.concurrency!==2));
+});
 test('production and empty snapshots validate without inventing points',()=>{
     const data=require('../data/leaderboard_frontier.json');
     model.validate(data);
@@ -41,7 +55,12 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
         assert.equal(p.evidence.benchmark_protocol.protocol_id,'swe-prefix-reuse/v1');
         assert.ok(cohort.workload.contract.prepared_workload_variants.some(v=>v.sha256===p.evidence.benchmark_protocol.prepared_workload_sha256));
         if(run.old_point_id) assert.ok(agentxData().points.some(old=>old.id===run.old_point_id));
-        else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
+        else if(p.evidence.benchmark_protocol.campaign==='server32-c32-extension'){
+            assert.equal(p.load.concurrency,32);
+            assert.equal(p.configuration.parameters.max_num_seqs,32);
+            assert.equal(p.load.concurrency_series,undefined);
+            assert.ok(agentxData().points.some(old=>old.id===run.configuration_source_point_id));
+        } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
     }

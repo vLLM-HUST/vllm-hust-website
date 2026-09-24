@@ -72,7 +72,17 @@ and concurrency levels. The original native C16 functional caveats remain in the
 performance success does not resolve them. Compare paired settings within this workload, and retain
 host, capacity and request-mix differences when interpreting the envelope.
 
+The requested C32 capacity extensions raise the server limit to 32 while retaining the original
+arm-specific KV budget. They must first pass a short C32 load/capacity check. This is a different
+serving configuration: successful C32 observations stay separate from the capacity16 concurrency
+lines, not silently joined to them. A failed capacity probe supplies no Frontier score and does not
+invalidate completed capacity16 observations.
+
 ## Published evidence
+
+The Frontier main chart directly connects each capacity16 concurrency series with a solid line and C
+labels. The dashed Pareto envelope is a different, cross-point projection; it must not be mistaken
+for a fixed-configuration concurrency sweep.
 
 The **Concurrency curves** link opens the
 [capacity16 speed-throughput plot](../assets/frontier-qwen35-swe-concurrency.svg). Each line
@@ -85,9 +95,10 @@ constant within a series. Regenerate it after importing results with
 The first native capacity sweep completed C1/C2/C4/C8 successfully. Its C16 window was interrupted
 by the selected-card foreign-owner guard and is excluded. The last retained run completed its drain
 at 09:12:12 UTC on 2026-09-24; the foreign process was observed at 09:23:11 UTC, during C16. Earlier
-completed windows are retained with that deployment note, and C16 is being remeasured separately
-rather than filling its missing result with the interrupted window. Actual device selection remains
-recorded in each point's download.
+completed windows are retained with that deployment note, and C16 was remeasured separately rather
+than filling its missing result with the interrupted window. Actual device selection remains
+recorded in each point's download. The clean C16 rerun on local cards 2/3 passed all request checks
+and owned-resource cleanup.
 
 [`leaderboard_frontier_swe_evidence.json`](../data/leaderboard_frontier_swe_evidence.json) contains
 the run summaries, sanitized client configurations and metric extracts used by the chart. The
