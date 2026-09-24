@@ -291,3 +291,18 @@ test('A+E frontier retains highest-throughput point while preserving all earlier
         assert.deepEqual(new Set(p.frontier_selection.compared_point_ids),new Set([p.id,...earlier.map(p=>p.id)]));
     }
 });
+test('failed correctness references stay visible but cannot form or dominate the Pareto envelope',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const refs=data.points.filter(p=>p.id.startsWith('qwen27-sweprefix-native-'));
+    assert.deepEqual(refs.map(p=>p.load.concurrency),[1,2,4,8,16]);
+    for(const p of refs){
+        assert.equal(model.failedCorrectness(p),true);
+        assert.equal(p.configuration.parameters.functional_check_concurrency,16);
+        assert.deepEqual(p.configuration.parameters.functional_failed_request_ids,[2,5,8,11,13]);
+    }
+    const projected=model.project(refs,'decode_p90_tps','output_tps_per_chip');
+    assert.equal(projected.measured.length,5);
+    assert.equal(projected.frontier.length,0);
+    const valid=structuredClone(refs[0]);valid.id='qualified-control';valid.configuration.parameters.functional_status='bounded_pass';valid.metrics.output_tps=1;valid.metrics.decode_p90_tps=1;
+    assert.deepEqual(model.project([...refs,valid],'decode_p90_tps','output_tps_per_chip').frontier.map(p=>p.point.id),[valid.id]);
+});

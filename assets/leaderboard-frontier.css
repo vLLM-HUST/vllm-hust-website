@@ -73,3 +73,6 @@
 .frontier-checks input { margin: 0; width: 15px; height: 15px; accent-color: var(--run-accent); }
 #frontier-filter-count { display: block; border-top: 1px solid var(--run-border); padding-top: 12px; color: var(--run-muted); font-size: 11px; }
 @media (max-width: 900px) { .frontier-layout { grid-template-columns: minmax(0, 1fr); } }
+
+.frontier-correctness-warning { color: #b91c1c; border-left: 3px solid #dc2626; padding-left: 10px; font-size: 12px; line-height: 1.5; }
+@media (prefers-color-scheme: dark) { .frontier-correctness-warning { color: #fca5a5; } }

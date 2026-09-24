@@ -33,7 +33,7 @@ permissions:
 jobs:
   review:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -54,6 +54,7 @@ jobs:
           trap 'kill "$server_pid"' EXIT
           python scripts/verify_leaderboard_runs_browser.py
           python scripts/verify_leaderboard_frontier_browser.py
+          FRONTIER_QA_URL=http://127.0.0.1:8774 python scripts/verify_leaderboard_frontier_native27_browser.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

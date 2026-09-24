@@ -58,9 +58,12 @@ a27B before/after ablation; the matched35B profiles establish the structural-rem
 The native27B deployment passed all8 serial cold/warm retrievals through262080 prompt tokens, but5
 of16 concurrent requests returned `cobalt-seven-` followed by EOS instead of `cobalt-seven-42`.
 Retain this failed correctness boundary; neither its cause nor harmless numerical variation has been
-established. Native chart admission is pending the explicit choice to show a failed-correctness
-reference or omit that reference. Candidate performance can proceed independently. Neither arm's
-protocol-valid performance is a SWE answer-quality score.
+established. Fletcher authorized displaying all five native points as red, failed-correctness
+throughput references. The failed check was C16 (request IDs 2, 5, 8, 11, 13); C1/2/4/8 were not
+separately correctness-qualified. The shared deployment failure is attached to every reference
+point, not claimed as five independently observed failures. Red references remain outside the Pareto
+envelope, including when BetterScale is filtered out. Neither arm's protocol-valid performance is a
+SWE answer-quality score.
 
 All five27B BetterScale900s windows completed with zero request failures:
 
@@ -87,3 +90,18 @@ exit and resource release are imported. Full metric extracts remain in
 identities. Same-configuration repeated observations follow
 [whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), with all inferior raw evidence
 retained. Different source/configuration curves are not silently pooled into repeats.
+
+## Native27B throughput references (correctness failed)
+
+| Concurrency | Native tokens/s/chip | BetterScale tokens/s/chip |
+| ----------- | -------------------: | ------------------------: |
+| 1           |               27.904 |                    33.007 |
+| 2           |               48.544 |                    57.138 |
+| 4           |               80.434 |                    96.477 |
+| 8           |              117.680 |                   145.924 |
+| 16          |              104.999 |                   119.482 |
+
+All five native900s diagnostic windows met the replay protocol and clean-release gates; that does
+not repair the independent failed retrieval check. Native C16 recorded52 preemptions including drain
+(BetterScale205); other native concurrency levels recorded0. These are single observations, not a
+correctness-qualified speedup or isolated optimization ablation.
