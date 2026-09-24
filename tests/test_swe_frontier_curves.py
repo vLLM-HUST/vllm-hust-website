@@ -21,6 +21,8 @@ def test_published_swe_curves_match_only_capacity16_observations():
         for point in data["points"]
         if point["cohort_id"] == renderer["COHORT"]
         and point["configuration"]["parameters"].get("max_num_seqs") == 16
+        and point["load"].get("concurrency_series")
+        in ("swe-capacity16-native", "swe-capacity16-full")
         and point["configuration"]["hardware"]["accelerator_count"] == 2
     }
     assert ids == expected
