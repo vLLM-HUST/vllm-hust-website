@@ -285,9 +285,25 @@ def main():
             assert page.locator("#view-runs-count").inner_text() == str(len(all_runs))
             page.locator("#runs-next").click()
             assert page.locator("#runs-page").inner_text().startswith("2 /")
-            assert page.evaluate(
-                "document.documentElement.scrollWidth <= window.innerWidth + 1"
+            layout = page.evaluate(
+                """() => ({viewport:innerWidth, width:document.documentElement.scrollWidth,
+                  outside:[...document.querySelectorAll('body *')].filter(n=>{
+                    for(let a=n.parentElement;a&&a!==document.body;a=a.parentElement){
+                      if(['auto','scroll','hidden','clip'].includes(getComputedStyle(a).overflowX))return false;
+                    }
+                    return true;
+                  }).map(n=>{
+                    const r=n.getBoundingClientRect();
+                    return {tag:n.tagName,id:n.id,classes:String(n.className),
+                      left:r.left,right:r.right,width:r.width};
+                  }).filter(r=>r.width>0&&(r.right>innerWidth+1||r.left < -1)).slice(0,20)})"""
             )
+            if layout["width"] > layout["viewport"] + 1:
+                page.screenshot(
+                    path=str(args.output / f"overflow-{width}-{language}-{scheme}.png"),
+                    full_page=True,
+                )
+            assert layout["width"] <= layout["viewport"] + 1, layout
             assert not errors, errors
             reports.append(
                 {
