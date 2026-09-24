@@ -78,10 +78,6 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 - vLLM 实际运行时架构与 9 个子任务映射：`docs/ARCHITECTURE_TASK_MAPPING.md`
 - 首阶段实施优先级与验证清单：`docs/IMPLEMENTATION_PRIORITIES.md`
 
-## Frontier 成绩提交示例
-
-向 Frontier 提交实测点，请阅读 [提交指南与真实样例](docs/FRONTIER-SUBMISSION.md)。 它与下述普通排行榜的快照同步链路独立；演示副本不会重复上榜。
-
 ## Benchmark Data Chain
 
 website does not ingest raw compare directories and does not hand-edit benchmark rows.
