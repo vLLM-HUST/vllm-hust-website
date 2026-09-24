@@ -3895,6 +3895,570 @@
         "direct_resident_experts_verified": true
       },
       "scope": "Metric-only public extract; complete launch, admission and generated-token artifacts retained privately. Lifetime counters include gate and drain."
+    },
+    {
+      "run_id": "e23c2ecc718f4efaa533ac7b0143c18d",
+      "point_id": "qwen35-sweprefix-matrix-full-attention-dp2-expert-ep2-slots32-sweep-c4-lease1-c4-20260924",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 436,
+        "max_prompt_tokens_observed": 99686,
+        "prompt_tokens_p50": 24272.5,
+        "max_turn_index_reached": 73,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 9,
+        "requests_completed_in_window": 432,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 264825,
+        "output_tokens_per_second": 294.25,
+        "output_tokens_per_second_per_chip": 147.125,
+        "decode_tokens_per_second_p90": 95.91457514556471,
+        "decode_speed_samples": 432,
+        "ttft_seconds_p95": 0.8529335992483539,
+        "client_inflight_seconds": {
+          "0": 0.000147593003930524,
+          "1": 0.0008220659801736474,
+          "2": 0.0005372710002120584,
+          "3": 1.6879506510449573,
+          "4": 898.3105424189707
+        },
+        "mean_client_inflight": 3.9981199091522206,
+        "full_concurrency_fraction": 0.9981228249099675,
+        "drain_seconds": 13.703852923004888,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "e23c2ecc718f4efaa533ac7b0143c18d",
+        "started_at_unix": 1790268547.2525055,
+        "model": "swe-full-attention-dp2-expert-ep2-slots32-sweep-c4-lease1",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "data_parallel_size": 2,
+        "routing_policy": "lane modulo DP size via X-data-parallel-rank",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 294.25,
+        "decode_p90_tps": 95.91457514556471,
+        "ttft_p95_ms": 852.9335992483539,
+        "ttft_p50_ms": 375.2137979899999,
+        "tpot_ms": 13.046239735058046,
+        "tpot_p95_ms": 17.119164902733946,
+        "e2e_p95_ms": 26569.00573328457,
+        "completed_requests": 432
+      },
+      "requests_artifact_sha256": "161b4b7b6b678287ef198f868a788217df38281602f87d9e1978d93203fb77ef",
+      "capacity_validation": {
+        "phase": "c4",
+        "client_concurrency": 4,
+        "data_parallel_size": 2,
+        "max_observed_running_total": 4.0,
+        "max_observed_kv_fraction": 0.1923076923076923,
+        "preemptions": 0.0,
+        "passed": true,
+        "scope": "Sampled engine-active occupancy across all DP ranks; bounded workload only, not C full-256K requests",
+        "server_log_corroboration": []
+      },
+      "partition_validation": {
+        "status": "PASS",
+        "attention_tp": 1,
+        "attention_dp": 2,
+        "expert_partition": "EP2",
+        "physical_moe_layers": 41,
+        "scope": "loaded weight geometry and expert-map coverage, not semantic qualification"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "guard_foreign_collision": false,
+        "release_probe_complete": true
+      },
+      "scope": "Metric-only public extract; original token IDs, source capsules and guarded admission/release evidence retained by measurement owner"
+    },
+    {
+      "run_id": "3cca8b7175ac447b82fd4a9960ce2736",
+      "point_id": "qwen35-sweprefix-matrix-full-attention-dp2-expert-tp2-slots32-sweep-c4-lease1-c4-20260924",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 430,
+        "max_prompt_tokens_observed": 99058,
+        "prompt_tokens_p50": 23900.0,
+        "max_turn_index_reached": 69,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 9,
+        "requests_completed_in_window": 426,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 259162,
+        "output_tokens_per_second": 287.9577777777778,
+        "output_tokens_per_second_per_chip": 143.9788888888889,
+        "decode_tokens_per_second_p90": 92.56408006855611,
+        "decode_speed_samples": 426,
+        "ttft_seconds_p95": 0.8578977647484862,
+        "client_inflight_seconds": {
+          "0": 0.0001351429964415729,
+          "1": 0.0009043790050782263,
+          "2": 0.0005706819938495755,
+          "3": 1.6657987928483635,
+          "4": 898.3325910031563
+        },
+        "mean_client_inflight": 3.9981442290379587,
+        "full_concurrency_fraction": 0.9981473233368403,
+        "drain_seconds": 32.321226453001145,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "3cca8b7175ac447b82fd4a9960ce2736",
+        "started_at_unix": 1790267018.4354208,
+        "model": "swe-full-attention-dp2-expert-tp2-slots32-sweep-c4-lease1",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "data_parallel_size": 2,
+        "routing_policy": "lane modulo DP size via X-data-parallel-rank",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 287.9577777777778,
+        "decode_p90_tps": 92.56408006855611,
+        "ttft_p95_ms": 857.8977647484862,
+        "ttft_p50_ms": 378.37919552112,
+        "tpot_ms": 13.357185345121595,
+        "tpot_p95_ms": 17.646016217495603,
+        "e2e_p95_ms": 27169.349589254125,
+        "completed_requests": 426
+      },
+      "requests_artifact_sha256": "ae95ddd2e2e4c16971136eeeacadbe5fa5fcd992a4630cc71d7671d153c0c313",
+      "capacity_validation": {
+        "phase": "c4",
+        "client_concurrency": 4,
+        "data_parallel_size": 2,
+        "max_observed_running_total": 4.0,
+        "max_observed_kv_fraction": 0.18976545842217485,
+        "preemptions": 0.0,
+        "passed": true,
+        "scope": "Sampled engine-active occupancy across all DP ranks; bounded workload only, not C full-256K requests",
+        "server_log_corroboration": []
+      },
+      "partition_validation": {
+        "status": "PASS",
+        "attention_tp": 1,
+        "attention_dp": 2,
+        "expert_partition": "TP2",
+        "physical_moe_layers": 41,
+        "scope": "loaded weight geometry and expert-map coverage, not semantic qualification"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "guard_foreign_collision": false,
+        "release_probe_complete": true
+      },
+      "scope": "Metric-only public extract; original token IDs, source capsules and guarded admission/release evidence retained by measurement owner"
+    },
+    {
+      "run_id": "154b4148d1ad4dfca7c810ff22abbdb6",
+      "point_id": "qwen35-sweprefix-matrix-full-attention-tp2-expert-ep2-slots32-sweep-c4-lease1-c4-20260924",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 446,
+        "max_prompt_tokens_observed": 102161,
+        "prompt_tokens_p50": 25039.0,
+        "max_turn_index_reached": 74,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 10,
+        "requests_completed_in_window": 442,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 270964,
+        "output_tokens_per_second": 301.0711111111111,
+        "output_tokens_per_second_per_chip": 150.53555555555556,
+        "decode_tokens_per_second_p90": 93.31919610860358,
+        "decode_speed_samples": 442,
+        "ttft_seconds_p95": 0.6348649281819234,
+        "client_inflight_seconds": {
+          "0": 0.00013760299771092832,
+          "1": 0.0008323160000145435,
+          "2": 0.000571501994272694,
+          "3": 1.875228738063015,
+          "4": 898.123229840945
+        },
+        "mean_client_inflight": 3.997911756553286,
+        "full_concurrency_fraction": 0.9979146998232722,
+        "drain_seconds": 3.7979112089960836,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "154b4148d1ad4dfca7c810ff22abbdb6",
+        "started_at_unix": 1790268589.859729,
+        "model": "swe-full-attention-tp2-expert-ep2-slots32-sweep-c4-lease1",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 301.0711111111111,
+        "decode_p90_tps": 93.31919610860358,
+        "ttft_p95_ms": 634.8649281819235,
+        "ttft_p50_ms": 310.6042559957132,
+        "tpot_ms": 12.899017900000596,
+        "tpot_p95_ms": 15.701083974267908,
+        "e2e_p95_ms": 25328.028229897605,
+        "completed_requests": 442
+      },
+      "requests_artifact_sha256": "04d7d849dde11f719f5ca51d892ffd779ddaed3845bc522701bf8d8e7fb8e8eb",
+      "capacity_validation": {
+        "phase": "c4",
+        "client_concurrency": 4,
+        "data_parallel_size": 1,
+        "max_observed_running_total": 4.0,
+        "max_observed_kv_fraction": 0.16447368421052633,
+        "preemptions": 0.0,
+        "passed": true,
+        "scope": "Sampled engine-active occupancy across all DP ranks; bounded workload only, not C full-256K requests",
+        "server_log_corroboration": []
+      },
+      "partition_validation": {
+        "status": "PASS",
+        "attention_tp": 2,
+        "attention_dp": 1,
+        "expert_partition": "EP2",
+        "physical_moe_layers": 41,
+        "scope": "loaded weight geometry and expert-map coverage, not semantic qualification"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "guard_foreign_collision": false,
+        "release_probe_complete": true
+      },
+      "scope": "Metric-only public extract; original token IDs, source capsules and guarded admission/release evidence retained by measurement owner"
+    },
+    {
+      "run_id": "fab080d3a6314879b325c2f2ab9b988e",
+      "point_id": "qwen35-sweprefix-matrix-native-attention-dp2-expert-ep2-slots32-sweep-c4-lease1-c4-20260924",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 309,
+        "max_prompt_tokens_observed": 71177,
+        "prompt_tokens_p50": 21687.0,
+        "max_turn_index_reached": 47,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 7,
+        "requests_completed_in_window": 305,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 191809,
+        "output_tokens_per_second": 213.1211111111111,
+        "output_tokens_per_second_per_chip": 106.56055555555555,
+        "decode_tokens_per_second_p90": 71.30135197338453,
+        "decode_speed_samples": 305,
+        "ttft_seconds_p95": 1.335393682791619,
+        "client_inflight_seconds": {
+          "0": 0.00016836400027386844,
+          "1": 0.0008256300061475486,
+          "2": 0.0005417439970187843,
+          "3": 1.2379756571608596,
+          "4": 898.7604886048357
+        },
+        "mean_client_inflight": 3.9986197672320283,
+        "full_concurrency_fraction": 0.9986227651164841,
+        "drain_seconds": 6.595602118992247,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "fab080d3a6314879b325c2f2ab9b988e",
+        "started_at_unix": 1790265457.1386628,
+        "model": "swe-native-attention-dp2-expert-ep2-slots32-sweep-c4-lease1",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "data_parallel_size": 2,
+        "routing_policy": "lane modulo DP size via X-data-parallel-rank",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 213.1211111111111,
+        "decode_p90_tps": 71.30135197338453,
+        "ttft_p95_ms": 1335.393682791619,
+        "ttft_p50_ms": 747.8863350115716,
+        "tpot_ms": 17.650891947649246,
+        "tpot_p95_ms": 25.771013754894156,
+        "e2e_p95_ms": 37094.76002879676,
+        "completed_requests": 305
+      },
+      "requests_artifact_sha256": "b54785cf3a1efb2e6942d4bd116ce507c1260f8bbcdb2389a6aebb2ac730ee60",
+      "capacity_validation": {
+        "phase": "c4",
+        "client_concurrency": 4,
+        "data_parallel_size": 2,
+        "max_observed_running_total": 4.0,
+        "max_observed_kv_fraction": 0.1913978494623656,
+        "preemptions": 0.0,
+        "passed": true,
+        "scope": "Sampled engine-active occupancy across all DP ranks; bounded workload only, not C full-256K requests",
+        "server_log_corroboration": []
+      },
+      "partition_validation": {
+        "status": "PASS",
+        "attention_tp": 1,
+        "attention_dp": 2,
+        "expert_partition": "EP2",
+        "physical_moe_layers": 41,
+        "scope": "loaded weight geometry and expert-map coverage, not semantic qualification"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "guard_foreign_collision": false,
+        "release_probe_complete": true
+      },
+      "scope": "Metric-only public extract; original token IDs, source capsules and guarded admission/release evidence retained by measurement owner"
+    },
+    {
+      "run_id": "6032d5cd8dc1439086c2302928675f65",
+      "point_id": "qwen35-sweprefix-matrix-native-attention-dp2-expert-tp2-slots32-sweep-c4-lease1-c4-20260924",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 340,
+        "max_prompt_tokens_observed": 74870,
+        "prompt_tokens_p50": 21616.5,
+        "max_turn_index_reached": 52,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 336,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 206502,
+        "output_tokens_per_second": 229.44666666666666,
+        "output_tokens_per_second_per_chip": 114.72333333333333,
+        "decode_tokens_per_second_p90": 77.78155493386402,
+        "decode_speed_samples": 336,
+        "ttft_seconds_p95": 1.2788205227407161,
+        "client_inflight_seconds": {
+          "0": 0.0001168329908978194,
+          "1": 0.0008086300222203135,
+          "2": 0.0005772839940618724,
+          "3": 1.0245255071204156,
+          "4": 898.9739717458724
+        },
+        "mean_client_inflight": 3.9988571407809568,
+        "full_concurrency_fraction": 0.9988599686065249,
+        "drain_seconds": 10.533292181004072,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "6032d5cd8dc1439086c2302928675f65",
+        "started_at_unix": 1790265361.1885939,
+        "model": "swe-native-attention-dp2-expert-tp2-slots32-sweep-c4-lease1",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "data_parallel_size": 2,
+        "routing_policy": "lane modulo DP size via X-data-parallel-rank",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 229.44666666666666,
+        "decode_p90_tps": 77.78155493386402,
+        "ttft_p95_ms": 1278.8205227407161,
+        "ttft_p50_ms": 741.1510350211756,
+        "tpot_ms": 16.342903391267864,
+        "tpot_p95_ms": 23.99998760216567,
+        "e2e_p95_ms": 34169.89773675596,
+        "completed_requests": 336
+      },
+      "requests_artifact_sha256": "08486597d625d6c3bbb77260c7fea83c47d6727393888d5c06da4dd17164efc8",
+      "capacity_validation": {
+        "phase": "c4",
+        "client_concurrency": 4,
+        "data_parallel_size": 2,
+        "max_observed_running_total": 4.0,
+        "max_observed_kv_fraction": 0.19313304721030045,
+        "preemptions": 0.0,
+        "passed": true,
+        "scope": "Sampled engine-active occupancy across all DP ranks; bounded workload only, not C full-256K requests",
+        "server_log_corroboration": []
+      },
+      "partition_validation": {
+        "status": "PASS",
+        "attention_tp": 1,
+        "attention_dp": 2,
+        "expert_partition": "TP2",
+        "physical_moe_layers": 41,
+        "scope": "loaded weight geometry and expert-map coverage, not semantic qualification"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "guard_foreign_collision": false,
+        "release_probe_complete": true
+      },
+      "scope": "Metric-only public extract; original token IDs, source capsules and guarded admission/release evidence retained by measurement owner"
+    },
+    {
+      "run_id": "ca641d790d1347a984491ef59c76ec0a",
+      "point_id": "qwen35-sweprefix-matrix-native-attention-tp2-expert-ep2-slots32-sweep-c4-lease1-c4-20260924",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 346,
+        "max_prompt_tokens_observed": 77201,
+        "prompt_tokens_p50": 22350.5,
+        "max_turn_index_reached": 55,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 342,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 209325,
+        "output_tokens_per_second": 232.58333333333334,
+        "output_tokens_per_second_per_chip": 116.29166666666667,
+        "decode_tokens_per_second_p90": 79.97564649456659,
+        "decode_speed_samples": 342,
+        "ttft_seconds_p95": 1.287966375083488,
+        "client_inflight_seconds": {
+          "0": 0.00012628297554329038,
+          "1": 0.000756615016143769,
+          "2": 0.0005425619892776012,
+          "3": 1.258013917133212,
+          "4": 898.7405606228858
+        },
+        "mean_client_inflight": 3.9985979177577087,
+        "full_concurrency_fraction": 0.9986006229143176,
+        "drain_seconds": 16.932226599979913,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "ca641d790d1347a984491ef59c76ec0a",
+        "started_at_unix": 1790266824.975976,
+        "model": "swe-native-attention-tp2-expert-ep2-slots32-sweep-c4-lease1",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 232.58333333333334,
+        "decode_p90_tps": 79.97564649456659,
+        "ttft_p95_ms": 1287.966375083488,
+        "ttft_p50_ms": 745.49341549573,
+        "tpot_ms": 16.1783217233196,
+        "tpot_p95_ms": 23.236951919206916,
+        "e2e_p95_ms": 34083.874207201,
+        "completed_requests": 342
+      },
+      "requests_artifact_sha256": "70fd243ef60f66d730b81aad5949e600052914fd083975ec936a6ed73c611359",
+      "capacity_validation": {
+        "phase": "c4",
+        "client_concurrency": 4,
+        "data_parallel_size": 1,
+        "max_observed_running_total": 4.0,
+        "max_observed_kv_fraction": 0.14124293785310738,
+        "preemptions": 0.0,
+        "passed": true,
+        "scope": "Sampled engine-active occupancy across all DP ranks; bounded workload only, not C full-256K requests",
+        "server_log_corroboration": []
+      },
+      "partition_validation": {
+        "status": "PASS",
+        "attention_tp": 2,
+        "attention_dp": 1,
+        "expert_partition": "EP2",
+        "physical_moe_layers": 41,
+        "scope": "loaded weight geometry and expert-map coverage, not semantic qualification"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "guard_foreign_collision": false,
+        "release_probe_complete": true
+      },
+      "scope": "Metric-only public extract; original token IDs, source capsules and guarded admission/release evidence retained by measurement owner"
     }
   ]
 }
