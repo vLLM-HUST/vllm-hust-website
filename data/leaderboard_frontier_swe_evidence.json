@@ -1,0 +1,141 @@
+{
+  "protocol": "swe-prefix-reuse/v1",
+  "runs": [
+    {
+      "run_id": "072d3c8f27d5407188313bf02fd76f6d",
+      "old_point_id": "qwen35-agentx-smoke-native-tp2-c4-20260923",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 367,
+        "max_prompt_tokens_observed": 80630,
+        "prompt_tokens_p50": 22974.0,
+        "max_turn_index_reached": 63,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 363,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 219210,
+        "output_tokens_per_second": 243.56666666666666,
+        "output_tokens_per_second_per_chip": 121.78333333333333,
+        "decode_tokens_per_second_p90": 85.63126330766188,
+        "decode_speed_samples": 363,
+        "ttft_seconds_p95": 1.2811036591825542,
+        "client_inflight_seconds": {
+          "0": 0.0001233890070579946,
+          "1": 0.0007766360067762434,
+          "2": 0.0005749870033469051,
+          "3": 1.3406417940859683,
+          "4": 898.6578831938969
+        },
+        "mean_client_inflight": 3.9985059830753986,
+        "full_concurrency_fraction": 0.9985087591043298,
+        "drain_seconds": 23.875199910020456,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.1",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "072d3c8f27d5407188313bf02fd76f6d",
+        "started_at_unix": 1790234142.1819136,
+        "model": "swe-native8",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 243.56666666666666,
+        "decode_p90_tps": 85.63126330766188,
+        "ttft_p95_ms": 1281.103659182554,
+        "ttft_p50_ms": 735.5037950037513,
+        "tpot_ms": 15.293445391879908,
+        "tpot_p95_ms": 21.378976147961133,
+        "e2e_p95_ms": 31477.678303580607,
+        "completed_requests": 363
+      },
+      "requests_artifact_sha256": "d023b74ab970bb3469bda12afef20e844ba92da868b517e28e22ce8ad8048d30",
+      "scope": "Metric-only public extract; full output-token logs, admission/ownership, source capsules and server counters retained by measurement owner"
+    },
+    {
+      "run_id": "38a43c94aa8d4b94af88db76f9a882de",
+      "old_point_id": "qwen35-agentx-smoke-betterscale-tp2-c4-20260923",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 478,
+        "max_prompt_tokens_observed": 108984,
+        "prompt_tokens_p50": 24749.5,
+        "max_turn_index_reached": 79,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 11,
+        "requests_completed_in_window": 474,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 292506,
+        "output_tokens_per_second": 325.00666666666666,
+        "output_tokens_per_second_per_chip": 162.50333333333333,
+        "decode_tokens_per_second_p90": 106.26696594164699,
+        "decode_speed_samples": 474,
+        "ttft_seconds_p95": 0.6745513833928267,
+        "client_inflight_seconds": {
+          "0": 0.000124503014376387,
+          "1": 0.0008813059830572456,
+          "2": 0.0005574300012085587,
+          "3": 1.9353954567632172,
+          "4": 898.0630413042381
+        },
+        "mean_client_inflight": 3.9978448308369194,
+        "full_concurrency_fraction": 0.9978478236713757,
+        "drain_seconds": 36.23018895401037,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.1",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "38a43c94aa8d4b94af88db76f9a882de",
+        "started_at_unix": 1790235948.6839879,
+        "model": "swe-full8",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 325.00666666666666,
+        "decode_p90_tps": 106.26696594164699,
+        "ttft_p95_ms": 674.5513833928267,
+        "ttft_p50_ms": 319.29916501394473,
+        "tpot_ms": 11.779149505371102,
+        "tpot_p95_ms": 15.095211337212898,
+        "e2e_p95_ms": 23694.60652044071,
+        "completed_requests": 474
+      },
+      "requests_artifact_sha256": "e263f3981f62e6e4700ed85a346780c326d31e469d10200273e12d3863ae894b",
+      "scope": "Metric-only public extract; full output-token logs, admission/ownership, source capsules and server counters retained by measurement owner"
+    }
+  ]
+}
