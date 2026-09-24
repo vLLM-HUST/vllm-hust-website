@@ -262,6 +262,33 @@ def main():
             assert page.locator(".frontier-concurrency-line").count() == 0
             for checkbox in page.locator("[data-filter]").all():
                 checkbox.check()
+            separated = [
+                p
+                for p in default_points
+                if p["configuration"].get("experiment_group")
+                == "betterscale-AEseparation"
+            ]
+            if separated:
+                for checkbox in page.locator("[data-filter=mods]").all():
+                    checkbox.set_checked(
+                        checkbox.get_attribute("value") == "betterscale-AEseparation"
+                    )
+                assert set(
+                    page.locator("[data-point]").evaluate_all(
+                        "nodes=>nodes.map(n=>n.dataset.point)"
+                    )
+                ) == {p["id"] for p in separated}
+                assert (
+                    "betterscale-AEseparation"
+                    in page.locator("#frontier-legend").inner_text()
+                )
+                click_point(page, page.locator(f'[data-point="{separated[0]["id"]}"]'))
+                assert (
+                    "betterscale-AEseparation"
+                    in page.locator("#frontier-popover").inner_text()
+                )
+                for checkbox in page.locator("[data-filter=mods]").all():
+                    checkbox.check()
             side = page.locator(".frontier-filters").bounding_box()
             card = page.locator(".frontier-card").bounding_box()
             assert page.locator(".frontier-card .frontier-filters").count() == 0

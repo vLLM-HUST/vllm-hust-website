@@ -36,6 +36,7 @@
                 || c.context_capacity_tokens < data.cohorts.find(cohort => cohort.id === p.cohort_id).context_tokens || e?.status !== 'measured'
                 || !Array.isArray(e.run_ids) || !e.run_ids.length || !e.aggregation
                 || !safeURL(e.url)) throw new Error(`Invalid measured configuration: ${p.id || '?'}`);
+            if (c.experiment_group != null && (typeof c.experiment_group !== 'string' || !c.experiment_group.trim())) throw new Error(`Invalid experiment group: ${p.id}`);
             if (Object.values(p.metrics).some(v => v !== null && (!finite(v) || v < 0))) throw new Error(`Invalid metric: ${p.id}`);
             if (p.load.concurrency_series != null && (typeof p.load.concurrency_series !== 'string' || !p.load.concurrency_series
                 || !Number.isInteger(p.load.concurrency) || p.load.concurrency < 1)) throw new Error(`Invalid concurrency series: ${p.id}`);
@@ -56,6 +57,7 @@
         return finite(m[key]) ? m[key] : null;
     }
     function modKey(point) { return [...point.configuration.mods].sort().join('+') || 'none'; }
+    function groupKey(point) { return point.configuration.experiment_group || modKey(point); }
     function project(points, xKey, yKey) {
         if (!metrics[xKey] || !metrics[yKey]) throw new Error('Unknown Frontier axis');
         const measured = points.map(point => ({ point, x: value(point, xKey), y: value(point, yKey) }))
@@ -85,7 +87,7 @@
         return [...groups.values()].filter(rows => rows.length > 1)
             .map(rows => [...rows].sort((a, b) => a.point.load.concurrency - b.point.load.concurrency));
     }
-    const api = { validate, metrics, value, modKey, project, safeURL, mtpState, concurrencySeries };
+    const api = { validate, metrics, value, modKey, groupKey, project, safeURL, mtpState, concurrencySeries };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);

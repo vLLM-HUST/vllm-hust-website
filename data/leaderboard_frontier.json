@@ -1742,7 +1742,8 @@
           "warmup_policy": "mandatory snapshot primers only; no additional cache-pressure replay",
           "warmup_elapsed_seconds": 391.96,
           "workload_wrapper_revision": "e7c2fd7dd3a127d57c932ad782a376115435e875"
-        }
+        },
+        "experiment_group": "betterscale-AEseparation"
       },
       "load": {
         "concurrency": 64,
@@ -1866,7 +1867,8 @@
           "warmup_policy": "mandatory snapshot primers only; no additional cache-pressure replay",
           "warmup_elapsed_seconds": 373.17,
           "workload_wrapper_revision": "e7c2fd7dd3a127d57c932ad782a376115435e875"
-        }
+        },
+        "experiment_group": "betterscale-AEseparation"
       },
       "load": {
         "concurrency": 64,
@@ -2369,7 +2371,8 @@
           "routed_parameter_storage_bytes_per_attention_rank": 164,
           "kv_cache_memory_bytes": 34359738368,
           "max_num_seqs_per_rank": 32
-        }
+        },
+        "experiment_group": "betterscale-AEseparation"
       },
       "load": {
         "concurrency": 64,
@@ -3171,7 +3174,8 @@
           "routed_parameter_storage_bytes_per_attention_rank": 164,
           "kv_cache_memory_bytes": 34359738368,
           "max_num_seqs_per_rank": 32
-        }
+        },
+        "experiment_group": "betterscale-AEseparation"
       },
       "load": {
         "concurrency": 64,

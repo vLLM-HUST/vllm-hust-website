@@ -228,3 +228,19 @@ test('MTP filter classifies explicit settings without treating missing as off',(
     assert.equal(data.points.filter(p=>model.mtpState(p)==='on').length,11);
     assert.equal(data.points.filter(p=>model.mtpState(p)==='off').length,5);
 });
+
+test('AE separation is a tracking group, not a new MOD or a TP/EP alias',()=>{
+    const data=model.validate(require('../data/leaderboard_frontier.json'));
+    const separated=data.points.filter(p=>p.configuration.experiment_group==='betterscale-AEseparation');
+    assert.equal(separated.length,4);
+    for(const p of separated){
+        assert.equal(model.groupKey(p),'betterscale-AEseparation');
+        assert.equal(model.modKey(p),'betterscale');
+        assert.ok(p.configuration.parameters.attention_ranks>0 && p.configuration.parameters.expert_ranks>0);
+        assert.equal(p.load.concurrency_series,undefined);
+    }
+    for(const p of data.points.filter(p=>!p.configuration.parameters.expert_ranks))
+        assert.equal(model.groupKey(p),model.modKey(p));
+    const invalid=structuredClone(data);invalid.points[0].configuration.experiment_group=' ';
+    assert.throws(()=>model.validate(invalid),/experiment group/);
+});

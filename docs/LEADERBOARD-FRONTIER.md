@@ -149,3 +149,14 @@ historical TP2 points. HF/ModelScope are accepted as the same model by Fletcher.
 MTP and warmup remain per-point settings; `evidence.benchmark_protocol` overrides historical
 cohort-wide assumptions. This is a throughput configuration comparison, not an identical-protocol
 causal experiment. The withdrawn eight-chip C16 points remain excluded.
+
+## Experiment groups
+
+Optional `configuration.experiment_group` separates tracking groups in the existing MOD / Group
+filter, legend and point popover without changing canonical `configuration.mods` attribution.
+`betterscale-AEseparation` labels actual separately allocated attention/expert serving experiments
+(including historical AgentX and current SWE points), not ordinary co-located TP/EP topology. Future
+revisions may share this group; each point retains its own source/configuration and metrics. A group
+alone never joins points into a concurrency line: `load.concurrency_series` still requires fixed
+serving settings. Retain all valid observations, including dominated results; interrupted windows
+without valid summaries are not benchmark scores.
