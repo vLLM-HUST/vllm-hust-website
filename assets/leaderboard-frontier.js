@@ -37,6 +37,11 @@
     const parallel = p => {
         const params = p.configuration.parameters;
         if (params.attention_ranks != null && params.expert_ranks != null) return `A${params.attention_ranks} / E${params.expert_ranks}`;
+        if (params.attention_tensor_parallel_size != null && params.expert_tensor_parallel_size != null) {
+            const attention = params.attention_data_parallel_size > 1 ? `DP${params.attention_data_parallel_size}` : `TP${params.attention_tensor_parallel_size}`;
+            const expert = params.expert_parallel_size > 1 ? `EP${params.expert_parallel_size}` : `TP${params.expert_tensor_parallel_size}`;
+            return `${lang() === 'zh' ? '注意力' : 'Attention'} ${attention} / ${lang() === 'zh' ? '专家' : 'Experts'} ${expert}`;
+        }
         return [['TP',params.tensor_parallel_size],['PP',params.pipeline_parallel_size],['DP',params.data_parallel_size],['EP',params.expert_parallel_size]]
             .filter(([key,value]) => value != null && (key === 'TP' || value > 1)).map(([key,value]) => `${key}${value}`).join(' / ') || t('unknown');
     };
@@ -218,7 +223,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=sweprefix-capacity32-20260924-6',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=swe-parallel-20260924-1',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.mods=null;state.mtp=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});
