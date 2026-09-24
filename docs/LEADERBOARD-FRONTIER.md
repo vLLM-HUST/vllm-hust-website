@@ -160,3 +160,14 @@ revisions may share this group; each point retains its own source/configuration 
 alone never joins points into a concurrency line: `load.concurrency_series` still requires fixed
 serving settings. Retain all valid observations, including dominated results; interrupted windows
 without valid summaries are not benchmark scores.
+
+## Best-point retention for the A+E batching comparison
+
+The September24 layer-separated real-MTP2/C64 A4E4 and A6E2 series retain one point per topology:
+the highest measured output tokens/s/chip across the historical control and new cap1/cap7 runs. This
+explicit curation does not collapse different MTP states, concurrency levels, capacity settings or
+unrelated campaigns. A selected point's `frontier_selection` names the compared IDs; superseded
+complete points live in the snapshot's optional `archived_points` with a link to the selected ID.
+Metric evidence retains every run. The renderer consumes only `points`; the legacy Runs table is not
+repurposed as a synthetic archive. Selection is an observed-throughput ranking, not a statistical or
+universal-optimum claim.
