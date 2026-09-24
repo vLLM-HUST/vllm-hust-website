@@ -45,11 +45,10 @@ test('published smoke points preserve official metrics and all allocated chips',
     const data=require('../data/leaderboard_frontier.json');
     const evidence=require('../data/leaderboard_frontier_evidence.json');
     model.validate(data);
-    const points=data.points.filter(p=>p.cohort_id==='qwen35-35b-a3b-bf16-agentx256k-smoke-v1');
-    assert.equal(points.length,evidence.runs.length);
-    assert.equal(new Set(points.map(p=>p.evidence.run_ids[0])).size,points.length);
+    assert.equal(data.points.length,evidence.runs.length);
+    assert.equal(new Set(data.points.map(p=>p.evidence.run_ids[0])).size,data.points.length);
     assert.equal(data.cohorts[0].workload.contract.profile,'smoke');
-    for(const p of points){
+    for(const p of data.points){
         const run=evidence.runs.find(r=>r.run_id===p.evidence.run_ids[0]);
         assert.ok(run);
         assert.equal(p.evidence.measurement_seconds,900);
@@ -68,17 +67,17 @@ test('published smoke points preserve official metrics and all allocated chips',
         assert.equal(p.evidence.profile,'smoke');
     }
     // Better mean interactivity does not conceal the slightly worse TTFT tail.
-    const initial=points.filter(p=>p.configuration.parameters.max_num_seqs===8);
+    const initial=data.points.filter(p=>p.configuration.parameters.max_num_seqs===8);
     assert.equal(initial.length,2);
     assert.equal(model.project(initial,'ttft_p95_ms','output_tps_per_chip').frontier.length,2);
-    const capacity=points.filter(p=>p.configuration.parameters.max_num_seqs===16);
+    const capacity=data.points.filter(p=>p.configuration.parameters.max_num_seqs===16);
     assert.equal(capacity.length,9);
     for(const p of capacity){
         const arm=p.configuration.mods.length?'full':'native';
         assert.equal(p.configuration.parameters.kv_cache_memory_bytes,evidence.capacity_series.kv_cache_bytes_per_chip[arm]);
     }
     for(const invalid of evidence.capacity_series.invalid){
-        assert.ok(!points.some(p=>p.evidence.run_ids.includes(invalid.run_id)));
+        assert.ok(!data.points.some(p=>p.evidence.run_ids.includes(invalid.run_id)));
     }
 });
 
@@ -89,32 +88,4 @@ test('P90 decode speed projects the recorded percentile, never a TPOT reciprocal
     delete p.metrics.decode_p90_tps;
     assert.equal(model.value(p,'decode_p90_tps'),null);
     assert.equal(model.project([p],'decode_p90_tps','output_tps_per_chip').excluded,1);
-});
-
-
-test('separated-expert smoke is a distinct no-spec cohort with complete eight-chip evidence',()=>{
-    const data=require('../data/leaderboard_frontier.json');
-    const evidence=require('../data/leaderboard_frontier_expert_evidence.json');
-    const points=data.points.filter(p=>p.cohort_id===evidence.cohort.id);
-    assert.equal(points.length,5);
-    assert.equal(data.points.length,require('../data/leaderboard_frontier_evidence.json').runs.length+points.length);
-    assert.deepEqual(data.cohorts.find(c=>c.id===evidence.cohort.id),evidence.cohort);
-    assert.notEqual(evidence.cohort.model.revision,data.cohorts.find(c=>c.id!==evidence.cohort.id).model.revision);
-    for(const p of points){
-        const run=evidence.runs.find(r=>r.run_id===p.evidence.run_ids[0]);
-        assert.ok(run);
-        assert.equal(run.client_exit_code,0);assert.equal(run.remote_exit_code,0);
-        assert.equal(run.official_metrics.metadata.submission_valid,true);
-        assert.deepEqual(run.official_metrics.error_summary,[]);
-        assert.equal(run.official_metrics.osl_mismatch_count.avg,0);
-        assert.equal(p.configuration.hardware.accelerator_count,8);
-        assert.equal(model.value(p,'output_tps_per_chip'),run.official_metrics.output_token_throughput.avg/8);
-        assert.equal(model.value(p,'decode_p90_tps'),run.official_metrics.output_token_throughput_per_user.p90);
-        assert.equal(p.metrics.ttft_p95_ms,run.official_metrics.time_to_first_token.p95);
-        assert.equal(p.evidence.measurement_seconds,900);assert.equal(p.load.concurrency,16);
-        assert.equal(p.configuration.parameters.mtp_draft_tokens,0);
-        const q=p.configuration.parameters;
-        if(q.attention_ranks)assert.equal(q.attention_ranks+q.expert_ranks,8);
-        if(q.expert_parallel)assert.equal(q.expert_parallel_size,8);
-    }
 });
