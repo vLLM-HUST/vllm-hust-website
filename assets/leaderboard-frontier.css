@@ -58,3 +58,9 @@
 .frontier-nearby { display: grid; gap: 4px; margin: 8px 0; font-size: 11px; }
 .frontier-nearby button { padding: 5px; text-align: left; color: var(--run-ink); background: var(--run-tint); border: 1px solid var(--run-border); border-radius: 4px; cursor: pointer; }
 .frontier-nearby button[aria-pressed="true"] { border-color: var(--run-accent); }
+
+.frontier-identity { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0; }
+.frontier-workload-tag { display: inline-block; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--run-accent); background: var(--run-tint); color: var(--run-accent); font-size: 11px; }
+.frontier-filters { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 12px; }
+.frontier-filters select { padding: 7px 10px; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 6px; font: inherit; }
+#frontier-filter-count { color: var(--run-muted); font-size: 11px; white-space: nowrap; }

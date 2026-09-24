@@ -90,3 +90,13 @@ Nearest-dot selection alone cannot make both touch targets usable. The popup's
 nearby-config buttons disambiguate points within12 screen pixels without jittering
 measurements. Browser QA clicks real chart coordinates and uses that user-visible
 chooser when needed, never forced clicks or hidden direct state changes.
+
+
+Fletcher added right-side MTP filtering on 2026-09-24: all/on/off, with unknown
+kept separate from explicit0. Recompute the envelope from visible points, close
+hidden selections, retain stable series colors and show visible/total counts.
+Single workload is a static selected-style pill, not a disabled select or a
+long-press-only interaction; show the selector only with multiple choices.
+Filters survive language re-render, reset on model/workload changes, and never
+mutate point evidence. Browser QA exercises real controls, point IDs, envelopes,
+empty/unknown states and the future multiple-workload path.

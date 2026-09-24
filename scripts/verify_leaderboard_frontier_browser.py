@@ -94,7 +94,8 @@ def main():
             assert page.locator(".frontier-model-tag").count() == len(tag_keys)
             assert "Qwen3.5-35B-A3B" in page.locator(".frontier-model-tag").first.inner_text()
             assert "BF16" in page.locator(".frontier-model-tag").first.inner_text()
-            assert page.locator("#frontier-workload").is_disabled()
+            assert page.locator("#frontier-workload").count() == 0
+            assert page.locator("#frontier-workload-tag").is_visible()
             assert "smoke" in page.locator("#frontier-status").inner_text()
             assert page.locator(".frontier-point").count() == len(default_points)
             assert page.locator("#frontier-popover").is_hidden()
@@ -104,6 +105,28 @@ def main():
             assert page.locator("#frontier-curves").is_visible() == bool(curves)
             if curves:
                 assert page.locator("#frontier-curves").get_attribute("href") == curves
+            # Real control changes filter points and the derived envelope, not data.
+            for setting in ('on', 'off', 'all'):
+                page.locator('#frontier-mtp').select_option(setting)
+                expected = [p for p in default_points if setting == 'all' or
+                            (p['configuration']['parameters'].get('mtp_draft_tokens', -1) > 0 if setting == 'on' else
+                             p['configuration']['parameters'].get('mtp_draft_tokens') == 0)]
+                ids = page.locator('[data-point]').evaluate_all('nodes => nodes.map(n => n.dataset.point)')
+                assert set(ids) == {p['id'] for p in expected}
+                assert f"{len(expected)} / {len(default_points)}" in page.locator('#frontier-filter-count').inner_text()
+                assert page.locator('#frontier-popover').is_hidden()
+                front = [p for p in expected if not any(
+                    q['metrics']['decode_p90_tps'] >= p['metrics']['decode_p90_tps'] and
+                    q['metrics']['output_tps'] / q['configuration']['hardware']['accelerator_count'] >= p['metrics']['output_tps'] / p['configuration']['hardware']['accelerator_count'] and
+                    (q['metrics']['decode_p90_tps'] > p['metrics']['decode_p90_tps'] or
+                     q['metrics']['output_tps'] / q['configuration']['hardware']['accelerator_count'] > p['metrics']['output_tps'] / p['configuration']['hardware']['accelerator_count']) for q in expected)]
+                envelope = page.locator('.frontier-envelope')
+                assert envelope.count() == (1 if len(front) > 1 else 0)
+                if len(front) > 1:
+                    assert len(envelope.get_attribute('points').split()) == len(front)
+                if expected:
+                    click_point(page, page.locator(f'[data-point="{expected[0]["id"]}"]'))
+            page.locator('#frontier-mtp').select_option('all')
             for point in default_points:
                 dot = page.locator(f'[data-point="{point["id"]}"]')
                 click_point(page, dot)
@@ -197,7 +220,7 @@ def main():
                 tag = (cohort['model']['id'], cohort['precision']['id'])
                 page.locator('.frontier-model-tag').nth(tag_keys.index(tag)).click()
                 picker = page.locator('#frontier-workload')
-                if not picker.is_disabled():
+                if picker.count():
                     picker.select_option(cohort['id'])
                 members = [p for p in production['points'] if p['cohort_id'] == cohort['id']]
                 assert page.locator('.frontier-point').count() == len(members)
@@ -261,12 +284,18 @@ def main():
         assert page.locator(".frontier-point").count() == 4
         assert page.locator(".frontier-envelope").count() == 1
         assert page.locator("#frontier-curves").is_visible()
+        page.locator('#frontier-mtp').select_option('off')
+        assert page.locator('.frontier-point').count() == 0
+        assert page.locator('#frontier-blank').is_visible()
+        page.locator('#frontier-mtp').select_option('unknown')
+        assert page.locator('.frontier-point').count() == 4
         page.locator("#frontier-workload").select_option("test-other-workload")
         assert page.locator("#frontier-curves").is_hidden()
         assert page.locator("#frontier-curves").get_attribute("href") is None
         assert page.locator(".frontier-point").count() == 0
         page.locator(".frontier-model-tag").nth(1).click()
-        assert page.locator("#frontier-workload option").count() == 1
+        assert page.locator("#frontier-workload").count() == 0
+        assert page.locator("#frontier-workload-tag").is_visible()
         assert page.locator(".frontier-point").count() == 0
         page.unroute("**/data/leaderboard_frontier.json*")
         page.route(
