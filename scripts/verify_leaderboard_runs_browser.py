@@ -52,6 +52,7 @@ def main():
             (390, "zh", "light"),
             (1440, "zh", "dark"),
             (390, "en", "dark"),
+            (320, "zh", "light"),
         ]:
             context = browser.new_context(
                 viewport={"width": width, "height": 1000}, color_scheme=scheme
