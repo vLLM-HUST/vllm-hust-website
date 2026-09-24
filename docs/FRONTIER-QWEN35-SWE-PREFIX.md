@@ -138,6 +138,19 @@ adapter admits only16 requests, with matching fixed GDN/FIA metadata and draft-p
 is an unsupported adapter configuration, not an observed out-of-memory result. It supplies no
 benchmark point; the published BetterScale capacity16 sweep is unchanged.
 
+## Original eight-chip MTP0 configuration remeasurement
+
+The original native TP8 / C64 configuration completed a separate900-second SWE observation on hw0:
+**58.56 output tokens/s/chip** and **21.95 decode P90 tokens/s**, with zero request failures. All
+eight chips remain in the throughput denominator. Client concurrency is64, while the single engine
+admits32 requests; queued requests remain part of this configuration, not proof of64 simultaneous
+running requests. Maximum observed prompt length was30,064 tokens.
+
+This point retains MTP0, the pinned vLLM0.23 / vLLM-Ascend0.23 runtime and the original graph
+settings. It does not join either TP2 capacity16 curve or pool with the repaired MTP2 observations
+below. The subsequent DP8EP8 attempt lost its host connection before completing its window and
+supplies no score.
+
 ## Repaired MTP2 expert separation: eight-chip C64
 
 The four completed hw0 observations use the same prepared inputs, real MTP2, 32 GiB KV per chip,
