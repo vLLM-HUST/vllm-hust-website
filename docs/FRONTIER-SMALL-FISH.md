@@ -1,0 +1,70 @@
+# BetterScale draft communication / copy increment
+
+These are new **15-minute SWE Prefix Reuse smoke observations**, using the same prepared35B workload
+and exact-token continuation as the earlier capacity16 series. They are not AgentX scores or SWE
+answer-quality measurements.
+
+The experimental prototype uses BF16 Qwen3.5-35B-A3B, TP2, natural MTP2, APC, 16 request slots,4096
+query budget and262144 configured context. Its explicit KV budget is24.25GiB/chip; the older
+BetterScale curve used20.25GiB. Keep the new fixed-configuration concurrency line separate. Client
+revisions59ea20a and 29136f1 differ only in repository knowledge documentation, not measurement
+code.
+
+The change reuses native distributed greedy for the draft only, retaining target sampling. It also
+removes gate copies under the owned stride-aware consumer and shares the identical mixed-QKV pack.
+Request-bounded sampling predates this increment. Qualified two-rank TraceLoom profiles show decode
+sampling payload 7,946,240→320 local tensor bytes across two draft rounds, target gate slices60→0,
+and mixed QKV packs60→30. These are structural/operator observations, not physical wire traffic or
+an end-to-end speedup percentage.
+
+Clean control/candidate serving passes24 targeted retrievals through262080 prompt tokens and16
+concurrent requests. An earlier deployment with diagnostic collective graphs allocated during
+startup failed32K retrieval; the clean startup passed. The low-level cause remains unresolved. These
+bounded checks are not general model-quality certification.
+
+## 35B concurrency observations
+
+All five900s windows completed with zero request failures:
+
+| HTTP concurrency | Output tokens/s/chip | P90 request decode tokens/s | Requests started |
+| ---------------- | -------------------: | --------------------------: | ---------------: |
+| 1                |               58.922 |                     133.343 |              178 |
+| 2                |              102.734 |                     125.854 |              289 |
+| 4                |              160.835 |                     102.356 |              477 |
+| 8                |              242.462 |                      74.058 |              702 |
+| 16               |              368.928 |                      55.379 |             1071 |
+
+At C4, the historical BetterScale point was160.008 output tokens/s/chip and 103.552 P90 decode
+tokens/s: the new point has slightly higher throughput and slightly lower P90 decode speed. At C16,
+the historical values were349.676 and 54.069; the new throughput is about5.5% higher. These are
+single shared-host observations with **different explicit KV budgets**, not a controlled ablation of
+this increment. Request-bounded sampling had already enabled the larger KV budget. Do not advertise
+removed profile work as a universal throughput gain. Finite-window request mixes, natural acceptance
+and host colocation remain part of the evidence.
+
+## 27B extension and correctness boundary
+
+The separate Qwen3.8-27B option uses the same source sessions,900s policy, TP2/BF16/natural MTP2,16
+slots,4096 query budget,262144 configured context and 24.25GiB KV/chip. It uses the actual27B
+tokenizer, so its prepared token IDs, output budgets and workload fingerprint differ from35B. The
+local checkpoint name is user-confirmed; no immutable upstream model revision is attested.
+
+BetterScale passed the new dense-geometry independent GDN/FIA gates and all24
+cold/warm/long/concurrent retrieval checks. Its exact-member TraceLoom ledger shows zero draft
+vocabulary gathers,320 local greedy-stat tensor bytes across two rounds in the complete decode
+captures, zero target gate slices and48 QKV packs per target. This is a candidate observation, not
+a27B before/after ablation; the matched35B profiles establish the structural-removal comparison.
+
+The native27B deployment passed all8 serial cold/warm retrievals through262080 prompt tokens, but5
+of16 concurrent requests returned `cobalt-seven-` followed by EOS instead of `cobalt-seven-42`.
+Retain this failed correctness boundary; neither its cause nor harmless numerical variation has been
+established. Native throughput admission is pending the explicit choice to show a failed-correctness
+reference or omit that reference. Candidate performance can proceed independently. Neither arm's
+protocol-valid performance is a SWE answer-quality score.
+
+Only complete valid windows with observed prefix reuse, continuous device-owner guards, clean server
+exit and resource release are imported. Full metric extracts remain in
+`data/leaderboard_frontier_swe_evidence.json`; point downloads retain source/configuration/protocol
+identities. Same-configuration repeated observations follow
+[whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), with all inferior raw evidence
+retained. Different source/configuration curves are not silently pooled into repeats.

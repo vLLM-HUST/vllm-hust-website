@@ -42,7 +42,9 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
     const cohort=data.cohorts.find(c=>c.workload.id==='sweprefix-qwen35-eight-traces-900s-v1');
     assert.ok(cohort);
     assert.equal(cohort.workload.contract.repository_url,'https://github.com/vLLM-HUST/swe-prefix-reuse');
-    const points=[...data.points,...(data.archived_points||[])].filter(p=>p.cohort_id===cohort.id);
+    const cohorts=data.cohorts.filter(c=>c.workload.contract.repository_url==='https://github.com/vLLM-HUST/swe-prefix-reuse');
+    const byId=new Map(cohorts.map(c=>[c.id,c]));
+    const points=[...data.points,...(data.archived_points||[])].filter(p=>byId.has(p.cohort_id));
     assert.ok(points.length>0);
     assert.equal(points.length,evidence.runs.length);
     assert.equal(agentxData().points.length,16);
@@ -61,7 +63,10 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
         assert.equal(p.load.concurrency,run.client.concurrency);
         assert.equal(p.configuration.parameters.synthetic_acceptance_length,undefined);
         assert.equal(p.evidence.benchmark_protocol.protocol_id,'swe-prefix-reuse/v1');
-        assert.ok(cohort.workload.contract.prepared_workload_variants.some(v=>v.sha256===p.evidence.benchmark_protocol.prepared_workload_sha256));
+        const contract=byId.get(p.cohort_id).workload.contract;
+        const variants=contract.prepared_workload_variants||[{sha256:contract.prepared_workload_sha256}];
+        assert.ok(variants.some(v=>v.sha256===p.evidence.benchmark_protocol.prepared_workload_sha256));
+        assert.equal(p.evidence.benchmark_protocol.tokenizer_fingerprint||run.client.tokenizer.fingerprint,contract.tokenizer_fingerprint);
         if(run.old_point_id) assert.ok(agentxData().points.some(old=>old.id===run.old_point_id));
         else if(p.evidence.benchmark_protocol.campaign==='server32-c32-extension'){
             assert.equal(p.load.concurrency,32);
@@ -82,6 +87,18 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.partition_validation.physical_moe_layers,41);
             assert.equal(run.validation.owned_server_exit_zero,true);
             assert.ok(p.load.concurrency_series);
+        } else if(p.evidence.benchmark_protocol.campaign==='small-fish-tp2-sweep-v1'){
+            const params=p.configuration.parameters;
+            assert.equal(params.max_num_seqs,16);
+            assert.equal(params.max_num_batched_tokens,4096);
+            assert.equal(params.mtp_draft_tokens,2);
+            assert.equal(params.kv_cache_memory_bytes,26038239232);
+            for(const key of ['owned_server_exit_zero','selected_device_guard_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
+            if(p.configuration.mods.includes('betterscale')){
+                assert.equal(params.draft_only_distributed_greedy,true);
+                assert.equal(params.gdn_strided_gates,true);
+                assert.equal(params.mixed_shared_qkv_pack,true);
+            }
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);

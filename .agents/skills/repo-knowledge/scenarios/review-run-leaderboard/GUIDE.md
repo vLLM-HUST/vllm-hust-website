@@ -126,3 +126,13 @@ cohort with one campaign's local inventory loses published results. Fetch before
 resolve concurrent updates additively. A later interrupted window does not supply a score: preserve
 earlier completed windows only with a verified timing boundary, continuous ownership guard evidence
 and owned cleanup, and record the later interruption separately.
+
+Fletcher's later September24 instruction selects the best complete BetterScale run for identical
+configurations to reduce repeat noise. Before publishing newly imported repeats, use
+`scripts/curate_frontier_repeats.py` and `docs/FRONTIER-REPEAT-SELECTION.md`: highest observed
+throughput/chip chooses one whole run, with compared IDs and inferior complete points preserved in
+`archived_points`. Never combine separately best throughput and P90. Source/configuration, model,
+protocol, measurement window and concurrency stay distinct; existing observed prompt/occupancy
+fields are outcomes, not configuration keys. Native points and other campaigns' unlike settings
+remain intact. This is an explicit repeat-selection exception to displaying every observation, not
+authority to drop a slower configuration or overwrite another campaign's inventory.

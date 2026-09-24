@@ -21,8 +21,11 @@ workload identities; never silently mix them.
   tokens/s / all allocated chips**. No axis, hardware or MOD filters.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
   other deployment parameters may differ while satisfying the selected comparison contract.
-- All points with both coordinates are shown, including dominated observations. The observed Pareto
-  envelope is a visual guide, not a globally optimal or statistically certified curve.
+- All selected points with both coordinates are shown, including dominated configurations.
+  Identical-configuration BetterScale repeats use the documented
+  [whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), retaining inferior raw evidence. The
+  observed Pareto envelope is a visual guide, not a globally optimal or statistically certified
+  curve.
 - Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
   session concurrency, MTP, request limit, explicit KV budget and the two coordinate values. Escape,
   outside-click or the close button dismisses it. The card stays inside the chart on mobile too.
