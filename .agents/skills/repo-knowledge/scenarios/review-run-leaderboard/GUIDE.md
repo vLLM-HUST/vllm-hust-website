@@ -136,3 +136,12 @@ protocol, measurement window and concurrency stay distinct; existing observed pr
 fields are outcomes, not configuration keys. Native points and other campaigns' unlike settings
 remain intact. This is an explicit repeat-selection exception to displaying every observation, not
 authority to drop a slower configuration or overwrite another campaign's inventory.
+
+A September24 CI review exposed horizontal overflow after switching the mobile run table from
+Chinese to English: document395px versus390px viewport, with `#view-frontier` extending to394.91px.
+Local390px passed, but320px reproduced383px content. The culprit was the nonwrapping three-button
+view switch, not the wide table inside its horizontal scroll container. Let the switch wrap while
+preserving complete labels/counts; do not hide overflow or weaken the document-width assertion. The
+run-browser check now includes320px with the language switch and retains bounded, unclipped layout
+offenders plus a failure screenshot, so a remote-only layout failure carries actionable geometry
+instead of another blind rerun.
