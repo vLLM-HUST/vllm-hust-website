@@ -30,7 +30,7 @@
 .frontier-legend { display: flex; flex-wrap: wrap; gap: 18px; }
 .frontier-legend span { display: inline-flex; align-items: center; gap: 7px; }
 .frontier-legend i { width: 9px; height: 9px; border-radius: 50%; }
-.frontier-popover { position: absolute; z-index: 5; box-sizing: border-box; width: 292px; max-width: calc(100% - 24px); padding: 18px; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 12px; box-shadow: 0 12px 40px #0003; }
+.frontier-popover { overflow-y: auto; position: absolute; z-index: 5; box-sizing: border-box; width: 292px; max-width: calc(100% - 24px); padding: 18px; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 12px; box-shadow: 0 12px 40px #0003; }
 .frontier .frontier-popover h2 { color: var(--run-ink); font-size: 16px; margin: 0 24px 5px 0; }
 .frontier-popup-close { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; background: transparent; color: var(--run-muted); border: 0; font-size: 24px; cursor: pointer; }
 .frontier-popup-subtitle, .frontier-popup-load { font-size: 11px; color: var(--run-muted); margin: 8px 0 14px; }
@@ -54,3 +54,7 @@
 }
 
 .frontier-popup-engine { margin: 8px 0; font-size: 11px; line-height: 1.5; color: var(--run-ink); }
+
+.frontier-nearby { display: grid; gap: 4px; margin: 8px 0; font-size: 11px; }
+.frontier-nearby button { padding: 5px; text-align: left; color: var(--run-ink); background: var(--run-tint); border: 1px solid var(--run-border); border-radius: 4px; cursor: pointer; }
+.frontier-nearby button[aria-pressed="true"] { border-color: var(--run-accent); }

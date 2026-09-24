@@ -45,10 +45,11 @@ test('published smoke points preserve official metrics and all allocated chips',
     const data=require('../data/leaderboard_frontier.json');
     const evidence=require('../data/leaderboard_frontier_evidence.json');
     model.validate(data);
-    assert.equal(data.points.length,evidence.runs.length);
+    const points=data.points.filter(p=>p.configuration.hardware.accelerator_count===2);
+    assert.equal(points.length,evidence.runs.length);
     assert.equal(new Set(data.points.map(p=>p.evidence.run_ids[0])).size,data.points.length);
     assert.equal(data.cohorts[0].workload.contract.profile,'smoke');
-    for(const p of data.points){
+    for(const p of points){
         const run=evidence.runs.find(r=>r.run_id===p.evidence.run_ids[0]);
         assert.ok(run);
         assert.equal(p.evidence.measurement_seconds,900);
@@ -88,4 +89,34 @@ test('P90 decode speed projects the recorded percentile, never a TPOT reciprocal
     delete p.metrics.decode_p90_tps;
     assert.equal(model.value(p,'decode_p90_tps'),null);
     assert.equal(model.project([p],'decode_p90_tps','output_tps_per_chip').excluded,1);
+});
+
+
+test('C64 expert observations share one view and preserve point-specific protocols',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const evidence=require('../data/leaderboard_frontier_expert_evidence.json');
+    assert.equal(data.cohorts.length,1);
+    assert.equal(data.points.length,16);
+    const points=data.points.filter(p=>p.configuration.hardware.accelerator_count===8);
+    assert.equal(points.length,5);
+    for(const p of data.points) assert.equal(p.cohort_id,data.cohorts[0].id);
+    for(const p of points){
+        const run=evidence.runs.find(r=>r.run_id===p.evidence.run_ids[0]);
+        assert.ok(run); assert.equal(run.official_metrics.metadata.submission_valid,true);
+        assert.deepEqual(run.official_metrics.error_summary,[]);
+        assert.equal(run.official_metrics.osl_mismatch_count.avg,0);
+        assert.equal(model.value(p,'output_tps_per_chip'),run.official_metrics.output_token_throughput.avg/8);
+        assert.equal(model.value(p,'decode_p90_tps'),run.official_metrics.output_token_throughput_per_user.p90);
+        assert.equal(p.evidence.measurement_seconds,900);assert.equal(p.load.concurrency,64);
+        assert.equal(p.configuration.parameters.mtp_draft_tokens,0);
+        assert.deepEqual(p.evidence.benchmark_protocol,run.protocol);
+        assert.equal(run.protocol.protocol_id,'agentx256k-snapshot-primers-v2');
+        assert.equal(run.warmup.completed_requests,63);assert.equal(run.warmup.completed,true);
+        assert.ok(p.configuration.parameters.checkpoint_revision.startsWith('sha256-manifest:'));
+    }
+    for(const p of data.points.filter(p=>p.configuration.hardware.accelerator_count===2)){
+        assert.equal(p.evidence.benchmark_protocol.warmup_requests_per_lane,10);
+        assert.equal(p.configuration.parameters.mtp_draft_tokens,2);
+    }
+    assert.ok(!data.points.some(p=>p.id.includes('expert-') && p.load.concurrency===16));
 });

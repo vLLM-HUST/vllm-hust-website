@@ -72,3 +72,21 @@ points, the old18px invisible hit circles intercepted nearby mobile points: adap
 hit circles plus nearest-dot click selection remove SVG paint-order bias, without moving data. Keep
 keyboard access and exact downloaded-point checks; never bypass interception with forced QA clicks.
 Static curves use official metrics, separate P50/P95 TTFT/TPOT, and label excluded coverage.
+
+
+On 2026-09-24 Fletcher selected one throughput view for accepted-equivalent
+HF/ModelScope Qwen35 weights, MTP configurations and warmup variants. Keep one
+model/cohort visible; each point carries its actual checkpoint revision and
+`evidence.benchmark_protocol`. Historical TP2 uses MTP2/AL2.63 and pressure10-v1;
+new eight-chip C64 uses MTP0 and mandatory snapshot primers only (v2). Do not
+claim identical initial cache state or pool these observations as repeats. The
+popover names warmup and MTP; downloads preserve full protocols. The five old
+eight-chip C16 points were withdrawn and must not return. See
+`docs/FRONTIER-QWEN35-EXPERT-SMOKE.md` for the accepted C64 evidence. Existing
+concurrency curves describe the historical TP2 series only, not the new C64 arms.
+
+The C64 TP8/TP8EP8 points nearly coincide (sub-pixel X separation on mobile).
+Nearest-dot selection alone cannot make both touch targets usable. The popup's
+nearby-config buttons disambiguate points within12 screen pixels without jittering
+measurements. Browser QA clicks real chart coordinates and uses that user-visible
+chooser when needed, never forced clicks or hidden direct state changes.
