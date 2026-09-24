@@ -58,6 +58,7 @@
     }
     function modKey(point) { return [...point.configuration.mods].sort().join('+') || 'none'; }
     function groupKey(point) { return point.configuration.experiment_group || modKey(point); }
+    function failedCorrectness(point) { return point.configuration.parameters.functional_status === 'failed'; }
     function project(points, xKey, yKey) {
         if (!metrics[xKey] || !metrics[yKey]) throw new Error('Unknown Frontier axis');
         const measured = points.map(point => ({ point, x: value(point, xKey), y: value(point, yKey) }))
@@ -65,7 +66,8 @@
         const signX = metrics[xKey].direction === 'max' ? 1 : -1;
         const signY = metrics[yKey].direction === 'max' ? 1 : -1;
         // Strict Pareto dominance. Equal observations are retained, not arbitrarily best-picked.
-        for (const a of measured) a.frontier = !measured.some(b =>
+        for (const a of measured) a.frontier = !failedCorrectness(a.point) && !measured.some(b =>
+            !failedCorrectness(b.point) &&
             signX * b.x >= signX * a.x && signY * b.y >= signY * a.y
             && (signX * b.x > signX * a.x || signY * b.y > signY * a.y));
         return { measured, excluded: points.length - measured.length,
@@ -87,7 +89,7 @@
         return [...groups.values()].filter(rows => rows.length > 1)
             .map(rows => [...rows].sort((a, b) => a.point.load.concurrency - b.point.load.concurrency));
     }
-    const api = { validate, metrics, value, modKey, groupKey, project, safeURL, mtpState, concurrencySeries };
+    const api = { validate, metrics, value, modKey, groupKey, project, safeURL, mtpState, concurrencySeries, failedCorrectness };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);

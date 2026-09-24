@@ -174,3 +174,12 @@ complete points live in the snapshot's optional `archived_points` with a link to
 Metric evidence retains every run. The renderer consumes only `points`; the legacy Runs table is not
 repurposed as a synthetic archive. Selection is an observed-throughput ranking, not a statistical or
 universal-optimum claim.
+
+## Failed-correctness references
+
+Explicit `functional_status: failed` points remain visible as red throughput references, with
+textual warnings in the legend, accessible point label and popup. They neither form nor dominate the
+Pareto envelope. The27B native check failed5/16 retrievals at C16; all five native points share that
+deployment, but this is not evidence of separately observed failures at every C. The independent
+browser check exercises all ten27B points, EN/ZH, dark/light, mobile/desktop, exact downloads and
+native-only filtering.

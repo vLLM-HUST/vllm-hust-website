@@ -6,7 +6,7 @@
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const words = {
         en: {
-            title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
+            failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', native: 'Native baseline',
             smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Solid: concurrency sweep · Dashed: Pareto envelope',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
@@ -15,7 +15,7 @@
             workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', experimental: 'BetterScale experimental'
         },
         zh: {
-            title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
+            failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', native: '原生 Baseline',
             smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '实线：同配置并发扫描 · 虚线：Pareto 边界',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
@@ -140,8 +140,8 @@
         $('frontier-filter-count').textContent=`${points().length} / ${cohortPoints().length} ${t('points')}`;
         const groups=[...new Map(cohortPoints().map(p=>[M.groupKey(p),p])).values()].sort((a,b)=>
             Number(M.groupKey(b)==='none')-Number(M.groupKey(a)==='none')||M.groupKey(a).localeCompare(M.groupKey(b)));
-        const color=p=>colors[groups.findIndex(g=>M.groupKey(g)===M.groupKey(p))%colors.length];
-        $('frontier-legend').innerHTML=groups.filter(g=>points().some(p=>M.groupKey(p)===M.groupKey(g))).map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}</span>`).join('');
+        const color=p=>M.failedCorrectness(p)?'#dc2626':colors[groups.findIndex(g=>M.groupKey(g)===M.groupKey(p))%colors.length];
+        $('frontier-legend').innerHTML=groups.filter(g=>points().some(p=>M.groupKey(p)===M.groupKey(g))).map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}${M.failedCorrectness(p)?` · ${t('failed')}`:''}</span>`).join('');
         $('frontier-hint').textContent=(M.concurrencySeries(measured.measured).length?t('lineHint'):t('hint'))+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         const curves=$('frontier-curves'), curveUrl=current?.workload.contract.concurrency_curves_url;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
@@ -168,6 +168,7 @@
         }):[];
         panel.innerHTML=`<button type="button" class="frontier-popup-close" data-close aria-label="${t('close')}">×</button>
             <h2 id="frontier-popover-title">${escape(label(point))}</h2>
+            ${M.failedCorrectness(point)?`<p class="frontier-correctness-warning"><strong>${t('failed')}</strong><br>${point.configuration.parameters.functional_check_id==='dense27-native1'?t('failureScope'):escape(params.functional_scope)}</p>`:''}
             <p class="frontier-popup-engine">${escape(point.configuration.engine)} ${escape(point.configuration.engine_version)}${point.configuration.mods.includes('betterscale')?`<br>${t('experimental')}`:''}</p>
             <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
             <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,X))}</strong><span>${t('x')}<br>tokens/s/user</span></div><div><strong>${fmt(M.value(point,Y))}</strong><span>${t('y')}<br>tokens/s/chip</span></div></div>
@@ -208,7 +209,7 @@
         for(const row of result.measured){
             const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);
             const hitRadius=Math.max(2,Math.min(18,...neighbors));
-            const p=row.point,text=`${label(p)} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
+            const p=row.point,text=`${label(p)}${M.failedCorrectness(p)?` · ${t('failed')}`:''} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
             svg+=`<g role="button" tabindex="0" aria-haspopup="dialog" aria-controls="frontier-popover" aria-expanded="false" aria-label="${escape(text)}" data-point="${escape(p.id)}" class="frontier-point"><circle class="frontier-hit" cx="${x(row.x)}" cy="${y(row.y)}" r="${hitRadius}"/><circle class="frontier-dot" cx="${x(row.x)}" cy="${y(row.y)}" r="7" fill="${color(p)}"/><title>${escape(text)}</title></g>`;
         }
         for(const row of result.measured.filter(row=>connected.has(row.point.id))){
@@ -223,7 +224,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=swe-parallel-20260924-7',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=native27-warning-20260924-1',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.mods=null;state.mtp=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});
