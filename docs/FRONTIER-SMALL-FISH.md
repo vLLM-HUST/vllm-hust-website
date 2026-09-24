@@ -62,6 +62,25 @@ established. Native throughput admission is pending the explicit choice to show 
 reference or omit that reference. Candidate performance can proceed independently. Neither arm's
 protocol-valid performance is a SWE answer-quality score.
 
+All five27B BetterScale900s windows completed with zero request failures:
+
+| HTTP concurrency | Output tokens/s/chip | P90 request decode tokens/s | Requests started |
+| ---------------- | -------------------: | --------------------------: | ---------------: |
+| 1                |               33.007 |                      77.784 |              118 |
+| 2                |               57.138 |                      68.271 |              175 |
+| 4                |               96.477 |                      59.967 |              281 |
+| 8                |              145.924 |                      46.172 |              439 |
+| 16               |              119.482 |                      31.868 |              396 |
+
+The27B C16 observation is deliberately retained even though it is slower than C8: 119.482
+versus145.924 output tokens/s/chip, with TTFT P95 17.788 versus1.358 seconds. Server counter deltas
+across the sending window **plus drain** record205 preemptions at C16 versus0 at C8, and
+prefix-cache hit fractions11.47% versus93.88%. This is an observed capacity/reuse degradation under
+the fixed KV budget, not a slower repeat of an identical concurrency setting. Performance protocol
+validity does not establish semantic correctness across those preemptions. The five35B windows
+recorded zero preemptions. These counters are retained in downloaded metrics with the explicit
+`measurement_and_drain` suffix; they do not credit drain tokens to plotted throughput.
+
 Only complete valid windows with observed prefix reuse, continuous device-owner guards, clean server
 exit and resource release are imported. Full metric extracts remain in
 `data/leaderboard_frontier_swe_evidence.json`; point downloads retain source/configuration/protocol
