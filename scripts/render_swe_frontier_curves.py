@@ -78,6 +78,7 @@ def render(snapshot):
             "task_queue_enable",
             "graph_mode",
             "graph_capture_sizes",
+            "max_cudagraph_capture_size",
             "runtime_base_commits",
             "source_capsule",
             "kv_cache_memory_bytes",
