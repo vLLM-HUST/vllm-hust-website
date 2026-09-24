@@ -12,12 +12,11 @@ workload identities; never silently mix them.
 
 - Model + precision is one combined tag. The only other choice is a fixed workload/context cohort; a
   single available workload is displayed without inviting an unnecessary selection.
-- An external right sidebar has checkbox rows for MOD and MTP (on/off; unknown
-  when present). All options start checked; no separate “all” choice. Options
-  within a row are OR, rows intersect, and unchecking a whole row hides all points.
-  It recomputes the observed envelope without changing measurements; mobile stacks
-  the sidebar below the chart.
-  A single workload is a selected-style static tag; multiple workloads use a selector.
+- An external right sidebar has checkbox rows for MOD and MTP (on/off; unknown when present). All
+  options start checked; no separate “all” choice. Options within a row are OR, rows intersect, and
+  unchecking a whole row hides all points. It recomputes the observed envelope without changing
+  measurements; mobile stacks the sidebar below the chart. A single workload is a selected-style
+  static tag; multiple workloads use a selector.
 - Axes are fixed: **X = P90 per-request decode speed (output tokens/s/user)**; **Y = total output
   tokens/s / all allocated chips**. No axis, hardware or MOD filters.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
@@ -128,18 +127,15 @@ Next.js/database deployment. This site remains a static snapshot consumer with n
 
 ## Workload source
 
-The [AgentX workload repository](https://github.com/vLLM-HUST/agentx-bench)
-pins the official replay harness and corpus and records the smoke protocol.
-Current comparison runs use 15-minute measured windows after full warmup; this
-is an evolving smoke protocol, not one-hour formal certification. The Frontier
-footer links the workload repository directly.
-
+The [AgentX workload repository](https://github.com/vLLM-HUST/agentx-bench) pins the official replay
+harness and corpus and records the smoke protocol. Current comparison runs use 15-minute measured
+windows after full warmup; this is an evolving smoke protocol, not one-hour formal certification.
+The Frontier footer links the workload repository directly.
 
 ## Unified throughput comparison (2026-09-24)
 
-The Qwen35 view now includes the [C64 expert matrix](FRONTIER-QWEN35-EXPERT-SMOKE.md)
-with historical TP2 points. HF/ModelScope are accepted as the same model by
-Fletcher. Exact checkpoint, MTP and warmup remain per-point settings;
-`evidence.benchmark_protocol` overrides historical cohort-wide assumptions.
-This is a throughput configuration comparison, not an identical-protocol causal
-experiment. The withdrawn eight-chip C16 points remain excluded.
+The Qwen35 view now includes the [C64 expert matrix](FRONTIER-QWEN35-EXPERT-SMOKE.md) with
+historical TP2 points. HF/ModelScope are accepted as the same model by Fletcher. Exact checkpoint,
+MTP and warmup remain per-point settings; `evidence.benchmark_protocol` overrides historical
+cohort-wide assumptions. This is a throughput configuration comparison, not an identical-protocol
+causal experiment. The withdrawn eight-chip C16 points remain excluded.

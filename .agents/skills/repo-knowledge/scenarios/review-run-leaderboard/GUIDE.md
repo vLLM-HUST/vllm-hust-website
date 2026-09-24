@@ -73,33 +73,41 @@ hit circles plus nearest-dot click selection remove SVG paint-order bias, withou
 keyboard access and exact downloaded-point checks; never bypass interception with forced QA clicks.
 Static curves use official metrics, separate P50/P95 TTFT/TPOT, and label excluded coverage.
 
-
-On 2026-09-24 Fletcher selected one throughput view for accepted-equivalent
-HF/ModelScope Qwen35 weights, MTP configurations and warmup variants. Keep one
-model/cohort visible; each point carries its actual checkpoint revision and
-`evidence.benchmark_protocol`. Historical TP2 uses MTP2/AL2.63 and pressure10-v1;
-new eight-chip C64 uses MTP0 and mandatory snapshot primers only (v2). Do not
-claim identical initial cache state or pool these observations as repeats. The
-popover names warmup and MTP; downloads preserve full protocols. The five old
-eight-chip C16 points were withdrawn and must not return. See
-`docs/FRONTIER-QWEN35-EXPERT-SMOKE.md` for the accepted C64 evidence. Existing
+On 2026-09-24 Fletcher selected one throughput view for accepted-equivalent HF/ModelScope Qwen35
+weights, MTP configurations and warmup variants. Keep one model/cohort visible; each point carries
+its actual checkpoint revision and `evidence.benchmark_protocol`. Historical TP2 uses MTP2/AL2.63
+and pressure10-v1; new eight-chip C64 uses MTP0 and mandatory snapshot primers only (v2). Do not
+claim identical initial cache state or pool these observations as repeats. The popover names warmup
+and MTP; downloads preserve full protocols. The five old eight-chip C16 points were withdrawn and
+must not return. See `docs/FRONTIER-QWEN35-EXPERT-SMOKE.md` for the accepted C64 evidence. Existing
 concurrency curves describe the historical TP2 series only, not the new C64 arms.
 
-The C64 TP8/TP8EP8 points nearly coincide (sub-pixel X separation on mobile).
-Nearest-dot selection alone cannot make both touch targets usable. The popup's
-nearby-config buttons disambiguate points within12 screen pixels without jittering
-measurements. Browser QA clicks real chart coordinates and uses that user-visible
-chooser when needed, never forced clicks or hidden direct state changes.
+The C64 TP8/TP8EP8 points nearly coincide (sub-pixel X separation on mobile). Nearest-dot selection
+alone cannot make both touch targets usable. The popup's nearby-config buttons disambiguate points
+within12 screen pixels without jittering measurements. Browser QA clicks real chart coordinates and
+uses that user-visible chooser when needed, never forced clicks or hidden direct state changes.
 
+Fletcher clarified right-side filtering on 2026-09-24: a separate sidebar outside the white chart
+card, with MOD and MTP checkbox rows. All choices start checked, no “all” option; choices within
+rows union and rows intersect. Empty selection means no points. Unknown remains separate from
+explicit MTP0. Mobile places it below the chart, not inside the top picker. Recompute the envelope
+from visible points, close hidden selections, retain stable series colors and show visible/total
+counts. Single workload is a static selected-style pill, not a disabled select or a long-press-only
+interaction; show the selector only with multiple choices. Filters survive language re-render, reset
+on model/workload changes, and never mutate point evidence. Browser QA exercises real controls,
+point IDs, envelopes, empty/unknown states and the future multiple-workload path.
 
-Fletcher clarified right-side filtering on 2026-09-24: a separate sidebar outside
-the white chart card, with MOD and MTP checkbox rows. All choices start checked,
-no “all” option; choices within rows union and rows intersect. Empty selection
-means no points. Unknown remains separate from explicit MTP0. Mobile places it
-below the chart, not inside the top picker. Recompute the envelope from visible points, close
-hidden selections, retain stable series colors and show visible/total counts.
-Single workload is a static selected-style pill, not a disabled select or a
-long-press-only interaction; show the selector only with multiple choices.
-Filters survive language re-render, reset on model/workload changes, and never
-mutate point evidence. Browser QA exercises real controls, point IDs, envelopes,
-empty/unknown states and the future multiple-workload path.
+SWE Prefix Reuse has its own cohort; enter `docs/FRONTIER-QWEN35-SWE-PREFIX.md` for real-token
+continuation and the repaired MTP2 C64 expert matrix. Prepared-file hashes can differ solely through
+tokenizer path/version metadata: only accept the recorded variant after exact comparison of all
+session IDs/deltas/output budgets, policy and tokenizer fingerprint. Preserve the actual per-run
+file hash. The 0.1.0 salt-aware relay and0.1.1 equal-valued correlation header preserve the same
+session affinity; do not relabel a client revision. Native EP is proven across all41 target/draft
+layers, and TP8's32-slot capacity limitation stays explicit.
+
+A publication check on2026-09-24 received HTTP403 for default Python urllib's User-Agent while a
+browser User-Agent returned200 with exact published data. Distinguish transport rejection from stale
+content/deployment delay before waiting on Pages. Confirm Pages status and the versioned HTML/data,
+not merely HTTP access. The same update found existing mdformat drift in three Frontier guides; full
+CI checks all files, unlike a changed-file hook run. Formatting those guides changes no protocol or
+measured values.
