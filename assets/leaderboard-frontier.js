@@ -32,8 +32,8 @@
     const tagKey = c => JSON.stringify([c.model.id,c.precision.id]);
     const cohort = () => state.data.cohorts.find(c => c.id === state.cohort);
     const cohortPoints = () => state.data.points.filter(p => p.cohort_id === state.cohort);
-    const points = () => cohortPoints().filter(p => state.mtp?.has(M.mtpState(p)) && state.mods?.has(M.modKey(p)));
-    const label = p => p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native');
+    const points = () => cohortPoints().filter(p => state.mtp?.has(M.mtpState(p)) && state.mods?.has(M.groupKey(p)));
+    const label = p => p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
     const parallel = p => {
         const params = p.configuration.parameters;
         if (params.attention_ranks != null && params.expert_ranks != null) return `A${params.attention_ranks} / E${params.expert_ranks}`;
@@ -54,9 +54,9 @@
         reconcile();
         const tags = [...new Map(state.data.cohorts.map(c => [tagKey(c),c])).values()];
         const choices = state.data.cohorts.filter(c => tagKey(c) === state.tag);
-        const mods=[...new Map(cohortPoints().map(p=>[M.modKey(p),p])).values()];
+        const mods=[...new Map(cohortPoints().map(p=>[M.groupKey(p),p])).values()];
         const mtpOptions=[['on',t('mtpOn')],['off',t('mtpOff')],...(cohortPoints().some(p=>M.mtpState(p)==='unknown')?[['unknown',t('unknown')]]:[])];
-        if(state.mods===null)state.mods=new Set(mods.map(M.modKey));
+        if(state.mods===null)state.mods=new Set(mods.map(M.groupKey));
         if(state.mtp===null)state.mtp=new Set(mtpOptions.map(([key])=>key));
         $('frontier-panel').innerHTML = `
             <header class="frontier-heading"><div><h1>${t('title')}</h1><p>${t('subtitle')}</p></div><span id="frontier-status" class="frontier-status" role="status"></span></header>
@@ -77,7 +77,7 @@
             </div>
             <aside class="frontier-filters" aria-label="${t('filter')}">
                 <h2>${t('filter')}</h2>
-                <fieldset><legend>MOD</legend><div class="frontier-checks">${mods.map(p=>`<label><input type="checkbox" data-filter="mods" value="${escape(M.modKey(p))}" ${state.mods.has(M.modKey(p))?'checked':''}>${escape(label(p))}</label>`).join('')}</div></fieldset>
+                <fieldset><legend>MOD / Group</legend><div class="frontier-checks">${mods.map(p=>`<label><input type="checkbox" data-filter="mods" value="${escape(M.groupKey(p))}" ${state.mods.has(M.groupKey(p))?'checked':''}>${escape(label(p))}</label>`).join('')}</div></fieldset>
                 <fieldset><legend>MTP</legend><div class="frontier-checks">${mtpOptions.map(([key,text])=>`<label><input type="checkbox" data-filter="mtp" value="${key}" ${state.mtp.has(key)?'checked':''}>${text}</label>`).join('')}</div></fieldset>
                 <span id="frontier-filter-count" role="status"></span>
             </aside></div>`;
@@ -138,10 +138,10 @@
         const blank=$('frontier-blank');blank.hidden=measured.measured.length>0;
         blank.textContent=state.error?t('error'):!state.ready?t('loading'):cohortPoints().length?t('noMatch'):t('empty');
         $('frontier-filter-count').textContent=`${points().length} / ${cohortPoints().length} ${t('points')}`;
-        const groups=[...new Map(cohortPoints().map(p=>[M.modKey(p),p])).values()].sort((a,b)=>
-            Number(M.modKey(b)==='none')-Number(M.modKey(a)==='none')||M.modKey(a).localeCompare(M.modKey(b)));
-        const color=p=>colors[groups.findIndex(g=>M.modKey(g)===M.modKey(p))%colors.length];
-        $('frontier-legend').innerHTML=groups.filter(g=>points().some(p=>M.modKey(p)===M.modKey(g))).map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}</span>`).join('');
+        const groups=[...new Map(cohortPoints().map(p=>[M.groupKey(p),p])).values()].sort((a,b)=>
+            Number(M.groupKey(b)==='none')-Number(M.groupKey(a)==='none')||M.groupKey(a).localeCompare(M.groupKey(b)));
+        const color=p=>colors[groups.findIndex(g=>M.groupKey(g)===M.groupKey(p))%colors.length];
+        $('frontier-legend').innerHTML=groups.filter(g=>points().some(p=>M.groupKey(p)===M.groupKey(g))).map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}</span>`).join('');
         $('frontier-hint').textContent=(M.concurrencySeries(measured.measured).length?t('lineHint'):t('hint'))+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         const curves=$('frontier-curves'), curveUrl=current?.workload.contract.concurrency_curves_url;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
@@ -223,7 +223,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=swe-parallel-20260924-3',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=swe-aeseparation-20260924-1',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.mods=null;state.mtp=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});
