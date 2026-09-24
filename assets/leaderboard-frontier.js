@@ -11,7 +11,7 @@
             smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
-            download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Session trees',
+            download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
             workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', experimental: 'BetterScale experimental'
         },
         zh: {
@@ -20,7 +20,7 @@
             smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
-            download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发会话树',
+            download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
             workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', experimental: 'BetterScale 实验版本'
         }
     };
@@ -209,7 +209,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=sweprefix-20260924-1',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=sweprefix-mtp-experts-20260924-2',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.mods=null;state.mtp=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

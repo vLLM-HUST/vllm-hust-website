@@ -54,11 +54,12 @@ The campaign remeasures the 16 previously published configurations serially: two
 TP2/C4 points, nine capacity16 TP2 concurrency points, and five eight-chip C64 topologies. Only
 completed, validated observations are added; absence means pending or invalid, not zero performance.
 
-TP2 retains vLLM 0.25.1 / vLLM-Ascend 0.25.1rc1 and the original graph/capacity settings. Eight-chip
-configurations retain vLLM 0.23.0 / vLLM-Ascend 0.23.0rc1. Exact source revisions, worker/MOD
-activation, hardware allocation, host, parallelism, MTP and memory settings are included in the
-point download. The capacity16 native and BetterScale arms retain their individually tuned 24.25 and
-20.25 GiB KV budgets per chip; this is **not an equal-KV ablation**.
+TP2 retains vLLM 0.25.1 / vLLM-Ascend 0.25.1rc1 and the original graph/capacity settings. The
+historical MTP-off eight-chip configurations retain vLLM 0.23.0 / vLLM-Ascend 0.23.0rc1; the new
+real-MTP2 expert/control campaign below uses the pinned 0.25.1 / 0.25.1rc1 runtime. Exact source
+revisions, worker/MOD activation, hardware allocation, host, parallelism, MTP and memory settings
+are included in the point download. The capacity16 native and BetterScale arms retain their
+individually tuned 24.25 and 20.25 GiB KV budgets per chip; this is **not an equal-KV ablation**.
 
 The configured context capacity is 262,144 tokens. The eight complete prepared session shapes end
 between 15,494 and 141,269 tokens; individual short windows may stop earlier. Each point records its
@@ -78,3 +79,49 @@ the run summaries, sanitized client configurations and metric extracts used by t
 chart's point download preserves the complete public configuration and comparison contract. Full
 generated-token logs, hardware admission records, server counters and source capsules remain with
 the measurement owner; the public extract does not claim to include those private artifacts.
+
+## Repaired MTP2 expert separation: eight-chip C64
+
+The four completed hw0 observations use the same prepared inputs, real MTP2, 32 GiB KV per chip,
+query budget 4096, native FULL decode graphs and asynchronous scheduling. Both separated and native
+EP controls include the qualified MTP feedback ownership correction: the previous-step D2H receipt
+has a private host mailbox, isolated from input-batch row reordering. This is a shared correctness
+bridge applied to all four configurations, not the separated-expert performance treatment.
+
+| Configuration          | Output tokens/s/chip | Decode speed P90 (tokens/s/request) | TTFT P95 (s) |
+| ---------------------- | -------------------: | ----------------------------------: | -----------: |
+| A4E4                   |               143.19 |                               25.81 |         4.47 |
+| A6E2                   |               132.39 |                               20.44 |         2.85 |
+| DP8EP8                 |                93.34 |                               16.74 |         3.28 |
+| TP8EP8 (32 live slots) |                65.06 |                               25.80 |        52.66 |
+
+Every point completed 900 measured seconds with zero request/protocol failures and clean
+owned-resource release. Mean client-inflight occupancy was approximately 64. Native EP receipts
+verify 32 local experts on each of 8 ranks and a complete, nonoverlapping 256-expert union at all 40
+target layers plus the physical draft layer. DP8EP8 is **not eight independent replicas**. Separated
+expert owners each use two directly launched resident kernels, no server graph and no host forward
+RPC; every owner/source generation count agrees at drain. Expert chips are included in the
+throughput denominator.
+
+These are single observations: A4E4's measured output throughput is about 8% higher than A6E2, while
+A6E2 has lower TTFT P95. A6E2 is about 42% above DP8EP8 in this window. Actual MTP acceptance
+lengths are close (about 2.87–2.89); they are not a forced calibration. Server-side prefix-cache
+hits are positive on all arms. Acceptance/cache ratios in the downloads cover the server lifetime
+including the HTTP gate and drain, not just the measured window.
+
+**TP8EP8 is capacity-limited here:** its single engine admits 32 active requests against 64 client
+lanes. The separated/DP arms have 32 slots per attention engine. The follow-up with 64 TP8 slots was
+cancelled before worker launch; no result is inferred. Do not describe the retained 32-slot point as
+a tuned TP8 optimum. All four table entries were completed before the campaign stopped.
+
+The new runs reached at most 30K–51K prompt tokens, not 141K or 256K; reached turns and session
+counts remain in the evidence. These fixed-shape measurements use actual generated IDs but do not
+score SWE solving or certify semantic quality. No partially cancelled AgentX or TP8 capacity run is
+admitted.
+
+The new prepared file has a different SHA because tokenizer path/version metadata uses Transformers
+5.14.1 rather than 5.17.0. Direct structural comparison proves identical source/policy/session
+ordering, all 360 input-token segments and output budgets, and identical tokenizer fingerprint. Both
+exact file hashes are retained in the contract and per-point evidence. Client 0.1.0 uses a
+cache-salt-aware relay; client 0.1.1 adds an equal-valued correlation header. Session affinity is
+identical, while exact tool/transport versions remain disclosed rather than rewritten.
