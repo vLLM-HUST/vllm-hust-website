@@ -106,6 +106,38 @@ chart's point download preserves the complete public configuration and compariso
 generated-token logs, hardware admission records, server counters and source capsules remain with
 the measurement owner; the public extract does not claim to include those private artifacts.
 
+## Native C32 capacity and graph coverage
+
+The native extensions retain the same 24.25 GiB/chip KV budget. Both C32 windows completed 900
+seconds with zero request failures and zero preemptions, observing 32 running requests. They reached
+a maximum prompt of 40,244 tokens; this is not proof that 32 full-256K contexts fit simultaneously.
+
+| Server limit | Client C | Graph capture maximum         | Output tokens/s/chip | Decode P90 tokens/s |
+| ------------ | -------- | ----------------------------- | -------------------: | ------------------: |
+| 16           | 16       | 48 tokens                     |               221.95 |               38.93 |
+| 32           | 32       | 48 tokens (untuned extension) |               135.53 |                9.72 |
+| 32           | 32       | 96 tokens                     |               207.88 |               21.01 |
+
+Raising the server limit alone retained a capture maximum of 48 tokens. A full 32-lane MTP2 decode
+batch needs 96 tokens; the pinned dispatcher's explicit rule returns no-graph execution above its
+capture maximum. The second extension adds 96 to the capture sizes. It restores eligible full-batch
+decode coverage, not full-graph coverage for all larger mixed-prefill batches.
+
+Peak observed KV usage was 61.8% for the original-capture C32 probe and 65.1% for the
+expanded-capture observation. The latter performed better, but still did not beat the C16 window on
+either coordinate. These are single shared-host windows with different reached request mixtures, not
+repeated estimates of the causal contribution of graph capture. Capacity and useful throughput are
+different questions; increasing concurrency need not improve either coordinate.
+
+Both C32 points remain visible with their exact configurations. Neither joins the server-limit16
+concurrency line. The initial slower observation is retained, not silently replaced or described as
+a tuned 32-slot baseline.
+
+The BetterScale server32 attempt was rejected before model initialization: the pinned capacity16
+adapter admits only16 requests, with matching fixed GDN/FIA metadata and draft-padding layouts. This
+is an unsupported adapter configuration, not an observed out-of-memory result. It supplies no
+benchmark point; the published BetterScale capacity16 sweep is unchanged.
+
 ## Repaired MTP2 expert separation: eight-chip C64
 
 The four completed hw0 observations use the same prepared inputs, real MTP2, 32 GiB KV per chip,

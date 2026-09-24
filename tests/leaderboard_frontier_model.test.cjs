@@ -59,6 +59,9 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(p.load.concurrency,32);
             assert.equal(p.configuration.parameters.max_num_seqs,32);
             assert.equal(p.load.concurrency_series,undefined);
+            assert.equal(run.capacity_validation.passed,true);
+            assert.equal(run.capacity_validation.preemptions,0);
+            assert.equal(run.capacity_validation.max_observed_running,32);
             assert.ok(agentxData().points.some(old=>old.id===run.configuration_source_point_id));
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);

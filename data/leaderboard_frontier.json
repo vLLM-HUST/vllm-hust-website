@@ -3260,6 +3260,12 @@
           "measured_mean_client_inflight": 3.9985059830753986,
           "full_client_concurrency_fraction": 0.9985087591043298,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "physical_devices": [
             0,
@@ -3320,6 +3326,7 @@
             "--default-chat-template-kwargs",
             "{\"enable_thinking\":true}"
           ],
+          "max_cudagraph_capture_size": 24,
           "worker_class": "native_worker.Worker"
         }
       },
@@ -3389,7 +3396,7 @@
           "thinking": true,
           "generation_temperature": 0,
           "task_queue_enable": 0,
-          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_mode": "FULL",
           "graph_capture_sizes": [
             3,
             6,
@@ -3422,6 +3429,12 @@
           "measured_mean_client_inflight": 3.9978448308369194,
           "full_client_concurrency_fraction": 0.9978478236713757,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "physical_devices": [
             0,
@@ -3484,6 +3497,7 @@
             "--default-chat-template-kwargs",
             "{\"enable_thinking\":true}"
           ],
+          "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
         }
       },
@@ -3579,6 +3593,12 @@
           "measured_mean_client_inflight": 0.9996067220112955,
           "full_client_concurrency_fraction": 0.9996067220112955,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "deployment_note": "Completed windows only; continuous selected-card guard had not triggered during these windows or their drain. Foreign process detected later during C16; incomplete C16 excluded, owned server exited zero, release observation complete.",
           "physical_devices": [
@@ -3642,6 +3662,7 @@
             "--kv-cache-memory-bytes",
             "26038239232"
           ],
+          "max_cudagraph_capture_size": 48,
           "worker_class": "native_worker.Worker"
         }
       },
@@ -3738,6 +3759,12 @@
           "measured_mean_client_inflight": 1.9992733420290623,
           "full_client_concurrency_fraction": 0.9992734718201488,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "deployment_note": "Completed windows only; continuous selected-card guard had not triggered during these windows or their drain. Foreign process detected later during C16; incomplete C16 excluded, owned server exited zero, release observation complete.",
           "physical_devices": [
@@ -3801,6 +3828,7 @@
             "--kv-cache-memory-bytes",
             "26038239232"
           ],
+          "max_cudagraph_capture_size": 48,
           "worker_class": "native_worker.Worker"
         }
       },
@@ -3897,6 +3925,12 @@
           "measured_mean_client_inflight": 3.998771407892507,
           "full_client_concurrency_fraction": 0.9987743359491449,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "deployment_note": "Completed windows only; continuous selected-card guard had not triggered during these windows or their drain. Foreign process detected later during C16; incomplete C16 excluded, owned server exited zero, release observation complete.",
           "physical_devices": [
@@ -3960,6 +3994,7 @@
             "--kv-cache-memory-bytes",
             "26038239232"
           ],
+          "max_cudagraph_capture_size": 48,
           "worker_class": "native_worker.Worker"
         }
       },
@@ -4056,6 +4091,12 @@
           "measured_mean_client_inflight": 7.998346572284612,
           "full_client_concurrency_fraction": 0.9983619656657619,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "deployment_note": "Completed windows only; continuous selected-card guard had not triggered during these windows or their drain. Foreign process detected later during C16; incomplete C16 excluded, owned server exited zero, release observation complete.",
           "physical_devices": [
@@ -4119,6 +4160,7 @@
             "--kv-cache-memory-bytes",
             "26038239232"
           ],
+          "max_cudagraph_capture_size": 48,
           "worker_class": "native_worker.Worker"
         }
       },
@@ -4189,7 +4231,7 @@
           "thinking": true,
           "generation_temperature": 0,
           "task_queue_enable": 0,
-          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_mode": "FULL",
           "graph_capture_sizes": [
             3,
             6,
@@ -4228,6 +4270,12 @@
           "measured_mean_client_inflight": 1.9987636005778526,
           "full_client_concurrency_fraction": 0.9987637220811707,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "physical_devices": [
             2,
@@ -4292,6 +4340,7 @@
             "--kv-cache-memory-bytes",
             "21743271936"
           ],
+          "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
         }
       },
@@ -4362,7 +4411,7 @@
           "thinking": true,
           "generation_temperature": 0,
           "task_queue_enable": 0,
-          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_mode": "FULL",
           "graph_capture_sizes": [
             3,
             6,
@@ -4401,6 +4450,12 @@
           "measured_mean_client_inflight": 3.997915066780309,
           "full_client_concurrency_fraction": 0.9979178194092108,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "physical_devices": [
             2,
@@ -4465,6 +4520,7 @@
             "--kv-cache-memory-bytes",
             "21743271936"
           ],
+          "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
         }
       },
@@ -4535,7 +4591,7 @@
           "thinking": true,
           "generation_temperature": 0,
           "task_queue_enable": 0,
-          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_mode": "FULL",
           "graph_capture_sizes": [
             3,
             6,
@@ -4574,6 +4630,12 @@
           "measured_mean_client_inflight": 7.996718245340324,
           "full_client_concurrency_fraction": 0.9967337956402399,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "physical_devices": [
             2,
@@ -4638,6 +4700,7 @@
             "--kv-cache-memory-bytes",
             "21743271936"
           ],
+          "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
         }
       },
@@ -4708,7 +4771,7 @@
           "thinking": true,
           "generation_temperature": 0,
           "task_queue_enable": 0,
-          "graph_mode": "FULL prefill / mixed / decode",
+          "graph_mode": "FULL",
           "graph_capture_sizes": [
             3,
             6,
@@ -4747,6 +4810,12 @@
           "measured_mean_client_inflight": 15.995835265370292,
           "full_client_concurrency_fraction": 0.9959184744436061,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "physical_devices": [
             2,
@@ -4811,6 +4880,7 @@
             "--kv-cache-memory-bytes",
             "21743271936"
           ],
+          "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
         }
       },
@@ -4907,6 +4977,12 @@
           "measured_mean_client_inflight": 15.997943813433134,
           "full_client_concurrency_fraction": 0.9980207514922302,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
           "execution_host": "local",
           "physical_devices": [
             2,
@@ -4969,6 +5045,7 @@
             "--kv-cache-memory-bytes",
             "26038239232"
           ],
+          "max_cudagraph_capture_size": 48,
           "worker_class": "native_worker.Worker"
         }
       },
@@ -5004,6 +5081,341 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-native-tp2-c16-20260923"
+        }
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-capacity32-native-tp2-c32-20260924",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native · C32 · KV24.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 32,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_policy": "No host KV offload; opportunistic shared-host execution; no claimed RAM reservation",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "baseline-source",
+          "availability": "Native engine plus required Mamba ABI bridge; no BetterScale treatment",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Server max_num_seqs=32 extension with unchanged arm-specific KV budget; separate from capacity16 sweeps.",
+          "comparison_scope": "One serial 900s observation of this configuration; not a repeatability estimate, equal-KV ablation or certified capacity peak",
+          "functional_limit": "Native C16 cold retrieval divergences retained with and without MTP; not quality-certified",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "observed_max_prompt_tokens": 40244,
+          "measured_mean_client_inflight": 31.9985781188997,
+          "full_client_concurrency_fraction": 0.9989232334468074,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 32,
+            "measurement_seconds": 120,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": true
+          },
+          "execution_host": "local",
+          "physical_devices": [
+            2,
+            3
+          ],
+          "transport": "Client and server on execution host loopback",
+          "server_command": [
+            "python",
+            "-m",
+            "vllm.entrypoints.cli.main",
+            "serve",
+            "$MODEL",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "33781",
+            "--served-model-name",
+            "swe-native32-c32",
+            "--tensor-parallel-size",
+            "2",
+            "--distributed-executor-backend",
+            "mp",
+            "--worker-cls",
+            "native_worker.Worker",
+            "--dtype",
+            "bfloat16",
+            "--kv-cache-dtype",
+            "auto",
+            "--max-model-len",
+            "262144",
+            "--max-num-seqs",
+            "32",
+            "--max-num-batched-tokens",
+            "4096",
+            "--gpu-memory-utilization",
+            "0.95",
+            "--seed",
+            "17",
+            "--enable-prefix-caching",
+            "--mamba-cache-mode",
+            "align",
+            "--enable-prompt-tokens-details",
+            "--async-scheduling",
+            "--shutdown-timeout",
+            "60",
+            "--additional-config",
+            "{\"enable_cpu_binding\":false}",
+            "--limit-mm-per-prompt",
+            "{\"image\":0,\"video\":0}",
+            "--compilation-config",
+            "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+            "--speculative-config",
+            "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+            "--generation-config",
+            "vllm",
+            "--override-generation-config",
+            "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+            "--default-chat-template-kwargs",
+            "{\"enable_thinking\":true}",
+            "--kv-cache-memory-bytes",
+            "26038239232"
+          ],
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "native_worker.Worker",
+          "graph_capacity_note": "Untuned capacity probe retaining original max48 graph capture. Batches above48 tokens dispatch without graphs; not tuned32-slot performance.",
+          "capacity_caveat": "Short C32 qualification must observe 32 running requests without preemption; not full-256K-per-lane capacity certification."
+        }
+      },
+      "load": {
+        "concurrency": 32,
+        "unit": "continuously replenished in-flight HTTP request lanes"
+      },
+      "metrics": {
+        "output_tps": 271.0522222222222,
+        "decode_p90_tps": 9.718916201936732,
+        "ttft_p95_ms": 6215.966668135661,
+        "ttft_p50_ms": 1645.1065775036113,
+        "tpot_ms": 120.97496818757992,
+        "tpot_p95_ms": 152.9020262617997,
+        "e2e_p95_ms": 145426.0456802351,
+        "completed_requests": 540
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-SWE-PREFIX.md",
+        "run_ids": [
+          "981b33f8685346bbbc54a0f7d1d467a5"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation; fixed window streamed-token accounting, in-flight drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "campaign": "server32-c32-extension",
+          "configuration_source_point_id": "qwen35-agentx-capacity16-native-tp2-c16-20260923"
+        }
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-capacity32-native-tp2-c32-20260924-graph96",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native · C32 · KV24.25GiB",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 32,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_policy": "No host KV offload; opportunistic shared-host execution; no claimed RAM reservation",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48,
+            96
+          ],
+          "runtime_base_commits": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "source_capsule": "baseline-source",
+          "availability": "Native engine plus required Mamba ABI bridge; no BetterScale treatment",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Server max_num_seqs=32 extension with unchanged arm-specific KV budget; separate from capacity16 sweeps.",
+          "comparison_scope": "One serial 900s observation of this configuration; not a repeatability estimate, equal-KV ablation or certified capacity peak",
+          "functional_limit": "Native C16 cold retrieval divergences retained with and without MTP; not quality-certified",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "observed_max_prompt_tokens": 40244,
+          "measured_mean_client_inflight": 31.998201650334426,
+          "full_client_concurrency_fraction": 0.9985337767998054,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 32,
+            "measurement_seconds": 120,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": true
+          },
+          "execution_host": "local",
+          "physical_devices": [
+            2,
+            3
+          ],
+          "transport": "Client and server on execution host loopback",
+          "server_command": [
+            "python",
+            "-m",
+            "vllm.entrypoints.cli.main",
+            "serve",
+            "$MODEL",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "33781",
+            "--served-model-name",
+            "swe-native32-c32-graph96",
+            "--tensor-parallel-size",
+            "2",
+            "--distributed-executor-backend",
+            "mp",
+            "--worker-cls",
+            "native_worker.Worker",
+            "--dtype",
+            "bfloat16",
+            "--kv-cache-dtype",
+            "auto",
+            "--max-model-len",
+            "262144",
+            "--max-num-seqs",
+            "32",
+            "--max-num-batched-tokens",
+            "4096",
+            "--gpu-memory-utilization",
+            "0.95",
+            "--seed",
+            "17",
+            "--enable-prefix-caching",
+            "--mamba-cache-mode",
+            "align",
+            "--enable-prompt-tokens-details",
+            "--async-scheduling",
+            "--shutdown-timeout",
+            "60",
+            "--additional-config",
+            "{\"enable_cpu_binding\":false}",
+            "--limit-mm-per-prompt",
+            "{\"image\":0,\"video\":0}",
+            "--compilation-config",
+            "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48, 96], \"max_cudagraph_capture_size\": 96}",
+            "--speculative-config",
+            "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+            "--generation-config",
+            "vllm",
+            "--override-generation-config",
+            "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+            "--default-chat-template-kwargs",
+            "{\"enable_thinking\":true}",
+            "--kv-cache-memory-bytes",
+            "26038239232"
+          ],
+          "max_cudagraph_capture_size": 96,
+          "worker_class": "native_worker.Worker",
+          "graph_capacity_note": "Capture extended to96 tokens for full32-lane MTP2 batches; original KV budget unchanged.",
+          "capacity_caveat": "Short C32 qualification must observe 32 running requests without preemption; not full-256K-per-lane capacity certification."
+        }
+      },
+      "load": {
+        "concurrency": 32,
+        "unit": "continuously replenished in-flight HTTP request lanes"
+      },
+      "metrics": {
+        "output_tps": 415.75666666666666,
+        "decode_p90_tps": 21.013988156352475,
+        "ttft_p95_ms": 7295.046780834674,
+        "ttft_p50_ms": 1502.8813754906878,
+        "tpot_ms": 83.68809474461455,
+        "tpot_p95_ms": 158.70692807607816,
+        "e2e_p95_ms": 117100.284394798,
+        "completed_requests": 714
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-SWE-PREFIX.md",
+        "run_ids": [
+          "efaa5252cec3442ca7912649a11c940e"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation; fixed window streamed-token accounting, in-flight drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "campaign": "server32-c32-extension",
+          "configuration_source_point_id": "qwen35-agentx-capacity16-native-tp2-c16-20260923"
         }
       }
     }
