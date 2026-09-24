@@ -42,7 +42,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
     const cohort=data.cohorts.find(c=>c.workload.id==='sweprefix-qwen35-eight-traces-900s-v1');
     assert.ok(cohort);
     assert.equal(cohort.workload.contract.repository_url,'https://github.com/vLLM-HUST/swe-prefix-reuse');
-    const points=data.points.filter(p=>p.cohort_id===cohort.id);
+    const points=[...data.points,...(data.archived_points||[])].filter(p=>p.cohort_id===cohort.id);
     assert.ok(points.length>0);
     assert.equal(points.length,evidence.runs.length);
     assert.equal(agentxData().points.length,16);
@@ -91,7 +91,8 @@ test('real-MTP expert points account for all eight chips and preserve native EP/
     const data=require('../data/leaderboard_frontier.json');
     const evidence=require('../data/leaderboard_frontier_swe_evidence.json');
     for(const arm of ['a4e4','a6e2','dp8ep8','tp8ep8']){
-        const p=data.points.find(p=>p.id===`qwen35-sweprefix-realmtp2-${arm}-c64-20260924`);
+        const id=arm.startsWith('a') ? `qwen35-sweprefix-realmtp2-${arm}-cap7-c64-hw3-20260924` : `qwen35-sweprefix-realmtp2-${arm}-c64-20260924`;
+        const p=data.points.find(p=>p.id===id);
         assert.ok(p);
         const run=evidence.runs.find(r=>r.point_id===p.id);
         const params=p.configuration.parameters;
@@ -251,4 +252,25 @@ test('AE separation is a tracking group, not a new MOD or a TP/EP alias',()=>{
         assert.equal(model.groupKey(p),model.modKey(p));
     const invalid=structuredClone(data);invalid.points[0].configuration.experiment_group=' ';
     assert.throws(()=>model.validate(invalid),/experiment group/);
+});
+
+test('A+E frontier retains highest-throughput point while preserving all earlier evidence',()=>{
+    const d=require('../data/leaderboard_frontier.json');
+    const archived=d.archived_points;
+    model.validate({...d,points:[...d.points,...archived]});
+    for(const arm of ['a4e4','a6e2']){
+        const prefix=`qwen35-sweprefix-realmtp2-${arm}-`;
+        const selected=d.points.filter(p=>p.id.startsWith(prefix));
+        assert.equal(selected.length,1);
+        const p=selected[0];
+        const earlier=archived.filter(p=>p.id.startsWith(prefix));
+        assert.equal(earlier.length,2);
+        assert.equal(p.configuration.parameters.expert_sources_per_wave,7);
+        assert.equal(p.configuration.parameters.execution_host,'hw3');
+        for(const old of earlier){
+            assert.equal(old.frontier_selection.selected_point_id,p.id);
+            assert.ok(model.value(old,'output_tps_per_chip')<=model.value(p,'output_tps_per_chip'));
+        }
+        assert.deepEqual(new Set(p.frontier_selection.compared_point_ids),new Set([p.id,...earlier.map(p=>p.id)]));
+    }
 });

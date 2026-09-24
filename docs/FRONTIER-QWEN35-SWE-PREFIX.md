@@ -207,3 +207,43 @@ ordering, all 360 input-token segments and output budgets, and identical tokeniz
 exact file hashes are retained in the contract and per-point evidence. Client 0.1.0 uses a
 cache-salt-aware relay; client 0.1.1 adds an equal-valued correlation header. Session affinity is
 identical, while exact tool/transport versions remain disclosed rather than rewritten.
+
+## Opportunistic expert batching and retained best points
+
+The subsequent hw3 comparison uses clean BetterScale source `d1d67fa`, the same
+real-MTP2/C64/900-second protocol and serving envelope above. These are source-snapshot
+measurements, not a new installed-wheel qualification or PyPI release. Each layer owner admits
+already-ready, same-layer compatible attention sources up to a configurable cap; cap7 does not wait
+to fill a batch. Placement remains physical-layer ownership, not expert-sharded EP.
+
+| Configuration | Sources per wave cap | Output tokens/s/chip | TTFT P95 (s) |
+| ------------- | -------------------: | -------------------: | -----------: |
+| A4E4          |                    1 |               141.93 |         4.52 |
+| A4E4          |                    7 |               143.93 |         4.83 |
+| A6E2          |                    1 |               134.02 |         2.83 |
+| A6E2          |                    7 |               138.18 |         2.79 |
+
+All four points passed with zero failed requests, real draft acceptance, positive prefix-cache hits,
+exact source/owner generation agreement and clean eight-role release. Before measurement, A4E4/A6E2
+also passed 128 mixed-length requests and 164/246 native layer shadows respectively. Maximum
+relative L2 errors were 0.000240644/0.000245942. The host was fully released afterward.
+
+The Frontier chart retains the **highest observed output throughput per chip for each A+E
+configuration at the same workload, MTP, C64 and serving envelope**: the two cap7 points above. They
+replace the earlier hw0 A4E4/A6E2 points on the chart; the new cap1 controls are also archived. This
+is selection by throughput, not a claim of statistical significance, lower latency, or a universal
+cap7 default. A4E4 TTFT worsened in this pair. Other configurations, MTP states, concurrency levels
+and independently published campaigns are unchanged.
+
+Complete superseded point configurations remain in `archived_points` in
+[`leaderboard_frontier.json`](../data/leaderboard_frontier.json); all four new run summaries and
+both older runs remain in the public SWE evidence extract. The legacy Runs table retains its own
+original data source; these archived Frontier observations are not fabricated as Runs submissions.
+No measurement is overwritten or averaged with a newer one.
+
+Cap7 increased measured throughput by about 1.4% for A4E4 and 3.1% for A6E2. Lifetime source
+frames/waves were 1,262,106/1,242,972 and 1,833,162/1,639,981: approximately 1.52% and 10.54% fewer
+waves than source frames. Those counters include startup and drain, so they do not isolate
+measured-window kernel cost or prove the remaining expert wait is solved. Each setting has one
+closed-loop observation, with different reached turn mixes. The earlier DP8EP8/TP8EP8 controls
+remain explicitly identified as hw0 observations; they were not rerun on hw3.
