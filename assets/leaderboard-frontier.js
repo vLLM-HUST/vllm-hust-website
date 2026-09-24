@@ -6,7 +6,7 @@
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const words = {
         en: {
-            title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload',
+            title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', native: 'Native baseline',
             smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
@@ -15,7 +15,7 @@
             workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', experimental: 'BetterScale experimental'
         },
         zh: {
-            title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload',
+            title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', native: '原生 Baseline',
             smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
@@ -27,11 +27,12 @@
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
     const t = key => words[lang()][key];
     const fmt = n => n == null ? '—' : new Intl.NumberFormat(lang(), {maximumFractionDigits: 2}).format(n);
-    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:''};
+    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:'', mtp:'all'};
     const colors = ['#4263eb','#008c78','#ad5c00','#965bd3','#d14469','#177baf'];
     const tagKey = c => JSON.stringify([c.model.id,c.precision.id]);
     const cohort = () => state.data.cohorts.find(c => c.id === state.cohort);
-    const points = () => state.data.points.filter(p => p.cohort_id === state.cohort);
+    const cohortPoints = () => state.data.points.filter(p => p.cohort_id === state.cohort);
+    const points = () => cohortPoints().filter(p => state.mtp === 'all' || M.mtpState(p) === state.mtp);
     const label = p => p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native');
     const parallel = p => {
         const params = p.configuration.parameters;
@@ -52,8 +53,14 @@
             <header class="frontier-heading"><div><h1>${t('title')}</h1><p>${t('subtitle')}</p></div><span id="frontier-status" class="frontier-status" role="status"></span></header>
             <div class="frontier-card">
                 <div class="frontier-picker">
-                    <div class="frontier-model-tags" role="group" aria-label="${t('model')}">${tags.map(c=>`<button type="button" class="frontier-model-tag" data-model-tag="${escape(tagKey(c))}" aria-pressed="${tagKey(c)===state.tag}">${escape(c.model.label)}<span>${escape(c.precision.label)}</span></button>`).join('')}</div>
-                    <label class="frontier-workload">${t('workload')}<select id="frontier-workload" ${choices.length<2?'disabled':''}>${choices.length?choices.map(c=>`<option value="${escape(c.id)}" ${c.id===state.cohort?'selected':''}>${escape(c.workload.label)} · ${fmt(c.context_tokens)} ${t('context')}</option>`).join(''):`<option>${t('empty')}</option>`}</select></label>
+                    <div class="frontier-identity">
+                        <div class="frontier-model-tags" role="group" aria-label="${t('model')}">${tags.map(c=>`<button type="button" class="frontier-model-tag" data-model-tag="${escape(tagKey(c))}" aria-pressed="${tagKey(c)===state.tag}">${escape(c.model.label)}<span>${escape(c.precision.label)}</span></button>`).join('')}</div>
+                        ${choices.length>1?`<label class="frontier-workload">${t('workload')}<select id="frontier-workload">${choices.map(c=>`<option value="${escape(c.id)}" ${c.id===state.cohort?'selected':''}>${escape(c.workload.label)} · ${fmt(c.context_tokens)} ${t('context')}</option>`).join('')}</select></label>`:choices.length?`<span id="frontier-workload-tag" class="frontier-workload-tag" aria-label="${t('workload')}">${escape(choices[0].workload.label)} · ${fmt(choices[0].context_tokens)} ${t('context')}</span>`:''}
+                    </div>
+                    <div class="frontier-filters" role="group" aria-label="${t('filter')}">
+                        <label for="frontier-mtp">MTP</label><select id="frontier-mtp" ${!cohortPoints().length?'disabled':''}>${[['all',t('all')],['on',t('mtpOn')],['off',t('mtpOff')],...(cohortPoints().some(p=>M.mtpState(p)==='unknown')?[['unknown',t('unknown')]]:[])].map(([value,text])=>`<option value="${value}" ${state.mtp===value?'selected':''}>${text}</option>`).join('')}</select>
+                        <span id="frontier-filter-count" role="status"></span>
+                    </div>
                 </div>
                 <div class="frontier-plot" id="frontier-plot">
                     <svg id="frontier-chart" viewBox="0 0 1000 480" role="group" aria-label="${t('x')} × ${t('y')}"></svg>
@@ -63,9 +70,10 @@
                 <footer class="frontier-footer"><div class="frontier-legend" id="frontier-legend"></div><div class="frontier-footer-links"><a id="frontier-curves" target="_blank" rel="noopener" hidden>${t('curves')} ↗</a><a id="frontier-workload-repo" href="https://github.com/vLLM-HUST/agentx-bench" target="_blank" rel="noopener">${t('workloadRepo')} ↗</a><span id="frontier-hint">${t('hint')}</span></div></footer>
             </div>`;
         $('frontier-panel').querySelectorAll('[data-model-tag]').forEach(button=>button.addEventListener('click',()=>{
-            state.tag=button.dataset.modelTag;state.cohort='';state.selected='';shell();
+            state.tag=button.dataset.modelTag;state.cohort='';state.selected='';state.mtp='all';shell();
         }));
-        $('frontier-workload').addEventListener('change',event=>{state.cohort=event.target.value;state.selected='';render();});
+        $('frontier-workload')?.addEventListener('change',event=>{state.cohort=event.target.value;state.selected='';state.mtp='all';shell();});
+        $('frontier-mtp').addEventListener('change',event=>{state.mtp=event.target.value;state.selected='';render();});
         $('frontier-chart').addEventListener('click',choose);
         $('frontier-chart').addEventListener('keydown',event=>{
             if(['Enter',' '].includes(event.key)&&event.target.closest('[data-point]')){event.preventDefault();choose(event);}
@@ -112,10 +120,11 @@
         const status=$('frontier-status');status.dataset.state=state.error?'error':state.ready?'ready':'loading';
         status.textContent=state.error?t('error'):!state.ready?t('loading'):current?.workload.contract.profile==='smoke'?t('smoke'):t('formal');
         const blank=$('frontier-blank');blank.hidden=measured.measured.length>0;
-        blank.textContent=state.error?t('error'):!state.ready?t('loading'):t('empty');
-        const groups=[...new Map(points().map(p=>[M.modKey(p),p])).values()];
+        blank.textContent=state.error?t('error'):!state.ready?t('loading'):cohortPoints().length&&state.mtp!=='all'?t('noMatch'):t('empty');
+        $('frontier-filter-count').textContent=`${points().length} / ${cohortPoints().length} ${t('points')}`;
+        const groups=[...new Map(cohortPoints().map(p=>[M.modKey(p),p])).values()];
         const color=p=>colors[groups.findIndex(g=>M.modKey(g)===M.modKey(p))%colors.length];
-        $('frontier-legend').innerHTML=groups.map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}</span>`).join('');
+        $('frontier-legend').innerHTML=groups.filter(g=>points().some(p=>M.modKey(p)===M.modKey(g))).map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}</span>`).join('');
         $('frontier-hint').textContent=t('hint')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         const curves=$('frontier-curves'), curveUrl=current?.workload.contract.concurrency_curves_url;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);

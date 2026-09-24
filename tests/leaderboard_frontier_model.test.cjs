@@ -120,3 +120,14 @@ test('C64 expert observations share one view and preserve point-specific protoco
     }
     assert.ok(!data.points.some(p=>p.id.includes('expert-') && p.load.concurrency===16));
 });
+
+
+test('MTP filter classifies explicit settings without treating missing as off',()=>{
+    const point=tokens=>({configuration:{parameters:{mtp_draft_tokens:tokens}}});
+    assert.equal(model.mtpState(point(0)),'off');
+    assert.equal(model.mtpState(point(2)),'on');
+    for(const value of [undefined,null,-1,'0',NaN])assert.equal(model.mtpState(point(value)),'unknown');
+    const data=require('../data/leaderboard_frontier.json');
+    assert.equal(data.points.filter(p=>model.mtpState(p)==='on').length,11);
+    assert.equal(data.points.filter(p=>model.mtpState(p)==='off').length,5);
+});

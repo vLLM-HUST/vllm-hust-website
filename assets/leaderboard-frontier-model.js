@@ -67,7 +67,11 @@
         return { measured, excluded: points.length - measured.length,
             frontier: measured.filter(p => p.frontier).sort((a, b) => a.x - b.x || a.point.id.localeCompare(b.point.id)) };
     }
-    const api = { validate, metrics, value, modKey, project, safeURL };
+    function mtpState(point) {
+        const tokens = point.configuration.parameters.mtp_draft_tokens;
+        return Number.isFinite(tokens) && tokens >= 0 ? (tokens > 0 ? 'on' : 'off') : 'unknown';
+    }
+    const api = { validate, metrics, value, modKey, project, safeURL, mtpState };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);
