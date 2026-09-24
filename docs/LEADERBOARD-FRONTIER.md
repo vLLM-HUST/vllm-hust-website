@@ -127,3 +127,13 @@ pins the official replay harness and corpus and records the smoke protocol.
 Current comparison runs use 15-minute measured windows after full warmup; this
 is an evolving smoke protocol, not one-hour formal certification. The Frontier
 footer links the workload repository directly.
+
+
+## Unified throughput comparison (2026-09-24)
+
+The Qwen35 view now includes the [C64 expert matrix](FRONTIER-QWEN35-EXPERT-SMOKE.md)
+with historical TP2 points. HF/ModelScope are accepted as the same model by
+Fletcher. Exact checkpoint, MTP and warmup remain per-point settings;
+`evidence.benchmark_protocol` overrides historical cohort-wide assumptions.
+This is a throughput configuration comparison, not an identical-protocol causal
+experiment. The withdrawn eight-chip C16 points remain excluded.
