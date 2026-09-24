@@ -1,0 +1,23 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const model=require('../assets/leaderboard-frontier-model.js');
+const sample=require('../docs/examples/frontier-submission/snapshot.json');
+const evidence=require('../docs/examples/frontier-submission/evidence.json');
+test('submission example is one real, internally consistent measured point',()=>{
+    model.validate(sample);
+    assert.equal(sample.cohorts.length,1);
+    assert.equal(sample.points.length,1);
+    assert.equal(evidence.runs.length,1);
+    const point=sample.points[0], run=evidence.runs[0], m=run.official_metrics;
+    assert.deepEqual(point.evidence.run_ids,[run.run_id]);
+    assert.equal(m.metadata.submission_valid,true);
+    assert.equal(point.evidence.profile,'smoke');
+    assert.equal(point.evidence.measurement_seconds,900);
+    assert.equal(point.metrics.decode_p90_tps,m.output_token_throughput_per_user.p90);
+    assert.equal(point.metrics.output_tps,m.output_token_throughput.avg);
+    assert.equal(point.metrics.ttft_p95_ms,m.time_to_first_token.p95);
+    assert.equal(point.metrics.tpot_ms,m.inter_token_latency.avg);
+    assert.equal(point.metrics.tpot_p95_ms,m.inter_token_latency.p95);
+    assert.equal(model.value(point,'output_tps_per_chip'),m.output_token_throughput.avg/2);
+    assert.equal(model.project(sample.points,'decode_p90_tps','output_tps_per_chip').measured.length,1);
+});
