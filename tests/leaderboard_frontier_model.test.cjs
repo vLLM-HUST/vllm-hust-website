@@ -15,7 +15,15 @@ test('concurrency lines connect only declared same-cohort series in C order',()=
     const native=lines.find(rows=>rows[0].point.load.concurrency_series==='swe-capacity16-native');
     assert.ok(native.length>=4);
     assert.deepEqual(native.map(row=>row.point.load.concurrency),[...native.map(row=>row.point.load.concurrency)].sort((a,b)=>a-b));
-    assert.ok(lines.flat().every(row=>row.point.configuration.parameters.max_num_seqs===16));
+    const legacy=lines.filter(rows=>['swe-capacity16-native','swe-capacity16-full'].includes(rows[0].point.load.concurrency_series));
+    assert.ok(legacy.flat().every(row=>row.point.configuration.parameters.max_num_seqs===16));
+    for(const rows of lines){
+        const first=rows[0].point;
+        assert.ok(rows.every(row=>row.point.cohort_id===first.cohort_id && row.point.load.concurrency_series===first.load.concurrency_series));
+        const fixed=p=>[p.configuration.mods,p.configuration.hardware.accelerator_count,...['max_num_seqs','total_serving_slots','tensor_parallel_size','data_parallel_size','expert_parallel','mtp_draft_tokens','graph_mode','max_model_len','max_num_batched_tokens','gpu_memory_utilization','execution_host'].map(k=>p.configuration.parameters[k])];
+        for(const row of rows) assert.deepEqual(fixed(row.point),fixed(first));
+        assert.deepEqual(rows.map(row=>row.point.load.concurrency),rows.map(row=>row.point.load.concurrency).sort((a,b)=>a-b));
+    }
     assert.equal(model.concurrencySeries(native.slice(0,1)).length,0);
     const other={...native[0],point:{...native[0].point,cohort_id:'other-workload'}};
     assert.equal(model.concurrencySeries([native[0],other]).length,0);
