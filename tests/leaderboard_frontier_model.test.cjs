@@ -39,10 +39,37 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
         assert.equal(p.load.concurrency,run.client.concurrency);
         assert.equal(p.configuration.parameters.synthetic_acceptance_length,undefined);
         assert.equal(p.evidence.benchmark_protocol.protocol_id,'swe-prefix-reuse/v1');
-        assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,cohort.workload.contract.prepared_workload_sha256);
-        assert.ok(agentxData().points.some(old=>old.id===run.old_point_id));
+        assert.ok(cohort.workload.contract.prepared_workload_variants.some(v=>v.sha256===p.evidence.benchmark_protocol.prepared_workload_sha256));
+        if(run.old_point_id) assert.ok(agentxData().points.some(old=>old.id===run.old_point_id));
+        else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
+    }
+});
+test('real-MTP expert points account for all eight chips and preserve native EP/capacity evidence',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const evidence=require('../data/leaderboard_frontier_swe_evidence.json');
+    for(const arm of ['a4e4','a6e2','dp8ep8','tp8ep8']){
+        const p=data.points.find(p=>p.id===`qwen35-sweprefix-realmtp2-${arm}-c64-20260924`);
+        assert.ok(p);
+        const run=evidence.runs.find(r=>r.point_id===p.id);
+        const params=p.configuration.parameters;
+        assert.equal(p.configuration.hardware.accelerator_count,8);
+        assert.equal(params.mtp_draft_tokens,2);
+        assert.equal(params.kv_cache_memory_bytes,32*1024**3);
+        assert.equal(p.load.concurrency,64);
+        assert.equal(run.validation.all_role_exits_zero,true);
+        assert.equal(run.validation.selected_devices_released,true);
+        assert.ok(params.lifecycle_prefix_cache_hit_fraction>0);
+        assert.ok(params.correctness_bridge.includes('9f58da1'));
+        if(arm.startsWith('a')){
+            assert.equal(params.attention_ranks+params.expert_ranks,8);
+            assert.equal(run.validation.direct_resident_experts_verified,true);
+        } else {
+            assert.equal(params.expert_parallel_size,8);
+            assert.equal(run.validation.actual_ep_partition_verified,true);
+        }
+        if(arm==='tp8ep8') assert.ok(params.capacity_caveat.includes('32 live request slots'));
     }
 });
 test('contract validates fixture, rejects unknown cohort, duplicate IDs and unsupported context',()=>{
