@@ -182,7 +182,7 @@
         panel.style.top=`${Math.max(12,Math.min(spot.top-plot.top-24,plot.height-height-12))}px`;
     }
     function chart(result,color) {
-        const width=Math.max(300,$('frontier-chart').clientWidth||1000),height=width<600?420:480,left=76,right=28,top=32,bottom=80;
+        const width=Math.max(300,$('frontier-chart').clientWidth||1000),height=width<600?420:480,left=96,right=28,top=32,bottom=80;
         $('frontier-chart').setAttribute('viewBox',`0 0 ${width} ${height}`);
         const bounds=key=>{const values=result.measured.map(p=>p[key]);if(!values.length)return[0,1];const min=Math.min(...values),max=Math.max(...values),pad=(max-min||Math.abs(max)||1)*.18;return[Math.max(0,min-pad),max+pad];};
         const [xmin,xmax]=bounds('x'),[ymin,ymax]=bounds('y');
