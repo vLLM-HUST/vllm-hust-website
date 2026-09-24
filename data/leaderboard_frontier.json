@@ -5418,6 +5418,117 @@
           "configuration_source_point_id": "qwen35-agentx-capacity16-native-tp2-c16-20260923"
         }
       }
+    },
+    {
+      "id": "qwen35-sweprefix-expert-tp8-c64-coldkv-20260924",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "TP8 · C64 · MTP0 · SWE smoke",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0 / 0.23.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel_size": null,
+          "expert_parallel": false,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "max_num_seqs_scope": "per attention/DP rank; total scheduling capacities differ by topology",
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "mtp_draft_tokens": 0,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            24,
+            32
+          ],
+          "thinking": true,
+          "generation_temperature": 0,
+          "host_kv_budget_gib": 0,
+          "runtime_revision": "vllm:0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665;vllm-ascend:f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db;betterscale:cfda9c24bfe40e36396325c70e7ceb0cf333dde0",
+          "transport": "same qualified sticky streaming relay; client over explicit SSH loopback tunnel",
+          "routing": "New X-Correlation-ID sessions round-robin; sticky subsequent turns; children independently placed",
+          "availability": "Fresh shared-lease admission, foreign-process guard, HTTP generation gate and clean release",
+          "worker_class": "native_graph_worker.NativeGraphWorker",
+          "native_worker_bridge": "Explicit native FULL decode activation; native EP receipt hook where applicable. Separated candidates additionally override routed experts only.",
+          "checkpoint_revision": "sha256-manifest:1ad9f5f76ce02ffe2df0512f6a187b9b65737cf62264fbbf780054922f14abe3",
+          "tokenizer_revision": "sha256-manifest:1ad9f5f76ce02ffe2df0512f6a187b9b65737cf62264fbbf780054922f14abe3",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "sampler": "Native greedy, no MTP",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "comparison_scope": "One serial 900s observation of this configuration; not a repeatability estimate, equal-KV ablation or certified capacity peak",
+          "host_memory_policy": "No host KV offload; opportunistic shared-host execution; no claimed RAM reservation",
+          "observed_max_prompt_tokens": 30064,
+          "measured_mean_client_inflight": 63.99735691043399,
+          "full_client_concurrency_fraction": 0.9986329657012377,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "execution_host": "hw0",
+          "physical_devices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        }
+      },
+      "load": {
+        "concurrency": 64,
+        "unit": "continuously replenished in-flight HTTP request lanes"
+      },
+      "metrics": {
+        "output_tps": 468.50111111111113,
+        "decode_p90_tps": 21.949317783197085,
+        "ttft_p95_ms": 67182.79729139176,
+        "ttft_p50_ms": 30179.5081809978,
+        "tpot_ms": 93.32788170527816,
+        "tpot_p95_ms": 165.44841561760765,
+        "e2e_p95_ms": 129633.21605439995,
+        "completed_requests": 845
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-SWE-PREFIX.md",
+        "run_ids": [
+          "32cb42dd1ac7412ab8ca1e1fe01274af"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation; fixed window streamed-token accounting, in-flight drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "59ea20a669904bca63076e4891313e0bc05cf4fb",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "old_point_id": "qwen35-agentx-expert-tp8-c64-primers-20260924"
+        }
+      }
     }
   ]
 }
