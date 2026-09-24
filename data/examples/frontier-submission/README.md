@@ -1,132 +1,177 @@
 # Frontier 成绩提交指南：从跑测试到看到榜单上的点
 
-这份 guide 用一次真实的 **BetterScale / Qwen3.5-35B-A3B BF16 / TP2 / C4** 测量， 演示怎样测试性能、整理成绩、提交 PR，以及在哪里查看结果。
+本指南使用 [swe-prefix-reuse](https://github.com/vLLM-HUST/swe-prefix-reuse) 做评测，演示怎样准备服务、运行测试、整理证据、提交
+PR，以及在哪里查看结果。
 
-本目录的 [snapshot.json](snapshot.json) 是完整配置和成绩， [evidence.json](evidence.json)
-是对应的官方指标摘录。这条记录已发布，副本用于学习， 不应重复上榜。按下面的流程提交时，请使用你自己测得的新 run。
-
-整个流程是：
+**本目录的 [snapshot.json](snapshot.json) 和 [evidence.json](evidence.json) 仍是已发布的 BetterScale /
+Qwen3.5-35B-A3B BF16 / TP2 / C4 的历史 AgentX 成绩。** 它们只供理解配置、point 和证据的组织方式，不能作为 SWE Prefix Reuse
+的报告、指标映射或 workload 模板，也不能重复上榜。下面的流程必须使用你自己测得的新 run；本次指南更新没有生成新成绩。
 
 ```text
-准备推理服务 → AgentX 测试 → 本地检查结果 → 整理成绩与证据
-→ website 数据 PR → 审查与合并 → 部署完成 → Frontier 查看与下载配置
+准备推理服务 → 编译 SWE workload → 短测检查协议 → 固定窗口评测
+→ 本地核对 summary/config → 整理成绩与证据 → website 数据 PR
+→ 审查与合并 → 部署完成 → Frontier 查看与下载配置
 ```
 
 ## 1. 准备一个可以测的推理服务
 
-先在获准使用的设备上部署模型，保留完整启动配置。AgentX 是压测客户端， 不会替你下载模型、启动 engine 或分配加速卡。
+先在获准使用的设备上部署模型并保留完整启动配置。`swe-prefix-reuse` 是客户端，不会下载模型、启动 engine、分配加速卡或修改服务配置。
 
-本指南使用 [agentx-bench](https://github.com/vLLM-HUST/agentx-bench) 的 AgentX 256K workload。 服务需满足：
+服务端必须支持：
 
-- 提供 OpenAI 兼容 chat 接口，支持流式输出、token usage 和 `ignore_eos`。
-- 支持语料的输入＋输出长度上限 256,000 tokens，并为模板和标记留余量；通常需要 至少 262,144 的上下文容量。不能通过截断或丢弃长请求来凑这个 workload。
-- 准备与模型匹配的本地 tokenizer，记录模型、tokenizer、engine、后端及 MOD 的版本或 commit。
-- 明确精度、总卡数、TP/PP/DP、批处理、KV/host memory 预算、prefix cache、graph 和 MTP 设置。 engine 与 MOD 分开填写；仅记录实际启用的
-  MOD。
+- `/v1/completions` 的整数 token ID 输入，而不只是 chat 接口。
+- 流式响应通过 `return_token_ids=true` 返回增量 `token_ids`，同时提供 prompt-ID echo、最终 usage、`ignore_eos=true` 和
+  `cache_salt`。
+- 足够的真实上下文容量，覆盖 prepared workload 的每条完整会话。下面以 262,144 为配置示例，不代表每条请求都有 256K tokens。
+- 与编译 workload 完全匹配的 tokenizer。客户端不提供文本重新分词的降级路径；仅通过 prompt echo 也不能证明词表身份一致。
 
-如果使用投机解码，先按 benchmark 的
-[协议说明](https://github.com/vLLM-HUST/agentx-bench#protocol-choices-and-comparison-boundaries)
-准备匹配模型、draft 长度和 thinking 模式的 acceptance 校准及服务端设置。 **不能直接把样例的 AL2.63 搬到自己的模型上**；没有相应证据时禁用投机解码并如实记录。
+记录模型与 tokenizer revision、engine/后端/MOD commit、权重/计算/KV 精度、总卡数、TP/PP/DP、批处理、KV/host memory、prefix
+cache、graph 和 MTP 设置。engine 与 MOD 分开填写，只记录实际启用的 MOD。使用 MTP 时保留真实生成和真实 acceptance，**不要沿用历史 AgentX 的
+synthetic sampler 或固定 AL2.63**。
 
-## 2. 安装客户端，先检查计划，再跑 smoke
+客户端保证后续轮次接上真实输出 ID，但这不等于 engine 一定复用了缓存。需另查服务端 prefix-cache 命中指标；多副本还需核对路由亲和性。
 
-安装 `uv` 后，在运行压测客户端的机器执行：
+## 2. 安装客户端并编译 workload
 
-```bash
-git clone https://github.com/vLLM-HUST/agentx-bench.git
-cd agentx-bench
-uv sync --locked
-uv run --frozen python prepare.py
-
-mkdir -p .cache
-cp examples/target.json .cache/target.json
-```
-
-编辑 `.cache/target.json`，将所有 `REPLACE_WITH_...` 替换为真实值，尤其是：
-
-| 配置                                   | 应填写什么                                                  |
-| -------------------------------------- | ----------------------------------------------------------- |
-| `url`                                  | 已获授权的服务 origin，例如本机服务 `http://127.0.0.1:8000` |
-| `model` / `model_revision`             | 实际 served model 名称及固定权重 revision                   |
-| `tokenizer` / `tokenizer_revision`     | 本地 tokenizer 目录及其固定 revision                        |
-| `engine`                               | 名称、源码 revision、去除密钥后的完整启动命令               |
-| `hardware`                             | 设备型号、全部分配卡数、按分配比例计算的 host DRAM          |
-| `max_model_len` / `host_kv_budget_gib` | 实际上下文容量及 host KV 预算                               |
-| `speculative_decoding`                 | 实际投机配置及所需校准信息；不用时保持 disabled             |
-
-初始客户端仅支持无凭据的受信任服务 origin。不要把密钥写进文件或命令，也不要拿付费 API 试跑。目标配置只声明服务状态，不会替你修改服务端参数。
+需要 Python 3.10+ 和本地 tokenizer，不需要在客户端安装 vLLM、torch 或加速卡驱动。以下固定到本指南核对过的工具 commit：
 
 ```bash
-# 只打印计划，不向服务发送压测请求
-uv run --frozen python bench.py plan --target .cache/target.json \
-  --profile smoke --concurrency 4
+git clone https://github.com/vLLM-HUST/swe-prefix-reuse.git
+cd swe-prefix-reuse
+git checkout 6861242dbd9f17b707003191e4200b7752911d7c
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e '.[prepare]'
 
-# 确认目标与配置无误后，开始实际压测
-uv run --frozen python bench.py run --target .cache/target.json \
-  --profile smoke --concurrency 4
+swe-prefix-reuse prepare \
+  --source data/open-swe-sample.json.gz \
+  --tokenizer /path/to/Qwen3.5-35B-A3B \
+  --max-context 262144 \
+  --output prepared/qwen35.json
 ```
 
-`C4` 表示 4 棵活跃 agent 会话树，不是固定 4 个 HTTP 请求。并发应根据资源选择， 需要曲线时分别跑 C1/C2/C4/C8 等点，保留各自结果，不只提交最好看的点。
+将 tokenizer 路径换成真实目录。`prepare` 只做本地编译，不向推理服务发送请求：它用 thinking-enabled
+模板提取原始输入增量和每轮输出预算；运行时模型自由生成，再把实际输出 ID 接入历史，不重新渲染历史。超长会话会整条拒绝，而不是截断；检查准备结果中的拒绝记录，不能静默更换接受的会话子集。
 
-`smoke` 是**预热之后测量 900 秒**；数据准备、请求重建、预热、排空与导出另计， 所以总耗时会超过 15 分钟。先用 smoke 调通，确认配置和资源后才考虑
-`--profile formal` 的 3600 秒测量；smoke 与 formal 是不同 workload 身份，不能混成同一组成绩。 不修改固定语料、输出长度、预热或回放时序来缩短测试。
+baseline/MOD 对比必须复用**同一份 prepared 文件**。其哈希、tokenizer 指纹、编译策略和接受的会话子集都是 workload 身份的一部分。更换
+tokenizer、模板或子集后，不能仍归入旧合约。
 
-## 3. 跑完之后，先在本地看结果
+在客户端准备 `server-metadata.json`：它是你填写的 JSON 对象，不是工具自动探测的证明。至少记录以下真实信息，不能留下占位值再公开：
 
-命令会打印本次输出目录 `artifacts/<run>/`，其中：
+| 内容                | 应记录什么                                             |
+| ------------------- | ------------------------------------------------------ |
+| engine / 后端 / MOD | 名称、版本、commit；MOD 是否实际启用                   |
+| 模型 / tokenizer    | 模型名称、固定权重 revision、tokenizer 身份与 revision |
+| 精度与硬件          | 权重/计算/KV 精度、设备型号、全部参与卡数              |
+| 服务参数            | TP/PP/DP、上下文、批处理、KV 预算、缓存、graph、MTP    |
+| 启动命令            | 去除凭据和私有信息的完整启动命令                       |
 
-| 文件                                   | 看什么                                                 |
-| -------------------------------------- | ------------------------------------------------------ |
-| `harness.log`                          | 请求准备、预热、测量进度与错误                         |
-| `run.json`                             | 固定协议、目标配置、wrapper commit、最终状态及报告位置 |
-| `aiperf/**/profile_export_aiperf.json` | 官方吞吐、延迟、有效性及失败原因                       |
+元数据只声明服务状态，不会修改服务。API key 如有需要，通过 `OPENAI_API_KEY` 环境变量安全提供，不要写进文件或命令；endpoint 不能带凭据。仅测试已获授权的服务，不拿付费
+API 试跑。
 
-将下面的 `<run>` 替换为刚刚打印的目录名：
+## 3. 先做短测，再跑固定窗口
+
+将模型名、endpoint、总卡数及上下文改成实际值后执行：
 
 ```bash
-cat artifacts/<run>/run.json
-find artifacts/<run>/aiperf -name profile_export_aiperf.json -print
-# 运行期间也可以查看进度：
-tail -f artifacts/<run>/harness.log
+swe-prefix-reuse run \
+  --workload prepared/qwen35.json \
+  --endpoint http://127.0.0.1:8000/v1/completions \
+  --model YOUR_SERVED_MODEL_NAME \
+  --server-max-context 262144 \
+  --concurrency 4 --duration 60 --chips 2 \
+  --server-metadata server-metadata.json \
+  --output results/c4-check
 ```
 
-先检查 `run.json` 的 `status` 是否为 `completed`、退出码是否为 0，再核对唯一官方报告的 `metadata.submission_valid` 是否为
-true，并检查错误和输出长度等信息。 `failed_or_invalid`、取消或报告缺失的 run 不能当作成功成绩；保留 `submission_invalid_reasons`
-排查，而不是改有效性标记。
+`C4` 是 4 条顺序请求 lane，每条最多一个在途请求；上一轮完成并校验后立即发下一轮，会话结束后循环补入新会话。**不是 AgentX 的 4 棵会话树，也不回放工具/人的等待时间。**
+`--chips` 是全部参与加速卡数量，多副本时不能只填 TP。
 
-有效性通过不代表模型质量或官方认证：AgentX 回放的是合成内容，不评价答案正确性。 **运行结束也不会自动上传到网站**，此时结果只在你的本地目录。
+每次会话播放有新的 `cache_salt`，同一会话各轮共享它；因此保留会话内复用、排除跨会话共同前缀复用。原生 vLLM DP 可在确认服务支持 rank header 后加
+`--data-parallel-size N`，令 lane 按编号固定到 rank。该参数不创建 DP 服务；带自有亲和协议的 relay 应省略它，并确认转发的
+`X-Correlation-ID` 能保持会话路由。记录实际路由策略和每 rank 的负载/缓存情况。
 
-## 4. 把报告整理成 Frontier 数据
+短测通过后，可使用同一 prepared 文件做一个明确的 900 秒窗口：
 
-参照同目录两份 JSON，保留自己的原始 run ID、完整配置和测量限制，清理凭据、内网地址、 机器绝对路径及私有请求内容后再公开。不要把整个本地 `artifacts/` 直接提交。
+```bash
+swe-prefix-reuse run \
+  --workload prepared/qwen35.json \
+  --endpoint http://127.0.0.1:8000/v1/completions \
+  --model YOUR_SERVED_MODEL_NAME \
+  --server-max-context 262144 \
+  --concurrency 4 --duration 900 --chips 2 \
+  --server-metadata server-metadata.json \
+  --output results/c4-900s
+```
+
+工具没有 `plan` 或 `--profile smoke/formal`。这里的 60 秒用于调通，900 秒是明确选定的测量窗口，不是自动获得的正式认证。测试**没有预热**：从新 salt
+冷启动，窗口结束停止发新请求，再排空在途请求。总耗时可能更长；`--timeout` 默认 1800 秒且按请求计，不是整个 run 的超时。新输出目录必须不存在，工具拒绝覆盖。
+
+需要曲线时分别测 C1/C2/C4/C8 等点并保留结果；比较 baseline/MOD 时先对齐 C、窗口、prepared 文件和客户端协议。不同 C
+在有限窗口内到达的轮次混合可能不同。不要修改输出预算或截短会话来改善成绩，也不要把 60 秒短测和 900 秒结果混成同一 workload。
+
+## 4. 跑完之后，先在本地看结果
+
+```bash
+cat results/c4-900s/summary.json
+cat results/c4-900s/config.json
+```
+
+| 文件                   | 看什么                                                                                |
+| ---------------------- | ------------------------------------------------------------------------------------- |
+| `summary.json`         | 有效性、窗口吞吐、P90 解码速度、TTFT、样本数、排空及覆盖情况                          |
+| `config.json`          | 原始 `run_id`、工具版本、workload 哈希、tokenizer、路由、窗口、卡数及声明的服务元数据 |
+| `requests.jsonl`       | 每请求真实输出 ID、prompt 指纹、chunk 时间、lane/play/turn、usage 和错误              |
+| `error.json`（异常时） | 运行异常；不能用缺失 summary 的 run 生成成绩                                          |
+
+确认退出码为 0、`valid=true`、`aborted=false`、`failed_requests=0`，且实际 `measurement_seconds` 与计划窗口一致。缺少 token
+IDs、echo/usage 不一致、输出预算不足或流不完整都会使 run 无效；不能手改有效性标记。检查 `decode_speed_samples`，缺少可测解码区间时 P90 为
+`null`，不是零。
+
+还需核对
+`max_prompt_tokens_observed`、`max_turn_index_reached`、`sessions_completed`、`mean_client_inflight` 和
+`full_concurrency_fraction`。短测可能没走到长轮次；配置 262,144 上下文不代表测到了 256K。客户端调度、JSON 和网络开销都在观测路径里，设置 C 不等于
+engine 始终有 C 个活跃 decode。
+
+`valid=true` 仅说明协议和形状检查通过，不证明硬件身份、真实缓存命中、充分样本、稳态或模型质量。记录的工具观察可能与新生成答案不一致：这不是 SWE 解题正确率或完整在线 agent
+评测。**测试结束不会自动上传到网站。**
+
+## 5. 把报告整理成 Frontier 数据
+
+先保留原始 prepared 文件、结果目录及服务配置。公开时清理凭据、内网地址、机器绝对路径和私有内容；`requests.jsonl` 含生成内容且可能很大，不要将整个目录直接提交。保留原始
+run ID、workload 哈希及数值，说明公开材料是完整报告还是脱敏摘录。
 
 ### 图上两个坐标怎样对应报告？
 
-| Frontier 字段或坐标                         | 本例使用的官方字段                                    |
-| ------------------------------------------- | ----------------------------------------------------- |
-| `metrics.decode_p90_tps`，横轴 P90 解码速度 | `output_token_throughput_per_user.p90`                |
-| `metrics.output_tps`，部署总输出吞吐        | `output_token_throughput.avg`                         |
-| 纵轴 output tokens/s/chip                   | 网页将 `output_tps` 除以 `hardware.accelerator_count` |
-| `metrics.ttft_p95_ms`                       | `time_to_first_token.p95`                             |
-| `metrics.tpot_ms` / `tpot_p95_ms`           | `inter_token_latency.avg` / `.p95`                    |
+| Frontier 字段或坐标                  | SWE `summary.json` 字段                                                                                 |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| `metrics.decode_p90_tps`，横轴       | `decode_tokens_per_second_p90`                                                                          |
+| `metrics.output_tps`，部署总输出吞吐 | `output_tokens_per_second`                                                                              |
+| 纵轴 output tokens/s/chip            | 网页将总吞吐除以 `configuration.hardware.accelerator_count`，应等于 `output_tokens_per_second_per_chip` |
+| `metrics.ttft_p95_ms`                | `ttft_seconds_p95` × 1000；若源值为 `null` 则保持 `null`                                                |
 
-本例总吞吐为 **84.62433838849498 tokens/s**，分配 2 张卡，所以纵轴为 **42.31216919424749 tokens/s/chip**；横轴为
-**97.66183282742962 tokens/s/user**。 保存 JSON 时保留原始数值，不用页面四舍五入后的显示值。 不要把纵轴的每卡吞吐填入
-`output_tps`，否则会再被除一次；也不要用 `1000 / TPOT P90` 替代 P90 解码速度，或用输出 token 数 / 900 重算官方吞吐。
+不要把每卡吞吐填入 `output_tps`，否则会重复除卡数。总吞吐只计算窗口内收到的实际输出 IDs；排空请求在窗口内收到的部分算入，窗口后的部分不算。不能用包含排空的总 token
+数重新计算，也不能套用历史 AIPerf 字段。
+
+P90 是窗口内完整完成、且有可测解码区间的请求的 `(output_tokens - 1) / (last_token_time - first_token_time)` 的 P90，不能用
+`1000 / TPOT P90` 替代。时间来自客户端 token-bearing SSE chunks；MTP 一个 chunk 可含多个 token，工具不虚构逐 token 时间。该
+summary 不直接提供 Frontier 的 TPOT 指标，未另行定义、计算并留证据时应省略或为 `null`。
 
 ### 一条成绩还需要什么？
 
-- **cohort**：模型及 revision、精度、固定 workload 合约、上下文要求。完全相同的合约复用 已有 cohort；模型/精度/workload 合约改变时建立对应的新身份。
-- **point**：唯一 ID、所属 cohort、engine/MOD、硬件总卡数、完整服务配置、并发及指标。
-- **evidence**：原始 run ID、可访问的 HTTPS 报告链接、有效性、smoke/formal、窗口时长、 聚合方法与已知限制。优先提供固定 revision
-  的链接；缺失指标不编造为零。
+- **cohort**：模型及 revision、精度、SWE 固定 workload 合约和上下文要求。合约保留 source/工具 commit、prepared
+  哈希、tokenizer/模板、接受子集、输出预算、无预热、盐与复用规则、窗口和聚合方式。只有合约完全相同才复用已有 cohort；不能挂到 AgentX cohort。
+- **point**：唯一 ID、所属 cohort、engine/MOD、总卡数、完整服务配置、lane 并发及指标。
+- **evidence**：`config.json` 的原始 `run_id`、可访问的 HTTPS
+  报告链接、summary、配置和有效性/缓存证据；注明窗口、覆盖、客户端占用及已知限制。优先用固定 revision 链接，不编造缺失指标，不平均多个 run 的 P90 来冒充 pooled
+  P90。
 
-字段含义可查 [Frontier 数据契约](../../../docs/LEADERBOARD-FRONTIER.md)。 本例的公开 evidence
-是指标摘录，不代表完整原始日志和实验源码已公开。
+字段含义见 [Frontier 数据契约](../../../docs/LEADERBOARD-FRONTIER.md)。本目录的历史 AgentX JSON 不能直接改 workload
+名称后提交；新成绩需要自己的 SWE 合约和证据。
 
-## 5. Fork website，提交自己的数据 PR
+## 6. Fork website，提交自己的数据 PR
 
-在 GitHub Fork [vllm-hust-website](https://github.com/vLLM-HUST/vllm-hust-website)， 把下面的
+在 GitHub Fork [vllm-hust-website](https://github.com/vLLM-HUST/vllm-hust-website)，把
 `YOUR_GITHUB_NAME` 换成自己的用户名：
 
 ```bash
@@ -135,15 +180,16 @@ cd vllm-hust-website
 git switch -c frontier/my-measurement
 ```
 
-真实上榜提交修改的是生产数据，而不是把新成绩留在本示例目录：
+真实上榜提交修改生产数据，而不是只把结果留在本示例目录：
 
-1. 在 `data/leaderboard_frontier.json` 的 `points` 追加新 point，必要时在 `cohorts` 追加新合约。保留已有点，不整份替换成只有自己成绩的
+1. 在 `data/leaderboard_frontier.json` 的 `points` 追加新 point，必要时在 `cohorts` 追加新合约。保留已有记录，不整份替换成自己的
    snapshot。
-1. 对本指南的 AgentX 协议，在 `data/leaderboard_frontier_evidence.json` 中追加对应 run 的指标摘录，并保留本次实际协议、runtime
-   与校准关联。不要让新结果错误继承旧配置； 若与现有公共元数据不同，在 run 中明确保留差异并在 PR 中说明。
-1. 检查 point/run ID 唯一、证据与成绩一一对应，且不是把本目录的已发布 run 再加一遍。
+1. 在 `data/leaderboard_frontier_swe_evidence.json` 的 `runs` 追加 SWE 证据，保留对应的 summary、config、point/run
+   ID 和限制；若目标分支尚无该文件，新增明确标识 SWE 协议的证据文件。不要写入历史 AgentX 的
+   `data/leaderboard_frontier_evidence.json`，也不要继承其 runtime 或 acceptance 校准。
+1. 检查 ID 唯一、point 与证据一一对应、报告链接可访问，且不是重复提交已发布的 run。
 
-安装 Node.js 后，可以直接复用网站现有的结构校验：
+安装 Node.js 后，复用现有结构校验：
 
 ```bash
 node - <<'JS'
@@ -157,8 +203,8 @@ JS
 
 git diff --check
 git diff --stat
-git add data/leaderboard_frontier.json data/leaderboard_frontier_evidence.json
-git commit -m "data: submit Frontier measurement"
+git add data/leaderboard_frontier.json data/leaderboard_frontier_swe_evidence.json
+git commit -m "data: submit SWE Prefix Reuse Frontier measurement"
 git push -u origin frontier/my-measurement
 ```
 
@@ -167,27 +213,27 @@ PR。正文可以按下面填写：
 
 ```text
 模型与精度：
-workload / smoke 或 formal：
-硬件、总卡数、并发：
-engine / 后端 / MOD 版本：
-point ID / run ID：
-P90 解码速度、总输出吞吐、每卡输出吞吐：
+SWE 工具 commit / prepared workload 哈希 / 测量窗口：
+硬件、总卡数、lane 并发、DP 路由：
+engine / 后端 / MOD 版本及服务配置：
+cohort / point ID / 原始 run ID：
+P90 解码速度、总输出吞吐、每卡输出吞吐、TTFT P95：
 报告和复现配置链接：
-有效性与本地检查结果：
-已知限制或与已有配置的差异：
+有效性、真实缓存命中、上下文覆盖、客户端占用及本地检查：
+已知限制或与已有合约的差异：
 ```
 
-检查 PR 的 Files changed 和 CI 结果，回答审查问题后等待维护者合并。 结构校验通过不等于证据审查通过，PR 创建成功也不代表已经上榜。 维护者负责核对 workload
+检查 Files changed 和 CI，回答审查问题后等待维护者合并。结构校验通过不等于证据审查通过，PR 创建成功也不代表已经上榜。维护者核对 workload
 归属、指标与配置，并完成发布所需的缓存版本更新。
 
-## 6. 在哪里看到自己的成绩？
+## 7. 在哪里看到自己的成绩？
 
-- **测试刚结束**：在客户端 `artifacts/<run>/` 查看报告，网站还没有变化。
-- **PR 审查中**：在 GitHub PR 查看数据 diff、检查结果及讨论。想先看效果，可在 website 仓库运行
-  `python3 -m http.server 8774 --bind 127.0.0.1`，打开
-  `http://127.0.0.1:8774/leaderboard-runs.html#frontier`。
-- **合并并部署完成后**：打开 [官网 Frontier](https://vllm-hust.sage.org.ai/leaderboard-runs.html#frontier)，选择对应的
-  **模型＋精度**及 **workload**，找到自己的点。点击点查看硬件、engine、并发和指标， 再点击下载配置，核对 point/run ID 与提交内容一致。
+- **测试刚结束**：在客户端 `results/c4-900s/` 查看报告，网站尚无变化。
+- **PR 审查中**：在 PR 查看 diff、检查结果与讨论。可在 website 仓库运行 `python3 -m http.server 8774 --bind 127.0.0.1`，打开
+  `http://127.0.0.1:8774/leaderboard-runs.html#frontier` 预览。
+- **合并并部署完成后**：打开
+  [官网 Frontier](https://vllm-hust.sage.org.ai/leaderboard-runs.html#frontier)，选择对应的**模型＋精度**及 **SWE
+  workload**，点击自己的点，再下载配置核对 point/run ID。
 
-合并不等于部署已完成。若没有看到新增点，先确认部署状态，再使用 `leaderboard-runs.html?v=<合并提交SHA>#frontier` 这样的新页面 URL，避免旧 HTML 缓存。
-还应核对 cohort 选择和数据是否进入生产 snapshot；仅提交到 `data/examples/` 的样例 不会被页面读取，也不会因合并而产生新的榜单点。
+合并不等于部署完成。若没看到新点，先确认部署状态，再使用 `leaderboard-runs.html?v=<合并提交SHA>#frontier` 避免旧 HTML 缓存，并核对 cohort 与生产
+snapshot。仅提交到 `data/examples/` 的示例不会被页面读取，也不会产生新的榜单点。
