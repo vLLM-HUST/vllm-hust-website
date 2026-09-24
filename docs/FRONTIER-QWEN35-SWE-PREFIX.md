@@ -73,6 +73,21 @@ host, capacity and request-mix differences when interpreting the envelope.
 
 ## Published evidence
 
+The **Concurrency curves** link opens the
+[capacity16 speed-throughput plot](../assets/frontier-qwen35-swe-concurrency.svg). Each line
+connects measured concurrency levels for one fixed serving configuration, not the combined Pareto
+envelope. Native and BetterScale are separate series; the legacy max-seqs8 C4 points and eight-chip
+topologies do not belong on these lines. The renderer checks that the serving settings remain
+constant within a series. Regenerate it after importing results with
+`python scripts/render_swe_frontier_curves.py`.
+
+The first native capacity sweep completed C1/C2/C4/C8 successfully. Its C16 window was interrupted
+by the selected-card foreign-owner guard and is excluded. The last retained run completed its drain
+at 09:12:12 UTC on 2026-09-24; the foreign process was observed at 09:23:11 UTC, during C16. Earlier
+completed windows are retained with that deployment note, and C16 is being remeasured separately
+rather than filling its missing result with the interrupted window. Actual device selection remains
+recorded in each point's download.
+
 [`leaderboard_frontier_swe_evidence.json`](../data/leaderboard_frontier_swe_evidence.json) contains
 the run summaries, sanitized client configurations and metric extracts used by the chart. The
 chart's point download preserves the complete public configuration and comparison contract. Full

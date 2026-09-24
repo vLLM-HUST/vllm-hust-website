@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" role="img" aria-labelledby="title desc">
+<title id="title">Qwen3.5 SWE concurrency speed-throughput tradeoff</title>
+<desc id="desc">Only concurrency changes within each capacity16 series. Legacy max-seqs8 points and eight-chip topologies are excluded.</desc>
+<rect width="1000" height="580" fill="#fff"/>
+<g font-family="system-ui,sans-serif" fill="#172033">
+<text x="60" y="40" font-size="23" font-weight="700">Qwen3.5-35B-A3B BF16 · SWE prefix reuse</text>
+<text x="60" y="68" font-size="15">TP2 · max-num-seqs 16 · real MTP2 · one 15-minute smoke per point</text>
+<path d="M90.00 120V440 M90 440.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="90.00" y="464" text-anchor="middle" font-size="13">0</text>
+<text x="78" y="444.00" text-anchor="end" font-size="13">0</text>
+<path d="M252.00 120V440 M90 376.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="252.00" y="464" text-anchor="middle" font-size="13">28</text>
+<text x="78" y="380.00" text-anchor="end" font-size="13">32</text>
+<path d="M414.00 120V440 M90 312.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="414.00" y="464" text-anchor="middle" font-size="13">56</text>
+<text x="78" y="316.00" text-anchor="end" font-size="13">64</text>
+<path d="M576.00 120V440 M90 248.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="576.00" y="464" text-anchor="middle" font-size="13">84</text>
+<text x="78" y="252.00" text-anchor="end" font-size="13">96</text>
+<path d="M738.00 120V440 M90 184.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="738.00" y="464" text-anchor="middle" font-size="13">112</text>
+<text x="78" y="188.00" text-anchor="end" font-size="13">128</text>
+<path d="M900.00 120V440 M90 120.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="900.00" y="464" text-anchor="middle" font-size="13">140</text>
+<text x="78" y="124.00" text-anchor="end" font-size="13">160</text>
+<polyline points="790.38,339.17 693.03,282.48 539.09,220.63 412.66,132.20" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+<circle data-point="qwen35-sweprefix-capacity16-native-tp2-c1-20260924" cx="790.38" cy="339.17" r="5" fill="#2563eb"><title>Native C1: P90 121.05 tokens/s; 50.42 tokens/s/chip</title></circle>
+<text x="799.38" y="329.17" fill="#2563eb" font-size="14">C1</text>
+<circle data-point="qwen35-sweprefix-capacity16-native-tp2-c2-20260924" cx="693.03" cy="282.48" r="5" fill="#2563eb"><title>Native C2: P90 104.23 tokens/s; 78.76 tokens/s/chip</title></circle>
+<text x="702.03" y="272.48" fill="#2563eb" font-size="14">C2</text>
+<circle data-point="qwen35-sweprefix-capacity16-native-tp2-c4-20260924" cx="539.09" cy="220.63" r="5" fill="#2563eb"><title>Native C4: P90 77.62 tokens/s; 109.69 tokens/s/chip</title></circle>
+<text x="548.09" y="210.63" fill="#2563eb" font-size="14">C4</text>
+<circle data-point="qwen35-sweprefix-capacity16-native-tp2-c8-20260924" cx="412.66" cy="132.20" r="5" fill="#2563eb"><title>Native C8: P90 55.77 tokens/s; 153.90 tokens/s/chip</title></circle>
+<text x="421.66" y="122.20" fill="#2563eb" font-size="14">C8</text>
+<text x="90" y="99" fill="#2563eb" font-size="15">Native · KV 24.25 GiB/chip</text>
+<text x="495" y="496" text-anchor="middle" font-size="16">P90 request decode speed · output tokens/s</text>
+<text transform="translate(25 280) rotate(-90)" text-anchor="middle" font-size="16">Output tokens/s/chip</text>
+<text x="60" y="532" font-size="13">Lines connect measured C levels, not a fitted curve or the combined Pareto frontier. Missing points are pending.</text>
+<text x="60" y="554" font-size="13">Finite-window request mixes differ. Separate series have different tuned KV budgets; no equal-KV speedup claim.</text>
+</g></svg>
