@@ -326,6 +326,23 @@ def main():
                     "node => getComputedStyle(node).color"
                 ) == popup.evaluate("node => getComputedStyle(node).color")
                 text = popup.inner_text()
+                is_known_budget = (
+                    "dla" in point["configuration"]["mods"]
+                    and point["configuration"]["parameters"].get("length_source")
+                    == "Declared exact ignore_eos output budgets, no learned predictor"
+                )
+                assert popup.locator(".frontier-popup-variant").count() == int(
+                    is_known_budget
+                )
+                if is_known_budget:
+                    assert (
+                        "已知输出预算" if language == "zh" else "Known output budget"
+                    ) in text
+                    assert (
+                        "准入容量检查已执行"
+                        if language == "zh"
+                        else "Admission capacity checks ran"
+                    ) in text
                 for metric in [
                     point["metrics"]["decode_p90_tps"],
                     point["metrics"]["output_tps"]
