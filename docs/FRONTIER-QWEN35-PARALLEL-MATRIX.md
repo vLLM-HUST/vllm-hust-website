@@ -68,3 +68,23 @@ For shared-host fairness, subsequent measurements use one point per deployment, 
 per wave. All campaign leases are released after the wave drains, followed by at least two minutes
 without a campaign lease. Every next wave needs fresh idle-device admission; no priority over other
 tasks is claimed. Earlier completed windows remain valid under their recorded deployment policy.
+
+## Completed coverage (2026-09-25)
+
+The sweep now covers all 48 logical cells: two engine arms, two attention placements, two expert
+placements and C1/C2/C4/C8/C16/C32. It contributes 38 newly sealed observations and reuses ten
+previously published TP/TP observations; the existing BetterScale TP/TP C2–C16 windows were not
+rerun. This is logical coverage, not a claim that the older 16-slot and new 32-slot deployments are
+one fixed configuration. Their concurrency lines remain separate.
+
+All seven new C32 windows completed and passed the workload's capacity and cleanup gates. C32 is not
+universally faster than C16: higher concurrency can lower both per-request decode speed and
+aggregate output for these finite-window traces. Keep every valid concurrency point rather than
+retaining only the best-looking one. A successful C32 window does not certify 32 simultaneous
+256K-token sequences.
+
+Measurements ran on the local shared host. Two attempts were aborted by the selected-device
+foreign-owner guard and excluded; retries used fresh admission, with physical cards0/1 subsequently
+avoided. Another attempt was interrupted by a container restart and was also excluded. No partial or
+contaminated window contributes a score. The final campaign ended with no active services or held
+campaign device leases.
