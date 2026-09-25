@@ -11543,6 +11543,1514 @@
         "abstentions": 753.0,
         "scope": "Actual admissions/completions during measured window and drain; performance delta requires matched native control"
       }
+    },
+    {
+      "run_id": "90ad1dfbb48e4c1c84185e4aefe937d2",
+      "point_id": "qwen35-sweprefix-budget-capsule-native-tp2-c1-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 148,
+        "max_prompt_tokens_observed": 52505,
+        "prompt_tokens_p50": 18209.0,
+        "max_turn_index_reached": 38,
+        "distinct_trajectories_started": 6,
+        "sessions_completed": 5,
+        "requests_completed_in_window": 147,
+        "requests_drained": 1,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 81369,
+        "output_tokens_per_second": 90.41,
+        "output_tokens_per_second_per_chip": 45.205,
+        "decode_tokens_per_second_p90": 105.9961707250672,
+        "decode_speed_samples": 147,
+        "ttft_seconds_p95": 1.1002124867402017,
+        "client_inflight_seconds": {
+          "0": 0.6164793744683266,
+          "1": 899.3835206255317
+        },
+        "mean_client_inflight": 0.9993150229172574,
+        "full_concurrency_fraction": 0.9993150229172574,
+        "drain_seconds": 11.748175011016428,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "90ad1dfbb48e4c1c84185e4aefe937d2",
+        "started_at_unix": 1790337340.8657408,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 90.41,
+        "decode_p90_tps": 105.9961707250672,
+        "ttft_p95_ms": 1100.2124867402017,
+        "completed_requests": 147
+      },
+      "requests_artifact_sha256": "6cacda3c69b2fb8b704740e8254b29b4578bface286acc45517a4704df6eaead",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 2406400.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification"
+    },
+    {
+      "run_id": "1165a8f69d564824ac8e25717578cf12",
+      "point_id": "qwen35-sweprefix-budget-capsule-native-tp2-c2-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 213,
+        "max_prompt_tokens_observed": 73616,
+        "prompt_tokens_p50": 23331.0,
+        "max_turn_index_reached": 52,
+        "distinct_trajectories_started": 7,
+        "sessions_completed": 6,
+        "requests_completed_in_window": 211,
+        "requests_drained": 2,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 136573,
+        "output_tokens_per_second": 151.74777777777777,
+        "output_tokens_per_second_per_chip": 75.87388888888889,
+        "decode_tokens_per_second_p90": 97.94041000004853,
+        "decode_speed_samples": 211,
+        "ttft_seconds_p95": 1.3449757527559996,
+        "client_inflight_seconds": {
+          "0": 0.0001147417351603508,
+          "1": 1.168656725436449,
+          "2": 898.8312285328284
+        },
+        "mean_client_inflight": 1.9987012375456592,
+        "full_concurrency_fraction": 0.998701365036476,
+        "drain_seconds": 9.684359032660723,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "1165a8f69d564824ac8e25717578cf12",
+        "started_at_unix": 1790338253.2681985,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 151.74777777777777,
+        "decode_p90_tps": 97.94041000004853,
+        "ttft_p95_ms": 1344.9757527559996,
+        "completed_requests": 211
+      },
+      "requests_artifact_sha256": "a2a4c6346e78373b17795d05ef12e84ea0460df4b3d9e3f2942f83213f1a0f59",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 5025792.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification"
+    },
+    {
+      "run_id": "c4400c251d544ae9a479749c2b214043",
+      "point_id": "qwen35-sweprefix-budget-capsule-native-tp2-c4-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 324,
+        "max_prompt_tokens_observed": 73616,
+        "prompt_tokens_p50": 21616.5,
+        "max_turn_index_reached": 52,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 320,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 195252,
+        "output_tokens_per_second": 216.94666666666666,
+        "output_tokens_per_second_per_chip": 108.47333333333333,
+        "decode_tokens_per_second_p90": 78.21680772934592,
+        "decode_speed_samples": 320,
+        "ttft_seconds_p95": 1.6899852065369487,
+        "client_inflight_seconds": {
+          "0": 0.00014271214604377747,
+          "1": 0.0010346714407205582,
+          "2": 0.0007112184539437294,
+          "3": 1.8701935224235058,
+          "4": 898.1279178755358
+        },
+        "mean_client_inflight": 3.997916343530847,
+        "full_concurrency_fraction": 0.9979199087505953,
+        "drain_seconds": 7.038530542515218,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "c4400c251d544ae9a479749c2b214043",
+        "started_at_unix": 1790339163.6621156,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 216.94666666666666,
+        "decode_p90_tps": 78.21680772934592,
+        "ttft_p95_ms": 1689.9852065369487,
+        "completed_requests": 320
+      },
+      "requests_artifact_sha256": "53cc36374ea3d1dd665ac612889855136f6a9f9e81516de3cf9aba385643dc7e",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 7774208.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification"
+    },
+    {
+      "run_id": "63963da3ba8a41faa4bdd7f2f3bfd3e3",
+      "point_id": "qwen35-sweprefix-budget-capsule-native-tp2-c8-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 437,
+        "max_prompt_tokens_observed": 77163,
+        "prompt_tokens_p50": 20937.0,
+        "max_turn_index_reached": 56,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 429,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 263440,
+        "output_tokens_per_second": 292.7111111111111,
+        "output_tokens_per_second_per_chip": 146.35555555555555,
+        "decode_tokens_per_second_p90": 59.52789514895598,
+        "decode_speed_samples": 429,
+        "ttft_seconds_p95": 2.009209311567247,
+        "client_inflight_seconds": {
+          "0": 0.00016043148934841156,
+          "1": 0.0009600510820746422,
+          "2": 0.0007087895646691322,
+          "3": 0.0006113667041063309,
+          "4": 0.0006242468953132629,
+          "5": 0.0006792182102799416,
+          "6": 0.0009145112708210945,
+          "7": 2.2022620122879744,
+          "8": 897.7930793724954
+        },
+        "mean_client_inflight": 7.997528956602845,
+        "full_concurrency_fraction": 0.9975478659694393,
+        "drain_seconds": 65.17577795218676,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "63963da3ba8a41faa4bdd7f2f3bfd3e3",
+        "started_at_unix": 1790340071.4975128,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 292.7111111111111,
+        "decode_p90_tps": 59.52789514895598,
+        "ttft_p95_ms": 2009.209311567247,
+        "completed_requests": 429
+      },
+      "requests_artifact_sha256": "dd214c4215bcac10b04a9dfb040b955300066f51d8a192adf2a0198e1917e4d2",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 9011200.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification"
+    },
+    {
+      "run_id": "65a016db1442419b98d65a20467238d3",
+      "point_id": "qwen35-sweprefix-budget-capsule-native-tp2-c16-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 576,
+        "max_prompt_tokens_observed": 59524,
+        "prompt_tokens_p50": 17721.0,
+        "max_turn_index_reached": 40,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 11,
+        "requests_completed_in_window": 560,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 320581,
+        "output_tokens_per_second": 356.2011111111111,
+        "output_tokens_per_second_per_chip": 178.10055555555556,
+        "decode_tokens_per_second_p90": 34.965660246795395,
+        "decode_speed_samples": 560,
+        "ttft_seconds_p95": 2.6889794495422366,
+        "client_inflight_seconds": {
+          "0": 0.00020561274141073227,
+          "1": 0.0009803315624594688,
+          "2": 0.0007047979161143303,
+          "3": 0.0006205970421433449,
+          "4": 0.0006247283890843391,
+          "5": 0.0009182104840874672,
+          "6": 0.0006674071773886681,
+          "7": 0.0006791884079575539,
+          "8": 0.0006774375215172768,
+          "9": 0.0005864575505256653,
+          "10": 0.000601637177169323,
+          "11": 0.0005934378132224083,
+          "12": 0.0008747894316911697,
+          "13": 0.0006378572434186935,
+          "14": 0.0006390474736690521,
+          "15": 2.3323908541351557,
+          "16": 897.657597607933
+        },
+        "mean_client_inflight": 15.997309447859104,
+        "full_concurrency_fraction": 0.9973973306754811,
+        "drain_seconds": 95.00448121596128,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "65a016db1442419b98d65a20467238d3",
+        "started_at_unix": 1790341037.5311704,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 356.2011111111111,
+        "decode_p90_tps": 34.965660246795395,
+        "ttft_p95_ms": 2688.9794495422366,
+        "completed_requests": 560
+      },
+      "requests_artifact_sha256": "65b45bd384f1b25cf413c69b11f9832ddc7bba956d038bee06771a1fe71e6cae",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 9211904.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification"
+    },
+    {
+      "run_id": "cc1d328a76f94923b9b1f8547caf91a2",
+      "point_id": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c1-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 149,
+        "max_prompt_tokens_observed": 52505,
+        "prompt_tokens_p50": 18533.0,
+        "max_turn_index_reached": 38,
+        "distinct_trajectories_started": 6,
+        "sessions_completed": 5,
+        "requests_completed_in_window": 148,
+        "requests_drained": 1,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 83062,
+        "output_tokens_per_second": 92.2911111111111,
+        "output_tokens_per_second_per_chip": 46.14555555555555,
+        "decode_tokens_per_second_p90": 106.93086222584674,
+        "decode_speed_samples": 148,
+        "ttft_seconds_p95": 1.0510360606946052,
+        "client_inflight_seconds": {
+          "0": 0.6267360420897603,
+          "1": 899.3732639579102
+        },
+        "mean_client_inflight": 0.9993036266199002,
+        "full_concurrency_fraction": 0.9993036266199002,
+        "drain_seconds": 4.433278716169298,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "cc1d328a76f94923b9b1f8547caf91a2",
+        "started_at_unix": 1790342432.4713216,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 92.2911111111111,
+        "decode_p90_tps": 106.93086222584674,
+        "ttft_p95_ms": 1051.036060694605,
+        "completed_requests": 148
+      },
+      "requests_artifact_sha256": "35a08f24740b7ff0da04beeccff200be0c663da7219648fc4c531a02bae19e94",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 2433024.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "bidkv.adapters.vllm_hust.selector.BidkvPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": false,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 0.0,
+          "extended_checks": 0.0,
+          "deferred": 0.0,
+          "passed": 0.0
+        },
+        "admission_status": "not-exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
+    },
+    {
+      "run_id": "d2d6123c69a64f5dab56e8aa40438137",
+      "point_id": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c2-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 218,
+        "max_prompt_tokens_observed": 73616,
+        "prompt_tokens_p50": 23054.5,
+        "max_turn_index_reached": 52,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 6,
+        "requests_completed_in_window": 216,
+        "requests_drained": 2,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 138451,
+        "output_tokens_per_second": 153.83444444444444,
+        "output_tokens_per_second_per_chip": 76.91722222222222,
+        "decode_tokens_per_second_p90": 98.28654581279235,
+        "decode_speed_samples": 216,
+        "ttft_seconds_p95": 1.3818519006017596,
+        "client_inflight_seconds": {
+          "0": 0.00011381227523088455,
+          "1": 1.2083627749234438,
+          "2": 898.7915234128013
+        },
+        "mean_client_inflight": 1.9986571217783624,
+        "full_concurrency_fraction": 0.998657248236446,
+        "drain_seconds": 16.660148952156305,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "d2d6123c69a64f5dab56e8aa40438137",
+        "started_at_unix": 1790343337.552624,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 153.83444444444444,
+        "decode_p90_tps": 98.28654581279235,
+        "ttft_p95_ms": 1381.8519006017596,
+        "completed_requests": 216
+      },
+      "requests_artifact_sha256": "3b19caba8b0da43d4fa6acc5b723a6225f09be37fc42fdfcdac08fedc8f932b8",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 5083136.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "bidkv.adapters.vllm_hust.selector.BidkvPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": false,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 0.0,
+          "extended_checks": 0.0,
+          "deferred": 0.0,
+          "passed": 0.0
+        },
+        "admission_status": "not-exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
+    },
+    {
+      "run_id": "353e280677f247e78d4d906693e23f96",
+      "point_id": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c4-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 328,
+        "max_prompt_tokens_observed": 73616,
+        "prompt_tokens_p50": 21616.5,
+        "max_turn_index_reached": 52,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 324,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 197685,
+        "output_tokens_per_second": 219.65,
+        "output_tokens_per_second_per_chip": 109.825,
+        "decode_tokens_per_second_p90": 79.03330028910618,
+        "decode_speed_samples": 324,
+        "ttft_seconds_p95": 1.6168408912140873,
+        "client_inflight_seconds": {
+          "0": 0.00014270097017288208,
+          "1": 0.0010386034846305847,
+          "2": 0.0007185190916061401,
+          "3": 2.0418059956282377,
+          "4": 897.9562941808254
+        },
+        "mean_client_inflight": 3.9977256337242824,
+        "full_concurrency_fraction": 0.9977292157564727,
+        "drain_seconds": 11.206197037361562,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "353e280677f247e78d4d906693e23f96",
+        "started_at_unix": 1790344254.8998132,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 219.65,
+        "decode_p90_tps": 79.03330028910618,
+        "ttft_p95_ms": 1616.8408912140872,
+        "completed_requests": 324
+      },
+      "requests_artifact_sha256": "cea164f4c3efe9f2fb6e179ebe731b4056e88e7a563530c97acd2dca428b3e0c",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 7942144.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "bidkv.adapters.vllm_hust.selector.BidkvPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": false,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 0.0,
+          "extended_checks": 0.0,
+          "deferred": 0.0,
+          "passed": 0.0
+        },
+        "admission_status": "not-exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
+    },
+    {
+      "run_id": "04853230fa30453c8555ab7311a6e5f5",
+      "point_id": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c8-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 440,
+        "max_prompt_tokens_observed": 78185,
+        "prompt_tokens_p50": 20961.0,
+        "max_turn_index_reached": 58,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 432,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 266571,
+        "output_tokens_per_second": 296.19,
+        "output_tokens_per_second_per_chip": 148.095,
+        "decode_tokens_per_second_p90": 57.73880840845708,
+        "decode_speed_samples": 432,
+        "ttft_seconds_p95": 2.0571530829649416,
+        "client_inflight_seconds": {
+          "0": 0.00016181264072656631,
+          "1": 0.000993381254374981,
+          "2": 0.0007437095046043396,
+          "3": 0.0006297165527939796,
+          "4": 0.0006456486880779266,
+          "5": 0.0006835972890257835,
+          "6": 0.000943661667406559,
+          "7": 2.4156173393130302,
+          "8": 897.57958113309
+        },
+        "mean_client_inflight": 7.997291114378927,
+        "full_concurrency_fraction": 0.9973106457034333,
+        "drain_seconds": 60.53800867963582,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "04853230fa30453c8555ab7311a6e5f5",
+        "started_at_unix": 1790345166.9117444,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 296.19,
+        "decode_p90_tps": 57.73880840845708,
+        "ttft_p95_ms": 2057.1530829649414,
+        "completed_requests": 432
+      },
+      "requests_artifact_sha256": "8e89a671aba2a2133cf6447c3dc0d73cfabdf73e1127428b36ee69122b9c5ac4",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 9318400.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "bidkv.adapters.vllm_hust.selector.BidkvPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": false,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 0.0,
+          "extended_checks": 0.0,
+          "deferred": 0.0,
+          "passed": 0.0
+        },
+        "admission_status": "not-exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
+    },
+    {
+      "run_id": "1b162d37831646d9b16e5b1072910f6e",
+      "point_id": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c16-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 584,
+        "max_prompt_tokens_observed": 59524,
+        "prompt_tokens_p50": 17774.0,
+        "max_turn_index_reached": 40,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 11,
+        "requests_completed_in_window": 568,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 324564,
+        "output_tokens_per_second": 360.62666666666667,
+        "output_tokens_per_second_per_chip": 180.31333333333333,
+        "decode_tokens_per_second_p90": 34.54890719544699,
+        "decode_speed_samples": 568,
+        "ttft_seconds_p95": 2.7141882334370155,
+        "client_inflight_seconds": {
+          "0": 0.00022083334624767303,
+          "1": 0.0010371115058660507,
+          "2": 0.000704609788954258,
+          "3": 0.0006159069016575813,
+          "4": 0.0006486168131232262,
+          "5": 0.0009352909401059151,
+          "6": 0.0006475476548075676,
+          "7": 0.0006873784586787224,
+          "8": 0.0006763674318790436,
+          "9": 0.0005880771204829216,
+          "10": 0.000603117048740387,
+          "11": 0.0006243772804737091,
+          "12": 0.000855710357427597,
+          "13": 0.0006368774920701981,
+          "14": 0.0006412584334611893,
+          "15": 2.4306547436863184,
+          "16": 897.5592221757397
+        },
+        "mean_client_inflight": 15.997198629310976,
+        "full_concurrency_fraction": 0.9972880246397108,
+        "drain_seconds": 91.67898260988295,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "1b162d37831646d9b16e5b1072910f6e",
+        "started_at_unix": 1790346128.3245018,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 360.62666666666667,
+        "decode_p90_tps": 34.54890719544699,
+        "ttft_p95_ms": 2714.1882334370157,
+        "completed_requests": 568
+      },
+      "requests_artifact_sha256": "4158a75b65e2a4c21ccd693696daf79386cc5c45bcce3354e5d0bd0c6742ac69",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 9441280.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "bidkv.adapters.vllm_hust.selector.BidkvPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": false,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 0.0,
+          "extended_checks": 0.0,
+          "deferred": 0.0,
+          "passed": 0.0
+        },
+        "admission_status": "not-exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
+    },
+    {
+      "run_id": "060ede02aa4243238bb6a84b4925d8f3",
+      "point_id": "qwen35-sweprefix-budget-capsule-dla-tp2-c1-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 149,
+        "max_prompt_tokens_observed": 52505,
+        "prompt_tokens_p50": 18533.0,
+        "max_turn_index_reached": 38,
+        "distinct_trajectories_started": 6,
+        "sessions_completed": 5,
+        "requests_completed_in_window": 148,
+        "requests_drained": 1,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 83522,
+        "output_tokens_per_second": 92.80222222222223,
+        "output_tokens_per_second_per_chip": 46.40111111111111,
+        "decode_tokens_per_second_p90": 108.03744127208387,
+        "decode_speed_samples": 148,
+        "ttft_seconds_p95": 1.0796321641188116,
+        "client_inflight_seconds": {
+          "0": 0.6136069605126977,
+          "1": 899.3863930394873
+        },
+        "mean_client_inflight": 0.9993182144883193,
+        "full_concurrency_fraction": 0.9993182144883193,
+        "drain_seconds": 0.02841694001108408,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "060ede02aa4243238bb6a84b4925d8f3",
+        "started_at_unix": 1790347523.7503464,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 92.80222222222223,
+        "decode_p90_tps": 108.03744127208387,
+        "ttft_p95_ms": 1079.6321641188115,
+        "completed_requests": 148
+      },
+      "requests_artifact_sha256": "2d3ee573d8cfc3d4ec07e2ac2c66bbf055165ff9025a1de65a44af8a60d7be99",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 2433024.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "dla.preemption.DeclaredBudgetPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": true,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 149.0,
+          "extended_checks": 149.0,
+          "deferred": 0.0,
+          "passed": 149.0
+        },
+        "admission_status": "exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
+    },
+    {
+      "run_id": "0f1fad2198084a7594ff1d98fe875d7f",
+      "point_id": "qwen35-sweprefix-budget-capsule-dla-tp2-c2-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 215,
+        "max_prompt_tokens_observed": 73616,
+        "prompt_tokens_p50": 23135.0,
+        "max_turn_index_reached": 52,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 6,
+        "requests_completed_in_window": 213,
+        "requests_drained": 2,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 137735,
+        "output_tokens_per_second": 153.0388888888889,
+        "output_tokens_per_second_per_chip": 76.51944444444445,
+        "decode_tokens_per_second_p90": 98.44800872306632,
+        "decode_speed_samples": 213,
+        "ttft_seconds_p95": 1.355786848068237,
+        "client_inflight_seconds": {
+          "0": 0.00011692102998495102,
+          "1": 1.26018179487437,
+          "2": 898.7397012840956
+        },
+        "mean_client_inflight": 1.998599538181184,
+        "full_concurrency_fraction": 0.9985996680934396,
+        "drain_seconds": 5.1089884508401155,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "0f1fad2198084a7594ff1d98fe875d7f",
+        "started_at_unix": 1790348424.4474103,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 153.0388888888889,
+        "decode_p90_tps": 98.44800872306632,
+        "ttft_p95_ms": 1355.7868480682368,
+        "completed_requests": 213
+      },
+      "requests_artifact_sha256": "95584b5d8ba413655c731060ac344ff15b9e1816923db34bbcb09f2c932284be",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 5025792.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "dla.preemption.DeclaredBudgetPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": true,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 215.0,
+          "extended_checks": 215.0,
+          "deferred": 0.0,
+          "passed": 215.0
+        },
+        "admission_status": "exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
+    },
+    {
+      "run_id": "d54906c77d1f499eb6e9992541fae484",
+      "point_id": "qwen35-sweprefix-budget-capsule-dla-tp2-c4-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 324,
+        "max_prompt_tokens_observed": 73616,
+        "prompt_tokens_p50": 21239.5,
+        "max_turn_index_reached": 52,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 320,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 194073,
+        "output_tokens_per_second": 215.63666666666666,
+        "output_tokens_per_second_per_chip": 107.81833333333333,
+        "decode_tokens_per_second_p90": 78.55806742941174,
+        "decode_speed_samples": 320,
+        "ttft_seconds_p95": 1.6732108481228358,
+        "client_inflight_seconds": {
+          "0": 0.0001414623111486435,
+          "1": 0.0009640911594033241,
+          "2": 0.000699029304087162,
+          "3": 1.7789198216050863,
+          "4": 898.2192755956203
+        },
+        "mean_client_inflight": 3.9980180266634044,
+        "full_concurrency_fraction": 0.9980214173284669,
+        "drain_seconds": 26.202478845603764,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "d54906c77d1f499eb6e9992541fae484",
+        "started_at_unix": 1790349330.2709482,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 215.63666666666666,
+        "decode_p90_tps": 78.55806742941174,
+        "ttft_p95_ms": 1673.2108481228358,
+        "completed_requests": 320
+      },
+      "requests_artifact_sha256": "632054c5e7993cb22d928cea706dfe9dd5ce0a9e0e6991ede5bdc7293dae2069",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 7577600.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "dla.preemption.DeclaredBudgetPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": true,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 324.0,
+          "extended_checks": 324.0,
+          "deferred": 0.0,
+          "passed": 324.0
+        },
+        "admission_status": "exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
+    },
+    {
+      "run_id": "944fb65af35f49f2bc56d68b04f3d0e4",
+      "point_id": "qwen35-sweprefix-budget-capsule-dla-tp2-c8-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 436,
+        "max_prompt_tokens_observed": 76322,
+        "prompt_tokens_p50": 20817.0,
+        "max_turn_index_reached": 55,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 428,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 263901,
+        "output_tokens_per_second": 293.22333333333336,
+        "output_tokens_per_second_per_chip": 146.61166666666668,
+        "decode_tokens_per_second_p90": 60.610071178097314,
+        "decode_speed_samples": 428,
+        "ttft_seconds_p95": 2.045830947905779,
+        "client_inflight_seconds": {
+          "0": 0.00017133168876171112,
+          "1": 0.0009755920618772507,
+          "2": 0.0006869286298751831,
+          "3": 0.0005937265232205391,
+          "4": 0.0006109969690442085,
+          "5": 0.000647418200969696,
+          "6": 0.000917620025575161,
+          "7": 2.2402937058359385,
+          "8": 897.7551026800647
+        },
+        "mean_client_inflight": 7.997486883121439,
+        "full_concurrency_fraction": 0.9975056696445164,
+        "drain_seconds": 64.13009173795581,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "944fb65af35f49f2bc56d68b04f3d0e4",
+        "started_at_unix": 1790350257.2282043,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 293.22333333333336,
+        "decode_p90_tps": 60.610071178097314,
+        "ttft_p95_ms": 2045.8309479057789,
+        "completed_requests": 428
+      },
+      "requests_artifact_sha256": "455e4fac60268f8b984b0ecd41813ad052eef005e116cddf948b786138caac27",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 8921088.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "dla.preemption.DeclaredBudgetPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": true,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 436.0,
+          "extended_checks": 436.0,
+          "deferred": 0.0,
+          "passed": 436.0
+        },
+        "admission_status": "exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
+    },
+    {
+      "run_id": "0fd56eba673b446099cee05a0e053412",
+      "point_id": "qwen35-sweprefix-budget-capsule-dla-tp2-c16-r1-20260925",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 583,
+        "max_prompt_tokens_observed": 59957,
+        "prompt_tokens_p50": 17721.0,
+        "max_turn_index_reached": 41,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 11,
+        "requests_completed_in_window": 567,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 323381,
+        "output_tokens_per_second": 359.3122222222222,
+        "output_tokens_per_second_per_chip": 179.6561111111111,
+        "decode_tokens_per_second_p90": 34.35197906941942,
+        "decode_speed_samples": 567,
+        "ttft_seconds_p95": 2.6288719874806694,
+        "client_inflight_seconds": {
+          "0": 0.00020587258040905,
+          "1": 0.0009759413078427315,
+          "2": 0.0006944788619875908,
+          "3": 0.0006237374618649483,
+          "4": 0.0006343964487314224,
+          "5": 0.0009096907451748848,
+          "6": 0.000649498775601387,
+          "7": 0.0006730379536747932,
+          "8": 0.0006735976785421371,
+          "9": 0.0005845772102475166,
+          "10": 0.0006127962842583656,
+          "11": 0.0006003370508551598,
+          "12": 0.0008569406345486641,
+          "13": 0.000637587159872055,
+          "14": 0.0006428379565477371,
+          "15": 2.3341423608362675,
+          "16": 897.6558823110536
+        },
+        "mean_client_inflight": 15.997307928997195,
+        "full_concurrency_fraction": 0.9973954247900595,
+        "drain_seconds": 98.4255874119699,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "0fd56eba673b446099cee05a0e053412",
+        "started_at_unix": 1790351222.2496328,
+        "model": "frontier-qwen35-dla",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 359.3122222222222,
+        "decode_p90_tps": 34.35197906941942,
+        "ttft_p95_ms": 2628.8719874806693,
+        "completed_requests": 567
+      },
+      "requests_artifact_sha256": "93f10d7232c9c1da5b608d0187b9dfd5d1d459d07ca2f2ca5c93ab5fbe62780c",
+      "retrieval_qualification": {
+        "kind": "retrieval-qualification-not-performance",
+        "passed": true,
+        "expected_requests": 26,
+        "completed_requests": 26,
+        "failed_labels": [],
+        "thinking": false,
+        "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+        "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "selected_devices_released": true,
+        "exact_token_budgets": true,
+        "prefix_cache_observed": true,
+        "prefix_hit_token_delta": 9246720.0
+      },
+      "scope": "Metric-only extract of one unpooled 900s observation; original per-request timings and tokens retained by measurement owner; no general answer-quality certification",
+      "policy_effectiveness": {
+        "policy": "dla.preemption.DeclaredBudgetPreemptionPolicy",
+        "enabled": true,
+        "status": "not-exercised",
+        "admission_check_executed": true,
+        "admission_deferral_observed": false,
+        "preemption_status": "not-exercised",
+        "preemption": {
+          "calls": 0.0,
+          "selections": 0.0,
+          "abstentions": 0.0,
+          "failures": 0.0,
+          "invalid_selections": 0.0
+        },
+        "admission": {
+          "checks": 583.0,
+          "extended_checks": 583.0,
+          "deferred": 0.0,
+          "passed": 583.0
+        },
+        "admission_status": "exercised",
+        "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
+      }
     }
   ]
 }
