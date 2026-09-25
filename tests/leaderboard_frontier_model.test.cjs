@@ -132,6 +132,13 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.equal(calibration.validation.ranks.length,4);
                 assert.ok(calibration.validation.ranks.every(r=>r.passed && r.rows>=40));
             }
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-dla-bidkv-curves-20260925'){
+            assert.equal(run.retrieval_qualification.passed,true);
+            assert.equal(run.retrieval_qualification.completed_requests,26);
+            assert.equal(p.configuration.hardware.accelerator_count,2);
+            assert.equal(p.configuration.parameters.pipeline_parallel_size,1);
+            for(const key of ['owned_server_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
+            assert.ok(run.validation.prefix_hit_token_delta>0);
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -470,6 +477,53 @@ test('completed PP2 curves retain all five measured concurrency levels in their 
             assert.deepEqual(point.configuration.mods,arm==='nativepp'?[]:['pipeline-microbatch-migration']);
             assert.equal(point.evidence.measurement_seconds,900);
             assert.equal(point.configuration.hardware.accelerator_count,4);
+        }
+    }
+});
+
+
+test('output-budget curves retain matched controls and distinguish executed checks from changed decisions',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const evidence=require('../data/leaderboard_frontier_swe_evidence.json');
+    const points=data.points.filter(p=>p.evidence.benchmark_protocol?.campaign==='qwen35-dla-bidkv-curves-20260925');
+    assert.equal(points.length,15);
+    for(const concurrency of [1,2,4,8,16]){
+        const triple=points.filter(p=>p.load.concurrency===concurrency);
+        assert.equal(triple.length,3);
+        const native=triple.find(p=>p.configuration.mods.length===0);
+        assert.ok(native);
+        for(const arm of ['native','bidkv','dla']){
+            const p=triple.find(p=>p.load.concurrency_series===`swe-output-budget-tp2-20260925-${arm}-r1`);
+            assert.ok(p);
+            assert.deepEqual(p.configuration.mods,arm==='native'?[]:[arm]);
+            assert.equal(p.configuration.experiment_group,undefined);
+            assert.deepEqual(p.evidence.benchmark_protocol,native.evidence.benchmark_protocol);
+            const a=native.configuration.parameters,b=p.configuration.parameters;
+            for(const key of ['tensor_parallel_size','pipeline_parallel_size','max_num_seqs','max_num_batched_tokens','kv_cache_memory_bytes','prefix_caching','async_scheduling','mtp_draft_tokens','mamba_cache_mode','graph_mode','graph_capture_sizes','worker_abi_bridge_sha256']){
+                assert.notEqual(a[key],undefined,key);
+                assert.deepEqual(a[key],b[key],key);
+            }
+            for(const key of ['packages','cann','model_manifest_sha256','worker_bridge_sha256','runtime_source_files','source_patches_sha256','core_commit','ascend_commit','source_archives']){
+                assert.notEqual(a.runtime_receipt[key],undefined,key);
+                assert.deepEqual(a.runtime_receipt[key],b.runtime_receipt[key],key);
+            }
+            assert.equal(b.scheduler_reserve_output_budget,arm==='dla');
+            assert.equal(b.runtime_base_commits,undefined);
+            const run=evidence.runs.find(r=>r.point_id===p.id);
+            const control=evidence.runs.find(r=>r.point_id===native.id);
+            for(const key of ['duration','concurrency','chips','seed','workload_sha256']) assert.deepEqual(run.client[key],control.client[key],key);
+            if(arm!=='native'){
+                const effect=run.policy_effectiveness;
+                assert.equal(effect.enabled,true);
+                assert.equal(effect.status,'not-exercised');
+                assert.ok(Object.values(effect.preemption).every(v=>v===0));
+                assert.equal(effect.admission.deferred,0);
+                if(arm==='dla'){
+                    assert.match(p.label,/已知输出预算/);
+                    assert.equal(effect.admission_check_executed,true);
+                    for(const key of ['checks','extended_checks','passed']) assert.equal(effect.admission[key],run.summary.requests_started);
+                } else assert.ok(Object.values(effect.admission).every(v=>v===0));
+            }
         }
     }
 });
