@@ -212,3 +212,10 @@ shared small-fish revision.
 Historical full5 uses3e99033; capacity16 retains both b0b8bb2 staging and37428c7 qualification; the
 parallel matrix usesce2ac3f; small-fish usesf7598b9. These derive from recorded capsule/runtime
 provenance, not the current repository HEAD. Missing future pointers must remain “Not recorded”.
+
+## Fresh Qwen3.5 MOD controls in the Kubernetes container
+
+The [2026-09-25 campaign report](FRONTIER-QWEN35-MODS-K8S.md) records new Native / BidKV TP2
+controls, common runtime overlays, and model/workload identity checks. Points whose enabled policy
+receives no calls are explicitly marked **MOD policy not exercised**; they are observations, not
+demonstrated optimization gains.
