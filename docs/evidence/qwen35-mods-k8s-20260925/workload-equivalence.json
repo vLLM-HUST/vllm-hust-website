@@ -1,0 +1,16 @@
+{
+  "verified": true,
+  "actual_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+  "reconstructed_reference_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+  "changed_fields": {
+    "tokenizer.path": {
+      "from": "model",
+      "to": "/workspace/models/Qwen3.5-35B-A3B"
+    },
+    "tokenizer.transformers": {
+      "from": "5.14.1",
+      "to": "5.17.0"
+    }
+  },
+  "method": "Replace only these two metadata fields, serialize with original compiler separators, match published historical SHA256 exactly; all other fields unchanged"
+}
