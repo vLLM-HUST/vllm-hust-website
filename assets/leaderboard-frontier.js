@@ -8,7 +8,7 @@
         en: {
             failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', native: 'Native baseline',
-            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Solid: concurrency sweep · Dashed: Pareto envelope',
+            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Lines: best observed frontier per baseline / MOD', frontierOnly: 'Hide non-Frontier points',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
@@ -17,7 +17,7 @@
         zh: {
             failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', native: '原生 Baseline',
-            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '实线：同配置并发扫描 · 虚线：Pareto 边界',
+            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '连线：Baseline / 各 MOD 的实测最优边界', frontierOnly: '隐藏非 Frontier 点',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
@@ -27,12 +27,14 @@
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
     const t = key => words[lang()][key];
     const fmt = n => n == null ? '—' : new Intl.NumberFormat(lang(), {maximumFractionDigits: 2}).format(n);
-    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:'', mtp:null, mods:null};
+    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:'', mtp:null, mods:null, frontierOnly:true};
     const colors = ['#4263eb','#008c78','#ad5c00','#965bd3','#d14469','#177baf'];
     const tagKey = c => JSON.stringify([c.model.id,c.precision.id]);
     const cohort = () => state.data.cohorts.find(c => c.id === state.cohort);
     const cohortPoints = () => state.data.points.filter(p => p.cohort_id === state.cohort);
-    const points = () => cohortPoints().filter(p => state.mtp?.has(M.mtpState(p)) && state.mods?.has(M.groupKey(p)));
+    const filteredPoints = () => cohortPoints().filter(p => state.mtp?.has(M.mtpState(p)) && state.mods?.has(M.groupKey(p)));
+    const points = () => state.frontierOnly
+        ? M.groupFrontiers(filteredPoints(),X,Y).flat().map(row=>row.point) : filteredPoints();
     const label = p => p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
     const parallel = p => {
         const params = p.configuration.parameters;
@@ -79,6 +81,7 @@
                 <h2>${t('filter')}</h2>
                 <fieldset><legend>MOD / Group</legend><div class="frontier-checks">${mods.map(p=>`<label><input type="checkbox" data-filter="mods" value="${escape(M.groupKey(p))}" ${state.mods.has(M.groupKey(p))?'checked':''}>${escape(label(p))}</label>`).join('')}</div></fieldset>
                 <fieldset><legend>MTP</legend><div class="frontier-checks">${mtpOptions.map(([key,text])=>`<label><input type="checkbox" data-filter="mtp" value="${key}" ${state.mtp.has(key)?'checked':''}>${text}</label>`).join('')}</div></fieldset>
+                <div class="frontier-checks"><label><input id="frontier-only" type="checkbox" ${state.frontierOnly?'checked':''}>${t('frontierOnly')}</label></div>
                 <span id="frontier-filter-count" role="status"></span>
             </aside></div>`;
         $('frontier-panel').querySelectorAll('[data-model-tag]').forEach(button=>button.addEventListener('click',()=>{
@@ -90,6 +93,7 @@
             if(input.checked)selected.add(input.value);else selected.delete(input.value);
             state.selected='';render();
         }));
+        $('frontier-only').addEventListener('change',event=>{state.frontierOnly=event.target.checked;state.selected='';render();});
         $('frontier-chart').addEventListener('click',choose);
         $('frontier-chart').addEventListener('keydown',event=>{
             if(['Enter',' '].includes(event.key)&&event.target.closest('[data-point]')){event.preventDefault();choose(event);}
@@ -142,7 +146,7 @@
             Number(M.groupKey(b)==='none')-Number(M.groupKey(a)==='none')||M.groupKey(a).localeCompare(M.groupKey(b)));
         const color=p=>M.failedCorrectness(p)?'#dc2626':colors[groups.findIndex(g=>M.groupKey(g)===M.groupKey(p))%colors.length];
         $('frontier-legend').innerHTML=groups.filter(g=>points().some(p=>M.groupKey(p)===M.groupKey(g))).map(p=>`<span><i style="background:${color(p)}"></i>${escape(label(p))}${M.failedCorrectness(p)?` · ${t('failed')}`:''}</span>`).join('');
-        $('frontier-hint').textContent=(M.concurrencySeries(measured.measured).length?t('lineHint'):t('hint'))+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
+        $('frontier-hint').textContent=(M.groupFrontiers(points(),X,Y).some(rows=>rows.length>1)?t('lineHint'):t('hint'))+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         const curves=$('frontier-curves'), curveUrl=current?.workload.contract.concurrency_curves_url;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
         if(!curves.hidden)curves.href=curveUrl;else curves.removeAttribute('href');
@@ -200,11 +204,11 @@
             if(result.measured.length)svg+=`<text text-anchor="middle" x="${x(xv)}" y="${height-bottom+24}">${fmt(xv)}</text><text text-anchor="end" x="${left-12}" y="${y(yv)+4}">${fmt(yv)}</text>`;
         }
         svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${t('x')}<tspan x="${(width+left-right)/2}" dy="16">output tokens/s/user</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${t('y')}<tspan x="0" dy="16">output tokens/s/chip</tspan></text>`;
-        if(result.frontier.length>1)svg+=`<polyline class="frontier-envelope" points="${result.frontier.map(p=>`${x(p.x)},${y(p.y)}`).join(' ')}"/>`;
-        const series=M.concurrencySeries(result.measured), connected=new Set(series.flat().map(row=>row.point.id));
-        for(const rows of series){
-            const id=rows[0].point.load.concurrency_series;
-            svg+=`<polyline class="frontier-concurrency-line" data-series="${escape(id)}" data-series-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(rows[0].point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
+        const frontiers=M.groupFrontiers(result.measured.map(row=>row.point),X,Y);
+        const connected=new Set(frontiers.flat().map(row=>row.point.id));
+        for(const rows of frontiers.filter(rows=>rows.length>1)){
+            const id=M.groupKey(rows[0].point);
+            svg+=`<polyline class="frontier-envelope" data-group="${escape(id)}" data-frontier-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(rows[0].point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
         }
         for(const row of result.measured){
             const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);
@@ -224,7 +228,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=swe-parallel-20260925-final',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=mod-frontiers-20260925',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.mods=null;state.mtp=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

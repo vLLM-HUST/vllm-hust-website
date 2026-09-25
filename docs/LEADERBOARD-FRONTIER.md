@@ -21,11 +21,13 @@ workload identities; never silently mix them.
   tokens/s / all allocated chips**. No axis, hardware or MOD filters.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
   other deployment parameters may differ while satisfying the selected comparison contract.
-- All selected points with both coordinates are shown, including dominated configurations.
-  Identical-configuration BetterScale repeats use the documented
-  [whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), retaining inferior raw evidence. The
-  observed Pareto envelope is a visual guide, not a globally optimal or statistically certified
-  curve.
+- The sidebar’s **Hide non-Frontier points** checkbox is checked by default. Only each group’s
+  current frontier vertices are shown; uncheck it to inspect all selected records, including
+  dominated configurations and failed-correctness references. MOD/MTP filters recompute membership;
+  the preference survives language and cohort changes. Identical-configuration BetterScale repeats
+  use the documented [whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), retaining inferior
+  raw evidence. The observed Pareto envelope is a visual guide, not a globally optimal or
+  statistically certified curve.
 - Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
   session concurrency, MTP, request limit, explicit KV budget and the two coordinate values. Escape,
   outside-click or the close button dismisses it. The card stays inside the chart on mobile too.
@@ -42,15 +44,24 @@ workload identities; never silently mix them.
 
 ## Data handoff
 
-The main chart connects explicitly declared concurrency sweeps with solid, series-colored lines,
-ordered by C. `point.load.concurrency_series` identifies a fixed serving configuration within its
-cohort: only client concurrency may change. The measurement producer must hold engine/MOD revisions,
-topology, precision, context, graph, batching, KV budget and workload policy constant within that
-series. Missing declarations stay as unconnected points; never infer a sweep from MOD color alone.
-Filters remove hidden points from lines, and singleton series have no line. The dashed Pareto
-envelope remains distinct from these measured sweeps. Point clicks and downloads retain the original
-data. The SWE capacity16 renderer and tests check that its serving settings remain constant,
-excluding legacy max-seqs8 C4 and eight-chip configurations.
+As of2026-09-25 the main chart draws **one observed Pareto frontier per baseline/MOD**, within the
+selected model/precision/workload cohort. Each group independently chooses nondominated whole
+records across parallel layouts, concurrency, capacity and other allowed settings. No other MOD can
+dominate away the baseline's line. Vertices are ordered by decode speed, not concurrency; this is a
+best-configuration envelope, not a controlled concurrency sweep or a continuous measured performance
+curve. Filters recompute each group's boundary. Equal coordinate ties use one stable point ID for
+the line while retaining all point records; singletons have no line. Failed-correctness references
+cannot contribute to or dominate a boundary. The old global dashed envelope is removed.
+
+All measured dots remain inspectable by unchecking **Hide non-Frontier points**. Original
+`load.concurrency_series` metadata and the linked static diagnostic sweeps remain unchanged; they
+still describe fixed-configuration studies but no longer determine main-chart lines.
+
+Fletcher withdrew BetterScale AE separation from display on2026-09-25. Its four then-visible
+AgentX/SWE observations now reside in `archived_points` with `display_withdrawal`; earlier archived
+runs and all metric evidence remain intact. Do not restore these points or their filter/legend entry
+from a historical import without explicit authorization. Ordinary co-located BetterScale TP/DP/EP
+measurements remain visible.
 
 The website reads `data/leaderboard_frontier.json` independently of the legacy run snapshot. Schema:
 `leaderboard-frontier/v1`. Two arrays: `cohorts` and `points`.
