@@ -14200,7 +14200,7 @@
     {
       "id": "qwen35-sweprefix-k8s-native-tp2-c4-r1-20260925",
       "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "Native · K8s · C4 · r1",
+      "label": "Native · TP2 · C4 · r1",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1+frontier.bidkv / 0.25.1rc1 + common Mamba feedback patch",
@@ -14306,8 +14306,7 @@
           "participating_deployment_chips": 2,
           "release_verified": true,
           "pod_memory_limit_gib": 128
-        },
-        "experiment_group": "Native · K8s"
+        }
       },
       "load": {
         "concurrency": 4,
@@ -14346,7 +14345,7 @@
     {
       "id": "qwen35-sweprefix-k8s-native-tp2-c16-r1-20260925",
       "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "Native · K8s · C16 · r1",
+      "label": "Native · TP2 · C16 · r1",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1+frontier.bidkv / 0.25.1rc1 + common Mamba feedback patch",
@@ -14452,8 +14451,7 @@
           "participating_deployment_chips": 2,
           "release_verified": true,
           "pod_memory_limit_gib": 128
-        },
-        "experiment_group": "Native · K8s"
+        }
       },
       "load": {
         "concurrency": 16,
@@ -14492,7 +14490,7 @@
     {
       "id": "qwen35-sweprefix-k8s-bidkv-tp2-c4-r1-20260925",
       "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "BidKV · K8s · C4 · r1 · 未触发预占",
+      "label": "BidKV · TP2 · C4 · r1 · 未触发预占",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1+frontier.bidkv / 0.25.1rc1 + common Mamba feedback patch",
@@ -14616,7 +14614,6 @@
             "scope": "Counter deltas covering measured window and in-flight drain; calls alone do not establish optimization benefit"
           }
         },
-        "experiment_group": "BidKV · K8s",
         "mod_sources": [
           {
             "id": "bidkv",
@@ -14664,7 +14661,7 @@
     {
       "id": "qwen35-sweprefix-k8s-bidkv-tp2-c16-r1-20260925",
       "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "BidKV · K8s · C16 · r1 · 未触发预占",
+      "label": "BidKV · TP2 · C16 · r1 · 未触发预占",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1+frontier.bidkv / 0.25.1rc1 + common Mamba feedback patch",
@@ -14788,7 +14785,6 @@
             "scope": "Counter deltas covering measured window and in-flight drain; calls alone do not establish optimization benefit"
           }
         },
-        "experiment_group": "BidKV · K8s",
         "mod_sources": [
           {
             "id": "bidkv",
@@ -14836,7 +14832,7 @@
     {
       "id": "qwen35-sweprefix-k8s-nativepp-tp2-pp2-c4-r1-20260925",
       "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "Native · K8s PP2 · C4 · r1",
+      "label": "Native · TP2 PP2 · C4 · r1",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1+frontier.bidkv.empty / 0.25.1rc1 + common PP hybrid-MTP capsule",
@@ -14996,8 +14992,7 @@
           "participating_deployment_chips": 4,
           "release_verified": true,
           "pod_memory_limit_gib": 128
-        },
-        "experiment_group": "Native · K8s PP2"
+        }
       },
       "load": {
         "concurrency": 4,
@@ -15036,7 +15031,7 @@
     {
       "id": "qwen35-sweprefix-k8s-nativepp-tp2-pp2-c16-r1-20260925",
       "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "Native · K8s PP2 · C16 · r1",
+      "label": "Native · TP2 PP2 · C16 · r1",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1+frontier.bidkv.empty / 0.25.1rc1 + common PP hybrid-MTP capsule",
@@ -15196,8 +15191,7 @@
           "participating_deployment_chips": 4,
           "release_verified": true,
           "pod_memory_limit_gib": 128
-        },
-        "experiment_group": "Native · K8s PP2"
+        }
       },
       "load": {
         "concurrency": 16,
@@ -15236,7 +15230,7 @@
     {
       "id": "qwen35-sweprefix-k8s-pipelinepp-tp2-pp2-c4-r1-20260925",
       "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "Pipeline Microbatch · K8s PP2 · C4 · r1",
+      "label": "Pipeline Microbatch · TP2 PP2 · C4 · r1",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1+frontier.bidkv.empty / 0.25.1rc1 + common PP hybrid-MTP capsule",
@@ -15689,7 +15683,6 @@
             "profiling_in_measurement": false
           }
         },
-        "experiment_group": "Pipeline Microbatch · K8s PP2",
         "mod_sources": [
           {
             "id": "pipeline-microbatch-migration",
@@ -15736,7 +15729,7 @@
     {
       "id": "qwen35-sweprefix-k8s-pipelinepp-tp2-pp2-c16-r1-20260925",
       "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "Pipeline Microbatch · K8s PP2 · C16 · r1",
+      "label": "Pipeline Microbatch · TP2 PP2 · C16 · r1",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
         "engine_version": "0.25.1+frontier.bidkv.empty / 0.25.1rc1 + common PP hybrid-MTP capsule",
@@ -16189,7 +16182,6 @@
             "profiling_in_measurement": false
           }
         },
-        "experiment_group": "Pipeline Microbatch · K8s PP2",
         "mod_sources": [
           {
             "id": "pipeline-microbatch-migration",
