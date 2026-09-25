@@ -88,9 +88,10 @@ A [35B Eagle3 draft](https://huggingface.co/jiapingW/Qwen3.5-35B-A3B-Eagle3-Spec
 the inspected DiffSpec revision `42e5909fc6fe276ba0defe1901257a523653aefb` explicitly requires TP4,
 dense Qwen architecture, asynchronous scheduling off, and APC off. That implementation therefore
 cannot join this TP2/MoE/APC/async cell by changing only the MOD. LatchMoE also currently conflicts
-with APC. Pipeline Microbatch needs a matched PP topology rather than this PP1 cell. DLA needs a
-documented prediction input and its additional scheduler interfaces. Their historical or simulated
-results are not imported into this campaign.
+with APC. Pipeline Microbatch now has a
+[separate matched PP2×TP2 campaign](FRONTIER-QWEN35-PIPELINE-K8S.md), with real calibrated profiles
+and fresh native controls. DLA needs a documented prediction input and its additional scheduler
+interfaces. Their historical or simulated results are not imported into this campaign.
 
 ## Completed matched observations
 

@@ -115,6 +115,23 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.equal(run.policy_effectiveness.invalid_selections,0);
                 if(run.policy_effectiveness.calls===0) assert.equal(run.policy_effectiveness.status,'not-exercised');
             }
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-pipeline-k8s-20260925'){
+            assert.equal(run.retrieval_qualification.passed,true);
+            assert.equal(run.retrieval_qualification.completed_requests,26);
+            assert.equal(p.configuration.hardware.accelerator_count,4);
+            assert.equal(p.configuration.parameters.pipeline_parallel_size,2);
+            for(const key of ['owned_server_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
+            assert.ok(run.validation.prefix_hit_token_delta>0);
+            if(p.configuration.mods.includes('pipeline-microbatch-migration')){
+                assert.equal(run.policy_effectiveness.status,'exercised');
+                for(const key of ['calls','admissions','completions']) assert.ok(run.policy_effectiveness[key]>0);
+                for(const key of ['aborts','failures','invalid_admissions','builtin_fallbacks']) assert.equal(run.policy_effectiveness[key],0);
+                const calibration=p.configuration.parameters.calibration;
+                assert.equal(calibration.profiling_in_measurement,false);
+                assert.equal(calibration.validation.passed,true);
+                assert.equal(calibration.validation.ranks.length,4);
+                assert.ok(calibration.validation.ranks.every(r=>r.passed && r.rows>=40));
+            }
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -285,6 +302,9 @@ test('AE separation is a tracking group, not a new MOD or a TP/EP alias',()=>{
         if(p.evidence.benchmark_protocol?.campaign==='qwen35-mods-k8s-20260925'){
             assert.ok(['none','bidkv'].includes(model.modKey(p)));
             assert.equal(model.groupKey(p),model.modKey(p)==='none'?'Native · K8s':'BidKV · K8s');
+        } else if(p.evidence.benchmark_protocol?.campaign==='qwen35-pipeline-k8s-20260925'){
+            assert.ok(['none','pipeline-microbatch-migration'].includes(model.modKey(p)));
+            assert.equal(model.groupKey(p),model.modKey(p)==='none'?'Native · K8s PP2':'Pipeline Microbatch · K8s PP2');
         } else assert.equal(model.groupKey(p),model.modKey(p));
     }
     const invalid=structuredClone(data);invalid.points[0].configuration.experiment_group=' ';
@@ -406,5 +426,42 @@ test('fresh K8s native and BidKV controls retain identical common runtime and wo
         }
         const clients=pair.map(p=>evidence.runs.find(r=>r.point_id===p.id).client);
         for(const key of ['duration','concurrency','chips','seed','workload_sha256'])assert.deepEqual(clients[0][key],clients[1][key],key);
+    }
+});
+
+test('Pipeline PP2 matched observations share runtime and use all four participating chips',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const evidence=require('../data/leaderboard_frontier_swe_evidence.json');
+    const points=data.points.filter(p=>p.evidence.benchmark_protocol?.campaign==='qwen35-pipeline-k8s-20260925');
+    assert.equal(points.length,4);
+    for(const concurrency of [4,16]){
+        const pair=points.filter(p=>p.load.concurrency===concurrency);
+        assert.equal(pair.length,2);
+        const native=pair.find(p=>p.configuration.mods.length===0);
+        const candidate=pair.find(p=>p.configuration.mods.includes('pipeline-microbatch-migration'));
+        assert.ok(native && candidate);
+        assert.deepEqual(native.evidence.benchmark_protocol,candidate.evidence.benchmark_protocol);
+        const a=native.configuration.parameters,b=candidate.configuration.parameters;
+        for(const key of ['tensor_parallel_size','pipeline_parallel_size','max_num_seqs','max_num_batched_tokens','kv_cache_memory_bytes','prefix_caching','async_scheduling','mtp_draft_tokens','mamba_cache_mode','graph_mode','graph_capture_sizes','worker_abi_bridge_sha256']){
+            assert.notEqual(a[key],undefined,key);
+            assert.deepEqual(a[key],b[key],key);
+        }
+        for(const key of ['packages','cann','wheel_sha256','model_manifest_sha256','worker_bridge_sha256','runtime_source_files','source_patches_sha256','core_commit','ascend_commit']){
+            assert.notEqual(a.runtime_receipt[key],undefined,key);
+            assert.deepEqual(a.runtime_receipt[key],b.runtime_receipt[key],key);
+        }
+        for(const p of pair){
+            assert.equal(p.configuration.hardware.accelerator_count,4);
+            assert.equal(p.configuration.parameters.participating_deployment_chips,4);
+            assert.deepEqual(p.configuration.parameters.physical_devices,[0,1,2,3]);
+            assert.equal(p.configuration.parameters.pipeline_parallel_size,2);
+            assert.equal(p.configuration.parameters.tensor_parallel_size,2);
+            assert.equal(p.configuration.parameters.mtp_draft_tokens,2);
+            assert.equal(p.configuration.parameters.prefix_caching,true);
+            assert.equal(p.configuration.parameters.async_scheduling,true);
+        }
+        const clients=pair.map(p=>evidence.runs.find(r=>r.point_id===p.id).client);
+        for(const key of ['duration','concurrency','chips','seed','workload_sha256']) assert.deepEqual(clients[0][key],clients[1][key],key);
+        assert.notEqual(native.load.concurrency_series,candidate.load.concurrency_series);
     }
 });
