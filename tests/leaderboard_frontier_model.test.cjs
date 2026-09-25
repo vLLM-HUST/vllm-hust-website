@@ -115,7 +115,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.equal(run.policy_effectiveness.invalid_selections,0);
                 if(run.policy_effectiveness.calls===0) assert.equal(run.policy_effectiveness.status,'not-exercised');
             }
-        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-pipeline-k8s-20260925'){
+        } else if(['qwen35-pipeline-k8s-20260925','qwen35-mod-curves-20260925'].includes(p.evidence.benchmark_protocol.campaign)){
             assert.equal(run.retrieval_qualification.passed,true);
             assert.equal(run.retrieval_qualification.completed_requests,26);
             assert.equal(p.configuration.hardware.accelerator_count,4);
@@ -457,5 +457,19 @@ test('Pipeline PP2 matched observations share runtime and use all four participa
         const clients=pair.map(p=>evidence.runs.find(r=>r.point_id===p.id).client);
         for(const key of ['duration','concurrency','chips','seed','workload_sha256']) assert.deepEqual(clients[0][key],clients[1][key],key);
         assert.notEqual(native.load.concurrency_series,candidate.load.concurrency_series);
+    }
+});
+
+test('completed PP2 curves retain all five measured concurrency levels in their actual MOD groups',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    for(const arm of ['nativepp','pipelinepp']){
+        const points=data.points.filter(p=>p.load.concurrency_series===`swe-k8s-pp2-20260925-${arm}-r1`);
+        assert.deepEqual(points.map(p=>p.load.concurrency).sort((a,b)=>a-b),[1,2,4,8,16]);
+        for(const point of points){
+            assert.equal(point.configuration.experiment_group,undefined);
+            assert.deepEqual(point.configuration.mods,arm==='nativepp'?[]:['pipeline-microbatch-migration']);
+            assert.equal(point.evidence.measurement_seconds,900);
+            assert.equal(point.configuration.hardware.accelerator_count,4);
+        }
     }
 });
