@@ -198,3 +198,17 @@ Pareto envelope. The27B native check failed5/16 retrievals at C16; all five nati
 deployment, but this is not evidence of separately observed failures at every C. The independent
 browser check exercises all ten27B points, EN/ZH, dark/light, mobile/desktop, exact downloads and
 native-only filtering.
+
+## MOD source pointers
+
+Each active BetterScale point now records `configuration.mod_sources`: canonical MOD ID, repository,
+full immutable revision, optional additional revisions, deployed source capsule and scope. The popup
+links the short commit IDs instead of saying only “BetterScale experimental”; the download retains
+the full pins and local-adaptation caveat. Engine, model and benchmark revisions are not MOD pins.
+These prototype pointers identify staging/adaptation code, not a claim that the deployed capsule is
+an unmodified released wheel. Dense27 retains its recorded envelope specialization on top of the
+shared small-fish revision.
+
+Historical full5 uses3e99033; capacity16 retains both b0b8bb2 staging and37428c7 qualification; the
+parallel matrix usesce2ac3f; small-fish usesf7598b9. These derive from recorded capsule/runtime
+provenance, not the current repository HEAD. Missing future pointers must remain “Not recorded”.

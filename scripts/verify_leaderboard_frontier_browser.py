@@ -383,6 +383,16 @@ def main():
                 assert payload["cohort"] == production["cohorts"][0]
                 assert payload["chart"]["x"] == "decode_p90_tps"
                 assert payload["chart"]["y"] == "output_tps_per_chip"
+                for source in point["configuration"].get("mod_sources", []):
+                    link = page.locator(
+                        f'.frontier-popup-mod-source a[href="{source["repository"]}/commit/{source["revision"]}"]'
+                    )
+                    assert link.inner_text() == source["revision"][:7]
+                    assert (
+                        payload["point"]["configuration"]["mod_sources"]
+                        == point["configuration"]["mod_sources"]
+                    )
+
                 assert (
                     f"{point['evidence']['sampling_date_utc']} (UTC)"
                     in page.locator(".frontier-popup-date").inner_text()
