@@ -36,6 +36,9 @@
                 || c.context_capacity_tokens < data.cohorts.find(cohort => cohort.id === p.cohort_id).context_tokens || e?.status !== 'measured'
                 || !Array.isArray(e.run_ids) || !e.run_ids.length || !e.aggregation
                 || !safeURL(e.url)) throw new Error(`Invalid measured configuration: ${p.id || '?'}`);
+            if (c.mod_sources != null && (!Array.isArray(c.mod_sources) || new Set(c.mod_sources.map(s=>s?.id)).size !== c.mod_sources.length
+                || c.mod_sources.some(s=>!s || !c.mods.includes(s.id) || !/^https:\/\/github\.com\/[^/?#]+\/[^/?#]+$/.test(s.repository)
+                    || !/^[0-9a-f]{40}$/.test(s.revision) || (s.additional_revisions != null && (!Array.isArray(s.additional_revisions) || s.additional_revisions.some(r=>!/^[0-9a-f]{40}$/.test(r))))))) throw new Error(`Invalid MOD source: ${p.id}`);
             if (e.sampling_date_utc != null && (typeof e.sampling_date_utc !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(e.sampling_date_utc)
                 || !Number.isFinite(Date.parse(e.sampling_date_utc)) || new Date(e.sampling_date_utc).toISOString().slice(0,10) !== e.sampling_date_utc)) throw new Error(`Invalid sampling date: ${p.id}`);
             if (c.experiment_group != null && (typeof c.experiment_group !== 'string' || !c.experiment_group.trim())) throw new Error(`Invalid experiment group: ${p.id}`);

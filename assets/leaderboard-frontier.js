@@ -12,7 +12,7 @@
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
-            workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', experimental: 'BetterScale experimental'
+            workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation'
         },
         zh: {
             failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
@@ -21,7 +21,7 @@
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
-            workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', experimental: 'BetterScale 实验版本'
+            workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配'
         }
     };
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
@@ -36,6 +36,12 @@
     const points = () => state.frontierOnly
         ? M.groupFrontiers(filteredPoints(),X,Y).flat().map(row=>row.point) : filteredPoints();
     const label = p => p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
+    const modSources = point => point.configuration.mods.map(id=>{
+        const name=state.catalog.get(id)?.name||id, source=point.configuration.mod_sources?.find(s=>s.id===id);
+        if(!source)return `${escape(name)} · ${t('unknown')}`;
+        const revisions=[source.revision,...(source.additional_revisions||[])];
+        return `${escape(name)} @ ${revisions.map(rev=>`<a href="${escape(source.repository+'/commit/'+rev)}" target="_blank" rel="noopener" title="${escape(rev)}">${escape(rev.slice(0,7))}</a>`).join(' + ')} <span title="${escape(source.source_capsule+' — '+source.scope)}">· ${t('staged')}</span>${source.local_adaptations?` · <span title="${escape(source.local_adaptations)}">${t('localAdaptation')}</span>`:''}`;
+    }).join('<br>');
     const parallel = p => {
         const params = p.configuration.parameters;
         if (params.attention_ranks != null && params.expert_ranks != null) return `A${params.attention_ranks} / E${params.expert_ranks}`;
@@ -173,7 +179,8 @@
         panel.innerHTML=`<button type="button" class="frontier-popup-close" data-close aria-label="${t('close')}">×</button>
             <h2 id="frontier-popover-title">${escape(label(point))}</h2>
             ${M.failedCorrectness(point)?`<p class="frontier-correctness-warning"><strong>${t('failed')}</strong><br>${point.configuration.parameters.functional_check_id==='dense27-native1'?t('failureScope'):escape(params.functional_scope)}</p>`:''}
-            <p class="frontier-popup-engine">${escape(point.configuration.engine)} ${escape(point.configuration.engine_version)}${point.configuration.mods.includes('betterscale')?`<br>${t('experimental')}`:''}</p>
+            <p class="frontier-popup-engine">${escape(point.configuration.engine)} ${escape(point.configuration.engine_version)}</p>
+            ${point.configuration.mods.length?`<p class="frontier-popup-mod-source">${t('modSource')}: ${modSources(point)}</p>`:''}
             <p class="frontier-popup-date">${t('sampled')}: ${point.evidence.sampling_date_utc?`${escape(point.evidence.sampling_date_utc)} (UTC)`:t('unknown')}</p>
             <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
             <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,X))}</strong><span>${t('x')}<br>tokens/s/user</span></div><div><strong>${fmt(M.value(point,Y))}</strong><span>${t('y')}<br>tokens/s/chip</span></div></div>
@@ -229,7 +236,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=frontier-dates-20260925',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=frontier-mod-pins-20260925',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.mods=null;state.mtp=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

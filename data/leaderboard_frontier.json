@@ -311,7 +311,17 @@
           "sampler": "Shared explicit benchmark-only synthetic sampler; rank0 broadcast; no quality claim",
           "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "snapshot primers + 10 additional requests/lane"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "3e99033a3d47df794cf282bc0d4a9f7faec82c5a",
+            "additional_revisions": [],
+            "source_capsule": "moe-full5 / candidate-runtime1",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -434,7 +444,19 @@
           "functional_limit": "Capacity16 real retrieval24/24 through262080 and16 concurrent; bounded functional evidence, not broad quality evaluation",
           "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "snapshot primers + 10 additional requests/lane"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "b0b8bb2d88c8673fe8431fefb2d47157fd91c76d",
+            "additional_revisions": [
+              "37428c7d89980f2494062766d39bc084c6f670ea"
+            ],
+            "source_capsule": "moe-capacity16-1 / local-candidate-runtime1",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 2,
@@ -557,7 +579,19 @@
           "functional_limit": "Capacity16 real retrieval24/24 through262080 and16 concurrent; bounded functional evidence, not broad quality evaluation",
           "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "snapshot primers + 10 additional requests/lane"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "b0b8bb2d88c8673fe8431fefb2d47157fd91c76d",
+            "additional_revisions": [
+              "37428c7d89980f2494062766d39bc084c6f670ea"
+            ],
+            "source_capsule": "moe-capacity16-1 / local-candidate-runtime1",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -680,7 +714,19 @@
           "functional_limit": "Capacity16 real retrieval24/24 through262080 and16 concurrent; bounded functional evidence, not broad quality evaluation",
           "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "snapshot primers + 10 additional requests/lane"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "b0b8bb2d88c8673fe8431fefb2d47157fd91c76d",
+            "additional_revisions": [
+              "37428c7d89980f2494062766d39bc084c6f670ea"
+            ],
+            "source_capsule": "moe-capacity16-1 / local-candidate-runtime1",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 8,
@@ -803,7 +849,19 @@
           "functional_limit": "Capacity16 real retrieval24/24 through262080 and16 concurrent; bounded functional evidence, not broad quality evaluation",
           "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "snapshot primers + 10 additional requests/lane"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "b0b8bb2d88c8673fe8431fefb2d47157fd91c76d",
+            "additional_revisions": [
+              "37428c7d89980f2494062766d39bc084c6f670ea"
+            ],
+            "source_capsule": "moe-capacity16-1 / local-candidate-runtime1",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 16,
@@ -2431,7 +2489,17 @@
           ],
           "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "3e99033a3d47df794cf282bc0d4a9f7faec82c5a",
+            "additional_revisions": [],
+            "source_capsule": "moe-full5",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -3284,7 +3352,19 @@
           ],
           "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "b0b8bb2d88c8673fe8431fefb2d47157fd91c76d",
+            "additional_revisions": [
+              "37428c7d89980f2494062766d39bc084c6f670ea"
+            ],
+            "source_capsule": "moe-capacity16-1",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 2,
@@ -3466,7 +3546,19 @@
           ],
           "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "b0b8bb2d88c8673fe8431fefb2d47157fd91c76d",
+            "additional_revisions": [
+              "37428c7d89980f2494062766d39bc084c6f670ea"
+            ],
+            "source_capsule": "moe-capacity16-1",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -3648,7 +3740,19 @@
           ],
           "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "b0b8bb2d88c8673fe8431fefb2d47157fd91c76d",
+            "additional_revisions": [
+              "37428c7d89980f2494062766d39bc084c6f670ea"
+            ],
+            "source_capsule": "moe-capacity16-1",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 8,
@@ -3830,7 +3934,19 @@
           ],
           "max_cudagraph_capture_size": 4096,
           "worker_class": "betterscale.worker.Worker"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "b0b8bb2d88c8673fe8431fefb2d47157fd91c76d",
+            "additional_revisions": [
+              "37428c7d89980f2494062766d39bc084c6f670ea"
+            ],
+            "source_capsule": "moe-capacity16-1",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 16,
@@ -4625,7 +4741,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-ep2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 1,
@@ -4801,7 +4927,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-ep2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 2,
@@ -4976,7 +5112,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-tp2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 1,
@@ -5151,7 +5297,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-tp2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 2,
@@ -5328,7 +5484,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-tp2-ep2-capacity32-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 1,
@@ -6051,7 +6217,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-tp2-tp2-capacity32-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 1,
@@ -6389,7 +6565,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-tp2-ep2-capacity32-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 2,
@@ -7047,7 +7233,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-ep2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -7222,7 +7418,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-tp2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -7399,7 +7605,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-tp2-ep2-capacity32-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -8057,7 +8273,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-ep2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 8,
@@ -8232,7 +8458,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-tp2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 8,
@@ -8409,7 +8645,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-tp2-ep2-capacity32-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 8,
@@ -9227,7 +9473,17 @@
           "measured_mean_client_inflight": 0.9994906330244137,
           "full_client_concurrency_fraction": 0.9994906330244137,
           "comparison_scope": "New capacity16/KV24.25GiB prototype; not a repeat of old FULL20.25GiB or capacity32; shared-host single observation, not isolated small-fish speedup"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "small-fish35b-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 1,
@@ -9405,7 +9661,17 @@
           "measured_mean_client_inflight": 1.9985577336232139,
           "full_client_concurrency_fraction": 0.9985578706043371,
           "comparison_scope": "New capacity16/KV24.25GiB prototype; not a repeat of old FULL20.25GiB or capacity32; shared-host single observation, not isolated small-fish speedup"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "small-fish35b-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 2,
@@ -9583,7 +9849,17 @@
           "measured_mean_client_inflight": 3.997629157013079,
           "full_client_concurrency_fraction": 0.9976320915920143,
           "comparison_scope": "New capacity16/KV24.25GiB prototype; not a repeat of old FULL20.25GiB or capacity32; shared-host single observation, not isolated small-fish speedup"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "small-fish35b-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -9761,7 +10037,17 @@
           "measured_mean_client_inflight": 7.996613094656625,
           "full_client_concurrency_fraction": 0.9966304228522413,
           "comparison_scope": "New capacity16/KV24.25GiB prototype; not a repeat of old FULL20.25GiB or capacity32; shared-host single observation, not isolated small-fish speedup"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "small-fish35b-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 8,
@@ -9939,7 +10225,17 @@
           "measured_mean_client_inflight": 15.995419418370746,
           "full_client_concurrency_fraction": 0.9954998576131442,
           "comparison_scope": "New capacity16/KV24.25GiB prototype; not a repeat of old FULL20.25GiB or capacity32; shared-host single observation, not isolated small-fish speedup"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "small-fish35b-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 16,
@@ -10118,7 +10414,18 @@
           "functional_status": "bounded_pass",
           "functional_scope": "24/24 exact long/cold/warm/concurrent retrievals; not general quality certification",
           "mod_revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4 + recorded dense27 envelope specialization"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "dense27-small-fish-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel.",
+            "local_adaptations": "recorded dense27 envelope specialization"
+          }
+        ]
       },
       "load": {
         "concurrency": 1,
@@ -10297,7 +10604,18 @@
           "functional_status": "bounded_pass",
           "functional_scope": "24/24 exact long/cold/warm/concurrent retrievals; not general quality certification",
           "mod_revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4 + recorded dense27 envelope specialization"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "dense27-small-fish-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel.",
+            "local_adaptations": "recorded dense27 envelope specialization"
+          }
+        ]
       },
       "load": {
         "concurrency": 2,
@@ -10476,7 +10794,18 @@
           "functional_status": "bounded_pass",
           "functional_scope": "24/24 exact long/cold/warm/concurrent retrievals; not general quality certification",
           "mod_revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4 + recorded dense27 envelope specialization"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "dense27-small-fish-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel.",
+            "local_adaptations": "recorded dense27 envelope specialization"
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -10655,7 +10984,18 @@
           "functional_status": "bounded_pass",
           "functional_scope": "24/24 exact long/cold/warm/concurrent retrievals; not general quality certification",
           "mod_revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4 + recorded dense27 envelope specialization"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "dense27-small-fish-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel.",
+            "local_adaptations": "recorded dense27 envelope specialization"
+          }
+        ]
       },
       "load": {
         "concurrency": 8,
@@ -10834,7 +11174,18 @@
           "functional_status": "bounded_pass",
           "functional_scope": "24/24 exact long/cold/warm/concurrent retrievals; not general quality certification",
           "mod_revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4 + recorded dense27 envelope specialization"
-        }
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "f7598b9f1d4cb13607a94a3d4f13246d0b76fbd4",
+            "additional_revisions": [],
+            "source_capsule": "dense27-small-fish-candidate-20260924",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel.",
+            "local_adaptations": "recorded dense27 envelope specialization"
+          }
+        ]
       },
       "load": {
         "concurrency": 16,
@@ -11012,7 +11363,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-ep2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 16,
@@ -11187,7 +11548,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-tp2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 16,
@@ -11364,7 +11735,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-tp2-ep2-capacity32-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 16,
@@ -12722,7 +13103,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-ep2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 32,
@@ -12897,7 +13288,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-dp2-tp2-skew-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 32,
@@ -13074,7 +13475,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-tp2-ep2-capacity32-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 32,
@@ -13250,7 +13661,17 @@
           "label": "Ascend 910B2",
           "accelerator_count": 2
         },
-        "context_capacity_tokens": 262144
+        "context_capacity_tokens": 262144,
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "ce2ac3f4e2ddd663199fc9d39374c5f6c6d37a3d",
+            "additional_revisions": [],
+            "source_capsule": "full-tp2-tp2-capacity32-source",
+            "scope": "Prototype staging/adaptation source; deployed capsule and engine patches are recorded separately, not an unmodified released wheel."
+          }
+        ]
       },
       "load": {
         "concurrency": 32,

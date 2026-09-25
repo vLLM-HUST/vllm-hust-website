@@ -343,3 +343,23 @@ test('sampling dates are calendar-valid UTC dates taken from recorded run starts
     }
     const legacy=structuredClone(d);delete legacy.points[0].evidence.sampling_date_utc;model.validate(legacy);
 });
+
+test('BetterScale points carry immutable MOD pointers, not engine or benchmark revisions',()=>{
+    const d=require('../data/leaderboard_frontier.json');
+    const points=d.points.filter(p=>p.configuration.mods.includes('betterscale'));
+    assert.ok(points.length);
+    for(const p of points){
+        const q=p.configuration.parameters, source=p.configuration.mod_sources.find(s=>s.id==='betterscale');
+        assert.equal(source.repository,'https://github.com/vLLM-HUST/BetterScale');
+        assert.match(source.revision,/^[0-9a-f]{40}$/);
+        assert.ok(source.source_capsule && source.scope);
+        if(q.mod_revision)assert.equal(source.revision,q.mod_revision.split(' ')[0]);
+        if(q.matrix_adaptation_revision)assert.equal(source.revision,q.matrix_adaptation_revision);
+        assert.notEqual(source.revision,q.benchmark_revision);
+        if(q.mod_revision?.includes(' + '))assert.ok(source.local_adaptations);
+    }
+    for(const mutate of [s=>s.repository='javascript:alert(1)',s=>s.revision='main',s=>s.id='unloaded-mod']){
+        const bad=structuredClone(d);const p=bad.points.find(p=>p.configuration.mod_sources);mutate(p.configuration.mod_sources[0]);
+        assert.throws(()=>model.validate(bad),/MOD source/);
+    }
+});
