@@ -36,6 +36,8 @@
                 || c.context_capacity_tokens < data.cohorts.find(cohort => cohort.id === p.cohort_id).context_tokens || e?.status !== 'measured'
                 || !Array.isArray(e.run_ids) || !e.run_ids.length || !e.aggregation
                 || !safeURL(e.url)) throw new Error(`Invalid measured configuration: ${p.id || '?'}`);
+            if (e.sampling_date_utc != null && (typeof e.sampling_date_utc !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(e.sampling_date_utc)
+                || !Number.isFinite(Date.parse(e.sampling_date_utc)) || new Date(e.sampling_date_utc).toISOString().slice(0,10) !== e.sampling_date_utc)) throw new Error(`Invalid sampling date: ${p.id}`);
             if (c.experiment_group != null && (typeof c.experiment_group !== 'string' || !c.experiment_group.trim())) throw new Error(`Invalid experiment group: ${p.id}`);
             if (Object.values(p.metrics).some(v => v !== null && (!finite(v) || v < 0))) throw new Error(`Invalid metric: ${p.id}`);
             if (p.load.concurrency_series != null && (typeof p.load.concurrency_series !== 'string' || !p.load.concurrency_series

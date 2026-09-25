@@ -29,8 +29,12 @@ workload identities; never silently mix them.
   raw evidence. The observed Pareto envelope is a visual guide, not a globally optimal or
   statistically certified curve.
 - Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
-  session concurrency, MTP, request limit, explicit KV budget and the two coordinate values. Escape,
-  outside-click or the close button dismisses it. The card stays inside the chart on mobile too.
+  session concurrency, MTP, request limit, explicit KV budget, UTC sampling date and the two
+  coordinate values. `evidence.sampling_date_utc` is a calendar-valid YYYY-MM-DD date, with
+  `sampling_date_source` recording provenance. Existing dates use SWE client run starts or AgentX
+  recorded run starts (including warmup), not publication dates or point-ID suffixes. Missing dates
+  display “Not recorded”; never infer them in the browser. Escape, outside-click or the close button
+  dismisses it. The card stays inside the chart on mobile too.
 - **Download configuration** exports a JSON containing the complete point and cohort, including
   original metrics, protocol, configuration and evidence references. The page does not dump JSON,
   show a configuration table, or display lengthy evidence/methodology sections.
