@@ -8,7 +8,7 @@
         en: {
             failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', native: 'Native baseline',
-            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Lines: best observed frontier per baseline / MOD', frontierOnly: 'Hide non-Frontier points',
+            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Lines: best observed frontier per baseline / MOD', frontierOnly: 'Hide non-Frontier points', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
@@ -17,7 +17,7 @@
         zh: {
             failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', native: '原生 Baseline',
-            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '连线：Baseline / 各 MOD 的实测最优边界', frontierOnly: '隐藏非 Frontier 点',
+            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '连线：Baseline / 各 MOD 的实测最优边界', frontierOnly: '隐藏非 Frontier 点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
@@ -174,6 +174,7 @@
             <h2 id="frontier-popover-title">${escape(label(point))}</h2>
             ${M.failedCorrectness(point)?`<p class="frontier-correctness-warning"><strong>${t('failed')}</strong><br>${point.configuration.parameters.functional_check_id==='dense27-native1'?t('failureScope'):escape(params.functional_scope)}</p>`:''}
             <p class="frontier-popup-engine">${escape(point.configuration.engine)} ${escape(point.configuration.engine_version)}${point.configuration.mods.includes('betterscale')?`<br>${t('experimental')}`:''}</p>
+            <p class="frontier-popup-date">${t('sampled')}: ${point.evidence.sampling_date_utc?`${escape(point.evidence.sampling_date_utc)} (UTC)`:t('unknown')}</p>
             <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
             <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,X))}</strong><span>${t('x')}<br>tokens/s/user</span></div><div><strong>${fmt(M.value(point,Y))}</strong><span>${t('y')}<br>tokens/s/chip</span></div></div>
             <p class="frontier-popup-load">${t('concurrency')}: ${fmt(point.load.concurrency)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}${params.max_num_seqs!=null?`<br>${t('capacity')}: ${fmt(params.max_num_seqs)}${params.max_num_seqs_per_rank!=null?' / rank':''}`:''}${params.kv_cache_memory_bytes!=null?` · KV ${fmt(params.kv_cache_memory_bytes/1024**3)} GiB/chip`:''}</p>
@@ -228,7 +229,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=mod-frontiers-20260925',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=frontier-dates-20260925',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=data;state.mods=null;state.mtp=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

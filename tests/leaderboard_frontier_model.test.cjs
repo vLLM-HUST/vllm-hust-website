@@ -325,3 +325,21 @@ test('AE separation is withdrawn from display, not erased from evidence',()=>{
     assert.equal(withdrawn.length,4);
     assert.ok(withdrawn.every(p=>p.configuration.experiment_group==='betterscale-AEseparation'));
 });
+
+test('sampling dates are calendar-valid UTC dates taken from recorded run starts',()=>{
+    const d=require('../data/leaderboard_frontier.json');
+    const runs=new Map(require('../data/leaderboard_frontier_swe_evidence.json').runs.map(r=>[r.run_id,r]));
+    for(const p of [...d.points,...d.archived_points]){
+        assert.match(p.evidence.sampling_date_utc,/^\d{4}-\d{2}-\d{2}$/);
+        assert.ok(p.evidence.sampling_date_source);
+        for(const id of p.evidence.run_ids){
+            const run=runs.get(id);
+            if(run)assert.equal(p.evidence.sampling_date_utc,new Date(run.client.started_at_unix*1000).toISOString().slice(0,10));
+        }
+    }
+    for(const value of ['2026-02-30','2026-13-01','09/25/2026',123]){
+        const bad=structuredClone(d);bad.points[0].evidence.sampling_date_utc=value;
+        assert.throws(()=>model.validate(bad),/sampling date/);
+    }
+    const legacy=structuredClone(d);delete legacy.points[0].evidence.sampling_date_utc;model.validate(legacy);
+});

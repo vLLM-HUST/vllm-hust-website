@@ -383,6 +383,11 @@ def main():
                 assert payload["cohort"] == production["cohorts"][0]
                 assert payload["chart"]["x"] == "decode_p90_tps"
                 assert payload["chart"]["y"] == "output_tps_per_chip"
+                assert (
+                    f"{point['evidence']['sampling_date_utc']} (UTC)"
+                    in page.locator(".frontier-popup-date").inner_text()
+                )
+
                 popup.locator("[data-close]").click()
                 assert popup.is_hidden()
             dot.focus()

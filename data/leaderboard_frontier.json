@@ -246,7 +246,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -359,7 +361,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -480,7 +484,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -601,7 +607,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -722,7 +730,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -843,7 +853,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -951,7 +963,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -1059,7 +1073,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -1167,7 +1183,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -1275,7 +1293,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -1383,7 +1403,9 @@
             }
           },
           "protocol_id": "agentx256k-pressure10-v1"
-        }
+        },
+        "sampling_date_utc": "2026-09-23",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -1497,7 +1519,9 @@
           "cancelled_requests": 0,
           "errors": 0,
           "elapsed_seconds": 639.9
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -1611,7 +1635,9 @@
           "cancelled_requests": 0,
           "errors": 0,
           "elapsed_seconds": 268.26
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -1725,7 +1751,9 @@
           "cancelled_requests": 0,
           "errors": 0,
           "elapsed_seconds": 615.38
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       }
     },
     {
@@ -1916,7 +1944,9 @@
           "prepared_workload_sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "repaired-mtp2-separated-experts-c64"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -2102,7 +2132,9 @@
           "prepared_workload_sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "repaired-mtp2-separated-experts-c64"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -2259,7 +2291,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-smoke-native-tp2-c4-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -2430,7 +2464,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-smoke-betterscale-tp2-c4-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -2596,7 +2632,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-native-tp2-c1-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -2762,7 +2800,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-native-tp2-c2-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -2928,7 +2968,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-native-tp2-c4-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -3094,7 +3136,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-native-tp2-c8-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -3274,7 +3318,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-full-tp2-c2-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -3454,7 +3500,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-full-tp2-c4-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -3634,7 +3682,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-full-tp2-c8-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -3814,7 +3864,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-full-tp2-c16-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -3979,7 +4031,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-capacity16-native-tp2-c16-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -4146,7 +4200,9 @@
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "server32-c32-extension",
           "configuration_source_point_id": "qwen35-agentx-capacity16-native-tp2-c16-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -4314,7 +4370,9 @@
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "server32-c32-extension",
           "configuration_source_point_id": "qwen35-agentx-capacity16-native-tp2-c16-20260923"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -4425,7 +4483,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-expert-tp8-c64-primers-20260924"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -4599,7 +4659,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -4773,7 +4835,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -4946,7 +5010,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -5119,7 +5185,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -5294,7 +5362,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -5453,7 +5523,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -5611,7 +5683,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -5722,7 +5796,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-expert-dp8ep8-c64-primers-20260924"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -5833,7 +5909,9 @@
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "old_point_id": "qwen35-agentx-expert-tp8ep8-c64-primers-20260924"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -6007,7 +6085,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -6166,7 +6246,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -6341,7 +6423,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -6500,7 +6584,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -6658,7 +6744,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -6817,7 +6905,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -6991,7 +7081,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -7164,7 +7256,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -7339,7 +7433,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -7498,7 +7594,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -7656,7 +7754,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -7815,7 +7915,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -7989,7 +8091,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -8162,7 +8266,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -8337,7 +8443,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -8496,7 +8604,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -8654,7 +8764,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -8812,7 +8924,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -8971,7 +9085,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -9147,7 +9263,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -9323,7 +9441,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -9499,7 +9619,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -9675,7 +9797,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -9851,7 +9975,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -10028,7 +10154,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -10205,7 +10333,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -10382,7 +10512,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -10559,7 +10691,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -10736,7 +10870,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -10910,7 +11046,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -11083,7 +11221,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -11258,7 +11398,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -11417,7 +11559,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -11576,7 +11720,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -11746,7 +11892,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -11916,7 +12064,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -12086,7 +12236,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -12256,7 +12408,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -12426,7 +12580,9 @@
           "revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
           "prepared_workload_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
           "tokenizer_fingerprint": "45266a092b670fac455f973c3de73fb48b84b5525f71fd7d26371553d89ff65e"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -12600,7 +12756,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -12773,7 +12931,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -12948,7 +13108,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-25",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -13122,7 +13284,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -13281,7 +13445,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -13439,7 +13605,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     },
     {
@@ -13598,7 +13766,9 @@
           "revision": "860e7c9",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       }
     }
   ],
@@ -14026,7 +14196,9 @@
           "prepared_workload_sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "repaired-mtp2-separated-experts-c64"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       },
       "frontier_selection": {
         "status": "superseded",
@@ -14492,7 +14664,9 @@
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "repaired-mtp2-separated-experts-c64",
           "batching_campaign": "hw3-cap1-cap7-20260924"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       },
       "frontier_selection": {
         "status": "superseded",
@@ -14975,7 +15149,9 @@
           "prepared_workload_sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "repaired-mtp2-separated-experts-c64"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       },
       "frontier_selection": {
         "status": "superseded",
@@ -15477,7 +15653,9 @@
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "repaired-mtp2-separated-experts-c64",
           "batching_campaign": "hw3-cap1-cap7-20260924"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       },
       "frontier_selection": {
         "status": "superseded",
@@ -15607,7 +15785,9 @@
           "cancelled_requests": 0,
           "errors": 0,
           "elapsed_seconds": 391.96
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       },
       "display_withdrawal": {
         "date": "2026-09-25",
@@ -15736,7 +15916,9 @@
           "cancelled_requests": 0,
           "errors": 0,
           "elapsed_seconds": 373.17
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "AgentX run.started_utc (run includes warmup)"
       },
       "display_withdrawal": {
         "date": "2026-09-25",
@@ -16201,7 +16383,9 @@
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "repaired-mtp2-separated-experts-c64",
           "batching_campaign": "hw3-cap1-cap7-20260924"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       },
       "frontier_selection": {
         "status": "selected",
@@ -16711,7 +16895,9 @@
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "repaired-mtp2-separated-experts-c64",
           "batching_campaign": "hw3-cap1-cap7-20260924"
-        }
+        },
+        "sampling_date_utc": "2026-09-24",
+        "sampling_date_source": "SWE client.started_at_unix"
       },
       "frontier_selection": {
         "status": "selected",
