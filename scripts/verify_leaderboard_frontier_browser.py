@@ -98,6 +98,8 @@ def assert_parallel(text, params, language):
         assert f"A{params['attention_ranks']} / E{params['expert_ranks']}" in text
     else:
         assert f"TP{params['tensor_parallel_size']}" in text
+        if params.get("pipeline_parallel_size", 1) > 1:
+            assert f"PP{params['pipeline_parallel_size']}" in text
         if params.get("expert_parallel_size"):
             assert f"EP{params['expert_parallel_size']}" in text
 
