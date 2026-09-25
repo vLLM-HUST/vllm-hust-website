@@ -299,13 +299,7 @@ test('AE separation is a tracking group, not a new MOD or a TP/EP alias',()=>{
         assert.equal(p.load.concurrency_series,undefined);
     }
     for(const p of data.points.filter(p=>!p.configuration.parameters.expert_ranks)){
-        if(p.evidence.benchmark_protocol?.campaign==='qwen35-mods-k8s-20260925'){
-            assert.ok(['none','bidkv'].includes(model.modKey(p)));
-            assert.equal(model.groupKey(p),model.modKey(p)==='none'?'Native · K8s':'BidKV · K8s');
-        } else if(p.evidence.benchmark_protocol?.campaign==='qwen35-pipeline-k8s-20260925'){
-            assert.ok(['none','pipeline-microbatch-migration'].includes(model.modKey(p)));
-            assert.equal(model.groupKey(p),model.modKey(p)==='none'?'Native · K8s PP2':'Pipeline Microbatch · K8s PP2');
-        } else assert.equal(model.groupKey(p),model.modKey(p));
+        assert.equal(model.groupKey(p),model.modKey(p));
     }
     const invalid=structuredClone(data);invalid.points[0].configuration.experiment_group=' ';
     assert.throws(()=>model.validate(invalid),/experiment group/);
