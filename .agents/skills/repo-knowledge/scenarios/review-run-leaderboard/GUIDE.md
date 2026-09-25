@@ -112,13 +112,20 @@ not merely HTTP access. The same update found existing mdformat drift in three F
 CI checks all files, unlike a changed-file hook run. Formatting those guides changes no protocol or
 measured values.
 
-Fletcher explicitly requested the fixed-configuration concurrency tradeoff lines in the Frontier
-main chart, not only a separate SVG. Declare `load.concurrency_series` only for points whose serving
-settings are held constant; solid lines connect visible C levels in order, while the dashed Pareto
-envelope remains distinct. Never join by MOD color alone: legacy max-seqs8 C4 and capacity16 C4 are
-different configurations. `render_swe_frontier_curves.py` checks the capacity16 settings and
-produces the linked standalone plot. Browser QA checks line vertices against actual point
-coordinates and filtering, alongside normal popover/download behavior.
+Fletcher superseded the fixed-configuration main-chart lines on2026-09-25: show one independent
+Pareto frontier per baseline/MOD, crossing allowed parallel settings and concurrency within the
+selected cohort. Default to frontier vertices only; the right-sidebar checkbox restores all
+dominated dots when unselected and survives language/cohort changes. Choose whole-run vertices,
+never separately best X/Y. No global dashed line; filter changes recompute each group independently.
+Failed-correctness points cannot enter or dominate a boundary, exact coordinate ties share one
+stable line vertex, and singletons have no line. Original concurrency-series metadata and static
+diagnostic sweeps retain their fixed-setting meaning. Browser QA independently checks group
+membership, vertices and filters.
+
+The same instruction withdraws BetterScale AE separation from all Frontier cohorts. Four formerly
+visible points moved to `archived_points` with `display_withdrawal`; existing archives and metric
+extracts stay intact. Future additive importers must not resurrect withdrawn IDs. This is not the
+ordinary co-located BetterScale TP/DP/EP matrix, which remains displayed.
 
 Independent authorized campaigns can add points to the same SWE cohort. Import by point/run ID and
 preserve unrelated points, metric evidence and accepted prepared-file variants; replacing the whole

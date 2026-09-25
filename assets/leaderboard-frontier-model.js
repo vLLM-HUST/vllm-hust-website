@@ -73,6 +73,24 @@
         return { measured, excluded: points.length - measured.length,
             frontier: measured.filter(p => p.frontier).sort((a, b) => a.x - b.x || a.point.id.localeCompare(b.point.id)) };
     }
+    // Each MOD/baseline owns its frontier; another MOD cannot dominate it away.
+    // Coordinates always come from one whole observed run, never mixed metrics.
+    function groupFrontiers(points, xKey, yKey) {
+        const groups = new Map();
+        for (const point of points) {
+            const key = JSON.stringify([point.cohort_id, groupKey(point)]);
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(point);
+        }
+        return [...groups.values()].map(members => {
+            const seen = new Set();
+            return project(members, xKey, yKey).frontier.filter(row => {
+                const key = JSON.stringify([row.x, row.y]);
+                if (seen.has(key)) return false;
+                seen.add(key); return true;
+            });
+        }).filter(rows => rows.length);
+    }
     function mtpState(point) {
         const tokens = point.configuration.parameters.mtp_draft_tokens;
         return Number.isFinite(tokens) && tokens >= 0 ? (tokens > 0 ? 'on' : 'off') : 'unknown';
@@ -89,7 +107,7 @@
         return [...groups.values()].filter(rows => rows.length > 1)
             .map(rows => [...rows].sort((a, b) => a.point.load.concurrency - b.point.load.concurrency));
     }
-    const api = { validate, metrics, value, modKey, groupKey, project, safeURL, mtpState, concurrencySeries, failedCorrectness };
+    const api = { validate, metrics, value, modKey, groupKey, project, safeURL, mtpState, concurrencySeries, groupFrontiers, failedCorrectness };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);

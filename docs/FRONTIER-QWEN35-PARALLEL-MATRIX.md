@@ -51,9 +51,10 @@ recorded tool/human delays. Actual generated token IDs become the next turn's hi
 budgets and all strict stream/prompt/usage checks retain the existing workload contract.
 
 The chart's fixed axes remain P90 request decode speed and output tokens/s/chip, counting both
-chips. Solid lines connect only matching fixed server configurations in concurrency order. They are
-not the dashed observed Pareto envelope, and lines of the same MOD color may represent different
-topologies. Click a point to see attention and expert placement separately and download its details.
+chips. The main chart now connects the best observed frontier separately for baseline and
+BetterScale, allowing different topologies and concurrency at each vertex. These are configuration
+envelopes, not fixed-configuration sweeps. Original concurrency-series metadata remains in
+downloads. Click a point to see attention and expert placement separately and download its details.
 
 Disjoint two-chip groups may run concurrently on a shared host. Selected-device leases, fresh
 admission and continuous foreign-owner guards protect each group; shared CPU/memory/host activity
@@ -75,7 +76,8 @@ The sweep now covers all 48 logical cells: two engine arms, two attention placem
 placements and C1/C2/C4/C8/C16/C32. It contributes 38 newly sealed observations and reuses ten
 previously published TP/TP observations; the existing BetterScale TP/TP C2–C16 windows were not
 rerun. This is logical coverage, not a claim that the older 16-slot and new 32-slot deployments are
-one fixed configuration. Their concurrency lines remain separate.
+one fixed configuration. Their original series metadata remains distinct; the main chart now shows
+each arm’s best envelope across configurations instead of separate sweep lines.
 
 All seven new C32 windows completed and passed the workload's capacity and cleanup gates. C32 is not
 universally faster than C16: higher concurrency can lower both per-request decode speed and

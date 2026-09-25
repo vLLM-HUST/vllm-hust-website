@@ -29,22 +29,51 @@ def click_point(page, dot):
     assert dot.get_attribute("aria-expanded") == "true"
 
 
-def assert_concurrency_lines(page, points):
+def assert_group_frontiers(page, points):
+    """Independent per-group Pareto oracle, including line vertices and filters."""
     groups = {}
     for point in points:
-        series = point["load"].get("concurrency_series")
-        if series:
-            groups.setdefault(series, []).append(point)
-    expected = {
-        key: sorted(rows, key=lambda p: p["load"]["concurrency"])
-        for key, rows in groups.items()
-        if len(rows) > 1
-    }
-    lines = page.locator(".frontier-concurrency-line")
+        if (
+            point["configuration"]["parameters"].get("functional_status") == "failed"
+            or point["metrics"].get("decode_p90_tps") is None
+            or not point["metrics"].get("output_tps")
+        ):
+            continue
+        group = (
+            point["configuration"].get("experiment_group")
+            or "+".join(sorted(point["configuration"]["mods"]))
+            or "none"
+        )
+        groups.setdefault(group, []).append(point)
+
+    def xy(p):
+        return (
+            p["metrics"]["decode_p90_tps"],
+            p["metrics"]["output_tps"]
+            / p["configuration"]["hardware"]["accelerator_count"],
+        )
+
+    expected = {}
+    for group, members in groups.items():
+        front = [
+            p
+            for p in members
+            if not any(
+                xy(q)[0] >= xy(p)[0] and xy(q)[1] >= xy(p)[1] and xy(q) != xy(p)
+                for q in members
+            )
+        ]
+        unique = {}
+        for p in sorted(front, key=lambda p: (xy(p)[0], p["id"])):
+            unique.setdefault(xy(p), p)
+        if len(unique) > 1:
+            expected[group] = list(unique.values())
+    lines = page.locator(".frontier-envelope")
     assert lines.count() == len(expected)
+    assert page.locator(".frontier-concurrency-line").count() == 0
     for line in lines.all():
-        rows = expected[line.get_attribute("data-series")]
-        assert json.loads(line.get_attribute("data-series-points")) == [
+        rows = expected[line.get_attribute("data-group")]
+        assert json.loads(line.get_attribute("data-frontier-points")) == [
             p["id"] for p in rows
         ]
         vertices = [
@@ -126,6 +155,24 @@ def main():
                 wait_until="domcontentloaded",
             )
             ready(page)
+            assert page.locator("#frontier-only").is_checked()
+            shown = page.locator("[data-point]").evaluate_all(
+                "nodes=>nodes.map(n=>n.dataset.point)"
+            )
+            expected_front = page.evaluate(
+                "points => LeaderboardFrontierModel.groupFrontiers(points, 'decode_p90_tps', 'output_tps_per_chip').flat().map(r=>r.point.id)",
+                default_points,
+            )
+            assert set(shown) == set(expected_front)
+            assert_group_frontiers(page, default_points)
+            page.screenshot(
+                path=str(
+                    args.output / f"frontier-only-{width}-{language}-{scheme}.png"
+                ),
+                full_page=True,
+            )
+            page.locator("#frontier-only").uncheck()
+
             assert page.locator("#runs-panel").is_hidden()
             assert page.locator("#tasks-panel").is_hidden()
             assert (
@@ -174,7 +221,7 @@ def main():
                 assert page.locator("#frontier-workload-tag").is_visible()
             assert "smoke" in page.locator("#frontier-status").inner_text()
             assert page.locator(".frontier-point").count() == len(default_points)
-            assert_concurrency_lines(page, default_points)
+            assert_group_frontiers(page, default_points)
             assert page.locator("#frontier-popover").is_hidden()
             curves = production["cohorts"][0]["workload"]["contract"].get(
                 "concurrency_curves_url"
@@ -205,36 +252,24 @@ def main():
                     "nodes => nodes.map(n => n.dataset.point)"
                 )
                 assert set(ids) == {p["id"] for p in expected}
-                assert_concurrency_lines(page, expected)
+                assert_group_frontiers(page, expected)
+                page.locator("#frontier-only").check()
+                assert_group_frontiers(page, expected)
+                shown = page.locator("[data-point]").evaluate_all(
+                    "nodes=>nodes.map(n=>n.dataset.point)"
+                )
+                expected_front = page.evaluate(
+                    "points => LeaderboardFrontierModel.groupFrontiers(points, 'decode_p90_tps', 'output_tps_per_chip').flat().map(r=>r.point.id)",
+                    expected,
+                )
+                assert set(shown) == set(expected_front)
+                page.locator("#frontier-only").uncheck()
+
                 assert (
                     f"{len(expected)} / {len(default_points)}"
                     in page.locator("#frontier-filter-count").inner_text()
                 )
                 assert page.locator("#frontier-popover").is_hidden()
-                front = [
-                    p
-                    for p in expected
-                    if not any(
-                        q["metrics"]["decode_p90_tps"] >= p["metrics"]["decode_p90_tps"]
-                        and q["metrics"]["output_tps"]
-                        / q["configuration"]["hardware"]["accelerator_count"]
-                        >= p["metrics"]["output_tps"]
-                        / p["configuration"]["hardware"]["accelerator_count"]
-                        and (
-                            q["metrics"]["decode_p90_tps"]
-                            > p["metrics"]["decode_p90_tps"]
-                            or q["metrics"]["output_tps"]
-                            / q["configuration"]["hardware"]["accelerator_count"]
-                            > p["metrics"]["output_tps"]
-                            / p["configuration"]["hardware"]["accelerator_count"]
-                        )
-                        for q in expected
-                    )
-                ]
-                envelope = page.locator(".frontier-envelope")
-                assert envelope.count() == (1 if len(front) > 1 else 0)
-                if len(front) > 1:
-                    assert len(envelope.get_attribute("points").split()) == len(front)
                 if expected:
                     click_point(
                         page, page.locator(f'[data-point="{expected[0]["id"]}"]')
@@ -262,33 +297,16 @@ def main():
             assert page.locator(".frontier-concurrency-line").count() == 0
             for checkbox in page.locator("[data-filter]").all():
                 checkbox.check()
-            separated = [
-                p
-                for p in default_points
-                if p["configuration"].get("experiment_group")
-                == "betterscale-AEseparation"
-            ]
-            if separated:
-                for checkbox in page.locator("[data-filter=mods]").all():
-                    checkbox.set_checked(
-                        checkbox.get_attribute("value") == "betterscale-AEseparation"
-                    )
-                assert set(
-                    page.locator("[data-point]").evaluate_all(
-                        "nodes=>nodes.map(n=>n.dataset.point)"
-                    )
-                ) == {p["id"] for p in separated}
-                assert (
-                    "betterscale-AEseparation"
-                    in page.locator("#frontier-legend").inner_text()
-                )
-                click_point(page, page.locator(f'[data-point="{separated[0]["id"]}"]'))
-                assert (
-                    "betterscale-AEseparation"
-                    in page.locator("#frontier-popover").inner_text()
-                )
-                for checkbox in page.locator("[data-filter=mods]").all():
-                    checkbox.check()
+            assert (
+                page.locator(
+                    '[data-filter=mods][value="betterscale-AEseparation"]'
+                ).count()
+                == 0
+            )
+            assert (
+                "betterscale-AEseparation"
+                not in page.locator("#frontier-legend").inner_text()
+            )
             side = page.locator(".frontier-filters").bounding_box()
             card = page.locator(".frontier-card").bounding_box()
             assert page.locator(".frontier-card .frontier-filters").count() == 0
@@ -387,6 +405,7 @@ def main():
             page.locator("#view-frontier").click()
             assert page.locator("table:visible").count() == 0
             page.locator("#langToggle").click()
+            assert not page.locator("#frontier-only").is_checked()
             assert page.locator(".frontier-point").count() == len(default_points)
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= window.innerWidth + 1"
@@ -418,7 +437,7 @@ def main():
                     p for p in production["points"] if p["cohort_id"] == cohort["id"]
                 ]
                 assert page.locator(".frontier-point").count() == len(members)
-                assert_concurrency_lines(page, members)
+                assert_group_frontiers(page, members)
                 for point in members:
                     click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
                     popup = page.locator("#frontier-popover")
@@ -469,10 +488,12 @@ def main():
         )
         page.goto(f"{args.url}/leaderboard-runs.html#frontier")
         ready(page)
+        assert page.locator("#frontier-only").is_checked()
+        page.locator("#frontier-only").uncheck()
         assert page.locator(".frontier-model-tag").count() == 2
         assert page.locator("#frontier-workload option").count() == 2
         assert page.locator(".frontier-point").count() == 4
-        assert page.locator(".frontier-envelope").count() == 1
+        assert_group_frontiers(page, fixture["points"][:4])
         assert page.locator("#frontier-curves").is_visible()
         page.locator("[data-filter=mtp][value=unknown]").uncheck()
         assert page.locator(".frontier-point").count() == 0

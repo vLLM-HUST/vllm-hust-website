@@ -6,7 +6,7 @@ function agentxData() {
     const all=require('../data/leaderboard_frontier.json');
     const cohorts=all.cohorts.filter(c=>c.workload.id.startsWith('agentx'));
     const ids=new Set(cohorts.map(c=>c.id));
-    return {...all,cohorts,points:all.points.filter(p=>ids.has(p.cohort_id))};
+    return {...all,cohorts,points:[...all.points,...(all.archived_points||[])].filter(p=>ids.has(p.cohort_id))};
 }
 test('concurrency lines connect only declared same-cohort series in C order',()=>{
     const data=require('../data/leaderboard_frontier.json');
@@ -109,7 +109,7 @@ test('real-MTP expert points account for all eight chips and preserve native EP/
     const evidence=require('../data/leaderboard_frontier_swe_evidence.json');
     for(const arm of ['a4e4','a6e2','dp8ep8','tp8ep8']){
         const id=arm.startsWith('a') ? `qwen35-sweprefix-realmtp2-${arm}-cap7-c64-hw3-20260924` : `qwen35-sweprefix-realmtp2-${arm}-c64-20260924`;
-        const p=data.points.find(p=>p.id===id);
+        const p=[...data.points,...(data.archived_points||[])].find(p=>p.id===id);
         assert.ok(p);
         const run=evidence.runs.find(r=>r.point_id===p.id);
         const params=p.configuration.parameters;
@@ -257,7 +257,7 @@ test('MTP filter classifies explicit settings without treating missing as off',(
 
 test('AE separation is a tracking group, not a new MOD or a TP/EP alias',()=>{
     const data=model.validate(require('../data/leaderboard_frontier.json'));
-    const separated=data.points.filter(p=>p.configuration.experiment_group==='betterscale-AEseparation');
+    const separated=data.archived_points.filter(p=>p.display_withdrawal && p.configuration.experiment_group==='betterscale-AEseparation');
     assert.equal(separated.length,4);
     for(const p of separated){
         assert.equal(model.groupKey(p),'betterscale-AEseparation');
@@ -277,10 +277,10 @@ test('A+E frontier retains highest-throughput point while preserving all earlier
     model.validate({...d,points:[...d.points,...archived]});
     for(const arm of ['a4e4','a6e2']){
         const prefix=`qwen35-sweprefix-realmtp2-${arm}-`;
-        const selected=d.points.filter(p=>p.id.startsWith(prefix));
+        const selected=archived.filter(p=>p.id.startsWith(prefix)&&p.display_withdrawal);
         assert.equal(selected.length,1);
         const p=selected[0];
-        const earlier=archived.filter(p=>p.id.startsWith(prefix));
+        const earlier=archived.filter(p=>p.id.startsWith(prefix)&&!p.display_withdrawal);
         assert.equal(earlier.length,2);
         assert.equal(p.configuration.parameters.expert_sources_per_wave,7);
         assert.equal(p.configuration.parameters.execution_host,'hw3');
@@ -305,4 +305,23 @@ test('failed correctness references stay visible but cannot form or dominate the
     assert.equal(projected.frontier.length,0);
     const valid=structuredClone(refs[0]);valid.id='qualified-control';valid.configuration.parameters.functional_status='bounded_pass';valid.metrics.output_tps=1;valid.metrics.decode_p90_tps=1;
     assert.deepEqual(model.project([...refs,valid],'decode_p90_tps','output_tps_per_chip').frontier.map(p=>p.point.id),[valid.id]);
+});
+
+test('one frontier per baseline/MOD crosses configurations, not cohorts; ties keep whole records',()=>{
+    const seed=require('../data/leaderboard_frontier.json').points[0];
+    const point=(id,mods,x,y,c=1,cohort=seed.cohort_id)=>({...structuredClone(seed),id,cohort_id:cohort,configuration:{...structuredClone(seed.configuration),mods,experiment_group:undefined,hardware:{...seed.configuration.hardware,accelerator_count:2}},load:{concurrency:c},metrics:{decode_p90_tps:x,output_tps:y*2}});
+    const rows=[point('native-slow',[],10,10),point('native-fast',[],20,5,8),point('native-dominated',[],8,8),point('mod-throughput',['betterscale'],30,30,32),point('mod-speed',['betterscale'],40,20,2),point('mod-tie',['betterscale'],40,20,16),point('other-cohort',['betterscale'],100,100,1,'other')];
+    const groups=model.groupFrontiers(rows,'decode_p90_tps','output_tps_per_chip');
+    assert.deepEqual(groups.map(g=>g.map(r=>r.point.id)),[['native-slow','native-fast'],['mod-throughput','mod-speed'],['other-cohort']]);
+    assert.deepEqual(model.groupFrontiers(rows.filter(p=>p.id!=='mod-throughput'),'decode_p90_tps','output_tps_per_chip')[1].map(r=>r.point.id),['mod-speed']);
+    const failed=point('failed',['betterscale'],1000,1000);failed.configuration.parameters.functional_status='failed';
+    assert.deepEqual(model.groupFrontiers([failed], 'decode_p90_tps','output_tps_per_chip'),[]);
+    assert.deepEqual(model.groupFrontiers([], 'decode_p90_tps','output_tps_per_chip'),[]);
+});
+test('AE separation is withdrawn from display, not erased from evidence',()=>{
+    const d=require('../data/leaderboard_frontier.json');
+    assert.ok(d.points.every(p=>p.configuration.experiment_group!=='betterscale-AEseparation'));
+    const withdrawn=d.archived_points.filter(p=>p.display_withdrawal);
+    assert.equal(withdrawn.length,4);
+    assert.ok(withdrawn.every(p=>p.configuration.experiment_group==='betterscale-AEseparation'));
 });
