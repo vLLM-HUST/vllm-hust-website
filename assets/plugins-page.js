@@ -180,6 +180,21 @@
     preview: { en: "Preview", zh: "能力预览" }
   };
   const quickStarts = {
+    "kv-tiering-migration": {
+      title_en: "Inspect the pinned KV Tiering candidate",
+      title_zh: "检查固定版本的 KV Tiering 候选实现",
+      action_en: "inspection commands",
+      action_zh: "检查命令",
+      note_en: "Experimental Frontier profile only. Requires the pinned Host hybrid-prefix fix, compatible Ascend runtime, and explicit CPU/storage budgets before activation. These commands install and inspect; see PR #3 for qualification and the exact runtime scope.",
+      note_zh: "仅限实验中的 Frontier 配置。启用前需要固定版本的 Host 混合前缀修复、配套 Ascend 运行时，并配置 CPU 与存储预算。以下命令用于安装和检查；资格结果及适配范围见 PR #3。",
+      guide: "https://github.com/vLLM-HUST/vllm-hust-kv-tiering/pull/3",
+      guide_en: "Pinned runtime and qualification →",
+      guide_zh: "固定运行时与资格验证 →",
+      command: `python -m pip install --no-deps "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@cf1ea71e3e2cb81ab06267ef05eddb3e580ea20b"
+python -m pip install --no-deps "git+https://github.com/vLLM-HUST/vllm-hust-kv-tiering.git@7ba646a780c3bd0a8906309ea59719f5ccf6187e"
+vllm-hust-ext extension inspect org.vllm-hust.kv-tiering
+vllm-hust-ext extension check org.vllm-hust.kv-tiering`
+    },
     traceloom: {
       title_en: "Install the TraceLoom runtime plugin",
       title_zh: "安装 TraceLoom 运行时插件",
