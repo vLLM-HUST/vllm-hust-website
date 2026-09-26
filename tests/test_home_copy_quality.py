@@ -38,7 +38,7 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "Typed runtime contracts. 24 audited MODs. Evidence before claims.",
+        "Typed runtime contracts. 19 audited MODs. Evidence before claims.",
         "every MOD publishes ownership, compatibility, workload fit, and evidence limits.",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
