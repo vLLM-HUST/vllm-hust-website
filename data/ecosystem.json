@@ -760,6 +760,7 @@
     },
     {
       "id": "simllm-migration",
+      "public_surface": false,
       "name": "SimLLM",
       "name_en": "SimLLM",
       "name_zh": "SimLLM",
@@ -787,6 +788,7 @@
     },
     {
       "id": "unified-communication-migration",
+      "public_surface": false,
       "name": "Unified Communication",
       "name_en": "Unified Communication",
       "name_zh": "统一通信",
@@ -875,6 +877,7 @@
     },
     {
       "id": "layered-prefill-migration",
+      "public_surface": false,
       "name": "Layered Prefill",
       "name_en": "Layered Prefill",
       "name_zh": "分层预填充",
@@ -906,6 +909,7 @@
     },
     {
       "id": "activation-sparsity-migration",
+      "public_surface": false,
       "name": "Activation Sparsity",
       "name_en": "Activation Sparsity",
       "name_zh": "激活稀疏",
@@ -974,6 +978,7 @@
     },
     {
       "id": "qos-scheduler-migration",
+      "public_surface": false,
       "name": "QoS Scheduler",
       "name_en": "QoS Scheduler",
       "name_zh": "QoS 调度器",
