@@ -556,32 +556,48 @@
       "artifact_type": "runtime_component",
       "system_role": "kv_residency_provider",
       "integration_contracts": [],
-      "integration_surfaces": ["vllm.kv_offload", "vllm.kv_connector"],
-      "execution_planes": ["scheduler", "worker", "external_service"],
+      "integration_surfaces": [
+        "vllm.kv_offload",
+        "vllm.kv_connector"
+      ],
+      "execution_planes": [
+        "scheduler",
+        "worker",
+        "external_service"
+      ],
       "deployment_topology": "mixed",
-      "delivery_model": "migration_scaffold",
+      "delivery_model": "plugin_bundle",
       "ownership": "original_contributor_maintained",
-      "maintainers": ["JieYang2001"],
+      "maintainers": [
+        "JieYang2001"
+      ],
       "repository_relationship": "organization_native",
-      "maturity": "incubating",
+      "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
       "upstream_repository": null,
-      "summary_en": "Owner-led migration of legacy device/CPU/filesystem KV residency and lifecycle management. Repository scaffold only; destructive shared-state operations are outside the manager boundary.",
-      "summary_zh": "由原贡献者主导迁移 legacy 设备、CPU 与文件系统 KV 驻留及生命周期管理；目前仅为迁移仓库，Manager 不负责破坏性共享状态操作。",
-      "public_effect_en": "Capability preview: tier KV residency across device, CPU, and filesystem storage. The public repository is still a migration scaffold and publishes no benchmark claim.",
-      "public_effect_zh": "能力预览：在设备、CPU 与文件系统之间分层管理 KV 驻留；当前仍是迁移脚手架，尚无公开 benchmark 声明。",
+      "summary_en": "Experimental device/CPU/filesystem KV tiering. A pinned Ascend carrier is available on the development branch and activates through Extension Manager.",
+      "summary_zh": "实验性的设备、CPU、文件系统 KV 分层；开发分支提供限定版本的 Ascend 实现，通过插件管理器启用。",
+      "public_effect_en": "The pinned Qwen3.5 Frontier candidate passes 26 retrieval checks and real NPU copy tests. Matched performance measurements are in progress; no optimization benefit is established.",
+      "public_effect_zh": "限定版本的 Qwen3.5 Frontier 候选已通过 26 项检索检查及真实 NPU 拷贝测试；同配置性能对照仍在进行，尚未证明优化收益。",
       "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering/pull/3",
       "compatibility": {
-        "status": "source_scaffold",
-        "host": "KV residency host contract pending",
-        "versions": ["No installable or runnable release"],
-        "platforms": ["Device / CPU / filesystem tiers are targets only; unverified"],
-        "requirements_en": "The repository contains README, provenance, and ownership records only. A versioned host contract, package or manifest, implementation, and platform validation are all required before installation.",
-        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需版本化宿主合同、package 或 manifest、实现代码与平台验证。",
+        "status": "experimental",
+        "host": "Pinned vLLM-HUST / vLLM-Ascend Frontier capsule",
+        "versions": [
+          "Tiering 7ba646a; Host hybrid-prefix fix 49f0827; Manager cf1ea71"
+        ],
+        "platforms": [
+          "Ascend 910B2 · TP2 · CANN 9.1.0 · graph/APC/MTP2/async"
+        ],
+        "models": [
+          "Qwen3.5-35B-A3B BF16 — Frontier configuration only"
+        ],
+        "requirements_en": "Use the exact runtime receipt and source pins in the experiment report. The development profile is restricted to 0.25.1+frontier.bidkv.empty and requires the Host hybrid-prefix fix; it is not a general release for current main. CPU budget and storage path must be configured before enabling.",
+        "requirements_zh": "须使用实验报告中的运行清单和源码版本。开发配置限定于 0.25.1+frontier.bidkv.empty，并依赖 Host 混合前缀命中修复；不是面向当前 main 的通用发布版。启用前需配置 CPU 预算及存储路径。",
         "followup_url": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering/issues/1"
       },
-      "evidence_level": "legacy_evidence"
+      "evidence_level": "runtime_qualified"
     },
     {
       "id": "knorm-migration",
