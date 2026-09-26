@@ -65,7 +65,6 @@ def test_registry_is_canonical_and_multidimensional() -> None:
 def test_legacy_migration_cards_preserve_original_ownership() -> None:
     expected = {
         "prefix-router-migration": ["Amber1qq", "WMASTER123", "Adr1anZheng"],
-        "kv-tiering-migration": ["JieYang2001"],
         "knorm-migration": ["kotoriqaq0", "SuccinctPaul"],
         "pyramidkv-ascend-migration": ["Irisuko"],
         "slicegpt-migration": ["qingfengyuhuoda"],
@@ -81,6 +80,23 @@ def test_legacy_migration_cards_preserve_original_ownership() -> None:
     assert "Original maintainers" in SCRIPT
     assert "原负责人" in SCRIPT
     assert "item.maintainers" in SCRIPT
+
+
+def test_tiering_qualification_preserves_ownership_and_pinned_scope() -> None:
+    item = by_id("kv-tiering-migration")
+    assert item["maintainers"] == ["JieYang2001"]
+    assert item["ownership"] == "original_contributor_maintained"
+    assert item["delivery_model"] == "plugin_bundle"
+    assert item["maturity"] == "experimental"
+    assert item["compatibility"]["status"] == "experimental"
+    assert "Frontier configuration only" in item["compatibility"]["models"][0]
+    # These are public source commits.
+    for revision in (
+        "7ba646a780c3bd0a8906309ea59719f5ccf6187e",  # pragma: allowlist secret
+        "cf1ea71e3e2cb81ab06267ef05eddb3e580ea20b",  # pragma: allowlist secret
+    ):
+        assert revision in SCRIPT
+    assert "extension check org.vllm-hust.kv-tiering" in SCRIPT
 
 
 def test_system_role_is_independent_from_delivery_model() -> None:
@@ -684,7 +700,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=workshop-v18-maintenance-audit"' in PAGE
+        'data-source="./data/ecosystem.json?v=workshop-v19-tiering-qualified"' in PAGE
     )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v11-maintenance-audit"'
@@ -969,7 +985,6 @@ def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
     assert kvcompress["python"] == [">=3.10,<3.15"]
     assert kvcompress["platforms"] == ["Single Ascend NPU", "Eager or ACL graph"]
     for component_id in (
-        "kv-tiering-migration",
         "knorm-migration",
         "pyramidkv-ascend-migration",
     ):
