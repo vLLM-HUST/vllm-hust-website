@@ -683,13 +683,15 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v17-traceloom"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v10-traceloom"'
+        'data-source="./data/ecosystem.json?v=workshop-v18-maintenance-audit"' in PAGE
+    )
+    assert (
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v11-maintenance-audit"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=traceloom-workload-navigation-v3-vspec"'
+        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v4-maintenance-audit"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -754,7 +756,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert vspec["public_surface"] is True
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v10-traceloom"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v11-maintenance-audit"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
@@ -902,9 +904,6 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
             [("吴天宇", "Raing5Days"), ("李上上", "ilnnfover")],
             "郑龙",
         ),
-        "layered-prefill-migration": ([("郁硕", "Yushuo-star")], "王雄"),
-        "activation-sparsity-migration": ([("雷翔麟", "llxler")], "万瑶"),
-        "qos-scheduler-migration": ([("郁硕", "Yushuo-star")], "王雄"),
     }
     for component_id, (people, advisor_name) in expected.items():
         metadata = WORKSHOP_METADATA["plugins"][component_id]
@@ -985,7 +984,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 24
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 19
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
