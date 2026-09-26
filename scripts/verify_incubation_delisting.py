@@ -30,6 +30,11 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                         "lang => document.documentElement.lang.startsWith(lang)",
                         arg=language,
                     )
+                    assert page.locator("#activation-sparsity-migration").count() == 0
+                    assert page.locator("#layered-prefill-migration").count() == 0
+                    assert page.locator("#qos-scheduler-migration").count() == 0
+                    assert page.locator("#simllm-migration").count() == 0
+                    assert page.locator("#unified-communication-migration").count() == 0
                     assert page.locator("#ascend-compact-greedy").count() == 0
                     assert (
                         page.locator(

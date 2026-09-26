@@ -43,7 +43,7 @@ def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> Non
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "类型化运行时契约、24 个已审计 MOD、证据先于结论。",
+        "类型化运行时契约、19 个已审计 MOD、证据先于结论。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX

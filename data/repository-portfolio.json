@@ -473,7 +473,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["SimLLM migration scaffold", "license-review gate", "legacy provenance ledger"],
       "component_ids": ["simllm-migration"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-hust-unified-comm",
@@ -484,7 +484,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["device-neutral communication migration scaffold", "legacy provenance ledger"],
       "component_ids": ["unified-communication-migration"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-ascend-split-batch-hust",
@@ -517,7 +517,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["layered-prefill migration scaffold", "upstream attribution", "legacy provenance ledger"],
       "component_ids": ["layered-prefill-migration"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-hust-activation-sparsity",
@@ -528,7 +528,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["activation-sparsity research scaffold", "legacy provenance ledger"],
       "component_ids": ["activation-sparsity-migration"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-hust-pipeline-microbatch",
@@ -550,7 +550,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["QoS scheduler research scaffold", "legacy provenance ledger"],
       "component_ids": ["qos-scheduler-migration"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-hust-stateharbor",
