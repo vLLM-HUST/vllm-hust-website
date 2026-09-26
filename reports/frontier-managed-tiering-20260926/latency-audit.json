@@ -1,0 +1,106 @@
+{
+  "kind": "derived-artifact",
+  "passed": true,
+  "windows": [
+    {
+      "run_id": "2c420dde8b9d4bc9be025d44d34c532f",
+      "raw_requests_sha256": "82866619e22224d98b7583cb1d6069c6a51d051cedb119c6a2354057cd7c0a3e",
+      "passed": true,
+      "output_tps": 91.80555555555556,
+      "decode_p90_tps": 106.68530198135217,
+      "ttft_p95_seconds": 1.063710648799315,
+      "decode_speed_samples": 148,
+      "mean_client_inflight": 0.9992749269948238
+    },
+    {
+      "run_id": "ff220a8b52e14278bd3b2db7090195d3",
+      "raw_requests_sha256": "17a7d7e740d2d46c0ab97c2544129e6c5f9ec0ccd75b8cbd8d975c382b60ee91",
+      "passed": true,
+      "output_tps": 153.35333333333332,
+      "decode_p90_tps": 98.30659361513993,
+      "ttft_p95_seconds": 1.345356421545148,
+      "decode_speed_samples": 211,
+      "mean_client_inflight": 1.9986401763827437
+    },
+    {
+      "run_id": "e5234bb637494f6db0f0ba007c49bf0f",
+      "raw_requests_sha256": "77d6245664cc1f722065194f0b5180fd15a4a94213351337a813850955767d2d",
+      "passed": true,
+      "output_tps": 218.23,
+      "decode_p90_tps": 78.67453628822796,
+      "ttft_p95_seconds": 1.7021764004603028,
+      "decode_speed_samples": 321,
+      "mean_client_inflight": 3.9978922699971333
+    },
+    {
+      "run_id": "69290b097eb940a5ba809c1dd29b31e4",
+      "raw_requests_sha256": "e8a6e10b6bc9896a11f11afac9530d6fee4bc6aba78b9960e0837a53fcc842c5",
+      "passed": true,
+      "output_tps": 292.43444444444447,
+      "decode_p90_tps": 57.56503647843146,
+      "ttft_p95_seconds": 2.024420057795942,
+      "decode_speed_samples": 429,
+      "mean_client_inflight": 7.99736996313557
+    },
+    {
+      "run_id": "402d256024664544b5ebb59ab95e89a2",
+      "raw_requests_sha256": "0dac17ade605f1e14a87438b394c38b765273092b473e34dbed7423d71a9cfd9",
+      "passed": true,
+      "output_tps": 361.49333333333334,
+      "decode_p90_tps": 33.21295917563086,
+      "ttft_p95_seconds": 2.8516307147219777,
+      "decode_speed_samples": 566,
+      "mean_client_inflight": 15.997155415871077
+    },
+    {
+      "run_id": "9b18ff67efc149a6b2f74fb1c7719318",
+      "raw_requests_sha256": "45783c5f252df4b682e5a2db93ba122673103e8503e4e8ad833e8a2e4b1d85b4",
+      "passed": true,
+      "output_tps": 89.14,
+      "decode_p90_tps": 103.82754351765834,
+      "ttft_p95_seconds": 1.1291029119864107,
+      "decode_speed_samples": 143,
+      "mean_client_inflight": 0.9993777358366384
+    },
+    {
+      "run_id": "be8e2e42d28a4e939ecd4dcbd62887f3",
+      "raw_requests_sha256": "da88a1031f4faac61ddba52739d8ae17a933fb14ae25324dc8bb3a112b9fcc75",
+      "passed": true,
+      "output_tps": 147.74777777777777,
+      "decode_p90_tps": 95.36416671619716,
+      "ttft_p95_seconds": 1.5208677807822824,
+      "decode_speed_samples": 201,
+      "mean_client_inflight": 1.9987918797280226
+    },
+    {
+      "run_id": "1667ac8e66074f5eb4472d24d1c777be",
+      "raw_requests_sha256": "637a41eeac5862573e8c27d7224fe1d9a3fd3cc5199cb7fd04fcf7be56127a54",
+      "passed": true,
+      "output_tps": 213.14888888888888,
+      "decode_p90_tps": 76.23957253491291,
+      "ttft_p95_seconds": 1.7773300769738853,
+      "decode_speed_samples": 307,
+      "mean_client_inflight": 3.998034501582798
+    },
+    {
+      "run_id": "598c99ebc0124c2f948fb5993d57011e",
+      "raw_requests_sha256": "db7ec95c7ad8cebc2c6770cdffc2d2bf5d3e5859370827c85ae8a54f221d55ea",
+      "passed": true,
+      "output_tps": 277.1511111111111,
+      "decode_p90_tps": 57.98780737067815,
+      "ttft_p95_seconds": 2.2679419939871877,
+      "decode_speed_samples": 414,
+      "mean_client_inflight": 7.997753276220626
+    },
+    {
+      "run_id": "f67fe2da31b74e049ff1ca05b1466643",
+      "raw_requests_sha256": "5e12fbd1a4c0385cc815982b469470cd379e060dd888eff0db26a9e202f7a160",
+      "passed": true,
+      "output_tps": 342.6911111111111,
+      "decode_p90_tps": 33.20243993044426,
+      "ttft_p95_seconds": 3.5268471425399186,
+      "decode_speed_samples": 540,
+      "mean_client_inflight": 15.997567164435361
+    }
+  ]
+}

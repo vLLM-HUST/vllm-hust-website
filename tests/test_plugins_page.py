@@ -700,7 +700,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=workshop-v18-maintenance-audit"' in PAGE
+        'data-source="./data/ecosystem.json?v=workshop-v19-tiering-qualified"' in PAGE
     )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v11-maintenance-audit"'

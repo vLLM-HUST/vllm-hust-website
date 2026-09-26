@@ -7,17 +7,27 @@ repos:
   hooks:
   - id: trailing-whitespace
     args: [--markdown-linebreak-ext=md]
+    # Preserve byte-identical measured Prometheus responses.
+    exclude: ^reports/frontier-managed-tiering-20260926/.*\.prom$
   - id: end-of-file-fixer
+    exclude: ^reports/frontier-managed-tiering-20260926/.*\.prom$
   - id: check-yaml
     args: [--unsafe]
   - id: check-json
   - id: check-toml
   - id: check-added-large-files
     args: ["--maxkb=1000"]
+    exclude: ^reports/frontier-managed-tiering-20260926/(native|tiering)-c16-requests\.jsonl\.gz$
+  - id: check-added-large-files
+    name: check bounded C16 raw request artifacts
+    # Complete measured streams, gzip-compressed and SHA256-checked by CI.
+    args: ["--maxkb=2048"]
+    files: ^reports/frontier-managed-tiering-20260926/(native|tiering)-c16-requests\.jsonl\.gz$
   - id: check-merge-conflict
   - id: check-case-conflict
   - id: mixed-line-ending
     args: [--fix=lf]
+    exclude: ^reports/frontier-managed-tiering-20260926/.*\.prom$
   - id: detect-private-key
   - id: no-commit-to-branch
     name: block commits to main
@@ -53,8 +63,8 @@ repos:
   rev: v1.5.0
   hooks:
   - id: detect-secrets
-    # Evidence snapshots carry public Git IDs and verified model/workload SHA256 values.
-    exclude: ^(docs/evidence/qwen35-mods-k8s-20260925/(model-manifest|workload-equivalence)\.json$|\.env\.template|tests/fixtures/|data/examples/.*\.json|data/leaderboard_.*\.json|data/leadership_performance_targets\.json|data/official_targets\.json|data/changzheng_release\.json|data/betterscale-(results|qwen-swe|qwen-steps|qwen-mc2|qwen-mtp-async|dsv4-steps)\.json|data/backups/|reports/prefix_repetition_wrong_gpu_mem_removed_20260726\.json)$
+    # Evidence snapshots carry public Git IDs and verified model/workload/script/request SHA256 values.
+    exclude: ^(reports/frontier-managed-tiering-20260926/((native|tiering)-qualification|latency-audit)\.json$|docs/evidence/qwen35-mods-k8s-20260925/(model-manifest|workload-equivalence)\.json$|\.env\.template|tests/fixtures/|data/examples/.*\.json|data/leaderboard_.*\.json|data/leadership_performance_targets\.json|data/official_targets\.json|data/changzheng_release\.json|data/betterscale-(results|qwen-swe|qwen-steps|qwen-mc2|qwen-mtp-async|dsv4-steps)\.json|data/backups/|reports/prefix_repetition_wrong_gpu_mem_removed_20260726\.json)$
 
 - repo: local
   hooks:
