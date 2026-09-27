@@ -1,5 +1,15 @@
 {
   "schema_version": "plugin-performance/v2",
+  "ecpa_experiment_boundary": {
+    "as_of": "2026-09-27",
+    "manager_repository": "https://github.com/vLLM-HUST/extension-manager",
+    "manager_main_commit": "cf1ea71e3e2cb81ab06267ef05eddb3e580ea20b",
+    "performance_analysis": "external-harness",
+    "performance_analysis_zh": "请求采集、吞吐与延迟复算、Native 配对及 Frontier 导入由专项实验脚本完成；check/status/plan 不构成绩效分析。",
+    "performance_analysis_en": "Specialized experiment scripts collected requests, recomputed throughput and latency, paired Native controls, and imported Frontier records; check/status/plan is not performance analysis.",
+    "process_release": "known-defect",
+    "process_release_evidence": "https://github.com/vLLM-HUST/extension-manager/pull/8#issuecomment-5844402943"
+  },
   "entries": [
     {
       "id": "bidkv",
@@ -7,7 +17,14 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OUTPUT-BUDGET.md",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "external-harness-only",
+        "configuration_path": "specialized-experiment-script",
+        "analysis_integration": "external-harness",
+        "note_zh": "本轮性能实测由 BidKV 专项脚本组织，未完成 ECPA 统一启动验收。",
+        "note_en": "This campaign used the BidKV-specific harness; unified ECPA launch acceptance was not completed."
+      }
     },
     {
       "id": "dla",
@@ -15,7 +32,14 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OUTPUT-BUDGET.md",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "external-harness-only",
+        "configuration_path": "specialized-experiment-script",
+        "analysis_integration": "external-harness",
+        "note_zh": "本轮性能实测由 DLA 专项脚本组织，未完成 ECPA 统一启动验收。",
+        "note_en": "This campaign used the DLA-specific harness; unified ECPA launch acceptance was not completed."
+      }
     },
     {
       "id": "kv-tiering-migration",
@@ -23,7 +47,14 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-KV-TIERING-20260926.md",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "manager-verified",
+        "configuration_path": "manager-standard",
+        "analysis_integration": "external-harness",
+        "note_zh": "已通过管理器启动并完成五档及 Native 对照；性能分析仍由专项脚本完成。",
+        "note_en": "Manager launch was verified across five concurrency levels and Native controls; performance analysis still used a specialized harness."
+      }
     },
     {
       "id": "mooncake-vllm-connectors",
@@ -31,7 +62,18 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "manager-verified-supplemental-adapter",
+        "configuration_path": "supplemental-adapter",
+        "analysis_integration": "external-harness",
+        "adapter_evidence": "https://github.com/vLLM-HUST/extension-manager/pull/8",
+        "adapter_merge_state": "open-draft",
+        "known_defect": "process-release",
+        "defect_evidence": "https://github.com/vLLM-HUST/extension-manager/pull/8#issuecomment-5844402943",
+        "note_zh": "已通过管理器启动 AscendStoreConnector + Mooncake，但依赖尚未合并的补充 Provider profile；性能分析仍由专项脚本完成。管理器退出曾遗留 API/worker 与设备显存，资源释放尚未验收。",
+        "note_en": "The manager launched AscendStoreConnector + Mooncake through a supplemental Provider profile that remains unmerged; performance analysis still used a specialized harness. Manager exit has left API/worker processes and device memory behind, so resource release is not accepted."
+      }
     },
     {
       "id": "pipeline-microbatch-migration",
@@ -39,7 +81,14 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PIPELINE-K8S.md",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "external-harness-only",
+        "configuration_path": "specialized-experiment-script",
+        "analysis_integration": "external-harness",
+        "note_zh": "本轮性能实测由流水线微批处理专项脚本组织，未完成 ECPA 统一启动验收。",
+        "note_en": "This campaign used the Pipeline Microbatch-specific harness; unified ECPA launch acceptance was not completed."
+      }
     },
     {
       "id": "betterscale",
@@ -47,7 +96,14 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "./betterscale.html#service-throughput",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "not-reproduced-this-round",
+        "configuration_path": "not-evaluated",
+        "analysis_integration": "external-harness",
+        "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
+        "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
+      }
     },
     {
       "id": "vspec",
@@ -55,7 +111,14 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-vSpec/blob/main/docs/gsm8k_b128_recovery_and_arc_easy_20260913.md",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "not-reproduced-this-round",
+        "configuration_path": "not-evaluated",
+        "analysis_integration": "external-harness",
+        "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
+        "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
+      }
     },
     {
       "id": "kvcompress-ascend",
@@ -63,7 +126,14 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/main/docs/resuts.md",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "not-reproduced-this-round",
+        "configuration_path": "not-evaluated",
+        "analysis_integration": "external-harness",
+        "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
+        "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
+      }
     },
     {
       "id": "latchmoe",
@@ -71,7 +141,14 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE#qualified-graph-result",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "not-reproduced-this-round",
+        "configuration_path": "not-evaluated",
+        "analysis_integration": "external-harness",
+        "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
+        "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
+      }
     },
     {
       "id": "diffspec",
@@ -79,7 +156,14 @@
       "scope_zh": "历史实测已归档；需通过统一 Qwen3.5-35B Native 基准重新验收。",
       "scope_en": "Historical measurements archived; awaiting qualification against the single Qwen3.5-35B Native baseline.",
       "url": "https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec#key-results",
-      "status": "awaiting-unified-native"
+      "status": "awaiting-unified-native",
+      "ecpa": {
+        "launch_acceptance": "not-reproduced-this-round",
+        "configuration_path": "not-evaluated",
+        "analysis_integration": "external-harness",
+        "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
+        "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
+      }
     }
   ],
   "status": "awaiting-unified-native",
