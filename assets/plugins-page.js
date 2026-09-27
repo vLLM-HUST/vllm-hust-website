@@ -1004,8 +1004,8 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=comparable-gain-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=qwen35-mooncake-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
+      fetch("./data/plugin-performance.json?v=unified-native-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=unified-native-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {
