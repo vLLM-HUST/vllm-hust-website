@@ -1,0 +1,200 @@
+{
+  "schema_version": "plugin-performance/v1",
+  "entries": [
+    {
+      "id": "bidkv",
+      "group": "qwen35",
+      "scope_zh": "Qwen3.5 · TP2 · C1–16；单次观测，未证明稳定收益",
+      "scope_en": "Qwen3.5 · TP2 · C1–16; single observations, no repeatable gain established",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OUTPUT-BUDGET.md",
+      "pairs": [
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c1-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c1-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c2-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c2-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c4-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c4-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c8-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c8-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-bidkv-tp2-c16-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c16-r1-20260925"
+        }
+      ]
+    },
+    {
+      "id": "dla",
+      "group": "qwen35",
+      "scope_zh": "Qwen3.5 · TP2 · C1–16；单次观测，未证明稳定收益；已知输出预算",
+      "scope_en": "Qwen3.5 · TP2 · C1–16; single observations, no repeatable gain established; known output budget",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OUTPUT-BUDGET.md",
+      "pairs": [
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-dla-tp2-c1-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c1-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-dla-tp2-c2-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c2-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-dla-tp2-c4-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c4-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-dla-tp2-c8-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c8-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-budget-capsule-dla-tp2-c16-r1-20260925",
+          "native": "qwen35-sweprefix-budget-capsule-native-tp2-c16-r1-20260925"
+        }
+      ]
+    },
+    {
+      "id": "kv-tiering-migration",
+      "group": "qwen35",
+      "scope_zh": "Qwen3.5 · TP2 · C1–16；单次观测；仅写出、无回读",
+      "scope_en": "Qwen3.5 · TP2 · C1–16; single observations; stores only, no restores",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-KV-TIERING-20260926.md",
+      "pairs": [
+        {
+          "candidate": "qwen35-sweprefix-managed-tiering-tiering-tp2-c1-r1-20260926",
+          "native": "qwen35-sweprefix-managed-tiering-native-tp2-c1-r1-20260926"
+        },
+        {
+          "candidate": "qwen35-sweprefix-managed-tiering-tiering-tp2-c2-r1-20260926",
+          "native": "qwen35-sweprefix-managed-tiering-native-tp2-c2-r1-20260926"
+        },
+        {
+          "candidate": "qwen35-sweprefix-managed-tiering-tiering-tp2-c4-r1-20260926",
+          "native": "qwen35-sweprefix-managed-tiering-native-tp2-c4-r1-20260926"
+        },
+        {
+          "candidate": "qwen35-sweprefix-managed-tiering-tiering-tp2-c8-r1-20260926",
+          "native": "qwen35-sweprefix-managed-tiering-native-tp2-c8-r1-20260926"
+        },
+        {
+          "candidate": "qwen35-sweprefix-managed-tiering-tiering-tp2-c16-r1-20260926",
+          "native": "qwen35-sweprefix-managed-tiering-native-tp2-c16-r1-20260926"
+        }
+      ]
+    },
+    {
+      "id": "mooncake-vllm-connectors",
+      "group": "qwen35",
+      "scope_zh": "Qwen3.5 · TP2 · C1–16；单次观测；AscendStoreConnector 路径",
+      "scope_en": "Qwen3.5 · TP2 · C1–16; single observations; AscendStoreConnector path",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+      "pairs": [
+        {
+          "candidate": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c1-r1-20260926",
+          "native": "qwen35-sweprefix-managed-mooncake-native-tp2-c1-r1-20260926"
+        },
+        {
+          "candidate": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c2-r1-20260926",
+          "native": "qwen35-sweprefix-managed-mooncake-native-tp2-c2-r1-20260926"
+        },
+        {
+          "candidate": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c4-r1-20260926",
+          "native": "qwen35-sweprefix-managed-mooncake-native-tp2-c4-r1-20260926"
+        },
+        {
+          "candidate": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c8-r1-20260926",
+          "native": "qwen35-sweprefix-managed-mooncake-native-tp2-c8-r1-20260926"
+        },
+        {
+          "candidate": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c16-r1-20260926",
+          "native": "qwen35-sweprefix-managed-mooncake-native-tp2-c16-r1-20260926"
+        }
+      ]
+    },
+    {
+      "id": "pipeline-microbatch-migration",
+      "group": "other",
+      "scope_zh": "Qwen3.5 · TP2/PP2 · 四卡 · C1–16；单次观测",
+      "scope_en": "Qwen3.5 · TP2/PP2 · four chips · C1–16; single observations",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PIPELINE-K8S.md",
+      "pairs": [
+        {
+          "candidate": "qwen35-sweprefix-k8s-pipelinepp-tp2-pp2-c4-r1-20260925",
+          "native": "qwen35-sweprefix-k8s-nativepp-tp2-pp2-c4-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-k8s-pipelinepp-tp2-pp2-c16-r1-20260925",
+          "native": "qwen35-sweprefix-k8s-nativepp-tp2-pp2-c16-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-curves-pipelinepp-tp2-pp2-c1-r1-20260925",
+          "native": "qwen35-sweprefix-curves-nativepp-tp2-pp2-c1-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-curves-pipelinepp-tp2-pp2-c2-r1-20260925",
+          "native": "qwen35-sweprefix-curves-nativepp-tp2-pp2-c2-r1-20260925"
+        },
+        {
+          "candidate": "qwen35-sweprefix-curves-pipelinepp-tp2-pp2-c8-r1-20260925",
+          "native": "qwen35-sweprefix-curves-nativepp-tp2-pp2-c8-r1-20260925"
+        }
+      ]
+    },
+    {
+      "id": "betterscale",
+      "group": "other",
+      "scope_zh": "DSV4 W8A8 K5 · 八卡 DP8/TP8 · 有限 HTTP 负载，各自 Native 对照",
+      "scope_en": "DSV4 W8A8 K5 · eight chips DP8/TP8 · bounded HTTP workload, respective Native controls",
+      "url": "./betterscale.html#service-throughput",
+      "ratios": [
+        1.3963,
+        1.3517
+      ]
+    },
+    {
+      "id": "vspec",
+      "group": "other",
+      "scope_zh": "Qwen2.5 · GSM8K B128 · 已发布配置",
+      "scope_en": "Qwen2.5 · GSM8K B128 · published configuration",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-vSpec/blob/main/docs/gsm8k_b128_recovery_and_arc_easy_20260913.md",
+      "ratios": [
+        1.518
+      ]
+    },
+    {
+      "id": "kvcompress-ascend",
+      "group": "other",
+      "scope_zh": "Qwen2.5-Coder-14B · 长上下文/KV 压力；recall 64→63/64",
+      "scope_en": "Qwen2.5-Coder-14B · long context/KV pressure; recall 64→63/64",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/main/docs/resuts.md",
+      "ratios": [
+        1.1025,
+        1.0468
+      ]
+    },
+    {
+      "id": "latchmoe",
+      "group": "other",
+      "scope_zh": "四卡 · C4 · 约 2.91 / 23.57 tok/s",
+      "scope_en": "Four ranks · C4 · approximately 2.91 / 23.57 tok/s",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE#qualified-graph-result",
+      "ratios": [
+        0.12346202800169707
+      ]
+    },
+    {
+      "id": "diffspec",
+      "group": "other",
+      "scope_zh": "TP4 graph · 吞吐低于 target-only；未列可复算比值",
+      "scope_en": "TP4 graph · slower than target-only; no reproducible ratio listed",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec#key-results",
+      "ratios": []
+    }
+  ]
+}

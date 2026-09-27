@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826">
 <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901">
-<link rel="stylesheet" href="./assets/plugins.css?v=0.3.8">
+<link rel="stylesheet" href="./assets/plugins.css?v=0.3.9">
 </head>
 <body data-page="plugins">
   <nav class="site-nav">
@@ -92,6 +92,8 @@ A plugin, KV connector, Mooncake service, and control-plane resource retain dist
 <small>55 CURATED REPOSITORIES</small>
 </a>
 </nav>
+
+    <section class="content-panel measured-mods" data-plugin-performance aria-live="polite"></section>
 
     <section id="technical-highlights" class="content-panel technical-highlights" aria-labelledby="technical-highlights-title">
       <header class="highlights-head">
@@ -997,18 +999,19 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
       title: "Extension Workshop | vLLM-HUST",
       "plugins-eyebrow": "vLLM-HUST MOD catalog",
       "plugins-title": "Extension Workshop",
-      "plugins-lede": "Independent vLLM-HUST MODs, organized by host version, platform, and readiness."
+      "plugins-lede": "Measured MODs first, ordered by throughput change. Choose by model, configuration, and compatibility."
     });
     Object.assign(window.vllmHustPageDict.zh, {
       title: "扩展工坊 | vLLM-HUST",
       "plugins-eyebrow": "vLLM-HUST MOD 目录",
       "plugins-title": "扩展工坊",
-      "plugins-lede": "只展示独立维护的 vLLM-HUST MOD，并按宿主版本、平台和成熟度选择。"
+      "plugins-lede": "实测 MOD 优先，按吞吐变化排序；结合模型、配置和兼容性选择。"
     });
   </script>
   <script src="./assets/site.js?v=leaderboard-v2-20260922">
 </script>
-<script src="./assets/plugins-page.js?v=qwen35-mooncake-20260927">
+<script src="./assets/plugin-performance.js?v=20260927"></script>
+<script src="./assets/plugins-page.js?v=measured-ranking-20260927">
 </script>
 </body>
 </html>

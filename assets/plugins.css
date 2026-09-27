@@ -408,3 +408,15 @@ body[data-page="plugins"] .content-panel .plugin-summary {
 }
 
 #plugin-launch-betterscale { max-height: 70vh; overflow: auto; }
+
+.measured-mods { margin: 24px 0; }
+.performance-method { max-width: 100ch; color: #52615f; line-height: 1.7; }
+.performance-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 16px 0 24px; }
+.performance-card { padding: 18px; border: 1px solid #d6dfdc; border-radius: 8px; background: #fff; }
+.performance-card h4 { margin: 0 0 12px; }
+.plugin-performance { display: grid; gap: 6px; margin: 12px 0; font-size: 12px; }
+.plugin-performance > strong { font-size: 28px; color: #166749; }
+.plugin-performance > .performance-negative { color: #a43e29; }
+.plugin-performance p { margin: 0; line-height: 1.6; }
+@media (max-width: 900px) { .performance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .performance-grid { grid-template-columns: 1fr; } }

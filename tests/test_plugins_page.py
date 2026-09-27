@@ -649,7 +649,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=0.3.8" in PAGE
+    assert "plugins.css?v=0.3.9" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES

@@ -13,6 +13,7 @@
   if (!catalog || !status || !filters || !search) return;
 
   let registry;
+  let performanceResults = new Map();
   let portfolio;
   let workshopMetadata = {};
   let workloadNavigation = { traits: {}, plugins: {} };
@@ -692,6 +693,44 @@ vllm-hust-ext extension check ${extensionId}`
     return "graphite";
   }
 
+  function performancePanel(result) {
+    const panel = element("div", "plugin-performance");
+    const value = result.gain === null ? (language() === "zh" ? "实测 · 未量化" : "Measured · unranked")
+      : `${result.gain >= 0 ? "+" : ""}${result.gain.toFixed(2)}%`;
+    panel.append(element("strong", result.gain < 0 ? "performance-negative" : "", value),
+      element("span", "", language() === "zh" ? "相对各自 Native 的吞吐变化" : "Throughput vs respective Native"),
+      element("p", "", local(result, "scope")));
+    const link = element("a", "plugin-public-effect-link", copy().effectSource + " ↗");
+    link.href = result.url;
+    panel.append(link);
+    return panel;
+  }
+
+  function renderPerformance() {
+    const root = document.querySelector("[data-plugin-performance]");
+    if (!root) return;
+    root.replaceChildren();
+    const zh = language() === "zh";
+    root.append(element("h2", "", zh ? "实测 MOD · 按吞吐变化排序" : "Measured MODs · ordered by throughput change"),
+      element("p", "performance-method", zh
+        ? "Qwen3.5 TP2 配对测试优先；其他配置单列。每组按所有已列配对点的吞吐比几何平均值降序排列，负收益也保留。各 MOD 使用自己的 Native 对照，测试条件不同，排序不代表同场胜负或稳定加速。"
+        : "Qwen3.5 TP2 pairs first; other configurations separately. Each group sorts by the geometric mean of all listed throughput ratios, including regressions. Each MOD has its own Native control; differing conditions mean this is not a head-to-head ranking or proof of repeatable speedup."));
+    for (const group of ["qwen35", "other"]) {
+      root.append(element("h3", "", group === "qwen35" ? "Qwen3.5 · TP2 / PP1" : (zh ? "其他模型 / 配置的实测" : "Other models / configurations")));
+      const grid = element("div", "performance-grid");
+      [...performanceResults.values()].filter(row => row.group === group)
+        .sort((a, b) => PluginPerformance.compare(a, b, performanceResults)).forEach(row => {
+          const item = registry.components.find(item => item.id === row.id);
+          if (!item || item.public_surface === false) return;
+          const card = element("article", "performance-card");
+          card.dataset.performanceMod = row.id;
+          card.append(element("h4", "", row.id === "mooncake-vllm-connectors" ? "AscendStoreConnector + Mooncake" : local(item, "name")), performancePanel(row));
+          grid.append(card);
+        });
+      root.append(grid);
+    }
+  }
+
   function publicEffectPanel(item) {
     const result = local(item, "public_effect");
     if (!result || !item.public_effect_status || !item.public_effect_url) return null;
@@ -751,6 +790,8 @@ vllm-hust-ext extension check ${extensionId}`
     card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", local(item, "summary")));
     const traits = workloadTags(item);
     if (traits) card.append(traits);
+    const measured = performanceResults.get(item.id);
+    if (measured) card.append(performancePanel(measured));
     const publicEffect = publicEffectPanel(item);
     if (publicEffect) card.append(publicEffect);
     const community = communityPanel(item);
@@ -915,6 +956,7 @@ vllm-hust-ext extension check ${extensionId}`
   }
 
   function renderCatalog() {
+    if (performanceResults.size) renderPerformance();
     const query = search.value.trim().toLowerCase();
     const visible = registry.components.filter((item) => {
       const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
@@ -926,7 +968,7 @@ vllm-hust-ext extension check ${extensionId}`
     visible.sort((left, right) => {
       const leftRank = priority[left.compatibility?.status] ?? 6;
       const rightRank = priority[right.compatibility?.status] ?? 6;
-      return leftRank - rightRank || left.name.localeCompare(right.name);
+      return PluginPerformance.compare(left, right, performanceResults) || leftRank - rightRank || left.name.localeCompare(right.name);
     });
     catalog.replaceChildren();
     const grid = element("section", "plugin-grid workshop-grid");
@@ -957,7 +999,7 @@ vllm-hust-ext extension check ${extensionId}`
     const values = {
       "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
       "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
-      "plugins-lede": zh ? "只展示独立维护的 vLLM-HUST MOD，并按宿主版本、平台和成熟度选择。" : "Independent vLLM-HUST MODs, organized by host version, platform, and readiness.",
+      "plugins-lede": zh ? "实测 MOD 优先，按吞吐变化排序；结合模型、配置和兼容性选择。" : "Measured MODs first, ordered by throughput change. Choose by model, configuration, and compatibility.",
       "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
       "plugins-fact-runtime": zh ? "个已支持" : "supported"
     };
@@ -981,9 +1023,13 @@ vllm-hust-ext extension check ${extensionId}`
     fetch(workloadNavigationRoot.dataset.source).then((response) => {
       if (!response.ok) throw new Error(`Workload navigation request failed: ${response.status}`);
       return response.json();
-    })
+    }),
+    Promise.all([
+      fetch("./data/plugin-performance.json?v=20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=qwen35-mooncake-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
+    ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])
-    .then(([payload, metadata, navigation]) => {
+    .then(([payload, metadata, navigation, performance]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
@@ -994,6 +1040,9 @@ vllm-hust-ext extension check ${extensionId}`
         throw new Error("unsupported workload navigation");
       }
       registry = payload;
+      performanceResults = performance || new Map();
+      if (performance) renderPerformance();
+      else document.querySelector("[data-plugin-performance]").textContent = language() === "zh" ? "实测排序暂不可用；请查看各 MOD 的证据链接。" : "Performance ordering unavailable; see individual evidence links.";
       workshopMetadata = metadata.plugins;
       workloadNavigation = navigation;
       renderPageLabels();
