@@ -20,18 +20,27 @@ def main():
         for key in ("qwen", "dsv4")
     }
     ecosystem = json.loads((root / "data/ecosystem.json").read_text())
+    performance_ids = {
+        entry["id"]
+        for entry in json.loads((root / "data/plugin-performance.json").read_text())[
+            "entries"
+        ]
+    }
     workshop_mod_count = sum(
-        item["artifact_type"] in {"runtime_component", "bridge"}
-        and item["repository_relationship"] == "organization_native"
-        and item.get("public_surface", True) is not False
-        and item["delivery_model"]
-        in {
-            "plugin_bundle",
-            "python_distribution",
-            "migration_scaffold",
-            "source_patch",
-        }
-        and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        item["id"] in performance_ids
+        or (
+            item["artifact_type"] in {"runtime_component", "bridge"}
+            and item["repository_relationship"] == "organization_native"
+            and item.get("public_surface", True) is not False
+            and item["delivery_model"]
+            in {
+                "plugin_bundle",
+                "python_distribution",
+                "migration_scaffold",
+                "source_patch",
+            }
+            and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        )
         for item in ecosystem["components"]
     )
     output = root / "output/playwright/betterscale"
@@ -308,6 +317,9 @@ def main():
         page.locator("[data-workload-filters] button").first.click()
         page.locator("[data-plugin-more]").click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
+        assert page.locator(".workshop-card").evaluate_all(
+            "cards => cards.slice(0, 4).map(card => card.id)"
+        ) == ["bidkv", "dla", "mooncake-vllm-connectors", "kv-tiering-migration"]
         assert page.locator("#stateharbor.workshop-card").count() == 0
         page.locator(
             '#betterscale .plugin-card-footer a[href="./betterscale.html"]'
