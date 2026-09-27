@@ -60,7 +60,14 @@
           ],
           "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
           "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point.",
-          "concurrency_curves_url": "./assets/frontier-qwen35-swe-concurrency.svg?v=sweprefix-curves-20260924-5"
+          "concurrency_curves_url": "./assets/frontier-qwen35-swe-concurrency.svg?v=sweprefix-curves-20260924-5",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "under-construction",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values."
+          }
         }
       }
     },
@@ -147,7 +154,14 @@
           "status": "15-minute smoke, tuning incomplete. BetterScale passed24 bounded retrieval checks; native passed8 serial cold/warm checks but failed5/16 concurrent retrievals. Native, if displayed, is throughput-only with failed correctness, never a qualified deployment. Not general answer quality or SWE solving",
           "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point.",
           "checkpoint_provenance": "Local checkpoint named Qwen3.8-27B by Fletcher. Model architecture qwen3_5_text; .mv Revision:master,CreatedAt:1786731894. No immutable upstream revision attested.",
-          "model_comparison": "Same source sessions and protocol as35B, independently tokenized with27B. Token IDs, output budgets and prepared-file identity differ; never pool as identical workloads."
+          "model_comparison": "Same source sessions and protocol as35B, independently tokenized with27B. Token IDs, output budgets and prepared-file identity differ; never pool as identical workloads.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "under-construction",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values."
+          }
         }
       }
     }
@@ -1978,7 +1992,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 746.6966666666667,
@@ -2166,7 +2181,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 520.4588888888889,
@@ -2325,7 +2341,8 @@
       },
       "load": {
         "concurrency": 4,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 243.56666666666666,
@@ -2508,7 +2525,8 @@
       },
       "load": {
         "concurrency": 4,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 325.00666666666666,
@@ -2676,7 +2694,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-native"
+        "concurrency_series": "swe-capacity16-native",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 100.83333333333333,
@@ -2844,7 +2863,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-native"
+        "concurrency_series": "swe-capacity16-native",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 157.51777777777778,
@@ -3012,7 +3032,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-native"
+        "concurrency_series": "swe-capacity16-native",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 219.37,
@@ -3180,7 +3201,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-native"
+        "concurrency_series": "swe-capacity16-native",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 307.79777777777775,
@@ -3374,7 +3396,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-full"
+        "concurrency_series": "swe-capacity16-full",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 205.47555555555556,
@@ -3568,7 +3591,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-full"
+        "concurrency_series": "swe-capacity16-full",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 320.01666666666665,
@@ -3762,7 +3786,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-full"
+        "concurrency_series": "swe-capacity16-full",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 477.4922222222222,
@@ -3956,7 +3981,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-full"
+        "concurrency_series": "swe-capacity16-full",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 699.3522222222222,
@@ -4123,7 +4149,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-native"
+        "concurrency_series": "swe-capacity16-native",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 443.90777777777777,
@@ -4291,7 +4318,8 @@
       },
       "load": {
         "concurrency": 32,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 271.0522222222222,
@@ -4461,7 +4489,8 @@
       },
       "load": {
         "concurrency": 32,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 415.75666666666666,
@@ -4575,7 +4604,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 468.50111111111113,
@@ -4761,7 +4791,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 105.88666666666667,
@@ -4947,7 +4978,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 177.34777777777776,
@@ -5132,7 +5164,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 113.22111111111111,
@@ -5317,7 +5350,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 190.07555555555555,
@@ -5504,7 +5538,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 122.33555555555556,
@@ -5665,7 +5700,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 72.82111111111111,
@@ -5825,7 +5861,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 77.43555555555555,
@@ -5938,7 +5975,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 585.5377777777778,
@@ -6051,7 +6089,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 348.51666666666665,
@@ -6237,7 +6276,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 113.6,
@@ -6398,7 +6438,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 92.54777777777778,
@@ -6585,7 +6626,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 184.85888888888888,
@@ -6746,7 +6788,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 138.47555555555556,
@@ -6906,7 +6949,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 148.9088888888889,
@@ -7067,7 +7111,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 152.5588888888889,
@@ -7253,7 +7298,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 294.25,
@@ -7438,7 +7484,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 287.9577777777778,
@@ -7625,7 +7672,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 301.0711111111111,
@@ -7786,7 +7834,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 213.1211111111111,
@@ -7946,7 +7995,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 229.44666666666666,
@@ -8107,7 +8157,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 232.58333333333334,
@@ -8293,7 +8344,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 438.93111111111114,
@@ -8478,7 +8530,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 440.4322222222222,
@@ -8665,7 +8718,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 473.6,
@@ -8826,7 +8880,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 320.56333333333333,
@@ -8986,7 +9041,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 457.0566666666667,
@@ -9146,7 +9202,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 322.99333333333334,
@@ -9307,7 +9364,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 325.03777777777776,
@@ -9493,7 +9551,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-small-fish-20260924"
+        "concurrency_series": "swe-capacity16-small-fish-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 117.84333333333333,
@@ -9681,7 +9740,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-small-fish-20260924"
+        "concurrency_series": "swe-capacity16-small-fish-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 205.4688888888889,
@@ -9869,7 +9929,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-small-fish-20260924"
+        "concurrency_series": "swe-capacity16-small-fish-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 321.67,
@@ -10057,7 +10118,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-small-fish-20260924"
+        "concurrency_series": "swe-capacity16-small-fish-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 484.9244444444444,
@@ -10245,7 +10307,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-capacity16-small-fish-20260924"
+        "concurrency_series": "swe-capacity16-small-fish-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 737.8555555555556,
@@ -10435,7 +10498,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-optimized-20260924"
+        "concurrency_series": "swe-dense27-capacity16-optimized-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 66.01333333333334,
@@ -10625,7 +10689,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-optimized-20260924"
+        "concurrency_series": "swe-dense27-capacity16-optimized-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 114.27555555555556,
@@ -10815,7 +10880,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-optimized-20260924"
+        "concurrency_series": "swe-dense27-capacity16-optimized-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 192.95333333333335,
@@ -11005,7 +11071,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-optimized-20260924"
+        "concurrency_series": "swe-dense27-capacity16-optimized-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 291.84777777777776,
@@ -11195,7 +11262,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-optimized-20260924"
+        "concurrency_series": "swe-dense27-capacity16-optimized-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 238.96444444444444,
@@ -11383,7 +11451,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 659.6933333333334,
@@ -11568,7 +11637,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 660.1388888888889,
@@ -11755,7 +11825,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 714.2566666666667,
@@ -11916,7 +11987,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 449.12888888888887,
@@ -12077,7 +12149,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 443.6455555555556,
@@ -12247,7 +12320,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-native-20260924"
+        "concurrency_series": "swe-dense27-capacity16-native-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 55.80777777777778,
@@ -12419,7 +12493,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-native-20260924"
+        "concurrency_series": "swe-dense27-capacity16-native-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 97.08888888888889,
@@ -12591,7 +12666,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-native-20260924"
+        "concurrency_series": "swe-dense27-capacity16-native-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 160.86888888888888,
@@ -12763,7 +12839,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-native-20260924"
+        "concurrency_series": "swe-dense27-capacity16-native-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 235.36,
@@ -12935,7 +13012,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-dense27-capacity16-native-20260924"
+        "concurrency_series": "swe-dense27-capacity16-native-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 209.9988888888889,
@@ -13123,7 +13201,8 @@
       "load": {
         "concurrency": 32,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 554.92,
@@ -13308,7 +13387,8 @@
       "load": {
         "concurrency": 32,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 534.2344444444444,
@@ -13495,7 +13575,8 @@
       "load": {
         "concurrency": 32,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 711.3833333333333,
@@ -13681,7 +13762,8 @@
       "load": {
         "concurrency": 32,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-full-attention-tp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 712.3855555555556,
@@ -13842,7 +13924,8 @@
       "load": {
         "concurrency": 32,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 385.1355555555556,
@@ -14002,7 +14085,8 @@
       "load": {
         "concurrency": 32,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-dp2-expert-tp2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 393.33666666666664,
@@ -14163,7 +14247,8 @@
       "load": {
         "concurrency": 32,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924"
+        "concurrency_series": "qwen35-bf16-mtp2-native-attention-tp2-expert-ep2-slots32-20260924",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 405.5577777777778,
@@ -14311,7 +14396,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-20260925-native-r1"
+        "concurrency_series": "swe-k8s-20260925-native-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 242.08,
@@ -14456,7 +14542,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-20260925-native-r1"
+        "concurrency_series": "swe-k8s-20260925-native-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 368.04,
@@ -14627,7 +14714,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-20260925-bidkv-r1"
+        "concurrency_series": "swe-k8s-20260925-bidkv-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 239.03,
@@ -14798,7 +14886,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-20260925-bidkv-r1"
+        "concurrency_series": "swe-k8s-20260925-bidkv-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 369.70444444444445,
@@ -14997,7 +15086,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 75.88111111111111,
@@ -15196,7 +15286,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 99.19444444444444,
@@ -15695,7 +15786,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 78.63444444444444,
@@ -16194,7 +16286,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 98.25111111111111,
@@ -16402,7 +16495,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 41.465555555555554,
@@ -16610,7 +16704,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 56.04333333333334,
@@ -16818,7 +16913,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-nativepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 81.78222222222222,
@@ -17326,7 +17422,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 60.98,
@@ -17834,7 +17931,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 58.916666666666664,
@@ -18342,7 +18440,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1"
+        "concurrency_series": "swe-k8s-pp2-20260925-pipelinepp-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 82.16444444444444,
@@ -20661,7 +20760,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 90.41,
@@ -22980,7 +23080,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 151.74777777777777,
@@ -25299,7 +25400,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 216.94666666666666,
@@ -27618,7 +27720,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 292.7111111111111,
@@ -29937,7 +30040,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-native-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 356.2011111111111,
@@ -32292,7 +32396,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 92.2911111111111,
@@ -34647,7 +34752,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 153.83444444444444,
@@ -37002,7 +37108,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 219.65,
@@ -39357,7 +39464,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 296.19,
@@ -41712,7 +41820,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-bidkv-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 360.62666666666667,
@@ -44067,7 +44176,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 92.80222222222223,
@@ -46422,7 +46532,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 153.0388888888889,
@@ -48777,7 +48888,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 215.63666666666666,
@@ -51132,7 +51244,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 293.22333333333336,
@@ -53487,7 +53600,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1"
+        "concurrency_series": "swe-output-budget-tp2-20260925-dla-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 359.3122222222222,
@@ -53775,7 +53889,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-native-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 91.80555555555556,
@@ -54063,7 +54178,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-native-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 153.35333333333332,
@@ -54351,7 +54467,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-native-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 218.23,
@@ -54639,7 +54756,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-native-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 292.43444444444447,
@@ -54927,7 +55045,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-native-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 361.49333333333334,
@@ -55253,7 +55372,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 89.14,
@@ -55579,7 +55699,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 147.74777777777777,
@@ -55905,7 +56026,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 213.14888888888888,
@@ -56231,7 +56353,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 277.1511111111111,
@@ -56557,7 +56680,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1"
+        "concurrency_series": "swe-managed-tiering-tiering-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 342.6911111111111,
@@ -56810,7 +56934,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 92.48444444444445,
@@ -57063,7 +57188,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 153.2788888888889,
@@ -57316,7 +57442,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 219.22444444444446,
@@ -57569,7 +57696,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 293.93111111111114,
@@ -57822,7 +57950,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 361.2477777777778,
@@ -58137,7 +58266,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 91.19333333333333,
@@ -58452,7 +58582,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 150.93555555555557,
@@ -58767,7 +58898,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 216.2811111111111,
@@ -59082,7 +59214,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 290.93444444444447,
@@ -59397,7 +59530,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 351.6322222222222,
@@ -59592,7 +59726,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-resident-state-20260926"
+        "concurrency_series": "swe-resident-state-20260926",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 829.6022222222222,
@@ -60024,7 +60159,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 1145.4888888888888,
@@ -60491,7 +60627,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 1135.4611111111112,
@@ -60977,7 +61114,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 1059.0855555555556,
@@ -61480,7 +61618,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 1072.191111111111,
@@ -62210,7 +62349,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 1151.43,
@@ -62722,7 +62862,8 @@
       },
       "load": {
         "concurrency": 64,
-        "unit": "continuously replenished in-flight HTTP request lanes"
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 1105.4077777777777,

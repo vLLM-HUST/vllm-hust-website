@@ -75,3 +75,5 @@
 
 .frontier-correctness-warning { color: #b91c1c; border-left: 3px solid #dc2626; padding-left: 10px; font-size: 12px; line-height: 1.5; }
 @media (prefers-color-scheme: dark) { .frontier-correctness-warning { color: #fca5a5; } }
+
+.frontier-filter-note { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: var(--run-muted); }

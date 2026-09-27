@@ -43,6 +43,9 @@
                 || !Number.isFinite(Date.parse(e.sampling_date_utc)) || new Date(e.sampling_date_utc).toISOString().slice(0,10) !== e.sampling_date_utc)) throw new Error(`Invalid sampling date: ${p.id}`);
             if (c.experiment_group != null && (typeof c.experiment_group !== 'string' || !c.experiment_group.trim())) throw new Error(`Invalid experiment group: ${p.id}`);
             if (Object.values(p.metrics).some(v => v !== null && (!finite(v) || v < 0))) throw new Error(`Invalid metric: ${p.id}`);
+            const rotationRequired = data.cohorts.find(cohort => cohort.id === p.cohort_id).workload.contract.session_rotation;
+            if ((rotationRequired || p.load.session_rotation_depth != null)
+                && (!Number.isInteger(p.load.session_rotation_depth) || p.load.session_rotation_depth < 1)) throw new Error(`Invalid session rotation depth: ${p.id}`);
             if (p.load.concurrency_series != null && (typeof p.load.concurrency_series !== 'string' || !p.load.concurrency_series
                 || !Number.isInteger(p.load.concurrency) || p.load.concurrency < 1)) throw new Error(`Invalid concurrency series: ${p.id}`);
             if (p.cost != null && (!positive(p.cost.usd_per_hour) || !p.cost.source || !p.cost.scope)) throw new Error(`Invalid deployment cost: ${p.id}`);

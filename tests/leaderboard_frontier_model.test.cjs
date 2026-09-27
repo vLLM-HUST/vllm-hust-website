@@ -545,3 +545,29 @@ test('output-budget curves retain matched controls and distinguish executed chec
         }
     }
 });
+
+test('SWE rotation metadata covers displayed and archived observations without relabeling AgentX',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const swe=new Set(data.cohorts.filter(c=>c.workload.id.startsWith('sweprefix-')).map(c=>c.id));
+    for(const c of data.cohorts.filter(c=>swe.has(c.id))) {
+        assert.equal(c.workload.contract.session_rotation.status,'under-construction');
+        assert.equal(c.workload.contract.session_rotation.depth_field,'load.session_rotation_depth');
+    }
+    for(const p of [...data.points,...data.archived_points]) {
+        if(swe.has(p.cohort_id)) assert.equal(p.load.session_rotation_depth,1);
+        else assert.equal(p.load.session_rotation_depth,undefined);
+    }
+});
+
+test('rotation-enabled cohorts require explicit positive integer depths, never default missing to 1',()=>{
+    const data=structuredClone(fixture);
+    data.cohorts[0].workload.contract.session_rotation={policy:'per-lane-round-robin'};
+    for(const p of data.points)p.load.session_rotation_depth=4;
+    assert.equal(model.validate(data),data);
+    for(const depth of [undefined,null,0,-1,1.5,'1',true]) {
+        const invalid=structuredClone(data);
+        invalid.points[0].load.session_rotation_depth=depth;
+        assert.throws(()=>model.validate(invalid),/session rotation depth/);
+    }
+    assert.equal(model.validate(fixture),fixture); // Non-rotation workloads stay unchanged.
+});

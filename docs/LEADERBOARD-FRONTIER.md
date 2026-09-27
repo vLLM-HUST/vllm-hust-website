@@ -12,11 +12,11 @@ workload identities; never silently mix them.
 
 - Model + precision is one combined tag. The only other choice is a fixed workload/context cohort; a
   single available workload is displayed without inviting an unnecessary selection.
-- An external right sidebar has checkbox rows for MOD and MTP (on/off; unknown when present). All
-  options start checked; no separate “all” choice. Options within a row are OR, rows intersect, and
-  unchecking a whole row hides all points. It recomputes the observed envelope without changing
-  measurements; mobile stacks the sidebar below the chart. A single workload is a selected-style
-  static tag; multiple workloads use a selector.
+- An external right sidebar has checkbox rows for MOD, MTP (on/off; unknown when present), and SWE
+  session rotation depth. All options start checked; no separate “all” choice. Options within a row
+  are OR, rows intersect, and unchecking a whole row hides all points. It recomputes the observed
+  envelope without changing measurements; mobile stacks the sidebar below the chart. A single
+  workload is a selected-style static tag; multiple workloads use a selector.
 - Axes are fixed: **X = P90 per-request decode speed (output tokens/s/user)**; **Y = total output
   tokens/s / all allocated chips**. No axis, hardware or MOD filters.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
@@ -124,6 +124,26 @@ The exact machine consumer is `assets/leaderboard-frontier-model.js::validate`. 
 `tests/fixtures/leaderboard_frontier.json` is explicitly synthetic test data, **not measurement
 input**. Publication replaces the production JSON after measurement review; no JS edits are needed
 to add a cohort or measured point.
+
+## SWE session rotation depth
+
+`load.session_rotation_depth` is a positive integer for every point in a cohort whose
+`workload.contract.session_rotation` is present. The sidebar derives checkbox choices from observed
+point depths, with the same union-within/intersection-across semantics as MOD and MTP. Missing depth
+in these cohorts fails validation rather than silently becoming 1. AgentX has no rotation filter.
+The selected point and its download retain the explicit depth; language changes preserve checkbox
+choices, while model/workload changes reset them.
+
+On 2026-09-27 Fletcher confirmed that all existing SWE 15-minute results used depth **1**. Both
+visible and archived SWE points are annotated; original metrics, run IDs and raw evidence artifacts
+remain unchanged. The compact “Session rotation depth testing is under construction” notice records
+pending deeper-session testing, not measured D>1 performance. Future measured depths become choices
+only when explicitly recorded; do not add placeholder points or infer results from this notice.
+
+At C lanes and D slots per lane, only C requests can be in flight, while C\*D histories may be
+revisited. Compare equal depths for matched comparisons; mixed-depth frontiers are a
+selected-configuration view, not evidence of equal resident-state capacity. Remove the construction
+status only when the measurement owner supplies the corresponding evidence.
 
 ## Implementation and checks
 

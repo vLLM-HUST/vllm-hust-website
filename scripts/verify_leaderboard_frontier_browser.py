@@ -116,6 +116,48 @@ def assert_parallel(text, params, language):
             assert f"EP{params['expert_parallel_size']}" in text
 
 
+def verify_rotation_choices(browser, url, fixture):
+    """Exercise future depths using explicitly synthetic browser-only input."""
+    data = copy.deepcopy(fixture)
+    data["cohorts"][0]["workload"]["contract"]["session_rotation"] = {
+        "status": "under-construction"
+    }
+    for index, point in enumerate(data["points"]):
+        point["load"]["session_rotation_depth"] = 1 if index % 2 == 0 else 4
+    context = browser.new_context(viewport={"width": 390, "height": 1000})
+    page = context.new_page()
+    page.route("**/data/leaderboard_frontier.json*", lambda r: r.fulfill(json=data))
+    page.goto(f"{url}/leaderboard-runs.html#frontier")
+    ready(page)
+    assert page.locator("[data-filter=rotation]").evaluate_all(
+        "nodes=>nodes.map(n=>n.value)"
+    ) == ["1", "4"]
+    page.locator("#frontier-only").uncheck()
+    page.locator('[data-filter=rotation][value="1"]').uncheck()
+    expected = [p for p in data["points"] if p["load"]["session_rotation_depth"] == 4]
+    assert set(
+        page.locator("[data-point]").evaluate_all(
+            "nodes=>nodes.map(n=>n.dataset.point)"
+        )
+    ) == {p["id"] for p in expected}
+    assert_group_frontiers(page, expected)
+    page.locator("#frontier-only").check()
+    expected_front = page.evaluate(
+        "points=>LeaderboardFrontierModel.groupFrontiers(points,'decode_p90_tps',"
+        "'output_tps_per_chip').flat().map(r=>r.point.id)",
+        expected,
+    )
+    assert set(
+        page.locator("[data-point]").evaluate_all(
+            "nodes=>nodes.map(n=>n.dataset.point)"
+        )
+    ) == set(expected_front)
+    page.locator('[data-filter=rotation][value="4"]').uncheck()
+    assert page.locator(".frontier-point, .frontier-envelope").count() == 0
+    assert page.locator("#frontier-blank").is_visible()
+    context.close()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="http://127.0.0.1:8774")
@@ -145,6 +187,7 @@ def main():
     reports = []
     with sync_playwright() as p:
         browser = p.chromium.launch()
+        verify_rotation_choices(browser, args.url, fixture)
         for width, language, scheme in [
             (1440, "en", "light"),
             (390, "zh", "light"),
@@ -187,6 +230,23 @@ def main():
                 full_page=True,
             )
             page.locator("#frontier-only").uncheck()
+
+            rotation = page.locator('[data-filter=rotation][value="1"]')
+            assert rotation.is_checked()
+            assert page.locator("[data-filter=rotation]").count() == 1
+            note = page.locator("#frontier-rotation-filter").inner_text()
+            assert (
+                "会话轮转深度测试正在施工"
+                if language == "zh"
+                else "Session rotation depth testing is under construction"
+            ) in note
+            rotation.uncheck()
+            assert page.locator(".frontier-point, .frontier-envelope").count() == 0
+            page.locator("#langToggle").click()
+            assert not page.locator('[data-filter=rotation][value="1"]').is_checked()
+            page.locator("#langToggle").click()
+            page.locator('[data-filter=rotation][value="1"]').check()
+            assert page.locator(".frontier-point").count() == len(default_points)
 
             assert page.locator("#runs-panel").is_hidden()
             assert page.locator("#tasks-panel").is_hidden()
@@ -371,6 +431,11 @@ def main():
                     assert formatted in text, (point["id"], formatted, text)
                 params = point["configuration"]["parameters"]
                 assert_parallel(text, params, language)
+                assert (
+                    "会话轮转深度: 1"
+                    if language == "zh"
+                    else "Session rotation depth: 1"
+                ) in text
                 if params.get("mtp_draft_tokens") is not None:
                     assert f"MTP{params['mtp_draft_tokens']}" in text
                 protocol = (
@@ -480,6 +545,9 @@ def main():
                     "href"
                 ) == cohort["workload"]["contract"].get(
                     "repository_url", "https://github.com/vLLM-HUST/agentx-bench"
+                )
+                assert page.locator("#frontier-rotation-filter").count() == int(
+                    "session_rotation" in cohort["workload"]["contract"]
                 )
                 members = [
                     p for p in production["points"] if p["cohort_id"] == cohort["id"]
