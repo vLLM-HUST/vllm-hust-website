@@ -1,0 +1,392 @@
+{
+  "state": {
+    "passed": true,
+    "stage": "completed",
+    "kind": "real-online",
+    "controller_pid": 392121,
+    "parent_pid": 367105,
+    "devices": [
+      0,
+      1
+    ],
+    "owned_server_processes": {
+      "pgid": 392156,
+      "processes": [
+        {
+          "pid": 392156,
+          "ppid": 367105,
+          "pgid": 392156,
+          "start_ticks": 613033781
+        },
+        {
+          "pid": 392454,
+          "ppid": 392156,
+          "pgid": 392156,
+          "start_ticks": 613035781
+        },
+        {
+          "pid": 392623,
+          "ppid": 392454,
+          "pgid": 392156,
+          "start_ticks": 613039103
+        },
+        {
+          "pid": 392624,
+          "ppid": 392454,
+          "pgid": 392156,
+          "start_ticks": 613039104
+        },
+        {
+          "pid": 392748,
+          "ppid": 392624,
+          "pgid": 392156,
+          "start_ticks": 613041213
+        },
+        {
+          "pid": 392749,
+          "ppid": 392624,
+          "pgid": 392156,
+          "start_ticks": 613041213
+        }
+      ]
+    },
+    "server_pid": 392156,
+    "windows": [
+      {
+        "name": "qualification",
+        "exit_code": 0,
+        "summary": {
+          "valid": true,
+          "measurement_seconds": 60.0,
+          "requests_started": 19,
+          "max_prompt_tokens_observed": 14239,
+          "prompt_tokens_p50": 7551.0,
+          "max_turn_index_reached": 10,
+          "distinct_trajectories_started": 2,
+          "sessions_completed": 0,
+          "requests_completed_in_window": 17,
+          "requests_drained": 2,
+          "failed_requests": 0,
+          "observed_output_tokens_in_window": 8835,
+          "output_tokens_per_second": 147.25,
+          "output_tokens_per_second_per_chip": 73.625,
+          "decode_tokens_per_second_p90": 96.32820249938689,
+          "decode_speed_samples": 17,
+          "ttft_seconds_p95": 1.104911207593977,
+          "client_inflight_seconds": {
+            "0": 0.00012386124581098557,
+            "1": 0.028851880691945553,
+            "2": 59.97102425806224
+          },
+          "mean_client_inflight": 1.9995150066136071,
+          "full_concurrency_fraction": 0.999517070967704,
+          "drain_seconds": 6.926680399104953,
+          "aborted": false,
+          "planned_measurement_seconds": 60.0
+        }
+      },
+      {
+        "name": "c1",
+        "exit_code": 0,
+        "summary": {
+          "valid": true,
+          "measurement_seconds": 900.0,
+          "requests_started": 149,
+          "max_prompt_tokens_observed": 52505,
+          "prompt_tokens_p50": 18533.0,
+          "max_turn_index_reached": 38,
+          "distinct_trajectories_started": 6,
+          "sessions_completed": 5,
+          "requests_completed_in_window": 148,
+          "requests_drained": 1,
+          "failed_requests": 0,
+          "observed_output_tokens_in_window": 83236,
+          "output_tokens_per_second": 92.48444444444445,
+          "output_tokens_per_second_per_chip": 46.242222222222225,
+          "decode_tokens_per_second_p90": 107.39977672186546,
+          "decode_speed_samples": 148,
+          "ttft_seconds_p95": 1.0910671505145728,
+          "client_inflight_seconds": {
+            "0": 0.6219486659392715,
+            "1": 899.3780513340607
+          },
+          "mean_client_inflight": 0.9993089459267341,
+          "full_concurrency_fraction": 0.9993089459267341,
+          "drain_seconds": 2.696389952674508,
+          "aborted": false,
+          "planned_measurement_seconds": 900.0
+        }
+      },
+      {
+        "name": "c2",
+        "exit_code": 0,
+        "summary": {
+          "valid": true,
+          "measurement_seconds": 900.0,
+          "requests_started": 215,
+          "max_prompt_tokens_observed": 73616,
+          "prompt_tokens_p50": 23135.0,
+          "max_turn_index_reached": 52,
+          "distinct_trajectories_started": 8,
+          "sessions_completed": 6,
+          "requests_completed_in_window": 213,
+          "requests_drained": 2,
+          "failed_requests": 0,
+          "observed_output_tokens_in_window": 137951,
+          "output_tokens_per_second": 153.2788888888889,
+          "output_tokens_per_second_per_chip": 76.63944444444445,
+          "decode_tokens_per_second_p90": 98.51820537099914,
+          "decode_speed_samples": 213,
+          "ttft_seconds_p95": 1.3450763678178188,
+          "client_inflight_seconds": {
+            "0": 0.00012342073023319244,
+            "1": 1.21022486127913,
+            "2": 898.7896517179906
+          },
+          "mean_client_inflight": 1.9986550314414004,
+          "full_concurrency_fraction": 0.9986551685755451,
+          "drain_seconds": 3.076439161784947,
+          "aborted": false,
+          "planned_measurement_seconds": 900.0
+        }
+      },
+      {
+        "name": "c4",
+        "exit_code": 0,
+        "summary": {
+          "valid": true,
+          "measurement_seconds": 900.0,
+          "requests_started": 328,
+          "max_prompt_tokens_observed": 73616,
+          "prompt_tokens_p50": 21921.0,
+          "max_turn_index_reached": 52,
+          "distinct_trajectories_started": 8,
+          "sessions_completed": 8,
+          "requests_completed_in_window": 324,
+          "requests_drained": 4,
+          "failed_requests": 0,
+          "observed_output_tokens_in_window": 197302,
+          "output_tokens_per_second": 219.22444444444446,
+          "output_tokens_per_second_per_chip": 109.61222222222223,
+          "decode_tokens_per_second_p90": 78.6941684952003,
+          "decode_speed_samples": 324,
+          "ttft_seconds_p95": 1.6353148844558738,
+          "client_inflight_seconds": {
+            "0": 0.00013204198330640793,
+            "1": 0.0010176319628953934,
+            "2": 0.0006916476413607597,
+            "3": 1.9911380680277944,
+            "4": 898.0070206103846
+          },
+          "mean_client_inflight": 3.9977821084142975,
+          "full_concurrency_fraction": 0.9977855784559829,
+          "drain_seconds": 13.278507423587143,
+          "aborted": false,
+          "planned_measurement_seconds": 900.0
+        }
+      },
+      {
+        "name": "c8",
+        "exit_code": 0,
+        "summary": {
+          "valid": true,
+          "measurement_seconds": 900.0,
+          "requests_started": 437,
+          "max_prompt_tokens_observed": 77163,
+          "prompt_tokens_p50": 20937.0,
+          "max_turn_index_reached": 56,
+          "distinct_trajectories_started": 8,
+          "sessions_completed": 8,
+          "requests_completed_in_window": 429,
+          "requests_drained": 8,
+          "failed_requests": 0,
+          "observed_output_tokens_in_window": 264538,
+          "output_tokens_per_second": 293.93111111111114,
+          "output_tokens_per_second_per_chip": 146.96555555555557,
+          "decode_tokens_per_second_p90": 58.51721297567176,
+          "decode_speed_samples": 429,
+          "ttft_seconds_p95": 2.0998226694762705,
+          "client_inflight_seconds": {
+            "0": 0.00017858203500509262,
+            "1": 0.0011060340330004692,
+            "2": 0.0007043788209557533,
+            "3": 0.0006316779181361198,
+            "4": 0.0006144382059574127,
+            "5": 0.0006655780598521233,
+            "6": 0.0009435918182134628,
+            "7": 2.253472151234746,
+            "8": 897.7416835678741
+          },
+          "mean_client_inflight": 7.9974707006901085,
+          "full_concurrency_fraction": 0.9974907595198601,
+          "drain_seconds": 62.1462024487555,
+          "aborted": false,
+          "planned_measurement_seconds": 900.0
+        }
+      },
+      {
+        "name": "c16",
+        "exit_code": 0,
+        "summary": {
+          "valid": true,
+          "measurement_seconds": 900.0,
+          "requests_started": 583,
+          "max_prompt_tokens_observed": 59524,
+          "prompt_tokens_p50": 17721.0,
+          "max_turn_index_reached": 40,
+          "distinct_trajectories_started": 8,
+          "sessions_completed": 11,
+          "requests_completed_in_window": 567,
+          "requests_drained": 16,
+          "failed_requests": 0,
+          "observed_output_tokens_in_window": 325123,
+          "output_tokens_per_second": 361.2477777777778,
+          "output_tokens_per_second_per_chip": 180.6238888888889,
+          "decode_tokens_per_second_p90": 33.89532348647167,
+          "decode_speed_samples": 567,
+          "ttft_seconds_p95": 3.0547701016068367,
+          "client_inflight_seconds": {
+            "0": 0.00020507164299488068,
+            "1": 0.0010276418179273605,
+            "2": 0.0007100887596607208,
+            "3": 0.0006258571520447731,
+            "4": 0.0006554871797561646,
+            "5": 0.0009175408631563187,
+            "6": 0.0006964383646845818,
+            "7": 0.0006882874295115471,
+            "8": 0.0006841579452157021,
+            "9": 0.0006053270772099495,
+            "10": 0.000657188706099987,
+            "11": 0.0006073266267776489,
+            "12": 0.00088546983897686,
+            "13": 0.0006496282294392586,
+            "14": 0.0006477367132902145,
+            "15": 2.332130446098745,
+            "16": 897.6576063055545
+          },
+          "mean_client_inflight": 15.997307224525139,
+          "full_concurrency_fraction": 0.997397340339505,
+          "drain_seconds": 89.87516130600125,
+          "aborted": false,
+          "planned_measurement_seconds": 900.0
+        }
+      }
+    ],
+    "owned_group_signals": [
+      {
+        "pgid": 392156,
+        "signal": 15
+      }
+    ],
+    "owned_processes_after_stop": [],
+    "release": {
+      "exit": 0,
+      "owners": [],
+      "owned_processes": []
+    },
+    "hbm_after_stop": {
+      "devices": {
+        "0": {
+          "used_mb": 3439,
+          "total_mb": 65536
+        },
+        "1": {
+          "used_mb": 3433,
+          "total_mb": 65536
+        }
+      },
+      "processes": [],
+      "observed_unix": 1790419717.6662703,
+      "command": [
+        "npu-smi",
+        "info"
+      ],
+      "raw": "+------------------------------------------------------------------------------------------------------------------+\n| npu-smi 26.0.rc1                            Version: 26.0.rc1                                                    |\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU   Name                | Health        | Power(W)             Temp(C)                 Hugepages-Usage(page)   |\n| Chip                      | Bus-Id        | AICore(%)            Memory-Usage(MB)        HBM-Usage(MB)           |\n+===========================+===============+======================================================================+\n| 0     910B2               | OK            | 100.8                39                      0    / 0                |\n| 0                         | 0000:C1:00.0  | 0                    0    / 0                3439 / 65536            |\n+===========================+===============+======================================================================+\n| 1     910B2               | OK            | 100.1                38                      0    / 0                |\n| 0                         | 0000:C2:00.0  | 0                    0    / 0                3433 / 65536            |\n+===========================+===============+======================================================================+\n| 2     910B2               | OK            | 101.3                39                      0    / 0                |\n| 0                         | 0000:81:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n| 3     910B2               | OK            | 97.5                 38                      0    / 0                |\n| 0                         | 0000:82:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU     Chip              | Process id    | Process name       | Process memory(MB)    | Process id in container |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 0                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 1                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 2                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 3                                                                              |\n+===========================+===============+======================================================================+\n"
+    }
+  },
+  "custody": {
+    "server_pid": 392156,
+    "program": "native",
+    "controller_pid": 392121,
+    "controller_parent": 367105,
+    "command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/vllm-hust-ext run -- /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48} --speculative-config {\"method\": \"mtp\", \"num_speculative_tokens\": 2} --generation-config vllm --override-generation-config {\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+    "serving_child": {
+      "pid": 392454,
+      "argv": [
+        "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+        "-m",
+        "vllm.entrypoints.cli.main",
+        "serve",
+        "/home/coder/frontier-mods-qwen35-20260925/model",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "33783",
+        "--served-model-name",
+        "frontier-qwen35-mooncake",
+        "--tensor-parallel-size",
+        "2",
+        "--pipeline-parallel-size",
+        "1",
+        "--distributed-executor-backend",
+        "mp",
+        "--worker-cls",
+        "pipeline_worker.Worker",
+        "--dtype",
+        "bfloat16",
+        "--kv-cache-dtype",
+        "auto",
+        "--max-model-len",
+        "262144",
+        "--max-num-seqs",
+        "16",
+        "--max-num-batched-tokens",
+        "4096",
+        "--gpu-memory-utilization",
+        "0.95",
+        "--seed",
+        "17",
+        "--enable-prefix-caching",
+        "--mamba-cache-mode",
+        "align",
+        "--enable-prompt-tokens-details",
+        "--async-scheduling",
+        "--shutdown-timeout",
+        "60",
+        "--additional-config",
+        "{\"enable_cpu_binding\":false}",
+        "--limit-mm-per-prompt",
+        "{\"image\":0,\"video\":0}",
+        "--compilation-config",
+        "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+        "--speculative-config",
+        "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+        "--generation-config",
+        "vllm",
+        "--override-generation-config",
+        "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+        "--default-chat-template-kwargs",
+        "{\"enable_thinking\":true}",
+        "--kv-cache-memory-bytes",
+        "26038239232"
+      ]
+    },
+    "kind": "real-online",
+    "pod_npu_quota": 4,
+    "participating_deployment_chips": 2
+  },
+  "gate": {
+    "kind": "retrieval-qualification-not-performance",
+    "passed": true,
+    "expected_requests": 26,
+    "completed_requests": 26,
+    "failed_labels": [],
+    "thinking": false,
+    "scope": "Exact marker retrieval only; not general answer quality or SWE solving",
+    "script_sha256": "9221d6e069d44051d5b54b2ce0962fe34542a136c8226bfb2907d0f605b44d70"
+  },
+  "prefix": {
+    "hit_token_delta": 67584.0,
+    "passed": true
+  }
+}

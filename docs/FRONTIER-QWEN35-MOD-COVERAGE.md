@@ -1,6 +1,9 @@
 # Qwen3.5-35B-A3B MOD 曲线覆盖进度
 
-**截至 2026-09-26：仍有 MOD 未取得合格曲线。** 本报告区分已发布观测与固定版本的运行阻碍，不将资格失败、源码检查或导入成功当作性能结果。
+**截至 2026-09-27：仍有 MOD 未取得合格曲线。** 本报告区分已发布观测与固定版本的运行阻碍，不将资格失败、源码检查或导入成功当作性能结果。
+
+Mooncake 最新复测已完成五档并发及匹配 Native，对照吞吐低 1.02%–2.66%。使用插件管理器启动 AscendStoreConnector + Mooncake；26
+项检索和前缀复用通过，退出需清理遗留进程。此前资格失败记录保留为历史；最新结果见 [完整报告](FRONTIER-MOONCAKE-20260926.md)。
 
 使用同一编译后的 SWE 多轮工作负载、900 秒测量窗口和匹配基线；保留 BF16、256K 上下文容量、MTP2、APC、async 和图执行。每点保留原始请求、窗口内
 token、质量检查和服务释放回执。收尾时间不计入吞吐。部署环境只作为来源信息，不能单独命名为 MOD。
@@ -14,8 +17,8 @@ token、质量检查和服务释放回执。收尾时间不计入吞吐。部署
 
 | 组件                               | 当前证据与下一步                                                                                                                                                                                                | 固定来源                                                                                                                                                                                                                                              |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Mooncake HUST                      | 已从固定源码构建，四类真实传输与跨进程 NPU Store 读写通过；Qwen3.5 检索资格三次失败：1 GiB/rank 在 warm-131072 失败；16 GiB/rank 及缓存跟踪修复版均在 warm-262080 失败，尚无性能曲线。                          | [8b8c7ae7](https://github.com/vLLM-HUST/mooncake-hust/tree/8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca)                                                                                                                                                  |
-| Mooncake vLLM Connectors           | 实际 AscendStore HMA/align 服务已加载模型并捕获图；相同环境 Native 26 项全通过；扩大容量后候选第 10 项 warm-262080 仍失败，且无容量错误日志。需修复混合缓存正确性与退出问题。                                   | [d0f22d2b](https://github.com/vLLM-HUST/vllm-hust/tree/d0f22d2bda562156e4dbf433ce645e1769b4f804)                                                                                                                                                      |
+| Mooncake HUST                      | 插件管理器启动的 AscendStoreConnector + Mooncake 已完成五档及匹配 Native，吞吐低 1.02%–2.66%；检索26/26、前缀复用及真实设备释放通过。退出需清理遗留进程；详见[新报告](FRONTIER-MOONCAKE-20260926.md)。          | [8b8c7ae7](https://github.com/vLLM-HUST/mooncake-hust/tree/8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca)                                                                                                                                                  |
+| Mooncake vLLM Connectors           | 插件管理器启动的 AscendStoreConnector + Mooncake 已完成五档及匹配 Native，吞吐低 1.02%–2.66%；检索26/26、前缀复用及真实设备释放通过。退出需清理遗留进程；详见[新报告](FRONTIER-MOONCAKE-20260926.md)。          | [d0f22d2b](https://github.com/vLLM-HUST/vllm-hust/tree/d0f22d2bda562156e4dbf433ce645e1769b4f804)                                                                                                                                                      |
 | PegaFlow                           | 普通连接器未声明 HMA 且只使用第 0 缓存组；NIXL 路径虽支持 HMA，但固定版本设备表无 NPU，共同 Ascend 平台未扩展该表，会被设备检查拒绝。需实际 NPU 传输适配，不能仅绕过检查。                                      | [bf92464b](https://github.com/vLLM-HUST/pegaflow-hust/tree/bf92464b91ec79c46c57b2d03851b51b2a0689d5)                                                                                                                                                  |
 | PegaFlow vLLM Connectors           | 普通连接器未声明 HMA 且只使用第 0 缓存组；NIXL 路径虽支持 HMA，但固定版本设备表无 NPU，共同 Ascend 平台未扩展该表，会被设备检查拒绝。需实际 NPU 传输适配，不能仅绕过检查。                                      | [bf92464b](https://github.com/vLLM-HUST/pegaflow-hust/tree/bf92464b91ec79c46c57b2d03851b51b2a0689d5)                                                                                                                                                  |
 | BidKV                              | 新共同运行时下 C1/C2/C4/C8/C16 与 Native 配对测试全部完成，原始记录校验与设备释放通过，已由 PR #283 发布。未触发抢占，不能宣称抢占收益。                                                                        | [a0cba97d](https://github.com/vLLM-HUST/vllm-hust-bidkv/tree/a0cba97d9abdc99908e46616db622f0e0099127f)                                                                                                                                                |
@@ -68,3 +71,18 @@ SHA256：`557cbf246b158b037f27896e276657dd4c32a7f0ff6dd11cb722fd021c7647f4`；38
 
 来源：[固定实验覆盖账本](https://github.com/vLLM-HUST/vllm-hust-dev-hub/blob/4b962ea46df6ed9d62bac904efd4733b29e5be8f/scripts/frontier_curves/catalog-coverage.json)。其中的本地原始归档路径和
 SHA256 用于追溯，并不表示归档已可公开下载。
+
+## 2026-09-27 增量复核
+
+对照昨日快照检查了 30 个仓库的默认分支及 17 个跟进线程，并读取发生变化的兼容性检查。没有发现新增、已能保持原 Frontier 配置直接补曲线的项目；这不表示所有未合并分支都经过完整审计。
+
+- KVCompression 更新到
+  [e51c566](https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/e51c566ae02791349956c5096d8670407e7a5344/src/vllm_ascend_kvcompress/provider.py#L383)，主要为版本/发布元数据变化；APC、MTP、async
+  的拒绝仍在。
+- SplitBatch 更新到
+  [8a36101](https://github.com/vLLM-HUST/vllm-ascend-split-batch-hust/blob/8a36101a796ee4915ed9ba563864258b405ed02e/src/vllm_ascend_split_batch/cascade_plugin.py#L235)。多
+  query 和 speculative/MTP 仍退回原生注意力；不能把该回退当成优化路径已生效。
+- AQK 的 [插件 PR #4](https://github.com/vLLM-HUST/vllm-ascend-adaptive-quantized-kv-hust/pull/4) 与
+  [Host PR #35](https://github.com/vLLM-HUST/vllm-ascend-hust/pull/35) 继续推进配置合同；仍缺校准 profile、BF16→C8
+  选择/加载和 cache-write 所有权，插件保持 import_only，尚无原配置硬件通过证据。
+- QuantizedKV、PegaFlow、LatchMoE、LayeredPrefill、vSpec、DiffSpec 默认头未变化，跟进线程中未见已解决前述阻断的新证据。

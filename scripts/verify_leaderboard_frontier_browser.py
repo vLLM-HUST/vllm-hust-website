@@ -4,6 +4,7 @@
 import argparse
 import copy
 import json
+import time
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -27,6 +28,17 @@ def click_point(page, dot):
     if dot.get_attribute("aria-expanded") != "true":
         page.locator(f'#frontier-popover [data-nearby="{point_id}"]').click()
     assert dot.get_attribute("aria-expanded") == "true"
+
+
+def download_configuration(page, popup, previous_download):
+    # Chromium silently drops burst downloads in LocalFrame::ShouldThrottleDownload.
+    # Pace this exhaustive UI check; retain every click and payload assertion.
+    remaining = 0.2 - (time.monotonic() - previous_download)
+    if remaining > 0:
+        page.wait_for_timeout(remaining * 1000)
+    with page.expect_download() as download:
+        popup.locator("[data-download]").click()
+    return download.value, time.monotonic()
 
 
 def assert_group_frontiers(page, points):
@@ -146,6 +158,7 @@ def main():
                 f"localStorage.setItem('vllm-hust_lang', '{language}')"
             )
             page = context.new_page()
+            previous_download = 0.0
             # A stale unversioned URL must not hide published points.
             page.route(
                 "**/data/leaderboard_frontier.json", lambda r: r.fulfill(json=empty)
@@ -393,10 +406,11 @@ def main():
                     box["y"] >= plot["y"]
                     and box["y"] + box["height"] <= plot["y"] + plot["height"]
                 )
-                with page.expect_download() as download:
-                    popup.locator("[data-download]").click()
+                download, previous_download = download_configuration(
+                    page, popup, previous_download
+                )
                 file = args.output / f"{width}-{language}-{point['id']}.json"
-                download.value.save_as(file)
+                download.save_as(file)
                 payload = json.loads(file.read_text())
                 assert payload["point"] == point
                 assert payload["cohort"] == production["cohorts"][0]
@@ -480,10 +494,11 @@ def main():
                     assert_parallel(text, params, language)
                     box = popup.bounding_box()
                     assert box["x"] >= 0 and box["x"] + box["width"] <= width
-                    with page.expect_download() as download:
-                        popup.locator("[data-download]").click()
+                    download, previous_download = download_configuration(
+                        page, popup, previous_download
+                    )
                     file = args.output / f"{width}-{language}-{point['id']}.json"
-                    download.value.save_as(file)
+                    download.save_as(file)
                     payload = json.loads(file.read_text())
                     assert payload["point"] == point and payload["cohort"] == cohort
                     popup.locator("[data-close]").click()

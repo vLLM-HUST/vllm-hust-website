@@ -165,8 +165,8 @@
       "maturity": "supported",
       "canonical_repository": "https://github.com/vllm-project/vllm",
       "upstream_repository": "https://github.com/kvcache-ai/Mooncake",
-      "summary_en": "Official vLLM MooncakeStoreConnector validated on Ascend with 9-key save/load and outage/recovery evidence; the non-invasive Host Provider checks NPU transport and operation evidence while Mooncake retains service ownership.",
-      "summary_zh": "官方 vLLM MooncakeStoreConnector 已在 Ascend 完成 9-key save/load 与故障恢复实测；无侵入 Host Provider 检查 NPU transport 和操作证据，Mooncake 仍保留服务所有权。",
+      "summary_en": "Official vLLM MooncakeStoreConnector validated on Ascend with 9-key save/load and outage/recovery evidence; the non-invasive Host Provider checks NPU transport and operation evidence while Mooncake retains service ownership. A separate manager-launched Qwen3.5 Frontier test of AscendStoreConnector + Mooncake completed five matched points, with throughput 1.02%–2.66% lower; these are not performance results for the official connector.",
+      "summary_zh": "官方 vLLM MooncakeStoreConnector 已在 Ascend 完成 9-key save/load 与故障恢复实测；无侵入 Host Provider 检查 NPU transport 和操作证据，Mooncake 仍保留服务所有权。 Qwen3.5 Frontier 另通过插件管理器测试 AscendStoreConnector + Mooncake：五档匹配对照吞吐低 1.02%–2.66%，并非官方连接器路径的性能结论。",
       "compatibility": {
         "status": "verified",
         "host": "vLLM official connector",

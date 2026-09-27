@@ -56587,6 +56587,2846 @@
         "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
         "execution_kind": "real-online"
       }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-native-tp2-c1-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native · TP2 · C1 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-native.sh",
+              "sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-native.json",
+              "state_sha256": "eb75056d8084ae9c0ceb7236597124d72ae04899be30ae0ea8c48a83dd211e2d",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-native.json.gz",
+              "sha256": "0595da92648c39f3f7d6150cfb4286a2de9f4f99c7a273755c9420275ad167af",
+              "content_sha256": "81b5cfd6a6a6a54e565045ea17fae7ab01f27d70d2e0f07f17365fd5d494d1ff",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 52505,
+          "measured_mean_client_inflight": 0.9993089459267341,
+          "full_client_concurrency_fraction": 0.9993089459267341,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 92.48444444444445,
+        "decode_p90_tps": 107.39977672186546,
+        "ttft_p95_ms": 1091.0671505145729,
+        "completed_requests": 148
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "9445105346354a8dab4ea0e93306ab4c"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-native-tp2-c2-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native · TP2 · C2 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-native.sh",
+              "sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-native.json",
+              "state_sha256": "eb75056d8084ae9c0ceb7236597124d72ae04899be30ae0ea8c48a83dd211e2d",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-native.json.gz",
+              "sha256": "0595da92648c39f3f7d6150cfb4286a2de9f4f99c7a273755c9420275ad167af",
+              "content_sha256": "81b5cfd6a6a6a54e565045ea17fae7ab01f27d70d2e0f07f17365fd5d494d1ff",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 73616,
+          "measured_mean_client_inflight": 1.9986550314414004,
+          "full_client_concurrency_fraction": 0.9986551685755451,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 153.2788888888889,
+        "decode_p90_tps": 98.51820537099914,
+        "ttft_p95_ms": 1345.076367817819,
+        "completed_requests": 213
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "61dc1cd7a9104944a4fdb09b8d88c243"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-native-tp2-c4-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native · TP2 · C4 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-native.sh",
+              "sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-native.json",
+              "state_sha256": "eb75056d8084ae9c0ceb7236597124d72ae04899be30ae0ea8c48a83dd211e2d",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-native.json.gz",
+              "sha256": "0595da92648c39f3f7d6150cfb4286a2de9f4f99c7a273755c9420275ad167af",
+              "content_sha256": "81b5cfd6a6a6a54e565045ea17fae7ab01f27d70d2e0f07f17365fd5d494d1ff",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 73616,
+          "measured_mean_client_inflight": 3.9977821084142975,
+          "full_client_concurrency_fraction": 0.9977855784559829,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 219.22444444444446,
+        "decode_p90_tps": 78.6941684952003,
+        "ttft_p95_ms": 1635.3148844558739,
+        "completed_requests": 324
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "66d0c8a2e13b4b3cadbcf9101c6ed10d"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-native-tp2-c8-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native · TP2 · C8 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-native.sh",
+              "sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-native.json",
+              "state_sha256": "eb75056d8084ae9c0ceb7236597124d72ae04899be30ae0ea8c48a83dd211e2d",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-native.json.gz",
+              "sha256": "0595da92648c39f3f7d6150cfb4286a2de9f4f99c7a273755c9420275ad167af",
+              "content_sha256": "81b5cfd6a6a6a54e565045ea17fae7ab01f27d70d2e0f07f17365fd5d494d1ff",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 77163,
+          "measured_mean_client_inflight": 7.9974707006901085,
+          "full_client_concurrency_fraction": 0.9974907595198601,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 293.93111111111114,
+        "decode_p90_tps": 58.51721297567176,
+        "ttft_p95_ms": 2099.8226694762707,
+        "completed_requests": 429
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "51dbe27ab1784371bcce89955a8df0dd"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-native-tp2-c16-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native · TP2 · C16 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-native.sh",
+              "sha256": "88cb83a8ce6f7e10793229fb80c7352ce10293259111d83cae873630a34fc074"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-native.json",
+              "state_sha256": "eb75056d8084ae9c0ceb7236597124d72ae04899be30ae0ea8c48a83dd211e2d",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-native.json.gz",
+              "sha256": "0595da92648c39f3f7d6150cfb4286a2de9f4f99c7a273755c9420275ad167af",
+              "content_sha256": "81b5cfd6a6a6a54e565045ea17fae7ab01f27d70d2e0f07f17365fd5d494d1ff",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 59524,
+          "measured_mean_client_inflight": 15.997307224525139,
+          "full_client_concurrency_fraction": 0.997397340339505,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-native-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 361.2477777777778,
+        "decode_p90_tps": 33.89532348647167,
+        "ttft_p95_ms": 3054.7701016068368,
+        "completed_requests": 567
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "796224b10df84cf3a4062c586d91bbb0"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c1-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Mooncake · TP2 · C1 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [
+          "mooncake-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [
+              "mooncake"
+            ],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-mooncake.sh",
+              "sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-mooncake.json",
+              "state_sha256": "4c29134fb0d8eb642a8d7f5aba65428af32083f9c1ecba1b0134c9633886c92e",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232",
+                "--kv-transfer-config",
+                "{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-mooncake.json.gz",
+              "sha256": "1d07dd421871d43ca162b1881e6feb7e5bdaa0bcf0263a52198d1f9472a5b1e7",
+              "content_sha256": "706f55a2bf6fc628f5b9efdbdd5f7819be5eaeed7e34252be8e2d24dba44f978",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 52505,
+          "measured_mean_client_inflight": 0.999339953655791,
+          "full_client_concurrency_fraction": 0.999339953655791,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232 --kv-transfer-config '{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}'",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false,
+          "kv_transfer_config": {
+            "kv_connector": "AscendStoreConnector",
+            "kv_connector_extra_config": {
+              "backend": "mooncake",
+              "lookup_rpc_port": "frontier_phase7",
+              "use_layerwise": false
+            },
+            "kv_load_failure_policy": "fail",
+            "kv_role": "kv_both"
+          },
+          "mod_runtime_effectiveness": {
+            "kind": "observed-runtime-counters",
+            "source": "vllm /metrics",
+            "status": "unavailable",
+            "series": [],
+            "transfer_bytes": null,
+            "effectiveness": null,
+            "interpretation": "No backend attribution or effectiveness inferred from generic counters; absent instrumentation is not zero transfer."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "mooncake-vllm-connectors",
+            "revision": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+            "local_adaptations": {
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "core_patch": {
+                "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+                "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+                "file_count": 3,
+                "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+              }
+            },
+            "repository": "https://github.com/vLLM-HUST/vllm-ascend-hust",
+            "source_capsule": "qwen35-managed-mooncake-20260926",
+            "scope": "AscendStoreConnector with managed Mooncake backend; not the official MooncakeStoreConnector",
+            "provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            }
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 91.19333333333333,
+        "decode_p90_tps": 106.46816271318905,
+        "ttft_p95_ms": 1127.3022273555396,
+        "completed_requests": 147
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "317aba975df24885aa9f353e9268c619"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c2-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Mooncake · TP2 · C2 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [
+          "mooncake-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [
+              "mooncake"
+            ],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-mooncake.sh",
+              "sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-mooncake.json",
+              "state_sha256": "4c29134fb0d8eb642a8d7f5aba65428af32083f9c1ecba1b0134c9633886c92e",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232",
+                "--kv-transfer-config",
+                "{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-mooncake.json.gz",
+              "sha256": "1d07dd421871d43ca162b1881e6feb7e5bdaa0bcf0263a52198d1f9472a5b1e7",
+              "content_sha256": "706f55a2bf6fc628f5b9efdbdd5f7819be5eaeed7e34252be8e2d24dba44f978",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 71192,
+          "measured_mean_client_inflight": 1.9987443871475343,
+          "full_client_concurrency_fraction": 0.9987445216149919,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232 --kv-transfer-config '{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}'",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false,
+          "kv_transfer_config": {
+            "kv_connector": "AscendStoreConnector",
+            "kv_connector_extra_config": {
+              "backend": "mooncake",
+              "lookup_rpc_port": "frontier_phase7",
+              "use_layerwise": false
+            },
+            "kv_load_failure_policy": "fail",
+            "kv_role": "kv_both"
+          },
+          "mod_runtime_effectiveness": {
+            "kind": "observed-runtime-counters",
+            "source": "vllm /metrics",
+            "status": "unavailable",
+            "series": [],
+            "transfer_bytes": null,
+            "effectiveness": null,
+            "interpretation": "No backend attribution or effectiveness inferred from generic counters; absent instrumentation is not zero transfer."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "mooncake-vllm-connectors",
+            "revision": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+            "local_adaptations": {
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "core_patch": {
+                "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+                "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+                "file_count": 3,
+                "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+              }
+            },
+            "repository": "https://github.com/vLLM-HUST/vllm-ascend-hust",
+            "source_capsule": "qwen35-managed-mooncake-20260926",
+            "scope": "AscendStoreConnector with managed Mooncake backend; not the official MooncakeStoreConnector",
+            "provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            }
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 150.93555555555557,
+        "decode_p90_tps": 97.55806873883617,
+        "ttft_p95_ms": 1448.5777372494335,
+        "completed_requests": 208
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "9ccc907cd6714f79bb01277e30f58a48"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c4-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Mooncake · TP2 · C4 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [
+          "mooncake-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [
+              "mooncake"
+            ],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-mooncake.sh",
+              "sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-mooncake.json",
+              "state_sha256": "4c29134fb0d8eb642a8d7f5aba65428af32083f9c1ecba1b0134c9633886c92e",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232",
+                "--kv-transfer-config",
+                "{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-mooncake.json.gz",
+              "sha256": "1d07dd421871d43ca162b1881e6feb7e5bdaa0bcf0263a52198d1f9472a5b1e7",
+              "content_sha256": "706f55a2bf6fc628f5b9efdbdd5f7819be5eaeed7e34252be8e2d24dba44f978",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 73616,
+          "measured_mean_client_inflight": 3.997918023098674,
+          "full_client_concurrency_fraction": 0.9979216871845226,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232 --kv-transfer-config '{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}'",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false,
+          "kv_transfer_config": {
+            "kv_connector": "AscendStoreConnector",
+            "kv_connector_extra_config": {
+              "backend": "mooncake",
+              "lookup_rpc_port": "frontier_phase7",
+              "use_layerwise": false
+            },
+            "kv_load_failure_policy": "fail",
+            "kv_role": "kv_both"
+          },
+          "mod_runtime_effectiveness": {
+            "kind": "observed-runtime-counters",
+            "source": "vllm /metrics",
+            "status": "unavailable",
+            "series": [],
+            "transfer_bytes": null,
+            "effectiveness": null,
+            "interpretation": "No backend attribution or effectiveness inferred from generic counters; absent instrumentation is not zero transfer."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "mooncake-vllm-connectors",
+            "revision": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+            "local_adaptations": {
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "core_patch": {
+                "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+                "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+                "file_count": 3,
+                "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+              }
+            },
+            "repository": "https://github.com/vLLM-HUST/vllm-ascend-hust",
+            "source_capsule": "qwen35-managed-mooncake-20260926",
+            "scope": "AscendStoreConnector with managed Mooncake backend; not the official MooncakeStoreConnector",
+            "provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            }
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 216.2811111111111,
+        "decode_p90_tps": 78.68991839391656,
+        "ttft_p95_ms": 1762.0817110873759,
+        "completed_requests": 318
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "3dd3ffa435584471a0829ca307ec3d59"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c8-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Mooncake · TP2 · C8 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [
+          "mooncake-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [
+              "mooncake"
+            ],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-mooncake.sh",
+              "sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-mooncake.json",
+              "state_sha256": "4c29134fb0d8eb642a8d7f5aba65428af32083f9c1ecba1b0134c9633886c92e",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232",
+                "--kv-transfer-config",
+                "{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-mooncake.json.gz",
+              "sha256": "1d07dd421871d43ca162b1881e6feb7e5bdaa0bcf0263a52198d1f9472a5b1e7",
+              "content_sha256": "706f55a2bf6fc628f5b9efdbdd5f7819be5eaeed7e34252be8e2d24dba44f978",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 77163,
+          "measured_mean_client_inflight": 7.997586986648126,
+          "full_client_concurrency_fraction": 0.9976061220394654,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232 --kv-transfer-config '{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}'",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false,
+          "kv_transfer_config": {
+            "kv_connector": "AscendStoreConnector",
+            "kv_connector_extra_config": {
+              "backend": "mooncake",
+              "lookup_rpc_port": "frontier_phase7",
+              "use_layerwise": false
+            },
+            "kv_load_failure_policy": "fail",
+            "kv_role": "kv_both"
+          },
+          "mod_runtime_effectiveness": {
+            "kind": "observed-runtime-counters",
+            "source": "vllm /metrics",
+            "status": "unavailable",
+            "series": [],
+            "transfer_bytes": null,
+            "effectiveness": null,
+            "interpretation": "No backend attribution or effectiveness inferred from generic counters; absent instrumentation is not zero transfer."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "mooncake-vllm-connectors",
+            "revision": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+            "local_adaptations": {
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "core_patch": {
+                "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+                "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+                "file_count": 3,
+                "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+              }
+            },
+            "repository": "https://github.com/vLLM-HUST/vllm-ascend-hust",
+            "source_capsule": "qwen35-managed-mooncake-20260926",
+            "scope": "AscendStoreConnector with managed Mooncake backend; not the official MooncakeStoreConnector",
+            "provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            }
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 290.93444444444447,
+        "decode_p90_tps": 56.37029446213708,
+        "ttft_p95_ms": 2068.5180490836497,
+        "completed_requests": 425
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "beb80910bbda46039a4aa7066b949f1f"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-managed-mooncake-mooncake-tp2-c16-r1-20260926",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Mooncake · TP2 · C16 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "Frozen qualified phase8 runtime; exact source hashes in runtime receipt",
+        "mods": [
+          "mooncake-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte KV per chip; Mooncake backend as recorded in frozen manager/runtime sources",
+          "comparison_scope": "One matched 900s observation per cell, candidate then Native; no repeatability or isolated-transfer speedup claim",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "physical_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "max_cudagraph_capture_size": 48,
+          "runtime_receipt": {
+            "pod_uid": "19a77c6d-a27a-4c6e-b955-e016beca3a82",
+            "namespace": "coder-workspaces",
+            "pod": "coder-admin-shuhao-evaluation-664b765847-wfh7z",
+            "node": "host-192-168-0-84",
+            "container_allocated_npus": 4,
+            "serving_devices": [
+              0,
+              1
+            ],
+            "serving_chips": 2,
+            "port": 33783,
+            "packages": {},
+            "cann": "9.1.0",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "launch_script_sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52",
+            "core_commit": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "model": "Qwen3.5-35B-A3B",
+            "model_provenance": "ModelScope complete source manifest; 5 matching readonly mounted shards; remaining9 copied and all22 files SHA verified. Historical HF revision equivalence not claimed.",
+            "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+            "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+            "worker": "pipeline_worker.Worker",
+            "comparison": "Phase7 frozen manager/runtime; Mooncake versus Native; original Frontier TP2",
+            "mods": [
+              "mooncake"
+            ],
+            "campaign": "qwen35-managed-mooncake-20260926",
+            "output_budget_admission": false,
+            "length_source": "Declared exact ignore_eos output budget; no learned predictor",
+            "concurrency_sweep": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "base_wheel_sha256": "0e6ba24d581ef9200aa38ae6773363633070a21a84ce229fbe41bbedc054ae42",
+            "core_commit_kind": "base plus explicit core_patch and frozen file hashes",
+            "ascend_provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            },
+            "mooncake_provenance": {
+              "kind": "phase7 frozen built artifacts",
+              "file_count": 37,
+              "files_sha256": "d008f86e56838201b574a912783b0ce2e2e859ff3132e885e58766fbee9e8fe6"
+            },
+            "launch_environment_source": {
+              "path": "/home/coder/frontier-mods-qwen35-20260925/phase8/launch-mooncake.sh",
+              "sha256": "6bb34a29738369163566aefc75a918fdf6d249b8e5c8d4bd85e5f6c54d430c52"
+            },
+            "python": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+            "manager": {
+              "state_path": "/home/coder/frontier-mods-qwen35-20260925/phase7/manager-mooncake.json",
+              "state_sha256": "4c29134fb0d8eb642a8d7f5aba65428af32083f9c1ecba1b0134c9633886c92e",
+              "qualified_command": [
+                "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python",
+                "-m",
+                "vllm.entrypoints.cli.main",
+                "serve",
+                "/home/coder/frontier-mods-qwen35-20260925/model",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "33783",
+                "--served-model-name",
+                "frontier-qwen35-mooncake",
+                "--tensor-parallel-size",
+                "2",
+                "--pipeline-parallel-size",
+                "1",
+                "--distributed-executor-backend",
+                "mp",
+                "--worker-cls",
+                "pipeline_worker.Worker",
+                "--dtype",
+                "bfloat16",
+                "--kv-cache-dtype",
+                "auto",
+                "--max-model-len",
+                "262144",
+                "--max-num-seqs",
+                "16",
+                "--max-num-batched-tokens",
+                "4096",
+                "--gpu-memory-utilization",
+                "0.95",
+                "--seed",
+                "17",
+                "--enable-prefix-caching",
+                "--mamba-cache-mode",
+                "align",
+                "--enable-prompt-tokens-details",
+                "--async-scheduling",
+                "--shutdown-timeout",
+                "60",
+                "--additional-config",
+                "{\"enable_cpu_binding\":false}",
+                "--limit-mm-per-prompt",
+                "{\"image\":0,\"video\":0}",
+                "--compilation-config",
+                "{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}",
+                "--speculative-config",
+                "{\"method\": \"mtp\", \"num_speculative_tokens\": 2}",
+                "--generation-config",
+                "vllm",
+                "--override-generation-config",
+                "{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}",
+                "--default-chat-template-kwargs",
+                "{\"enable_thinking\":true}",
+                "--kv-cache-memory-bytes",
+                "26038239232",
+                "--kv-transfer-config",
+                "{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}"
+              ]
+            },
+            "qualification_root": "/home/coder/frontier-mods-qwen35-20260925/phase7",
+            "core_patch": {
+              "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+              "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+              "file_count": 3,
+              "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+            },
+            "effective_runtime_provenance": "Phase7 manifest and runtime_source_files supersede historical phase4 metadata",
+            "package_provenance": "Frozen phase7 source hashes; do not infer versions from phase4",
+            "runtime_source_files_sha256": "678d6e7316c4c817f6346fcc5f6a93cf5427fe66cfe61ebcfafd4dacf047f8ed",
+            "runtime_source_file_count": 6455,
+            "full_metadata": {
+              "url": "https://vllm-hust.sage.org.ai/reports/frontier-managed-mooncake-20260926/metadata-mooncake.json.gz",
+              "sha256": "1d07dd421871d43ca162b1881e6feb7e5bdaa0bcf0263a52198d1f9472a5b1e7",
+              "content_sha256": "706f55a2bf6fc628f5b9efdbdd5f7819be5eaeed7e34252be8e2d24dba44f978",
+              "encoding": "gzip"
+            }
+          },
+          "worker_class": "pipeline_worker.Worker (profiling disabled)",
+          "model_provider": "ModelScope",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "checkpoint_verification": "All 22 model files SHA256 and size match official revision tree",
+          "functional_status": "passed",
+          "functional_scope": "26 exact retrieval probes: cold/warm 1K..262080 and 16 concurrent; not general answer-quality certification",
+          "source_capsule": "qwen35-managed-mooncake-20260926",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "worker_abi_bridge_sha256": "a63c615acf7dd23062ab5e8407fcd8c30d1346c51becf2f5f9bd6483beb457e6",
+          "observed_max_prompt_tokens": 59957,
+          "measured_mean_client_inflight": 15.997494894226806,
+          "full_client_concurrency_fraction": 0.9975885347442495,
+          "execution_host": "user-provided-kubernetes-container",
+          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-mooncake --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config '{\"enable_cpu_binding\":false}' --limit-mm-per-prompt '{\"image\":0,\"video\":0}' --compilation-config '{\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48}' --speculative-config '{\"method\": \"mtp\", \"num_speculative_tokens\": 2}' --generation-config vllm --override-generation-config '{\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0}' --default-chat-template-kwargs '{\"enable_thinking\":true}' --kv-cache-memory-bytes 26038239232 --kv-transfer-config '{\"kv_connector\":\"AscendStoreConnector\",\"kv_connector_extra_config\":{\"backend\":\"mooncake\",\"lookup_rpc_port\":\"frontier_phase7\",\"use_layerwise\":false},\"kv_load_failure_policy\":\"fail\",\"kv_role\":\"kv_both\"}'",
+          "pod_npu_quota": 4,
+          "participating_deployment_chips": 2,
+          "release_verified": true,
+          "pod_memory_limit_gib": 128,
+          "request_history_mode": "Closed-loop actual output IDs feed the next input; compiled prompt lengths and output budgets remain fixed",
+          "window_cache_lifecycle": "Fresh service per arm; 26 retrieval requests, 60s prefix gate, then serial C1/2/4/8/16 without resets",
+          "scheduler_reserve_output_budget": false,
+          "kv_transfer_config": {
+            "kv_connector": "AscendStoreConnector",
+            "kv_connector_extra_config": {
+              "backend": "mooncake",
+              "lookup_rpc_port": "frontier_phase7",
+              "use_layerwise": false
+            },
+            "kv_load_failure_policy": "fail",
+            "kv_role": "kv_both"
+          },
+          "mod_runtime_effectiveness": {
+            "kind": "observed-runtime-counters",
+            "source": "vllm /metrics",
+            "status": "unavailable",
+            "series": [],
+            "transfer_bytes": null,
+            "effectiveness": null,
+            "interpretation": "No backend attribution or effectiveness inferred from generic counters; absent instrumentation is not zero transfer."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "mooncake-vllm-connectors",
+            "revision": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+            "local_adaptations": {
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "core_patch": {
+                "base_revision": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+                "revision": "49f082797535ef2f730639e008588a5912a20d2c",
+                "file_count": 3,
+                "files_sha256": "c8e02a5e1ef81c8bf960c7aa505b88f182903b93475a398256ab2b7b1d51693c"
+              }
+            },
+            "repository": "https://github.com/vLLM-HUST/vllm-ascend-hust",
+            "source_capsule": "qwen35-managed-mooncake-20260926",
+            "scope": "AscendStoreConnector with managed Mooncake backend; not the official MooncakeStoreConnector",
+            "provenance": {
+              "kind": "frozen phase7 wheel files plus tracker fix",
+              "tracker_fix": {
+                "revision": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+                "base": "66350e7b7d8ec68ad68a14fb841678054f2c0f98",
+                "file": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+                "before_sha256": "ccf9d0bab338dbf2012948513b52b35456df8f78312f0157649aa050b09194bd",
+                "after_sha256": "287fd133af2403e0831b0a5c0d3e01e2419fa7d3506fac5dc55fd824b7eb1024",
+                "scope": "Single source change in copied qualified wheel; same runtime in both arms"
+              },
+              "file_count": 1160,
+              "files_sha256": "65126caafd3bd263b1ece61b82681edd399fc7b07421537a5a3635cebb6d3528"
+            }
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-managed-mooncake-mooncake-20260926-r1"
+      },
+      "metrics": {
+        "output_tps": 351.6322222222222,
+        "decode_p90_tps": 34.07206610945322,
+        "ttft_p95_ms": 2601.3813056517374,
+        "completed_requests": 552
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+        "run_ids": [
+          "522f027ca0514a50b84903188b904f43"
+        ],
+        "aggregation": "One unpooled 900s observation; count actual streamed output tokens inside window; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-managed-mooncake-20260926",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "sampling_date_utc": "2026-09-26",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "execution_kind": "real-online"
+      }
     }
   ],
   "archived_points": [

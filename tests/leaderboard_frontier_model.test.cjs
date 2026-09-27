@@ -139,7 +139,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(p.configuration.parameters.pipeline_parallel_size,1);
             for(const key of ['owned_server_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
             assert.ok(run.validation.prefix_hit_token_delta>0);
-        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-managed-tiering-20260926'){
+        } else if(['qwen35-managed-tiering-20260926','qwen35-managed-mooncake-20260926'].includes(p.evidence.benchmark_protocol.campaign)){
             assert.equal(run.retrieval_qualification.passed,true);
             assert.equal(run.retrieval_qualification.completed_requests,26);
             assert.equal(p.configuration.hardware.accelerator_count,2);
