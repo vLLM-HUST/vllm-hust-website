@@ -430,6 +430,9 @@ def main():
             assert page.locator(".frontier-concurrency-line").count() == 0
             for checkbox in page.locator("[data-filter]").all():
                 checkbox.check()
+            # Keep this pass on the default D1 series after restoring the
+            # other filters; D2 has its own checks above.
+            page.locator('[data-filter="rotation"][value="2"]').uncheck()
             assert (
                 page.locator(
                     '[data-filter=mods][value="betterscale-AEseparation"]'
