@@ -40,7 +40,7 @@
     return rows.every(Boolean) ? rows : null;
   }
   function summarize(data, frontier) {
-    if (data.schema_version !== 'plugin-performance/v5'
+    if (data.schema_version !== 'plugin-performance/v6'
         || data.metric !== 'output_tps' || data.aggregation !== 'geometric-mean'
         || JSON.stringify(data.concurrencies) !== '[1,2,4,8,16]'
         || !Array.isArray(data.comparison_sets)) throw new Error('Invalid comparison contract');
@@ -77,22 +77,23 @@
         baseline_point_id: baseline[index].id,
         gain: (point.metrics.output_tps / baseline[index].metrics.output_tps - 1) * 100
       })) : [];
-      const published = entry.published_comparison;
-      if (published && (entry.series_id
-          || published.metric !== data.metric
-          || !Number.isFinite(published.baseline) || published.baseline <= 0
-          || !Number.isFinite(published.candidate) || published.candidate <= 0
-          || !published.model_label || !published.scope)) {
+      const published = entry.published_comparisons;
+      if (published && (entry.series_id || !Array.isArray(published) || !published.length
+          || published.some(row => row.metric !== data.metric
+            || !Number.isFinite(row.baseline) || row.baseline <= 0
+            || !Number.isFinite(row.candidate) || row.candidate <= 0
+            || !row.model_label || !row.scope)
+          || published.some(row => row.model_label !== published[0].model_label))) {
         throw new Error('Invalid published comparison');
       }
       const gain = comparisons.length
         ? (Math.exp(comparisons.reduce((sum, row) => sum + Math.log1p(row.gain / 100), 0) / comparisons.length) - 1) * 100
-        : published ? (published.candidate / published.baseline - 1) * 100 : null;
+        : published ? (Math.exp(published.reduce((sum, row) => sum + Math.log(row.candidate / row.baseline), 0) / published.length) - 1) * 100 : null;
       const modelLabel = baseline
         ? frontier.cohorts.find(cohort => cohort.id === baseline[0].cohort_id)?.model.label
-        : published?.model_label || null;
+        : published?.[0].model_label || null;
       return [entry.id, { ...entry, gain,
-        count: comparisons.length || (published ? 1 : 0), comparisons,
+        count: comparisons.length || (published ? published.length : 0), comparisons,
         baseline_series_id: baselineSeriesId || null, modelLabel,
         source: comparisons.length ? 'frontier' : published ? 'published-comparison' : null }];
     }));
