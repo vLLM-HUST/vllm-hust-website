@@ -704,11 +704,16 @@ vllm-hust-ext extension check ${extensionId}`
     const value = measured ? format(result.gain) : (zh ? "缺数据" : "No data");
     panel.append(element("strong", measured && result.gain < 0 ? "performance-negative" : "", value));
     if (measured) {
-      panel.append(element("span", "", [result.modelLabel, zh ? "吞吐提升 · vs Native" : "Throughput gain · vs Native"].filter(Boolean).join(" · ")));
-      const link = element("a", "plugin-public-effect-link", "Frontier ↗");
-      link.href = "./leaderboard-runs.html#frontier";
-      link.title = (zh ? "C1/2/4/8/16 吞吐比的几何平均。" : "Geometric mean of C1/2/4/8/16 throughput ratios. ")
-        + result.comparisons.map(row => `C${row.concurrency}: ${format(row.gain)}`).join(" · ");
+      panel.append(element("span", "", [result.modelLabel, zh ? "输出吞吐" : "Output throughput"].filter(Boolean).join(" · ")));
+      const frontier = result.source === "frontier";
+      const link = element("a", "plugin-public-effect-link", frontier ? "Frontier ↗" : (zh ? "实测 ↗" : "Evidence ↗"));
+      link.href = frontier ? "./leaderboard-runs.html#frontier" : result.url;
+      link.target = frontier ? "" : "_blank";
+      link.rel = frontier ? "" : "noopener noreferrer";
+      link.title = frontier
+        ? (zh ? "C1/2/4/8/16 吞吐比的几何平均。" : "Geometric mean of C1/2/4/8/16 throughput ratios. ")
+          + result.comparisons.map(row => `C${row.concurrency}: ${format(row.gain)}`).join(" · ")
+        : result.published_comparison.scope;
       panel.append(link);
     }
     return panel;
@@ -954,7 +959,8 @@ vllm-hust-ext extension check ${extensionId}`
     });
     catalog.replaceChildren();
     const grid = element("section", "plugin-grid workshop-grid");
-    const visibleLimit = pageSize;
+    const measuredCount = visible.filter(item => Number.isFinite(performanceResults.get(item.id)?.gain)).length;
+    const visibleLimit = Math.max(pageSize, measuredCount);
     const displayed = query || expanded ? visible : visible.slice(0, visibleLimit);
     displayed.forEach((item) => grid.append(renderCard(item)));
     catalog.append(grid);
@@ -1006,8 +1012,8 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=pipeline-existing-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=pipeline-existing-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
+      fetch("./data/plugin-performance.json?v=all-tested-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=all-tested-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {

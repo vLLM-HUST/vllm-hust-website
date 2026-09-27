@@ -20,6 +20,9 @@ WORKSHOP_METADATA = json.loads(
 WORKLOAD_NAVIGATION = json.loads(
     (ROOT / "data" / "plugin-workload-navigation.json").read_text(encoding="utf-8")
 )
+PLUGIN_PERFORMANCE = json.loads(
+    (ROOT / "data" / "plugin-performance.json").read_text(encoding="utf-8")
+)
 CORE_CONTRIBUTORS = json.loads(
     (ROOT / "data" / "core_contributors.json").read_text(encoding="utf-8")
 )
@@ -444,7 +447,7 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
-    assert "const visibleLimit = pageSize;" in SCRIPT
+    assert "const visibleLimit = Math.max(pageSize, measuredCount);" in SCRIPT
 
 
 def test_workshop_supports_workload_guided_discovery() -> None:
@@ -465,7 +468,7 @@ def test_workshop_supports_workload_guided_discovery() -> None:
             "source_patch",
         }
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
-    }
+    } | {item["id"] for item in PLUGIN_PERFORMANCE["entries"]}
     assert set(mappings) == workshop_mods
     assert len(traits) >= 8
     for profile in traits.values():
@@ -487,12 +490,14 @@ def test_workshop_supports_workload_guided_discovery() -> None:
     assert ".plugin-workload-tag" in STYLES
 
 
-def test_workshop_does_not_present_official_connectors_or_systems_as_mods() -> None:
+def test_workshop_adds_only_measured_connectors_to_the_mod_catalog() -> None:
     assert "isWorkshopMod(item) && matchesSelectedType(item)" in SCRIPT
     assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
-    assert "Only independent vLLM-HUST extension repositories appear here." in PAGE
-    assert "official connectors" in PAGE
-    assert "官方 Connector" in PAGE
+    assert (
+        "Independent vLLM-HUST extensions and manager-tested carriers appear here."
+        in PAGE
+    )
+    assert "performanceResults.has(item.id)" in SCRIPT
 
 
 def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> None:
@@ -696,13 +701,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v21-runnable-only"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v22-tested"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v12-runnable-only"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v13-tested"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v5-runnable-only"'
+        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v6-tested"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -1001,19 +1006,17 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 12
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 15
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
 
 
-def test_non_runnable_descriptors_and_source_scaffolds_are_not_published():
+def test_unmeasured_descriptors_and_source_scaffolds_are_not_published():
     unpublished = {
         "ascend-adaptive-quantized-kv",
         "ascend-quant-runtime-descriptor",
-        "dla",
         "knorm-migration",
-        "kv-tiering-migration",
         "kv-transfer-observability-migration",
         "pyramidkv-ascend-migration",
     }
@@ -1021,6 +1024,25 @@ def test_non_runnable_descriptors_and_source_scaffolds_are_not_published():
         assert by_id(component_id)["public_surface"] is False
     assert unpublished.isdisjoint(WORKLOAD_NAVIGATION["plugins"])
     assert unpublished.isdisjoint(WORKSHOP_METADATA["plugins"])
+
+
+def test_measured_mods_remain_published_even_when_the_effect_is_negative():
+    measured = {
+        "betterscale",
+        "pipeline-microbatch-migration",
+        "kvcompress-ascend",
+        "bidkv",
+        "dla",
+        "mooncake-vllm-connectors",
+        "kv-tiering-migration",
+        "diffspec",
+        "latchmoe",
+        "vspec",
+    }
+    assert "performanceResults.has(item.id)" in SCRIPT
+    assert "Math.max(pageSize, measuredCount)" in SCRIPT
+    assert measured <= set(WORKLOAD_NAVIGATION["plugins"])
+    assert {"dla", "kv-tiering-migration"} <= set(WORKSHOP_METADATA["plugins"])
 
 
 def test_compact_greedy_incubator_is_not_in_public_catalog():

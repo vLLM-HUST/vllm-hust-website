@@ -6,9 +6,9 @@ const data = JSON.parse(fs.readFileSync('data/plugin-performance.json'));
 const frontier = JSON.parse(fs.readFileSync('data/leaderboard_frontier.json'));
 const points = new Map(frontier.points.map(point => [point.id, point]));
 
-test('every published gain is computed from five points in a declared comparison set', () => {
+test('every Frontier gain is computed from five points in a declared comparison set', () => {
   const results = M.summarize(data, frontier);
-  const measured = [...results.values()].filter(result => Number.isFinite(result.gain));
+  const measured = [...results.values()].filter(result => result.source === 'frontier');
   assert.ok(measured.length >= 1);
   for (const result of measured) {
     assert.equal(result.count, 5);
@@ -30,6 +30,26 @@ test('every published gain is computed from five points in a declared comparison
   assert.equal(results.get('pipeline-microbatch-migration').gain.toFixed(2), '9.78');
 });
 
+test('published paired runs expose both gains and regressions without precomputed scores', () => {
+  const results = M.summarize(data, frontier);
+  const expected = {
+    vspec: '51.80',
+    'kvcompress-ascend': '10.25',
+    diffspec: '-70.66',
+    latchmoe: '-87.65'
+  };
+  for (const [id, gain] of Object.entries(expected)) {
+    const result = results.get(id);
+    assert.equal(result.source, 'published-comparison');
+    assert.equal(result.count, 1);
+    assert.equal(result.gain.toFixed(2), gain);
+    assert.ok(result.url.startsWith('https://github.com/vLLM-HUST/'));
+    assert.ok(result.published_comparison.baseline > 0);
+    assert.ok(result.published_comparison.candidate > 0);
+  }
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 10);
+});
+
 test('comparison sets declare baselines centrally and entries cannot supply a baseline or score', () => {
   const results = M.summarize(data, frontier);
   const declared = new Set(data.comparison_sets.map(set => set.baseline_series_id));
@@ -43,6 +63,22 @@ test('comparison sets declare baselines centrally and entries cannot supply a ba
   const duplicate = structuredClone(data);
   duplicate.comparison_sets[1].entry_ids.push('bidkv');
   assert.throws(() => M.summarize(duplicate, frontier), /multiple comparison sets/);
+});
+
+test('published comparisons require raw matched values and cannot shadow a Frontier series', () => {
+  for (const edit of [
+    comparison => { comparison.baseline = 0; },
+    comparison => { comparison.metric = 'request_tps'; },
+    comparison => { comparison.scope = ''; }
+  ]) {
+    const invalid = structuredClone(data);
+    const entry = invalid.entries.find(row => row.id === 'vspec');
+    edit(entry.published_comparison);
+    assert.throws(() => M.summarize(invalid, frontier), /Invalid published comparison/);
+  }
+  const invalid = structuredClone(data);
+  invalid.entries.find(row => row.id === 'vspec').series_id = 'swe-unified-bidkv-20260927';
+  assert.throws(() => M.summarize(invalid, frontier), /Invalid published comparison/);
 });
 
 test('series outside declared comparison sets do not produce percentages', () => {
@@ -97,15 +133,18 @@ test('missing or duplicated concurrency windows cannot turn a partial curve into
   assert.throws(() => M.summarize(data, {...frontier, points: frontier.points.filter(point => point.id !== native)}), /Native series/);
 });
 
-test('catalog sorts comparable percentages before every missing score', () => {
+test('catalog sorts every measured percentage from gain through regression', () => {
   const results = new Map([['fast', {gain: 25}], ['slow', {gain: -3}], ['pending', {gain: null}]]);
   const rows = ['pending', 'slow', 'unknown', 'fast'].map(id => ({id}));
   assert.deepEqual(rows.sort((a, b) => M.compare(a, b, results)).map(row => row.id),
     ['fast', 'slow', 'pending', 'unknown']);
   const real = M.summarize(data, frontier);
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
-  assert.ok(Number.isFinite(sorted[0].gain));
-  assert.ok(sorted.slice(1).every(row => !Number.isFinite(row.gain) || sorted[0].gain >= row.gain));
+  assert.deepEqual(sorted.map(row => row.id), [
+    'vspec', 'betterscale', 'kvcompress-ascend', 'pipeline-microbatch-migration',
+    'bidkv', 'dla', 'mooncake-vllm-connectors', 'kv-tiering-migration',
+    'diffspec', 'latchmoe'
+  ]);
 });
 
 test('ECPA evidence is preserved in metadata without becoming a performance claim', () => {
