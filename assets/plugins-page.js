@@ -695,14 +695,25 @@ vllm-hust-ext extension check ${extensionId}`
 
   function performancePanel(result) {
     const panel = element("div", "plugin-performance");
-    const value = result.gain === null ? (language() === "zh" ? "待统一基准补测" : "Awaiting shared baseline")
+    const zh = language() === "zh";
+    const measured = result.measuredPointCount > 0;
+    const value = result.gain === null
+      ? (measured ? (zh ? "已有 Frontier 实测" : "Frontier measurements available")
+        : (zh ? "已有项目实测" : "Project measurements available"))
       : `${result.gain >= 0 ? "+" : ""}${result.gain.toFixed(2)}%`;
-    panel.append(element("strong", result.gain < 0 ? "performance-negative" : "", value),
-      element("span", "", language() === "zh" ? "统一 Native 验收后参与排序" : "Ranked only after shared-Native qualification"),
-      element("p", "", local(result, "scope")));
+    panel.append(element("strong", result.gain < 0 ? "performance-negative" : "", value));
+    if (measured) {
+      panel.append(element("p", "", zh
+        ? `Qwen3.5-35B · ${result.measuredPointCount} 个实测点 · 并发 ${result.measuredConcurrencies.join(" / ")}`
+        : `Qwen3.5-35B · ${result.measuredPointCount} measured points · concurrency ${result.measuredConcurrencies.join(" / ")}`));
+      const frontierLink = element("a", "plugin-public-effect-link", zh ? "查看 Frontier 曲线 ↗" : "View Frontier curves ↗");
+      frontierLink.href = "./leaderboard-runs.html#frontier";
+      panel.append(frontierLink);
+    }
+    panel.append(element("p", "", local(result, "scope")));
     const link = element("a", "plugin-public-effect-link", copy().effectSource + " ↗");
     link.href = result.url;
-    panel.append(link);
+    if (!measured || result.url !== "./leaderboard-runs.html#frontier") panel.append(link);
     const launchLabels = language() === "zh" ? {
       "manager-verified": "ECPA 启动已验收",
       "manager-verified-supplemental-adapter": "ECPA 启动已验收 · 补充适配",
@@ -738,9 +749,8 @@ vllm-hust-ext extension check ${extensionId}`
   }
 
   function publicEffectPanel(item) {
-    const result = performanceResults.has(item.id)
-      ? (language() === "zh" ? "历史结果仅供查阅，尚未通过统一 Native 基准验收，不展示跨基准性能比较。" : "Historical evidence only; shared-Native qualification is pending. Cross-baseline performance comparisons are not displayed.")
-      : local(item, "public_effect");
+    if (performanceResults.has(item.id)) return null;
+    const result = local(item, "public_effect");
     if (!result || !item.public_effect_status || !item.public_effect_url) return null;
     const panel = element("section", `plugin-public-effect effect-${item.public_effect_status}`);
     const head = element("div", "plugin-public-effect-head");
@@ -1032,7 +1042,7 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=shared-native-ecpa-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/plugin-performance.json?v=frontier-evidence-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=qwen35-mooncake-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])

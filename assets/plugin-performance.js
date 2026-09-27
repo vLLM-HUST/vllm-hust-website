@@ -12,7 +12,7 @@
     'specialized-experiment-script',
     'not-evaluated'
   ]);
-  function summarize(data) {
+  function summarize(data, frontier = {points: []}) {
     if (data.schema_version !== 'plugin-performance/v2' || data.baseline !== null
         || data.status !== 'awaiting-unified-native') throw new Error('Unified Native evidence is not admitted');
     if (data.ecpa_experiment_boundary?.performance_analysis !== 'external-harness'
@@ -35,7 +35,15 @@
             || !entry.ecpa.defect_evidence)) {
         throw new Error(`Invalid supplemental adapter evidence: ${entry.id}`);
       }
-      return [entry.id, { ...entry, gain: null, count: 0 }];
+      const points = frontier.points.filter(point =>
+        point.cohort_id === 'qwen35-35b-a3b-bf16-sweprefix-smoke-v1'
+        && point.configuration?.mods?.includes(entry.id)
+        && point.evidence?.status === 'measured'
+        && Number.isFinite(point.metrics?.output_tps));
+      return [entry.id, { ...entry, gain: null, count: 0,
+        measuredPointCount: points.length,
+        measuredConcurrencies: [...new Set(points.map(point => point.load.concurrency))].sort((a, b) => a - b)
+      }];
     }));
   }
   function compare(left, right, results) {

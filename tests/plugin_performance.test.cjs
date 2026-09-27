@@ -54,3 +54,18 @@ test('catalog sorts admitted gains descending, leaving pending items to catalog 
     ['fast', 'slow', 'pending', 'unknown']);
   assert.equal(M.compare({id: 'pending'}, {id: 'unknown'}, results), 0);
 });
+
+test('existing Frontier evidence remains measured independently of ranking admission', () => {
+  const frontier = JSON.parse(fs.readFileSync('data/leaderboard_frontier.json'));
+  const result = M.summarize(data, frontier).get('betterscale');
+  const expected = frontier.points.filter(point =>
+    point.cohort_id === 'qwen35-35b-a3b-bf16-sweprefix-smoke-v1'
+    && point.configuration.mods.includes('betterscale') && point.evidence.status === 'measured');
+  assert.equal(result.measuredPointCount, expected.length);
+  assert.ok(result.measuredPointCount >= 5);
+  for (const concurrency of [1, 2, 4, 8, 16]) assert.ok(result.measuredConcurrencies.includes(concurrency));
+  assert.equal(result.gain, null);
+  const invalid = structuredClone(frontier);
+  invalid.points.forEach(point => {point.evidence.status = 'pending';});
+  assert.equal(M.summarize(data, invalid).get('betterscale').measuredPointCount, 0);
+});

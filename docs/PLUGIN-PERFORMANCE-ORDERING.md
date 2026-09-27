@@ -40,3 +40,9 @@ release have an independent regression result.
 Performance ordering belongs to the existing MOD catalog, with no separate results section. Admitted
 gains sort descending, including negative gains; items without an admitted score follow and retain
 the catalog compatibility/name ordering. Historical evidence alone grants no priority.
+
+Published Frontier evidence is independent of gain-ranking admission. The catalog derives measured
+point coverage directly from the Qwen3.5 SWE Frontier data and links to the existing curves. A
+pending ranking review must never relabel completed measurements as waiting for another run.
+BetterScale already has C1/2/4/8/16 curves alongside a complete Native series;
+baseline/configuration mapping still needs review before assigning a cross-MOD gain score.
