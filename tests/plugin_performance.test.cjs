@@ -69,9 +69,9 @@ test('missing or duplicated concurrency windows cannot turn a partial curve into
   assert.throws(() => M.summarize(data, {...frontier, points: frontier.points.filter(point => point.id !== native)}), /Native series/);
 });
 
-test('catalog sorts positive and negative gains descending, with unavailable scores last', () => {
+test('catalog sorts percentages, then records with data, then missing records', () => {
   const results = new Map([['fast', {gain: 25}], ['slow', {gain: -3}], ['pending', {gain: null}]]);
-  const rows = ['pending', 'slow', 'unknown', 'fast'].map(id => ({id}));
+  const rows = ['unknown', 'slow', 'pending', 'fast'].map(id => ({id}));
   assert.deepEqual(rows.sort((a, b) => M.compare(a, b, results)).map(row => row.id),
     ['fast', 'slow', 'pending', 'unknown']);
   const real = M.summarize(data, frontier);

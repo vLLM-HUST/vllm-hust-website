@@ -74,7 +74,9 @@
     const a = results.get(left.id)?.gain, b = results.get(right.id)?.gain;
     const aMeasured = Number.isFinite(a), bMeasured = Number.isFinite(b);
     if (aMeasured !== bMeasured) return aMeasured ? -1 : 1;
-    return aMeasured ? b - a : 0;
+    if (aMeasured) return b - a;
+    const aHasData = results.has(left.id), bHasData = results.has(right.id);
+    return aHasData === bHasData ? 0 : aHasData ? -1 : 1;
   }
   const api = { summarize, compare };
   if (typeof module === 'object' && module.exports) module.exports = api;

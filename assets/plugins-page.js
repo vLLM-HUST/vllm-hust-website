@@ -697,14 +697,19 @@ vllm-hust-ext extension check ${extensionId}`
     const panel = element("div", "plugin-performance");
     const zh = language() === "zh";
     const format = value => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
-    const value = Number.isFinite(result.gain) ? format(result.gain) : "—";
-    panel.append(element("strong", result.gain < 0 ? "performance-negative" : "", value),
-      element("span", "", [result.modelLabel, zh ? "吞吐提升 · vs Native" : "Throughput gain · vs Native"].filter(Boolean).join(" · ")));
-    if (result.comparisons.length) {
+    const measured = result && Number.isFinite(result.gain);
+    const value = measured ? format(result.gain) : result ? (zh ? "有数据" : "Data") : (zh ? "缺数据" : "No data");
+    panel.append(element("strong", measured && result.gain < 0 ? "performance-negative" : "", value));
+    if (measured) {
+      panel.append(element("span", "", [result.modelLabel, zh ? "吞吐提升 · vs Native" : "Throughput gain · vs Native"].filter(Boolean).join(" · ")));
       const link = element("a", "plugin-public-effect-link", "Frontier ↗");
       link.href = "./leaderboard-runs.html#frontier";
       link.title = (zh ? "C1/2/4/8/16 吞吐比的几何平均。" : "Geometric mean of C1/2/4/8/16 throughput ratios. ")
         + result.comparisons.map(row => `C${row.concurrency}: ${format(row.gain)}`).join(" · ");
+      panel.append(link);
+    } else if (result?.url) {
+      const link = element("a", "plugin-public-effect-link", `${zh ? "数据" : "Data"} ↗`);
+      link.href = result.url;
       panel.append(link);
     }
     return panel;
@@ -770,8 +775,7 @@ vllm-hust-ext extension check ${extensionId}`
     card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", local(item, "summary")));
     const traits = workloadTags(item);
     if (traits) card.append(traits);
-    const measured = performanceResults.get(item.id);
-    card.append(performancePanel(measured || { gain: null, comparisons: [] }));
+    card.append(performancePanel(performanceResults.get(item.id)));
     const community = communityPanel(item);
     if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
@@ -1004,7 +1008,7 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=throughput-gain-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/plugin-performance.json?v=data-status-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=qwen35-mooncake-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])
