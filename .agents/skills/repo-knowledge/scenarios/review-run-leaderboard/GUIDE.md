@@ -152,3 +152,21 @@ preserving complete labels/counts; do not hide overflow or weaken the document-w
 run-browser check now includes320px with the language switch and retains bounded, unclipped layout
 offenders plus a failure screenshot, so a remote-only layout failure carries actionable geometry
 instead of another blind rerun.
+
+Fletcher corrected rotation comparability on2026-09-27: Pareto dominance and tie deduplication must
+stay within **cohort × baseline/MOD × session rotation depth**, even when multiple depths are
+checked. Keep MOD filter identity separate from frontier identity. Depth1 uses solid/filled marks;
+depth2 uses dashed/hollow marks, with explicit depth legends/labels. Never hide a depth2 point
+merely because depth1 dominates its coordinates. The independent browser oracle uses the same
+comparison boundary, not the renderer's computed output as its only evidence.
+
+AgentX is retired from active Frontier choices at Fletcher's request. Its cohort-level
+`display_withdrawal` excludes its points from rendered choices/counts without deleting historical
+records or breaking SWE provenance links. Do not resurrect it while importing new data or confuse
+this withdrawal with the separate legacy Runs table.
+
+The same September27 correction merges the unified Native campaign's25 SWE points into the existing
+Qwen35 chart. Do not create another same-named model button merely for its ModelScope checkpoint
+identifier. Preserve actual checkpoint/runtime/tool revisions per point and the original cohort in
+`archived_cohorts`; `evidence.original_cohort_id` records the presentation move. Campaign-native
+matched comparisons remain the authority for MOD speedups, not arbitrary cross-campaign pairing.

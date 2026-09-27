@@ -607,3 +607,45 @@ test('native Rotation2 points retain both C16 observations and exact public run 
         assert.equal(r.validation.selected_devices_released,true);
     }
 });
+
+
+test('rotation depths cannot dominate or tie-deduplicate each other, even within one MOD',()=>{
+    const seed=structuredClone(fixture.points[0]);
+    const point=(id,depth,x,y)=>({...structuredClone(seed),id,load:{...seed.load,session_rotation_depth:depth},metrics:{decode_p90_tps:x,output_tps:y}});
+    const rows=[point('d1-fast',1,100,100),point('d2-a',2,10,20),point('d2-b',2,20,10),point('d2-dominated',2,5,5),point('d3-tie',3,100,100)];
+    assert.deepEqual(model.groupFrontiers(rows,'decode_p90_tps','output_tps_per_chip').map(g=>g.map(r=>r.point.id)),[['d1-fast'],['d2-a','d2-b'],['d3-tie']]);
+    assert.equal(model.groupKey(rows[0]),model.groupKey(rows[1]));
+    assert.notEqual(model.frontierKey(rows[0]),model.frontierKey(rows[1]));
+    const only2=model.groupFrontiers(rows.filter(p=>p.load.session_rotation_depth===2),'decode_p90_tps','output_tps_per_chip');
+    assert.deepEqual(only2[0].map(r=>r.point.id),['d2-a','d2-b']);
+});
+
+
+test('retired AgentX cohorts disappear from active choices without deleting historical evidence',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const before=JSON.stringify(data);
+    const visible=model.visibleData(data);
+    assert.ok(data.cohorts.some(c=>c.workload.id.startsWith('agentx') && c.display_withdrawal));
+    assert.ok(data.points.some(p=>p.cohort_id.includes('agentx')));
+    assert.ok(visible.cohorts.every(c=>!c.workload.id.startsWith('agentx')));
+    assert.ok(visible.points.every(p=>visible.cohorts.some(c=>c.id===p.cohort_id)));
+    assert.equal(JSON.stringify(data),before);
+    assert.equal(visible.points.length,data.points.filter(p=>!data.cohorts.find(c=>c.id===p.cohort_id).display_withdrawal).length);
+});
+
+
+test('Qwen35 unified campaign shares the existing chart without losing checkpoint provenance',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const visible=model.visibleData(data);
+    const cohorts=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
+    assert.equal(cohorts.length,1);
+    const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
+    assert.ok(original);
+    const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
+    assert.equal(moved.length,25);
+    for(const p of moved){
+        assert.equal(p.cohort_id,cohorts[0].id);
+        assert.equal(p.configuration.parameters.checkpoint_revision,original.model.revision);
+        assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,original.workload.contract.prepared_workload_sha256);
+    }
+});

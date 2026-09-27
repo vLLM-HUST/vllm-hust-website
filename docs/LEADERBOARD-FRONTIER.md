@@ -48,14 +48,15 @@ workload identities; never silently mix them.
 
 ## Data handoff
 
-As of2026-09-25 the main chart draws **one observed Pareto frontier per baseline/MOD**, within the
-selected model/precision/workload cohort. Each group independently chooses nondominated whole
-records across parallel layouts, concurrency, capacity and other allowed settings. No other MOD can
-dominate away the baseline's line. Vertices are ordered by decode speed, not concurrency; this is a
-best-configuration envelope, not a controlled concurrency sweep or a continuous measured performance
-curve. Filters recompute each group's boundary. Equal coordinate ties use one stable point ID for
-the line while retaining all point records; singletons have no line. Failed-correctness references
-cannot contribute to or dominate a boundary. The old global dashed envelope is removed.
+As of2026-09-27 the main chart draws **one observed Pareto frontier per baseline/MOD and session
+rotation depth**, within the selected model/precision/workload cohort. Each group independently
+chooses nondominated whole records across parallel layouts, concurrency, capacity and other allowed
+settings. No other MOD can dominate away the baseline's line. Vertices are ordered by decode speed,
+not concurrency; this is a best-configuration envelope, not a controlled concurrency sweep or a
+continuous measured performance curve. Filters recompute each group's boundary. Equal coordinate
+ties use one stable point ID for the line while retaining all point records; singletons have no
+line. Failed-correctness references cannot contribute to or dominate a boundary. The old global
+dashed envelope is removed.
 
 All measured dots remain inspectable by unchecking **Hide non-Frontier points**. Original
 `load.concurrency_series` metadata and the linked static diagnostic sweeps remain unchanged; they
@@ -142,9 +143,10 @@ choices only when explicitly recorded; do not add placeholder points or infer re
 notice.
 
 At C lanes and D slots per lane, only C requests can be in flight, while C\*D histories may be
-revisited. Compare equal depths for matched comparisons; mixed-depth frontiers are a
-selected-configuration view, not evidence of equal resident-state capacity. Remove the construction
-status only when the measurement owner supplies the corresponding evidence.
+revisited. Different rotation depths are different load conditions: they never dominate each other
+or share a frontier line, even when both checkboxes are selected. Depth1 uses solid lines/filled
+dots; depth2 uses dashed lines/hollow dots. Legends and point labels retain the depth. Remove the
+construction status only when the measurement owner supplies the corresponding evidence.
 
 ## Implementation and checks
 
@@ -245,3 +247,8 @@ The September27 Qwen35 native Rotation2 import supplies five complete observatio
 including both C16 repeats. Its construction notice is removed; Qwen27 remains under construction.
 Depth1/2 checkboxes are derived from the real points. Both depths are initially selected; select
 only2 for the Rotation2 frontier, and disable frontier-only display to inspect every observation.
+
+On September27 the owner retired AgentX from the active leaderboard. Its cohort carries
+`display_withdrawal`; the renderer excludes that cohort and its points from choices, counts and
+charts. Historical point IDs, metrics and evidence remain unchanged in the snapshot. This does not
+change legacy Runs submissions or relabel AgentX as SWE.

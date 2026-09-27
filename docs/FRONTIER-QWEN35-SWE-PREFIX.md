@@ -280,6 +280,7 @@ much of the tail gap occurs early in the window, and depth changes the finite-wi
 Low active-KV usage or zero preemptions cannot rule out cached-history eviction; raw cached/prompt
 ratios also depend on hybrid alignment and prompt length.
 
-Select rotation depth2 in the sidebar for its frontier. Both depths are selected initially; that
-combined envelope is a selected-configuration view, not an equal-depth comparison. Uncheck
-frontier-only display to inspect all five records, including dominated points.
+Select rotation depth2 in the sidebar for its frontier. Both depths are selected initially, but each
+baseline/MOD and depth has an independent frontier; points at different depths never dominate one
+another. Solid/filled marks denote depth1; dashed/hollow marks denote depth2. Uncheck frontier-only
+display to inspect all five records, including dominated points.

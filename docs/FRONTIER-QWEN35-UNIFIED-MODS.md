@@ -17,3 +17,11 @@ bytes per chip.
 
 Each point is one real-online 900-second observation with zero failed requests, successful retrieval
 and prefix-reuse gates, and verified device release.
+
+The25 observations share the existing Qwen3.5-35B-A3B BF16 / SWE15-minute chart at the owner's
+request; checkpoint/source differences are retained per point, not promoted into a duplicate model
+button. The original campaign cohort contract is retained in `archived_cohorts`, and moved points
+record `evidence.original_cohort_id`. This presentation merge does not pool repeats, alter metrics,
+or replace the campaign's own matched Native controls for MOD speedup attribution. The prepared
+workload variant/tokenizer equivalence was already recorded in the shared SWE contract. Rotation
+depths continue to own independent Pareto frontiers within the combined chart.

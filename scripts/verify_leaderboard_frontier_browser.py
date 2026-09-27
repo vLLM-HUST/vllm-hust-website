@@ -56,6 +56,10 @@ def assert_group_frontiers(page, points):
             or "+".join(sorted(point["configuration"]["mods"]))
             or "none"
         )
+        group = json.dumps(
+            [point["cohort_id"], group, point["load"].get("session_rotation_depth")],
+            separators=(",", ":"),
+        )
         groups.setdefault(group, []).append(point)
 
     def xy(p):
@@ -85,6 +89,11 @@ def assert_group_frontiers(page, points):
     assert page.locator(".frontier-concurrency-line").count() == 0
     for line in lines.all():
         rows = expected[line.get_attribute("data-group")]
+        depth = rows[0]["load"].get("session_rotation_depth")
+        assert all(p["load"].get("session_rotation_depth") == depth for p in rows)
+        assert line.get_attribute("stroke-dasharray") == (
+            "7 4" if depth and depth > 1 else "none"
+        )
         assert json.loads(line.get_attribute("data-frontier-points")) == [
             p["id"] for p in rows
         ]
@@ -170,6 +179,13 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     site = Path(__file__).resolve().parents[1]
     production = json.loads((site / "data/leaderboard_frontier.json").read_text())
+    production["cohorts"] = [
+        c for c in production["cohorts"] if not c.get("display_withdrawal")
+    ]
+    visible_ids = {c["id"] for c in production["cohorts"]}
+    production["points"] = [
+        p for p in production["points"] if p["cohort_id"] in visible_ids
+    ]
     default_points = [
         p
         for p in production["points"]
@@ -213,6 +229,7 @@ def main():
                 wait_until="domcontentloaded",
             )
             ready(page)
+            assert "AgentX" not in page.locator("#frontier-panel").inner_text()
             assert page.locator("#frontier-only").is_checked()
             shown = page.locator("[data-point]").evaluate_all(
                 "nodes=>nodes.map(n=>n.dataset.point)"

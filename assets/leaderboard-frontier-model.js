@@ -53,6 +53,11 @@
         }
         return data;
     }
+    function visibleData(data) {
+        const cohorts = data.cohorts.filter(cohort => !cohort.display_withdrawal);
+        const ids = new Set(cohorts.map(cohort => cohort.id));
+        return {...data, cohorts, points: data.points.filter(point => ids.has(point.cohort_id))};
+    }
     function safeURL(value) {
         try { const url = new URL(value); return url.protocol === 'https:' ? url.href : null; } catch (_) { return null; }
     }
@@ -66,6 +71,7 @@
     }
     function modKey(point) { return [...point.configuration.mods].sort().join('+') || 'none'; }
     function groupKey(point) { return point.configuration.experiment_group || modKey(point); }
+    function frontierKey(point) { return JSON.stringify([point.cohort_id, groupKey(point), point.load.session_rotation_depth ?? null]); }
     function failedCorrectness(point) { return point.configuration.parameters.functional_status === 'failed'; }
     function project(points, xKey, yKey) {
         if (!metrics[xKey] || !metrics[yKey]) throw new Error('Unknown Frontier axis');
@@ -81,12 +87,12 @@
         return { measured, excluded: points.length - measured.length,
             frontier: measured.filter(p => p.frontier).sort((a, b) => a.x - b.x || a.point.id.localeCompare(b.point.id)) };
     }
-    // Each MOD/baseline owns its frontier; another MOD cannot dominate it away.
+    // Each cohort × MOD/baseline × rotation depth owns an independent frontier.
     // Coordinates always come from one whole observed run, never mixed metrics.
     function groupFrontiers(points, xKey, yKey) {
         const groups = new Map();
         for (const point of points) {
-            const key = JSON.stringify([point.cohort_id, groupKey(point)]);
+            const key = frontierKey(point);
             if (!groups.has(key)) groups.set(key, []);
             groups.get(key).push(point);
         }
@@ -115,7 +121,7 @@
         return [...groups.values()].filter(rows => rows.length > 1)
             .map(rows => [...rows].sort((a, b) => a.point.load.concurrency - b.point.load.concurrency));
     }
-    const api = { validate, metrics, value, modKey, groupKey, project, safeURL, mtpState, concurrencySeries, groupFrontiers, failedCorrectness };
+    const api = { validate, visibleData, metrics, value, modKey, groupKey, frontierKey, project, safeURL, mtpState, concurrencySeries, groupFrontiers, failedCorrectness };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);
