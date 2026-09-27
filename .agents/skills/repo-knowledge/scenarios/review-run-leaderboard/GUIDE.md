@@ -153,12 +153,15 @@ run-browser check now includes320px with the language switch and retains bounded
 offenders plus a failure screenshot, so a remote-only layout failure carries actionable geometry
 instead of another blind rerun.
 
-Fletcher corrected rotation comparability on2026-09-27: Pareto dominance and tie deduplication must
-stay within **cohort × baseline/MOD × session rotation depth**, even when multiple depths are
-checked. Keep MOD filter identity separate from frontier identity. Depth1 uses solid/filled marks;
-depth2 uses dashed/hollow marks, with explicit depth legends/labels. Never hide a depth2 point
-merely because depth1 dominates its coordinates. The independent browser oracle uses the same
-comparison boundary, not the renderer's computed output as its only evidence.
+Fletcher's final September27 rotation UI separates workloads with a single-choice slider, not
+multi-select checkboxes or overlaid lines. Default to the lowest observed depth; native range
+indices map only to real depths (1/4 must not manufacture2/3). Keep one-depth cohorts visible with a
+disabled slider, preserve selection across language changes, reset on model/workload changes, and
+scope chart bounds/counts/frontiers to that one depth. No D1/D2 annotations in chart, legend or
+popover; all lines/dots share normal styles. Downloads preserve the actual depth, and the model's
+cohort×MOD×depth key remains a fail-safe comparison boundary. Hide depth1 static-curve links at
+other depths. Browser QA covers keyboard slider input, sparse depths, per-depth membership,
+old-popup dismissal and exact configuration downloads.
 
 AgentX is retired from active Frontier choices at Fletcher's request. Its cohort-level
 `display_withdrawal` excludes its points from rendered choices/counts without deleting historical
@@ -178,3 +181,8 @@ implying a hardware ceiling. The append-only importer and separate metric extrac
 archives. Model/precision choices now live inside a native disclosure on the selected model tag; QA
 must open the trigger before selecting a model, and checks Escape, outside dismissal, mobile bounds
 and exact downloaded DSV4 coordinates.
+
+For depth-control-only changes, use `scripts/verify_leaderboard_depth_browser.py` for bounded
+responsive/keyboard/isolation checks. The full Frontier checker downloads every historical point in
+four views and took about20 minutes; do not make that exhaustive traversal the default for a small
+selector edit. Keep the full check for evidence/export changes.

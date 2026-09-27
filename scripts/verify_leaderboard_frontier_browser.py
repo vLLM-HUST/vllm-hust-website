@@ -91,9 +91,7 @@ def assert_group_frontiers(page, points):
         rows = expected[line.get_attribute("data-group")]
         depth = rows[0]["load"].get("session_rotation_depth")
         assert all(p["load"].get("session_rotation_depth") == depth for p in rows)
-        assert line.get_attribute("stroke-dasharray") == (
-            "7 4" if depth and depth > 1 else "none"
-        )
+        assert line.get_attribute("stroke-dasharray") == "none"
         assert json.loads(line.get_attribute("data-frontier-points")) == [
             p["id"] for p in rows
         ]
@@ -138,11 +136,14 @@ def verify_rotation_choices(browser, url, fixture):
     page.route("**/data/leaderboard_frontier.json*", lambda r: r.fulfill(json=data))
     page.goto(f"{url}/leaderboard-runs.html#frontier")
     ready(page)
-    assert page.locator("[data-filter=rotation]").evaluate_all(
-        "nodes=>nodes.map(n=>n.value)"
-    ) == ["1", "4"]
+    slider = page.locator("#frontier-depth")
+    assert slider.get_attribute("min") == "0" and slider.get_attribute("max") == "1"
+    assert slider.get_attribute("aria-valuetext") == "1"
+    assert page.locator(".frontier-depth-ticks").inner_text().split() == ["1", "4"]
     page.locator("#frontier-only").uncheck()
-    page.locator('[data-filter=rotation][value="1"]').uncheck()
+    slider.focus()
+    slider.press("ArrowRight")
+    assert slider.get_attribute("aria-valuetext") == "4"
     expected = [p for p in data["points"] if p["load"]["session_rotation_depth"] == 4]
     assert set(
         page.locator("[data-point]").evaluate_all(
@@ -150,20 +151,19 @@ def verify_rotation_choices(browser, url, fixture):
         )
     ) == {p["id"] for p in expected}
     assert_group_frontiers(page, expected)
-    page.locator("#frontier-only").check()
-    expected_front = page.evaluate(
-        "points=>LeaderboardFrontierModel.groupFrontiers(points,'decode_p90_tps',"
-        "'output_tps_per_chip').flat().map(r=>r.point.id)",
-        expected,
+    assert (
+        f"{len(expected)} / {len(expected)}"
+        in page.locator("#frontier-filter-count").inner_text()
     )
-    assert set(
-        page.locator("[data-point]").evaluate_all(
-            "nodes=>nodes.map(n=>n.dataset.point)"
-        )
-    ) == set(expected_front)
-    page.locator('[data-filter=rotation][value="4"]').uncheck()
-    assert page.locator(".frontier-point, .frontier-envelope").count() == 0
-    assert page.locator("#frontier-blank").is_visible()
+    assert "D4" not in page.locator("#frontier-chart").text_content()
+    assert "rotation depth" not in page.locator("#frontier-legend").inner_text()
+    page.locator("#frontier-only").check()
+    assert_group_frontiers(page, expected)
+    slider.focus()
+    slider.press("Home")
+    assert slider.get_attribute("aria-valuetext") == "1"
+    expected = [p for p in data["points"] if p["load"]["session_rotation_depth"] == 1]
+    assert_group_frontiers(page, expected)
     context.close()
 
 
@@ -186,10 +186,13 @@ def main():
     production["points"] = [
         p for p in production["points"] if p["cohort_id"] in visible_ids
     ]
-    default_points = [
+    default_cohort_points = [
         p
         for p in production["points"]
         if p["cohort_id"] == production["cohorts"][0]["id"]
+    ]
+    default_points = [
+        p for p in default_cohort_points if p["load"]["session_rotation_depth"] == 1
     ]
     tag_keys = list(
         dict.fromkeys(
@@ -248,37 +251,55 @@ def main():
             )
             page.locator("#frontier-only").uncheck()
 
-            depths = sorted(
-                {p["load"]["session_rotation_depth"] for p in default_points}
-            )
-            assert page.locator("[data-filter=rotation]").count() == len(depths)
+            slider = page.locator("#frontier-depth")
+            assert slider.get_attribute("aria-valuetext") == "1"
+            assert page.locator("[data-filter=rotation]").count() == 0
             assert (
                 page.locator("#frontier-rotation-filter .frontier-filter-note").count()
                 == 0
             )
-            for depth in depths:
-                assert page.locator(
-                    f'[data-filter=rotation][value="{depth}"]'
-                ).is_checked()
-            page.locator('[data-filter=rotation][value="1"]').uncheck()
-            expected_rotation2 = {
-                p["id"]
-                for p in default_points
+            click_point(page, page.locator(f'[data-point="{default_points[0]["id"]}"]'))
+            slider.focus()
+            slider.press("ArrowRight")
+            assert page.locator("#frontier-popover").is_hidden()
+            expected_rotation2 = [
+                p
+                for p in default_cohort_points
                 if p["load"]["session_rotation_depth"] == 2
-            }
+            ]
             shown = page.locator("[data-point]").evaluate_all(
                 "nodes=>nodes.map(n=>n.dataset.point)"
             )
-            assert set(shown) == expected_rotation2
+            assert set(shown) == {p["id"] for p in expected_rotation2}
             assert len(expected_rotation2) == 5
+            assert_group_frontiers(page, expected_rotation2)
+            assert page.locator("#frontier-curves").is_hidden()
+            assert "D2" not in page.locator("#frontier-chart").text_content()
+            assert (
+                "Session rotation depth"
+                not in page.locator("#frontier-legend").inner_text()
+            )
+            page.screenshot(
+                path=str(args.output / f"depth2-{width}-{language}-{scheme}.png"),
+                full_page=True,
+            )
+            for point in expected_rotation2:
+                click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
+                popup = page.locator("#frontier-popover")
+                download, previous_download = download_configuration(
+                    page, popup, previous_download
+                )
+                payload = json.loads(Path(download.path()).read_text())
+                assert payload["point"] == point
+                popup.locator("[data-close]").click()
+            page.locator("#frontier-only").check()
+            assert_group_frontiers(page, expected_rotation2)
             page.locator("#langToggle").click()
-            assert not page.locator('[data-filter=rotation][value="1"]').is_checked()
-            assert page.locator('[data-filter=rotation][value="2"]').is_checked()
+            assert slider.get_attribute("aria-valuetext") == "2"
             page.locator("#langToggle").click()
-            page.locator('[data-filter=rotation][value="2"]').uncheck()
-            assert page.locator(".frontier-point, .frontier-envelope").count() == 0
-            for depth in depths:
-                page.locator(f'[data-filter=rotation][value="{depth}"]').check()
+            slider.focus()
+            slider.press("Home")
+            page.locator("#frontier-only").uncheck()
             assert page.locator(".frontier-point").count() == len(default_points)
 
             assert page.locator("#runs-panel").is_hidden()
@@ -478,10 +499,9 @@ def main():
                 params = point["configuration"]["parameters"]
                 assert_parallel(text, params, language)
                 assert (
-                    f"会话轮转深度: {point['load']['session_rotation_depth']}"
-                    if language == "zh"
-                    else f"Session rotation depth: {point['load']['session_rotation_depth']}"
-                ) in text
+                    "会话轮转深度:" not in text
+                    and "Session rotation depth:" not in text
+                )
                 if params.get("mtp_draft_tokens") is not None:
                     assert f"MTP{params['mtp_draft_tokens']}" in text
                 protocol = (
@@ -604,6 +624,12 @@ def main():
                     page.screenshot(
                         path=str(args.output / f"dsv4-{width}-{language}-{scheme}.png"),
                         full_page=True,
+                    )
+                if "session_rotation" in cohort["workload"]["contract"]:
+                    assert page.locator("#frontier-depth").is_disabled()
+                    assert (
+                        page.locator("#frontier-depth").get_attribute("aria-valuetext")
+                        == "1"
                     )
                 members = [
                     p for p in production["points"] if p["cohort_id"] == cohort["id"]

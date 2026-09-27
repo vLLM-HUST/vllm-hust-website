@@ -12,11 +12,14 @@ workload identities; never silently mix them.
 
 - Model + precision is one combined tag. The only other choice is a fixed workload/context cohort; a
   single available workload is displayed without inviting an unnecessary selection.
-- An external right sidebar has checkbox rows for MOD, MTP (on/off; unknown when present), and SWE
-  session rotation depth. All options start checked; no separate “all” choice. Options within a row
-  are OR, rows intersect, and unchecking a whole row hides all points. It recomputes the observed
-  envelope without changing measurements; mobile stacks the sidebar below the chart. A single
-  workload is a selected-style static tag; multiple workloads use a selector.
+- An external right sidebar has checkbox rows for MOD and MTP (on/off; unknown when present). All
+  options start checked; choices within a row union and the rows intersect. Unchecking a whole row
+  hides all points. SWE session rotation depth is a separate **single-selection slider**: each depth
+  is a distinct workload, never an overlay. It starts at the lowest measured depth and steps only
+  through observed depths (e.g.1 and4, not invented2/3). One available depth is shown with a
+  disabled slider. The selected value survives language changes and resets on model/workload
+  changes. The visible/total count is scoped to that depth. Mobile stacks the sidebar below the
+  chart. A single workload is a selected-style static tag; multiple workloads use a selector.
 - Axes are fixed: **X = P90 per-request decode speed (output tokens/s/user)**; **Y = total output
   tokens/s / all allocated chips**. No axis, hardware or MOD filters.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
@@ -129,11 +132,10 @@ to add a cohort or measured point.
 ## SWE session rotation depth
 
 `load.session_rotation_depth` is a positive integer for every point in a cohort whose
-`workload.contract.session_rotation` is present. The sidebar derives checkbox choices from observed
-point depths, with the same union-within/intersection-across semantics as MOD and MTP. Missing depth
-in these cohorts fails validation rather than silently becoming 1. AgentX has no rotation filter.
-The selected point and its download retain the explicit depth; language changes preserve checkbox
-choices, while model/workload changes reset them.
+`workload.contract.session_rotation` is present. The slider selects exactly one observed depth; only
+that workload supplies points, axes, counts and frontier vertices. Missing depth in these cohorts
+fails validation rather than silently becoming1. AgentX has no depth slider. Downloads retain
+explicit depth even though point labels, popovers and legends no longer repeat it.
 
 On 2026-09-27 Fletcher confirmed that all existing SWE 15-minute results used depth **1**. Both
 visible and archived SWE points are annotated; original metrics, run IDs and raw evidence artifacts
@@ -143,9 +145,10 @@ choices only when explicitly recorded; do not add placeholder points or infer re
 notice.
 
 At C lanes and D slots per lane, only C requests can be in flight, while C\*D histories may be
-revisited. Different rotation depths are different load conditions: they never dominate each other
-or share a frontier line, even when both checkboxes are selected. Depth1 uses solid lines/filled
-dots; depth2 uses dashed lines/hollow dots. Legends and point labels retain the depth. Remove the
+revisited. Different rotation depths are different workloads: they never appear together or dominate
+each other. Lines are solid and dots filled at every selected depth; D1/D2 suffixes are unnecessary
+because the slider identifies the workload. Historical static concurrency SVGs describe depth1, so
+their link is hidden at other depths rather than misrepresenting a depth1 chart. Remove the
 construction status only when the measurement owner supplies the corresponding evidence.
 
 ## Implementation and checks
@@ -162,6 +165,12 @@ python -m http.server 8774 --bind 127.0.0.1
 python scripts/verify_leaderboard_frontier_browser.py
 python scripts/verify_leaderboard_runs_browser.py
 ```
+
+For depth-selector-only edits,
+`python scripts/verify_leaderboard_depth_browser.py --url http://127.0.0.1:8774` checks every active
+model/depth and four responsive language/theme combinations, with representative exact downloads.
+The full browser suite additionally exports every historical point and can take about20 minutes;
+reserve that traversal for evidence/export changes.
 
 The Frontier browser check covers production values, fixed axes, combined model/precision tags,
 workload isolation, point popovers, downloaded configuration equality, keyboard/outside-click
@@ -245,8 +254,8 @@ demonstrated optimization gains.
 
 The September27 Qwen35 native Rotation2 import supplies five complete observations at C2/4/8/16,
 including both C16 repeats. Its construction notice is removed; Qwen27 remains under construction.
-Depth1/2 checkboxes are derived from the real points. Both depths are initially selected; select
-only2 for the Rotation2 frontier, and disable frontier-only display to inspect every observation.
+The slider offers measured depths1 and2 separately. Select2 for Rotation2 and disable frontier-only
+display to inspect every observation of that workload.
 
 On September27 the owner retired AgentX from the active leaderboard. Its cohort carries
 `display_withdrawal`; the renderer excludes that cohort and its points from choices, counts and

@@ -88,3 +88,9 @@
 .frontier-model-picker[open] .frontier-model-chevron { transform: translateY(-2px) rotate(180deg); }
 .frontier-model-tags { position: absolute; z-index: 10; top: calc(100% + 6px); left: 0; display: grid; width: max-content; min-width: 100%; max-width: min(360px, calc(100vw - 64px)); box-sizing: border-box; max-height: 300px; overflow-y: auto; padding: 6px; border: 1px solid var(--run-border); border-radius: 10px; background: var(--run-bg); box-shadow: 0 10px 28px #0003; }
 .frontier-model-tag { width: 100%; text-align: left; }
+
+.frontier-depth-value { color: var(--run-accent); font-size: 22px; font-variant-numeric: tabular-nums; margin-bottom: 6px; }
+#frontier-depth { display: block; width: 100%; margin: 0; accent-color: var(--run-accent); cursor: pointer; }
+#frontier-depth:disabled { cursor: default; opacity: .55; }
+#frontier-depth:focus-visible { outline: 2px solid var(--run-accent); outline-offset: 4px; }
+.frontier-depth-ticks { display: flex; justify-content: space-between; margin-top: 5px; color: var(--run-muted); font-size: 11px; }
