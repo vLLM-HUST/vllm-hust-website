@@ -1,4 +1,4 @@
-/* Derive every MOD's throughput change from one declared Native series. */
+/* Derive MOD throughput changes from their published five-point comparison sets. */
 (function (root) {
   const commonParameters = [
     'tensor_parallel_size', 'pipeline_parallel_size', 'data_parallel_size',
@@ -40,24 +40,38 @@
     return rows.every(Boolean) ? rows : null;
   }
   function summarize(data, frontier) {
-    if (data.schema_version !== 'plugin-performance/v3'
+    if (data.schema_version !== 'plugin-performance/v4'
         || data.metric !== 'output_tps' || data.aggregation !== 'geometric-mean'
         || JSON.stringify(data.concurrencies) !== '[1,2,4,8,16]'
-        || !data.baseline?.series_id) throw new Error('Invalid shared Native contract');
-    const baseline = series(frontier, data.baseline.series_id, data.concurrencies, []);
-    if (!baseline || !identity(baseline[0])
-        || baseline.some(point => identity(point) !== identity(baseline[0]))) {
-      throw new Error('Incomplete or inconsistent Native series');
+        || !Array.isArray(data.comparison_sets)) throw new Error('Invalid comparison contract');
+    const assignments = new Map();
+    const baselines = new Map();
+    for (const set of data.comparison_sets) {
+      if (!set.baseline_series_id || !Array.isArray(set.entry_ids)) {
+        throw new Error('Invalid comparison set');
+      }
+      const baseline = series(frontier, set.baseline_series_id, data.concurrencies, []);
+      if (!baseline || !identity(baseline[0])
+          || baseline.some(point => identity(point) !== identity(baseline[0]))) {
+        throw new Error('Incomplete or inconsistent Native series');
+      }
+      baselines.set(set.baseline_series_id, baseline);
+      for (const id of set.entry_ids) {
+        if (assignments.has(id)) throw new Error('MOD assigned to multiple comparison sets');
+        assignments.set(id, set.baseline_series_id);
+      }
     }
-    const modelLabel = frontier.cohorts.find(cohort => cohort.id === baseline[0].cohort_id)?.model.label;
     const ids = new Set();
     return new Map(data.entries.map(entry => {
-      if (ids.has(entry.id) || ['baseline', 'baseline_id', 'pairs', 'ratios', 'gain'].some(key => key in entry)) {
-        throw new Error('Per-MOD baseline or precomputed score is forbidden');
+      if (ids.has(entry.id) || ['baseline', 'baseline_id', 'baseline_series_id', 'pairs', 'ratios', 'gain'].some(key => key in entry)) {
+        throw new Error('Per-MOD comparison or precomputed score is forbidden');
       }
       ids.add(entry.id);
+      const baselineSeriesId = assignments.get(entry.id);
+      const baseline = baselines.get(baselineSeriesId);
       const candidate = entry.series_id ? series(frontier, entry.series_id, data.concurrencies, [entry.id]) : null;
-      const compatible = candidate && candidate.every((point, index) => identity(point) === identity(baseline[index]));
+      const compatible = baseline && candidate
+        && candidate.every((point, index) => identity(point) === identity(baseline[index]));
       const comparisons = compatible ? candidate.map((point, index) => ({
         concurrency: point.load.concurrency, point_id: point.id,
         baseline_point_id: baseline[index].id,
@@ -66,8 +80,11 @@
       const gain = comparisons.length
         ? (Math.exp(comparisons.reduce((sum, row) => sum + Math.log1p(row.gain / 100), 0) / comparisons.length) - 1) * 100
         : null;
+      const modelLabel = baseline
+        ? frontier.cohorts.find(cohort => cohort.id === baseline[0].cohort_id)?.model.label
+        : null;
       return [entry.id, { ...entry, gain, count: comparisons.length, comparisons,
-        baseline_series_id: data.baseline.series_id, modelLabel }];
+        baseline_series_id: baselineSeriesId || null, modelLabel }];
     }));
   }
   function compare(left, right, results) {
