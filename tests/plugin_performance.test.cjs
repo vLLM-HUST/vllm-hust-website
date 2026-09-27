@@ -35,19 +35,22 @@ test('published paired runs expose both gains and regressions without precompute
   const expected = {
     vspec: '51.80',
     'kvcompress-ascend': '10.25',
+    'kv-materialization-arrival-control': '-0.42',
     diffspec: '-70.66',
     latchmoe: '-87.65'
   };
   for (const [id, gain] of Object.entries(expected)) {
     const result = results.get(id);
     assert.equal(result.source, 'published-comparison');
-    assert.equal(result.count, 1);
+    assert.equal(result.count, id === 'kv-materialization-arrival-control' ? 6 : 1);
     assert.equal(result.gain.toFixed(2), gain);
     assert.ok(result.url.startsWith('https://github.com/vLLM-HUST/'));
-    assert.ok(result.published_comparison.baseline > 0);
-    assert.ok(result.published_comparison.candidate > 0);
+    assert.ok(result.published_comparisons.every(row => row.baseline > 0));
+    assert.ok(result.published_comparisons.every(row => row.candidate > 0));
   }
-  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 10);
+  const kvmat = results.get('kv-materialization-arrival-control');
+  assert.equal(kvmat.count, 6);
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 11);
 });
 
 test('comparison sets declare baselines centrally and entries cannot supply a baseline or score', () => {
@@ -73,7 +76,7 @@ test('published comparisons require raw matched values and cannot shadow a Front
   ]) {
     const invalid = structuredClone(data);
     const entry = invalid.entries.find(row => row.id === 'vspec');
-    edit(entry.published_comparison);
+    edit(entry.published_comparisons[0]);
     assert.throws(() => M.summarize(invalid, frontier), /Invalid published comparison/);
   }
   const invalid = structuredClone(data);
@@ -142,7 +145,7 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
     'vspec', 'betterscale', 'kvcompress-ascend', 'pipeline-microbatch-migration',
-    'bidkv', 'dla', 'mooncake-vllm-connectors', 'kv-tiering-migration',
+    'bidkv', 'dla', 'kv-materialization-arrival-control', 'mooncake-vllm-connectors', 'kv-tiering-migration',
     'diffspec', 'latchmoe'
   ]);
 });

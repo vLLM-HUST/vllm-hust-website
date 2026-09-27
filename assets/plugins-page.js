@@ -713,7 +713,7 @@ vllm-hust-ext extension check ${extensionId}`
       link.title = frontier
         ? (zh ? "C1/2/4/8/16 吞吐比的几何平均。" : "Geometric mean of C1/2/4/8/16 throughput ratios. ")
           + result.comparisons.map(row => `C${row.concurrency}: ${format(row.gain)}`).join(" · ")
-        : result.published_comparison.scope;
+        : [...new Set(result.published_comparisons.map(row => row.scope))].join(" · ");
       panel.append(link);
     }
     return panel;
@@ -1012,7 +1012,7 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=all-tested-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/plugin-performance.json?v=all-tested-2-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=all-tested-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])

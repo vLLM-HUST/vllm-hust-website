@@ -1,5 +1,5 @@
 {
-  "schema_version": "plugin-performance/v5",
+  "schema_version": "plugin-performance/v6",
   "entries": [
     {
       "id": "bidkv",
@@ -30,6 +30,62 @@
         "analysis_integration": "external-harness"
       },
       "series_id": "swe-unified-kv-tiering-migration-20260927"
+    },
+    {
+      "id": "kv-materialization-arrival-control",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control/tree/751b3043c20b082b39b682b2004c7434fa6448c4/paper/kv_materialization_control/experiments/results/m2_online_boundary_20260803",
+      "ecpa": {
+        "launch_acceptance": "not-reproduced-this-round",
+        "configuration_path": "not-evaluated",
+        "analysis_integration": "external-harness",
+        "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
+        "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
+      },
+      "series_id": null,
+      "published_comparisons": [
+        {
+          "metric": "output_tps",
+          "baseline": 216.886,
+          "candidate": 215.699,
+          "model_label": "Qwen2.5-7B-Instruct",
+          "scope": "M2 benefit boundary · controller vs always_full_reuse · 3 rounds × 2 workloads"
+        },
+        {
+          "metric": "output_tps",
+          "baseline": 218.216,
+          "candidate": 217.106,
+          "model_label": "Qwen2.5-7B-Instruct",
+          "scope": "M2 benefit boundary · controller vs always_full_reuse · 3 rounds × 2 workloads"
+        },
+        {
+          "metric": "output_tps",
+          "baseline": 218.795,
+          "candidate": 216.723,
+          "model_label": "Qwen2.5-7B-Instruct",
+          "scope": "M2 benefit boundary · controller vs always_full_reuse · 3 rounds × 2 workloads"
+        },
+        {
+          "metric": "output_tps",
+          "baseline": 230.588,
+          "candidate": 232.017,
+          "model_label": "Qwen2.5-7B-Instruct",
+          "scope": "M2 benefit boundary · controller vs always_full_reuse · 3 rounds × 2 workloads"
+        },
+        {
+          "metric": "output_tps",
+          "baseline": 234.115,
+          "candidate": 233.016,
+          "model_label": "Qwen2.5-7B-Instruct",
+          "scope": "M2 benefit boundary · controller vs always_full_reuse · 3 rounds × 2 workloads"
+        },
+        {
+          "metric": "output_tps",
+          "baseline": 233.129,
+          "candidate": 231.599,
+          "model_label": "Qwen2.5-7B-Instruct",
+          "scope": "M2 benefit boundary · controller vs always_full_reuse · 3 rounds × 2 workloads"
+        }
+      ]
     },
     {
       "id": "mooncake-vllm-connectors",
@@ -76,13 +132,15 @@
         "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
       },
       "series_id": null,
-      "published_comparison": {
-        "metric": "output_tps",
-        "baseline": 1557.25,
-        "candidate": 2363.98,
-        "model_label": "Qwen2.5-14B",
-        "scope": "GSM8K B128 · same-card target-only comparison"
-      }
+      "published_comparisons": [
+        {
+          "metric": "output_tps",
+          "baseline": 1557.25,
+          "candidate": 2363.98,
+          "model_label": "Qwen2.5-14B",
+          "scope": "GSM8K B128 · same-card target-only comparison"
+        }
+      ]
     },
     {
       "id": "kvcompress-ascend",
@@ -95,13 +153,15 @@
         "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
       },
       "series_id": null,
-      "published_comparison": {
-        "metric": "output_tps",
-        "baseline": 2215.61,
-        "candidate": 2442.73,
-        "model_label": "Qwen2.5-Coder-14B",
-        "scope": "Long context · Ascend 910B2 · matched single run"
-      }
+      "published_comparisons": [
+        {
+          "metric": "output_tps",
+          "baseline": 2215.61,
+          "candidate": 2442.73,
+          "model_label": "Qwen2.5-Coder-14B",
+          "scope": "Long context · Ascend 910B2 · matched single run"
+        }
+      ]
     },
     {
       "id": "latchmoe",
@@ -114,13 +174,15 @@
         "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
       },
       "series_id": null,
-      "published_comparison": {
-        "metric": "output_tps",
-        "baseline": 23.57,
-        "candidate": 2.91,
-        "model_label": "Qwen3-30B-A3B",
-        "scope": "Qualified TP4 PIECEWISE graph · matched no-plugin comparison"
-      }
+      "published_comparisons": [
+        {
+          "metric": "output_tps",
+          "baseline": 23.57,
+          "candidate": 2.91,
+          "model_label": "Qwen3-30B-A3B",
+          "scope": "Qualified TP4 PIECEWISE graph · matched no-plugin comparison"
+        }
+      ]
     },
     {
       "id": "diffspec",
@@ -133,13 +195,15 @@
         "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
       },
       "series_id": null,
-      "published_comparison": {
-        "metric": "output_tps",
-        "baseline": 47.72,
-        "candidate": 14.0,
-        "model_label": "Qwen3.8-27B",
-        "scope": "Warm output-throughput P50 · TP4 graph · target-only comparison"
-      }
+      "published_comparisons": [
+        {
+          "metric": "output_tps",
+          "baseline": 47.72,
+          "candidate": 14.0,
+          "model_label": "Qwen3.8-27B",
+          "scope": "Warm output-throughput P50 · TP4 graph · target-only comparison"
+        }
+      ]
     }
   ],
   "comparison_sets": [
