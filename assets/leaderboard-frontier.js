@@ -85,7 +85,7 @@
             <div class="frontier-layout"><div class="frontier-card">
                 <div class="frontier-picker">
                     <div class="frontier-identity">
-                        <div class="frontier-model-tags" role="group" aria-label="${t('model')}">${tags.map(c=>`<button type="button" class="frontier-model-tag" data-model-tag="${escape(tagKey(c))}" aria-pressed="${tagKey(c)===state.tag}">${escape(c.model.label)}<span>${escape(c.precision.label)}</span></button>`).join('')}</div>
+                        ${tags.length?`<details class="frontier-model-picker" id="frontier-model-picker"><summary id="frontier-model-trigger" aria-label="${t('model')}: ${escape(cohort().model.label)} · ${escape(cohort().precision.label)}">${escape(cohort().model.label)}<span>${escape(cohort().precision.label)}</span><span class="frontier-model-chevron" aria-hidden="true"></span></summary><div class="frontier-model-tags" role="group" aria-label="${t('model')}">${tags.map(c=>`<button type="button" class="frontier-model-tag" data-model-tag="${escape(tagKey(c))}" aria-pressed="${tagKey(c)===state.tag}">${escape(c.model.label)}<span>${escape(c.precision.label)}</span></button>`).join('')}</div></details>`:''}
                         ${choices.length>1?`<label class="frontier-workload">${t('workload')}<select id="frontier-workload">${choices.map(c=>`<option value="${escape(c.id)}" ${c.id===state.cohort?'selected':''}>${escape(c.workload.label)} · ${fmt(c.context_tokens)} ${t('context')}</option>`).join('')}</select></label>`:choices.length?`<span id="frontier-workload-tag" class="frontier-workload-tag" aria-label="${t('workload')}">${escape(choices[0].workload.label)} · ${fmt(choices[0].context_tokens)} ${t('context')}</span>`:''}
                     </div>
 
@@ -106,7 +106,7 @@
                 <span id="frontier-filter-count" role="status"></span>
             </aside></div>`;
         $('frontier-panel').querySelectorAll('[data-model-tag]').forEach(button=>button.addEventListener('click',()=>{
-            state.tag=button.dataset.modelTag;state.cohort='';state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();
+            state.tag=button.dataset.modelTag;state.cohort='';state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();$('frontier-model-trigger')?.focus();
         }));
         $('frontier-workload')?.addEventListener('change',event=>{state.cohort=event.target.value;state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();});
         $('frontier-panel').querySelectorAll('[data-filter]').forEach(input=>input.addEventListener('change',()=>{
@@ -174,6 +174,7 @@
         if(!curves.hidden)curves.href=curveUrl;else curves.removeAttribute('href');
         const workloadRepo=current?.workload.contract.repository_url;
         $('frontier-workload-repo').href=typeof workloadRepo==='string'&&/^https:\/\/github\.com\/vLLM-HUST\/[a-z0-9-]+$/i.test(workloadRepo)?workloadRepo:'https://github.com/vLLM-HUST/agentx-bench';
+        $('frontier-mod-coverage').hidden=!current?.model.label.startsWith('Qwen3.5');
         chart(measured,color);popup();
     }
     function popup() {
@@ -248,14 +249,14 @@
         }
         $('frontier-chart').innerHTML=svg;
     }
-    document.addEventListener('pointerdown',event=>{if(state.selected&&!event.target.closest('#frontier-popover,[data-point]'))close();});
-    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&state.selected){event.preventDefault();close(true);}});
+    document.addEventListener('pointerdown',event=>{if(!event.target.closest('#frontier-model-picker'))$('frontier-model-picker')?.removeAttribute('open');if(state.selected&&!event.target.closest('#frontier-popover,[data-point]'))close();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&$('frontier-model-picker')?.open){event.preventDefault();$('frontier-model-picker').open=false;$('frontier-model-trigger').focus();return;}if(event.key==='Escape'&&state.selected){event.preventDefault();close(true);}});
     window.addEventListener('vllm-hust:langchange',shell);
     let resize;window.addEventListener('resize',()=>{cancelAnimationFrame(resize);resize=requestAnimationFrame(render);});
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=rotation-frontiers-20260927',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=dsv4-int8-20260927',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=qwen35-mooncake-20260927').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

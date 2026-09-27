@@ -55,6 +55,7 @@ with sync_playwright() as p:
             wait_until="domcontentloaded",
         )
         qa.ready(page)
+        page.locator("#frontier-model-trigger").click()
         page.locator(".frontier-model-tag").filter(has_text="Qwen3.8-27B").click()
         assert page.locator("#frontier-only").is_checked()
         assert page.locator('[data-point^="qwen27-sweprefix-native-"]').count() == 0

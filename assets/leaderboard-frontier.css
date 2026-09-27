@@ -4,7 +4,7 @@
 .frontier-heading h1 { font-size: 30px; letter-spacing: -.04em; margin: 0 0 6px; color: #edf3ff; }
 .frontier-heading p { color: #aebcd0; font-size: 13px; margin: 0; }
 .frontier-status { color: #c3d1e6; border: 1px solid #3b4962; border-radius: 20px; padding: 7px 12px; font-size: 11px; }
-.frontier-card { background: var(--run-bg); color: var(--run-ink); border: 1px solid var(--run-border); border-radius: 14px; overflow: hidden; }
+.frontier-card { background: var(--run-bg); color: var(--run-ink); border: 1px solid var(--run-border); border-radius: 14px; }
 .frontier-picker { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 24px; border-bottom: 1px solid var(--run-border); }
 .frontier-model-tags { display: flex; gap: 8px; flex-wrap: wrap; }
 .frontier-model-tag { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 8px; padding: 10px 12px; color: var(--run-ink); font: inherit; font-size: 13px; cursor: pointer; }
@@ -77,3 +77,14 @@
 @media (prefers-color-scheme: dark) { .frontier-correctness-warning { color: #fca5a5; } }
 
 .frontier-filter-note { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: var(--run-muted); }
+
+/* A native disclosure keeps model selection compact and keyboard accessible. */
+.frontier-model-picker { position: relative; max-width: 100%; }
+.frontier-model-picker summary { display: flex; gap: 8px; align-items: center; padding: 10px 12px; border: 1px solid var(--run-accent); border-radius: 8px; background: var(--run-tint); color: var(--run-accent); font-size: 13px; cursor: pointer; list-style: none; }
+.frontier-model-picker summary::-webkit-details-marker { display: none; }
+.frontier-model-picker summary span { font-size: 10px; }
+.frontier-model-picker summary:focus-visible { outline: 2px solid var(--run-accent); outline-offset: 2px; }
+.frontier-model-chevron { margin-left: auto; width: 0; height: 0; border: 4px solid transparent; border-top-color: currentColor; transform: translateY(2px); }
+.frontier-model-picker[open] .frontier-model-chevron { transform: translateY(-2px) rotate(180deg); }
+.frontier-model-tags { position: absolute; z-index: 10; top: calc(100% + 6px); left: 0; display: grid; width: max-content; min-width: 100%; max-width: min(360px, calc(100vw - 64px)); box-sizing: border-box; max-height: 300px; overflow-y: auto; padding: 6px; border: 1px solid var(--run-border); border-radius: 10px; background: var(--run-bg); box-shadow: 0 10px 28px #0003; }
+.frontier-model-tag { width: 100%; text-align: left; }

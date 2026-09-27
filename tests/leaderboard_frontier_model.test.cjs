@@ -42,7 +42,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
     const cohort=data.cohorts.find(c=>c.workload.id==='sweprefix-qwen35-eight-traces-900s-v1');
     assert.ok(cohort);
     assert.equal(cohort.workload.contract.repository_url,'https://github.com/vLLM-HUST/swe-prefix-reuse');
-    const cohorts=data.cohorts.filter(c=>c.workload.contract.repository_url==='https://github.com/vLLM-HUST/swe-prefix-reuse');
+    const cohorts=data.cohorts.filter(c=>c.id.startsWith('qwen') && c.workload.contract.repository_url==='https://github.com/vLLM-HUST/swe-prefix-reuse');
     const byId=new Map(cohorts.map(c=>[c.id,c]));
     const points=[...data.points,...(data.archived_points||[])].filter(p=>byId.has(p.cohort_id));
     assert.ok(points.length>0);
@@ -562,7 +562,7 @@ test('SWE rotation metadata covers displayed and archived observations without r
     const data=require('../data/leaderboard_frontier.json');
     const swe=new Set(data.cohorts.filter(c=>c.workload.id.startsWith('sweprefix-')).map(c=>c.id));
     for(const c of data.cohorts.filter(c=>swe.has(c.id))) {
-        assert.equal(c.workload.contract.session_rotation.status,c.id.startsWith('qwen35-')?'measured':'under-construction');
+        assert.equal(c.workload.contract.session_rotation.status,c.id.startsWith('qwen38-')?'under-construction':'measured');
         assert.equal(c.workload.contract.session_rotation.depth_field,'load.session_rotation_depth');
     }
     for(const p of [...data.points,...data.archived_points]) {
@@ -648,4 +648,32 @@ test('Qwen35 unified campaign shares the existing chart without losing checkpoin
         assert.equal(p.configuration.parameters.checkpoint_revision,original.model.revision);
         assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,original.workload.contract.prepared_workload_sha256);
     }
+});
+
+
+test('DSV4 INT8 retains all 24 matched K5 windows including saturation points',()=>{
+    const data=model.validate(require('../data/leaderboard_frontier.json'));
+    const cohort=data.cohorts.find(c=>c.id==='dsv4-flash-int8-sweprefix-smoke-v1');
+    assert.equal(cohort.model.label,'DeepSeek V4 Flash');
+    assert.equal(cohort.precision.label,'INT8');
+    const points=data.points.filter(p=>p.cohort_id===cohort.id);
+    const evidence=require('../data/leaderboard_frontier_dsv4_evidence.json');
+    assert.equal(points.length,24);assert.equal(evidence.runs.length,24);
+    for(const p of points){
+        const r=evidence.runs.find(r=>r.run_id===p.id), k=p.configuration.parameters;
+        assert.ok(r);assert.equal(r.summary.valid,true);assert.equal(r.summary.failed_requests,0);
+        assert.equal(r.summary.measurement_seconds,900);assert.equal(r.acceptance.released_to_idle,true);
+        assert.equal(p.metrics.output_tps,r.summary.observed_output_tokens_in_window/900);
+        assert.equal(p.metrics.decode_p90_tps,r.summary.decode_tokens_per_second_p90);
+        assert.equal(p.metrics.ttft_p95_ms,1000*r.summary.ttft_seconds_p95);
+        assert.equal(k.mtp_draft_tokens,5);assert.equal(k.speculative_method,'dspark');
+        assert.equal(k.global_seats,k.data_parallel_size===8?16:4);
+        assert.equal(p.load.session_rotation_depth,1);
+        const d=r.counter_deltas_including_drain;
+        assert.equal(d.draft_tokens,d.dspark_drafts*5);assert.ok(d.accepted_draft_tokens>0&&d.prefix_hit_tokens>0);
+    }
+    const lines=model.concurrencySeries(model.project(points,'decode_p90_tps','output_tps_per_chip').measured);
+    assert.equal(lines.length,4);
+    for(const line of lines)assert.deepEqual(line.map(r=>r.point.load.concurrency),[1,2,4,8,16,32]);
+    assert.equal(Object.keys(evidence.omitted).length,4);
 });

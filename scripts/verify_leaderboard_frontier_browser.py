@@ -289,7 +289,7 @@ def main():
             )
             assert (
                 page.locator(
-                    "#frontier-panel table, #frontier-panel pre, #frontier-panel details"
+                    "#frontier-panel table, #frontier-panel pre, #frontier-panel details:not(#frontier-model-picker)"
                 ).count()
                 == 0
             )
@@ -303,12 +303,25 @@ def main():
                 "frontier-detail",
             ]:
                 assert page.locator(f"#{removed}").count() == 0
+            trigger = page.locator("#frontier-model-trigger")
+            assert not page.locator("#frontier-model-picker").get_attribute("open")
+            trigger.focus()
+            trigger.press("Enter")
+            assert page.locator(".frontier-model-tag").first.is_visible()
+            trigger.press("Escape")
+            assert not page.locator(".frontier-model-tag").first.is_visible()
+            assert trigger.evaluate("el => el === document.activeElement")
+            trigger.click()
+            menu_box = page.locator(".frontier-model-tags").bounding_box()
+            assert menu_box["x"] >= 0 and menu_box["x"] + menu_box["width"] <= width
+            page.locator(".frontier-heading h1").click()
+            assert not page.locator(".frontier-model-tag").first.is_visible()
             assert page.locator(".frontier-model-tag").count() == len(tag_keys)
             assert (
                 "Qwen3.5-35B-A3B"
-                in page.locator(".frontier-model-tag").first.inner_text()
+                in page.locator(".frontier-model-tag").first.text_content()
             )
-            assert "BF16" in page.locator(".frontier-model-tag").first.inner_text()
+            assert "BF16" in page.locator(".frontier-model-tag").first.text_content()
             default_tag = (
                 production["cohorts"][0]["model"]["id"],
                 production["cohorts"][0]["precision"]["id"],
@@ -570,6 +583,7 @@ def main():
             # downloadable evidence distinct from the original MTP2 series.
             for cohort in production["cohorts"][1:]:
                 tag = (cohort["model"]["id"], cohort["precision"]["id"])
+                page.locator("#frontier-model-trigger").click()
                 page.locator(".frontier-model-tag").nth(tag_keys.index(tag)).click()
                 picker = page.locator("#frontier-workload")
                 if picker.count():
@@ -582,6 +596,15 @@ def main():
                 assert page.locator("#frontier-rotation-filter").count() == int(
                     "session_rotation" in cohort["workload"]["contract"]
                 )
+                assert not page.locator(".frontier-model-tag").first.is_visible()
+                if cohort["model"]["label"] == "DeepSeek V4 Flash":
+                    assert (
+                        "INT8" in page.locator("#frontier-model-trigger").inner_text()
+                    )
+                    page.screenshot(
+                        path=str(args.output / f"dsv4-{width}-{language}-{scheme}.png"),
+                        full_page=True,
+                    )
                 members = [
                     p for p in production["points"] if p["cohort_id"] == cohort["id"]
                 ]
@@ -654,6 +677,7 @@ def main():
         assert page.locator("#frontier-curves").is_hidden()
         assert page.locator("#frontier-curves").get_attribute("href") is None
         assert page.locator(".frontier-point").count() == 0
+        page.locator("#frontier-model-trigger").click()
         page.locator(".frontier-model-tag").nth(1).click()
         assert page.locator("#frontier-workload").count() == 0
         assert page.locator("#frontier-workload-tag").is_visible()

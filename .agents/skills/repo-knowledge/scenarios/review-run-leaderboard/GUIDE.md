@@ -170,3 +170,11 @@ Qwen35 chart. Do not create another same-named model button merely for its Model
 identifier. Preserve actual checkpoint/runtime/tool revisions per point and the original cohort in
 `archived_cohorts`; `evidence.original_cohort_id` records the presentation move. Campaign-native
 matched comparisons remain the authority for MOD speedups, not arbitrary cross-campaign pairing.
+
+For DeepSeek V4 Flash INT8, enter `docs/FRONTIER-DSV4-SWE.md`. Its separate cohort uses the official
+DSV4 encoder and 24 clean DSparkK5 windows, not Qwen tokens or BF16 weights. TP has four total
+seats; DP has16. Preserve plateau/regression points and the explicit C64 omission rather than
+implying a hardware ceiling. The append-only importer and separate metric extract retain existing
+archives. Model/precision choices now live inside a native disclosure on the selected model tag; QA
+must open the trigger before selecting a model, and checks Escape, outside dismissal, mobile bounds
+and exact downloaded DSV4 coordinates.

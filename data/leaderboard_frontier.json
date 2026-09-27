@@ -170,6 +170,58 @@
           }
         }
       }
+    },
+    {
+      "id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "model": {
+        "id": "deepseek-v4-flash-0731-w8a8",
+        "label": "DeepSeek V4 Flash",
+        "revision": "DeepSeek-V4-Flash-0731-w8a8-local-checkpoint"
+      },
+      "precision": {
+        "id": "int8-w8a8-bf16-activations",
+        "label": "INT8",
+        "contract": "Ascend W8A8 quantized checkpoint; BF16 activation dtype; not BF16 weights. Weight artifact revision not independently attested."
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-dsv4-eight-traces-900s-v1",
+        "label": "SWE prefix reuse · 15 min smoke",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b"
+          },
+          "prepared_workload_sha256": "fb4e0ca00f0689d4499ae88c64563b01c802aac76f785eef0a51274b9ef04ff9",
+          "tokenizer_fingerprint": "352abd317f716aceb7a638b771e50875e6c350e4f3a3bc7e8deac05059168014",
+          "encoder_revision": "7872f01b1d1fe23eabc4c98b48bffcef5a386062",
+          "chat_template": "Official DSV4 Python encoder, thinking on, keep reasoning; independent fixed input deltas/output budgets; no Jinja template",
+          "history": "Append actual generated IDs then next source delta; no history rerendering or generated-text retokenization",
+          "output_policy": "Exact source-derived per-turn output budgets; greedy ignore_eos, native DSpark K5 natural rejection, no forced acceptance",
+          "arrival": "Closed-loop C sequential lanes; whole-session replacement; no original tool/human delays",
+          "cache": "Fresh unique salt per session play; same salt within play; same byte-preserving relay in every arm, sticky native DP header = lane modulo DP",
+          "warmup": "Separate cold/warm cache check plus 60s protocol qualification; measured sessions use fresh salts",
+          "aggregation": "One 900s observation per point; count only outputs received inside window; drain in-flight work without post-window token credit",
+          "x_axis": "P90 in-window-complete request (N-1)/(last-first token time); grouped SSE arrival timestamps",
+          "y_axis": "In-window output tokens / 900 seconds / 8 allocated chips",
+          "acceptance": "Exact prompt-ID echo, output count/usage/length/DONE, zero request errors, positive APC and DSpark counters, clean exit and owned release. Not SWE answer accuracy or numerical equivalence.",
+          "context_scope": "262144 configured; not a full-256K qualification. Observed maximum prompts remain per-point.",
+          "limitations": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "Depth1 only; each lane advances one session consecutively before replacement"
+          },
+          "concurrency_curves_url": "./assets/frontier-dsv4-swe-concurrency.svg?v=dsv4-int8-20260927"
+        }
+      }
     }
   ],
   "points": [
@@ -63652,6 +63704,3156 @@
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-tp-c1-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-tp / C1 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            24
+          ],
+          "worker": "native_worker.NativeTPWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "native_worker.NativeTPWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [24], \"max_cudagraph_capture_size\": 24}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 40450,
+          "full_client_concurrency_fraction": 0.9995456032379945,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 1,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 83.11639284918955,
+        "output_tps": 68.33666666666667,
+        "ttft_p95_ms": 1054.5071904198264
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-tp-c1-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-tp-c1-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-tp / C1 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            24,
+            4128
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [24, 4128], \"max_cudagraph_capture_size\": 4128}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 52167,
+          "full_client_concurrency_fraction": 0.999226298276529,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 1,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 119.95283759422092,
+        "output_tps": 100.47111111111111,
+        "ttft_p95_ms": 586.5453786798753
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-tp-c1-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-dp-c1-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-dp / C1 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "worker": "vllm_ascend.worker.worker.NPUWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "vllm_ascend.worker.worker.NPUWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [6, 12], \"max_cudagraph_capture_size\": 12}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 40450,
+          "full_client_concurrency_fraction": 0.9995474901269578,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 1,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 94.19924960895617,
+        "output_tps": 66.37,
+        "ttft_p95_ms": 2284.200038993731
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-dp-c1-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-dp-c1-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-dp / C1 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            6,
+            12,
+            132,
+            264,
+            516,
+            1026
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [6, 12, 132, 264, 516, 1026], \"max_cudagraph_capture_size\": 1026}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 49298,
+          "full_client_concurrency_fraction": 0.9994520845678764,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 1,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 110.3535282036072,
+        "output_tps": 77.22777777777777,
+        "ttft_p95_ms": 2397.1824683278096
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-dp-c1-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-tp-c2-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-tp / C2 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            24
+          ],
+          "worker": "native_worker.NativeTPWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "native_worker.NativeTPWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [24], \"max_cudagraph_capture_size\": 24}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 56834,
+          "full_client_concurrency_fraction": 0.9989730379699419,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 2,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 83.9777353174807,
+        "output_tps": 135.1822222222222,
+        "ttft_p95_ms": 1328.5323823860385
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-tp-c2-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-tp-c2-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-tp / C2 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            24,
+            4128
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [24, 4128], \"max_cudagraph_capture_size\": 4128}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 71776,
+          "full_client_concurrency_fraction": 0.9981319687784546,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 2,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 108.98760841319361,
+        "output_tps": 181.89111111111112,
+        "ttft_p95_ms": 758.9572282915468
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-tp-c2-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-dp-c2-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-dp / C2 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "worker": "vllm_ascend.worker.worker.NPUWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "vllm_ascend.worker.worker.NPUWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [6, 12], \"max_cudagraph_capture_size\": 12}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 52167,
+          "full_client_concurrency_fraction": 0.9991824541271328,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 2,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 88.33266502399762,
+        "output_tps": 121.31555555555556,
+        "ttft_p95_ms": 2591.014039030415
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-dp-c2-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-dp-c2-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-dp / C2 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            6,
+            12,
+            132,
+            264,
+            516,
+            1026
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [6, 12, 132, 264, 516, 1026], \"max_cudagraph_capture_size\": 1026}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 59719,
+          "full_client_concurrency_fraction": 0.9990322614201836,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 2,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 99.85180198744355,
+        "output_tps": 138.28,
+        "ttft_p95_ms": 2667.2837459191196
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-dp-c2-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-tp-c4-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-tp / C4 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            24
+          ],
+          "worker": "native_worker.NativeTPWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "native_worker.NativeTPWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [24], \"max_cudagraph_capture_size\": 24}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 76206,
+          "full_client_concurrency_fraction": 0.9977533738221327,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 4,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 78.45230884065197,
+        "output_tps": 228.89333333333335,
+        "ttft_p95_ms": 1611.6607765899969
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-tp-c4-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-tp-c4-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-tp / C4 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            24,
+            4128
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [24, 4128], \"max_cudagraph_capture_size\": 4128}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 110597,
+          "full_client_concurrency_fraction": 0.9959549447588183,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 4,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 103.41023627508429,
+        "output_tps": 330.19666666666666,
+        "ttft_p95_ms": 1140.775627541006
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-tp-c4-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-dp-c4-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-dp / C4 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "worker": "vllm_ascend.worker.worker.NPUWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "vllm_ascend.worker.worker.NPUWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [6, 12], \"max_cudagraph_capture_size\": 12}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 62775,
+          "full_client_concurrency_fraction": 0.9983062686895331,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 4,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 75.34532195261671,
+        "output_tps": 192.0688888888889,
+        "ttft_p95_ms": 2749.7193954070094
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-dp-c4-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-dp-c4-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-dp / C4 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            6,
+            12,
+            132,
+            264,
+            516,
+            1026
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [6, 12, 132, 264, 516, 1026], \"max_cudagraph_capture_size\": 1026}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 74541,
+          "full_client_concurrency_fraction": 0.9978334978202797,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 4,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 89.97215730545724,
+        "output_tps": 215.9788888888889,
+        "ttft_p95_ms": 2575.8009411481908
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-dp-c4-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-tp-c8-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-tp / C8 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            24
+          ],
+          "worker": "native_worker.NativeTPWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "native_worker.NativeTPWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [24], \"max_cudagraph_capture_size\": 24}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 67857,
+          "full_client_concurrency_fraction": 0.9982504401494386,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 73.52098037174076,
+        "output_tps": 229.92555555555555,
+        "ttft_p95_ms": 21036.774712061742
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-tp-c8-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-tp-c8-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-tp / C8 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            24,
+            4128
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [24, 4128], \"max_cudagraph_capture_size\": 4128}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 88800,
+          "full_client_concurrency_fraction": 0.9966509574744203,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 102.53078916171135,
+        "output_tps": 342.51222222222225,
+        "ttft_p95_ms": 15672.836664656641
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-tp-c8-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-dp-c8-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-dp / C8 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "worker": "vllm_ascend.worker.worker.NPUWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "vllm_ascend.worker.worker.NPUWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [6, 12], \"max_cudagraph_capture_size\": 12}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 78912,
+          "full_client_concurrency_fraction": 0.9975477241441453,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 60.3369523442596,
+        "output_tps": 283.12555555555554,
+        "ttft_p95_ms": 3040.9582007676363
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-dp-c8-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-dp-c8-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-dp / C8 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            6,
+            12,
+            132,
+            264,
+            516,
+            1026
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [6, 12, 132, 264, 516, 1026], \"max_cudagraph_capture_size\": 1026}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 80239,
+          "full_client_concurrency_fraction": 0.9971513740127881,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 69.15941495787301,
+        "output_tps": 332.4888888888889,
+        "ttft_p95_ms": 2803.5673275007866
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-dp-c8-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-tp-c16-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-tp / C16 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            24
+          ],
+          "worker": "native_worker.NativeTPWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "native_worker.NativeTPWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [24], \"max_cudagraph_capture_size\": 24}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 47292,
+          "full_client_concurrency_fraction": 0.9985322721896227,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 76.55919595276454,
+        "output_tps": 228.47666666666666,
+        "ttft_p95_ms": 61643.52698589208
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-tp-c16-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-tp-c16-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-tp / C16 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            24,
+            4128
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [24, 4128], \"max_cudagraph_capture_size\": 4128}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 59032,
+          "full_client_concurrency_fraction": 0.9976545986282872,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 99.68692533029622,
+        "output_tps": 334.8022222222222,
+        "ttft_p95_ms": 38538.8857663027
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-tp-c16-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-dp-c16-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-dp / C16 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "worker": "vllm_ascend.worker.worker.NPUWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "vllm_ascend.worker.worker.NPUWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [6, 12], \"max_cudagraph_capture_size\": 12}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 57561,
+          "full_client_concurrency_fraction": 0.9978439510680942,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 31.761053733614514,
+        "output_tps": 322.47444444444443,
+        "ttft_p95_ms": 4823.569443810265
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-dp-c16-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-dp-c16-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-dp / C16 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            6,
+            12,
+            132,
+            264,
+            516,
+            1026
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [6, 12, 132, 264, 516, 1026], \"max_cudagraph_capture_size\": 1026}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 69479,
+          "full_client_concurrency_fraction": 0.996532370500758,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 43.78694919130974,
+        "output_tps": 456.81444444444446,
+        "ttft_p95_ms": 3118.5618751856955
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-dp-c16-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-tp-c32-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-tp / C32 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            24
+          ],
+          "worker": "native_worker.NativeTPWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "native_worker.NativeTPWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [24], \"max_cudagraph_capture_size\": 24}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 30972,
+          "full_client_concurrency_fraction": 0.9991144929841782,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 76.18129795862403,
+        "output_tps": 233.20333333333335,
+        "ttft_p95_ms": 165147.95900404282
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-tp-c32-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-tp-c32-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-tp / C32 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 4,
+          "max_num_batched_tokens": 4128,
+          "kv_cache_memory_bytes": 12884901888,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            24,
+            4128
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "8",
+              "--data-parallel-size",
+              "1",
+              "--data-parallel-size-local",
+              "1",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "4",
+              "--max-num-batched-tokens",
+              "4128",
+              "--kv-cache-memory-bytes",
+              "12884901888",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [24, 4128], \"max_cudagraph_capture_size\": 4128}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": true, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 42590,
+          "full_client_concurrency_fraction": 0.9982284185609832,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-tp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 102.64177945204375,
+        "output_tps": 337.5211111111111,
+        "ttft_p95_ms": 103158.93681920134
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-tp-c32-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-native-dp-c32-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "native-dp / C32 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "worker": "vllm_ascend.worker.worker.NPUWorker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "vllm_ascend.worker.worker.NPUWorker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL_DECODE_ONLY\", \"cudagraph_capture_sizes\": [6, 12], \"max_cudagraph_capture_size\": 12}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 41969,
+          "full_client_concurrency_fraction": 0.998205798208817,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        }
+      },
+      "load": {
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-native-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 28.583678862668247,
+        "output_tps": 283.53555555555556,
+        "ttft_p95_ms": 76942.4593739095
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-native-dp-c32-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
+      }
+    },
+    {
+      "id": "dsv4-sweprefix-better-dp-c32-20260927",
+      "cohort_id": "dsv4-flash-int8-sweprefix-smoke-v1",
+      "label": "better-dp / C32 / DSpark K5",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 / 0.25.1rc1",
+        "mods": [
+          "betterscale"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "kv_cache_memory_bytes": 7516192768,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "sampler": "Native standard rejection; never synthetic acceptance",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL",
+          "graph_capture_sizes": [
+            6,
+            12,
+            132,
+            264,
+            516,
+            1026
+          ],
+          "worker": "betterscale.worker.Worker",
+          "baseline_bridge": "TP only: required K5 LCM startup compatibility; no BetterScale treatment",
+          "benchmark_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "runtime_pins": {
+            "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+            "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+          },
+          "server_commands": [
+            [
+              "python",
+              "-m",
+              "vllm.entrypoints.cli.main",
+              "serve",
+              "$MODEL",
+              "--host",
+              "127.0.0.1",
+              "--port",
+              "33861",
+              "--served-model-name",
+              "dsv4",
+              "--tensor-parallel-size",
+              "1",
+              "--data-parallel-size",
+              "8",
+              "--data-parallel-size-local",
+              "8",
+              "--enable-expert-parallel",
+              "--quantization",
+              "ascend",
+              "--dtype",
+              "bfloat16",
+              "--distributed-executor-backend",
+              "mp",
+              "--async-scheduling",
+              "--worker-cls",
+              "betterscale.worker.Worker",
+              "--max-model-len",
+              "262144",
+              "--max-num-seqs",
+              "2",
+              "--max-num-batched-tokens",
+              "1026",
+              "--kv-cache-memory-bytes",
+              "7516192768",
+              "--enable-prefix-caching",
+              "--enable-prompt-tokens-details",
+              "--seed",
+              "123",
+              "--speculative-config",
+              "{\"method\": \"dspark\", \"num_speculative_tokens\": 5, \"enforce_eager\": true}",
+              "--compilation-config",
+              "{\"cudagraph_mode\": \"FULL\", \"cudagraph_capture_sizes\": [6, 12, 132, 264, 516, 1026], \"max_cudagraph_capture_size\": 1026}",
+              "--additional-config",
+              "{\"ascend_compilation_config\": {\"enable_npugraph_ex\": true, \"enable_static_kernel\": false}, \"enable_cpu_binding\": false, \"enable_dsa_cp\": false, \"multistream_overlap_shared_expert\": true}"
+            ]
+          ],
+          "observed_max_prompt_tokens": 51572,
+          "full_client_concurrency_fraction": 0.997515417481514,
+          "comparison_scope": "Single-run finite-window trajectories differ by speed/concurrency. Fixed 4 TP seats or 2 per DP rank (16 total); not tuned peak capacity. C64 omitted after C32 saturation review; all 24 completed points retained.",
+          "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+          "execution_host": "local 910B2 eight-card host; all 24 points matched on one host"
+        },
+        "mod_sources": [
+          {
+            "id": "betterscale",
+            "repository": "https://github.com/vLLM-HUST/BetterScale",
+            "revision": "76709dba52af7e81ac8f0280ae7e007ed50b2bd5",
+            "source_capsule": "dsv4-swe-frontier-20260927-local-v2",
+            "scope": "Frozen v0.5.1 source capsule; not an additional installed-wheel qualification"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-fixed-better-dp-20260927"
+      },
+      "metrics": {
+        "decode_p90_tps": 38.691279200636906,
+        "output_tps": 394.3333333333333,
+        "ttft_p95_ms": 60765.8247925923
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-DSV4-SWE.md",
+        "run_ids": [
+          "dsv4-sweprefix-better-dp-c32-20260927"
+        ],
+        "sampling_date_utc": "2026-09-27",
+        "sampling_date_source": "Point receipt started_utc, UTC",
+        "aggregation": "Single complete 900s window; no pooling or repeat selection",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "29136f1f481ebab8566014a05b7ed53bcf79dc84",
+          "measurement_seconds": 900
+        },
+        "metric_extract": "./data/leaderboard_frontier_dsv4_evidence.json"
       }
     }
   ],
