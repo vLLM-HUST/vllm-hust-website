@@ -226,7 +226,11 @@
           "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
           "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point.",
           "concurrency_curves_url": "./assets/frontier-qwen35-swe-concurrency.svg?v=sweprefix-curves-20260924-5",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c"
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "session_rotation": {
+            "status": "under-construction",
+            "depth_field": "load.session_rotation_depth"
+          }
         }
       }
     }
@@ -60748,7 +60752,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-native-20260927"
+        "concurrency_series": "swe-unified-native-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 91.54555555555555,
@@ -60859,7 +60864,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-native-20260927"
+        "concurrency_series": "swe-unified-native-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 152.7211111111111,
@@ -60970,7 +60976,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-native-20260927"
+        "concurrency_series": "swe-unified-native-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 217.47555555555556,
@@ -61081,7 +61088,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-native-20260927"
+        "concurrency_series": "swe-unified-native-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 291.1066666666667,
@@ -61192,7 +61200,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-native-20260927"
+        "concurrency_series": "swe-unified-native-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 359.75,
@@ -61298,11 +61307,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca"
         },
         "mod_sources": [
           {
             "id": "mooncake-vllm-connectors",
+            "repository": "https://github.com/kvcache-ai/Mooncake",
+            "revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -61310,7 +61323,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927"
+        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 90.81777777777778,
@@ -61416,11 +61430,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca"
         },
         "mod_sources": [
           {
             "id": "mooncake-vllm-connectors",
+            "repository": "https://github.com/kvcache-ai/Mooncake",
+            "revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -61428,7 +61446,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927"
+        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 151.69555555555556,
@@ -61534,11 +61553,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca"
         },
         "mod_sources": [
           {
             "id": "mooncake-vllm-connectors",
+            "repository": "https://github.com/kvcache-ai/Mooncake",
+            "revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -61546,7 +61569,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927"
+        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 216.22222222222223,
@@ -61652,11 +61676,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca"
         },
         "mod_sources": [
           {
             "id": "mooncake-vllm-connectors",
+            "repository": "https://github.com/kvcache-ai/Mooncake",
+            "revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -61664,7 +61692,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927"
+        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 290.2711111111111,
@@ -61770,11 +61799,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca"
         },
         "mod_sources": [
           {
             "id": "mooncake-vllm-connectors",
+            "repository": "https://github.com/kvcache-ai/Mooncake",
+            "revision": "8b8c7ae705bdaf918f5a8fbc7a06cb7eb1d5f3ca",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -61782,7 +61815,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927"
+        "concurrency_series": "swe-unified-mooncake-vllm-connectors-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 352.8888888888889,
@@ -61888,11 +61922,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e"
         },
         "mod_sources": [
           {
             "id": "kv-tiering-migration",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
+            "revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -61900,7 +61938,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-kv-tiering-migration-20260927"
+        "concurrency_series": "swe-unified-kv-tiering-migration-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 91.03222222222222,
@@ -62006,11 +62045,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e"
         },
         "mod_sources": [
           {
             "id": "kv-tiering-migration",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
+            "revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -62018,7 +62061,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-kv-tiering-migration-20260927"
+        "concurrency_series": "swe-unified-kv-tiering-migration-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 150.45222222222222,
@@ -62124,11 +62168,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e"
         },
         "mod_sources": [
           {
             "id": "kv-tiering-migration",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
+            "revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -62136,7 +62184,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-kv-tiering-migration-20260927"
+        "concurrency_series": "swe-unified-kv-tiering-migration-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 215.9322222222222,
@@ -62242,11 +62291,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e"
         },
         "mod_sources": [
           {
             "id": "kv-tiering-migration",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
+            "revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -62254,7 +62307,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-kv-tiering-migration-20260927"
+        "concurrency_series": "swe-unified-kv-tiering-migration-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 286.12,
@@ -62360,11 +62414,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e"
         },
         "mod_sources": [
           {
             "id": "kv-tiering-migration",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
+            "revision": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -62372,7 +62430,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-kv-tiering-migration-20260927"
+        "concurrency_series": "swe-unified-kv-tiering-migration-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 341.6333333333333,
@@ -62478,11 +62537,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "a0cba97d9abdc99908e46616db622f0e0099127f"
         },
         "mod_sources": [
           {
             "id": "bidkv",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
+            "revision": "a0cba97d9abdc99908e46616db622f0e0099127f",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -62490,7 +62553,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-bidkv-20260927"
+        "concurrency_series": "swe-unified-bidkv-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 92.13333333333334,
@@ -62596,11 +62660,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "a0cba97d9abdc99908e46616db622f0e0099127f"
         },
         "mod_sources": [
           {
             "id": "bidkv",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
+            "revision": "a0cba97d9abdc99908e46616db622f0e0099127f",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -62608,7 +62676,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-bidkv-20260927"
+        "concurrency_series": "swe-unified-bidkv-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 153.43,
@@ -62714,11 +62783,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "a0cba97d9abdc99908e46616db622f0e0099127f"
         },
         "mod_sources": [
           {
             "id": "bidkv",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
+            "revision": "a0cba97d9abdc99908e46616db622f0e0099127f",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -62726,7 +62799,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-bidkv-20260927"
+        "concurrency_series": "swe-unified-bidkv-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 216.70222222222222,
@@ -62832,11 +62906,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "a0cba97d9abdc99908e46616db622f0e0099127f"
         },
         "mod_sources": [
           {
             "id": "bidkv",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
+            "revision": "a0cba97d9abdc99908e46616db622f0e0099127f",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -62844,7 +62922,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-bidkv-20260927"
+        "concurrency_series": "swe-unified-bidkv-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 293.44555555555553,
@@ -62950,11 +63029,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "a0cba97d9abdc99908e46616db622f0e0099127f"
         },
         "mod_sources": [
           {
             "id": "bidkv",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
+            "revision": "a0cba97d9abdc99908e46616db622f0e0099127f",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -62962,7 +63045,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-bidkv-20260927"
+        "concurrency_series": "swe-unified-bidkv-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 358.70666666666665,
@@ -63068,11 +63152,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545"
         },
         "mod_sources": [
           {
             "id": "dla",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-dla",
+            "revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -63080,7 +63168,8 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-dla-20260927"
+        "concurrency_series": "swe-unified-dla-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 91.84666666666666,
@@ -63186,11 +63275,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545"
         },
         "mod_sources": [
           {
             "id": "dla",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-dla",
+            "revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -63198,7 +63291,8 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-dla-20260927"
+        "concurrency_series": "swe-unified-dla-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 152.60666666666665,
@@ -63304,11 +63398,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545"
         },
         "mod_sources": [
           {
             "id": "dla",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-dla",
+            "revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -63316,7 +63414,8 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-dla-20260927"
+        "concurrency_series": "swe-unified-dla-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 215.56222222222223,
@@ -63422,11 +63521,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545"
         },
         "mod_sources": [
           {
             "id": "dla",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-dla",
+            "revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -63434,7 +63537,8 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-dla-20260927"
+        "concurrency_series": "swe-unified-dla-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 288.1488888888889,
@@ -63540,11 +63644,15 @@
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
-          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545"
         },
         "mod_sources": [
           {
             "id": "dla",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-dla",
+            "revision": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+            "source_capsule": "qwen35-unified-native-20260927",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
         ]
@@ -63552,7 +63660,8 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-unified-dla-20260927"
+        "concurrency_series": "swe-unified-dla-20260927",
+        "session_rotation_depth": 1
       },
       "metrics": {
         "output_tps": 358.1988888888889,

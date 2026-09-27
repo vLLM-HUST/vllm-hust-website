@@ -16335,6 +16335,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "562a9f3349c04f69b9069f81d518a198",
+        "started_at_unix": 1790479009.4205317,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16382,6 +16404,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "edda8b45980944edb315abc2172910c9",
+        "started_at_unix": 1790479911.9905431,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16431,6 +16475,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "2357194fcf6143ca9c78d65d8f7eca09",
+        "started_at_unix": 1790480817.1521757,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16484,6 +16550,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "9f9dc7fa5e40427b8ef9fe99a95c737e",
+        "started_at_unix": 1790481731.636249,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16545,6 +16633,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "f7e5da90a1a243deb3e24b8c86f68303",
+        "started_at_unix": 1790482730.6811786,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16591,6 +16701,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "fc3db3b29cd2414ba9e7b884191e53ef",
+        "started_at_unix": 1790484815.6679256,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16638,6 +16770,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "8fdec8eb80f64ae2a3ae7d5a83ac5fe4",
+        "started_at_unix": 1790485724.3741293,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16687,6 +16841,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "9c7aa2aba6a8425e8aed2554212a99cd",
+        "started_at_unix": 1790486634.259184,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16740,6 +16916,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "be3af92788434f1c9b3d15eafc44612a",
+        "started_at_unix": 1790487541.1842046,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16801,6 +16999,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "709b175976f04a16ba1965adcacb1e71",
+        "started_at_unix": 1790488511.1425083,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16847,6 +17067,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "4f4aa33f2ab046ada0de34df16fbc6c3",
+        "started_at_unix": 1790489928.7909727,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16894,6 +17136,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "99370030aacb43918f0a3f3ad924ad5c",
+        "started_at_unix": 1790490835.680994,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16943,6 +17207,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "9ed47b70f85549c09efdb9e115df2b3c",
+        "started_at_unix": 1790491737.6486464,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -16996,6 +17282,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "d650f3a508814a5c8525631111a0238b",
+        "started_at_unix": 1790492648.424616,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17057,6 +17365,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "2cd49521050b4aa8a756e6edb1327885",
+        "started_at_unix": 1790493622.0549722,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17103,6 +17433,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "9cd43584a1ab4a7085da2dec73ffb5ad",
+        "started_at_unix": 1790495196.7476737,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17150,6 +17502,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "7d1281c1e2474bcdbf4e5fde3b8a6b1f",
+        "started_at_unix": 1790496103.0526679,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17199,6 +17573,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "b041218b96c3473bb50230ce679483a2",
+        "started_at_unix": 1790497006.8901591,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17252,6 +17648,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "eeb2c659cf2c434baa1daab4e3393728",
+        "started_at_unix": 1790497919.238196,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17313,6 +17731,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "8b09ecc3847f4578a0b044e359400f04",
+        "started_at_unix": 1790498898.1210861,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17359,6 +17799,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "e4c11fa8ea304eb181c12192248a4070",
+        "started_at_unix": 1790500350.0511372,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17406,6 +17868,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "ef7efb2e134d480580de65f3102ce866",
+        "started_at_unix": 1790501258.9069884,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17455,6 +17939,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "dfdb8d3893cb4292ad2a3bb7be291a00",
+        "started_at_unix": 1790502166.8770304,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17508,6 +18014,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "2ab00cdf0a0a44159154c1a38b131f14",
+        "started_at_unix": 1790503080.454894,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     },
     {
@@ -17569,6 +18097,28 @@
         "prefix_cache_observed": true,
         "selected_devices_released": true,
         "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331"
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "5bf7b8ce60ba4b68864debbbf91bacb7",
+        "started_at_unix": 1790504074.4425945,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
     }
   ]
