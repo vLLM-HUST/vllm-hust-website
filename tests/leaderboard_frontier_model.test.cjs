@@ -157,6 +157,10 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(p.configuration.hardware.accelerator_count,2);
             for(const key of ['owned_server_stop_command_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
             assert.ok(run.validation.prefix_hit_token_delta>0);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-native-rotation2-hw3-20260927'){
+            assert.equal(p.load.session_rotation_depth,2);
+            assert.equal(run.client.session_rotation_depth,2);
+            for(const key of ['all_role_exits_zero','selected_devices_released','exact_request_protocol_passed','prefix_cache_qualification_passed']) assert.equal(run.validation[key],true);
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -550,11 +554,11 @@ test('SWE rotation metadata covers displayed and archived observations without r
     const data=require('../data/leaderboard_frontier.json');
     const swe=new Set(data.cohorts.filter(c=>c.workload.id.startsWith('sweprefix-')).map(c=>c.id));
     for(const c of data.cohorts.filter(c=>swe.has(c.id))) {
-        assert.equal(c.workload.contract.session_rotation.status,'under-construction');
+        assert.equal(c.workload.contract.session_rotation.status,c.id.startsWith('qwen35-')?'measured':'under-construction');
         assert.equal(c.workload.contract.session_rotation.depth_field,'load.session_rotation_depth');
     }
     for(const p of [...data.points,...data.archived_points]) {
-        if(swe.has(p.cohort_id)) assert.equal(p.load.session_rotation_depth,1);
+        if(swe.has(p.cohort_id)) assert.equal(p.load.session_rotation_depth,p.id.includes('-rotation2-')?2:1);
         else assert.equal(p.load.session_rotation_depth,undefined);
     }
 });
@@ -570,4 +574,28 @@ test('rotation-enabled cohorts require explicit positive integer depths, never d
         assert.throws(()=>model.validate(invalid),/session rotation depth/);
     }
     assert.equal(model.validate(fixture),fixture); // Non-rotation workloads stay unchanged.
+});
+
+
+test('native Rotation2 points retain both C16 observations and exact public run metrics',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const evidence=require('../data/leaderboard_frontier_swe_evidence.json');
+    const points=data.points.filter(p=>p.load.session_rotation_depth===2);
+    assert.deepEqual(points.map(p=>p.load.concurrency).sort((a,b)=>a-b),[2,4,8,16,16]);
+    assert.equal(new Set(points.flatMap(p=>p.evidence.run_ids)).size,5);
+    for(const p of points) {
+        const r=evidence.runs.find(r=>r.point_id===p.id);
+        assert.ok(r);
+        assert.deepEqual(p.metrics,r.metrics);
+        assert.equal(p.metrics.output_tps,r.summary.output_tokens_per_second);
+        assert.equal(p.metrics.decode_p90_tps,r.summary.decode_tokens_per_second_p90);
+        assert.equal(p.configuration.parameters.expert_parallel,true);
+        assert.equal(p.configuration.parameters.tensor_parallel_size,2);
+        assert.deepEqual(p.configuration.mods,[]);
+        assert.equal(r.client.session_rotation_depth,2);
+        assert.equal(r.summary.session_slots,2*p.load.concurrency);
+        assert.equal(r.summary.failed_requests,0);
+        assert.equal(r.validation.all_role_exits_zero,true);
+        assert.equal(r.validation.selected_devices_released,true);
+    }
 });

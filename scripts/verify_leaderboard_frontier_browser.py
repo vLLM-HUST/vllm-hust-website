@@ -231,21 +231,37 @@ def main():
             )
             page.locator("#frontier-only").uncheck()
 
-            rotation = page.locator('[data-filter=rotation][value="1"]')
-            assert rotation.is_checked()
-            assert page.locator("[data-filter=rotation]").count() == 1
-            note = page.locator("#frontier-rotation-filter").inner_text()
+            depths = sorted(
+                {p["load"]["session_rotation_depth"] for p in default_points}
+            )
+            assert page.locator("[data-filter=rotation]").count() == len(depths)
             assert (
-                "会话轮转深度测试正在施工"
-                if language == "zh"
-                else "Session rotation depth testing is under construction"
-            ) in note
-            rotation.uncheck()
-            assert page.locator(".frontier-point, .frontier-envelope").count() == 0
+                page.locator("#frontier-rotation-filter .frontier-filter-note").count()
+                == 0
+            )
+            for depth in depths:
+                assert page.locator(
+                    f'[data-filter=rotation][value="{depth}"]'
+                ).is_checked()
+            page.locator('[data-filter=rotation][value="1"]').uncheck()
+            expected_rotation2 = {
+                p["id"]
+                for p in default_points
+                if p["load"]["session_rotation_depth"] == 2
+            }
+            shown = page.locator("[data-point]").evaluate_all(
+                "nodes=>nodes.map(n=>n.dataset.point)"
+            )
+            assert set(shown) == expected_rotation2
+            assert len(expected_rotation2) == 5
             page.locator("#langToggle").click()
             assert not page.locator('[data-filter=rotation][value="1"]').is_checked()
+            assert page.locator('[data-filter=rotation][value="2"]').is_checked()
             page.locator("#langToggle").click()
-            page.locator('[data-filter=rotation][value="1"]').check()
+            page.locator('[data-filter=rotation][value="2"]').uncheck()
+            assert page.locator(".frontier-point, .frontier-envelope").count() == 0
+            for depth in depths:
+                page.locator(f'[data-filter=rotation][value="{depth}"]').check()
             assert page.locator(".frontier-point").count() == len(default_points)
 
             assert page.locator("#runs-panel").is_hidden()
@@ -432,9 +448,9 @@ def main():
                 params = point["configuration"]["parameters"]
                 assert_parallel(text, params, language)
                 assert (
-                    "会话轮转深度: 1"
+                    f"会话轮转深度: {point['load']['session_rotation_depth']}"
                     if language == "zh"
-                    else "Session rotation depth: 1"
+                    else f"Session rotation depth: {point['load']['session_rotation_depth']}"
                 ) in text
                 if params.get("mtp_draft_tokens") is not None:
                     assert f"MTP{params['mtp_draft_tokens']}" in text

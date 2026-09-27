@@ -137,8 +137,9 @@ choices, while model/workload changes reset them.
 On 2026-09-27 Fletcher confirmed that all existing SWE 15-minute results used depth **1**. Both
 visible and archived SWE points are annotated; original metrics, run IDs and raw evidence artifacts
 remain unchanged. The compact “Session rotation depth testing is under construction” notice records
-pending deeper-session testing, not measured D>1 performance. Future measured depths become choices
-only when explicitly recorded; do not add placeholder points or infer results from this notice.
+pending deeper-session testing at that time, not measured D>1 performance. Measured depths become
+choices only when explicitly recorded; do not add placeholder points or infer results from this
+notice.
 
 At C lanes and D slots per lane, only C requests can be in flight, while C\*D histories may be
 revisited. Compare equal depths for matched comparisons; mixed-depth frontiers are a
@@ -239,3 +240,8 @@ The [2026-09-25 campaign report](FRONTIER-QWEN35-MODS-K8S.md) records new Native
 controls, common runtime overlays, and model/workload identity checks. Points whose enabled policy
 receives no calls are explicitly marked **MOD policy not exercised**; they are observations, not
 demonstrated optimization gains.
+
+The September27 Qwen35 native Rotation2 import supplies five complete observations at C2/4/8/16,
+including both C16 repeats. Its construction notice is removed; Qwen27 remains under construction.
+Depth1/2 checkboxes are derived from the real points. Both depths are initially selected; select
+only2 for the Rotation2 frontier, and disable frontier-only display to inspect every observation.

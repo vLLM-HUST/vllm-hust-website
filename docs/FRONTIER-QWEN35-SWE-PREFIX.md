@@ -247,3 +247,39 @@ waves than source frames. Those counters include startup and drain, so they do n
 measured-window kernel cost or prove the remaining expert wait is solved. Each setting has one
 closed-loop observation, with different reached turn mixes. The earlier DP8EP8/TP8EP8 controls
 remain explicitly identified as hw0 observations; they were not rerun on hw3.
+
+## Session rotation depth2 native baseline
+
+Five native TP2/EP2 observations on Ascend910B2 were completed on September27. Each uses 900
+measured seconds, natural MTP2,24.25GiB KV per chip, a16-request server limit, 4096-token batch
+budget, and graph capture sizes3/6/12/24/48. The client is swe-prefix-reuse0.1.3 at
+`8bb99ebac120f8907623fc1b5a04946894424d31`.
+
+Each of C lanes rotates between two independent session slots, advancing one turn at a time; there
+are2C histories but still at most C requests in flight. Pipeline depth remains1. Cold starts remain
+in measurement. A separate90-second protocol/cache qualification precedes each window. All five
+passed request checks, clean server exit and selected-device release.
+
+| Client C | Observation | Output tokens/s/chip | Decode P90 tokens/s | All-request TTFT P95 (s) |
+| -------: | :---------- | -------------------: | ------------------: | -----------------------: |
+|        2 | d2-c2-r2    |                76.28 |               98.05 |                    1.281 |
+|        4 | d2-c4-r1    |               109.81 |               78.54 |                    1.645 |
+|        8 | d2-c8-r1    |               159.16 |               57.26 |                    1.801 |
+|       16 | d2-c16-r1   |               200.23 |               38.04 |                    2.974 |
+|       16 | d2-c16-r2   |               199.87 |               37.14 |                    3.238 |
+
+Both C16 observations remain independent points, not averaged or best-selected. The corresponding
+public metric extracts retain run IDs, complete summaries, actual depths, source/configuration and
+continuation latency diagnostics. No historical point or measurement was replaced. These points do
+not join the older Rotation1 static concurrency curves.
+
+The matched local depth1 controls triggered the campaign's operational stop criterion at C16:
+continuation TTFT P95 increased28.4% in the first pair and52.8% in reverse-order confirmation. Depth
+escalation stopped at2. This is not statistical significance or proof of resident-cache exhaustion:
+much of the tail gap occurs early in the window, and depth changes the finite-window context mix.
+Low active-KV usage or zero preemptions cannot rule out cached-history eviction; raw cached/prompt
+ratios also depend on hybrid alignment and prompt length.
+
+Select rotation depth2 in the sidebar for its frontier. Both depths are selected initially; that
+combined envelope is a selected-configuration view, not an equal-depth comparison. Uncheck
+frontier-only display to inspect all five records, including dominated points.
