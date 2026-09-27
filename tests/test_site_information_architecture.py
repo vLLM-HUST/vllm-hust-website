@@ -64,7 +64,10 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
 
 
 def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
-    assert "Typed runtime contracts. 12 published MOD projects. Evidence before claims." in HOME
+    assert (
+        "Typed runtime contracts. 12 published MOD projects. Evidence before claims."
+        in HOME
+    )
     assert (
         "every MOD publishes ownership, compatibility, workload fit, and evidence limits"
         in HOME
