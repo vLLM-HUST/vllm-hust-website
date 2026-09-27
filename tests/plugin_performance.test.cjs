@@ -17,3 +17,13 @@ test('rejects the old per-MOD comparison format and any injected ratio', () => {
 test('a baseline cannot be admitted before the unified evidence validator exists', () => {
   assert.throws(() => M.summarize({...data,baseline:{id:'unverified'}}));
 });
+
+test('catalog sorts admitted gains descending, leaving pending items to catalog fallback', () => {
+  const results = new Map([
+    ['fast', {gain: 25}], ['slow', {gain: -3}], ['pending', {gain: null}]
+  ]);
+  const rows = ['pending', 'slow', 'unknown', 'fast'].map(id => ({id}));
+  assert.deepEqual(rows.sort((a, b) => M.compare(a, b, results)).map(row => row.id),
+    ['fast', 'slow', 'pending', 'unknown']);
+  assert.equal(M.compare({id: 'pending'}, {id: 'unknown'}, results), 0);
+});

@@ -9,8 +9,10 @@
     }));
   }
   function compare(left, right, results) {
-    const a = results.has(left.id), b = results.has(right.id);
-    return a !== b ? (a ? -1 : 1) : left.id.localeCompare(right.id);
+    const a = results.get(left.id)?.gain, b = results.get(right.id)?.gain;
+    const aMeasured = Number.isFinite(a), bMeasured = Number.isFinite(b);
+    if (aMeasured !== bMeasured) return aMeasured ? -1 : 1;
+    return aMeasured ? b - a : 0;
   }
   const api = { summarize, compare };
   if (typeof module === 'object' && module.exports) module.exports = api;

@@ -706,31 +706,6 @@ vllm-hust-ext extension check ${extensionId}`
     return panel;
   }
 
-  function renderPerformance() {
-    const root = document.querySelector("[data-plugin-performance]");
-    if (!root) return;
-    root.replaceChildren();
-    const zh = language() === "zh";
-    root.append(element("h2", "", zh ? "统一 Native 实测 · 补测中" : "Shared-Native measurements · pending"),
-      element("p", "performance-method", zh
-        ? "此前基于不同 Native 对照的百分比和排序已撤下。所有 MOD 必须使用同一个 Qwen3.5-35B-A3B Native 基准，固定运行时、配置、工作负载和计量方式；不符合条件的历史结果不参与比较。"
-        : "The previous percentages and ordering used different Native controls and have been withdrawn. Every MOD must use one Qwen3.5-35B-A3B Native baseline with fixed runtime, configuration, workload and accounting. Incompatible historical results are excluded."));
-    for (const group of ["pending"]) {
-      root.append(element("h3", "", zh ? "历史实测索引 · 不参与排名" : "Historical evidence · excluded from ranking"));
-      const grid = element("div", "performance-grid");
-      [...performanceResults.values()]
-        .sort((a, b) => PluginPerformance.compare(a, b, performanceResults)).forEach(row => {
-          const item = registry.components.find(item => item.id === row.id);
-          if (!item || item.public_surface === false) return;
-          const card = element("article", "performance-card");
-          card.dataset.performanceMod = row.id;
-          card.append(element("h4", "", row.id === "mooncake-vllm-connectors" ? "AscendStoreConnector + Mooncake" : local(item, "name")), performancePanel(row));
-          grid.append(card);
-        });
-      root.append(grid);
-    }
-  }
-
   function publicEffectPanel(item) {
     const result = performanceResults.has(item.id)
       ? (language() === "zh" ? "历史结果仅供查阅，尚未通过统一 Native 基准验收，不展示跨基准性能比较。" : "Historical evidence only; shared-Native qualification is pending. Cross-baseline performance comparisons are not displayed.")
@@ -958,7 +933,6 @@ vllm-hust-ext extension check ${extensionId}`
   }
 
   function renderCatalog() {
-    if (performanceResults.size) renderPerformance();
     const query = search.value.trim().toLowerCase();
     const visible = registry.components.filter((item) => {
       const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
@@ -1043,8 +1017,6 @@ vllm-hust-ext extension check ${extensionId}`
       }
       registry = payload;
       performanceResults = performance || new Map();
-      if (performance) renderPerformance();
-      else document.querySelector("[data-plugin-performance]").textContent = language() === "zh" ? "实测排序暂不可用；请查看各 MOD 的证据链接。" : "Performance ordering unavailable; see individual evidence links.";
       workshopMetadata = metadata.plugins;
       workloadNavigation = navigation;
       renderPageLabels();

@@ -12,3 +12,7 @@ measurements by a newly selected Native value does not establish comparability.
 The website currently exposes no scores. `plugin-performance/v2` records the pending state and
 rejects per-MOD ratios. A future evidence validator must bind every candidate to the exact same
 Native point IDs at C1/2/4/8/16 and the same frozen experiment contract before ranking is restored.
+
+Performance ordering belongs to the existing MOD catalog, with no separate results section. Admitted
+gains sort descending, including negative gains; items without an admitted score follow and retain
+the catalog compatibility/name ordering. Historical evidence alone grants no priority.
