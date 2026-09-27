@@ -24,9 +24,10 @@ test('every published gain is computed from five points in a declared comparison
     assert.ok(Math.abs(result.gain - (product ** (1 / 5) - 1) * 100) < 1e-10);
   }
   assert.deepEqual(new Set(measured.map(result => result.id)), new Set([
-    'betterscale', 'bidkv', 'dla', 'kv-tiering-migration', 'mooncake-vllm-connectors'
+    'betterscale', 'pipeline-microbatch-migration', 'bidkv', 'dla', 'kv-tiering-migration', 'mooncake-vllm-connectors'
   ]));
   assert.equal(results.get('betterscale').gain.toFixed(2), '42.39');
+  assert.equal(results.get('pipeline-microbatch-migration').gain.toFixed(2), '9.78');
 });
 
 test('comparison sets declare baselines centrally and entries cannot supply a baseline or score', () => {

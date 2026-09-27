@@ -34,9 +34,9 @@ point independently at each load or substituting the newer single resident-state
 ## Later unified campaign
 
 BidKV, DLA, Tiering and Mooncake use the single five-point Native curve from their later unified
-campaign. Pipeline changes TP2/PP1 to TP2/PP2, and other published MOD reports use other models or
-workloads, so they remain unscored. The validator excludes incompatible identities and incomplete
-evidence.
+campaign. Pipeline's complete TP2/PP2 campaign uses its published five-point Native curve. Other
+published MOD reports use other models or workloads, so they remain unscored. The validator excludes
+incompatible identities and incomplete evidence.
 
 ECPA launch/adapter/analysis metadata remains in the data file. It is not injected into the
 performance card or used to invent a performance score.
