@@ -99,7 +99,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.equal(params.gdn_strided_gates,true);
                 assert.equal(params.mixed_shared_qkv_pack,true);
             }
-        } else if(p.evidence.benchmark_protocol.campaign==='resident-state-tp2-c16-v1'){
+        } else if(['resident-state-tp2-c16-v1','resident-balanced-tp2-c16-v1'].includes(p.evidence.benchmark_protocol.campaign)){
             const params=p.configuration.parameters;
             assert.equal(params.using_live_runtime,true);
             assert.equal(params.execution_seats,16);
@@ -107,7 +107,13 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(params.shared_attention_pages*params.attention_page_tokens,2140160);
             assert.equal(params.mtp_draft_tokens,2);
             assert.equal(params.async_scheduling,true);
-            assert.equal(params.mod_revision,'a8abd056a3ece455f683b212d6bd905da4058cbb'); // pragma: allowlist secret (public Git commit)
+            if(p.evidence.benchmark_protocol.campaign==='resident-balanced-tp2-c16-v1'){
+                assert.equal(params.mod_revision,'eee35fd6b50fca73385ad8f8af714fcd7e5c2684'); // pragma: allowlist secret (public Git commit)
+                assert.equal(params.balanced_decode_attention,true);
+                assert.equal(params.server_environment.BETTERSCALE_CONTEXT_PARALLEL,'1');
+                assert.equal(params.worker_class,'betterscale.qwen35_worker.Worker');
+                assert.equal(run.qualification.status,'PASS');
+            } else assert.equal(params.mod_revision,'a8abd056a3ece455f683b212d6bd905da4058cbb'); // pragma: allowlist secret (public Git commit)
             assert.equal(p.configuration.mod_sources[0].revision,params.mod_revision);
             assert.equal(p.load.concurrency,16);
             for(const key of ['owned_server_exit_zero','selected_device_guard_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
