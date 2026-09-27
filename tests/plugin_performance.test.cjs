@@ -59,6 +59,16 @@ test('workload, model, topology, KV budget, runtime and measurement mismatches e
   }
 });
 
+test('MOD-specific host-tier capacity remains part of the treatment', () => {
+  const result = M.summarize(data, frontier).get('betterscale');
+  const changed = structuredClone(frontier);
+  for (const row of result.comparisons) {
+    changed.points.find(point => point.id === row.point_id)
+      .configuration.parameters.host_kv_budget_gib = 8;
+  }
+  assert.equal(M.summarize(data, changed).get('betterscale').gain.toFixed(2), '42.39');
+});
+
 test('missing or duplicated concurrency windows cannot turn a partial curve into a score', () => {
   const id = M.summarize(data, frontier).get('betterscale').comparisons[0].point_id;
   const missing = {...frontier, points: frontier.points.filter(point => point.id !== id)};

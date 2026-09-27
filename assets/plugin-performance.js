@@ -5,7 +5,7 @@
     'expert_parallel', 'max_num_seqs', 'max_num_batched_tokens',
     'async_scheduling', 'prefix_caching', 'mamba_cache_mode',
     'mtp_draft_tokens', 'thinking', 'generation_temperature',
-    'kv_cache_memory_bytes', 'host_kv_budget_gib', 'checkpoint_revision'
+    'kv_cache_memory_bytes', 'checkpoint_revision'
   ];
   function identity(point) {
     const c = point.configuration, p = c.parameters, e = point.evidence;
