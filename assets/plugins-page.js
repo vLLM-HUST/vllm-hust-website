@@ -157,11 +157,14 @@
   };
 
   const isWorkshopMod = (item) => (
-    ["runtime_component", "bridge"].includes(item.artifact_type)
-    && item.repository_relationship === "organization_native"
-    && item.public_surface !== false
-    && ["plugin_bundle", "python_distribution", "migration_scaffold", "source_patch"].includes(item.delivery_model)
-    && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
+    performanceResults.has(item.id)
+    || (
+      ["runtime_component", "bridge"].includes(item.artifact_type)
+      && item.repository_relationship === "organization_native"
+      && item.public_surface !== false
+      && ["plugin_bundle", "python_distribution", "migration_scaffold", "source_patch"].includes(item.delivery_model)
+      && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
+    )
   );
   const compatibilityLabels = {
     ready: { en: "Ready", zh: "可用" },
@@ -978,7 +981,6 @@ vllm-hust-ext extension check ${extensionId}`
     const values = {
       "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
       "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
-      "plugins-lede": zh ? "以统一 Native 基准评测 MOD；性能排序待补测，ECPA 启动验收另行标注。" : "MOD evaluation uses one Native baseline; ranking awaits corrected measurements, while ECPA launch acceptance is labeled separately.",
       "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
       "plugins-fact-runtime": zh ? "个已支持" : "supported"
     };
