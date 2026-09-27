@@ -14,12 +14,12 @@ workload identities; never silently mix them.
   single available workload is displayed without inviting an unnecessary selection.
 - An external right sidebar has checkbox rows for MOD and MTP (on/off; unknown when present). All
   options start checked; choices within a row union and the rows intersect. Unchecking a whole row
-  hides all points. SWE session rotation depth is a separate **single-selection slider**: each depth
-  is a distinct workload, never an overlay. It starts at the lowest measured depth and steps only
-  through observed depths (e.g.1 and4, not invented2/3). One available depth is shown with a
-  disabled slider. The selected value survives language changes and resets on model/workload
-  changes. The visible/total count is scoped to that depth. Mobile stacks the sidebar below the
-  chart. A single workload is a selected-style static tag; multiple workloads use a selector.
+  hides all points. **Concurrent service scale** is another checkbox row: observed depths may
+  overlay but retain independent frontiers. All start checked, including a single available depth.
+  Choices survive language changes and reset on model/workload changes. Visible/total counts are
+  scoped to selected scales. MOD / Group offers Select all / Deselect all without changing other
+  rows. Mobile stacks the sidebar below the chart. A single workload is a selected-style static tag;
+  multiple workloads use a selector.
 - Axes are fixed: **X = P90 per-request decode speed (output tokens/s/user)**; **Y = total output
   tokens/s / all allocated chips**. No axis, hardware or MOD filters.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
@@ -137,10 +137,12 @@ requests, 16 active sessions**. Active sessions are C×D histories served by C r
 simultaneous requests.
 
 `load.session_rotation_depth` is a positive integer for every point in a cohort whose
-`workload.contract.session_rotation` is present. The slider selects exactly one observed depth; only
-that workload supplies points, axes, counts and frontier vertices. Missing depth in these cohorts
-fails validation rather than silently becoming1. AgentX has no depth slider. Downloads retain
-explicit depth even though point labels, popovers and legends no longer repeat it.
+`workload.contract.session_rotation` is present. Checkboxes select any combination of observed
+scales, initially all selected; an empty selection shows no points. Missing depth fails validation
+rather than silently becoming1. MOD / Group has a **Select all / Deselect all** toggle: partial or
+empty selection becomes all, and all becomes empty. It does not change MTP or scale selections.
+Selections survive language changes and reset on model/workload changes. Downloads retain exact
+original point metadata.
 
 On 2026-09-27 Fletcher confirmed that all existing SWE 15-minute results used depth **1**. Both
 visible and archived SWE points are annotated; original metrics, run IDs and raw evidence artifacts
@@ -150,10 +152,10 @@ choices only when explicitly recorded; do not add placeholder points or infer re
 notice.
 
 At C lanes and D slots per lane, only C requests can be in flight, while C\*D histories may be
-revisited. Different rotation depths are different workloads: they never appear together or dominate
-each other. Lines are solid and dots filled at every selected depth; D1/D2 suffixes are unnecessary
-because the slider identifies the workload. Historical static concurrency SVGs describe depth1, so
-their link is hidden at other depths rather than misrepresenting a depth1 chart. Remove the
+revisited. Different rotation depths may share one chart but never dominate each other: frontiers
+are independent per cohort × MOD/group × depth. Depth1 uses solid lines and filled points; depth2
+uses dashed lines and hollow points. Legends name the session scale. Historical static concurrency
+SVGs describe depth1, so their link is visible only when depth1 alone is selected. Remove the
 construction status only when the measurement owner supplies the corresponding evidence.
 
 ## Implementation and checks
@@ -259,8 +261,8 @@ demonstrated optimization gains.
 
 The September27 Qwen35 native Rotation2 import supplies five complete observations at C2/4/8/16,
 including both C16 repeats. Its construction notice is removed; Qwen27 remains under construction.
-The slider offers measured depths1 and2 separately. Select2 for Rotation2 and disable frontier-only
-display to inspect every observation of that workload.
+Checkboxes offer measured depths1 and2, together or separately. Select only2 for Rotation2 and
+disable frontier-only display to inspect every observation of that workload.
 
 On September27 the owner retired AgentX from the active leaderboard. Its cohort carries
 `display_withdrawal`; the renderer excludes that cohort and its points from choices, counts and

@@ -153,15 +153,14 @@ run-browser check now includes320px with the language switch and retains bounded
 offenders plus a failure screenshot, so a remote-only layout failure carries actionable geometry
 instead of another blind rerun.
 
-Fletcher's final September27 rotation UI separates workloads with a single-choice slider, not
-multi-select checkboxes or overlaid lines. Default to the lowest observed depth; native range
-indices map only to real depths (1/4 must not manufacture2/3). Keep one-depth cohorts visible with a
-disabled slider, preserve selection across language changes, reset on model/workload changes, and
-scope chart bounds/counts/frontiers to that one depth. No D1/D2 annotations in chart, legend or
-popover; all lines/dots share normal styles. Downloads preserve the actual depth, and the model's
-cohort×MOD×depth key remains a fail-safe comparison boundary. Hide depth1 static-curve links at
-other depths. Browser QA covers keyboard slider input, sparse depths, per-depth membership,
-old-popup dismissal and exact configuration downloads.
+Fletcher's latest September27 UI uses **并发服务规模 / Concurrent service scale** checkboxes, not the
+earlier single-choice slider. All observed scales start checked; empty means no points. Allow
+same-chart overlays but keep dominance and tie deduplication within cohort × MOD/group × depth.
+Depth1 is solid/filled, depth2 dashed/hollow; legends name the scale. The popup reports C concurrent
+requests and C×D active sessions, not C×D simultaneous requests. MOD / Group has a Select all /
+Deselect all toggle: partial/empty becomes all, all becomes empty, without changing MTP or scale
+filters. Preserve selections across language changes and reset on model/workload changes. Hide
+depth1 static-curve links unless depth1 alone is checked. Downloads retain actual metadata.
 
 AgentX is retired from active Frontier choices at Fletcher's request. Its cohort-level
 `display_withdrawal` excludes its points from rendered choices/counts without deleting historical
@@ -183,6 +182,6 @@ must open the trigger before selecting a model, and checks Escape, outside dismi
 and exact downloaded DSV4 coordinates.
 
 For depth-control-only changes, use `scripts/verify_leaderboard_depth_browser.py` for bounded
-responsive/keyboard/isolation checks. The full Frontier checker downloads every historical point in
-four views and took about20 minutes; do not make that exhaustive traversal the default for a small
-selector edit. Keep the full check for evidence/export changes.
+responsive/multi-selection/isolation checks. The full Frontier checker downloads every historical
+point in four views and took about20 minutes; do not make that exhaustive traversal the default for
+a small selector edit. Keep the full check for evidence/export changes.

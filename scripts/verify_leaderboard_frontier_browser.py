@@ -91,7 +91,9 @@ def assert_group_frontiers(page, points):
         rows = expected[line.get_attribute("data-group")]
         depth = rows[0]["load"].get("session_rotation_depth")
         assert all(p["load"].get("session_rotation_depth") == depth for p in rows)
-        assert line.get_attribute("stroke-dasharray") == "none"
+        assert line.get_attribute("stroke-dasharray") == (
+            "7 4" if depth and depth > 1 else "none"
+        )
         assert json.loads(line.get_attribute("data-frontier-points")) == [
             p["id"] for p in rows
         ]
@@ -136,17 +138,12 @@ def verify_rotation_choices(browser, url, fixture):
     page.route("**/data/leaderboard_frontier.json*", lambda r: r.fulfill(json=data))
     page.goto(f"{url}/leaderboard-runs.html#frontier")
     ready(page)
-    slider = page.locator("#frontier-depth")
-    assert slider.get_attribute("min") == "0" and slider.get_attribute("max") == "1"
-    assert slider.get_attribute("aria-valuetext") == "1"
-    assert page.locator(".frontier-depth-ticks span").all_text_contents() == [
-        "1× sessions",
-        "4× sessions",
-    ]
+    choices = page.locator('[data-filter="rotation"]')
+    assert choices.evaluate_all("nodes=>nodes.map(n=>n.value)") == ["1", "4"]
+    assert all(choice.is_checked() for choice in choices.all())
     page.locator("#frontier-only").uncheck()
-    slider.focus()
-    slider.press("ArrowRight")
-    assert slider.get_attribute("aria-valuetext") == "4"
+    assert_group_frontiers(page, data["points"])
+    page.locator('[data-filter="rotation"][value="1"]').uncheck()
     expected = [p for p in data["points"] if p["load"]["session_rotation_depth"] == 4]
     assert set(
         page.locator("[data-point]").evaluate_all(
@@ -154,17 +151,9 @@ def verify_rotation_choices(browser, url, fixture):
         )
     ) == {p["id"] for p in expected}
     assert_group_frontiers(page, expected)
-    assert (
-        f"{len(expected)} / {len(expected)}"
-        in page.locator("#frontier-filter-count").inner_text()
-    )
-    assert "D4" not in page.locator("#frontier-chart").text_content()
-    assert "rotation depth" not in page.locator("#frontier-legend").inner_text()
-    page.locator("#frontier-only").check()
-    assert_group_frontiers(page, expected)
-    slider.focus()
-    slider.press("Home")
-    assert slider.get_attribute("aria-valuetext") == "1"
+    page.locator('[data-filter="rotation"][value="4"]').uncheck()
+    assert page.locator("[data-point]").count() == 0
+    page.locator('[data-filter="rotation"][value="1"]').check()
     expected = [p for p in data["points"] if p["load"]["session_rotation_depth"] == 1]
     assert_group_frontiers(page, expected)
     context.close()
@@ -235,6 +224,7 @@ def main():
                 wait_until="domcontentloaded",
             )
             ready(page)
+            page.locator('[data-filter="rotation"][value="2"]').uncheck()
             assert "AgentX" not in page.locator("#frontier-panel").inner_text()
             assert page.locator("#frontier-only").is_checked()
             shown = page.locator("[data-point]").evaluate_all(
@@ -254,16 +244,14 @@ def main():
             )
             page.locator("#frontier-only").uncheck()
 
-            slider = page.locator("#frontier-depth")
-            assert slider.get_attribute("aria-valuetext") == "1"
-            assert page.locator("[data-filter=rotation]").count() == 0
+            assert page.locator("[data-filter=rotation]").count() == 2
             assert (
                 page.locator("#frontier-rotation-filter .frontier-filter-note").count()
                 == 0
             )
             click_point(page, page.locator(f'[data-point="{default_points[0]["id"]}"]'))
-            slider.focus()
-            slider.press("ArrowRight")
+            page.locator('[data-filter="rotation"][value="2"]').check()
+            page.locator('[data-filter="rotation"][value="1"]').uncheck()
             assert page.locator("#frontier-popover").is_hidden()
             expected_rotation2 = [
                 p
@@ -298,10 +286,10 @@ def main():
             page.locator("#frontier-only").check()
             assert_group_frontiers(page, expected_rotation2)
             page.locator("#langToggle").click()
-            assert slider.get_attribute("aria-valuetext") == "2"
+            assert page.locator('[data-filter="rotation"][value="2"]').is_checked()
             page.locator("#langToggle").click()
-            slider.focus()
-            slider.press("Home")
+            page.locator('[data-filter="rotation"][value="1"]').check()
+            page.locator('[data-filter="rotation"][value="2"]').uncheck()
             page.locator("#frontier-only").uncheck()
             assert page.locator(".frontier-point").count() == len(default_points)
 
@@ -629,11 +617,9 @@ def main():
                         full_page=True,
                     )
                 if "session_rotation" in cohort["workload"]["contract"]:
-                    assert page.locator("#frontier-depth").is_disabled()
-                    assert (
-                        page.locator("#frontier-depth").get_attribute("aria-valuetext")
-                        == "1"
-                    )
+                    assert page.locator(
+                        '[data-filter="rotation"][value="1"]'
+                    ).is_checked()
                 members = [
                     p for p in production["points"] if p["cohort_id"] == cohort["id"]
                 ]

@@ -57,14 +57,44 @@ def main():
                 ).inner_text() == (
                     "并发服务规模" if language == "zh" else "Concurrent service scale"
                 )
-                slider = page.locator("#frontier-depth")
-                assert slider.is_disabled() == (len(depths) == 1)
-                for index, depth in enumerate(depths):
-                    if index:
-                        slider.focus()
-                        slider.press("ArrowRight")
-                    assert slider.get_attribute("aria-valuetext") == str(depth)
-                    assert page.locator("#frontier-depth-value").inner_text() == (
+                choices = page.locator('[data-filter="rotation"]')
+                assert choices.count() == len(depths)
+                assert all(choice.is_checked() for choice in choices.all())
+                assert_group_frontiers(page, members)
+                page.locator("#frontier-only").check()
+                assert_group_frontiers(page, members)
+                page.locator("#frontier-only").uncheck()
+                toggle = page.locator("#frontier-mods-toggle")
+                assert toggle.inner_text() == (
+                    "全不选" if language == "zh" else "Deselect all"
+                )
+                toggle.click()
+                assert page.locator("[data-point]").count() == 0
+                assert all(
+                    not c.is_checked()
+                    for c in page.locator('[data-filter="mods"]').all()
+                )
+                assert toggle.inner_text() == (
+                    "全选" if language == "zh" else "Select all"
+                )
+                toggle.click()
+                assert page.locator("[data-point]").count() == len(members)
+                # A partial MOD selection is completed by Select all, then cleared on the next click.
+                mod = page.locator('[data-filter="mods"]').first
+                mod.uncheck()
+                assert toggle.inner_text() == (
+                    "全选" if language == "zh" else "Select all"
+                )
+                toggle.click()
+                assert all(
+                    c.is_checked() for c in page.locator('[data-filter="mods"]').all()
+                )
+                for depth in depths:
+                    for choice in choices.all():
+                        choice.set_checked(int(choice.input_value()) == depth)
+                    assert page.locator(
+                        f'[data-filter="rotation"][value="{depth}"]'
+                    ).locator("..").inner_text() == (
                         f"{depth}倍会话" if language == "zh" else f"{depth}× sessions"
                     )
                     expected = [
@@ -106,14 +136,20 @@ def main():
                     )
                     page.locator("[data-close]").click()
                     page.locator("#langToggle").click()
-                    assert slider.get_attribute("aria-valuetext") == str(depth)
+                    assert [
+                        c.input_value() for c in choices.all() if c.is_checked()
+                    ] == [str(depth)]
                     page.locator("#langToggle").click()
                     assert (
                         page.evaluate("document.documentElement.scrollWidth") <= width
                     )
+                for choice in choices.all():
+                    choice.uncheck()
+                assert page.locator("[data-point]").count() == 0
+                assert page.locator("#frontier-blank").is_visible()
                 assert not errors, errors
             print(
-                f"PASS {width}px {language} {scheme}: depth isolation, frontier, counts, downloads, language persistence",
+                f"PASS {width}px {language} {scheme}: scale overlays/isolation, MOD toggle, counts, downloads, language persistence",
                 flush=True,
             )
             context.close()
