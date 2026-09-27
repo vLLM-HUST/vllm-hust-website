@@ -3,55 +3,43 @@
   "entries": [
     {
       "id": "bidkv",
-      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OUTPUT-BUDGET.md",
-      "ecpa": {
-        "launch_acceptance": "external-harness-only",
-        "configuration_path": "specialized-experiment-script",
-        "analysis_integration": "external-harness",
-        "note_zh": "本轮性能实测由 BidKV 专项脚本组织，未完成 ECPA 统一启动验收。",
-        "note_en": "This campaign used the BidKV-specific harness; unified ECPA launch acceptance was not completed."
-      },
-      "series_id": "swe-output-budget-tp2-20260925-bidkv-r1"
-    },
-    {
-      "id": "dla",
-      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OUTPUT-BUDGET.md",
-      "ecpa": {
-        "launch_acceptance": "external-harness-only",
-        "configuration_path": "specialized-experiment-script",
-        "analysis_integration": "external-harness",
-        "note_zh": "本轮性能实测由 DLA 专项脚本组织，未完成 ECPA 统一启动验收。",
-        "note_en": "This campaign used the DLA-specific harness; unified ECPA launch acceptance was not completed."
-      },
-      "series_id": "swe-output-budget-tp2-20260925-dla-r1"
-    },
-    {
-      "id": "kv-tiering-migration",
-      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-KV-TIERING-20260926.md",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-UNIFIED-MODS.md",
       "ecpa": {
         "launch_acceptance": "manager-verified",
         "configuration_path": "manager-standard",
-        "analysis_integration": "external-harness",
-        "note_zh": "已通过管理器启动并完成五档及 Native 对照；性能分析仍由专项脚本完成。",
-        "note_en": "Manager launch was verified across five concurrency levels and Native controls; performance analysis still used a specialized harness."
+        "analysis_integration": "external-harness"
       },
-      "series_id": "swe-managed-tiering-tiering-20260926-r1"
+      "series_id": "swe-unified-bidkv-20260927"
+    },
+    {
+      "id": "dla",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-UNIFIED-MODS.md",
+      "ecpa": {
+        "launch_acceptance": "manager-verified",
+        "configuration_path": "manager-standard",
+        "analysis_integration": "external-harness"
+      },
+      "series_id": "swe-unified-dla-20260927"
+    },
+    {
+      "id": "kv-tiering-migration",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-UNIFIED-MODS.md",
+      "ecpa": {
+        "launch_acceptance": "manager-verified",
+        "configuration_path": "manager-standard",
+        "analysis_integration": "external-harness"
+      },
+      "series_id": "swe-unified-kv-tiering-migration-20260927"
     },
     {
       "id": "mooncake-vllm-connectors",
-      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-UNIFIED-MODS.md",
       "ecpa": {
-        "launch_acceptance": "manager-verified-supplemental-adapter",
-        "configuration_path": "supplemental-adapter",
-        "analysis_integration": "external-harness",
-        "adapter_evidence": "https://github.com/vLLM-HUST/extension-manager/pull/8",
-        "adapter_merge_state": "open-draft",
-        "known_defect": "process-release",
-        "defect_evidence": "https://github.com/vLLM-HUST/extension-manager/pull/8#issuecomment-5844402943",
-        "note_zh": "已通过管理器启动 AscendStoreConnector + Mooncake，但依赖尚未合并的补充 Provider profile；性能分析仍由专项脚本完成。管理器退出曾遗留 API/worker 与设备显存，资源释放尚未验收。",
-        "note_en": "The manager launched AscendStoreConnector + Mooncake through a supplemental Provider profile that remains unmerged; performance analysis still used a specialized harness. Manager exit has left API/worker processes and device memory behind, so resource release is not accepted."
+        "launch_acceptance": "manager-verified",
+        "configuration_path": "manager-standard",
+        "analysis_integration": "external-harness"
       },
-      "series_id": "swe-managed-mooncake-mooncake-20260926-r1"
+      "series_id": "swe-unified-mooncake-vllm-connectors-20260927"
     },
     {
       "id": "pipeline-microbatch-migration",
@@ -127,7 +115,7 @@
     }
   ],
   "baseline": {
-    "series_id": "swe-capacity16-native"
+    "series_id": "swe-unified-native-20260927"
   },
   "ecpa_experiment_boundary": {
     "as_of": "2026-09-27",

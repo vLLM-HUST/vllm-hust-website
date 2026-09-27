@@ -161,6 +161,14 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(p.load.session_rotation_depth,2);
             assert.equal(run.client.session_rotation_depth,2);
             for(const key of ['all_role_exits_zero','selected_devices_released','exact_request_protocol_passed','prefix_cache_qualification_passed']) assert.equal(run.validation[key],true);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-unified-native-20260927'){
+            assert.equal(p.configuration.hardware.accelerator_count,2);
+            assert.equal(p.configuration.parameters.pipeline_parallel_size,1);
+            assert.equal(run.validation.real_online,true);
+            assert.equal(run.validation.failed_requests,0);
+            assert.equal(run.validation.prefix_cache_observed,true);
+            assert.equal(run.validation.selected_devices_released,true);
+            assert.equal(run.validation.shared_native_contract_sha256,p.configuration.parameters.unified_native_contract_sha256);
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
