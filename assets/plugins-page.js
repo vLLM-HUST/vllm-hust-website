@@ -703,6 +703,37 @@ vllm-hust-ext extension check ${extensionId}`
     const link = element("a", "plugin-public-effect-link", copy().effectSource + " ↗");
     link.href = result.url;
     panel.append(link);
+    const launchLabels = language() === "zh" ? {
+      "manager-verified": "ECPA 启动已验收",
+      "manager-verified-supplemental-adapter": "ECPA 启动已验收 · 补充适配",
+      "external-harness-only": "专项脚本实测 · 非 ECPA 启动验收",
+      "not-reproduced-this-round": "本轮未通过 ECPA 复现"
+    } : {
+      "manager-verified": "ECPA launch accepted",
+      "manager-verified-supplemental-adapter": "ECPA launch accepted · supplemental adapter",
+      "external-harness-only": "Specialized harness · no ECPA launch acceptance",
+      "not-reproduced-this-round": "Not reproduced through ECPA this round"
+    };
+    const ecpa = element("section", `plugin-ecpa-status status-${result.ecpa.launch_acceptance}`);
+    ecpa.append(
+      element("strong", "", launchLabels[result.ecpa.launch_acceptance]),
+      element("p", "", local(result.ecpa, "note"))
+    );
+    if (result.ecpa.adapter_evidence) {
+      const adapter = element("a", "plugin-public-effect-link", language() === "zh" ? "补充适配 PR（未合并）↗" : "Supplemental adapter PR (unmerged) ↗");
+      adapter.href = result.ecpa.adapter_evidence;
+      adapter.target = "_blank";
+      adapter.rel = "noopener noreferrer";
+      ecpa.append(adapter);
+    }
+    if (result.ecpa.defect_evidence) {
+      const defect = element("a", "plugin-public-effect-link plugin-ecpa-defect", language() === "zh" ? "进程退出与资源释放缺陷记录 ↗" : "Process-exit and resource-release defect ↗");
+      defect.href = result.ecpa.defect_evidence;
+      defect.target = "_blank";
+      defect.rel = "noopener noreferrer";
+      ecpa.append(defect);
+    }
+    panel.append(ecpa);
     return panel;
   }
 
@@ -975,7 +1006,7 @@ vllm-hust-ext extension check ${extensionId}`
     const values = {
       "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
       "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
-      "plugins-lede": zh ? "以统一 Native 基准评测 MOD；性能排序正在补测校正。" : "MOD evaluation against one Native baseline; performance ordering awaits corrected measurements.",
+      "plugins-lede": zh ? "以统一 Native 基准评测 MOD；性能排序待补测，ECPA 启动验收另行标注。" : "MOD evaluation uses one Native baseline; ranking awaits corrected measurements, while ECPA launch acceptance is labeled separately.",
       "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
       "plugins-fact-runtime": zh ? "个已支持" : "supported"
     };
@@ -1001,7 +1032,7 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=shared-native-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/plugin-performance.json?v=shared-native-ecpa-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=qwen35-mooncake-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])
