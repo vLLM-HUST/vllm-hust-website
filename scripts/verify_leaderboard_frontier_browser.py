@@ -139,7 +139,10 @@ def verify_rotation_choices(browser, url, fixture):
     slider = page.locator("#frontier-depth")
     assert slider.get_attribute("min") == "0" and slider.get_attribute("max") == "1"
     assert slider.get_attribute("aria-valuetext") == "1"
-    assert page.locator(".frontier-depth-ticks").inner_text().split() == ["1", "4"]
+    assert page.locator(".frontier-depth-ticks span").all_text_contents() == [
+        "1× sessions",
+        "4× sessions",
+    ]
     page.locator("#frontier-only").uncheck()
     slider.focus()
     slider.press("ArrowRight")

@@ -52,6 +52,11 @@ def main():
                 ).click()
                 members = [v for v in data["points"] if v["cohort_id"] == cohort["id"]]
                 depths = sorted({v["load"]["session_rotation_depth"] for v in members})
+                assert page.locator(
+                    "#frontier-rotation-filter legend"
+                ).inner_text() == (
+                    "并发服务规模" if language == "zh" else "Concurrent service scale"
+                )
                 slider = page.locator("#frontier-depth")
                 assert slider.is_disabled() == (len(depths) == 1)
                 for index, depth in enumerate(depths):
@@ -59,6 +64,9 @@ def main():
                         slider.focus()
                         slider.press("ArrowRight")
                     assert slider.get_attribute("aria-valuetext") == str(depth)
+                    assert page.locator("#frontier-depth-value").inner_text() == (
+                        f"{depth}倍会话" if language == "zh" else f"{depth}× sessions"
+                    )
                     expected = [
                         v
                         for v in members
@@ -84,6 +92,12 @@ def main():
                     click_point(
                         page, page.locator(f'[data-point="{expected[0]["id"]}"]')
                     )
+                    c = expected[0]["load"]["concurrency"]
+                    assert (
+                        f"{c}路并发，{c * depth}个活跃会话"
+                        if language == "zh"
+                        else f"{c} concurrent requests, {c * depth} active sessions"
+                    ) in page.locator("#frontier-popover").inner_text()
                     with page.expect_download() as downloaded:
                         page.locator("[data-download]").click()
                     assert (

@@ -129,7 +129,12 @@ The exact machine consumer is `assets/leaderboard-frontier-model.js::validate`. 
 input**. Publication replaces the production JSON after measurement review; no JS edits are needed
 to add a cohort or measured point.
 
-## SWE session rotation depth
+## SWE concurrent service scale
+
+The visible control is **并发服务规模 / Concurrent service scale**, with choices such as **1倍会话 / 1×
+sessions** and **2倍会话 / 2× sessions**. A C8/D2 point displays **8路并发，16个活跃会话 / 8 concurrent
+requests, 16 active sessions**. Active sessions are C×D histories served by C request lanes, not C×D
+simultaneous requests.
 
 `load.session_rotation_depth` is a positive integer for every point in a cohort whose
 `workload.contract.session_rotation` is present. The slider selects exactly one observed depth; only
