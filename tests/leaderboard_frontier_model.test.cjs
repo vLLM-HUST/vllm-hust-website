@@ -99,6 +99,18 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.equal(params.gdn_strided_gates,true);
                 assert.equal(params.mixed_shared_qkv_pack,true);
             }
+        } else if(p.evidence.benchmark_protocol.campaign==='resident-state-tp2-c16-v1'){
+            const params=p.configuration.parameters;
+            assert.equal(params.using_live_runtime,true);
+            assert.equal(params.execution_seats,16);
+            assert.equal(params.resident_seats,20);
+            assert.equal(params.shared_attention_pages*params.attention_page_tokens,2140160);
+            assert.equal(params.mtp_draft_tokens,2);
+            assert.equal(params.async_scheduling,true);
+            assert.equal(params.mod_revision,'a8abd056a3ece455f683b212d6bd905da4058cbb'); // pragma: allowlist secret (public Git commit)
+            assert.equal(p.configuration.mod_sources[0].revision,params.mod_revision);
+            assert.equal(p.load.concurrency,16);
+            for(const key of ['owned_server_exit_zero','selected_device_guard_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
         } else if(p.evidence.benchmark_protocol.campaign==='qwen35-mods-k8s-20260925'){
             assert.equal(run.retrieval_qualification.passed,true);
             assert.equal(run.retrieval_qualification.completed_requests,26);
