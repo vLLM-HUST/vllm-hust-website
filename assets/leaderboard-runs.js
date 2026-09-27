@@ -53,7 +53,7 @@
     const t = key => words[lang()][key] || key;
     const fmt = value => value === null || value === undefined ? '—' : new Intl.NumberFormat(lang(), { maximumFractionDigits: 2 }).format(value);
     const state = { rows: [], tasks: [], page: 0, expanded: new Set(), selectedTask: '', ready: false,
-        view: 'runs', columnFilters: {}, sort: null,
+        view: 'frontier', columnFilters: {}, sort: null,
         filters: { source: '' }, missingSupplement: false };
     const pageSize = 40;
     const link = (url, label) => url ? `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a>` : '';
@@ -68,7 +68,7 @@
     function filteredRows() { return model.selectRows(state.rows.filter(matches), state.columnFilters, state.sort); }
     function setView(view) {
         state.view = view;
-        history.replaceState(null, '', `${location.pathname}${location.search}${view === 'frontier' ? '#frontier' : ''}`);
+        history.replaceState(null, '', `${location.pathname}${location.search}#${view}`);
         for (const name of ['runs', 'tasks', 'frontier']) {
             $(`${name}-panel`).hidden = view !== name;
             $(`view-${name}`).setAttribute('aria-pressed', String(view === name));
@@ -310,6 +310,6 @@
         }
     });
     window.addEventListener('vllm-hust:langchange', translate);
-    if (location.hash === '#frontier') setView('frontier');
+    setView(['#runs', '#tasks'].includes(location.hash) ? location.hash.slice(1) : 'frontier');
     initialize();
 })();

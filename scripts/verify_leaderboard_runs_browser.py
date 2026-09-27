@@ -68,6 +68,17 @@ def main():
             )
             assert response.status == 200
             page.locator("#runs-content").wait_for(state="visible", timeout=30000)
+            assert (
+                page.locator(".runs-view-switch button").first.get_attribute("id")
+                == "view-frontier"
+            )
+            assert (
+                page.locator("#view-frontier").get_attribute("aria-pressed") == "true"
+            )
+            assert page.locator("#frontier-panel").is_visible()
+            assert page.locator("#runs-panel").is_hidden()
+            page.locator("#view-runs").click()
+
             nav = page.locator('.site-nav [data-nav-page="leaderboard-v2"]')
             assert nav.count() == 1
             group = page.locator('.site-nav [data-nav-group="evidence"]')
@@ -327,7 +338,9 @@ def main():
         context = browser.new_context()
         page = context.new_page()
         page.route("**/leaderboard_run_observations.json", lambda route: route.abort())
-        page.goto(f"{args.url}/leaderboard-runs.html", wait_until="domcontentloaded")
+        page.goto(
+            f"{args.url}/leaderboard-runs.html#runs", wait_until="domcontentloaded"
+        )
         page.locator("#runs-content").wait_for(state="visible", timeout=30000)
         assert page.locator("#runs-supplement-warning").is_visible()
         assert all(
@@ -339,7 +352,9 @@ def main():
         context = browser.new_context()
         page = context.new_page()
         page.route("**/leaderboard_mod_attributions.json", lambda route: route.abort())
-        page.goto(f"{args.url}/leaderboard-runs.html", wait_until="domcontentloaded")
+        page.goto(
+            f"{args.url}/leaderboard-runs.html#runs", wait_until="domcontentloaded"
+        )
         page.locator("#runs-content").wait_for(state="visible", timeout=30000)
         assert page.locator("#runs-identity-warning").is_visible()
         assert page.locator("#view-runs-count").inner_text() == str(len(all_runs))

@@ -52,7 +52,11 @@
       <p id="runs-supplement-warning" class="warning" data-runs-i18n="supplementMissing" hidden></p>
       <p id="runs-identity-warning" class="warning" data-runs-i18n="identityMissing" hidden></p>
       <div class="runs-view-switch" role="group" aria-label="Table view">
-        <button id="view-runs" type="button" aria-pressed="true" aria-controls="runs-panel">
+        <button id="view-frontier" type="button" aria-pressed="true" aria-controls="frontier-panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16M6 16l4-6 4 2 5-7" /><circle cx="10" cy="10" r="1" /><circle cx="14" cy="12" r="1" /><circle cx="19" cy="5" r="1" /></svg>
+          <span>Frontier</span><span id="view-frontier-count" class="view-count">0</span>
+        </button>
+        <button id="view-runs" type="button" aria-pressed="false" aria-controls="runs-panel">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10h5v10M9 20V4h6v16M15 20v-7h5v7M3 20h18" /></svg>
           <span>Leaderboards</span><span id="view-runs-count" class="view-count">0</span>
         </button>
@@ -60,13 +64,9 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 6 1.5 1.5L8 5M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9" /></svg>
           <span>Tasks</span><span id="view-tasks-count" class="view-count">0</span>
         </button>
-        <button id="view-frontier" type="button" aria-pressed="false" aria-controls="frontier-panel">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16M6 16l4-6 4 2 5-7" /><circle cx="10" cy="10" r="1" /><circle cx="14" cy="12" r="1" /><circle cx="19" cy="5" r="1" /></svg>
-          <span>Frontier</span><span id="view-frontier-count" class="view-count">0</span>
-        </button>
       </div>
-      <section id="frontier-panel" class="frontier" aria-label="Frontier" hidden></section>
-      <section id="runs-panel" aria-label="Leaderboards">
+      <section id="frontier-panel" class="frontier" aria-label="Frontier"></section>
+      <section id="runs-panel" aria-label="Leaderboards" hidden>
         <div class="runs-table-scroll" tabindex="0" role="region" aria-label="Measurements">
           <table class="runs-table"><thead><tr id="runs-headers"></tr></thead><tbody id="runs-body"></tbody></table>
         </div>
@@ -105,7 +105,7 @@
   <script src="./assets/hf-data-loader.js?v=stable-trend-v5-public-sanitized-20260902"></script>
   <script src="./assets/leaderboard-runs-model.js?v=swe-parallel-20260924-4"></script>
   <script src="./assets/leaderboard-frontier-model.js?v=frontier-mod-pins-20260925"></script>
-  <script src="./assets/leaderboard-runs.js?v=leaderboard-primary-20260927"></script>
+  <script src="./assets/leaderboard-runs.js?v=frontier-default-20260927"></script>
   <script src="./assets/leaderboard-frontier.js?v=resident-state-20260927"></script>
 </body>
 </html>
