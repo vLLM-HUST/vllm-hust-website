@@ -254,7 +254,7 @@
     }
     function translate() {
         for (const node of document.querySelectorAll('[data-runs-i18n]')) node.textContent = t(node.dataset.runsI18n);
-        document.title = lang() === 'zh' ? '排行榜 v2 - vLLM-HUST' : 'Leaderboard v2 - vLLM-HUST';
+        document.title = lang() === 'zh' ? '排行榜 - vLLM-HUST' : 'Leaderboard - vLLM-HUST';
         if (state.ready) { renderHeaders(); renderRows(); }
     }
     async function initialize() {

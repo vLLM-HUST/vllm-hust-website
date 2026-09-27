@@ -3,7 +3,7 @@
         en: {
             navHome: 'Home',
             navLeaderboard: 'Leaderboard',
-            navLeaderboardV2: 'Leaderboard v2',
+            navLeaderboardV2: 'Leaderboard',
             navDatasetValidation: 'Dataset validation',
             navAchievements: 'Achievements',
             navNews: 'News',
@@ -33,7 +33,7 @@
         zh: {
             navHome: '首页',
             navLeaderboard: '性能排行榜',
-            navLeaderboardV2: '排行榜 v2',
+            navLeaderboardV2: '排行榜',
             navDatasetValidation: '数据集验证',
             navAchievements: '成果',
             navNews: '新闻',

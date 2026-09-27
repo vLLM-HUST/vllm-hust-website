@@ -70,9 +70,7 @@ def main():
             page.locator("#runs-content").wait_for(state="visible", timeout=30000)
             nav = page.locator('.site-nav [data-nav-page="leaderboard-v2"]')
             assert nav.count() == 1
-            assert nav.inner_text() == (
-                "排行榜 v2" if language == "zh" else "Leaderboard v2"
-            )
+            assert nav.inner_text() == ("排行榜" if language == "zh" else "Leaderboard")
             assert nav.get_attribute("href") == "./leaderboard-runs.html"
             assert "active" in nav.get_attribute("class")
             assert (
