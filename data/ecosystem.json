@@ -769,14 +769,14 @@
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust",
       "upstream_repository": null,
-      "summary_en": "Owner-led carrier for INT8, KIVI INT4, and dynamic quantized KV-cache work. It is distinct from offline model quantization and Adaptive Quantized KV.",
-      "summary_zh": "INT8、KIVI INT4 与动态量化 KV cache 的原负责人迁移载体；与离线模型量化和 Adaptive Quantized KV 分开治理。",
-      "public_effect_en": "Capability preview: one owner-led home for INT8, KIVI INT4, and dynamic KV-cache quantization. Public benchmark results remain pending migration.",
-      "public_effect_zh": "能力预览：统一承载 INT8、KIVI INT4 与动态 KV Cache 量化；公开 benchmark 结果仍待迁移。",
-      "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust",
-      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend (attachment contract pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Ascend NPU target; hardware unverified"], "python": [">=3.10"], "requirements_en": "The wheel, fail-closed dtype/layout resolver, and manifest are installable and inspectable; vLLM Ascend attachment, device kernels, and hardware evidence are required before activation.", "requirements_zh": "wheel、fail-closed dtype/layout resolver 与 manifest 可安装、可检查；激活前仍需补齐 vLLM Ascend 接入、设备 kernel 与硬件证据。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/issues/2"},
-      "evidence_level": "cpu_smoke"
+      "summary_en": "Ascend runtime plugin for dynamic per-channel INT8 KV cache; legacy KIVI and packed-format work remains separate migration history.",
+      "summary_zh": "面向昇腾的动态 per-channel INT8 KV Cache 运行时插件；KIVI 与其他 packed 格式仍属于后续迁移范围。",
+      "public_effect_en": "Real Qwen2.5-14B single-card serving, prefill/decode, ACL Graph replay, and three OpenAI API requests are verified. No matched performance comparison has been published.",
+      "public_effect_zh": "已验证 Qwen2.5-14B 单卡真实服务、prefill/decode、ACL Graph 回放及三次 OpenAI API 请求；尚无已发布的配对性能对比。",
+      "public_effect_status": "validated",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/tree/ae7b44bfee695d0ba580040dffd10eb802104485#%E5%B7%B2%E9%AA%8C%E8%AF%81%E7%8E%AF%E5%A2%83",
+      "compatibility": {"status": "experimental", "host": "vLLM Ascend HUST", "versions": ["Plugin 0.2.0.dev0 @ ae7b44b", "Core 8a6655cf62 + Ascend f4f49832"], "platforms": ["Ascend 910B single card · Qwen2.5-14B · 8K"], "python": [">=3.10"], "requirements_en": "Activation requires --kv-cache-dtype int8. TP2, Qwen3.5 hybrid cache, APC, MTP2, asynchronous scheduling, and the current Frontier graph combination remain unqualified.", "requirements_zh": "启用需传入 --kv-cache-dtype int8；TP2、Qwen3.5 hybrid cache、APC、MTP2、异步调度及当前 Frontier 图组合仍未验收。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/issues/2"},
+      "evidence_level": "hardware_verified"
     },
     {
       "id": "simllm-migration",
@@ -994,7 +994,7 @@
       "public_effect_zh": "Qwen3.5 TP2/PP2 五档并发及匹配 Native 对照已发布，吞吐按全部四张卡计量。批次准入策略实际执行；每点仍为单次观测，不能据此宣称稳定加速。",
       "public_effect_status": "inconclusive",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PIPELINE-K8S.md",
-      "compatibility": {"status": "inspect_only", "host": "vLLM (scheduler/worker attachment pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Pinned Ascend TP2/PP2 carrier measured; current-main activation unqualified"], "python": [">=3.10"], "requirements_en": "The measured TP2/PP2 batch-admission carrier requires the exact runtime receipt linked above. Current-main compatibility and general pipeline integration are not established; installation alone is not activation.", "requirements_zh": "已测 TP2/PP2 批次准入实现须使用上方报告中的限定运行时。当前 main 兼容性和通用流水线接入尚未验证；安装本身不代表启用。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch/issues/2"},
+      "compatibility": {"status": "verified", "host": "vLLM Frontier scheduler policy", "versions": ["Pipeline a15a229", "vLLM 0.25.1 Frontier backport · protocol 1.1"], "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B · TP2/PP2"], "python": [">=3.10"], "requirements_en": "ECPA launched the measured APC, MTP2, asynchronous scheduling, Mamba align, and FULL_AND_PIECEWISE configuration. The published curve uses the matched four-chip TP2/PP2 Native control.", "requirements_zh": "ECPA 已启动实测所用的 APC、MTP2、异步调度、Mamba align 与 FULL_AND_PIECEWISE 组合；公开曲线使用匹配的四卡 TP2/PP2 Native 对照。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch/issues/3"},
       "evidence_level": "performance_verified"
     },
     {
