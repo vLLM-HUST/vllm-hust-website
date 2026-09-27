@@ -1,62 +1,45 @@
 {
-  "schema_version": "plugin-performance/v2",
+  "schema_version": "plugin-performance/v3",
   "entries": [
     {
       "id": "bidkv",
-      "group": "qwen35",
-      "scope_zh": "已有实测记录保留展示；跨 MOD 的提升排名需核对同一组 Native 对照。",
-      "scope_en": "Existing measurements remain available; cross-MOD gain ranking requires verification against one shared Native series.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OUTPUT-BUDGET.md",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "external-harness-only",
         "configuration_path": "specialized-experiment-script",
         "analysis_integration": "external-harness",
         "note_zh": "本轮性能实测由 BidKV 专项脚本组织，未完成 ECPA 统一启动验收。",
         "note_en": "This campaign used the BidKV-specific harness; unified ECPA launch acceptance was not completed."
-      }
+      },
+      "series_id": "swe-output-budget-tp2-20260925-bidkv-r1"
     },
     {
       "id": "dla",
-      "group": "qwen35",
-      "scope_zh": "已有实测记录保留展示；跨 MOD 的提升排名需核对同一组 Native 对照。",
-      "scope_en": "Existing measurements remain available; cross-MOD gain ranking requires verification against one shared Native series.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OUTPUT-BUDGET.md",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "external-harness-only",
         "configuration_path": "specialized-experiment-script",
         "analysis_integration": "external-harness",
         "note_zh": "本轮性能实测由 DLA 专项脚本组织，未完成 ECPA 统一启动验收。",
         "note_en": "This campaign used the DLA-specific harness; unified ECPA launch acceptance was not completed."
-      }
+      },
+      "series_id": "swe-output-budget-tp2-20260925-dla-r1"
     },
     {
       "id": "kv-tiering-migration",
-      "group": "qwen35",
-      "scope_zh": "已有实测记录保留展示；跨 MOD 的提升排名需核对同一组 Native 对照。",
-      "scope_en": "Existing measurements remain available; cross-MOD gain ranking requires verification against one shared Native series.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-KV-TIERING-20260926.md",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "manager-verified",
         "configuration_path": "manager-standard",
         "analysis_integration": "external-harness",
         "note_zh": "已通过管理器启动并完成五档及 Native 对照；性能分析仍由专项脚本完成。",
         "note_en": "Manager launch was verified across five concurrency levels and Native controls; performance analysis still used a specialized harness."
-      }
+      },
+      "series_id": "swe-managed-tiering-tiering-20260926-r1"
     },
     {
       "id": "mooncake-vllm-connectors",
-      "group": "qwen35",
-      "scope_zh": "已有实测记录保留展示；跨 MOD 的提升排名需核对同一组 Native 对照。",
-      "scope_en": "Existing measurements remain available; cross-MOD gain ranking requires verification against one shared Native series.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-MOONCAKE-20260926.md",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "manager-verified-supplemental-adapter",
         "configuration_path": "supplemental-adapter",
@@ -67,107 +50,85 @@
         "defect_evidence": "https://github.com/vLLM-HUST/extension-manager/pull/8#issuecomment-5844402943",
         "note_zh": "已通过管理器启动 AscendStoreConnector + Mooncake，但依赖尚未合并的补充 Provider profile；性能分析仍由专项脚本完成。管理器退出曾遗留 API/worker 与设备显存，资源释放尚未验收。",
         "note_en": "The manager launched AscendStoreConnector + Mooncake through a supplemental Provider profile that remains unmerged; performance analysis still used a specialized harness. Manager exit has left API/worker processes and device memory behind, so resource release is not accepted."
-      }
+      },
+      "series_id": "swe-managed-mooncake-mooncake-20260926-r1"
     },
     {
       "id": "pipeline-microbatch-migration",
-      "group": "other",
-      "scope_zh": "已有实测记录保留展示；跨 MOD 的提升排名需核对同一组 Native 对照。",
-      "scope_en": "Existing measurements remain available; cross-MOD gain ranking requires verification against one shared Native series.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PIPELINE-K8S.md",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "external-harness-only",
         "configuration_path": "specialized-experiment-script",
         "analysis_integration": "external-harness",
         "note_zh": "本轮性能实测由流水线微批处理专项脚本组织，未完成 ECPA 统一启动验收。",
         "note_en": "This campaign used the Pipeline Microbatch-specific harness; unified ECPA launch acceptance was not completed."
-      }
+      },
+      "series_id": "swe-k8s-pp2-20260925-pipelinepp-r1"
     },
     {
       "id": "betterscale",
-      "group": "qwen35",
-      "scope_zh": "已有完整 C1/2/4/8/16 实测曲线，Frontier 也保留了 Native 五档基准。已有数据无需等待本轮补测；提升排名的基准对应关系待核对。",
-      "scope_en": "Complete C1/2/4/8/16 curves and a five-load Native reference already exist in Frontier. These measurements do not depend on the new campaign; baseline mapping for gain ranking is under review.",
       "url": "./leaderboard-runs.html#frontier",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "not-reproduced-this-round",
         "configuration_path": "not-evaluated",
         "analysis_integration": "external-harness",
         "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
         "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
-      }
+      },
+      "series_id": "swe-capacity16-small-fish-20260924"
     },
     {
       "id": "vspec",
-      "group": "other",
-      "scope_zh": "已有实测记录保留展示；跨 MOD 的提升排名需核对同一组 Native 对照。",
-      "scope_en": "Existing measurements remain available; cross-MOD gain ranking requires verification against one shared Native series.",
       "url": "https://github.com/vLLM-HUST/vllm-hust-vSpec/blob/main/docs/gsm8k_b128_recovery_and_arc_easy_20260913.md",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "not-reproduced-this-round",
         "configuration_path": "not-evaluated",
         "analysis_integration": "external-harness",
         "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
         "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
-      }
+      },
+      "series_id": null
     },
     {
       "id": "kvcompress-ascend",
-      "group": "other",
-      "scope_zh": "已有实测记录保留展示；跨 MOD 的提升排名需核对同一组 Native 对照。",
-      "scope_en": "Existing measurements remain available; cross-MOD gain ranking requires verification against one shared Native series.",
       "url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/main/docs/resuts.md",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "not-reproduced-this-round",
         "configuration_path": "not-evaluated",
         "analysis_integration": "external-harness",
         "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
         "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
-      }
+      },
+      "series_id": null
     },
     {
       "id": "latchmoe",
-      "group": "other",
-      "scope_zh": "已有实测记录保留展示；跨 MOD 的提升排名需核对同一组 Native 对照。",
-      "scope_en": "Existing measurements remain available; cross-MOD gain ranking requires verification against one shared Native series.",
       "url": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE#qualified-graph-result",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "not-reproduced-this-round",
         "configuration_path": "not-evaluated",
         "analysis_integration": "external-harness",
         "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
         "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
-      }
+      },
+      "series_id": null
     },
     {
       "id": "diffspec",
-      "group": "other",
-      "scope_zh": "已有实测记录保留展示；跨 MOD 的提升排名需核对同一组 Native 对照。",
-      "scope_en": "Existing measurements remain available; cross-MOD gain ranking requires verification against one shared Native series.",
       "url": "https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec#key-results",
-      "status": "existing-evidence",
-      "ranking_status": "baseline-mapping-under-review",
       "ecpa": {
         "launch_acceptance": "not-reproduced-this-round",
         "configuration_path": "not-evaluated",
         "analysis_integration": "external-harness",
         "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
         "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
-      }
+      },
+      "series_id": null
     }
   ],
-  "status": "awaiting-unified-native",
-  "baseline": null,
+  "baseline": {
+    "series_id": "swe-capacity16-native"
+  },
   "ecpa_experiment_boundary": {
     "as_of": "2026-09-27",
     "manager_repository": "https://github.com/vLLM-HUST/extension-manager",
@@ -177,5 +138,14 @@
     "performance_analysis_en": "Specialized experiment scripts collected requests, recomputed throughput and latency, paired Native controls, and imported Frontier records; check/status/plan is not performance analysis.",
     "process_release": "known-defect",
     "process_release_evidence": "https://github.com/vLLM-HUST/extension-manager/pull/8#issuecomment-5844402943"
-  }
+  },
+  "metric": "output_tps",
+  "aggregation": "geometric-mean",
+  "concurrencies": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ]
 }

@@ -1,49 +1,73 @@
-/* Comparisons require one shared Native series. Historical per-MOD ratios are rejected. */
+/* Derive every MOD's throughput change from one declared Native series. */
 (function (root) {
-  const launchStatuses = new Set([
-    'manager-verified',
-    'manager-verified-supplemental-adapter',
-    'external-harness-only',
-    'not-reproduced-this-round'
-  ]);
-  const configurationPaths = new Set([
-    'manager-standard',
-    'supplemental-adapter',
-    'specialized-experiment-script',
-    'not-evaluated'
-  ]);
-  function summarize(data, frontier = {points: []}) {
-    if (data.schema_version !== 'plugin-performance/v2' || data.baseline !== null
-        || data.status !== 'awaiting-unified-native') throw new Error('Unified Native evidence is not admitted');
-    if (data.ecpa_experiment_boundary?.performance_analysis !== 'external-harness'
-        || data.ecpa_experiment_boundary?.process_release !== 'known-defect') {
-      throw new Error('Unsupported performance evidence boundary');
+  const commonParameters = [
+    'tensor_parallel_size', 'pipeline_parallel_size', 'data_parallel_size',
+    'expert_parallel', 'max_num_seqs', 'max_num_batched_tokens',
+    'async_scheduling', 'prefix_caching', 'mamba_cache_mode',
+    'mtp_draft_tokens', 'thinking', 'generation_temperature',
+    'kv_cache_memory_bytes', 'host_kv_budget_gib', 'checkpoint_revision'
+  ];
+  function identity(point) {
+    const c = point.configuration, p = c.parameters, e = point.evidence;
+    const protocol = e.benchmark_protocol;
+    const runtime = p.runtime_base_commits;
+    if (!runtime?.vllm || !(runtime['vllm-ascend'] || runtime.vllm_ascend)
+        || !protocol?.prepared_workload_sha256 || !protocol.tokenizer_fingerprint
+        || commonParameters.some(key => p[key] === undefined)) return null;
+    return JSON.stringify([
+      point.cohort_id, c.engine, c.engine_version, c.hardware.label,
+      c.hardware.accelerator_count, c.context_capacity_tokens,
+      ...commonParameters.map(key => p[key]), runtime.vllm,
+      runtime['vllm-ascend'] || runtime.vllm_ascend,
+      protocol.protocol_id, protocol.prepared_workload_sha256,
+      protocol.tokenizer_fingerprint, e.measurement_seconds
+    ]);
+  }
+  function series(frontier, id, loads, mods) {
+    const points = frontier.points.filter(point => point.load.concurrency_series === id);
+    if (points.length !== loads.length) return null;
+    const rows = loads.map(concurrency => {
+      const matches = points.filter(point => point.load.concurrency === concurrency);
+      if (matches.length !== 1) return null;
+      const point = matches[0];
+      if (point.evidence.status !== 'measured' || !point.evidence.run_ids?.length
+          || !point.evidence.url || !Number.isFinite(point.metrics.output_tps)
+          || point.metrics.output_tps <= 0
+          || JSON.stringify(point.configuration.mods) !== JSON.stringify(mods)
+          || !['FULL', 'FULL_AND_PIECEWISE'].includes(point.configuration.parameters.graph_mode)) return null;
+      return point;
+    });
+    return rows.every(Boolean) ? rows : null;
+  }
+  function summarize(data, frontier) {
+    if (data.schema_version !== 'plugin-performance/v3'
+        || data.metric !== 'output_tps' || data.aggregation !== 'geometric-mean'
+        || JSON.stringify(data.concurrencies) !== '[1,2,4,8,16]'
+        || !data.baseline?.series_id) throw new Error('Invalid shared Native contract');
+    const baseline = series(frontier, data.baseline.series_id, data.concurrencies, []);
+    if (!baseline || !identity(baseline[0])
+        || baseline.some(point => identity(point) !== identity(baseline[0]))) {
+      throw new Error('Incomplete or inconsistent Native series');
     }
+    const modelLabel = frontier.cohorts.find(cohort => cohort.id === baseline[0].cohort_id)?.model.label;
+    const ids = new Set();
     return new Map(data.entries.map(entry => {
-      if ('pairs' in entry || 'ratios' in entry) throw new Error('Per-MOD Native comparisons are forbidden');
-      if (!launchStatuses.has(entry.ecpa?.launch_acceptance)
-          || !configurationPaths.has(entry.ecpa?.configuration_path)
-          || entry.ecpa?.analysis_integration !== 'external-harness'
-          || !entry.ecpa?.note_en || !entry.ecpa?.note_zh) {
-        throw new Error(`Invalid ECPA status: ${entry.id}`);
+      if (ids.has(entry.id) || ['baseline', 'baseline_id', 'pairs', 'ratios', 'gain'].some(key => key in entry)) {
+        throw new Error('Per-MOD baseline or precomputed score is forbidden');
       }
-      if (entry.ecpa.launch_acceptance === 'manager-verified-supplemental-adapter'
-          && (entry.ecpa.configuration_path !== 'supplemental-adapter'
-            || entry.ecpa.adapter_merge_state !== 'open-draft'
-            || !entry.ecpa.adapter_evidence
-            || entry.ecpa.known_defect !== 'process-release'
-            || !entry.ecpa.defect_evidence)) {
-        throw new Error(`Invalid supplemental adapter evidence: ${entry.id}`);
-      }
-      const points = frontier.points.filter(point =>
-        point.cohort_id === 'qwen35-35b-a3b-bf16-sweprefix-smoke-v1'
-        && point.configuration?.mods?.includes(entry.id)
-        && point.evidence?.status === 'measured'
-        && Number.isFinite(point.metrics?.output_tps));
-      return [entry.id, { ...entry, gain: null, count: 0,
-        measuredPointCount: points.length,
-        measuredConcurrencies: [...new Set(points.map(point => point.load.concurrency))].sort((a, b) => a - b)
-      }];
+      ids.add(entry.id);
+      const candidate = entry.series_id ? series(frontier, entry.series_id, data.concurrencies, [entry.id]) : null;
+      const compatible = candidate && candidate.every((point, index) => identity(point) === identity(baseline[index]));
+      const comparisons = compatible ? candidate.map((point, index) => ({
+        concurrency: point.load.concurrency, point_id: point.id,
+        baseline_point_id: baseline[index].id,
+        gain: (point.metrics.output_tps / baseline[index].metrics.output_tps - 1) * 100
+      })) : [];
+      const gain = comparisons.length
+        ? (Math.exp(comparisons.reduce((sum, row) => sum + Math.log1p(row.gain / 100), 0) / comparisons.length) - 1) * 100
+        : null;
+      return [entry.id, { ...entry, gain, count: comparisons.length, comparisons,
+        baseline_series_id: data.baseline.series_id, modelLabel }];
     }));
   }
   function compare(left, right, results) {

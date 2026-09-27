@@ -696,55 +696,17 @@ vllm-hust-ext extension check ${extensionId}`
   function performancePanel(result) {
     const panel = element("div", "plugin-performance");
     const zh = language() === "zh";
-    const measured = result.measuredPointCount > 0;
-    const value = result.gain === null
-      ? (measured ? (zh ? "已有 Frontier 实测" : "Frontier measurements available")
-        : (zh ? "已有项目实测" : "Project measurements available"))
-      : `${result.gain >= 0 ? "+" : ""}${result.gain.toFixed(2)}%`;
-    panel.append(element("strong", result.gain < 0 ? "performance-negative" : "", value));
-    if (measured) {
-      panel.append(element("p", "", zh
-        ? `Qwen3.5-35B · ${result.measuredPointCount} 个实测点 · 并发 ${result.measuredConcurrencies.join(" / ")}`
-        : `Qwen3.5-35B · ${result.measuredPointCount} measured points · concurrency ${result.measuredConcurrencies.join(" / ")}`));
-      const frontierLink = element("a", "plugin-public-effect-link", zh ? "查看 Frontier 曲线 ↗" : "View Frontier curves ↗");
-      frontierLink.href = "./leaderboard-runs.html#frontier";
-      panel.append(frontierLink);
+    const format = value => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+    const value = Number.isFinite(result.gain) ? format(result.gain) : "—";
+    panel.append(element("strong", result.gain < 0 ? "performance-negative" : "", value),
+      element("span", "", [result.modelLabel, zh ? "吞吐提升 · vs Native" : "Throughput gain · vs Native"].filter(Boolean).join(" · ")));
+    if (result.comparisons.length) {
+      const link = element("a", "plugin-public-effect-link", "Frontier ↗");
+      link.href = "./leaderboard-runs.html#frontier";
+      link.title = (zh ? "C1/2/4/8/16 吞吐比的几何平均。" : "Geometric mean of C1/2/4/8/16 throughput ratios. ")
+        + result.comparisons.map(row => `C${row.concurrency}: ${format(row.gain)}`).join(" · ");
+      panel.append(link);
     }
-    panel.append(element("p", "", local(result, "scope")));
-    const link = element("a", "plugin-public-effect-link", copy().effectSource + " ↗");
-    link.href = result.url;
-    if (!measured || result.url !== "./leaderboard-runs.html#frontier") panel.append(link);
-    const launchLabels = language() === "zh" ? {
-      "manager-verified": "ECPA 启动已验收",
-      "manager-verified-supplemental-adapter": "ECPA 启动已验收 · 补充适配",
-      "external-harness-only": "专项脚本实测 · 非 ECPA 启动验收",
-      "not-reproduced-this-round": "本轮未通过 ECPA 复现"
-    } : {
-      "manager-verified": "ECPA launch accepted",
-      "manager-verified-supplemental-adapter": "ECPA launch accepted · supplemental adapter",
-      "external-harness-only": "Specialized harness · no ECPA launch acceptance",
-      "not-reproduced-this-round": "Not reproduced through ECPA this round"
-    };
-    const ecpa = element("section", `plugin-ecpa-status status-${result.ecpa.launch_acceptance}`);
-    ecpa.append(
-      element("strong", "", launchLabels[result.ecpa.launch_acceptance]),
-      element("p", "", local(result.ecpa, "note"))
-    );
-    if (result.ecpa.adapter_evidence) {
-      const adapter = element("a", "plugin-public-effect-link", language() === "zh" ? "补充适配 PR（未合并）↗" : "Supplemental adapter PR (unmerged) ↗");
-      adapter.href = result.ecpa.adapter_evidence;
-      adapter.target = "_blank";
-      adapter.rel = "noopener noreferrer";
-      ecpa.append(adapter);
-    }
-    if (result.ecpa.defect_evidence) {
-      const defect = element("a", "plugin-public-effect-link plugin-ecpa-defect", language() === "zh" ? "进程退出与资源释放缺陷记录 ↗" : "Process-exit and resource-release defect ↗");
-      defect.href = result.ecpa.defect_evidence;
-      defect.target = "_blank";
-      defect.rel = "noopener noreferrer";
-      ecpa.append(defect);
-    }
-    panel.append(ecpa);
     return panel;
   }
 
@@ -809,9 +771,7 @@ vllm-hust-ext extension check ${extensionId}`
     const traits = workloadTags(item);
     if (traits) card.append(traits);
     const measured = performanceResults.get(item.id);
-    if (measured) card.append(performancePanel(measured));
-    const publicEffect = publicEffectPanel(item);
-    if (publicEffect) card.append(publicEffect);
+    card.append(performancePanel(measured || { gain: null, comparisons: [] }));
     const community = communityPanel(item);
     if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
@@ -821,6 +781,8 @@ vllm-hust-ext extension check ${extensionId}`
     const details = element("details", "plugin-technical-details");
     details.append(element("summary", "", copy().details));
     const detailBody = element("div", "plugin-technical-body");
+    const publicEffect = publicEffectPanel(item);
+    if (publicEffect) detailBody.append(publicEffect);
     const compatibilityDetailsBlock = compatibilityDetails(item);
     if (compatibilityDetailsBlock) detailBody.append(compatibilityDetailsBlock);
     const facts = element("dl", "plugin-component-facts");
@@ -1042,7 +1004,7 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=frontier-evidence-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/plugin-performance.json?v=throughput-gain-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=qwen35-mooncake-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])

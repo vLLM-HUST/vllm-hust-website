@@ -1,22 +1,52 @@
-# One Native baseline for MOD comparisons
+# MOD throughput comparisons
 
-The previous plugin-homepage ranking was incorrect: it combined percentages measured against
-separate Native controls, including other models and topologies. That comparison is withdrawn.
-Historical artifacts remain available for audit, but do not qualify for the performance ranking.
+The existing plugin cards show one number: output-throughput change versus one Native concurrency
+series. Cards sort by this number descending. A missing comparable curve is a dash, never zero or a
+percentage borrowed from a different Native control. No extra results section or qualification
+status paragraphs are rendered on the cards.
 
-Every admitted MOD must use one shared Qwen3.5-35B-A3B Native baseline series. Runtime sources,
-model, hardware topology, common launch settings, workload, qualification and metric accounting must
-be fixed. Candidate changes must be attributable to the MOD. Re-dividing incompatible old
-measurements by a newly selected Native value does not establish comparability.
+`data/plugin-performance.json` declares one shared baseline (`swe-capacity16-native`) and one
+complete candidate series per MOD. `assets/plugin-performance.js` reads actual Frontier throughput
+values. It computes `(geometric_mean(candidate_tps / native_tps) - 1) * 100` across C1/2/4/8/16.
+Every load receives equal weight; the same five Native point IDs apply to every MOD. The Frontier
+link tooltip exposes the aggregation and per-load percentages. No scores are stored in metadata, and
+per-MOD baselines, precomputed ratios and partial sweeps are rejected.
 
-The website currently exposes no scores. `plugin-performance/v2` records the pending state and
-rejects per-MOD ratios. A future evidence validator must bind every candidate to the exact same
-Native point IDs at C1/2/4/8/16 and the same frozen experiment contract before ranking is restored.
+## Existing BetterScale data
 
-## ECPA status is an independent dimension
+The complete small-fish series and the existing capacity16 Native series have matching model
+revision, runtime base commits, workload/tokenizer fingerprints, hardware topology, explicit 24.25
+GiB/chip KV budget, context, slots, batching, APC, async scheduling and natural MTP2. Both use
+900-second fixed-window streamed-token accounting, excluding drain. Their client revisions differ
+only in repository documentation, as recorded in [the source evidence](FRONTIER-SMALL-FISH.md).
+
+Graph/capture settings, task-queue settings and MOD workers are treatment configuration differences:
+BetterScale uses its FULL graph path while Native uses FULL_AND_PIECEWISE. The reported number is
+observed end-to-end throughput relative to Native, not an isolated kernel ablation. Both curves are
+single smoke observations. The Native C16 retrieval caveat recorded in
+[the original report](FRONTIER-QWEN35-SWE-PREFIX.md) remains; throughput comparisons do not certify
+answer quality or repeatability. No original measurements or caveats are removed.
+
+The five throughput changes are +16.87%, +30.44%, +46.63%, +57.55%, and +66.22%; their geometric
+aggregate is +42.39%. This complete series is selected explicitly, rather than selecting the best
+point independently at each load or substituting the newer single resident-state C16 observation.
+
+## Other MODs
+
+BidKV, DLA, Tiering and Mooncake's later campaigns have a different prepared-workload hash and
+runtime provenance. Pipeline also changes TP2/PP1 to TP2/PP2. Other published MOD reports use other
+models or workloads. These cannot acquire a score by dividing their historical throughput by the
+chosen Native series. The validator excludes incompatible identities and incomplete evidence. A
+future campaign can replace the single shared baseline and candidate series together after
+qualification; it cannot add a private baseline to an individual MOD.
+
+ECPA launch/adapter/analysis metadata remains in the data file. It is not injected into the
+performance card or used to invent a performance score.
+
+## ECPA acceptance evidence
 
 The ten historical performance entries are not ten ECPA certifications. The same
-`plugin-performance/v2` record keeps three facts independent: archived performance evidence, ECPA
+`plugin-performance/v3` record keeps three facts independent: archived performance evidence, ECPA
 launch acceptance, and analysis integration. The 2026-09-27 campaign records are:
 
 | Entries                                               | ECPA launch acceptance                                                                                          | Analysis path                |
@@ -36,13 +66,3 @@ and device memory could remain until the experiment supervisor cleaned them up. 
 boundary keeps this as `known-defect` and links the retained incident record. Do not promote process
 exit or resource release to accepted until signal forwarding, descendant waiting, and device-memory
 release have an independent regression result.
-
-Performance ordering belongs to the existing MOD catalog, with no separate results section. Admitted
-gains sort descending, including negative gains; items without an admitted score follow and retain
-the catalog compatibility/name ordering. Historical evidence alone grants no priority.
-
-Published Frontier evidence is independent of gain-ranking admission. The catalog derives measured
-point coverage directly from the Qwen3.5 SWE Frontier data and links to the existing curves. A
-pending ranking review must never relabel completed measurements as waiting for another run.
-BetterScale already has C1/2/4/8/16 curves alongside a complete Native series;
-baseline/configuration mapping still needs review before assigning a cross-MOD gain score.
