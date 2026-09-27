@@ -228,8 +228,12 @@
           "concurrency_curves_url": "./assets/frontier-qwen35-swe-concurrency.svg?v=sweprefix-curves-20260924-5",
           "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
           "session_rotation": {
-            "status": "under-construction",
-            "depth_field": "load.session_rotation_depth"
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
+            "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points."
           }
         }
       }
