@@ -129,6 +129,12 @@
       "entry_ids": [
         "betterscale"
       ]
+    },
+    {
+      "baseline_series_id": "swe-k8s-pp2-20260925-nativepp-r1",
+      "entry_ids": [
+        "pipeline-microbatch-migration"
+      ]
     }
   ],
   "ecpa_experiment_boundary": {
