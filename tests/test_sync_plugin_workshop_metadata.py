@@ -50,6 +50,36 @@ def test_workshop_filter_accepts_org_bridges_but_excludes_external_systems() -> 
     )
 
 
+def test_prune_snapshot_keeps_only_current_public_workshop_mods() -> None:
+    base = {
+        "artifact_type": "runtime_component",
+        "repository_relationship": "organization_native",
+        "delivery_model": "plugin_bundle",
+        "canonical_repository": "https://github.com/vLLM-HUST/example-mod",
+    }
+    registry = {
+        "components": [
+            {**base, "id": "runnable"},
+            {**base, "id": "source-scaffold", "public_surface": False},
+        ]
+    }
+    snapshot = {
+        "schema_version": "plugin-workshop-metadata/v1",
+        "generated_at": "2026-09-27T00:00:00+00:00",
+        "source": "preserved source",
+        "plugins": {
+            "runnable": {"repository": "vLLM-HUST/runnable"},
+            "source-scaffold": {"repository": "vLLM-HUST/scaffold"},
+            "stale-entry": {"repository": "vLLM-HUST/stale"},
+        },
+    }
+
+    assert MODULE.prune_snapshot(registry, snapshot) == {
+        **snapshot,
+        "plugins": {"runnable": snapshot["plugins"]["runnable"]},
+    }
+
+
 def test_verified_identity_names_prefers_confirmed_real_names() -> None:
     payload = {
         "people": [

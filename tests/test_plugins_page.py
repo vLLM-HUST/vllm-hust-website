@@ -554,10 +554,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
     assert kvcompress["advisors"] == [
         {"name_zh": "万瑶", "name_en": "Yao Wan", "relationship": "internal"}
     ]
-    assert {
-        advisor["name_zh"]
-        for advisor in WORKSHOP_METADATA["plugins"]["knorm-migration"]["advisors"]
-    } == {"万瑶", "张书豪"}
+    assert "knorm-migration" not in WORKSHOP_METADATA["plugins"]
     assert {
         advisor["name_zh"]
         for advisor in WORKSHOP_METADATA["plugins"]["quantized-kv-cache-migration"][
@@ -699,15 +696,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
+    assert 'data-source="./data/ecosystem.json?v=workshop-v21-runnable-only"' in PAGE
     assert (
-        'data-source="./data/ecosystem.json?v=workshop-v20-mooncake-measured"' in PAGE
-    )
-    assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v11-maintenance-audit"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v12-runnable-only"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v4-maintenance-audit"'
+        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v5-runnable-only"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -763,7 +758,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     )
     assert dla["url"] == "https://github.com/vLLM-HUST/vllm-hust-dla"
     assert dla["component_ids"] == ["dla"]
-    assert dla["public_surface"] is True
+    assert dla["public_surface"] is False
     vspec = next(
         item for item in PORTFOLIO["repositories"] if item["name"] == "vllm-hust-vSpec"
     )
@@ -915,7 +910,6 @@ def test_public_plugin_evidence_never_exposes_internal_machine_ids() -> None:
 def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
     expected = {
         "kvcompress-ascend": ([("张家万", "Jiawan23")], "万瑶"),
-        "pyramidkv-ascend-migration": ([("毛潮云", "Irisuko")], "罗瑞坤"),
         "split-batch-full-graph-migration": (
             [("吴天宇", "Raing5Days"), ("李上上", "ilnnfover")],
             "郑龙",
@@ -930,6 +924,14 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
             advisor["name_zh"] == advisor_name and advisor["relationship"] == "internal"
             for advisor in metadata["advisors"]
         )
+
+    pyramid = by_id("pyramidkv-ascend-migration")
+    assert pyramid["public_surface"] is False
+    assert pyramid["maintainer_profiles"] == [{"login": "Irisuko", "name": "毛潮云"}]
+    assert any(
+        advisor["name_zh"] == "罗瑞坤" and advisor["relationship"] == "internal"
+        for advisor in pyramid["advisors"]
+    )
 
     pipeline = WORKSHOP_METADATA["plugins"]["pipeline-microbatch-migration"]
     assert [
@@ -999,10 +1001,26 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 19
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 12
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
+
+
+def test_non_runnable_descriptors_and_source_scaffolds_are_not_published():
+    unpublished = {
+        "ascend-adaptive-quantized-kv",
+        "ascend-quant-runtime-descriptor",
+        "dla",
+        "knorm-migration",
+        "kv-tiering-migration",
+        "kv-transfer-observability-migration",
+        "pyramidkv-ascend-migration",
+    }
+    for component_id in unpublished:
+        assert by_id(component_id)["public_surface"] is False
+    assert unpublished.isdisjoint(WORKLOAD_NAVIGATION["plugins"])
+    assert unpublished.isdisjoint(WORKSHOP_METADATA["plugins"])
 
 
 def test_compact_greedy_incubator_is_not_in_public_catalog():

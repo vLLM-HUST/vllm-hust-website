@@ -187,7 +187,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["import-only Adaptive Quantized KV descriptor", "host-contract proposal and compatibility receipts"],
       "component_ids": ["ascend-adaptive-quantized-kv"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-ascend-hust-bidkv",
@@ -298,7 +298,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["DLA decode-length-aware admission and preemption scheduler policy"],
       "component_ids": ["dla"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-hust-vSpec",
@@ -418,7 +418,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["owner-led KV-tiering migration scaffold", "legacy provenance ledger"],
       "component_ids": ["kv-tiering-migration"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-hust-knorm",
@@ -429,7 +429,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["owner-led KNorm migration scaffold", "legacy provenance ledger"],
       "component_ids": ["knorm-migration"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-ascend-pyramidkv-hust",
@@ -440,7 +440,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["owner-led PyramidKV Ascend migration scaffold", "legacy provenance ledger"],
       "component_ids": ["pyramidkv-ascend-migration"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-hust-slicegpt",
@@ -506,7 +506,7 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["KV transfer observability migration scaffold", "legacy provenance ledger"],
       "component_ids": ["kv-transfer-observability-migration"],
-      "public_surface": true
+      "public_surface": false
     },
     {
       "name": "vllm-ascend-layered-prefill-hust",

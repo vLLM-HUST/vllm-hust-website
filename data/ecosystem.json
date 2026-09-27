@@ -398,6 +398,7 @@
     },
     {
       "id": "ascend-adaptive-quantized-kv",
+      "public_surface": false,
       "name": "Adaptive Quantized KV",
       "artifact_type": "runtime_component",
       "system_role": "kv_quantization_research",
@@ -451,6 +452,7 @@
     },
     {
       "id": "ascend-quant-runtime-descriptor",
+      "public_surface": false,
       "name": "Ascend Quant Runtime Descriptor",
       "name_en": "Ascend Quant Runtime Descriptor",
       "name_zh": "昇腾量化运行时描述器",
@@ -550,6 +552,7 @@
     },
     {
       "id": "kv-tiering-migration",
+      "public_surface": false,
       "name": "KV Tiering",
       "name_en": "KV Tiering",
       "name_zh": "KV 分层",
@@ -601,6 +604,7 @@
     },
     {
       "id": "knorm-migration",
+      "public_surface": false,
       "name": "KNorm",
       "name_en": "KNorm",
       "name_zh": "KNorm",
@@ -636,6 +640,7 @@
     },
     {
       "id": "pyramidkv-ascend-migration",
+      "public_surface": false,
       "name": "PyramidKV Ascend",
       "name_en": "PyramidKV Ascend",
       "name_zh": "PyramidKV 昇腾版",
@@ -866,6 +871,7 @@
     },
     {
       "id": "kv-transfer-observability-migration",
+      "public_surface": false,
       "name": "KV Transfer Observability",
       "name_en": "KV Transfer Observability",
       "name_zh": "KV 传输可观测性",
@@ -1254,6 +1260,7 @@
 ,
     {
       "id": "dla",
+      "public_surface": false,
       "name": "DLA",
       "name_en": "DLA",
       "name_zh": "DLA（解码长度感知准入/预占）",
