@@ -20,6 +20,8 @@ workload identities; never silently mix them.
   scoped to selected scales. MOD / Group offers Select all / Deselect all without changing other
   rows. Mobile stacks the sidebar below the chart. A single workload is a selected-style static tag;
   multiple workloads use a selector.
+- Per-point concurrency/session tags appear in the click popover, not as persistent chart labels.
+  Keep the series legend and accessible point names; leave the plot for dots and frontier lines.
 - Axes are fixed: **X = P90 per-request decode speed (output tokens/s/user)**; **Y = total output
   tokens/s / all allocated chips**. No axis, hardware or MOD filters.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and

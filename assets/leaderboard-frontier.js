@@ -250,7 +250,6 @@
         }
         svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${t('x')}<tspan x="${(width+left-right)/2}" dy="16">output tokens/s/user</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${t('y')}<tspan x="0" dy="16">output tokens/s/chip</tspan></text>`;
         const frontiers=M.groupFrontiers(result.measured.map(row=>row.point),X,Y);
-        const connected=new Set(frontiers.flat().map(row=>row.point.id));
         for(const rows of frontiers.filter(rows=>rows.length>1)){
             const id=M.frontierKey(rows[0].point);
             svg+=`<polyline class="frontier-envelope" data-group="${escape(id)}" stroke-dasharray="${rows[0].point.load.session_rotation_depth>1?'7 4':'none'}" data-frontier-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(rows[0].point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
@@ -260,9 +259,6 @@
             const hitRadius=Math.max(2,Math.min(18,...neighbors));
             const p=row.point,text=`${label(p)}${hasRotation()?` · ${sessionScale(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}${notExercised(p)?` · ${t('notExercised')}`:''}${storeOnly(p)?` · ${t('storeOnly')}`:''} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
             svg+=`<g role="button" tabindex="0" aria-haspopup="dialog" aria-controls="frontier-popover" aria-expanded="false" aria-label="${escape(text)}" data-point="${escape(p.id)}" class="frontier-point"><circle class="frontier-hit" cx="${x(row.x)}" cy="${y(row.y)}" r="${hitRadius}"/><circle class="frontier-dot" cx="${x(row.x)}" cy="${y(row.y)}" r="7" fill="${p.load.session_rotation_depth>1?'var(--run-bg)':color(p)}" style="stroke:${color(p)}"/><title>${escape(text)}</title></g>`;
-        }
-        for(const row of result.measured.filter(row=>connected.has(row.point.id))){
-            svg+=`<text class="frontier-concurrency-label" style="fill:${color(row.point)}" x="${x(row.x)+9}" y="${y(row.y)-10}">C${row.point.load.concurrency}${hasRotation()?` · ${sessionScale(row.point.load.session_rotation_depth)}`:''}</text>`;
         }
         $('frontier-chart').innerHTML=svg;
     }

@@ -60,6 +60,7 @@ def main():
                 choices = page.locator('[data-filter="rotation"]')
                 assert choices.count() == len(depths)
                 assert all(choice.is_checked() for choice in choices.all())
+                assert page.locator(".frontier-concurrency-label").count() == 0
                 assert_group_frontiers(page, members)
                 page.locator("#frontier-only").check()
                 assert_group_frontiers(page, members)
