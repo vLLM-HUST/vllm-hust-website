@@ -70,7 +70,15 @@ def main():
             page.locator("#runs-content").wait_for(state="visible", timeout=30000)
             nav = page.locator('.site-nav [data-nav-page="leaderboard-v2"]')
             assert nav.count() == 1
-            assert nav.inner_text() == ("排行榜" if language == "zh" else "Leaderboard")
+            group = page.locator('.site-nav [data-nav-group="evidence"]')
+            assert group.locator('[data-nav-page="leaderboard-v2"]').count() == 1
+            assert (
+                page.locator('.site-nav a[href="./dataset-validation.html"]').count()
+                == 0
+            )
+            assert nav.text_content().strip() == (
+                "性能排行榜" if language == "zh" else "Leaderboard"
+            )
             assert nav.get_attribute("href") == "./leaderboard-runs.html"
             assert "active" in nav.get_attribute("class")
             assert (
@@ -82,7 +90,9 @@ def main():
                 assert nav.is_visible()
                 page.locator("#navToggle").click()
             else:
+                group.locator("summary").click()
                 assert nav.is_visible()
+                group.locator("summary").click()
 
             assert (
                 page.locator(
