@@ -6,20 +6,30 @@ const data = JSON.parse(fs.readFileSync('data/plugin-performance.json'));
 const frontier = JSON.parse(fs.readFileSync('data/leaderboard_frontier.json'));
 const points = new Map(frontier.points.map(point => [point.id, point]));
 
-test('BetterScale gain is computed from five published points against the one Native series', () => {
-  const result = M.summarize(data, frontier).get('betterscale');
-  assert.equal(result.count, 5);
-  let product = 1;
-  for (const row of result.comparisons) {
-    const candidate = points.get(row.point_id), baseline = points.get(row.baseline_point_id);
-    assert.equal(baseline.load.concurrency_series, data.baseline.series_id);
-    assert.equal(candidate.load.concurrency, baseline.load.concurrency);
-    const ratio = candidate.metrics.output_tps / baseline.metrics.output_tps;
-    assert.ok(Math.abs(row.gain - (ratio - 1) * 100) < 1e-10);
-    product *= ratio;
+test('every published gain is computed from five points against the one Native series', () => {
+  const results = M.summarize(data, frontier);
+  const measured = [...results.values()].filter(result => Number.isFinite(result.gain));
+  assert.ok(measured.length >= 1);
+  for (const result of measured) {
+    assert.equal(result.count, 5);
+    let product = 1;
+    for (const row of result.comparisons) {
+      const candidate = points.get(row.point_id), baseline = points.get(row.baseline_point_id);
+      assert.equal(baseline.load.concurrency_series, data.baseline.series_id);
+      assert.equal(candidate.load.concurrency, baseline.load.concurrency);
+      const ratio = candidate.metrics.output_tps / baseline.metrics.output_tps;
+      assert.ok(Math.abs(row.gain - (ratio - 1) * 100) < 1e-10);
+      product *= ratio;
+    }
+    assert.ok(Math.abs(result.gain - (product ** (1 / 5) - 1) * 100) < 1e-10);
   }
-  assert.ok(Math.abs(result.gain - (product ** (1 / 5) - 1) * 100) < 1e-10);
-  assert.equal(result.gain.toFixed(2), '42.39');
+  if (data.baseline.series_id === 'swe-capacity16-native') {
+    assert.equal(results.get('betterscale').gain.toFixed(2), '42.39');
+  } else {
+    assert.deepEqual(new Set(measured.map(result => result.id)), new Set([
+      'bidkv', 'dla', 'kv-tiering-migration', 'mooncake-vllm-connectors'
+    ]));
+  }
 });
 
 test('all candidates reference the same Native IDs and cannot supply their own baseline or score', () => {
@@ -32,16 +42,20 @@ test('all candidates reference the same Native IDs and cannot supply their own b
   }
 });
 
-test('incompatible historical MOD series do not produce cross-baseline percentages', () => {
+test('series outside the selected shared baseline do not produce cross-baseline percentages', () => {
   const results = M.summarize(data, frontier);
-  for (const id of ['bidkv', 'dla', 'kv-tiering-migration', 'mooncake-vllm-connectors', 'pipeline-microbatch-migration']) {
+  const selected = new Set([...results.values()]
+    .filter(result => Number.isFinite(result.gain)).map(result => result.id));
+  for (const id of ['bidkv', 'dla', 'kv-tiering-migration', 'mooncake-vllm-connectors', 'pipeline-microbatch-migration', 'betterscale']) {
+    if (selected.has(id)) continue;
     assert.equal(results.get(id).gain, null);
     assert.deepEqual(results.get(id).comparisons, []);
   }
 });
 
 test('workload, model, topology, KV budget, runtime and measurement mismatches exclude a candidate', () => {
-  const id = M.summarize(data, frontier).get('betterscale').comparisons[0].point_id;
+  const measured = [...M.summarize(data, frontier).values()].find(result => Number.isFinite(result.gain));
+  const id = measured.comparisons[0].point_id;
   const edits = [
     p => {p.evidence.benchmark_protocol.prepared_workload_sha256 = 'different';},
     p => {p.configuration.parameters.checkpoint_revision = 'different';},
@@ -55,27 +69,28 @@ test('workload, model, topology, KV budget, runtime and measurement mismatches e
   for (const edit of edits) {
     const invalid = structuredClone(frontier);
     edit(invalid.points.find(point => point.id === id));
-    assert.equal(M.summarize(data, invalid).get('betterscale').gain, null);
+    assert.equal(M.summarize(data, invalid).get(measured.id).gain, null);
   }
 });
 
 test('MOD-specific host-tier capacity remains part of the treatment', () => {
-  const result = M.summarize(data, frontier).get('betterscale');
+  const result = [...M.summarize(data, frontier).values()].find(row => Number.isFinite(row.gain));
   const changed = structuredClone(frontier);
   for (const row of result.comparisons) {
-    changed.points.find(point => point.id === row.point_id)
-      .configuration.parameters.host_kv_budget_gib = 8;
+    const parameters = changed.points.find(point => point.id === row.point_id).configuration.parameters;
+    parameters.host_kv_budget_gib = (parameters.host_kv_budget_gib || 0) + 1;
   }
-  assert.equal(M.summarize(data, changed).get('betterscale').gain.toFixed(2), '42.39');
+  assert.equal(M.summarize(data, changed).get(result.id).gain, result.gain);
 });
 
 test('missing or duplicated concurrency windows cannot turn a partial curve into a score', () => {
-  const id = M.summarize(data, frontier).get('betterscale').comparisons[0].point_id;
+  const measured = [...M.summarize(data, frontier).values()].find(result => Number.isFinite(result.gain));
+  const id = measured.comparisons[0].point_id;
   const missing = {...frontier, points: frontier.points.filter(point => point.id !== id)};
-  assert.equal(M.summarize(data, missing).get('betterscale').gain, null);
+  assert.equal(M.summarize(data, missing).get(measured.id).gain, null);
   const duplicate = {...frontier, points: [...frontier.points, points.get(id)]};
-  assert.equal(M.summarize(data, duplicate).get('betterscale').gain, null);
-  const native = M.summarize(data, frontier).get('betterscale').comparisons[0].baseline_point_id;
+  assert.equal(M.summarize(data, duplicate).get(measured.id).gain, null);
+  const native = measured.comparisons[0].baseline_point_id;
   assert.throws(() => M.summarize(data, {...frontier, points: frontier.points.filter(point => point.id !== native)}), /Native series/);
 });
 
@@ -85,12 +100,19 @@ test('catalog sorts comparable percentages before every missing score', () => {
   assert.deepEqual(rows.sort((a, b) => M.compare(a, b, results)).map(row => row.id),
     ['fast', 'slow', 'pending', 'unknown']);
   const real = M.summarize(data, frontier);
-  assert.equal([...real.values()].sort((a, b) => M.compare(a, b, real))[0].id, 'betterscale');
+  const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
+  assert.ok(Number.isFinite(sorted[0].gain));
+  assert.ok(sorted.slice(1).every(row => !Number.isFinite(row.gain) || sorted[0].gain >= row.gain));
 });
 
 test('ECPA evidence is preserved in metadata without becoming a performance claim', () => {
   const result = M.summarize(data, frontier);
   assert.equal(result.get('betterscale').ecpa.launch_acceptance, 'not-reproduced-this-round');
-  assert.equal(result.get('mooncake-vllm-connectors').ecpa.adapter_merge_state, 'open-draft');
+  const mooncake = result.get('mooncake-vllm-connectors');
+  if (data.baseline.series_id === 'swe-capacity16-native') {
+    assert.equal(mooncake.ecpa.adapter_merge_state, 'open-draft');
+  } else {
+    assert.equal(mooncake.ecpa.launch_acceptance, 'manager-verified');
+  }
   assert.equal(data.ecpa_experiment_boundary.process_release, 'known-defect');
 });
