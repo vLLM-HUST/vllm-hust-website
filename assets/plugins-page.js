@@ -695,10 +695,10 @@ vllm-hust-ext extension check ${extensionId}`
 
   function performancePanel(result) {
     const panel = element("div", "plugin-performance");
-    const value = result.gain === null ? (language() === "zh" ? "实测 · 未量化" : "Measured · unranked")
+    const value = result.gain === null ? (language() === "zh" ? "待统一基准补测" : "Awaiting shared baseline")
       : `${result.gain >= 0 ? "+" : ""}${result.gain.toFixed(2)}%`;
     panel.append(element("strong", result.gain < 0 ? "performance-negative" : "", value),
-      element("span", "", language() === "zh" ? "相对各自 Native 的吞吐变化" : "Throughput vs respective Native"),
+      element("span", "", language() === "zh" ? "统一 Native 验收后参与排序" : "Ranked only after shared-Native qualification"),
       element("p", "", local(result, "scope")));
     const link = element("a", "plugin-public-effect-link", copy().effectSource + " ↗");
     link.href = result.url;
@@ -711,14 +711,14 @@ vllm-hust-ext extension check ${extensionId}`
     if (!root) return;
     root.replaceChildren();
     const zh = language() === "zh";
-    root.append(element("h2", "", zh ? "实测 MOD · 按吞吐变化排序" : "Measured MODs · ordered by throughput change"),
+    root.append(element("h2", "", zh ? "统一 Native 实测 · 补测中" : "Shared-Native measurements · pending"),
       element("p", "performance-method", zh
-        ? "Qwen3.5 TP2 配对测试优先；其他配置单列。每组按所有已列配对点的吞吐比几何平均值降序排列，负收益也保留。各 MOD 使用自己的 Native 对照，测试条件不同，排序不代表同场胜负或稳定加速。"
-        : "Qwen3.5 TP2 pairs first; other configurations separately. Each group sorts by the geometric mean of all listed throughput ratios, including regressions. Each MOD has its own Native control; differing conditions mean this is not a head-to-head ranking or proof of repeatable speedup."));
-    for (const group of ["qwen35", "other"]) {
-      root.append(element("h3", "", group === "qwen35" ? "Qwen3.5 · TP2 / PP1" : (zh ? "其他模型 / 配置的实测" : "Other models / configurations")));
+        ? "此前基于不同 Native 对照的百分比和排序已撤下。所有 MOD 必须使用同一个 Qwen3.5-35B-A3B Native 基准，固定运行时、配置、工作负载和计量方式；不符合条件的历史结果不参与比较。"
+        : "The previous percentages and ordering used different Native controls and have been withdrawn. Every MOD must use one Qwen3.5-35B-A3B Native baseline with fixed runtime, configuration, workload and accounting. Incompatible historical results are excluded."));
+    for (const group of ["pending"]) {
+      root.append(element("h3", "", zh ? "历史实测索引 · 不参与排名" : "Historical evidence · excluded from ranking"));
       const grid = element("div", "performance-grid");
-      [...performanceResults.values()].filter(row => row.group === group)
+      [...performanceResults.values()]
         .sort((a, b) => PluginPerformance.compare(a, b, performanceResults)).forEach(row => {
           const item = registry.components.find(item => item.id === row.id);
           if (!item || item.public_surface === false) return;
@@ -732,7 +732,9 @@ vllm-hust-ext extension check ${extensionId}`
   }
 
   function publicEffectPanel(item) {
-    const result = local(item, "public_effect");
+    const result = performanceResults.has(item.id)
+      ? (language() === "zh" ? "历史结果仅供查阅，尚未通过统一 Native 基准验收，不展示跨基准性能比较。" : "Historical evidence only; shared-Native qualification is pending. Cross-baseline performance comparisons are not displayed.")
+      : local(item, "public_effect");
     if (!result || !item.public_effect_status || !item.public_effect_url) return null;
     const panel = element("section", `plugin-public-effect effect-${item.public_effect_status}`);
     const head = element("div", "plugin-public-effect-head");
@@ -999,7 +1001,7 @@ vllm-hust-ext extension check ${extensionId}`
     const values = {
       "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
       "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
-      "plugins-lede": zh ? "实测 MOD 优先，按吞吐变化排序；结合模型、配置和兼容性选择。" : "Measured MODs first, ordered by throughput change. Choose by model, configuration, and compatibility.",
+      "plugins-lede": zh ? "以统一 Native 基准评测 MOD；性能排序正在补测校正。" : "MOD evaluation against one Native baseline; performance ordering awaits corrected measurements.",
       "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
       "plugins-fact-runtime": zh ? "个已支持" : "supported"
     };
@@ -1025,7 +1027,7 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/plugin-performance.json?v=shared-native-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=qwen35-mooncake-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])
