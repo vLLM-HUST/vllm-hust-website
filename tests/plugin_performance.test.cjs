@@ -24,17 +24,18 @@ test('every Frontier gain is computed from five points in a declared comparison 
     assert.ok(Math.abs(result.gain - (product ** (1 / 5) - 1) * 100) < 1e-10);
   }
   assert.deepEqual(new Set(measured.map(result => result.id)), new Set([
-    'betterscale', 'pipeline-microbatch-migration', 'bidkv', 'dla', 'kv-tiering-migration', 'mooncake-vllm-connectors'
+    'betterscale', 'pipeline-microbatch-migration', 'bidkv', 'dla', 'kv-tiering-migration',
+    'mooncake-vllm-connectors', 'kvcompress-ascend'
   ]));
   assert.equal(results.get('betterscale').gain.toFixed(2), '42.39');
   assert.equal(results.get('pipeline-microbatch-migration').gain.toFixed(2), '9.78');
+  assert.equal(results.get('kvcompress-ascend').gain.toFixed(2), '-5.83');
 });
 
 test('published paired runs expose both gains and regressions without precomputed scores', () => {
   const results = M.summarize(data, frontier);
   const expected = {
     vspec: '51.80',
-    'kvcompress-ascend': '10.25',
     'kv-materialization-arrival-control': '-0.42',
     diffspec: '-70.66',
     latchmoe: '-87.65'
@@ -88,7 +89,7 @@ test('series outside declared comparison sets do not produce percentages', () =>
   const results = M.summarize(data, frontier);
   const selected = new Set([...results.values()]
     .filter(result => Number.isFinite(result.gain)).map(result => result.id));
-  for (const id of ['bidkv', 'dla', 'kv-tiering-migration', 'mooncake-vllm-connectors', 'pipeline-microbatch-migration', 'betterscale']) {
+  for (const id of ['bidkv', 'dla', 'kv-tiering-migration', 'mooncake-vllm-connectors', 'pipeline-microbatch-migration', 'betterscale', 'kvcompress-ascend']) {
     if (selected.has(id)) continue;
     assert.equal(results.get(id).gain, null);
     assert.deepEqual(results.get(id).comparisons, []);
@@ -144,9 +145,9 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const real = M.summarize(data, frontier);
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
-    'vspec', 'betterscale', 'kvcompress-ascend', 'pipeline-microbatch-migration',
+    'vspec', 'betterscale', 'pipeline-microbatch-migration',
     'bidkv', 'dla', 'kv-materialization-arrival-control', 'mooncake-vllm-connectors', 'kv-tiering-migration',
-    'diffspec', 'latchmoe'
+    'kvcompress-ascend', 'diffspec', 'latchmoe'
   ]);
 });
 
@@ -158,5 +159,6 @@ test('ECPA evidence is preserved in metadata without becoming a performance clai
   const pipeline = result.get('pipeline-microbatch-migration');
   assert.equal(pipeline.ecpa.launch_acceptance, 'manager-verified');
   assert.match(pipeline.ecpa.evidence_url, /frontier_pipeline\/ecpa$/);
+  assert.equal(result.get('kvcompress-ascend').ecpa.launch_acceptance, 'manager-verified');
   assert.equal(data.ecpa_experiment_boundary.process_release, 'known-defect');
 });

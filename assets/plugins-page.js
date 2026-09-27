@@ -334,18 +334,28 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     "kvcompress-ascend": {
       title_en: "Install and start Ascend KV Compression",
       title_zh: "安装并启动昇腾 KV 压缩",
-      note_en: "Requires the paired vLLM-HUST and vLLM-Ascend-HUST source lines shown on this card; the full serving configuration remains mandatory.",
-      note_zh: "需要卡片所列的成对 vLLM-HUST 与 vLLM-Ascend-HUST 源码版本；启动时仍须提供完整服务配置。",
-      command: `uv pip install -e /path/to/vllm-ascend-kvcompress-hust
-export VLLM_PLUGINS=ascend_kvcompress
-export VLLM_KNORM_ENABLED=0
-vllm serve /path/to/model \\
-  --no-async-scheduling \\
+      note_en: "ECPA enables the plugin; the compression profile and full serving configuration remain explicit inputs.",
+      note_zh: "ECPA 负责启用插件；压缩 profile 与完整服务配置仍需显式提供。",
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+pip install git+https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust.git
+vllm-hust-ext extension check org.vllm-hust.ascend-kvcompress
+vllm-hust-ext extension enable org.vllm-hust.ascend-kvcompress
+export VLLM_ASCEND_KVCOMPRESS_CONFIG=/path/to/qwen35-triattention.json
+export VLLM_ASCEND_KVCOMPRESS_QWEN_GDN_LIST_COMPAT=1
+vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
+  --tensor-parallel-size 2 \\
+  --pipeline-parallel-size 1 \\
+  --dtype bfloat16 \\
+  --kv-cache-dtype auto \\
+  --max-model-len 262144 \\
+  --max-num-seqs 16 \\
+  --max-num-batched-tokens 4096 \\
   --enable-prefix-caching \\
-  --block-size 128 \\
-  --max-model-len 12288 \\
-  --gpu-memory-utilization 0.8 \\
-  --kv-cache-compression-config '{"schema_version":1,"provider":"ascend_kvcompress","provider_config":{"method":"triattention","stats_path":"/path/to/stats.pt","kv_budget":2048,"recompute_window":128,"protected_recent_window":128,"score_aggregation":"mean","layer_aggregation":"mean","score_chunk_size":512,"score_layer_stride":4}}'`
+  --mamba-cache-mode align \\
+  --async-scheduling \\
+  --compilation-config '{"cudagraph_mode":"FULL_AND_PIECEWISE","cudagraph_capture_sizes":[3,6,12,24,48],"max_cudagraph_capture_size":48}' \\
+  --speculative-config '{"method":"mtp","num_speculative_tokens":2}' \\
+  --kv-cache-memory-bytes 26038239232`
     }
   };
   const inspectableBundles = {
@@ -1012,7 +1022,7 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=all-tested-2-20260927").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/plugin-performance.json?v=kvcompress-frontier-20260928").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=all-tested-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
   ])
