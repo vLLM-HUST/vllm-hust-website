@@ -155,5 +155,8 @@ test('ECPA evidence is preserved in metadata without becoming a performance clai
   assert.equal(result.get('betterscale').ecpa.launch_acceptance, 'not-reproduced-this-round');
   const mooncake = result.get('mooncake-vllm-connectors');
   assert.equal(mooncake.ecpa.launch_acceptance, 'manager-verified');
+  const pipeline = result.get('pipeline-microbatch-migration');
+  assert.equal(pipeline.ecpa.launch_acceptance, 'manager-verified');
+  assert.match(pipeline.ecpa.evidence_url, /frontier_pipeline\/ecpa$/);
   assert.equal(data.ecpa_experiment_boundary.process_release, 'known-defect');
 });

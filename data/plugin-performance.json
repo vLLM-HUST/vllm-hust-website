@@ -101,11 +101,10 @@
       "id": "pipeline-microbatch-migration",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PIPELINE-K8S.md",
       "ecpa": {
-        "launch_acceptance": "external-harness-only",
-        "configuration_path": "specialized-experiment-script",
+        "launch_acceptance": "manager-verified",
+        "configuration_path": "frontier-adapter",
         "analysis_integration": "external-harness",
-        "note_zh": "本轮性能实测由流水线微批处理专项脚本组织，未完成 ECPA 统一启动验收。",
-        "note_en": "This campaign used the Pipeline Microbatch-specific harness; unified ECPA launch acceptance was not completed."
+        "evidence_url": "https://github.com/vLLM-HUST/vllm-hust-dev-hub/tree/main/scripts/frontier_pipeline/ecpa"
       },
       "series_id": "swe-k8s-pp2-20260925-pipelinepp-r1"
     },
