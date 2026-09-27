@@ -1,5 +1,5 @@
 {
-  "schema_version": "plugin-performance/v3",
+  "schema_version": "plugin-performance/v4",
   "entries": [
     {
       "id": "bidkv",
@@ -114,9 +114,23 @@
       "series_id": null
     }
   ],
-  "baseline": {
-    "series_id": "swe-unified-native-20260927"
-  },
+  "comparison_sets": [
+    {
+      "baseline_series_id": "swe-unified-native-20260927",
+      "entry_ids": [
+        "bidkv",
+        "dla",
+        "kv-tiering-migration",
+        "mooncake-vllm-connectors"
+      ]
+    },
+    {
+      "baseline_series_id": "swe-capacity16-native",
+      "entry_ids": [
+        "betterscale"
+      ]
+    }
+  ],
   "ecpa_experiment_boundary": {
     "as_of": "2026-09-27",
     "manager_repository": "https://github.com/vLLM-HUST/extension-manager",

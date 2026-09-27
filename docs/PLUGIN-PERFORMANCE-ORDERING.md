@@ -1,16 +1,16 @@
 # MOD throughput comparisons
 
-The existing plugin cards show one number: output-throughput change versus one Native concurrency
-series. Cards sort by this number descending. A missing comparable curve is a dash, never zero or a
-percentage borrowed from a different Native control. No extra results section or qualification
-status paragraphs are rendered on the cards.
+The existing plugin cards show one number: output-throughput change versus the Native concurrency
+series recorded by the same published campaign. Cards sort by this number descending. A missing
+complete comparison is a dash, never zero. No extra results section or qualification status
+paragraphs are rendered on the cards.
 
-`data/plugin-performance.json` declares one shared baseline (`swe-capacity16-native`) and one
-complete candidate series per MOD. `assets/plugin-performance.js` reads actual Frontier throughput
-values. It computes `(geometric_mean(candidate_tps / native_tps) - 1) * 100` across C1/2/4/8/16.
-Every load receives equal weight; the same five Native point IDs apply to every MOD. The Frontier
-link tooltip exposes the aggregation and per-load percentages. No scores are stored in metadata, and
-per-MOD baselines, precomputed ratios and partial sweeps are rejected.
+`data/plugin-performance.json` groups complete candidate series with the Native series from their
+published campaign. `assets/plugin-performance.js` reads actual Frontier throughput values and
+computes `(geometric_mean(candidate_tps / native_tps) - 1) * 100` across C1/2/4/8/16. Every load
+receives equal weight. The Frontier link tooltip exposes the aggregation and per-load percentages.
+No scores are stored in metadata; per-entry baselines, precomputed ratios and partial sweeps are
+rejected.
 
 ## Existing BetterScale data
 
@@ -31,14 +31,12 @@ The five throughput changes are +16.87%, +30.44%, +46.63%, +57.55%, and +66.22%;
 aggregate is +42.39%. This complete series is selected explicitly, rather than selecting the best
 point independently at each load or substituting the newer single resident-state C16 observation.
 
-## Other MODs
+## Later unified campaign
 
-BidKV, DLA, Tiering and Mooncake's later campaigns have a different prepared-workload hash and
-runtime provenance. Pipeline also changes TP2/PP1 to TP2/PP2. Other published MOD reports use other
-models or workloads. These cannot acquire a score by dividing their historical throughput by the
-chosen Native series. The validator excludes incompatible identities and incomplete evidence. A
-future campaign can replace the single shared baseline and candidate series together after
-qualification; it cannot add a private baseline to an individual MOD.
+BidKV, DLA, Tiering and Mooncake use the single five-point Native curve from their later unified
+campaign. Pipeline changes TP2/PP1 to TP2/PP2, and other published MOD reports use other models or
+workloads, so they remain unscored. The validator excludes incompatible identities and incomplete
+evidence.
 
 ECPA launch/adapter/analysis metadata remains in the data file. It is not injected into the
 performance card or used to invent a performance score.
@@ -46,7 +44,7 @@ performance card or used to invent a performance score.
 ## ECPA acceptance evidence
 
 The ten historical performance entries are not ten ECPA certifications. The same
-`plugin-performance/v3` record keeps three facts independent: archived performance evidence, ECPA
+`plugin-performance/v4` record keeps three facts independent: archived performance evidence, ECPA
 launch acceptance, and analysis integration. The 2026-09-27 campaign records are:
 
 | Entries                                               | ECPA launch acceptance                                                                                          | Analysis path                |
