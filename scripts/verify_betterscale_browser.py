@@ -318,14 +318,18 @@ def main():
         page.locator("[data-plugin-more]").click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
         assert page.locator(".workshop-card").evaluate_all(
-            "cards => cards.slice(0, 6).map(card => card.id)"
+            "cards => cards.slice(0, 10).map(card => card.id)"
         ) == [
+            "vspec",
             "betterscale",
+            "kvcompress-ascend",
             "pipeline-microbatch-migration",
             "bidkv",
             "dla",
             "mooncake-vllm-connectors",
             "kv-tiering-migration",
+            "diffspec",
+            "latchmoe",
         ]
         assert "+42.39%" in page.locator("#betterscale").inner_text()
         assert "+9.78%" in page.locator("#pipeline-microbatch-migration").inner_text()

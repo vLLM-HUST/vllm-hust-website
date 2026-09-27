@@ -1,16 +1,17 @@
 # MOD throughput comparisons
 
-The existing plugin cards show one number: output-throughput change versus the Native concurrency
-series recorded by the same published campaign. Cards sort by this number descending. A missing
-complete comparison is a dash, never zero. No extra results section or qualification status
-paragraphs are rendered on the cards.
+The existing plugin cards show one number: output-throughput change from a published matched
+comparison. Cards sort by this number descending, including negative results. A missing comparison
+is a dash, never zero. No extra results section or qualification status paragraphs are rendered on
+the cards.
 
 `data/plugin-performance.json` groups complete candidate series with the Native series from their
 published campaign. `assets/plugin-performance.js` reads actual Frontier throughput values and
 computes `(geometric_mean(candidate_tps / native_tps) - 1) * 100` across C1/2/4/8/16. Every load
 receives equal weight. The Frontier link tooltip exposes the aggregation and per-load percentages.
-No scores are stored in metadata; per-entry baselines, precomputed ratios and partial sweeps are
-rejected.
+No scores are stored in metadata. Current Frontier campaigns declare their Native series centrally;
+older published runs retain their raw candidate and baseline throughput so the page recomputes the
+percentage rather than storing it.
 
 ## Existing BetterScale data
 
@@ -34,9 +35,9 @@ point independently at each load or substituting the newer single resident-state
 ## Later unified campaign
 
 BidKV, DLA, Tiering and Mooncake use the single five-point Native curve from their later unified
-campaign. Pipeline's complete TP2/PP2 campaign uses its published five-point Native curve. Other
-published MOD reports use other models or workloads, so they remain unscored. The validator excludes
-incompatible identities and incomplete evidence.
+campaign. Pipeline's complete TP2/PP2 campaign uses its published five-point Native curve. vSpec,
+KVCompression, DiffSpec and LatchMoE use the raw paired throughput values from their linked public
+reports. The validator excludes incompatible Frontier identities and malformed published pairs.
 
 ECPA launch/adapter/analysis metadata remains in the data file. It is not injected into the
 performance card or used to invent a performance score.
@@ -44,7 +45,7 @@ performance card or used to invent a performance score.
 ## ECPA acceptance evidence
 
 The ten historical performance entries are not ten ECPA certifications. The same
-`plugin-performance/v4` record keeps three facts independent: archived performance evidence, ECPA
+`plugin-performance/v5` record keeps three facts independent: archived performance evidence, ECPA
 launch acceptance, and analysis integration. The 2026-09-27 campaign records are:
 
 | Entries                                               | ECPA launch acceptance                                                                                          | Analysis path                |
