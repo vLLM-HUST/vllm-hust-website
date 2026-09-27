@@ -18437,6 +18437,377 @@
         ]
       },
       "cleanup": "Server/controller/admission exit0; continuous foreign-owner guard; selected0/1 IDLE through30s release window"
+    },
+    {
+      "run_id": "82393b9c610c41a3b9d0d194429a4eab",
+      "point_id": "qwen35-unified-kvcompress-ascend-tp2-c1-r1-20260928",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 143,
+        "max_prompt_tokens_observed": 52505,
+        "prompt_tokens_p50": 17774.0,
+        "max_turn_index_reached": 38,
+        "distinct_trajectories_started": 6,
+        "sessions_completed": 5,
+        "requests_completed_in_window": 142,
+        "requests_drained": 1,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 73842,
+        "output_tokens_per_second": 82.04666666666667,
+        "output_tokens_per_second_per_chip": 41.02333333333333,
+        "decode_tokens_per_second_p90": 110.48573068185316,
+        "decode_speed_samples": 142,
+        "ttft_seconds_p95": 1.2321659420616924,
+        "client_inflight_seconds": {
+          "0": 0.5326112704351544,
+          "1": 899.4673887295648
+        },
+        "mean_client_inflight": 0.9994082096995165,
+        "full_concurrency_fraction": 0.9994082096995165,
+        "drain_seconds": 38.22742444463074,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "82393b9c610c41a3b9d0d194429a4eab",
+        "started_at_unix": 1790533071.4378624,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 82.04666666666667,
+        "decode_p90_tps": 110.48573068185316,
+        "ttft_p95_ms": 1232.1659420616925,
+        "completed_requests": 142
+      },
+      "requests_artifact_sha256": "10c212b9e8f3571c62998c3bfcfcb0e615dbc63bc79b58d8bf820afc8ce21f76",
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "prefix_cache_observed": true,
+        "selected_devices_released": true,
+        "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+        "kv_compression_runtime_effective": true
+      }
+    },
+    {
+      "run_id": "e92e7211e26c46fea76ac671c889ae84",
+      "point_id": "qwen35-unified-kvcompress-ascend-tp2-c2-r1-20260928",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 199,
+        "max_prompt_tokens_observed": 63711,
+        "prompt_tokens_p50": 21410.0,
+        "max_turn_index_reached": 42,
+        "distinct_trajectories_started": 7,
+        "sessions_completed": 5,
+        "requests_completed_in_window": 197,
+        "requests_drained": 2,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 130856,
+        "output_tokens_per_second": 145.39555555555555,
+        "output_tokens_per_second_per_chip": 72.69777777777777,
+        "decode_tokens_per_second_p90": 106.34698361845508,
+        "decode_speed_samples": 197,
+        "ttft_seconds_p95": 1.8492935683578247,
+        "client_inflight_seconds": {
+          "0": 0.00013605132699012756,
+          "1": 0.9382489724084735,
+          "2": 899.0616149762645
+        },
+        "mean_client_inflight": 1.9989571988054862,
+        "full_concurrency_fraction": 0.9989573499736273,
+        "drain_seconds": 0.5489149270579219,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "e92e7211e26c46fea76ac671c889ae84",
+        "started_at_unix": 1790534010.302558,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 145.39555555555555,
+        "decode_p90_tps": 106.34698361845508,
+        "ttft_p95_ms": 1849.2935683578246,
+        "completed_requests": 197
+      },
+      "requests_artifact_sha256": "40f02a31965c19638b48040e109cdebb4a833dde47936bd6ad9fb05025aff15a",
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "prefix_cache_observed": true,
+        "selected_devices_released": true,
+        "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+        "kv_compression_runtime_effective": true
+      }
+    },
+    {
+      "run_id": "71fd3ce40c584d18b828b822a7bc13db",
+      "point_id": "qwen35-unified-kvcompress-ascend-tp2-c4-r1-20260928",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 311,
+        "max_prompt_tokens_observed": 74706,
+        "prompt_tokens_p50": 23554.0,
+        "max_turn_index_reached": 52,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 7,
+        "requests_completed_in_window": 307,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 194030,
+        "output_tokens_per_second": 215.5888888888889,
+        "output_tokens_per_second_per_chip": 107.79444444444445,
+        "decode_tokens_per_second_p90": 92.47301710001881,
+        "decode_speed_samples": 307,
+        "ttft_seconds_p95": 2.0014415716752407,
+        "client_inflight_seconds": {
+          "0": 0.00013500265777111053,
+          "1": 0.001004992052912712,
+          "2": 0.000689617358148098,
+          "3": 1.7161156004294753,
+          "4": 898.2820547875017
+        },
+        "mean_client_inflight": 3.9980877224200717,
+        "full_concurrency_fraction": 0.998091171986113,
+        "drain_seconds": 14.077558742836118,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "71fd3ce40c584d18b828b822a7bc13db",
+        "started_at_unix": 1790534911.5331109,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 215.5888888888889,
+        "decode_p90_tps": 92.47301710001881,
+        "ttft_p95_ms": 2001.4415716752408,
+        "completed_requests": 307
+      },
+      "requests_artifact_sha256": "7056b9ded188a2758b58d5e3f6cd285c4980c672d19f3fb706cd01c406ffa57d",
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "prefix_cache_observed": true,
+        "selected_devices_released": true,
+        "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+        "kv_compression_runtime_effective": true
+      }
+    },
+    {
+      "run_id": "91380ca1870c4fe6a999d96946c11f86",
+      "point_id": "qwen35-unified-kvcompress-ascend-tp2-c8-r1-20260928",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 430,
+        "max_prompt_tokens_observed": 77624,
+        "prompt_tokens_p50": 20620.0,
+        "max_turn_index_reached": 57,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 422,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 252089,
+        "output_tokens_per_second": 280.0988888888889,
+        "output_tokens_per_second_per_chip": 140.04944444444445,
+        "decode_tokens_per_second_p90": 62.427229343135295,
+        "decode_speed_samples": 422,
+        "ttft_seconds_p95": 2.62360217240639,
+        "client_inflight_seconds": {
+          "0": 0.00016781222075223923,
+          "1": 0.001041811890900135,
+          "2": 0.0006971582770347595,
+          "3": 0.0006110770627856255,
+          "4": 0.0006382167339324951,
+          "5": 0.0006523476913571358,
+          "6": 0.0009242808446288109,
+          "7": 1.9739915942773223,
+          "8": 898.0212757010013
+        },
+        "mean_client_inflight": 7.997781973797828,
+        "full_concurrency_fraction": 0.997801417445557,
+        "drain_seconds": 55.73157142288983,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "91380ca1870c4fe6a999d96946c11f86",
+        "started_at_unix": 1790535826.3966858,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 280.0988888888889,
+        "decode_p90_tps": 62.427229343135295,
+        "ttft_p95_ms": 2623.60217240639,
+        "completed_requests": 422
+      },
+      "requests_artifact_sha256": "255744fb9a2ceefe927d4e27a5c40298a82534c1fb57799085991c7c1a742e95",
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "prefix_cache_observed": true,
+        "selected_devices_released": true,
+        "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+        "kv_compression_runtime_effective": true
+      }
+    },
+    {
+      "run_id": "97d19a31f9d24a1692aed17db52295eb",
+      "point_id": "qwen35-unified-kvcompress-ascend-tp2-c16-r1-20260928",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 520,
+        "max_prompt_tokens_observed": 59524,
+        "prompt_tokens_p50": 16903.0,
+        "max_turn_index_reached": 40,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 504,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 294595,
+        "output_tokens_per_second": 327.3277777777778,
+        "output_tokens_per_second_per_chip": 163.6638888888889,
+        "decode_tokens_per_second_p90": 36.122167220638175,
+        "decode_speed_samples": 504,
+        "ttft_seconds_p95": 3.1017702505458136,
+        "client_inflight_seconds": {
+          "0": 0.00020736269652843475,
+          "1": 0.0010243114084005356,
+          "2": 0.0006953682750463486,
+          "3": 0.0006070472300052643,
+          "4": 0.0006119562312960625,
+          "5": 0.000889969989657402,
+          "6": 0.0006656888872385025,
+          "7": 0.0006799874827265739,
+          "8": 0.000657406635582447,
+          "9": 0.0005975076928734779,
+          "10": 0.0005985964089632034,
+          "11": 0.0005857469514012337,
+          "12": 0.000848669558763504,
+          "13": 0.0006334278732538223,
+          "14": 0.0006279265508055687,
+          "15": 1.8983598435297608,
+          "16": 898.0917091825977
+        },
+        "mean_client_inflight": 15.997792120062643,
+        "full_concurrency_fraction": 0.997879676869553,
+        "drain_seconds": 60.45961079094559,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "97d19a31f9d24a1692aed17db52295eb",
+        "started_at_unix": 1790536782.98977,
+        "model": "frontier-qwen35-unified",
+        "workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+        "tokenizer": {
+          "path": "model",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.14.1",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "metrics": {
+        "output_tps": 327.3277777777778,
+        "decode_p90_tps": 36.122167220638175,
+        "ttft_p95_ms": 3101.7702505458137,
+        "completed_requests": 504
+      },
+      "requests_artifact_sha256": "58b9c45746aa9595fb0f195413a48249d8cc3eb8651897b9e1e3f1aa1032f8bc",
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "prefix_cache_observed": true,
+        "selected_devices_released": true,
+        "shared_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+        "kv_compression_runtime_effective": true
+      }
     }
   ]
 }

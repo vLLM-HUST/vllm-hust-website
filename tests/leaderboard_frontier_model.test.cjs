@@ -175,6 +175,16 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.validation.prefix_cache_observed,true);
             assert.equal(run.validation.selected_devices_released,true);
             assert.equal(run.validation.shared_native_contract_sha256,p.configuration.parameters.unified_native_contract_sha256);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-kvcompress-frontier-20260928'){
+            assert.deepEqual(p.configuration.mods,['kvcompress-ascend']);
+            assert.equal(p.configuration.hardware.accelerator_count,2);
+            assert.equal(p.configuration.parameters.pipeline_parallel_size,1);
+            assert.equal(run.validation.real_online,true);
+            assert.equal(run.validation.failed_requests,0);
+            assert.equal(run.validation.prefix_cache_observed,true);
+            assert.equal(run.validation.selected_devices_released,true);
+            assert.equal(run.validation.kv_compression_runtime_effective,true);
+            assert.equal(run.validation.shared_native_contract_sha256,p.configuration.parameters.unified_native_contract_sha256);
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -648,7 +658,7 @@ test('Qwen35 unified campaign shares the existing chart without losing checkpoin
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
-    assert.equal(moved.length,25);
+    assert.equal(moved.length,30);
     for(const p of moved){
         assert.equal(p.cohort_id,cohorts[0].id);
         assert.equal(p.configuration.parameters.checkpoint_revision,original.model.revision);

@@ -495,40 +495,67 @@
       "artifact_type": "runtime_component",
       "system_role": "kv_state_manager",
       "integration_contracts": [],
-      "integration_surfaces": ["vllm.general_plugins", "vllm.kv_compression.provider", "vllm.kv_lifecycle"],
-      "execution_planes": ["scheduler", "worker", "device"],
+      "integration_surfaces": [
+        "vllm.general_plugins",
+        "vllm.kv_compression.provider",
+        "vllm.kv_lifecycle"
+      ],
+      "execution_planes": [
+        "scheduler",
+        "worker",
+        "device"
+      ],
       "deployment_topology": "in_process",
       "delivery_model": "plugin_bundle",
       "ownership": "hust_owned_subsystem",
       "repository_relationship": "organization_native",
       "maturity": "incubating",
-      "maintainers": ["Jiawan23"],
-      "maintainer_profiles": [{"login": "Jiawan23", "name": "张家万"}],
+      "maintainers": [
+        "Jiawan23"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "Jiawan23",
+          "name": "张家万"
+        }
+      ],
       "advisors": [
-        {"name_zh": "万瑶", "name_en": "Yao Wan", "relationship": "internal"}
+        {
+          "name_zh": "万瑶",
+          "name_en": "Yao Wan",
+          "relationship": "internal"
+        }
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust",
       "upstream_repository": null,
-      "summary_en": "KV transformation and compression provider built on transactional KV lifecycle hooks.",
-      "summary_zh": "建立在事务化 KV 生命周期接口上的状态转换与压缩 provider。",
-      "public_effect_en": "On one Ascend 910B2 with Qwen2.5-Coder-14B, published matched runs report +10.25% long-context throughput, +4.68% under KV pressure, and a 75% physical prompt-KV reduction; the 64-case recall check changed from 64/64 to 63/64.",
-      "public_effect_zh": "单张 Ascend 910B2、Qwen2.5-Coder-14B 的公开配对测试中：长上下文吞吐 +10.25%，KV 压力吞吐 +4.68%，物理 prompt KV 减少 75%；64 例 recall 从 64/64 变为 63/64。",
+      "summary_en": "KV transformation and compression provider for vLLM Ascend, with Qwen3.5 hybrid-cache, APC, asynchronous scheduling and MTP support.",
+      "summary_zh": "vLLM Ascend KV 状态转换与压缩 provider，已支持 Qwen3.5 混合缓存、APC、异步调度与 MTP。",
+      "public_effect_en": "On the exact Qwen3.5-35B Frontier contract, the five-point geometric-mean output-throughput change is -5.83% versus the shared Native series.",
+      "public_effect_zh": "在完全相同的 Qwen3.5-35B Frontier 配置下，相对统一 Native 曲线，五个并发点的输出吞吐几何平均变化为 -5.83%。",
       "public_effect_status": "measured",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/main/docs/resuts.md",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
       "compatibility": {
         "status": "verified",
         "host": "vLLM-HUST + vLLM-Ascend-HUST",
         "versions": [
-          "vLLM-HUST >=0.23.1,<0.24",
-          "vLLM-Ascend-HUST >=0.19.1,<0.20",
-          "Extension 0.2.0"
+          "vLLM-HUST 0.25.1+frontier.unified",
+          "vLLM-Ascend-HUST 0.25.1rc1",
+          "KVCompress ed058fa1"
         ],
-        "platforms": ["Single Ascend NPU", "Eager or ACL graph"],
-        "python": [">=3.10,<3.15"],
-        "requirements_en": "Use one plain full-attention KV group with block size 128 and separate contiguous BF16/FP16 K/V tensors; disable prefix caching, async scheduling, and the independent KNorm compressor. Multi-device, hybrid/MLA, sliding-window, speculative-decoding, KV-transfer, sparse-layout, and quantized-KV configurations fail closed.",
-        "requirements_zh": "仅支持单一普通 full-attention KV group、block size 128，以及分离且连续的 BF16/FP16 K/V tensor；需关闭 prefix caching、async scheduling 与独立 KNorm compressor。多设备、hybrid/MLA、sliding-window、speculative decoding、KV transfer、稀疏布局和量化 KV 配置均会 fail-closed。"
+        "platforms": [
+          "Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph"
+        ],
+        "python": [
+          ">=3.10,<3.15"
+        ],
+        "requirements_en": "The exact Frontier run used ECPA, TP2, aligned hybrid KV groups, APC, asynchronous scheduling and native MTP2. Runtime effectiveness requires cache-binding and compression-commit evidence.",
+        "requirements_zh": "Frontier 实测通过 ECPA 启动，使用 TP2、align 混合 KV 分组、APC、异步调度和原生 MTP2；运行时生效需同时观测缓存绑定与压缩提交。",
+        "models": [
+          "Qwen3.5-35B-A3B — Frontier contract verified"
+        ],
+        "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/issues/2"
       },
-      "evidence_level": "hardware_verified"
+      "evidence_level": "performance_verified"
     },
     {
       "id": "prefix-router-migration",

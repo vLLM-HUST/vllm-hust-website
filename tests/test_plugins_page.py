@@ -870,7 +870,7 @@ def test_graduation_followups_and_external_advisors_are_visible() -> None:
         for item in REGISTRY["components"]
         if item.get("compatibility", {}).get("followup_url")
     ]
-    assert len(followups) == 14
+    assert len(followups) == 15
     assert all(url.startswith("https://github.com/vLLM-HUST/") for url in followups)
     assert "profile.followup_url" in SCRIPT
     assert "plugin-compatibility-followup" in SCRIPT
@@ -998,12 +998,14 @@ def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
     kvcompress = by_id("kvcompress-ascend")["compatibility"]
     assert kvcompress["status"] == "verified"
     assert kvcompress["versions"] == [
-        "vLLM-HUST >=0.23.1,<0.24",
-        "vLLM-Ascend-HUST >=0.19.1,<0.20",
-        "Extension 0.2.0",
+        "vLLM-HUST 0.25.1+frontier.unified",
+        "vLLM-Ascend-HUST 0.25.1rc1",
+        "KVCompress ed058fa1",
     ]
     assert kvcompress["python"] == [">=3.10,<3.15"]
-    assert kvcompress["platforms"] == ["Single Ascend NPU", "Eager or ACL graph"]
+    assert kvcompress["platforms"] == ["Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph"]
+    assert kvcompress["models"] == ["Qwen3.5-35B-A3B — Frontier contract verified"]
+    assert kvcompress["followup_url"].endswith("/issues/2")
     for component_id in (
         "knorm-migration",
         "pyramidkv-ascend-migration",
@@ -1011,6 +1013,29 @@ def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
         compatibility = by_id(component_id)["compatibility"]
         assert compatibility["status"] == "source_scaffold"
         assert compatibility["versions"] == ["No installable or runnable release"]
+
+
+def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
+    for expected in (
+        "vllm-hust-ext extension check org.vllm-hust.ascend-kvcompress",
+        "vllm-hust-ext extension enable org.vllm-hust.ascend-kvcompress",
+        "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve",
+        "VLLM_ASCEND_KVCOMPRESS_CONFIG",
+        "--tensor-parallel-size 2",
+        "--pipeline-parallel-size 1",
+        "--dtype bfloat16",
+        "--max-model-len 262144",
+        "--max-num-seqs 16",
+        "--max-num-batched-tokens 4096",
+        "--enable-prefix-caching",
+        "--mamba-cache-mode align",
+        "--async-scheduling",
+        '"cudagraph_mode":"FULL_AND_PIECEWISE"',
+        '"method":"mtp","num_speculative_tokens":2',
+        "--kv-cache-memory-bytes 26038239232",
+    ):
+        assert expected in SCRIPT
+    assert "--no-async-scheduling" not in SCRIPT
 
 
 def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():

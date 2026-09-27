@@ -34,9 +34,9 @@ point independently at each load or substituting the newer single resident-state
 
 ## Later unified campaign
 
-BidKV, DLA, Tiering and Mooncake use the single five-point Native curve from their later unified
-campaign. Pipeline's complete TP2/PP2 campaign uses its published five-point Native curve. vSpec,
-KVCompression, DiffSpec, LatchMoE and KV Materialization Arrival Control use raw paired throughput
+BidKV, DLA, Tiering, Mooncake and KVCompression use the single five-point Native curve from their
+later unified campaign. Pipeline's complete TP2/PP2 campaign uses its published five-point Native
+curve. vSpec, DiffSpec, LatchMoE and KV Materialization Arrival Control use raw paired throughput
 values from their linked public reports. The KV Materialization result covers three matched rounds
 on each of two workloads and reports the controller against `always_full_reuse`; its six-pair
 geometric mean is a small regression. The validator excludes incompatible Frontier identities and
@@ -51,12 +51,13 @@ The eleven historical performance entries are not eleven ECPA certifications. Th
 `plugin-performance/v6` record keeps three facts independent: archived performance evidence, ECPA
 launch acceptance, and analysis integration. The 2026-09-27 campaign records are:
 
-| Entries                                                                                   | ECPA launch acceptance                                                                                          | Analysis path                |
-| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| KV Tiering                                                                                | Manager-verified                                                                                                | External specialized harness |
-| AscendStoreConnector + Mooncake                                                           | Manager-verified through a supplemental Provider profile; `vLLM-HUST/extension-manager#8` remains an open draft | External specialized harness |
-| BidKV, DLA, Pipeline Microbatch                                                           | Performance runs used project-specific scripts; no unified ECPA launch acceptance                               | External specialized harness |
-| BetterScale, vSpec, KVCompression, LatchMoE, DiffSpec, KV Materialization Arrival Control | Existing public results only; not reproduced through ECPA in this round                                         | External/published analysis  |
+| Entries                                                                    | ECPA launch acceptance                                                                                          | Analysis path                |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| KV Tiering                                                                 | Manager-verified                                                                                                | External specialized harness |
+| Ascend KV Compression                                                      | Manager-verified                                                                                                | External specialized harness |
+| AscendStoreConnector + Mooncake                                            | Manager-verified through a supplemental Provider profile; `vLLM-HUST/extension-manager#8` remains an open draft | External specialized harness |
+| BidKV, DLA, Pipeline Microbatch                                            | Performance runs used project-specific scripts; no unified ECPA launch acceptance                               | External specialized harness |
+| BetterScale, vSpec, LatchMoE, DiffSpec, KV Materialization Arrival Control | Existing public results only; not reproduced through ECPA in this round                                         | External/published analysis  |
 
 For all eleven entries, request collection, throughput/latency recomputation, baseline pairing, and
 Frontier import remain outside the manager. `check`, `status`, and `plan` validate configuration and

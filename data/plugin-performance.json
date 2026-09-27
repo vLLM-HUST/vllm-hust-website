@@ -143,24 +143,13 @@
     },
     {
       "id": "kvcompress-ascend",
-      "url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/e4a4864/docs/resuts.md",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
       "ecpa": {
-        "launch_acceptance": "not-reproduced-this-round",
-        "configuration_path": "not-evaluated",
-        "analysis_integration": "external-harness",
-        "note_zh": "主页引用已有公开性能结果；本轮未通过 ECPA 复现。",
-        "note_en": "The homepage cites existing public performance results; this round did not reproduce them through ECPA."
+        "launch_acceptance": "manager-verified",
+        "configuration_path": "manager-standard",
+        "analysis_integration": "external-harness"
       },
-      "series_id": null,
-      "published_comparisons": [
-        {
-          "metric": "output_tps",
-          "baseline": 2215.61,
-          "candidate": 2442.73,
-          "model_label": "Qwen2.5-Coder-14B",
-          "scope": "Long context · Ascend 910B2 · matched single run"
-        }
-      ]
+      "series_id": "swe-unified-kvcompress-ascend-20260928"
     },
     {
       "id": "latchmoe",
@@ -212,7 +201,8 @@
         "bidkv",
         "dla",
         "kv-tiering-migration",
-        "mooncake-vllm-connectors"
+        "mooncake-vllm-connectors",
+        "kvcompress-ascend"
       ]
     },
     {
@@ -229,7 +219,7 @@
     }
   ],
   "ecpa_experiment_boundary": {
-    "as_of": "2026-09-27",
+    "as_of": "2026-09-28",
     "manager_repository": "https://github.com/vLLM-HUST/extension-manager",
     "manager_main_commit": "cf1ea71e3e2cb81ab06267ef05eddb3e580ea20b",
     "performance_analysis": "external-harness",
