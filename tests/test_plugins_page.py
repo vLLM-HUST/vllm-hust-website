@@ -799,11 +799,12 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         assert repository["component_ids"] == [component_id]
         component = by_id(component_id)
         assert component["canonical_repository"] == repository["url"]
-        expected_status = (
-            "source_scaffold"
-            if component_id == "scheduler-policy-lab"
-            else "inspect_only"
-        )
+        promoted_statuses = {
+            "quantized-kv-cache-migration": "experimental",
+            "pipeline-microbatch-migration": "verified",
+            "scheduler-policy-lab": "source_scaffold",
+        }
+        expected_status = promoted_statuses.get(component_id, "inspect_only")
         assert component["compatibility"]["status"] == expected_status
         assert component["maturity"] == "incubating"
 
@@ -955,14 +956,12 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
 
 def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> None:
     inspectable = {
-        "quantized-kv-cache-migration",
         "simllm-migration",
         "unified-communication-migration",
         "split-batch-full-graph-migration",
         "kv-transfer-observability-migration",
         "layered-prefill-migration",
         "activation-sparsity-migration",
-        "pipeline-microbatch-migration",
         "qos-scheduler-migration",
         "stateharbor",
     }
@@ -979,6 +978,20 @@ def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> Non
     assert "vllm-hust-ext extension inspect ${extensionId}" in SCRIPT
     assert "vllm-hust-ext extension check ${extensionId}" in SCRIPT
     assert "function installationStatus(item)" in SCRIPT
+
+
+def test_promoted_runtime_entries_publish_current_hardware_contracts() -> None:
+    quantized = by_id("quantized-kv-cache-migration")
+    assert quantized["compatibility"]["status"] == "experimental"
+    assert quantized["evidence_level"] == "hardware_verified"
+    assert quantized["public_effect_status"] == "validated"
+    assert "No matched performance comparison" in quantized["public_effect_en"]
+
+    pipeline = by_id("pipeline-microbatch-migration")
+    assert pipeline["compatibility"]["status"] == "verified"
+    assert pipeline["evidence_level"] == "performance_verified"
+    assert "ECPA launched" in pipeline["compatibility"]["requirements_en"]
+    assert pipeline["compatibility"]["followup_url"].endswith("/issues/3")
 
 
 def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
