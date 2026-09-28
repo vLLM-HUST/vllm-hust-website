@@ -6,26 +6,26 @@
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const words = {
         en: {
-            selectAll: 'Select all', clearAll: 'Deselect all', rotationDepth: 'Concurrent service scale', rotationPending: 'Larger active-session scale testing is under construction.',
+            selectAll: 'Select all', clearAll: 'Deselect all', rotationDepth: 'Session rotation depth', rotationHelp: 'C1/C2/… is request concurrency; D1/D2 is the number of session states rotated per request lane.', rotationPending: 'Larger rotation depths are under construction.',
             knownBudget: 'Known output budget · no learned predictor', budgetChecksOnly: 'Admission capacity checks ran, but no admission deferrals or preemptions were observed. This point does not demonstrate an optimization benefit.',
             notExercised: 'MOD policy not exercised', notExercisedScope: 'The MOD was enabled, but its optimization mechanism was not exercised during this window. This point does not demonstrate an optimization benefit.',
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
             failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', native: 'Native baseline',
-            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Lines: independent frontier per baseline / MOD and session scale', frontierOnly: 'Hide non-Frontier points', sampled: 'Sampling date',
+            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Lines: one concurrency curve per baseline / MOD and rotation depth', frontierOnly: 'Hide non-Frontier points', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
             modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation'
         },
         zh: {
-            selectAll: '全选', clearAll: '全不选', rotationDepth: '并发服务规模', rotationPending: '更大活跃会话规模测试正在施工。',
+            selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
             knownBudget: '已知输出预算 · 未使用学习型预测器', budgetChecksOnly: '准入容量检查已执行，但未观察到准入延后或抢占；该点不构成优化收益证据。',
             notExercised: 'MOD 策略未触发', notExercisedScope: 'MOD 已启用，但本窗口未触发有效的优化动作；该点不构成优化收益证据。',
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
             failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', native: '原生 Baseline',
-            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '连线：Baseline / 各 MOD 按会话规模独立计算的边界', frontierOnly: '隐藏非 Frontier 点', sampled: '采样日期',
+            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '连线：每个 Baseline / MOD、每个轮转深度各有一条并发曲线', frontierOnly: '隐藏非 Frontier 点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
@@ -35,12 +35,11 @@
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
     const t = key => words[lang()][key];
     const fmt = n => n == null ? '—' : new Intl.NumberFormat(lang(), {maximumFractionDigits: 2}).format(n);
-    const sessionScale = depth => depth == null ? '—' : (lang() === 'zh' ? `${fmt(depth)}倍会话` : `${fmt(depth)}× sessions`);
+    const rotationLabel = depth => depth == null ? 'D—' : `D${fmt(depth)}`;
     const serviceScale = point => {
         const c = point.load.concurrency, d = point.load.session_rotation_depth;
         if (!hasRotation()) return `${t('concurrency')}: ${fmt(c)}`;
-        return lang() === 'zh' ? `${fmt(c)}路并发，${fmt(c * d)}个活跃会话`
-            : `${fmt(c)} concurrent requests, ${fmt(c * d)} active sessions`;
+        return `${t('concurrency')}: C${fmt(c)} · ${t('rotationDepth')}: ${rotationLabel(d)}`;
     };
     const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:'', mtp:null, mods:null, rotation:null, frontierOnly:true};
     const colors = ['#4263eb','#008c78','#ad5c00','#965bd3','#d14469','#177baf'];
@@ -109,7 +108,7 @@
                 <h2>${t('filter')}</h2>
                 <fieldset><legend>MOD / Group <button type="button" id="frontier-mods-toggle"></button></legend><div class="frontier-checks">${mods.map(p=>`<label><input type="checkbox" data-filter="mods" value="${escape(M.groupKey(p))}" ${state.mods.has(M.groupKey(p))?'checked':''}>${escape(label(p))}</label>`).join('')}</div></fieldset>
                 <fieldset><legend>MTP</legend><div class="frontier-checks">${mtpOptions.map(([key,text])=>`<label><input type="checkbox" data-filter="mtp" value="${key}" ${state.mtp.has(key)?'checked':''}>${text}</label>`).join('')}</div></fieldset>
-                ${hasRotation()?`<fieldset id="frontier-rotation-filter"><legend>${t('rotationDepth')}</legend><div class="frontier-checks">${depths.map(depth=>`<label><input type="checkbox" data-filter="rotation" value="${depth}" ${state.rotation.has(String(depth))?'checked':''}>${sessionScale(depth)}</label>`).join('')}</div>${cohort().workload.contract.session_rotation.status==='under-construction'?`<p class="frontier-filter-note">${t('rotationPending')}</p>`:''}</fieldset>`:''}
+                ${hasRotation()?`<fieldset id="frontier-rotation-filter"><legend>${t('rotationDepth')}</legend><div class="frontier-checks">${depths.map(depth=>`<label><input type="checkbox" data-filter="rotation" value="${depth}" ${state.rotation.has(String(depth))?'checked':''}>${rotationLabel(depth)}</label>`).join('')}</div><p class="frontier-filter-note">${t('rotationHelp')}</p>${cohort().workload.contract.session_rotation.status==='under-construction'?`<p class="frontier-filter-note">${t('rotationPending')}</p>`:''}</fieldset>`:''}
                 <div class="frontier-checks"><label><input id="frontier-only" type="checkbox" ${state.frontierOnly?'checked':''}>${t('frontierOnly')}</label></div>
                 <span id="frontier-filter-count" role="status"></span>
             </aside></div>`;
@@ -183,7 +182,7 @@
             Number(M.groupKey(b)==='none')-Number(M.groupKey(a)==='none')||M.groupKey(a).localeCompare(M.groupKey(b)));
         const color=p=>M.failedCorrectness(p)?'#dc2626':colors[groups.findIndex(g=>M.groupKey(g)===M.groupKey(p))%colors.length];
         const series=[...new Map(cohortPoints().map(p=>[M.frontierKey(p),p])).values()];
-        $('frontier-legend').innerHTML=series.filter(g=>points().some(p=>M.frontierKey(p)===M.frontierKey(g))).map(p=>`<span data-frontier-group="${escape(M.frontierKey(p))}"><i style="background:${p.load.session_rotation_depth>1?'transparent':color(p)};border:2px solid ${color(p)}"></i>${escape(label(p))}${hasRotation()?` · ${sessionScale(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}</span>`).join('');
+        $('frontier-legend').innerHTML=series.filter(g=>points().some(p=>M.frontierKey(p)===M.frontierKey(g))).map(p=>`<span data-frontier-group="${escape(M.frontierKey(p))}"><i style="background:${p.load.session_rotation_depth>1?'transparent':color(p)};border:2px solid ${color(p)}"></i>${escape(label(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}</span>`).join('');
         $('frontier-hint').textContent=(M.groupFrontiers(points(),X,Y).some(rows=>rows.length>1)?t('lineHint'):t('hint'))+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         // Historical static curves describe depth1, not every workload selected by the checkboxes.
         const curves=$('frontier-curves'), curveUrl=!hasRotation()||(state.rotation?.size===1&&state.rotation.has('1'))?current?.workload.contract.concurrency_curves_url:null;
@@ -223,7 +222,7 @@
             <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,X))}</strong><span>${t('x')}<br>tokens/s/user</span></div><div><strong>${fmt(M.value(point,Y))}</strong><span>${t('y')}<br>tokens/s/chip</span></div></div>
             <p class="frontier-popup-load">${serviceScale(point)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}${params.max_num_seqs!=null?`<br>${t('capacity')}: ${fmt(params.max_num_seqs)}${params.max_num_seqs_per_rank!=null?' / rank':''}`:''}${params.kv_cache_memory_bytes!=null?` · KV ${fmt(params.kv_cache_memory_bytes/1024**3)} GiB/chip`:''}</p>
             <p class="frontier-popup-load">${t('warmup')}: ${t(warmupKey)}</p>
-            ${nearby.length>1?`<div class="frontier-nearby"><span>${t('nearby')}</span>${nearby.map(p=>`<button type="button" data-nearby="${escape(p.id)}" aria-pressed="${p.id===point.id}">${escape(parallel(p))}${hasRotation()?` · ${sessionScale(p.load.session_rotation_depth)}`:''} · C${fmt(p.load.concurrency)} · MTP${p.configuration.parameters.mtp_draft_tokens??'—'} · ${fmt(p.configuration.parameters.max_num_seqs)}</button>`).join('')}</div>`:''}
+            ${nearby.length>1?`<div class="frontier-nearby"><span>${t('nearby')}</span>${nearby.map(p=>`<button type="button" data-nearby="${escape(p.id)}" aria-pressed="${p.id===point.id}">${escape(parallel(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''} · C${fmt(p.load.concurrency)} · MTP${p.configuration.parameters.mtp_draft_tokens??'—'} · ${fmt(p.configuration.parameters.max_num_seqs)}</button>`).join('')}</div>`:''}
             <button type="button" class="frontier-download" data-download>${t('download')} ↓</button>`;
         const anchor=$('frontier-chart').querySelector(`[data-point="${CSS.escape(point.id)}"]`);
         if(!anchor){panel.hidden=true;return;}
@@ -257,7 +256,7 @@
         for(const row of result.measured){
             const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);
             const hitRadius=Math.max(2,Math.min(18,...neighbors));
-            const p=row.point,text=`${label(p)}${hasRotation()?` · ${sessionScale(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}${notExercised(p)?` · ${t('notExercised')}`:''}${storeOnly(p)?` · ${t('storeOnly')}`:''} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
+            const p=row.point,text=`${label(p)}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}${notExercised(p)?` · ${t('notExercised')}`:''}${storeOnly(p)?` · ${t('storeOnly')}`:''} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
             svg+=`<g role="button" tabindex="0" aria-haspopup="dialog" aria-controls="frontier-popover" aria-expanded="false" aria-label="${escape(text)}" data-point="${escape(p.id)}" class="frontier-point"><circle class="frontier-hit" cx="${x(row.x)}" cy="${y(row.y)}" r="${hitRadius}"/><circle class="frontier-dot" cx="${x(row.x)}" cy="${y(row.y)}" r="7" fill="${p.load.session_rotation_depth>1?'var(--run-bg)':color(p)}" style="stroke:${color(p)}"/><title>${escape(text)}</title></g>`;
         }
         $('frontier-chart').innerHTML=svg;

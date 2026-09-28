@@ -247,7 +247,7 @@ def main():
             assert page.locator("[data-filter=rotation]").count() == 2
             assert (
                 page.locator("#frontier-rotation-filter .frontier-filter-note").count()
-                == 0
+                == 1
             )
             click_point(page, page.locator(f'[data-point="{default_points[0]["id"]}"]'))
             page.locator('[data-filter="rotation"][value="2"]').check()
@@ -493,9 +493,10 @@ def main():
                 params = point["configuration"]["parameters"]
                 assert_parallel(text, params, language)
                 assert (
-                    "会话轮转深度:" not in text
-                    and "Session rotation depth:" not in text
-                )
+                    f"并发数: C{point['load']['concurrency']} · 会话轮转深度: D{point['load']['session_rotation_depth']}"
+                    if language == "zh"
+                    else f"Concurrency: C{point['load']['concurrency']} · Session rotation depth: D{point['load']['session_rotation_depth']}"
+                ) in text
                 if params.get("mtp_draft_tokens") is not None:
                     assert f"MTP{params['mtp_draft_tokens']}" in text
                 protocol = (
