@@ -269,7 +269,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=resident-balanced-20260927',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=resident-balanced-curves-20260927',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=qwen35-mooncake-20260927').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

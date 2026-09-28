@@ -99,7 +99,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.equal(params.gdn_strided_gates,true);
                 assert.equal(params.mixed_shared_qkv_pack,true);
             }
-        } else if(['resident-state-tp2-c16-v1','resident-balanced-tp2-c16-v1'].includes(p.evidence.benchmark_protocol.campaign)){
+        } else if(['resident-state-tp2-c16-v1','resident-balanced-tp2-c16-v1','resident-balanced-tp2-curve-v1'].includes(p.evidence.benchmark_protocol.campaign)){
             const params=p.configuration.parameters;
             assert.equal(params.using_live_runtime,true);
             assert.equal(params.execution_seats,16);
@@ -107,7 +107,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(params.shared_attention_pages*params.attention_page_tokens,2140160);
             assert.equal(params.mtp_draft_tokens,2);
             assert.equal(params.async_scheduling,true);
-            if(p.evidence.benchmark_protocol.campaign==='resident-balanced-tp2-c16-v1'){
+            if(['resident-balanced-tp2-c16-v1','resident-balanced-tp2-curve-v1'].includes(p.evidence.benchmark_protocol.campaign)){
                 assert.equal(params.mod_revision,'eee35fd6b50fca73385ad8f8af714fcd7e5c2684'); // pragma: allowlist secret (public Git commit)
                 assert.equal(params.balanced_decode_attention,true);
                 assert.equal(params.server_environment.BETTERSCALE_CONTEXT_PARALLEL,'1');
@@ -115,7 +115,10 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.equal(run.qualification.status,'PASS');
             } else assert.equal(params.mod_revision,'a8abd056a3ece455f683b212d6bd905da4058cbb'); // pragma: allowlist secret (public Git commit)
             assert.equal(p.configuration.mod_sources[0].revision,params.mod_revision);
-            assert.equal(p.load.concurrency,16);
+            if(p.evidence.benchmark_protocol.campaign==='resident-balanced-tp2-curve-v1'){
+                assert.ok([1,2,4,8].includes(p.load.concurrency));
+                assert.equal(params.measured_mod_revision,params.mod_revision);
+            } else assert.equal(p.load.concurrency,16);
             for(const key of ['owned_server_exit_zero','selected_device_guard_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
         } else if(p.evidence.benchmark_protocol.campaign==='qwen35-mods-k8s-20260925'){
             assert.equal(run.retrieval_qualification.passed,true);
