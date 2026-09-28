@@ -222,6 +222,39 @@
           "concurrency_curves_url": "./assets/frontier-dsv4-swe-concurrency.svg?v=dsv4-int8-20260927"
         }
       }
+    },
+    {
+      "id": "qwen25-14b-bf16-gsm8k-b128-vspec-v1",
+      "model": {
+        "id": "qwen25-14b-instruct",
+        "label": "Qwen2.5-14B",
+        "revision": "not-recorded-in-published-capsule"
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 1024,
+      "workload": {
+        "id": "gsm8k-200-b128-offline-vspec-20260913",
+        "label": "GSM8K · B128 offline paired throughput",
+        "contract": {
+          "profile": "paired-measurement",
+          "repository_url": "https://github.com/vLLM-HUST/vllm-hust-vSpec",
+          "dataset": "GSM8K",
+          "prompts": 200,
+          "batch_size": 128,
+          "max_output_tokens": 512,
+          "timing_scope": "llm.generate() only; model load, compile, and graph capture excluded",
+          "comparison": "Same accelerator, target model, prompts, batch size, precision, output limit, graph mode, async scheduling, prefix caching, and token-throughput metric.",
+          "quality": "Target-only 188/200 (94%); Draft Adaptive 182/200 (91%).",
+          "limitations": "One paired B128 offline observation per arm. This is not an online request-concurrency or P90 decode curve.",
+          "frontier_axes": {
+            "x": "batch_size",
+            "y": "output_tps"
+          }
+        }
+      }
     }
   ],
   "points": [
@@ -68525,6 +68558,143 @@
         },
         "sampling_date_utc": "2026-09-27",
         "sampling_date_source": "SWE client.started_at_unix"
+      }
+    },
+    {
+      "id": "qwen25-gsm8k-b128-target-only-20260913",
+      "cohort_id": "qwen25-14b-bf16-gsm8k-b128-vspec-v1",
+      "label": "Target-only · B128",
+      "configuration": {
+        "engine": "vLLM-HUST",
+        "engine_version": "762f85b",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend NPU (device 7; SKU not recorded)",
+          "accelerator_count": 1
+        },
+        "context_capacity_tokens": 1024,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 128,
+          "max_num_batched_tokens": 33280,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "graph_mode": "FULL",
+          "dtype": "bfloat16",
+          "max_output_tokens": 512,
+          "num_prompts": 200,
+          "gpu_memory_utilization": 0.92,
+          "runtime_base_commits": {
+            "vllm": "762f85b311fbab0bcf8921dd216f5093cd58b9b8"
+          },
+          "checkpoint_revision": "not-recorded-in-published-capsule",
+          "speculative_method": "target-only",
+          "gsm8k_accuracy": 0.94,
+          "output_tokens": 60009
+        }
+      },
+      "load": {
+        "batch_size": 128,
+        "unit": "offline prompts per generate batch"
+      },
+      "metrics": {
+        "output_tps": 1557.2500009783057
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "paired-measurement",
+        "measurement_seconds": 38.5352383768186,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-vSpec/blob/95d90acd8b7e6bfd73f8bc923de40088d688beae/docs/gsm8k_b128_recovery_and_arc_easy_20260913.md",
+        "run_ids": [
+          "gsm8k_b128_target.json"
+        ],
+        "aggregation": "One offline llm.generate() observation; 60,009 output tokens / 38.5352383768186 seconds.",
+        "sampling_date_utc": "2026-09-13",
+        "benchmark_protocol": {
+          "protocol_id": "vspec-gsm8k-b128-offline-v1",
+          "result_path": "benchmark_results/regression_20260913/gsm8k_b128_target.json"
+        },
+        "sampling_date_source": "Published report date and regression_20260913 artifact directory"
+      }
+    },
+    {
+      "id": "qwen25-gsm8k-b128-vspec-draft-adaptive-20260913",
+      "cohort_id": "qwen25-14b-bf16-gsm8k-b128-vspec-v1",
+      "label": "vSpec Draft Adaptive · B128",
+      "configuration": {
+        "engine": "vLLM-HUST + vSpec",
+        "engine_version": "762f85b / vSpec 0.13.2",
+        "mods": [
+          "vspec"
+        ],
+        "mod_sources": [
+          {
+            "id": "vspec",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-vSpec",
+            "revision": "95d90acd8b7e6bfd73f8bc923de40088d688beae",
+            "source_capsule": "published repository evidence",
+            "scope": "Draft Adaptive gamma 1..4"
+          }
+        ],
+        "hardware": {
+          "label": "Ascend NPU (device 7; SKU not recorded)",
+          "accelerator_count": 1
+        },
+        "context_capacity_tokens": 1024,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 128,
+          "max_num_batched_tokens": 33280,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "graph_mode": "FULL",
+          "dtype": "bfloat16",
+          "max_output_tokens": 512,
+          "num_prompts": 200,
+          "gpu_memory_utilization": 0.92,
+          "runtime_base_commits": {
+            "vllm": "762f85b311fbab0bcf8921dd216f5093cd58b9b8"
+          },
+          "checkpoint_revision": "not-recorded-in-published-capsule",
+          "speculative_method": "draft-adaptive",
+          "draft_model": "Qwen2.5-0.5B-Instruct",
+          "draft_tensor_parallel_size": 1,
+          "gamma_min": 1,
+          "gamma_max": 4,
+          "gsm8k_accuracy": 0.91,
+          "output_tokens": 60782
+        }
+      },
+      "load": {
+        "batch_size": 128,
+        "unit": "offline prompts per generate batch"
+      },
+      "metrics": {
+        "output_tps": 2363.975576906442
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "paired-measurement",
+        "measurement_seconds": 25.711771557107568,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-vSpec/blob/95d90acd8b7e6bfd73f8bc923de40088d688beae/docs/gsm8k_b128_recovery_and_arc_easy_20260913.md",
+        "run_ids": [
+          "gsm8k_b128_draft_adaptive.json"
+        ],
+        "aggregation": "One offline llm.generate() observation; 60,782 output tokens / 25.711771557107568 seconds.",
+        "sampling_date_utc": "2026-09-13",
+        "benchmark_protocol": {
+          "protocol_id": "vspec-gsm8k-b128-offline-v1",
+          "result_path": "benchmark_results/regression_20260913/gsm8k_b128_draft_adaptive.json"
+        },
+        "sampling_date_source": "Published report date and regression_20260913 artifact directory"
       }
     }
   ],

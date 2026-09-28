@@ -2,7 +2,7 @@
 (() => {
     'use strict';
     const $ = id => document.getElementById(id), M = window.LeaderboardFrontierModel;
-    const X = 'decode_p90_tps', Y = 'output_tps_per_chip';
+    const DEFAULT_AXES = {x:'decode_p90_tps',y:'output_tps_per_chip'};
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const words = {
         en: {
@@ -10,8 +10,8 @@
             knownBudget: 'Known output budget · no learned predictor', budgetChecksOnly: 'Admission capacity checks ran, but no admission deferrals or preemptions were observed. This point does not demonstrate an optimization benefit.',
             notExercised: 'MOD policy not exercised', notExercisedScope: 'The MOD was enabled, but its optimization mechanism was not exercised during this window. This point does not demonstrate an optimization benefit.',
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
-            failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Frontier', subtitle: 'Decode speed × output efficiency', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
-            x: 'P90 decode speed', y: 'Output throughput / chip', native: 'Native baseline',
+            failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Frontier', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
+            x: 'P90 decode speed', y: 'Output throughput / chip', batchSize: 'Batch size', outputThroughput: 'Output throughput', native: 'Native baseline',
             smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Lines: one concurrency curve per baseline / MOD and rotation depth', frontierOnly: 'Hide non-Frontier points', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
@@ -23,8 +23,8 @@
             knownBudget: '已知输出预算 · 未使用学习型预测器', budgetChecksOnly: '准入容量检查已执行，但未观察到准入延后或抢占；该点不构成优化收益证据。',
             notExercised: 'MOD 策略未触发', notExercisedScope: 'MOD 已启用，但本窗口未触发有效的优化动作；该点不构成优化收益证据。',
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
-            failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: 'Frontier', subtitle: '解码速度 × 产出效率', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
-            x: 'P90 解码速度', y: '每卡输出吞吐', native: '原生 Baseline',
+            failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: 'Frontier', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
+            x: 'P90 解码速度', y: '每卡输出吞吐', batchSize: 'Batch size', outputThroughput: '总输出吞吐', native: '原生 Baseline',
             smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '连线：每个 Baseline / MOD、每个轮转深度各有一条并发曲线', frontierOnly: '隐藏非 Frontier 点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
@@ -38,6 +38,7 @@
     const rotationLabel = depth => depth == null ? 'D—' : `D${fmt(depth)}`;
     const serviceScale = point => {
         const c = point.load.concurrency, d = point.load.session_rotation_depth;
+        if (axes().x === 'batch_size') return `${t('batchSize')}: B${fmt(point.load.batch_size)}`;
         if (!hasRotation()) return `${t('concurrency')}: ${fmt(c)}`;
         return `${t('concurrency')}: C${fmt(c)} · ${t('rotationDepth')}: ${rotationLabel(d)}`;
     };
@@ -45,12 +46,14 @@
     const colors = ['#4263eb','#008c78','#ad5c00','#965bd3','#d14469','#177baf'];
     const tagKey = c => JSON.stringify([c.model.id,c.precision.id]);
     const cohort = () => state.data.cohorts.find(c => c.id === state.cohort);
+    const axes = () => cohort()?.workload.contract.frontier_axes || DEFAULT_AXES;
+    const axisLabel = key => ({batch_size:t('batchSize'),output_tps:t('outputThroughput'),decode_p90_tps:t('x'),output_tps_per_chip:t('y')})[key] || key;
     const cohortPoints = () => state.data.points.filter(p => p.cohort_id === state.cohort);
     const hasRotation = () => !!cohort()?.workload.contract.session_rotation;
     const depthPoints = () => cohortPoints().filter(p => !hasRotation() || state.rotation?.has(String(p.load.session_rotation_depth)));
     const filteredPoints = () => depthPoints().filter(p => state.mtp?.has(M.mtpState(p)) && state.mods?.has(M.groupKey(p)));
     const points = () => state.frontierOnly
-        ? M.groupFrontiers(filteredPoints(),X,Y).flat().map(row=>row.point) : filteredPoints();
+        ? M.groupFrontiers(filteredPoints(),axes().x,axes().y).flat().map(row=>row.point) : filteredPoints();
     const label = p => p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
     const knownBudget = p => p.configuration.mods.includes('dla') && p.configuration.parameters.length_source === 'Declared exact ignore_eos output budgets, no learned predictor';
     const notExercised = p => p.configuration.mods.length > 0 && p.configuration.parameters.mod_runtime_effectiveness?.status === 'not-exercised';
@@ -88,7 +91,7 @@
         if(state.mods===null)state.mods=new Set(mods.map(M.groupKey));
         if(state.mtp===null)state.mtp=new Set(mtpOptions.map(([key])=>key));
         $('frontier-panel').innerHTML = `
-            <header class="frontier-heading"><div><h1>${t('title')}</h1><p>${t('subtitle')}</p></div><span id="frontier-status" class="frontier-status" role="status"></span></header>
+            <header class="frontier-heading"><div><h1>${t('title')}</h1><p>${t(axes().x==='batch_size'?'pairedSubtitle':'subtitle')}</p></div><span id="frontier-status" class="frontier-status" role="status"></span></header>
             <div class="frontier-layout"><div class="frontier-card">
                 <div class="frontier-picker">
                     <div class="frontier-identity">
@@ -98,7 +101,7 @@
 
                 </div>
                 <div class="frontier-plot" id="frontier-plot">
-                    <svg id="frontier-chart" viewBox="0 0 1000 480" role="group" aria-label="${t('x')} × ${t('y')}"></svg>
+                    <svg id="frontier-chart" viewBox="0 0 1000 480" role="group" aria-label="${axisLabel(axes().x)} × ${axisLabel(axes().y)}"></svg>
                     <div id="frontier-blank" class="frontier-blank" role="status"></div>
                     <section id="frontier-popover" class="frontier-popover" role="dialog" aria-modal="false" aria-labelledby="frontier-popover-title" hidden></section>
                 </div>
@@ -107,7 +110,7 @@
             <aside class="frontier-filters" aria-label="${t('filter')}">
                 <h2>${t('filter')}</h2>
                 <fieldset><legend>MOD / Group <button type="button" id="frontier-mods-toggle"></button></legend><div class="frontier-checks">${mods.map(p=>`<label><input type="checkbox" data-filter="mods" value="${escape(M.groupKey(p))}" ${state.mods.has(M.groupKey(p))?'checked':''}>${escape(label(p))}</label>`).join('')}</div></fieldset>
-                <fieldset><legend>MTP</legend><div class="frontier-checks">${mtpOptions.map(([key,text])=>`<label><input type="checkbox" data-filter="mtp" value="${key}" ${state.mtp.has(key)?'checked':''}>${text}</label>`).join('')}</div></fieldset>
+                ${cohortPoints().some(p=>M.mtpState(p)!=='unknown')?`<fieldset><legend>MTP</legend><div class="frontier-checks">${mtpOptions.map(([key,text])=>`<label><input type="checkbox" data-filter="mtp" value="${key}" ${state.mtp.has(key)?'checked':''}>${text}</label>`).join('')}</div></fieldset>`:''}
                 ${hasRotation()?`<fieldset id="frontier-rotation-filter"><legend>${t('rotationDepth')}</legend><div class="frontier-checks">${depths.map(depth=>`<label><input type="checkbox" data-filter="rotation" value="${depth}" ${state.rotation.has(String(depth))?'checked':''}>${rotationLabel(depth)}</label>`).join('')}</div><p class="frontier-filter-note">${t('rotationHelp')}</p>${cohort().workload.contract.session_rotation.status==='under-construction'?`<p class="frontier-filter-note">${t('rotationPending')}</p>`:''}</fieldset>`:''}
                 <div class="frontier-checks"><label><input id="frontier-only" type="checkbox" ${state.frontierOnly?'checked':''}>${t('frontierOnly')}</label></div>
                 <span id="frontier-filter-count" role="status"></span>
@@ -163,13 +166,13 @@
         const point=points().find(p=>p.id===state.selected);
         if(!point)return;
         const payload={schema_version:'frontier-configuration/v1',cohort:cohort(),point,
-            chart:{x:X,y:Y,x_unit:M.metrics[X].unit,y_unit:M.metrics[Y].unit}};
+            chart:{x:axes().x,y:axes().y,x_unit:M.metrics[axes().x].unit,y_unit:M.metrics[axes().y].unit}};
         const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'}));
         const a=document.createElement('a');a.href=url;a.download=`${point.id.replace(/[^a-z0-9_.-]/gi,'_')}.json`;
         document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
     }
     function render() {
-        const measured=M.project(points(),X,Y), current=cohort();
+        const measured=M.project(points(),axes().x,axes().y), current=cohort();
         $('frontier-mods-toggle').textContent=t(cohortPoints().every(p=>state.mods?.has(M.groupKey(p)))?'clearAll':'selectAll');
         $('frontier-mods-toggle').disabled=cohortPoints().length===0;
         $('view-frontier-count').textContent=state.data.points.length;
@@ -183,7 +186,7 @@
         const color=p=>M.failedCorrectness(p)?'#dc2626':colors[groups.findIndex(g=>M.groupKey(g)===M.groupKey(p))%colors.length];
         const series=[...new Map(cohortPoints().map(p=>[M.frontierKey(p),p])).values()];
         $('frontier-legend').innerHTML=series.filter(g=>points().some(p=>M.frontierKey(p)===M.frontierKey(g))).map(p=>`<span data-frontier-group="${escape(M.frontierKey(p))}"><i style="background:${p.load.session_rotation_depth>1?'transparent':color(p)};border:2px solid ${color(p)}"></i>${escape(label(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}</span>`).join('');
-        $('frontier-hint').textContent=(M.groupFrontiers(points(),X,Y).some(rows=>rows.length>1)?t('lineHint'):t('hint'))+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
+        $('frontier-hint').textContent=(M.groupFrontiers(points(),axes().x,axes().y).some(rows=>rows.length>1)?t('lineHint'):t('hint'))+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         // Historical static curves describe depth1, not every workload selected by the checkboxes.
         const curves=$('frontier-curves'), curveUrl=!hasRotation()||(state.rotation?.size===1&&state.rotation.has('1'))?current?.workload.contract.concurrency_curves_url:null;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
@@ -219,7 +222,7 @@
             ${point.configuration.mods.length?`<p class="frontier-popup-mod-source">${t('modSource')}: ${modSources(point)}</p>`:''}
             <p class="frontier-popup-date">${t('sampled')}: ${point.evidence.sampling_date_utc?`${escape(point.evidence.sampling_date_utc)} (UTC)`:t('unknown')}</p>
             <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
-            <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,X))}</strong><span>${t('x')}<br>tokens/s/user</span></div><div><strong>${fmt(M.value(point,Y))}</strong><span>${t('y')}<br>tokens/s/chip</span></div></div>
+            <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,axes().x))}</strong><span>${axisLabel(axes().x)}<br>${M.metrics[axes().x].unit}</span></div><div><strong>${fmt(M.value(point,axes().y))}</strong><span>${axisLabel(axes().y)}<br>${M.metrics[axes().y].unit}</span></div></div>
             <p class="frontier-popup-load">${serviceScale(point)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}${params.max_num_seqs!=null?`<br>${t('capacity')}: ${fmt(params.max_num_seqs)}${params.max_num_seqs_per_rank!=null?' / rank':''}`:''}${params.kv_cache_memory_bytes!=null?` · KV ${fmt(params.kv_cache_memory_bytes/1024**3)} GiB/chip`:''}</p>
             <p class="frontier-popup-load">${t('warmup')}: ${t(warmupKey)}</p>
             ${nearby.length>1?`<div class="frontier-nearby"><span>${t('nearby')}</span>${nearby.map(p=>`<button type="button" data-nearby="${escape(p.id)}" aria-pressed="${p.id===point.id}">${escape(parallel(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''} · C${fmt(p.load.concurrency)} · MTP${p.configuration.parameters.mtp_draft_tokens??'—'} · ${fmt(p.configuration.parameters.max_num_seqs)}</button>`).join('')}</div>`:''}
@@ -247,8 +250,8 @@
             svg+=`<line class="frontier-grid" x1="${x(xv)}" y1="${top}" x2="${x(xv)}" y2="${height-bottom}"/><line class="frontier-grid" x1="${left}" y1="${y(yv)}" x2="${width-right}" y2="${y(yv)}"/>`;
             if(result.measured.length)svg+=`<text text-anchor="middle" x="${x(xv)}" y="${height-bottom+24}">${fmt(xv)}</text><text text-anchor="end" x="${left-12}" y="${y(yv)+4}">${fmt(yv)}</text>`;
         }
-        svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${t('x')}<tspan x="${(width+left-right)/2}" dy="16">output tokens/s/user</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${t('y')}<tspan x="0" dy="16">output tokens/s/chip</tspan></text>`;
-        const frontiers=M.groupFrontiers(result.measured.map(row=>row.point),X,Y);
+        svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${axisLabel(axes().x)}<tspan x="${(width+left-right)/2}" dy="16">${M.metrics[axes().x].unit}</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${axisLabel(axes().y)}<tspan x="0" dy="16">${M.metrics[axes().y].unit}</tspan></text>`;
+        const frontiers=M.groupFrontiers(result.measured.map(row=>row.point),axes().x,axes().y);
         for(const rows of frontiers.filter(rows=>rows.length>1)){
             const id=M.frontierKey(rows[0].point);
             svg+=`<polyline class="frontier-envelope" data-group="${escape(id)}" stroke-dasharray="${rows[0].point.load.session_rotation_depth>1?'7 4':'none'}" data-frontier-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(rows[0].point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
@@ -256,7 +259,7 @@
         for(const row of result.measured){
             const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);
             const hitRadius=Math.max(2,Math.min(18,...neighbors));
-            const p=row.point,text=`${label(p)}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}${notExercised(p)?` · ${t('notExercised')}`:''}${storeOnly(p)?` · ${t('storeOnly')}`:''} · ${parallel(p)} · C${p.load.concurrency??'—'}: ${t('x')} ${fmt(row.x)}, ${t('y')} ${fmt(row.y)}`;
+            const p=row.point,text=`${label(p)}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}${notExercised(p)?` · ${t('notExercised')}`:''}${storeOnly(p)?` · ${t('storeOnly')}`:''} · ${parallel(p)} · ${serviceScale(p)}: ${axisLabel(axes().x)} ${fmt(row.x)}, ${axisLabel(axes().y)} ${fmt(row.y)}`;
             svg+=`<g role="button" tabindex="0" aria-haspopup="dialog" aria-controls="frontier-popover" aria-expanded="false" aria-label="${escape(text)}" data-point="${escape(p.id)}" class="frontier-point"><circle class="frontier-hit" cx="${x(row.x)}" cy="${y(row.y)}" r="${hitRadius}"/><circle class="frontier-dot" cx="${x(row.x)}" cy="${y(row.y)}" r="7" fill="${p.load.session_rotation_depth>1?'var(--run-bg)':color(p)}" style="stroke:${color(p)}"/><title>${escape(text)}</title></g>`;
         }
         $('frontier-chart').innerHTML=svg;
@@ -268,7 +271,7 @@
     $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=resident-balanced-curves-20260927',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=qwen25-vspec-20260928',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=qwen35-mooncake-20260927').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});

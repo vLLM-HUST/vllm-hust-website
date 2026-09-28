@@ -11,6 +11,7 @@
         tpot_p95_ms: { direction: 'min', unit: 'ms' },
         e2e_p95_ms: { direction: 'min', unit: 'ms' },
         output_tps: { direction: 'max', unit: 'output tok/s' },
+        batch_size: { direction: 'max', unit: 'prompts / batch' },
         output_tps_per_chip: { direction: 'max', unit: 'output tok/s/chip' },
         cost_per_million: { direction: 'min', unit: 'USD / 1M output tokens' }
     };
@@ -23,6 +24,8 @@
                 || !c.precision?.id || !c.precision?.label || !c.workload?.id || !c.workload?.label
                 || !object(c.workload?.contract) || !Number.isInteger(c.context_tokens) || c.context_tokens < 1) throw new Error('Invalid or duplicate Frontier cohort');
             ids.add(c.id); contracts.add(key);
+            const axes = c.workload.contract.frontier_axes;
+            if (axes != null && (!object(axes) || !metrics[axes.x] || !metrics[axes.y])) throw new Error('Invalid Frontier axes');
         }
         const pointIds = new Set();
         for (const p of data.points) {
@@ -63,6 +66,7 @@
     }
     function value(point, key) {
         const m = point.metrics;
+        if (key === 'batch_size') return positive(point.load.batch_size) ? point.load.batch_size : null;
         if (key === 'interactivity') return positive(m.tpot_ms) ? 1000 / m.tpot_ms : null;
         if (key === 'output_tps_per_chip') return positive(m.output_tps) ? m.output_tps / point.configuration.hardware.accelerator_count : null;
         if (key === 'cost_per_million') return positive(m.output_tps) && positive(point.cost?.usd_per_hour)

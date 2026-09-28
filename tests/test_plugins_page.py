@@ -438,7 +438,7 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
         '["plugin_bundle", "python_distribution", "migration_scaffold", "source_patch"]'
         in SCRIPT
     )
-    assert 'element("section", "plugin-grid workshop-grid")' in SCRIPT
+    assert 'element("div", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert "function coverTone(item)" in SCRIPT
     assert ".workshop-tone-lagoon .workshop-cover" in STYLES
@@ -1095,6 +1095,7 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
     item = by_id("traceloom")
     assert item["artifact_type"] == "runtime_component"
     assert item["system_role"] == "profiling_analysis"
+    assert '"profiling_analysis", "telemetry_provider"' in SCRIPT
     assert item["delivery_model"] == "python_distribution"
     assert item["documentation_url"] == "./traceloom.html"
     assert item["compatibility"]["status"] == "experimental"
@@ -1115,3 +1116,11 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
         for lane in snapshot["lanes"]
         for interval in lane["intervals"]
     )
+
+
+def test_tool_mods_are_grouped_without_performance_placeholders():
+    profiler = by_id("request-lifecycle-profiler")
+    assert profiler["system_role"] == "telemetry_provider"
+    assert "if (!isToolMod(item))" in SCRIPT
+    assert "appendGroup(copy().performanceMods" in SCRIPT
+    assert "appendGroup(copy().toolMods" in SCRIPT

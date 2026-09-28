@@ -36,6 +36,17 @@ test('production and empty snapshots validate without inventing points',()=>{
     assert.deepEqual(model.validate({schema_version:'leaderboard-frontier/v1',cohorts:[],points:[]}).points,[]);
     assert.equal(model.project([], 'interactivity','output_tps_per_chip').frontier.length,0);
 });
+test('Qwen2.5-14B vSpec uses measured offline batch and total-throughput axes',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const cohort=data.cohorts.find(c=>c.id==='qwen25-14b-bf16-gsm8k-b128-vspec-v1');
+    assert.deepEqual(cohort.workload.contract.frontier_axes,{x:'batch_size',y:'output_tps'});
+    const points=data.points.filter(p=>p.cohort_id===cohort.id);
+    assert.equal(points.length,2);
+    assert.deepEqual(points.map(p=>p.load.batch_size),[128,128]);
+    assert.deepEqual(points.map(p=>Number(p.metrics.output_tps.toFixed(2))),[1557.25,2363.98]);
+    assert.ok(points.every(p=>p.metrics.decode_p90_tps===undefined));
+    assert.ok((points[1].metrics.output_tps/points[0].metrics.output_tps-1)*100>51.79);
+});
 test('SWE observations keep their fixed-window protocol and real MTP separate from AgentX',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const evidence=require('../data/leaderboard_frontier_swe_evidence.json');
