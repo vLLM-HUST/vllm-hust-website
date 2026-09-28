@@ -707,7 +707,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert 'data-source="./data/ecosystem.json?v=workshop-v24-adm"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v15-adm"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v16-adm-advisor"'
         in PAGE
     )
     assert (
@@ -738,6 +738,13 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
         WORKSHOP_METADATA["plugins"]["adm"]["maintainers"][0]["login"]
         == "sad-and-bad1231"
     )
+    assert WORKSHOP_METADATA["plugins"]["adm"]["advisors"] == [
+        {
+            "name_zh": "张书豪",
+            "name_en": "Shuhao Zhang",
+            "relationship": "internal",
+        }
+    ]
     evidence = next(
         item for item in PLUGIN_PERFORMANCE["entries"] if item["id"] == "adm"
     )
