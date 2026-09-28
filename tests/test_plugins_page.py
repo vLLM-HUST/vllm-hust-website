@@ -1044,7 +1044,7 @@ def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
     assert kvcompress["versions"] == [
         "vLLM-HUST 0.25.1+frontier.unified",
         "vLLM-Ascend-HUST 0.25.1rc1",
-        "KVCompress ed058fa1",
+        "KVCompress 2ca0f933",
     ]
     assert kvcompress["python"] == [">=3.10,<3.15"]
     assert kvcompress["platforms"] == ["Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph"]

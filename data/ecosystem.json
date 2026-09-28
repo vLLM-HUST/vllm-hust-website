@@ -572,8 +572,8 @@
       "upstream_repository": null,
       "summary_en": "KV transformation and compression provider for vLLM Ascend, with Qwen3.5 hybrid-cache, APC, asynchronous scheduling and MTP support.",
       "summary_zh": "vLLM Ascend KV 状态转换与压缩 provider，已支持 Qwen3.5 混合缓存、APC、异步调度与 MTP。",
-      "public_effect_en": "On the exact Qwen3.5-35B Frontier contract, the five-point geometric-mean output-throughput change is -5.83% versus the shared Native series.",
-      "public_effect_zh": "在完全相同的 Qwen3.5-35B Frontier 配置下，相对统一 Native 曲线，五个并发点的输出吞吐几何平均变化为 -5.83%。",
+      "public_effect_en": "On the exact Qwen3.5-35B Frontier contract, the five-point geometric-mean output-throughput change is -3.55% versus the shared Native series.",
+      "public_effect_zh": "在完全相同的 Qwen3.5-35B Frontier 配置下，相对统一 Native 曲线，五个并发点的输出吞吐几何平均变化为 -3.55%。",
       "public_effect_status": "measured",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
       "compatibility": {
@@ -582,7 +582,7 @@
         "versions": [
           "vLLM-HUST 0.25.1+frontier.unified",
           "vLLM-Ascend-HUST 0.25.1rc1",
-          "KVCompress ed058fa1"
+          "KVCompress 2ca0f933"
         ],
         "platforms": [
           "Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph"
