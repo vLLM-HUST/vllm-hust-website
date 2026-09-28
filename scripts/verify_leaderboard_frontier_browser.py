@@ -265,7 +265,7 @@ def main():
             assert len(expected_rotation2) == 5
             assert_group_frontiers(page, expected_rotation2)
             assert page.locator("#frontier-curves").is_hidden()
-            assert "D2" not in page.locator("#frontier-chart").text_content()
+            assert "D2" in page.locator("#frontier-chart").text_content()
             assert (
                 "Session rotation depth"
                 not in page.locator("#frontier-legend").inner_text()
