@@ -200,6 +200,28 @@ def main():
                 }
             )
             context.close()
+        for missing_asset, handler in (
+            (
+                "**/data/plugin-performance.json*",
+                lambda route: route.fulfill(
+                    json={"schema_version": "invalid", "entries": []}
+                ),
+            ),
+            (
+                "**/assets/plugin-performance.js*",
+                lambda route: route.fulfill(status=503, body="unavailable"),
+            ),
+        ):
+            context = browser.new_context()
+            page = context.new_page()
+            page.route(missing_asset, handler)
+            page.goto(f"{args.url.rstrip('/')}/plugins.html")
+            page.wait_for_selector("#adm.workshop-card")
+            assert (
+                "could not be loaded"
+                not in page.locator("[data-plugin-status]").inner_text()
+            )
+            context.close()
         browser.close()
     print(json.dumps(report, ensure_ascii=False, indent=2))
     (args.output / "results.json").write_text(

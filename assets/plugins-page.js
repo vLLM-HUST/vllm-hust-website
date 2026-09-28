@@ -992,7 +992,7 @@ vllm-hust-ext extension check ${extensionId}`
     performanceMods.sort((left, right) => {
       const leftRank = priority[left.compatibility?.status] ?? 6;
       const rightRank = priority[right.compatibility?.status] ?? 6;
-      return PluginPerformance.compare(left, right, performanceResults) || leftRank - rightRank || left.name.localeCompare(right.name);
+      return (window.PluginPerformance?.compare(left, right, performanceResults) || 0) || leftRank - rightRank || left.name.localeCompare(right.name);
     });
     toolMods.sort((left, right) => left.name.localeCompare(right.name));
     catalog.replaceChildren();
@@ -1026,6 +1026,7 @@ vllm-hust-ext extension check ${extensionId}`
     renderPortfolio();
   });
   modelSelect?.addEventListener("change", () => {
+    if (!performanceData || !frontierData || !window.PluginPerformance) return;
     selectedModel = modelSelect.value;
     performanceResults = PluginPerformance.summarize(performanceData, frontierData, selectedModel || null);
     expanded = false;
@@ -1067,8 +1068,8 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=model-filter-adm-20260928").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=qwen25-vspec-20260928").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
+      fetch("./data/plugin-performance.json?v=model-filter-v7-20260928").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=model-filter-v7-20260928").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {
@@ -1084,14 +1085,21 @@ vllm-hust-ext extension check ${extensionId}`
       registry = payload;
       performanceData = performance?.data;
       frontierData = performance?.frontier;
-      performanceResults = performance
-        ? PluginPerformance.summarize(performanceData, frontierData)
-        : new Map();
-      if (modelSelect && performance) {
-        modelSelect.replaceChildren(new Option(copy().allModels, ""));
-        PluginPerformance.models(performanceData, frontierData).forEach((model) => {
-          modelSelect.append(new Option(model, model));
-        });
+      if (performance && window.PluginPerformance) {
+        try {
+          performanceResults = PluginPerformance.summarize(performanceData, frontierData);
+          if (modelSelect) {
+            modelSelect.replaceChildren(new Option(copy().allModels, ""));
+            PluginPerformance.models(performanceData, frontierData).forEach((model) => {
+              modelSelect.append(new Option(model, model));
+            });
+          }
+        } catch (error) {
+          console.warn("Performance metadata unavailable:", error);
+          performanceData = undefined;
+          frontierData = undefined;
+          performanceResults = new Map();
+        }
       }
       workshopMetadata = metadata.plugins;
       workloadNavigation = navigation;
@@ -1112,7 +1120,7 @@ vllm-hust-ext extension check ${extensionId}`
       renderBoundaries();
     })
     .catch((error) => {
-      status.textContent = language() === "zh" ? "生态目录加载失败，请检查规范 registry。" : "The ecosystem catalog could not be loaded. Check the canonical registry.";
+      status.textContent = (language() === "zh" ? "生态目录加载失败：" : "The ecosystem catalog could not be loaded: ") + error.message;
       status.title = error.message;
     });
 
