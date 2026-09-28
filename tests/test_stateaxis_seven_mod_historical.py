@@ -70,3 +70,13 @@ def test_followup_stops_before_serving_when_identity_gates_fail() -> None:
         "official-agentx-dataset",
         "runtime-image-identity",
     }
+
+
+def test_frontier_page_renders_the_seven_mod_audit() -> None:
+    script = (ROOT / "assets/leaderboard-frontier.js").read_text(encoding="utf-8")
+    page = (ROOT / "leaderboard-runs.html").read_text(encoding="utf-8")
+    assert "frontier-stateaxis" in script
+    assert "data-stateaxis-mod" in script
+    assert "stateaxis-seven-mod-historical.json" in script
+    assert "stateaxis-qwen35-agentx-followup.json" in script
+    assert "stateaxis-seven-mod-20260928" in page
