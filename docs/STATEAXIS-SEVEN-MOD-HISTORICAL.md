@@ -22,10 +22,9 @@ Lower wall time is better. The feedback result is a single observation without c
 repetition. All other request paths were slower or fallback-only. Failed `invalid-port-custody`
 attempts remain preserved in the source record and support no claim.
 
-The campaign belonged to the aggregate repository at `f4e4a87bb56b553961adee5aab6e6d0ba588071c`. The
-seven current independent `private-source*` repositories do not inherit its functional,
-device or performance qualification. The machine-readable record maps each historical identity to
-its current repository solely for provenance.
+The campaign belonged to the private aggregate source at `f4e4a87bb56b553961adee5aab6e6d0ba588071c`.
+The seven current independent private sources do not inherit its functional, device or performance
+qualification. Private repository locations are intentionally omitted from this public record.
 
 See [`data/stateaxis-seven-mod-historical.json`](../data/stateaxis-seven-mod-historical.json) for
 effect receipts, fixed commits, archive digests and the pending Qwen3.5 + AgentX follow-up contract.
