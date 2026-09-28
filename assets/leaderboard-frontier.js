@@ -16,8 +16,7 @@
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
-            modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation',
-            stateaxisTitle: 'StateAxis · seven MOD audit', stateaxisHistorical: 'Qwen3.8-27B historical screen', stateaxisFollowup: 'Qwen3.5-35B · AgentX', stateaxisBlocked: 'Awaiting qualified rerun', stateaxisScope: 'Percentages are one-run Qwen3.8-27B historical screens, not Qwen3.5 / AgentX results. Split repositories inherit no performance qualification.', stateaxisPreflight: 'Preflight found four idle Ascend 910B2 devices; serving did not start because the exact AgentX dataset and frozen runtime identity were unavailable.', stateaxisLower: 'lower wall time', stateaxisPrivate: 'private source · no public link', stateaxisUnavailable: 'StateAxis audit data unavailable.'
+            modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation'
         },
         zh: {
             selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
@@ -30,8 +29,7 @@
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
-            modCoverage: '35B MOD 补测进度', workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配',
-            stateaxisTitle: 'StateAxis · 七个 MOD 审计', stateaxisHistorical: 'Qwen3.8-27B 历史筛查', stateaxisFollowup: 'Qwen3.5-35B · AgentX', stateaxisBlocked: '待合格补测', stateaxisScope: '百分比来自 Qwen3.8-27B 单次历史筛查，不是 Qwen3.5 / AgentX 成绩；拆分仓库不继承性能资格。', stateaxisPreflight: '预检时四张 Ascend 910B2 均空闲；因精确 AgentX 数据集与冻结运行时身份不可用，未启动服务。', stateaxisLower: '请求时间越低越好', stateaxisPrivate: '私有来源 · 无公开跳转', stateaxisUnavailable: 'StateAxis 审计数据暂不可用。'
+            modCoverage: '35B MOD 补测进度', workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配'
         }
     };
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
@@ -44,7 +42,7 @@
         if (!hasRotation()) return `${t('concurrency')}: ${fmt(c)}`;
         return `${t('concurrency')}: C${fmt(c)} · ${t('rotationDepth')}: ${rotationLabel(d)}`;
     };
-    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), stateaxis:null, stateaxisFollowup:null, ready:false, error:false, tag:'', cohort:'', selected:'', mtp:null, mods:null, rotation:null, frontierOnly:true};
+    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:'', mtp:null, mods:null, rotation:null, frontierOnly:true};
     const colors = ['#4263eb','#008c78','#ad5c00','#965bd3','#d14469','#177baf'];
     const tagKey = c => JSON.stringify([c.model.id,c.precision.id]);
     const cohort = () => state.data.cohorts.find(c => c.id === state.cohort);
@@ -107,7 +105,6 @@
                     <div id="frontier-blank" class="frontier-blank" role="status"></div>
                     <section id="frontier-popover" class="frontier-popover" role="dialog" aria-modal="false" aria-labelledby="frontier-popover-title" hidden></section>
                 </div>
-                <section id="frontier-stateaxis" class="frontier-stateaxis" aria-labelledby="frontier-stateaxis-title"></section>
                 <footer class="frontier-footer"><div class="frontier-legend" id="frontier-legend"></div><div class="frontier-footer-links"><a id="frontier-curves" target="_blank" rel="noopener" hidden>${t('curves')} ↗</a><a id="frontier-mod-coverage" href="https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-MOD-COVERAGE.md" target="_blank" rel="noopener">${t('modCoverage')} ↗</a><a id="frontier-workload-repo" href="https://github.com/vLLM-HUST/agentx-bench" target="_blank" rel="noopener">${t('workloadRepo')} ↗</a><span id="frontier-hint">${t('hint')}</span></div></footer>
             </div>
             <aside class="frontier-filters" aria-label="${t('filter')}">
@@ -197,26 +194,7 @@
         const workloadRepo=current?.workload.contract.repository_url;
         $('frontier-workload-repo').href=typeof workloadRepo==='string'&&/^https:\/\/github\.com\/vLLM-HUST\/[a-z0-9-]+$/i.test(workloadRepo)?workloadRepo:'https://github.com/vLLM-HUST/agentx-bench';
         $('frontier-mod-coverage').hidden=!current?.model.label.startsWith('Qwen3.5');
-        renderStateAxis();
         chart(measured,color);popup();
-    }
-    function renderStateAxis() {
-        const panel=$('frontier-stateaxis'), current=cohort();
-        if(!panel)return;
-        panel.hidden=!current?.model.label.startsWith('Qwen3.');
-        if(panel.hidden)return;
-        const record=state.stateaxis, followup=state.stateaxisFollowup;
-        if(!record?.results?.length||!followup){
-            panel.innerHTML=`<p class="frontier-stateaxis-unavailable">${t('stateaxisUnavailable')}</p>`;
-            return;
-        }
-        const status=followup.status==='blocked-before-serving'?t('stateaxisBlocked'):followup.status;
-        panel.innerHTML=`<div class="frontier-stateaxis-heading"><div><h2 id="frontier-stateaxis-title">${t('stateaxisTitle')}</h2><p>${t('stateaxisScope')}</p></div><span class="frontier-stateaxis-status">${escape(status)}</span></div>
-            <div class="frontier-stateaxis-meta"><span><strong>${t('stateaxisHistorical')}</strong> · ${escape(record.scope.hardware)} · ${t('stateaxisLower')}</span><span><strong>${t('stateaxisFollowup')}</strong> · ${escape(followup.status)}</span></div>
-            <div class="frontier-stateaxis-grid">${record.results.map(row=>{
-                const name=row.mod_id.replace(/^stateaxis\./,'').replaceAll('-',' '), change=row.change_from_control_percent, favorable=change<0;
-                return `<article class="frontier-stateaxis-mod" data-stateaxis-mod="${escape(row.mod_id)}"><h3>${escape(name)}</h3><span class="frontier-stateaxis-private">${t('stateaxisPrivate')}</span><div><strong class="${favorable?'is-favorable':'is-negative'}">${change>0?'+':''}${fmt(change)}%</strong><span>${escape(row.classification)}</span></div><small>${t('stateaxisFollowup')}: ${escape(status)}</small></article>`;
-            }).join('')}</div><p class="frontier-stateaxis-preflight">${t('stateaxisPreflight')}</p>`;
     }
     function popup() {
         const point=points().find(p=>p.id===state.selected), panel=$('frontier-popover');
@@ -294,9 +272,7 @@
     $('runs-content').hidden=false;shell();
     Promise.all([
         fetch('./data/leaderboard_frontier.json?v=offloading-phase1-20260928',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
-        fetch('./data/ecosystem.json?v=qwen35-mooncake-20260927').then(r=>r.ok?r.json():{}).catch(()=>({})),
-        fetch('./data/stateaxis-seven-mod-historical.json?v=frontier-ui-20260928').then(r=>r.ok?r.json():null).catch(()=>null),
-        fetch('./data/stateaxis-qwen35-agentx-followup.json?v=frontier-ui-20260928').then(r=>r.ok?r.json():null).catch(()=>null)
-    ]).then(([data,catalog,stateaxis,stateaxisFollowup])=>{state.data=M.visibleData(data);state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.stateaxis=stateaxis;state.stateaxisFollowup=stateaxisFollowup;state.ready=true;shell();})
+        fetch('./data/ecosystem.json?v=qwen35-mooncake-20260927').then(r=>r.ok?r.json():{}).catch(()=>({}))
+    ]).then(([data,catalog])=>{state.data=M.visibleData(data);state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});
 })();

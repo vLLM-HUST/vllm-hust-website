@@ -27,24 +27,6 @@
 .frontier-footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
 .frontier-footer-links a { color: var(--run-accent); text-underline-offset: 3px; }
 .frontier-footer-links a[hidden] { display: none; }
-.frontier-stateaxis { padding: 20px 24px; border-top: 1px solid var(--run-border); }
-.frontier-stateaxis[hidden] { display: none; }
-.frontier-stateaxis-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
-.frontier .frontier-stateaxis-heading h2 { margin: 0 0 7px; color: var(--run-ink); font-size: 17px; }
-.frontier-stateaxis-heading p, .frontier-stateaxis-preflight, .frontier-stateaxis-unavailable { margin: 0; max-width: 760px; color: var(--run-muted); font-size: 11px; line-height: 1.55; }
-.frontier-stateaxis-status { flex: none; padding: 6px 10px; border: 1px solid #d97706; border-radius: 20px; color: #b45309; background: #fffbeb; font-size: 10px; font-weight: 700; }
-.frontier-stateaxis-meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 16px 0 12px; color: var(--run-muted); font-size: 11px; }
-.frontier-stateaxis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 9px; }
-.frontier-stateaxis-mod { min-width: 0; padding: 12px; border: 1px solid var(--run-border); border-radius: 9px; background: color-mix(in srgb, var(--run-tint) 45%, var(--run-bg)); }
-.frontier .frontier-stateaxis-mod h3 { margin: 0 0 5px; color: var(--run-ink); font-size: 12px; text-transform: capitalize; }
-.frontier-stateaxis-private { color: var(--run-muted); font-size: 10px; }
-.frontier-stateaxis-mod > div { display: flex; align-items: baseline; gap: 8px; margin-top: 12px; }
-.frontier-stateaxis-mod > div strong { font-size: 20px; font-variant-numeric: tabular-nums; }
-.frontier-stateaxis-mod > div strong.is-favorable { color: #15803d; }
-.frontier-stateaxis-mod > div strong.is-negative { color: #b91c1c; }
-.frontier-stateaxis-mod > div span, .frontier-stateaxis-mod small { color: var(--run-muted); font-size: 9px; line-height: 1.35; }
-.frontier-stateaxis-mod small { display: block; margin-top: 8px; }
-.frontier-stateaxis-preflight { margin-top: 13px; }
 .frontier-legend { display: flex; flex-wrap: wrap; gap: 18px; }
 .frontier-legend span { display: inline-flex; align-items: center; gap: 7px; }
 .frontier-legend i { width: 9px; height: 9px; border-radius: 50%; }
@@ -67,18 +49,8 @@
   .frontier-plot { padding: 4px; }
   .frontier-plot svg { min-height: 300px; }
   .frontier-footer { padding: 14px; }
-  .frontier-stateaxis { padding: 16px 14px; }
-  .frontier-stateaxis-heading { display: grid; }
-  .frontier-stateaxis-status { justify-self: start; }
-  .frontier-stateaxis-grid { grid-template-columns: 1fr; }
   .runs-shell .runs-view-switch button { padding: 9px 7px; gap: 4px; font-size: 12px; }
   .runs-view-switch svg { width: 15px; height: 15px; }
-}
-
-@media (prefers-color-scheme: dark) {
-  .frontier-stateaxis-status { color: #fbbf24; background: #451a0333; border-color: #92400e; }
-  .frontier-stateaxis-mod > div strong.is-favorable { color: #86efac; }
-  .frontier-stateaxis-mod > div strong.is-negative { color: #fca5a5; }
 }
 
 .frontier-popup-engine { margin: 8px 0; font-size: 11px; line-height: 1.5; color: var(--run-ink); }
