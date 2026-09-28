@@ -29,10 +29,8 @@ def test_historical_record_preserves_seven_exact_identities() -> None:
         row["mod_id"]: row["change_from_control_percent"] for row in RECORD["results"]
     }
     assert actual == EXPECTED
-    assert all(
-        row["current_repository"].startswith("private-source")
-        for row in RECORD["results"]
-    )
+    assert all("current_repository" not in row for row in RECORD["results"])
+    assert "private source" not in json.dumps(RECORD)
 
 
 def test_historical_result_cannot_be_presented_as_qwen35_agentx() -> None:
@@ -80,3 +78,4 @@ def test_frontier_page_renders_the_seven_mod_audit() -> None:
     assert "stateaxis-seven-mod-historical.json" in script
     assert "stateaxis-qwen35-agentx-followup.json" in script
     assert "stateaxis-seven-mod-20260928" in page
+    assert "github.com/${escape(row.current_repository)}" not in script

@@ -15,7 +15,7 @@
     "graph_mode": "eager",
     "image": "stateaxis/runtime:dev42-cann91",
     "stateaxis_commit": "167e3945350dbf080542fd1c2adca621364da2e7",
-    "aggregate_repository": "private-source",
+    "aggregate_source": "private StateAxis aggregate carrier",
     "aggregate_commit": "f4e4a87bb56b553961adee5aab6e6d0ba588071c",
     "control": "ECPA-off dev42 in the same runtime; not untouched 0.3.0.base1",
     "repetitions": 1
@@ -29,7 +29,6 @@
   "results": [
     {
       "mod_id": "stateaxis.state-feedback-plane",
-      "current_repository": "private-source",
       "candidate_median_seconds": 3.657639,
       "change_from_control_percent": -1.06,
       "classification": "promising-single-run-unqualified",
@@ -37,7 +36,6 @@
     },
     {
       "mod_id": "stateaxis.ascend-state-action",
-      "current_repository": "private-source",
       "candidate_median_seconds": 3.82798,
       "change_from_control_percent": 3.55,
       "classification": "negative-fallback-only",
@@ -45,7 +43,6 @@
     },
     {
       "mod_id": "stateaxis.hybrid-branch-coherence",
-      "current_repository": "private-source",
       "candidate_median_seconds": 4.940114,
       "change_from_control_percent": 1.41,
       "classification": "negative",
@@ -53,7 +50,6 @@
     },
     {
       "mod_id": "stateaxis.no-harm-preparation",
-      "current_repository": "private-source",
       "candidate_median_seconds": 4.978619,
       "change_from_control_percent": 2.2,
       "classification": "negative-safety-mechanism",
@@ -61,7 +57,6 @@
     },
     {
       "mod_id": "stateaxis.dependency-invalidation",
-      "current_repository": "private-source",
       "candidate_median_seconds": 5.44851,
       "change_from_control_percent": 1.0,
       "classification": "negative-safety-mechanism",
@@ -70,7 +65,6 @@
     },
     {
       "mod_id": "stateaxis.workflow-state-scheduling",
-      "current_repository": "private-source",
       "candidate_median_seconds": 3.768619,
       "change_from_control_percent": 1.94,
       "classification": "negative-policy-mechanism",
@@ -78,7 +72,6 @@
     },
     {
       "mod_id": "stateaxis.hybrid-hibernation",
-      "current_repository": "private-source",
       "candidate_median_seconds": 3.99975,
       "change_from_control_percent": 8.2,
       "classification": "negative-lifecycle-mechanism",
@@ -87,9 +80,8 @@
     }
   ],
   "provenance": {
-    "summary_url": "https://example.invalid/private-source",
+    "source_visibility": "private-no-public-link",
     "summary_sha256": "2d1819d186eec276afbb3cbadfce776645c6eb6e8f6d8b4e63017b236517ef5f",
-    "result_ledger_url": "https://example.invalid/private-source",
     "result_ledger_sha256": "21d225211eb1fb66fc781a9da5c5f08364499fa03d0ef3a59e54bbaa923ec213",
     "raw_archive_recorded_path": "/data/statecentric-builds/stateaxis-ecpa-seven-performance-20260928-r001",
     "performance_summary_sha256": "08f7032ceb48eb3e90346b63e1f597f9b2491b98273fa39bf86763075c6ed857",

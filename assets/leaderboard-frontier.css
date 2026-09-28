@@ -37,7 +37,7 @@
 .frontier-stateaxis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 9px; }
 .frontier-stateaxis-mod { min-width: 0; padding: 12px; border: 1px solid var(--run-border); border-radius: 9px; background: color-mix(in srgb, var(--run-tint) 45%, var(--run-bg)); }
 .frontier .frontier-stateaxis-mod h3 { margin: 0 0 5px; color: var(--run-ink); font-size: 12px; text-transform: capitalize; }
-.frontier-stateaxis-mod > a { color: var(--run-accent); font-size: 10px; }
+.frontier-stateaxis-private { color: var(--run-muted); font-size: 10px; }
 .frontier-stateaxis-mod > div { display: flex; align-items: baseline; gap: 8px; margin-top: 12px; }
 .frontier-stateaxis-mod > div strong { font-size: 20px; font-variant-numeric: tabular-nums; }
 .frontier-stateaxis-mod > div strong.is-favorable { color: #15803d; }

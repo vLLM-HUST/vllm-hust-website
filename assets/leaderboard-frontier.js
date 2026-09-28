@@ -17,7 +17,7 @@
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
             modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation',
-            stateaxisTitle: 'StateAxis · seven MOD audit', stateaxisHistorical: 'Qwen3.8-27B historical screen', stateaxisFollowup: 'Qwen3.5-35B · AgentX', stateaxisBlocked: 'Awaiting qualified rerun', stateaxisScope: 'Percentages are one-run Qwen3.8-27B historical screens, not Qwen3.5 / AgentX results. Split repositories inherit no performance qualification.', stateaxisPreflight: 'Preflight found four idle Ascend 910B2 devices; serving did not start because the exact AgentX dataset and frozen runtime identity were unavailable.', stateaxisLower: 'lower wall time', stateaxisRepo: 'repository', stateaxisUnavailable: 'StateAxis audit data unavailable.'
+            stateaxisTitle: 'StateAxis · seven MOD audit', stateaxisHistorical: 'Qwen3.8-27B historical screen', stateaxisFollowup: 'Qwen3.5-35B · AgentX', stateaxisBlocked: 'Awaiting qualified rerun', stateaxisScope: 'Percentages are one-run Qwen3.8-27B historical screens, not Qwen3.5 / AgentX results. Split repositories inherit no performance qualification.', stateaxisPreflight: 'Preflight found four idle Ascend 910B2 devices; serving did not start because the exact AgentX dataset and frozen runtime identity were unavailable.', stateaxisLower: 'lower wall time', stateaxisPrivate: 'private source · no public link', stateaxisUnavailable: 'StateAxis audit data unavailable.'
         },
         zh: {
             selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
@@ -31,7 +31,7 @@
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
             modCoverage: '35B MOD 补测进度', workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配',
-            stateaxisTitle: 'StateAxis · 七个 MOD 审计', stateaxisHistorical: 'Qwen3.8-27B 历史筛查', stateaxisFollowup: 'Qwen3.5-35B · AgentX', stateaxisBlocked: '待合格补测', stateaxisScope: '百分比来自 Qwen3.8-27B 单次历史筛查，不是 Qwen3.5 / AgentX 成绩；拆分仓库不继承性能资格。', stateaxisPreflight: '预检时四张 Ascend 910B2 均空闲；因精确 AgentX 数据集与冻结运行时身份不可用，未启动服务。', stateaxisLower: '请求时间越低越好', stateaxisRepo: '仓库', stateaxisUnavailable: 'StateAxis 审计数据暂不可用。'
+            stateaxisTitle: 'StateAxis · 七个 MOD 审计', stateaxisHistorical: 'Qwen3.8-27B 历史筛查', stateaxisFollowup: 'Qwen3.5-35B · AgentX', stateaxisBlocked: '待合格补测', stateaxisScope: '百分比来自 Qwen3.8-27B 单次历史筛查，不是 Qwen3.5 / AgentX 成绩；拆分仓库不继承性能资格。', stateaxisPreflight: '预检时四张 Ascend 910B2 均空闲；因精确 AgentX 数据集与冻结运行时身份不可用，未启动服务。', stateaxisLower: '请求时间越低越好', stateaxisPrivate: '私有来源 · 无公开跳转', stateaxisUnavailable: 'StateAxis 审计数据暂不可用。'
         }
     };
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
@@ -214,8 +214,8 @@
         panel.innerHTML=`<div class="frontier-stateaxis-heading"><div><h2 id="frontier-stateaxis-title">${t('stateaxisTitle')}</h2><p>${t('stateaxisScope')}</p></div><span class="frontier-stateaxis-status">${escape(status)}</span></div>
             <div class="frontier-stateaxis-meta"><span><strong>${t('stateaxisHistorical')}</strong> · ${escape(record.scope.hardware)} · ${t('stateaxisLower')}</span><span><strong>${t('stateaxisFollowup')}</strong> · ${escape(followup.status)}</span></div>
             <div class="frontier-stateaxis-grid">${record.results.map(row=>{
-                const slug=row.current_repository.split('/').pop(), change=row.change_from_control_percent, favorable=change<0;
-                return `<article class="frontier-stateaxis-mod" data-stateaxis-mod="${escape(row.mod_id)}"><h3>${escape(slug.replace(/^stateaxis-/,'').replaceAll('-',' '))}</h3><a href="https://github.com/${escape(row.current_repository)}" target="_blank" rel="noopener">${t('stateaxisRepo')} ↗</a><div><strong class="${favorable?'is-favorable':'is-negative'}">${change>0?'+':''}${fmt(change)}%</strong><span>${escape(row.classification)}</span></div><small>${t('stateaxisFollowup')}: ${escape(status)}</small></article>`;
+                const name=row.mod_id.replace(/^stateaxis\./,'').replaceAll('-',' '), change=row.change_from_control_percent, favorable=change<0;
+                return `<article class="frontier-stateaxis-mod" data-stateaxis-mod="${escape(row.mod_id)}"><h3>${escape(name)}</h3><span class="frontier-stateaxis-private">${t('stateaxisPrivate')}</span><div><strong class="${favorable?'is-favorable':'is-negative'}">${change>0?'+':''}${fmt(change)}%</strong><span>${escape(row.classification)}</span></div><small>${t('stateaxisFollowup')}: ${escape(status)}</small></article>`;
             }).join('')}</div><p class="frontier-stateaxis-preflight">${t('stateaxisPreflight')}</p>`;
     }
     function popup() {
