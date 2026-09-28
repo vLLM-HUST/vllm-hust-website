@@ -26,8 +26,7 @@ EXPECTED = {
 
 def test_historical_record_preserves_seven_exact_identities() -> None:
     actual = {
-        row["mod_id"]: row["change_from_control_percent"]
-        for row in RECORD["results"]
+        row["mod_id"]: row["change_from_control_percent"] for row in RECORD["results"]
     }
     assert actual == EXPECTED
     assert all(

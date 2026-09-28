@@ -2,10 +2,9 @@
 
 **截至 2026-09-28：仍有 MOD 未取得合格曲线。** 本报告区分已发布观测与固定版本的运行阻碍，不将资格失败、源码检查或导入成功当作性能结果。
 
-StateAxis 七个 carrier 的既有 matched screen 已单独登记在
-[历史性能记录](STATEAXIS-SEVEN-MOD-HISTORICAL.md)。该矩阵使用 Qwen3.8-27B、TP4 和 eager，
-不是 Qwen3.5-35B/AgentX 结果，也不向当前七个独立仓库继承资格；因此没有把这些数值混入本页
-Qwen3.5 Frontier 曲线。新的 Qwen3.5 + AgentX 配对补测仍需固定运行环境后完成。
+StateAxis 七个 carrier 的既有 matched screen 已单独登记在 [历史性能记录](STATEAXIS-SEVEN-MOD-HISTORICAL.md)。该矩阵使用
+Qwen3.8-27B、TP4 和 eager， 不是 Qwen3.5-35B/AgentX 结果，也不向当前七个独立仓库继承资格；因此没有把这些数值混入本页 Qwen3.5 Frontier
+曲线。新的 Qwen3.5 + AgentX 配对补测仍需固定运行环境后完成。
 
 Mooncake 最新复测已完成五档并发及匹配 Native，对照吞吐低 1.02%–2.66%。使用插件管理器启动 AscendStoreConnector + Mooncake；26
 项检索和前缀复用通过，退出需清理遗留进程。此前资格失败记录保留为历史；最新结果见 [完整报告](FRONTIER-MOONCAKE-20260926.md)。
