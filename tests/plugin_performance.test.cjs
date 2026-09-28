@@ -29,7 +29,7 @@ test('every Frontier gain is computed from five points in a declared comparison 
   ]));
   assert.equal(results.get('betterscale').gain.toFixed(2), '42.39');
   assert.equal(results.get('pipeline-microbatch-migration').gain.toFixed(2), '9.78');
-  assert.equal(results.get('kvcompress-ascend').gain.toFixed(2), '-5.83');
+  assert.equal(results.get('kvcompress-ascend').gain.toFixed(2), '-3.55');
   assert.equal(results.get('betterscale').runtimeBase.vllm.slice(0, 7), '752a3a5');
   assert.equal(results.get('bidkv').runtimeBase.vllm.slice(0, 7), 'd0f22d2');
 });
@@ -56,7 +56,7 @@ test('published paired runs expose both gains and regressions without precompute
 
 test('model-scoped summaries expose and rank only measurements from the selected model', () => {
   assert.deepEqual(M.models(data, frontier), [
-    'Qwen2.5-14B', 'Qwen2.5-7B-Instruct', 'Qwen3-30B-A3B', 'Qwen3-30B-A3B-W8A8',
+    'Qwen2.5-14B', 'Qwen2.5-7B-Instruct', 'Qwen2.5-Coder-14B', 'Qwen3-30B-A3B', 'Qwen3-30B-A3B-W8A8',
     'Qwen3.5-35B-A3B', 'Qwen3.8-27B'
   ]);
   const qwen25 = M.summarize(data, frontier, 'Qwen2.5-14B');
@@ -72,6 +72,11 @@ test('model-scoped summaries expose and rank only measurements from the selected
   assert.equal(qwen25Kvmat.source, 'published-comparison');
   assert.equal(qwen25Kvmat.count, 6);
   assert.equal(qwen25Kvmat.gain.toFixed(2), '-0.42');
+  const qwen25Kvcompress = M.summarize(data, frontier, 'Qwen2.5-Coder-14B')
+    .get('kvcompress-ascend');
+  assert.equal(qwen25Kvcompress.source, 'published-comparison');
+  assert.equal(qwen25Kvcompress.count, 1);
+  assert.equal(qwen25Kvcompress.gain.toFixed(2), '10.25');
 });
 
 test('kv-materialization publishes five exact unified windows and exercised actions', () => {
@@ -99,6 +104,26 @@ test('kv-materialization publishes five exact unified windows and exercised acti
   const allModels = M.summarize(data, frontier).get('kv-materialization-arrival-control');
   assert.equal(allModels.source, 'frontier');
   assert.equal(allModels.gain.toFixed(2), '7.13');
+});
+
+test('KVCompress publishes the clean 2ca0f933 Frontier evidence without duplicating the series', () => {
+  const series = frontier.points.filter(point => point.load.concurrency_series
+    === 'swe-unified-kvcompress-ascend-20260928');
+  assert.deepEqual(series.map(point => point.load.concurrency), [1, 2, 4, 8, 16]);
+  assert.deepEqual(series.map(point => point.metrics.output_tps), [
+    94.57222222222222, 136.70555555555555, 206.5988888888889,
+    286.1011111111111, 347.75333333333333
+  ]);
+  assert.equal(new Set(series.map(point => point.evidence.run_ids[0])).size, 5);
+  for (const point of series) {
+    const parameters = point.configuration.parameters;
+    assert.equal(parameters.mod_revision, '2ca0f9335399a698342285870df1514e9c519bd4'); // pragma: allowlist secret (public Git commit)
+    assert.equal(parameters.checkpoint_revision, '712cf74392b05026a6db2bf213d343747d1f6d45'); // pragma: allowlist secret (public model revision)
+    assert.equal(point.evidence.benchmark_protocol.prepared_workload_sha256,
+      '8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85'); // pragma: allowlist secret (public workload hash)
+    assert.match(point.evidence.source_evidence_url, /a020c164.*qwen35-frontier-formal/);
+  }
+  assert.equal(M.summarize(data, frontier).get('kvcompress-ascend').gain.toFixed(2), '-3.55');
 });
 
 test('comparison sets declare baselines centrally and entries cannot supply a baseline or score', () => {

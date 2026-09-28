@@ -698,10 +698,21 @@ test('Qwen35 unified campaign shares the existing chart without losing checkpoin
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
     assert.equal(moved.length,30);
+    const canonical=cohorts[0];
+    const checkpointIdentities=new Set([
+        original.model.revision,
+        canonical.model.revision,
+        ...(canonical.model.verified_identity_aliases||[]).map(alias=>alias.value),
+    ]);
+    const workloadIdentities=new Set([
+        original.workload.contract.prepared_workload_sha256,
+        canonical.workload.contract.prepared_workload_sha256,
+        ...(canonical.workload.contract.prepared_workload_variants||[]).map(variant=>variant.sha256),
+    ]);
     for(const p of moved){
         assert.equal(p.cohort_id,cohorts[0].id);
-        assert.equal(p.configuration.parameters.checkpoint_revision,original.model.revision);
-        assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,original.workload.contract.prepared_workload_sha256);
+        assert.ok(checkpointIdentities.has(p.configuration.parameters.checkpoint_revision));
+        assert.ok(workloadIdentities.has(p.evidence.benchmark_protocol.prepared_workload_sha256));
     }
 });
 

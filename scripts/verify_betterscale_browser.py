@@ -336,7 +336,10 @@ def main():
         ]
         assert "+42.39%" in page.locator("#betterscale").inner_text()
         assert "+9.78%" in page.locator("#pipeline-microbatch-migration").inner_text()
-        assert "-5.83%" in page.locator("#kvcompress-ascend").inner_text()
+        assert "-3.55%" in page.locator("#kvcompress-ascend").inner_text()
+        page.locator("[data-plugin-model]").select_option("Qwen2.5-Coder-14B")
+        assert "+10.25%" in page.locator("#kvcompress-ascend").inner_text()
+        page.locator("[data-plugin-model]").select_option("")
         assert page.locator("#stateharbor.workshop-card").count() == 0
         page.locator(
             '#betterscale .plugin-card-footer a[href="./betterscale.html"]'

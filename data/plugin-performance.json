@@ -223,11 +223,31 @@
       "ecpa": {
         "launch_acceptance": "manager-verified",
         "configuration_path": "manager-standard",
-        "analysis_integration": "external-harness"
+        "analysis_integration": "external-harness",
+        "note_zh": "Qwen3.5 统一配置已通过 ECPA 启动验收；历史 Qwen2.5-Coder 公开结果继续保留。",
+        "note_en": "The unified Qwen3.5 configuration passed ECPA launch acceptance; the historical Qwen2.5-Coder public result remains available."
       },
       "default_observation_id": "kvcompress-ascend:qwen35-frontier",
       "observations": [
-        {"id": "kvcompress-ascend:qwen35-frontier", "kind": "frontier-series", "series_id": "swe-unified-kvcompress-ascend-20260928"}
+        {
+          "id": "kvcompress-ascend:qwen35-frontier",
+          "kind": "frontier-series",
+          "series_id": "swe-unified-kvcompress-ascend-20260928"
+        },
+        {
+          "id": "kvcompress-ascend:qwen25-coder-historical",
+          "kind": "published-comparisons",
+          "url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/e4a4864/docs/resuts.md",
+          "comparisons": [
+            {
+              "metric": "output_tps",
+              "baseline": 2215.61,
+              "candidate": 2442.73,
+              "model_label": "Qwen2.5-Coder-14B",
+              "scope": "Long context · Ascend 910B2 · matched single run"
+            }
+          ]
+        }
       ]
     },
     {

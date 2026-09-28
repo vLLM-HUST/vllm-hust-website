@@ -67158,39 +67158,39 @@
           "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
           "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
           "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
-          "checkpoint_revision": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
           "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
           "observed_max_prompt_tokens": 52505,
-          "measured_mean_client_inflight": 0.9994082096995165,
-          "full_client_concurrency_fraction": 0.9994082096995165,
+          "measured_mean_client_inflight": 0.999290498321255,
+          "full_client_concurrency_fraction": 0.999290498321255,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
           "qualification": {
-            "concurrency": 2,
+            "concurrency": 4,
             "measurement_seconds": 60,
             "fresh_measured_session_salts": true,
             "capacity_gate": false
           },
           "execution_host": "user-provided Kubernetes container",
           "physical_devices": [
-            0,
-            1
+            2,
+            3
           ],
           "transport": "Client and server on execution host loopback",
-          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/vllm-hust-ext run -- /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48} --speculative-config {\"method\": \"mtp\", \"num_speculative_tokens\": 2} --generation-config vllm --override-generation-config {\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232",
           "max_cudagraph_capture_size": 48,
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
           "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
-          "mod_revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde"
+          "mod_revision": "2ca0f9335399a698342285870df1514e9c519bd4"
         },
         "mod_sources": [
           {
             "id": "kvcompress-ascend",
             "repository": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust",
-            "revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde",
+            "revision": "2ca0f9335399a698342285870df1514e9c519bd4",
             "source_capsule": "qwen35-kvcompress-frontier-20260928",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
@@ -67203,14 +67203,14 @@
         "session_rotation_depth": 1
       },
       "metrics": {
-        "output_tps": 82.04666666666667,
-        "decode_p90_tps": 110.48573068185316,
-        "ttft_p95_ms": 1232.1659420616925,
-        "completed_requests": 142
+        "output_tps": 94.57222222222222,
+        "decode_p90_tps": 110.35405668201226,
+        "ttft_p95_ms": 1013.2363806478679,
+        "completed_requests": 151
       },
       "evidence": {
         "execution_kind": "real-online",
-        "sampling_date_utc": "2026-09-27",
+        "sampling_date_utc": "2026-09-28",
         "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
         "status": "measured",
         "profile": "smoke",
@@ -67218,7 +67218,7 @@
         "tuning_complete": false,
         "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
         "run_ids": [
-          "82393b9c610c41a3b9d0d194429a4eab"
+          "b31b00379e034d7e813ae774a6ca41a2"
         ],
         "aggregation": "One unpooled 900s observation; drain excluded",
         "benchmark_protocol": {
@@ -67226,10 +67226,11 @@
           "campaign": "qwen35-kvcompress-frontier-20260928",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
         },
-        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1"
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/a020c164ec68cf3a7c53a40c0129b37a14ed1a05/handoff/2026-09-28-qwen35-frontier-formal/README.md"
       }
     },
     {
@@ -67282,39 +67283,39 @@
           "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
           "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
           "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
-          "checkpoint_revision": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
           "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "observed_max_prompt_tokens": 63711,
-          "measured_mean_client_inflight": 1.9989571988054862,
-          "full_client_concurrency_fraction": 0.9989573499736273,
+          "observed_max_prompt_tokens": 61438,
+          "measured_mean_client_inflight": 1.9990031099660943,
+          "full_client_concurrency_fraction": 0.9990032389232268,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
           "qualification": {
-            "concurrency": 2,
+            "concurrency": 4,
             "measurement_seconds": 60,
             "fresh_measured_session_salts": true,
             "capacity_gate": false
           },
           "execution_host": "user-provided Kubernetes container",
           "physical_devices": [
-            0,
-            1
+            2,
+            3
           ],
           "transport": "Client and server on execution host loopback",
-          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/vllm-hust-ext run -- /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48} --speculative-config {\"method\": \"mtp\", \"num_speculative_tokens\": 2} --generation-config vllm --override-generation-config {\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232",
           "max_cudagraph_capture_size": 48,
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
           "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
-          "mod_revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde"
+          "mod_revision": "2ca0f9335399a698342285870df1514e9c519bd4"
         },
         "mod_sources": [
           {
             "id": "kvcompress-ascend",
             "repository": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust",
-            "revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde",
+            "revision": "2ca0f9335399a698342285870df1514e9c519bd4",
             "source_capsule": "qwen35-kvcompress-frontier-20260928",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
@@ -67327,14 +67328,14 @@
         "session_rotation_depth": 1
       },
       "metrics": {
-        "output_tps": 145.39555555555555,
-        "decode_p90_tps": 106.34698361845508,
-        "ttft_p95_ms": 1849.2935683578246,
-        "completed_requests": 197
+        "output_tps": 136.70555555555555,
+        "decode_p90_tps": 88.41768829712161,
+        "ttft_p95_ms": 1964.7687214892358,
+        "completed_requests": 188
       },
       "evidence": {
         "execution_kind": "real-online",
-        "sampling_date_utc": "2026-09-27",
+        "sampling_date_utc": "2026-09-28",
         "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
         "status": "measured",
         "profile": "smoke",
@@ -67342,7 +67343,7 @@
         "tuning_complete": false,
         "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
         "run_ids": [
-          "e92e7211e26c46fea76ac671c889ae84"
+          "7fe75902ced340b9b7b24abf1058794c"
         ],
         "aggregation": "One unpooled 900s observation; drain excluded",
         "benchmark_protocol": {
@@ -67350,10 +67351,11 @@
           "campaign": "qwen35-kvcompress-frontier-20260928",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
         },
-        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1"
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/a020c164ec68cf3a7c53a40c0129b37a14ed1a05/handoff/2026-09-28-qwen35-frontier-formal/README.md"
       }
     },
     {
@@ -67406,39 +67408,39 @@
           "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
           "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
           "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
-          "checkpoint_revision": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
           "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "observed_max_prompt_tokens": 74706,
-          "measured_mean_client_inflight": 3.9980877224200717,
-          "full_client_concurrency_fraction": 0.998091171986113,
+          "observed_max_prompt_tokens": 69089,
+          "measured_mean_client_inflight": 3.9981284188272226,
+          "full_client_concurrency_fraction": 0.9981323229935434,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
           "qualification": {
-            "concurrency": 2,
+            "concurrency": 4,
             "measurement_seconds": 60,
             "fresh_measured_session_salts": true,
             "capacity_gate": false
           },
           "execution_host": "user-provided Kubernetes container",
           "physical_devices": [
-            0,
-            1
+            2,
+            3
           ],
           "transport": "Client and server on execution host loopback",
-          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/vllm-hust-ext run -- /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48} --speculative-config {\"method\": \"mtp\", \"num_speculative_tokens\": 2} --generation-config vllm --override-generation-config {\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232",
           "max_cudagraph_capture_size": 48,
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
           "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
-          "mod_revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde"
+          "mod_revision": "2ca0f9335399a698342285870df1514e9c519bd4"
         },
         "mod_sources": [
           {
             "id": "kvcompress-ascend",
             "repository": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust",
-            "revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde",
+            "revision": "2ca0f9335399a698342285870df1514e9c519bd4",
             "source_capsule": "qwen35-kvcompress-frontier-20260928",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
@@ -67451,14 +67453,14 @@
         "session_rotation_depth": 1
       },
       "metrics": {
-        "output_tps": 215.5888888888889,
-        "decode_p90_tps": 92.47301710001881,
-        "ttft_p95_ms": 2001.4415716752408,
-        "completed_requests": 307
+        "output_tps": 206.5988888888889,
+        "decode_p90_tps": 77.34354504472113,
+        "ttft_p95_ms": 2056.065628118813,
+        "completed_requests": 295
       },
       "evidence": {
         "execution_kind": "real-online",
-        "sampling_date_utc": "2026-09-27",
+        "sampling_date_utc": "2026-09-28",
         "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
         "status": "measured",
         "profile": "smoke",
@@ -67466,7 +67468,7 @@
         "tuning_complete": false,
         "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
         "run_ids": [
-          "71fd3ce40c584d18b828b822a7bc13db"
+          "2042394037de4949926f5ceea42b04ea"
         ],
         "aggregation": "One unpooled 900s observation; drain excluded",
         "benchmark_protocol": {
@@ -67474,10 +67476,11 @@
           "campaign": "qwen35-kvcompress-frontier-20260928",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
         },
-        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1"
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/a020c164ec68cf3a7c53a40c0129b37a14ed1a05/handoff/2026-09-28-qwen35-frontier-formal/README.md"
       }
     },
     {
@@ -67530,39 +67533,39 @@
           "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
           "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
           "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
-          "checkpoint_revision": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
           "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "observed_max_prompt_tokens": 77624,
-          "measured_mean_client_inflight": 7.997781973797828,
-          "full_client_concurrency_fraction": 0.997801417445557,
+          "observed_max_prompt_tokens": 75919,
+          "measured_mean_client_inflight": 7.997569176840286,
+          "full_client_concurrency_fraction": 0.9975888937328838,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
           "qualification": {
-            "concurrency": 2,
+            "concurrency": 4,
             "measurement_seconds": 60,
             "fresh_measured_session_salts": true,
             "capacity_gate": false
           },
           "execution_host": "user-provided Kubernetes container",
           "physical_devices": [
-            0,
-            1
+            2,
+            3
           ],
           "transport": "Client and server on execution host loopback",
-          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/vllm-hust-ext run -- /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48} --speculative-config {\"method\": \"mtp\", \"num_speculative_tokens\": 2} --generation-config vllm --override-generation-config {\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232",
           "max_cudagraph_capture_size": 48,
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
           "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
-          "mod_revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde"
+          "mod_revision": "2ca0f9335399a698342285870df1514e9c519bd4"
         },
         "mod_sources": [
           {
             "id": "kvcompress-ascend",
             "repository": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust",
-            "revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde",
+            "revision": "2ca0f9335399a698342285870df1514e9c519bd4",
             "source_capsule": "qwen35-kvcompress-frontier-20260928",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
@@ -67575,14 +67578,14 @@
         "session_rotation_depth": 1
       },
       "metrics": {
-        "output_tps": 280.0988888888889,
-        "decode_p90_tps": 62.427229343135295,
-        "ttft_p95_ms": 2623.60217240639,
-        "completed_requests": 422
+        "output_tps": 286.1011111111111,
+        "decode_p90_tps": 61.13461820415613,
+        "ttft_p95_ms": 2465.534031391144,
+        "completed_requests": 421
       },
       "evidence": {
         "execution_kind": "real-online",
-        "sampling_date_utc": "2026-09-27",
+        "sampling_date_utc": "2026-09-28",
         "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
         "status": "measured",
         "profile": "smoke",
@@ -67590,7 +67593,7 @@
         "tuning_complete": false,
         "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
         "run_ids": [
-          "91380ca1870c4fe6a999d96946c11f86"
+          "bda15187dacf4d4b994fb34aaf7bb310"
         ],
         "aggregation": "One unpooled 900s observation; drain excluded",
         "benchmark_protocol": {
@@ -67598,10 +67601,11 @@
           "campaign": "qwen35-kvcompress-frontier-20260928",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
         },
-        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1"
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/a020c164ec68cf3a7c53a40c0129b37a14ed1a05/handoff/2026-09-28-qwen35-frontier-formal/README.md"
       }
     },
     {
@@ -67654,39 +67658,39 @@
           "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
           "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
           "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
-          "checkpoint_revision": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
           "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
           "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "observed_max_prompt_tokens": 59524,
-          "measured_mean_client_inflight": 15.997792120062643,
-          "full_client_concurrency_fraction": 0.997879676869553,
+          "observed_max_prompt_tokens": 58285,
+          "measured_mean_client_inflight": 15.997336489406104,
+          "full_client_concurrency_fraction": 0.9974275773939573,
           "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
           "qualification": {
-            "concurrency": 2,
+            "concurrency": 4,
             "measurement_seconds": 60,
             "fresh_measured_session_salts": true,
             "capacity_gate": false
           },
           "execution_host": "user-provided Kubernetes container",
           "physical_devices": [
-            0,
-            1
+            2,
+            3
           ],
           "transport": "Client and server on execution host loopback",
-          "server_command": "/home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/vllm-hust-ext run -- /home/coder/frontier-mods-qwen35-20260925/phase7-env/venv/bin/python -m vllm.entrypoints.cli.main serve /home/coder/frontier-mods-qwen35-20260925/model --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\": \"FULL_AND_PIECEWISE\", \"cudagraph_capture_sizes\": [3, 6, 12, 24, 48], \"max_cudagraph_capture_size\": 48} --speculative-config {\"method\": \"mtp\", \"num_speculative_tokens\": 2} --generation-config vllm --override-generation-config {\"temperature\": 0.0, \"top_p\": 1.0, \"top_k\": -1, \"presence_penalty\": 0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232",
           "max_cudagraph_capture_size": 48,
           "worker_class": "pipeline_worker.Worker",
           "participating_deployment_chips": 2,
           "pod_npu_quota": 4,
           "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
-          "mod_revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde"
+          "mod_revision": "2ca0f9335399a698342285870df1514e9c519bd4"
         },
         "mod_sources": [
           {
             "id": "kvcompress-ascend",
             "repository": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust",
-            "revision": "ed058fa1e45a6830776ccc10b6100537b8fc4fde",
+            "revision": "2ca0f9335399a698342285870df1514e9c519bd4",
             "source_capsule": "qwen35-kvcompress-frontier-20260928",
             "scope": "The only candidate-specific treatment admitted by the unified audit"
           }
@@ -67699,14 +67703,14 @@
         "session_rotation_depth": 1
       },
       "metrics": {
-        "output_tps": 327.3277777777778,
-        "decode_p90_tps": 36.122167220638175,
-        "ttft_p95_ms": 3101.7702505458137,
-        "completed_requests": 504
+        "output_tps": 347.75333333333333,
+        "decode_p90_tps": 34.93487505412306,
+        "ttft_p95_ms": 3044.8468025773764,
+        "completed_requests": 548
       },
       "evidence": {
         "execution_kind": "real-online",
-        "sampling_date_utc": "2026-09-27",
+        "sampling_date_utc": "2026-09-28",
         "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
         "status": "measured",
         "profile": "smoke",
@@ -67714,7 +67718,7 @@
         "tuning_complete": false,
         "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
         "run_ids": [
-          "97d19a31f9d24a1692aed17db52295eb"
+          "436f78f03dd24c9ea2dd462803db3d4b"
         ],
         "aggregation": "One unpooled 900s observation; drain excluded",
         "benchmark_protocol": {
@@ -67722,10 +67726,11 @@
           "campaign": "qwen35-kvcompress-frontier-20260928",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
           "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
         },
-        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1"
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/a020c164ec68cf3a7c53a40c0129b37a14ed1a05/handoff/2026-09-28-qwen35-frontier-formal/README.md"
       }
     },
     {
