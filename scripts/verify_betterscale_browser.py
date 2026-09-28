@@ -27,19 +27,23 @@ def main():
         ]
     }
     workshop_mod_count = sum(
-        item["id"] in performance_ids
-        or (
-            item["artifact_type"] in {"runtime_component", "bridge"}
-            and item["repository_relationship"] == "organization_native"
-            and item.get("public_surface", True) is not False
-            and item["delivery_model"]
-            in {
-                "plugin_bundle",
-                "python_distribution",
-                "migration_scaffold",
-                "source_patch",
-            }
-            and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        item.get("public_surface", True) is not False
+        and (
+            item["id"] in performance_ids
+            or (
+                item["artifact_type"] in {"runtime_component", "bridge"}
+                and item["repository_relationship"] == "organization_native"
+                and item["delivery_model"]
+                in {
+                    "plugin_bundle",
+                    "python_distribution",
+                    "migration_scaffold",
+                    "source_patch",
+                }
+                and item["canonical_repository"].startswith(
+                    "https://github.com/vLLM-HUST/"
+                )
+            )
         )
         for item in ecosystem["components"]
     )
@@ -318,16 +322,14 @@ def main():
         page.locator("[data-plugin-more]").click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
         assert page.locator(".workshop-card").evaluate_all(
-            "cards => cards.slice(0, 11).map(card => card.id)"
+            "cards => cards.slice(0, 9).map(card => card.id)"
         ) == [
             "vspec",
             "betterscale",
             "pipeline-microbatch-migration",
             "bidkv",
-            "dla",
             "kv-materialization-arrival-control",
             "mooncake-vllm-connectors",
-            "kv-tiering-migration",
             "kvcompress-ascend",
             "diffspec",
             "latchmoe",
