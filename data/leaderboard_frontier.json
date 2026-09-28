@@ -118,6 +118,10 @@
           "checkpoint_provenance": "HF 712cf743 and the ModelScope content manifest are accepted as the same Qwen3.5-35B-A3B model for this throughput view by Fletcher (2026-09-24). Actual source identity stays per point; no byte-equality claim.",
           "workload_repository": "https://github.com/vLLM-HUST/agentx-bench"
         }
+      },
+      "display_withdrawal": {
+        "date": "2026-09-27",
+        "reason": "Workload retired from the active leaderboard at owner request; historical measurements retained unchanged."
       }
     },
     {

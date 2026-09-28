@@ -89,9 +89,9 @@
     "raw_archive_publicly_downloadable": false
   },
   "qwen35_agentx_followup": {
-    "status": "measured-single-run-smoke",
-    "reason": "The historical seven-mod screen still cannot be relabelled as Qwen3.5-35B AgentX evidence. A separate Qwen3.5/AgentX matrix now records one smoke per mod and two controls without making a qualified speedup claim.",
-    "remaining_design": "Repeat matched controls and candidates after workloads exercise each mod's intended protocol events; preserve exactness, effect, process-release and device-release receipts.",
-    "followup_record": "data/stateaxis-qwen35-agentx-followup.json"
+    "status": "blocked-before-serving",
+    "reason": "The historical seven-mod screen used Qwen3.8-27B and did not record AgentX. It cannot be relabelled as Qwen3.5-35B AgentX evidence.",
+    "required_design": "Fresh matched control plus each independently pinned repository, fixed AgentX revision, repeated order, exactness, effect, process-release and device-release receipts.",
+    "preflight_record": "data/stateaxis-qwen35-agentx-followup.json"
   }
 }
