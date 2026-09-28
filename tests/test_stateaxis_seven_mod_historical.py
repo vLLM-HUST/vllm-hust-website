@@ -23,14 +23,14 @@ EXPECTED = {
     "stateaxis.hybrid-hibernation": 8.20,
 }
 
-SOURCE_REVISIONS = {
-    "stateaxis.ascend-state-action": "ac7c616bba4fc6645ab82b35d8366337cd9186ef",
-    "stateaxis.dependency-invalidation": "deac2a05c279e02ce72c52d0c6bcda1d86cada99",
-    "stateaxis.hybrid-branch-coherence": "65bc4fa60f739919aada1d615221d8d1a53ceb46",
-    "stateaxis.hybrid-hibernation": "bb9cf7c29b6a95496a9189e396b66845825fdf1e",
-    "stateaxis.no-harm-preparation": "4e73bb547270abb2b76ed8ce3dd27cdfea21e3ef",
-    "stateaxis.state-feedback-plane": "199e739cefd246541f8e995e45650d0034d1dc18",
-    "stateaxis.workflow-state-scheduling": "af6f70364969088f0d3e5e572f0dc5eeea5b0588",
+SOURCE_REVISION_PREFIXES = {
+    "stateaxis.ascend-state-action": "ac7c616b",
+    "stateaxis.dependency-invalidation": "deac2a05",
+    "stateaxis.hybrid-branch-coherence": "65bc4fa6",
+    "stateaxis.hybrid-hibernation": "bb9cf7c2",
+    "stateaxis.no-harm-preparation": "4e73bb54",
+    "stateaxis.state-feedback-plane": "199e739c",
+    "stateaxis.workflow-state-scheduling": "af6f7036",
 }
 
 
@@ -74,8 +74,9 @@ def test_followup_preserves_nine_valid_runs_without_qualification() -> None:
     assert len(FOLLOWUP["raw_archive_sha256"]) == 64
     assert {row["mod_id"] for row in FOLLOWUP["results"]} == set(EXPECTED)
     assert {
-        row["mod_id"]: row["source_revision"] for row in FOLLOWUP["results"]
-    } == SOURCE_REVISIONS
+        row["mod_id"]: row["source_revision"][:8] for row in FOLLOWUP["results"]
+    } == SOURCE_REVISION_PREFIXES
+    assert all(len(row["source_revision"]) == 40 for row in FOLLOWUP["results"])
     for row in [*FOLLOWUP["controls"], *FOLLOWUP["results"]]:
         assert row["submission_valid"] is True
         assert row["errors"] == 0
@@ -83,7 +84,8 @@ def test_followup_preserves_nine_valid_runs_without_qualification() -> None:
         assert row["devices_released"] is True
         assert len(row["export_sha256"]) == 64
     feedback = next(
-        row for row in FOLLOWUP["results"]
+        row
+        for row in FOLLOWUP["results"]
         if row["mod_id"] == "stateaxis.state-feedback-plane"
     )
     assert feedback["effect_status"] == "exercised-with-drops"

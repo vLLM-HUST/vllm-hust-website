@@ -44,5 +44,5 @@ The observations split into 58-request / 11.457 output tok/s and 59-request / 16
 windows because one long-output request crossed the measurement boundary; the closing control
 returned to the 58-request mode. This prevents a causal speedup claim. Five mods were not exercised,
 Ascend state action was fallback-only, and feedback plane emitted 256 events while dropping 3266.
-See the [machine-readable run receipt](../data/stateaxis-qwen35-agentx-followup.json). Private source
-locations remain intentionally unlinked.
+See the [machine-readable run receipt](../data/stateaxis-qwen35-agentx-followup.json). Private
+source locations remain intentionally unlinked.

@@ -1,12 +1,13 @@
 # Qwen3.5-35B-A3B MOD 曲线覆盖进度
 
-**截至 2026-09-28：StateAxis 七个 MOD 已各完成一次 Qwen3.5-35B / AgentX 900 秒 smoke，但均未取得性能资格。** 本报告区分已发布观测与固定版本的运行阻碍，不将资格失败、源码检查或导入成功当作性能结果。
+**截至 2026-09-28：StateAxis 七个 MOD 已各完成一次 Qwen3.5-35B / AgentX 900 秒 smoke，但均未取得性能资格。**
+本报告区分已发布观测与固定版本的运行阻碍，不将资格失败、源码检查或导入成功当作性能结果。
 
 StateAxis 七个 carrier 的既有 matched screen 已单独登记在 [历史性能记录](STATEAXIS-SEVEN-MOD-HISTORICAL.md)。该矩阵使用
 Qwen3.8-27B、TP4 和 eager， 不是 Qwen3.5-35B/AgentX 结果，也不向当前七个独立仓库继承资格；因此没有把这些数值混入本页 Qwen3.5 Frontier
 曲线。新的 Qwen3.5 + AgentX 补测使用固定 StateAxis dev43、同一物理 NPU 对、完整 393-session 数据和首尾两个 control。九个导出全部
-`submission_valid=true`、请求错误与输出长度不匹配均为零，并且设备均已释放。58 请求窗口为 11.457 output tok/s，59 请求窗口为
-16.105 output tok/s；尾部 control 回到 58 请求，因此不把窗口边界双峰归因于 MOD。Ascend state action 只有 3580 次 fallback；五项没有
+`submission_valid=true`、请求错误与输出长度不匹配均为零，并且设备均已释放。58 请求窗口为 11.457 output tok/s，59 请求窗口为 16.105 output
+tok/s；尾部 control 回到 58 请求，因此不把窗口边界双峰归因于 MOD。Ascend state action 只有 3580 次 fallback；五项没有
 触发相应协议事件；feedback plane 发出 256 个事件后丢弃 3266 个。页面展示原始观测与 effect 状态，不计算加速百分比。
 
 Mooncake 最新复测已完成五档并发及匹配 Native，对照吞吐低 1.02%–2.66%。使用插件管理器启动 AscendStoreConnector + Mooncake；26

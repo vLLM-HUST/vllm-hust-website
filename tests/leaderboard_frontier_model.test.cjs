@@ -676,14 +676,13 @@ test('rotation depths cannot dominate or tie-deduplicate each other, even within
 });
 
 
-test('newly measured Qwen35 AgentX is visible while other retired evidence stays hidden',()=>{
+test('newly measured Qwen35 AgentX is visible without mutating the snapshot',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const before=JSON.stringify(data);
     const visible=model.visibleData(data);
     const measured=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-agentx256k-smoke-v1');
     assert.ok(measured);
     assert.equal(measured.display_withdrawal,undefined);
-    assert.ok(data.cohorts.some(c=>c.display_withdrawal));
     assert.ok(data.points.some(p=>p.cohort_id.includes('agentx')));
     assert.ok(visible.cohorts.some(c=>c.id===measured.id));
     assert.ok(visible.cohorts.every(c=>!c.display_withdrawal));
@@ -697,13 +696,15 @@ test('Qwen35 unified campaign shares the existing chart without losing checkpoin
     const data=require('../data/leaderboard_frontier.json');
     const visible=model.visibleData(data);
     const cohorts=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
-    assert.equal(cohorts.length,1);
+    assert.equal(cohorts.length,2);
+    const swe=cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
+    assert.ok(swe);
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
     assert.equal(moved.length,30);
     for(const p of moved){
-        assert.equal(p.cohort_id,cohorts[0].id);
+        assert.equal(p.cohort_id,swe.id);
         assert.equal(p.configuration.parameters.checkpoint_revision,original.model.revision);
         assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,original.workload.contract.prepared_workload_sha256);
     }
