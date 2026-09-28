@@ -65,14 +65,14 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
 
 def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
     assert (
-        "Typed runtime contracts. 12 published MOD projects. Evidence before claims."
+        "Typed runtime contracts. 13 published MOD projects. Evidence before claims."
         in HOME
     )
     assert (
         "every MOD publishes ownership, compatibility, workload fit, and evidence limits"
         in HOME
     )
-    assert "类型化运行时契约、12 个公开 MOD 项目、证据先于结论。" in HOME
+    assert "类型化运行时契约、13 个公开 MOD 项目、证据先于结论。" in HOME
     assert "每个 MOD 明示负责人、兼容性、Workload 与证据边界" in HOME
 
 

@@ -64,6 +64,7 @@
   },
   "plugins": {
     "traceloom": ["profiling_analysis"],
+    "adm": ["distributed_pipeline"],
     "bidkv": ["memory_kv_pressure", "high_concurrency"],
     "diffspec": ["decode_heavy", "latency_slo"],
     "vspec": ["decode_heavy", "latency_slo"],

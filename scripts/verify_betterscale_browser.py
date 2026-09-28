@@ -327,12 +327,12 @@ def main():
             "vspec",
             "betterscale",
             "pipeline-microbatch-migration",
+            "adm",
             "bidkv",
             "kv-materialization-arrival-control",
             "mooncake-vllm-connectors",
             "kvcompress-ascend",
             "diffspec",
-            "latchmoe",
         ]
         assert "+42.39%" in page.locator("#betterscale").inner_text()
         assert "+9.78%" in page.locator("#pipeline-microbatch-migration").inner_text()

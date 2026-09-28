@@ -37,6 +37,7 @@ test('every Frontier gain is computed from five points in a declared comparison 
 test('published paired runs expose both gains and regressions without precomputed scores', () => {
   const results = M.summarize(data, frontier);
   const expected = {
+    adm: '0.80',
     vspec: '51.80',
     'kv-materialization-arrival-control': '-0.42',
     diffspec: '-70.66',
@@ -45,7 +46,7 @@ test('published paired runs expose both gains and regressions without precompute
   for (const [id, gain] of Object.entries(expected)) {
     const result = results.get(id);
     assert.equal(result.source, 'published-comparison');
-    assert.equal(result.count, id === 'kv-materialization-arrival-control' ? 6 : 1);
+    assert.equal(result.count, id === 'kv-materialization-arrival-control' ? 6 : id === 'adm' ? 3 : 1);
     assert.equal(result.gain.toFixed(2), gain);
     assert.ok(result.url.startsWith('https://github.com/vLLM-HUST/'));
     assert.ok(result.published_comparisons.every(row => row.baseline > 0));
@@ -53,12 +54,12 @@ test('published paired runs expose both gains and regressions without precompute
   }
   const kvmat = results.get('kv-materialization-arrival-control');
   assert.equal(kvmat.count, 6);
-  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 11);
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 12);
 });
 
 test('model-scoped summaries expose and rank only measurements from the selected model', () => {
   assert.deepEqual(M.models(data, frontier), [
-    'Qwen2.5-14B', 'Qwen2.5-7B-Instruct', 'Qwen3-30B-A3B',
+    'Qwen2.5-14B', 'Qwen2.5-7B-Instruct', 'Qwen3-30B-A3B', 'Qwen3-30B-A3B-W8A8',
     'Qwen3.5-35B-A3B', 'Qwen3.8-27B'
   ]);
   const qwen25 = M.summarize(data, frontier, 'Qwen2.5-14B');
@@ -113,7 +114,7 @@ test('series outside declared comparison sets do not produce percentages', () =>
 });
 
 test('workload, model, topology, KV budget, runtime and measurement mismatches exclude a candidate', () => {
-  const measured = [...M.summarize(data, frontier).values()].find(result => Number.isFinite(result.gain));
+  const measured = [...M.summarize(data, frontier).values()].find(result => result.source === 'frontier' && Number.isFinite(result.gain));
   const id = measured.comparisons[0].point_id;
   const edits = [
     p => {p.evidence.benchmark_protocol.prepared_workload_sha256 = 'different';},
@@ -133,7 +134,7 @@ test('workload, model, topology, KV budget, runtime and measurement mismatches e
 });
 
 test('MOD-specific host-tier capacity remains part of the treatment', () => {
-  const result = [...M.summarize(data, frontier).values()].find(row => Number.isFinite(row.gain));
+  const result = [...M.summarize(data, frontier).values()].find(row => row.source === 'frontier' && Number.isFinite(row.gain));
   const changed = structuredClone(frontier);
   for (const row of result.comparisons) {
     const parameters = changed.points.find(point => point.id === row.point_id).configuration.parameters;
@@ -143,7 +144,7 @@ test('MOD-specific host-tier capacity remains part of the treatment', () => {
 });
 
 test('missing or duplicated concurrency windows cannot turn a partial curve into a score', () => {
-  const measured = [...M.summarize(data, frontier).values()].find(result => Number.isFinite(result.gain));
+  const measured = [...M.summarize(data, frontier).values()].find(result => result.source === 'frontier' && Number.isFinite(result.gain));
   const id = measured.comparisons[0].point_id;
   const missing = {...frontier, points: frontier.points.filter(point => point.id !== id)};
   assert.equal(M.summarize(data, missing).get(measured.id).gain, null);
@@ -161,7 +162,7 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const real = M.summarize(data, frontier);
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
-    'vspec', 'betterscale', 'pipeline-microbatch-migration',
+    'vspec', 'betterscale', 'pipeline-microbatch-migration', 'adm',
     'bidkv', 'dla', 'kv-materialization-arrival-control', 'mooncake-vllm-connectors', 'kv-tiering-migration',
     'kvcompress-ascend', 'diffspec', 'latchmoe'
   ]);
