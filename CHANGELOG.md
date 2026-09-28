@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- 登记 StateAxis 七个 carrier 的 Qwen3.8-27B 历史 matched screen、固定提交、效果回执与负结果；明确其不是 Qwen3.5/AgentX 数据，也不向拆分后的七个独立仓库继承性能资格。
+
 ## [0.3.7] - 2026-09-03
 
 ### Fixed
