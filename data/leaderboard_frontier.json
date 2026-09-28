@@ -6,7 +6,15 @@
       "model": {
         "id": "qwen35-35b-a3b-712cf743",
         "label": "Qwen3.5-35B-A3B",
-        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45"
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+        "verified_identity_aliases": [
+          {
+            "value": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "kind": "model_manifest_sha256",
+            "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+          }
+        ]
       },
       "precision": {
         "id": "bf16-weights-compute-kv",
@@ -70175,6 +70183,996 @@
         },
         "sampling_date_utc": "2026-09-27",
         "sampling_date_source": "SWE client.started_at_unix"
+      }
+    },
+    {
+      "id": "qwen35-unified-kv-materialization-arrival-control-tp2-c1-r1-20260928",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "kv-materialization-arrival-control · C1 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "kv-materialization-arrival-control"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_policy": "No declared local host KV tier",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "runtime_source_heads": {
+            "vllm": "556671b117716300121b2ac78b112443b83d1958",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip as the unique unified Native series",
+          "comparison_scope": "One serial 900s observation per cell; paired only with swe-unified-native-20260927",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate 60s qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 52505,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "health": true,
+            "prompt_id_usage_done": true,
+            "output_budget": true,
+            "apc": true,
+            "mtp2": true,
+            "async_scheduling": true,
+            "graph_mode": true,
+            "mamba_align": true
+          },
+          "execution_host": "180-evaluation experiment container",
+          "physical_devices": [
+            1,
+            5
+          ],
+          "container_visible_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "server_command": "/root/frontier-kvmat-env/bin/vllm-hust-ext run --shutdown-grace-seconds 60 -- /root/frontier-kvmat-env/bin/python -m vllm.entrypoints.cli.main serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\":\"FULL_AND_PIECEWISE\",\"cudagraph_capture_sizes\":[3,6,12,24,48],\"max_cudagraph_capture_size\":48} --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --generation-config vllm --override-generation-config {\"temperature\":0.0,\"top_p\":1.0,\"top_k\":-1,\"presence_penalty\":0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "release_verified": true,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+          "extension_manager_revision": "701aa95ae8d5b23b5ea8c8ec475ceaa470393e54",
+          "mod_runtime_effectiveness": {
+            "enabled": true,
+            "status": "exercised",
+            "controller_calls": 148,
+            "observed_decisions": {
+              "recompute": 6,
+              "partial_reuse": 3,
+              "full_reuse": 139
+            },
+            "effective_decisions": {
+              "recompute": 6,
+              "full_reuse": 142
+            },
+            "realized_scheduler_decisions": {
+              "recompute": 22,
+              "partial_reuse": 126
+            },
+            "runtime_events": {
+              "lookup": 148,
+              "commit": 28527
+            },
+            "hash_block_size_tokens": 2048,
+            "total_engine_reused_tokens": 2406400,
+            "total_engine_recomputed_tokens": 564788,
+            "matched_blocks": 4700,
+            "partial_reuse_note": "Block-aligned partial decisions fell back to anchor-scoped full reuse when full reuse dominated; request-scoped recompute and anchor-scoped reuse paths both executed."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "kv-materialization-arrival-control",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+            "revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+            "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+            "scope": "Arrival controller, request metadata adapter, runtime decision seam and measured action telemetry"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-kv-materialization-arrival-control-20260928",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 90.5911111111111,
+        "decode_p90_tps": 107.36876391861011,
+        "ttft_p95_ms": 937.7691274508834,
+        "completed_requests": 147
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-28",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KV-MATERIALIZATION.md",
+        "run_ids": [
+          "ad9925f9329b4f87ad3da5285ebab36b"
+        ],
+        "aggregation": "One unpooled 900s observation; fixed-window output tokens only; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-kv-materialization-frontier-20260928",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "window": {
+          "started_at_utc": "2026-09-28T06:11:23Z",
+          "ended_at_utc": "2026-09-28T06:26:33Z",
+          "output_tokens": 81532,
+          "requests_started": 148,
+          "requests_completed_in_window": 147,
+          "requests_drained": 1,
+          "request_errors": 0
+        },
+        "correctness": {
+          "status": "passed",
+          "prompt_id_echo": true,
+          "usage": true,
+          "done": true,
+          "output_budget": true,
+          "request_errors": 0
+        },
+        "release": {
+          "service_exited": true,
+          "port_released": true,
+          "processes_released": true,
+          "npu_resources_released": true
+        },
+        "artifact_sha256": {
+          "config": "a54880c720bca2f3eb15d4ec0117a32ddf88c069379a2da189625d3275d779af",
+          "summary": "b29accf45386003fff4eb7a9b50ea34c037d309e5dec6e884ed5e7bdfd846141",
+          "requests": "3a88a223052d1b282dae781b3dd91e916d09f530628a59437606454b7279de05",
+          "server": "6356f98b48790aa1dbba39c744c37b9ad96162e8a70062794ebc5c71b411e3d1",
+          "client": "12a21bf5962462a265c73dbbc37e8e898c964fc7205200f70ca5ddb592418073",
+          "mod": "01df7993261584d68a88ff17f265a8b7de64b1fb24c89c37849f2c6ba11ced16",
+          "runtime": "7bd72c212c6b7017ca0fe909be02ffe5d513e6d0f79bc72f7a4daa03dd899398",
+          "manifest": "581853b041cfa1bbcaee360b18036436f7ff36a37ce5f1490724b71ecf54e332"
+        }
+      }
+    },
+    {
+      "id": "qwen35-unified-kv-materialization-arrival-control-tp2-c2-r1-20260928",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "kv-materialization-arrival-control · C2 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "kv-materialization-arrival-control"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_policy": "No declared local host KV tier",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "runtime_source_heads": {
+            "vllm": "556671b117716300121b2ac78b112443b83d1958",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip as the unique unified Native series",
+          "comparison_scope": "One serial 900s observation per cell; paired only with swe-unified-native-20260927",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate 60s qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 73616,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "health": true,
+            "prompt_id_usage_done": true,
+            "output_budget": true,
+            "apc": true,
+            "mtp2": true,
+            "async_scheduling": true,
+            "graph_mode": true,
+            "mamba_align": true
+          },
+          "execution_host": "180-evaluation experiment container",
+          "physical_devices": [
+            1,
+            5
+          ],
+          "container_visible_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "server_command": "/root/frontier-kvmat-env/bin/vllm-hust-ext run --shutdown-grace-seconds 60 -- /root/frontier-kvmat-env/bin/python -m vllm.entrypoints.cli.main serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\":\"FULL_AND_PIECEWISE\",\"cudagraph_capture_sizes\":[3,6,12,24,48],\"max_cudagraph_capture_size\":48} --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --generation-config vllm --override-generation-config {\"temperature\":0.0,\"top_p\":1.0,\"top_k\":-1,\"presence_penalty\":0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "release_verified": true,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+          "extension_manager_revision": "701aa95ae8d5b23b5ea8c8ec475ceaa470393e54",
+          "mod_runtime_effectiveness": {
+            "enabled": true,
+            "status": "exercised",
+            "controller_calls": 224,
+            "observed_decisions": {
+              "recompute": 8,
+              "partial_reuse": 3,
+              "full_reuse": 213
+            },
+            "effective_decisions": {
+              "recompute": 8,
+              "full_reuse": 216
+            },
+            "realized_scheduler_decisions": {
+              "recompute": 30,
+              "partial_reuse": 195
+            },
+            "runtime_events": {
+              "lookup": 225,
+              "commit": 48344
+            },
+            "hash_block_size_tokens": 2048,
+            "total_engine_reused_tokens": 5117952,
+            "total_engine_recomputed_tokens": 875750,
+            "matched_blocks": 9996,
+            "partial_reuse_note": "Block-aligned partial decisions fell back to anchor-scoped full reuse when full reuse dominated; request-scoped recompute and anchor-scoped reuse paths both executed."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "kv-materialization-arrival-control",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+            "revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+            "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+            "scope": "Arrival controller, request metadata adapter, runtime decision seam and measured action telemetry"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-kv-materialization-arrival-control-20260928",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 154.7288888888889,
+        "decode_p90_tps": 98.92568495208843,
+        "ttft_p95_ms": 1339.4468300975857,
+        "completed_requests": 222
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-28",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KV-MATERIALIZATION.md",
+        "run_ids": [
+          "aa7b91b673fb4b1caf4adbc2134ed65b"
+        ],
+        "aggregation": "One unpooled 900s observation; fixed-window output tokens only; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-kv-materialization-frontier-20260928",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "window": {
+          "started_at_utc": "2026-09-28T06:32:11Z",
+          "ended_at_utc": "2026-09-28T06:47:26Z",
+          "output_tokens": 139256,
+          "requests_started": 224,
+          "requests_completed_in_window": 222,
+          "requests_drained": 2,
+          "request_errors": 0
+        },
+        "correctness": {
+          "status": "passed",
+          "prompt_id_echo": true,
+          "usage": true,
+          "done": true,
+          "output_budget": true,
+          "request_errors": 0
+        },
+        "release": {
+          "service_exited": true,
+          "port_released": true,
+          "processes_released": true,
+          "npu_resources_released": true
+        },
+        "artifact_sha256": {
+          "config": "6937ef203b2d15979d0298dc5f8d3aaef26d5d4640628432d31f3d6e67e8cc08",
+          "summary": "613f97601829216456eebb035a365abbb6914cbee0a18d61143ca02a5c561113",
+          "requests": "3162b71a58aec7bcef4384d1dd9f511613faa5f21adf064cbf8a5076ba1d4f4d",
+          "server": "bda5a49662a4fd7f3522d377a0676fb1d05f98d33e7562754c19504218a78317",
+          "client": "d5b1e32ff03d75c62f1379928d93108036c6b651c78f4315f2bcddd3197fa797",
+          "mod": "db454adb7e1335eb4924050d1f5d6aa366bbaf4366bf9fd2ebbe24d4aa429670",
+          "runtime": "f755f7e94c5d117a4eb54a90a6c8b21955cf6b19fb6abaaa3b7eddf646b80e70",
+          "manifest": "1ff671ca9a361b7b933e6032de61ce1488a6c7153a8765527be04c977c058634"
+        }
+      }
+    },
+    {
+      "id": "qwen35-unified-kv-materialization-arrival-control-tp2-c4-r1-20260928",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "kv-materialization-arrival-control · C4 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "kv-materialization-arrival-control"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_policy": "No declared local host KV tier",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "runtime_source_heads": {
+            "vllm": "556671b117716300121b2ac78b112443b83d1958",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip as the unique unified Native series",
+          "comparison_scope": "One serial 900s observation per cell; paired only with swe-unified-native-20260927",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate 60s qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 79479,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "health": true,
+            "prompt_id_usage_done": true,
+            "output_budget": true,
+            "apc": true,
+            "mtp2": true,
+            "async_scheduling": true,
+            "graph_mode": true,
+            "mamba_align": true
+          },
+          "execution_host": "180-evaluation experiment container",
+          "physical_devices": [
+            1,
+            5
+          ],
+          "container_visible_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "server_command": "/root/frontier-kvmat-env/bin/vllm-hust-ext run --shutdown-grace-seconds 60 -- /root/frontier-kvmat-env/bin/python -m vllm.entrypoints.cli.main serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\":\"FULL_AND_PIECEWISE\",\"cudagraph_capture_sizes\":[3,6,12,24,48],\"max_cudagraph_capture_size\":48} --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --generation-config vllm --override-generation-config {\"temperature\":0.0,\"top_p\":1.0,\"top_k\":-1,\"presence_penalty\":0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "release_verified": true,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+          "extension_manager_revision": "701aa95ae8d5b23b5ea8c8ec475ceaa470393e54",
+          "mod_runtime_effectiveness": {
+            "enabled": true,
+            "status": "exercised",
+            "controller_calls": 353,
+            "observed_decisions": {
+              "recompute": 12,
+              "partial_reuse": 6,
+              "full_reuse": 335
+            },
+            "effective_decisions": {
+              "recompute": 12,
+              "full_reuse": 341
+            },
+            "realized_scheduler_decisions": {
+              "recompute": 45,
+              "partial_reuse": 311
+            },
+            "runtime_events": {
+              "lookup": 356,
+              "commit": 73998
+            },
+            "hash_block_size_tokens": 2048,
+            "total_engine_reused_tokens": 9091072,
+            "total_engine_recomputed_tokens": 1377245,
+            "matched_blocks": 17756,
+            "partial_reuse_note": "Block-aligned partial decisions fell back to anchor-scoped full reuse when full reuse dominated; request-scoped recompute and anchor-scoped reuse paths both executed."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "kv-materialization-arrival-control",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+            "revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+            "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+            "scope": "Arrival controller, request metadata adapter, runtime decision seam and measured action telemetry"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-kv-materialization-arrival-control-20260928",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 237.52444444444444,
+        "decode_p90_tps": 84.76666140724171,
+        "ttft_p95_ms": 1513.5780688375226,
+        "completed_requests": 349
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-28",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KV-MATERIALIZATION.md",
+        "run_ids": [
+          "5a723cba6cf146379aee490dc398fc8b"
+        ],
+        "aggregation": "One unpooled 900s observation; fixed-window output tokens only; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-kv-materialization-frontier-20260928",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "window": {
+          "started_at_utc": "2026-09-28T07:12:49Z",
+          "ended_at_utc": "2026-09-28T07:28:00Z",
+          "output_tokens": 213772,
+          "requests_started": 353,
+          "requests_completed_in_window": 349,
+          "requests_drained": 4,
+          "request_errors": 0
+        },
+        "correctness": {
+          "status": "passed",
+          "prompt_id_echo": true,
+          "usage": true,
+          "done": true,
+          "output_budget": true,
+          "request_errors": 0
+        },
+        "release": {
+          "service_exited": true,
+          "port_released": true,
+          "processes_released": true,
+          "npu_resources_released": true
+        },
+        "artifact_sha256": {
+          "config": "05e0680d3b329512eefa93bd67328aeea2843600c49d92f056415514e36d5bae",
+          "summary": "480656a202d3da99beba471d27036f91c5bb7e08354ace4b04e506457a34ead9",
+          "requests": "86ad28605b4c5f8425327bc4da8a696b2f110314c654d69211330be4b2072522",
+          "server": "ec0185e59e90462569632c9344cf611ad48e6996db2b7662eac099897101b19a",
+          "client": "66d2d92f5287049a74ce7932d19b41a761504646dfd79115c6fbfcb2a7ecdeaa",
+          "mod": "7d3a8b80a3c60cc704c7239ff08f6d34aa61f08528b27a0c6b7461d7b2cca8f1",
+          "runtime": "8966c4bf3671a100e4089d6a68acfe5c9484c05adeb3812c605c27975a8e332c",
+          "manifest": "174ec2a32bc1b45160fa3bd58aea2db71801199652047cbec0101a24bce75858"
+        }
+      }
+    },
+    {
+      "id": "qwen35-unified-kv-materialization-arrival-control-tp2-c8-r1-20260928",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "kv-materialization-arrival-control · C8 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "kv-materialization-arrival-control"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_policy": "No declared local host KV tier",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "runtime_source_heads": {
+            "vllm": "556671b117716300121b2ac78b112443b83d1958",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip as the unique unified Native series",
+          "comparison_scope": "One serial 900s observation per cell; paired only with swe-unified-native-20260927",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate 60s qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 80630,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "health": true,
+            "prompt_id_usage_done": true,
+            "output_budget": true,
+            "apc": true,
+            "mtp2": true,
+            "async_scheduling": true,
+            "graph_mode": true,
+            "mamba_align": true
+          },
+          "execution_host": "180-evaluation experiment container",
+          "physical_devices": [
+            1,
+            5
+          ],
+          "container_visible_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "server_command": "/root/frontier-kvmat-env/bin/vllm-hust-ext run --shutdown-grace-seconds 60 -- /root/frontier-kvmat-env/bin/python -m vllm.entrypoints.cli.main serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\":\"FULL_AND_PIECEWISE\",\"cudagraph_capture_sizes\":[3,6,12,24,48],\"max_cudagraph_capture_size\":48} --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --generation-config vllm --override-generation-config {\"temperature\":0.0,\"top_p\":1.0,\"top_k\":-1,\"presence_penalty\":0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "release_verified": true,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+          "extension_manager_revision": "701aa95ae8d5b23b5ea8c8ec475ceaa470393e54",
+          "mod_runtime_effectiveness": {
+            "enabled": true,
+            "status": "exercised",
+            "controller_calls": 482,
+            "observed_decisions": {
+              "recompute": 17,
+              "partial_reuse": 7,
+              "full_reuse": 458
+            },
+            "effective_decisions": {
+              "recompute": 17,
+              "full_reuse": 465
+            },
+            "realized_scheduler_decisions": {
+              "recompute": 66,
+              "partial_reuse": 424
+            },
+            "runtime_events": {
+              "lookup": 490,
+              "commit": 105422
+            },
+            "hash_block_size_tokens": 2048,
+            "total_engine_reused_tokens": 10987520,
+            "total_engine_recomputed_tokens": 1905943,
+            "matched_blocks": 21460,
+            "partial_reuse_note": "Block-aligned partial decisions fell back to anchor-scoped full reuse when full reuse dominated; request-scoped recompute and anchor-scoped reuse paths both executed."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "kv-materialization-arrival-control",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+            "revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+            "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+            "scope": "Arrival controller, request metadata adapter, runtime decision seam and measured action telemetry"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-kv-materialization-arrival-control-20260928",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 325.75111111111113,
+        "decode_p90_tps": 59.8154350121774,
+        "ttft_p95_ms": 1659.4872324727473,
+        "completed_requests": 474
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-28",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KV-MATERIALIZATION.md",
+        "run_ids": [
+          "5c9cd4af1452439f90d746ee86f4f843"
+        ],
+        "aggregation": "One unpooled 900s observation; fixed-window output tokens only; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-kv-materialization-frontier-20260928",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "window": {
+          "started_at_utc": "2026-09-28T07:33:41Z",
+          "ended_at_utc": "2026-09-28T07:49:44Z",
+          "output_tokens": 293176,
+          "requests_started": 482,
+          "requests_completed_in_window": 474,
+          "requests_drained": 8,
+          "request_errors": 0
+        },
+        "correctness": {
+          "status": "passed",
+          "prompt_id_echo": true,
+          "usage": true,
+          "done": true,
+          "output_budget": true,
+          "request_errors": 0
+        },
+        "release": {
+          "service_exited": true,
+          "port_released": true,
+          "processes_released": true,
+          "npu_resources_released": true
+        },
+        "artifact_sha256": {
+          "config": "c4d081104d602c116517e9966c0548a91fc4b20df76e4b969365ab6d022844c7",
+          "summary": "c2860973e553c89106ec0dd3ea7cbc2f151585680027fcec1b4ea85170614c9f",
+          "requests": "115b6e8330870637bd98ecdbb86c5b29f36f4a6c27c9b96012c7224cb6ae8029",
+          "server": "54125b5ab413b9f7d2d9ba3da38bd44f4d3c7eac22432bbf319ed6170bc125f8",
+          "client": "9ba8605ff0ce2f9720104274575b3ac6367666d89446d564a7759918258470a4",
+          "mod": "500b9d0d80ba448768020b6ef7c613ebf0dfe30c89a00e031af1ee601d3a0db5",
+          "runtime": "129f1cff56756e545571805fc80b5c800e9f1ca491c9f4f7e6b72e5545fdf95f",
+          "manifest": "6f10739d9bedd3470ed037eb1dc5a13710a1c18477069720667464ae8af23b21"
+        }
+      }
+    },
+    {
+      "id": "qwen35-unified-kv-materialization-arrival-control-tp2-c16-r1-20260928",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "kv-materialization-arrival-control · C16 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "kv-materialization-arrival-control"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 0,
+          "host_memory_policy": "No declared local host KV tier",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "runtime_source_heads": {
+            "vllm": "556671b117716300121b2ac78b112443b83d1958",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip as the unique unified Native series",
+          "comparison_scope": "One serial 900s observation per cell; paired only with swe-unified-native-20260927",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate 60s qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 59957,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "health": true,
+            "prompt_id_usage_done": true,
+            "output_budget": true,
+            "apc": true,
+            "mtp2": true,
+            "async_scheduling": true,
+            "graph_mode": true,
+            "mamba_align": true
+          },
+          "execution_host": "180-evaluation experiment container",
+          "physical_devices": [
+            1,
+            5
+          ],
+          "container_visible_devices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution host loopback",
+          "server_command": "/root/frontier-kvmat-env/bin/vllm-hust-ext run --shutdown-grace-seconds 60 -- /root/frontier-kvmat-env/bin/python -m vllm.entrypoints.cli.main serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --host 127.0.0.1 --port 33783 --served-model-name frontier-qwen35-unified --tensor-parallel-size 2 --pipeline-parallel-size 1 --distributed-executor-backend mp --worker-cls pipeline_worker.Worker --dtype bfloat16 --kv-cache-dtype auto --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --gpu-memory-utilization 0.95 --seed 17 --enable-prefix-caching --mamba-cache-mode align --enable-prompt-tokens-details --async-scheduling --shutdown-timeout 60 --additional-config {\"enable_cpu_binding\":false} --limit-mm-per-prompt {\"image\":0,\"video\":0} --compilation-config {\"cudagraph_mode\":\"FULL_AND_PIECEWISE\",\"cudagraph_capture_sizes\":[3,6,12,24,48],\"max_cudagraph_capture_size\":48} --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --generation-config vllm --override-generation-config {\"temperature\":0.0,\"top_p\":1.0,\"top_k\":-1,\"presence_penalty\":0.0} --default-chat-template-kwargs {\"enable_thinking\":true} --kv-cache-memory-bytes 26038239232",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "release_verified": true,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+          "extension_manager_revision": "701aa95ae8d5b23b5ea8c8ec475ceaa470393e54",
+          "mod_runtime_effectiveness": {
+            "enabled": true,
+            "status": "exercised",
+            "controller_calls": 638,
+            "observed_decisions": {
+              "recompute": 27,
+              "partial_reuse": 11,
+              "full_reuse": 600
+            },
+            "effective_decisions": {
+              "recompute": 27,
+              "full_reuse": 611
+            },
+            "realized_scheduler_decisions": {
+              "recompute": 113,
+              "partial_reuse": 577
+            },
+            "runtime_events": {
+              "lookup": 690,
+              "commit": 133606
+            },
+            "hash_block_size_tokens": 2048,
+            "total_engine_reused_tokens": 11280384,
+            "total_engine_recomputed_tokens": 2775821,
+            "matched_blocks": 22032,
+            "partial_reuse_note": "Block-aligned partial decisions fell back to anchor-scoped full reuse when full reuse dominated; request-scoped recompute and anchor-scoped reuse paths both executed."
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "kv-materialization-arrival-control",
+            "repository": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+            "revision": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+            "source_capsule": "qwen35-kv-materialization-frontier-20260928",
+            "scope": "Arrival controller, request metadata adapter, runtime decision seam and measured action telemetry"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-kv-materialization-arrival-control-20260928",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 414.2922222222222,
+        "decode_p90_tps": 36.79618457742906,
+        "ttft_p95_ms": 2303.8990977220237,
+        "completed_requests": 622
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-28",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KV-MATERIALIZATION.md",
+        "run_ids": [
+          "1f9c022d2026433682cffd3d25211cbc"
+        ],
+        "aggregation": "One unpooled 900s observation; fixed-window output tokens only; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-kv-materialization-frontier-20260928",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "window": {
+          "started_at_utc": "2026-09-28T07:54:59Z",
+          "ended_at_utc": "2026-09-28T08:11:03Z",
+          "output_tokens": 372863,
+          "requests_started": 638,
+          "requests_completed_in_window": 622,
+          "requests_drained": 16,
+          "request_errors": 0
+        },
+        "correctness": {
+          "status": "passed",
+          "prompt_id_echo": true,
+          "usage": true,
+          "done": true,
+          "output_budget": true,
+          "request_errors": 0
+        },
+        "release": {
+          "service_exited": true,
+          "port_released": true,
+          "processes_released": true,
+          "npu_resources_released": true
+        },
+        "artifact_sha256": {
+          "config": "4771e2d638c125bc4385818c0b3eadd853abc0f3633de092ed63eed50342aa39",
+          "summary": "99eaface572235bae48195d08260fa1fbd4212f1e55ba02493106f1040ba1de2",
+          "requests": "62084ae10db958997f40be8057fc6e196373c1d09a2207019c708e18541cc136",
+          "server": "aef14a1d2e18f04ef07ce47ca3be94d6f230462b54f1647fdcff1e7f07885e3b",
+          "client": "42d5a7a7c9389c2a2e5ffbefb8e0bebb6e41aba077a3b64128eb1954d6913706",
+          "mod": "0a277546385c0e4745f59f4dc88ece53dfff4aeb1c61f18c8e9b629c28d91e5f",
+          "runtime": "ac6b0c01fa3f14b4a6aea390fc1d568d41fe3fc3fe5e6457342f400d1a268ad2",
+          "manifest": "8bd612ed81b81974f3c37623f4792aaef8e09fc9eafa94b0bcb410280af2c796"
+        }
       }
     }
   ],

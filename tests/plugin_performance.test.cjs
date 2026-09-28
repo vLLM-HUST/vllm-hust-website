@@ -25,7 +25,7 @@ test('every Frontier gain is computed from five points in a declared comparison 
   }
   assert.deepEqual(new Set(measured.map(result => result.id)), new Set([
     'betterscale', 'pipeline-microbatch-migration', 'bidkv', 'dla', 'kv-tiering-migration',
-    'mooncake-vllm-connectors', 'kvcompress-ascend'
+    'mooncake-vllm-connectors', 'kvcompress-ascend', 'kv-materialization-arrival-control'
   ]));
   assert.equal(results.get('betterscale').gain.toFixed(2), '42.39');
   assert.equal(results.get('pipeline-microbatch-migration').gain.toFixed(2), '9.78');
@@ -39,21 +39,18 @@ test('published paired runs expose both gains and regressions without precompute
   const expected = {
     adm: '0.80',
     vspec: '51.80',
-    'kv-materialization-arrival-control': '-0.42',
     diffspec: '-70.66',
     latchmoe: '-87.65'
   };
   for (const [id, gain] of Object.entries(expected)) {
     const result = results.get(id);
     assert.equal(result.source, 'published-comparison');
-    assert.equal(result.count, id === 'kv-materialization-arrival-control' ? 6 : id === 'adm' ? 3 : 1);
+    assert.equal(result.count, id === 'adm' ? 3 : 1);
     assert.equal(result.gain.toFixed(2), gain);
     assert.ok(result.url.startsWith('https://github.com/vLLM-HUST/'));
     assert.ok(result.published_comparisons.every(row => row.baseline > 0));
     assert.ok(result.published_comparisons.every(row => row.candidate > 0));
   }
-  const kvmat = results.get('kv-materialization-arrival-control');
-  assert.equal(kvmat.count, 6);
   assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 12);
 });
 
@@ -69,6 +66,39 @@ test('model-scoped summaries expose and rank only measurements from the selected
   const qwen35 = M.summarize(data, frontier, 'Qwen3.5-35B-A3B');
   assert.equal(qwen35.get('vspec').gain, null);
   assert.equal(qwen35.get('betterscale').gain.toFixed(2), '42.39');
+  assert.equal(qwen35.get('kv-materialization-arrival-control').gain.toFixed(2), '7.13');
+  const qwen25Kvmat = M.summarize(data, frontier, 'Qwen2.5-7B-Instruct')
+    .get('kv-materialization-arrival-control');
+  assert.equal(qwen25Kvmat.source, 'published-comparison');
+  assert.equal(qwen25Kvmat.count, 6);
+  assert.equal(qwen25Kvmat.gain.toFixed(2), '-0.42');
+});
+
+test('kv-materialization publishes five exact unified windows and exercised actions', () => {
+  const series = frontier.points.filter(point => point.load.concurrency_series
+    === 'swe-unified-kv-materialization-arrival-control-20260928');
+  assert.deepEqual(series.map(point => point.load.concurrency), [1, 2, 4, 8, 16]);
+  assert.equal(new Set(series.map(point => point.evidence.run_ids[0])).size, 5);
+  for (const point of series) {
+    const parameters = point.configuration.parameters;
+    assert.equal(point.evidence.measurement_seconds, 900);
+    assert.equal(point.cohort_id, 'qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
+    assert.equal(parameters.runtime_base_commits.vllm, 'd0f22d2bda562156e4dbf433ce645e1769b4f804'); // pragma: allowlist secret (public Git commit)
+    assert.equal(parameters.runtime_base_commits['vllm-ascend'], '03766ac696fde5ab1980d80ca0b8543d3580c989'); // pragma: allowlist secret (public Git commit)
+    assert.equal(parameters.checkpoint_revision, '712cf74392b05026a6db2bf213d343747d1f6d45'); // pragma: allowlist secret (public model revision)
+    assert.equal(parameters.kv_cache_memory_bytes, 26038239232);
+    assert.equal(parameters.mod_runtime_effectiveness.status, 'exercised');
+    assert.ok(parameters.mod_runtime_effectiveness.controller_calls > 0);
+    assert.ok(parameters.mod_runtime_effectiveness.realized_scheduler_decisions.partial_reuse > 0);
+    assert.equal(point.evidence.benchmark_protocol.prepared_workload_sha256,
+      '8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85'); // pragma: allowlist secret (public workload hash)
+    assert.equal(point.evidence.benchmark_protocol.tokenizer_fingerprint,
+      '3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0'); // pragma: allowlist secret (public tokenizer fingerprint)
+    assert.equal(point.evidence.correctness.status, 'passed');
+  }
+  const allModels = M.summarize(data, frontier).get('kv-materialization-arrival-control');
+  assert.equal(allModels.source, 'frontier');
+  assert.equal(allModels.gain.toFixed(2), '7.13');
 });
 
 test('comparison sets declare baselines centrally and entries cannot supply a baseline or score', () => {
@@ -82,24 +112,24 @@ test('comparison sets declare baselines centrally and entries cannot supply a ba
     assert.throws(() => M.summarize(invalid, frontier), /forbidden/);
   }
   const duplicate = structuredClone(data);
-  duplicate.comparison_sets[1].entry_ids.push('bidkv');
-  assert.throws(() => M.summarize(duplicate, frontier), /multiple comparison sets/);
+  duplicate.comparison_sets[1].observation_ids.push('bidkv:qwen35-frontier');
+  assert.throws(() => M.summarize(duplicate, frontier), /multiple comparison sets/i);
 });
 
-test('published comparisons require raw matched values and cannot shadow a Frontier series', () => {
+test('published observations require raw matched values', () => {
   for (const edit of [
     comparison => { comparison.baseline = 0; },
     comparison => { comparison.metric = 'request_tps'; },
     comparison => { comparison.scope = ''; }
   ]) {
     const invalid = structuredClone(data);
-    const entry = invalid.entries.find(row => row.id === 'vspec');
-    edit(entry.published_comparisons[0]);
-    assert.throws(() => M.summarize(invalid, frontier), /Invalid published comparison/);
+    const observation = invalid.entries.find(row => row.id === 'vspec').observations[0];
+    edit(observation.comparisons[0]);
+    assert.throws(() => M.summarize(invalid, frontier), /Invalid performance observation/);
   }
   const invalid = structuredClone(data);
-  invalid.entries.find(row => row.id === 'vspec').series_id = 'swe-unified-bidkv-20260927';
-  assert.throws(() => M.summarize(invalid, frontier), /Invalid published comparison/);
+  invalid.entries.find(row => row.id === 'vspec').observations[0].kind = 'unknown';
+  assert.throws(() => M.summarize(invalid, frontier), /Invalid performance observation/);
 });
 
 test('series outside declared comparison sets do not produce percentages', () => {
@@ -133,6 +163,25 @@ test('workload, model, topology, KV budget, runtime and measurement mismatches e
   }
 });
 
+test('only explicitly evidenced model and workload aliases join a comparison set', () => {
+  const changed = structuredClone(frontier);
+  const point = changed.points.find(row => row.load.concurrency_series === 'swe-unified-bidkv-20260927');
+  const cohort = changed.cohorts.find(row => row.id === point.cohort_id);
+  point.configuration.parameters.checkpoint_revision = cohort.model.revision;
+  point.evidence.benchmark_protocol.prepared_workload_sha256 = cohort.workload.contract.prepared_workload_sha256;
+  assert.ok(Number.isFinite(M.summarize(data, changed).get('bidkv').gain));
+
+  const missingModelEvidence = structuredClone(changed);
+  const changedCohort = missingModelEvidence.cohorts.find(row => row.id === point.cohort_id);
+  changedCohort.model.verified_identity_aliases = [];
+  assert.throws(() => M.summarize(data, missingModelEvidence), /Native series/);
+
+  const missingWorkloadEvidence = structuredClone(changed);
+  const workload = missingWorkloadEvidence.cohorts.find(row => row.id === point.cohort_id).workload.contract;
+  workload.prepared_workload_variants = workload.prepared_workload_variants.filter(row => !row.equivalence);
+  assert.throws(() => M.summarize(data, missingWorkloadEvidence), /Native series/);
+});
+
 test('MOD-specific host-tier capacity remains part of the treatment', () => {
   const result = [...M.summarize(data, frontier).values()].find(row => row.source === 'frontier' && Number.isFinite(row.gain));
   const changed = structuredClone(frontier);
@@ -162,8 +211,8 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const real = M.summarize(data, frontier);
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
-    'vspec', 'betterscale', 'pipeline-microbatch-migration', 'adm',
-    'bidkv', 'dla', 'kv-materialization-arrival-control', 'mooncake-vllm-connectors', 'kv-tiering-migration',
+    'vspec', 'betterscale', 'pipeline-microbatch-migration',
+    'kv-materialization-arrival-control', 'adm', 'bidkv', 'dla', 'mooncake-vllm-connectors', 'kv-tiering-migration',
     'kvcompress-ascend', 'diffspec', 'latchmoe'
   ]);
 });

@@ -742,10 +742,14 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
         item for item in PLUGIN_PERFORMANCE["entries"] if item["id"] == "adm"
     )
     assert evidence["url"] == adm["public_effect_url"]
-    assert len(evidence["published_comparisons"]) == 3
-    assert all(
-        "previous MOD" in row["scope"] for row in evidence["published_comparisons"]
+    observation = next(
+        item
+        for item in evidence["observations"]
+        if item["id"] == evidence["default_observation_id"]
     )
+    assert observation["kind"] == "published-comparisons"
+    assert len(observation["comparisons"]) == 3
+    assert all("previous MOD" in row["scope"] for row in observation["comparisons"])
 
 
 def test_repository_portfolio_is_separate_and_complete() -> None:

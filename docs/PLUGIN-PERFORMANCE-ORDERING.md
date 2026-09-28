@@ -5,13 +5,16 @@ comparison. Cards sort by this number descending, including negative results. A 
 is a dash, never zero. No extra results section or qualification status paragraphs are rendered on
 the cards.
 
-`data/plugin-performance.json` groups complete candidate series with the Native series from their
-published campaign. `assets/plugin-performance.js` reads actual Frontier throughput values and
-computes `(geometric_mean(candidate_tps / native_tps) - 1) * 100` across C1/2/4/8/16. Every load
-receives equal weight. The Frontier link tooltip exposes the aggregation and per-load percentages.
-No scores are stored in metadata. Current Frontier campaigns declare their Native series centrally;
-older published runs retain one or more raw candidate/baseline throughput pairs so the page
-recomputes their geometric mean rather than storing a percentage.
+`data/plugin-performance.json` stores one or more model-scoped observations for each entry and
+groups complete Frontier observations with the Native series from their published campaign. Each
+entry explicitly names one default observation for the all-model view; a model-filtered view selects
+only the observation for that model. Results from different models are never averaged together.
+`assets/plugin-performance.js` reads actual Frontier throughput values and computes
+`(geometric_mean(candidate_tps / native_tps) - 1) * 100` across C1/2/4/8/16. Every load receives
+equal weight. The Frontier link tooltip exposes the aggregation and per-load percentages. No scores
+are stored in metadata. Current Frontier campaigns bind observation IDs to their Native series
+centrally; older published observations retain one or more raw candidate/baseline throughput pairs
+so the page recomputes their geometric mean rather than storing a percentage.
 
 ## Existing BetterScale data
 
