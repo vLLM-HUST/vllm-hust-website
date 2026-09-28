@@ -468,7 +468,11 @@ def test_workshop_supports_workload_guided_discovery() -> None:
             "source_patch",
         }
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
-    } | {item["id"] for item in PLUGIN_PERFORMANCE["entries"]}
+    } | {
+        item["id"]
+        for item in PLUGIN_PERFORMANCE["entries"]
+        if by_id(item["id"]).get("public_surface", True) is not False
+    }
     assert set(mappings) == workshop_mods
     assert len(traits) >= 8
     for profile in traits.values():
@@ -701,13 +705,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v22-tested"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v23-publication-gate"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v13-tested"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v14-publication-gate"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v6-tested"'
+        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v7-publication-gate"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -1044,19 +1048,21 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 15
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 13
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
 
 
-def test_unmeasured_descriptors_and_source_scaffolds_are_not_published():
+def test_non_runnable_descriptors_scaffolds_and_legacy_carriers_are_not_published():
     unpublished = {
         "ascend-adaptive-quantized-kv",
         "ascend-quant-runtime-descriptor",
         "knorm-migration",
         "kv-transfer-observability-migration",
         "pyramidkv-ascend-migration",
+        "dla",
+        "kv-tiering-migration",
     }
     for component_id in unpublished:
         assert by_id(component_id)["public_surface"] is False
@@ -1064,7 +1070,7 @@ def test_unmeasured_descriptors_and_source_scaffolds_are_not_published():
     assert unpublished.isdisjoint(WORKSHOP_METADATA["plugins"])
 
 
-def test_measured_mods_remain_published_even_when_the_effect_is_negative():
+def test_performance_evidence_cannot_override_the_publication_gate():
     measured = {
         "betterscale",
         "pipeline-microbatch-migration",
@@ -1078,9 +1084,18 @@ def test_measured_mods_remain_published_even_when_the_effect_is_negative():
         "vspec",
     }
     assert "performanceResults.has(item.id)" in SCRIPT
+    assert "if (item.public_surface === false) return false;" in SCRIPT
     assert "Math.max(pageSize, measuredCount)" in SCRIPT
-    assert measured <= set(WORKLOAD_NAVIGATION["plugins"])
-    assert {"dla", "kv-tiering-migration"} <= set(WORKSHOP_METADATA["plugins"])
+    performance_ids = {item["id"] for item in PLUGIN_PERFORMANCE["entries"]}
+    assert measured <= performance_ids
+    hidden_measured = {"dla", "kv-tiering-migration"}
+    assert all(
+        by_id(component_id)["public_surface"] is False
+        for component_id in hidden_measured
+    )
+    assert hidden_measured.isdisjoint(WORKLOAD_NAVIGATION["plugins"])
+    assert hidden_measured.isdisjoint(WORKSHOP_METADATA["plugins"])
+    assert measured - hidden_measured <= set(WORKLOAD_NAVIGATION["plugins"])
 
 
 def test_compact_greedy_incubator_is_not_in_public_catalog():

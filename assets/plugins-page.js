@@ -156,16 +156,18 @@
     applications_research: { en: "Applications and research", zh: "应用与研究" }
   };
 
-  const isWorkshopMod = (item) => (
-    performanceResults.has(item.id)
-    || (
+  const isWorkshopMod = (item) => {
+    if (item.public_surface === false) return false;
+    return (
+      performanceResults.has(item.id)
+      || (
       ["runtime_component", "bridge"].includes(item.artifact_type)
       && item.repository_relationship === "organization_native"
-      && item.public_surface !== false
       && ["plugin_bundle", "python_distribution", "migration_scaffold", "source_patch"].includes(item.delivery_model)
       && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
-    )
-  );
+      )
+    );
+  };
   const compatibilityLabels = {
     ready: { en: "Ready", zh: "可用" },
     verified: { en: "Verified", zh: "已验证" },
