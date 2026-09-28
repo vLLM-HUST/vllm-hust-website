@@ -3,6 +3,7 @@
   const status = document.querySelector("[data-plugin-status]");
   const filters = document.querySelector("[data-plugin-filters]");
   const search = document.querySelector("[data-plugin-search]");
+  const modelSelect = document.querySelector("[data-plugin-model]");
   const more = document.querySelector("[data-plugin-more]");
   const workloadNavigationRoot = document.querySelector("[data-workload-navigation]");
   const workloadFilters = document.querySelector("[data-workload-filters]");
@@ -14,6 +15,9 @@
 
   let registry;
   let performanceResults = new Map();
+  let performanceData;
+  let frontierData;
+  let selectedModel = "";
   let portfolio;
   let workshopMetadata = {};
   let workloadNavigation = { traits: {}, plugins: {} };
@@ -21,6 +25,8 @@
   let selectedWorkload = "all";
   let expanded = false;
   const pageSize = 9;
+  const toolRoles = new Set(["profiling_analysis", "telemetry_provider"]);
+  const isToolMod = item => toolRoles.has(item.system_role);
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -75,6 +81,9 @@
     installRun: "安装 / 启动",
     boundaries: "关键边界",
     repositories: "个组织仓库",
+    allModels: "全部模型",
+    performanceMods: "性能型 MOD",
+    toolMods: "工具型 MOD",
     repositoryEmpty: "没有符合当前搜索条件的仓库。",
     artifacts: "规范制品",
     relation: "与运行时关系",
@@ -127,6 +136,9 @@
     installRun: "Install / run",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
+    allModels: "All models",
+    performanceMods: "Performance MODs",
+    toolMods: "Tool MODs",
     repositoryEmpty: "No repositories match the current search.",
     artifacts: "Canonical artifacts",
     relation: "Runtime relation",
@@ -717,6 +729,11 @@ vllm-hust-ext extension check ${extensionId}`
     panel.append(element("strong", measured && result.gain < 0 ? "performance-negative" : "", value));
     if (measured) {
       panel.append(element("span", "", [result.modelLabel, zh ? "输出吞吐" : "Output throughput"].filter(Boolean).join(" · ")));
+      if (result.runtimeBase) {
+        const ascend = result.runtimeBase["vllm-ascend"] || result.runtimeBase.vllm_ascend;
+        panel.append(element("span", "plugin-performance-runtime",
+          `vLLM ${result.runtimeBase.vllm.slice(0, 7)} · Ascend ${ascend.slice(0, 7)}`));
+      }
       const frontier = result.source === "frontier";
       const link = element("a", "plugin-public-effect-link", frontier ? "Frontier ↗" : (zh ? "实测 ↗" : "Evidence ↗"));
       link.href = frontier ? "./leaderboard-runs.html#frontier" : result.url;
@@ -791,7 +808,9 @@ vllm-hust-ext extension check ${extensionId}`
     card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", local(item, "summary")));
     const traits = workloadTags(item);
     if (traits) card.append(traits);
-    card.append(performancePanel(performanceResults.get(item.id)));
+    if (!isToolMod(item)) {
+      card.append(performancePanel(performanceResults.get(item.id)));
+    }
     const community = communityPanel(item);
     if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
@@ -960,26 +979,42 @@ vllm-hust-ext extension check ${extensionId}`
     const visible = registry.components.filter((item) => {
       const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
       const matchesWorkload = selectedWorkload === "all" || itemWorkloadTraits.includes(selectedWorkload);
-      return isWorkshopMod(item) && matchesSelectedType(item) && matchesWorkload && itemSearchText(item).includes(query);
+      const matchesModel = isToolMod(item) || !selectedModel
+        || (performanceResults.get(item.id)?.modelLabel === selectedModel
+          && Number.isFinite(performanceResults.get(item.id)?.gain));
+      return isWorkshopMod(item) && matchesSelectedType(item) && matchesWorkload
+        && matchesModel && itemSearchText(item).includes(query);
     });
 
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
-    visible.sort((left, right) => {
+    const performanceMods = visible.filter(item => !isToolMod(item));
+    const toolMods = visible.filter(isToolMod);
+    performanceMods.sort((left, right) => {
       const leftRank = priority[left.compatibility?.status] ?? 6;
       const rightRank = priority[right.compatibility?.status] ?? 6;
       return PluginPerformance.compare(left, right, performanceResults) || leftRank - rightRank || left.name.localeCompare(right.name);
     });
+    toolMods.sort((left, right) => left.name.localeCompare(right.name));
     catalog.replaceChildren();
-    const grid = element("section", "plugin-grid workshop-grid");
-    const measuredCount = visible.filter(item => Number.isFinite(performanceResults.get(item.id)?.gain)).length;
+    const measuredCount = performanceMods.filter(item => Number.isFinite(performanceResults.get(item.id)?.gain)).length;
     const visibleLimit = Math.max(pageSize, measuredCount);
-    const displayed = query || expanded ? visible : visible.slice(0, visibleLimit);
-    displayed.forEach((item) => grid.append(renderCard(item)));
-    catalog.append(grid);
-    status.textContent = visible.length ? `${displayed.length} / ${visible.length} ${copy().entries}` : copy().empty;
+    const displayedPerformance = query || expanded ? performanceMods : performanceMods.slice(0, visibleLimit);
+    const appendGroup = (title, items, kind) => {
+      if (!items.length) return;
+      const section = element("section", `plugin-category plugin-category-${kind}`);
+      section.append(element("h2", "plugin-category-title", title));
+      const grid = element("div", "plugin-grid workshop-grid");
+      items.forEach(item => grid.append(renderCard(item)));
+      section.append(grid);
+      catalog.append(section);
+    };
+    appendGroup(copy().performanceMods, displayedPerformance, "performance");
+    appendGroup(copy().toolMods, toolMods, "tools");
+    const displayedCount = displayedPerformance.length + toolMods.length;
+    status.textContent = visible.length ? `${displayedCount} / ${visible.length} ${copy().entries}` : copy().empty;
     if (more) {
-      more.hidden = Boolean(query) || expanded || visible.length <= visibleLimit;
-      more.textContent = `${copy().more} (${visible.length})`;
+      more.hidden = Boolean(query) || expanded || performanceMods.length <= visibleLimit;
+      more.textContent = `${copy().more} (${performanceMods.length})`;
     }
   }
 
@@ -989,6 +1024,13 @@ vllm-hust-ext extension check ${extensionId}`
       renderCatalog();
     }
     renderPortfolio();
+  });
+  modelSelect?.addEventListener("change", () => {
+    selectedModel = modelSelect.value;
+    performanceResults = PluginPerformance.summarize(performanceData, frontierData, selectedModel || null);
+    expanded = false;
+    renderWorkloadNavigation();
+    renderCatalog();
   });
   more?.addEventListener("click", () => {
     expanded = true;
@@ -1006,6 +1048,7 @@ vllm-hust-ext extension check ${extensionId}`
       const node = document.getElementById(id);
       if (node) node.textContent = value;
     });
+    if (modelSelect?.options.length) modelSelect.options[0].textContent = copy().allModels;
   }
   renderPageLabels();
   search.placeholder = copy().searchPlaceholder;
@@ -1024,9 +1067,9 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=kvcompress-frontier-20260928").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=all-tested-20260927").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
-    ]).then(([data, frontier]) => PluginPerformance.summarize(data, frontier)).catch(() => null)
+      fetch("./data/plugin-performance.json?v=model-filter-20260928").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=qwen25-vspec-20260928").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
+    ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
@@ -1039,7 +1082,17 @@ vllm-hust-ext extension check ${extensionId}`
         throw new Error("unsupported workload navigation");
       }
       registry = payload;
-      performanceResults = performance || new Map();
+      performanceData = performance?.data;
+      frontierData = performance?.frontier;
+      performanceResults = performance
+        ? PluginPerformance.summarize(performanceData, frontierData)
+        : new Map();
+      if (modelSelect && performance) {
+        modelSelect.replaceChildren(new Option(copy().allModels, ""));
+        PluginPerformance.models(performanceData, frontierData).forEach((model) => {
+          modelSelect.append(new Option(model, model));
+        });
+      }
       workshopMetadata = metadata.plugins;
       workloadNavigation = navigation;
       renderPageLabels();

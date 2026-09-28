@@ -39,7 +39,7 @@
     });
     return rows.every(Boolean) ? rows : null;
   }
-  function summarize(data, frontier) {
+  function summarize(data, frontier, selectedModel = null) {
     if (data.schema_version !== 'plugin-performance/v6'
         || data.metric !== 'output_tps' || data.aggregation !== 'geometric-mean'
         || JSON.stringify(data.concurrencies) !== '[1,2,4,8,16]'
@@ -92,11 +92,20 @@
       const modelLabel = baseline
         ? frontier.cohorts.find(cohort => cohort.id === baseline[0].cohort_id)?.model.label
         : published?.[0].model_label || null;
-      return [entry.id, { ...entry, gain,
+      const runtimeBase = baseline?.[0].configuration.parameters.runtime_base_commits || null;
+      const scopedGain = selectedModel && modelLabel !== selectedModel ? null : gain;
+      return [entry.id, { ...entry, gain: scopedGain,
         count: comparisons.length || (published ? published.length : 0), comparisons,
-        baseline_series_id: baselineSeriesId || null, modelLabel,
-        source: comparisons.length ? 'frontier' : published ? 'published-comparison' : null }];
+        baseline_series_id: baselineSeriesId || null, modelLabel, runtimeBase,
+        source: Number.isFinite(scopedGain)
+          ? (comparisons.length ? 'frontier' : published ? 'published-comparison' : null)
+          : null }];
     }));
+  }
+  function models(data, frontier) {
+    return [...new Set([...summarize(data, frontier).values()]
+      .filter(result => Number.isFinite(result.gain) && result.modelLabel)
+      .map(result => result.modelLabel))].sort((left, right) => left.localeCompare(right));
   }
   function compare(left, right, results) {
     const a = results.get(left.id)?.gain, b = results.get(right.id)?.gain;
@@ -104,7 +113,7 @@
     if (aMeasured !== bMeasured) return aMeasured ? -1 : 1;
     return aMeasured ? b - a : 0;
   }
-  const api = { summarize, compare };
+  const api = { summarize, compare, models };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.PluginPerformance = api;
 })(globalThis);

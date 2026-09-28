@@ -30,6 +30,8 @@ test('every Frontier gain is computed from five points in a declared comparison 
   assert.equal(results.get('betterscale').gain.toFixed(2), '42.39');
   assert.equal(results.get('pipeline-microbatch-migration').gain.toFixed(2), '9.78');
   assert.equal(results.get('kvcompress-ascend').gain.toFixed(2), '-5.83');
+  assert.equal(results.get('betterscale').runtimeBase.vllm.slice(0, 7), '752a3a5');
+  assert.equal(results.get('bidkv').runtimeBase.vllm.slice(0, 7), 'd0f22d2');
 });
 
 test('published paired runs expose both gains and regressions without precomputed scores', () => {
@@ -52,6 +54,20 @@ test('published paired runs expose both gains and regressions without precompute
   const kvmat = results.get('kv-materialization-arrival-control');
   assert.equal(kvmat.count, 6);
   assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 11);
+});
+
+test('model-scoped summaries expose and rank only measurements from the selected model', () => {
+  assert.deepEqual(M.models(data, frontier), [
+    'Qwen2.5-14B', 'Qwen2.5-7B-Instruct', 'Qwen3-30B-A3B',
+    'Qwen3.5-35B-A3B', 'Qwen3.8-27B'
+  ]);
+  const qwen25 = M.summarize(data, frontier, 'Qwen2.5-14B');
+  assert.equal(qwen25.get('vspec').gain.toFixed(2), '51.80');
+  assert.equal(qwen25.get('betterscale').gain, null);
+  assert.equal(qwen25.get('kv-materialization-arrival-control').gain, null);
+  const qwen35 = M.summarize(data, frontier, 'Qwen3.5-35B-A3B');
+  assert.equal(qwen35.get('vspec').gain, null);
+  assert.equal(qwen35.get('betterscale').gain.toFixed(2), '42.39');
 });
 
 test('comparison sets declare baselines centrally and entries cannot supply a baseline or score', () => {
