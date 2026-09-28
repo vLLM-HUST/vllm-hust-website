@@ -2,6 +2,41 @@
   "schema_version": "plugin-performance/v6",
   "entries": [
     {
+      "id": "adm",
+      "url": "https://github.com/vLLM-HUST/ascend-distributed-metadata/blob/main/qualifications/qwen3moe-dp4-int64-word-20260928.json",
+      "ecpa": {
+        "launch_acceptance": "not-reproduced-this-round",
+        "configuration_path": "not-evaluated",
+        "analysis_integration": "external-harness",
+        "note_zh": "引用 ADM 仓库中固定版本的配对服务结果；本轮未通过网站 ECPA 复现，对照为先前已发布 MOD。",
+        "note_en": "Cites pinned paired serving results from the ADM repository; this website ECPA round did not reproduce them. The comparator is the previous published MOD."
+      },
+      "series_id": null,
+      "published_comparisons": [
+        {
+          "metric": "output_tps",
+          "baseline": 463.1999171118466,
+          "candidate": 464.9764975222131,
+          "model_label": "Qwen3-30B-A3B-W8A8",
+          "scope": "TP1/DP4 FULL_DECODE_ONLY · frozen 64-request trace · two rounds per session · new word path vs previous MOD"
+        },
+        {
+          "metric": "output_tps",
+          "baseline": 462.1914940510524,
+          "candidate": 465.46964175026187,
+          "model_label": "Qwen3-30B-A3B-W8A8",
+          "scope": "TP1/DP4 FULL_DECODE_ONLY · frozen 64-request trace · two rounds per session · new word path vs previous MOD"
+        },
+        {
+          "metric": "output_tps",
+          "baseline": 464.7356391006364,
+          "candidate": 470.8495848419581,
+          "model_label": "Qwen3-30B-A3B-W8A8",
+          "scope": "TP1/DP4 FULL_DECODE_ONLY · frozen 64-request trace · two rounds per session · new word path vs previous MOD"
+        }
+      ]
+    },
+    {
       "id": "bidkv",
       "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-UNIFIED-MODS.md",
       "ecpa": {

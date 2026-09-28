@@ -705,13 +705,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v23-publication-gate"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=workshop-v24-adm"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v14-publication-gate"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v15-adm"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v7-publication-gate"'
+        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v8-adm"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -719,9 +719,38 @@ def test_page_consumes_the_docs_owned_registry() -> None:
     assert "data/plugins.json" not in PAGE
 
 
+def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> None:
+    adm = by_id("adm")
+    repo = "https://github.com/vLLM-HUST/ascend-distributed-metadata"
+    assert adm["canonical_repository"] == repo
+    assert adm["delivery_model"] == "python_distribution"
+    assert adm["maturity"] == "experimental"
+    assert adm["compatibility"]["status"] == "verified"
+    assert any(
+        version.startswith("Core e1248fa")
+        for version in adm["compatibility"]["versions"]
+    )
+    assert "previous published MOD" in adm["public_effect_en"]
+    assert "not establish general speedup" in adm["public_effect_en"]
+    assert WORKLOAD_NAVIGATION["plugins"]["adm"] == ["distributed_pipeline"]
+    assert WORKSHOP_METADATA["plugins"]["adm"]["repository_url"] == repo
+    assert (
+        WORKSHOP_METADATA["plugins"]["adm"]["maintainers"][0]["login"]
+        == "sad-and-bad1231"
+    )
+    evidence = next(
+        item for item in PLUGIN_PERFORMANCE["entries"] if item["id"] == "adm"
+    )
+    assert evidence["url"] == adm["public_effect_url"]
+    assert len(evidence["published_comparisons"]) == 3
+    assert all(
+        "previous MOD" in row["scope"] for row in evidence["published_comparisons"]
+    )
+
+
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 54
+    assert len(PORTFOLIO["repositories"]) == 55
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "extension-manager",
@@ -776,7 +805,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert vspec["public_surface"] is True
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v11-maintenance-audit"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v12-adm"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
@@ -1048,7 +1077,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 13
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 14
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1072,6 +1101,7 @@ def test_non_runnable_descriptors_scaffolds_and_legacy_carriers_are_not_publishe
 
 def test_performance_evidence_cannot_override_the_publication_gate():
     measured = {
+        "adm",
         "betterscale",
         "pipeline-microbatch-migration",
         "kvcompress-ascend",

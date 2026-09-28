@@ -37,6 +37,7 @@ test('every Frontier gain is computed from five points in a declared comparison 
 test('published paired runs expose both gains and regressions without precomputed scores', () => {
   const results = M.summarize(data, frontier);
   const expected = {
+    adm: '0.80',
     vspec: '51.80',
     'kv-materialization-arrival-control': '-0.42',
     diffspec: '-70.66',
@@ -45,7 +46,7 @@ test('published paired runs expose both gains and regressions without precompute
   for (const [id, gain] of Object.entries(expected)) {
     const result = results.get(id);
     assert.equal(result.source, 'published-comparison');
-    assert.equal(result.count, id === 'kv-materialization-arrival-control' ? 6 : 1);
+    assert.equal(result.count, id === 'kv-materialization-arrival-control' ? 6 : id === 'adm' ? 3 : 1);
     assert.equal(result.gain.toFixed(2), gain);
     assert.ok(result.url.startsWith('https://github.com/vLLM-HUST/'));
     assert.ok(result.published_comparisons.every(row => row.baseline > 0));
@@ -53,12 +54,12 @@ test('published paired runs expose both gains and regressions without precompute
   }
   const kvmat = results.get('kv-materialization-arrival-control');
   assert.equal(kvmat.count, 6);
-  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 11);
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 12);
 });
 
 test('model-scoped summaries expose and rank only measurements from the selected model', () => {
   assert.deepEqual(M.models(data, frontier), [
-    'Qwen2.5-14B', 'Qwen2.5-7B-Instruct', 'Qwen3-30B-A3B',
+    'Qwen2.5-14B', 'Qwen2.5-7B-Instruct', 'Qwen3-30B-A3B', 'Qwen3-30B-A3B-W8A8',
     'Qwen3.5-35B-A3B', 'Qwen3.8-27B'
   ]);
   const qwen25 = M.summarize(data, frontier, 'Qwen2.5-14B');

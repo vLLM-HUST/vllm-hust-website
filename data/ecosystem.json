@@ -227,6 +227,48 @@
       "evidence_level": "integration_tested"
     },
     {
+      "id": "adm",
+      "name": "ADM",
+      "name_en": "Ascend Distributed Metadata",
+      "name_zh": "昇腾分布式元数据",
+      "artifact_type": "runtime_component",
+      "system_role": "dp_metadata_sync",
+      "integration_contracts": [],
+      "integration_surfaces": ["vllm.general_plugins", "NPUModelRunner._sync_metadata_across_dp (AST-pinned)"],
+      "execution_planes": ["worker"],
+      "deployment_topology": "in_process",
+      "delivery_model": "python_distribution",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "maintainers": ["sad-and-bad1231"],
+      "maintainer_profiles": [{"login": "sad-and-bad1231", "name": "匡明轩"}],
+      "canonical_repository": "https://github.com/vLLM-HUST/ascend-distributed-metadata",
+      "upstream_repository": null,
+      "summary_en": "Opt-in, version-pinned Ascend DP scheduling-metadata plugin. It preserves the native token vector and graph-mode result while packing DP2 and DP4 rank metadata into one CPU-group all-reduce word.",
+      "summary_zh": "按版本固定、默认关闭的昇腾 DP 调度元数据插件；保持原生 token 向量和图模式结果，将 DP2、DP4 各 rank 元数据打包到一次 CPU 组 all-reduce。",
+      "public_effect_en": "On Qwen3-30B-A3B-W8A8 TP1/DP4, three matched session means favored the new word path by 0.38%, 0.71%, and 1.32% against the previous published MOD; aggregate output throughput was 467.099 vs 463.376 tok/s (+0.80%). Individual rounds varied. This does not establish general speedup or research recovery acceptance.",
+      "public_effect_zh": "Qwen3-30B-A3B-W8A8 TP1/DP4 三组配对会话相对先前已发布 MOD 分别提升 0.38%、0.71%、1.32%；输出吞吐总均值为 467.099 对 463.376 tok/s（+0.80%）。单轮存在波动，不代表普遍提速或研究恢复验收。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/ascend-distributed-metadata/blob/main/qualifications/qwen3moe-dp4-int64-word-20260928.json",
+      "functional_compatibility": {"status": "passed", "scope": "Qwen3-30B-A3B-W8A8 · Ascend 910B2 · TP1/DP4 · FULL_DECODE_ONLY graph"},
+      "effectiveness_qualifications": [
+        {"status": "measured", "scope": "Qwen3-30B-A3B-W8A8 · DP4 · three paired sessions · +0.80% mean output throughput vs previous MOD"},
+        {"status": "inconclusive", "scope": "Qwen3.5-35B-A3B · TP4/DP2 eager · service gain not established"}
+      ],
+      "compatibility": {
+        "status": "verified",
+        "host": "vLLM-HUST + vLLM-Ascend-HUST",
+        "versions": ["Core e1248fa2655fdb8d72f80a5d6c28fa9c75b660c0", "Ascend 367b8e62da799870a7476ce34f5f7658589a8aad", "ADM 16362b2d6c229ec1c900b87cdb2c974039db95a6"],
+        "platforms": ["Ascend 910B2 · TP1/DP4 · FULL_DECODE_ONLY graph"],
+        "models": ["Qwen3-30B-A3B-W8A8 — matched DP4 serving qualified", "Qwen3.5-35B-A3B — DP2 functional; throughput benefit unconfirmed"],
+        "python": [">=3.11"],
+        "requirements_en": "Install into the exact reviewed Ascend runtime; include adm_packed_sync in VLLM_PLUGINS and set ADM_PACKED_SYNC_ENABLE=1. The plugin rejects an unmatched target method. Not an Extension Manager bundle or a recovery protocol.",
+        "requirements_zh": "安装到已核对版本的昇腾运行环境，在 VLLM_PLUGINS 中加入 adm_packed_sync 并设置 ADM_PACKED_SYNC_ENABLE=1；目标方法不匹配时拒绝接入。当前不是 Extension Manager bundle 或恢复协议。"
+      },
+      "evidence_level": "performance_verified"
+    },
+    {
       "id": "bidkv",
       "name": "BidKV",
       "name_en": "BidKV",

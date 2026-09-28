@@ -14,6 +14,17 @@
       "public_surface": true
     },
     {
+      "name": "ascend-distributed-metadata",
+      "url": "https://github.com/vLLM-HUST/ascend-distributed-metadata",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "runtime_component",
+      "relation_to_runtime": "extends_runtime_behavior",
+      "lifecycle": "experimental",
+      "canonical_artifacts": ["ADM packed DP metadata sync plugin", "DP4 matched serving evidence"],
+      "component_ids": ["adm"],
+      "public_surface": true
+    },
+    {
       "name": "ascend-runtime-manager",
       "url": "https://github.com/vLLM-HUST/ascend-runtime-manager",
       "portfolio_domain": "development_operations",
