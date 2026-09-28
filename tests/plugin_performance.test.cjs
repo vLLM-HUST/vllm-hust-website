@@ -114,7 +114,7 @@ test('series outside declared comparison sets do not produce percentages', () =>
 });
 
 test('workload, model, topology, KV budget, runtime and measurement mismatches exclude a candidate', () => {
-  const measured = [...M.summarize(data, frontier).values()].find(result => Number.isFinite(result.gain));
+  const measured = [...M.summarize(data, frontier).values()].find(result => result.source === 'frontier' && Number.isFinite(result.gain));
   const id = measured.comparisons[0].point_id;
   const edits = [
     p => {p.evidence.benchmark_protocol.prepared_workload_sha256 = 'different';},
@@ -134,7 +134,7 @@ test('workload, model, topology, KV budget, runtime and measurement mismatches e
 });
 
 test('MOD-specific host-tier capacity remains part of the treatment', () => {
-  const result = [...M.summarize(data, frontier).values()].find(row => Number.isFinite(row.gain));
+  const result = [...M.summarize(data, frontier).values()].find(row => row.source === 'frontier' && Number.isFinite(row.gain));
   const changed = structuredClone(frontier);
   for (const row of result.comparisons) {
     const parameters = changed.points.find(point => point.id === row.point_id).configuration.parameters;
@@ -144,7 +144,7 @@ test('MOD-specific host-tier capacity remains part of the treatment', () => {
 });
 
 test('missing or duplicated concurrency windows cannot turn a partial curve into a score', () => {
-  const measured = [...M.summarize(data, frontier).values()].find(result => Number.isFinite(result.gain));
+  const measured = [...M.summarize(data, frontier).values()].find(result => result.source === 'frontier' && Number.isFinite(result.gain));
   const id = measured.comparisons[0].point_id;
   const missing = {...frontier, points: frontier.points.filter(point => point.id !== id)};
   assert.equal(M.summarize(data, missing).get(measured.id).gain, null);
@@ -162,7 +162,7 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const real = M.summarize(data, frontier);
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
-    'vspec', 'betterscale', 'pipeline-microbatch-migration',
+    'vspec', 'betterscale', 'pipeline-microbatch-migration', 'adm',
     'bidkv', 'dla', 'kv-materialization-arrival-control', 'mooncake-vllm-connectors', 'kv-tiering-migration',
     'kvcompress-ascend', 'diffspec', 'latchmoe'
   ]);
