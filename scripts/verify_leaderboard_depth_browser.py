@@ -55,8 +55,15 @@ def main():
                 assert page.locator(
                     "#frontier-rotation-filter legend"
                 ).inner_text() == (
-                    "并发服务规模" if language == "zh" else "Concurrent service scale"
+                    "会话轮转深度" if language == "zh" else "Session rotation depth"
                 )
+                notes = page.locator("#frontier-rotation-filter .frontier-filter-note")
+                help_text = (
+                    "C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。"
+                    if language == "zh"
+                    else "C1/C2/… is request concurrency; D1/D2 is the number of session states rotated per request lane."
+                )
+                assert help_text in notes.first.inner_text()
                 choices = page.locator('[data-filter="rotation"]')
                 assert choices.count() == len(depths)
                 assert all(choice.is_checked() for choice in choices.all())
@@ -93,10 +100,11 @@ def main():
                 for depth in depths:
                     for choice in choices.all():
                         choice.set_checked(int(choice.input_value()) == depth)
-                    assert page.locator(
-                        f'[data-filter="rotation"][value="{depth}"]'
-                    ).locator("..").inner_text() == (
-                        f"{depth}倍会话" if language == "zh" else f"{depth}× sessions"
+                    assert (
+                        page.locator(f'[data-filter="rotation"][value="{depth}"]')
+                        .locator("..")
+                        .inner_text()
+                        == f"D{depth}"
                     )
                     expected = [
                         v
@@ -113,10 +121,7 @@ def main():
                         f"{len(expected)} / {len(expected)}"
                         in page.locator("#frontier-filter-count").inner_text()
                     )
-                    assert (
-                        f"D{depth}"
-                        not in page.locator("#frontier-chart").text_content()
-                    )
+                    assert f"D{depth}" in page.locator("#frontier-chart").text_content()
                     page.locator("#frontier-only").check()
                     assert_group_frontiers(page, expected)
                     page.locator("#frontier-only").uncheck()
@@ -125,9 +130,9 @@ def main():
                     )
                     c = expected[0]["load"]["concurrency"]
                     assert (
-                        f"{c}路并发，{c * depth}个活跃会话"
+                        f"并发数: C{c} · 会话轮转深度: D{depth}"
                         if language == "zh"
-                        else f"{c} concurrent requests, {c * depth} active sessions"
+                        else f"Concurrency: C{c} · Session rotation depth: D{depth}"
                     ) in page.locator("#frontier-popover").inner_text()
                     with page.expect_download() as downloaded:
                         page.locator("[data-download]").click()
