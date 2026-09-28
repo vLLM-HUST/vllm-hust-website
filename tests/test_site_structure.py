@@ -2357,7 +2357,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     snapshot_path = root / "data" / "core_contributors.json"
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
-    assert payload["updated_at"] == "2026-09-27"
+    assert payload["updated_at"] == "2026-09-28"
     assert len(payload["all_repos"]["contributors"]) == 34
     assert len(payload["core_repos"]["contributors"]) == 12
     profiles = payload["member_profiles"]
@@ -2639,7 +2639,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         if item["person_id"] == "github:sad-and-bad1231"
     ]
     assert len(kuang_rows) == 1
-    assert kuang_rows[0]["commits"] == 16
+    assert kuang_rows[0]["commits"] == 26
 
     canonical_snapshot = (
         root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"
