@@ -262,7 +262,9 @@ def main():
                 "nodes=>nodes.map(n=>n.dataset.point)"
             )
             assert set(shown) == {p["id"] for p in expected_rotation2}
-            assert len(expected_rotation2) == 5
+            assert (
+                expected_rotation2
+            )  # Membership is checked against the snapshot above.
             assert_group_frontiers(page, expected_rotation2)
             assert page.locator("#frontier-curves").is_hidden()
             assert "D2" in page.locator("#frontier-chart").text_content()

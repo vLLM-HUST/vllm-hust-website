@@ -19911,6 +19911,3172 @@
         }
       },
       "cleanup": "Server/controller/admission exit0; selected[0, 1] IDLE for30s after release; no foreign-owner violation"
+    },
+    {
+      "run_id": "efc4cfca3af94d92a6e97929c3609aa6",
+      "point_id": "qwen35-sweprefix-offloading-phase1-off-tp2-c16-d1-20260927",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 1223,
+        "max_prompt_tokens_observed": 100619,
+        "prompt_tokens_p50": 23554.0,
+        "max_turn_index_reached": 74,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 24,
+        "requests_completed_in_window": 1207,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 752129,
+        "output_tokens_per_second": 835.6988888888889,
+        "output_tokens_per_second_per_chip": 417.84944444444443,
+        "decode_tokens_per_second_p90": 59.75578457930757,
+        "decode_speed_samples": 1207,
+        "ttft_seconds_p95": 0.5909130489453674,
+        "client_inflight_seconds": {
+          "0": 0.00022201193496584892,
+          "1": 0.001036717090755701,
+          "2": 0.0007128040306270123,
+          "3": 0.0006647149566560984,
+          "4": 0.0006367040332406759,
+          "5": 0.0009467459749430418,
+          "6": 0.0006723848637193441,
+          "7": 0.0007060449570417404,
+          "8": 0.0007064240053296089,
+          "9": 0.000661125173792243,
+          "10": 0.0006218538619577885,
+          "11": 0.0006149741820991039,
+          "12": 0.0008824157994240522,
+          "13": 0.0006952541880309582,
+          "14": 0.0006626748945564032,
+          "15": 7.890662226127461,
+          "16": 892.0988949239254
+        },
+        "mean_client_inflight": 15.991129394811578,
+        "full_concurrency_fraction": 0.9912209943599171,
+        "drain_seconds": 39.71334826992825,
+        "session_rotation_depth": 1,
+        "session_slots": 16,
+        "first_turn_requests_started": 40,
+        "continuation_requests_started": 1183,
+        "slot_coverage": [
+          {
+            "lane": 0,
+            "slot": 0,
+            "requests_started": 69,
+            "continuation_requests_started": 66,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 1,
+            "slot": 0,
+            "requests_started": 103,
+            "continuation_requests_started": 98,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 2,
+            "slot": 0,
+            "requests_started": 72,
+            "continuation_requests_started": 70,
+            "max_turn_index_reached": 44
+          },
+          {
+            "lane": 3,
+            "slot": 0,
+            "requests_started": 67,
+            "continuation_requests_started": 64,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 4,
+            "slot": 0,
+            "requests_started": 67,
+            "continuation_requests_started": 65,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 5,
+            "slot": 0,
+            "requests_started": 64,
+            "continuation_requests_started": 62,
+            "max_turn_index_reached": 52
+          },
+          {
+            "lane": 6,
+            "slot": 0,
+            "requests_started": 54,
+            "continuation_requests_started": 53,
+            "max_turn_index_reached": 53
+          },
+          {
+            "lane": 7,
+            "slot": 0,
+            "requests_started": 75,
+            "continuation_requests_started": 74,
+            "max_turn_index_reached": 74
+          },
+          {
+            "lane": 8,
+            "slot": 0,
+            "requests_started": 89,
+            "continuation_requests_started": 86,
+            "max_turn_index_reached": 56
+          },
+          {
+            "lane": 9,
+            "slot": 0,
+            "requests_started": 90,
+            "continuation_requests_started": 87,
+            "max_turn_index_reached": 39
+          },
+          {
+            "lane": 10,
+            "slot": 0,
+            "requests_started": 91,
+            "continuation_requests_started": 87,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 11,
+            "slot": 0,
+            "requests_started": 117,
+            "continuation_requests_started": 112,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 12,
+            "slot": 0,
+            "requests_started": 71,
+            "continuation_requests_started": 69,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 13,
+            "slot": 0,
+            "requests_started": 68,
+            "continuation_requests_started": 66,
+            "max_turn_index_reached": 52
+          },
+          {
+            "lane": 14,
+            "slot": 0,
+            "requests_started": 52,
+            "continuation_requests_started": 51,
+            "max_turn_index_reached": 51
+          },
+          {
+            "lane": 15,
+            "slot": 0,
+            "requests_started": 74,
+            "continuation_requests_started": 73,
+            "max_turn_index_reached": 73
+          }
+        ],
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.3",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "efc4cfca3af94d92a6e97929c3609aa6",
+        "started_at_unix": 1790528736.6726224,
+        "model": "cache-pressure",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "scheduling_policy": "session-round-robin-v1",
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "campaign_exit_zero": true,
+        "selected_devices_released": true,
+        "request_protocol_pass": true,
+        "teardown_warnings": "Shared-memory resource_tracker warnings; four arms log output-handler EngineDeadError after requested shutdown; no measured request failures"
+      },
+      "state_capacity": {
+        "total_bytes": 26038239232,
+        "resident_bytes": 1912095920,
+        "attention_bytes": 24126143312,
+        "resident_seats": 20,
+        "execution_seats": 16,
+        "token_pages": 16720,
+        "page_tokens": 128
+      },
+      "cache_observation": {
+        "group": "g0-c16-d1",
+        "arm": "control",
+        "C": 16,
+        "D": 1,
+        "valid": true,
+        "failed": 0,
+        "tokens_per_second_per_chip": 417.84944444444443,
+        "ttft_p95": 0.5909130489453674,
+        "decode_tps_p90": 59.75578457930757,
+        "completions": 1207,
+        "drained": 16,
+        "max_prompt": 100619,
+        "full_concurrency_fraction": 0.9912209943599171,
+        "continuation_requests": 1183,
+        "continuation_hits": 1183,
+        "continuation_ttft_p95": 0.5823718048399315,
+        "prompt_cache_fraction": 0.9754879038442625,
+        "uncached_prompt_tokens": 910471,
+        "slot_return_coverage": 1.0,
+        "preemptions": 0.0,
+        "cache_counters": {
+          "device_evictions": 22,
+          "schedule_steps": 19168,
+          "scheduled_request_steps": 267895
+        },
+        "peak_host_bytes": 0,
+        "peak_page_usage": 0.4990421455938697,
+        "peak_pending": 0,
+        "scope": "throughput is official900s; request/cache fractions include drain; telemetry is sampled deployment lifetime including qualification"
+      },
+      "metrics": {
+        "output_tps": 835.6988888888889,
+        "decode_p90_tps": 59.75578457930757,
+        "ttft_p95_ms": 590.9130489453674,
+        "completed_requests": 1207,
+        "preemptions_measurement_and_drain": 0.0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0.9754879038442625
+      }
+    },
+    {
+      "run_id": "912f2a9203444bfc86705405690df83e",
+      "point_id": "qwen35-sweprefix-offloading-phase1-on-tp2-c16-d1-20260927",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 1217,
+        "max_prompt_tokens_observed": 100619,
+        "prompt_tokens_p50": 23554.0,
+        "max_turn_index_reached": 74,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 24,
+        "requests_completed_in_window": 1201,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 750133,
+        "output_tokens_per_second": 833.4811111111111,
+        "output_tokens_per_second_per_chip": 416.74055555555555,
+        "decode_tokens_per_second_p90": 59.514431972137764,
+        "decode_speed_samples": 1201,
+        "ttft_seconds_p95": 0.6277611749246716,
+        "client_inflight_seconds": {
+          "0": 0.00020370306447148323,
+          "1": 0.0009875961113721132,
+          "2": 0.0007146918214857578,
+          "3": 0.000637540128082037,
+          "4": 0.0006835609674453735,
+          "5": 0.0009315949864685535,
+          "6": 0.0006711699534207582,
+          "7": 0.0007094121538102627,
+          "8": 0.0006991007830947638,
+          "9": 0.0006686311680823565,
+          "10": 0.0006279798690229654,
+          "11": 0.0006295300554484129,
+          "12": 0.0008860640227794647,
+          "13": 0.0006789509207010269,
+          "14": 0.0006781809497624636,
+          "15": 7.9956149170175195,
+          "16": 891.993977376027
+        },
+        "mean_client_inflight": 15.991013716972278,
+        "full_concurrency_fraction": 0.9911044193066967,
+        "drain_seconds": 41.73857098002918,
+        "session_rotation_depth": 1,
+        "session_slots": 16,
+        "first_turn_requests_started": 40,
+        "continuation_requests_started": 1177,
+        "slot_coverage": [
+          {
+            "lane": 0,
+            "slot": 0,
+            "requests_started": 87,
+            "continuation_requests_started": 84,
+            "max_turn_index_reached": 54
+          },
+          {
+            "lane": 1,
+            "slot": 0,
+            "requests_started": 104,
+            "continuation_requests_started": 99,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 2,
+            "slot": 0,
+            "requests_started": 91,
+            "continuation_requests_started": 87,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 3,
+            "slot": 0,
+            "requests_started": 67,
+            "continuation_requests_started": 64,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 4,
+            "slot": 0,
+            "requests_started": 67,
+            "continuation_requests_started": 65,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 5,
+            "slot": 0,
+            "requests_started": 64,
+            "continuation_requests_started": 62,
+            "max_turn_index_reached": 52
+          },
+          {
+            "lane": 6,
+            "slot": 0,
+            "requests_started": 52,
+            "continuation_requests_started": 51,
+            "max_turn_index_reached": 51
+          },
+          {
+            "lane": 7,
+            "slot": 0,
+            "requests_started": 74,
+            "continuation_requests_started": 73,
+            "max_turn_index_reached": 73
+          },
+          {
+            "lane": 8,
+            "slot": 0,
+            "requests_started": 69,
+            "continuation_requests_started": 66,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 9,
+            "slot": 0,
+            "requests_started": 90,
+            "continuation_requests_started": 87,
+            "max_turn_index_reached": 39
+          },
+          {
+            "lane": 10,
+            "slot": 0,
+            "requests_started": 72,
+            "continuation_requests_started": 70,
+            "max_turn_index_reached": 44
+          },
+          {
+            "lane": 11,
+            "slot": 0,
+            "requests_started": 113,
+            "continuation_requests_started": 108,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 12,
+            "slot": 0,
+            "requests_started": 69,
+            "continuation_requests_started": 67,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 13,
+            "slot": 0,
+            "requests_started": 69,
+            "continuation_requests_started": 67,
+            "max_turn_index_reached": 52
+          },
+          {
+            "lane": 14,
+            "slot": 0,
+            "requests_started": 54,
+            "continuation_requests_started": 53,
+            "max_turn_index_reached": 53
+          },
+          {
+            "lane": 15,
+            "slot": 0,
+            "requests_started": 75,
+            "continuation_requests_started": 74,
+            "max_turn_index_reached": 74
+          }
+        ],
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.3",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "912f2a9203444bfc86705405690df83e",
+        "started_at_unix": 1790530025.9906695,
+        "model": "cache-pressure",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "scheduling_policy": "session-round-robin-v1",
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "campaign_exit_zero": true,
+        "selected_devices_released": true,
+        "request_protocol_pass": true,
+        "teardown_warnings": "Shared-memory resource_tracker warnings; four arms log output-handler EngineDeadError after requested shutdown; no measured request failures"
+      },
+      "state_capacity": {
+        "total_bytes": 26038239232,
+        "resident_bytes": 1912095920,
+        "attention_bytes": 24126143312,
+        "resident_seats": 20,
+        "execution_seats": 16,
+        "token_pages": 16720,
+        "page_tokens": 128
+      },
+      "cache_observation": {
+        "group": "g0-c16-d1",
+        "arm": "policy",
+        "C": 16,
+        "D": 1,
+        "valid": true,
+        "failed": 0,
+        "tokens_per_second_per_chip": 416.74055555555555,
+        "ttft_p95": 0.6277611749246716,
+        "decode_tps_p90": 59.514431972137764,
+        "completions": 1201,
+        "drained": 16,
+        "max_prompt": 100619,
+        "full_concurrency_fraction": 0.9911044193066967,
+        "continuation_requests": 1177,
+        "continuation_hits": 1177,
+        "continuation_ttft_p95": 0.6074242827016862,
+        "prompt_cache_fraction": 0.9753785147488304,
+        "uncached_prompt_tokens": 908286,
+        "slot_return_coverage": 1.0,
+        "preemptions": 0.0,
+        "cache_counters": {
+          "device_evictions": 24,
+          "schedule_steps": 20826,
+          "scheduled_request_steps": 269371,
+          "store": 765,
+          "store_bytes": 398867311460,
+          "drop": 756,
+          "drop_bytes": 391247747472
+        },
+        "peak_host_bytes": 8588932268,
+        "peak_page_usage": 0.5038314176245211,
+        "peak_pending": 1,
+        "scope": "throughput is official900s; request/cache fractions include drain; telemetry is sampled deployment lifetime including qualification"
+      },
+      "metrics": {
+        "output_tps": 833.4811111111111,
+        "decode_p90_tps": 59.514431972137764,
+        "ttft_p95_ms": 627.7611749246716,
+        "completed_requests": 1201,
+        "preemptions_measurement_and_drain": 0.0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0.9753785147488304
+      }
+    },
+    {
+      "run_id": "cd16bf408727491c96941529e7a6a8d3",
+      "point_id": "qwen35-sweprefix-offloading-phase1-off-tp2-c16-d2-20260927",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 706,
+        "max_prompt_tokens_observed": 45994,
+        "prompt_tokens_p50": 13502.0,
+        "max_turn_index_reached": 23,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 690,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 371846,
+        "output_tokens_per_second": 413.1622222222222,
+        "output_tokens_per_second_per_chip": 206.5811111111111,
+        "decode_tokens_per_second_p90": 48.23877699742943,
+        "decode_speed_samples": 690,
+        "ttft_seconds_p95": 4.606100736255753,
+        "client_inflight_seconds": {
+          "0": 0.00019713304936885834,
+          "1": 0.000969636021181941,
+          "2": 0.0006930709350854158,
+          "3": 0.0006596699822694063,
+          "4": 0.0006890811491757631,
+          "5": 0.0008731139823794365,
+          "6": 0.0006082400213927031,
+          "7": 0.0006397198885679245,
+          "8": 0.0006909510120749474,
+          "9": 0.0006131699774414301,
+          "10": 0.0006135799922049046,
+          "11": 0.0006676709745079279,
+          "12": 0.0009181839413940907,
+          "13": 0.0006203700322657824,
+          "14": 0.0006102800834923983,
+          "15": 2.2179063614457846,
+          "16": 897.7720297675114
+        },
+        "mean_client_inflight": 15.997436454578873,
+        "full_concurrency_fraction": 0.9975244775194572,
+        "drain_seconds": 51.22264687996358,
+        "session_rotation_depth": 2,
+        "session_slots": 32,
+        "first_turn_requests_started": 40,
+        "continuation_requests_started": 666,
+        "slot_coverage": [
+          {
+            "lane": 0,
+            "slot": 0,
+            "requests_started": 26,
+            "continuation_requests_started": 24,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 0,
+            "slot": 1,
+            "requests_started": 26,
+            "continuation_requests_started": 24,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 1,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 1,
+            "slot": 1,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 2,
+            "slot": 0,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 2,
+            "slot": 1,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 3,
+            "slot": 0,
+            "requests_started": 20,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 19
+          },
+          {
+            "lane": 3,
+            "slot": 1,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 4,
+            "slot": 0,
+            "requests_started": 27,
+            "continuation_requests_started": 25,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 4,
+            "slot": 1,
+            "requests_started": 27,
+            "continuation_requests_started": 25,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 5,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 5,
+            "slot": 1,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 6,
+            "slot": 0,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 6,
+            "slot": 1,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 7,
+            "slot": 0,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 7,
+            "slot": 1,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 8,
+            "slot": 0,
+            "requests_started": 27,
+            "continuation_requests_started": 25,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 8,
+            "slot": 1,
+            "requests_started": 26,
+            "continuation_requests_started": 24,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 9,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 9,
+            "slot": 1,
+            "requests_started": 23,
+            "continuation_requests_started": 22,
+            "max_turn_index_reached": 22
+          },
+          {
+            "lane": 10,
+            "slot": 0,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 10,
+            "slot": 1,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 11,
+            "slot": 0,
+            "requests_started": 20,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 19
+          },
+          {
+            "lane": 11,
+            "slot": 1,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 12,
+            "slot": 0,
+            "requests_started": 28,
+            "continuation_requests_started": 26,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 12,
+            "slot": 1,
+            "requests_started": 27,
+            "continuation_requests_started": 25,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 13,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 13,
+            "slot": 1,
+            "requests_started": 23,
+            "continuation_requests_started": 22,
+            "max_turn_index_reached": 22
+          },
+          {
+            "lane": 14,
+            "slot": 0,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 14,
+            "slot": 1,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 15,
+            "slot": 0,
+            "requests_started": 20,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 19
+          },
+          {
+            "lane": 15,
+            "slot": 1,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          }
+        ],
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.3",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "cd16bf408727491c96941529e7a6a8d3",
+        "started_at_unix": 1790530027.0538378,
+        "model": "cache-pressure",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "session_rotation_depth": 2,
+        "scheduling_policy": "session-round-robin-v1",
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "campaign_exit_zero": true,
+        "selected_devices_released": true,
+        "request_protocol_pass": true,
+        "teardown_warnings": "Shared-memory resource_tracker warnings; four arms log output-handler EngineDeadError after requested shutdown; no measured request failures"
+      },
+      "state_capacity": {
+        "total_bytes": 26038239232,
+        "resident_bytes": 1912095920,
+        "attention_bytes": 24126143312,
+        "resident_seats": 20,
+        "execution_seats": 16,
+        "token_pages": 16720,
+        "page_tokens": 128
+      },
+      "cache_observation": {
+        "group": "g1-c16-d2",
+        "arm": "control",
+        "C": 16,
+        "D": 2,
+        "valid": true,
+        "failed": 0,
+        "tokens_per_second_per_chip": 206.5811111111111,
+        "ttft_p95": 4.606100736255753,
+        "decode_tps_p90": 48.23877699742943,
+        "completions": 690,
+        "drained": 16,
+        "max_prompt": 45994,
+        "full_concurrency_fraction": 0.9975244775194572,
+        "continuation_requests": 666,
+        "continuation_hits": 105,
+        "continuation_ttft_p95": 5.024574049108196,
+        "prompt_cache_fraction": 0.15994306868349895,
+        "uncached_prompt_tokens": 8838617,
+        "slot_return_coverage": 1.0,
+        "preemptions": 0.0,
+        "cache_counters": {
+          "device_evictions": 585,
+          "schedule_steps": 13430,
+          "scheduled_request_steps": 143654
+        },
+        "peak_host_bytes": 0,
+        "peak_page_usage": 0.29501915708812265,
+        "peak_pending": 0,
+        "scope": "throughput is official900s; request/cache fractions include drain; telemetry is sampled deployment lifetime including qualification"
+      },
+      "metrics": {
+        "output_tps": 413.1622222222222,
+        "decode_p90_tps": 48.23877699742943,
+        "ttft_p95_ms": 4606.100736255753,
+        "completed_requests": 690,
+        "preemptions_measurement_and_drain": 0.0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0.15994306868349895
+      }
+    },
+    {
+      "run_id": "98b76f5f70654d5d9e3e1d393703196f",
+      "point_id": "qwen35-sweprefix-offloading-phase1-on-tp2-c16-d2-20260927",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 1017,
+        "max_prompt_tokens_observed": 59142,
+        "prompt_tokens_p50": 17065.0,
+        "max_turn_index_reached": 34,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 18,
+        "requests_completed_in_window": 1001,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 559724,
+        "output_tokens_per_second": 621.9155555555556,
+        "output_tokens_per_second_per_chip": 310.9577777777778,
+        "decode_tokens_per_second_p90": 61.65573319158112,
+        "decode_speed_samples": 1001,
+        "ttft_seconds_p95": 3.136977434856817,
+        "client_inflight_seconds": {
+          "0": 0.00021789083257317543,
+          "1": 0.0010164070408791304,
+          "2": 0.0006684239488095045,
+          "3": 0.0006422651931643486,
+          "4": 0.0007106238044798374,
+          "5": 0.0008441160898655653,
+          "6": 0.0006120039615780115,
+          "7": 0.0006273540202528238,
+          "8": 0.0006743550766259432,
+          "9": 0.0006209539715200663,
+          "10": 0.0005915339570492506,
+          "11": 0.0006229139398783445,
+          "12": 0.0009121859911829233,
+          "13": 0.0006094041746109724,
+          "14": 0.0005916638765484095,
+          "15": 4.18014918314293,
+          "16": 895.809888720978
+        },
+        "mean_client_inflight": 15.99525640723399,
+        "full_concurrency_fraction": 0.9953443208010867,
+        "drain_seconds": 35.23032790282741,
+        "session_rotation_depth": 2,
+        "session_slots": 32,
+        "first_turn_requests_started": 50,
+        "continuation_requests_started": 967,
+        "slot_coverage": [
+          {
+            "lane": 0,
+            "slot": 0,
+            "requests_started": 31,
+            "continuation_requests_started": 29,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 0,
+            "slot": 1,
+            "requests_started": 30,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 1,
+            "slot": 0,
+            "requests_started": 40,
+            "continuation_requests_started": 38,
+            "max_turn_index_reached": 26
+          },
+          {
+            "lane": 1,
+            "slot": 1,
+            "requests_started": 40,
+            "continuation_requests_started": 38,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 2,
+            "slot": 0,
+            "requests_started": 25,
+            "continuation_requests_started": 24,
+            "max_turn_index_reached": 24
+          },
+          {
+            "lane": 2,
+            "slot": 1,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 3,
+            "slot": 0,
+            "requests_started": 29,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 28
+          },
+          {
+            "lane": 3,
+            "slot": 1,
+            "requests_started": 28,
+            "continuation_requests_started": 27,
+            "max_turn_index_reached": 27
+          },
+          {
+            "lane": 4,
+            "slot": 0,
+            "requests_started": 40,
+            "continuation_requests_started": 38,
+            "max_turn_index_reached": 22
+          },
+          {
+            "lane": 4,
+            "slot": 1,
+            "requests_started": 39,
+            "continuation_requests_started": 36,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 5,
+            "slot": 0,
+            "requests_started": 36,
+            "continuation_requests_started": 34,
+            "max_turn_index_reached": 26
+          },
+          {
+            "lane": 5,
+            "slot": 1,
+            "requests_started": 36,
+            "continuation_requests_started": 34,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 6,
+            "slot": 0,
+            "requests_started": 25,
+            "continuation_requests_started": 24,
+            "max_turn_index_reached": 24
+          },
+          {
+            "lane": 6,
+            "slot": 1,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 7,
+            "slot": 0,
+            "requests_started": 29,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 28
+          },
+          {
+            "lane": 7,
+            "slot": 1,
+            "requests_started": 29,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 28
+          },
+          {
+            "lane": 8,
+            "slot": 0,
+            "requests_started": 32,
+            "continuation_requests_started": 30,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 8,
+            "slot": 1,
+            "requests_started": 31,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 9,
+            "slot": 0,
+            "requests_started": 37,
+            "continuation_requests_started": 35,
+            "max_turn_index_reached": 26
+          },
+          {
+            "lane": 9,
+            "slot": 1,
+            "requests_started": 36,
+            "continuation_requests_started": 34,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 10,
+            "slot": 0,
+            "requests_started": 25,
+            "continuation_requests_started": 24,
+            "max_turn_index_reached": 24
+          },
+          {
+            "lane": 10,
+            "slot": 1,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 11,
+            "slot": 0,
+            "requests_started": 30,
+            "continuation_requests_started": 29,
+            "max_turn_index_reached": 29
+          },
+          {
+            "lane": 11,
+            "slot": 1,
+            "requests_started": 29,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 28
+          },
+          {
+            "lane": 12,
+            "slot": 0,
+            "requests_started": 42,
+            "continuation_requests_started": 40,
+            "max_turn_index_reached": 24
+          },
+          {
+            "lane": 12,
+            "slot": 1,
+            "requests_started": 41,
+            "continuation_requests_started": 39,
+            "max_turn_index_reached": 25
+          },
+          {
+            "lane": 13,
+            "slot": 0,
+            "requests_started": 39,
+            "continuation_requests_started": 37,
+            "max_turn_index_reached": 26
+          },
+          {
+            "lane": 13,
+            "slot": 1,
+            "requests_started": 38,
+            "continuation_requests_started": 36,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 14,
+            "slot": 0,
+            "requests_started": 25,
+            "continuation_requests_started": 24,
+            "max_turn_index_reached": 24
+          },
+          {
+            "lane": 14,
+            "slot": 1,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 15,
+            "slot": 0,
+            "requests_started": 30,
+            "continuation_requests_started": 29,
+            "max_turn_index_reached": 29
+          },
+          {
+            "lane": 15,
+            "slot": 1,
+            "requests_started": 29,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 28
+          }
+        ],
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.3",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "98b76f5f70654d5d9e3e1d393703196f",
+        "started_at_unix": 1790528738.6233232,
+        "model": "cache-pressure",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "session_rotation_depth": 2,
+        "scheduling_policy": "session-round-robin-v1",
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "campaign_exit_zero": true,
+        "selected_devices_released": true,
+        "request_protocol_pass": true,
+        "teardown_warnings": "Shared-memory resource_tracker warnings; four arms log output-handler EngineDeadError after requested shutdown; no measured request failures"
+      },
+      "state_capacity": {
+        "total_bytes": 26038239232,
+        "resident_bytes": 1912095920,
+        "attention_bytes": 24126143312,
+        "resident_seats": 20,
+        "execution_seats": 16,
+        "token_pages": 16720,
+        "page_tokens": 128
+      },
+      "cache_observation": {
+        "group": "g1-c16-d2",
+        "arm": "policy",
+        "C": 16,
+        "D": 2,
+        "valid": true,
+        "failed": 0,
+        "tokens_per_second_per_chip": 310.9577777777778,
+        "ttft_p95": 3.136977434856817,
+        "decode_tps_p90": 61.65573319158112,
+        "completions": 1001,
+        "drained": 16,
+        "max_prompt": 59142,
+        "full_concurrency_fraction": 0.9953443208010867,
+        "continuation_requests": 967,
+        "continuation_hits": 752,
+        "continuation_ttft_p95": 3.1540358582511545,
+        "prompt_cache_fraction": 0.7294107060482253,
+        "uncached_prompt_tokens": 5283332,
+        "slot_return_coverage": 1.0,
+        "preemptions": 0.0,
+        "cache_counters": {
+          "device_evictions": 834,
+          "schedule_steps": 14719,
+          "scheduled_request_steps": 203033,
+          "store": 957,
+          "store_bytes": 323449279076,
+          "load": 587,
+          "load_bytes": 183735904060,
+          "drop": 941,
+          "drop_bytes": 315183550244
+        },
+        "peak_host_bytes": 8588932268,
+        "peak_page_usage": 0.36494252873563215,
+        "peak_pending": 4,
+        "scope": "throughput is official900s; request/cache fractions include drain; telemetry is sampled deployment lifetime including qualification"
+      },
+      "metrics": {
+        "output_tps": 621.9155555555556,
+        "decode_p90_tps": 61.65573319158112,
+        "ttft_p95_ms": 3136.977434856817,
+        "completed_requests": 1001,
+        "preemptions_measurement_and_drain": 0.0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0.7294107060482253
+      }
+    },
+    {
+      "run_id": "d8d0c55f06f545348a5479a5d4a481e7",
+      "point_id": "qwen35-sweprefix-offloading-phase1-off-tp2-c32-d1-20260927",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 686,
+        "max_prompt_tokens_observed": 39971,
+        "prompt_tokens_p50": 13645.0,
+        "max_turn_index_reached": 28,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 654,
+        "requests_drained": 32,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 320188,
+        "output_tokens_per_second": 355.76444444444445,
+        "output_tokens_per_second_per_chip": 177.88222222222223,
+        "decode_tokens_per_second_p90": 37.826971133984166,
+        "decode_speed_samples": 654,
+        "ttft_seconds_p95": 37.491786316991785,
+        "client_inflight_seconds": {
+          "0": 0.00030890805646777153,
+          "1": 0.0011207489296793938,
+          "2": 0.000713268993422389,
+          "3": 0.0006317859515547752,
+          "4": 0.0008770031854510307,
+          "5": 0.0006724668201059103,
+          "6": 0.000714689027518034,
+          "7": 0.0007031681016087532,
+          "8": 0.0006912678945809603,
+          "9": 0.0006170161068439484,
+          "10": 0.0006203160155564547,
+          "11": 0.0008724119979888201,
+          "12": 0.0006822978612035513,
+          "13": 0.0006595870945602655,
+          "14": 0.0006556070875376463,
+          "15": 0.0007008879911154509,
+          "16": 0.000691017834469676,
+          "17": 0.0006271360907703638,
+          "18": 0.0008780029602348804,
+          "19": 0.0006506170611828566,
+          "20": 0.0006525670178234577,
+          "21": 0.0006448458880186081,
+          "22": 0.0006759180687367916,
+          "23": 0.0007425290532410145,
+          "24": 0.0006936779245734215,
+          "25": 0.0008489019237458706,
+          "26": 0.0006711471360176802,
+          "27": 0.0006372169591486454,
+          "28": 0.0006261260714381933,
+          "29": 0.0007093078456819057,
+          "30": 0.0006627780385315418,
+          "31": 2.025159157346934,
+          "32": 897.9531876216643
+        },
+        "mean_client_inflight": 31.99733859247321,
+        "full_concurrency_fraction": 0.9977257640240714,
+        "drain_seconds": 69.01349863409996,
+        "session_rotation_depth": 1,
+        "session_slots": 32,
+        "first_turn_requests_started": 40,
+        "continuation_requests_started": 646,
+        "slot_coverage": [
+          {
+            "lane": 0,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 22,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 1,
+            "slot": 0,
+            "requests_started": 22,
+            "continuation_requests_started": 20,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 2,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 3,
+            "slot": 0,
+            "requests_started": 20,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 19
+          },
+          {
+            "lane": 4,
+            "slot": 0,
+            "requests_started": 22,
+            "continuation_requests_started": 21,
+            "max_turn_index_reached": 21
+          },
+          {
+            "lane": 5,
+            "slot": 0,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 6,
+            "slot": 0,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 7,
+            "slot": 0,
+            "requests_started": 29,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 28
+          },
+          {
+            "lane": 8,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 22,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 9,
+            "slot": 0,
+            "requests_started": 21,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 10,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 11,
+            "slot": 0,
+            "requests_started": 20,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 19
+          },
+          {
+            "lane": 12,
+            "slot": 0,
+            "requests_started": 22,
+            "continuation_requests_started": 21,
+            "max_turn_index_reached": 21
+          },
+          {
+            "lane": 13,
+            "slot": 0,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 14,
+            "slot": 0,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 15,
+            "slot": 0,
+            "requests_started": 29,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 28
+          },
+          {
+            "lane": 16,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 22,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 17,
+            "slot": 0,
+            "requests_started": 21,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 18,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 19,
+            "slot": 0,
+            "requests_started": 20,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 19
+          },
+          {
+            "lane": 20,
+            "slot": 0,
+            "requests_started": 22,
+            "continuation_requests_started": 21,
+            "max_turn_index_reached": 21
+          },
+          {
+            "lane": 21,
+            "slot": 0,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 22,
+            "slot": 0,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 23,
+            "slot": 0,
+            "requests_started": 28,
+            "continuation_requests_started": 27,
+            "max_turn_index_reached": 27
+          },
+          {
+            "lane": 24,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 22,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 25,
+            "slot": 0,
+            "requests_started": 21,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 26,
+            "slot": 0,
+            "requests_started": 24,
+            "continuation_requests_started": 23,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 27,
+            "slot": 0,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 28,
+            "slot": 0,
+            "requests_started": 21,
+            "continuation_requests_started": 20,
+            "max_turn_index_reached": 20
+          },
+          {
+            "lane": 29,
+            "slot": 0,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 30,
+            "slot": 0,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 31,
+            "slot": 0,
+            "requests_started": 28,
+            "continuation_requests_started": 27,
+            "max_turn_index_reached": 27
+          }
+        ],
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.3",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "d8d0c55f06f545348a5479a5d4a481e7",
+        "started_at_unix": 1790533134.5042806,
+        "model": "cache-pressure",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "scheduling_policy": "session-round-robin-v1",
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "campaign_exit_zero": true,
+        "selected_devices_released": true,
+        "request_protocol_pass": true,
+        "teardown_warnings": "Shared-memory resource_tracker warnings; four arms log output-handler EngineDeadError after requested shutdown; no measured request failures"
+      },
+      "state_capacity": {
+        "total_bytes": 26038239232,
+        "resident_bytes": 1912095920,
+        "attention_bytes": 24126143312,
+        "resident_seats": 20,
+        "execution_seats": 16,
+        "token_pages": 16720,
+        "page_tokens": 128
+      },
+      "cache_observation": {
+        "group": "g2-c32-d1",
+        "arm": "control",
+        "C": 32,
+        "D": 1,
+        "valid": true,
+        "failed": 0,
+        "tokens_per_second_per_chip": 177.88222222222223,
+        "ttft_p95": 37.491786316991785,
+        "decode_tps_p90": 37.826971133984166,
+        "completions": 654,
+        "drained": 32,
+        "max_prompt": 39971,
+        "full_concurrency_fraction": 0.9977257640240714,
+        "continuation_requests": 646,
+        "continuation_hits": 0,
+        "continuation_ttft_p95": 38.07104741159128,
+        "prompt_cache_fraction": 0.0,
+        "uncached_prompt_tokens": 10250824,
+        "slot_return_coverage": 1.0,
+        "preemptions": 0.0,
+        "cache_counters": {
+          "device_evictions": 670,
+          "schedule_steps": 11224,
+          "scheduled_request_steps": 128556
+        },
+        "peak_host_bytes": 0,
+        "peak_page_usage": 0.2777777777777778,
+        "peak_pending": 0,
+        "scope": "throughput is official900s; request/cache fractions include drain; telemetry is sampled deployment lifetime including qualification"
+      },
+      "metrics": {
+        "output_tps": 355.76444444444445,
+        "decode_p90_tps": 37.826971133984166,
+        "ttft_p95_ms": 37491.786316991784,
+        "completed_requests": 654,
+        "preemptions_measurement_and_drain": 0.0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0.0
+      }
+    },
+    {
+      "run_id": "2de2bc2cd65d4cc5af22963792fdb6ab",
+      "point_id": "qwen35-sweprefix-offloading-phase1-on-tp2-c32-d1-20260927",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 1201,
+        "max_prompt_tokens_observed": 82121,
+        "prompt_tokens_p50": 20465.0,
+        "max_turn_index_reached": 64,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 21,
+        "requests_completed_in_window": 1169,
+        "requests_drained": 32,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 732066,
+        "output_tokens_per_second": 813.4066666666666,
+        "output_tokens_per_second_per_chip": 406.7033333333333,
+        "decode_tokens_per_second_p90": 60.520138629347535,
+        "decode_speed_samples": 1169,
+        "ttft_seconds_p95": 27.36951413229106,
+        "client_inflight_seconds": {
+          "0": 0.00028891093097627163,
+          "1": 0.0010093431919813156,
+          "2": 0.0007126419804990292,
+          "3": 0.0006293619517236948,
+          "4": 0.0009261630475521088,
+          "5": 0.000671482877805829,
+          "6": 0.0006582820788025856,
+          "7": 0.0006986320950090885,
+          "8": 0.0006886818446218967,
+          "9": 0.0006738719530403614,
+          "10": 0.0006258320063352585,
+          "11": 0.0008692431729286909,
+          "12": 0.0006524519994854927,
+          "13": 0.0006590320263057947,
+          "14": 0.0006430919747799635,
+          "15": 0.0007248918991535902,
+          "16": 0.0006873221136629581,
+          "17": 0.0006156619638204575,
+          "18": 0.0008527929894626141,
+          "19": 0.0006265218835324049,
+          "20": 0.000641111982986331,
+          "21": 0.0006588420365005732,
+          "22": 0.000672442140057683,
+          "23": 0.0006939719896763563,
+          "24": 0.0006841819267719984,
+          "25": 0.0008420329540967941,
+          "26": 0.000668911961838603,
+          "27": 0.0006588820833712816,
+          "28": 0.0006323119159787893,
+          "29": 0.0006554620340466499,
+          "30": 0.0006454719696193933,
+          "31": 6.290481485892087,
+          "32": 893.6881506771315
+        },
+        "mean_client_inflight": 31.99260500115834,
+        "full_concurrency_fraction": 0.9929868340857017,
+        "drain_seconds": 49.17219289415516,
+        "session_rotation_depth": 1,
+        "session_slots": 32,
+        "first_turn_requests_started": 53,
+        "continuation_requests_started": 1148,
+        "slot_coverage": [
+          {
+            "lane": 0,
+            "slot": 0,
+            "requests_started": 41,
+            "continuation_requests_started": 38,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 1,
+            "slot": 0,
+            "requests_started": 22,
+            "continuation_requests_started": 20,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 2,
+            "slot": 0,
+            "requests_started": 46,
+            "continuation_requests_started": 44,
+            "max_turn_index_reached": 26
+          },
+          {
+            "lane": 3,
+            "slot": 0,
+            "requests_started": 37,
+            "continuation_requests_started": 35,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 4,
+            "slot": 0,
+            "requests_started": 40,
+            "continuation_requests_started": 38,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 5,
+            "slot": 0,
+            "requests_started": 32,
+            "continuation_requests_started": 31,
+            "max_turn_index_reached": 31
+          },
+          {
+            "lane": 6,
+            "slot": 0,
+            "requests_started": 23,
+            "continuation_requests_started": 22,
+            "max_turn_index_reached": 22
+          },
+          {
+            "lane": 7,
+            "slot": 0,
+            "requests_started": 45,
+            "continuation_requests_started": 44,
+            "max_turn_index_reached": 44
+          },
+          {
+            "lane": 8,
+            "slot": 0,
+            "requests_started": 33,
+            "continuation_requests_started": 30,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 9,
+            "slot": 0,
+            "requests_started": 26,
+            "continuation_requests_started": 24,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 10,
+            "slot": 0,
+            "requests_started": 43,
+            "continuation_requests_started": 41,
+            "max_turn_index_reached": 26
+          },
+          {
+            "lane": 11,
+            "slot": 0,
+            "requests_started": 36,
+            "continuation_requests_started": 34,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 12,
+            "slot": 0,
+            "requests_started": 40,
+            "continuation_requests_started": 38,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 13,
+            "slot": 0,
+            "requests_started": 29,
+            "continuation_requests_started": 28,
+            "max_turn_index_reached": 28
+          },
+          {
+            "lane": 14,
+            "slot": 0,
+            "requests_started": 39,
+            "continuation_requests_started": 38,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 15,
+            "slot": 0,
+            "requests_started": 44,
+            "continuation_requests_started": 43,
+            "max_turn_index_reached": 43
+          },
+          {
+            "lane": 16,
+            "slot": 0,
+            "requests_started": 41,
+            "continuation_requests_started": 39,
+            "max_turn_index_reached": 23
+          },
+          {
+            "lane": 17,
+            "slot": 0,
+            "requests_started": 41,
+            "continuation_requests_started": 39,
+            "max_turn_index_reached": 25
+          },
+          {
+            "lane": 18,
+            "slot": 0,
+            "requests_started": 45,
+            "continuation_requests_started": 42,
+            "max_turn_index_reached": 26
+          },
+          {
+            "lane": 19,
+            "slot": 0,
+            "requests_started": 52,
+            "continuation_requests_started": 50,
+            "max_turn_index_reached": 34
+          },
+          {
+            "lane": 20,
+            "slot": 0,
+            "requests_started": 50,
+            "continuation_requests_started": 48,
+            "max_turn_index_reached": 38
+          },
+          {
+            "lane": 21,
+            "slot": 0,
+            "requests_started": 32,
+            "continuation_requests_started": 31,
+            "max_turn_index_reached": 31
+          },
+          {
+            "lane": 22,
+            "slot": 0,
+            "requests_started": 45,
+            "continuation_requests_started": 44,
+            "max_turn_index_reached": 44
+          },
+          {
+            "lane": 23,
+            "slot": 0,
+            "requests_started": 65,
+            "continuation_requests_started": 64,
+            "max_turn_index_reached": 64
+          },
+          {
+            "lane": 24,
+            "slot": 0,
+            "requests_started": 20,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 25,
+            "slot": 0,
+            "requests_started": 34,
+            "continuation_requests_started": 32,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 26,
+            "slot": 0,
+            "requests_started": 28,
+            "continuation_requests_started": 26,
+            "max_turn_index_reached": 26
+          },
+          {
+            "lane": 27,
+            "slot": 0,
+            "requests_started": 30,
+            "continuation_requests_started": 29,
+            "max_turn_index_reached": 29
+          },
+          {
+            "lane": 28,
+            "slot": 0,
+            "requests_started": 37,
+            "continuation_requests_started": 36,
+            "max_turn_index_reached": 36
+          },
+          {
+            "lane": 29,
+            "slot": 0,
+            "requests_started": 36,
+            "continuation_requests_started": 35,
+            "max_turn_index_reached": 35
+          },
+          {
+            "lane": 30,
+            "slot": 0,
+            "requests_started": 21,
+            "continuation_requests_started": 20,
+            "max_turn_index_reached": 20
+          },
+          {
+            "lane": 31,
+            "slot": 0,
+            "requests_started": 48,
+            "continuation_requests_started": 47,
+            "max_turn_index_reached": 47
+          }
+        ],
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.3",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "2de2bc2cd65d4cc5af22963792fdb6ab",
+        "started_at_unix": 1790531823.7739892,
+        "model": "cache-pressure",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "scheduling_policy": "session-round-robin-v1",
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "campaign_exit_zero": true,
+        "selected_devices_released": true,
+        "request_protocol_pass": true,
+        "teardown_warnings": "Shared-memory resource_tracker warnings; four arms log output-handler EngineDeadError after requested shutdown; no measured request failures"
+      },
+      "state_capacity": {
+        "total_bytes": 26038239232,
+        "resident_bytes": 1912095920,
+        "attention_bytes": 24126143312,
+        "resident_seats": 20,
+        "execution_seats": 16,
+        "token_pages": 16720,
+        "page_tokens": 128
+      },
+      "cache_observation": {
+        "group": "g2-c32-d1",
+        "arm": "policy",
+        "C": 32,
+        "D": 1,
+        "valid": true,
+        "failed": 0,
+        "tokens_per_second_per_chip": 406.7033333333333,
+        "ttft_p95": 27.36951413229106,
+        "decode_tps_p90": 60.520138629347535,
+        "completions": 1169,
+        "drained": 32,
+        "max_prompt": 82121,
+        "full_concurrency_fraction": 0.9929868340857017,
+        "continuation_requests": 1148,
+        "continuation_hits": 1109,
+        "continuation_ttft_p95": 22.737284027796672,
+        "prompt_cache_fraction": 0.9375710459160828,
+        "uncached_prompt_tokens": 1843814,
+        "slot_return_coverage": 1.0,
+        "preemptions": 0.0,
+        "cache_counters": {
+          "device_evictions": 1052,
+          "schedule_steps": 18177,
+          "scheduled_request_steps": 263567,
+          "store": 1128,
+          "store_bytes": 444460262688,
+          "load": 978,
+          "load_bytes": 396946794152,
+          "drop": 1112,
+          "drop_bytes": 436056121824
+        },
+        "peak_host_bytes": 8588690240,
+        "peak_page_usage": 0.4454022988505747,
+        "peak_pending": 5,
+        "scope": "throughput is official900s; request/cache fractions include drain; telemetry is sampled deployment lifetime including qualification"
+      },
+      "metrics": {
+        "output_tps": 813.4066666666666,
+        "decode_p90_tps": 60.520138629347535,
+        "ttft_p95_ms": 27369.51413229106,
+        "completed_requests": 1169,
+        "preemptions_measurement_and_drain": 0.0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0.9375710459160828
+      }
+    },
+    {
+      "run_id": "7539ca068dab4077834ef5d1987c7847",
+      "point_id": "qwen35-sweprefix-offloading-phase1-off-tp2-c32-d2-20260927",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 807,
+        "max_prompt_tokens_observed": 36457,
+        "prompt_tokens_p50": 9605.0,
+        "max_turn_index_reached": 13,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 0,
+        "requests_completed_in_window": 775,
+        "requests_drained": 32,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 452807,
+        "output_tokens_per_second": 503.1188888888889,
+        "output_tokens_per_second_per_chip": 251.55944444444444,
+        "decode_tokens_per_second_p90": 44.58700200747615,
+        "decode_speed_samples": 775,
+        "ttft_seconds_p95": 41.03693129946477,
+        "client_inflight_seconds": {
+          "0": 0.00027890107594430447,
+          "1": 0.0009089328814297915,
+          "2": 0.0006803921423852444,
+          "3": 0.0006609519477933645,
+          "4": 0.0009132230188697577,
+          "5": 0.0006054118275642395,
+          "6": 0.0005940620321780443,
+          "7": 0.0006284620612859726,
+          "8": 0.0006693920586258173,
+          "9": 0.0006014320533722639,
+          "10": 0.0005837709177285433,
+          "11": 0.000860102940350771,
+          "12": 0.0006861619185656309,
+          "13": 0.0005919921677559614,
+          "14": 0.0005834719631820917,
+          "15": 0.0006997419986873865,
+          "16": 0.0006776619702577591,
+          "17": 0.0005926319863647223,
+          "18": 0.0008164129685610533,
+          "19": 0.0006349820178002119,
+          "20": 0.0006809020414948463,
+          "21": 0.0006073920521885157,
+          "22": 0.0005945418961346149,
+          "23": 0.0006437420379370451,
+          "24": 0.0006674120668321848,
+          "25": 0.0008047218434512615,
+          "26": 0.0006018320564180613,
+          "27": 0.000670932000502944,
+          "28": 0.0006697820499539375,
+          "29": 0.000597911886870861,
+          "30": 0.0005813119933009148,
+          "31": 1.6863238401710987,
+          "32": 898.2932875859551
+        },
+        "mean_client_inflight": 31.99774018610724,
+        "full_concurrency_fraction": 0.9981036528732835,
+        "drain_seconds": 37.496942905010656,
+        "session_rotation_depth": 2,
+        "session_slots": 64,
+        "first_turn_requests_started": 64,
+        "continuation_requests_started": 743,
+        "slot_coverage": [
+          {
+            "lane": 0,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 0,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 1,
+            "slot": 0,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 1,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 2,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 2,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 3,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 3,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 4,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 4,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 5,
+            "slot": 0,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 5,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 6,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 6,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 7,
+            "slot": 0,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 7,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 8,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 8,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 9,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 9,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 10,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 10,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 11,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 11,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 12,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 12,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 13,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 13,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 14,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 14,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 15,
+            "slot": 0,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 15,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 16,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 16,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 17,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 17,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 18,
+            "slot": 0,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 18,
+            "slot": 1,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 19,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 19,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 20,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 20,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 21,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 21,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 22,
+            "slot": 0,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 22,
+            "slot": 1,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 23,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 23,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 24,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 24,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 25,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 25,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 26,
+            "slot": 0,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 26,
+            "slot": 1,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 27,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 27,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 28,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 28,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 29,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 29,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 30,
+            "slot": 0,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 30,
+            "slot": 1,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 31,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 31,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          }
+        ],
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.3",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "7539ca068dab4077834ef5d1987c7847",
+        "started_at_unix": 1790531822.7152452,
+        "model": "cache-pressure",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 32,
+        "session_rotation_depth": 2,
+        "scheduling_policy": "session-round-robin-v1",
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "campaign_exit_zero": true,
+        "selected_devices_released": true,
+        "request_protocol_pass": true,
+        "teardown_warnings": "Shared-memory resource_tracker warnings; four arms log output-handler EngineDeadError after requested shutdown; no measured request failures"
+      },
+      "state_capacity": {
+        "total_bytes": 26038239232,
+        "resident_bytes": 1912095920,
+        "attention_bytes": 24126143312,
+        "resident_seats": 20,
+        "execution_seats": 16,
+        "token_pages": 16720,
+        "page_tokens": 128
+      },
+      "cache_observation": {
+        "group": "g3-c32-d2",
+        "arm": "control",
+        "C": 32,
+        "D": 2,
+        "valid": true,
+        "failed": 0,
+        "tokens_per_second_per_chip": 251.55944444444444,
+        "ttft_p95": 41.03693129946477,
+        "decode_tps_p90": 44.58700200747615,
+        "completions": 775,
+        "drained": 32,
+        "max_prompt": 36457,
+        "full_concurrency_fraction": 0.9981036528732835,
+        "continuation_requests": 743,
+        "continuation_hits": 0,
+        "continuation_ttft_p95": 42.01927833508234,
+        "prompt_cache_fraction": 0.0,
+        "uncached_prompt_tokens": 8358023,
+        "slot_return_coverage": 1.0,
+        "preemptions": 0.0,
+        "cache_counters": {
+          "device_evictions": 789,
+          "schedule_steps": 11968,
+          "scheduled_request_steps": 167173
+        },
+        "peak_host_bytes": 0,
+        "peak_page_usage": 0.25574712643678166,
+        "peak_pending": 0,
+        "scope": "throughput is official900s; request/cache fractions include drain; telemetry is sampled deployment lifetime including qualification"
+      },
+      "metrics": {
+        "output_tps": 503.1188888888889,
+        "decode_p90_tps": 44.58700200747615,
+        "ttft_p95_ms": 41036.93129946477,
+        "completed_requests": 775,
+        "preemptions_measurement_and_drain": 0.0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0.0
+      }
+    },
+    {
+      "run_id": "bda30cd5ba5a42aa8343114d6fac8f37",
+      "point_id": "qwen35-sweprefix-offloading-phase1-on-tp2-c32-d2-20260927",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 911,
+        "max_prompt_tokens_observed": 43215,
+        "prompt_tokens_p50": 10665.0,
+        "max_turn_index_reached": 19,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 2,
+        "requests_completed_in_window": 879,
+        "requests_drained": 32,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 495720,
+        "output_tokens_per_second": 550.8,
+        "output_tokens_per_second_per_chip": 275.4,
+        "decode_tokens_per_second_p90": 50.52982214800819,
+        "decode_speed_samples": 879,
+        "ttft_seconds_p95": 44.54871837503739,
+        "client_inflight_seconds": {
+          "0": 0.00028899707831442356,
+          "1": 0.0010107269044965506,
+          "2": 0.0006952581461519003,
+          "3": 0.0006486459169536829,
+          "4": 0.0009236740879714489,
+          "5": 0.0006112759001553059,
+          "6": 0.0006045959889888763,
+          "7": 0.0006568171083927155,
+          "8": 0.000678366981446743,
+          "9": 0.0005986259784549475,
+          "10": 0.0005970550701022148,
+          "11": 0.0008569019846618176,
+          "12": 0.000690957996994257,
+          "13": 0.000623706029728055,
+          "14": 0.0005879558157175779,
+          "15": 0.0006370160263031721,
+          "16": 0.0006829181220382452,
+          "17": 0.0006074849516153336,
+          "18": 0.000817091902717948,
+          "19": 0.0006664770189672709,
+          "20": 0.0006871181540191174,
+          "21": 0.0005923248827457428,
+          "22": 0.0006078861188143492,
+          "23": 0.000635865842923522,
+          "24": 0.0006686770357191563,
+          "25": 0.0008274419233202934,
+          "26": 0.0006224261596798897,
+          "27": 0.0006405860185623169,
+          "28": 0.0006810878403484821,
+          "29": 0.0005931551568210125,
+          "30": 0.0005914659705013037,
+          "31": 2.2115997553337365,
+          "32": 897.7677676605526
+        },
+        "mean_client_inflight": 31.997149902031136,
+        "full_concurrency_fraction": 0.9975197418450585,
+        "drain_seconds": 61.53866132115945,
+        "session_rotation_depth": 2,
+        "session_slots": 64,
+        "first_turn_requests_started": 65,
+        "continuation_requests_started": 846,
+        "slot_coverage": [
+          {
+            "lane": 0,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 0,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 1,
+            "slot": 0,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 1,
+            "slot": 1,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 2,
+            "slot": 0,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 2,
+            "slot": 1,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 3,
+            "slot": 0,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 3,
+            "slot": 1,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 4,
+            "slot": 0,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 4,
+            "slot": 1,
+            "requests_started": 17,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 5,
+            "slot": 0,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 5,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 6,
+            "slot": 0,
+            "requests_started": 10,
+            "continuation_requests_started": 9,
+            "max_turn_index_reached": 9
+          },
+          {
+            "lane": 6,
+            "slot": 1,
+            "requests_started": 10,
+            "continuation_requests_started": 9,
+            "max_turn_index_reached": 9
+          },
+          {
+            "lane": 7,
+            "slot": 0,
+            "requests_started": 18,
+            "continuation_requests_started": 17,
+            "max_turn_index_reached": 17
+          },
+          {
+            "lane": 7,
+            "slot": 1,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 8,
+            "slot": 0,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 8,
+            "slot": 1,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 9,
+            "slot": 0,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 9,
+            "slot": 1,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 10,
+            "slot": 0,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 10,
+            "slot": 1,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 11,
+            "slot": 0,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 11,
+            "slot": 1,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 12,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 12,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 13,
+            "slot": 0,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 13,
+            "slot": 1,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 14,
+            "slot": 0,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 14,
+            "slot": 1,
+            "requests_started": 11,
+            "continuation_requests_started": 10,
+            "max_turn_index_reached": 10
+          },
+          {
+            "lane": 15,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 15,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 16,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 16,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 17,
+            "slot": 0,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 17,
+            "slot": 1,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 18,
+            "slot": 0,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 18,
+            "slot": 1,
+            "requests_started": 14,
+            "continuation_requests_started": 13,
+            "max_turn_index_reached": 13
+          },
+          {
+            "lane": 19,
+            "slot": 0,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 19,
+            "slot": 1,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 20,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 20,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 21,
+            "slot": 0,
+            "requests_started": 20,
+            "continuation_requests_started": 19,
+            "max_turn_index_reached": 19
+          },
+          {
+            "lane": 21,
+            "slot": 1,
+            "requests_started": 19,
+            "continuation_requests_started": 18,
+            "max_turn_index_reached": 18
+          },
+          {
+            "lane": 22,
+            "slot": 0,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 22,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 23,
+            "slot": 0,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 23,
+            "slot": 1,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 24,
+            "slot": 0,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 24,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 25,
+            "slot": 0,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 25,
+            "slot": 1,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 26,
+            "slot": 0,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 26,
+            "slot": 1,
+            "requests_started": 17,
+            "continuation_requests_started": 16,
+            "max_turn_index_reached": 16
+          },
+          {
+            "lane": 27,
+            "slot": 0,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 27,
+            "slot": 1,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 28,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 28,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          },
+          {
+            "lane": 29,
+            "slot": 0,
+            "requests_started": 16,
+            "continuation_requests_started": 15,
+            "max_turn_index_reached": 15
+          },
+          {
+            "lane": 29,
+            "slot": 1,
+            "requests_started": 15,
+            "continuation_requests_started": 14,
+            "max_turn_index_reached": 14
+          },
+          {
+            "lane": 30,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 30,
+            "slot": 1,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 31,
+            "slot": 0,
+            "requests_started": 13,
+            "continuation_requests_started": 12,
+            "max_turn_index_reached": 12
+          },
+          {
+            "lane": 31,
+            "slot": 1,
+            "requests_started": 12,
+            "continuation_requests_started": 11,
+            "max_turn_index_reached": 11
+          }
+        ],
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "client": {
+        "tool_version": "0.1.3",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "bda30cd5ba5a42aa8343114d6fac8f37",
+        "started_at_unix": 1790533134.6173959,
+        "model": "cache-pressure",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 32,
+        "session_rotation_depth": 2,
+        "scheduling_policy": "session-round-robin-v1",
+        "data_parallel_size": null,
+        "routing_policy": "server/relay managed; X-Correlation-ID per session",
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 20260924,
+        "timeout": 900.0,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      },
+      "validation": {
+        "owned_server_exit_zero": true,
+        "campaign_exit_zero": true,
+        "selected_devices_released": true,
+        "request_protocol_pass": true,
+        "teardown_warnings": "Shared-memory resource_tracker warnings; four arms log output-handler EngineDeadError after requested shutdown; no measured request failures"
+      },
+      "state_capacity": {
+        "total_bytes": 26038239232,
+        "resident_bytes": 1912095920,
+        "attention_bytes": 24126143312,
+        "resident_seats": 20,
+        "execution_seats": 16,
+        "token_pages": 16720,
+        "page_tokens": 128
+      },
+      "cache_observation": {
+        "group": "g3-c32-d2",
+        "arm": "policy",
+        "C": 32,
+        "D": 2,
+        "valid": true,
+        "failed": 0,
+        "tokens_per_second_per_chip": 275.4,
+        "ttft_p95": 44.54871837503739,
+        "decode_tps_p90": 50.52982214800819,
+        "completions": 879,
+        "drained": 32,
+        "max_prompt": 43215,
+        "full_concurrency_fraction": 0.9975197418450585,
+        "continuation_requests": 846,
+        "continuation_hits": 376,
+        "continuation_ttft_p95": 44.91116511297878,
+        "prompt_cache_fraction": 0.344256942476888,
+        "uncached_prompt_tokens": 7167789,
+        "slot_return_coverage": 1.0,
+        "preemptions": 0.0,
+        "cache_counters": {
+          "device_evictions": 927,
+          "schedule_steps": 15182,
+          "scheduled_request_steps": 187962,
+          "store": 813,
+          "store_bytes": 210071663908,
+          "load": 408,
+          "load_bytes": 86735835872,
+          "drop": 792,
+          "drop_bytes": 201812353248
+        },
+        "peak_host_bytes": 8589658352,
+        "peak_page_usage": 0.27203065134099613,
+        "peak_pending": 2,
+        "scope": "throughput is official900s; request/cache fractions include drain; telemetry is sampled deployment lifetime including qualification"
+      },
+      "metrics": {
+        "output_tps": 550.8,
+        "decode_p90_tps": 50.52982214800819,
+        "ttft_p95_ms": 44548.71837503739,
+        "completed_requests": 879,
+        "preemptions_measurement_and_drain": 0.0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0.344256942476888
+      }
     }
   ]
 }
