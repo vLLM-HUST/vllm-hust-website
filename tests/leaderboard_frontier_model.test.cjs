@@ -131,6 +131,18 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.equal(params.measured_mod_revision,params.mod_revision);
             } else assert.equal(p.load.concurrency,16);
             for(const key of ['owned_server_exit_zero','selected_device_guard_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
+        } else if(p.evidence.benchmark_protocol.campaign==='width-matched-cache-tp2-v1'){
+            const params=p.configuration.parameters;
+            const wide=p.load.concurrency===32;
+            assert.deepEqual([params.execution_seats,params.resident_seats,params.max_num_seqs],wide?[36,36,36]:[16,20,16]);
+            assert.equal(params.shared_attention_pages,wide?15664:16720);
+            assert.equal(params.state_budget_bytes_per_chip,26038239232);
+            assert.equal(params.balanced_decode_attention,true);
+            assert.equal(params.state_cache_policy,true);
+            assert.equal(params.state_cache_incremental,p.id.includes('-incremental-'));
+            assert.equal(p.load.session_rotation_depth,run.client.session_rotation_depth);
+            assert.equal(run.summary.session_slots,p.load.concurrency*p.load.session_rotation_depth);
+            for(const key of ['owned_server_exit_zero','campaign_exit_zero','selected_devices_released','request_protocol_pass']) assert.equal(run.validation[key],true);
         } else if(p.evidence.benchmark_protocol.campaign==='offloading-phase1-tp2-v1'){
             const params=p.configuration.parameters;
             assert.deepEqual(p.configuration.mods,['betterscale']);
@@ -618,7 +630,7 @@ test('SWE rotation metadata covers displayed and archived observations without r
     }
     for(const p of [...data.points,...data.archived_points]) {
         if(swe.has(p.cohort_id)) {
-            const offload=p.evidence.benchmark_protocol.campaign==='offloading-phase1-tp2-v1';
+            const offload=['offloading-phase1-tp2-v1','width-matched-cache-tp2-v1'].includes(p.evidence.benchmark_protocol.campaign);
             const expected=offload?Number(p.id.match(/-d([12])-/)[1]):p.id.includes('-rotation2-')?2:1;
             assert.equal(p.load.session_rotation_depth,expected);
         }
