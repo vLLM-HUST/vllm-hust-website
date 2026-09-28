@@ -38,12 +38,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "Typed runtime contracts. 15 published MOD projects. Evidence before claims.",
+        "Typed runtime contracts. 12 published MOD projects. Evidence before claims.",
         "every MOD publishes ownership, compatibility, workload fit, and evidence limits.",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "类型化运行时契约、15 个公开 MOD 项目、证据先于结论。",
+        "类型化运行时契约、12 个公开 MOD 项目、证据先于结论。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
@@ -63,10 +63,10 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     import json
 
     root = Path(__file__).resolve().parents[1]
-    workload = json.loads(
-        (root / "data" / "plugin-workload-navigation.json").read_text(encoding="utf-8")
+    workshop = json.loads(
+        (root / "data" / "plugin-workshop-metadata.json").read_text(encoding="utf-8")
     )
-    mod_count = len(workload["plugins"])
+    mod_count = len(workshop["plugins"])
     assert f"Explore all {mod_count} MODs" in INDEX
     assert f"查看全部 {mod_count} 个 MOD" in INDEX
     assert 'href="./plugins.html#plugin-catalog"' in INDEX
