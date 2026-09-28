@@ -676,13 +676,17 @@ test('rotation depths cannot dominate or tie-deduplicate each other, even within
 });
 
 
-test('retired AgentX cohorts disappear from active choices without deleting historical evidence',()=>{
+test('newly measured Qwen35 AgentX is visible while other retired evidence stays hidden',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const before=JSON.stringify(data);
     const visible=model.visibleData(data);
-    assert.ok(data.cohorts.some(c=>c.workload.id.startsWith('agentx') && c.display_withdrawal));
+    const measured=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-agentx256k-smoke-v1');
+    assert.ok(measured);
+    assert.equal(measured.display_withdrawal,undefined);
+    assert.ok(data.cohorts.some(c=>c.display_withdrawal));
     assert.ok(data.points.some(p=>p.cohort_id.includes('agentx')));
-    assert.ok(visible.cohorts.every(c=>!c.workload.id.startsWith('agentx')));
+    assert.ok(visible.cohorts.some(c=>c.id===measured.id));
+    assert.ok(visible.cohorts.every(c=>!c.display_withdrawal));
     assert.ok(visible.points.every(p=>visible.cohorts.some(c=>c.id===p.cohort_id)));
     assert.equal(JSON.stringify(data),before);
     assert.equal(visible.points.length,data.points.filter(p=>!data.cohorts.find(c=>c.id===p.cohort_id).display_withdrawal).length);

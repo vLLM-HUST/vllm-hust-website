@@ -225,14 +225,16 @@ def main():
             )
             ready(page)
             page.locator('[data-filter="rotation"][value="2"]').uncheck()
-            assert "AgentX" not in page.locator("#frontier-workload-tag").inner_text()
+            workloads = page.locator("#frontier-workload option").all_inner_texts()
+            assert any("AgentX" in label for label in workloads)
             assert page.locator("[data-stateaxis-mod]").count() == 7
             stateaxis = page.locator("#frontier-stateaxis").inner_text()
-            assert "Qwen3.8-27B" in stateaxis
             assert "Qwen3.5-35B" in stateaxis
             assert "AgentX" in stateaxis
-            assert "-1.06%" in stateaxis
-            assert "+8.2%" in stateaxis
+            assert "11.46 tok/s" in stateaxis
+            assert "16.11 tok/s" in stateaxis
+            assert "fallback-only" in stateaxis
+            assert "exercised-with-drops" in stateaxis
             assert page.locator("#frontier-only").is_checked()
             shown = page.locator("[data-point]").evaluate_all(
                 "nodes=>nodes.map(n=>n.dataset.point)"

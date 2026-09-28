@@ -32,15 +32,17 @@ A future Qwen3.5/AgentX matrix must use a fresh matched control, the independent
 repositories, repeated ordering, exactness, effect attribution, process release and device release.
 These historical values must not be inserted into the Qwen3.5 Frontier curve.
 
-## Qwen3.5 + AgentX follow-up preflight
+## Qwen3.5 + AgentX follow-up
 
-The 2026-09-28 follow-up found four visible idle Ascend 910B2 devices and verified all 22 Qwen3.5
-model files against the published SHA-256/size manifest. The pinned AgentX wrapper passed 18 tests
-and the StateAxis source import exposed all seven identities. No server or device workload was
-started.
+The exact dataset revision was subsequently restored and verified, and a frozen dev43 source carrier
+completed two controls plus all seven independently activated mods on the same Ascend 910B2 pair.
+Every run used the full 393-session corpus, C4, TP2 and a 900-second official smoke window. All nine
+exports are submission-valid with zero request errors and output-length mismatches, and every run
+released its devices.
 
-The official dataset loader could not resolve the exact public corpus revision after exhausting TLS
-EOF retries, and no prepared cache was present. The pod's default vLLM metadata was also 0.23.0
-rather than a frozen dev43 runtime image. The run therefore stopped before serving. No mirror,
-alternate revision, subset, synthetic workload or old metric was substituted. See the
-[machine-readable preflight receipt](../data/stateaxis-qwen35-agentx-followup.json).
+The observations split into 58-request / 11.457 output tok/s and 59-request / 16.105 output tok/s
+windows because one long-output request crossed the measurement boundary; the closing control
+returned to the 58-request mode. This prevents a causal speedup claim. Five mods were not exercised,
+Ascend state action was fallback-only, and feedback plane emitted 256 events while dropping 3266.
+See the [machine-readable run receipt](../data/stateaxis-qwen35-agentx-followup.json). Private source
+locations remain intentionally unlinked.

@@ -23,6 +23,16 @@ EXPECTED = {
     "stateaxis.hybrid-hibernation": 8.20,
 }
 
+SOURCE_REVISIONS = {
+    "stateaxis.ascend-state-action": "ac7c616bba4fc6645ab82b35d8366337cd9186ef",
+    "stateaxis.dependency-invalidation": "deac2a05c279e02ce72c52d0c6bcda1d86cada99",
+    "stateaxis.hybrid-branch-coherence": "65bc4fa60f739919aada1d615221d8d1a53ceb46",
+    "stateaxis.hybrid-hibernation": "bb9cf7c29b6a95496a9189e396b66845825fdf1e",
+    "stateaxis.no-harm-preparation": "4e73bb547270abb2b76ed8ce3dd27cdfea21e3ef",
+    "stateaxis.state-feedback-plane": "199e739cefd246541f8e995e45650d0034d1dc18",
+    "stateaxis.workflow-state-scheduling": "af6f70364969088f0d3e5e572f0dc5eeea5b0588",
+}
+
 
 def test_historical_record_preserves_seven_exact_identities() -> None:
     actual = {
@@ -37,7 +47,8 @@ def test_historical_result_cannot_be_presented_as_qwen35_agentx() -> None:
     assert RECORD["scope"]["model"] == "Qwen3.8-27B"
     assert RECORD["scope"]["dataset"] is None
     assert RECORD["scope"]["agentx_attribution"] == "not-recorded-do-not-infer"
-    assert RECORD["qwen35_agentx_followup"]["status"] == "blocked-before-serving"
+    assert RECORD["qwen35_agentx_followup"]["status"] == "measured-single-run-smoke"
+    assert FOLLOWUP["performance_qualified"] is False
 
 
 def test_split_repositories_inherit_no_qualification() -> None:
@@ -53,21 +64,36 @@ def test_public_projection_retains_raw_archive_boundary() -> None:
     assert provenance["raw_archive_publicly_downloadable"] is False
 
 
-def test_followup_stops_before_serving_when_identity_gates_fail() -> None:
-    assert FOLLOWUP["performance_result"] is False
-    assert FOLLOWUP["server_started"] is False
-    assert FOLLOWUP["accelerator_work_submitted"] is False
-    assert FOLLOWUP["preflight"]["hardware"]["running_npu_processes_at_check"] == 0
-    assert FOLLOWUP["preflight"]["model"]["sha256_and_size_matches"] == 22
-    assert FOLLOWUP["preflight"]["agentx"]["wrapper_tests"] == {
-        "passed": 18,
-        "failed": 0,
+def test_followup_preserves_nine_valid_runs_without_qualification() -> None:
+    assert FOLLOWUP["performance_result"] is True
+    assert FOLLOWUP["server_started"] is True
+    assert FOLLOWUP["accelerator_work_submitted"] is True
+    assert FOLLOWUP["performance_qualified"] is False
+    assert len(FOLLOWUP["controls"]) == 2
+    assert len(FOLLOWUP["results"]) == 7
+    assert len(FOLLOWUP["raw_archive_sha256"]) == 64
+    assert {row["mod_id"] for row in FOLLOWUP["results"]} == set(EXPECTED)
+    assert {
+        row["mod_id"]: row["source_revision"] for row in FOLLOWUP["results"]
+    } == SOURCE_REVISIONS
+    for row in [*FOLLOWUP["controls"], *FOLLOWUP["results"]]:
+        assert row["submission_valid"] is True
+        assert row["errors"] == 0
+        assert row["osl_mismatches"] == 0
+        assert row["devices_released"] is True
+        assert len(row["export_sha256"]) == 64
+    feedback = next(
+        row for row in FOLLOWUP["results"]
+        if row["mod_id"] == "stateaxis.state-feedback-plane"
+    )
+    assert feedback["effect_status"] == "exercised-with-drops"
+    assert feedback["effects"] == {
+        "events_emitted": 256,
+        "events_dropped": 3266,
+        "events_flushed": 0,
     }
-    assert FOLLOWUP["preflight"]["agentx"]["dataset_prepared"] is False
-    assert {item["gate"] for item in FOLLOWUP["blockers"]} == {
-        "official-agentx-dataset",
-        "runtime-image-identity",
-    }
+    assert all("repository" not in row for row in FOLLOWUP["results"])
+    assert "private source" not in json.dumps(FOLLOWUP)
 
 
 def test_frontier_page_renders_the_seven_mod_audit() -> None:
