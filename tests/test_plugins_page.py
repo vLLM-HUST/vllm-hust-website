@@ -45,6 +45,14 @@ REQUIRED_FIELDS = {
     "summary_zh",
     "evidence_level",
 }
+TOOL_MOD_ROLES = {
+    "lifecycle_control_plane",
+    "model_artifact_preparation",
+    "offline_model_quantization",
+    "profiling_analysis",
+    "scheduler_policy_research",
+    "telemetry_provider",
+}
 
 
 def by_id(component_id: str) -> dict:
@@ -434,10 +442,7 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert "const isWorkshopMod = (item)" in SCRIPT
     assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
     assert 'item.repository_relationship === "organization_native"' in SCRIPT
-    assert (
-        '["plugin_bundle", "python_distribution", "migration_scaffold", "source_patch"]'
-        in SCRIPT
-    )
+    assert '"source_toolkit"' in SCRIPT
     assert 'element("div", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert "function coverTone(item)" in SCRIPT
@@ -457,7 +462,10 @@ def test_workshop_supports_workload_guided_discovery() -> None:
     workshop_mods = {
         item["id"]
         for item in REGISTRY["components"]
-        if item["artifact_type"] in {"runtime_component", "bridge"}
+        if (
+            item["artifact_type"] in {"runtime_component", "bridge"}
+            or item["system_role"] in TOOL_MOD_ROLES
+        )
         and item["repository_relationship"] == "organization_native"
         and item.get("public_surface", True) is not False
         and item["delivery_model"]
@@ -466,6 +474,7 @@ def test_workshop_supports_workload_guided_discovery() -> None:
             "python_distribution",
             "migration_scaffold",
             "source_patch",
+            "source_toolkit",
         }
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
     } | {
@@ -497,6 +506,8 @@ def test_workshop_supports_workload_guided_discovery() -> None:
 def test_workshop_adds_only_measured_connectors_to_the_mod_catalog() -> None:
     assert "isWorkshopMod(item) && matchesSelectedType(item)" in SCRIPT
     assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
+    assert "|| isToolMod(item)" in SCRIPT
+    assert '"source_toolkit"' in SCRIPT
     assert (
         "Independent vLLM-HUST extensions and manager-tested carriers appear here."
         in PAGE
@@ -705,13 +716,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=qwen35-pegaflow-20260929"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=tool-mods-20260929"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v16-adm-advisor"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v17-clm"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=qwen35-pegaflow-20260929"'
+        'data-source="./data/plugin-workload-navigation.json?v=tool-mods-20260929"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -761,7 +772,7 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 55
+    assert len(PORTFOLIO["repositories"]) == 56
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "extension-manager",
@@ -816,7 +827,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert vspec["public_surface"] is True
     assert "Repositories are governance boundaries, not runtime types." in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v12-adm"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v13-clm"'
         in PAGE
     )
     assert "repository portfolio request failed" in SCRIPT
@@ -1088,7 +1099,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 15
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 18
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1151,7 +1162,8 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
     item = by_id("traceloom")
     assert item["artifact_type"] == "runtime_component"
     assert item["system_role"] == "profiling_analysis"
-    assert '"profiling_analysis", "telemetry_provider"' in SCRIPT
+    assert '"profiling_analysis"' in SCRIPT
+    assert '"telemetry_provider"' in SCRIPT
     assert item["delivery_model"] == "python_distribution"
     assert item["documentation_url"] == "./traceloom.html"
     assert item["compatibility"]["status"] == "experimental"
@@ -1177,6 +1189,48 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
 def test_tool_mods_are_grouped_without_performance_placeholders():
     profiler = by_id("request-lifecycle-profiler")
     assert profiler["system_role"] == "telemetry_provider"
+    assert '"offline_model_quantization"' in SCRIPT
+    assert '"model_artifact_preparation"' in SCRIPT
+    assert '"lifecycle_control_plane"' in SCRIPT
     assert "if (!isToolMod(item))" in SCRIPT
     assert "appendGroup(copy().performanceMods" in SCRIPT
     assert "appendGroup(copy().toolMods" in SCRIPT
+
+    visible_tools = {
+        "ascend-quant-toolkit",
+        "slicegpt-migration",
+        "request-lifecycle-profiler",
+        "traceloom",
+        "clm-lifecycle",
+    }
+    assert all(
+        by_id(component_id).get("public_surface", True)
+        for component_id in visible_tools
+    )
+    assert visible_tools <= set(WORKLOAD_NAVIGATION["plugins"])
+    assert by_id("scheduler-policy-lab")["public_surface"] is False
+
+
+def test_clm_is_cataloged_as_a_tool_control_plane_without_a_speedup_claim():
+    clm = by_id("clm-lifecycle")
+    assert clm["artifact_type"] == "runtime_component"
+    assert clm["system_role"] == "lifecycle_control_plane"
+    assert clm["compatibility"]["versions"] == [
+        "vllm-hust-clm-lifecycle 0.1.1",
+        "ECPA manifest 0.3",
+    ]
+    assert clm["repository_visibility"] == "private"
+    assert "makes no throughput claim" in clm["public_effect_en"]
+    assert WORKLOAD_NAVIGATION["plugins"]["clm-lifecycle"] == [
+        "lifecycle_control",
+        "repeated_prefix_agent",
+    ]
+    assert (
+        WORKSHOP_METADATA["plugins"]["clm-lifecycle"]["maintainers"][0]["login"]
+        == "xiehanlong834-gif"
+    )
+    assert set(WORKSHOP_METADATA["plugins"]["clm-lifecycle"]["metrics"].values()) == {
+        None
+    }
+    assert '"clm-lifecycle": "org.vllm-hust.clm-lifecycle"' in SCRIPT
+    assert "python -m pip install vllm-hust-clm-lifecycle==0.1.1" in SCRIPT

@@ -38,12 +38,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "Typed runtime contracts. 13 published MOD projects. Evidence before claims.",
+        "Typed runtime contracts. 18 cataloged MODs. Evidence before claims.",
         "every MOD publishes ownership, compatibility, workload fit, and evidence limits.",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "类型化运行时契约、13 个公开 MOD 项目、证据先于结论。",
+        "类型化运行时契约、18 个目录 MOD、证据先于结论。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
@@ -63,10 +63,46 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     import json
 
     root = Path(__file__).resolve().parents[1]
-    workshop = json.loads(
-        (root / "data" / "plugin-workshop-metadata.json").read_text(encoding="utf-8")
+    ecosystem = json.loads(
+        (root / "data" / "ecosystem.json").read_text(encoding="utf-8")
     )
-    mod_count = len(workshop["plugins"])
+    performance = json.loads(
+        (root / "data" / "plugin-performance.json").read_text(encoding="utf-8")
+    )
+    measured = {item["id"] for item in performance["entries"]}
+    tool_roles = {
+        "lifecycle_control_plane",
+        "model_artifact_preparation",
+        "offline_model_quantization",
+        "profiling_analysis",
+        "scheduler_policy_research",
+        "telemetry_provider",
+    }
+    deliveries = {
+        "plugin_bundle",
+        "python_distribution",
+        "migration_scaffold",
+        "source_patch",
+        "source_toolkit",
+    }
+    mod_count = sum(
+        item.get("public_surface", True) is not False
+        and (
+            item["id"] in measured
+            or (
+                (
+                    item["artifact_type"] in {"runtime_component", "bridge"}
+                    or item["system_role"] in tool_roles
+                )
+                and item["repository_relationship"] == "organization_native"
+                and item["delivery_model"] in deliveries
+                and item["canonical_repository"].startswith(
+                    "https://github.com/vLLM-HUST/"
+                )
+            )
+        )
+        for item in ecosystem["components"]
+    )
     assert f"Explore all {mod_count} MODs" in INDEX
     assert f"查看全部 {mod_count} 个 MOD" in INDEX
     assert 'href="./plugins.html#plugin-catalog"' in INDEX

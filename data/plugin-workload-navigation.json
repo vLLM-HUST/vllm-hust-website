@@ -7,6 +7,18 @@
       "description_en": "Understand captured inference structure and correlate scheduling context with supported device evidence.",
       "description_zh": "理解采集到的推理执行结构，将调度上下文与受支持的设备证据关联。"
     },
+    "model_preparation": {
+      "label_en": "Model preparation",
+      "label_zh": "模型制备",
+      "description_en": "Prepare, transform, or validate model artifacts before they enter an inference runtime.",
+      "description_zh": "在模型进入推理运行时之前制备、转换或校验模型产物。"
+    },
+    "lifecycle_control": {
+      "label_en": "Lifecycle control",
+      "label_zh": "生命周期控制",
+      "description_en": "Observe request and KV lifecycle events or report bounded signals to an external control plane.",
+      "description_zh": "观察请求与 KV 生命周期事件，或向外部控制面报告有界信号。"
+    },
     "long_context": {
       "label_en": "Long context",
       "label_zh": "长上下文",
@@ -64,6 +76,8 @@
   },
   "plugins": {
     "traceloom": ["profiling_analysis"],
+    "ascend-quant-toolkit": ["model_preparation"],
+    "slicegpt-migration": ["model_preparation"],
     "adm": ["distributed_pipeline"],
     "bidkv": ["memory_kv_pressure", "high_concurrency"],
     "diffspec": ["decode_heavy", "latency_slo"],
@@ -77,6 +91,7 @@
     "pipeline-microbatch-migration": ["distributed_pipeline", "high_concurrency"],
     "betterscale": ["distributed_pipeline"],
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
+    "clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
     "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"]
   }
 }

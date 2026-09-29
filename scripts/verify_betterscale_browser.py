@@ -26,12 +26,23 @@ def main():
             "entries"
         ]
     }
+    tool_mod_roles = {
+        "lifecycle_control_plane",
+        "model_artifact_preparation",
+        "offline_model_quantization",
+        "profiling_analysis",
+        "scheduler_policy_research",
+        "telemetry_provider",
+    }
     workshop_mod_count = sum(
         item.get("public_surface", True) is not False
         and (
             item["id"] in performance_ids
             or (
-                item["artifact_type"] in {"runtime_component", "bridge"}
+                (
+                    item["artifact_type"] in {"runtime_component", "bridge"}
+                    or item["system_role"] in tool_mod_roles
+                )
                 and item["repository_relationship"] == "organization_native"
                 and item["delivery_model"]
                 in {
@@ -39,6 +50,7 @@ def main():
                     "python_distribution",
                     "migration_scaffold",
                     "source_patch",
+                    "source_toolkit",
                 }
                 and item["canonical_repository"].startswith(
                     "https://github.com/vLLM-HUST/"
@@ -321,6 +333,30 @@ def main():
         page.locator("[data-workload-filters] button").first.click()
         page.locator("[data-plugin-more]").click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
+        tool_section = page.locator(".plugin-category-tools")
+        assert (
+            tool_section.locator(".plugin-category-title").inner_text() == "Tool MODs"
+        )
+        assert tool_section.locator(".workshop-card").evaluate_all(
+            "cards => cards.map(card => card.id)"
+        ) == [
+            "ascend-quant-toolkit",
+            "clm-lifecycle",
+            "request-lifecycle-profiler",
+            "slicegpt-migration",
+            "traceloom",
+        ]
+        assert tool_section.locator(".plugin-performance").count() == 0
+        assert page.locator(".plugin-category-performance #clm-lifecycle").count() == 0
+        clm = tool_section.locator("#clm-lifecycle")
+        assert clm.locator(".plugin-card-footer .withheld").count() == 1
+        assert clm.locator(".plugin-card-footer a").count() == 0
+        clm.locator(".plugin-launch-icon").click()
+        assert (
+            "python -m pip install vllm-hust-clm-lifecycle==0.1.1"
+            in clm.locator(".plugin-launch-tooltip").text_content()
+        )
+        clm.locator(".plugin-launch-icon").click()
         assert page.locator(".workshop-card").evaluate_all(
             "cards => cards.slice(0, 10).map(card => card.id)"
         ) == [

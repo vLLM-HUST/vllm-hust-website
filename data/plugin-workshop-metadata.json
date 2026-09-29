@@ -309,6 +309,31 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
+    "clm-lifecycle": {
+      "repository": "vLLM-HUST/vllm-hust-clm-lifecycle",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-clm-lifecycle",
+      "metrics": {
+        "stars": null,
+        "forks": null,
+        "open_pull_requests": null
+      },
+      "maintainers": [
+        {
+          "login": "xiehanlong834-gif",
+          "name": "谢汉龙",
+          "profile_url": "https://github.com/xiehanlong834-gif",
+          "avatar_url": "https://avatars.githubusercontent.com/u/292786496?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
     "kv-materialization-arrival-control": {
       "repository": "vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
       "repository_url": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",

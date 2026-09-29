@@ -25,8 +25,15 @@
   let selectedWorkload = "all";
   let expanded = false;
   const pageSize = 9;
-  const toolRoles = new Set(["profiling_analysis", "telemetry_provider"]);
-  const isToolMod = item => toolRoles.has(item.system_role);
+  const toolModRoles = new Set([
+    "lifecycle_control_plane",
+    "model_artifact_preparation",
+    "offline_model_quantization",
+    "profiling_analysis",
+    "scheduler_policy_research",
+    "telemetry_provider"
+  ]);
+  const isToolMod = item => toolModRoles.has(item.system_role);
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -173,9 +180,15 @@
     return (
       performanceResults.has(item.id)
       || (
-      ["runtime_component", "bridge"].includes(item.artifact_type)
+      (
+        ["runtime_component", "bridge"].includes(item.artifact_type)
+        || isToolMod(item)
+      )
       && item.repository_relationship === "organization_native"
-      && ["plugin_bundle", "python_distribution", "migration_scaffold", "source_patch"].includes(item.delivery_model)
+      && [
+        "plugin_bundle", "python_distribution", "migration_scaffold",
+        "source_patch", "source_toolkit"
+      ].includes(item.delivery_model)
       && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
       )
     );
@@ -224,6 +237,18 @@ export TRACELOOM_RUN_ID=inference-study-001
 vllm serve /path/to/model --async-scheduling \
   --scheduler-cls traceloom.vllm.TracingAsyncScheduler \
   --host 127.0.0.1 --port 8000`
+    },
+    "clm-lifecycle": {
+      title_en: "Install and inspect CLM Lifecycle",
+      title_zh: "安装并检查 CLM 生命周期控制面",
+      action_en: "inspection commands",
+      action_zh: "检查命令",
+      note_en: "Requires a host exposing vllm.request-lifecycle.v1. With no controller endpoint configured, the component remains observation-only and claims no throughput benefit.",
+      note_zh: "要求宿主提供 vllm.request-lifecycle.v1；未配置控制器端点时仅进行观察，不声明吞吐收益。",
+      command: `python -m pip install vllm-hust-clm-lifecycle==0.1.1
+vllm-hust-ext extension inspect org.vllm-hust.clm-lifecycle
+vllm-hust-ext extension check org.vllm-hust.clm-lifecycle
+export VLLM_PLUGINS=ascend,clm_lifecycle`
     },
     betterscale: {
       guide: "./betterscale.html#install-qwen",
@@ -382,7 +407,8 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
     "activation-sparsity-migration": "org.vllm-hust.activation-sparsity",
     "pipeline-microbatch-migration": "org.vllm-hust.pipeline-microbatch",
     "qos-scheduler-migration": "org.vllm-hust.qos-scheduler",
-    "stateharbor": "org.vllm-hust.stateharbor"
+    "stateharbor": "org.vllm-hust.stateharbor",
+    "clm-lifecycle": "org.vllm-hust.clm-lifecycle"
   };
 
   const valueLabel = (value) => String(value).replaceAll("_", " ");
