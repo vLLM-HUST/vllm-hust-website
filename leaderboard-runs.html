@@ -54,7 +54,7 @@
       <div class="runs-view-switch" role="group" aria-label="Table view">
         <button id="view-frontier" type="button" aria-pressed="true" aria-controls="frontier-panel">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16M6 16l4-6 4 2 5-7" /><circle cx="10" cy="10" r="1" /><circle cx="14" cy="12" r="1" /><circle cx="19" cy="5" r="1" /></svg>
-          <span>Frontier</span><span id="view-frontier-count" class="view-count">0</span>
+          <span data-runs-i18n="settings"></span><span id="view-frontier-count" class="view-count">0</span>
         </button>
         <button id="view-runs" type="button" aria-pressed="false" aria-controls="runs-panel">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10h5v10M9 20V4h6v16M15 20v-7h5v7M3 20h18" /></svg>
@@ -65,7 +65,7 @@
           <span>Tasks</span><span id="view-tasks-count" class="view-count">0</span>
         </button>
       </div>
-      <section id="frontier-panel" class="frontier" aria-label="Frontier"></section>
+      <section id="frontier-panel" class="frontier" aria-label="Benchmark settings"></section>
       <section id="runs-panel" aria-label="Leaderboards" hidden>
         <div class="runs-table-scroll" tabindex="0" role="region" aria-label="Measurements">
           <table class="runs-table"><thead><tr id="runs-headers"></tr></thead><tbody id="runs-body"></tbody></table>
@@ -105,7 +105,7 @@
   <script src="./assets/hf-data-loader.js?v=stable-trend-v5-public-sanitized-20260902"></script>
   <script src="./assets/leaderboard-runs-model.js?v=swe-parallel-20260924-4"></script>
   <script src="./assets/leaderboard-frontier-model.js?v=model-axes-20260928"></script>
-  <script src="./assets/leaderboard-runs.js?v=frontier-default-20260927"></script>
-  <script src="./assets/leaderboard-frontier.js?v=qwen35-pegaflow-20260929"></script>
+  <script src="./assets/leaderboard-runs.js?v=benchmark-settings-20260929"></script>
+  <script src="./assets/leaderboard-frontier.js?v=benchmark-settings-20260929"></script>
 </body>
 </html>

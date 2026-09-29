@@ -2,8 +2,8 @@
 
 24 complete 900-second observations on one local eight-chip Ascend 910B2 host, 2026-09-27 UTC. Four
 configurations cover client C1/2/4/8/16/32. All enable native DSpark K5 natural rejection and prefix
-caching. No failed run is scored. The Frontier model selector labels this checkpoint **DeepSeek V4
-Flash · INT8**.
+caching. No failed run is scored. The benchmark-setting model selector labels this checkpoint
+**DeepSeek V4 Flash · INT8**.
 
 ## Measured throughput
 
@@ -19,8 +19,8 @@ Output tokens/s/chip; the denominator includes all eight allocated chips.
 |       32 |       29.150 |          42.190 |          35.442 |             49.292 |
 
 [All throughput, TTFT and decode-speed curves](../assets/frontier-dsv4-swe-concurrency.svg). Every
-completed plateau/regression point remains in the snapshot. The existing “Hide non-Frontier points”
-checkbox can be unchecked to inspect them all. The Pareto view retains separate baseline/MOD
+completed plateau/regression point remains in the snapshot. The existing “Best trade-off points
+only” checkbox can be unchecked to inspect them all. The compact view retains separate baseline/MOD
 boundaries; the diagnostic curves retain fixed parallel configurations.
 
 Both TP arms plateau from C4; C32 P95 TTFT reaches165.15/103.16s (baseline/BetterScale). DP peaks at

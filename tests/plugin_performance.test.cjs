@@ -34,6 +34,8 @@ test('every Frontier gain is computed from five points in a declared comparison 
   assert.equal(results.get('pegaflow-vllm-connectors').gain.toFixed(2), '6.34');
   assert.equal(results.get('betterscale').runtimeBase.vllm.slice(0, 7), '752a3a5');
   assert.equal(results.get('bidkv').runtimeBase.vllm.slice(0, 7), 'd0f22d2');
+  assert.equal(results.get('kvcompress-ascend').cohortId,
+    'qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
 });
 
 test('published paired runs expose both gains and regressions without precomputed scores', () => {

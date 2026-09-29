@@ -30,12 +30,12 @@ were archived under `intellistream/*-legacy-20260831`; current MOD `PROVENANCE.m
 old PR identities. In particular, PR #49 offload compatibility is not KV Tiering, and the native
 MTP2 arm's BetterScale worker bridge is not evidence that it ran the BetterScale treatment.
 
-For the sibling Frontier view, read
-[the Frontier handoff](../../../../../docs/LEADERBOARD-FRONTIER.md). It consumes a separate
-production snapshot. Fletcher authorized the first native/BetterScale Qwen35 AgentX points as
-explicitly labeled 15-minute smoke results, not formal results. Do not derive Frontier admission,
-prices, or MOD activation from the historical run table. The pure model and browser checks exercise
-the contract without using accelerator capacity.
+For the sibling Benchmark settings view, read
+[the settings handoff](../../../../../docs/BENCHMARK-SETTINGS.md). It consumes a separate production
+snapshot. Fletcher authorized the first native/BetterScale Qwen35 AgentX points as explicitly
+labeled 15-minute smoke results, not formal results. Do not derive settings admission, prices, or
+MOD activation from the historical run table. The pure model and browser checks exercise the
+contract without using accelerator capacity.
 
 AgentX metric import uses the official output throughput field, not a reconstructed token count /
 900 seconds or the separately exported benchmark-duration statistic: native observation/drain

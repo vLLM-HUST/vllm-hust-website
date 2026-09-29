@@ -7,9 +7,9 @@ The existing leaderboard, its scripts, publication schema and snapshots remain u
 
 ## Reading the page
 
-- Use the **Leaderboards / Tasks / Frontier** tabs to switch views; only one view is visible.
-  Frontier is an independent fixed-workload configuration view; see
-  [its data handoff](LEADERBOARD-FRONTIER.md). Clicking a task tag switches to its definition and
+- Use the **Benchmark settings / Leaderboards / Tasks** tabs to switch views; only one view is
+  visible. Benchmark settings is an independent exact-cohort view; see
+  [its data handoff](BENCHMARK-SETTINGS.md). Clicking a task tag switches to its definition and
   highlights the row. Returning preserves the result filters, sorting and page.
 - Click a measurement column title to toggle ascending/descending sorting; its separate small arrow
   opens a dropdown with searchable checkboxes. Selections combine OR within a column and AND across

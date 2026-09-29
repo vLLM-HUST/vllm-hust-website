@@ -165,8 +165,8 @@
       "maturity": "supported",
       "canonical_repository": "https://github.com/vllm-project/vllm",
       "upstream_repository": "https://github.com/kvcache-ai/Mooncake",
-      "summary_en": "Official vLLM MooncakeStoreConnector validated on Ascend with 9-key save/load and outage/recovery evidence; the non-invasive Host Provider checks NPU transport and operation evidence while Mooncake retains service ownership. A separate manager-launched Qwen3.5 Frontier test of AscendStoreConnector + Mooncake completed five matched points, with throughput 1.02%–2.66% lower; these are not performance results for the official connector.",
-      "summary_zh": "官方 vLLM MooncakeStoreConnector 已在 Ascend 完成 9-key save/load 与故障恢复实测；无侵入 Host Provider 检查 NPU transport 和操作证据，Mooncake 仍保留服务所有权。 Qwen3.5 Frontier 另通过插件管理器测试 AscendStoreConnector + Mooncake：五档匹配对照吞吐低 1.02%–2.66%，并非官方连接器路径的性能结论。",
+      "summary_en": "Official vLLM MooncakeStoreConnector validated on Ascend with 9-key save/load and outage/recovery evidence; the non-invasive Host Provider checks NPU transport and operation evidence while Mooncake retains service ownership. A separate manager-launched Qwen3.5 benchmark setting tested AscendStoreConnector + Mooncake at five matched points, with throughput 1.02%–2.66% lower; these are not performance results for the official connector.",
+      "summary_zh": "官方 vLLM MooncakeStoreConnector 已在 Ascend 完成 9-key save/load 与故障恢复实测；无侵入 Host Provider 检查 NPU transport 和操作证据，Mooncake 仍保留服务所有权。另一个 Qwen3.5 实验设定通过插件管理器测试 AscendStoreConnector + Mooncake：五档匹配对照吞吐低 1.02%–2.66%，并非官方连接器路径的性能结论。",
       "compatibility": {
         "status": "verified",
         "host": "vLLM official connector",
@@ -214,21 +214,21 @@
       "maintainer_profiles": [{"login": "mynameisczj", "name": "陈子嘉"}],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
       "upstream_repository": null,
-      "summary_en": "Non-invasive PegaFlow Host Provider and PegaKVConnector profile, now qualified for Qwen3.5 hybrid cache groups on the unified Ascend Frontier contract; the external operator retains service lifecycle and stored-data ownership.",
-      "summary_zh": "无侵入 PegaFlow Host Provider 与 PegaKVConnector profile，现已在统一 Ascend Frontier 合同下完成 Qwen3.5 混合缓存组验收。",
-      "public_effect_en": "On the exact Qwen3.5-35B Frontier contract, the five-point geometric-mean output-throughput change is +6.34% versus the shared Native series; C1 regresses while C2-C16 improve.",
-      "public_effect_zh": "在完全相同的 Qwen3.5-35B Frontier 配置下，相对统一 Native 曲线，五点输出吞吐几何平均变化为 +6.34%；C1 回退，C2-C16 提升。",
+      "summary_en": "Non-invasive PegaFlow Host Provider and PegaKVConnector profile, now qualified for Qwen3.5 hybrid cache groups on the unified Ascend Qwen3.5 BF16 setting; the external operator retains service lifecycle and stored-data ownership.",
+      "summary_zh": "无侵入 PegaFlow Host Provider 与 PegaKVConnector profile，现已在统一 Ascend Qwen3.5 BF16 设定下完成混合缓存组验收。",
+      "public_effect_en": "On the exact Qwen3.5-35B BF16 setting, the five-point geometric-mean output-throughput change is +6.34% versus the shared Native series; C1 regresses while C2-C16 improve.",
+      "public_effect_zh": "在完全相同的 Qwen3.5-35B BF16 设定下，相对统一 Native 曲线，五点输出吞吐几何平均变化为 +6.34%；C1 回退，C2-C16 提升。",
       "public_effect_status": "measured",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PEGAFLOW.md",
       "compatibility": {
         "status": "verified",
-        "host": "vLLM-HUST 0.25.1 Frontier + vLLM-Ascend-HUST",
+        "host": "vLLM-HUST 0.25.1 reference runtime + vLLM-Ascend-HUST",
         "versions": ["PegaFlow 0.23.3 @ cd64ecc", "Extension Provider 0.2.0.dev0"],
         "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B · TP2/PP1 · FULL_AND_PIECEWISE"],
         "python": [">=3.10"],
         "requirements_en": "PegaFlow remains an external operator-owned service. The measured profile uses a 30 GiB pinned pool, PegaKVConnector read_write mode, APC, async scheduling, Mamba align, and native MTP2.",
         "requirements_zh": "PegaFlow 仍是由外部运维者管理的服务；实测 profile 使用 30 GiB pinned pool、PegaKVConnector read_write、APC、异步调度、Mamba align 与原生 MTP2。",
-        "models": ["Qwen3.5-35B-A3B — unified Frontier contract verified"]
+        "models": ["Qwen3.5-35B-A3B — unified BF16 setting verified"]
       },
       "evidence_level": "performance_verified"
     },
@@ -578,8 +578,8 @@
       "upstream_repository": null,
       "summary_en": "KV transformation and compression provider for vLLM Ascend, with Qwen3.5 hybrid-cache, APC, asynchronous scheduling and MTP support.",
       "summary_zh": "vLLM Ascend KV 状态转换与压缩 provider，已支持 Qwen3.5 混合缓存、APC、异步调度与 MTP。",
-      "public_effect_en": "On the exact Qwen3.5-35B Frontier contract, the five-point geometric-mean output-throughput change is -3.55% versus the shared Native series.",
-      "public_effect_zh": "在完全相同的 Qwen3.5-35B Frontier 配置下，相对统一 Native 曲线，五个并发点的输出吞吐几何平均变化为 -3.55%。",
+      "public_effect_en": "On the exact Qwen3.5-35B BF16 setting, the five-point geometric-mean output-throughput change is -3.55% versus the shared Native series.",
+      "public_effect_zh": "在完全相同的 Qwen3.5-35B BF16 设定下，相对统一 Native 曲线，五个并发点的输出吞吐几何平均变化为 -3.55%。",
       "public_effect_status": "measured",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
       "compatibility": {
@@ -596,10 +596,10 @@
         "python": [
           ">=3.10,<3.15"
         ],
-        "requirements_en": "The exact Frontier run used ECPA, TP2, aligned hybrid KV groups, APC, asynchronous scheduling and native MTP2. Runtime effectiveness requires cache-binding and compression-commit evidence.",
-        "requirements_zh": "Frontier 实测通过 ECPA 启动，使用 TP2、align 混合 KV 分组、APC、异步调度和原生 MTP2；运行时生效需同时观测缓存绑定与压缩提交。",
+        "requirements_en": "The measured Qwen3.5 BF16 setting used ECPA, TP2, aligned hybrid KV groups, APC, asynchronous scheduling and native MTP2. Runtime effectiveness requires cache-binding and compression-commit evidence.",
+        "requirements_zh": "Qwen3.5 BF16 设定通过 ECPA 启动，使用 TP2、align 混合 KV 分组、APC、异步调度和原生 MTP2；运行时生效需同时观测缓存绑定与压缩提交。",
         "models": [
-          "Qwen3.5-35B-A3B — Frontier contract verified"
+          "Qwen3.5-35B-A3B — unified BF16 setting verified"
         ],
         "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/issues/2"
       },
@@ -661,7 +661,7 @@
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-KV-TIERING-20260926.md",
       "compatibility": {
         "status": "experimental",
-        "host": "Pinned vLLM-HUST / vLLM-Ascend Frontier capsule",
+        "host": "Pinned vLLM-HUST / vLLM-Ascend runtime capsule",
         "versions": [
           "Tiering 7ba646a; Host hybrid-prefix fix 49f0827; Manager cf1ea71"
         ],
@@ -669,7 +669,7 @@
           "Ascend 910B2 · TP2 · CANN 9.1.0 · graph/APC/MTP2/async"
         ],
         "models": [
-          "Qwen3.5-35B-A3B BF16 — Frontier configuration only"
+          "Qwen3.5-35B-A3B BF16 — pinned setting only"
         ],
         "requirements_en": "Use the exact runtime receipt and source pins in the experiment report. The development profile is restricted to 0.25.1+frontier.bidkv.empty and requires the Host hybrid-prefix fix; it is not a general release for current main. CPU budget and storage path must be configured before enabling.",
         "requirements_zh": "须使用实验报告中的运行清单和源码版本。开发配置限定于 0.25.1+frontier.bidkv.empty，并依赖 Host 混合前缀命中修复；不是面向当前 main 的通用发布版。启用前需配置 CPU 预算及存储路径。",
@@ -851,7 +851,7 @@
       "public_effect_zh": "已验证 Qwen2.5-14B 单卡真实服务、prefill/decode、ACL Graph 回放及三次 OpenAI API 请求；尚无已发布的配对性能对比。",
       "public_effect_status": "validated",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/tree/ae7b44bfee695d0ba580040dffd10eb802104485#%E5%B7%B2%E9%AA%8C%E8%AF%81%E7%8E%AF%E5%A2%83",
-      "compatibility": {"status": "experimental", "host": "vLLM Ascend HUST", "versions": ["Plugin 0.2.0.dev0 @ ae7b44b", "Core 8a6655cf62 + Ascend f4f49832"], "platforms": ["Ascend 910B single card · Qwen2.5-14B · 8K"], "python": [">=3.10"], "requirements_en": "Activation requires --kv-cache-dtype int8. TP2, Qwen3.5 hybrid cache, APC, MTP2, asynchronous scheduling, and the current Frontier graph combination remain unqualified.", "requirements_zh": "启用需传入 --kv-cache-dtype int8；TP2、Qwen3.5 hybrid cache、APC、MTP2、异步调度及当前 Frontier 图组合仍未验收。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/issues/2"},
+      "compatibility": {"status": "experimental", "host": "vLLM Ascend HUST", "versions": ["Plugin 0.2.0.dev0 @ ae7b44b", "Core 8a6655cf62 + Ascend f4f49832"], "platforms": ["Ascend 910B single card · Qwen2.5-14B · 8K"], "python": [">=3.10"], "requirements_en": "Activation requires --kv-cache-dtype int8. TP2, Qwen3.5 hybrid cache, APC, MTP2, asynchronous scheduling, and the current Qwen3.5 graph-mode setting remain unqualified.", "requirements_zh": "启用需传入 --kv-cache-dtype int8；TP2、Qwen3.5 hybrid cache、APC、MTP2、异步调度及当前 Qwen3.5 图模式设定仍未验收。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/issues/2"},
       "evidence_level": "hardware_verified"
     },
     {
@@ -1070,7 +1070,7 @@
       "public_effect_zh": "Qwen3.5 TP2/PP2 五档并发及匹配 Native 对照已发布，吞吐按全部四张卡计量。批次准入策略实际执行；每点仍为单次观测，不能据此宣称稳定加速。",
       "public_effect_status": "inconclusive",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PIPELINE-K8S.md",
-      "compatibility": {"status": "verified", "host": "vLLM Frontier scheduler policy", "versions": ["Pipeline a15a229", "vLLM 0.25.1 Frontier backport · protocol 1.1"], "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B · TP2/PP2"], "python": [">=3.10"], "requirements_en": "ECPA launched the measured APC, MTP2, asynchronous scheduling, Mamba align, and FULL_AND_PIECEWISE configuration. The published curve uses the matched four-chip TP2/PP2 Native control.", "requirements_zh": "ECPA 已启动实测所用的 APC、MTP2、异步调度、Mamba align 与 FULL_AND_PIECEWISE 组合；公开曲线使用匹配的四卡 TP2/PP2 Native 对照。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch/issues/3"},
+      "compatibility": {"status": "verified", "host": "vLLM reference scheduler policy", "versions": ["Pipeline a15a229", "vLLM 0.25.1 experimental backport · protocol 1.1"], "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B · TP2/PP2"], "python": [">=3.10"], "requirements_en": "ECPA launched the measured APC, MTP2, asynchronous scheduling, Mamba align, and FULL_AND_PIECEWISE configuration. The published curve uses the matched four-chip TP2/PP2 Native control.", "requirements_zh": "ECPA 已启动实测所用的 APC、MTP2、异步调度、Mamba align 与 FULL_AND_PIECEWISE 组合；公开曲线使用匹配的四卡 TP2/PP2 Native 对照。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch/issues/3"},
       "evidence_level": "performance_verified"
     },
     {
@@ -1399,8 +1399,8 @@
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-dla",
       "upstream_repository": null,
-      "summary_en": "Length-aware admission and preemption. The original prediction work includes offline simulations; the measured Frontier carrier uses explicitly declared output budgets on a pinned runtime.",
-      "summary_zh": "按输出长度进行准入与抢占。原预测方案包含离线模拟；已实测的 Frontier 实现使用显式声明的输出预算及限定运行时。",
+      "summary_en": "Length-aware admission and preemption. The original prediction work includes offline simulations; the measured reference-setting carrier uses explicitly declared output budgets on a pinned runtime.",
+      "summary_zh": "按输出长度进行准入与抢占。原预测方案包含离线模拟；已实测的基准设定实现使用显式声明的输出预算及限定运行时。",
       "public_effect_en": "The pinned known-output-budget carrier has five Qwen3.5 TP2/PP1 observations with matched Native controls. Admission checks ran, but no deferral or preemption occurred. These are single observations, not validation of learned length prediction or a stable speedup.",
       "public_effect_zh": "限定版本的已知输出预算实现已有 Qwen3.5 TP2/PP1 五档并发及匹配 Native 对照。准入检查已执行，但没有延后或抢占；单次观测不能证明稳定加速，也不代表学习型长度预测已验证。",
       "public_effect_status": "inconclusive",

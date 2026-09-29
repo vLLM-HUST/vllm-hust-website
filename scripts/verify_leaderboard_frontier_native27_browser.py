@@ -57,10 +57,11 @@ with sync_playwright() as p:
         qa.ready(page)
         page.locator("#frontier-model-trigger").click()
         page.locator(".frontier-model-tag").filter(has_text="Qwen3.8-27B").click()
-        assert page.locator("#frontier-only").is_checked()
+        assert not page.locator("#frontier-only").is_checked()
+        assert page.locator(".frontier-point").count() == len(points)
+        page.locator("#frontier-only").check()
         assert page.locator('[data-point^="qwen27-sweprefix-native-"]').count() == 0
         page.locator("#frontier-only").uncheck()
-        assert page.locator(".frontier-point").count() == len(points)
         qa.assert_group_frontiers(page, points)
         for point in points:
             qa.click_point(page, page.locator(f'[data-point="{point["id"]}"]'))

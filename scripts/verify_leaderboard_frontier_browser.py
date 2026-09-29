@@ -159,6 +159,28 @@ def verify_rotation_choices(browser, url, fixture):
     context.close()
 
 
+def verify_setting_deep_links(browser, url):
+    setting = "qwen25-14b-bf16-gsm8k-b128-vspec-v1"
+    context = browser.new_context(viewport={"width": 390, "height": 1000})
+    context.add_init_script("localStorage.setItem('vllm-hust_lang', 'zh')")
+    page = context.new_page()
+    page.goto(f"{url}/leaderboard-runs.html?setting={setting}#settings")
+    ready(page)
+    assert page.locator("#view-frontier").get_attribute("aria-pressed") == "true"
+    assert "实验设定" in page.locator("#view-frontier").inner_text()
+    assert "Qwen2.5-14B" in page.locator("#frontier-model-trigger").inner_text()
+    assert "GSM8K" in page.locator("#frontier-workload-tag").inner_text()
+    assert "仅显示最佳权衡点" in page.locator("#frontier-panel").inner_text()
+    assert not page.locator("#frontier-only").is_checked()
+    assert f"setting={setting}" in page.url
+    assert page.url.endswith("#settings")
+
+    page.goto(f"{url}/leaderboard-runs.html#frontier")
+    ready(page)
+    assert page.url.endswith("#settings")
+    context.close()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="http://127.0.0.1:8774")
@@ -199,6 +221,7 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.launch()
         verify_rotation_choices(browser, args.url, fixture)
+        verify_setting_deep_links(browser, args.url)
         for width, language, scheme in [
             (1440, "en", "light"),
             (390, "zh", "light"),
@@ -226,7 +249,12 @@ def main():
             ready(page)
             page.locator('[data-filter="rotation"][value="2"]').uncheck()
             assert "AgentX" not in page.locator("#frontier-panel").inner_text()
-            assert page.locator("#frontier-only").is_checked()
+            assert not page.locator("#frontier-only").is_checked()
+            shown = page.locator("[data-point]").evaluate_all(
+                "nodes=>nodes.map(n=>n.dataset.point)"
+            )
+            assert set(shown) == {point["id"] for point in default_points}
+            page.locator("#frontier-only").check()
             shown = page.locator("[data-point]").evaluate_all(
                 "nodes=>nodes.map(n=>n.dataset.point)"
             )
@@ -370,7 +398,10 @@ def main():
             else:
                 assert page.locator("#frontier-workload").count() == 0
                 assert page.locator("#frontier-workload-tag").is_visible()
-            assert "smoke" in page.locator("#frontier-status").inner_text()
+            expected_status = (
+                "工程测量" if language == "zh" else "Engineering measurement"
+            )
+            assert expected_status in page.locator("#frontier-status").inner_text()
             assert page.locator(".frontier-point").count() == len(default_points)
             assert_group_frontiers(page, default_points)
             assert page.locator("#frontier-popover").is_hidden()
@@ -698,8 +729,7 @@ def main():
         )
         page.goto(f"{args.url}/leaderboard-runs.html#frontier")
         ready(page)
-        assert page.locator("#frontier-only").is_checked()
-        page.locator("#frontier-only").uncheck()
+        assert not page.locator("#frontier-only").is_checked()
         assert page.locator(".frontier-model-tag").count() == 2
         assert page.locator("#frontier-workload option").count() == 2
         assert page.locator(".frontier-point").count() == 4

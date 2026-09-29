@@ -10,9 +10,9 @@
             knownBudget: 'Known output budget · no learned predictor', budgetChecksOnly: 'Admission capacity checks ran, but no admission deferrals or preemptions were observed. This point does not demonstrate an optimization benefit.',
             notExercised: 'MOD policy not exercised', notExercisedScope: 'The MOD was enabled, but its optimization mechanism was not exercised during this window. This point does not demonstrate an optimization benefit.',
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
-            failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Frontier', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
+            failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Benchmark setting', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', batchSize: 'Batch size', outputThroughput: 'Output throughput', native: 'Native baseline',
-            smoke: '15 min smoke', formal: 'Measured configurations', hint: 'Select a point for configuration', lineHint: 'Lines: one concurrency curve per baseline / MOD and rotation depth', frontierOnly: 'Hide non-Frontier points', sampled: 'Sampling date',
+            smoke: 'Engineering measurement', formal: 'Measured setting', hint: 'Select a point for configuration', lineHint: 'Lines: one concurrency curve per baseline / MOD and rotation depth', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
@@ -23,9 +23,9 @@
             knownBudget: '已知输出预算 · 未使用学习型预测器', budgetChecksOnly: '准入容量检查已执行，但未观察到准入延后或抢占；该点不构成优化收益证据。',
             notExercised: 'MOD 策略未触发', notExercisedScope: 'MOD 已启用，但本窗口未触发有效的优化动作；该点不构成优化收益证据。',
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
-            failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: 'Frontier', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
+            failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: '实验设定', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', batchSize: 'Batch size', outputThroughput: '总输出吞吐', native: '原生 Baseline',
-            smoke: '15 分钟 smoke', formal: '实测配置', hint: '点击数据点查看配置', lineHint: '连线：每个 Baseline / MOD、每个轮转深度各有一条并发曲线', frontierOnly: '隐藏非 Frontier 点', sampled: '采样日期',
+            smoke: '工程测量', formal: '实测设定', hint: '点击数据点查看配置', lineHint: '连线：每个 Baseline / MOD、每个轮转深度各有一条并发曲线', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
@@ -42,7 +42,8 @@
         if (!hasRotation()) return `${t('concurrency')}: ${fmt(c)}`;
         return `${t('concurrency')}: C${fmt(c)} · ${t('rotationDepth')}: ${rotationLabel(d)}`;
     };
-    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:'', mtp:null, mods:null, rotation:null, frontierOnly:true};
+    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:'', mtp:null, mods:null, rotation:null, frontierOnly:false};
+    const requestedSetting = new URLSearchParams(location.search).get('setting') || '';
     const colors = ['#4263eb','#008c78','#ad5c00','#965bd3','#d14469','#177baf'];
     const tagKey = c => JSON.stringify([c.model.id,c.precision.id]);
     const cohort = () => state.data.cohorts.find(c => c.id === state.cohort);
@@ -80,6 +81,12 @@
         const available = state.data.cohorts.filter(c => tagKey(c) === state.tag);
         if (!available.some(c => c.id === state.cohort)) state.cohort = available[0]?.id || '';
     }
+    function updateSettingURL() {
+        if (!state.ready || !state.cohort || $('view-frontier')?.getAttribute('aria-pressed') !== 'true') return;
+        const params = new URLSearchParams(location.search);
+        params.set('setting', state.cohort);
+        history.replaceState(null, '', `${location.pathname}?${params.toString()}#settings`);
+    }
     function shell() {
         reconcile();
         const tags = [...new Map(state.data.cohorts.map(c => [tagKey(c),c])).values()];
@@ -116,9 +123,9 @@
                 <span id="frontier-filter-count" role="status"></span>
             </aside></div>`;
         $('frontier-panel').querySelectorAll('[data-model-tag]').forEach(button=>button.addEventListener('click',()=>{
-            state.tag=button.dataset.modelTag;state.cohort='';state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();$('frontier-model-trigger')?.focus();
+            state.tag=button.dataset.modelTag;state.cohort='';state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();updateSettingURL();$('frontier-model-trigger')?.focus();
         }));
-        $('frontier-workload')?.addEventListener('change',event=>{state.cohort=event.target.value;state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();});
+        $('frontier-workload')?.addEventListener('change',event=>{state.cohort=event.target.value;state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();updateSettingURL();});
         $('frontier-panel').querySelectorAll('[data-filter]').forEach(input=>input.addEventListener('change',()=>{
             const selected=state[input.dataset.filter];
             if(input.checked)selected.add(input.value);else selected.delete(input.value);
@@ -268,11 +275,11 @@
     document.addEventListener('keydown',event=>{if(event.key==='Escape'&&$('frontier-model-picker')?.open){event.preventDefault();$('frontier-model-picker').open=false;$('frontier-model-trigger').focus();return;}if(event.key==='Escape'&&state.selected){event.preventDefault();close(true);}});
     window.addEventListener('vllm-hust:langchange',shell);
     let resize;window.addEventListener('resize',()=>{cancelAnimationFrame(resize);resize=requestAnimationFrame(render);});
-    $('view-frontier').addEventListener('click',()=>requestAnimationFrame(render));
+    $('view-frontier').addEventListener('click',()=>{updateSettingURL();requestAnimationFrame(render);});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=qwen35-pegaflow-20260929',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
-        fetch('./data/ecosystem.json?v=qwen35-pegaflow-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
-    ]).then(([data,catalog])=>{state.data=M.visibleData(data);state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();})
-        .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Frontier]',error.message);});
+        fetch('./data/leaderboard_frontier.json?v=benchmark-settings-20260929',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
+    ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=state.data.cohorts.find(c=>c.id===requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
+        .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});
 })();

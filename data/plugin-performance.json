@@ -177,7 +177,7 @@
     },
     {
       "id": "betterscale",
-      "url": "./leaderboard-runs.html#frontier",
+      "url": "./leaderboard-runs.html#settings",
       "ecpa": {
         "launch_acceptance": "not-reproduced-this-round",
         "configuration_path": "not-evaluated",

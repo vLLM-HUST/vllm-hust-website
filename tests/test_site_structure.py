@@ -40,6 +40,32 @@ def test_index_contains_expected_project_markers() -> None:
     assert "长征 Desktop 下载" not in text
 
 
+def test_leaderboard_names_exact_settings_without_frontier_jargon() -> None:
+    root = Path(__file__).resolve().parents[1]
+    page = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
+    runs_script = (root / "assets" / "leaderboard-runs.js").read_text(encoding="utf-8")
+    settings_script = (root / "assets" / "leaderboard-frontier.js").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'aria-label="Benchmark settings"' in page
+    assert "Benchmark settings" in runs_script
+    assert "实验设定" in runs_script
+    assert "Best trade-off points only" in settings_script
+    assert "仅显示最佳权衡点" in settings_script
+    assert "frontierOnly:false" in settings_script
+    assert "Hide non-Frontier points" not in settings_script
+    assert "Pareto-efficient points only" not in settings_script
+
+    handoff = (root / "docs" / "BENCHMARK-SETTINGS.md").read_text(encoding="utf-8")
+    legacy_handoff = (root / "docs" / "LEADERBOARD-FRONTIER.md").read_text(
+        encoding="utf-8"
+    )
+    assert "Benchmark settings / 实验设定" in handoff
+    assert "not a benchmark class or evidence level" in legacy_handoff
+    assert "[BENCHMARK-SETTINGS.md](BENCHMARK-SETTINGS.md)" in legacy_handoff
+
+
 def test_versions_page_links_the_ascend_runtime_matrix() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "versions.html").read_text(encoding="utf-8")

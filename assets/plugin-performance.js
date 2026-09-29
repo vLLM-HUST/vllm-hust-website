@@ -120,7 +120,8 @@
         return { ...observation, gain,
           count: comparisons.length || (published ? published.length : 0), comparisons,
           published_comparisons: published || [], baseline_series_id: baselineSeriesId || null,
-          modelLabel, runtimeBase: baseline?.[0].configuration.parameters.runtime_base_commits || null,
+          modelLabel, cohortId: baseline?.[0].cohort_id || null,
+          runtimeBase: baseline?.[0].configuration.parameters.runtime_base_commits || null,
           source: Number.isFinite(gain)
             ? (comparisons.length ? 'frontier' : published ? 'published-comparison' : null)
             : null };
@@ -139,7 +140,7 @@
       if (matches.length > 1) throw new Error('Ambiguous model observation');
       const selected = matches[0];
       const empty = { gain: null, count: 0, comparisons: [], published_comparisons: [],
-        baseline_series_id: null, modelLabel: null, runtimeBase: null, source: null };
+        baseline_series_id: null, modelLabel: null, cohortId: null, runtimeBase: null, source: null };
       return [id, { ...derived.entry, observations: derived.observations, ...(selected || empty), id }];
     }));
   }

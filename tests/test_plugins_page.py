@@ -100,7 +100,7 @@ def test_tiering_qualification_preserves_ownership_and_pinned_scope() -> None:
     assert item["delivery_model"] == "plugin_bundle"
     assert item["maturity"] == "experimental"
     assert item["compatibility"]["status"] == "experimental"
-    assert "Frontier configuration only" in item["compatibility"]["models"][0]
+    assert "pinned setting only" in item["compatibility"]["models"][0]
     # These are public source commits.
     for revision in (
         "7ba646a780c3bd0a8906309ea59719f5ccf6187e",  # pragma: allowlist secret
@@ -108,6 +108,12 @@ def test_tiering_qualification_preserves_ownership_and_pinned_scope() -> None:
     ):
         assert revision in SCRIPT
     assert "extension check org.vllm-hust.kv-tiering" in SCRIPT
+
+
+def test_measured_cards_link_to_their_exact_benchmark_setting() -> None:
+    assert "?setting=${encodeURIComponent(result.cohortId)}#settings" in SCRIPT
+    assert 'zh ? "设定 ↗" : "Setting ↗"' in SCRIPT
+    assert '"Frontier ↗"' not in SCRIPT
 
 
 def test_system_role_is_independent_from_delivery_model() -> None:
@@ -1059,7 +1065,7 @@ def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
     ]
     assert kvcompress["python"] == [">=3.10,<3.15"]
     assert kvcompress["platforms"] == ["Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph"]
-    assert kvcompress["models"] == ["Qwen3.5-35B-A3B — Frontier contract verified"]
+    assert kvcompress["models"] == ["Qwen3.5-35B-A3B — unified BF16 setting verified"]
     assert kvcompress["followup_url"].endswith("/issues/2")
     for component_id in (
         "knorm-migration",

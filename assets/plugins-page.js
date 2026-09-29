@@ -216,8 +216,8 @@
       title_zh: "检查固定版本的 KV Tiering 候选实现",
       action_en: "inspection commands",
       action_zh: "检查命令",
-      note_en: "Experimental Frontier profile only. Requires the pinned Host hybrid-prefix fix, compatible Ascend runtime, and explicit CPU/storage budgets before activation. These commands install and inspect; see PR #3 for qualification and the exact runtime scope.",
-      note_zh: "仅限实验中的 Frontier 配置。启用前需要固定版本的 Host 混合前缀修复、配套 Ascend 运行时，并配置 CPU 与存储预算。以下命令用于安装和检查；资格结果及适配范围见 PR #3。",
+      note_en: "Experimental pinned setting only. Requires the pinned Host hybrid-prefix fix, compatible Ascend runtime, and explicit CPU/storage budgets before activation. These commands install and inspect; see PR #3 for qualification and the exact runtime scope.",
+      note_zh: "仅限实验中的固定设定。启用前需要固定版本的 Host 混合前缀修复、配套 Ascend 运行时，并配置 CPU 与存储预算。以下命令用于安装和检查；资格结果及适配范围见 PR #3。",
       guide: "https://github.com/vLLM-HUST/vllm-hust-kv-tiering/pull/3",
       guide_en: "Pinned runtime and qualification →",
       guide_zh: "固定运行时与资格验证 →",
@@ -760,12 +760,14 @@ vllm-hust-ext extension check ${extensionId}`
         panel.append(element("span", "plugin-performance-runtime",
           `vLLM ${result.runtimeBase.vllm.slice(0, 7)} · Ascend ${ascend.slice(0, 7)}`));
       }
-      const frontier = result.source === "frontier";
-      const link = element("a", "plugin-public-effect-link", frontier ? "Frontier ↗" : (zh ? "实测 ↗" : "Evidence ↗"));
-      link.href = frontier ? "./leaderboard-runs.html#frontier" : result.url;
-      link.target = frontier ? "" : "_blank";
-      link.rel = frontier ? "" : "noopener noreferrer";
-      link.title = frontier
+      const matchedSetting = result.source === "frontier";
+      const link = element("a", "plugin-public-effect-link", matchedSetting ? (zh ? "设定 ↗" : "Setting ↗") : (zh ? "实测 ↗" : "Evidence ↗"));
+      link.href = matchedSetting
+        ? `./leaderboard-runs.html?setting=${encodeURIComponent(result.cohortId)}#settings`
+        : result.url;
+      link.target = matchedSetting ? "" : "_blank";
+      link.rel = matchedSetting ? "" : "noopener noreferrer";
+      link.title = matchedSetting
         ? (zh ? "C1/2/4/8/16 吞吐比的几何平均。" : "Geometric mean of C1/2/4/8/16 throughput ratios. ")
           + result.comparisons.map(row => `C${row.concurrency}: ${format(row.gain)}`).join(" · ")
         : [...new Set(result.published_comparisons.map(row => row.scope))].join(" · ");
@@ -1094,8 +1096,8 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=qwen35-pegaflow-20260929").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=qwen35-pegaflow-20260929").then(response => { if (!response.ok) throw new Error("Frontier unavailable"); return response.json(); })
+      fetch("./data/plugin-performance.json?v=benchmark-settings-20260929").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=benchmark-settings-20260929").then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {

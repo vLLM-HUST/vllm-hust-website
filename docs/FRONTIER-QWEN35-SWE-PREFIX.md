@@ -3,9 +3,9 @@
 These observations replay SWE-shaped multi-turn sessions with
 [swe-prefix-reuse](https://github.com/vLLM-HUST/swe-prefix-reuse), not AgentX. Select **SWE prefix
 reuse · 15 min smoke** on the
-[Frontier page](https://vllm-hust.sage.org.ai/leaderboard-runs.html#frontier). Historical AgentX
-observations remain under their original workload. They are not repeats of this experiment and their
-numerical differences are not MOD speedups.
+[benchmark-settings page](https://vllm-hust.sage.org.ai/leaderboard-runs.html#settings). Historical
+AgentX observations remain under their original workload. They are not repeats of this experiment
+and their numerical differences are not MOD speedups.
 
 ## Fixed workload, real continuation
 
@@ -228,7 +228,7 @@ exact source/owner generation agreement and clean eight-role release. Before mea
 also passed 128 mixed-length requests and 164/246 native layer shadows respectively. Maximum
 relative L2 errors were 0.000240644/0.000245942. The host was fully released afterward.
 
-The Frontier chart retains the **highest observed output throughput per chip for each A+E
+The benchmark-settings chart retains the **highest observed output throughput per chip for each A+E
 configuration at the same workload, MTP, C64 and serving envelope**: the two cap7 points above. They
 replace the earlier hw0 A4E4/A6E2 points on the chart; the new cap1 controls are also archived. This
 is selection by throughput, not a claim of statistical significance, lower latency, or a universal
