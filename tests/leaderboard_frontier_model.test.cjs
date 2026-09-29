@@ -24,6 +24,11 @@ test('concurrency lines connect only declared same-cohort series in C order',()=
         for(const row of rows) assert.deepEqual(fixed(row.point),fixed(first));
         assert.deepEqual(rows.map(row=>row.point.load.concurrency),rows.map(row=>row.point.load.concurrency).sort((a,b)=>a-b));
     }
+    const w8a8=lines.find(rows=>rows[0].point.load.concurrency_series==='swe-w8a8-tp2-20260929-mtp2-r2');
+    assert.ok(w8a8,'W8A8 SWE curve must form exactly one concurrency line');
+    assert.deepEqual(w8a8.map(row=>row.point.load.concurrency),[1,2,4,8,16]);
+    assert.ok(w8a8.every(row=>row.point.configuration.parameters.mtp_draft_tokens===2));
+    assert.ok(w8a8.every(row=>row.point.configuration.parameters.max_num_seqs===16));
     assert.equal(model.concurrencySeries(native.slice(0,1)).length,0);
     const other={...native[0],point:{...native[0].point,cohort_id:'other-workload'}};
     assert.equal(model.concurrencySeries([native[0],other]).length,0);
@@ -243,6 +248,37 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.validation.mamba_cache_mode,'align');
             assert.equal(run.validation.controller_status,'exercised');
             assert.equal(run.validation.shared_native_contract_sha256,p.configuration.parameters.unified_native_contract_sha256);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-w8a8-swe-curves-20260929-r2'){
+            const params=p.configuration.parameters;
+            assert.deepEqual(p.configuration.mods,['ascend-mtp-contract-2patch']);
+            assert.deepEqual(params.mods,['ascend-mtp-contract-2patch']);
+            assert.equal(params.quantization,'ascend');
+            assert.ok(String(params.weight_precision).startsWith('int8'));
+            assert.equal(params.mtp_draft_tokens,2);
+            assert.equal(params.max_num_seqs,16);
+            assert.equal(params.gpu_memory_utilization,0.95);
+            assert.ok(params.kv_cache_memory_bytes>0);
+            assert.equal(params.kv_cache_memory_bytes,26038239232);
+            assert.equal(params.max_num_batched_tokens,4096);
+            assert.equal(params.pipeline_parallel_size,1);
+            assert.equal(p.configuration.hardware.accelerator_count,2);
+            assert.equal(p.load.session_rotation_depth,1);
+            // D=1: 本曲线不使用 session rotation, 客户端记录里不存在 rotation depth
+            // (站点 schema 只给 rotation 批次写 client.session_rotation_depth, 且上游禁止把缺失
+            //  默认成 1)。D=1 由上面 p.load.session_rotation_depth 与 cohort 级 rotation 元数据守卫。
+            assert.equal(run.client.session_rotation_depth,undefined);
+            assert.equal(p.load.concurrency_series,'swe-w8a8-tp2-20260929-mtp2-r2');
+            assert.equal(params.qualification.concurrency,p.load.concurrency);
+            assert.equal(params.qualification.measurement_seconds,60);
+            assert.equal(run.qualification_run.concurrency,p.load.concurrency);
+            assert.equal(run.qualification_run.duration,60);
+            assert.equal(run.qualification_run.summary.failed_requests,0);
+            assert.equal(run.validation.protocol_qualification_run_id,run.qualification_run.run_id);
+            assert.equal(run.validation.protocol_qualification_passed,true);
+            assert.equal(run.validation.measured_seconds_matches_plan,true);
+            assert.equal(run.validation.prefix_cache_observed,true);
+            assert.equal(run.validation.campaign_finished_ok,true);
+            assert.ok(Object.keys(run.runtime_evidence.prefix_cache_counters).length);
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -715,8 +751,15 @@ test('retired AgentX cohorts disappear from active choices without deleting hist
 test('Qwen35 unified campaign shares the existing chart without losing checkpoint provenance',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const visible=model.visibleData(data);
-    const cohorts=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
+    // W8A8 与 BF16 是两条精度口径不同的曲线, 各自只允许一个可见 cohort (上游用 precision 区分,
+    // 本 cohort 的 display_scope 也明确不与 BF16 曲线混画)。统一曲线的 canonical cohort 仍是
+    // BF16 那一个, W8A8 cohort 不得成为统一活动 campaign 的落点。
+    const allQwen35=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
+    const cohorts=allQwen35.filter(c=>c.precision.id==='bf16-weights-compute-kv');
     assert.equal(cohorts.length,1);
+    const w8a8=allQwen35.filter(c=>c.precision.id==='w8a8-int8-weights-compute-bf16-kv');
+    assert.equal(w8a8.length,1);
+    assert.notEqual(w8a8[0].id,cohorts[0].id);
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);

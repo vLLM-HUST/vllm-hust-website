@@ -1097,7 +1097,7 @@ vllm-hust-ext extension check ${extensionId}`
     }),
     Promise.all([
       fetch("./data/plugin-performance.json?v=benchmark-settings-20260929").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=benchmark-settings-20260929").then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
+      fetch("./data/leaderboard_frontier.json?v=qwen35-w8a8-swe-curves-20260929-r2").then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {
