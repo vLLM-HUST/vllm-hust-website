@@ -25,11 +25,13 @@ test('every Frontier gain is computed from five points in a declared comparison 
   }
   assert.deepEqual(new Set(measured.map(result => result.id)), new Set([
     'betterscale', 'pipeline-microbatch-migration', 'bidkv', 'dla', 'kv-tiering-migration',
-    'mooncake-vllm-connectors', 'kvcompress-ascend', 'kv-materialization-arrival-control'
+    'mooncake-vllm-connectors', 'kvcompress-ascend', 'kv-materialization-arrival-control',
+    'pegaflow-vllm-connectors'
   ]));
   assert.equal(results.get('betterscale').gain.toFixed(2), '42.39');
   assert.equal(results.get('pipeline-microbatch-migration').gain.toFixed(2), '9.78');
   assert.equal(results.get('kvcompress-ascend').gain.toFixed(2), '-3.55');
+  assert.equal(results.get('pegaflow-vllm-connectors').gain.toFixed(2), '6.34');
   assert.equal(results.get('betterscale').runtimeBase.vllm.slice(0, 7), '752a3a5');
   assert.equal(results.get('bidkv').runtimeBase.vllm.slice(0, 7), 'd0f22d2');
 });
@@ -51,7 +53,7 @@ test('published paired runs expose both gains and regressions without precompute
     assert.ok(result.published_comparisons.every(row => row.baseline > 0));
     assert.ok(result.published_comparisons.every(row => row.candidate > 0));
   }
-  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 12);
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 13);
 });
 
 test('model-scoped summaries expose and rank only measurements from the selected model', () => {
@@ -67,6 +69,7 @@ test('model-scoped summaries expose and rank only measurements from the selected
   assert.equal(qwen35.get('vspec').gain, null);
   assert.equal(qwen35.get('betterscale').gain.toFixed(2), '42.39');
   assert.equal(qwen35.get('kv-materialization-arrival-control').gain.toFixed(2), '7.13');
+  assert.equal(qwen35.get('pegaflow-vllm-connectors').gain.toFixed(2), '6.34');
   const qwen25Kvmat = M.summarize(data, frontier, 'Qwen2.5-7B-Instruct')
     .get('kv-materialization-arrival-control');
   assert.equal(qwen25Kvmat.source, 'published-comparison');
@@ -124,6 +127,30 @@ test('KVCompress publishes the clean 2ca0f933 Frontier evidence without duplicat
     assert.match(point.evidence.source_evidence_url, /a020c164.*qwen35-frontier-formal/);
   }
   assert.equal(M.summarize(data, frontier).get('kvcompress-ascend').gain.toFixed(2), '-3.55');
+});
+
+test('PegaFlow publishes five exercised save/load windows without duplicating the core service', () => {
+  const series = frontier.points.filter(point => point.load.concurrency_series
+    === 'swe-unified-pegaflow-vllm-connectors-20260929');
+  assert.deepEqual(series.map(point => point.load.concurrency), [1, 2, 4, 8, 16]);
+  assert.deepEqual(series.map(point => point.metrics.output_tps), [
+    65.52333333333333, 167.14333333333335, 237.96777777777777,
+    361.4411111111111, 459.71555555555557
+  ]);
+  assert.equal(new Set(series.map(point => point.evidence.run_ids[0])).size, 5);
+  for (const point of series) {
+    const parameters = point.configuration.parameters;
+    assert.deepEqual(point.configuration.mods, ['pegaflow-vllm-connectors']);
+    assert.equal(parameters.mod_revision, 'cd64ecc283ff856a44437a9a25659929ef3a0653'); // pragma: allowlist secret (public Git commit)
+    assert.equal(parameters.mod_runtime_effectiveness.status, 'exercised');
+    assert.ok(parameters.mod_runtime_effectiveness.load_successes > 0);
+    assert.ok(parameters.mod_runtime_effectiveness.save_successes > 0);
+    assert.equal(parameters.mod_runtime_effectiveness.load_failures, 0);
+    assert.equal(parameters.mod_runtime_effectiveness.save_failures, 0);
+    assert.match(point.evidence.source_evidence_url, /64ef9d0b.*qwen35-frontier-formal/);
+  }
+  assert.equal(M.summarize(data, frontier).get('pegaflow-vllm-connectors').gain.toFixed(2), '6.34');
+  assert.equal(data.entries.some(entry => entry.id === 'pegaflow'), false);
 });
 
 test('comparison sets declare baselines centrally and entries cannot supply a baseline or score', () => {
@@ -237,7 +264,7 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
     'vspec', 'betterscale', 'pipeline-microbatch-migration',
-    'kv-materialization-arrival-control', 'adm', 'bidkv', 'dla', 'mooncake-vllm-connectors', 'kv-tiering-migration',
+    'kv-materialization-arrival-control', 'pegaflow-vllm-connectors', 'adm', 'bidkv', 'dla', 'mooncake-vllm-connectors', 'kv-tiering-migration',
     'kvcompress-ascend', 'diffspec', 'latchmoe'
   ]);
 });
@@ -251,5 +278,6 @@ test('ECPA evidence is preserved in metadata without becoming a performance clai
   assert.equal(pipeline.ecpa.launch_acceptance, 'manager-verified');
   assert.match(pipeline.ecpa.evidence_url, /frontier_pipeline\/ecpa$/);
   assert.equal(result.get('kvcompress-ascend').ecpa.launch_acceptance, 'manager-verified');
+  assert.equal(result.get('pegaflow-vllm-connectors').ecpa.launch_acceptance, 'manager-verified');
   assert.equal(data.ecpa_experiment_boundary.process_release, 'known-defect');
 });

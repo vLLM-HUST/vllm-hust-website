@@ -251,6 +251,25 @@
       ]
     },
     {
+      "id": "pegaflow-vllm-connectors",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PEGAFLOW.md",
+      "ecpa": {
+        "launch_acceptance": "manager-verified",
+        "configuration_path": "manager-standard",
+        "analysis_integration": "external-harness",
+        "note_zh": "Qwen3.5 统一配置已通过外部服务连接器实际执行 PegaFlow save/load 路径。",
+        "note_en": "The Qwen3.5 unified configuration exercised real PegaFlow save/load paths through the external-service connector."
+      },
+      "default_observation_id": "pegaflow-vllm-connectors:qwen35-frontier",
+      "observations": [
+        {
+          "id": "pegaflow-vllm-connectors:qwen35-frontier",
+          "kind": "frontier-series",
+          "series_id": "swe-unified-pegaflow-vllm-connectors-20260929"
+        }
+      ]
+    },
+    {
       "id": "latchmoe",
       "url": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE#qualified-graph-result",
       "ecpa": {
@@ -314,7 +333,8 @@
         "kv-tiering-migration:qwen35-frontier",
         "kv-materialization-arrival-control:qwen35-frontier",
         "mooncake-vllm-connectors:qwen35-frontier",
-        "kvcompress-ascend:qwen35-frontier"
+        "kvcompress-ascend:qwen35-frontier",
+        "pegaflow-vllm-connectors:qwen35-frontier"
       ]
     },
     {

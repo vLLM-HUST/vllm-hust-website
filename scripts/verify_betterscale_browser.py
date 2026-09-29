@@ -322,12 +322,13 @@ def main():
         page.locator("[data-plugin-more]").click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
         assert page.locator(".workshop-card").evaluate_all(
-            "cards => cards.slice(0, 9).map(card => card.id)"
+            "cards => cards.slice(0, 10).map(card => card.id)"
         ) == [
             "vspec",
             "betterscale",
             "pipeline-microbatch-migration",
             "kv-materialization-arrival-control",
+            "pegaflow-vllm-connectors",
             "adm",
             "bidkv",
             "mooncake-vllm-connectors",
@@ -336,6 +337,7 @@ def main():
         ]
         assert "+42.39%" in page.locator("#betterscale").inner_text()
         assert "+9.78%" in page.locator("#pipeline-microbatch-migration").inner_text()
+        assert "+6.34%" in page.locator("#pegaflow-vllm-connectors").inner_text()
         assert "-3.55%" in page.locator("#kvcompress-ascend").inner_text()
         page.locator("[data-plugin-model]").select_option("Qwen2.5-Coder-14B")
         assert "+10.25%" in page.locator("#kvcompress-ascend").inner_text()

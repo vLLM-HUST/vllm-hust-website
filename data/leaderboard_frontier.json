@@ -72319,6 +72319,691 @@
         "sampling_date_utc": "2026-09-28",
         "sampling_date_source": "SWE client.started_at_unix"
       }
+    },
+    {
+      "id": "qwen35-unified-pegaflow-vllm-connectors-tp2-c1-r1-20260929",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "pegaflow-vllm-connectors · C1 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "pegaflow-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 30,
+          "host_memory_policy": "PegaFlow external pinned-memory pool; 30 GiB service budget",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-pegaflow-frontier-20260929",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
+          "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate C4/60 qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 41173,
+          "measured_mean_client_inflight": 0.9995322045342376,
+          "full_client_concurrency_fraction": 0.9995322045342376,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 4,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "execution_host": "user-provided 180-evaluation container",
+          "physical_devices": [
+            2,
+            3
+          ],
+          "transport": "vLLM and external PegaFlow service on execution-host loopback; Ascend IPC data path",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232 --kv-transfer-config PegaKVConnector:read_write",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+          "pegaflow_service_version": "0.23.3",
+          "pegaflow_connector": "PegaKVConnector",
+          "pegaflow_mode": "read_write",
+          "mod_runtime_effectiveness": {
+            "status": "exercised",
+            "load_successes": 204,
+            "save_successes": 204,
+            "load_failures": 0,
+            "save_failures": 0,
+            "loaded_bytes": 9142075392,
+            "saved_bytes": 4709646336
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "pegaflow-vllm-connectors",
+            "repository": "https://github.com/vLLM-HUST/pegaflow-hust",
+            "revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+            "source_capsule": "qwen35-pegaflow-frontier-20260929",
+            "scope": "PegaFlow service and PegaKVConnector are the only candidate-specific treatment admitted by the unified audit"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-pegaflow-vllm-connectors-20260929",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 65.52333333333333,
+        "decode_p90_tps": 113.9060417414391,
+        "ttft_p95_ms": 2225.8489223197093,
+        "completed_requests": 117
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-29",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PEGAFLOW.md",
+        "run_ids": [
+          "c01435f8e7a34e19aec12f2c24031d5c"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-pegaflow-frontier-20260929",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/pegaflow-hust/blob/64ef9d0b5c4f11589d296f8500dc1664ffc346dc/handoff/2026-09-29-qwen35-frontier-formal/README.md"
+      }
+    },
+    {
+      "id": "qwen35-unified-pegaflow-vllm-connectors-tp2-c2-r1-20260929",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "pegaflow-vllm-connectors · C2 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "pegaflow-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 30,
+          "host_memory_policy": "PegaFlow external pinned-memory pool; 30 GiB service budget",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-pegaflow-frontier-20260929",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
+          "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate C4/60 qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 73616,
+          "measured_mean_client_inflight": 1.9985423690173776,
+          "full_client_concurrency_fraction": 0.9985425041522831,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 4,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "execution_host": "user-provided 180-evaluation container",
+          "physical_devices": [
+            2,
+            3
+          ],
+          "transport": "vLLM and external PegaFlow service on execution-host loopback; Ascend IPC data path",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232 --kv-transfer-config PegaKVConnector:read_write",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+          "pegaflow_service_version": "0.23.3",
+          "pegaflow_connector": "PegaKVConnector",
+          "pegaflow_mode": "read_write",
+          "mod_runtime_effectiveness": {
+            "status": "exercised",
+            "load_successes": 454,
+            "save_successes": 412,
+            "load_failures": 0,
+            "save_failures": 0,
+            "loaded_bytes": 23919886336,
+            "saved_bytes": 11012243456
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "pegaflow-vllm-connectors",
+            "repository": "https://github.com/vLLM-HUST/pegaflow-hust",
+            "revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+            "source_capsule": "qwen35-pegaflow-frontier-20260929",
+            "scope": "PegaFlow service and PegaKVConnector are the only candidate-specific treatment admitted by the unified audit"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-pegaflow-vllm-connectors-20260929",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 167.14333333333335,
+        "decode_p90_tps": 109.48681228877716,
+        "ttft_p95_ms": 1314.8417789023365,
+        "completed_requests": 250
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-29",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PEGAFLOW.md",
+        "run_ids": [
+          "9d697fe6af154fe785a626a10864c7f5"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-pegaflow-frontier-20260929",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/pegaflow-hust/blob/64ef9d0b5c4f11589d296f8500dc1664ffc346dc/handoff/2026-09-29-qwen35-frontier-formal/README.md"
+      }
+    },
+    {
+      "id": "qwen35-unified-pegaflow-vllm-connectors-tp2-c4-r1-20260929",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "pegaflow-vllm-connectors · C4 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "pegaflow-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 30,
+          "host_memory_policy": "PegaFlow external pinned-memory pool; 30 GiB service budget",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-pegaflow-frontier-20260929",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
+          "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate C4/60 qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 79479,
+          "measured_mean_client_inflight": 3.997832899748658,
+          "full_client_concurrency_fraction": 0.9978364127429409,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 4,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "execution_host": "user-provided 180-evaluation container",
+          "physical_devices": [
+            2,
+            3
+          ],
+          "transport": "vLLM and external PegaFlow service on execution-host loopback; Ascend IPC data path",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232 --kv-transfer-config PegaKVConnector:read_write",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+          "pegaflow_service_version": "0.23.3",
+          "pegaflow_connector": "PegaKVConnector",
+          "pegaflow_mode": "read_write",
+          "mod_runtime_effectiveness": {
+            "status": "exercised",
+            "load_successes": 628,
+            "save_successes": 544,
+            "load_failures": 0,
+            "save_failures": 0,
+            "loaded_bytes": 34366160896,
+            "saved_bytes": 14894170112
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "pegaflow-vllm-connectors",
+            "repository": "https://github.com/vLLM-HUST/pegaflow-hust",
+            "revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+            "source_capsule": "qwen35-pegaflow-frontier-20260929",
+            "scope": "PegaFlow service and PegaKVConnector are the only candidate-specific treatment admitted by the unified audit"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-pegaflow-vllm-connectors-20260929",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 237.96777777777777,
+        "decode_p90_tps": 87.30566240630844,
+        "ttft_p95_ms": 1734.3937232159078,
+        "completed_requests": 350
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-29",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PEGAFLOW.md",
+        "run_ids": [
+          "d09d02d878be40d883d746c4ec660956"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-pegaflow-frontier-20260929",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/pegaflow-hust/blob/64ef9d0b5c4f11589d296f8500dc1664ffc346dc/handoff/2026-09-29-qwen35-frontier-formal/README.md"
+      }
+    },
+    {
+      "id": "qwen35-unified-pegaflow-vllm-connectors-tp2-c8-r1-20260929",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "pegaflow-vllm-connectors · C8 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "pegaflow-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 30,
+          "host_memory_policy": "PegaFlow external pinned-memory pool; 30 GiB service budget",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-pegaflow-frontier-20260929",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
+          "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate C4/60 qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 86383,
+          "measured_mean_client_inflight": 7.996884836830819,
+          "full_client_concurrency_fraction": 0.9969043889724546,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 4,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "execution_host": "user-provided 180-evaluation container",
+          "physical_devices": [
+            2,
+            3
+          ],
+          "transport": "vLLM and external PegaFlow service on execution-host loopback; Ascend IPC data path",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232 --kv-transfer-config PegaKVConnector:read_write",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+          "pegaflow_service_version": "0.23.3",
+          "pegaflow_connector": "PegaKVConnector",
+          "pegaflow_mode": "read_write",
+          "mod_runtime_effectiveness": {
+            "status": "exercised",
+            "load_successes": 922,
+            "save_successes": 784,
+            "load_failures": 0,
+            "save_failures": 0,
+            "loaded_bytes": 50241994752,
+            "saved_bytes": 22139846656
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "pegaflow-vllm-connectors",
+            "repository": "https://github.com/vLLM-HUST/pegaflow-hust",
+            "revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+            "source_capsule": "qwen35-pegaflow-frontier-20260929",
+            "scope": "PegaFlow service and PegaKVConnector are the only candidate-specific treatment admitted by the unified audit"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-pegaflow-vllm-connectors-20260929",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 361.4411111111111,
+        "decode_p90_tps": 73.03849278224763,
+        "ttft_p95_ms": 2017.7119441330426,
+        "completed_requests": 519
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-29",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PEGAFLOW.md",
+        "run_ids": [
+          "618a071154cb4b8e810c0d4f4efd5125"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-pegaflow-frontier-20260929",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/pegaflow-hust/blob/64ef9d0b5c4f11589d296f8500dc1664ffc346dc/handoff/2026-09-29-qwen35-frontier-formal/README.md"
+      }
+    },
+    {
+      "id": "qwen35-unified-pegaflow-vllm-connectors-tp2-c16-r1-20260929",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "pegaflow-vllm-connectors · C16 · r1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1+frontier.unified / 0.25.1rc1",
+        "mods": [
+          "pegaflow-vllm-connectors"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "host_kv_budget_gib": 30,
+          "host_memory_policy": "PegaFlow external pinned-memory pool; 30 GiB service budget",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "runtime_base_commits": {
+            "vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+            "vllm-ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989"
+          },
+          "source_capsule": "qwen35-pegaflow-frontier-20260929",
+          "sampler": "Native real accept/reject MTP2",
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_memory_scope": "Per chip; explicit bytes override utilization; includes hybrid cache allocations",
+          "capacity_policy": "Same explicit 26038239232-byte device KV budget per chip in every arm; candidate storage is part of the MOD treatment",
+          "comparison_scope": "One serial 900s observation per cell; every MOD is paired with the same five-point Native series",
+          "checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "warmup_policy": "Separate C4/60 qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 65581,
+          "measured_mean_client_inflight": 15.996872585424118,
+          "full_client_concurrency_fraction": 0.9969637051172968,
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 4,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "execution_host": "user-provided 180-evaluation container",
+          "physical_devices": [
+            2,
+            3
+          ],
+          "transport": "vLLM and external PegaFlow service on execution-host loopback; Ascend IPC data path",
+          "server_command": "vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve <model-path> --tensor-parallel-size 2 --pipeline-parallel-size 1 --dtype bfloat16 --max-model-len 262144 --max-num-seqs 16 --max-num-batched-tokens 4096 --enable-prefix-caching --mamba-cache-mode align --async-scheduling --compilation-config FULL_AND_PIECEWISE --speculative-config mtp:2 --kv-cache-memory-bytes 26038239232 --kv-transfer-config PegaKVConnector:read_write",
+          "max_cudagraph_capture_size": 48,
+          "worker_class": "pipeline_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4,
+          "unified_native_contract_sha256": "30bc578c2e691440a4a8cde540ed0184c257a1e78396f49a2473cf4ebc877331",
+          "mod_revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+          "pegaflow_service_version": "0.23.3",
+          "pegaflow_connector": "PegaKVConnector",
+          "pegaflow_mode": "read_write",
+          "mod_runtime_effectiveness": {
+            "status": "exercised",
+            "load_successes": 1178,
+            "save_successes": 1106,
+            "load_failures": 0,
+            "save_failures": 0,
+            "loaded_bytes": 59623899136,
+            "saved_bytes": 30804475904
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "pegaflow-vllm-connectors",
+            "repository": "https://github.com/vLLM-HUST/pegaflow-hust",
+            "revision": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+            "source_capsule": "qwen35-pegaflow-frontier-20260929",
+            "scope": "PegaFlow service and PegaKVConnector are the only candidate-specific treatment admitted by the unified audit"
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-unified-pegaflow-vllm-connectors-20260929",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 459.71555555555557,
+        "decode_p90_tps": 46.37622765934938,
+        "ttft_p95_ms": 3079.105538921428,
+        "completed_requests": 690
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-09-29",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PEGAFLOW.md",
+        "run_ids": [
+          "eed86dbce9f74fc583ef30f3073cfdec"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-pegaflow-frontier-20260929",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
+        "source_evidence_url": "https://github.com/vLLM-HUST/pegaflow-hust/blob/64ef9d0b5c4f11589d296f8500dc1664ffc346dc/handoff/2026-09-29-qwen35-frontier-formal/README.md"
+      }
     }
   ],
   "archived_points": [

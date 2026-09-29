@@ -137,6 +137,18 @@ def main():
                     )
                 else:
                     page.wait_for_selector(".workload-filter")
+                    search = page.locator("[data-plugin-search]")
+                    search.fill("PegaFlow")
+                    pegaflow = page.locator("#pegaflow-vllm-connectors")
+                    pegaflow.wait_for(state="visible")
+                    assert "+6.34%" in pegaflow.inner_text()
+                    performance_link = pegaflow.locator(".plugin-performance a")
+                    assert "C1: -28.43%" in performance_link.get_attribute("title")
+                    assert "C16: +27.79%" in performance_link.get_attribute("title")
+                    page.locator("#langToggle").click()
+                    assert "输出吞吐" in pegaflow.inner_text()
+                    page.locator("#langToggle").click()
+                    search.fill("")
                     filters = page.locator("[data-workload-filters]")
                     assert filters.get_attribute("tabindex") == "0"
                     filters.focus()

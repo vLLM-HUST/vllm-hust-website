@@ -244,6 +244,22 @@ def main():
             )
             page.locator("#frontier-only").uncheck()
 
+            pegaflow_points = [
+                point
+                for point in default_points
+                if point["load"].get("concurrency_series")
+                == "swe-unified-pegaflow-vllm-connectors-20260929"
+            ]
+            assert [point["load"]["concurrency"] for point in pegaflow_points] == [
+                1,
+                2,
+                4,
+                8,
+                16,
+            ]
+            for point in pegaflow_points:
+                assert page.locator(f'[data-point="{point["id"]}"]').count() == 1
+
             assert page.locator("[data-filter=rotation]").count() == 2
             assert (
                 page.locator("#frontier-rotation-filter .frontier-filter-note").count()

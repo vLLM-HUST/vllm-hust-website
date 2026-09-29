@@ -193,9 +193,9 @@
       "maintainer_profiles": [{"login": "mynameisczj", "name": "陈子嘉"}],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
       "upstream_repository": null,
-      "summary_en": "HUST-owned KV state system with storage, transfer, and metadata services.",
-      "summary_zh": "包含存储、传输与元数据服务的 HUST 自有 KV 状态系统。",
-      "evidence_level": "integration_tested"
+      "summary_en": "HUST-owned KV state system with storage, transfer, metadata services, and measured Ascend IPC save/load execution.",
+      "summary_zh": "包含存储、传输与元数据服务的 HUST 自有 KV 状态系统，已实测 Ascend IPC save/load 执行路径。",
+      "evidence_level": "performance_verified"
     },
     {
       "id": "pegaflow-vllm-connectors",
@@ -214,17 +214,23 @@
       "maintainer_profiles": [{"login": "mynameisczj", "name": "陈子嘉"}],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
       "upstream_repository": null,
-      "summary_en": "Non-invasive PegaFlow Host Provider and PegaKVConnector profile. It renders vLLM KV-transfer configuration and health checks, while the external operator retains service lifecycle and stored-data ownership.",
-      "summary_zh": "无侵入 PegaFlow Host Provider 与 PegaKVConnector profile；只生成 vLLM KV-transfer 配置并执行健康检查，服务生命周期和已存 KV 数据仍由外部运维者负责。",
+      "summary_en": "Non-invasive PegaFlow Host Provider and PegaKVConnector profile, now qualified for Qwen3.5 hybrid cache groups on the unified Ascend Frontier contract; the external operator retains service lifecycle and stored-data ownership.",
+      "summary_zh": "无侵入 PegaFlow Host Provider 与 PegaKVConnector profile，现已在统一 Ascend Frontier 合同下完成 Qwen3.5 混合缓存组验收。",
+      "public_effect_en": "On the exact Qwen3.5-35B Frontier contract, the five-point geometric-mean output-throughput change is +6.34% versus the shared Native series; C1 regresses while C2-C16 improve.",
+      "public_effect_zh": "在完全相同的 Qwen3.5-35B Frontier 配置下，相对统一 Native 曲线，五点输出吞吐几何平均变化为 +6.34%；C1 回退，C2-C16 提升。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PEGAFLOW.md",
       "compatibility": {
-        "status": "external_service",
-        "host": "vLLM KV connector",
-        "versions": ["Manifest 0.2 experimental"],
-        "platforms": ["Ascend NPU"],
-        "requirements_en": "PegaFlow must be deployed and operated separately.",
-        "requirements_zh": "PegaFlow 必须单独部署和运维。"
+        "status": "verified",
+        "host": "vLLM-HUST 0.25.1 Frontier + vLLM-Ascend-HUST",
+        "versions": ["PegaFlow 0.23.3 @ cd64ecc", "Extension Provider 0.2.0.dev0"],
+        "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B · TP2/PP1 · FULL_AND_PIECEWISE"],
+        "python": [">=3.10"],
+        "requirements_en": "PegaFlow remains an external operator-owned service. The measured profile uses a 30 GiB pinned pool, PegaKVConnector read_write mode, APC, async scheduling, Mamba align, and native MTP2.",
+        "requirements_zh": "PegaFlow 仍是由外部运维者管理的服务；实测 profile 使用 30 GiB pinned pool、PegaKVConnector read_write、APC、异步调度、Mamba align 与原生 MTP2。",
+        "models": ["Qwen3.5-35B-A3B — unified Frontier contract verified"]
       },
-      "evidence_level": "integration_tested"
+      "evidence_level": "performance_verified"
     },
     {
       "id": "adm",

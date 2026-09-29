@@ -221,6 +221,17 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.validation.selected_devices_released,true);
             assert.equal(run.validation.kv_compression_runtime_effective,true);
             assert.equal(run.validation.shared_native_contract_sha256,p.configuration.parameters.unified_native_contract_sha256);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-pegaflow-frontier-20260929'){
+            assert.deepEqual(p.configuration.mods,['pegaflow-vllm-connectors']);
+            assert.equal(p.configuration.hardware.accelerator_count,2);
+            assert.equal(p.configuration.parameters.pipeline_parallel_size,1);
+            for(const key of ['real_online','all_requests_succeeded','request_token_consistency','prefix_cache_observed','mtp2_observed','async_scheduling','selected_devices_released','pegaflow_runtime_effective']) assert.equal(run.validation[key],true);
+            for(const key of ['load_successes','save_successes','loaded_bytes','saved_bytes','mtp_draft_tokens','mtp_accepted_tokens']) assert.ok(run.validation[key]>0);
+            assert.equal(run.validation.load_failures,0);
+            assert.equal(run.validation.save_failures,0);
+            assert.equal(run.validation.graph_mode,'FULL_AND_PIECEWISE');
+            assert.equal(run.validation.mamba_cache_mode,'align');
+            assert.equal(run.validation.shared_native_contract_sha256,p.configuration.parameters.unified_native_contract_sha256);
         } else if(p.evidence.benchmark_protocol.campaign==='qwen35-kv-materialization-frontier-20260928'){
             assert.deepEqual(p.configuration.mods,['kv-materialization-arrival-control']);
             assert.equal(p.configuration.hardware.accelerator_count,2);
@@ -709,7 +720,7 @@ test('Qwen35 unified campaign shares the existing chart without losing checkpoin
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
-    assert.equal(moved.length,30);
+    assert.equal(moved.length,35);
     const canonical=cohorts[0];
     const checkpointIdentities=new Set([
         original.model.revision,

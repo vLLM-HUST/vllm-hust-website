@@ -71,6 +71,7 @@
     "latchmoe": ["moe", "memory_kv_pressure"],
     "kvcompress-ascend": ["long_context", "memory_kv_pressure"],
     "mooncake-vllm-connectors": ["repeated_prefix_agent", "distributed_pipeline"],
+    "pegaflow-vllm-connectors": ["repeated_prefix_agent", "memory_kv_pressure"],
     "quantized-kv-cache-migration": ["long_context", "memory_kv_pressure"],
     "split-batch-full-graph-migration": ["high_concurrency", "prefill_heavy", "decode_heavy"],
     "pipeline-microbatch-migration": ["distributed_pipeline", "high_concurrency"],

@@ -705,13 +705,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=workshop-v24-adm"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=qwen35-pegaflow-20260929"' in PAGE
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v16-adm-advisor"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=workload-navigation-v8-adm"'
+        'data-source="./data/plugin-workload-navigation.json?v=qwen35-pegaflow-20260929"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -1088,7 +1088,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 14
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 15
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
