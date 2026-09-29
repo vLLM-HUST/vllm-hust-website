@@ -1356,7 +1356,7 @@
       ],
       "integration_surfaces": [
         "vLLM-HUST vllm.request-lifecycle.v1 (PR pending)",
-        "vllm.extension_bundles (Bundle v1, PyPI)",
+        "vllm_hust.extension_bundles (ECPA 0.3, PyPI)",
         "vllm.general_plugins (runtime registration)"
       ],
       "execution_planes": [
@@ -1387,8 +1387,8 @@
       "upstream_repository": null,
       "summary_en": "Context Lifecycle Management perception layer: consumes request lifecycle events and reports session KV growth to an out-of-tree CLM controller; a context compaction scheduler for long conversations that bounds decode cost.",
       "summary_zh": "上下文生命周期管理感知层：消费请求生命周期事件并向树外 CLM 控制器上报会话 KV 增长；服务于约束长会话 decode 成本的上下文压缩调度器。",
-      "public_effect_en": "Published to PyPI (vllm-hust-clm-lifecycle 0.1.0, Extension Bundle v1 manifest). CI green (ruff + pytest 11/11 across Python 3.10/3.12/3.14). Sink logic covers per-session KV aggregation (engine-side session_id or __default__ bucket), threshold reporting, KV-pressure preempt reporting, env-parse fallbacks and re-entrant registration. Host integration depends on vllm-hust PR #6 (request-lifecycle events) and is not yet verified on standard host: the Ascend serving path is currently blocked by vllm-ascend-hust#34 (engine core fails to initialize against current vllm-hust main).",
-      "public_effect_zh": "已发布 PyPI（vllm-hust-clm-lifecycle 0.1.0，Extension Bundle v1 manifest）。CI 全绿（ruff + pytest 11/11，覆盖 Python 3.10/3.12/3.14）；sink 逻辑覆盖会话级 KV 聚合（engine 侧 session_id 或 __default__ 桶）、阈值上报、KV 压力抢占上报、env 解析容错与幂等注册。宿主集成依赖 vllm-hust PR #6（request-lifecycle 事件），尚未在标准宿主上验证：Ascend serving 路径当前被 vllm-ascend-hust#34 阻塞（引擎核心无法对当前 vllm-hust main 完成初始化）。",
+      "public_effect_en": "Published to PyPI (vllm-hust-clm-lifecycle 0.1.1, ECPA 0.3 manifest). CI green (ruff + pytest 22/22 across Python 3.10/3.12/3.14). Sink logic covers per-session KV aggregation (engine-side session_id or __default__ bucket), threshold reporting, KV-pressure preempt reporting, env-parse fallbacks, bounded non-blocking report delivery and re-entrant registration. Host integration depends on vllm-hust PR #6 (request-lifecycle events) and is not yet verified on standard host: the Ascend serving path is currently blocked by vllm-ascend-hust#34 (engine core fails to initialize against current vllm-hust main).",
+      "public_effect_zh": "已发布 PyPI（vllm-hust-clm-lifecycle 0.1.1，ECPA 0.3 manifest）。CI 全绿（ruff + pytest 22/22，覆盖 Python 3.10/3.12/3.14）；sink 逻辑覆盖会话级 KV 聚合（engine 侧 session_id 或 __default__ 桶）、阈值上报、KV 压力抢占上报、env 解析容错、有界非阻塞上报投递与幂等注册。宿主集成依赖 vllm-hust PR #6（request-lifecycle 事件），尚未在标准宿主上验证：Ascend serving 路径当前被 vllm-ascend-hust#34 阻塞（引擎核心无法对当前 vllm-hust main 完成初始化）。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-clm-lifecycle",
       "compatibility": {
