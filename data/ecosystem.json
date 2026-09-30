@@ -428,6 +428,7 @@
         {"login": "pluviophile-chen", "name": "陈德斌"}
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE",
+      "repository_visibility": "private",
       "upstream_repository": null,
       "summary_en": "LatchMoE is not applicable to dense Qwen3.8-27B. Version 0.3.0 is now packaged under the Extension Bundle contract with a narrowed TP1 PIECEWISE functional release scope. Its published throughput comparison remains a separate historical Qwen3-30B-A3B TP4 graph artifact and is substantially degraded.",
       "summary_zh": "LatchMoE 0.3.0 已按 Extension Bundle 合同打包，当前功能发行范围收窄为 TP1 PIECEWISE。公开吞吐对比仍属于独立的历史 Qwen3-30B-A3B TP4 制品，且性能明显退化；dense Qwen3.8-27B 不适用。",
