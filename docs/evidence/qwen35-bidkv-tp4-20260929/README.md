@@ -109,18 +109,20 @@ length and 512 MiB KV cache per NPU. BidKV used `BIDKV_UTILITY_PREEMPT_WEIGHT=5.
 alternated order, each completed 12/12 requests, and each generated the same 24,148 output tokens.
 The cache was under pressure: baseline made 850 preemptions in each repeat.
 
+**Observed single-cell TP4 C12 output-throughput uplift: +13.88%**, the arithmetic mean of the two
+paired percentage changes below.
+
 | Run order           | Baseline tok/s | BidKV tok/s | BidKV change | Preemptions baseline / BidKV | BidKV calls / selections / failures |
 | ------------------- | -------------: | ----------: | -----------: | ---------------------------: | ----------------------------------: |
-| Baseline then BidKV |         35.370 |      41.422 |  **+17.11%** |                    850 / 786 |                        786 / 10 / 0 |
-| BidKV then baseline |         35.966 |      39.795 |  **+10.65%** |                    850 / 711 |                         711 / 7 / 0 |
+| Baseline then BidKV |         35.370 |      41.422 |      +17.11% |                    850 / 786 |                        786 / 10 / 0 |
+| BidKV then baseline |         35.966 |      39.795 |      +10.65% |                    850 / 711 |                         711 / 7 / 0 |
 
-The mean of the two paired percentage changes is +13.88%. Both repeats show active BidKV selections
-and lower preemption counts, so this is a measured benefit in this tested cell rather than a
-zero-call difference. Two pairs do not establish a confidence interval or generalize to other
-workloads. Every arm's log records `FULL_AND_PIECEWISE` and completed decode FULL graph capture. The
-second BidKV server emitted an `EngineDeadError` in its output handler while shutting down **after**
-the benchmark result and metrics had been saved; the benchmark itself completed and its policy
-failure counter was zero.
+Both repeats show active BidKV selections and lower preemption counts, so this is a measured benefit
+in this tested cell rather than a zero-call difference. Two pairs do not establish a confidence
+interval or generalize to other workloads. Every arm's log records `FULL_AND_PIECEWISE` and
+completed decode FULL graph capture. The second BidKV server emitted an `EngineDeadError` in its
+output handler while shutting down **after** the benchmark result and metrics had been saved; the
+benchmark itself completed and its policy failure counter was zero.
 
 Raw commands, `result.json`, Prometheus metrics, server logs and NPU snapshots are in
 `bidkv-qwen35-evoscientist-first12-c12-512m-20260929/`. The exact compressed snapshot is

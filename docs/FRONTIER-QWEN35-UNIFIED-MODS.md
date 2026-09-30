@@ -34,15 +34,18 @@ subset in `vllm-hust-benchmark`: concurrency 12, request rate 4, maximum model l
 MiB device KV cache per NPU. Baseline and BidKV each completed all 12 requests and generated the
 same 24,148 output tokens in each repeat. BidKV used `BIDKV_UTILITY_PREEMPT_WEIGHT=5.0`.
 
-| Run order      | Native output tok/s | BidKV output tok/s |      Change | Native / BidKV preemptions | BidKV active selections / failures |
-| -------------- | ------------------: | -----------------: | ----------: | -------------------------: | ---------------------------------: |
-| Native → BidKV |              35.370 |             41.422 | **+17.11%** |                  850 / 786 |                             10 / 0 |
-| BidKV → Native |              35.966 |             39.795 | **+10.65%** |                  850 / 711 |                              7 / 0 |
+**Observed single-cell TP4 C12 output-throughput uplift: +13.88%**, the arithmetic mean of the two
+paired percentage changes below.
 
-The mean of the two paired percentage changes is +13.88%. Unlike the TP2 SWE series above, both TP4
-repeats exercised BidKV's victim selector. This is one KV-constrained workload cell with two pairs,
-not a five-concurrency aggregate or a confidence interval. The TP2 +0.25% value above remains the
-result for its original SWE protocol. Other attempted settings gave mixed or negative results; they
-are included in the [full report and raw evidence](evidence/qwen35-bidkv-tp4-20260929/README.md).
-The second BidKV server logged an `EngineDeadError` during shutdown after its benchmark result and
-metrics had been saved; its 12 requests completed, and the policy failure counter was zero.
+| Run order      | Native output tok/s | BidKV output tok/s |  Change | Native / BidKV preemptions | BidKV active selections / failures |
+| -------------- | ------------------: | -----------------: | ------: | -------------------------: | ---------------------------------: |
+| Native → BidKV |              35.370 |             41.422 | +17.11% |                  850 / 786 |                             10 / 0 |
+| BidKV → Native |              35.966 |             39.795 | +10.65% |                  850 / 711 |                              7 / 0 |
+
+Unlike the TP2 SWE series above, both TP4 repeats exercised BidKV's victim selector. This is one
+KV-constrained workload cell with two pairs, not a five-concurrency aggregate or a confidence
+interval. The TP2 +0.25% value above remains the result for its original SWE protocol. Other
+attempted settings gave mixed or negative results; they are included in the
+[full report and raw evidence](evidence/qwen35-bidkv-tp4-20260929/README.md). The second BidKV
+server logged an `EngineDeadError` during shutdown after its benchmark result and metrics had been
+saved; its 12 requests completed, and the policy failure counter was zero.
