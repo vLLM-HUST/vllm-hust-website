@@ -57,6 +57,12 @@ def test_leaderboard_names_exact_settings_without_frontier_jargon() -> None:
     assert "M.concurrencySeries(result.measured)" in settings_script
     assert 'class="frontier-concurrency-line"' in settings_script
     assert "standalone measurements have no same-series partner" in settings_script
+    assert (
+        "Fixed-configuration comparison; points are independent measured observations"
+        in settings_script
+    )
+    assert "固定配置对照；各点是独立实测，不表示缺失并发曲线" in settings_script
+    assert "fixedComparison()?'':`<div class=\"frontier-checks\"" in settings_script
     assert "Hide non-Frontier points" not in settings_script
     assert "Pareto-efficient points only" not in settings_script
 
