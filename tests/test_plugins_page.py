@@ -694,6 +694,11 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     )
     assert "Qwen3.8-27B — not applicable (dense)" in latchmoe["compatibility"]["models"]
     assert latchmoe["public_effect_status"] == "not-beneficial-in-tested-cell"
+    assert latchmoe["repository_visibility"] == "private"
+    assert all(
+        value is None
+        for value in WORKSHOP_METADATA["plugins"]["latchmoe"]["metrics"].values()
+    )
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
