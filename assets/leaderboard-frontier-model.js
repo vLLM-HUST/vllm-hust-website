@@ -31,6 +31,11 @@
             if (axes != null && (!object(axes) || !metrics[axes.x] || !metrics[axes.y])) throw new Error('Invalid Frontier axes');
             const presentation = c.workload.contract.presentation;
             if (presentation != null && !['concurrency-series', 'fixed-comparison', 'configuration-study'].includes(presentation)) throw new Error('Invalid Frontier presentation');
+            const displayPrefix = c.workload.contract.display_series_prefix;
+            if (displayPrefix != null && (typeof displayPrefix !== 'string' || !displayPrefix)) throw new Error('Invalid display series prefix');
+            const defaultGroups = c.workload.contract.default_groups;
+            if (defaultGroups != null && (!Array.isArray(defaultGroups) || !defaultGroups.length
+                || new Set(defaultGroups).size !== defaultGroups.length || defaultGroups.some(group => typeof group !== 'string' || !group))) throw new Error('Invalid default groups');
         }
         const pointIds = new Set();
         for (const p of data.points) {
@@ -73,6 +78,11 @@
     }
     function resolveCohort(cohorts, requested) {
         return cohorts.find(cohort => cohort.id === requested || cohort.aliases?.includes(requested));
+    }
+    function presentationPoints(points, cohort) {
+        const members = points.filter(point => point.cohort_id === cohort?.id);
+        const prefix = cohort?.workload?.contract?.display_series_prefix;
+        return prefix ? members.filter(point => point.load.concurrency_series?.startsWith(prefix)) : members;
     }
     function safeURL(value) {
         try { const url = new URL(value); return url.protocol === 'https:' ? url.href : null; } catch (_) { return null; }
@@ -140,7 +150,7 @@
         return [...groups.values()].filter(rows => rows.length > 1)
             .map(rows => [...rows].sort((a, b) => a.point.load.concurrency - b.point.load.concurrency));
     }
-    const api = { validate, visibleData, resolveCohort, metrics, value, modKey, groupKey, frontierKey, project, safeURL, mtpState, concurrencySeries, groupFrontiers, failedCorrectness };
+    const api = { validate, visibleData, resolveCohort, presentationPoints, metrics, value, modKey, groupKey, frontierKey, project, safeURL, mtpState, concurrencySeries, groupFrontiers, failedCorrectness };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);

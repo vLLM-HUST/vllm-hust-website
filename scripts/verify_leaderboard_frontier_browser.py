@@ -183,13 +183,34 @@ def main():
     production["points"] = [
         p for p in production["points"] if p["cohort_id"] in visible_ids
     ]
+    default_cohort = production["cohorts"][0]
     default_cohort_points = [
         p
         for p in production["points"]
-        if p["cohort_id"] == production["cohorts"][0]["id"]
+        if p["cohort_id"] == default_cohort["id"]
+        and (
+            not default_cohort["workload"]["contract"].get("display_series_prefix")
+            or p["load"]
+            .get("concurrency_series", "")
+            .startswith(default_cohort["workload"]["contract"]["display_series_prefix"])
+        )
     ]
     default_points = [
         p for p in default_cohort_points if p["load"]["session_rotation_depth"] == 1
+    ]
+    default_groups = set(
+        default_cohort["workload"]["contract"].get("default_groups", [])
+    )
+    initial_points = [
+        p
+        for p in default_points
+        if not default_groups
+        or (
+            p["configuration"].get("experiment_group")
+            or "+".join(sorted(p["configuration"]["mods"]))
+            or "none"
+        )
+        in default_groups
     ]
     tag_keys = list(
         dict.fromkeys(
@@ -230,24 +251,23 @@ def main():
                 wait_until="domcontentloaded",
             )
             ready(page)
-            page.locator('[data-filter="rotation"][value="2"]').uncheck()
             assert "AgentX" not in page.locator("#frontier-panel").inner_text()
             assert not page.locator("#frontier-only").is_checked()
             shown = page.locator("[data-point]").evaluate_all(
                 "nodes=>nodes.map(n=>n.dataset.point)"
             )
-            assert set(shown) == {point["id"] for point in default_points}
+            assert set(shown) == {point["id"] for point in initial_points}
             page.locator("#frontier-only").check()
             shown = page.locator("[data-point]").evaluate_all(
                 "nodes=>nodes.map(n=>n.dataset.point)"
             )
             expected_front = page.evaluate(
                 "points => LeaderboardFrontierModel.groupFrontiers(points, 'decode_p90_tps', 'output_tps_per_chip').flat().map(r=>r.point.id)",
-                default_points,
+                initial_points,
             )
             assert set(shown) == set(expected_front)
             assert_concurrency_series(
-                page, [p for p in default_points if p["id"] in shown]
+                page, [p for p in initial_points if p["id"] in shown]
             )
             page.screenshot(
                 path=str(
@@ -256,6 +276,8 @@ def main():
                 full_page=True,
             )
             page.locator("#frontier-only").uncheck()
+            page.locator("#frontier-mods-toggle").click()
+            assert page.locator("[data-point]").count() == len(default_points)
 
             pegaflow_points = [
                 point
@@ -273,62 +295,15 @@ def main():
             for point in pegaflow_points:
                 assert page.locator(f'[data-point="{point["id"]}"]').count() == 1
 
-            assert page.locator("[data-filter=rotation]").count() == 2
+            assert page.locator("[data-filter=rotation]").count() == 1
             assert (
                 page.locator("#frontier-rotation-filter .frontier-filter-note").count()
                 == 1
             )
-            click_point(page, page.locator(f'[data-point="{default_points[0]["id"]}"]'))
-            page.locator('[data-filter="rotation"][value="2"]').check()
-            page.locator('[data-filter="rotation"][value="1"]').uncheck()
-            assert page.locator("#frontier-popover").is_hidden()
-            expected_rotation2 = [
-                p
-                for p in default_cohort_points
-                if p["load"]["session_rotation_depth"] == 2
-            ]
-            shown = page.locator("[data-point]").evaluate_all(
-                "nodes=>nodes.map(n=>n.dataset.point)"
-            )
-            assert set(shown) == {p["id"] for p in expected_rotation2}
-            assert (
-                expected_rotation2
-            )  # Membership is checked against the snapshot above.
-            assert_concurrency_series(page, expected_rotation2)
-            assert page.locator("#frontier-curves").is_hidden()
-            assert "D2" in page.locator("#frontier-chart").text_content()
-            assert (
-                "Session rotation depth"
-                not in page.locator("#frontier-legend").inner_text()
-            )
-            page.screenshot(
-                path=str(args.output / f"depth2-{width}-{language}-{scheme}.png"),
-                full_page=True,
-            )
-            for point in expected_rotation2:
-                click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
-                popup = page.locator("#frontier-popover")
-                download, previous_download = download_configuration(
-                    page, popup, previous_download
-                )
-                payload = json.loads(Path(download.path()).read_text())
-                assert payload["point"] == point
-                popup.locator("[data-close]").click()
-            page.locator("#frontier-only").check()
-            shown = set(
-                page.locator("[data-point]").evaluate_all(
-                    "nodes=>nodes.map(n=>n.dataset.point)"
-                )
-            )
-            assert_concurrency_series(
-                page, [p for p in expected_rotation2 if p["id"] in shown]
-            )
+            assert page.locator('[data-filter="rotation"][value="2"]').count() == 0
             page.locator("#langToggle").click()
-            assert page.locator('[data-filter="rotation"][value="2"]').is_checked()
+            assert page.locator('[data-filter="rotation"][value="1"]').is_checked()
             page.locator("#langToggle").click()
-            page.locator('[data-filter="rotation"][value="1"]').check()
-            page.locator('[data-filter="rotation"][value="2"]').uncheck()
-            page.locator("#frontier-only").uncheck()
             assert page.locator(".frontier-point").count() == len(default_points)
 
             assert page.locator("#runs-panel").is_hidden()
@@ -390,9 +365,7 @@ def main():
             else:
                 assert page.locator("#frontier-workload").count() == 0
                 assert page.locator("#frontier-workload-tag").is_visible()
-            expected_status = (
-                "工程测量" if language == "zh" else "Engineering measurement"
-            )
+            expected_status = "实测对比" if language == "zh" else "Measured comparison"
             assert expected_status in page.locator("#frontier-status").inner_text()
             assert page.locator(".frontier-point").count() == len(default_points)
             assert_concurrency_series(page, default_points)
@@ -478,9 +451,8 @@ def main():
             assert page.locator(".frontier-concurrency-line").count() == 0
             for checkbox in page.locator("[data-filter]").all():
                 checkbox.check()
-            # Keep this pass on the default D1 series after restoring the
-            # other filters; D2 has its own checks above.
-            page.locator('[data-filter="rotation"][value="2"]').uncheck()
+            # The public comparison contains only the unified D1 series.
+            assert page.locator('[data-filter="rotation"][value="2"]').count() == 0
             assert (
                 page.locator(
                     '[data-filter=mods][value="betterscale-AEseparation"]'

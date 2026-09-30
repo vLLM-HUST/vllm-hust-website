@@ -41,6 +41,17 @@ test('production and empty snapshots validate without inventing points',()=>{
     assert.deepEqual(model.validate({schema_version:'leaderboard-frontier/v1',cohorts:[],points:[]}).points,[]);
     assert.equal(model.project([], 'interactivity','output_tps_per_chip').frontier.length,0);
 });
+test('presentation scope keeps the unified comparison readable without deleting evidence',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
+    const all=data.points.filter(p=>p.cohort_id===cohort.id);
+    const displayed=model.presentationPoints(data.points,cohort);
+    assert.equal(all.length,159);
+    assert.equal(displayed.length,40);
+    assert.ok(displayed.every(p=>p.load.concurrency_series.startsWith('swe-unified-')));
+    assert.deepEqual(cohort.workload.contract.default_groups,['none']);
+    assert.equal(displayed.filter(p=>model.groupKey(p)==='none').length,5);
+});
 test('Qwen3.5 configuration studies consolidate related observations without implying missing series',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const studies=data.cohorts.filter(c=>c.workload.contract.presentation==='configuration-study');
