@@ -51,8 +51,8 @@ token、质量检查和服务释放回执。收尾时间不计入吞吐。部署
 | DLA                                | 已知输出预算版本的五档并发全部完成并通过原始记录校验，已由 PR #283 发布。准入检查已执行，延后与抢占为零；不是学习型长度预测或已证实收益。                                                                                                        | [dc20d0f8](https://github.com/vLLM-HUST/vllm-hust-dla/tree/dc20d0f8ea8d09106f77571e1947b9a2f8702545)                                                                                                                                                  |
 | TraceLoom                          | 已有可选 Scheduler/AsyncScheduler 运行时观察入口与离线分析器；现有硬件证据为 Qwen3-0.6B TP1/eager。原 Frontier 图模式、TP2 与记录开销尚未验证，不作为已测优化曲线。                                                                              | [ab8b5131](https://github.com/vLLM-HUST/vllm-hust-perf-analyzer/tree/ab8b5131191c6d5aeee2dd8566c34411f49ceab0)                                                                                                                                        |
 
-BidKV 另有 2026-09-29 的 TP4 EvoScientist 高 KV 压力配对测试，两轮输出吞吐分别提升 +17.11% 和
-+10.65%，均触发主动选择；完整结果和负结果见[原始证据](evidence/qwen35-bidkv-tp4-20260929/README.md)。
+BidKV 另有 2026-09-29 的 TP4 EvoScientist 高 KV 压力单档探索性测试，输出吞吐提升 +13.88%（两轮配对提升率的算术平均），两轮均触发主动选择。该结果与原
+TP2/SWE 五档指标口径不同；逐轮结果和负结果见[原始证据](evidence/qwen35-bidkv-tp4-20260929/README.md)。
 
 已发布的新增对照点见网站 PR [#279](https://github.com/vLLM-HUST/vllm-hust-website/pull/279)
 、[#280](https://github.com/vLLM-HUST/vllm-hust-website/pull/280) 与补齐 Pipeline 五档并发的
