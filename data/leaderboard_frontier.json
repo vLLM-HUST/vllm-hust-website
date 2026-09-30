@@ -59991,6 +59991,7 @@
       },
       "load": {
         "concurrency": 2,
+        "concurrency_series": "qwen35-native-rotation2-hw3-20260927",
         "unit": "continuously replenished in-flight HTTP request lanes",
         "session_rotation_depth": 2,
         "session_slots": 4
@@ -60159,6 +60160,7 @@
       },
       "load": {
         "concurrency": 4,
+        "concurrency_series": "qwen35-native-rotation2-hw3-20260927",
         "unit": "continuously replenished in-flight HTTP request lanes",
         "session_rotation_depth": 2,
         "session_slots": 8
@@ -60327,6 +60329,7 @@
       },
       "load": {
         "concurrency": 8,
+        "concurrency_series": "qwen35-native-rotation2-hw3-20260927",
         "unit": "continuously replenished in-flight HTTP request lanes",
         "session_rotation_depth": 2,
         "session_slots": 16
@@ -60495,6 +60498,7 @@
       },
       "load": {
         "concurrency": 16,
+        "concurrency_series": "qwen35-native-rotation2-hw3-20260927",
         "unit": "continuously replenished in-flight HTTP request lanes",
         "session_rotation_depth": 2,
         "session_slots": 32
@@ -60663,6 +60667,7 @@
       },
       "load": {
         "concurrency": 16,
+        "concurrency_series": "qwen35-native-rotation2-hw3-20260927",
         "unit": "continuously replenished in-flight HTTP request lanes",
         "session_rotation_depth": 2,
         "session_slots": 32

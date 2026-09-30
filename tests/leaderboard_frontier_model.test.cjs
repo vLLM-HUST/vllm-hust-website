@@ -673,6 +673,7 @@ test('native Rotation2 points retain both C16 observations and exact public run 
     const evidence=require('../data/leaderboard_frontier_swe_evidence.json');
     const points=data.points.filter(p=>p.evidence.benchmark_protocol?.campaign==='qwen35-native-rotation2-hw3-20260927');
     assert.deepEqual(points.map(p=>p.load.concurrency).sort((a,b)=>a-b),[2,4,8,16,16]);
+    assert.deepEqual([...new Set(points.map(p=>p.load.concurrency_series))],['qwen35-native-rotation2-hw3-20260927']);
     assert.equal(new Set(points.flatMap(p=>p.evidence.run_ids)).size,5);
     for(const p of points) {
         const r=evidence.runs.find(r=>r.point_id===p.id);
