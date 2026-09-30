@@ -39,6 +39,11 @@ def main():
         and (
             item["id"] in performance_ids
             or (
+                item["artifact_type"] == "bridge"
+                and item.get("compatibility", {}).get("status") == "verified"
+                and item["canonical_repository"].startswith("https://github.com/")
+            )
+            or (
                 (
                     item["artifact_type"] in {"runtime_component", "bridge"}
                     or item["system_role"] in tool_mod_roles
@@ -362,14 +367,14 @@ def main():
         ) == [
             "vspec",
             "betterscale",
+            "bidkv",
             "pipeline-microbatch-migration",
             "kv-materialization-arrival-control",
             "pegaflow-vllm-connectors",
             "adm",
-            "bidkv",
-            "mooncake-vllm-connectors",
             "kvcompress-ascend",
             "diffspec",
+            "latchmoe",
         ]
         assert "+42.39%" in page.locator("#betterscale").inner_text()
         assert "+9.78%" in page.locator("#pipeline-microbatch-migration").inner_text()
