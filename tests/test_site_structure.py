@@ -62,7 +62,10 @@ def test_leaderboard_names_exact_settings_without_frontier_jargon() -> None:
         in settings_script
     )
     assert "固定配置对照；各点是独立实测，不表示缺失并发曲线" in settings_script
-    assert "fixedComparison()?'':`<div class=\"frontier-checks\"" in settings_script
+    assert "independentStudy()?'':`<div class=\"frontier-checks\"" in settings_script
+    assert "Independent study groups are not connected" in settings_script
+    assert "不同实验组之间不连线" in settings_script
+    assert "M.resolveCohort(state.data.cohorts,requestedSetting)" in settings_script
     assert "Hide non-Frontier points" not in settings_script
     assert "Pareto-efficient points only" not in settings_script
 

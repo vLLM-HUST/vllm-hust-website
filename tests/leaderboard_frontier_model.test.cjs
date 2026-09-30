@@ -41,16 +41,19 @@ test('production and empty snapshots validate without inventing points',()=>{
     assert.deepEqual(model.validate({schema_version:'leaderboard-frontier/v1',cohorts:[],points:[]}).points,[]);
     assert.equal(model.project([], 'interactivity','output_tps_per_chip').frontier.length,0);
 });
-test('fixed Qwen3.5 comparisons live on precise setting pages without implying missing series',()=>{
+test('Qwen3.5 configuration studies consolidate related observations without implying missing series',()=>{
     const data=require('../data/leaderboard_frontier.json');
-    const fixed=data.cohorts.filter(c=>c.workload.contract.presentation==='fixed-comparison');
-    assert.equal(fixed.length,8);
-    const fixedIds=new Set(fixed.map(c=>c.id));
-    const fixedPoints=data.points.filter(p=>fixedIds.has(p.cohort_id));
-    assert.equal(fixedPoints.length,16);
-    assert.deepEqual(fixed.map(c=>data.points.filter(p=>p.cohort_id===c.id).length).sort((a,b)=>a-b),
-        [1,2,2,2,2,2,2,3]);
-    assert.equal(model.concurrencySeries(model.project(fixedPoints,'decode_p90_tps','output_tps_per_chip').measured).length,0);
+    const studies=data.cohorts.filter(c=>c.workload.contract.presentation==='configuration-study');
+    assert.equal(studies.length,3);
+    const studyIds=new Set(studies.map(c=>c.id));
+    const studyPoints=data.points.filter(p=>studyIds.has(p.cohort_id));
+    assert.equal(studyPoints.length,16);
+    assert.deepEqual(studies.map(c=>data.points.filter(p=>p.cohort_id===c.id).length).sort((a,b)=>a-b),[4,5,7]);
+    assert.deepEqual(studies.map(c=>new Set(data.points.filter(p=>p.cohort_id===c.id).map(p=>p.study_group.id)).size).sort(),[2,2,3]);
+    assert.ok(studyPoints.every(p=>p.study_group.label_en&&p.study_group.label_zh));
+    assert.equal(model.concurrencySeries(model.project(studyPoints,'decode_p90_tps','output_tps_per_chip').measured).length,0);
+    assert.equal(new Set(studies.flatMap(c=>c.aliases)).size,8);
+    for(const study of studies) for(const alias of study.aliases) assert.equal(model.resolveCohort(data.cohorts,alias),study);
 
     const unifiedId='qwen35-35b-a3b-bf16-sweprefix-smoke-v1';
     const unified=data.points.filter(p=>p.cohort_id===unifiedId);
@@ -62,6 +65,10 @@ test('fixed Qwen3.5 comparisons live on precise setting pages without implying m
 test('presentation mode accepts only declared setting semantics',()=>{
     const fixture=structuredClone(require('./fixtures/leaderboard_frontier.json'));
     fixture.cohorts[0].workload.contract.presentation='fixed-comparison';
+    assert.equal(model.validate(fixture),fixture);
+    fixture.cohorts[0].workload.contract.presentation='configuration-study';
+    assert.throws(()=>model.validate(fixture),/Missing study group/);
+    fixture.points.forEach(point=>{point.study_group={id:'fixture-study',label_en:'Fixture study',label_zh:'测试实验组'};});
     assert.equal(model.validate(fixture),fixture);
     fixture.cohorts[0].workload.contract.presentation='pareto-invalid';
     assert.throws(()=>model.validate(fixture),/Invalid Frontier presentation/);
@@ -439,9 +446,10 @@ test('AE separation is a tracking group, not a new MOD or a TP/EP alias',()=>{
         assert.ok(p.configuration.parameters.attention_ranks>0 && p.configuration.parameters.expert_ranks>0);
         assert.equal(p.load.concurrency_series,undefined);
     }
-    for(const p of data.points.filter(p=>!p.configuration.parameters.expert_ranks)){
+    for(const p of data.points.filter(p=>!p.configuration.parameters.expert_ranks&&!p.study_group)){
         assert.equal(model.groupKey(p),model.modKey(p));
     }
+    for(const p of data.points.filter(p=>p.study_group)) assert.equal(model.groupKey(p),p.study_group.id);
     const invalid=structuredClone(data);invalid.points[0].configuration.experiment_group=' ';
     assert.throws(()=>model.validate(invalid),/experiment group/);
 });
@@ -747,8 +755,8 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     const data=require('../data/leaderboard_frontier.json');
     const visible=model.visibleData(data);
     const cohorts=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
-    assert.equal(cohorts.length,9);
-    assert.equal(cohorts.filter(c=>c.workload.contract.presentation==='fixed-comparison').length,8);
+    assert.equal(cohorts.length,4);
+    assert.equal(cohorts.filter(c=>c.workload.contract.presentation==='configuration-study').length,3);
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
