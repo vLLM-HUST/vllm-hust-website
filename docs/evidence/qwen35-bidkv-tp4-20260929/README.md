@@ -7,6 +7,8 @@ an archive to inspect its `result.json`, commands, metrics, and server logs.
 The archived trials include negative and aborted experiments as well as the
 positive TP4 result. These runs use a different protocol from the TP2 SWE
 series on the [unified MOD results page](../../FRONTIER-QWEN35-UNIFIED-MODS.md).
+The benchmark runner and comparison script are published in
+[BidKV PR #17](https://github.com/vLLM-HUST/vllm-hust-bidkv/pull/17).
 
 This directory keeps the Qwen3.5-35B-A3B measurements and the inputs needed to
 check them. The model ran on machine 91 with Ascend NPUs 2–5 (TP4), in the
