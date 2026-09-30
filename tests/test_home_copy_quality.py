@@ -90,6 +90,11 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
         and (
             item["id"] in measured
             or (
+                item["artifact_type"] == "bridge"
+                and item.get("compatibility", {}).get("status") == "verified"
+                and item["canonical_repository"].startswith("https://github.com/")
+            )
+            or (
                 (
                     item["artifact_type"] in {"runtime_component", "bridge"}
                     or item["system_role"] in tool_roles
