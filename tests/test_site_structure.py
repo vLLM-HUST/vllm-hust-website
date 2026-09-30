@@ -54,6 +54,9 @@ def test_leaderboard_names_exact_settings_without_frontier_jargon() -> None:
     assert "Best trade-off points only" in settings_script
     assert "仅显示最佳权衡点" in settings_script
     assert "frontierOnly:false" in settings_script
+    assert "M.concurrencySeries(result.measured)" in settings_script
+    assert 'class="frontier-concurrency-line"' in settings_script
+    assert "standalone measurements have no same-series partner" in settings_script
     assert "Hide non-Frontier points" not in settings_script
     assert "Pareto-efficient points only" not in settings_script
 

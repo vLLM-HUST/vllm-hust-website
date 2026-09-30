@@ -118,7 +118,9 @@
         for (const row of rows) {
             const p = row.point, series = p.load.concurrency_series;
             if (!series) continue;
-            const key = JSON.stringify([p.cohort_id, series]);
+            const key = JSON.stringify([
+                p.cohort_id, series, p.load.session_rotation_depth ?? null
+            ]);
             if (!groups.has(key)) groups.set(key, []);
             groups.get(key).push(row);
         }

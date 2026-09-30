@@ -62,7 +62,7 @@ with sync_playwright() as p:
         page.locator("#frontier-only").check()
         assert page.locator('[data-point^="qwen27-sweprefix-native-"]').count() == 0
         page.locator("#frontier-only").uncheck()
-        qa.assert_group_frontiers(page, points)
+        qa.assert_concurrency_series(page, points)
         for point in points:
             qa.click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
             popup = page.locator("#frontier-popover")
@@ -107,7 +107,7 @@ with sync_playwright() as p:
             popup.locator("[data-close]").click()
         page.locator('[data-filter="mods"][value="betterscale"]').uncheck()
         assert page.locator(".frontier-point").count() == 5
-        assert page.locator(".frontier-envelope").count() == 0
+        assert page.locator(".frontier-concurrency-line").count() == 1
         page.locator('[data-filter="mods"][value="betterscale"]').check()
         assert not errors, errors
         assert page.evaluate(

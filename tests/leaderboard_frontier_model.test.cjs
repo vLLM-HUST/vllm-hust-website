@@ -27,6 +27,11 @@ test('concurrency lines connect only declared same-cohort series in C order',()=
     assert.equal(model.concurrencySeries(native.slice(0,1)).length,0);
     const other={...native[0],point:{...native[0].point,cohort_id:'other-workload'}};
     assert.equal(model.concurrencySeries([native[0],other]).length,0);
+    const mixedDepth=[...native.slice(0,2),...native.slice(0,2).map(row=>({
+        ...row,point:{...row.point,load:{...row.point.load,session_rotation_depth:2}}
+    }))];
+    assert.deepEqual(model.concurrencySeries(mixedDepth).map(rows=>rows.map(
+        row=>row.point.load.session_rotation_depth)),[[1,1],[2,2]]);
     const hidden=model.concurrencySeries(native.filter(row=>row.point.load.concurrency!==2));
     assert.ok(hidden.flat().every(row=>row.point.load.concurrency!==2));
 });
