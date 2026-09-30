@@ -17,17 +17,20 @@
     };
     function validate(data) {
         if (data?.schema_version !== 'leaderboard-frontier/v1' || !Array.isArray(data.cohorts) || !Array.isArray(data.points)) throw new Error('Unsupported Frontier snapshot');
-        const ids = new Set(), contracts = new Set();
+        const ids = new Set(), aliases = new Set(), contracts = new Set();
         for (const c of data.cohorts) {
             const key = JSON.stringify([c.model?.id, c.precision?.id, c.workload?.id, c.context_tokens]);
-            if (!c.id || ids.has(c.id) || contracts.has(key) || !c.model?.id || !c.model?.revision || !c.model?.label
+            if (!c.id || ids.has(c.id) || aliases.has(c.id) || contracts.has(key) || !c.model?.id || !c.model?.revision || !c.model?.label
                 || !c.precision?.id || !c.precision?.label || !c.workload?.id || !c.workload?.label
                 || !object(c.workload?.contract) || !Number.isInteger(c.context_tokens) || c.context_tokens < 1) throw new Error('Invalid or duplicate Frontier cohort');
             ids.add(c.id); contracts.add(key);
+            if (c.aliases != null && (!Array.isArray(c.aliases) || new Set(c.aliases).size !== c.aliases.length
+                || c.aliases.some(alias => typeof alias !== 'string' || !alias || ids.has(alias) || aliases.has(alias)))) throw new Error('Invalid Frontier cohort aliases');
+            for (const alias of c.aliases || []) aliases.add(alias);
             const axes = c.workload.contract.frontier_axes;
             if (axes != null && (!object(axes) || !metrics[axes.x] || !metrics[axes.y])) throw new Error('Invalid Frontier axes');
             const presentation = c.workload.contract.presentation;
-            if (presentation != null && !['concurrency-series', 'fixed-comparison'].includes(presentation)) throw new Error('Invalid Frontier presentation');
+            if (presentation != null && !['concurrency-series', 'fixed-comparison', 'configuration-study'].includes(presentation)) throw new Error('Invalid Frontier presentation');
         }
         const pointIds = new Set();
         for (const p of data.points) {
@@ -47,6 +50,11 @@
             if (e.sampling_date_utc != null && (typeof e.sampling_date_utc !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(e.sampling_date_utc)
                 || !Number.isFinite(Date.parse(e.sampling_date_utc)) || new Date(e.sampling_date_utc).toISOString().slice(0,10) !== e.sampling_date_utc)) throw new Error(`Invalid sampling date: ${p.id}`);
             if (c.experiment_group != null && (typeof c.experiment_group !== 'string' || !c.experiment_group.trim())) throw new Error(`Invalid experiment group: ${p.id}`);
+            if (p.study_group != null && (!object(p.study_group) || typeof p.study_group.id !== 'string' || !p.study_group.id
+                || typeof p.study_group.label_en !== 'string' || !p.study_group.label_en
+                || typeof p.study_group.label_zh !== 'string' || !p.study_group.label_zh)) throw new Error(`Invalid study group: ${p.id}`);
+            if (data.cohorts.find(cohort => cohort.id === p.cohort_id).workload.contract.presentation === 'configuration-study'
+                && p.study_group == null) throw new Error(`Missing study group: ${p.id}`);
             if (Object.values(p.metrics).some(v => v !== null && (!finite(v) || v < 0))) throw new Error(`Invalid metric: ${p.id}`);
             const rotationRequired = data.cohorts.find(cohort => cohort.id === p.cohort_id).workload.contract.session_rotation;
             if ((rotationRequired || p.load.session_rotation_depth != null)
@@ -63,6 +71,9 @@
         const ids = new Set(cohorts.map(cohort => cohort.id));
         return {...data, cohorts, points: data.points.filter(point => ids.has(point.cohort_id))};
     }
+    function resolveCohort(cohorts, requested) {
+        return cohorts.find(cohort => cohort.id === requested || cohort.aliases?.includes(requested));
+    }
     function safeURL(value) {
         try { const url = new URL(value); return url.protocol === 'https:' ? url.href : null; } catch (_) { return null; }
     }
@@ -76,7 +87,7 @@
         return finite(m[key]) ? m[key] : null;
     }
     function modKey(point) { return [...point.configuration.mods].sort().join('+') || 'none'; }
-    function groupKey(point) { return point.configuration.experiment_group || modKey(point); }
+    function groupKey(point) { return point.study_group?.id || point.configuration.experiment_group || modKey(point); }
     function frontierKey(point) { return JSON.stringify([point.cohort_id, groupKey(point), point.load.session_rotation_depth ?? null]); }
     function failedCorrectness(point) { return point.configuration.parameters.functional_status === 'failed'; }
     function project(points, xKey, yKey) {
@@ -129,7 +140,7 @@
         return [...groups.values()].filter(rows => rows.length > 1)
             .map(rows => [...rows].sort((a, b) => a.point.load.concurrency - b.point.load.concurrency));
     }
-    const api = { validate, visibleData, metrics, value, modKey, groupKey, frontierKey, project, safeURL, mtpState, concurrencySeries, groupFrontiers, failedCorrectness };
+    const api = { validate, visibleData, resolveCohort, metrics, value, modKey, groupKey, frontierKey, project, safeURL, mtpState, concurrencySeries, groupFrontiers, failedCorrectness };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);
