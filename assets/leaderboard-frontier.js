@@ -12,9 +12,9 @@
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
             failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Benchmark setting', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', batchSize: 'Batch size', outputThroughput: 'Output throughput', native: 'Native baseline',
-            smoke: 'Engineering measurement', formal: 'Measured setting', hint: 'Select a point for configuration', lineHint: 'Lines: one concurrency curve per baseline / MOD and rotation depth', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
+            smoke: 'Engineering measurement', formal: 'Measured setting', hint: 'Select a point for configuration', lineHint: 'Lines connect points from the same declared measurement series, in concurrency order', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
-            missing: 'Missing axis metrics', points: 'points', context: 'context',
+            missing: 'Missing axis metrics', standalone: 'standalone measurements have no same-series partner', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
             modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation'
         },
@@ -25,9 +25,9 @@
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
             failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: '实验设定', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', batchSize: 'Batch size', outputThroughput: '总输出吞吐', native: '原生 Baseline',
-            smoke: '工程测量', formal: '实测设定', hint: '点击数据点查看配置', lineHint: '连线：每个 Baseline / MOD、每个轮转深度各有一条并发曲线', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
+            smoke: '工程测量', formal: '实测设定', hint: '点击数据点查看配置', lineHint: '连线仅连接同一实测序列，并按并发顺序排列', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
-            missing: '缺少坐标指标', points: '个点', context: '上下文',
+            missing: '缺少坐标指标', standalone: '个独立测量点没有同序列伙伴', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
             modCoverage: '35B MOD 补测进度', workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配'
         }
@@ -193,7 +193,10 @@
         const color=p=>M.failedCorrectness(p)?'#dc2626':colors[groups.findIndex(g=>M.groupKey(g)===M.groupKey(p))%colors.length];
         const series=[...new Map(cohortPoints().map(p=>[M.frontierKey(p),p])).values()];
         $('frontier-legend').innerHTML=series.filter(g=>points().some(p=>M.frontierKey(p)===M.frontierKey(g))).map(p=>`<span data-frontier-group="${escape(M.frontierKey(p))}"><i style="background:${p.load.session_rotation_depth>1?'transparent':color(p)};border:2px solid ${color(p)}"></i>${escape(label(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}</span>`).join('');
-        $('frontier-hint').textContent=(M.groupFrontiers(points(),axes().x,axes().y).some(rows=>rows.length>1)?t('lineHint'):t('hint'))+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
+        const measuredSeries=M.concurrencySeries(measured.measured);
+        const connected=new Set(measuredSeries.flatMap(rows=>rows.map(row=>row.point.id)));
+        const standalone=measured.measured.filter(row=>!connected.has(row.point.id)).length;
+        $('frontier-hint').textContent=(measuredSeries.length?t('lineHint'):t('hint'))+(standalone?` · ${standalone} ${t('standalone')}`:'')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         // Historical static curves describe depth1, not every workload selected by the checkboxes.
         const curves=$('frontier-curves'), curveUrl=!hasRotation()||(state.rotation?.size===1&&state.rotation.has('1'))?current?.workload.contract.concurrency_curves_url:null;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
@@ -258,10 +261,11 @@
             if(result.measured.length)svg+=`<text text-anchor="middle" x="${x(xv)}" y="${height-bottom+24}">${fmt(xv)}</text><text text-anchor="end" x="${left-12}" y="${y(yv)+4}">${fmt(yv)}</text>`;
         }
         svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${axisLabel(axes().x)}<tspan x="${(width+left-right)/2}" dy="16">${M.metrics[axes().x].unit}</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${axisLabel(axes().y)}<tspan x="0" dy="16">${M.metrics[axes().y].unit}</tspan></text>`;
-        const frontiers=M.groupFrontiers(result.measured.map(row=>row.point),axes().x,axes().y);
-        for(const rows of frontiers.filter(rows=>rows.length>1)){
-            const id=M.frontierKey(rows[0].point);
-            svg+=`<polyline class="frontier-envelope" data-group="${escape(id)}" stroke-dasharray="${rows[0].point.load.session_rotation_depth>1?'7 4':'none'}" data-frontier-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(rows[0].point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
+        const series=M.concurrencySeries(result.measured);
+        for(const rows of series){
+            const point=rows[0].point;
+            const id=JSON.stringify([point.cohort_id,point.load.concurrency_series,point.load.session_rotation_depth??null]);
+            svg+=`<polyline class="frontier-concurrency-line" data-series="${escape(id)}" stroke-dasharray="${point.load.session_rotation_depth>1?'7 4':'none'}" data-series-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
         }
         for(const row of result.measured){
             const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);

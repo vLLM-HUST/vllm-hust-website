@@ -41,60 +41,43 @@ def download_configuration(page, popup, previous_download):
     return download.value, time.monotonic()
 
 
-def assert_group_frontiers(page, points):
-    """Independent per-group Pareto oracle, including line vertices and filters."""
+def assert_concurrency_series(page, points):
+    """Lines connect only explicitly declared measured concurrency series."""
+    visible = set(
+        page.locator("[data-point]").evaluate_all(
+            "nodes => nodes.map(node => node.dataset.point)"
+        )
+    )
     groups = {}
     for point in points:
-        if (
-            point["configuration"]["parameters"].get("functional_status") == "failed"
-            or point["metrics"].get("decode_p90_tps") is None
-            or not point["metrics"].get("output_tps")
-        ):
+        if point["id"] not in visible or not point["load"].get("concurrency_series"):
             continue
-        group = (
-            point["configuration"].get("experiment_group")
-            or "+".join(sorted(point["configuration"]["mods"]))
-            or "none"
-        )
-        group = json.dumps(
-            [point["cohort_id"], group, point["load"].get("session_rotation_depth")],
+        series = json.dumps(
+            [
+                point["cohort_id"],
+                point["load"]["concurrency_series"],
+                point["load"].get("session_rotation_depth"),
+            ],
             separators=(",", ":"),
         )
-        groups.setdefault(group, []).append(point)
+        groups.setdefault(series, []).append(point)
 
-    def xy(p):
-        return (
-            p["metrics"]["decode_p90_tps"],
-            p["metrics"]["output_tps"]
-            / p["configuration"]["hardware"]["accelerator_count"],
-        )
-
-    expected = {}
-    for group, members in groups.items():
-        front = [
-            p
-            for p in members
-            if not any(
-                xy(q)[0] >= xy(p)[0] and xy(q)[1] >= xy(p)[1] and xy(q) != xy(p)
-                for q in members
-            )
-        ]
-        unique = {}
-        for p in sorted(front, key=lambda p: (xy(p)[0], p["id"])):
-            unique.setdefault(xy(p), p)
-        if len(unique) > 1:
-            expected[group] = list(unique.values())
-    lines = page.locator(".frontier-envelope")
+    expected = {
+        series: sorted(members, key=lambda p: p["load"]["concurrency"])
+        for series, members in groups.items()
+        if len(members) > 1
+    }
+    lines = page.locator(".frontier-concurrency-line")
     assert lines.count() == len(expected)
-    assert page.locator(".frontier-concurrency-line").count() == 0
+    assert page.locator(".frontier-envelope").count() == 0
     for line in lines.all():
-        rows = expected[line.get_attribute("data-group")]
+        rows = expected[line.get_attribute("data-series")]
         depth = rows[0]["load"].get("session_rotation_depth")
         assert all(p["load"].get("session_rotation_depth") == depth for p in rows)
         assert line.get_attribute("stroke-dasharray") == (
             "7 4" if depth and depth > 1 else "none"
         )
-        assert json.loads(line.get_attribute("data-frontier-points")) == [
+        assert json.loads(line.get_attribute("data-series-points")) == [
             p["id"] for p in rows
         ]
         vertices = [
@@ -142,7 +125,7 @@ def verify_rotation_choices(browser, url, fixture):
     assert choices.evaluate_all("nodes=>nodes.map(n=>n.value)") == ["1", "4"]
     assert all(choice.is_checked() for choice in choices.all())
     page.locator("#frontier-only").uncheck()
-    assert_group_frontiers(page, data["points"])
+    assert_concurrency_series(page, data["points"])
     page.locator('[data-filter="rotation"][value="1"]').uncheck()
     expected = [p for p in data["points"] if p["load"]["session_rotation_depth"] == 4]
     assert set(
@@ -150,12 +133,12 @@ def verify_rotation_choices(browser, url, fixture):
             "nodes=>nodes.map(n=>n.dataset.point)"
         )
     ) == {p["id"] for p in expected}
-    assert_group_frontiers(page, expected)
+    assert_concurrency_series(page, expected)
     page.locator('[data-filter="rotation"][value="4"]').uncheck()
     assert page.locator("[data-point]").count() == 0
     page.locator('[data-filter="rotation"][value="1"]').check()
     expected = [p for p in data["points"] if p["load"]["session_rotation_depth"] == 1]
-    assert_group_frontiers(page, expected)
+    assert_concurrency_series(page, expected)
     context.close()
 
 
@@ -263,7 +246,9 @@ def main():
                 default_points,
             )
             assert set(shown) == set(expected_front)
-            assert_group_frontiers(page, default_points)
+            assert_concurrency_series(
+                page, [p for p in default_points if p["id"] in shown]
+            )
             page.screenshot(
                 path=str(
                     args.output / f"frontier-only-{width}-{language}-{scheme}.png"
@@ -309,7 +294,7 @@ def main():
             assert (
                 expected_rotation2
             )  # Membership is checked against the snapshot above.
-            assert_group_frontiers(page, expected_rotation2)
+            assert_concurrency_series(page, expected_rotation2)
             assert page.locator("#frontier-curves").is_hidden()
             assert "D2" in page.locator("#frontier-chart").text_content()
             assert (
@@ -330,7 +315,14 @@ def main():
                 assert payload["point"] == point
                 popup.locator("[data-close]").click()
             page.locator("#frontier-only").check()
-            assert_group_frontiers(page, expected_rotation2)
+            shown = set(
+                page.locator("[data-point]").evaluate_all(
+                    "nodes=>nodes.map(n=>n.dataset.point)"
+                )
+            )
+            assert_concurrency_series(
+                page, [p for p in expected_rotation2 if p["id"] in shown]
+            )
             page.locator("#langToggle").click()
             assert page.locator('[data-filter="rotation"][value="2"]').is_checked()
             page.locator("#langToggle").click()
@@ -403,7 +395,7 @@ def main():
             )
             assert expected_status in page.locator("#frontier-status").inner_text()
             assert page.locator(".frontier-point").count() == len(default_points)
-            assert_group_frontiers(page, default_points)
+            assert_concurrency_series(page, default_points)
             assert page.locator("#frontier-popover").is_hidden()
             curves = production["cohorts"][0]["workload"]["contract"].get(
                 "concurrency_curves_url"
@@ -434,9 +426,16 @@ def main():
                     "nodes => nodes.map(n => n.dataset.point)"
                 )
                 assert set(ids) == {p["id"] for p in expected}
-                assert_group_frontiers(page, expected)
+                assert_concurrency_series(page, expected)
                 page.locator("#frontier-only").check()
-                assert_group_frontiers(page, expected)
+                shown = set(
+                    page.locator("[data-point]").evaluate_all(
+                        "nodes=>nodes.map(n=>n.dataset.point)"
+                    )
+                )
+                assert_concurrency_series(
+                    page, [p for p in expected if p["id"] in shown]
+                )
                 shown = page.locator("[data-point]").evaluate_all(
                     "nodes=>nodes.map(n=>n.dataset.point)"
                 )
@@ -677,7 +676,7 @@ def main():
                     p for p in production["points"] if p["cohort_id"] == cohort["id"]
                 ]
                 assert page.locator(".frontier-point").count() == len(members)
-                assert_group_frontiers(page, members)
+                assert_concurrency_series(page, members)
                 for point in members:
                     click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
                     popup = page.locator("#frontier-popover")
@@ -733,7 +732,7 @@ def main():
         assert page.locator(".frontier-model-tag").count() == 2
         assert page.locator("#frontier-workload option").count() == 2
         assert page.locator(".frontier-point").count() == 4
-        assert_group_frontiers(page, fixture["points"][:4])
+        assert_concurrency_series(page, fixture["points"][:4])
         assert page.locator("#frontier-curves").is_visible()
         page.locator("[data-filter=mtp][value=unknown]").uncheck()
         assert page.locator(".frontier-point").count() == 0
