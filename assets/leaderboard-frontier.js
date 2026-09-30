@@ -10,9 +10,9 @@
             knownBudget: 'Known output budget · no learned predictor', budgetChecksOnly: 'Admission capacity checks ran, but no admission deferrals or preemptions were observed. This point does not demonstrate an optimization benefit.',
             notExercised: 'MOD policy not exercised', notExercisedScope: 'The MOD was enabled, but its optimization mechanism was not exercised during this window. This point does not demonstrate an optimization benefit.',
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
-            failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Benchmark setting', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
+            failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Benchmark setting', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', fixedSubtitle: 'Fixed-configuration measured comparison', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', batchSize: 'Batch size', outputThroughput: 'Output throughput', native: 'Native baseline',
-            smoke: 'Engineering measurement', formal: 'Measured setting', hint: 'Select a point for configuration', lineHint: 'Lines connect points from the same declared measurement series, in concurrency order', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
+            smoke: 'Engineering measurement', formal: 'Measured setting', fixed: 'Fixed comparison', hint: 'Select a point for configuration', fixedHint: 'Fixed-configuration comparison; points are independent measured observations', lineHint: 'Lines connect points from the same declared measurement series, in concurrency order', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', standalone: 'standalone measurements have no same-series partner', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
@@ -23,9 +23,9 @@
             knownBudget: '已知输出预算 · 未使用学习型预测器', budgetChecksOnly: '准入容量检查已执行，但未观察到准入延后或抢占；该点不构成优化收益证据。',
             notExercised: 'MOD 策略未触发', notExercisedScope: 'MOD 已启用，但本窗口未触发有效的优化动作；该点不构成优化收益证据。',
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
-            failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: '实验设定', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
+            failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: '实验设定', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', fixedSubtitle: '固定配置实测对照', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', batchSize: 'Batch size', outputThroughput: '总输出吞吐', native: '原生 Baseline',
-            smoke: '工程测量', formal: '实测设定', hint: '点击数据点查看配置', lineHint: '连线仅连接同一实测序列，并按并发顺序排列', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
+            smoke: '工程测量', formal: '实测设定', fixed: '固定配置对照', hint: '点击数据点查看配置', fixedHint: '固定配置对照；各点是独立实测，不表示缺失并发曲线', lineHint: '连线仅连接同一实测序列，并按并发顺序排列', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', standalone: '个独立测量点没有同序列伙伴', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
@@ -48,12 +48,13 @@
     const tagKey = c => JSON.stringify([c.model.id,c.precision.id]);
     const cohort = () => state.data.cohorts.find(c => c.id === state.cohort);
     const axes = () => cohort()?.workload.contract.frontier_axes || DEFAULT_AXES;
+    const fixedComparison = () => cohort()?.workload.contract.presentation === 'fixed-comparison';
     const axisLabel = key => ({batch_size:t('batchSize'),output_tps:t('outputThroughput'),decode_p90_tps:t('x'),output_tps_per_chip:t('y')})[key] || key;
     const cohortPoints = () => state.data.points.filter(p => p.cohort_id === state.cohort);
     const hasRotation = () => !!cohort()?.workload.contract.session_rotation;
     const depthPoints = () => cohortPoints().filter(p => !hasRotation() || state.rotation?.has(String(p.load.session_rotation_depth)));
     const filteredPoints = () => depthPoints().filter(p => state.mtp?.has(M.mtpState(p)) && state.mods?.has(M.groupKey(p)));
-    const points = () => state.frontierOnly
+    const points = () => state.frontierOnly && !fixedComparison()
         ? M.groupFrontiers(filteredPoints(),axes().x,axes().y).flat().map(row=>row.point) : filteredPoints();
     const label = p => p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
     const knownBudget = p => p.configuration.mods.includes('dla') && p.configuration.parameters.length_source === 'Declared exact ignore_eos output budgets, no learned predictor';
@@ -98,7 +99,7 @@
         if(state.mods===null)state.mods=new Set(mods.map(M.groupKey));
         if(state.mtp===null)state.mtp=new Set(mtpOptions.map(([key])=>key));
         $('frontier-panel').innerHTML = `
-            <header class="frontier-heading"><div><h1>${t('title')}</h1><p>${t(axes().x==='batch_size'?'pairedSubtitle':'subtitle')}</p></div><span id="frontier-status" class="frontier-status" role="status"></span></header>
+            <header class="frontier-heading"><div><h1>${t('title')}</h1><p>${t(fixedComparison()?'fixedSubtitle':axes().x==='batch_size'?'pairedSubtitle':'subtitle')}</p></div><span id="frontier-status" class="frontier-status" role="status"></span></header>
             <div class="frontier-layout"><div class="frontier-card">
                 <div class="frontier-picker">
                     <div class="frontier-identity">
@@ -119,7 +120,7 @@
                 <fieldset><legend>MOD / Group <button type="button" id="frontier-mods-toggle"></button></legend><div class="frontier-checks">${mods.map(p=>`<label><input type="checkbox" data-filter="mods" value="${escape(M.groupKey(p))}" ${state.mods.has(M.groupKey(p))?'checked':''}>${escape(label(p))}</label>`).join('')}</div></fieldset>
                 <fieldset><legend>MTP</legend><div class="frontier-checks">${mtpOptions.map(([key,text])=>`<label><input type="checkbox" data-filter="mtp" value="${key}" ${state.mtp.has(key)?'checked':''}>${text}</label>`).join('')}</div></fieldset>
                 ${hasRotation()?`<fieldset id="frontier-rotation-filter"><legend>${t('rotationDepth')}</legend><div class="frontier-checks">${depths.map(depth=>`<label><input type="checkbox" data-filter="rotation" value="${depth}" ${state.rotation.has(String(depth))?'checked':''}>${rotationLabel(depth)}</label>`).join('')}</div><p class="frontier-filter-note">${t('rotationHelp')}</p>${cohort().workload.contract.session_rotation.status==='under-construction'?`<p class="frontier-filter-note">${t('rotationPending')}</p>`:''}</fieldset>`:''}
-                <div class="frontier-checks"><label><input id="frontier-only" type="checkbox" ${state.frontierOnly?'checked':''}>${t('frontierOnly')}</label></div>
+                ${fixedComparison()?'':`<div class="frontier-checks"><label><input id="frontier-only" type="checkbox" ${state.frontierOnly?'checked':''}>${t('frontierOnly')}</label></div>`}
                 <span id="frontier-filter-count" role="status"></span>
             </aside></div>`;
         $('frontier-panel').querySelectorAll('[data-model-tag]').forEach(button=>button.addEventListener('click',()=>{
@@ -137,7 +138,7 @@
             $('frontier-panel').querySelectorAll('[data-filter="mods"]').forEach(input=>{input.checked=!all;});
             render();
         });
-        $('frontier-only').addEventListener('change',event=>{state.frontierOnly=event.target.checked;state.selected='';render();});
+        $('frontier-only')?.addEventListener('change',event=>{state.frontierOnly=event.target.checked;state.selected='';render();});
         $('frontier-chart').addEventListener('click',choose);
         $('frontier-chart').addEventListener('keydown',event=>{
             if(['Enter',' '].includes(event.key)&&event.target.closest('[data-point]')){event.preventDefault();choose(event);}
@@ -184,7 +185,7 @@
         $('frontier-mods-toggle').disabled=cohortPoints().length===0;
         $('view-frontier-count').textContent=state.data.points.length;
         const status=$('frontier-status');status.dataset.state=state.error?'error':state.ready?'ready':'loading';
-        status.textContent=state.error?t('error'):!state.ready?t('loading'):current?.workload.contract.profile==='smoke'?t('smoke'):t('formal');
+        status.textContent=state.error?t('error'):!state.ready?t('loading'):fixedComparison()?t('fixed'):current?.workload.contract.profile==='smoke'?t('smoke'):t('formal');
         const blank=$('frontier-blank');blank.hidden=measured.measured.length>0;
         blank.textContent=state.error?t('error'):!state.ready?t('loading'):cohortPoints().length?t('noMatch'):t('empty');
         $('frontier-filter-count').textContent=`${points().length} / ${depthPoints().length} ${t('points')}`;
@@ -196,7 +197,7 @@
         const measuredSeries=M.concurrencySeries(measured.measured);
         const connected=new Set(measuredSeries.flatMap(rows=>rows.map(row=>row.point.id)));
         const standalone=measured.measured.filter(row=>!connected.has(row.point.id)).length;
-        $('frontier-hint').textContent=(measuredSeries.length?t('lineHint'):t('hint'))+(standalone?` · ${standalone} ${t('standalone')}`:'')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
+        $('frontier-hint').textContent=(fixedComparison()?t('fixedHint'):measuredSeries.length?t('lineHint'):t('hint'))+(!fixedComparison()&&standalone?` · ${standalone} ${t('standalone')}`:'')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         // Historical static curves describe depth1, not every workload selected by the checkboxes.
         const curves=$('frontier-curves'), curveUrl=!hasRotation()||(state.rotation?.size===1&&state.rotation.has('1'))?current?.workload.contract.concurrency_curves_url:null;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
@@ -282,7 +283,7 @@
     $('view-frontier').addEventListener('click',()=>{updateSettingURL();requestAnimationFrame(render);});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=benchmark-settings-20260929',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=setting-split-20260930',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=state.data.cohorts.find(c=>c.id===requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});

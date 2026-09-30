@@ -82,6 +82,646 @@
       }
     },
     {
+      "id": "qwen35-35b-a3b-bf16-sweprefix-fixed-c4-legacy-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+        "verified_identity_aliases": [
+          {
+            "value": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "kind": "model_manifest_sha256",
+            "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+          }
+        ]
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-fixed-c4-legacy-900s-v1",
+        "label": "SWE prefix reuse · fixed C4 engine comparison",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject if enabled; never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes; one request per session; no original tool/human delays; cyclic whole-session queue",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Small deterministic size-spread sample; cold-start/finite-window request mixes and reached context differ across loads/engines. Shared-host single observations; natural MTP output content may differ. Historical AgentX results are a separate workload.",
+          "status": "15-minute smoke, tuning incomplete; retained historical native C16 functional caveats apply; not SWE task solving",
+          "prepared_workload_variants": [
+            {
+              "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+              "transformers": "5.17.0"
+            },
+            {
+              "sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
+              "transformers": "5.14.1"
+            },
+            {
+              "sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+              "transformers": "5.14.1",
+              "equivalence": "Replacing only tokenizer.path with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers with5.17.0 reconstructs original8044561f SHA256 exactly; fixed input-token deltas/output budgets/session order unchanged"
+            }
+          ],
+          "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
+          "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
+            "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
+          },
+          "display_scope": "Fixed C4 comparison on two Ascend 910B2 chips with max_num_seqs=8. Native FULL_AND_PIECEWISE and BetterScale FULL are independent measured configurations; this page is not a concurrency sweep.",
+          "presentation": "fixed-comparison"
+        }
+      }
+    },
+    {
+      "id": "qwen35-35b-a3b-bf16-sweprefix-fixed-topology-mtp2-c64-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+        "verified_identity_aliases": [
+          {
+            "value": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "kind": "model_manifest_sha256",
+            "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+          }
+        ]
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-fixed-8chip-topology-mtp2-c64-900s-v1",
+        "label": "SWE prefix reuse · fixed C64 8-chip MTP2 topology",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject if enabled; never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes; one request per session; no original tool/human delays; cyclic whole-session queue",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Small deterministic size-spread sample; cold-start/finite-window request mixes and reached context differ across loads/engines. Shared-host single observations; natural MTP output content may differ. Historical AgentX results are a separate workload.",
+          "status": "15-minute smoke, tuning incomplete; retained historical native C16 functional caveats apply; not SWE task solving",
+          "prepared_workload_variants": [
+            {
+              "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+              "transformers": "5.17.0"
+            },
+            {
+              "sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
+              "transformers": "5.14.1"
+            },
+            {
+              "sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+              "transformers": "5.14.1",
+              "equivalence": "Replacing only tokenizer.path with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers with5.17.0 reconstructs original8044561f SHA256 exactly; fixed input-token deltas/output budgets/session order unchanged"
+            }
+          ],
+          "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
+          "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
+            "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
+          },
+          "display_scope": "Fixed C64 topology comparison on eight Ascend 910B2 chips with native MTP2 and max_num_seqs=32. DP8/EP8 and TP8/EP8 are independent measured configurations; this page is not a concurrency sweep.",
+          "presentation": "fixed-comparison"
+        }
+      }
+    },
+    {
+      "id": "qwen35-35b-a3b-bf16-sweprefix-fixed-topology-coldkv-mtp0-c64-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+        "verified_identity_aliases": [
+          {
+            "value": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "kind": "model_manifest_sha256",
+            "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+          }
+        ]
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-fixed-8chip-topology-coldkv-mtp0-c64-900s-v1",
+        "label": "SWE prefix reuse · fixed C64 8-chip cold-KV MTP0 topology",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject if enabled; never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes; one request per session; no original tool/human delays; cyclic whole-session queue",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Small deterministic size-spread sample; cold-start/finite-window request mixes and reached context differ across loads/engines. Shared-host single observations; natural MTP output content may differ. Historical AgentX results are a separate workload.",
+          "status": "15-minute smoke, tuning incomplete; retained historical native C16 functional caveats apply; not SWE task solving",
+          "prepared_workload_variants": [
+            {
+              "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+              "transformers": "5.17.0"
+            },
+            {
+              "sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
+              "transformers": "5.14.1"
+            },
+            {
+              "sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+              "transformers": "5.14.1",
+              "equivalence": "Replacing only tokenizer.path with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers with5.17.0 reconstructs original8044561f SHA256 exactly; fixed input-token deltas/output budgets/session order unchanged"
+            }
+          ],
+          "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
+          "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
+            "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
+          },
+          "display_scope": "Fixed C64 cold-KV topology comparison on eight Ascend 910B2 chips with MTP0 and max_num_seqs=32. TP8, DP8/EP8 and TP8/EP8 are independent measured configurations from the same historical campaign; this page is not a concurrency sweep.",
+          "presentation": "fixed-comparison"
+        }
+      }
+    },
+    {
+      "id": "qwen35-35b-a3b-bf16-sweprefix-fixed-capacity32-graph-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+        "verified_identity_aliases": [
+          {
+            "value": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "kind": "model_manifest_sha256",
+            "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+          }
+        ]
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-fixed-capacity32-graph-900s-v1",
+        "label": "SWE prefix reuse · fixed C32 graph-capture comparison",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject if enabled; never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes; one request per session; no original tool/human delays; cyclic whole-session queue",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Small deterministic size-spread sample; cold-start/finite-window request mixes and reached context differ across loads/engines. Shared-host single observations; natural MTP output content may differ. Historical AgentX results are a separate workload.",
+          "status": "15-minute smoke, tuning incomplete; retained historical native C16 functional caveats apply; not SWE task solving",
+          "prepared_workload_variants": [
+            {
+              "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+              "transformers": "5.17.0"
+            },
+            {
+              "sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
+              "transformers": "5.14.1"
+            },
+            {
+              "sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+              "transformers": "5.14.1",
+              "equivalence": "Replacing only tokenizer.path with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers with5.17.0 reconstructs original8044561f SHA256 exactly; fixed input-token deltas/output budgets/session order unchanged"
+            }
+          ],
+          "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
+          "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
+            "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
+          },
+          "display_scope": "Fixed C32 Native TP2 comparison with max_num_seqs=32. The points preserve their distinct graph-capture configurations and are independent observations, not a concurrency sweep.",
+          "presentation": "fixed-comparison"
+        }
+      }
+    },
+    {
+      "id": "qwen35-35b-a3b-bf16-sweprefix-fixed-resident-state-c16-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+        "verified_identity_aliases": [
+          {
+            "value": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "kind": "model_manifest_sha256",
+            "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+          }
+        ]
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-fixed-resident-state-c16-900s-v1",
+        "label": "SWE prefix reuse · resident State E16/R20 C16",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject if enabled; never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes; one request per session; no original tool/human delays; cyclic whole-session queue",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Small deterministic size-spread sample; cold-start/finite-window request mixes and reached context differ across loads/engines. Shared-host single observations; natural MTP output content may differ. Historical AgentX results are a separate workload.",
+          "status": "15-minute smoke, tuning incomplete; retained historical native C16 functional caveats apply; not SWE task solving",
+          "prepared_workload_variants": [
+            {
+              "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+              "transformers": "5.17.0"
+            },
+            {
+              "sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
+              "transformers": "5.14.1"
+            },
+            {
+              "sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+              "transformers": "5.14.1",
+              "equivalence": "Replacing only tokenizer.path with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers with5.17.0 reconstructs original8044561f SHA256 exactly; fixed input-token deltas/output budgets/session order unchanged"
+            }
+          ],
+          "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
+          "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
+            "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
+          },
+          "display_scope": "Single fixed BetterScale resident-State observation at C16 with 16 execution seats and 20 resident seats. It is retained as measured evidence and does not imply a missing concurrency curve.",
+          "presentation": "fixed-comparison"
+        }
+      }
+    },
+    {
+      "id": "qwen35-35b-a3b-bf16-sweprefix-fixed-cache-width-e16-r20-c16-d1-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+        "verified_identity_aliases": [
+          {
+            "value": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "kind": "model_manifest_sha256",
+            "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+          }
+        ]
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-fixed-cache-width-e16-r20-c16-d1-900s-v1",
+        "label": "SWE prefix reuse · cache width E16/R20 C16 D1",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject if enabled; never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes; one request per session; no original tool/human delays; cyclic whole-session queue",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Small deterministic size-spread sample; cold-start/finite-window request mixes and reached context differ across loads/engines. Shared-host single observations; natural MTP output content may differ. Historical AgentX results are a separate workload.",
+          "status": "15-minute smoke, tuning incomplete; retained historical native C16 functional caveats apply; not SWE task solving",
+          "prepared_workload_variants": [
+            {
+              "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+              "transformers": "5.17.0"
+            },
+            {
+              "sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
+              "transformers": "5.14.1"
+            },
+            {
+              "sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+              "transformers": "5.14.1",
+              "equivalence": "Replacing only tokenizer.path with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers with5.17.0 reconstructs original8044561f SHA256 exactly; fixed input-token deltas/output budgets/session order unchanged"
+            }
+          ],
+          "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
+          "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
+            "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
+          },
+          "display_scope": "Fixed C16 D1 BetterScale cache-width comparison with 16 execution seats and 20 resident seats. Full and incremental cache modes are matched independent observations, not a concurrency sweep.",
+          "presentation": "fixed-comparison"
+        }
+      }
+    },
+    {
+      "id": "qwen35-35b-a3b-bf16-sweprefix-fixed-cache-width-e16-r20-c16-d2-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+        "verified_identity_aliases": [
+          {
+            "value": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "kind": "model_manifest_sha256",
+            "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+          }
+        ]
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-fixed-cache-width-e16-r20-c16-d2-900s-v1",
+        "label": "SWE prefix reuse · cache width E16/R20 C16 D2",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject if enabled; never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes; one request per session; no original tool/human delays; cyclic whole-session queue",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Small deterministic size-spread sample; cold-start/finite-window request mixes and reached context differ across loads/engines. Shared-host single observations; natural MTP output content may differ. Historical AgentX results are a separate workload.",
+          "status": "15-minute smoke, tuning incomplete; retained historical native C16 functional caveats apply; not SWE task solving",
+          "prepared_workload_variants": [
+            {
+              "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+              "transformers": "5.17.0"
+            },
+            {
+              "sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
+              "transformers": "5.14.1"
+            },
+            {
+              "sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+              "transformers": "5.14.1",
+              "equivalence": "Replacing only tokenizer.path with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers with5.17.0 reconstructs original8044561f SHA256 exactly; fixed input-token deltas/output budgets/session order unchanged"
+            }
+          ],
+          "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
+          "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
+            "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
+          },
+          "display_scope": "Fixed C16 D2 BetterScale cache-width comparison with 16 execution seats and 20 resident seats. Full and incremental cache modes are matched independent observations, not a concurrency sweep.",
+          "presentation": "fixed-comparison"
+        }
+      }
+    },
+    {
+      "id": "qwen35-35b-a3b-bf16-sweprefix-fixed-cache-width-e36-r36-c32-d1-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+        "verified_identity_aliases": [
+          {
+            "value": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "kind": "model_manifest_sha256",
+            "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+          }
+        ]
+      },
+      "precision": {
+        "id": "bf16-weights-compute-kv",
+        "label": "BF16"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-fixed-cache-width-e36-r36-c32-d1-900s-v1",
+        "label": "SWE prefix reuse · cache width E36/R36 C32 D1",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject if enabled; never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes; one request per session; no original tool/human delays; cyclic whole-session queue",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Small deterministic size-spread sample; cold-start/finite-window request mixes and reached context differ across loads/engines. Shared-host single observations; natural MTP output content may differ. Historical AgentX results are a separate workload.",
+          "status": "15-minute smoke, tuning incomplete; retained historical native C16 functional caveats apply; not SWE task solving",
+          "prepared_workload_variants": [
+            {
+              "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+              "transformers": "5.17.0"
+            },
+            {
+              "sha256": "e95703601e8ded66e94f1ade997adc9281c41a0b9ee8ffb2b4811b46d9dd7fed",
+              "transformers": "5.14.1"
+            },
+            {
+              "sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
+              "transformers": "5.14.1",
+              "equivalence": "Replacing only tokenizer.path with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers with5.17.0 reconstructs original8044561f SHA256 exactly; fixed input-token deltas/output budgets/session order unchanged"
+            }
+          ],
+          "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
+          "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload. Depth may be swept; compare equal depths for matched comparisons.",
+            "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
+            "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
+          },
+          "display_scope": "Fixed C32 D1 BetterScale cache-width comparison with 36 execution and resident seats. Full and incremental cache modes are matched independent observations, not a concurrency sweep.",
+          "presentation": "fixed-comparison"
+        }
+      }
+    },
+    {
       "id": "qwen35-35b-a3b-bf16-agentx256k-smoke-v1",
       "model": {
         "id": "qwen35-35b-a3b-712cf743",
@@ -1934,7 +2574,7 @@
     },
     {
       "id": "qwen35-sweprefix-realmtp2-dp8ep8-c64-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-topology-mtp2-c64-v1",
       "label": "Native · DP8EP8 / C64 · real MTP2",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -2128,7 +2768,7 @@
     },
     {
       "id": "qwen35-sweprefix-realmtp2-tp8ep8-c64-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-topology-mtp2-c64-v1",
       "label": "Native · TP8EP8 / C64 · real MTP2",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -2317,7 +2957,7 @@
     },
     {
       "id": "qwen35-sweprefix-smoke-native-tp2-c4-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-c4-legacy-v1",
       "label": "Native baseline · TP2 / C4 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -2477,7 +3117,7 @@
     },
     {
       "id": "qwen35-sweprefix-smoke-betterscale-tp2-c4-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-c4-legacy-v1",
       "label": "BetterScale (experimental) · TP2 / C4 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -4285,7 +4925,7 @@
     },
     {
       "id": "qwen35-sweprefix-capacity32-native-tp2-c32-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-capacity32-graph-v1",
       "label": "Native · C32 · KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -4455,7 +5095,7 @@
     },
     {
       "id": "qwen35-sweprefix-capacity32-native-tp2-c32-20260924-graph96",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-capacity32-graph-v1",
       "label": "Native · C32 · KV24.25GiB",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -4626,7 +5266,7 @@
     },
     {
       "id": "qwen35-sweprefix-expert-tp8-c64-coldkv-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-topology-coldkv-mtp0-c64-v1",
       "label": "TP8 · C64 · MTP0 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -5997,7 +6637,7 @@
     },
     {
       "id": "qwen35-sweprefix-expert-dp8ep8-c64-coldkv-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-topology-coldkv-mtp0-c64-v1",
       "label": "DP8EP8 · C64 · MTP0 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -6111,7 +6751,7 @@
     },
     {
       "id": "qwen35-sweprefix-expert-tp8ep8-c64-coldkv-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-topology-coldkv-mtp0-c64-v1",
       "label": "TP8EP8 · C64 · MTP0 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -59663,7 +60303,7 @@
     },
     {
       "id": "qwen35-sweprefix-resident-state-tp2-c16-20260926",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-resident-state-c16-v1",
       "label": "BetterScale resident State TP2 C16 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -71187,7 +71827,7 @@
     },
     {
       "id": "qwen35-sweprefix-cache-width-full-tp2-c16-d1-20260928",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-cache-width-e16-r20-c16-d1-v1",
       "label": "BetterScale full cache E16/R20 TP2 C16 D1 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -71376,7 +72016,7 @@
     },
     {
       "id": "qwen35-sweprefix-cache-width-incremental-tp2-c16-d1-20260928",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-cache-width-e16-r20-c16-d1-v1",
       "label": "BetterScale incremental cache E16/R20 TP2 C16 D1 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -71565,7 +72205,7 @@
     },
     {
       "id": "qwen35-sweprefix-cache-width-full-tp2-c16-d2-20260928",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-cache-width-e16-r20-c16-d2-v1",
       "label": "BetterScale full cache E16/R20 TP2 C16 D2 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -71754,7 +72394,7 @@
     },
     {
       "id": "qwen35-sweprefix-cache-width-incremental-tp2-c16-d2-20260928",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-cache-width-e16-r20-c16-d2-v1",
       "label": "BetterScale incremental cache E16/R20 TP2 C16 D2 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -71943,7 +72583,7 @@
     },
     {
       "id": "qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-cache-width-e36-r36-c32-d1-v1",
       "label": "BetterScale full cache E36/R36 TP2 C32 D1 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -72135,7 +72775,7 @@
     },
     {
       "id": "qwen35-sweprefix-cache-width-incremental-tp2-c32-d1-20260928",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-fixed-cache-width-e36-r36-c32-d1-v1",
       "label": "BetterScale incremental cache E36/R36 TP2 C32 D1 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",

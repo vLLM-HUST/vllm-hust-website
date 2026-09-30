@@ -26,6 +26,8 @@
             ids.add(c.id); contracts.add(key);
             const axes = c.workload.contract.frontier_axes;
             if (axes != null && (!object(axes) || !metrics[axes.x] || !metrics[axes.y])) throw new Error('Invalid Frontier axes');
+            const presentation = c.workload.contract.presentation;
+            if (presentation != null && !['concurrency-series', 'fixed-comparison'].includes(presentation)) throw new Error('Invalid Frontier presentation');
         }
         const pointIds = new Set();
         for (const p of data.points) {

@@ -668,13 +668,20 @@ def main():
                         path=str(args.output / f"dsv4-{width}-{language}-{scheme}.png"),
                         full_page=True,
                     )
-                if "session_rotation" in cohort["workload"]["contract"]:
-                    assert page.locator(
-                        '[data-filter="rotation"][value="1"]'
-                    ).is_checked()
                 members = [
                     p for p in production["points"] if p["cohort_id"] == cohort["id"]
                 ]
+                if "session_rotation" in cohort["workload"]["contract"]:
+                    depths = sorted(
+                        {p["load"]["session_rotation_depth"] for p in members}
+                    )
+                    assert page.locator('[data-filter="rotation"]').count() == len(
+                        depths
+                    )
+                    for depth in depths:
+                        assert page.locator(
+                            f'[data-filter="rotation"][value="{depth}"]'
+                        ).is_checked()
                 assert page.locator(".frontier-point").count() == len(members)
                 assert_concurrency_series(page, members)
                 for point in members:

@@ -11,7 +11,7 @@
 .frontier-model-tag span { font-size: 10px; opacity: .8; }
 .frontier-model-tag[aria-pressed="true"] { background: var(--run-tint); border-color: var(--run-accent); color: var(--run-accent); }
 .frontier-workload { display: grid; gap: 5px; color: var(--run-muted); font-size: 10px; max-width: 100%; }
-.frontier-workload select { max-width: 100%; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 6px; padding: 8px; font: inherit; font-size: 12px; }
+.frontier-workload select { width: 100%; min-width: 0; max-width: 100%; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 6px; padding: 8px; font: inherit; font-size: 12px; }
 .frontier-workload select:disabled { opacity: 1; cursor: default; }
 .frontier-plot { position: relative; padding: 12px 14px 0; }
 .frontier-plot svg { display: block; width: 100%; height: auto; min-height: 260px; max-height: 530px; }

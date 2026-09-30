@@ -41,6 +41,31 @@ test('production and empty snapshots validate without inventing points',()=>{
     assert.deepEqual(model.validate({schema_version:'leaderboard-frontier/v1',cohorts:[],points:[]}).points,[]);
     assert.equal(model.project([], 'interactivity','output_tps_per_chip').frontier.length,0);
 });
+test('fixed Qwen3.5 comparisons live on precise setting pages without implying missing series',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const fixed=data.cohorts.filter(c=>c.workload.contract.presentation==='fixed-comparison');
+    assert.equal(fixed.length,8);
+    const fixedIds=new Set(fixed.map(c=>c.id));
+    const fixedPoints=data.points.filter(p=>fixedIds.has(p.cohort_id));
+    assert.equal(fixedPoints.length,16);
+    assert.deepEqual(fixed.map(c=>data.points.filter(p=>p.cohort_id===c.id).length).sort((a,b)=>a-b),
+        [1,2,2,2,2,2,2,3]);
+    assert.equal(model.concurrencySeries(model.project(fixedPoints,'decode_p90_tps','output_tps_per_chip').measured).length,0);
+
+    const unifiedId='qwen35-35b-a3b-bf16-sweprefix-smoke-v1';
+    const unified=data.points.filter(p=>p.cohort_id===unifiedId);
+    const measured=model.project(unified,'decode_p90_tps','output_tps_per_chip').measured;
+    const connected=new Set(model.concurrencySeries(measured).flat().map(row=>row.point.id));
+    assert.ok(measured.length>0);
+    assert.ok(measured.every(row=>connected.has(row.point.id)));
+});
+test('presentation mode accepts only declared setting semantics',()=>{
+    const fixture=structuredClone(require('./fixtures/leaderboard_frontier.json'));
+    fixture.cohorts[0].workload.contract.presentation='fixed-comparison';
+    assert.equal(model.validate(fixture),fixture);
+    fixture.cohorts[0].workload.contract.presentation='pareto-invalid';
+    assert.throws(()=>model.validate(fixture),/Invalid Frontier presentation/);
+});
 test('Qwen2.5-14B vSpec uses measured offline batch and total-throughput axes',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const cohort=data.cohorts.find(c=>c.id==='qwen25-14b-bf16-gsm8k-b128-vspec-v1');
@@ -718,16 +743,18 @@ test('retired AgentX cohorts disappear from active choices without deleting hist
 });
 
 
-test('Qwen35 unified campaign shares the existing chart without losing checkpoint provenance',()=>{
+test('Qwen35 unified campaign remains on its series page without losing checkpoint provenance',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const visible=model.visibleData(data);
     const cohorts=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
-    assert.equal(cohorts.length,1);
+    assert.equal(cohorts.length,9);
+    assert.equal(cohorts.filter(c=>c.workload.contract.presentation==='fixed-comparison').length,8);
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
     assert.equal(moved.length,35);
-    const canonical=cohorts[0];
+    const canonical=cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
+    assert.ok(canonical);
     const checkpointIdentities=new Set([
         original.model.revision,
         canonical.model.revision,
@@ -739,7 +766,7 @@ test('Qwen35 unified campaign shares the existing chart without losing checkpoin
         ...(canonical.workload.contract.prepared_workload_variants||[]).map(variant=>variant.sha256),
     ]);
     for(const p of moved){
-        assert.equal(p.cohort_id,cohorts[0].id);
+        assert.equal(p.cohort_id,canonical.id);
         assert.ok(checkpointIdentities.has(p.configuration.parameters.checkpoint_revision));
         assert.ok(workloadIdentities.has(p.evidence.benchmark_protocol.prepared_workload_sha256));
     }
