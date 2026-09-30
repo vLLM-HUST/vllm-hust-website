@@ -180,6 +180,11 @@
     return (
       performanceResults.has(item.id)
       || (
+        item.artifact_type === "bridge"
+        && item.compatibility?.status === "verified"
+        && String(item.canonical_repository || "").startsWith("https://github.com/")
+      )
+      || (
       (
         ["runtime_component", "bridge"].includes(item.artifact_type)
         || isToolMod(item)
@@ -754,7 +759,13 @@ vllm-hust-ext extension check ${extensionId}`
     const value = measured ? format(result.gain) : (zh ? "缺数据" : "No data");
     panel.append(element("strong", measured && result.gain < 0 ? "performance-negative" : "", value));
     if (measured) {
-      panel.append(element("span", "", [result.modelLabel, zh ? "输出吞吐" : "Output throughput"].filter(Boolean).join(" · ")));
+      panel.append(element("span", "", [
+        result.modelLabel,
+        local(result, "setting_label"),
+        zh ? "输出吞吐" : "Output throughput"
+      ].filter(Boolean).join(" · ")));
+      const aggregationNote = local(result, "aggregation_note");
+      if (aggregationNote) panel.append(element("span", "plugin-performance-aggregation", aggregationNote));
       if (result.runtimeBase) {
         const ascend = result.runtimeBase["vllm-ascend"] || result.runtimeBase.vllm_ascend;
         panel.append(element("span", "plugin-performance-runtime",
@@ -1083,21 +1094,21 @@ vllm-hust-ext extension check ${extensionId}`
   search.placeholder = copy().searchPlaceholder;
 
   Promise.all([
-    fetch(catalog.dataset.source).then((response) => {
+    fetch(catalog.dataset.source, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
       return response.json();
     }),
-    fetch(catalog.dataset.metadata).then((response) => {
+    fetch(catalog.dataset.metadata, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`Workshop metadata request failed: ${response.status}`);
       return response.json();
     }),
-    fetch(workloadNavigationRoot.dataset.source).then((response) => {
+    fetch(workloadNavigationRoot.dataset.source, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`Workload navigation request failed: ${response.status}`);
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=benchmark-settings-20260929").then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=benchmark-settings-20260929").then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
+      fetch("./data/plugin-performance.json?v=plugin-observations-20260930", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=plugin-observations-20260930", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {

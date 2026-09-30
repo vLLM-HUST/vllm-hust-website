@@ -148,8 +148,8 @@ Research code can evolve without permanent forks or a universal plugin abstracti
 <span class="lang-zh">把 KV 状态变成可编程策略面</span>
 </h3>
 <p>
-<span class="lang-en">BidKV ba700cb uses the merged vLLM-HUST preemption-policy API v1 with bounded safe abstention. Runtime tree 199e0bd passed artifact functional qualification on Qwen3.8-27B, Ascend TP4 FULL_DECODE_ONLY graph, Core a4d6aa0 and Ascend 2c8c722. Only 5/13 Stage-1 effectiveness cells have real runs; ascending mixed is inconclusive and interactive c=8 is not beneficial in the tested cell.</span>
-<span class="lang-zh">BidKV ba700cb 使用已合并的 vLLM-HUST preemption-policy API v1 与有界安全弃权。运行树 199e0bd 在 Core a4d6aa0、Ascend 2c8c722、Qwen3.8-27B Ascend TP4 FULL_DECODE_ONLY graph 上通过制品功能资格验收；Stage-1 效果矩阵仅 5/13 个单元有真实运行，ascending mixed 为 inconclusive，interactive c=8 在已测单元不具收益。
+<span class="lang-en">BidKV now has a separate Qwen3.5-35B-A3B TP4 KV-pressure observation. Two alternating-order C12 pairs improved output throughput by 17.11% and 10.65%, with active policy selections and zero policy failures. The earlier TP2/SWE and Qwen3.8 observations remain visible as separate settings, including their zero-action and negative boundaries.</span>
+<span class="lang-zh">BidKV 现已增加独立的 Qwen3.5-35B-A3B TP4 KV-pressure 观察。两轮交替顺序 C12 配对的输出吞吐分别提升 17.11% 与 10.65%，策略真实执行且失败为 0。旧 TP2/SWE 与 Qwen3.8 观察继续按独立设定保留，包括未触发与负向边界。
 </span>
 </p>
 <div class="highlight-links">
@@ -622,24 +622,24 @@ vllm-hust-ext run -- vllm serve MODEL
 Manifest 0.2 distinguishes kind, host, runtime, lifecycle owner, required services, compatibility ranges, and Python/service/OCI/Helm/Kubernetes carriers.
 MooncakeStoreConnector has passed a real Ascend save/load and outage/recovery gate.
 Production Stack has passed controller reconciliation, metrics-backed scaling, and a real GLM Router 500-to-200 recovery without restarting vLLM. Its arm64 carrier was published by GitHub-hosted runners, then pulled and entrypoint-tested in an arm64 validation environment; amd64 and self-hosted infrastructure are not required.
-BidKV's current artifact passed startup, four-rank graph, policy-safety, cancellation/recovery, and rollback gates in five paired cells on Qwen3.8-27B TP4 graph. Eight of thirteen Stage-1 cells remain pending. The legacy short workload leaked special tokens in both arms and long artifacts retained prefixes only, so corrected exact/semantic output gates require a fresh run. The generic scheduler contract is merged in vLLM-HUST organization PR #11; qualification remains model-, artifact-, and workload-specific.</span>
+BidKV's newer Qwen3.5 TP4 campaign completed two alternating-order C12 pairs with identical output-token totals, active policy selections and zero policy failures. Its positive KV-pressure cell, retained negative tuning trials, and post-result shutdown diagnostic are published together. The older Qwen3.8 TP4 matrix still has eight of thirteen Stage-1 cells pending. The generic scheduler contract is merged in vLLM-HUST organization PR #11; every qualification remains model-, artifact-, setting-, and workload-specific.</span>
 <span class="lang-zh">原单一 Python Bundle v1 设计已冻结为不稳定实验。
 Manifest 0.2 显式区分 kind、host、runtime、lifecycle owner、required services、兼容范围以及 Python/service/OCI/Helm/Kubernetes 载体。
 MooncakeStoreConnector 已通过真实 Ascend save/load 与中断/恢复门禁。
 Production Stack 已通过 controller 调谐、Metrics 扩容，以及不重启 vLLM 的真实 GLM Router 500→200 恢复；arm64 载体已由 GitHub-hosted runner 发布，并在 arm64 验证环境完成拉取与入口验收，不要求 amd64 或 self-hosted 基础设施。
-BidKV 当前制品在 Qwen3.8-27B TP4 graph 的五组配对单元中通过启动、四 rank graph、策略安全、取消/恢复和回滚门槛；十三个 Stage-1 单元仍有八个待测。旧短输出负载在两臂都泄漏特殊 token，旧长输出制品只保留前缀，因此修正后的精确/语义输出门槛仍需新运行；通用 scheduler 契约已通过 vLLM-HUST 组织 PR #11 合并，资格仍按模型、制品与 workload 单独判定。
+BidKV 新增的 Qwen3.5 TP4 实验完成两轮交替顺序 C12 配对，各臂输出 token 总数一致，策略真实执行且失败为 0；正向 KV-pressure 单元、负向调参试验与结果保存后的退出诊断一并公开。旧 Qwen3.8 TP4 矩阵仍有十三个 Stage-1 单元中的八个待测。通用 scheduler 契约已通过 vLLM-HUST 组织 PR #11 合并；资格仍按模型、制品、设定与 workload 单独判定。
 </span>
 </p>
 </aside>
 
       <aside class="plugin-runtime-note">
 <strong>
-<span class="lang-en">BidKV is qualified on the Sage Mate 0.28.1 candidate lane</span>
-<span class="lang-zh">BidKV 已在 Sage Mate 0.28.1 候选通道通过验证</span>
+<span class="lang-en">BidKV observations stay separated by exact setting</span>
+<span class="lang-zh">BidKV 按精确实验设定分开记录</span>
 </strong>
 <p>
-<span class="lang-en">The current BidKV distribution uses <code>vllm.preemption_policy.v1</code> and does not register or monkey-patch the removed private victim selector. On Qwen3.8-27B, Core a4d6aa0, Ascend 2c8c722, Ascend TP4 FULL_DECODE_ONLY graph, five paired cells passed runtime/policy-safety gates with zero policy failures or invalid selections; eight Stage-1 cells and corrected output gates remain pending. Ascending mixed is inconclusive because one of three repeats did not invoke the policy. Interactive c=8 invoked it in every repeat but was not beneficial in that tested cell: mean throughput -25.31% (95% CI -26.66% to -23.96%) and P95 latency +34.57% (95% CI +31.96% to +37.17%). Qwen3-0.6B and Qwen2.5-3B remain historical 0.23-lane evidence only.</span>
-<span class="lang-zh">当前 BidKV 使用 <code>vllm.preemption_policy.v1</code>，不再注册或 monkey-patch 被移除的私有 victim selector。在 Qwen3.8-27B、Core a4d6aa0、Ascend 2c8c722、Ascend TP4 FULL_DECODE_ONLY graph 上，五组配对单元通过运行/策略安全门槛，策略失败和无效选择均为 0；Stage-1 仍有八个单元待测，修正后的输出门槛也待新运行。ascending mixed 三轮中有一轮未触发策略，因此为 inconclusive。interactive c=8 每轮都触发，但在该已测单元不具收益：吞吐均值 -25.31%（95% CI -26.66% 至 -23.96%），P95 延迟 +34.57%（95% CI +31.96% 至 +37.17%）。Qwen3-0.6B 与 Qwen2.5-3B 仅保留为历史 0.23 通道证据。
+<span class="lang-en">The current BidKV distribution uses <code>vllm.preemption_policy.v1</code> and does not monkey-patch the removed private victim selector. In the Qwen3.5-35B-A3B TP4 FULL_AND_PIECEWISE C12 cell with 512 MiB KV/NPU, paired changes were +17.11% and +10.65%: +13.83% geometric mean under the Workshop aggregation contract, or +13.88% arithmetic mean of the two percentage changes. Candidate arms made 10 and 7 active selections with zero policy failures. Separate negative tuning trials are retained. The older Qwen3.8 FULL_DECODE_ONLY matrix, its -25.31% interactive c=8 cell, and the TP2/SWE zero-action five-point observation are not pooled with this result.</span>
+<span class="lang-zh">当前 BidKV 使用 <code>vllm.preemption_policy.v1</code>，不再 monkey-patch 已移除的私有 victim selector。在 Qwen3.5-35B-A3B、TP4 FULL_AND_PIECEWISE、C12、每 NPU 512 MiB KV 的单元中，两轮配对变化为 +17.11% 与 +10.65%；按扩展工坊统一聚合合同，几何平均为 +13.83%，两轮百分比变化的算术平均为 +13.88%。候选臂分别执行 10 与 7 次有效选择，策略失败为 0，负向调参试验也完整保留。旧 Qwen3.8 FULL_DECODE_ONLY 矩阵、其中 interactive c=8 的 -25.31%，以及 TP2/SWE 未触发策略的五点观察均不会与此结果合并。
 </span>
 </p>
 </aside>
@@ -922,7 +922,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
       <span class="lang-en">Independent vLLM-HUST extensions and manager-tested carriers appear here. Measured throughput changes include both gains and regressions.</span>
       <span class="lang-zh">这里展示 vLLM-HUST 独立扩展及通过插件管理器实测的载体；吞吐提升与回退均如实列出。</span>
     </p>
-    <section class="workload-navigation" data-workload-navigation data-source="./data/plugin-workload-navigation.json?v=tool-mods-20260929" aria-labelledby="workload-navigation-title">
+    <section class="workload-navigation" data-workload-navigation data-source="./data/plugin-workload-navigation.json?v=plugin-observations-20260930" aria-labelledby="workload-navigation-title">
       <header>
         <div>
           <span class="workload-navigation-kicker"><span class="lang-en">Find by workload</span><span class="lang-zh">按 Workload 找 MOD</span></span>
@@ -949,7 +949,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
       </div>
     </aside>
     <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
-    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=tool-mods-20260929" data-metadata="./data/plugin-workshop-metadata.json?v=workshop-metadata-v17-clm">
+    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=plugin-observations-20260930" data-metadata="./data/plugin-workshop-metadata.json?v=plugin-observations-20260930">
 </div>
     <button class="plugin-more" data-plugin-more type="button" hidden>Show all extensions</button>
     <section id="repository-portfolio" class="content-panel repository-portfolio" aria-labelledby="repository-portfolio-title">
@@ -1012,8 +1012,8 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
   </script>
   <script src="./assets/site.js?v=leaderboard-primary-20260927">
 </script>
-<script src="./assets/plugin-performance.js?v=benchmark-settings-20260929"></script>
-<script src="./assets/plugins-page.js?v=benchmark-settings-20260929">
+<script src="./assets/plugin-performance.js?v=plugin-observations-20260930"></script>
+<script src="./assets/plugins-page.js?v=plugin-observations-20260930">
 </script>
 </body>
 </html>

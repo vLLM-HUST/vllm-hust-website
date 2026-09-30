@@ -167,6 +167,10 @@
       "upstream_repository": "https://github.com/kvcache-ai/Mooncake",
       "summary_en": "Official vLLM MooncakeStoreConnector validated on Ascend with 9-key save/load and outage/recovery evidence; the non-invasive Host Provider checks NPU transport and operation evidence while Mooncake retains service ownership. A separate manager-launched Qwen3.5 benchmark setting tested AscendStoreConnector + Mooncake at five matched points, with throughput 1.02%–2.66% lower; these are not performance results for the official connector.",
       "summary_zh": "官方 vLLM MooncakeStoreConnector 已在 Ascend 完成 9-key save/load 与故障恢复实测；无侵入 Host Provider 检查 NPU transport 和操作证据，Mooncake 仍保留服务所有权。另一个 Qwen3.5 实验设定通过插件管理器测试 AscendStoreConnector + Mooncake：五档匹配对照吞吐低 1.02%–2.66%，并非官方连接器路径的性能结论。",
+      "public_effect_en": "The official MooncakeStoreConnector has functional save/load and outage/recovery evidence. The separate AscendStoreConnector + Mooncake measurements are deliberately not scored on this card because they did not exercise the official connector.",
+      "public_effect_zh": "官方 MooncakeStoreConnector 已有 save/load 与故障恢复功能证据。另一组 AscendStoreConnector + Mooncake 测量未执行官方 connector，因此不会归入此卡片的性能分数。",
+      "public_effect_status": "validated",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-UNIFIED-MODS.md",
       "compatibility": {
         "status": "verified",
         "host": "vLLM official connector",
@@ -295,26 +299,27 @@
       "maintainers": ["MingqiWang-coder", "cybber695"],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
       "upstream_repository": null,
-      "summary_en": "BidKV ba700cb uses the merged vLLM-HUST preemption-policy API v1 with bounded safe abstention; runtime tree 199e0bd passed Qwen3.8-27B artifact functional qualification on Core a4d6aa0, Ascend 2c8c722 and TP4 graph. Only 5/13 Stage-1 effectiveness cells have real runs, and corrected output gates need a fresh run.",
-      "summary_zh": "BidKV ba700cb 使用已合并的 vLLM-HUST preemption-policy API v1 与有界安全弃权；运行树 199e0bd 已在 Core a4d6aa0、Ascend 2c8c722、Qwen3.8-27B、TP4 graph 上通过制品功能资格验收。Stage-1 效果矩阵仅 5/13 个单元有真实运行，修正后的输出门槛仍需新运行。",
-      "public_effect_en": "All five functional pairs and the cancellation/recovery lane passed with zero policy failures or invalid selections. Ascending mixed is inconclusive because one repeat did not invoke the policy. In interactive c=8 (n=3), throughput was -25.31% and P95 latency +34.57%, so that cell is not beneficial.",
-      "public_effect_zh": "五组功能配对及取消/恢复通道全部通过，策略失败和无效选择均为 0。ascending mixed 因一轮未触发策略而为 inconclusive；interactive c=8（n=3）吞吐 -25.31%、P95 延迟 +34.57%，因此该单元不具收益。",
-      "public_effect_status": "inconclusive",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-bidkv/blob/main/docs/evidence/sage-mate-20260905-bounded-preemption-matrix.md",
-      "functional_compatibility": {"status": "passed", "scope": "Qwen3.8-27B · Ascend TP4 · FULL_DECODE_ONLY graph"},
+      "summary_en": "BidKV uses the merged vLLM-HUST preemption-policy API v1 with bounded safe abstention. The latest Qwen3.5-35B-A3B TP4 KV-pressure campaign preserves two positive C12 pairs, active policy selections, negative tuning trials and shutdown diagnostics; it remains separate from the older TP2/SWE and Qwen3.8 observations.",
+      "summary_zh": "BidKV 使用已合并的 vLLM-HUST preemption-policy API v1 与有界安全弃权。最新 Qwen3.5-35B-A3B TP4 KV-pressure 实验保留两轮 C12 正向配对、真实策略选择、负向调参试验与退出诊断，并与旧 TP2/SWE 和 Qwen3.8 观察严格分开。",
+      "public_effect_en": "In the Qwen3.5 TP4 C12 cell with 512 MiB KV per NPU, two alternating-order pairs improved output throughput by 17.11% and 10.65% (13.83% geometric mean; 13.88% arithmetic mean). BidKV made 10 and 7 active selections with zero policy failures. Other retained cells are negative or not exercised, so this is a tested-cell result, not a general speedup claim.",
+      "public_effect_zh": "在 Qwen3.5 TP4 C12、每 NPU 512 MiB KV 的测试单元中，两轮交替顺序配对的输出吞吐分别提升 17.11% 与 10.65%（几何平均 13.83%，算术平均 13.88%）。BidKV 分别执行 10 与 7 次有效选择，策略失败为 0。其余保留单元为负向或未触发，因此这只是已测单元结果，不代表普遍加速。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-bidkv/blob/main/results/qwen35-evoscientist-20260929/README.md#high-concurrency-kv-pressure-result",
+      "functional_compatibility": {"status": "passed", "scope": "Qwen3.5-35B-A3B · Ascend TP4 · FULL_AND_PIECEWISE graph; Qwen3.8-27B · Ascend TP4 · FULL_DECODE_ONLY graph"},
       "effectiveness_qualifications": [
+        {"status": "beneficial", "scope": "Qwen3.5 TP4 · C12 · 512 MiB KV/NPU · n=2 paired repeats"},
         {"status": "inconclusive", "scope": "ascending mixed · concurrency=4 · n=3"},
         {"status": "not-beneficial-in-tested-cell", "scope": "interactive · concurrency=8 · n=3"}
       ],
       "runtime_state_dimensions": ["installed", "configured", "enabled", "runtimeEffective"],
       "compatibility": {
         "status": "verified",
-        "host": "vLLM-HUST",
-        "versions": ["0.28.1rc1.dev319 @ 762f85b3"],
-        "platforms": ["Ascend NPU · TP4 · graph"],
-        "models": ["Qwen3.8-27B — artifact functional qualified; effectiveness matrix incomplete", "Qwen3-0.6B — historical 0.23 lane", "Qwen2.5-3B — historical 0.23 lane"],
-        "requirements_en": "Organization main ba700cb; qualified runtime tree 199e0bd with Manager 6e9a477. Functional compatibility, per-cell effectiveness, and live installed/configured/enabled/runtime-effective state are separate facts.",
-        "requirements_zh": "组织 main 为 ba700cb；已验证运行树 199e0bd，Manager 6e9a477。功能兼容性、逐测试单元效果与当前实例 installed/configured/enabled/runtime-effective 是彼此独立的事实。"
+        "host": "vLLM-HUST (setting-specific pinned runtimes)",
+        "versions": ["BidKV 0.2.1 measured @ a0cba97", "Qwen3.5 evidence merged @ edb7f09", "Qwen3.8 qualified runtime tree 199e0bd"],
+        "platforms": ["Ascend NPU · TP4 · FULL_AND_PIECEWISE", "Ascend NPU · TP4 · FULL_DECODE_ONLY"],
+        "models": ["Qwen3.5-35B-A3B — TP4 C12 KV-pressure measured; tested-cell benefit", "Qwen3.8-27B — artifact functional qualified; effectiveness matrix incomplete", "Qwen3-0.6B — historical 0.23 lane", "Qwen2.5-3B — historical 0.23 lane"],
+        "requirements_en": "The Qwen3.5 result used Core f18cf803, Ascend 249ac12 plus the recorded build patch, FULL_AND_PIECEWISE graph, C12 and 512 MiB KV/NPU. Do not pool it with the TP2/SWE five-point observation or the older Qwen3.8 matrix. Functional compatibility, per-cell effectiveness, and live runtime-effective state are separate facts.",
+        "requirements_zh": "Qwen3.5 结果使用 Core f18cf803、Ascend 249ac12 加已记录构建补丁、FULL_AND_PIECEWISE graph、C12 与每 NPU 512 MiB KV。不得与 TP2/SWE 五点观察或旧 Qwen3.8 矩阵合并。功能兼容、逐单元效果与当前实例 runtime-effective 状态是不同事实。"
       },
       "evidence_level": "performance_verified"
     },
@@ -424,8 +429,8 @@
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE",
       "upstream_repository": null,
-      "summary_en": "LatchMoE is not applicable to dense Qwen3.8-27B. Qwen3-30B-A3B is functionally qualified on Core 762f85b3, Ascend 4e57439e/seam v2, TP4 graph (PIECEWISE), but performance is substantially degraded.",
-      "summary_zh": "LatchMoE 不适用于 dense Qwen3.8-27B。Qwen3-30B-A3B 已在 Core 762f85b3、Ascend 4e57439e/seam v2、TP4 PIECEWISE graph 上通过功能资格验证，但性能明显退化。",
+      "summary_en": "LatchMoE is not applicable to dense Qwen3.8-27B. Version 0.3.0 is now packaged under the Extension Bundle contract with a narrowed TP1 PIECEWISE functional release scope. Its published throughput comparison remains a separate historical Qwen3-30B-A3B TP4 graph artifact and is substantially degraded.",
+      "summary_zh": "LatchMoE 0.3.0 已按 Extension Bundle 合同打包，当前功能发行范围收窄为 TP1 PIECEWISE。公开吞吐对比仍属于独立的历史 Qwen3-30B-A3B TP4 制品，且性能明显退化；dense Qwen3.8-27B 不适用。",
       "public_effect_en": "All four ranks exercised expert mapping, host/device movement and graph replay with 48/48 stable-address checks. Four concurrent outputs, cancellation and exception recovery passed; output throughput was about 2.91 tok/s versus 23.57 tok/s without the plugin.",
       "public_effect_zh": "四个 rank 均实际执行专家映射、主机/设备换入换出与 graph replay，48/48 地址稳定性检查通过；四路并发输出、取消与异常恢复通过，但输出吞吐约 2.91 tok/s，显著低于无插件基线的 23.57 tok/s。",
       "public_effect_status": "not-beneficial-in-tested-cell",
@@ -436,11 +441,11 @@
       "compatibility": {
         "status": "verified",
         "host": "vLLM Ascend HUST",
-        "versions": ["Core 762f85b3 + Ascend 4e57439e/seam-v2"],
-        "platforms": ["Ascend NPU · TP4 · graph"],
-        "models": ["Qwen3-30B-A3B — verified functional, performance degraded", "Qwen3.8-27B — not applicable (dense)", "GLM-4.7-Flash — historical single-NPU lane", "Qwen3-Next-80B-A3B-Instruct — historical single-NPU lane"],
-        "requirements_en": "Qualified artifact 63781f3d on Qwen3-30B-A3B BF16 TP4 PIECEWISE graph, max_num_seqs=4. Functional compatibility does not imply a speedup or production recommendation.",
-        "requirements_zh": "已验证制品 63781f3d：Qwen3-30B-A3B BF16、TP4 PIECEWISE graph、max_num_seqs=4。功能兼容不代表加速效果或生产推荐。"
+        "versions": ["Current package 0.3.0 @ 75b922b", "Historical TP4 performance artifact 63781f3d · Core 762f85b3 + Ascend 4e57439e/seam-v2"],
+        "platforms": ["Current release scope: Ascend NPU · TP1 · PIECEWISE · prefix cache off", "Historical performance scope: Ascend NPU · TP4 · PIECEWISE graph"],
+        "models": ["Qwen3-30B-A3B — current TP1 functional release scope; historical TP4 performance degraded", "Qwen3.8-27B — not applicable (dense)", "GLM-4.7-Flash — historical single-NPU lane", "Qwen3-Next-80B-A3B-Instruct — historical single-NPU lane"],
+        "requirements_en": "The current 0.3.0 package scope and the historical TP4 performance artifact are different qualifications. The -87.65% card result belongs only to artifact 63781f3d on Qwen3-30B-A3B BF16 TP4 PIECEWISE graph with max_num_seqs=4; it must not be transferred to the TP1 release package.",
+        "requirements_zh": "当前 0.3.0 包范围与历史 TP4 性能制品是两项不同资格。卡片中的 -87.65% 仅属于制品 63781f3d 在 Qwen3-30B-A3B BF16、TP4 PIECEWISE、max_num_seqs=4 下的结果，不得转移到 TP1 发行包。"
       },
       "evidence_level": "hardware_verified"
     },
@@ -576,8 +581,8 @@
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust",
       "upstream_repository": null,
-      "summary_en": "KV transformation and compression provider for vLLM Ascend, with Qwen3.5 hybrid-cache, APC, asynchronous scheduling and MTP support.",
-      "summary_zh": "vLLM Ascend KV 状态转换与压缩 provider，已支持 Qwen3.5 混合缓存、APC、异步调度与 MTP。",
+      "summary_en": "KV transformation and compression provider for vLLM Ascend. The measured Qwen3.5 artifact supports hybrid cache groups, APC, asynchronous scheduling and MTP2; current main additionally carries method-neutral per-layer physical state and query-observation support for graph replay.",
+      "summary_zh": "vLLM Ascend KV 状态转换与压缩 provider。已测 Qwen3.5 制品支持混合缓存分组、APC、异步调度与 MTP2；当前 main 还加入了面向 graph replay 的方法无关逐层物理状态与 query observation 支持。",
       "public_effect_en": "On the exact Qwen3.5-35B BF16 setting, the five-point geometric-mean output-throughput change is -3.55% versus the shared Native series.",
       "public_effect_zh": "在完全相同的 Qwen3.5-35B BF16 设定下，相对统一 Native 曲线，五个并发点的输出吞吐几何平均变化为 -3.55%。",
       "public_effect_status": "measured",
@@ -588,7 +593,8 @@
         "versions": [
           "vLLM-HUST 0.25.1+frontier.unified",
           "vLLM-Ascend-HUST 0.25.1rc1",
-          "KVCompress 2ca0f933"
+          "Measured KVCompress artifact 2ca0f933",
+          "Current compatibility head d5507c2 (per-layer MTP graph replay; no performance transfer)"
         ],
         "platforms": [
           "Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph"
@@ -596,8 +602,8 @@
         "python": [
           ">=3.10,<3.15"
         ],
-        "requirements_en": "The measured Qwen3.5 BF16 setting used ECPA, TP2, aligned hybrid KV groups, APC, asynchronous scheduling and native MTP2. Runtime effectiveness requires cache-binding and compression-commit evidence.",
-        "requirements_zh": "Qwen3.5 BF16 设定通过 ECPA 启动，使用 TP2、align 混合 KV 分组、APC、异步调度和原生 MTP2；运行时生效需同时观测缓存绑定与压缩提交。",
+        "requirements_en": "The -3.55% observation is pinned to measured artifact 2ca0f933 and is not a performance claim for current main d5507c2. The measured setting used ECPA, TP2, aligned hybrid KV groups, APC, asynchronous scheduling and native MTP2. Runtime effectiveness requires cache-binding and compression-commit evidence.",
+        "requirements_zh": "-3.55% 观察固定属于实测制品 2ca0f933，不构成当前 main d5507c2 的性能结论。实测设定通过 ECPA 启动，使用 TP2、align 混合 KV 分组、APC、异步调度和原生 MTP2；运行时生效需同时观测缓存绑定与压缩提交。",
         "models": [
           "Qwen3.5-35B-A3B — unified BF16 setting verified"
         ],
@@ -1070,7 +1076,7 @@
       "public_effect_zh": "Qwen3.5 TP2/PP2 五档并发及匹配 Native 对照已发布，吞吐按全部四张卡计量。批次准入策略实际执行；每点仍为单次观测，不能据此宣称稳定加速。",
       "public_effect_status": "inconclusive",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PIPELINE-K8S.md",
-      "compatibility": {"status": "verified", "host": "vLLM reference scheduler policy", "versions": ["Pipeline a15a229", "vLLM 0.25.1 experimental backport · protocol 1.1"], "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B · TP2/PP2"], "python": [">=3.10"], "requirements_en": "ECPA launched the measured APC, MTP2, asynchronous scheduling, Mamba align, and FULL_AND_PIECEWISE configuration. The published curve uses the matched four-chip TP2/PP2 Native control.", "requirements_zh": "ECPA 已启动实测所用的 APC、MTP2、异步调度、Mamba align 与 FULL_AND_PIECEWISE 组合；公开曲线使用匹配的四卡 TP2/PP2 Native 对照。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch/issues/3"},
+      "compatibility": {"status": "verified", "host": "vLLM reference scheduler policy", "versions": ["Pipeline a15a229", "vLLM 0.25.1 experimental backport · protocol 1.1"], "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B · TP2/PP2"], "models": ["Qwen3.5-35B-A3B — matched four-chip TP2/PP2 five-point observation"], "python": [">=3.10"], "requirements_en": "ECPA launched the measured APC, MTP2, asynchronous scheduling, Mamba align, and FULL_AND_PIECEWISE configuration. The published curve uses the matched four-chip TP2/PP2 Native control.", "requirements_zh": "ECPA 已启动实测所用的 APC、MTP2、异步调度、Mamba align 与 FULL_AND_PIECEWISE 组合；公开曲线使用匹配的四卡 TP2/PP2 Native 对照。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch/issues/3"},
       "evidence_level": "performance_verified"
     },
     {
@@ -1241,14 +1247,14 @@
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
       "upstream_repository": null,
-      "summary_en": "Arrival-time KV materialization MOD for studying full reuse, block-aligned partial reuse, and recomputation through an out-of-tree vLLM plugin.",
-      "summary_zh": "面向请求到达时刻 KV 物化决策的 MOD，通过 out-of-tree vLLM 插件研究完整复用、块对齐部分复用与重计算。",
-      "public_effect_en": "The live M2 study completed 18 matched lifecycles and found that the controller did not outperform the best fixed policy. The repository publishes this negative boundary result and does not claim a stable performance gain.",
-      "public_effect_zh": "M2 在线研究完成 18 个配对 lifecycle，结果显示 controller 未优于最佳固定策略；仓库公开该负向边界结果，不声明稳定性能收益。",
-      "public_effect_status": "inconclusive",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
-      "compatibility": {"status": "inspect_only", "host": "vLLM", "versions": ["Plugin 0.1.0", "pinned research carrier"], "platforms": ["Ascend NPU research path"], "python": [">=3.10"], "requirements_en": "The vllm.general_plugins entry point and research carrier are available. The current controller direction is stopped by its preregistered negative result; future work requires a materially different mechanism and a new protocol.", "requirements_zh": "已提供 vllm.general_plugins 入口与研究 carrier；当前 controller 方向已依据预注册负向结果停止，后续工作需提出实质不同的机制并重新制定实验协议。"},
-      "evidence_level": "integration_tested"
+      "summary_en": "Arrival-time KV materialization MOD for full reuse, block-aligned partial reuse and recomputation. A unified Qwen3.5 plugin artifact exercised real scheduler decisions; the separate historical M2 study remains a negative mechanism boundary.",
+      "summary_zh": "面向请求到达时刻完整复用、块对齐部分复用与重计算的 KV 物化 MOD。统一 Qwen3.5 插件制品已执行真实 scheduler 决策；独立的历史 M2 研究仍保留为负向机制边界。",
+      "public_effect_en": "The unified Qwen3.5 five-point observation is +7.13% geometric mean versus its exact Native series, with recompute and reuse actions exercised. The separate Qwen2.5 M2 study did not beat the best fixed policy; neither result transfers to the other protocol.",
+      "public_effect_zh": "统一 Qwen3.5 五点观察相对精确 Native 序列的几何平均变化为 +7.13%，且真实执行了 recompute 与 reuse。独立的 Qwen2.5 M2 研究未优于最佳固定策略；两项结果不得跨协议转移。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KV-MATERIALIZATION.md",
+      "compatibility": {"status": "verified", "host": "vLLM-HUST", "versions": ["Measured plugin artifact 53a6b113", "Plugin 0.1.0 research carrier"], "platforms": ["Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph", "Historical Ascend research path"], "models": ["Qwen3.5-35B-A3B — unified BF16 five-point observation", "Qwen2.5-7B-Instruct — historical M2 negative boundary"], "python": [">=3.10"], "requirements_en": "Keep the Qwen3.5 unified observation and historical Qwen2.5 M2 study separate. The Qwen3.5 runtime exercised recompute, partial-reuse and full-reuse decisions; the M2 controller direction stopped after its preregistered negative result.", "requirements_zh": "必须分开 Qwen3.5 统一观察与历史 Qwen2.5 M2 研究。Qwen3.5 运行时执行了 recompute、partial-reuse 与 full-reuse 决策；M2 controller 方向则依据预注册负向结果停止。"},
+      "evidence_level": "performance_verified"
     },
     {
       "id": "vllm-hust-benchmark",
@@ -1339,8 +1345,8 @@
       "repository_visibility": "public",
       "upstream_repository": null,
       "documentation_url": "./betterscale.html",
-      "summary_en": "Less host waiting. More device execution. FULL graphs, ordered replay and device-side metadata preparation shorten cross-step dependencies in DeepSeek V4 Flash.",
-      "summary_zh": "让设备少等调度，多做推理。通过 FULL graph、有序 replay 与 device 侧元数据准备，缩短 DeepSeek V4 Flash 波次之间的依赖与等待。",
+      "summary_en": "Less host waiting. More device execution. BetterScale publishes separate bounded observations for DeepSeek V4 Flash and a Qwen3.5 TP2 small-fish prototype; their models, runtimes and protocols are not pooled.",
+      "summary_zh": "让设备少等调度，多做推理。BetterScale 分别公开 DeepSeek V4 Flash 与 Qwen3.5 TP2 small-fish 原型的有限观察；两者的模型、运行时与协议不会合并。",
       "public_effect_en": "Bounded HTTP output throughput vs respective native baseline: DP8 +39.63%, TP8 +35.17%. 0.3.1 carries the qualified DP startup implementation; results are reused, not remeasured. Retained retrieval: 32/32. No universal latency claim.",
       "public_effect_zh": "有限 HTTP 负载下，相对各自原生基线的输出吞吐：DP8 +39.63%，TP8 +35.17%。0.3.1 收进已验收的 DP 预热实现，沿用既有测量。检索子集 32/32；不声称所有延迟都改善。",
       "public_effect_status": "measured",
@@ -1357,16 +1363,18 @@
           "vllm-betterscale 0.3.2 / betterscale.worker.Worker"
         ],
         "platforms": [
-          "8 × Ascend 910B2 / HCCS · TP8 + EP or TP1 / DP8 / EP8"
+          "8 × Ascend 910B2 / HCCS · TP8 + EP or TP1 / DP8 / EP8",
+          "2 × Ascend 910B2 · TP2 · FULL graph · Qwen3.5 small-fish prototype"
         ],
         "models": [
-          "DeepSeek-V4-Flash-0731-w8a8 · W8A8 / BF16 activations"
+          "DeepSeek-V4-Flash-0731-w8a8 · W8A8 / BF16 activations",
+          "Qwen3.5-35B-A3B — TP2 small-fish five-point smoke observation; shared-host, single observations"
         ],
         "python": [
           ">=3.12"
         ],
-        "requirements_en": "One native Worker entry: DSV4 TP8/DP8 K5 or Qwen27 BF16 TP2 FULL without MTP. vllm-betterscale 0.5.1 includes qualified Linux/aarch64 native libraries; an existing pinned Ascend runtime and model weights are required. No Extension Manager bundle contract. Native third-party license terms and bounded configurations are documented on the project page.",
-        "requirements_zh": "统一原生 Worker：DSV4 TP8／DP8 K5，或 Qwen27 BF16 TP2 FULL、无 MTP。vllm-betterscale 0.5.1 包含已验收 Linux/aarch64 原生库，仍需已有固定 Ascend 运行时和模型权重。不是 Extension Manager bundle；原生第三方许可与配置边界见项目页。"
+        "requirements_en": "The +42.39% Qwen3.5 card result is pinned to source capsule f7598b9 on Core 752a3a5 / Ascend 9bf964c and five shared-host smoke observations; it is not a result for the current package or the DeepSeek configuration. vllm-betterscale 0.5.1 requires an existing pinned Ascend runtime and model weights and is not an Extension Manager bundle.",
+        "requirements_zh": "卡片中的 Qwen3.5 +42.39% 固定属于源码胶囊 f7598b9、Core 752a3a5 / Ascend 9bf964c 与五个共享主机 smoke 单次观察；它不是当前软件包或 DeepSeek 配置的结果。vllm-betterscale 0.5.1 仍需固定 Ascend 运行时和模型权重，且不是 Extension Manager bundle。"
       },
       "evidence_level": "hardware_verified"
     }
@@ -1416,10 +1424,11 @@
           "scheduler logic is device-agnostic"
         ],
         "models": [
+          "Qwen3.5-35B-A3B — pinned known-output-budget carrier measured; no deferral or preemption occurred",
           "Qwen2.5-7B-Instruct — length predictor (EGTP head) reproduced on ForeLen"
         ],
-        "requirements_en": "Core PR vllm-HUST/vllm-hust#8 must merge for the victim-selector group and predicted_length channel to exist in main. Installing the bundle alone changes nothing (explicit two-layer selection).",
-        "requirements_zh": "需 vllm-HUST/vllm-hust#8 合入后 main 才存在 victim-selector 组与 predicted_length 通道。仅安装 Bundle 不改变任何行为（两层显式选择）。"
+        "requirements_en": "The Qwen3.5 card result belongs to a pinned known-output-budget carrier whose admission checks ran but took no control action; it does not qualify the learned predictor. Core PR vllm-HUST/vllm-hust#8 is still required for the legacy victim-selector group and predicted_length channel.",
+        "requirements_zh": "Qwen3.5 卡片结果属于固定版本的已知输出预算 carrier；准入检查执行了，但没有采取控制动作，因此不能验证学习型预测器。旧 victim-selector 组与 predicted_length 通道仍需要 vllm-HUST/vllm-hust#8。"
       },
       "evidence_level": "performance_verified"
     },
