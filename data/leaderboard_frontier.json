@@ -23,7 +23,7 @@
       "context_tokens": 262144,
       "workload": {
         "id": "sweprefix-qwen35-eight-traces-900s-v1",
-        "label": "SWE prefix reuse · 15 min smoke",
+        "label": "SWE prefix reuse · unified concurrency comparison",
         "contract": {
           "profile": "smoke",
           "measurement_seconds": 900,
@@ -77,7 +77,11 @@
             "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
             "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
           },
-          "display_scope": "Owner-selected shared Qwen3.5-35B-A3B BF16 SWE chart across checkpoint/source campaigns; actual revisions and matched-control provenance remain per point. Rotation depths have independent frontiers; display merge is not a causal speedup comparison."
+          "display_scope": "The public comparison defaults to the swe-unified series under one fixed contract. Historical and qualification observations remain in the evidence snapshot but are not mixed into this chart.",
+          "display_series_prefix": "swe-unified-",
+          "default_groups": [
+            "none"
+          ]
         }
       }
     },
@@ -349,7 +353,7 @@
       "context_tokens": 262144,
       "workload": {
         "id": "agentx256k-8fecd2fc-smoke900-v1",
-        "label": "AgentX 256K · 15 min smoke",
+        "label": "AgentX 256K · measured comparison",
         "contract": {
           "profile": "smoke",
           "measurement_seconds": 900,
@@ -392,7 +396,7 @@
       "context_tokens": 262144,
       "workload": {
         "id": "sweprefix-qwen38-27b-eight-traces-900s-v1",
-        "label": "SWE prefix reuse · 15 min smoke",
+        "label": "SWE prefix reuse · measured concurrency comparison",
         "contract": {
           "profile": "smoke",
           "measurement_seconds": 900,
@@ -448,7 +452,7 @@
       "context_tokens": 262144,
       "workload": {
         "id": "sweprefix-dsv4-eight-traces-900s-v1",
-        "label": "SWE prefix reuse · 15 min smoke",
+        "label": "SWE prefix reuse · measured concurrency comparison",
         "contract": {
           "profile": "smoke",
           "measurement_seconds": 900,
