@@ -17,6 +17,12 @@
     };
     function validate(data) {
         if (data?.schema_version !== 'leaderboard-frontier/v1' || !Array.isArray(data.cohorts) || !Array.isArray(data.points)) throw new Error('Unsupported Frontier snapshot');
+        const baseline = data.official_baseline;
+        if (!object(baseline) || typeof baseline.id !== 'string' || !baseline.id
+            || baseline.engine !== 'vLLM + vLLM-Ascend'
+            || !/^\d+\.\d+\.\d+$/.test(baseline.vllm_version)
+            || !/^\d+\.\d+\.\d+$/.test(baseline.vllm_ascend_version)
+            || typeof baseline.comparison_policy !== 'string' || !baseline.comparison_policy) throw new Error('Invalid official baseline');
         const ids = new Set(), aliases = new Set(), contracts = new Set();
         for (const c of data.cohorts) {
             const key = JSON.stringify([c.model?.id, c.precision?.id, c.workload?.id, c.context_tokens]);
@@ -33,6 +39,14 @@
             if (presentation != null && !['concurrency-series', 'fixed-comparison', 'configuration-study'].includes(presentation)) throw new Error('Invalid Frontier presentation');
             const displayPrefix = c.workload.contract.display_series_prefix;
             if (displayPrefix != null && (typeof displayPrefix !== 'string' || !displayPrefix)) throw new Error('Invalid display series prefix');
+            const displaySeries = c.workload.contract.display_series_ids;
+            if (displaySeries != null && (!Array.isArray(displaySeries) || !displaySeries.length
+                || new Set(displaySeries).size !== displaySeries.length || displaySeries.some(series => typeof series !== 'string' || !series)
+                || displayPrefix != null)) throw new Error('Invalid display series IDs');
+            const displayLabels = c.workload.contract.display_group_labels;
+            if (displayLabels != null && (!object(displayLabels) || Object.entries(displayLabels).some(([group, labels]) =>
+                !group || !object(labels) || typeof labels.label_en !== 'string' || !labels.label_en
+                || typeof labels.label_zh !== 'string' || !labels.label_zh))) throw new Error('Invalid display group labels');
             const defaultGroups = c.workload.contract.default_groups;
             if (defaultGroups != null && (!Array.isArray(defaultGroups) || !defaultGroups.length
                 || new Set(defaultGroups).size !== defaultGroups.length || defaultGroups.some(group => typeof group !== 'string' || !group))) throw new Error('Invalid default groups');
@@ -64,10 +78,16 @@
             const rotationRequired = data.cohorts.find(cohort => cohort.id === p.cohort_id).workload.contract.session_rotation;
             if ((rotationRequired || p.load.session_rotation_depth != null)
                 && (!Number.isInteger(p.load.session_rotation_depth) || p.load.session_rotation_depth < 1)) throw new Error(`Invalid session rotation depth: ${p.id}`);
+            if (p.load.presentation_group != null && (!object(p.load.presentation_group) || typeof p.load.presentation_group.id !== 'string' || !p.load.presentation_group.id
+                || typeof p.load.presentation_group.label_en !== 'string' || !p.load.presentation_group.label_en
+                || typeof p.load.presentation_group.label_zh !== 'string' || !p.load.presentation_group.label_zh)) throw new Error(`Invalid presentation group: ${p.id}`);
             if (p.load.concurrency_series != null && (typeof p.load.concurrency_series !== 'string' || !p.load.concurrency_series
                 || !Number.isInteger(p.load.concurrency) || p.load.concurrency < 1)) throw new Error(`Invalid concurrency series: ${p.id}`);
             if (p.cost != null && (!positive(p.cost.usd_per_hour) || !p.cost.source || !p.cost.scope)) throw new Error(`Invalid deployment cost: ${p.id}`);
             pointIds.add(p.id);
+        }
+        for (const c of data.cohorts) for (const series of c.workload.contract.display_series_ids || []) {
+            if (!data.points.some(point => point.cohort_id === c.id && point.load.concurrency_series === series)) throw new Error(`Missing display series: ${series}`);
         }
         return data;
     }
@@ -81,6 +101,8 @@
     }
     function presentationPoints(points, cohort) {
         const members = points.filter(point => point.cohort_id === cohort?.id);
+        const series = cohort?.workload?.contract?.display_series_ids;
+        if (series) return members.filter(point => series.includes(point.load.concurrency_series));
         const prefix = cohort?.workload?.contract?.display_series_prefix;
         return prefix ? members.filter(point => point.load.concurrency_series?.startsWith(prefix)) : members;
     }
@@ -97,7 +119,7 @@
         return finite(m[key]) ? m[key] : null;
     }
     function modKey(point) { return [...point.configuration.mods].sort().join('+') || 'none'; }
-    function groupKey(point) { return point.study_group?.id || point.configuration.experiment_group || modKey(point); }
+    function groupKey(point) { return point.study_group?.id || point.load.presentation_group?.id || point.configuration.experiment_group || modKey(point); }
     function frontierKey(point) { return JSON.stringify([point.cohort_id, groupKey(point), point.load.session_rotation_depth ?? null]); }
     function failedCorrectness(point) { return point.configuration.parameters.functional_status === 'failed'; }
     function project(points, xKey, yKey) {
@@ -114,7 +136,7 @@
         return { measured, excluded: points.length - measured.length,
             frontier: measured.filter(p => p.frontier).sort((a, b) => a.x - b.x || a.point.id.localeCompare(b.point.id)) };
     }
-    // Each cohort × MOD/baseline × rotation depth owns an independent frontier.
+    // Each cohort × measured configuration group × rotation depth owns an independent frontier.
     // Coordinates always come from one whole observed run, never mixed metrics.
     function groupFrontiers(points, xKey, yKey) {
         const groups = new Map();

@@ -189,10 +189,9 @@ def main():
         for p in production["points"]
         if p["cohort_id"] == default_cohort["id"]
         and (
-            not default_cohort["workload"]["contract"].get("display_series_prefix")
-            or p["load"]
-            .get("concurrency_series", "")
-            .startswith(default_cohort["workload"]["contract"]["display_series_prefix"])
+            not default_cohort["workload"]["contract"].get("display_series_ids")
+            or p["load"].get("concurrency_series")
+            in default_cohort["workload"]["contract"]["display_series_ids"]
         )
     ]
     default_points = [
@@ -206,7 +205,8 @@ def main():
         for p in default_points
         if not default_groups
         or (
-            p["configuration"].get("experiment_group")
+            p["load"].get("presentation_group", {}).get("id")
+            or p["configuration"].get("experiment_group")
             or "+".join(sorted(p["configuration"]["mods"]))
             or "none"
         )
@@ -220,7 +220,12 @@ def main():
     fixture = json.loads(
         (site / "tests/fixtures/leaderboard_frontier.json").read_text()
     )
-    empty = {"schema_version": "leaderboard-frontier/v1", "cohorts": [], "points": []}
+    empty = {
+        "schema_version": "leaderboard-frontier/v1",
+        "official_baseline": production["official_baseline"],
+        "cohorts": [],
+        "points": [],
+    }
     reports = []
     with sync_playwright() as p:
         browser = p.chromium.launch()
@@ -252,6 +257,11 @@ def main():
             )
             ready(page)
             assert "AgentX" not in page.locator("#frontier-panel").inner_text()
+            baseline_text = page.locator(".frontier-baseline").inner_text()
+            assert "vLLM 0.18.0 + vLLM-Ascend 0.18.0" in baseline_text
+            assert (
+                "同合同实测待补" if language == "zh" else "matched measurement pending"
+            ) in baseline_text
             assert not page.locator("#frontier-only").is_checked()
             shown = page.locator("[data-point]").evaluate_all(
                 "nodes=>nodes.map(n=>n.dataset.point)"
@@ -431,7 +441,13 @@ def main():
             for checkbox in page.locator("[data-filter=mtp]").all():
                 checkbox.check()
             # MOD union within its row intersects the MTP row; empty means hide all.
-            page.locator("[data-filter=mods][value=none]").uncheck()
+            native_groups = {
+                p["load"].get("presentation_group", {}).get("id", "none")
+                for p in default_points
+                if not p["configuration"]["mods"]
+            }
+            for group in native_groups:
+                page.locator(f'[data-filter="mods"][value="{group}"]').uncheck()
             page.locator("[data-filter=mtp][value=on]").uncheck()
             expected = [
                 p

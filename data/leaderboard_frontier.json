@@ -1,5 +1,12 @@
 {
   "schema_version": "leaderboard-frontier/v1",
+  "official_baseline": {
+    "id": "vllm-0.18.0-vllm-ascend-0.18.0",
+    "engine": "vLLM + vLLM-Ascend",
+    "vllm_version": "0.18.0",
+    "vllm_ascend_version": "0.18.0",
+    "comparison_policy": "Only a matched model, workload, hardware, and runtime-contract measurement may represent this baseline. Other Native configurations remain visible but are not the official baseline."
+  },
   "cohorts": [
     {
       "id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
@@ -77,10 +84,28 @@
             "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
             "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
           },
-          "display_scope": "The public comparison defaults to the swe-unified series under one fixed contract. Historical and qualification observations remain in the evidence snapshot but are not mixed into this chart.",
-          "display_series_prefix": "swe-unified-",
+          "display_scope": "The public comparison uses an explicit set of complete five-point curves: the swe-unified series plus the latest BetterScale resident-state curve. Historical and qualification observations remain in the evidence snapshot but are not mixed into this chart.",
+          "display_series_ids": [
+            "swe-unified-native-20260927",
+            "swe-capacity16-native",
+            "swe-unified-bidkv-20260927",
+            "swe-unified-dla-20260927",
+            "swe-unified-kv-materialization-arrival-control-20260928",
+            "swe-unified-kv-tiering-migration-20260927",
+            "swe-unified-kvcompress-ascend-20260928",
+            "swe-unified-mooncake-vllm-connectors-20260927",
+            "swe-unified-pegaflow-vllm-connectors-20260929",
+            "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927"
+          ],
+          "display_group_labels": {
+            "betterscale": {
+              "label_en": "BetterScale · FULL graph · resident E16/R20 · balanced attention",
+              "label_zh": "BetterScale · FULL 图模式 · resident E16/R20 · balanced attention"
+            }
+          },
           "default_groups": [
-            "none"
+            "native-runtime-d0f22d2-03766ac",
+            "native-runtime-752a3a5-9bf964c"
           ]
         }
       }
@@ -3072,6 +3097,7 @@
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
+        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -3241,6 +3267,7 @@
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
+        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -3410,6 +3437,7 @@
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
+        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -3579,6 +3607,7 @@
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
+        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -4527,6 +4556,7 @@
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
+        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61096,6 +61126,7 @@
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
+        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61209,6 +61240,7 @@
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
+        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61322,6 +61354,7 @@
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
+        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61435,6 +61468,7 @@
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
+        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61548,6 +61582,7 @@
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
+        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -67383,7 +67418,7 @@
       "load": {
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-resident-balanced-20260927",
+        "concurrency_series": "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -68218,7 +68253,7 @@
       "load": {
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-resident-balanced-20260927",
+        "concurrency_series": "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -68428,7 +68463,7 @@
       "load": {
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-resident-balanced-20260927",
+        "concurrency_series": "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -68638,7 +68673,7 @@
       "load": {
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-resident-balanced-20260927",
+        "concurrency_series": "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -68848,7 +68883,7 @@
       "load": {
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
-        "concurrency_series": "swe-resident-balanced-20260927",
+        "concurrency_series": "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
         "session_rotation_depth": 1
       },
       "metrics": {

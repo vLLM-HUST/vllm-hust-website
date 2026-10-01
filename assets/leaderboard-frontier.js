@@ -11,7 +11,7 @@
             notExercised: 'MOD policy not exercised', notExercisedScope: 'The MOD was enabled, but its optimization mechanism was not exercised during this window. This point does not demonstrate an optimization benefit.',
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
             failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Benchmark setting', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', fixedSubtitle: 'Fixed-configuration measured comparison', studySubtitle: 'Measured configuration study', studyGroup: 'Study group', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
-            x: 'P90 decode speed', y: 'Output throughput / chip', batchSize: 'Batch size', outputThroughput: 'Output throughput', native: 'Native baseline',
+            x: 'P90 decode speed', y: 'Output throughput / chip', batchSize: 'Batch size', outputThroughput: 'Output throughput', native: 'Native configuration', officialBaseline: 'Fixed official baseline', baselinePending: 'matched measurement pending for this setting', baselineMeasured: 'matched measurement available',
             smoke: 'Measured comparison', formal: 'Measured setting', fixed: 'Fixed comparison', study: 'Configuration study', hint: 'Select a point for configuration', fixedHint: 'Fixed-configuration comparison; points are independent measured observations', studyHint: 'Independent study groups are not connected; compare points only within the same group', lineHint: 'Lines connect points from the same declared measurement series, in concurrency order', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', standalone: 'standalone measurements have no same-series partner', points: 'points', context: 'context',
@@ -24,7 +24,7 @@
             notExercised: 'MOD 策略未触发', notExercisedScope: 'MOD 已启用，但本窗口未触发有效的优化动作；该点不构成优化收益证据。',
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
             failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: '实验设定', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', fixedSubtitle: '固定配置实测对照', studySubtitle: '配置实测研究', studyGroup: '实验组', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
-            x: 'P90 解码速度', y: '每卡输出吞吐', batchSize: 'Batch size', outputThroughput: '总输出吞吐', native: '原生 Baseline',
+            x: 'P90 解码速度', y: '每卡输出吞吐', batchSize: 'Batch size', outputThroughput: '总输出吞吐', native: 'Native 配置', officialBaseline: '固定官方基线', baselinePending: '该设定的同合同实测待补', baselineMeasured: '已有该设定的同合同实测',
             smoke: '实测对比', formal: '实测设定', fixed: '固定配置对照', study: '配置研究', hint: '点击数据点查看配置', fixedHint: '固定配置对照；各点是独立实测，不表示缺失并发曲线', studyHint: '不同实验组之间不连线；只在同一实验组内比较', lineHint: '连线仅连接同一实测序列，并按并发顺序排列', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', standalone: '个独立测量点没有同序列伙伴', points: '个点', context: '上下文',
@@ -58,7 +58,13 @@
     const filteredPoints = () => depthPoints().filter(p => state.mtp?.has(M.mtpState(p)) && state.mods?.has(M.groupKey(p)));
     const points = () => state.frontierOnly && !independentStudy()
         ? M.groupFrontiers(filteredPoints(),axes().x,axes().y).flat().map(row=>row.point) : filteredPoints();
-    const groupLabel = p => p.study_group?.[lang()==='zh'?'label_zh':'label_en'] || p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
+    const groupLabel = p => p.study_group?.[lang()==='zh'?'label_zh':'label_en'] || p.load.presentation_group?.[lang()==='zh'?'label_zh':'label_en'] || cohort()?.workload.contract.display_group_labels?.[M.groupKey(p)]?.[lang()==='zh'?'label_zh':'label_en'] || p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
+    const hasOfficialBaseline = () => !!state.data.official_baseline && cohortPoints().some(p => p.configuration.official_baseline_id === state.data.official_baseline.id);
+    const officialBaselineText = () => {
+        const baseline=state.data.official_baseline;
+        if(!baseline)return '';
+        return `${t('officialBaseline')} · vLLM ${baseline.vllm_version} + vLLM-Ascend ${baseline.vllm_ascend_version} · ${t(hasOfficialBaseline()?'baselineMeasured':'baselinePending')}`;
+    };
     const pointLabel = p => independentStudy() ? p.label : groupLabel(p);
     const knownBudget = p => p.configuration.mods.includes('dla') && p.configuration.parameters.length_source === 'Declared exact ignore_eos output budgets, no learned predictor';
     const notExercised = p => p.configuration.mods.length > 0 && p.configuration.parameters.mod_runtime_effectiveness?.status === 'not-exercised';
@@ -95,13 +101,14 @@
         reconcile();
         const tags = [...new Map(state.data.cohorts.map(c => [tagKey(c),c])).values()];
         const choices = state.data.cohorts.filter(c => tagKey(c) === state.tag);
-        const mods=[...new Map(cohortPoints().map(p=>[M.groupKey(p),p])).values()];
+        const declaredDefaults=cohort()?.workload.contract.default_groups;
+        const mods=[...new Map(cohortPoints().map(p=>[M.groupKey(p),p])).values()].sort((a,b)=>
+            Number(Array.isArray(declaredDefaults)&&declaredDefaults.includes(M.groupKey(b)))-Number(Array.isArray(declaredDefaults)&&declaredDefaults.includes(M.groupKey(a))));
         const mtpOptions=[['on',t('mtpOn')],['off',t('mtpOff')],...(cohortPoints().some(p=>M.mtpState(p)==='unknown')?[['unknown',t('unknown')]]:[])];
         const depths=[...new Set(cohortPoints().map(p=>p.load.session_rotation_depth))].filter(Number.isInteger).sort((a,b)=>a-b);
         if(state.rotation===null)state.rotation=new Set(depths.map(String));
         if(state.mods===null){
-            const defaults=cohort()?.workload.contract.default_groups;
-            state.mods=new Set(independentStudy()||!Array.isArray(defaults)?mods.map(M.groupKey):defaults);
+            state.mods=new Set(independentStudy()||!Array.isArray(declaredDefaults)?mods.map(M.groupKey):declaredDefaults);
         }
         if(state.mtp===null)state.mtp=new Set(mtpOptions.map(([key])=>key));
         $('frontier-panel').innerHTML = `
@@ -114,6 +121,7 @@
                     </div>
 
                 </div>
+                ${state.data.official_baseline?`<p class="frontier-baseline" data-state="${hasOfficialBaseline()?'measured':'pending'}">${escape(officialBaselineText())}</p>`:''}
                 <div class="frontier-plot" id="frontier-plot">
                     <svg id="frontier-chart" viewBox="0 0 1000 480" role="group" aria-label="${axisLabel(axes().x)} × ${axisLabel(axes().y)}"></svg>
                     <div id="frontier-blank" class="frontier-blank" role="status"></div>
@@ -289,7 +297,7 @@
     $('view-frontier').addEventListener('click',()=>{updateSettingURL();requestAnimationFrame(render);});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=readable-defaults-20260930',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=fixed-baseline-20261001',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});
