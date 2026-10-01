@@ -49,8 +49,8 @@ workload identities; never silently mix them.
   seats, balanced attention and state-cache policy appear in its popover. The historical FULL-cache
   E36/R36 C32 point (613.88 output tokens/s/chip) is restored to the main SWE comparison as a
   standalone observation, not connected to the E16/R20 sweep. BetterScale is selected by default
-  alongside the two native runtime curves. C32 has its own **betterscale C32** checkbox, independent
-  of the **BetterScale** E16/R20 group; both start checked.
+  alongside the two native runtime curves. C32 and E16/R20 share the same **BetterScale** tag and
+  checkbox: workload-tuned slot counts are point-level configuration, not different MOD identities.
 - Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
   session concurrency, MTP, request limit, explicit KV budget, UTC sampling date and the two
   coordinate values. `evidence.sampling_date_utc` is a calendar-valid YYYY-MM-DD date, with

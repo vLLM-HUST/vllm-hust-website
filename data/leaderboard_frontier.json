@@ -110,8 +110,7 @@
             "native-runtime-v018-qwen35-backports-piecewise",
             "native-runtime-d0f22d2-03766ac",
             "native-runtime-752a3a5-9bf964c",
-            "betterscale",
-            "betterscale-c32"
+            "betterscale"
           ]
         }
       }
@@ -72510,7 +72509,6 @@
         "concurrency": 32,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-cache-width-full-d1-20260928-e36-r36",
-        "presentation_group": {"id": "betterscale-c32", "label_en": "betterscale C32", "label_zh": "betterscale C32"},
         "session_rotation_depth": 1
       },
       "metrics": {
