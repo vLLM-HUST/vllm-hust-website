@@ -91,10 +91,8 @@
             "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
             "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
           },
-          "display_scope": "The public comparison uses the declared measured curves plus the historical BetterScale FULL-cache E36/R36 C32 observation (613.88 output tokens/s/chip). That different configuration remains a standalone point, not an extension of the resident E16/R20 curve. Other historical and qualification observations remain in the evidence snapshot.",
+          "display_scope": "The public concurrency comparison shows only declared five-point C1/C2/C4/C8/C16 sweeps with fixed configuration within each series. Fixed-concurrency A2A ablations, the BetterScale E36/R36 C32 capacity observation, and other configuration studies remain in the evidence snapshot but are excluded from this chart.",
           "display_series_ids": [
-            "swe-a2a-reuse-on-tp2ep-20261001",
-            "swe-a2a-reuse-off-tp2ep-20261001",
             "swe-v018-native-text-only-backport-20261001",
             "swe-unified-native-20260927",
             "swe-capacity16-native",
@@ -105,8 +103,7 @@
             "swe-unified-kvcompress-ascend-20260928",
             "swe-unified-mooncake-vllm-connectors-20260927",
             "swe-unified-pegaflow-vllm-connectors-20260929",
-            "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
-            "swe-cache-width-full-d1-20260928-e36-r36"
+            "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927"
           ],
           "display_group_labels": {
             "betterscale": {
