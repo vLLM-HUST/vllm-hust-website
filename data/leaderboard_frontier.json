@@ -5,7 +5,8 @@
     "engine": "vLLM + vLLM-Ascend",
     "vllm_version": "0.18.0",
     "vllm_ascend_version": "0.18.0",
-    "comparison_policy": "Only a matched model, workload, hardware, and runtime-contract measurement may represent this baseline. Other Native configurations remain visible but are not the official baseline."
+    "comparison_policy": "Only a matched model, workload, hardware, and runtime-contract measurement may represent this baseline. Other Native configurations remain visible but are not the official baseline.",
+    "measurement_note": "Qwen3.5 requires the disclosed text-only compatibility backports on the 0.18 release line. The measured baseline uses effective PIECEWISE ACL Graph mode and the runtime's available 23.37 GiB/chip KV capacity; it is a visible runtime reference, not a matched comparator for the separate 0.25 Native configurations."
   },
   "cohorts": [
     {
@@ -86,6 +87,7 @@
           },
           "display_scope": "The public comparison uses the declared measured curves plus the historical BetterScale FULL-cache E36/R36 C32 observation (613.88 output tokens/s/chip). That different configuration remains a standalone point, not an extension of the resident E16/R20 curve. Other historical and qualification observations remain in the evidence snapshot.",
           "display_series_ids": [
+            "swe-v018-native-text-only-backport-20261001",
             "swe-unified-native-20260927",
             "swe-capacity16-native",
             "swe-unified-bidkv-20260927",
@@ -105,6 +107,7 @@
             }
           },
           "default_groups": [
+            "native-runtime-v018-qwen35-backports-piecewise",
             "native-runtime-d0f22d2-03766ac",
             "native-runtime-752a3a5-9bf964c",
             "betterscale",
@@ -3100,7 +3103,11 @@
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
-        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-752a3a5-9bf964c",
+          "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -3270,7 +3277,11 @@
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
-        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-752a3a5-9bf964c",
+          "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -3440,7 +3451,11 @@
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
-        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-752a3a5-9bf964c",
+          "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -3610,7 +3625,11 @@
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
-        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-752a3a5-9bf964c",
+          "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -4559,7 +4578,11 @@
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-capacity16-native",
-        "presentation_group": {"id": "native-runtime-752a3a5-9bf964c", "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-752a3a5-9bf964c",
+          "label_en": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1 (752a3a5) / Ascend 0.25.1rc1 (9bf964c) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61129,7 +61152,11 @@
         "concurrency": 1,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
-        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-d0f22d2-03766ac",
+          "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61243,7 +61270,11 @@
         "concurrency": 2,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
-        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-d0f22d2-03766ac",
+          "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61357,7 +61388,11 @@
         "concurrency": 4,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
-        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-d0f22d2-03766ac",
+          "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61471,7 +61506,11 @@
         "concurrency": 8,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
-        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-d0f22d2-03766ac",
+          "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -61585,7 +61624,11 @@
         "concurrency": 16,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-unified-native-20260927",
-        "presentation_group": {"id": "native-runtime-d0f22d2-03766ac", "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE", "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"},
+        "presentation_group": {
+          "id": "native-runtime-d0f22d2-03766ac",
+          "label_en": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE",
+          "label_zh": "Native · vLLM 0.25.1+frontier.unified (d0f22d2) / Ascend 0.25.1rc1+2 (03766ac) · FULL_AND_PIECEWISE"
+        },
         "session_rotation_depth": 1
       },
       "metrics": {
@@ -73380,6 +73423,651 @@
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-unified-v1",
         "source_evidence_url": "https://github.com/vLLM-HUST/pegaflow-hust/blob/64ef9d0b5c4f11589d296f8500dc1664ffc346dc/handoff/2026-09-29-qwen35-frontier-formal/README.md"
+      }
+    },
+    {
+      "id": "qwen35-v018-native-textonly-tp2-c1-20261001",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native 0.18 + Qwen3.5 backports · C1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.18.0+qwen35-backports / 0.18.0+qwen35-backport",
+        "official_baseline_id": "vllm-0.18.0-vllm-ascend-0.18.0",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "dtype": "bfloat16",
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "PIECEWISE",
+          "requested_graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "max_cudagraph_capture_size": 48,
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_cache_memory_bytes_scope": "Requested per chip",
+          "effective_available_kv_cache_gib_per_chip": 23.37,
+          "effective_gpu_kv_cache_tokens": 544768,
+          "runtime_release_versions": {
+            "vllm": "0.18.0",
+            "vllm-ascend": "0.18.0",
+            "cann": "8.5.1"
+          },
+          "runtime_release_commits": {
+            "vllm": "bcf2be96120005e9aea171927f85055a6a5c0cf6",
+            "vllm-ascend": "e18643f8a4d5bd9990727654318ad069ea0b56e2"
+          },
+          "runtime_applied_commits": {
+            "vllm": "9878e0432107e69082f8837b1f275d3aad71fd4e",
+            "vllm-ascend": "0f40ff06f1c6b7e6efb8ae4850eb72bd35a47762"
+          },
+          "compatibility_scope": "Upstream-derived Qwen3.5 text-only registration/MTP config and conditional multimodal-RoPE backports; not an untouched 0.18 binary",
+          "official_image": "quay.io/ascend/vllm-ascend:v0.18.0",
+          "official_image_index_digest": "sha256:697175418772c65b56afc04a7ccde7c24e7ad15a988a852eb8239fa9b6298e24",
+          "official_image_arm64_digest": "sha256:2467d259ff068ca4edd7b50b849152910f3c05e435f314639fc06bcc7a00f9fa",
+          "checkpoint_revision": "59d61f3ce65a6d9863b86d2e96597125219dc754",
+          "checkpoint_provenance": "Hugging Face source identity retained; the cohort records its accepted equivalence to the canonical ModelScope Qwen3.5 checkpoint without a byte-equality claim",
+          "text_only_config_sha256": "5abb937cfa1f8a4089e37e34b25a7a3d7a5567bbde471875cf5734a19dd08521",
+          "text_only_config_scope": "Derived from checkpoint text_config; tokenizer and weights remain symlinks to the source checkpoint",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 28638,
+          "measured_mean_client_inflight": 0.9997871824353933,
+          "full_client_concurrency_fraction": 0.9997871824353933,
+          "warmup_policy": "Separate 60s warm qualification after first-request ACL/Triton JIT; formal windows use fresh measured session salts on one serially retained server",
+          "execution_host": "isolated four-NPU evaluation container",
+          "physical_devices": [
+            4,
+            5
+          ],
+          "runtime_visible_device_indices": [
+            2,
+            3
+          ],
+          "transport": "Client and server on execution-host loopback",
+          "worker_class": "native_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-v018-native-text-only-backport-20261001",
+        "presentation_group": {
+          "id": "native-runtime-v018-qwen35-backports-piecewise",
+          "label_en": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE",
+          "label_zh": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 29.844444444444445,
+        "decode_p90_tps": 31.975014377092148,
+        "ttft_p95_ms": 934.4734754413366,
+        "completed_requests": 66
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-01",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-NATIVE-RUNTIMES.md",
+        "run_ids": [
+          "d817c8e696b54738a29175e2bc74b0b3"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-v018-native-text-only-20261001",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
+      }
+    },
+    {
+      "id": "qwen35-v018-native-textonly-tp2-c2-20261001",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native 0.18 + Qwen3.5 backports · C2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.18.0+qwen35-backports / 0.18.0+qwen35-backport",
+        "official_baseline_id": "vllm-0.18.0-vllm-ascend-0.18.0",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "dtype": "bfloat16",
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "PIECEWISE",
+          "requested_graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "max_cudagraph_capture_size": 48,
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_cache_memory_bytes_scope": "Requested per chip",
+          "effective_available_kv_cache_gib_per_chip": 23.37,
+          "effective_gpu_kv_cache_tokens": 544768,
+          "runtime_release_versions": {
+            "vllm": "0.18.0",
+            "vllm-ascend": "0.18.0",
+            "cann": "8.5.1"
+          },
+          "runtime_release_commits": {
+            "vllm": "bcf2be96120005e9aea171927f85055a6a5c0cf6",
+            "vllm-ascend": "e18643f8a4d5bd9990727654318ad069ea0b56e2"
+          },
+          "runtime_applied_commits": {
+            "vllm": "9878e0432107e69082f8837b1f275d3aad71fd4e",
+            "vllm-ascend": "0f40ff06f1c6b7e6efb8ae4850eb72bd35a47762"
+          },
+          "compatibility_scope": "Upstream-derived Qwen3.5 text-only registration/MTP config and conditional multimodal-RoPE backports; not an untouched 0.18 binary",
+          "official_image": "quay.io/ascend/vllm-ascend:v0.18.0",
+          "official_image_index_digest": "sha256:697175418772c65b56afc04a7ccde7c24e7ad15a988a852eb8239fa9b6298e24",
+          "official_image_arm64_digest": "sha256:2467d259ff068ca4edd7b50b849152910f3c05e435f314639fc06bcc7a00f9fa",
+          "checkpoint_revision": "59d61f3ce65a6d9863b86d2e96597125219dc754",
+          "checkpoint_provenance": "Hugging Face source identity retained; the cohort records its accepted equivalence to the canonical ModelScope Qwen3.5 checkpoint without a byte-equality claim",
+          "text_only_config_sha256": "5abb937cfa1f8a4089e37e34b25a7a3d7a5567bbde471875cf5734a19dd08521",
+          "text_only_config_scope": "Derived from checkpoint text_config; tokenizer and weights remain symlinks to the source checkpoint",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 36215,
+          "measured_mean_client_inflight": 1.9995801479255573,
+          "full_client_concurrency_fraction": 0.9995803183617278,
+          "warmup_policy": "Separate 60s warm qualification after first-request ACL/Triton JIT; formal windows use fresh measured session salts on one serially retained server",
+          "execution_host": "isolated four-NPU evaluation container",
+          "physical_devices": [
+            4,
+            5
+          ],
+          "runtime_visible_device_indices": [
+            2,
+            3
+          ],
+          "transport": "Client and server on execution-host loopback",
+          "worker_class": "native_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-v018-native-text-only-backport-20261001",
+        "presentation_group": {
+          "id": "native-runtime-v018-qwen35-backports-piecewise",
+          "label_en": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE",
+          "label_zh": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 56.73,
+        "decode_p90_tps": 31.55350557296592,
+        "ttft_p95_ms": 1250.3627517260609,
+        "completed_requests": 108
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-01",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-NATIVE-RUNTIMES.md",
+        "run_ids": [
+          "95d6c935f7eb4575b96bf8c726fd58cc"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-v018-native-text-only-20261001",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
+      }
+    },
+    {
+      "id": "qwen35-v018-native-textonly-tp2-c4-20261001",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native 0.18 + Qwen3.5 backports · C4",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.18.0+qwen35-backports / 0.18.0+qwen35-backport",
+        "official_baseline_id": "vllm-0.18.0-vllm-ascend-0.18.0",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "dtype": "bfloat16",
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "PIECEWISE",
+          "requested_graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "max_cudagraph_capture_size": 48,
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_cache_memory_bytes_scope": "Requested per chip",
+          "effective_available_kv_cache_gib_per_chip": 23.37,
+          "effective_gpu_kv_cache_tokens": 544768,
+          "runtime_release_versions": {
+            "vllm": "0.18.0",
+            "vllm-ascend": "0.18.0",
+            "cann": "8.5.1"
+          },
+          "runtime_release_commits": {
+            "vllm": "bcf2be96120005e9aea171927f85055a6a5c0cf6",
+            "vllm-ascend": "e18643f8a4d5bd9990727654318ad069ea0b56e2"
+          },
+          "runtime_applied_commits": {
+            "vllm": "9878e0432107e69082f8837b1f275d3aad71fd4e",
+            "vllm-ascend": "0f40ff06f1c6b7e6efb8ae4850eb72bd35a47762"
+          },
+          "compatibility_scope": "Upstream-derived Qwen3.5 text-only registration/MTP config and conditional multimodal-RoPE backports; not an untouched 0.18 binary",
+          "official_image": "quay.io/ascend/vllm-ascend:v0.18.0",
+          "official_image_index_digest": "sha256:697175418772c65b56afc04a7ccde7c24e7ad15a988a852eb8239fa9b6298e24",
+          "official_image_arm64_digest": "sha256:2467d259ff068ca4edd7b50b849152910f3c05e435f314639fc06bcc7a00f9fa",
+          "checkpoint_revision": "59d61f3ce65a6d9863b86d2e96597125219dc754",
+          "checkpoint_provenance": "Hugging Face source identity retained; the cohort records its accepted equivalence to the canonical ModelScope Qwen3.5 checkpoint without a byte-equality claim",
+          "text_only_config_sha256": "5abb937cfa1f8a4089e37e34b25a7a3d7a5567bbde471875cf5734a19dd08521",
+          "text_only_config_scope": "Derived from checkpoint text_config; tokenizer and weights remain symlinks to the source checkpoint",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 41173,
+          "measured_mean_client_inflight": 3.999292067332814,
+          "full_client_concurrency_fraction": 0.9992955512812154,
+          "warmup_policy": "Separate 60s warm qualification after first-request ACL/Triton JIT; formal windows use fresh measured session salts on one serially retained server",
+          "execution_host": "isolated four-NPU evaluation container",
+          "physical_devices": [
+            4,
+            5
+          ],
+          "runtime_visible_device_indices": [
+            2,
+            3
+          ],
+          "transport": "Client and server on execution-host loopback",
+          "worker_class": "native_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-v018-native-text-only-backport-20261001",
+        "presentation_group": {
+          "id": "native-runtime-v018-qwen35-backports-piecewise",
+          "label_en": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE",
+          "label_zh": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 106.28888888888889,
+        "decode_p90_tps": 30.766422493408047,
+        "ttft_p95_ms": 1647.0442740246654,
+        "completed_requests": 173
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-01",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-NATIVE-RUNTIMES.md",
+        "run_ids": [
+          "96f92dbd3c6c49d483c28a39ff013a15"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-v018-native-text-only-20261001",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
+      }
+    },
+    {
+      "id": "qwen35-v018-native-textonly-tp2-c8-20261001",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native 0.18 + Qwen3.5 backports · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.18.0+qwen35-backports / 0.18.0+qwen35-backport",
+        "official_baseline_id": "vllm-0.18.0-vllm-ascend-0.18.0",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "dtype": "bfloat16",
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "PIECEWISE",
+          "requested_graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "max_cudagraph_capture_size": 48,
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_cache_memory_bytes_scope": "Requested per chip",
+          "effective_available_kv_cache_gib_per_chip": 23.37,
+          "effective_gpu_kv_cache_tokens": 544768,
+          "runtime_release_versions": {
+            "vllm": "0.18.0",
+            "vllm-ascend": "0.18.0",
+            "cann": "8.5.1"
+          },
+          "runtime_release_commits": {
+            "vllm": "bcf2be96120005e9aea171927f85055a6a5c0cf6",
+            "vllm-ascend": "e18643f8a4d5bd9990727654318ad069ea0b56e2"
+          },
+          "runtime_applied_commits": {
+            "vllm": "9878e0432107e69082f8837b1f275d3aad71fd4e",
+            "vllm-ascend": "0f40ff06f1c6b7e6efb8ae4850eb72bd35a47762"
+          },
+          "compatibility_scope": "Upstream-derived Qwen3.5 text-only registration/MTP config and conditional multimodal-RoPE backports; not an untouched 0.18 binary",
+          "official_image": "quay.io/ascend/vllm-ascend:v0.18.0",
+          "official_image_index_digest": "sha256:697175418772c65b56afc04a7ccde7c24e7ad15a988a852eb8239fa9b6298e24",
+          "official_image_arm64_digest": "sha256:2467d259ff068ca4edd7b50b849152910f3c05e435f314639fc06bcc7a00f9fa",
+          "checkpoint_revision": "59d61f3ce65a6d9863b86d2e96597125219dc754",
+          "checkpoint_provenance": "Hugging Face source identity retained; the cohort records its accepted equivalence to the canonical ModelScope Qwen3.5 checkpoint without a byte-equality claim",
+          "text_only_config_sha256": "5abb937cfa1f8a4089e37e34b25a7a3d7a5567bbde471875cf5734a19dd08521",
+          "text_only_config_scope": "Derived from checkpoint text_config; tokenizer and weights remain symlinks to the source checkpoint",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 55491,
+          "measured_mean_client_inflight": 7.998825019410708,
+          "full_client_concurrency_fraction": 0.9988452297821641,
+          "warmup_policy": "Separate 60s warm qualification after first-request ACL/Triton JIT; formal windows use fresh measured session salts on one serially retained server",
+          "execution_host": "isolated four-NPU evaluation container",
+          "physical_devices": [
+            4,
+            5
+          ],
+          "runtime_visible_device_indices": [
+            2,
+            3
+          ],
+          "transport": "Client and server on execution-host loopback",
+          "worker_class": "native_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-v018-native-text-only-backport-20261001",
+        "presentation_group": {
+          "id": "native-runtime-v018-qwen35-backports-piecewise",
+          "label_en": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE",
+          "label_zh": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 161.91555555555556,
+        "decode_p90_tps": 23.958968366305356,
+        "ttft_p95_ms": 2004.9860393628478,
+        "completed_requests": 261
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-01",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-NATIVE-RUNTIMES.md",
+        "run_ids": [
+          "62834417afe642e09224f7b4cc0ab098"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-v018-native-text-only-20261001",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
+      }
+    },
+    {
+      "id": "qwen35-v018-native-textonly-tp2-c16-20261001",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Native 0.18 + Qwen3.5 backports · C16",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.18.0+qwen35-backports / 0.18.0+qwen35-backport",
+        "official_baseline_id": "vllm-0.18.0-vllm-ascend-0.18.0",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "dtype": "bfloat16",
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 4096,
+          "async_scheduling": true,
+          "prefix_caching": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "task_queue_enable": 1,
+          "graph_mode": "PIECEWISE",
+          "requested_graph_mode": "FULL_AND_PIECEWISE",
+          "graph_capture_sizes": [
+            3,
+            6,
+            12,
+            24,
+            48
+          ],
+          "max_cudagraph_capture_size": 48,
+          "kv_cache_memory_bytes": 26038239232,
+          "kv_cache_memory_bytes_scope": "Requested per chip",
+          "effective_available_kv_cache_gib_per_chip": 23.37,
+          "effective_gpu_kv_cache_tokens": 544768,
+          "runtime_release_versions": {
+            "vllm": "0.18.0",
+            "vllm-ascend": "0.18.0",
+            "cann": "8.5.1"
+          },
+          "runtime_release_commits": {
+            "vllm": "bcf2be96120005e9aea171927f85055a6a5c0cf6",
+            "vllm-ascend": "e18643f8a4d5bd9990727654318ad069ea0b56e2"
+          },
+          "runtime_applied_commits": {
+            "vllm": "9878e0432107e69082f8837b1f275d3aad71fd4e",
+            "vllm-ascend": "0f40ff06f1c6b7e6efb8ae4850eb72bd35a47762"
+          },
+          "compatibility_scope": "Upstream-derived Qwen3.5 text-only registration/MTP config and conditional multimodal-RoPE backports; not an untouched 0.18 binary",
+          "official_image": "quay.io/ascend/vllm-ascend:v0.18.0",
+          "official_image_index_digest": "sha256:697175418772c65b56afc04a7ccde7c24e7ad15a988a852eb8239fa9b6298e24",
+          "official_image_arm64_digest": "sha256:2467d259ff068ca4edd7b50b849152910f3c05e435f314639fc06bcc7a00f9fa",
+          "checkpoint_revision": "59d61f3ce65a6d9863b86d2e96597125219dc754",
+          "checkpoint_provenance": "Hugging Face source identity retained; the cohort records its accepted equivalence to the canonical ModelScope Qwen3.5 checkpoint without a byte-equality claim",
+          "text_only_config_sha256": "5abb937cfa1f8a4089e37e34b25a7a3d7a5567bbde471875cf5734a19dd08521",
+          "text_only_config_scope": "Derived from checkpoint text_config; tokenizer and weights remain symlinks to the source checkpoint",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 49750,
+          "measured_mean_client_inflight": 15.998494568940044,
+          "full_client_concurrency_fraction": 0.9985855900775641,
+          "warmup_policy": "Separate 60s warm qualification after first-request ACL/Triton JIT; formal windows use fresh measured session salts on one serially retained server",
+          "execution_host": "isolated four-NPU evaluation container",
+          "physical_devices": [
+            4,
+            5
+          ],
+          "runtime_visible_device_indices": [
+            2,
+            3
+          ],
+          "transport": "Client and server on execution-host loopback",
+          "worker_class": "native_worker.Worker",
+          "participating_deployment_chips": 2,
+          "pod_npu_quota": 4
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-v018-native-text-only-backport-20261001",
+        "presentation_group": {
+          "id": "native-runtime-v018-qwen35-backports-piecewise",
+          "label_en": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE",
+          "label_zh": "Native · vLLM 0.18.0 + Qwen3.5 backports (9878e04) / Ascend 0.18.0 + Qwen3.5 backport (0f40ff0) · PIECEWISE"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 247.26555555555555,
+        "decode_p90_tps": 20.584684439154053,
+        "ttft_p95_ms": 3340.9653300419436,
+        "completed_requests": 392
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-01",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-NATIVE-RUNTIMES.md",
+        "run_ids": [
+          "dab8ed7c4ee74f2d958dab5528514294"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-v018-native-text-only-20261001",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
       }
     }
   ],
