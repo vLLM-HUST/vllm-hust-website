@@ -50,17 +50,15 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
     assert.equal(all.length,167);
-    assert.equal(displayed.length,58);
+    assert.equal(displayed.length,55);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
-    assert.equal(betterScale.length,6);
+    assert.equal(betterScale.length,5);
     assert.equal(betterScale.filter(p=>p.load.concurrency_series==='swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927').length,5);
-    const restored=displayed.find(p=>p.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928');
-    assert.equal(model.groupKey(restored),'betterscale');
-    assert.equal(restored.load.concurrency,32);
-    assert.equal(model.value(restored,'output_tps_per_chip'),613.88);
-    assert.equal(restored.metrics.decode_p90_tps,44.006734854001266);
-    assert.equal(model.concurrencySeries(model.project(betterScale,'decode_p90_tps','output_tps_per_chip').measured).flat().some(row=>row.point.id===restored.id),false);
+    const hiddenIds=new Set(all.filter(p=>!displayed.includes(p)).map(p=>p.id));
+    assert.ok(hiddenIds.has('qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
+    assert.ok(hiddenIds.has('qwen35-a2a-reuse-off-tp2ep-c8-20261001'));
+    assert.ok(hiddenIds.has('qwen35-a2a-reuse-on-tp2ep-c8-20261001'));
     assert.deepEqual(cohort.workload.contract.display_group_labels.betterscale,{label_en:'BetterScale',label_zh:'BetterScale'});
     assert.deepEqual(cohort.workload.contract.default_groups,['native-runtime-v018-qwen35-backports-piecewise','native-runtime-d0f22d2-03766ac','native-runtime-752a3a5-9bf964c','betterscale']);
     const v018=displayed.filter(p=>model.groupKey(p)==='native-runtime-v018-qwen35-backports-piecewise');
@@ -87,11 +85,12 @@ test('Qwen3.5 configuration studies consolidate related observations without imp
     for(const study of studies) for(const alias of study.aliases) assert.equal(model.resolveCohort(data.cohorts,alias),study);
 
     const unifiedId='qwen35-35b-a3b-bf16-sweprefix-smoke-v1';
-    const unified=data.points.filter(p=>p.cohort_id===unifiedId);
-    const measured=model.project(unified,'decode_p90_tps','output_tps_per_chip').measured;
+    const cohort=data.cohorts.find(c=>c.id===unifiedId);
+    const displayed=model.presentationPoints(data.points,cohort);
+    const measured=model.project(displayed,'decode_p90_tps','output_tps_per_chip').measured;
     const connected=new Set(model.concurrencySeries(measured).flat().map(row=>row.point.id));
     assert.ok(measured.length>0);
-    assert.deepEqual(measured.filter(row=>!connected.has(row.point.id)).map(row=>row.point.id),['qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928','qwen35-a2a-reuse-off-tp2ep-c8-20261001','qwen35-a2a-reuse-on-tp2ep-c8-20261001']);
+    assert.deepEqual(measured.filter(row=>!connected.has(row.point.id)),[]);
 });
 test('presentation mode accepts only declared setting semantics',()=>{
     const fixture=structuredClone(require('./fixtures/leaderboard_frontier.json'));
@@ -862,7 +861,7 @@ test('DSV4 INT8 retains all 24 matched K5 windows including saturation points',(
     assert.equal(Object.keys(evidence.omitted).length,4);
 });
 
-test('BetterScale chart line joins frontier vertices across tuned slot configurations only',()=>{
+test('BetterScale chart line uses only the displayed five-point configuration family',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const points=model.presentationPoints(data.points,cohort);
@@ -870,8 +869,9 @@ test('BetterScale chart line joins frontier vertices across tuned slot configura
     const lines=model.chartSeries(projected,'decode_p90_tps','output_tps_per_chip');
     const better=lines.find(line=>model.groupKey(line[0].point)==='betterscale');
     assert.deepEqual(better,model.groupFrontiers(points.filter(p=>model.groupKey(p)==='betterscale'),'decode_p90_tps','output_tps_per_chip')[0]);
-    assert.ok(better.some(row=>row.point.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
-    assert.ok(new Set(better.map(row=>row.point.configuration.parameters.execution_seats)).size>1);
+    assert.ok(better.every(row=>row.point.load.concurrency_series==='swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927'));
+    assert.ok(!points.some(point=>point.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
+    assert.ok(data.points.some(point=>point.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
     assert.deepEqual(lines.filter(line=>model.groupKey(line[0].point)!=='betterscale'),model.concurrencySeries(projected.filter(row=>model.groupKey(row.point)!=='betterscale')));
     assert.deepEqual(model.chartSeries(better.slice(0,1),'decode_p90_tps','output_tps_per_chip'),[]);
 });
