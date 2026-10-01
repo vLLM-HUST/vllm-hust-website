@@ -72,6 +72,12 @@
               "sha256": "aa23f49e08a946d94eaab21307e9e015140cc8598adfbd5f7e244bdded7b17d0",
               "transformers": "5.14.1",
               "equivalence": "Replacing only tokenizer.path with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers with5.17.0 reconstructs original8044561f SHA256 exactly; fixed input-token deltas/output budgets/session order unchanged"
+            },
+            {
+              "sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+              "transformers": "5.18.0",
+              "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+              "equivalence": "Replacing tokenizer.path with /workspace/models/Qwen3.5-35B-A3B, tokenizer.transformers with 5.17.0 and tokenizer.fingerprint with the canonical value reconstructs original 8044561f SHA256 exactly, so sessions, input-token deltas, output budgets and order are byte-identical. The local tokenizer backend+chat-template fingerprint itself differs (tokenizer.json/tokenizer_config.json on that host were modified after download); tokenizer identity is therefore NOT independently verified equal."
             }
           ],
           "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
@@ -87,6 +93,8 @@
           },
           "display_scope": "The public comparison uses the declared measured curves plus the historical BetterScale FULL-cache E36/R36 C32 observation (613.88 output tokens/s/chip). That different configuration remains a standalone point, not an extension of the resident E16/R20 curve. Other historical and qualification observations remain in the evidence snapshot.",
           "display_series_ids": [
+            "swe-a2a-reuse-on-tp2ep-20261001",
+            "swe-a2a-reuse-off-tp2ep-20261001",
             "swe-v018-native-text-only-backport-20261001",
             "swe-unified-native-20260927",
             "swe-capacity16-native",
@@ -74064,6 +74072,264 @@
           "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
           "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
+      }
+    },
+    {
+      "id": "qwen35-a2a-reuse-off-tp2ep-c8-20261001",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "a2a-buffer-reuse OFF · TP2+EP · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.28.1.post1.dev143 / 0.25.1rc2.dev125+hust.20260903",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "effective_available_kv_cache_gib_per_chip": 16.73,
+          "effective_gpu_kv_cache_tokens": 1692929,
+          "runtime_versions": {
+            "vllm": "0.28.1.post1.dev143+gf18cf803c",
+            "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+            "cann": "9.1.0"
+          },
+          "a2a_buffer_reuse": {
+            "package": "vllm-hust-a2a-buffer-reuse 0.1.0.dev0 (local, not yet published or in the workshop catalog)",
+            "extension_id": "org.vllm-hust.a2a-buffer-reuse",
+            "env": {
+              "VLLM_HUST_A2A_BUFFER_REUSE_ENABLE": "unset",
+              "VLLM_HUST_A2A_BUFFER_REUSE_EVIDENCE": "1",
+              "VLLM_HUST_A2A_BUFFER_REUSE_KILL_SWITCH": "unset"
+            },
+            "extension_manager_state": "enabled (vllm-hust-ext extension list); `enable` alone does not set ENABLE=1",
+            "patch_installed_events": 0,
+            "runtime_effective_events": 0,
+            "patched_classes": [],
+            "scope": "OFF arm: package installed, patch not installed. ON arm: patch installed but no runtime_effective (buffer reuse) event observed, so the throughput difference is not attributed to the mechanism."
+          },
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 59957,
+          "measured_mean_client_inflight": 7.998503249996445,
+          "full_client_concurrency_fraction": 0.9985222383971429,
+          "sessions_completed": 7,
+          "workload_deviation": "prepared workload sha256 4e62e54e… and tokenizer fingerprint 319f580a… differ from the cohort's 8044561f… / 3f9ca785… (same source bundle a31abfc7…, re-prepared locally with transformers 5.18.0)",
+          "warmup_policy": "20s protocol probe at C8 on the same server before the measured window; fresh session salts, no primers",
+          "execution_host": "k8s container, 2 of the pod's NPUs",
+          "physical_devices": [
+            0,
+            7
+          ],
+          "runtime_visible_device_indices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution-host loopback",
+          "participating_deployment_chips": 2,
+          "launch_command_redacted": "vllm serve /models/Qwen3.5-35B-A3B --served-model-name qwen3.5-35b-a3b --dtype bfloat16 --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --distributed-executor-backend mp --disable-custom-all-reduce --compilation-config {\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"} --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-a2a-reuse-off-tp2ep-20261001",
+        "presentation_group": {
+          "id": "ascend-0.25.1rc2-hust-tp2ep-a2a-off",
+          "label_en": "vLLM-HUST 0.28.1 / Ascend-HUST 0.25.1rc2 · TP2+EP · a2a-buffer-reuse OFF (installed, ENABLE=0)",
+          "label_zh": "vLLM-HUST 0.28.1 / Ascend-HUST 0.25.1rc2 · TP2+EP · a2a-buffer-reuse OFF (installed, ENABLE=0)"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 194.4777777777778,
+        "decode_p90_tps": 40.7159836061309,
+        "ttft_p95_ms": 3093.1868952233344,
+        "completed_requests": 314,
+        "ttft_p50_ms": 1345.9,
+        "tpot_ms": 37.91,
+        "tpot_p95_ms": 57.3,
+        "e2e_p95_ms": 73204.2
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-01",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-A2A-BUFFER-REUSE.md",
+        "run_ids": [
+          "185bfd0a06c042fc8e7e1c9f70bc31b6"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-a2a-buffer-reuse-tp2ep-c8-20261001",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
+      }
+    },
+    {
+      "id": "qwen35-a2a-reuse-on-tp2ep-c8-20261001",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "a2a-buffer-reuse ON · TP2+EP · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.28.1.post1.dev143 / 0.25.1rc2.dev125+hust.20260903",
+        "mods": [
+          "a2a-buffer-reuse"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "effective_available_kv_cache_gib_per_chip": 16.73,
+          "effective_gpu_kv_cache_tokens": 1692929,
+          "runtime_versions": {
+            "vllm": "0.28.1.post1.dev143+gf18cf803c",
+            "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+            "cann": "9.1.0"
+          },
+          "a2a_buffer_reuse": {
+            "package": "vllm-hust-a2a-buffer-reuse 0.1.0.dev0 (local, not yet published or in the workshop catalog)",
+            "extension_id": "org.vllm-hust.a2a-buffer-reuse",
+            "env": {
+              "VLLM_HUST_A2A_BUFFER_REUSE_ENABLE": "1",
+              "VLLM_HUST_A2A_BUFFER_REUSE_EVIDENCE": "1",
+              "VLLM_HUST_A2A_BUFFER_REUSE_KILL_SWITCH": "unset"
+            },
+            "extension_manager_state": "enabled (vllm-hust-ext extension list); `enable` alone does not set ENABLE=1",
+            "patch_installed_events": 4,
+            "runtime_effective_events": 0,
+            "patched_classes": [
+              "OProjRowParallelOp"
+            ],
+            "scope": "OFF arm: package installed, patch not installed. ON arm: patch installed but no runtime_effective (buffer reuse) event observed, so the throughput difference is not attributed to the mechanism."
+          },
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "observed_max_prompt_tokens": 59957,
+          "measured_mean_client_inflight": 7.998523676674813,
+          "full_client_concurrency_fraction": 0.9985427750336627,
+          "sessions_completed": 7,
+          "workload_deviation": "prepared workload sha256 4e62e54e… and tokenizer fingerprint 319f580a… differ from the cohort's 8044561f… / 3f9ca785… (same source bundle a31abfc7…, re-prepared locally with transformers 5.18.0)",
+          "warmup_policy": "20s protocol probe at C8 on the same server before the measured window; fresh session salts, no primers",
+          "execution_host": "k8s container, 2 of the pod's NPUs",
+          "physical_devices": [
+            0,
+            7
+          ],
+          "runtime_visible_device_indices": [
+            0,
+            1
+          ],
+          "transport": "Client and server on execution-host loopback",
+          "participating_deployment_chips": 2,
+          "launch_command_redacted": "vllm serve /models/Qwen3.5-35B-A3B --served-model-name qwen3.5-35b-a3b --dtype bfloat16 --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --distributed-executor-backend mp --disable-custom-all-reduce --compilation-config {\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"} --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-a2a-reuse-on-tp2ep-20261001",
+        "presentation_group": {
+          "id": "ascend-0.25.1rc2-hust-tp2ep-a2a-on",
+          "label_en": "vLLM-HUST 0.28.1 / Ascend-HUST 0.25.1rc2 · TP2+EP · a2a-buffer-reuse ON (ENABLE=1, no runtime_effective event)",
+          "label_zh": "vLLM-HUST 0.28.1 / Ascend-HUST 0.25.1rc2 · TP2+EP · a2a-buffer-reuse ON (ENABLE=1, no runtime_effective event)"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 198.33,
+        "decode_p90_tps": 40.70713686650224,
+        "ttft_p95_ms": 3088.652145350351,
+        "completed_requests": 318,
+        "ttft_p50_ms": 1322.6,
+        "tpot_ms": 37.25,
+        "tpot_p95_ms": 55.53,
+        "e2e_p95_ms": 74158.0
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-01",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-A2A-BUFFER-REUSE.md",
+        "run_ids": [
+          "26c10e385cfd49b7ac0122066740b696"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-a2a-buffer-reuse-tp2ep-c8-20261001",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
       }
