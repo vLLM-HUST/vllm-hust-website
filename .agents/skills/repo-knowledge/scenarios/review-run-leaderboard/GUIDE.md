@@ -197,6 +197,7 @@ study, while its incremental-cache peer remains there.
 
 Fletcher then requested a connected BetterScale frontier: the main chart uses group Pareto vertices
 across workload-tuned slots, within cohort and rotation depth, rather than its fixed-configuration
-concurrency line. Other MODs retain measured-series lines. A bilingual note under the BetterScale
-checkbox explains that slot capacity is tunable, C32 actually uses E36/R36, and the boundary is not
-a fixed-slot sweep. Keep immutable load/configuration evidence intact.
+concurrency line. Other MODs retain measured-series lines. Fletcher clarified that the rationale
+belongs only in the source comment at checkbox construction, not on the webpage: slot capacity is
+tunable, C32 uses E36/R36, and both are one configuration family. Keep immutable load/configuration
+evidence intact.

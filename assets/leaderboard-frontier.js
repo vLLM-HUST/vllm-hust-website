@@ -6,7 +6,7 @@
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const words = {
         en: {
-            betterScaleFamily: 'Slot counts are tuned to the workload, not a different BetterScale execution mechanism. E16/R20 and C32 (E36/R36) belong to one configuration family; C32 is request concurrency, not the execution-slot count. The line connects best measured trade-offs, not a fixed-slot sweep.', selectAll: 'Select all', clearAll: 'Deselect all', rotationDepth: 'Session rotation depth', rotationHelp: 'C1/C2/… is request concurrency; D1/D2 is the number of session states rotated per request lane.', rotationPending: 'Larger rotation depths are under construction.',
+            selectAll: 'Select all', clearAll: 'Deselect all', rotationDepth: 'Session rotation depth', rotationHelp: 'C1/C2/… is request concurrency; D1/D2 is the number of session states rotated per request lane.', rotationPending: 'Larger rotation depths are under construction.',
             knownBudget: 'Known output budget · no learned predictor', budgetChecksOnly: 'Admission capacity checks ran, but no admission deferrals or preemptions were observed. This point does not demonstrate an optimization benefit.',
             notExercised: 'MOD policy not exercised', notExercisedScope: 'The MOD was enabled, but its optimization mechanism was not exercised during this window. This point does not demonstrate an optimization benefit.',
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
@@ -19,7 +19,7 @@
             modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', graphMode: 'Graph mode', stateSeats: 'Execution / resident seats', balancedAttention: 'Balanced attention', cachePolicy: 'State cache', fullCache: 'Full', incrementalCache: 'Incremental', enabled: 'On', disabled: 'Off', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation'
         },
         zh: {
-            betterScaleFamily: '槽位数随 workload 调优，不改变 BetterScale 的执行机制。E16/R20 与 C32（E36/R36）属于同类配置；C32 指请求并发数，并非执行槽位数。连线表示实测最佳权衡边界，不是固定槽位的并发扫描。', selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
+            selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
             knownBudget: '已知输出预算 · 未使用学习型预测器', budgetChecksOnly: '准入容量检查已执行，但未观察到准入延后或抢占；该点不构成优化收益证据。',
             notExercised: 'MOD 策略未触发', notExercisedScope: 'MOD 已启用，但本窗口未触发有效的优化动作；该点不构成优化收益证据。',
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
@@ -97,17 +97,15 @@
         params.set('setting', state.cohort);
         history.replaceState(null, '', `${location.pathname}?${params.toString()}#settings`);
     }
-    function modOption(point) {
-        const key=M.groupKey(point), betterScale=key==='betterscale';
-        // Seats are workload-tuned capacity, not a MOD identity boundary. C32 actually uses E36/R36.
-        const label=`<label><input type="checkbox" data-filter="mods" value="${escape(key)}" ${state.mods.has(key)?'checked':''} ${betterScale?'aria-describedby="frontier-betterscale-note"':''}>${escape(groupLabel(point))}</label>`;
-        return betterScale?`<div class="frontier-mod-option">${label}<p id="frontier-betterscale-note" class="frontier-filter-note">${t('betterScaleFamily')}</p></div>`:label;
-    }
     function shell() {
         reconcile();
         const tags = [...new Map(state.data.cohorts.map(c => [tagKey(c),c])).values()];
         const choices = state.data.cohorts.filter(c => tagKey(c) === state.tag);
         const declaredDefaults=cohort()?.workload.contract.default_groups;
+        // BetterScale checkbox identity follows the MOD, not its workload-tuned slot capacity.
+        // E16/R20 and the C32 observation (E36/R36; C32 is request concurrency) use the same
+        // parameterized execution mechanism and configuration family. Keep one BetterScale tag;
+        // preserve seat/graph/cache differences in each point's configuration and popover.
         const mods=[...new Map(cohortPoints().map(p=>[M.groupKey(p),p])).values()].sort((a,b)=>
             Number(Array.isArray(declaredDefaults)&&declaredDefaults.includes(M.groupKey(b)))-Number(Array.isArray(declaredDefaults)&&declaredDefaults.includes(M.groupKey(a))));
         const mtpOptions=[['on',t('mtpOn')],['off',t('mtpOff')],...(cohortPoints().some(p=>M.mtpState(p)==='unknown')?[['unknown',t('unknown')]]:[])];
@@ -137,7 +135,7 @@
             </div>
             <aside class="frontier-filters" aria-label="${t('filter')}">
                 <h2>${t('filter')}</h2>
-                <fieldset><legend>${configurationStudy()?t('studyGroup'):'MOD / Group'} <button type="button" id="frontier-mods-toggle"></button></legend><div class="frontier-checks">${mods.map(modOption).join('')}</div></fieldset>
+                <fieldset><legend>${configurationStudy()?t('studyGroup'):'MOD / Group'} <button type="button" id="frontier-mods-toggle"></button></legend><div class="frontier-checks">${mods.map(p=>`<label><input type="checkbox" data-filter="mods" value="${escape(M.groupKey(p))}" ${state.mods.has(M.groupKey(p))?'checked':''}>${escape(groupLabel(p))}</label>`).join('')}</div></fieldset>
                 <fieldset><legend>MTP</legend><div class="frontier-checks">${mtpOptions.map(([key,text])=>`<label><input type="checkbox" data-filter="mtp" value="${key}" ${state.mtp.has(key)?'checked':''}>${text}</label>`).join('')}</div></fieldset>
                 ${hasRotation()?`<fieldset id="frontier-rotation-filter"><legend>${t('rotationDepth')}</legend><div class="frontier-checks">${depths.map(depth=>`<label><input type="checkbox" data-filter="rotation" value="${depth}" ${state.rotation.has(String(depth))?'checked':''}>${rotationLabel(depth)}</label>`).join('')}</div><p class="frontier-filter-note">${t('rotationHelp')}</p>${cohort().workload.contract.session_rotation.status==='under-construction'?`<p class="frontier-filter-note">${t('rotationPending')}</p>`:''}</fieldset>`:''}
                 ${independentStudy()?'':`<div class="frontier-checks"><label><input id="frontier-only" type="checkbox" ${state.frontierOnly?'checked':''}>${t('frontierOnly')}</label></div>`}
@@ -310,7 +308,7 @@
     $('view-frontier').addEventListener('click',()=>{updateSettingURL();requestAnimationFrame(render);});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=betterscale-frontier-20261001',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=betterscale-source-note-20261001',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});

@@ -93,6 +93,3 @@
 
 #frontier-mods-toggle { margin-left: 8px; border: 1px solid var(--run-border); border-radius: 5px; padding: 3px 7px; color: var(--run-accent); background: transparent; font: inherit; cursor: pointer; }
 #frontier-mods-toggle:focus-visible { outline: 2px solid var(--run-accent); outline-offset: 2px; }
-
-.frontier-mod-option { flex-basis: 100%; }
-.frontier-mod-option .frontier-filter-note { margin-top: 6px; }

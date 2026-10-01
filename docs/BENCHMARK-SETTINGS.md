@@ -74,10 +74,11 @@ workload identities; never silently mix them.
 BetterScale connects one Pareto frontier per cohort × MOD/group × session-rotation depth, across
 workload-tuned slot configurations. Vertices are whole measured records, ordered by P90 decode
 speed; dominated observations remain visible but are not line vertices, coordinate ties share one
-vertex, failed-correctness references are excluded, and singletons have no line. The checkbox note
-explains why E16/R20 and C32 (actually E36/R36) belong to one family. This is a best measured
-trade-off boundary, not a claim of one fixed-slot sweep or an interpolated measurement. Filters
-recompute that boundary.
+vertex, failed-correctness references are excluded, and singletons have no line. A source-only
+comment at checkbox construction explains why E16/R20 and C32 (actually E36/R36) belong to one
+family; no explanatory note is rendered beneath the checkbox. This is a best measured trade-off
+boundary, not a claim of one fixed-slot sweep or an interpolated measurement. Filters recompute that
+boundary.
 
 Other groups retain one line for each declared `load.concurrency_series` within the selected cohort
 and rotation depth, ordered by client concurrency. Their lines represent actual sweeps; filters can
