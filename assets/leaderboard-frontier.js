@@ -12,7 +12,7 @@
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
             failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Benchmark setting', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', fixedSubtitle: 'Fixed-configuration measured comparison', studySubtitle: 'Measured configuration study', studyGroup: 'Study group', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', batchSize: 'Batch size', outputThroughput: 'Output throughput', native: 'Native configuration', officialBaseline: 'Fixed official baseline', baselinePending: 'matched measurement pending for this setting', baselineMeasured: 'matched measurement available',
-            smoke: 'Measured comparison', formal: 'Measured setting', fixed: 'Fixed comparison', study: 'Configuration study', hint: 'Select a point for configuration', fixedHint: 'Fixed-configuration comparison; points are independent measured observations', studyHint: 'Independent study groups are not connected; compare points only within the same group', lineHint: 'BetterScale lines connect best trade-offs across workload-tuned configurations; other lines follow measured concurrency series', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
+            smoke: 'Measured comparison', formal: 'Measured setting', fixed: 'Fixed comparison', study: 'Configuration study', hint: 'Select a point for configuration', fixedHint: 'Fixed-configuration comparison; points are independent measured observations', studyComparisonHint: 'BetterScale C1–C32: workload-tuned configurations; Native C1–C16: fixed configuration. Other cache studies remain independent.', studyHint: 'Independent study groups are not connected; compare points only within the same group', lineHint: 'BetterScale lines connect best trade-offs across workload-tuned configurations; other lines follow measured concurrency series', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', standalone: 'measurements are not on a displayed line', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
@@ -25,7 +25,7 @@
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
             failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: '实验设定', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', fixedSubtitle: '固定配置实测对照', studySubtitle: '配置实测研究', studyGroup: '实验组', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', batchSize: 'Batch size', outputThroughput: '总输出吞吐', native: 'Native 配置', officialBaseline: '固定官方基线', baselinePending: '该设定的同合同实测待补', baselineMeasured: '已有该设定的同合同实测',
-            smoke: '实测对比', formal: '实测设定', fixed: '固定配置对照', study: '配置研究', hint: '点击数据点查看配置', fixedHint: '固定配置对照；各点是独立实测，不表示缺失并发曲线', studyHint: '不同实验组之间不连线；只在同一实验组内比较', lineHint: 'BetterScale 连线连接不同 workload 调优配置的最佳权衡点；其他连线按实测并发序列连接', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
+            smoke: '实测对比', formal: '实测设定', fixed: '固定配置对照', study: '配置研究', hint: '点击数据点查看配置', fixedHint: '固定配置对照；各点是独立实测，不表示缺失并发曲线', studyComparisonHint: 'BetterScale C1–C32 为 workload 调优配置连线；Native C1–C16 为固定配置扫描。其他缓存实验组保持独立。', studyHint: '不同实验组之间不连线；只在同一实验组内比较', lineHint: 'BetterScale 连线连接不同 workload 调优配置的最佳权衡点；其他连线按实测并发序列连接', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', standalone: '个测量点不在当前连线上', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
@@ -50,6 +50,7 @@
     const axes = () => cohort()?.workload.contract.frontier_axes || DEFAULT_AXES;
     const fixedComparison = () => cohort()?.workload.contract.presentation === 'fixed-comparison';
     const configurationStudy = () => cohort()?.workload.contract.presentation === 'configuration-study';
+    const studyComparison = p => cohort()?.workload.contract.comparison_point_ids?.includes(p.id);
     const independentStudy = () => fixedComparison() || configurationStudy();
     const axisLabel = key => ({batch_size:t('batchSize'),output_tps:t('outputThroughput'),decode_p90_tps:t('x'),output_tps_per_chip:t('y')})[key] || key;
     const cohortPoints = () => M.presentationPoints(state.data.points,cohort());
@@ -65,7 +66,7 @@
         if(!baseline)return '';
         return `${t('officialBaseline')} · vLLM ${baseline.vllm_version} + vLLM-Ascend ${baseline.vllm_ascend_version} · ${t(hasOfficialBaseline()?'baselineMeasured':'baselinePending')}`;
     };
-    const pointLabel = p => independentStudy() ? p.label : groupLabel(p);
+    const pointLabel = p => independentStudy() && !studyComparison(p) ? p.label : groupLabel(p);
     const knownBudget = p => p.configuration.mods.includes('dla') && p.configuration.parameters.length_source === 'Declared exact ignore_eos output budgets, no learned predictor';
     const notExercised = p => p.configuration.mods.length > 0 && p.configuration.parameters.mod_runtime_effectiveness?.status === 'not-exercised';
     const storeOnly = p => p.configuration.mods.length > 0 && p.configuration.parameters.mod_runtime_effectiveness?.status === 'store-only';
@@ -112,7 +113,7 @@
         const depths=[...new Set(cohortPoints().map(p=>p.load.session_rotation_depth))].filter(Number.isInteger).sort((a,b)=>a-b);
         if(state.rotation===null)state.rotation=new Set(depths.map(String));
         if(state.mods===null){
-            state.mods=new Set(independentStudy()||!Array.isArray(declaredDefaults)?mods.map(M.groupKey):declaredDefaults);
+            state.mods=new Set(!Array.isArray(declaredDefaults)?mods.map(M.groupKey):declaredDefaults);
         }
         if(state.mtp===null)state.mtp=new Set(mtpOptions.map(([key])=>key));
         $('frontier-panel').innerHTML = `
@@ -191,7 +192,8 @@
     function download() {
         const point=points().find(p=>p.id===state.selected);
         if(!point)return;
-        const payload={schema_version:'frontier-configuration/v1',cohort:cohort(),point,
+        const payload={schema_version:'frontier-configuration/v1',cohort:state.data.cohorts.find(c=>c.id===point.cohort_id),point,
+            ...(studyComparison(point)?{comparison_cohort:cohort()}:{}),
             chart:{x:axes().x,y:axes().y,x_unit:M.metrics[axes().x].unit,y_unit:M.metrics[axes().y].unit}};
         const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'}));
         const a=document.createElement('a');a.href=url;a.download=`${point.id.replace(/[^a-z0-9_.-]/gi,'_')}.json`;
@@ -210,12 +212,12 @@
         const groups=[...new Map(cohortPoints().map(p=>[M.groupKey(p),p])).values()].sort((a,b)=>
             Number(M.groupKey(b)==='none')-Number(M.groupKey(a)==='none')||M.groupKey(a).localeCompare(M.groupKey(b)));
         const color=p=>M.failedCorrectness(p)?'#dc2626':colors[groups.findIndex(g=>M.groupKey(g)===M.groupKey(p))%colors.length];
-        const series=independentStudy()?cohortPoints():[...new Map(cohortPoints().map(p=>[M.frontierKey(p),p])).values()];
-        $('frontier-legend').innerHTML=series.filter(g=>points().some(p=>independentStudy()?p.id===g.id:M.frontierKey(p)===M.frontierKey(g))).map(p=>`<span data-frontier-group="${escape(M.frontierKey(p))}"><i style="background:${p.load.session_rotation_depth>1?'transparent':color(p)};border:2px solid ${color(p)}"></i>${escape(pointLabel(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}</span>`).join('');
-        const measuredSeries=M.chartSeries(measured.measured,axes().x,axes().y);
+        const series=[...new Map(cohortPoints().map(p=>[independentStudy()&&!studyComparison(p)?p.id:M.frontierKey(p),p])).values()];
+        $('frontier-legend').innerHTML=series.filter(g=>points().some(p=>independentStudy()&&!studyComparison(g)?p.id===g.id:M.frontierKey(p)===M.frontierKey(g))).map(p=>`<span data-frontier-group="${escape(M.frontierKey(p))}"><i style="background:${p.load.session_rotation_depth>1?'transparent':color(p)};border:2px solid ${color(p)}"></i>${escape(pointLabel(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}</span>`).join('');
+        const measuredSeries=M.chartSeries(measured.measured,axes().x,axes().y,current);
         const connected=new Set(measuredSeries.flatMap(rows=>rows.map(row=>row.point.id)));
         const standalone=measured.measured.filter(row=>!connected.has(row.point.id)).length;
-        $('frontier-hint').textContent=(configurationStudy()?t('studyHint'):fixedComparison()?t('fixedHint'):measuredSeries.length?t('lineHint'):t('hint'))+(!independentStudy()&&standalone?` · ${standalone} ${t('standalone')}`:'')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
+        $('frontier-hint').textContent=(configurationStudy()?t(cohort()?.workload.contract.comparison_point_ids?'studyComparisonHint':'studyHint'):fixedComparison()?t('fixedHint'):measuredSeries.length?t('lineHint'):t('hint'))+(!independentStudy()&&standalone?` · ${standalone} ${t('standalone')}`:'')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
         // Historical static curves describe depth1, not every workload selected by the checkboxes.
         const curves=$('frontier-curves'), curveUrl=!hasRotation()||(state.rotation?.size===1&&state.rotation.has('1'))?current?.workload.contract.concurrency_curves_url:null;
         curves.hidden=typeof curveUrl!=='string'||!/^\.\/assets\/[a-z0-9-]+\.svg(?:\?v=[a-z0-9-]+)?$/.test(curveUrl);
@@ -286,12 +288,12 @@
             if(result.measured.length)svg+=`<text text-anchor="middle" x="${x(xv)}" y="${height-bottom+24}">${fmt(xv)}</text><text text-anchor="end" x="${left-12}" y="${y(yv)+4}">${fmt(yv)}</text>`;
         }
         svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${axisLabel(axes().x)}<tspan x="${(width+left-right)/2}" dy="16">${M.metrics[axes().x].unit}</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${axisLabel(axes().y)}<tspan x="0" dy="16">${M.metrics[axes().y].unit}</tspan></text>`;
-        const series=M.chartSeries(result.measured,axes().x,axes().y);
+        const series=M.chartSeries(result.measured,axes().x,axes().y,cohort());
         for(const rows of series){
             const point=rows[0].point;
-            const frontier=M.groupKey(point)==='betterscale';
+            const frontier=M.groupKey(point)==='betterscale'&&!configurationStudy();
             const id=frontier?M.frontierKey(point):JSON.stringify([point.cohort_id,point.load.concurrency_series,point.load.session_rotation_depth??null]);
-            svg+=`<polyline class="frontier-concurrency-line" data-line-kind="${frontier?'frontier':'concurrency'}" data-series="${escape(id)}" stroke-dasharray="${point.load.session_rotation_depth>1?'7 4':'none'}" data-series-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
+            svg+=`<polyline class="frontier-concurrency-line" data-line-kind="${configurationStudy()&&M.groupKey(point)==='betterscale'?'configuration-family':frontier?'frontier':'concurrency'}" data-series="${escape(id)}" stroke-dasharray="${point.load.session_rotation_depth>1?'7 4':'none'}" data-series-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
         }
         for(const row of result.measured){
             const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);
@@ -308,7 +310,7 @@
     $('view-frontier').addEventListener('click',()=>{updateSettingURL();requestAnimationFrame(render);});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=betterscale-source-note-20261001',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=betterscale-study-comparison-20261001',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});

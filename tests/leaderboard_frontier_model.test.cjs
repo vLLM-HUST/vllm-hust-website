@@ -882,3 +882,35 @@ test('BetterScale chart line uses only the displayed five-point configuration fa
     assert.deepEqual(lines.filter(line=>model.groupKey(line[0].point)!=='betterscale'),model.concurrencySeries(projected.filter(row=>model.groupKey(row.point)!=='betterscale')));
     assert.deepEqual(model.chartSeries(better.slice(0,1),'decode_p90_tps','output_tps_per_chip'),[]);
 });
+
+
+test('BetterScale cache study reuses exact Native and tuned C1–C32 measurements without changing the main chart',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    model.validate(data);
+    const study=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-study-betterscale-cache-v1');
+    const main=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
+    const shared=study.workload.contract.comparison_point_ids;
+    assert.equal(shared.length,11);
+    const points=model.presentationPoints(data.points,study);
+    assert.equal(points.length,data.points.filter(p=>p.cohort_id===study.id).length+11);
+    for(const id of shared) assert.equal(points.find(p=>p.id===id),data.points.find(p=>p.id===id));
+    const rows=model.project(points,'decode_p90_tps','output_tps_per_chip').measured;
+    const lines=model.chartSeries(rows,'decode_p90_tps','output_tps_per_chip',study);
+    assert.equal(lines.length,2);
+    const better=lines.find(line=>model.groupKey(line[0].point)==='betterscale');
+    const native=lines.find(line=>model.groupKey(line[0].point)==='native-runtime-752a3a5-9bf964c');
+    assert.deepEqual(better.map(row=>row.point.load.concurrency),[1,2,4,8,16,32]);
+    assert.deepEqual(native.map(row=>row.point.load.concurrency),[1,2,4,8,16]);
+    assert.equal(model.value(better.at(-1).point,'output_tps_per_chip'),613.88);
+    assert.ok(lines.flat().every(row=>shared.includes(row.point.id)));
+    const c32=better.at(-1).point;
+    assert.ok(!model.presentationPoints(data.points,main).includes(c32));
+    assert.equal(model.chartSeries(rows.filter(row=>row.point===c32),'decode_p90_tps','output_tps_per_chip',study).length,0);
+    const withoutNative=model.chartSeries(rows.filter(row=>model.groupKey(row.point)!=='native-runtime-752a3a5-9bf964c'),'decode_p90_tps','output_tps_per_chip',study);
+    assert.equal(withoutNative.length,1);
+    for(const invalid of [[shared[0],shared[0]],['missing-point'],[],[data.points.find(p=>p.cohort_id==='qwen38-27b-bf16-sweprefix-smoke-v1').id]]){
+        const fixture=structuredClone(data);
+        fixture.cohorts.find(c=>c.id===study.id).workload.contract.comparison_point_ids=invalid;
+        assert.throws(()=>model.validate(fixture),/Invalid comparison point IDs/);
+    }
+});

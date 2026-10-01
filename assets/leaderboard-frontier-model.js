@@ -89,6 +89,18 @@
         for (const c of data.cohorts) for (const series of c.workload.contract.display_series_ids || []) {
             if (!data.points.some(point => point.cohort_id === c.id && point.load.concurrency_series === series)) throw new Error(`Missing display series: ${series}`);
         }
+        for (const c of data.cohorts) {
+            const shared = c.workload.contract.comparison_point_ids;
+            const compatible = id => {
+                const point = data.points.find(p => p.id === id);
+                const source = data.cohorts.find(source => source.id === point?.cohort_id);
+                return source && !source.display_withdrawal && source.model.id === c.model.id
+                    && source.precision.id === c.precision.id && source.context_tokens === c.context_tokens;
+            };
+            if (shared != null && (c.workload.contract.presentation !== 'configuration-study'
+                || !Array.isArray(shared) || !shared.length || new Set(shared).size !== shared.length
+                || shared.some(id => !pointIds.has(id) || !compatible(id)))) throw new Error('Invalid comparison point IDs');
+        }
         return data;
     }
     function visibleData(data) {
@@ -100,7 +112,9 @@
         return cohorts.find(cohort => cohort.id === requested || cohort.aliases?.includes(requested));
     }
     function presentationPoints(points, cohort) {
-        const members = points.filter(point => point.cohort_id === cohort?.id);
+        // Reuse immutable measurements in a study without moving or duplicating source records.
+        const shared = new Set(cohort?.workload?.contract?.comparison_point_ids || []);
+        const members = points.filter(point => point.cohort_id === cohort?.id || shared.has(point.id));
         const series = cohort?.workload?.contract?.display_series_ids;
         if (series) return members.filter(point => series.includes(point.load.concurrency_series));
         const prefix = cohort?.workload?.contract?.display_series_prefix;
@@ -174,7 +188,17 @@
     }
     // BetterScale is a workload-tuned configuration family; connect its Pareto vertices.
     // Other groups retain their declared, fixed-configuration concurrency sweeps.
-    function chartSeries(rows, xKey, yKey) {
+    function chartSeries(rows, xKey, yKey, cohort) {
+        const shared = cohort?.workload?.contract?.comparison_point_ids;
+        if (cohort?.workload?.contract?.presentation === 'configuration-study') {
+            const comparison = rows.filter(row => shared?.includes(row.point.id));
+            const native = comparison.filter(row => groupKey(row.point) !== 'betterscale');
+            const better = comparison.filter(row => groupKey(row.point) === 'betterscale');
+            const depths = [...new Set(better.map(row => row.point.load.session_rotation_depth))];
+            return [...concurrencySeries(native), ...depths.map(depth => better
+                .filter(row => row.point.load.session_rotation_depth === depth)
+                .sort((a,b) => a.point.load.concurrency - b.point.load.concurrency)).filter(line => line.length > 1)];
+        }
         const betterScale = rows.filter(row => groupKey(row.point) === 'betterscale');
         return [...concurrencySeries(rows.filter(row => groupKey(row.point) !== 'betterscale')),
             ...groupFrontiers(betterScale.map(row => row.point), xKey, yKey).filter(line => line.length > 1)];

@@ -46,11 +46,18 @@ workload identities; never silently mix them.
   Identical-configuration BetterScale repeats use the documented
   [whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), retaining inferior raw evidence.
 - BetterScale uses the short **BetterScale** group/legend label; graph mode, execution/resident
-  seats, balanced attention and state-cache policy appear in its popover. The historical FULL-cache
-  E36/R36 C32 point (613.88 output tokens/s/chip) is restored to the main SWE comparison as a
-  standalone observation, not connected to the E16/R20 sweep. BetterScale is selected by default
-  alongside the two native runtime curves. C32 and E16/R20 share the same **BetterScale** tag and
-  checkbox: workload-tuned slot counts are point-level configuration, not different MOD identities.
+  seats, balanced attention and state-cache policy appear in its popover. The main unified
+  concurrency comparison retains its declared C1–C16 sweeps; C32 stays excluded there.
+- **BetterScale residency and cache studies** additionally references eleven immutable source points
+  through `workload.contract.comparison_point_ids`: the Native vLLM752a3a5 / Ascend9bf964c
+  FULL_AND_PIECEWISE C1/C2/C4/C8/C16 sweep and BetterScale C1/C2/C4/C8/C16/C32. BetterScale connects
+  all six measurements in concurrency order, not just Pareto vertices: C1–C16 uses E16/R20, while
+  C32 uses E36/R36 FULL cache (613.88 output tokens/s/chip). This is a workload-tuned
+  configuration-family comparison, not a fixed-slot sweep or a causal ablation. These two curves are
+  selected by default; the original residency/cache study groups remain available as independent
+  dots via their checkboxes. Shared points retain their original IDs, cohort, metrics, configuration
+  and provenance. Downloads include the source cohort plus `comparison_cohort` for this study; no
+  duplicate measurements or baseline C32 values are fabricated.
 - Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
   session concurrency, MTP, request limit, explicit KV budget, UTC sampling date and the two
   coordinate values. `evidence.sampling_date_utc` is a calendar-valid YYYY-MM-DD date, with

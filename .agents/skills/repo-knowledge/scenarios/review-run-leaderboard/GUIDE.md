@@ -201,3 +201,13 @@ concurrency line. Other MODs retain measured-series lines. Fletcher clarified th
 belongs only in the source comment at checkbox construction, not on the webpage: slot capacity is
 tunable, C32 uses E36/R36, and both are one configuration family. Keep immutable load/configuration
 evidence intact.
+
+On October1 PR#340 excluded C32 again by restricting the main display whitelist to complete C1–C16
+sweeps. Fletcher accepted that main-chart scope and instead requested the six-point BetterScale
+C1–C32 line in **BetterScale residency and cache studies**, alongside only Native vLLM752a3a5 /
+Ascend9bf964c FULL_AND_PIECEWISE C1–C16. The study references the eleven existing records through
+`comparison_point_ids`; do not duplicate or move measurements, resurrect C32 in the main whitelist,
+invent a native C32 value, or connect unrelated cache-ablation dots. All six BetterScale points are
+joined in concurrency order, with E16/R20 versus E36/R36 retained in their original configurations.
+Download the source cohort and the study separately. The bounded browser check is
+`scripts/verify_betterscale_study_browser.cjs`.

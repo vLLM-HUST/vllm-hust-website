@@ -370,8 +370,31 @@
             "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
             "measurement_scope": "This page includes D1 and D2 observations. Rotation depth is a load facet, not a separate benchmark setting; compare matched depths within the same study group."
           },
-          "display_scope": "BetterScale residency and cache-policy studies. Resident-state reference, E16/R20 C16 cache policy, and E36/R36 C32 cache policy are separate study groups; full/incremental comparisons are interpreted only within their matched group and depth.",
-          "presentation": "configuration-study"
+          "display_scope": "BetterScale residency and cache-policy studies, with the Native vLLM 752a3a5 / Ascend 9bf964c FULL_AND_PIECEWISE C1/C2/C4/C8/C16 reference and a workload-tuned BetterScale C1/C2/C4/C8/C16/C32 line. BetterScale C1–C16 uses E16/R20; C32 uses E36/R36 FULL cache. This is a measured configuration-family comparison, not a fixed-configuration sweep or causal ablation. Original residency/cache groups remain independent; compare full/incremental policies only within their matched group and depth.",
+          "presentation": "configuration-study",
+          "comparison_point_ids": [
+            "qwen35-sweprefix-capacity16-native-tp2-c1-20260924",
+            "qwen35-sweprefix-capacity16-native-tp2-c2-20260924",
+            "qwen35-sweprefix-capacity16-native-tp2-c4-20260924",
+            "qwen35-sweprefix-capacity16-native-tp2-c8-20260924",
+            "qwen35-sweprefix-capacity16-native-tp2-c16-20260924",
+            "qwen35-sweprefix-resident-balanced-tp2-c1-20260927",
+            "qwen35-sweprefix-resident-balanced-tp2-c2-20260927",
+            "qwen35-sweprefix-resident-balanced-tp2-c4-20260927",
+            "qwen35-sweprefix-resident-balanced-tp2-c8-20260927",
+            "qwen35-sweprefix-resident-balanced-tp2-c16-20260927",
+            "qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928"
+          ],
+          "display_group_labels": {
+            "betterscale": {
+              "label_en": "BetterScale",
+              "label_zh": "BetterScale"
+            }
+          },
+          "default_groups": [
+            "native-runtime-752a3a5-9bf964c",
+            "betterscale"
+          ]
         }
       }
     },
