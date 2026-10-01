@@ -121,8 +121,9 @@
       }
     },
     {
-      "id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-legacy-v1",
+      "id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-engine-graph-v1",
       "aliases": [
+        "qwen35-35b-a3b-bf16-sweprefix-study-tp2-legacy-v1",
         "qwen35-35b-a3b-bf16-sweprefix-fixed-c4-legacy-v1",
         "qwen35-35b-a3b-bf16-sweprefix-fixed-capacity32-graph-v1"
       ],
@@ -145,8 +146,8 @@
       },
       "context_tokens": 262144,
       "workload": {
-        "id": "sweprefix-qwen35-study-tp2-legacy-900s-v1",
-        "label": "SWE prefix reuse · TP2 historical configuration studies",
+        "id": "sweprefix-qwen35-study-tp2-engine-graph-900s-v1",
+        "label": "SWE prefix reuse · TP2 engine and graph configurations",
         "contract": {
           "profile": "smoke",
           "measurement_seconds": 900,
@@ -199,7 +200,7 @@
             "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
             "measurement_scope": "All observations on this page use D1. Concurrency and max_num_seqs differ between the two declared study groups."
           },
-          "display_scope": "Historical two-chip TP2 configuration studies. The C4 Native/BetterScale engine comparison and the C32 Native graph-capture comparison are separate study groups; do not compare across groups as a causal ablation.",
+          "display_scope": "TP2 engine and graph configuration studies. The C4 Native/BetterScale engine comparison and the C32 Native graph-capture comparison are separate study groups; do not compare across groups as a causal ablation.",
           "presentation": "configuration-study"
         }
       }
@@ -283,7 +284,7 @@
             "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
             "measurement_scope": "All observations on this page use C64 and D1. MTP2 and cold-KV MTP0 belong to separate declared study groups."
           },
-          "display_scope": "Historical eight-chip C64 topology studies. Native MTP2 and cold-KV MTP0 are separate runtime campaigns and study groups; compare topologies only within the same group.",
+          "display_scope": "Eight-chip C64 topology configuration studies. Native MTP2 and cold-KV MTP0 are separate runtime campaigns and study groups; compare topologies only within the same group.",
           "presentation": "configuration-study"
         }
       }
@@ -2620,7 +2621,7 @@
     },
     {
       "id": "qwen35-sweprefix-smoke-native-tp2-c4-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-legacy-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-engine-graph-v1",
       "study_group": {
         "id": "c4-engine-comparison",
         "label_en": "C4 engine comparison",
@@ -2785,7 +2786,7 @@
     },
     {
       "id": "qwen35-sweprefix-smoke-betterscale-tp2-c4-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-legacy-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-engine-graph-v1",
       "study_group": {
         "id": "c4-engine-comparison",
         "label_en": "C4 engine comparison",
@@ -4623,7 +4624,7 @@
     },
     {
       "id": "qwen35-sweprefix-capacity32-native-tp2-c32-20260924",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-legacy-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-engine-graph-v1",
       "study_group": {
         "id": "c32-graph-capture",
         "label_en": "C32 graph-capture comparison",
@@ -4798,7 +4799,7 @@
     },
     {
       "id": "qwen35-sweprefix-capacity32-native-tp2-c32-20260924-graph96",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-legacy-v1",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-study-tp2-engine-graph-v1",
       "study_group": {
         "id": "c32-graph-capture",
         "label_en": "C32 graph-capture comparison",
