@@ -1,6 +1,6 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-09-28T08:19:36+00:00",
+  "generated_at": "2026-10-01T10:26:41+00:00",
   "source": "GitHub API + canonical ownership and organization identity data",
   "plugins": {
     "adm": {
@@ -34,7 +34,7 @@
       "metrics": {
         "stars": 1,
         "forks": 0,
-        "open_pull_requests": 1
+        "open_pull_requests": 2
       },
       "maintainers": [
         {
@@ -64,7 +64,7 @@
       "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec",
       "metrics": {
         "stars": 0,
-        "forks": 0,
+        "forks": 1,
         "open_pull_requests": 0
       },
       "maintainers": [
@@ -90,7 +90,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 0
+        "open_pull_requests": 1
       },
       "maintainers": [
         {
@@ -259,38 +259,13 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
-    "betterscale": {
-      "repository": "vLLM-HUST/BetterScale",
-      "repository_url": "https://github.com/vLLM-HUST/BetterScale",
-      "metrics": {
-        "stars": 0,
-        "forks": 0,
-        "open_pull_requests": 0
-      },
-      "maintainers": [
-        {
-          "login": "CubeLander",
-          "name": "田景远",
-          "profile_url": "https://github.com/CubeLander",
-          "avatar_url": "https://avatars.githubusercontent.com/u/49518565?v=4"
-        }
-      ],
-      "advisors": [
-        {
-          "name_zh": "张书豪",
-          "name_en": "Shuhao Zhang",
-          "relationship": "internal"
-        }
-      ],
-      "maintainer_source": "ecosystem.json#component.maintainers"
-    },
     "request-lifecycle-profiler": {
       "repository": "vLLM-HUST/vllm-hust-request-lifecycle-profiler",
       "repository_url": "https://github.com/vLLM-HUST/vllm-hust-request-lifecycle-profiler",
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 2
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -340,7 +315,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 1
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -359,11 +334,36 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
+    "betterscale": {
+      "repository": "vLLM-HUST/BetterScale",
+      "repository_url": "https://github.com/vLLM-HUST/BetterScale",
+      "metrics": {
+        "stars": 0,
+        "forks": 1,
+        "open_pull_requests": 1
+      },
+      "maintainers": [
+        {
+          "login": "CubeLander",
+          "name": "田景远",
+          "profile_url": "https://github.com/CubeLander",
+          "avatar_url": "https://avatars.githubusercontent.com/u/49518565?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
     "traceloom": {
       "repository": "vLLM-HUST/vllm-hust-perf-analyzer",
       "repository_url": "https://github.com/vLLM-HUST/vllm-hust-perf-analyzer",
       "metrics": {
-        "stars": 2,
+        "stars": 3,
         "forks": 1,
         "open_pull_requests": 1
       },
