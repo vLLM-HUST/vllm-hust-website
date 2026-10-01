@@ -172,7 +172,14 @@
         return [...groups.values()].filter(rows => rows.length > 1)
             .map(rows => [...rows].sort((a, b) => a.point.load.concurrency - b.point.load.concurrency));
     }
-    const api = { validate, visibleData, resolveCohort, presentationPoints, metrics, value, modKey, groupKey, frontierKey, project, safeURL, mtpState, concurrencySeries, groupFrontiers, failedCorrectness };
+    // BetterScale is a workload-tuned configuration family; connect its Pareto vertices.
+    // Other groups retain their declared, fixed-configuration concurrency sweeps.
+    function chartSeries(rows, xKey, yKey) {
+        const betterScale = rows.filter(row => groupKey(row.point) === 'betterscale');
+        return [...concurrencySeries(rows.filter(row => groupKey(row.point) !== 'betterscale')),
+            ...groupFrontiers(betterScale.map(row => row.point), xKey, yKey).filter(line => line.length > 1)];
+    }
+    const api = { validate, visibleData, resolveCohort, presentationPoints, metrics, value, modKey, groupKey, frontierKey, project, safeURL, mtpState, concurrencySeries, chartSeries, groupFrontiers, failedCorrectness };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);

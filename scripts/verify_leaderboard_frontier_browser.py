@@ -42,15 +42,38 @@ def download_configuration(page, popup, previous_download):
 
 
 def assert_concurrency_series(page, points):
-    """Lines connect only explicitly declared measured concurrency series."""
+    """BetterScale joins Pareto vertices; other groups retain measured sweeps."""
     visible = set(
         page.locator("[data-point]").evaluate_all(
             "nodes => nodes.map(node => node.dataset.point)"
         )
     )
     groups = {}
+    frontiers = {}
     for point in points:
         if point["id"] not in visible or not point["load"].get("concurrency_series"):
+            continue
+        group = (
+            point.get("study_group", {}).get("id")
+            or point["load"].get("presentation_group", {}).get("id")
+            or point["configuration"].get("experiment_group")
+            or "+".join(sorted(point["configuration"]["mods"]))
+            or "none"
+        )
+        if group == "betterscale":
+            key = json.dumps(
+                [
+                    point["cohort_id"],
+                    group,
+                    point["load"].get("session_rotation_depth"),
+                ],
+                separators=(",", ":"),
+            )
+            if (
+                point["configuration"]["parameters"].get("functional_status")
+                != "failed"
+            ):
+                frontiers.setdefault(key, []).append(point)
             continue
         series = json.dumps(
             [
@@ -67,6 +90,34 @@ def assert_concurrency_series(page, points):
         for series, members in groups.items()
         if len(members) > 1
     }
+
+    def coordinates(point):
+        return (
+            point["metrics"]["decode_p90_tps"],
+            point["metrics"]["output_tps"]
+            / point["configuration"]["hardware"]["accelerator_count"],
+        )
+
+    for key, members in frontiers.items():
+        vertices = []
+        seen = set()
+        for point in sorted(members, key=lambda p: (coordinates(p)[0], p["id"])):
+            x, y = coordinates(point)
+            if (
+                any(
+                    coordinates(other)[0] >= x
+                    and coordinates(other)[1] >= y
+                    and coordinates(other) != (x, y)
+                    for other in members
+                )
+                or (x, y) in seen
+            ):
+                continue
+            vertices.append(point)
+            seen.add((x, y))
+        if len(vertices) > 1:
+            expected[key] = vertices
+
     lines = page.locator(".frontier-concurrency-line")
     assert lines.count() == len(expected)
     assert page.locator(".frontier-envelope").count() == 0

@@ -6,28 +6,28 @@
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const words = {
         en: {
-            selectAll: 'Select all', clearAll: 'Deselect all', rotationDepth: 'Session rotation depth', rotationHelp: 'C1/C2/… is request concurrency; D1/D2 is the number of session states rotated per request lane.', rotationPending: 'Larger rotation depths are under construction.',
+            betterScaleFamily: 'Slot counts are tuned to the workload, not a different BetterScale execution mechanism. E16/R20 and C32 (E36/R36) belong to one configuration family; C32 is request concurrency, not the execution-slot count. The line connects best measured trade-offs, not a fixed-slot sweep.', selectAll: 'Select all', clearAll: 'Deselect all', rotationDepth: 'Session rotation depth', rotationHelp: 'C1/C2/… is request concurrency; D1/D2 is the number of session states rotated per request lane.', rotationPending: 'Larger rotation depths are under construction.',
             knownBudget: 'Known output budget · no learned predictor', budgetChecksOnly: 'Admission capacity checks ran, but no admission deferrals or preemptions were observed. This point does not demonstrate an optimization benefit.',
             notExercised: 'MOD policy not exercised', notExercisedScope: 'The MOD was enabled, but its optimization mechanism was not exercised during this window. This point does not demonstrate an optimization benefit.',
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
             failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Benchmark setting', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', fixedSubtitle: 'Fixed-configuration measured comparison', studySubtitle: 'Measured configuration study', studyGroup: 'Study group', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', batchSize: 'Batch size', outputThroughput: 'Output throughput', native: 'Native configuration', officialBaseline: 'Fixed official baseline', baselinePending: 'matched measurement pending for this setting', baselineMeasured: 'matched measurement available',
-            smoke: 'Measured comparison', formal: 'Measured setting', fixed: 'Fixed comparison', study: 'Configuration study', hint: 'Select a point for configuration', fixedHint: 'Fixed-configuration comparison; points are independent measured observations', studyHint: 'Independent study groups are not connected; compare points only within the same group', lineHint: 'Lines connect points from the same declared measurement series, in concurrency order', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
+            smoke: 'Measured comparison', formal: 'Measured setting', fixed: 'Fixed comparison', study: 'Configuration study', hint: 'Select a point for configuration', fixedHint: 'Fixed-configuration comparison; points are independent measured observations', studyHint: 'Independent study groups are not connected; compare points only within the same group', lineHint: 'BetterScale lines connect best trade-offs across workload-tuned configurations; other lines follow measured concurrency series', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
-            missing: 'Missing axis metrics', standalone: 'standalone measurements have no same-series partner', points: 'points', context: 'context',
+            missing: 'Missing axis metrics', standalone: 'measurements are not on a displayed line', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
             modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', graphMode: 'Graph mode', stateSeats: 'Execution / resident seats', balancedAttention: 'Balanced attention', cachePolicy: 'State cache', fullCache: 'Full', incrementalCache: 'Incremental', enabled: 'On', disabled: 'Off', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation'
         },
         zh: {
-            selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
+            betterScaleFamily: '槽位数随 workload 调优，不改变 BetterScale 的执行机制。E16/R20 与 C32（E36/R36）属于同类配置；C32 指请求并发数，并非执行槽位数。连线表示实测最佳权衡边界，不是固定槽位的并发扫描。', selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
             knownBudget: '已知输出预算 · 未使用学习型预测器', budgetChecksOnly: '准入容量检查已执行，但未观察到准入延后或抢占；该点不构成优化收益证据。',
             notExercised: 'MOD 策略未触发', notExercisedScope: 'MOD 已启用，但本窗口未触发有效的优化动作；该点不构成优化收益证据。',
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
             failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: '实验设定', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', fixedSubtitle: '固定配置实测对照', studySubtitle: '配置实测研究', studyGroup: '实验组', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', batchSize: 'Batch size', outputThroughput: '总输出吞吐', native: 'Native 配置', officialBaseline: '固定官方基线', baselinePending: '该设定的同合同实测待补', baselineMeasured: '已有该设定的同合同实测',
-            smoke: '实测对比', formal: '实测设定', fixed: '固定配置对照', study: '配置研究', hint: '点击数据点查看配置', fixedHint: '固定配置对照；各点是独立实测，不表示缺失并发曲线', studyHint: '不同实验组之间不连线；只在同一实验组内比较', lineHint: '连线仅连接同一实测序列，并按并发顺序排列', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
+            smoke: '实测对比', formal: '实测设定', fixed: '固定配置对照', study: '配置研究', hint: '点击数据点查看配置', fixedHint: '固定配置对照；各点是独立实测，不表示缺失并发曲线', studyHint: '不同实验组之间不连线；只在同一实验组内比较', lineHint: 'BetterScale 连线连接不同 workload 调优配置的最佳权衡点；其他连线按实测并发序列连接', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
-            missing: '缺少坐标指标', standalone: '个独立测量点没有同序列伙伴', points: '个点', context: '上下文',
+            missing: '缺少坐标指标', standalone: '个测量点不在当前连线上', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
             modCoverage: '35B MOD 补测进度', workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', graphMode: '图模式', stateSeats: '执行 / 驻留槽位', balancedAttention: '均衡 attention', cachePolicy: '状态缓存', fullCache: '全量', incrementalCache: '增量', enabled: '开启', disabled: '关闭', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配'
         }
@@ -97,6 +97,12 @@
         params.set('setting', state.cohort);
         history.replaceState(null, '', `${location.pathname}?${params.toString()}#settings`);
     }
+    function modOption(point) {
+        const key=M.groupKey(point), betterScale=key==='betterscale';
+        // Seats are workload-tuned capacity, not a MOD identity boundary. C32 actually uses E36/R36.
+        const label=`<label><input type="checkbox" data-filter="mods" value="${escape(key)}" ${state.mods.has(key)?'checked':''} ${betterScale?'aria-describedby="frontier-betterscale-note"':''}>${escape(groupLabel(point))}</label>`;
+        return betterScale?`<div class="frontier-mod-option">${label}<p id="frontier-betterscale-note" class="frontier-filter-note">${t('betterScaleFamily')}</p></div>`:label;
+    }
     function shell() {
         reconcile();
         const tags = [...new Map(state.data.cohorts.map(c => [tagKey(c),c])).values()];
@@ -131,7 +137,7 @@
             </div>
             <aside class="frontier-filters" aria-label="${t('filter')}">
                 <h2>${t('filter')}</h2>
-                <fieldset><legend>${configurationStudy()?t('studyGroup'):'MOD / Group'} <button type="button" id="frontier-mods-toggle"></button></legend><div class="frontier-checks">${mods.map(p=>`<label><input type="checkbox" data-filter="mods" value="${escape(M.groupKey(p))}" ${state.mods.has(M.groupKey(p))?'checked':''}>${escape(groupLabel(p))}</label>`).join('')}</div></fieldset>
+                <fieldset><legend>${configurationStudy()?t('studyGroup'):'MOD / Group'} <button type="button" id="frontier-mods-toggle"></button></legend><div class="frontier-checks">${mods.map(modOption).join('')}</div></fieldset>
                 <fieldset><legend>MTP</legend><div class="frontier-checks">${mtpOptions.map(([key,text])=>`<label><input type="checkbox" data-filter="mtp" value="${key}" ${state.mtp.has(key)?'checked':''}>${text}</label>`).join('')}</div></fieldset>
                 ${hasRotation()?`<fieldset id="frontier-rotation-filter"><legend>${t('rotationDepth')}</legend><div class="frontier-checks">${depths.map(depth=>`<label><input type="checkbox" data-filter="rotation" value="${depth}" ${state.rotation.has(String(depth))?'checked':''}>${rotationLabel(depth)}</label>`).join('')}</div><p class="frontier-filter-note">${t('rotationHelp')}</p>${cohort().workload.contract.session_rotation.status==='under-construction'?`<p class="frontier-filter-note">${t('rotationPending')}</p>`:''}</fieldset>`:''}
                 ${independentStudy()?'':`<div class="frontier-checks"><label><input id="frontier-only" type="checkbox" ${state.frontierOnly?'checked':''}>${t('frontierOnly')}</label></div>`}
@@ -208,7 +214,7 @@
         const color=p=>M.failedCorrectness(p)?'#dc2626':colors[groups.findIndex(g=>M.groupKey(g)===M.groupKey(p))%colors.length];
         const series=independentStudy()?cohortPoints():[...new Map(cohortPoints().map(p=>[M.frontierKey(p),p])).values()];
         $('frontier-legend').innerHTML=series.filter(g=>points().some(p=>independentStudy()?p.id===g.id:M.frontierKey(p)===M.frontierKey(g))).map(p=>`<span data-frontier-group="${escape(M.frontierKey(p))}"><i style="background:${p.load.session_rotation_depth>1?'transparent':color(p)};border:2px solid ${color(p)}"></i>${escape(pointLabel(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''}${M.failedCorrectness(p)?` · ${t('failed')}`:''}</span>`).join('');
-        const measuredSeries=M.concurrencySeries(measured.measured);
+        const measuredSeries=M.chartSeries(measured.measured,axes().x,axes().y);
         const connected=new Set(measuredSeries.flatMap(rows=>rows.map(row=>row.point.id)));
         const standalone=measured.measured.filter(row=>!connected.has(row.point.id)).length;
         $('frontier-hint').textContent=(configurationStudy()?t('studyHint'):fixedComparison()?t('fixedHint'):measuredSeries.length?t('lineHint'):t('hint'))+(!independentStudy()&&standalone?` · ${standalone} ${t('standalone')}`:'')+(measured.excluded?` · ${t('missing')}: ${measured.excluded}`:'');
@@ -282,11 +288,12 @@
             if(result.measured.length)svg+=`<text text-anchor="middle" x="${x(xv)}" y="${height-bottom+24}">${fmt(xv)}</text><text text-anchor="end" x="${left-12}" y="${y(yv)+4}">${fmt(yv)}</text>`;
         }
         svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${axisLabel(axes().x)}<tspan x="${(width+left-right)/2}" dy="16">${M.metrics[axes().x].unit}</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${axisLabel(axes().y)}<tspan x="0" dy="16">${M.metrics[axes().y].unit}</tspan></text>`;
-        const series=M.concurrencySeries(result.measured);
+        const series=M.chartSeries(result.measured,axes().x,axes().y);
         for(const rows of series){
             const point=rows[0].point;
-            const id=JSON.stringify([point.cohort_id,point.load.concurrency_series,point.load.session_rotation_depth??null]);
-            svg+=`<polyline class="frontier-concurrency-line" data-series="${escape(id)}" stroke-dasharray="${point.load.session_rotation_depth>1?'7 4':'none'}" data-series-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
+            const frontier=M.groupKey(point)==='betterscale';
+            const id=frontier?M.frontierKey(point):JSON.stringify([point.cohort_id,point.load.concurrency_series,point.load.session_rotation_depth??null]);
+            svg+=`<polyline class="frontier-concurrency-line" data-line-kind="${frontier?'frontier':'concurrency'}" data-series="${escape(id)}" stroke-dasharray="${point.load.session_rotation_depth>1?'7 4':'none'}" data-series-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
         }
         for(const row of result.measured){
             const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);
@@ -303,7 +310,7 @@
     $('view-frontier').addEventListener('click',()=>{updateSettingURL();requestAnimationFrame(render);});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=betterscale-unified-20261001',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=betterscale-frontier-20261001',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});

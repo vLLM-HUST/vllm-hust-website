@@ -71,19 +71,19 @@ workload identities; never silently mix them.
 
 ## Data handoff
 
-The main chart draws one line for each declared `load.concurrency_series` within the selected
-model/precision/workload cohort and session-rotation depth. Vertices are whole observed records,
-ordered by client concurrency. A line therefore represents one actual sweep, never an inferred fit
-or a path assembled from unrelated experiments. A declared series with only one visible point stays
-as a point; points without `concurrency_series` are also standalone. The footer reports how many
-visible measurements have no same-series partner. Filters can shorten or remove a line.
-Failed-correctness references remain visibly marked and may stay connected to their original
-measured series, but never qualify as best-trade-off points.
+BetterScale connects one Pareto frontier per cohort × MOD/group × session-rotation depth, across
+workload-tuned slot configurations. Vertices are whole measured records, ordered by P90 decode
+speed; dominated observations remain visible but are not line vertices, coordinate ties share one
+vertex, failed-correctness references are excluded, and singletons have no line. The checkbox note
+explains why E16/R20 and C32 (actually E36/R36) belong to one family. This is a best measured
+trade-off boundary, not a claim of one fixed-slot sweep or an interpolated measurement. Filters
+recompute that boundary.
 
-All measured dots are shown by default and remain inspectable by leaving **Best trade-off points
-only** unchecked. The optional filter computes the best trade-offs within each baseline/MOD and
-rotation-depth group, but it does not define series identity. Original `load.concurrency_series`
-metadata and linked static diagnostic sweeps remain the source of truth for main-chart lines.
+Other groups retain one line for each declared `load.concurrency_series` within the selected cohort
+and rotation depth, ordered by client concurrency. Their lines represent actual sweeps; filters can
+shorten or remove them. All measurements remain inspectable by leaving **Best trade-off points
+only** unchecked. The footer reports points that are not on any displayed line. Original series
+metadata and static diagnostics preserve their fixed-configuration meaning.
 
 Fletcher withdrew BetterScale AE separation from display on2026-09-25. Its four then-visible
 AgentX/SWE observations now reside in `archived_points` with `display_withdrawal`; earlier archived

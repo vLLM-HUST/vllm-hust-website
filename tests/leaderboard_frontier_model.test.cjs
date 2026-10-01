@@ -849,3 +849,17 @@ test('DSV4 INT8 retains all 24 matched K5 windows including saturation points',(
     for(const line of lines)assert.deepEqual(line.map(r=>r.point.load.concurrency),[1,2,4,8,16,32]);
     assert.equal(Object.keys(evidence.omitted).length,4);
 });
+
+test('BetterScale chart line joins frontier vertices across tuned slot configurations only',()=>{
+    const data=require('../data/leaderboard_frontier.json');
+    const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
+    const points=model.presentationPoints(data.points,cohort);
+    const projected=model.project(points,'decode_p90_tps','output_tps_per_chip').measured;
+    const lines=model.chartSeries(projected,'decode_p90_tps','output_tps_per_chip');
+    const better=lines.find(line=>model.groupKey(line[0].point)==='betterscale');
+    assert.deepEqual(better,model.groupFrontiers(points.filter(p=>model.groupKey(p)==='betterscale'),'decode_p90_tps','output_tps_per_chip')[0]);
+    assert.ok(better.some(row=>row.point.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
+    assert.ok(new Set(better.map(row=>row.point.configuration.parameters.execution_seats)).size>1);
+    assert.deepEqual(lines.filter(line=>model.groupKey(line[0].point)!=='betterscale'),model.concurrencySeries(projected.filter(row=>model.groupKey(row.point)!=='betterscale')));
+    assert.deepEqual(model.chartSeries(better.slice(0,1),'decode_p90_tps','output_tps_per_chip'),[]);
+});
