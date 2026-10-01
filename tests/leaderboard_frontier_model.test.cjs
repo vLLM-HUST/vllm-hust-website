@@ -49,8 +49,8 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
-    assert.equal(all.length,165);
-    assert.equal(displayed.length,56);
+    assert.equal(all.length,167);
+    assert.equal(displayed.length,58);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
     assert.equal(betterScale.length,6);
@@ -91,7 +91,7 @@ test('Qwen3.5 configuration studies consolidate related observations without imp
     const measured=model.project(unified,'decode_p90_tps','output_tps_per_chip').measured;
     const connected=new Set(model.concurrencySeries(measured).flat().map(row=>row.point.id));
     assert.ok(measured.length>0);
-    assert.deepEqual(measured.filter(row=>!connected.has(row.point.id)).map(row=>row.point.id),['qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928']);
+    assert.deepEqual(measured.filter(row=>!connected.has(row.point.id)).map(row=>row.point.id),['qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928','qwen35-a2a-reuse-off-tp2ep-c8-20261001','qwen35-a2a-reuse-on-tp2ep-c8-20261001']);
 });
 test('presentation mode accepts only declared setting semantics',()=>{
     const fixture=structuredClone(require('./fixtures/leaderboard_frontier.json'));
@@ -145,7 +145,8 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
         const contract=byId.get(p.cohort_id).workload.contract;
         const variants=contract.prepared_workload_variants||[{sha256:contract.prepared_workload_sha256}];
         assert.ok(variants.some(v=>v.sha256===p.evidence.benchmark_protocol.prepared_workload_sha256));
-        assert.equal(p.evidence.benchmark_protocol.tokenizer_fingerprint||run.client.tokenizer.fingerprint,contract.tokenizer_fingerprint);
+        const variant=variants.find(v=>v.sha256===p.evidence.benchmark_protocol.prepared_workload_sha256);
+        assert.equal(p.evidence.benchmark_protocol.tokenizer_fingerprint||run.client.tokenizer.fingerprint,variant.tokenizer_fingerprint||contract.tokenizer_fingerprint);
         if(run.old_point_id) assert.ok(agentxData().points.some(old=>old.id===run.old_point_id));
         else if(p.evidence.benchmark_protocol.campaign==='server32-c32-extension'){
             assert.equal(p.load.concurrency,32);
@@ -321,6 +322,17 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             for(const key of ['real_online','prefix_cache_observed','native_mtp_observed','series_devices_released','source_and_runtime_sha256_manifest_verified']) assert.equal(run.validation[key],true);
             assert.equal(run.validation.failed_requests,0);
             assert.equal(run.validation.effective_graph_mode,'PIECEWISE ACL Graph');
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-a2a-buffer-reuse-tp2ep-c8-20261001'){
+            const params=p.configuration.parameters;
+            const on=p.id.includes('-on-');
+            assert.deepEqual(p.configuration.mods,on?['a2a-buffer-reuse']:[]);
+            assert.equal(p.load.concurrency,8);
+            assert.equal(params.prefix_caching,false);
+            assert.equal(params.a2a_buffer_reuse.env.VLLM_HUST_A2A_BUFFER_REUSE_ENABLE,on?'1':'unset');
+            assert.equal(params.a2a_buffer_reuse.runtime_effective_events,0);
+            assert.equal(run.validation.a2a_patch_installed,on);
+            assert.equal(run.validation.prefix_cache_observed,false);
+            assert.equal(run.validation.failed_requests,0);
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);

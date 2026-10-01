@@ -26335,6 +26335,166 @@
         "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
         "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
+    },
+    {
+      "run_id": "185bfd0a06c042fc8e7e1c9f70bc31b6",
+      "point_id": "qwen35-a2a-reuse-off-tp2ep-c8-20261001",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 322,
+        "max_prompt_tokens_observed": 59957,
+        "prompt_tokens_p50": 16417.0,
+        "max_turn_index_reached": 41,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 7,
+        "requests_completed_in_window": 314,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 175030,
+        "output_tokens_per_second": 194.4777777777778,
+        "output_tokens_per_second_per_chip": 97.2388888888889,
+        "decode_tokens_per_second_p90": 40.7159836061309,
+        "decode_speed_samples": 314,
+        "ttft_seconds_p95": 3.0931868952233343,
+        "client_inflight_seconds": {
+          "0": 0.00014994200319051743,
+          "1": 0.0009705610573291779,
+          "2": 0.0007336186245083809,
+          "3": 0.000615476630628109,
+          "4": 0.0006160186603665352,
+          "5": 0.0006541870534420013,
+          "6": 0.0009301705285906792,
+          "7": 1.3253154680132866,
+          "8": 898.6700145574287
+        },
+        "mean_client_inflight": 7.998503249996445,
+        "full_concurrency_fraction": 0.9985222383971429,
+        "drain_seconds": 111.78802865091711,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 194.4777777777778,
+        "decode_p90_tps": 40.7159836061309,
+        "ttft_p95_ms": 3093.1868952233344,
+        "completed_requests": 314,
+        "ttft_p50_ms": 1345.9,
+        "tpot_ms": 37.91,
+        "tpot_p95_ms": 57.3,
+        "e2e_p95_ms": 73204.2
+      },
+      "requests_artifact_sha256": "5edbc86381a405c92b5b5c282636b523a99fe3edda8b14c45679f8e9e903f1ed",
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "prefix_cache_observed": false,
+        "native_mtp_observed": false,
+        "a2a_patch_installed": false,
+        "a2a_runtime_effective_events": 0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "185bfd0a06c042fc8e7e1c9f70bc31b6",
+        "started_at_unix": 1790844097.916781,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+        "tokenizer": {
+          "path": "/models/Qwen3.5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "26c10e385cfd49b7ac0122066740b696",
+      "point_id": "qwen35-a2a-reuse-on-tp2ep-c8-20261001",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 326,
+        "max_prompt_tokens_observed": 59957,
+        "prompt_tokens_p50": 16419.0,
+        "max_turn_index_reached": 41,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 7,
+        "requests_completed_in_window": 318,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 178497,
+        "output_tokens_per_second": 198.33,
+        "output_tokens_per_second_per_chip": 99.165,
+        "decode_tokens_per_second_p90": 40.70713686650224,
+        "decode_speed_samples": 318,
+        "ttft_seconds_p95": 3.088652145350351,
+        "client_inflight_seconds": {
+          "0": 0.0001589721068739891,
+          "1": 0.0009751515462994576,
+          "2": 0.0007299985736608505,
+          "3": 0.000615767203271389,
+          "4": 0.0006212666630744934,
+          "5": 0.0006577381864190102,
+          "6": 0.0009324708953499794,
+          "7": 1.306811104528606,
+          "8": 898.6884975302964
+        },
+        "mean_client_inflight": 7.998523676674813,
+        "full_concurrency_fraction": 0.9985427750336627,
+        "drain_seconds": 99.44428585097194,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 198.33,
+        "decode_p90_tps": 40.70713686650224,
+        "ttft_p95_ms": 3088.652145350351,
+        "completed_requests": 318,
+        "ttft_p50_ms": 1322.6,
+        "tpot_ms": 37.25,
+        "tpot_p95_ms": 55.53,
+        "e2e_p95_ms": 74158.0
+      },
+      "requests_artifact_sha256": "91ba927a0c5ae2910e35c477d067c2d5ab7e21e7deaae761430c20735f0e4fb1",
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "prefix_cache_observed": false,
+        "native_mtp_observed": false,
+        "a2a_patch_installed": true,
+        "a2a_runtime_effective_events": 0
+      },
+      "client": {
+        "tool_version": "0.1.2",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "26c10e385cfd49b7ac0122066740b696",
+        "started_at_unix": 1790851021.1866393,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+        "tokenizer": {
+          "path": "/models/Qwen3.5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
     }
   ]
 }
