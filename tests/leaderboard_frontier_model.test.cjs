@@ -81,8 +81,15 @@ test('Qwen3.5 configuration studies consolidate related observations without imp
     assert.deepEqual(studies.map(c=>new Set(data.points.filter(p=>p.cohort_id===c.id).map(p=>p.study_group.id)).size).sort(),[2,2,3]);
     assert.ok(studyPoints.every(p=>p.study_group.label_en&&p.study_group.label_zh));
     assert.equal(model.concurrencySeries(model.project(studyPoints,'decode_p90_tps','output_tps_per_chip').measured).length,0);
-    assert.equal(new Set(studies.flatMap(c=>c.aliases)).size,8);
+    assert.equal(new Set(studies.flatMap(c=>c.aliases)).size,9);
     for(const study of studies) for(const alias of study.aliases) assert.equal(model.resolveCohort(data.cohorts,alias),study);
+    const tp2=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-study-tp2-engine-graph-v1');
+    assert.equal(model.resolveCohort(data.cohorts,'qwen35-35b-a3b-bf16-sweprefix-study-tp2-legacy-v1'),tp2);
+    for(const study of studies){
+        assert.doesNotMatch(study.id,/legacy|historical/i);
+        assert.doesNotMatch(study.workload.label,/legacy|historical/i);
+        assert.doesNotMatch(study.workload.contract.display_scope,/legacy|historical/i);
+    }
 
     const unifiedId='qwen35-35b-a3b-bf16-sweprefix-smoke-v1';
     const cohort=data.cohorts.find(c=>c.id===unifiedId);
