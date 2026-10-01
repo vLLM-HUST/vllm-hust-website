@@ -185,3 +185,12 @@ For depth-control-only changes, use `scripts/verify_leaderboard_depth_browser.py
 responsive/multi-selection/isolation checks. The full Frontier checker downloads every historical
 point in four views and took about20 minutes; do not make that exhaustive traversal the default for
 a small selector edit. Keep the full check for evidence/export changes.
+
+On October1 Fletcher explicitly restored the historical FULL-cache E36/R36 C32 observation
+(`qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928`,613.88tokens/s/chip) from commit `85f6d48`
+to the main SWE comparison. It is a standalone measurement, not an extension of the E16/R20 C1–C16
+sweep. BetterScale E16/R20 is labeled simply **BetterScale**; C32 has its own **betterscale C32**
+checkbox (`load.presentation_group.id=betterscale-c32`). Both are selected by default; graph mode,
+execution/resident seats, balanced attention and cache policy belong in the popover. The original
+metrics, run ID and configuration were unchanged; the C32 full-cache point moved out of the cache
+study, while its incremental-cache peer remains there.

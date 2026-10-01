@@ -49,13 +49,21 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
-    assert.equal(all.length,159);
-    assert.equal(displayed.length,50);
+    assert.equal(all.length,160);
+    assert.equal(displayed.length,51);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
     assert.equal(betterScale.length,5);
-    assert.ok(betterScale.every(p=>p.load.concurrency_series==='swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927'));
-    assert.deepEqual(cohort.workload.contract.default_groups,['native-runtime-d0f22d2-03766ac','native-runtime-752a3a5-9bf964c']);
+    assert.equal(betterScale.filter(p=>p.load.concurrency_series==='swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927').length,5);
+    const restored=displayed.find(p=>p.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928');
+    assert.equal(model.groupKey(restored),'betterscale-c32');
+    assert.deepEqual(restored.load.presentation_group,{id:'betterscale-c32',label_en:'betterscale C32',label_zh:'betterscale C32'});
+    assert.equal(restored.load.concurrency,32);
+    assert.equal(model.value(restored,'output_tps_per_chip'),613.88);
+    assert.equal(restored.metrics.decode_p90_tps,44.006734854001266);
+    assert.equal(model.concurrencySeries(model.project(betterScale,'decode_p90_tps','output_tps_per_chip').measured).flat().some(row=>row.point.id===restored.id),false);
+    assert.deepEqual(cohort.workload.contract.display_group_labels.betterscale,{label_en:'BetterScale',label_zh:'BetterScale'});
+    assert.deepEqual(cohort.workload.contract.default_groups,['native-runtime-d0f22d2-03766ac','native-runtime-752a3a5-9bf964c','betterscale','betterscale-c32']);
     assert.equal(displayed.filter(p=>model.groupKey(p)==='native-runtime-d0f22d2-03766ac').length,5);
     assert.equal(displayed.filter(p=>model.groupKey(p)==='native-runtime-752a3a5-9bf964c').length,5);
     assert.ok(displayed.every(p=>p.configuration.official_baseline_id==null));
@@ -67,8 +75,8 @@ test('Qwen3.5 configuration studies consolidate related observations without imp
     assert.equal(studies.length,3);
     const studyIds=new Set(studies.map(c=>c.id));
     const studyPoints=data.points.filter(p=>studyIds.has(p.cohort_id));
-    assert.equal(studyPoints.length,16);
-    assert.deepEqual(studies.map(c=>data.points.filter(p=>p.cohort_id===c.id).length).sort((a,b)=>a-b),[4,5,7]);
+    assert.equal(studyPoints.length,15);
+    assert.deepEqual(studies.map(c=>data.points.filter(p=>p.cohort_id===c.id).length).sort((a,b)=>a-b),[4,5,6]);
     assert.deepEqual(studies.map(c=>new Set(data.points.filter(p=>p.cohort_id===c.id).map(p=>p.study_group.id)).size).sort(),[2,2,3]);
     assert.ok(studyPoints.every(p=>p.study_group.label_en&&p.study_group.label_zh));
     assert.equal(model.concurrencySeries(model.project(studyPoints,'decode_p90_tps','output_tps_per_chip').measured).length,0);
@@ -80,7 +88,7 @@ test('Qwen3.5 configuration studies consolidate related observations without imp
     const measured=model.project(unified,'decode_p90_tps','output_tps_per_chip').measured;
     const connected=new Set(model.concurrencySeries(measured).flat().map(row=>row.point.id));
     assert.ok(measured.length>0);
-    assert.ok(measured.every(row=>connected.has(row.point.id)));
+    assert.deepEqual(measured.filter(row=>!connected.has(row.point.id)).map(row=>row.point.id),['qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928']);
 });
 test('presentation mode accepts only declared setting semantics',()=>{
     const fixture=structuredClone(require('./fixtures/leaderboard_frontier.json'));

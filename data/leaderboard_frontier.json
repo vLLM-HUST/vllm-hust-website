@@ -84,7 +84,7 @@
             "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
             "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
           },
-          "display_scope": "The public comparison uses an explicit set of complete five-point curves: the swe-unified series plus the latest BetterScale resident-state curve. Historical and qualification observations remain in the evidence snapshot but are not mixed into this chart.",
+          "display_scope": "The public comparison uses the declared measured curves plus the historical BetterScale FULL-cache E36/R36 C32 observation (613.88 output tokens/s/chip). That different configuration remains a standalone point, not an extension of the resident E16/R20 curve. Other historical and qualification observations remain in the evidence snapshot.",
           "display_series_ids": [
             "swe-unified-native-20260927",
             "swe-capacity16-native",
@@ -95,17 +95,20 @@
             "swe-unified-kvcompress-ascend-20260928",
             "swe-unified-mooncake-vllm-connectors-20260927",
             "swe-unified-pegaflow-vllm-connectors-20260929",
-            "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927"
+            "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
+            "swe-cache-width-full-d1-20260928-e36-r36"
           ],
           "display_group_labels": {
             "betterscale": {
-              "label_en": "BetterScale · FULL graph · resident E16/R20 · balanced attention",
-              "label_zh": "BetterScale · FULL 图模式 · resident E16/R20 · balanced attention"
+              "label_en": "BetterScale",
+              "label_zh": "BetterScale"
             }
           },
           "default_groups": [
             "native-runtime-d0f22d2-03766ac",
-            "native-runtime-752a3a5-9bf964c"
+            "native-runtime-752a3a5-9bf964c",
+            "betterscale",
+            "betterscale-c32"
           ]
         }
       }
@@ -72306,12 +72309,7 @@
     },
     {
       "id": "qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-study-betterscale-cache-v1",
-      "study_group": {
-        "id": "cache-e36-r36-c32",
-        "label_en": "Cache policy E36/R36 C32",
-        "label_zh": "缓存策略 E36/R36 C32"
-      },
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
       "label": "BetterScale full cache E36/R36 TP2 C32 D1 · SWE smoke",
       "configuration": {
         "engine": "vLLM + vLLM-Ascend",
@@ -72469,6 +72467,7 @@
         "concurrency": 32,
         "unit": "continuously replenished in-flight HTTP request lanes",
         "concurrency_series": "swe-cache-width-full-d1-20260928-e36-r36",
+        "presentation_group": {"id": "betterscale-c32", "label_en": "betterscale C32", "label_zh": "betterscale C32"},
         "session_rotation_depth": 1
       },
       "metrics": {

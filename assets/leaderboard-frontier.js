@@ -16,7 +16,7 @@
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', standalone: 'standalone measurements have no same-series partner', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
-            modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation'
+            modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', graphMode: 'Graph mode', stateSeats: 'Execution / resident seats', balancedAttention: 'Balanced attention', cachePolicy: 'State cache', fullCache: 'Full', incrementalCache: 'Incremental', enabled: 'On', disabled: 'Off', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation'
         },
         zh: {
             selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
@@ -29,7 +29,7 @@
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', standalone: '个独立测量点没有同序列伙伴', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
-            modCoverage: '35B MOD 补测进度', workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配'
+            modCoverage: '35B MOD 补测进度', workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', graphMode: '图模式', stateSeats: '执行 / 驻留槽位', balancedAttention: '均衡 attention', cachePolicy: '状态缓存', fullCache: '全量', incrementalCache: '增量', enabled: '开启', disabled: '关闭', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配'
         }
     };
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
@@ -249,6 +249,12 @@
             <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
             <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,axes().x))}</strong><span>${axisLabel(axes().x)}<br>${M.metrics[axes().x].unit}</span></div><div><strong>${fmt(M.value(point,axes().y))}</strong><span>${axisLabel(axes().y)}<br>${M.metrics[axes().y].unit}</span></div></div>
             <p class="frontier-popup-load">${serviceScale(point)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}${params.max_num_seqs!=null?`<br>${t('capacity')}: ${fmt(params.max_num_seqs)}${params.max_num_seqs_per_rank!=null?' / rank':''}`:''}${params.kv_cache_memory_bytes!=null?` · KV ${fmt(params.kv_cache_memory_bytes/1024**3)} GiB/chip`:''}</p>
+            ${point.configuration.mods.includes('betterscale')?`<p class="frontier-popup-configuration">${[
+                params.graph_mode!=null?`${t('graphMode')}: ${escape(params.graph_mode)}`:null,
+                params.execution_seats!=null||params.resident_seats!=null?`${t('stateSeats')}: E${fmt(params.execution_seats)}/R${fmt(params.resident_seats)}`:null,
+                params.balanced_decode_attention!=null?`${t('balancedAttention')}: ${t(params.balanced_decode_attention?'enabled':'disabled')}`:null,
+                params.state_cache_policy!=null?`${t('cachePolicy')}: ${t(!params.state_cache_policy?'disabled':params.state_cache_incremental?'incrementalCache':'fullCache')}`:null
+            ].filter(Boolean).join('<br>')}</p>`:''}
             <p class="frontier-popup-load">${t('warmup')}: ${t(warmupKey)}</p>
             ${nearby.length>1?`<div class="frontier-nearby"><span>${t('nearby')}</span>${nearby.map(p=>`<button type="button" data-nearby="${escape(p.id)}" aria-pressed="${p.id===point.id}">${escape(parallel(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''} · C${fmt(p.load.concurrency)} · MTP${p.configuration.parameters.mtp_draft_tokens??'—'} · ${fmt(p.configuration.parameters.max_num_seqs)}</button>`).join('')}</div>`:''}
             <button type="button" class="frontier-download" data-download>${t('download')} ↓</button>`;
@@ -297,7 +303,7 @@
     $('view-frontier').addEventListener('click',()=>{updateSettingURL();requestAnimationFrame(render);});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=fixed-baseline-20261001',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=betterscale-c32-20261001',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});
