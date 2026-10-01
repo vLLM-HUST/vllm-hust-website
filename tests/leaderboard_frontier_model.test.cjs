@@ -38,7 +38,10 @@ test('concurrency lines connect only declared same-cohort series in C order',()=
 test('production and empty snapshots validate without inventing points',()=>{
     const data=require('../data/leaderboard_frontier.json');
     model.validate(data);
-    assert.deepEqual(model.validate({schema_version:'leaderboard-frontier/v1',cohorts:[],points:[]}).points,[]);
+    assert.equal(data.official_baseline.id,'vllm-0.18.0-vllm-ascend-0.18.0');
+    assert.equal(data.official_baseline.vllm_version,'0.18.0');
+    assert.equal(data.official_baseline.vllm_ascend_version,'0.18.0');
+    assert.deepEqual(model.validate({schema_version:'leaderboard-frontier/v1',official_baseline:data.official_baseline,cohorts:[],points:[]}).points,[]);
     assert.equal(model.project([], 'interactivity','output_tps_per_chip').frontier.length,0);
 });
 test('presentation scope keeps the unified comparison readable without deleting evidence',()=>{
@@ -47,10 +50,16 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
     assert.equal(all.length,159);
-    assert.equal(displayed.length,40);
-    assert.ok(displayed.every(p=>p.load.concurrency_series.startsWith('swe-unified-')));
-    assert.deepEqual(cohort.workload.contract.default_groups,['none']);
-    assert.equal(displayed.filter(p=>model.groupKey(p)==='none').length,5);
+    assert.equal(displayed.length,50);
+    assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
+    const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
+    assert.equal(betterScale.length,5);
+    assert.ok(betterScale.every(p=>p.load.concurrency_series==='swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927'));
+    assert.deepEqual(cohort.workload.contract.default_groups,['native-runtime-d0f22d2-03766ac','native-runtime-752a3a5-9bf964c']);
+    assert.equal(displayed.filter(p=>model.groupKey(p)==='native-runtime-d0f22d2-03766ac').length,5);
+    assert.equal(displayed.filter(p=>model.groupKey(p)==='native-runtime-752a3a5-9bf964c').length,5);
+    assert.ok(displayed.every(p=>p.configuration.official_baseline_id==null));
+    assert.match(displayed.find(p=>model.groupKey(p)==='native-runtime-d0f22d2-03766ac').load.presentation_group.label_en,/0\.25\.1\+frontier\.unified.*0\.25\.1rc1\+2/);
 });
 test('Qwen3.5 configuration studies consolidate related observations without implying missing series',()=>{
     const data=require('../data/leaderboard_frontier.json');
@@ -457,10 +466,11 @@ test('AE separation is a tracking group, not a new MOD or a TP/EP alias',()=>{
         assert.ok(p.configuration.parameters.attention_ranks>0 && p.configuration.parameters.expert_ranks>0);
         assert.equal(p.load.concurrency_series,undefined);
     }
-    for(const p of data.points.filter(p=>!p.configuration.parameters.expert_ranks&&!p.study_group)){
+    for(const p of data.points.filter(p=>!p.configuration.parameters.expert_ranks&&!p.study_group&&!p.load.presentation_group)){
         assert.equal(model.groupKey(p),model.modKey(p));
     }
     for(const p of data.points.filter(p=>p.study_group)) assert.equal(model.groupKey(p),p.study_group.id);
+    for(const p of data.points.filter(p=>p.load.presentation_group)) assert.equal(model.groupKey(p),p.load.presentation_group.id);
     const invalid=structuredClone(data);invalid.points[0].configuration.experiment_group=' ';
     assert.throws(()=>model.validate(invalid),/experiment group/);
 });

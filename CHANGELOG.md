@@ -7,6 +7,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Qwen3.5 设置页固定声明 vLLM 0.18.0 + vLLM-Ascend 0.18.0 官方基线；缺少同合同实测时明确标记待补，不再把任意 Native 配置称作官方基线。
+- 默认同时展示两条已有五点 Native 曲线，并按实际 vLLM/vLLM-Ascend 版本、源码 commit 和图模式区分；恢复完整 BetterScale 五点曲线且保留其他统一 MOD 曲线供筛选。
+
+### Tests
+
+- 增加官方基线 schema、显式展示曲线、Native runtime 分组及中英文桌面/移动端基线状态回归。
+
 ## [0.3.7] - 2026-09-03
 
 ### Fixed
