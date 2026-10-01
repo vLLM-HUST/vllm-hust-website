@@ -260,7 +260,9 @@ def main():
             baseline_text = page.locator(".frontier-baseline").inner_text()
             assert "vLLM 0.18.0 + vLLM-Ascend 0.18.0" in baseline_text
             assert (
-                "同合同实测待补" if language == "zh" else "matched measurement pending"
+                "已有该设定的同合同实测"
+                if language == "zh"
+                else "matched measurement available"
             ) in baseline_text
             assert not page.locator("#frontier-only").is_checked()
             shown = page.locator("[data-point]").evaluate_all(

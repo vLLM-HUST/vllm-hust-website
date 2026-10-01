@@ -49,8 +49,8 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
-    assert.equal(all.length,160);
-    assert.equal(displayed.length,51);
+    assert.equal(all.length,165);
+    assert.equal(displayed.length,56);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
     assert.equal(betterScale.length,5);
@@ -63,10 +63,14 @@ test('presentation scope keeps the unified comparison readable without deleting 
     assert.equal(restored.metrics.decode_p90_tps,44.006734854001266);
     assert.equal(model.concurrencySeries(model.project(betterScale,'decode_p90_tps','output_tps_per_chip').measured).flat().some(row=>row.point.id===restored.id),false);
     assert.deepEqual(cohort.workload.contract.display_group_labels.betterscale,{label_en:'BetterScale',label_zh:'BetterScale'});
-    assert.deepEqual(cohort.workload.contract.default_groups,['native-runtime-d0f22d2-03766ac','native-runtime-752a3a5-9bf964c','betterscale','betterscale-c32']);
+    assert.deepEqual(cohort.workload.contract.default_groups,['native-runtime-v018-qwen35-backports-piecewise','native-runtime-d0f22d2-03766ac','native-runtime-752a3a5-9bf964c','betterscale','betterscale-c32']);
+    const v018=displayed.filter(p=>model.groupKey(p)==='native-runtime-v018-qwen35-backports-piecewise');
+    assert.equal(v018.length,5);
+    assert.ok(v018.every(p=>p.configuration.official_baseline_id===data.official_baseline.id));
+    assert.match(v018[0].load.presentation_group.label_en,/0\.18\.0.*9878e04.*0\.18\.0.*0f40ff0.*PIECEWISE/);
     assert.equal(displayed.filter(p=>model.groupKey(p)==='native-runtime-d0f22d2-03766ac').length,5);
     assert.equal(displayed.filter(p=>model.groupKey(p)==='native-runtime-752a3a5-9bf964c').length,5);
-    assert.ok(displayed.every(p=>p.configuration.official_baseline_id==null));
+    assert.ok(displayed.filter(p=>model.groupKey(p)!=='native-runtime-v018-qwen35-backports-piecewise').every(p=>p.configuration.official_baseline_id==null));
     assert.match(displayed.find(p=>model.groupKey(p)==='native-runtime-d0f22d2-03766ac').load.presentation_group.label_en,/0\.25\.1\+frontier\.unified.*0\.25\.1rc1\+2/);
 });
 test('Qwen3.5 configuration studies consolidate related observations without implying missing series',()=>{
@@ -308,6 +312,16 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.validation.mamba_cache_mode,'align');
             assert.equal(run.validation.controller_status,'exercised');
             assert.equal(run.validation.shared_native_contract_sha256,p.configuration.parameters.unified_native_contract_sha256);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-v018-native-text-only-20261001'){
+            assert.deepEqual(p.configuration.mods,[]);
+            assert.equal(p.configuration.official_baseline_id,data.official_baseline.id);
+            assert.equal(p.configuration.parameters.graph_mode,'PIECEWISE');
+            assert.equal(p.configuration.parameters.requested_graph_mode,'FULL_AND_PIECEWISE');
+            assert.equal(p.configuration.parameters.runtime_release_versions.vllm,'0.18.0');
+            assert.equal(p.configuration.parameters.runtime_release_versions['vllm-ascend'],'0.18.0');
+            for(const key of ['real_online','prefix_cache_observed','native_mtp_observed','series_devices_released','source_and_runtime_sha256_manifest_verified']) assert.equal(run.validation[key],true);
+            assert.equal(run.validation.failed_requests,0);
+            assert.equal(run.validation.effective_graph_mode,'PIECEWISE ACL Graph');
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
