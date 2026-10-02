@@ -1,0 +1,22 @@
+{
+  "contract_version": "agent-dataset-qualification-v1",
+  "generated_at": "2026-10-02T10:05:08Z",
+  "qualifications": [
+    {
+      "id": "szyn-qwen35-opencode-django-15104",
+      "dataset": "SZYN-OPENCODE-SWEBENCH-VERIFIED-500",
+      "owner_en": "China Mobile Suzhou / Suzhou Yunneng",
+      "owner_zh": "中国移动苏州（苏州云能）",
+      "model": "Qwen3.5-35B-A3B",
+      "configuration": "BF16 · TP2 · OpenCode 1.18.19 · thinking=false",
+      "executed_tasks": 1,
+      "total_tasks": 500,
+      "resolved_tasks": 1,
+      "case_id": "django__django-15104",
+      "status": "single_case_qualification_passed",
+      "caveat_en": "1/1 resolved in the qualification sample; the remaining 499 tasks have not run.",
+      "caveat_zh": "Qualification 样本 1/1 resolved；其余 499 题尚未运行。",
+      "evidence_url": "https://github.com/vLLM-HUST/vllm-hust-dev-hub/tree/main/results/szyn-opencode-qwen35-20261002/django__django-15104"
+    }
+  ]
+}
