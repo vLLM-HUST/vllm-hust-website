@@ -53,6 +53,20 @@
         <div id="validation-empty" class="validation-empty"><h3 id="validation-empty-title">No dataset results yet</h3><p id="validation-empty-body">The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.</p></div>
       </div>
     </section>
+    <section class="content-panel dataset-validation-section agent-qualification-section" aria-labelledby="agent-qualification-title">
+      <div class="section-head"><div><span id="agent-qualification-kicker" class="eyebrow">Tool / Agent datasets</span><h2 id="agent-qualification-title">Qualification results</h2><p id="agent-qualification-description">Collector and sandbox checks are shown separately from aggregate dataset scores.</p></div></div>
+      <div id="agent-qualification-loading" class="loading-state">Loading qualification results...</div>
+      <div id="agent-qualification-error" class="validation-empty" hidden><h3 id="agent-qualification-error-title">Qualification data unavailable</h3><p id="agent-qualification-error-body">The result document could not be loaded.</p></div>
+      <div id="agent-qualification-content" hidden>
+        <div class="agent-qualification-table-wrap">
+          <table class="agent-qualification-table">
+            <thead><tr><th id="agent-heading-dataset" scope="col">Dataset</th><th id="agent-heading-config" scope="col">Configuration</th><th id="agent-heading-progress" scope="col">Progress</th><th id="agent-heading-result" scope="col">Result</th><th id="agent-heading-evidence" scope="col">Evidence</th></tr></thead>
+            <tbody id="agent-qualification-body"></tbody>
+          </table>
+        </div>
+        <p id="agent-qualification-caveat" class="agent-qualification-caveat"></p>
+      </div>
+    </section>
   </main>
   <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="validation-footer">Dataset results are read-only website data.</span></footer>
   <script>
@@ -61,5 +75,6 @@
   </script>
   <script src="./assets/site.js?v=leaderboard-primary-20260927"></script>
   <script src="./assets/dataset-validation.js?v=dataset-validation-v1"></script>
+  <script src="./assets/agent-dataset-qualifications.js?v=agent-dataset-qualification-v1"></script>
 </body>
 </html>
