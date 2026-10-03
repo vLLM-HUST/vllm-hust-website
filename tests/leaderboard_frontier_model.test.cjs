@@ -732,7 +732,7 @@ test('output-budget curves retain matched controls and distinguish executed chec
 
 test('SWE rotation metadata covers displayed and archived observations without relabeling AgentX',()=>{
     const data=require('../data/leaderboard_frontier.json');
-    const swe=new Set(data.cohorts.filter(c=>c.workload.id.startsWith('sweprefix-')).map(c=>c.id));
+    const swe=new Set(data.cohorts.filter(c=>c.workload.contract.session_rotation).map(c=>c.id));
     for(const c of data.cohorts.filter(c=>swe.has(c.id))) {
         assert.equal(c.workload.contract.session_rotation.status,c.id.startsWith('qwen38-')?'under-construction':'measured');
         assert.equal(c.workload.contract.session_rotation.depth_field,'load.session_rotation_depth');
@@ -744,6 +744,55 @@ test('SWE rotation metadata covers displayed and archived observations without r
             assert.equal(p.load.session_rotation_depth,expected);
         }
         else assert.equal(p.load.session_rotation_depth,undefined);
+    }
+});
+
+test('utility-victim retains six independently evidenced C16 observations without a sweep',()=>{
+    const data=model.validate(require('../data/leaderboard_frontier.json'));
+    const evidence=require('../data/leaderboard_utility_victim_evidence.json');
+    const cohort=data.cohorts.find(c=>c.id===evidence.campaign);
+    assert.equal(cohort.workload.contract.presentation,'fixed-comparison');
+    assert.equal(cohort.model.revision,'unrecorded-local-checkpoint');
+    const points=model.presentationPoints(data.points,cohort);
+    assert.equal(points.length,6);
+    assert.equal(evidence.runs.length,6);
+    assert.equal(new Set(evidence.runs.map(r=>r.run_id)).size,6);
+    assert.equal(model.concurrencySeries(model.project(points,'decode_p90_tps','output_tps_per_chip').measured).length,0);
+    for(const point of points){
+        const run=evidence.runs.find(r=>r.point_id===point.id);
+        const on=point.configuration.mods.includes('utility-victim');
+        assert.deepEqual(point.evidence.run_ids,[run.run_id]);
+        assert.deepEqual(point.metrics,run.metrics);
+        assert.equal(point.metrics.output_tps,run.summary.observed_output_tokens_in_window/900);
+        assert.equal(model.value(point,'output_tps_per_chip'),run.summary.output_tokens_per_second_per_chip);
+        assert.equal(point.metrics.decode_p90_tps,run.summary.decode_tokens_per_second_p90);
+        assert.equal(point.metrics.ttft_p95_ms,run.summary.ttft_seconds_p95*1000);
+        assert.equal(point.load.concurrency,16);
+        assert.equal(point.load.concurrency_series,undefined);
+        assert.equal(point.configuration.parameters.gpu_memory_utilization,0.65);
+        assert.equal(point.configuration.parameters.prefix_caching,false);
+        assert.equal(point.configuration.parameters.mtp_draft_tokens,0);
+        assert.equal(point.configuration.parameters.utility_victim.kill_switch,!on);
+        assert.equal(point.configuration.parameters.utility_victim.runtime_effective_events,on?1:0);
+        assert.equal(run.summary.valid,true);
+        assert.equal(run.summary.failed_requests,0);
+        assert.equal(run.validation.owned_devices_released,null);
+        assert.equal(run.client.server_metadata,null);
+        assert.equal(run.client.endpoint,undefined);
+        assert.equal(run.client.tokenizer.path,undefined);
+        assert.match(run.requests_artifact_sha256,/^[a-f0-9]{64}$/);
+        assert.equal(point.evidence.sampling_date_utc,new Date(run.client.started_at_unix*1000).toISOString().slice(0,10));
+        assert.ok(run.source_artifacts.some(a=>a.path.endsWith('/requests.jsonl')&&a.sha256===run.requests_artifact_sha256));
+    }
+    const suspect=evidence.runs.find(r=>r.point_id.includes('off-m65-c16-r2'));
+    assert.equal(suspect.preemption_counter.delta,0);
+    assert.equal(suspect.preemption_counter.status,'unverified-zero-snapshot');
+    for(const repeat of [1,2,3]){
+        const pair=points.filter(p=>p.load.repeat===repeat);
+        const off=pair.find(p=>p.configuration.mods.length===0);
+        const on=pair.find(p=>p.configuration.mods.includes('utility-victim'));
+        assert.ok(on.metrics.output_tps<off.metrics.output_tps);
+        assert.ok(on.metrics.ttft_p95_ms<off.metrics.ttft_p95_ms);
     }
 });
 
