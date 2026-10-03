@@ -204,7 +204,8 @@ def test_dataset_validation_page_uses_versioned_contract() -> None:
     assert 'data-page="dataset-validation"' in page
     assert "dataset-validation-v1" in page
     assert "dataset-validation-v1" in script
-    assert "Empty cells are intentionally shown" in page
+    assert "The matrix stays hidden until measured results exist" in page
+    assert "document.querySelector(selector).hidden = !hasResults" in script
     assert 'id="nav-dataset-validation"' not in page
     assert "Result references an undeclared dataset or metric" in script
     assert "Duplicate result cell" in script

@@ -74,6 +74,7 @@
             $(`${name}-panel`).hidden = view !== name;
             $(`view-${name}`).setAttribute('aria-pressed', String(view === name));
         }
+        $('frontier-agent-qualifications').hidden = view !== 'frontier';
     }
     function renderHeaders() {
         $('runs-headers').innerHTML = columns.map(([key, label, unit]) => {

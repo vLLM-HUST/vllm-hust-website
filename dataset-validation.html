@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
   <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901" />
-  <link rel="stylesheet" href="./assets/dataset-validation.css?v=dataset-validation-v1" />
+  <link rel="stylesheet" href="./assets/dataset-validation.css?v=dataset-validation-v1-hide-empty-matrix-20261003" />
 </head>
 <body data-page="dataset-validation">
   <nav class="site-nav"><div class="site-shell site-nav-inner">
@@ -50,31 +50,16 @@
         <div class="validation-table-wrap"><table class="validation-table"><thead><tr id="validation-table-head"></tr></thead><tbody id="validation-table-body"></tbody></table></div>
         <div id="validation-pagination" class="validation-pagination" aria-label="Dataset pages"></div>
         <div id="validation-detail" class="validation-detail" hidden><div><span id="validation-detail-status" class="validation-status validation-status--not_tested">Not tested</span><h3 id="validation-detail-title">Cell detail</h3><p id="validation-detail-description"></p><button type="button" class="action-button" data-close-detail id="validation-detail-close">Close</button></div><dl id="validation-detail-meta"></dl></div>
-        <div id="validation-empty" class="validation-empty"><h3 id="validation-empty-title">No dataset results yet</h3><p id="validation-empty-body">The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.</p></div>
-      </div>
-    </section>
-    <section class="content-panel dataset-validation-section agent-qualification-section" aria-labelledby="agent-qualification-title">
-      <div class="section-head"><div><span id="agent-qualification-kicker" class="eyebrow">Tool / Agent datasets</span><h2 id="agent-qualification-title">Qualification results</h2><p id="agent-qualification-description">Collector and sandbox checks are shown separately from aggregate dataset scores.</p></div></div>
-      <div id="agent-qualification-loading" class="loading-state">Loading qualification results...</div>
-      <div id="agent-qualification-error" class="validation-empty" hidden><h3 id="agent-qualification-error-title">Qualification data unavailable</h3><p id="agent-qualification-error-body">The result document could not be loaded.</p></div>
-      <div id="agent-qualification-content" hidden>
-        <div class="agent-qualification-table-wrap">
-          <table class="agent-qualification-table">
-            <thead><tr><th id="agent-heading-dataset" scope="col">Dataset</th><th id="agent-heading-config" scope="col">Configuration</th><th id="agent-heading-progress" scope="col">Progress</th><th id="agent-heading-result" scope="col">Result</th><th id="agent-heading-evidence" scope="col">Evidence</th></tr></thead>
-            <tbody id="agent-qualification-body"></tbody>
-          </table>
-        </div>
-        <p id="agent-qualification-caveat" class="agent-qualification-caveat"></p>
+        <div id="validation-empty" class="validation-empty"><h3 id="validation-empty-title">No dataset results yet</h3><p id="validation-empty-body">The validation service has not published a result for this scenario. The matrix stays hidden until measured results exist.</p></div>
       </div>
     </section>
   </main>
   <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="validation-footer">Dataset results are read-only website data.</span></footer>
   <script>
     window.vllmHustDatasetValidationConfig = { dataUrl: './data/dataset_validation_v1.empty.json' };
-    window.vllmHustPageDict = { en: { title: 'Dataset Validation - vllm-hust', 'validation-eyebrow': 'Independent validation', 'validation-title': 'Dataset validation', 'validation-lede': 'Results published by the fixed-machine validation service, organized as a dataset by metric matrix.', 'validation-scenario-kicker': 'Scenario', 'validation-description': 'B0 and current values remain visible together for auditability.', 'validation-loading': 'Loading validation artifact...', 'validation-error-title': 'Validation artifact unavailable', 'validation-error-body': 'The result document could not be loaded.', 'validation-stat-total-label': 'Matrix cells', 'validation-stat-passed-label': 'Passed', 'validation-stat-failed-label': 'Failed', 'validation-stat-pending-label': 'Pending', 'validation-status-label': 'Status', 'validation-source-label': 'Source', 'validation-detail-close': 'Close', 'validation-empty-title': 'No dataset results yet', 'validation-empty-body': 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', 'validation-footer': 'Dataset results are read-only website data.' }, zh: { title: '数据集验证 - vllm-hust', 'validation-eyebrow': '独立验证', 'validation-title': '数据集验证', 'validation-lede': '展示固定机器验证服务发布的结果，并按数据集与指标组成矩阵。', 'validation-scenario-kicker': '验证场景', 'validation-description': '同时保留 B0 与当前值，便于核查。', 'validation-loading': '正在加载验证产物...', 'validation-error-title': '验证产物不可用', 'validation-error-body': '无法加载结果文档。', 'validation-stat-total-label': '矩阵单元格', 'validation-stat-passed-label': '通过', 'validation-stat-failed-label': '失败', 'validation-stat-pending-label': '待处理', 'validation-status-label': '状态', 'validation-source-label': '来源', 'validation-detail-close': '关闭', 'validation-empty-title': '当前还没有数据集结果', 'validation-empty-body': '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', 'validation-footer': '数据集结果为网站只读数据。' } };
+    window.vllmHustPageDict = { en: { title: 'Dataset Validation - vllm-hust', 'validation-eyebrow': 'Independent validation', 'validation-title': 'Dataset validation', 'validation-lede': 'Results published by the fixed-machine validation service, organized as a dataset by metric matrix.', 'validation-scenario-kicker': 'Scenario', 'validation-description': 'B0 and current values remain visible together for auditability.', 'validation-loading': 'Loading validation artifact...', 'validation-error-title': 'Validation artifact unavailable', 'validation-error-body': 'The result document could not be loaded.', 'validation-stat-total-label': 'Matrix cells', 'validation-stat-passed-label': 'Passed', 'validation-stat-failed-label': 'Failed', 'validation-stat-pending-label': 'Pending', 'validation-status-label': 'Status', 'validation-source-label': 'Source', 'validation-detail-close': 'Close', 'validation-empty-title': 'No dataset results yet', 'validation-empty-body': 'The validation service has not published a result for this scenario. The matrix stays hidden until measured results exist.', 'validation-footer': 'Dataset results are read-only website data.' }, zh: { title: '数据集验证 - vllm-hust', 'validation-eyebrow': '独立验证', 'validation-title': '数据集验证', 'validation-lede': '展示固定机器验证服务发布的结果，并按数据集与指标组成矩阵。', 'validation-scenario-kicker': '验证场景', 'validation-description': '同时保留 B0 与当前值，便于核查。', 'validation-loading': '正在加载验证产物...', 'validation-error-title': '验证产物不可用', 'validation-error-body': '无法加载结果文档。', 'validation-stat-total-label': '矩阵单元格', 'validation-stat-passed-label': '通过', 'validation-stat-failed-label': '失败', 'validation-stat-pending-label': '待处理', 'validation-status-label': '状态', 'validation-source-label': '来源', 'validation-detail-close': '关闭', 'validation-empty-title': '当前还没有数据集结果', 'validation-empty-body': '验证服务尚未发布该场景的实测结果；在有结果前不展示空矩阵。', 'validation-footer': '数据集结果为网站只读数据。' } };
   </script>
   <script src="./assets/site.js?v=leaderboard-primary-20260927"></script>
-  <script src="./assets/dataset-validation.js?v=dataset-validation-v1"></script>
-  <script src="./assets/agent-dataset-qualifications.js?v=agent-dataset-qualification-v1"></script>
+  <script src="./assets/dataset-validation.js?v=dataset-validation-v1-hide-empty-matrix-20261003"></script>
 </body>
 </html>

@@ -8,6 +8,8 @@ const vm = require('node:vm');
 
 const SCRIPT_PATH = path.join(__dirname, '..', 'assets', 'agent-dataset-qualifications.js');
 const DATA_PATH = path.join(__dirname, '..', 'data', 'agent_dataset_qualifications.json');
+const FRONTIER_PAGE_PATH = path.join(__dirname, '..', 'leaderboard-runs.html');
+const DATASET_PAGE_PATH = path.join(__dirname, '..', 'dataset-validation.html');
 const SOURCE = fs.readFileSync(SCRIPT_PATH, 'utf8');
 
 function loadTestApi() {
@@ -41,4 +43,14 @@ test('qualification contract rejects resolved counts above executed counts', () 
         contract_version: 'agent-dataset-qualification-v1',
         qualifications: [{ id: 'bad', executed_tasks: 1, total_tasks: 500, resolved_tasks: 2 }],
     }), /Invalid resolved task count/);
+});
+
+test('tool and agent qualifications belong to the Frontier settings view only', () => {
+    const frontierPage = fs.readFileSync(FRONTIER_PAGE_PATH, 'utf8');
+    const datasetPage = fs.readFileSync(DATASET_PAGE_PATH, 'utf8');
+
+    assert.match(frontierPage, /id="frontier-agent-qualifications"/);
+    assert.match(frontierPage, /agent-dataset-qualifications\.js/);
+    assert.doesNotMatch(datasetPage, /id="frontier-agent-qualifications"/);
+    assert.doesNotMatch(datasetPage, /agent-dataset-qualifications\.js/);
 });
