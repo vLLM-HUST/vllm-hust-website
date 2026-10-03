@@ -41,7 +41,7 @@ def download_configuration(page, popup, previous_download):
     return download.value, time.monotonic()
 
 
-def assert_concurrency_series(page, points):
+def assert_concurrency_series(page, points, cohort=None):
     """BetterScale joins Pareto vertices; other groups retain measured sweeps."""
     visible = set(
         page.locator("[data-point]").evaluate_all(
@@ -50,6 +50,10 @@ def assert_concurrency_series(page, points):
     )
     groups = {}
     frontiers = {}
+    configuration_groups = {}
+    contract = (cohort or {}).get("workload", {}).get("contract", {})
+    shared_ids = set(contract.get("comparison_point_ids", []))
+    configuration_comparison = contract.get("presentation") == "configuration-study"
     for point in points:
         if point["id"] not in visible or not point["load"].get("concurrency_series"):
             continue
@@ -60,6 +64,14 @@ def assert_concurrency_series(page, points):
             or "+".join(sorted(point["configuration"]["mods"]))
             or "none"
         )
+        if (
+            group == "betterscale"
+            and configuration_comparison
+            and point["id"] in shared_ids
+        ):
+            key = (point["cohort_id"], point["load"].get("session_rotation_depth"))
+            configuration_groups.setdefault(key, []).append(point)
+            continue
         if group == "betterscale":
             key = json.dumps(
                 [
@@ -90,6 +102,20 @@ def assert_concurrency_series(page, points):
         for series, members in groups.items()
         if len(members) > 1
     }
+    for members in configuration_groups.values():
+        members.sort(key=lambda p: p["load"]["concurrency"])
+        if len(members) < 2:
+            continue
+        first = members[0]
+        series = json.dumps(
+            [
+                first["cohort_id"],
+                first["load"]["concurrency_series"],
+                first["load"].get("session_rotation_depth"),
+            ],
+            separators=(",", ":"),
+        )
+        expected[series] = members
 
     def coordinates(point):
         return (
@@ -716,22 +742,64 @@ def main():
                         path=str(args.output / f"dsv4-{width}-{language}-{scheme}.png"),
                         full_page=True,
                     )
+                contract = cohort["workload"]["contract"]
+                shared_ids = set(contract.get("comparison_point_ids", []))
                 members = [
-                    p for p in production["points"] if p["cohort_id"] == cohort["id"]
+                    p
+                    for p in production["points"]
+                    if p["cohort_id"] == cohort["id"] or p["id"] in shared_ids
                 ]
+                if contract.get("display_series_ids"):
+                    members = [
+                        p
+                        for p in members
+                        if p["load"].get("concurrency_series")
+                        in contract["display_series_ids"]
+                    ]
+                if contract.get("display_series_prefix"):
+                    members = [
+                        p
+                        for p in members
+                        if p["load"]
+                        .get("concurrency_series", "")
+                        .startswith(contract["display_series_prefix"])
+                    ]
+                available_depths = sorted(
+                    {
+                        p["load"]["session_rotation_depth"]
+                        for p in members
+                        if isinstance(p["load"].get("session_rotation_depth"), int)
+                    }
+                )
+                default_groups = set(contract.get("default_groups", []))
+                if default_groups:
+                    members = [
+                        p
+                        for p in members
+                        if (
+                            p.get("study_group", {}).get("id")
+                            or p["load"].get("presentation_group", {}).get("id")
+                            or p["configuration"].get("experiment_group")
+                            or "+".join(sorted(p["configuration"]["mods"]))
+                            or "none"
+                        )
+                        in default_groups
+                    ]
                 if "session_rotation" in cohort["workload"]["contract"]:
-                    depths = sorted(
-                        {p["load"]["session_rotation_depth"] for p in members}
-                    )
                     assert page.locator('[data-filter="rotation"]').count() == len(
-                        depths
+                        available_depths
                     )
-                    for depth in depths:
+                    for depth in available_depths:
                         assert page.locator(
                             f'[data-filter="rotation"][value="{depth}"]'
                         ).is_checked()
-                assert page.locator(".frontier-point").count() == len(members)
-                assert_concurrency_series(page, members)
+                rendered_point_count = page.locator(".frontier-point").count()
+                assert rendered_point_count == len(members), (
+                    cohort["id"],
+                    len(members),
+                    rendered_point_count,
+                )
+                assert_concurrency_series(page, members, cohort)
                 for point in members:
                     click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
                     popup = page.locator("#frontier-popover")
@@ -746,7 +814,17 @@ def main():
                     file = args.output / f"{width}-{language}-{point['id']}.json"
                     download.save_as(file)
                     payload = json.loads(file.read_text())
-                    assert payload["point"] == point and payload["cohort"] == cohort
+                    source_cohort = next(
+                        c
+                        for c in production["cohorts"]
+                        if c["id"] == point["cohort_id"]
+                    )
+                    assert payload["point"] == point
+                    assert payload["cohort"] == source_cohort
+                    if point["id"] in shared_ids:
+                        assert payload["comparison_cohort"] == cohort
+                    else:
+                        assert "comparison_cohort" not in payload
                     popup.locator("[data-close]").click()
             assert not errors, errors
             reports.append(
