@@ -55,7 +55,11 @@ def validate_source(source_dir: Path) -> tuple[dict, list[str]]:
     for scenario in scenarios:
         scenario_id = scenario.get("id") if isinstance(scenario, dict) else None
         data_file = scenario.get("data_file") if isinstance(scenario, dict) else None
-        if not isinstance(scenario_id, str) or not scenario_id or scenario_id in scenario_ids:
+        if (
+            not isinstance(scenario_id, str)
+            or not scenario_id
+            or scenario_id in scenario_ids
+        ):
             raise SystemExit(f"invalid or duplicate scenario id: {scenario_id}")
         if (
             not isinstance(data_file, str)
@@ -111,9 +115,7 @@ def sync_publication(source_dir: Path, target_dir: Path, *, check: bool) -> int:
     target_dir.mkdir(parents=True, exist_ok=True)
 
     projections = {INDEX_FILE: render_website_index(index)}
-    projections.update(
-        {name: (source_dir / name).read_bytes() for name in data_files}
-    )
+    projections.update({name: (source_dir / name).read_bytes() for name in data_files})
     changed: list[str] = []
     for name, content in projections.items():
         target = target_dir / name
