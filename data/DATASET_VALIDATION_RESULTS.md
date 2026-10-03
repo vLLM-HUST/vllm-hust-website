@@ -1,7 +1,9 @@
 # Dataset Matrix Results
 
-The website consumes published, versioned benchmark evidence. It does not start evaluation jobs,
-apply merge gates, publish to Hugging Face, or read the retired benchmark CI workflows.
+The canonical publication lives in
+`vLLM-HUST/vllm-hust-benchmark/leaderboard-data/dataset-validation`. This website contains a
+generated read-only mirror. It does not start evaluation jobs, apply merge gates, publish to Hugging
+Face, or own benchmark facts.
 
 `dataset_validation_index_v1.json` is the model/scenario catalog used by the page. Each entry points
 to one model-specific `dataset-validation-v1` artifact. Model selection is preserved in the
@@ -65,7 +67,8 @@ comparison colors; this private fixture field is not part of the production cont
 
 ## Integration boundary
 
-Add model/configuration artifacts to `dataset_validation_index_v1.json`; each index entry points to
-one `dataset-validation-v1` document. The adapter rejects unknown statuses, dimensions, duplicate
-cells, scenario identity mismatches, and invalid index defaults. Keep it independent from
+Add model/configuration artifacts in the benchmark repository; each central `data_file` points to
+one `dataset-validation-v1` document. Run `scripts/sync_dataset_validation_snapshots.py` to project
+those filenames into website `data_url` values. The adapter rejects unknown statuses, dimensions,
+duplicate cells, scenario identity mismatches, and invalid index defaults. Keep it independent from
 `leaderboard_v1` and retain the empty, loading, error, and stale-source states.

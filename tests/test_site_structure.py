@@ -906,6 +906,8 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
     assert "SNAPSHOT_FILES = (" in script
     assert "sanitize_public_payload" in script
     assert "--check" in script
+    assert "leaderboard-data/dataset-validation" in workflow
+    assert "python scripts/sync_dataset_validation_snapshots.py" in workflow
 
 
 def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
