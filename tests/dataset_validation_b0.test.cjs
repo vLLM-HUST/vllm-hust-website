@@ -53,8 +53,13 @@ test('vSpec fills the six evidenced B1 metrics for GSM8K and ARC-Easy', () => {
     assert.equal(arcOutput.baseline_value, 274.82);
 });
 
-test('Dataset Validation loads the B0 import rather than the empty fixture', () => {
+test('Dataset Validation loads the model index rather than a fixed artifact', () => {
     const page = fs.readFileSync(path.join(ROOT, 'dataset-validation.html'), 'utf8');
-    assert.match(page, /dataset_validation_v1\.b0\.json/);
+    const index = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_index_v1.json'), 'utf8'));
+    assert.match(page, /dataset_validation_index_v1\.json/);
+    assert.match(page, /id="validation-model-select"/);
     assert.match(page, /B1 is selected independently per cell/);
+    assert.equal(index.scenarios.length, 1);
+    assert.equal(index.scenarios[0].model, 'Qwen2.5-14B-Instruct');
+    assert.equal(index.scenarios[0].data_url, './data/dataset_validation_v1.b0.json');
 });

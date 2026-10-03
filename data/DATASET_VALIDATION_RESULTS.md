@@ -4,6 +4,11 @@ The website consumes results produced by the independent fixed-machine dataset v
 It does not start evaluation jobs, apply merge gates, publish to Hugging Face, or read the retired
 benchmark CI workflows.
 
+`dataset_validation_index_v1.json` is the model/scenario catalog used by the page. Each entry points
+to one model-specific `dataset-validation-v1` artifact. Model selection is preserved in the
+`?model=` query parameter. Adding Qwen3.5-35B therefore requires a separate measured artifact and
+one index entry; it must not append Qwen3.5 cells to the Qwen2.5 artifact.
+
 ## Contract
 
 The first frontend contract is `dataset-validation-v1`. A result document contains:

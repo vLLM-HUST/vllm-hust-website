@@ -69,7 +69,7 @@
     ]
   },
   "scenario": {
-    "id": "acceptance-v4.6-home-b0-import",
+    "id": "qwen25-14b-instruct-fp16-ascend-single",
     "label": "V4.6 A1-A4 · B0 archive import",
     "model": "Qwen2.5-14B-Instruct",
     "hardware": "Ascend single NPU",

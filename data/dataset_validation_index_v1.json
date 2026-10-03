@@ -1,0 +1,14 @@
+{
+  "contract_version": "dataset-validation-index-v1",
+  "default_scenario_id": "qwen25-14b-instruct-fp16-ascend-single",
+  "scenarios": [
+    {
+      "id": "qwen25-14b-instruct-fp16-ascend-single",
+      "label": "Qwen2.5-14B-Instruct · FP16 · 1× Ascend 910B2",
+      "model": "Qwen2.5-14B-Instruct",
+      "hardware": "1× Ascend 910B2",
+      "precision": "FP16",
+      "data_url": "./data/dataset_validation_v1.b0.json"
+    }
+  ]
+}

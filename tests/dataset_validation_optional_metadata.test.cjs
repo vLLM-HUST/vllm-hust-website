@@ -9,7 +9,7 @@ const vm = require('node:vm');
 const SCRIPT_PATH = path.join(__dirname, '..', 'assets', 'dataset-validation.js');
 const SOURCE = fs.readFileSync(SCRIPT_PATH, 'utf8').replace(
     /\}\)\(\);\s*$/,
-    'window.__datasetValidationTest = { normalize, detailMetadata };\n})();'
+    'window.__datasetValidationTest = { normalize, normalizeIndex, selectScenario, detailMetadata };\n})();'
 );
 
 function loadTestApi() {
@@ -55,4 +55,33 @@ test('cell metadata overrides optional scenario and source defaults', () => {
         JSON.parse(JSON.stringify(api.detailMetadata(cell, data))),
         { model: 'cell-model', hardware: 'cell-hardware', provenance: 'cell-job' }
     );
+});
+
+test('model index selects requested scenarios and falls back to the declared default', () => {
+    const api = loadTestApi();
+    const index = api.normalizeIndex({
+        contract_version: 'dataset-validation-index-v1',
+        default_scenario_id: 'qwen25',
+        scenarios: [
+            { id: 'qwen25', label: 'Qwen2.5-14B', data_url: './qwen25.json' },
+            { id: 'qwen35', label: 'Qwen3.5-35B', data_url: './qwen35.json' },
+        ],
+    });
+
+    assert.equal(api.selectScenario(index, 'qwen35').id, 'qwen35');
+    assert.equal(api.selectScenario(index, 'unknown').id, 'qwen25');
+});
+
+test('model index rejects duplicate scenarios and missing defaults', () => {
+    const api = loadTestApi();
+    assert.throws(() => api.normalizeIndex({
+        contract_version: 'dataset-validation-index-v1',
+        default_scenario_id: 'missing',
+        scenarios: [{ id: 'qwen25', data_url: './qwen25.json' }],
+    }), /Invalid default/);
+    assert.throws(() => api.normalizeIndex({
+        contract_version: 'dataset-validation-index-v1',
+        default_scenario_id: 'qwen25',
+        scenarios: [{ id: 'qwen25', data_url: './one.json' }, { id: 'qwen25', data_url: './two.json' }],
+    }), /Invalid or duplicate/);
 });
