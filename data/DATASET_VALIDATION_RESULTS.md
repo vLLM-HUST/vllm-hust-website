@@ -32,11 +32,19 @@ not measurements: datasets without a benchmark-result screenshot remain `not_tes
 
 `candidate_search` records each completed B1 evidence audit. A near match is not a B1 value: changes
 to model, hardware, precision, dataset materialization, endpoint, arrival policy, execution mode, or
-metric definition make the result ineligible for the corresponding cell. The 2026-10-03 audit of the
-benchmark snapshots, result-bearing remote branches, and A1-A4 handoff found no eligible B1 cell. In
-particular, the available ShareGPT and Sonnet results use different online/offline or arrival
-contracts, while the available InstructCoder result also uses the Coder model. Those measurements
-remain in their original leaderboard contexts and are not copied into this matrix.
+metric definition make the result ineligible for the corresponding cell. The 2026-10-03 audit covers
+the benchmark snapshots, result-bearing remote branches, A1-A4 handoff, and evidence already
+published by the Plugin page. The vSpec raw artifacts provide 12 eligible B1 cells across GSM8K and
+ARC-Easy: request, output-token and total-token throughput, mean TTFT, mean TPOT, and request
+success rate. Each cell retains the vSpec repository revision, engine revision, raw artifact, model,
+hardware, precision, endpoint, request count, and arrival policy.
+
+Output-token throughput is a separate metric from total-token throughput. The Home workbook supplies
+the B0 output-token values for all 28 evidenced B0 datasets. GSM8K has a vSpec B1 measurement but no
+measured B0 value in the Home archive or workbook, so its B0 side remains empty. The available
+ShareGPT and Sonnet results still use different online/offline or arrival contracts, while the
+available InstructCoder result also uses the Coder model. Those near matches remain in their
+original leaderboard contexts and are not copied into this matrix.
 
 The checked-in `data/dataset_validation_v1.empty.json` file is a schema-shaped empty fixture for
 local UI development. It is not a benchmark result and must be replaced by a signed or otherwise
