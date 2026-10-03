@@ -210,7 +210,9 @@ def test_dataset_validation_page_uses_versioned_contract() -> None:
     assert "Result references an undeclared dataset or metric" in script
     assert "Duplicate result cell" in script
     assert "Unsupported result status" in script
-    assert "vllmHustDatasetValidationConfig?.dataUrl" in script
+    assert "dataset-validation-index-v1" in script
+    assert "config.indexUrl" in script
+    assert 'id="validation-model-select"' in page
     assert 'id="validation-freshness"' in page
     assert 'id="validation-dataset-search"' in page
     assert 'id="validation-group-filter"' in page
@@ -963,7 +965,8 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     text = (root / "index.html").read_text(encoding="utf-8")
 
     assert 'data-page="home"' in text
-    assert 'href="./leaderboard.html"' in text
+    assert 'href="./leaderboard-runs.html"' in text
+    assert 'href="./dataset-validation.html"' in text
     assert 'href="./achievements.html"' in text
     assert 'href="./contributors.html"' in text
     assert 'href="./conferences.html"' in text
@@ -1116,8 +1119,8 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=nav-polish-20260826" in text
-        assert "assets/site.js?v=leaderboard-primary-20260927" in text
+        assert "assets/site.css?v=benchmarks-ia-20261003" in text
+        assert "assets/site.js?v=benchmarks-ia-20261003" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -1180,7 +1183,7 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     proving_ground = html_text.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
     assert "Runtime Contracts" in proving_ground
     assert "Ecosystem Interfaces" in proving_ground
-    assert "Validation Matrix" in proving_ground
+    assert "Dataset Matrix" in proving_ground
     assert "Benchmark Contract" in proving_ground
     assert "vllm-ascend-hust" not in proving_ground
     assert "triton-ascend-hust" not in proving_ground
@@ -1555,7 +1558,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=nav-polish-20260826" in html_text
+    assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/achievements-page.js?v=upstream-20260904T022103Z" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
@@ -2752,9 +2755,9 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert 'id="issues-error"' in html_text
     assert 'id="issues-content"' in html_text
     assert "assets/issues-page.js?v=" in html_text
-    assert "assets/site.css?v=nav-polish-20260826" in html_text
+    assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=leaderboard-primary-20260927" in html_text
+    assert "assets/site.js?v=benchmarks-ia-20261003" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js

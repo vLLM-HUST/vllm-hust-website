@@ -2,8 +2,10 @@
     const I18N = {
         en: {
             navHome: 'Home',
-            navLeaderboard: 'Leaderboard',
-            navDatasetValidation: 'Dataset Validation',
+            navLeaderboard: 'Benchmarks',
+            navPerformanceCurves: 'Performance curves',
+            navFixedTarget: 'Fixed-target results',
+            navDatasetValidation: 'Dataset matrix',
             navAchievements: 'Achievements',
             navNews: 'News',
             navContributors: 'Contributors',
@@ -31,8 +33,10 @@
         },
         zh: {
             navHome: '首页',
-            navLeaderboard: '性能排行榜',
-            navDatasetValidation: '数据集验证',
+            navLeaderboard: '评测',
+            navPerformanceCurves: '性能曲线',
+            navFixedTarget: '固定目标结果',
+            navDatasetValidation: '数据集矩阵',
             navAchievements: '成果',
             navNews: '新闻',
             navContributors: '核心成员',
@@ -151,7 +155,8 @@
             label: 'navEvidence',
             pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', 'achievements', 'news'],
             links: [
-                ['leaderboard-v2', './leaderboard-runs.html', 'navLeaderboard'],
+                ['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves'],
+                ['leaderboard', './leaderboard.html', 'navFixedTarget'],
                 ['dataset-validation', './dataset-validation.html', 'navDatasetValidation'],
                 ['achievements', './achievements.html', 'navAchievements'],
                 ['news', './news.html', 'navNews'],
@@ -281,7 +286,7 @@
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
                     <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
-                    <div><strong data-i18n-common="footerEvidence">Evidence</strong><a href="./leaderboard-runs.html" data-i18n-common="navLeaderboard">Leaderboard</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset Validation</a><a href="./achievements.html" data-i18n-common="navAchievements">Achievements</a><a href="./news.html" data-i18n-common="navNews">News</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
+                    <div><strong data-i18n-common="footerEvidence">Evidence</strong><a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves">Performance curves</a><a href="./leaderboard.html" data-i18n-common="navFixedTarget">Fixed-target results</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset matrix</a><a href="./achievements.html" data-i18n-common="navAchievements">Achievements</a><a href="./news.html" data-i18n-common="navNews">News</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
                     <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
                 </nav>
             </div>`;

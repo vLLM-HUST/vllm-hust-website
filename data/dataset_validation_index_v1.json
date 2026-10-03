@@ -9,6 +9,14 @@
       "hardware": "1× Ascend 910B2",
       "precision": "FP16",
       "data_url": "./data/dataset_validation_v1.b0.json"
+    },
+    {
+      "id": "qwen35-35b-a3b-bf16-tp4-c12-kv512m",
+      "label": "Qwen3.5-35B-A3B · BF16 · TP4/C12 · 512 MiB KV/NPU",
+      "model": "Qwen3.5-35B-A3B",
+      "hardware": "4× Ascend 910B2",
+      "precision": "BF16",
+      "data_url": "./data/dataset_validation_qwen35_bidkv.json"
     }
   ]
 }

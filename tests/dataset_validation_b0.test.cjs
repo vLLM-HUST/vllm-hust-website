@@ -59,7 +59,24 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.match(page, /dataset_validation_index_v1\.json/);
     assert.match(page, /id="validation-model-select"/);
     assert.match(page, /B1 is selected independently per cell/);
-    assert.equal(index.scenarios.length, 1);
+    assert.equal(index.scenarios.length, 2);
     assert.equal(index.scenarios[0].model, 'Qwen2.5-14B-Instruct');
     assert.equal(index.scenarios[0].data_url, './data/dataset_validation_v1.b0.json');
+    assert.equal(index.scenarios[1].model, 'Qwen3.5-35B-A3B');
+    assert.equal(index.scenarios[1].data_url, './data/dataset_validation_qwen35_bidkv.json');
+});
+
+test('BidKV publishes the evidenced Qwen3.5 EvoScientist cell as a separate scenario', () => {
+    const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_qwen35_bidkv.json'), 'utf8'));
+    assert.equal(data.scenario.id, 'qwen35-35b-a3b-bf16-tp4-c12-kv512m');
+    assert.equal(data.datasets.length, 1);
+    assert.equal(data.metrics.length, 1);
+    assert.equal(data.results.length, 1);
+    const cell = data.results[0];
+    assert.equal(cell.dataset_id, 'evoscientist');
+    assert.equal(cell.metric_id, 'output_token_throughput');
+    assert.equal(cell.baseline_value, 35.66676184907216);
+    assert.equal(cell.value, 40.60051695308914);
+    assert.equal(cell.provenance.repository, 'vLLM-HUST/vllm-hust-bidkv');
+    assert.deepEqual(cell.provenance.policy_selections, [10, 7]);
 });

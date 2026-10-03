@@ -14,7 +14,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
   <link rel="stylesheet" href="./assets/home.css?v=0.3.7" />
 </head>
 <body data-page="home">
@@ -27,7 +27,7 @@
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
         <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">Ecosystem</a>
-        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard-runs.html">Leaderboard</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard-runs.html">Benchmarks</a>
         <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
         <a id="nav-news" class="nav-link" data-nav-page="news" href="./news.html">News</a>
         <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
@@ -142,7 +142,7 @@
       <div class="stack-grid">
         <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / HOST</span><strong>Runtime Contracts</strong><p id="stack-core-copy">Typed domain boundaries owned by the engine.</p><em>Repository ↗</em></a>
         <a href="./plugins.html"><span>02 / CONNECT</span><strong>Ecosystem Interfaces</strong><p id="stack-ascend-copy">Platform profiles, KV adapters, bridges, and bundles keep distinct roles.</p><em id="stack-catalog-link">Open ecosystem catalog →</em></a>
-        <a href="./leaderboard.html"><span>03 / VALIDATE</span><strong>Validation Matrix</strong><p id="stack-triton-copy">Validate across engines, compilers, and hardware.</p><em id="stack-leaderboard-link">Open leaderboard →</em></a>
+        <a href="./dataset-validation.html"><span>03 / VALIDATE</span><strong>Dataset Matrix</strong><p id="stack-triton-copy">Validate across engines, compilers, and hardware.</p><em id="stack-leaderboard-link">Open dataset matrix →</em></a>
         <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / MEASURE</span><strong>Benchmark Contract</strong><p id="stack-benchmark-copy">Fixed targets and public evidence.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
       </div>
     </section>
@@ -224,7 +224,7 @@
 
   <footer class="execution-footer">
     <div><strong>vLLM-HUST</strong><span id="footer-copy">Inference for domestic compute.</span></div>
-    <nav aria-label="Footer navigation"><a href="./leaderboard.html">Leaderboard</a><a href="./contributors.html">Contributors</a><a href="https://github.com/vLLM-HUST">GitHub</a></nav>
+    <nav aria-label="Footer navigation"><a href="./leaderboard-runs.html">Benchmarks</a><a href="./contributors.html">Contributors</a><a href="https://github.com/vLLM-HUST">GitHub</a></nav>
   </footer>
 
   <script>
@@ -257,7 +257,7 @@
         'stack-core-copy': 'Typed domain boundaries owned by the engine.',
         'stack-ascend-copy': 'Platform profiles, KV adapters, bridges, and bundles keep distinct roles.',
         'stack-triton-copy': 'Validate across engines, compilers, and hardware.',
-        'stack-catalog-link': 'Open ecosystem catalog ↓', 'stack-leaderboard-link': 'Open leaderboard →',
+        'stack-catalog-link': 'Open ecosystem catalog ↓', 'stack-leaderboard-link': 'Open dataset matrix →',
         'stack-benchmark-copy': 'Fixed targets and public evidence.', 'stack-benchmark-link': 'Open benchmark ↗',
         'atlas-eyebrow': 'MOD portfolio', 'atlas-title': '18 catalog entries, with activation and performance evidence kept separate.',
         'atlas-summary': 'The catalog separates verified, inspect-only, and source-scaffold MODs; static checks never become runtime or NPU claims.',
@@ -306,7 +306,7 @@
         'stack-core-copy': '由引擎拥有的类型化领域边界。',
         'stack-ascend-copy': '平台 profile、KV 适配器、bridge 与 bundle 保持不同角色。',
         'stack-triton-copy': '跨引擎、编译栈与硬件验证。',
-        'stack-catalog-link': '查看生态目录 ↓', 'stack-leaderboard-link': '打开排行榜 →',
+        'stack-catalog-link': '查看生态目录 ↓', 'stack-leaderboard-link': '打开数据集矩阵 →',
         'stack-benchmark-copy': '固定靶与公开证据。', 'stack-benchmark-link': '打开 Benchmark ↗',
         'atlas-eyebrow': 'MOD 项目组合', 'atlas-title': '18 个目录条目，启用证据与性能证据分开呈现。',
         'atlas-summary': '规范目录区分已验证集成、仅可检查仓库与源码脚手架，不把静态检查写成运行时或 NPU 结论。',
@@ -330,7 +330,7 @@
       }
     };
   </script>
-  <script src="./assets/site.js?v=leaderboard-primary-20260927"></script>
+  <script src="./assets/site.js?v=benchmarks-ia-20261003"></script>
   <script src="./assets/product-catalog.js?v=0.3.7"></script>
   <script src="./assets/home-disclosure.js?v=0.3.7"></script>
 </body>

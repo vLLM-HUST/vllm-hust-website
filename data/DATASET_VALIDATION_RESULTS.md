@@ -1,13 +1,12 @@
-# Dataset Validation Results
+# Dataset Matrix Results
 
-The website consumes results produced by the independent fixed-machine dataset validation service.
-It does not start evaluation jobs, apply merge gates, publish to Hugging Face, or read the retired
-benchmark CI workflows.
+The website consumes published, versioned benchmark evidence. It does not start evaluation jobs,
+apply merge gates, publish to Hugging Face, or read the retired benchmark CI workflows.
 
 `dataset_validation_index_v1.json` is the model/scenario catalog used by the page. Each entry points
 to one model-specific `dataset-validation-v1` artifact. Model selection is preserved in the
-`?model=` query parameter. Adding Qwen3.5-35B therefore requires a separate measured artifact and
-one index entry; it must not append Qwen3.5 cells to the Qwen2.5 artifact.
+`?model=` query parameter. Qwen3.5-35B therefore has a separate measured artifact and index entry;
+its cells are never appended to the Qwen2.5 artifact.
 
 ## Contract
 
@@ -51,6 +50,13 @@ ShareGPT and Sonnet results still use different online/offline or arrival contra
 available InstructCoder result also uses the Coder model. Those near matches remain in their
 original leaderboard contexts and are not copied into this matrix.
 
+The Qwen3.5 selector currently exposes one separately configured BidKV measurement: EvoScientist
+first 12 requests at TP4, C12, request rate 4, and 512 MiB KV cache per NPU. B0 and B1 are geometric
+means across the two order-reversed paired repeats. The artifact preserves both repeat values,
+policy calls and selections, exact source revisions, input hash, and archive hash. It is one
+measured cell, not a claim of coverage for the rest of the Qwen3.5 matrix, and it is not pooled with
+the TP2 SWE Prefix Reuse series.
+
 The checked-in `data/dataset_validation_v1.empty.json` file is a schema-shaped empty fixture for
 local UI development. It is not a benchmark result and must be replaced by a signed or otherwise
 authenticated service artifact before production ingestion is enabled. For visual smoke testing
@@ -59,8 +65,7 @@ comparison colors; this private fixture field is not part of the production cont
 
 ## Integration boundary
 
-When the service contract is finalized, set `window.vllmHustDatasetValidationConfig.dataUrl` to the
-published artifact and update the authentication/provenance policy in
-`assets/dataset-validation.js`. The adapter rejects unknown statuses, dimensions, and duplicate
-cells. Keep it independent from `leaderboard_v1` and retain the empty, loading, error, and
-stale-source states.
+Add model/configuration artifacts to `dataset_validation_index_v1.json`; each index entry points to
+one `dataset-validation-v1` document. The adapter rejects unknown statuses, dimensions, duplicate
+cells, scenario identity mismatches, and invalid index defaults. Keep it independent from
+`leaderboard_v1` and retain the empty, loading, error, and stale-source states.

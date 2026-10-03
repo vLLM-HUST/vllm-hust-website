@@ -43,6 +43,10 @@
         "repository": "vLLM-HUST/vllm-hust-vSpec",
         "commit": "4a29bf9bce72b3ea8cf7abbc54cbba204f00942f",
         "scope": "published Qwen2.5-14B GSM8K and ARC-Easy raw online benchmark artifacts"
+      },
+      {
+        "repository": "vLLM-HUST/vllm-hust-website",
+        "scope": "Plugin-page comparisons and their linked primary reports; Qwen3.5 BidKV evidence is published as a separate scenario"
       }
     ],
     "rejected_near_matches": [
@@ -3208,6 +3212,7 @@
     "B0 values are transcribed from the 28 benchmark-result screenshots present in the Home archive.",
     "The other 16 registered datasets have preparation material but no benchmark-result screenshot in the archive.",
     "The screenshots report mean and P99 latency, not P95; this publication uses only the explicitly reported mean latency fields.",
-    "The 2026-10-03 candidate audit populated 12 B1 cells from vSpec raw artifacts; remaining B1 cells require matching measured evidence."
+    "The 2026-10-03 candidate audit populated 12 B1 cells from vSpec raw artifacts; remaining B1 cells require matching measured evidence.",
+    "The Qwen3.5 BidKV EvoScientist result uses a different model and TP4 configuration, so it is published through a separate model scenario."
   ]
 }
