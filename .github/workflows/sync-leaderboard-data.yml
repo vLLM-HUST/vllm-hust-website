@@ -25,6 +25,7 @@ jobs:
           path: _benchmark
           sparse-checkout: |
             leaderboard-data/snapshots
+            leaderboard-data/dataset-validation
             leaderboard-data/official-targets.json
             leaderboard-data/official-targets.sha256
             docs/official-baselines
@@ -41,6 +42,8 @@ jobs:
         run: |
           python _benchmark/scripts/validate_public_leaderboard_snapshots.py \
             --snapshot-dir _benchmark/leaderboard-data/snapshots
+          PYTHONPATH=_benchmark/src python -m vllm_hust_benchmark.dataset_validation \
+            --root _benchmark/leaderboard-data/dataset-validation
 
       - name: Prepare admitted sync evidence
         run: |
@@ -57,12 +60,15 @@ jobs:
           python scripts/sync_leaderboard_snapshots.py \
             --source-dir _benchmark/leaderboard-data/snapshots \
             --target-dir data
+          python scripts/sync_dataset_validation_snapshots.py \
+            --source-dir _benchmark/leaderboard-data/dataset-validation \
+            --target-dir data
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v7
         with:
           branch: automation/sync-leaderboard-data
-          commit-message: 'data: sync leaderboard snapshots from benchmark repo'
-          title: 'data: sync leaderboard snapshots'
+          commit-message: 'data: sync benchmark publications from benchmark repo'
+          title: 'data: sync benchmark publications'
           body-path: /tmp/leaderboard-sync-pr-body.md
           delete-branch: true

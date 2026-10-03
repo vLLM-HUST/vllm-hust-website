@@ -11,7 +11,7 @@
         zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
     };
 
-    const state = { data: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
+    const state = { data: null, index: null, scenarioId: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
     const $ = (id) => document.getElementById(id);
     const lang = () => window.vllmHustSite?.getCurrentLang?.() || 'en';
     const t = (key) => TEXT[lang()][key] || TEXT.en[key] || key;
@@ -45,6 +45,26 @@
             results.set(key, { ...item, status: item.status || 'not_tested' });
         });
         return { ...data, results };
+    }
+
+    function normalizeIndex(data) {
+        if (!data || data.contract_version !== 'dataset-validation-index-v1' || !Array.isArray(data.scenarios) || data.scenarios.length === 0) {
+            throw new Error('Unsupported dataset validation index');
+        }
+        const ids = new Set();
+        data.scenarios.forEach((scenario) => {
+            if (!scenario || typeof scenario.id !== 'string' || !scenario.id || ids.has(scenario.id) || typeof scenario.data_url !== 'string' || !scenario.data_url) {
+                throw new Error('Invalid or duplicate validation scenario');
+            }
+            ids.add(scenario.id);
+        });
+        if (!ids.has(data.default_scenario_id)) throw new Error('Invalid default validation scenario');
+        return data;
+    }
+
+    function selectScenario(index, requestedId) {
+        return index.scenarios.find((scenario) => scenario.id === requestedId)
+            || index.scenarios.find((scenario) => scenario.id === index.default_scenario_id);
     }
 
     function getCell(dataset, metric) {
@@ -181,6 +201,45 @@
         $('validation-empty').hidden = hasResults;
     }
 
+    function renderScenarioOptions() {
+        const select = $('validation-model-select');
+        select.innerHTML = state.index.scenarios.map((scenario) => `<option value="${escapeHtml(scenario.id)}">${escapeHtml(scenario.label || scenario.model || scenario.id)}</option>`).join('');
+        select.value = state.scenarioId;
+        select.disabled = false;
+    }
+
+    function fetchJson(url) {
+        return fetch(url).then((response) => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        });
+    }
+
+    function loadScenario(scenario, updateUrl = false) {
+        state.scenarioId = scenario.id;
+        state.data = null;
+        state.selected = null;
+        state.page = 1;
+        $('validation-loading').hidden = false;
+        $('validation-content').hidden = true;
+        $('validation-error').hidden = true;
+        renderScenarioOptions();
+        if (updateUrl) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('model', scenario.id);
+            window.history.replaceState(null, '', url);
+        }
+        return fetchJson(scenario.data_url).then((data) => {
+            const demo = new URLSearchParams(window.location.search).get('demo') === '1';
+            const payload = demo && Array.isArray(data._demo_results) ? { ...data, results: data._demo_results } : data;
+            if (payload.scenario?.id && payload.scenario.id !== scenario.id) throw new Error('Validation scenario identity mismatch');
+            state.data = normalize(payload);
+            $('validation-loading').hidden = true;
+            $('validation-content').hidden = false;
+            render();
+        });
+    }
+
     function renderFreshness() {
         const node = $('validation-freshness');
         const timestamp = Date.parse(state.data.generated_at || '');
@@ -217,9 +276,28 @@
         $('validation-dataset-search').addEventListener('input', (event) => { state.query = event.target.value; state.page = 1; render(); });
         $('validation-group-filter').addEventListener('change', (event) => { state.group = event.target.value; state.page = 1; render(); });
         document.addEventListener('click', (event) => { if (event.target.closest('[data-close-detail]')) { state.selected = null; renderDetail(); } });
-        const dataUrl = window.vllmHustDatasetValidationConfig?.dataUrl || DEFAULT_DATA_URL;
-        fetch(dataUrl).then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).then((data) => { const demo = new URLSearchParams(window.location.search).get('demo') === '1'; const payload = demo && Array.isArray(data._demo_results) ? { ...data, results: data._demo_results } : data; state.data = normalize(payload); $('validation-loading').hidden = true; $('validation-content').hidden = false; render(); }).catch((error) => { console.error(error); $('validation-loading').hidden = true; $('validation-error').hidden = false; $('validation-error-body').textContent = error.message || 'Unable to load validation artifact'; });
+        $('validation-model-select').addEventListener('change', (event) => {
+            const scenario = selectScenario(state.index, event.target.value);
+            loadScenario(scenario, true).catch(showLoadError);
+        });
+        const config = window.vllmHustDatasetValidationConfig || {};
+        const indexPromise = config.indexUrl
+            ? fetchJson(config.indexUrl).then(normalizeIndex)
+            : Promise.resolve(normalizeIndex({ contract_version: 'dataset-validation-index-v1', default_scenario_id: 'default', scenarios: [{ id: 'default', label: 'Default', data_url: config.dataUrl || DEFAULT_DATA_URL }] }));
+        indexPromise.then((index) => {
+            state.index = index;
+            const requestedId = new URLSearchParams(window.location.search).get('model');
+            return loadScenario(selectScenario(index, requestedId));
+        }).catch(showLoadError);
         window.addEventListener('vllm-hust:langchange', () => { if (state.data) { select.innerHTML = `<option value="all">${t('all')}</option>`; STATUS_ORDER.forEach((status) => { const option = document.createElement('option'); option.value = status; option.textContent = statusLabel(status); select.appendChild(option); }); select.value = state.status; render(); } });
+    }
+
+    function showLoadError(error) {
+        console.error(error);
+        $('validation-loading').hidden = true;
+        $('validation-content').hidden = true;
+        $('validation-error').hidden = false;
+        $('validation-error-body').textContent = error.message || 'Unable to load validation artifact';
     }
 
     document.addEventListener('DOMContentLoaded', init);

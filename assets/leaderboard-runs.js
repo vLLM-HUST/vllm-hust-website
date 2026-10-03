@@ -256,7 +256,7 @@
     }
     function translate() {
         for (const node of document.querySelectorAll('[data-runs-i18n]')) node.textContent = t(node.dataset.runsI18n);
-        document.title = lang() === 'zh' ? '性能排行榜 - vLLM-HUST' : 'Leaderboard - vLLM-HUST';
+        document.title = lang() === 'zh' ? '性能曲线 - vLLM-HUST' : 'Performance curves - vLLM-HUST';
         if (state.ready) { renderHeaders(); renderRows(); }
     }
     async function initialize() {
