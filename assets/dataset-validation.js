@@ -162,14 +162,23 @@
     function render() {
         if (!state.data) return;
         const scenario = state.data.scenario || {};
+        const hasResults = state.data.results.size !== 0;
         $('validation-scenario').textContent = scenario.label || scenario.id || t('notProvided');
         $('validation-source').innerHTML = state.data.source?.commit ? `${escapeHtml(state.data.source.service)} · <strong>${escapeHtml(state.data.source.commit)}</strong>` : t('sourcePending');
         renderFreshness();
-        renderDatasetControls();
-        renderSummary();
-        renderMatrix();
-        renderDetail();
-        $('validation-empty').hidden = state.data.results.size !== 0;
+        for (const selector of ['.validation-summary', '.validation-toolbar', '.validation-legend', '.validation-table-wrap', '.validation-pagination']) {
+            document.querySelector(selector).hidden = !hasResults;
+        }
+        if (hasResults) {
+            renderDatasetControls();
+            renderSummary();
+            renderMatrix();
+            renderDetail();
+        } else {
+            state.selected = null;
+            $('validation-detail').hidden = true;
+        }
+        $('validation-empty').hidden = hasResults;
     }
 
     function renderFreshness() {

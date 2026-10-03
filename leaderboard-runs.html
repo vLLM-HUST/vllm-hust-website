@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
   <link rel="stylesheet" href="./assets/leaderboard-runs.css?v=nav-wrap-20260924-2" />
-  <link rel="stylesheet" href="./assets/leaderboard-frontier.css?v=betterscale-study-comparison-20261001" />
+  <link rel="stylesheet" href="./assets/leaderboard-frontier.css?v=frontier-agent-datasets-20261003" />
   <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901" />
 </head>
 
@@ -66,6 +66,20 @@
         </button>
       </div>
       <section id="frontier-panel" class="frontier" aria-label="Benchmark settings"></section>
+      <section id="frontier-agent-qualifications" class="frontier-agent-qualifications" aria-labelledby="agent-qualification-title">
+        <div class="frontier-agent-heading"><div><span id="agent-qualification-kicker">Tool / Agent datasets</span><h2 id="agent-qualification-title">Qualification results</h2><p id="agent-qualification-description">Collector and sandbox checks are shown separately from aggregate dataset scores.</p></div></div>
+        <div id="agent-qualification-loading" class="frontier-agent-loading">Loading qualification results...</div>
+        <div id="agent-qualification-error" class="frontier-agent-empty" hidden><h3 id="agent-qualification-error-title">Qualification data unavailable</h3><p id="agent-qualification-error-body">The result document could not be loaded.</p></div>
+        <div id="agent-qualification-content" hidden>
+          <div class="agent-qualification-table-wrap">
+            <table class="agent-qualification-table">
+              <thead><tr><th id="agent-heading-dataset" scope="col">Dataset</th><th id="agent-heading-config" scope="col">Configuration</th><th id="agent-heading-progress" scope="col">Progress</th><th id="agent-heading-result" scope="col">Result</th><th id="agent-heading-evidence" scope="col">Evidence</th></tr></thead>
+              <tbody id="agent-qualification-body"></tbody>
+            </table>
+          </div>
+          <p id="agent-qualification-caveat" class="agent-qualification-caveat"></p>
+        </div>
+      </section>
       <section id="runs-panel" aria-label="Leaderboards" hidden>
         <div class="runs-table-scroll" tabindex="0" role="region" aria-label="Measurements">
           <table class="runs-table"><thead><tr id="runs-headers"></tr></thead><tbody id="runs-body"></tbody></table>
@@ -107,5 +121,6 @@
   <script src="./assets/leaderboard-frontier-model.js?v=betterscale-study-comparison-20261001"></script>
   <script src="./assets/leaderboard-runs.js?v=benchmark-settings-20260929"></script>
   <script src="./assets/leaderboard-frontier.js?v=betterscale-study-comparison-20261001"></script>
+  <script src="./assets/agent-dataset-qualifications.js?v=frontier-agent-datasets-20261003"></script>
 </body>
 </html>
