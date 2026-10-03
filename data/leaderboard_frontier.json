@@ -78,7 +78,1518 @@
               "transformers": "5.18.0",
               "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
               "equivalence": "Replacing tokenizer.path with /workspace/models/Qwen3.5-35B-A3B, tokenizer.transformers with 5.17.0 and tokenizer.fingerprint with the canonical value reconstructs original 8044561f SHA256 exactly, so sessions, input-token deltas, output budgets and order are byte-identical. The local tokenizer backend+chat-template fingerprint itself differs (tokenizer.json/tokenizer_config.json on that host were modified after download); tokenizer identity is therefore NOT independently verified equal."
+            },
+            {
+              "id": "qwen35-utility-victim-off-tp2ep-m65-c1-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim OFF · TP2+EP · C1 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
+                  },
+                  "observed_max_prompt_tokens": 28638,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": true,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 0,
+                    "runtime_effective_events": 0,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 1,
+                "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim OFF (m65, r1)",
+                  "label_zh": "utility-victim OFF（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 39.44888888888889,
+                "decode_p90_tps": 44.01672571158207,
+                "ttft_p95_ms": 1876.0696141980588,
+                "tpot_ms": 23.415315015559788,
+                "tpot_p95_ms": 24.476748657783265,
+                "e2e_p95_ms": 40938.52128274739,
+                "completed_requests": 76
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "a68431af211c4dfa966d699bbb67a80f"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
+            },
+            {
+              "id": "qwen35-utility-victim-off-tp2ep-m65-c2-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim OFF · TP2+EP · C2 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
+                  },
+                  "observed_max_prompt_tokens": 41173,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": true,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 0,
+                    "runtime_effective_events": 0,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 2,
+                "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim OFF (m65, r1)",
+                  "label_zh": "utility-victim OFF（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 66.35666666666667,
+                "decode_p90_tps": 40.63884881047793,
+                "ttft_p95_ms": 2515.3636655770238,
+                "tpot_ms": 27.433913574908537,
+                "tpot_p95_ms": 33.80421619957339,
+                "e2e_p95_ms": 44236.2772103399,
+                "completed_requests": 123
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "0fa2d4ced65a4a48acf03e648e1cc033"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
+            },
+            {
+              "id": "qwen35-utility-victim-off-tp2ep-m65-c4-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim OFF · TP2+EP · C4 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
+                  },
+                  "observed_max_prompt_tokens": 41173,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": true,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 0,
+                    "runtime_effective_events": 0,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 4,
+                "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim OFF (m65, r1)",
+                  "label_zh": "utility-victim OFF（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 108.34,
+                "decode_p90_tps": 36.43808913504434,
+                "ttft_p95_ms": 2684.8208060488105,
+                "tpot_ms": 33.93599058781433,
+                "tpot_p95_ms": 45.33779106999587,
+                "e2e_p95_ms": 66866.30471558312,
+                "completed_requests": 178
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "16ec0ab723e04e169fb91a7d45e025b3"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
+            },
+            {
+              "id": "qwen35-utility-victim-off-tp2ep-m65-c8-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim OFF · TP2+EP · C8 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
+                  },
+                  "observed_max_prompt_tokens": 55491,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": true,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 0,
+                    "runtime_effective_events": 0,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 8,
+                "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim OFF (m65, r1)",
+                  "label_zh": "utility-victim OFF（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 162.37555555555556,
+                "decode_p90_tps": 29.86863425386144,
+                "ttft_p95_ms": 2747.880484908819,
+                "tpot_ms": 46.04265476523217,
+                "tpot_p95_ms": 61.80716899400654,
+                "e2e_p95_ms": 87137.39985786378,
+                "completed_requests": 261
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "e856a1639261421fbb5249da76e14ee2"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
+            },
+            {
+              "id": "qwen35-utility-victim-off-tp2ep-m65-c16-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim OFF · TP2+EP · C16 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
+                  },
+                  "observed_max_prompt_tokens": 40244,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": true,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 0,
+                    "runtime_effective_events": 0,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 16,
+                "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim OFF (m65, r1)",
+                  "label_zh": "utility-victim OFF（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 175.02444444444444,
+                "decode_p90_tps": 19.306774114946485,
+                "ttft_p95_ms": 9237.753272056578,
+                "tpot_ms": 81.31433718261185,
+                "tpot_p95_ms": 151.6934510881461,
+                "e2e_p95_ms": 110545.96144519743,
+                "completed_requests": 323
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "caaf91a4a6744d2287201b1f988733f5"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
+            },
+            {
+              "id": "qwen35-utility-victim-on-tp2ep-m65-c1-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim ON · TP2+EP · C1 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [
+                  "utility-victim"
+                ],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
+                  },
+                  "observed_max_prompt_tokens": 28638,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": false,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 4,
+                    "runtime_effective_events": 0,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 1,
+                "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim ON (m65, r1)",
+                  "label_zh": "utility-victim ON（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 40.31444444444445,
+                "decode_p90_tps": 45.72131300746206,
+                "ttft_p95_ms": 1889.361854456365,
+                "tpot_ms": 22.617200941725233,
+                "tpot_p95_ms": 23.724104080086807,
+                "e2e_p95_ms": 39593.18858180195,
+                "completed_requests": 77
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "36ca7c81453242d1a3b86200bceb2c58"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
+            },
+            {
+              "id": "qwen35-utility-victim-on-tp2ep-m65-c2-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim ON · TP2+EP · C2 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [
+                  "utility-victim"
+                ],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
+                  },
+                  "observed_max_prompt_tokens": 41173,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": false,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 4,
+                    "runtime_effective_events": 0,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 2,
+                "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim ON (m65, r1)",
+                  "label_zh": "utility-victim ON（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 66.41,
+                "decode_p90_tps": 40.70811308167541,
+                "ttft_p95_ms": 2534.284984599799,
+                "tpot_ms": 27.545299048446843,
+                "tpot_p95_ms": 34.54315565647445,
+                "e2e_p95_ms": 42096.980458591126,
+                "completed_requests": 123
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "a392a568ce414aacbe095513af17a695"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
+            },
+            {
+              "id": "qwen35-utility-victim-on-tp2ep-m65-c4-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim ON · TP2+EP · C4 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [
+                  "utility-victim"
+                ],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
+                  },
+                  "observed_max_prompt_tokens": 41173,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": false,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 4,
+                    "runtime_effective_events": 0,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 4,
+                "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim ON (m65, r1)",
+                  "label_zh": "utility-victim ON（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 107.70333333333333,
+                "decode_p90_tps": 36.11086415643278,
+                "ttft_p95_ms": 2657.152462936938,
+                "tpot_ms": 34.04127940929769,
+                "tpot_p95_ms": 45.76941615061608,
+                "e2e_p95_ms": 69807.15419165787,
+                "completed_requests": 177
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "e579a951e31746ceb0b734120305bf60"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
+            },
+            {
+              "id": "qwen35-utility-victim-on-tp2ep-m65-c8-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim ON · TP2+EP · C8 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [
+                  "utility-victim"
+                ],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
+                  },
+                  "observed_max_prompt_tokens": 55491,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": false,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 4,
+                    "runtime_effective_events": 0,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 8,
+                "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim ON (m65, r1)",
+                  "label_zh": "utility-victim ON（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 158.6211111111111,
+                "decode_p90_tps": 28.123006870416283,
+                "ttft_p95_ms": 2713.216918054968,
+                "tpot_ms": 47.647987679767226,
+                "tpot_p95_ms": 63.33724739846237,
+                "e2e_p95_ms": 88615.23441085592,
+                "completed_requests": 256
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "f7ca8a0ad2cf4a84a031997347e124ba"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
+            },
+            {
+              "id": "qwen35-utility-victim-on-tp2ep-m65-c16-r1-20261003",
+              "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+              "label": "utility-victim ON · TP2+EP · C16 · r1",
+              "configuration": {
+                "engine": "vLLM + vLLM-Ascend",
+                "engine_version": "0.23.0+empty / 0.23.0.post1",
+                "mods": [
+                  "utility-victim"
+                ],
+                "hardware": {
+                  "label": "Ascend 910B2",
+                  "accelerator_count": 2
+                },
+                "context_capacity_tokens": 262144,
+                "parameters": {
+                  "tensor_parallel_size": 2,
+                  "pipeline_parallel_size": 1,
+                  "data_parallel_size": 1,
+                  "max_model_len": 262144,
+                  "gpu_memory_utilization": 0.65,
+                  "max_num_seqs": 16,
+                  "max_num_batched_tokens": 8192,
+                  "block_size": 128,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": false,
+                  "async_scheduling": false,
+                  "seed": 0,
+                  "scheduling_policy": "fcfs",
+                  "distributed_executor_backend": "mp",
+                  "disable_custom_all_reduce": true,
+                  "trust_remote_code": false,
+                  "load_format": "auto",
+                  "enable_log_requests": false,
+                  "uvicorn_log_level": "info",
+                  "compilation_config": {
+                    "mode": 3,
+                    "cudagraph_mode": "FULL_DECODE_ONLY"
+                  },
+                  "cudagraph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "mtp_draft_tokens": 0,
+                  "expert_parallel": true,
+                  "prefix_caching": false,
+                  "graph_mode": "FULL_DECODE_ONLY",
+                  "graph_capture_sizes": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                  ],
+                  "dtype": "bfloat16",
+                  "kv_cache_dtype": "auto",
+                  "thinking": true,
+                  "checkpoint_revision": null,
+                  "checkpoint_identity_status": "unverified; candidate admission blocked",
+                  "runtime_base_commits": {
+                    "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+                    "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+                  },
+                  "runtime_versions": {
+                    "vllm": "0.23.0+empty",
+                    "vllm-ascend": "0.23.0.post1",
+                    "torch": "2.10.0+cpu",
+                    "torch_npu": "2.10.0.post4",
+                    "vllm-hust-ext": "0.2.0.dev0"
+                  },
+                  "cann_version": "9.1.0",
+                  "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
+                  "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "benchmark_source_dirty": true,
+                  "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
+                  "core_source_dirty": true,
+                  "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
+                  "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
+                  "physical_devices": [
+                    2,
+                    3
+                  ],
+                  "logical_rank_mapping_verified": false,
+                  "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
+                  "launch_environment": {
+                    "KV_MEMORY_FRACTION": "0.65",
+                    "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
+                    "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
+                    "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
+                    "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
+                    "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
+                  },
+                  "observed_max_prompt_tokens": 40244,
+                  "utility_victim": {
+                    "package_version": "0.1.0.dev2",
+                    "extension_id": "org.vllm-hust.utility-victim",
+                    "backend": "core-contract-v1",
+                    "kill_switch": false,
+                    "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
+                    "wheel_sha256": null,
+                    "source_revision": null,
+                    "patch_installed_events": 4,
+                    "runtime_effective_events": 1,
+                    "actual_kv_freed_verified": false
+                  },
+                  "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
+                }
+              },
+              "load": {
+                "concurrency": 16,
+                "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                "session_rotation_depth": 1,
+                "presentation_group": {
+                  "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+                  "label_en": "utility-victim ON (m65, r1)",
+                  "label_zh": "utility-victim ON（m65，r1）"
+                }
+              },
+              "metrics": {
+                "output_tps": 151.36777777777777,
+                "decode_p90_tps": 19.225105712074566,
+                "ttft_p95_ms": 6525.029728421941,
+                "tpot_ms": 95.54783752938495,
+                "tpot_p95_ms": 276.225097063596,
+                "e2e_p95_ms": 117480.76437716372,
+                "completed_requests": 296
+              },
+              "evidence": {
+                "status": "measured",
+                "execution_kind": "real-online",
+                "profile": "formal",
+                "sampling_date_utc": "2026-10-03",
+                "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
+                "measurement_seconds": 900,
+                "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
+                "run_ids": [
+                  "f531b2823fa540c787c59ab3c9042a4c"
+                ],
+                "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
+                "benchmark_protocol": {
+                  "protocol_id": "swe-prefix-reuse/v1",
+                  "campaign": "utility-victim-c1-c16-m65-20261003",
+                  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+                  "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+                  "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
+                  "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
+                }
+              }
             }
+
           ],
           "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
           "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
@@ -74355,1516 +75866,6 @@
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-off-tp2ep-m65-c1-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim OFF · TP2+EP · C1 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
-          },
-          "observed_max_prompt_tokens": 28638,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": true,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 0,
-            "runtime_effective_events": 0,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 1,
-        "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim OFF (m65, r1)",
-          "label_zh": "utility-victim OFF（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 39.44888888888889,
-        "decode_p90_tps": 44.01672571158207,
-        "ttft_p95_ms": 1876.0696141980588,
-        "tpot_ms": 23.415315015559788,
-        "tpot_p95_ms": 24.476748657783265,
-        "e2e_p95_ms": 40938.52128274739,
-        "completed_requests": 76
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "a68431af211c4dfa966d699bbb67a80f"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-off-tp2ep-m65-c2-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim OFF · TP2+EP · C2 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
-          },
-          "observed_max_prompt_tokens": 41173,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": true,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 0,
-            "runtime_effective_events": 0,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 2,
-        "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim OFF (m65, r1)",
-          "label_zh": "utility-victim OFF（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 66.35666666666667,
-        "decode_p90_tps": 40.63884881047793,
-        "ttft_p95_ms": 2515.3636655770238,
-        "tpot_ms": 27.433913574908537,
-        "tpot_p95_ms": 33.80421619957339,
-        "e2e_p95_ms": 44236.2772103399,
-        "completed_requests": 123
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "0fa2d4ced65a4a48acf03e648e1cc033"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-off-tp2ep-m65-c4-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim OFF · TP2+EP · C4 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
-          },
-          "observed_max_prompt_tokens": 41173,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": true,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 0,
-            "runtime_effective_events": 0,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 4,
-        "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim OFF (m65, r1)",
-          "label_zh": "utility-victim OFF（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 108.34,
-        "decode_p90_tps": 36.43808913504434,
-        "ttft_p95_ms": 2684.8208060488105,
-        "tpot_ms": 33.93599058781433,
-        "tpot_p95_ms": 45.33779106999587,
-        "e2e_p95_ms": 66866.30471558312,
-        "completed_requests": 178
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "16ec0ab723e04e169fb91a7d45e025b3"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-off-tp2ep-m65-c8-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim OFF · TP2+EP · C8 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
-          },
-          "observed_max_prompt_tokens": 55491,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": true,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 0,
-            "runtime_effective_events": 0,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 8,
-        "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim OFF (m65, r1)",
-          "label_zh": "utility-victim OFF（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 162.37555555555556,
-        "decode_p90_tps": 29.86863425386144,
-        "ttft_p95_ms": 2747.880484908819,
-        "tpot_ms": 46.04265476523217,
-        "tpot_p95_ms": 61.80716899400654,
-        "e2e_p95_ms": 87137.39985786378,
-        "completed_requests": 261
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "e856a1639261421fbb5249da76e14ee2"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-off-tp2ep-m65-c16-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim OFF · TP2+EP · C16 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "1"
-          },
-          "observed_max_prompt_tokens": 40244,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": true,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 0,
-            "runtime_effective_events": 0,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 16,
-        "concurrency_series": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim OFF (m65, r1)",
-          "label_zh": "utility-victim OFF（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 175.02444444444444,
-        "decode_p90_tps": 19.306774114946485,
-        "ttft_p95_ms": 9237.753272056578,
-        "tpot_ms": 81.31433718261185,
-        "tpot_p95_ms": 151.6934510881461,
-        "e2e_p95_ms": 110545.96144519743,
-        "completed_requests": 323
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "caaf91a4a6744d2287201b1f988733f5"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-on-tp2ep-m65-c1-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim ON · TP2+EP · C1 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [
-          "utility-victim"
-        ],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
-          },
-          "observed_max_prompt_tokens": 28638,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": false,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 4,
-            "runtime_effective_events": 0,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 1,
-        "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim ON (m65, r1)",
-          "label_zh": "utility-victim ON（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 40.31444444444445,
-        "decode_p90_tps": 45.72131300746206,
-        "ttft_p95_ms": 1889.361854456365,
-        "tpot_ms": 22.617200941725233,
-        "tpot_p95_ms": 23.724104080086807,
-        "e2e_p95_ms": 39593.18858180195,
-        "completed_requests": 77
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "36ca7c81453242d1a3b86200bceb2c58"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-on-tp2ep-m65-c2-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim ON · TP2+EP · C2 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [
-          "utility-victim"
-        ],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
-          },
-          "observed_max_prompt_tokens": 41173,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": false,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 4,
-            "runtime_effective_events": 0,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 2,
-        "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim ON (m65, r1)",
-          "label_zh": "utility-victim ON（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 66.41,
-        "decode_p90_tps": 40.70811308167541,
-        "ttft_p95_ms": 2534.284984599799,
-        "tpot_ms": 27.545299048446843,
-        "tpot_p95_ms": 34.54315565647445,
-        "e2e_p95_ms": 42096.980458591126,
-        "completed_requests": 123
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "a392a568ce414aacbe095513af17a695"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-on-tp2ep-m65-c4-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim ON · TP2+EP · C4 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [
-          "utility-victim"
-        ],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
-          },
-          "observed_max_prompt_tokens": 41173,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": false,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 4,
-            "runtime_effective_events": 0,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 4,
-        "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim ON (m65, r1)",
-          "label_zh": "utility-victim ON（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 107.70333333333333,
-        "decode_p90_tps": 36.11086415643278,
-        "ttft_p95_ms": 2657.152462936938,
-        "tpot_ms": 34.04127940929769,
-        "tpot_p95_ms": 45.76941615061608,
-        "e2e_p95_ms": 69807.15419165787,
-        "completed_requests": 177
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "e579a951e31746ceb0b734120305bf60"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-on-tp2ep-m65-c8-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim ON · TP2+EP · C8 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [
-          "utility-victim"
-        ],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
-          },
-          "observed_max_prompt_tokens": 55491,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": false,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 4,
-            "runtime_effective_events": 0,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 8,
-        "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim ON (m65, r1)",
-          "label_zh": "utility-victim ON（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 158.6211111111111,
-        "decode_p90_tps": 28.123006870416283,
-        "ttft_p95_ms": 2713.216918054968,
-        "tpot_ms": 47.647987679767226,
-        "tpot_p95_ms": 63.33724739846237,
-        "e2e_p95_ms": 88615.23441085592,
-        "completed_requests": 256
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "f7ca8a0ad2cf4a84a031997347e124ba"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
-      }
-    },
-    {
-      "id": "qwen35-utility-victim-on-tp2ep-m65-c16-r1-20261003",
-      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "label": "utility-victim ON · TP2+EP · C16 · r1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.23.0+empty / 0.23.0.post1",
-        "mods": [
-          "utility-victim"
-        ],
-        "hardware": {
-          "label": "Ascend 910B2",
-          "accelerator_count": 2
-        },
-        "context_capacity_tokens": 262144,
-        "parameters": {
-          "tensor_parallel_size": 2,
-          "pipeline_parallel_size": 1,
-          "data_parallel_size": 1,
-          "max_model_len": 262144,
-          "gpu_memory_utilization": 0.65,
-          "max_num_seqs": 16,
-          "max_num_batched_tokens": 8192,
-          "block_size": 128,
-          "enable_chunked_prefill": true,
-          "enforce_eager": false,
-          "async_scheduling": false,
-          "seed": 0,
-          "scheduling_policy": "fcfs",
-          "distributed_executor_backend": "mp",
-          "disable_custom_all_reduce": true,
-          "trust_remote_code": false,
-          "load_format": "auto",
-          "enable_log_requests": false,
-          "uvicorn_log_level": "info",
-          "compilation_config": {
-            "mode": 3,
-            "cudagraph_mode": "FULL_DECODE_ONLY"
-          },
-          "cudagraph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "mtp_draft_tokens": 0,
-          "expert_parallel": true,
-          "prefix_caching": false,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "graph_capture_sizes": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ],
-          "dtype": "bfloat16",
-          "kv_cache_dtype": "auto",
-          "thinking": true,
-          "checkpoint_revision": null,
-          "checkpoint_identity_status": "unverified; candidate admission blocked",
-          "runtime_base_commits": {
-            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
-          },
-          "runtime_versions": {
-            "vllm": "0.23.0+empty",
-            "vllm-ascend": "0.23.0.post1",
-            "torch": "2.10.0+cpu",
-            "torch_npu": "2.10.0.post4",
-            "vllm-hust-ext": "0.2.0.dev0"
-          },
-          "cann_version": "9.1.0",
-          "cann_version_scope": "Installed component receipts and inspected shell environment; loaded server library identity unverified",
-          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "benchmark_source_dirty": true,
-          "benchmark_diff_sha256": "c7390ce6483cfc87f27f0266cdeec14b56f026e32abc1aaf442a12c100bf7388",
-          "core_source_dirty": true,
-          "core_scheduler_diff_sha256": "63d9d41fd6b1f067496b66c715d5ad96690240ad1a94816495d9fd0f5bc63964",
-          "installed_scheduler_sha256": "09d5813b77dccac854c013c2e913ea8f5d2484bd5f1f6d0a421e4908d0d0ea6a",
-          "physical_devices": [
-            2,
-            3
-          ],
-          "logical_rank_mapping_verified": false,
-          "launch_command_redacted": "vllm-hust-ext run -- vllm serve <MODEL_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.65 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --no-async-scheduling --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config \\{\\\"mode\\\":3\\,\\\"cudagraph_mode\\\":\\\"FULL_DECODE_ONLY\\\"\\} --cudagraph-capture-sizes 1 2 4 8 16",
-          "launch_environment": {
-            "KV_MEMORY_FRACTION": "0.65",
-            "VLLM_HUST_UTILITY_VICTIM_ENABLE": "1",
-            "VLLM_HUST_UTILITY_VICTIM_BACKEND": "core-contract-v1",
-            "VLLM_HUST_UTILITY_VICTIM_EVIDENCE": "1",
-            "VLLM_ASCEND_BALANCE_SCHEDULING": "0",
-            "VLLM_HUST_UTILITY_VICTIM_KILL_SWITCH": "0"
-          },
-          "observed_max_prompt_tokens": 40244,
-          "utility_victim": {
-            "package_version": "0.1.0.dev2",
-            "extension_id": "org.vllm-hust.utility-victim",
-            "backend": "core-contract-v1",
-            "kill_switch": false,
-            "installed_files_manifest_sha256": "a82011aefe70c75fbce3f6b7cbf5085684e77493e855ce6db55d9100514afee8",
-            "wheel_sha256": null,
-            "source_revision": null,
-            "patch_installed_events": 4,
-            "runtime_effective_events": 1,
-            "actual_kv_freed_verified": false
-          },
-          "warmup_policy": "Separate 20s probe precedes formal window; server log paired by supplied filename, continuous server ownership not independently proven"
-        }
-      },
-      "load": {
-        "concurrency": 16,
-        "concurrency_series": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-        "session_rotation_depth": 1,
-        "presentation_group": {
-          "id": "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-          "label_en": "utility-victim ON (m65, r1)",
-          "label_zh": "utility-victim ON（m65，r1）"
-        }
-      },
-      "metrics": {
-        "output_tps": 151.36777777777777,
-        "decode_p90_tps": 19.225105712074566,
-        "ttft_p95_ms": 6525.029728421941,
-        "tpot_ms": 95.54783752938495,
-        "tpot_p95_ms": 276.225097063596,
-        "e2e_p95_ms": 117480.76437716372,
-        "completed_requests": 296
-      },
-      "evidence": {
-        "status": "measured",
-        "execution_kind": "real-online",
-        "profile": "formal",
-        "sampling_date_utc": "2026-10-03",
-        "sampling_date_source": "Client config.started_at_unix converted to UTC; host clock not independently verified",
-        "measurement_seconds": 900,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-UTILITY-VICTIM-CURVES.md",
-        "run_ids": [
-          "f531b2823fa540c787c59ab3c9042a4c"
-        ],
-        "aggregation": "One unpooled 900s observation; drain excluded from latency samples; no repeat uncertainty estimate",
-        "benchmark_protocol": {
-          "protocol_id": "swe-prefix-reuse/v1",
-          "campaign": "utility-victim-c1-c16-m65-20261003",
-          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
-          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8",
-          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
-        }
       }
     }
   ],
