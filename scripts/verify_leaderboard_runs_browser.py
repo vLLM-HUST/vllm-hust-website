@@ -178,7 +178,9 @@ def main():
             page.locator("#column-values input").check()
             page.locator("#column-apply").click()
             assert page.locator(".run-row").count() == min(40, total_runs)
-            assert "Leaderboards" in page.locator("#view-runs").inner_text()
+            assert ("成绩主表" if language == "zh" else "Measurements") in page.locator(
+                "#view-runs"
+            ).inner_text()
             assert "Tasks" in page.locator("#view-tasks").inner_text()
             assert page.locator("#view-runs-count").inner_text() == str(total_runs)
             assert page.locator("#view-tasks-count").inner_text() == "8"
