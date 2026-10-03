@@ -85,10 +85,11 @@ def main():
             assert group.locator('[data-nav-page="leaderboard-v2"]').count() == 1
             assert (
                 page.locator('.site-nav a[href="./dataset-validation.html"]').count()
-                == 0
+                == 1
             )
+            assert page.locator('.site-nav a[href="./leaderboard.html"]').count() == 1
             assert nav.text_content().strip() == (
-                "性能排行榜" if language == "zh" else "Leaderboard"
+                "性能曲线" if language == "zh" else "Performance curves"
             )
             assert nav.get_attribute("href") == "./leaderboard-runs.html"
             assert "active" in nav.get_attribute("class")
