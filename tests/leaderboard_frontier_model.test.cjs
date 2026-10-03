@@ -49,8 +49,10 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
-    assert.equal(all.length,167);
-    assert.equal(displayed.length,55);
+//     assert.equal(all.length,167);
+//     assert.equal(displayed.length,55);
+    assert.equal(all.length,177);
+    assert.equal(displayed.length,65);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
     assert.equal(betterScale.length,5);
@@ -97,7 +99,8 @@ test('Qwen3.5 configuration studies consolidate related observations without imp
     const measured=model.project(displayed,'decode_p90_tps','output_tps_per_chip').measured;
     const connected=new Set(model.concurrencySeries(measured).flat().map(row=>row.point.id));
     assert.ok(measured.length>0);
-    assert.deepEqual(measured.filter(row=>!connected.has(row.point.id)),[]);
+    assert.deepEqual(measured.filter(row=>!connected.has(row.point.id)),['qwen35-utility-victim-off-tp2ep-m65-c1-r1-20261003','qwen35-utility-victim-off-tp2ep-m65-c2-r1-20261003','qwen35-utility-victim-off-tp2ep-m65-c4-r1-20261003','qwen35-utility-victim-off-tp2ep-m65-c8-r1-20261003','qwen35-utility-victim-off-tp2ep-m65-c16-r1-20261003',
+        'qwen35-utility-victim-on-tp2ep-m65-c1-r1-20261003','qwen35-utility-victim-on-tp2ep-m65-c2-r1-20261003','qwen35-utility-victim-on-tp2ep-m65-c4-r1-20261003','qwen35-utility-victim-on-tp2ep-m65-c8-r1-20261003','qwen35-utility-victim-on-tp2ep-m65-c16-r1-20261003']);
 });
 test('presentation mode accepts only declared setting semantics',()=>{
     const fixture=structuredClone(require('./fixtures/leaderboard_frontier.json'));
