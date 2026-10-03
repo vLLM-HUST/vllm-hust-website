@@ -666,7 +666,14 @@ def main():
             page.locator("#view-tasks").click()
             assert page.locator("#tasks-panel").is_visible()
             page.locator("#view-frontier").click()
-            assert page.locator("table:visible").count() == 0
+            assert page.locator("#runs-panel table:visible").count() == 0
+            assert page.locator("#tasks-panel table:visible").count() == 0
+            assert (
+                page.locator(
+                    "#frontier-agent-qualifications .agent-qualification-table:visible"
+                ).count()
+                == 1
+            )
             page.locator("#langToggle").click()
             assert not page.locator("#frontier-only").is_checked()
             assert page.locator(".frontier-point").count() == len(default_points)
