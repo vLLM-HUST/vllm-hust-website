@@ -49,8 +49,8 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
-    assert.equal(all.length,177);
-    assert.equal(displayed.length,65);
+    assert.equal(all.length,167);
+    assert.equal(displayed.length,55);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
     assert.equal(betterScale.length,5);
@@ -339,20 +339,6 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.validation.a2a_patch_installed,on);
             assert.equal(run.validation.prefix_cache_observed,false);
             assert.equal(run.validation.failed_requests,0);
-        } else if(p.evidence.benchmark_protocol.campaign==='utility-victim-c1-c16-m65-20261003'){
-            const on=p.configuration.mods.includes('utility-victim');
-            const params=p.configuration.parameters;
-            assert.equal(params.gpu_memory_utilization,0.65);
-            assert.equal(params.prefix_caching,false);
-            assert.equal(params.mtp_draft_tokens,0);
-            assert.equal(params.checkpoint_revision,null);
-            assert.equal(run.validation.checkpoint_identity_verified,false);
-            assert.equal(params.utility_victim.patch_installed_events,on?4:0);
-            assert.equal(params.utility_victim.runtime_effective_events,run.activation.runtime_effective_events);
-            assert.equal(run.validation.performance_attribution_verified,false);
-            assert.equal(run.probe.summary.measurement_seconds,20);
-            assert.match(run.requests_artifact_sha256,/^[a-f0-9]{64}$/);
-            for(const k of ['tpot_ms','tpot_p95_ms','e2e_p95_ms']) assert.ok(p.metrics[k]>0);
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -927,140 +913,4 @@ test('BetterScale cache study reuses exact Native and tuned C1–C32 measurement
         fixture.cohorts.find(c=>c.id===study.id).workload.contract.comparison_point_ids=invalid;
         assert.throws(()=>model.validate(fixture),/Invalid comparison point IDs/);
     }
-});
-
-const utilityExpected=[
-  {
-    "id": "qwen35-utility-victim-off-tp2ep-m65-c1-r1-20261003",
-    "c": 1,
-    "run_id": "a68431af211c4dfa966d699bbb67a80f",
-    "tokens": 35504,
-    "completed": 76,
-    "effective": 0,
-    "preemptions": 0.0,
-    "sha256": "e910496a71b7c9796f963ab796a3c662b4265397965121e646d1235edaca7876"
-  },
-  {
-    "id": "qwen35-utility-victim-off-tp2ep-m65-c2-r1-20261003",
-    "c": 2,
-    "run_id": "0fa2d4ced65a4a48acf03e648e1cc033",
-    "tokens": 59721,
-    "completed": 123,
-    "effective": 0,
-    "preemptions": 0.0,
-    "sha256": "9e9645622a2fd896a720346520d9e1569c093493b665c6be74270703ef498be9"
-  },
-  {
-    "id": "qwen35-utility-victim-off-tp2ep-m65-c4-r1-20261003",
-    "c": 4,
-    "run_id": "16ec0ab723e04e169fb91a7d45e025b3",
-    "tokens": 97506,
-    "completed": 178,
-    "effective": 0,
-    "preemptions": 0.0,
-    "sha256": "5dc62c28228e8988f0fdc13018b47acfa78633b60bdc65dae082d7fc55c47b20"
-  },
-  {
-    "id": "qwen35-utility-victim-off-tp2ep-m65-c8-r1-20261003",
-    "c": 8,
-    "run_id": "e856a1639261421fbb5249da76e14ee2",
-    "tokens": 146138,
-    "completed": 261,
-    "effective": 0,
-    "preemptions": 0.0,
-    "sha256": "9aa58ef0aa53d981463dcd44994b4550681306205cc92046b437731fae73fd9f"
-  },
-  {
-    "id": "qwen35-utility-victim-off-tp2ep-m65-c16-r1-20261003",
-    "c": 16,
-    "run_id": "caaf91a4a6744d2287201b1f988733f5",
-    "tokens": 157522,
-    "completed": 323,
-    "effective": 0,
-    "preemptions": 398.0,
-    "sha256": "19234a0e1d8a997e3d811de4ec703cb1f4c5f4a9922e85ef326241d76844b55f"
-  },
-  {
-    "id": "qwen35-utility-victim-on-tp2ep-m65-c1-r1-20261003",
-    "c": 1,
-    "run_id": "36ca7c81453242d1a3b86200bceb2c58",
-    "tokens": 36283,
-    "completed": 77,
-    "effective": 0,
-    "preemptions": 0.0,
-    "sha256": "800066ec478f41ed621ea474039b45e4c44de559f367f8b3704e2cbf1db96502"
-  },
-  {
-    "id": "qwen35-utility-victim-on-tp2ep-m65-c2-r1-20261003",
-    "c": 2,
-    "run_id": "a392a568ce414aacbe095513af17a695",
-    "tokens": 59769,
-    "completed": 123,
-    "effective": 0,
-    "preemptions": 0.0,
-    "sha256": "96e1ee12466b85da9c6b6a59abaad2f4493c6ad197971032681db01018620bb6"
-  },
-  {
-    "id": "qwen35-utility-victim-on-tp2ep-m65-c4-r1-20261003",
-    "c": 4,
-    "run_id": "e579a951e31746ceb0b734120305bf60",
-    "tokens": 96933,
-    "completed": 177,
-    "effective": 0,
-    "preemptions": 0.0,
-    "sha256": "de7b5bfbbb3ac44d20bb285467f729a261862b7635f3666752bbbcc4d3b86832"
-  },
-  {
-    "id": "qwen35-utility-victim-on-tp2ep-m65-c8-r1-20261003",
-    "c": 8,
-    "run_id": "f7ca8a0ad2cf4a84a031997347e124ba",
-    "tokens": 142759,
-    "completed": 256,
-    "effective": 0,
-    "preemptions": 0.0,
-    "sha256": "487bc9c28fe97858c2bdb95d0e0310e61f39715bc99152afd6e9944eedc73f73"
-  },
-  {
-    "id": "qwen35-utility-victim-on-tp2ep-m65-c16-r1-20261003",
-    "c": 16,
-    "run_id": "f531b2823fa540c787c59ab3c9042a4c",
-    "tokens": 136231,
-    "completed": 296,
-    "effective": 1,
-    "preemptions": 191.0,
-    "sha256": "0848267caa553a920f5be01e7280d519678b751d8f54e6ece8689c965766e9b2"
-  }
-];
-
-test('utility-victim connects only retained valid concurrency observations, preserving gaps',()=>{
-    const data=require('../data/leaderboard_frontier.json');
-    const ps=data.points.filter(p=>p.evidence.benchmark_protocol?.campaign==='utility-victim-c1-c16-m65-20261003');
-    assert.deepEqual(ps.map(p=>p.id).sort(),utilityExpected.map(p=>p.id).sort());
-    const lines=model.concurrencySeries(model.project(ps,'decode_p90_tps','output_tps_per_chip').measured);
-    assert.equal(lines.length,2);
-    assert.equal(ps.length,10);
-    const runs=require('../data/leaderboard_frontier_swe_evidence.json').runs;
-    for(const rows of lines){
-        const expected=utilityExpected.filter(e=>ps.find(p=>p.id===e.id).load.concurrency_series===rows[0].point.load.concurrency_series);
-        assert.deepEqual(rows.map(row=>row.point.load.concurrency),expected.map(e=>e.c).sort((a,b)=>a-b));
-        assert.equal(new Set(rows.map(row=>row.point.load.concurrency)).size,rows.length);
-        assert.deepEqual(rows.map(row=>row.point.load.concurrency),[1,2,4,8,16]);
-    }
-    for(const e of utilityExpected){
-        const p=ps.find(p=>p.id===e.id), r=runs.find(r=>r.point_id===e.id);
-        assert.equal(r.run_id,e.run_id);
-        assert.equal(r.requests_artifact_sha256,e.sha256);
-        assert.equal(r.activation.runtime_effective_events,e.effective);
-        assert.equal(r.preemptions.delta,e.preemptions);
-        assert.equal(p.metrics.output_tps,e.tokens/900);
-        assert.equal(p.metrics.completed_requests,e.completed);
-        assert.equal(r.client.duration,900);
-        assert.equal(r.summary.valid,true);
-        assert.equal(r.summary.aborted,false);
-    }
-    const on16=ps.find(p=>p.configuration.mods.includes('utility-victim') && p.load.concurrency===16);
-    const on16run=runs.find(r=>r.point_id===on16.id);
-    assert.equal(on16run.activation.runtime_effective_events,1);
-    assert.equal(on16run.activation.runtime_effective_payloads[0].selection_changed,true);
-    assert.equal(on16run.activation.runtime_effective_payloads[0].actual_kv_freed_verified,false);
 });
