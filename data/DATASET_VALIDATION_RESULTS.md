@@ -30,6 +30,14 @@ The production `dataset_validation_v1.b0.json` imports the B0 screenshots suppli
 archive. Its archive SHA-256 and screenshot path are retained per cell. Preparation instructions are
 not measurements: datasets without a benchmark-result screenshot remain `not_tested`.
 
+`candidate_search` records each completed B1 evidence audit. A near match is not a B1 value: changes
+to model, hardware, precision, dataset materialization, endpoint, arrival policy, execution mode, or
+metric definition make the result ineligible for the corresponding cell. The 2026-10-03 audit of the
+benchmark snapshots, result-bearing remote branches, and A1-A4 handoff found no eligible B1 cell. In
+particular, the available ShareGPT and Sonnet results use different online/offline or arrival
+contracts, while the available InstructCoder result also uses the Coder model. Those measurements
+remain in their original leaderboard contexts and are not copied into this matrix.
+
 The checked-in `data/dataset_validation_v1.empty.json` file is a schema-shaped empty fixture for
 local UI development. It is not a benchmark result and must be replaced by a signed or otherwise
 authenticated service artifact before production ingestion is enabled. For visual smoke testing

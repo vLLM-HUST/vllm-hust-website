@@ -29,6 +29,17 @@ test('B1 selection is per cell and keeps unmatched datasets empty', () => {
     assert.equal(longbench.baseline_value, 98);
 });
 
+test('B1 audit rejects near matches instead of populating incomparable cells', () => {
+    assert.equal(DATA.candidate_search.audited_at, '2026-10-03');
+    assert.equal(DATA.candidate_search.eligible_cells, 0);
+    assert.equal(DATA.candidate_search.rejected_near_matches.length, 4);
+    assert.deepEqual(
+        new Set(DATA.candidate_search.rejected_near_matches.map((item) => item.dataset_id)),
+        new Set(['sharegpt-v3', 'sonnet', 'instructcoder'])
+    );
+    assert.ok(DATA.results.every((cell) => cell.value === null));
+});
+
 test('Dataset Validation loads the B0 import rather than the empty fixture', () => {
     const page = fs.readFileSync(path.join(ROOT, 'dataset-validation.html'), 'utf8');
     assert.match(page, /dataset_validation_v1\.b0\.json/);

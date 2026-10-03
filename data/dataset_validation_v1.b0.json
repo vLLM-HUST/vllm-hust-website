@@ -22,6 +22,47 @@
     "single_version_required": false,
     "rule": "Each B1 cell may select a different engine version; provenance is mandatory and comparison settings must match B0."
   },
+  "candidate_search": {
+    "audited_at": "2026-10-03",
+    "eligible_cells": 0,
+    "sources": [
+      {
+        "repository": "vLLM-HUST/vllm-hust-benchmark",
+        "commit": "47c12e518a9188bb714bb6193d00260a7741841b",
+        "scope": "canonical single-GPU, historical, comparison, and multi-GPU snapshots"
+      },
+      {
+        "repository": "vLLM-HUST/vllm-hust-benchmark",
+        "scope": "remote result-bearing branches and submission paths"
+      },
+      {
+        "repository": "vLLM-HUST/vllm-hust-dev-hub",
+        "scope": "A1-A4 registry, evaluation handoff, and public result references"
+      }
+    ],
+    "rejected_near_matches": [
+      {
+        "dataset_id": "sharegpt-v3",
+        "candidate_workload": "sharegpt-online",
+        "reason": "Candidate uses request_rate=1 and the completions endpoint; B0 uses request_rate=inf and the chat-completions endpoint."
+      },
+      {
+        "dataset_id": "sharegpt-v3",
+        "candidate_workload": "sharegpt-throughput",
+        "reason": "Candidate is an offline throughput run and does not provide the matching online latency measurements."
+      },
+      {
+        "dataset_id": "sonnet",
+        "candidate_workload": "sonnet-throughput",
+        "reason": "Candidate is an offline throughput run; B0 is an online chat-completions run."
+      },
+      {
+        "dataset_id": "instructcoder",
+        "candidate_workload": "instructcoder-online",
+        "reason": "Candidate uses Qwen2.5-Coder-14B-Instruct, request_rate=1, and the completions endpoint; B0 uses Qwen2.5-14B-Instruct, request_rate=inf, and chat completions."
+      }
+    ]
+  },
   "scenario": {
     "id": "acceptance-v4.6-home-b0-import",
     "label": "V4.6 A1-A4 · B0 archive import",
@@ -2433,6 +2474,6 @@
     "B0 values are transcribed from the 28 benchmark-result screenshots present in the Home archive.",
     "The other 16 registered datasets have preparation material but no benchmark-result screenshot in the archive.",
     "The screenshots report mean and P99 latency, not P95; this publication uses only the explicitly reported mean latency fields.",
-    "B1 remains empty until a matching compliant candidate result is selected independently for each cell."
+    "The 2026-10-03 candidate audit found no B1 result matching the B0 model, hardware, precision, dataset, workload, endpoint, arrival policy, and metric definition."
   ]
 }
