@@ -11,18 +11,27 @@ HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -> None:
     for label in ("navProducts", "navEngine", "navProjects", "navPlugins"):
         assert label in SITE_JS
-    assert "pages: ['leaderboard', 'leaderboard-v2', 'achievements', 'news']" in SITE_JS
+    assert (
+        "pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', "
+        "'achievements', 'news']" in SITE_JS
+    )
     assert "['leaderboard-v2', './leaderboard-runs.html', 'navLeaderboard']" in SITE_JS
+    assert (
+        "['dataset-validation', './dataset-validation.html', "
+        "'navDatasetValidation']" in SITE_JS
+    )
     assert "pages: ['members', 'contributors', 'conferences', 'courses']" in SITE_JS
     assert "pages: ['versions', 'issues']" in SITE_JS
     assert '<details class="nav-group"' in SITE_JS
 
 
-def test_empty_dataset_validation_is_not_in_shared_navigation() -> None:
+def test_published_dataset_validation_is_in_shared_navigation() -> None:
     assert (
         'href="./dataset-validation.html" data-i18n-common="navDatasetValidation"'
-        not in SITE_JS
+        in SITE_JS
     )
+    assert "navDatasetValidation: 'Dataset Validation'" in SITE_JS
+    assert "navDatasetValidation: '数据集验证'" in SITE_JS
     assert "navLeaderboardV2" not in SITE_JS
 
 

@@ -1,10 +1,10 @@
 (function () {
     const DEFAULT_DATA_URL = './data/dataset_validation_v1.empty.json';
-    const STATUS_ORDER = ['not_tested', 'queued', 'running', 'passed', 'failed', 'not_applicable'];
+    const STATUS_ORDER = ['not_tested', 'baseline_only', 'queued', 'running', 'passed', 'failed', 'not_applicable'];
     const TREND_ORDER = ['improved', 'regressed', 'unchanged', 'not_comparable'];
     const STATUS_LABELS = {
-        en: { not_tested: 'Not tested', queued: 'Queued', running: 'Running', passed: 'Passed', failed: 'Failed', not_applicable: 'N/A' },
-        zh: { not_tested: '未测试', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
+        en: { not_tested: 'Not tested', baseline_only: 'B0 only', queued: 'Queued', running: 'Running', passed: 'Passed', failed: 'Failed', not_applicable: 'N/A' },
+        zh: { not_tested: '未测试', baseline_only: '仅 B0', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
     };
     const TEXT = {
         en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
@@ -80,7 +80,7 @@
         return {
             model: cell.model || data.scenario?.model || t('notProvided'),
             hardware: cell.hardware || data.scenario?.hardware || t('notProvided'),
-            provenance: provenance.job_url || provenance.artifact || data.source?.artifact_url || t('notProvided'),
+            provenance: provenance.job_url || provenance.screenshot || provenance.artifact || data.source?.artifact_url || t('notProvided'),
         };
     }
 
@@ -106,7 +106,7 @@
         $('validation-stat-total').textContent = cells.length;
         $('validation-stat-passed').textContent = counts.passed;
         $('validation-stat-failed').textContent = counts.failed;
-        $('validation-stat-pending').textContent = counts.not_tested + counts.queued + counts.running;
+        $('validation-stat-pending').textContent = counts.not_tested + counts.baseline_only + counts.queued + counts.running;
     }
 
     function renderMatrix() {

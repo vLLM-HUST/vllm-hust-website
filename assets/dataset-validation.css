@@ -330,6 +330,11 @@
     background: #f1f5f9;
 }
 
+.validation-status--baseline_only {
+    color: #075985;
+    background: #e0f2fe;
+}
+
 .validation-status--running {
     color: #1d4ed8;
     background: #dbeafe;
