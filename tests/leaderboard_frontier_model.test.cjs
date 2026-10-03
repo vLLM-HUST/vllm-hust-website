@@ -938,7 +938,7 @@ const utilityExpected=[
     "completed": 76,
     "effective": 0,
     "preemptions": 0.0,
-    "sha256": "e910496a71b7c9796f963ab796a3c662b4265397965121e646d1235edaca7876"
+    "sha256": "e910496a71b7c9796f963ab796a3c662b4265397965121e646d1235edaca7876"// pragma: allowlist secret (request artifact SHA256 checksum)
   },
   {
     "id": "qwen35-utility-victim-off-tp2ep-m65-c2-r1-20261003",
@@ -948,7 +948,7 @@ const utilityExpected=[
     "completed": 123,
     "effective": 0,
     "preemptions": 0.0,
-    "sha256": "9e9645622a2fd896a720346520d9e1569c093493b665c6be74270703ef498be9"
+    "sha256": "9e9645622a2fd896a720346520d9e1569c093493b665c6be74270703ef498be9"// pragma: allowlist secret (request artifact SHA256 checksum)
   },
   {
     "id": "qwen35-utility-victim-off-tp2ep-m65-c4-r1-20261003",
@@ -958,7 +958,7 @@ const utilityExpected=[
     "completed": 178,
     "effective": 0,
     "preemptions": 0.0,
-    "sha256": "5dc62c28228e8988f0fdc13018b47acfa78633b60bdc65dae082d7fc55c47b20"
+    "sha256": "5dc62c28228e8988f0fdc13018b47acfa78633b60bdc65dae082d7fc55c47b20"// pragma: allowlist secret (request artifact SHA256 checksum)
   },
   {
     "id": "qwen35-utility-victim-off-tp2ep-m65-c8-r1-20261003",
@@ -968,7 +968,7 @@ const utilityExpected=[
     "completed": 261,
     "effective": 0,
     "preemptions": 0.0,
-    "sha256": "9aa58ef0aa53d981463dcd44994b4550681306205cc92046b437731fae73fd9f"
+    "sha256": "9aa58ef0aa53d981463dcd44994b4550681306205cc92046b437731fae73fd9f"// pragma: allowlist secret (request artifact SHA256 checksum)
   },
   {
     "id": "qwen35-utility-victim-off-tp2ep-m65-c16-r1-20261003",
@@ -978,7 +978,7 @@ const utilityExpected=[
     "completed": 323,
     "effective": 0,
     "preemptions": 398.0,
-    "sha256": "19234a0e1d8a997e3d811de4ec703cb1f4c5f4a9922e85ef326241d76844b55f"
+    "sha256": "19234a0e1d8a997e3d811de4ec703cb1f4c5f4a9922e85ef326241d76844b55f"// pragma: allowlist secret (request artifact SHA256 checksum)
   },
   {
     "id": "qwen35-utility-victim-on-tp2ep-m65-c1-r1-20261003",
@@ -988,7 +988,7 @@ const utilityExpected=[
     "completed": 77,
     "effective": 0,
     "preemptions": 0.0,
-    "sha256": "800066ec478f41ed621ea474039b45e4c44de559f367f8b3704e2cbf1db96502"
+    "sha256": "800066ec478f41ed621ea474039b45e4c44de559f367f8b3704e2cbf1db96502"// pragma: allowlist secret (request artifact SHA256 checksum)
   },
   {
     "id": "qwen35-utility-victim-on-tp2ep-m65-c2-r1-20261003",
@@ -998,7 +998,7 @@ const utilityExpected=[
     "completed": 123,
     "effective": 0,
     "preemptions": 0.0,
-    "sha256": "96e1ee12466b85da9c6b6a59abaad2f4493c6ad197971032681db01018620bb6"
+    "sha256": "96e1ee12466b85da9c6b6a59abaad2f4493c6ad197971032681db01018620bb6"// pragma: allowlist secret (request artifact SHA256 checksum)
   },
   {
     "id": "qwen35-utility-victim-on-tp2ep-m65-c4-r1-20261003",
@@ -1008,7 +1008,7 @@ const utilityExpected=[
     "completed": 177,
     "effective": 0,
     "preemptions": 0.0,
-    "sha256": "de7b5bfbbb3ac44d20bb285467f729a261862b7635f3666752bbbcc4d3b86832"
+    "sha256": "de7b5bfbbb3ac44d20bb285467f729a261862b7635f3666752bbbcc4d3b86832"// pragma: allowlist secret (request artifact SHA256 checksum)
   },
   {
     "id": "qwen35-utility-victim-on-tp2ep-m65-c8-r1-20261003",
@@ -1018,7 +1018,7 @@ const utilityExpected=[
     "completed": 256,
     "effective": 0,
     "preemptions": 0.0,
-    "sha256": "487bc9c28fe97858c2bdb95d0e0310e61f39715bc99152afd6e9944eedc73f73"
+    "sha256": "487bc9c28fe97858c2bdb95d0e0310e61f39715bc99152afd6e9944eedc73f73"// pragma: allowlist secret (request artifact SHA256 checksum)
   },
   {
     "id": "qwen35-utility-victim-on-tp2ep-m65-c16-r1-20261003",
@@ -1028,7 +1028,7 @@ const utilityExpected=[
     "completed": 296,
     "effective": 1,
     "preemptions": 191.0,
-    "sha256": "0848267caa553a920f5be01e7280d519678b751d8f54e6ece8689c965766e9b2"
+    "sha256": "0848267caa553a920f5be01e7280d519678b751d8f54e6ece8689c965766e9b2"// pragma: allowlist secret (request artifact SHA256 checksum)
   }
 ];
 
