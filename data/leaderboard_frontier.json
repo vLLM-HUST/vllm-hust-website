@@ -78,6 +78,12 @@
               "transformers": "5.18.0",
               "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
               "equivalence": "Replacing tokenizer.path with /workspace/models/Qwen3.5-35B-A3B, tokenizer.transformers with 5.17.0 and tokenizer.fingerprint with the canonical value reconstructs original 8044561f SHA256 exactly, so sessions, input-token deltas, output budgets and order are byte-identical. The local tokenizer backend+chat-template fingerprint itself differs (tokenizer.json/tokenizer_config.json on that host were modified after download); tokenizer identity is therefore NOT independently verified equal."
+            },
+            {
+              "sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+              "transformers": "5.18.0",
+              "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+              "equivalence": "Replacing tokenizer.path with /workspace/models/Qwen3.5-35B-A3B, tokenizer.transformers with 5.17.0, and tokenizer.fingerprint with the canonical value reconstructs 8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85 exactly; token IDs, output budgets, session order, and source identity are unchanged."
             }
           ],
           "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
@@ -105,7 +111,9 @@
             "swe-unified-pegaflow-vllm-connectors-20260929",
             "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
             "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-            "swe-utility-victim-on-tp2ep-m65-r1-20261003"
+            "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+            "swe-op01-ascend-boundary-off-tp2ep-20261004",
+            "swe-op01-ascend-boundary-on-tp2ep-20261004"
           ],
           "display_group_labels": {
             "betterscale": {
@@ -75865,6 +75873,1288 @@
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9"
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1"
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-off-tp2ep-c1-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary OFF · TP2+EP · C1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 41173,
+          "measured_mean_client_inflight": 0.9996221731541057,
+          "full_client_concurrency_fraction": 0.9996221731541057,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-off-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-off-tp2ep-20261004",
+          "label_en": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 49.11333333333334,
+        "decode_p90_tps": 60.16220045042456,
+        "ttft_p95_ms": 2493.1142549961805,
+        "tpot_ms": 17.60083252507722,
+        "tpot_p95_ms": 18.673206767565414,
+        "e2e_p95_ms": 26264.8237973451,
+        "completed_requests": 97
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "0cd5def13501424aa2f5a3453fa19e90"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-off-tp2ep-c2-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary OFF · TP2+EP · C2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 49428,
+          "measured_mean_client_inflight": 1.9993401299479108,
+          "full_client_concurrency_fraction": 0.9993403408262465,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-off-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-off-tp2ep-20261004",
+          "label_en": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 89.03777777777778,
+        "decode_p90_tps": 58.89392248254317,
+        "ttft_p95_ms": 3095.263903401792,
+        "tpot_ms": 20.048936849416187,
+        "tpot_p95_ms": 26.956510804639734,
+        "e2e_p95_ms": 40710.85131457072,
+        "completed_requests": 142
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "5c3ea5afd5cd48729dcffba000cff25d"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-off-tp2ep-c4-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary OFF · TP2+EP · C4",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 52505,
+          "measured_mean_client_inflight": 3.998795450412565,
+          "full_client_concurrency_fraction": 0.9987990692340666,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-off-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-off-tp2ep-20261004",
+          "label_en": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 146.51,
+        "decode_p90_tps": 58.41973367436157,
+        "ttft_p95_ms": 3269.0279375761747,
+        "tpot_ms": 23.652070314453674,
+        "tpot_p95_ms": 36.698023420657606,
+        "e2e_p95_ms": 60118.29214207825,
+        "completed_requests": 215
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "8f8cfc1081ee4552aa4f8fc613fabd5d"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-off-tp2ep-c8-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary OFF · TP2+EP · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 59957,
+          "measured_mean_client_inflight": 7.998547578694092,
+          "full_client_concurrency_fraction": 0.9985668618232012,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-off-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-off-tp2ep-20261004",
+          "label_en": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 193.35,
+        "decode_p90_tps": 42.73433385298583,
+        "ttft_p95_ms": 3329.8411012627184,
+        "tpot_ms": 37.914039089677736,
+        "tpot_p95_ms": 58.530555805454746,
+        "e2e_p95_ms": 74079.45379456501,
+        "completed_requests": 312
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "be9d48fb129d4731a5b06a45f4202cd0"
+        ],
+        "aggregation": "One unpooled 900s observation selected as the median output-throughput window among five valid C8 runs; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": {
+          "method": "median output_tokens_per_second among five valid 900s windows",
+          "selected_directory": "op01-off-c8-900s-r2",
+          "selected_output_tps": 193.35,
+          "ranked_candidates": [
+            {
+              "directory": "op01-off-c8-900s",
+              "output_tps": 180.07
+            },
+            {
+              "directory": "op01-off-c8-900s-r4",
+              "output_tps": 191.58
+            },
+            {
+              "directory": "op01-off-c8-900s-r2",
+              "output_tps": 193.35
+            },
+            {
+              "directory": "op01-off-c8-900s-r3",
+              "output_tps": 195.17888888888888
+            },
+            {
+              "directory": "op01-off-c8-900s-r5",
+              "output_tps": 195.54666666666665
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-off-tp2ep-c16-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary OFF · TP2+EP · C16",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 50188,
+          "measured_mean_client_inflight": 15.998183718474788,
+          "full_client_concurrency_fraction": 0.9982723495467669,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-off-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-off-tp2ep-20261004",
+          "label_en": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 270.12444444444446,
+        "decode_p90_tps": 27.80995640111425,
+        "ttft_p95_ms": 3692.250066436821,
+        "tpot_ms": 57.438898616913775,
+        "tpot_p95_ms": 85.80684210041177,
+        "e2e_p95_ms": 105133.15789680928,
+        "completed_requests": 439
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "6a6c157cfbee44d4a7d8217faf35d9a5"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-on-tp2ep-c1-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary ON · TP2+EP · C1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "ascend-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 41173,
+          "measured_mean_client_inflight": 0.9996160566372176,
+          "full_client_concurrency_fraction": 0.9996160566372176,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-on-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-on-tp2ep-20261004",
+          "label_en": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 48.714444444444446,
+        "decode_p90_tps": 60.22453693936011,
+        "ttft_p95_ms": 2601.161597669124,
+        "tpot_ms": 17.495018176145134,
+        "tpot_p95_ms": 18.7384958330603,
+        "e2e_p95_ms": 27168.866374622994,
+        "completed_requests": 94
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "af36b167a2fb41999c0cb82ced2df82e"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-on-tp2ep-c2-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary ON · TP2+EP · C2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "ascend-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 48901,
+          "measured_mean_client_inflight": 1.9993748467912276,
+          "full_client_concurrency_fraction": 0.9993750000682969,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-on-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-on-tp2ep-20261004",
+          "label_en": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 88.09666666666666,
+        "decode_p90_tps": 58.271898996781,
+        "ttft_p95_ms": 3101.1460856534536,
+        "tpot_ms": 20.17049540049295,
+        "tpot_p95_ms": 26.67079737528165,
+        "e2e_p95_ms": 42067.17455890028,
+        "completed_requests": 140
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "3d61fa99bf4a44fdb20f29a43779e0b4"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-on-tp2ep-c4-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary ON · TP2+EP · C4",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "ascend-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 52505,
+          "measured_mean_client_inflight": 3.99894691032254,
+          "full_client_concurrency_fraction": 0.9989504748251703,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-on-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-on-tp2ep-20261004",
+          "label_en": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 140.44444444444446,
+        "decode_p90_tps": 57.241687365635414,
+        "ttft_p95_ms": 3303.568622469902,
+        "tpot_ms": 24.186714991440923,
+        "tpot_p95_ms": 37.222163595440115,
+        "e2e_p95_ms": 62387.00007721782,
+        "completed_requests": 209
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "27928932241c4c33a8a2abe0425d20d6"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-on-tp2ep-c8-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary ON · TP2+EP · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "ascend-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 59957,
+          "measured_mean_client_inflight": 7.998516234718263,
+          "full_client_concurrency_fraction": 0.9985363862270282,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-on-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-on-tp2ep-20261004",
+          "label_en": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 196.11888888888888,
+        "decode_p90_tps": 42.059229980247544,
+        "ttft_p95_ms": 3324.820808134973,
+        "tpot_ms": 37.42772825944847,
+        "tpot_p95_ms": 57.55733899212548,
+        "e2e_p95_ms": 77686.87243014574,
+        "completed_requests": 316
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "7d805f110c974996bebc0dfa78a0677d"
+        ],
+        "aggregation": "One unpooled 900s observation selected as the median output-throughput window among five valid C8 runs; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": {
+          "method": "median output_tokens_per_second among five valid 900s windows",
+          "selected_directory": "op01-on-c8-900s-r3",
+          "selected_output_tps": 196.11888888888888,
+          "ranked_candidates": [
+            {
+              "directory": "op01-on-c8-900s",
+              "output_tps": 119.92666666666666
+            },
+            {
+              "directory": "op01-on-c8-900s-r4",
+              "output_tps": 194.4488888888889
+            },
+            {
+              "directory": "op01-on-c8-900s-r3",
+              "output_tps": 196.11888888888888
+            },
+            {
+              "directory": "op01-on-c8-900s-r2",
+              "output_tps": 196.15
+            },
+            {
+              "directory": "op01-on-c8-900s-r5",
+              "output_tps": 196.19333333333333
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "qwen35-op01-attention-boundary-on-tp2ep-c16-20261003",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP01 attention boundary ON · TP2+EP · C16",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "ascend-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "mod": {
+            "package": "vllm-hust-ascend-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true
+          },
+          "workload_file_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "observed_max_prompt_tokens": 50188,
+          "measured_mean_client_inflight": 15.998159499571969,
+          "full_client_concurrency_fraction": 0.9982488674049577,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op01-ascend-boundary-on-tp2ep-20261004",
+        "presentation_group": {
+          "id": "op01-attention-boundary-on-tp2ep-20261004",
+          "label_en": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP",
+          "label_zh": "OP01 attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 268.6822222222222,
+        "decode_p90_tps": 28.187977387820936,
+        "ttft_p95_ms": 4088.506604079156,
+        "tpot_ms": 57.39989797716585,
+        "tpot_p95_ms": 83.86884612752785,
+        "e2e_p95_ms": 105106.92939627916,
+        "completed_requests": 434
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-03",
+        "sampling_date_source": "Recorded SWE client started_at_unix (UTC)",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "95c71387e53d4a25b4e7e6d46fecb695"
+        ],
+        "aggregation": "One unpooled 900s observation; drain excluded from latency samples",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": null,
+          "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+          "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": false
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "local draft; not submitted",
+        "activation_log": {
+          "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
+          "point_isolated": false
+        },
+        "c8_selection": null
       }
     }
   ],

@@ -28427,6 +28427,1070 @@
         "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
         "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
+    },
+    {
+      "run_id": "0cd5def13501424aa2f5a3453fa19e90",
+      "point_id": "qwen35-op01-attention-boundary-off-tp2ep-c1-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 98,
+        "max_prompt_tokens_observed": 41173,
+        "prompt_tokens_p50": 15552.0,
+        "max_turn_index_reached": 34,
+        "distinct_trajectories_started": 5,
+        "sessions_completed": 4,
+        "requests_completed_in_window": 97,
+        "requests_drained": 1,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 44202,
+        "output_tokens_per_second": 49.11333333333334,
+        "output_tokens_per_second_per_chip": 24.55666666666667,
+        "decode_tokens_per_second_p90": 60.16220045042456,
+        "decode_speed_samples": 97,
+        "ttft_seconds_p95": 2.4931142549961804,
+        "client_inflight_seconds": {
+          "0": 0.3400441613048315,
+          "1": 899.6599558386952
+        },
+        "mean_client_inflight": 0.9996221731541057,
+        "full_concurrency_fraction": 0.9996221731541057,
+        "drain_seconds": 6.1994728948920965,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 49.11333333333334,
+        "decode_p90_tps": 60.16220045042456,
+        "ttft_p95_ms": 2493.1142549961805,
+        "tpot_ms": 17.60083252507722,
+        "tpot_p95_ms": 18.673206767565414,
+        "e2e_p95_ms": 26264.8237973451,
+        "completed_requests": 97
+      },
+      "requests_artifact_sha256": "f01125d401bd477998d7a63ad65ff1251f2dcd7673f103b8b2cb7eece2668493",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-off-c1-900s/config.json",
+          "sha256": "64b2bf42eed60ebfa077534b304f7b3247a9a9cd1adfc98efc68f4fc62fb25fd",
+          "bytes": 3204
+        },
+        {
+          "path": "op01-evidence/op01-off-c1-900s/summary.json",
+          "sha256": "af8dbfff754cc54ac9ed1decf737230307302401c86422e14cc74d0e729f9c25",
+          "bytes": 898
+        },
+        {
+          "path": "op01-evidence/op01-off-c1-900s/requests.jsonl",
+          "sha256": "f01125d401bd477998d7a63ad65ff1251f2dcd7673f103b8b2cb7eece2668493",
+          "bytes": 1255762
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "c8_selection": null
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "0cd5def13501424aa2f5a3453fa19e90",
+        "started_at_unix": 1791050723.3819518,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "5c3ea5afd5cd48729dcffba000cff25d",
+      "point_id": "qwen35-op01-attention-boundary-off-tp2ep-c2-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 144,
+        "max_prompt_tokens_observed": 49428,
+        "prompt_tokens_p50": 17803.5,
+        "max_turn_index_reached": 34,
+        "distinct_trajectories_started": 6,
+        "sessions_completed": 4,
+        "requests_completed_in_window": 142,
+        "requests_drained": 2,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 80134,
+        "output_tokens_per_second": 89.03777777777778,
+        "output_tokens_per_second_per_chip": 44.51888888888889,
+        "decode_tokens_per_second_p90": 58.89392248254317,
+        "decode_speed_samples": 142,
+        "ttft_seconds_p95": 3.095263903401792,
+        "client_inflight_seconds": {
+          "0": 0.0001897905021905899,
+          "1": 0.5935034658759832,
+          "2": 899.4063067436218
+        },
+        "mean_client_inflight": 1.9993401299479108,
+        "full_concurrency_fraction": 0.9993403408262465,
+        "drain_seconds": 23.67217499949038,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 89.03777777777778,
+        "decode_p90_tps": 58.89392248254317,
+        "ttft_p95_ms": 3095.263903401792,
+        "tpot_ms": 20.048936849416187,
+        "tpot_p95_ms": 26.956510804639734,
+        "e2e_p95_ms": 40710.85131457072,
+        "completed_requests": 142
+      },
+      "requests_artifact_sha256": "272329e464c89c3b2033f54b72832aeb5cd4dec958b2eaedc9dbb0da1532ec6d",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-off-c2-900s/config.json",
+          "sha256": "86bbcd3dd241a3532dd0422eb30cd89da7832bad4fd85a30bf1e0e07f20bdf34",
+          "bytes": 3204
+        },
+        {
+          "path": "op01-evidence/op01-off-c2-900s/summary.json",
+          "sha256": "5bf5b3cab6cde92e28f1d7af62ebbc20f8d3bd41d31305cfd914bd6a8cb7feb3",
+          "bytes": 931
+        },
+        {
+          "path": "op01-evidence/op01-off-c2-900s/requests.jsonl",
+          "sha256": "272329e464c89c3b2033f54b72832aeb5cd4dec958b2eaedc9dbb0da1532ec6d",
+          "bytes": 2276248
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "c8_selection": null
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "5c3ea5afd5cd48729dcffba000cff25d",
+        "started_at_unix": 1791053217.7271323,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "8f8cfc1081ee4552aa4f8fc613fabd5d",
+      "point_id": "qwen35-op01-attention-boundary-off-tp2ep-c4-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 219,
+        "max_prompt_tokens_observed": 52505,
+        "prompt_tokens_p50": 20000.0,
+        "max_turn_index_reached": 38,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 5,
+        "requests_completed_in_window": 215,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 131859,
+        "output_tokens_per_second": 146.51,
+        "output_tokens_per_second_per_chip": 73.255,
+        "decode_tokens_per_second_p90": 58.41973367436157,
+        "decode_speed_samples": 215,
+        "ttft_seconds_p95": 3.269027937576175,
+        "client_inflight_seconds": {
+          "0": 0.00016394071280956268,
+          "1": 0.0010397359728813171,
+          "2": 0.000685645267367363,
+          "3": 1.0789483673870564,
+          "4": 898.9191623106599
+        },
+        "mean_client_inflight": 3.998795450412565,
+        "full_concurrency_fraction": 0.9987990692340666,
+        "drain_seconds": 57.79461383447051,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 146.51,
+        "decode_p90_tps": 58.41973367436157,
+        "ttft_p95_ms": 3269.0279375761747,
+        "tpot_ms": 23.652070314453674,
+        "tpot_p95_ms": 36.698023420657606,
+        "e2e_p95_ms": 60118.29214207825,
+        "completed_requests": 215
+      },
+      "requests_artifact_sha256": "3e4c7b2fcbc03828961876d73f9169546e7b4f81b72ac7be08c9d7af785648c0",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-off-c4-900s/config.json",
+          "sha256": "b256c1e6a87d035434c365e31753b23297d6c4d46fb4af3e68e56df6d73bc0e7",
+          "bytes": 3204
+        },
+        {
+          "path": "op01-evidence/op01-off-c4-900s/summary.json",
+          "sha256": "06520d6db0393fa13d27292ce7674e5938121d4940593d7a588680208ce0d12e",
+          "bytes": 973
+        },
+        {
+          "path": "op01-evidence/op01-off-c4-900s/requests.jsonl",
+          "sha256": "3e4c7b2fcbc03828961876d73f9169546e7b4f81b72ac7be08c9d7af785648c0",
+          "bytes": 3803076
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "c8_selection": null
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "8f8cfc1081ee4552aa4f8fc613fabd5d",
+        "started_at_unix": 1791055752.3314016,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "be9d48fb129d4731a5b06a45f4202cd0",
+      "point_id": "qwen35-op01-attention-boundary-off-tp2ep-c8-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 320,
+        "max_prompt_tokens_observed": 59957,
+        "prompt_tokens_p50": 16262.0,
+        "max_turn_index_reached": 41,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 7,
+        "requests_completed_in_window": 312,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 174015,
+        "output_tokens_per_second": 193.35,
+        "output_tokens_per_second_per_chip": 96.675,
+        "decode_tokens_per_second_p90": 42.73433385298583,
+        "decode_speed_samples": 312,
+        "ttft_seconds_p95": 3.3298411012627183,
+        "client_inflight_seconds": {
+          "0": 0.0001758132129907608,
+          "1": 0.0010025855153799057,
+          "2": 0.0006960853934288025,
+          "3": 0.0006476324051618576,
+          "4": 0.0006166361272335052,
+          "5": 0.0006343647837638855,
+          "6": 0.0009190160781145096,
+          "7": 1.2851322256028652,
+          "8": 898.7101756408811
+        },
+        "mean_client_inflight": 7.998547578694092,
+        "full_concurrency_fraction": 0.9985668618232012,
+        "drain_seconds": 111.29538153298199,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 193.35,
+        "decode_p90_tps": 42.73433385298583,
+        "ttft_p95_ms": 3329.8411012627184,
+        "tpot_ms": 37.914039089677736,
+        "tpot_p95_ms": 58.530555805454746,
+        "e2e_p95_ms": 74079.45379456501,
+        "completed_requests": 312
+      },
+      "requests_artifact_sha256": "646da2880fcca4141138f3c0e1ed9742e296fe2827c203e6f6a1fcc4b2ac1d20",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-off-c8-900s-r2/config.json",
+          "sha256": "4c35fd566d648e360b2f8a2cb8ae51ad7af31543d8383f574f88530c9f7efaf4",
+          "bytes": 3204
+        },
+        {
+          "path": "op01-evidence/op01-off-c8-900s-r2/summary.json",
+          "sha256": "d34446d49f402b18db870aebfeff9ed82a322d327aa727a745ed06c124894ef5",
+          "bytes": 1103
+        },
+        {
+          "path": "op01-evidence/op01-off-c8-900s-r2/requests.jsonl",
+          "sha256": "646da2880fcca4141138f3c0e1ed9742e296fe2827c203e6f6a1fcc4b2ac1d20",
+          "bytes": 5212238
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "c8_selection": {
+          "method": "median output_tokens_per_second among five valid 900s windows",
+          "selected_directory": "op01-off-c8-900s-r2",
+          "selected_output_tps": 193.35,
+          "ranked_candidates": [
+            {
+              "directory": "op01-off-c8-900s",
+              "output_tps": 180.07
+            },
+            {
+              "directory": "op01-off-c8-900s-r4",
+              "output_tps": 191.58
+            },
+            {
+              "directory": "op01-off-c8-900s-r2",
+              "output_tps": 193.35
+            },
+            {
+              "directory": "op01-off-c8-900s-r3",
+              "output_tps": 195.17888888888888
+            },
+            {
+              "directory": "op01-off-c8-900s-r5",
+              "output_tps": 195.54666666666665
+            }
+          ]
+        }
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "be9d48fb129d4731a5b06a45f4202cd0",
+        "started_at_unix": 1791038923.9129121,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "6a6c157cfbee44d4a7d8217faf35d9a5",
+      "point_id": "qwen35-op01-attention-boundary-off-tp2ep-c16-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 455,
+        "max_prompt_tokens_observed": 50188,
+        "prompt_tokens_p50": 14239.0,
+        "max_turn_index_reached": 31,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 439,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 243112,
+        "output_tokens_per_second": 270.12444444444446,
+        "output_tokens_per_second_per_chip": 135.06222222222223,
+        "decode_tokens_per_second_p90": 27.80995640111425,
+        "decode_speed_samples": 439,
+        "ttft_seconds_p95": 3.692250066436821,
+        "client_inflight_seconds": {
+          "0": 0.0002515409141778946,
+          "1": 0.0010629482567310333,
+          "2": 0.0007002130150794983,
+          "3": 0.0006041750311851501,
+          "4": 0.0005990918725728989,
+          "5": 0.0009079482406377792,
+          "6": 0.0006521120667457581,
+          "7": 0.0006642863154411316,
+          "8": 0.0006566736847162247,
+          "9": 0.000583253800868988,
+          "10": 0.0005925334990024567,
+          "11": 0.0006006043404340744,
+          "12": 0.0008407570421695709,
+          "13": 0.0006448030471801758,
+          "14": 0.0006347130984067917,
+          "15": 1.5448897536844015,
+          "16": 898.4451145920902
+        },
+        "mean_client_inflight": 15.998183718474788,
+        "full_concurrency_fraction": 0.9982723495467669,
+        "drain_seconds": 73.05414755269885,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 270.12444444444446,
+        "decode_p90_tps": 27.80995640111425,
+        "ttft_p95_ms": 3692.250066436821,
+        "tpot_ms": 57.438898616913775,
+        "tpot_p95_ms": 85.80684210041177,
+        "e2e_p95_ms": 105133.15789680928,
+        "completed_requests": 439
+      },
+      "requests_artifact_sha256": "0f89803d1d274f0f3d1bf34c6de891acd4184c7d87bccd7fb303de34759b23b1",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-off-c16-900s/config.json",
+          "sha256": "5d841b5dbe141f44fabb436ab43acd3f3b65c296a8059c64d83d78b86f7ddcb1",
+          "bytes": 3205
+        },
+        {
+          "path": "op01-evidence/op01-off-c16-900s/summary.json",
+          "sha256": "3610ade4c1e075877e7ece758f18d65a4eca3b47e87071dd0e4a9d59c0f7a1f3",
+          "bytes": 1389
+        },
+        {
+          "path": "op01-evidence/op01-off-c16-900s/requests.jsonl",
+          "sha256": "0f89803d1d274f0f3d1bf34c6de891acd4184c7d87bccd7fb303de34759b23b1",
+          "bytes": 7322011
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "c8_selection": null
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "6a6c157cfbee44d4a7d8217faf35d9a5",
+        "started_at_unix": 1791058346.1420035,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "af36b167a2fb41999c0cb82ced2df82e",
+      "point_id": "qwen35-op01-attention-boundary-on-tp2ep-c1-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 95,
+        "max_prompt_tokens_observed": 41173,
+        "prompt_tokens_p50": 16417.0,
+        "max_turn_index_reached": 34,
+        "distinct_trajectories_started": 5,
+        "sessions_completed": 4,
+        "requests_completed_in_window": 94,
+        "requests_drained": 1,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 43843,
+        "output_tokens_per_second": 48.714444444444446,
+        "output_tokens_per_second_per_chip": 24.357222222222223,
+        "decode_tokens_per_second_p90": 60.22453693936011,
+        "decode_speed_samples": 94,
+        "ttft_seconds_p95": 2.6011615976691242,
+        "client_inflight_seconds": {
+          "0": 0.345549026504159,
+          "1": 899.6544509734958
+        },
+        "mean_client_inflight": 0.9996160566372176,
+        "full_concurrency_fraction": 0.9996160566372176,
+        "drain_seconds": 0.5639804005622864,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 48.714444444444446,
+        "decode_p90_tps": 60.22453693936011,
+        "ttft_p95_ms": 2601.161597669124,
+        "tpot_ms": 17.495018176145134,
+        "tpot_p95_ms": 18.7384958330603,
+        "e2e_p95_ms": 27168.866374622994,
+        "completed_requests": 94
+      },
+      "requests_artifact_sha256": "14d6352dbfad646997f631fbf61a6fbd08f10c9d24ac7bd9860be3f786870773",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-on-c1-900s/config.json",
+          "sha256": "95b0f4382ae189e2ced40691ec337f513365e2a375db347af6ea72a6b630c57a",
+          "bytes": 3202
+        },
+        {
+          "path": "op01-evidence/op01-on-c1-900s/summary.json",
+          "sha256": "d020b6925af8fbfa689f74545f84186757a597dca0c15bf03fe7ff173c5da12c",
+          "bytes": 899
+        },
+        {
+          "path": "op01-evidence/op01-on-c1-900s/requests.jsonl",
+          "sha256": "14d6352dbfad646997f631fbf61a6fbd08f10c9d24ac7bd9860be3f786870773",
+          "bytes": 1234879
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "c8_selection": null
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "af36b167a2fb41999c0cb82ced2df82e",
+        "started_at_unix": 1791049489.527897,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "3d61fa99bf4a44fdb20f29a43779e0b4",
+      "point_id": "qwen35-op01-attention-boundary-on-tp2ep-c2-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 142,
+        "max_prompt_tokens_observed": 48901,
+        "prompt_tokens_p50": 17747.5,
+        "max_turn_index_reached": 34,
+        "distinct_trajectories_started": 6,
+        "sessions_completed": 4,
+        "requests_completed_in_window": 140,
+        "requests_drained": 2,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 79287,
+        "output_tokens_per_second": 88.09666666666666,
+        "output_tokens_per_second_per_chip": 44.04833333333333,
+        "decode_tokens_per_second_p90": 58.271898996781,
+        "decode_speed_samples": 140,
+        "ttft_seconds_p95": 3.1011460856534536,
+        "client_inflight_seconds": {
+          "0": 0.0001379493623971939,
+          "1": 0.5623619891703129,
+          "2": 899.4375000614673
+        },
+        "mean_client_inflight": 1.9993748467912276,
+        "full_concurrency_fraction": 0.9993750000682969,
+        "drain_seconds": 6.6925784684717655,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 88.09666666666666,
+        "decode_p90_tps": 58.271898996781,
+        "ttft_p95_ms": 3101.1460856534536,
+        "tpot_ms": 20.17049540049295,
+        "tpot_p95_ms": 26.67079737528165,
+        "e2e_p95_ms": 42067.17455890028,
+        "completed_requests": 140
+      },
+      "requests_artifact_sha256": "f35cf97b9b127364f307c0e17f037cb74dd63e22f5b89de4142f6df390b4adcd",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-on-c2-900s/config.json",
+          "sha256": "2848d85f4e2907d77bd72fee471db910dc4ae05008f2a79f8e5e97e79114dd82",
+          "bytes": 3203
+        },
+        {
+          "path": "op01-evidence/op01-on-c2-900s/summary.json",
+          "sha256": "485781ceb4b706a01b324b32ce6f005e79fd8a5ffd66fc69ca0011ce06a7fc92",
+          "bytes": 931
+        },
+        {
+          "path": "op01-evidence/op01-on-c2-900s/requests.jsonl",
+          "sha256": "f35cf97b9b127364f307c0e17f037cb74dd63e22f5b89de4142f6df390b4adcd",
+          "bytes": 2220618
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "c8_selection": null
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "3d61fa99bf4a44fdb20f29a43779e0b4",
+        "started_at_unix": 1791051977.0337753,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "27928932241c4c33a8a2abe0425d20d6",
+      "point_id": "qwen35-op01-attention-boundary-on-tp2ep-c4-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 213,
+        "max_prompt_tokens_observed": 52505,
+        "prompt_tokens_p50": 20465.0,
+        "max_turn_index_reached": 38,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 5,
+        "requests_completed_in_window": 209,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 126400,
+        "output_tokens_per_second": 140.44444444444446,
+        "output_tokens_per_second_per_chip": 70.22222222222223,
+        "decode_tokens_per_second_p90": 57.241687365635414,
+        "decode_speed_samples": 209,
+        "ttft_seconds_p95": 3.303568622469902,
+        "client_inflight_seconds": {
+          "0": 0.0001570526510477066,
+          "1": 0.0010261647403240204,
+          "2": 0.000684564933180809,
+          "3": 0.9427048750221729,
+          "4": 899.0554273426533
+        },
+        "mean_client_inflight": 3.99894691032254,
+        "full_concurrency_fraction": 0.9989504748251703,
+        "drain_seconds": 39.75959826260805,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 140.44444444444446,
+        "decode_p90_tps": 57.241687365635414,
+        "ttft_p95_ms": 3303.568622469902,
+        "tpot_ms": 24.186714991440923,
+        "tpot_p95_ms": 37.222163595440115,
+        "e2e_p95_ms": 62387.00007721782,
+        "completed_requests": 209
+      },
+      "requests_artifact_sha256": "9355631f6b14fa4b8782609904eb96f9933677c16d3b84f5e788a7b16c4ebc59",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-on-c4-900s/config.json",
+          "sha256": "a5e65ca6d98000b641497d9abc85508734c30cdd82b90967f49b7742caf2862d",
+          "bytes": 3202
+        },
+        {
+          "path": "op01-evidence/op01-on-c4-900s/summary.json",
+          "sha256": "17291b5470b0713736310d4bb8da69e22b2dbbec463abd613ec5b4934a546c58",
+          "bytes": 995
+        },
+        {
+          "path": "op01-evidence/op01-on-c4-900s/requests.jsonl",
+          "sha256": "9355631f6b14fa4b8782609904eb96f9933677c16d3b84f5e788a7b16c4ebc59",
+          "bytes": 3639747
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "c8_selection": null
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "27928932241c4c33a8a2abe0425d20d6",
+        "started_at_unix": 1791054480.023808,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "7d805f110c974996bebc0dfa78a0677d",
+      "point_id": "qwen35-op01-attention-boundary-on-tp2ep-c8-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 324,
+        "max_prompt_tokens_observed": 59957,
+        "prompt_tokens_p50": 16418.0,
+        "max_turn_index_reached": 41,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 7,
+        "requests_completed_in_window": 316,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 176507,
+        "output_tokens_per_second": 196.11888888888888,
+        "output_tokens_per_second_per_chip": 98.05944444444444,
+        "decode_tokens_per_second_p90": 42.059229980247544,
+        "decode_speed_samples": 316,
+        "ttft_seconds_p95": 3.324820808134973,
+        "client_inflight_seconds": {
+          "0": 0.00019907206296920776,
+          "1": 0.001064816489815712,
+          "2": 0.0007017552852630615,
+          "3": 0.0006586723029613495,
+          "4": 0.0006384644657373428,
+          "5": 0.0006691236048936844,
+          "6": 0.0009568482637405396,
+          "7": 1.3123636431992054,
+          "8": 898.6827476043254
+        },
+        "mean_client_inflight": 7.998516234718263,
+        "full_concurrency_fraction": 0.9985363862270282,
+        "drain_seconds": 107.89848394691944,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 196.11888888888888,
+        "decode_p90_tps": 42.059229980247544,
+        "ttft_p95_ms": 3324.820808134973,
+        "tpot_ms": 37.42772825944847,
+        "tpot_p95_ms": 57.55733899212548,
+        "e2e_p95_ms": 77686.87243014574,
+        "completed_requests": 316
+      },
+      "requests_artifact_sha256": "19ec5410c07bc2eb79ca162a71af361cfd5a8836e11a0c726c686f1095e87d97",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-on-c8-900s-r3/config.json",
+          "sha256": "3cfa2ea755bd9df4beb62023800354717ab8f379c0fc32698672bbb0518af9c2",
+          "bytes": 3203
+        },
+        {
+          "path": "op01-evidence/op01-on-c8-900s-r3/summary.json",
+          "sha256": "d2d3c35761af4ea3fe4f65c4b848af73e3aa27293122447d46541e27d145b224",
+          "bytes": 1126
+        },
+        {
+          "path": "op01-evidence/op01-on-c8-900s-r3/requests.jsonl",
+          "sha256": "19ec5410c07bc2eb79ca162a71af361cfd5a8836e11a0c726c686f1095e87d97",
+          "bytes": 5290608
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "c8_selection": {
+          "method": "median output_tokens_per_second among five valid 900s windows",
+          "selected_directory": "op01-on-c8-900s-r3",
+          "selected_output_tps": 196.11888888888888,
+          "ranked_candidates": [
+            {
+              "directory": "op01-on-c8-900s",
+              "output_tps": 119.92666666666666
+            },
+            {
+              "directory": "op01-on-c8-900s-r4",
+              "output_tps": 194.4488888888889
+            },
+            {
+              "directory": "op01-on-c8-900s-r3",
+              "output_tps": 196.11888888888888
+            },
+            {
+              "directory": "op01-on-c8-900s-r2",
+              "output_tps": 196.15
+            },
+            {
+              "directory": "op01-on-c8-900s-r5",
+              "output_tps": 196.19333333333333
+            }
+          ]
+        }
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "7d805f110c974996bebc0dfa78a0677d",
+        "started_at_unix": 1791044596.9817028,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "95c71387e53d4a25b4e7e6d46fecb695",
+      "point_id": "qwen35-op01-attention-boundary-on-tp2ep-c16-20261003",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "requests_started": 450,
+        "max_prompt_tokens_observed": 50188,
+        "prompt_tokens_p50": 14239.0,
+        "max_turn_index_reached": 31,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 434,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 241814,
+        "output_tokens_per_second": 268.6822222222222,
+        "output_tokens_per_second_per_chip": 134.3411111111111,
+        "decode_tokens_per_second_p90": 28.187977387820936,
+        "decode_speed_samples": 434,
+        "ttft_seconds_p95": 4.088506604079156,
+        "client_inflight_seconds": {
+          "0": 0.00022537074983119965,
+          "1": 0.0010366756469011307,
+          "2": 0.0007345676422119141,
+          "3": 0.0006144139915704727,
+          "4": 0.0006110332906246185,
+          "5": 0.0008982066065073013,
+          "6": 0.0006670933216810226,
+          "7": 0.0006858054548501968,
+          "8": 0.0006895437836647034,
+          "9": 0.0005978848785161972,
+          "10": 0.0006078314036130905,
+          "11": 0.0005941838026046753,
+          "12": 0.0008698683232069016,
+          "13": 0.0006597843021154404,
+          "14": 0.0006617847830057144,
+          "15": 1.5658652875572443,
+          "16": 898.4239806644619
+        },
+        "mean_client_inflight": 15.998159499571969,
+        "full_concurrency_fraction": 0.9982488674049577,
+        "drain_seconds": 72.8402428086847,
+        "aborted": false,
+        "planned_measurement_seconds": 900.0
+      },
+      "metrics": {
+        "output_tps": 268.6822222222222,
+        "decode_p90_tps": 28.187977387820936,
+        "ttft_p95_ms": 4088.506604079156,
+        "tpot_ms": 57.39989797716585,
+        "tpot_p95_ms": 83.86884612752785,
+        "e2e_p95_ms": 105106.92939627916,
+        "completed_requests": 434
+      },
+      "requests_artifact_sha256": "235ecbf49e4b305334c12c85c6f06dafcaf39c4b6e0b1581804c3425b5578e44",
+      "artifacts": [
+        {
+          "path": "op01-evidence/op01-on-c16-900s/config.json",
+          "sha256": "47cec3a1639d40d827fe0a8df379a752aa21ee73c95635969667f4d2df4ee652",
+          "bytes": 3204
+        },
+        {
+          "path": "op01-evidence/op01-on-c16-900s/summary.json",
+          "sha256": "d7ab9309feb2da9fc502e9aec9e7ad2b2330539372b104aca18d4e75e4f379fc",
+          "bytes": 1389
+        },
+        {
+          "path": "op01-evidence/op01-on-c16-900s/requests.jsonl",
+          "sha256": "235ecbf49e4b305334c12c85c6f06dafcaf39c4b6e0b1581804c3425b5578e44",
+          "bytes": 7255790
+        }
+      ],
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": false,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "server_log_campaign_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "c8_selection": null
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "95c71387e53d4a25b4e7e6d46fecb695",
+        "started_at_unix": 1791057041.6202474,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+        "tokenizer": {
+          "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+          "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+          "transformers": "5.18.0",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900.0,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
     }
   ]
 }

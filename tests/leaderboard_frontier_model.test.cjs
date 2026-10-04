@@ -49,8 +49,8 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
-    assert.equal(all.length,177);
-    assert.equal(displayed.length,65);
+    assert.equal(all.length,187);
+    assert.equal(displayed.length,75);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
     assert.equal(betterScale.length,5);
@@ -353,6 +353,22 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.probe.summary.measurement_seconds,20);
             assert.match(run.requests_artifact_sha256,/^[a-f0-9]{64}$/);
             for(const k of ['tpot_ms','tpot_p95_ms','e2e_p95_ms']) assert.ok(p.metrics[k]>0);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-op01-attention-boundary-tp2ep-20261003'){
+            const on=p.id.includes('-on-');
+            const params=p.configuration.parameters;
+            assert.deepEqual(p.configuration.mods,on?['ascend-attention-boundary']:[]);
+            assert.ok([1,2,4,8,16].includes(p.load.concurrency));
+            assert.equal(params.runtime_versions.vllm,'0.23.0+empty');
+            assert.equal(params.runtime_versions['vllm-ascend'],'0.23.0.post1');
+            assert.equal(params.mod.enable,on);
+            assert.equal(run.validation.patch_requested,on);
+            assert.equal(run.validation.failed_requests,0);
+            assert.equal(run.validation.tokenizer_identity_independently_verified,false);
+            assert.equal(run.validation.activation_log_point_isolated,false);
+            if(p.load.concurrency===8){
+                assert.ok(p.evidence.c8_selection);
+                assert.equal(p.evidence.c8_selection.ranked_candidates.length,5);
+            }
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
