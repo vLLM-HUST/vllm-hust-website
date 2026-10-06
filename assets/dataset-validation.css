@@ -241,7 +241,7 @@ body[data-page="dataset-validation"] main.site-shell {
     border-bottom: 0;
 }
 
-.validation-dataset {
+.validation-table .validation-dataset {
     position: sticky;
     left: 0;
     z-index: 2;

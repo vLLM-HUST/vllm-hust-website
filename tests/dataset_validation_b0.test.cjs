@@ -80,7 +80,14 @@ test('Qwen3.5 TP2 matrix separates online and agent applicability', () => {
     assert.equal(data.results.filter((cell) => cell.status === 'not_tested').length, 258);
     assert.equal(data.results.filter((cell) => cell.status === 'not_applicable').length, 49);
     const szyn = data.results.find((cell) => cell.dataset_id === 'szyn-opencode-swebench-verified-500' && cell.metric_id === 'agent_resolve_rate');
-    assert.equal(szyn.status, 'queued');
+    assert.equal(szyn.status, 'baseline_only');
+    assert.equal(szyn.baseline_value, 46.4);
+    assert.equal(szyn.value, null);
+    assert.equal(szyn.provenance.resolved_tasks, 232);
+    assert.equal(szyn.provenance.attempted_tasks, 500);
+    assert.equal(szyn.provenance.raw_publishable, false);
+    assert.equal(szyn.provenance.adjudicated_publishable, true);
+    assert.match(szyn.note_zh, /232\/500/);
     assert.match(szyn.tracking_url, /vllm-hust-dev-hub\/issues\/87$/);
 });
 
