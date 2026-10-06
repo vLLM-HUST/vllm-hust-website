@@ -7,8 +7,8 @@
         zh: { not_tested: '未测试', baseline_only: '仅 B0', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
     };
     const TEXT = {
-        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', reason: 'Reason', tracking: 'Tracking', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
-        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', reason: '原因', tracking: '跟踪', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
+        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', reason: 'Reason', note: 'Note', tracking: 'Tracking', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', viewSource: 'View report', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
+        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', reason: '原因', note: '说明', tracking: '跟踪', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', viewSource: '查看报告', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
     };
 
     const state = { data: null, index: null, scenarioId: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
@@ -100,8 +100,20 @@
         return {
             model: cell.model || data.scenario?.model || t('notProvided'),
             hardware: cell.hardware || data.scenario?.hardware || t('notProvided'),
-            provenance: provenance.job_url || provenance.screenshot || provenance.artifact || data.source?.artifact_url || t('notProvided'),
+            provenance: provenance.job_url || provenance.screenshot || provenance.report_url || provenance.artifact || data.source?.artifact_url || t('notProvided'),
         };
+    }
+
+    function provenanceHtml(value) {
+        try {
+            const url = new URL(value);
+            if (url.protocol === 'https:') return `<a href="${escapeHtml(url.href)}" target="_blank" rel="noopener noreferrer">${t('viewSource')}</a>`;
+        } catch (_) { return escapeHtml(value); }
+        return escapeHtml(value);
+    }
+
+    function detailNote(cell) {
+        return lang() === 'zh' ? cell.note_zh || cell.note : cell.note;
     }
 
     function allCells() {
@@ -176,8 +188,10 @@
         $('validation-detail-status').textContent = statusLabel(cell.status);
         $('validation-detail-description').textContent = `${dataset.description || ''} - ${metric.unit || ''}`;
         const reason = cell.reason ? `<dt>${t('reason')}</dt><dd>${escapeHtml(cell.reason)}</dd>` : '';
+        const noteText = detailNote(cell);
+        const note = noteText ? `<dt>${t('note')}</dt><dd>${escapeHtml(noteText)}</dd>` : '';
         const tracking = cell.tracking_url ? `<dt>${t('tracking')}</dt><dd>${escapeHtml(cell.tracking_url)}</dd>` : '';
-        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.current_value ?? cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd>${reason}${tracking}<dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(metadata.model)}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(metadata.hardware)}</dd><dt>${t('provenance')}</dt><dd>${escapeHtml(metadata.provenance)}</dd>`;
+        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.current_value ?? cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd>${reason}${note}${tracking}<dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(metadata.model)}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(metadata.hardware)}</dd><dt>${t('provenance')}</dt><dd>${provenanceHtml(metadata.provenance)}</dd>`;
         panel.hidden = false;
     }
 
