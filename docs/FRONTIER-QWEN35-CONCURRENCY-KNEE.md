@@ -35,9 +35,11 @@ waiting counts are 2 and 5 respectively, while peak KV page occupancy drops to a
 15-second sampling; headline throughput and latency exclude drain.
 
 This points toward resident-state/cache churn after exceeding 36 seats rather than exhaustion of the
-shared attention page pool. Increasing resident seats separately from execution seats is a pending
-causal check. Zero native preemptions does not mean zero resident-cache evictions; backup/restore
-counts were not collected.
+shared attention page pool. A subsequent
+[width-matched study and separate resident-only diagnosis](FRONTIER-QWEN35-CONCURRENCY-WIDTH.md)
+confirm that sufficient residency removes most of this cliff and directly observe restored-state
+discard before request claim. Zero native preemptions does not mean zero resident-cache evictions;
+backup/restore counts were not collected in these original seven windows.
 
 ## Protocol and source
 

@@ -47,7 +47,10 @@ workload identities; never silently mix them.
   [whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), retaining inferior raw evidence.
 - BetterScale uses the short **BetterScale** group/legend label; graph mode, execution/resident
   seats, balanced attention and state-cache policy appear in its popover. The main unified
-  concurrency comparison retains its declared C1–C16 sweeps; C32 stays excluded there.
+  concurrency comparison retains its declared C1–C16 sweeps and the owner-authorized October6
+  fixed-E36 and width-matched extensions through C56. Historical standalone C32 remains excluded;
+  the new C32 belongs to a separately recorded campaign. See
+  [the width-matched boundary](FRONTIER-QWEN35-CONCURRENCY-WIDTH.md).
 - **BetterScale residency and cache studies** additionally references eleven immutable source points
   through `workload.contract.comparison_point_ids`: the Native vLLM752a3a5 / Ascend9bf964c
   FULL_AND_PIECEWISE C1/C2/C4/C8/C16 sweep and BetterScale C1/C2/C4/C8/C16/C32. BetterScale connects

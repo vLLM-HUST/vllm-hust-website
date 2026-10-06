@@ -220,3 +220,13 @@ extension of the earlier main-chart scope, not reinstatement of historical stand
 capacity. The next investigation increases execution and residency together. Metadata-only raw-byte
 replacement of tokenizer path and transformers version exactly reconstructs historical8044561f from
 prepared3879dff; historical client8bb99eb and runtime identity still differ.
+
+The later October6 width extension adds eight valid900s observations/six retained configurations
+through C56; see `docs/FRONTIER-QWEN35-CONCURRENCY-WIDTH.md`. Capacity64 is an explicit source
+patch, not unchanged96cd03a. Keep E/R-specific series IDs even though one BetterScale Pareto group
+spans those capacities; singleton settings do not imply fixed-configuration sweeps. The first C56
+window was contaminated by a parallel retrieval helper retaining another server's port and is
+excluded, not a poorer repeat. Two300s cache-observer diagnostics are also not ranking scores.
+Preserve the corrected endpoint receipts and the distinct source/configuration/card/co-run context
+when importing new observations. Measured C48–C52 TTFT degradation is budget/workload-specific, not
+a hardware limit.
