@@ -69,7 +69,20 @@ def assert_concurrency_series(page, points, cohort=None):
             and configuration_comparison
             and point["id"] in shared_ids
         ):
-            key = (point["cohort_id"], point["load"].get("session_rotation_depth"))
+            campaign = (
+                point.get("evidence", {}).get("benchmark_protocol", {}).get("campaign")
+            )
+            family = (
+                campaign
+                if campaign
+                in {"concurrency-knee-20261006", "concurrency-width-20261006"}
+                else "original"
+            )
+            key = (
+                point["cohort_id"],
+                point["load"].get("session_rotation_depth"),
+                family,
+            )
             configuration_groups.setdefault(key, []).append(point)
             continue
         if group == "betterscale":
