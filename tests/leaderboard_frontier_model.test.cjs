@@ -49,11 +49,11 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
-    assert.equal(all.length,177);
-    assert.equal(displayed.length,65);
+    assert.equal(all.length,181);
+    assert.equal(displayed.length,69);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
-    assert.equal(betterScale.length,5);
+    assert.equal(betterScale.length,9);
     assert.equal(betterScale.filter(p=>p.load.concurrency_series==='swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927').length,5);
     const hiddenIds=new Set(all.filter(p=>!displayed.includes(p)).map(p=>p.id));
     assert.ok(hiddenIds.has('qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
@@ -218,6 +218,14 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(p.load.session_rotation_depth,run.client.session_rotation_depth);
             assert.equal(run.summary.session_slots,p.load.concurrency*p.load.session_rotation_depth);
             for(const key of ['owned_server_exit_zero','campaign_exit_zero','selected_devices_released','request_protocol_pass']) assert.equal(run.validation[key],true);
+        } else if(p.evidence.benchmark_protocol.campaign==='concurrency-knee-20261006'){
+            const params=p.configuration.parameters;
+            assert.deepEqual([params.execution_seats,params.resident_seats],[36,36]);
+            assert.ok([32,36,37,40].includes(p.load.concurrency));
+            assert.equal(params.cann_version,'9.0.1');
+            assert.equal(run.validation.exact_retrieval_passed,40);
+            assert.equal(run.validation.owned_server_exit_zero,true);
+            assert.equal(run.validation.owned_devices_released,true);
         } else if(p.evidence.benchmark_protocol.campaign==='offloading-phase1-tp2-v1'){
             const params=p.configuration.parameters;
             assert.deepEqual(p.configuration.mods,['betterscale']);
@@ -882,7 +890,7 @@ test('DSV4 INT8 retains all 24 matched K5 windows including saturation points',(
     assert.equal(Object.keys(evidence.omitted).length,4);
 });
 
-test('BetterScale chart line uses only the displayed five-point configuration family',()=>{
+test('BetterScale chart includes the E36/R36 sweep and keeps historical standalone exclusion',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const points=model.presentationPoints(data.points,cohort);
@@ -890,7 +898,9 @@ test('BetterScale chart line uses only the displayed five-point configuration fa
     const lines=model.chartSeries(projected,'decode_p90_tps','output_tps_per_chip');
     const better=lines.find(line=>model.groupKey(line[0].point)==='betterscale');
     assert.deepEqual(better,model.groupFrontiers(points.filter(p=>model.groupKey(p)==='betterscale'),'decode_p90_tps','output_tps_per_chip')[0]);
-    assert.ok(better.every(row=>row.point.load.concurrency_series==='swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927'));
+    assert.ok(better.some(row=>row.point.load.concurrency===36));
+    assert.ok(points.some(p=>p.load.concurrency===37 && model.groupKey(p)==='betterscale'));
+    assert.ok(points.some(p=>p.load.concurrency===40 && model.groupKey(p)==='betterscale'));
     assert.ok(!points.some(point=>point.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
     assert.ok(data.points.some(point=>point.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
     assert.deepEqual(lines.filter(line=>model.groupKey(line[0].point)!=='betterscale'),model.concurrencySeries(projected.filter(row=>model.groupKey(row.point)!=='betterscale')));

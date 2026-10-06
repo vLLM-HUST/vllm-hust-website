@@ -211,3 +211,12 @@ invent a native C32 value, or connect unrelated cache-ablation dots. All six Bet
 joined in concurrency order, with E16/R20 versus E36/R36 retained in their original configurations.
 Download the source cohort and the study separately. The bounded browser check is
 `scripts/verify_betterscale_study_browser.cjs`.
+
+On October6 Fletcher explicitly requested publication of the fixed E36/R36 concurrency campaign. The
+main BetterScale group now additionally admits `swe-betterscale-e36-r36-cann901-knee-20261006`:
+C32/36/37/40 with complete repeats archived under the existing whole-run best-of rule. This is an
+extension of the earlier main-chart scope, not reinstatement of historical standalone C32. See
+`docs/FRONTIER-QWEN35-CONCURRENCY-KNEE.md`; do not present the C37 overload cliff as physical device
+capacity. The next investigation increases execution and residency together. Metadata-only raw-byte
+replacement of tokenizer path and transformers version exactly reconstructs historical8044561f from
+prepared3879dff; historical client8bb99eb and runtime identity still differ.
