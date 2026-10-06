@@ -96,7 +96,7 @@
             "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
             "measurement_scope": "Native TP2/EP2 depth2 measured at C2/4/8/16, including a separate C16 repeat. Deeper depths and other engines are not qualified by these points. BetterScale offloading phase1 adds matched ON/OFF C16/C32 at D1/D2 with fixed E16/R20; C32 is offered load, not32 execution seats."
           },
-          "display_scope": "The public concurrency comparison shows only declared five-point C1/C2/C4/C8/C16 sweeps with fixed configuration within each series. Fixed-concurrency A2A ablations, the BetterScale E36/R36 C32 capacity observation, and other configuration studies remain in the evidence snapshot but are excluded from this chart. Owner-authorized October6 extension: fixed E36/R36 CANN9.0.1 reconstruction C32/36/37/40, including regressions. Historical standalone C32 remains in the residency study; new campaign records carry their actual runtime and protocol. October6 width-matched extension additionally admits capacity64 source observations with execution/residency increasing alongside C; actual E/R/shared KV, card placement, co-run context and complete regressions remain downloadable.",
+          "display_scope": "The public concurrency comparison shows only declared five-point C1/C2/C4/C8/C16 sweeps with fixed configuration within each series. Fixed-concurrency A2A ablations, the BetterScale E36/R36 C32 capacity observation, and other configuration studies remain in the evidence snapshot but are excluded from this chart.",
           "display_series_ids": [
             "swe-v018-native-text-only-backport-20261001",
             "swe-unified-native-20260927",
@@ -110,13 +110,7 @@
             "swe-unified-pegaflow-vllm-connectors-20260929",
             "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
             "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-            "swe-utility-victim-on-tp2ep-m65-r1-20261003",
-            "swe-betterscale-e36-r36-cann901-knee-20261006",
-            "swe-betterscale-e40-r44-cann901-width-20261006",
-            "swe-betterscale-e44-r48-cann901-width-20261006",
-            "swe-betterscale-e48-r52-cann901-width-20261006",
-            "swe-betterscale-e52-r56-cann901-width-20261006",
-            "swe-betterscale-e56-r60-cann901-width-20261006"
+            "swe-utility-victim-on-tp2ep-m65-r1-20261003"
           ],
           "display_group_labels": {
             "betterscale": {
@@ -383,7 +377,7 @@
             "historical_annotation": "Fletcher confirmed on 2026-09-27 that all existing SWE 15-minute observations used session rotation depth 1. This annotates historical load metadata; it does not alter raw run artifacts or measured values.",
             "measurement_scope": "This page includes D1 and D2 observations. Rotation depth is a load facet, not a separate benchmark setting; compare matched depths within the same study group."
           },
-          "display_scope": "BetterScale residency and cache-policy studies, with the Native vLLM 752a3a5 / Ascend 9bf964c FULL_AND_PIECEWISE C1/C2/C4/C8/C16 reference and a workload-tuned BetterScale C1/C2/C4/C8/C16/C32 line. BetterScale C1–C16 uses E16/R20; C32 uses E36/R36 FULL cache. This is a measured configuration-family comparison, not a fixed-configuration sweep or causal ablation. Original residency/cache groups remain independent; compare full/incremental policies only within their matched group and depth.",
+          "display_scope": "BetterScale residency and cache-policy studies, with the Native vLLM 752a3a5 / Ascend 9bf964c FULL_AND_PIECEWISE C1/C2/C4/C8/C16 reference and a workload-tuned BetterScale C1/C2/C4/C8/C16/C32 line. BetterScale C1–C16 uses E16/R20; C32 uses E36/R36 FULL cache. This is a measured configuration-family comparison, not a fixed-configuration sweep or causal ablation. Original residency/cache groups remain independent; compare full/incremental policies only within their matched group and depth. October6 concurrency campaigns appear only here: fixed E36/R36 C32/36/37/40 and width-matched C37/40/44/48/52/56. Each campaign is a separate line; the width-matched line changes execution/resident capacity and is not a fixed-configuration sweep. Actual runtime, shared KV budget, card placement and co-run context remain in each source record.",
           "presentation": "configuration-study",
           "comparison_point_ids": [
             "qwen35-sweprefix-capacity16-native-tp2-c1-20260924",
@@ -396,7 +390,17 @@
             "qwen35-sweprefix-resident-balanced-tp2-c4-20260927",
             "qwen35-sweprefix-resident-balanced-tp2-c8-20260927",
             "qwen35-sweprefix-resident-balanced-tp2-c16-20260927",
-            "qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928"
+            "qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928",
+            "qwen35-sweprefix-e36-r36-c32-control-20261006",
+            "qwen35-sweprefix-e36-r36-c36-confirmation-20261006",
+            "qwen35-sweprefix-e36-r36-c40-confirmation-20261006",
+            "qwen35-sweprefix-e36-r36-c37-confirmation-20261006",
+            "qwen35-sweprefix-e40-r44-c37-control-20261006",
+            "qwen35-sweprefix-e40-r44-c40-sweep-20261006",
+            "qwen35-sweprefix-e44-r48-c44-sweep-20261006",
+            "qwen35-sweprefix-e48-r52-c48-confirmation-20261006",
+            "qwen35-sweprefix-e52-r56-c52-refinement-20261006",
+            "qwen35-sweprefix-e56-r60-c56-confirmation-20261006"
           ],
           "display_group_labels": {
             "betterscale": {

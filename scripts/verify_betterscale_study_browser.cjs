@@ -1,4 +1,4 @@
-/* Bounded QA for shared measurements, six-point family lines and source downloads. */
+/* Bounded QA for shared measurements, campaign-separated family lines and source downloads. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -8,7 +8,7 @@ const data = require('../data/leaderboard_frontier.json');
 const study = data.cohorts.find(c => c.id === 'qwen35-35b-a3b-bf16-sweprefix-study-betterscale-cache-v1');
 const expected = model.presentationPoints(data.points,study);
 const baseURL = process.argv[2] || 'http://127.0.0.1:8774';
-const output = path.resolve(__dirname,'../output/playwright/betterscale-study');
+const output = process.env.PLAYWRIGHT_OUTPUT_DIR || path.resolve(__dirname,'../output/playwright/betterscale-study');
 fs.mkdirSync(output,{recursive:true});
 (async () => {
     const browser = await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH});
@@ -25,9 +25,9 @@ fs.mkdirSync(output,{recursive:true});
             await page.waitForFunction(() => document.querySelector('#frontier-status')?.dataset.state === 'ready');
             assert.deepEqual((await page.locator('[data-point]').evaluateAll(nodes => nodes.map(n => n.dataset.point))).sort(),study.workload.contract.comparison_point_ids.slice().sort());
             const lines = await page.locator('polyline[data-series-points]').evaluateAll(nodes => nodes.map(n => JSON.parse(n.dataset.seriesPoints)));
-            assert.equal(lines.length,2);
-            assert.deepEqual(lines.map(ids => ids.map(id => data.points.find(p=>p.id===id).load.concurrency)).sort((a,b)=>a.length-b.length),[[1,2,4,8,16],[1,2,4,8,16,32]]);
-            assert.equal(await page.locator('[data-line-kind="configuration-family"]').count(),1);
+            assert.equal(lines.length,4);
+            assert.deepEqual(lines.map(ids => ids.map(id => data.points.find(p=>p.id===id).load.concurrency)).sort((a,b)=>a.length-b.length),[[32,36,37,40],[1,2,4,8,16],[1,2,4,8,16,32],[37,40,44,48,52,56]]);
+            assert.equal(await page.locator('[data-line-kind="configuration-family"]').count(),3);
             assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
             for (const id of study.workload.contract.comparison_point_ids) {
                 const dot = page.locator(`[data-point="${id}"]`);
@@ -47,18 +47,21 @@ fs.mkdirSync(output,{recursive:true});
             }
             await page.screenshot({path:path.join(output,`${language}-${width}-${theme}.png`),fullPage:true});
             await page.locator('[data-filter="mods"][value="native-runtime-752a3a5-9bf964c"]').uncheck();
-            assert.equal(await page.locator('polyline[data-series-points]').count(),1);
+            assert.equal(await page.locator('polyline[data-series-points]').count(),3);
             await page.locator('[data-filter="mods"][value="betterscale"]').uncheck();
             assert.equal(await page.locator('polyline[data-series-points]').count(),0);
             assert.equal(await page.locator('[data-point]').count(),0);
             await page.locator('#frontier-mods-toggle').click();
             assert.equal(await page.locator('[data-point]').count(),expected.length);
-            assert.equal(await page.locator('polyline[data-series-points]').count(),2);
+            assert.equal(await page.locator('polyline[data-series-points]').count(),4);
             await page.locator('#frontier-workload').selectOption('qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
             assert.equal(await page.locator('[data-point="qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928"]').count(),0);
+            for (const point of data.points.filter(p=>['concurrency-knee-20261006','concurrency-width-20261006'].includes(p.evidence?.benchmark_protocol?.campaign))) {
+                assert.equal(await page.locator(`[data-point="${point.id}"]`).count(),0);
+            }
             assert.deepEqual(errors,[]);
             await context.close();
-            console.log(`PASS ${language} ${width} ${theme}: exact points, two lines, source downloads, filters, main exclusion`);
+            console.log(`PASS ${language} ${width} ${theme}: exact points, four campaign-separated lines, source downloads, filters, main exclusion`);
         }
     } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode=1; });

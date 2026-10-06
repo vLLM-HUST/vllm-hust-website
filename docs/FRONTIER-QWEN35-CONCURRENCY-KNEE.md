@@ -23,8 +23,9 @@ The chart follows existing whole-run best-of repeat selection: four configuratio
 the other three full observations remain in `archived_points` and
 [the complete metric/configuration extract](../data/leaderboard_betterscale_knee_evidence.json). No
 percentile pooling or independently selected X/Y coordinates. Regressing C37/C40 configurations
-remain visible. This new campaign extends the main BetterScale group; it does not reinstate the
-historical standalone C32 point or change other groups.
+remain visible. This campaign appears only in **BetterScale residency and cache studies**, not the
+main chart. It does not reinstate historical standalone C32 in the main chart or change other
+groups.
 
 ## Interpretation
 

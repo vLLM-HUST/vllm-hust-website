@@ -83,8 +83,10 @@ after the campaigns.
 
 The chart retains six configurations and archives the two inferior identical-configuration repeats
 under the existing whole-run highest-throughput selection rule. Slower C48/C52/C56 configurations
-remain present. BetterScale keeps one MOD identity and its group Pareto curve. Distinct E/R settings
-have distinct measured-series IDs; singleton capacities do not fabricate fixed-setting sweeps.
+remain present only in **BetterScale residency and cache studies**, not the first/main chart.
+BetterScale keeps one MOD identity, with this width-matched campaign connected separately from the
+original tuned line and fixed-E36 campaign. Distinct E/R settings retain their measured-series IDs;
+the width-matched line is explicitly a changing-capacity family, not a fixed-setting sweep.
 
 ## Source and protocol envelope
 

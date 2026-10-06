@@ -50,10 +50,10 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
     assert.equal(all.length,187);
-    assert.equal(displayed.length,75);
+    assert.equal(displayed.length,65);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
-    assert.equal(betterScale.length,15);
+    assert.equal(betterScale.length,5);
     assert.equal(betterScale.filter(p=>p.load.concurrency_series==='swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927').length,5);
     const hiddenIds=new Set(all.filter(p=>!displayed.includes(p)).map(p=>p.id));
     assert.ok(hiddenIds.has('qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
@@ -99,7 +99,7 @@ test('Qwen3.5 configuration studies consolidate related observations without imp
     assert.ok(measured.length>0);
     // Tuned BetterScale singleton capacities are not fictitious fixed-setting sweeps.
     const singleton=measured.filter(row=>!connected.has(row.point.id));
-    assert.deepEqual(singleton.map(row=>row.point.load.concurrency).sort((a,b)=>a-b),[44,48,52,56]);
+    assert.deepEqual(singleton.map(row=>row.point.load.concurrency).sort((a,b)=>a-b),[]);
     assert.ok(singleton.every(row=>model.groupKey(row.point)==='betterscale' && row.point.evidence.benchmark_protocol.campaign==='concurrency-width-20261006'));
 
 });
@@ -908,7 +908,7 @@ test('DSV4 INT8 retains all 24 matched K5 windows including saturation points',(
     assert.equal(Object.keys(evidence.omitted).length,4);
 });
 
-test('BetterScale chart includes the E36/R36 sweep and keeps historical standalone exclusion',()=>{
+test('BetterScale main chart excludes the October6 campaigns and keeps historical standalone exclusion',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const points=model.presentationPoints(data.points,cohort);
@@ -916,9 +916,7 @@ test('BetterScale chart includes the E36/R36 sweep and keeps historical standalo
     const lines=model.chartSeries(projected,'decode_p90_tps','output_tps_per_chip');
     const better=lines.find(line=>model.groupKey(line[0].point)==='betterscale');
     assert.deepEqual(better,model.groupFrontiers(points.filter(p=>model.groupKey(p)==='betterscale'),'decode_p90_tps','output_tps_per_chip')[0]);
-    assert.ok(better.some(row=>row.point.load.concurrency===36));
-    assert.ok(points.some(p=>p.load.concurrency===37 && model.groupKey(p)==='betterscale'));
-    assert.ok(points.some(p=>p.load.concurrency===40 && model.groupKey(p)==='betterscale'));
+    assert.ok(!points.some(p=>['concurrency-knee-20261006','concurrency-width-20261006'].includes(p.evidence?.benchmark_protocol?.campaign)));
     assert.ok(!points.some(point=>point.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
     assert.ok(data.points.some(point=>point.id==='qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928'));
     assert.deepEqual(lines.filter(line=>model.groupKey(line[0].point)!=='betterscale'),model.concurrencySeries(projected.filter(row=>model.groupKey(row.point)!=='betterscale')));
@@ -926,30 +924,34 @@ test('BetterScale chart includes the E36/R36 sweep and keeps historical standalo
 });
 
 
-test('BetterScale cache study reuses exact Native and tuned C1–C32 measurements without changing the main chart',()=>{
+test('BetterScale cache study reuses exact Native and all selected campaign measurements without changing the main chart',()=>{
     const data=require('../data/leaderboard_frontier.json');
     model.validate(data);
     const study=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-study-betterscale-cache-v1');
     const main=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const shared=study.workload.contract.comparison_point_ids;
-    assert.equal(shared.length,11);
+    assert.equal(shared.length,21);
     const points=model.presentationPoints(data.points,study);
-    assert.equal(points.length,data.points.filter(p=>p.cohort_id===study.id).length+11);
+    assert.equal(points.length,data.points.filter(p=>p.cohort_id===study.id).length+21);
     for(const id of shared) assert.equal(points.find(p=>p.id===id),data.points.find(p=>p.id===id));
     const rows=model.project(points,'decode_p90_tps','output_tps_per_chip').measured;
     const lines=model.chartSeries(rows,'decode_p90_tps','output_tps_per_chip',study);
-    assert.equal(lines.length,2);
+    assert.equal(lines.length,4);
     const better=lines.find(line=>model.groupKey(line[0].point)==='betterscale');
     const native=lines.find(line=>model.groupKey(line[0].point)==='native-runtime-752a3a5-9bf964c');
     assert.deepEqual(better.map(row=>row.point.load.concurrency),[1,2,4,8,16,32]);
     assert.deepEqual(native.map(row=>row.point.load.concurrency),[1,2,4,8,16]);
     assert.equal(model.value(better.at(-1).point,'output_tps_per_chip'),613.88);
     assert.ok(lines.flat().every(row=>shared.includes(row.point.id)));
+    assert.deepEqual(lines.slice(2).map(line=>line.map(r=>r.point.load.concurrency)),[[32,36,37,40],[37,40,44,48,52,56]]);
+    const newPoints=points.filter(p=>['concurrency-knee-20261006','concurrency-width-20261006'].includes(p.evidence?.benchmark_protocol?.campaign));
+    assert.equal(newPoints.length,10);
+    assert.ok(newPoints.every(p=>!model.presentationPoints(data.points,main).includes(p)));
     const c32=better.at(-1).point;
     assert.ok(!model.presentationPoints(data.points,main).includes(c32));
     assert.equal(model.chartSeries(rows.filter(row=>row.point===c32),'decode_p90_tps','output_tps_per_chip',study).length,0);
     const withoutNative=model.chartSeries(rows.filter(row=>model.groupKey(row.point)!=='native-runtime-752a3a5-9bf964c'),'decode_p90_tps','output_tps_per_chip',study);
-    assert.equal(withoutNative.length,1);
+    assert.equal(withoutNative.length,3);
     for(const invalid of [[shared[0],shared[0]],['missing-point'],[],[data.points.find(p=>p.cohort_id==='qwen38-27b-bf16-sweprefix-smoke-v1').id]]){
         const fixture=structuredClone(data);
         fixture.cohorts.find(c=>c.id===study.id).workload.contract.comparison_point_ids=invalid;
