@@ -1156,7 +1156,7 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
     assert (
-            "22 catalog entries, with activation and performance evidence kept separate."
+        "22 catalog entries, with activation and performance evidence kept separate."
         in html_text
     )
     assert "22 个目录条目，启用证据与性能证据分开呈现。" in html_text
