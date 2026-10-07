@@ -87,9 +87,17 @@ def test_legacy_migration_cards_preserve_original_ownership() -> None:
         component = by_id(component_id)
         assert component["ownership"] == "original_contributor_maintained"
         assert component["maintainers"] == maintainers
-        assert component["delivery_model"] == "migration_scaffold"
+        expected_delivery = (
+            "plugin_bundle"
+            if component_id in {"knorm-migration", "pyramidkv-ascend-migration"}
+            else "migration_scaffold"
+        )
+        assert component["delivery_model"] == expected_delivery
         assert component["maturity"] == "incubating"
-        assert "Repository scaffold only" in component["summary_en"]
+        if expected_delivery == "migration_scaffold":
+            assert "Repository scaffold only" in component["summary_en"]
+        else:
+            assert "ECPA 0.3" in component["summary_en"]
 
     assert "Original maintainers" in SCRIPT
     assert "原负责人" in SCRIPT
@@ -605,7 +613,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
     assert kvcompress["advisors"] == [
         {"name_zh": "万瑶", "name_en": "Yao Wan", "relationship": "internal"}
     ]
-    assert "knorm-migration" not in WORKSHOP_METADATA["plugins"]
+    assert "knorm-migration" in WORKSHOP_METADATA["plugins"]
     assert {
         advisor["name_zh"]
         for advisor in WORKSHOP_METADATA["plugins"]["quantized-kv-cache-migration"][
@@ -1031,7 +1039,7 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
         )
 
     pyramid = by_id("pyramidkv-ascend-migration")
-    assert pyramid["public_surface"] is False
+    assert pyramid["public_surface"] is True
     assert pyramid["maintainer_profiles"] == [{"login": "Irisuko", "name": "毛潮云"}]
     assert any(
         advisor["name_zh"] == "罗瑞坤" and advisor["relationship"] == "internal"
@@ -1093,7 +1101,7 @@ def test_promoted_runtime_entries_publish_current_hardware_contracts() -> None:
     assert pipeline["compatibility"]["followup_url"].endswith("/issues/3")
 
 
-def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
+def test_compatibility_gaps_follow_current_repository_contracts() -> None:
     kvcompress = by_id("kvcompress-ascend")["compatibility"]
     assert kvcompress["status"] == "verified"
     assert kvcompress["versions"] == [
@@ -1111,8 +1119,8 @@ def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
         "pyramidkv-ascend-migration",
     ):
         compatibility = by_id(component_id)["compatibility"]
-        assert compatibility["status"] == "source_scaffold"
-        assert compatibility["versions"] == ["No installable or runnable release"]
+        assert compatibility["status"] == "inspect_only"
+        assert compatibility["versions"][0].startswith("ECPA 0.3 package ")
 
 
 def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
@@ -1144,7 +1152,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 18
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 22
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1154,11 +1162,8 @@ def test_non_runnable_descriptors_scaffolds_and_legacy_carriers_are_not_publishe
     unpublished = {
         "ascend-adaptive-quantized-kv",
         "ascend-quant-runtime-descriptor",
-        "knorm-migration",
         "kv-transfer-observability-migration",
-        "pyramidkv-ascend-migration",
         "dla",
-        "kv-tiering-migration",
     }
     for component_id in unpublished:
         assert by_id(component_id)["public_surface"] is False
@@ -1184,7 +1189,7 @@ def test_performance_evidence_cannot_override_the_publication_gate():
     assert "Math.max(pageSize, measuredCount)" in SCRIPT
     performance_ids = {item["id"] for item in PLUGIN_PERFORMANCE["entries"]}
     assert measured <= performance_ids
-    hidden_measured = {"dla", "kv-tiering-migration"}
+    hidden_measured = {"dla"}
     assert all(
         by_id(component_id)["public_surface"] is False
         for component_id in hidden_measured
