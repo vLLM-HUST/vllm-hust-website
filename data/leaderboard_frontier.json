@@ -83,7 +83,8 @@
               "sha256": "3879dffad03bc6ad4574f75dab06f27bb905e5bb18104be0d4bf39b42fdc9a1e",
               "transformers": "5.14.1",
               "equivalence": "Replacing only tokenizer.path /models/Qwen3.5-35B-A3B with /workspace/models/Qwen3.5-35B-A3B and tokenizer.transformers5.14.1 with5.17.0 in original compact JSON reconstructs historical8044561f SHA256 exactly. All session input-token deltas, output budgets, order and policy are unchanged."
-            }
+            },
+
           ],
           "prepared_workload_equivalence": "Direct structural comparison: all360 fixed input-ID deltas, output budgets, session ordering, source identity and policy identical. Files differ only in tokenizer path/version metadata; tokenizer fingerprint identical. Exact file identity retained per point.",
           "client_versions": "0.1.0 routes session affinity by cache_salt at relay;0.1.1 additionally sends X-Correlation-ID equal to that salt. Same sticky-play policy; exact revision/transport retained per point. Version0.1.3 adds explicit per-lane session rotation; exact depth and revision are recorded per point.",
@@ -110,7 +111,9 @@
             "swe-unified-pegaflow-vllm-connectors-20260929",
             "swe-betterscale-resident-e16-r20-balanced-attn-graph-full-20260927",
             "swe-utility-victim-off-tp2ep-m65-r1-20261003",
-            "swe-utility-victim-on-tp2ep-m65-r1-20261003"
+            "swe-utility-victim-on-tp2ep-m65-r1-20261003",
+            "pr173-dev4-20261006-off-mean3",
+            "pr173-dev4-20261006-on-mean3"
           ],
           "display_group_labels": {
             "betterscale": {
@@ -600,6 +603,1746 @@
     }
   ],
   "points": [
+    {
+      "id": "pr173-dev4-20261006-off-c1-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing OFF · C1 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 1,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-off-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-off-mean3",
+          "label_en": "Prefix Routing OFF (3-run mean)",
+          "label_zh": "Prefix Routing OFF（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 39.36962962962963,
+        "output_tps_per_chip": 9.842407407407407,
+        "decode_p90_tps": 48.341173619591835,
+        "ttft_p95_ms": 2308.2366846812265,
+        "tpot_p95_ms": 26.00238089965319,
+        "e2e_p95_ms": 37909.67002849404,
+        "completed_requests": 76.33333333333333
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "9a042bbac9c74af6b8b052446f5274f0",
+          "82d46bf49da44f1f8c24d2657e6695b3",
+          "410ac660de574b769e336acaaca14328"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 39.36962962962963,
+            "sample_sd": 2.5735003623909503,
+            "min": 36.44,
+            "max": 41.26555555555556,
+            "values": [
+              36.44,
+              41.26555555555556,
+              40.403333333333336
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 9.842407407407407,
+            "sample_sd": 0.6433750905977376,
+            "min": 9.11,
+            "max": 10.31638888888889,
+            "values": [
+              9.11,
+              10.31638888888889,
+              10.100833333333334
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 48.341173619591835,
+            "sample_sd": 0.2987480750652965,
+            "min": 48.13239114202275,
+            "max": 48.683383739355804,
+            "values": [
+              48.20774597739696,
+              48.13239114202275,
+              48.683383739355804
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 2308.2366846812265,
+            "sample_sd": 2628.204381808649,
+            "min": 780.0965390168124,
+            "max": 5343.00027359277,
+            "values": [
+              5343.00027359277,
+              780.0965390168124,
+              801.6132414340975
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 26.00238089965319,
+            "sample_sd": 0.9223136801452241,
+            "min": 25.174102874993157,
+            "max": 26.99628638219512,
+            "values": [
+              25.174102874993157,
+              25.83675344177129,
+              26.99628638219512
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 37909.67002849404,
+            "sample_sd": 744.158091333604,
+            "min": 37465.558106917844,
+            "max": 38768.78541801128,
+            "values": [
+              37494.666560553,
+              37465.558106917844,
+              38768.78541801128
+            ]
+          },
+          "completed_requests": {
+            "mean": 76.33333333333333,
+            "sample_sd": 3.0550504633038935,
+            "min": 73,
+            "max": 79,
+            "values": [
+              73,
+              79,
+              77
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-off-c1-r1",
+          "swe-off-c1-r2",
+          "swe-off-c1-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
+    {
+      "id": "pr173-dev4-20261006-off-c2-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing OFF · C2 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 2,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-off-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-off-mean3",
+          "label_en": "Prefix Routing OFF (3-run mean)",
+          "label_zh": "Prefix Routing OFF（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 75.7988888888889,
+        "output_tps_per_chip": 18.949722222222224,
+        "decode_p90_tps": 47.40124374882035,
+        "ttft_p95_ms": 902.8285994194448,
+        "tpot_p95_ms": 29.767118929912318,
+        "e2e_p95_ms": 41593.51811700809,
+        "completed_requests": 127.33333333333333
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "fedeb92ac4ee477d8a4cfb932061080d",
+          "9be53b07c83c47f2896f50d2cee1ed5b",
+          "c205840d36cc4dc9b879a00bd0bdee5a"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 75.7988888888889,
+            "sample_sd": 2.0658460138854546,
+            "min": 74.33666666666667,
+            "max": 78.16222222222223,
+            "values": [
+              78.16222222222223,
+              74.89777777777778,
+              74.33666666666667
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 18.949722222222224,
+            "sample_sd": 0.5164615034713637,
+            "min": 18.58416666666667,
+            "max": 19.540555555555557,
+            "values": [
+              19.540555555555557,
+              18.724444444444444,
+              18.58416666666667
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 47.40124374882035,
+            "sample_sd": 0.2951366592862136,
+            "min": 47.1774101502173,
+            "max": 47.73571287400712,
+            "values": [
+              47.29060822223663,
+              47.73571287400712,
+              47.1774101502173
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 902.8285994194448,
+            "sample_sd": 3.640855137959661,
+            "min": 900.2513372339308,
+            "max": 906.9937068037688,
+            "values": [
+              901.2407542206347,
+              906.9937068037688,
+              900.2513372339308
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 29.767118929912318,
+            "sample_sd": 0.7333727352338604,
+            "min": 28.924629453428476,
+            "max": 30.262486406196487,
+            "values": [
+              28.924629453428476,
+              30.262486406196487,
+              30.114240930111993
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 41593.51811700809,
+            "sample_sd": 2268.5111568315197,
+            "min": 40067.10775149985,
+            "max": 44200.27867341412,
+            "values": [
+              44200.27867341412,
+              40067.10775149985,
+              40513.167926110305
+            ]
+          },
+          "completed_requests": {
+            "mean": 127.33333333333333,
+            "sample_sd": 0.5773502691896257,
+            "min": 127,
+            "max": 128,
+            "values": [
+              128,
+              127,
+              127
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-off-c2-r1",
+          "swe-off-c2-r2",
+          "swe-off-c2-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
+    {
+      "id": "pr173-dev4-20261006-off-c4-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing OFF · C4 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 4,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-off-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-off-mean3",
+          "label_en": "Prefix Routing OFF (3-run mean)",
+          "label_zh": "Prefix Routing OFF（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 134.14037037037036,
+        "output_tps_per_chip": 33.53509259259259,
+        "decode_p90_tps": 44.85098366176507,
+        "ttft_p95_ms": 1122.0442628798373,
+        "tpot_p95_ms": 37.30747240385289,
+        "e2e_p95_ms": 58973.30148442025,
+        "completed_requests": 200.33333333333334
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "62658b91a46f40918d4799941576eb36",
+          "7732de29aa0e462a9672305edee449e2",
+          "bead12396b0a47a29b33963fcc53a177"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 134.14037037037036,
+            "sample_sd": 3.355840005113139,
+            "min": 130.26888888888888,
+            "max": 136.2188888888889,
+            "values": [
+              135.93333333333334,
+              136.2188888888889,
+              130.26888888888888
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 33.53509259259259,
+            "sample_sd": 0.8389600012782847,
+            "min": 32.56722222222222,
+            "max": 34.054722222222225,
+            "values": [
+              33.983333333333334,
+              34.054722222222225,
+              32.56722222222222
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 44.85098366176507,
+            "sample_sd": 2.0107725354298354,
+            "min": 43.40334516552329,
+            "max": 47.14689173606216,
+            "values": [
+              43.40334516552329,
+              44.00271408370976,
+              47.14689173606216
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 1122.0442628798373,
+            "sample_sd": 140.51028608256715,
+            "min": 997.8245209902524,
+            "max": 1274.543471075594,
+            "values": [
+              1274.543471075594,
+              997.8245209902524,
+              1093.7647965736658
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 37.30747240385289,
+            "sample_sd": 1.052432113339251,
+            "min": 36.25700440818568,
+            "max": 38.361857699281906,
+            "values": [
+              36.25700440818568,
+              37.303555104091096,
+              38.361857699281906
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 58973.30148442025,
+            "sample_sd": 3622.467611368377,
+            "min": 55075.12467475608,
+            "max": 62235.94794501549,
+            "values": [
+              55075.12467475608,
+              62235.94794501549,
+              59608.83183348917
+            ]
+          },
+          "completed_requests": {
+            "mean": 200.33333333333334,
+            "sample_sd": 4.725815626252609,
+            "min": 195,
+            "max": 204,
+            "values": [
+              204,
+              202,
+              195
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-off-c4-r1",
+          "swe-off-c4-r2",
+          "swe-off-c4-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
+    {
+      "id": "pr173-dev4-20261006-off-c8-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing OFF · C8 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-off-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-off-mean3",
+          "label_en": "Prefix Routing OFF (3-run mean)",
+          "label_zh": "Prefix Routing OFF（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 215.4777777777778,
+        "output_tps_per_chip": 53.86944444444445,
+        "decode_p90_tps": 38.824027932977266,
+        "ttft_p95_ms": 4804.30175575117,
+        "tpot_p95_ms": 59.16860813627393,
+        "e2e_p95_ms": 75240.21730953825,
+        "completed_requests": 336.3333333333333
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "c1dbade51de94df89d5582daf9316b66",
+          "1117e8f5ea8846cb9b69fb7cb764dc09",
+          "3270cde6141b49af87d4a05ceb1632f6"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 215.4777777777778,
+            "sample_sd": 11.10092939052101,
+            "min": 203.70444444444445,
+            "max": 225.75444444444443,
+            "values": [
+              203.70444444444445,
+              225.75444444444443,
+              216.97444444444446
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 53.86944444444445,
+            "sample_sd": 2.7752323476302525,
+            "min": 50.92611111111111,
+            "max": 56.43861111111111,
+            "values": [
+              50.92611111111111,
+              56.43861111111111,
+              54.243611111111115
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 38.824027932977266,
+            "sample_sd": 0.6847279738172102,
+            "min": 38.06043331103423,
+            "max": 39.38343390965116,
+            "values": [
+              39.38343390965116,
+              38.06043331103423,
+              39.0282165782464
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 4804.30175575117,
+            "sample_sd": 3118.380192944974,
+            "min": 2885.2189024910317,
+            "max": 8402.429125551127,
+            "values": [
+              8402.429125551127,
+              2885.2189024910317,
+              3125.2572392113507
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 59.16860813627393,
+            "sample_sd": 15.564563379409206,
+            "min": 49.12849614120482,
+            "max": 77.09806948558585,
+            "values": [
+              77.09806948558585,
+              49.12849614120482,
+              51.279258782031114
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 75240.21730953825,
+            "sample_sd": 6248.576936655909,
+            "min": 71571.11961189653,
+            "max": 82455.10121271941,
+            "values": [
+              82455.10121271941,
+              71571.11961189653,
+              71694.4311039988
+            ]
+          },
+          "completed_requests": {
+            "mean": 336.3333333333333,
+            "sample_sd": 12.503332889007368,
+            "min": 324,
+            "max": 349,
+            "values": [
+              324,
+              349,
+              336
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-off-c8-r1",
+          "swe-off-c8-r2",
+          "swe-off-c8-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
+    {
+      "id": "pr173-dev4-20261006-off-c16-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing OFF · C16 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-off-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-off-mean3",
+          "label_en": "Prefix Routing OFF (3-run mean)",
+          "label_zh": "Prefix Routing OFF（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 297.39296296296294,
+        "output_tps_per_chip": 74.34824074074074,
+        "decode_p90_tps": 32.37492427282852,
+        "ttft_p95_ms": 5229.6175417955965,
+        "tpot_p95_ms": 116.10365324571234,
+        "e2e_p95_ms": 105456.90210092191,
+        "completed_requests": 473
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "2ed8f0814b7349b5b96ea961a75571c7",
+          "910be7599b1a4b3682338b99a48e33c2",
+          "bd9cd8e9f4cd4646accd0558b4ee1375"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 297.39296296296294,
+            "sample_sd": 10.241170923922905,
+            "min": 287.2788888888889,
+            "max": 307.75666666666666,
+            "values": [
+              287.2788888888889,
+              297.1433333333333,
+              307.75666666666666
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 74.34824074074074,
+            "sample_sd": 2.560292730980726,
+            "min": 71.81972222222223,
+            "max": 76.93916666666667,
+            "values": [
+              71.81972222222223,
+              74.28583333333333,
+              76.93916666666667
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 32.37492427282852,
+            "sample_sd": 1.5781058594966306,
+            "min": 30.674724034822855,
+            "max": 33.792833749619426,
+            "values": [
+              32.6572150340433,
+              33.792833749619426,
+              30.674724034822855
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 5229.6175417955965,
+            "sample_sd": 1790.3560434165845,
+            "min": 4134.604271501303,
+            "max": 7295.703847426921,
+            "values": [
+              7295.703847426921,
+              4134.604271501303,
+              4258.544506458566
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 116.10365324571234,
+            "sample_sd": 36.24364708512431,
+            "min": 81.84528658775871,
+            "max": 154.05050189714902,
+            "values": [
+              154.05050189714902,
+              112.41517125222927,
+              81.84528658775871
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 105456.90210092191,
+            "sample_sd": 5415.730190124912,
+            "min": 99204.9996573478,
+            "max": 108707.03210211358,
+            "values": [
+              108458.67454330437,
+              99204.9996573478,
+              108707.03210211358
+            ]
+          },
+          "completed_requests": {
+            "mean": 473,
+            "sample_sd": 18.083141320025124,
+            "min": 456,
+            "max": 492,
+            "values": [
+              456,
+              471,
+              492
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-off-c16-r1",
+          "swe-off-c16-r2",
+          "swe-off-c16-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
+    {
+      "id": "pr173-dev4-20261006-on-c1-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing ON · C1 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "prefix-routing"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 1,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-on-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-on-mean3",
+          "label_en": "Prefix Routing ON (3-run mean)",
+          "label_zh": "Prefix Routing ON（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 39.745925925925924,
+        "output_tps_per_chip": 9.936481481481481,
+        "decode_p90_tps": 48.20385737497275,
+        "ttft_p95_ms": 734.0772839418302,
+        "tpot_p95_ms": 26.424676122031695,
+        "e2e_p95_ms": 41581.183360066876,
+        "completed_requests": 76
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "1207a78c57124844b287b476bb527207",
+          "39c6f22bda61472b87c1f64a5956c761",
+          "ae79f9ffcb5f40f6bbc2926dc4eb5f6f"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 39.745925925925924,
+            "sample_sd": 0.5848671193742242,
+            "min": 39.39555555555555,
+            "max": 40.42111111111111,
+            "values": [
+              40.42111111111111,
+              39.42111111111111,
+              39.39555555555555
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 9.936481481481481,
+            "sample_sd": 0.14621677984355605,
+            "min": 9.848888888888888,
+            "max": 10.105277777777777,
+            "values": [
+              10.105277777777777,
+              9.855277777777777,
+              9.848888888888888
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 48.20385737497275,
+            "sample_sd": 0.009267178874433946,
+            "min": 48.19379720345157,
+            "max": 48.2120458331012,
+            "values": [
+              48.19379720345157,
+              48.20572908836547,
+              48.2120458331012
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 734.0772839418302,
+            "sample_sd": 5.75378159169778,
+            "min": 729.1325845289975,
+            "max": 740.3926094993949,
+            "values": [
+              740.3926094993949,
+              729.1325845289975,
+              732.7066577970982
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 26.424676122031695,
+            "sample_sd": 0.33637302708726463,
+            "min": 26.0563876817835,
+            "max": 26.715682552204594,
+            "values": [
+              26.0563876817835,
+              26.715682552204594,
+              26.50195813210699
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 41581.183360066876,
+            "sample_sd": 4031.630216607099,
+            "min": 37579.115947615326,
+            "max": 45641.73995354213,
+            "values": [
+              41522.69417904318,
+              45641.73995354213,
+              37579.115947615326
+            ]
+          },
+          "completed_requests": {
+            "mean": 76,
+            "sample_sd": 1.0,
+            "min": 75,
+            "max": 77,
+            "values": [
+              77,
+              76,
+              75
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-on-c1-r1",
+          "swe-on-c1-r2",
+          "swe-on-c1-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
+    {
+      "id": "pr173-dev4-20261006-on-c2-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing ON · C2 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "prefix-routing"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 2,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-on-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-on-mean3",
+          "label_en": "Prefix Routing ON (3-run mean)",
+          "label_zh": "Prefix Routing ON（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 79.96148148148148,
+        "output_tps_per_chip": 19.99037037037037,
+        "decode_p90_tps": 48.116491774538474,
+        "ttft_p95_ms": 782.8717299116155,
+        "tpot_p95_ms": 29.207498327070077,
+        "e2e_p95_ms": 45199.039948452235,
+        "completed_requests": 130.33333333333334
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "ffd0dddca204494a9a0c2f71d674d937",
+          "aa3a2f6f0f904af9aea65e38f96c6582",
+          "5a0d91ccc531486aa6042f04bf62bf5c"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 79.96148148148148,
+            "sample_sd": 3.192260960691064,
+            "min": 76.95111111111112,
+            "max": 83.30888888888889,
+            "values": [
+              83.30888888888889,
+              76.95111111111112,
+              79.62444444444445
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 19.99037037037037,
+            "sample_sd": 0.798065240172766,
+            "min": 19.23777777777778,
+            "max": 20.827222222222222,
+            "values": [
+              20.827222222222222,
+              19.23777777777778,
+              19.906111111111112
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 48.116491774538474,
+            "sample_sd": 0.2594999919160941,
+            "min": 47.843122427018805,
+            "max": 48.35944095639935,
+            "values": [
+              48.35944095639935,
+              47.843122427018805,
+              48.14691194019728
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 782.8717299116155,
+            "sample_sd": 42.86439547448418,
+            "min": 750.9852385614067,
+            "max": 831.5990441478789,
+            "values": [
+              750.9852385614067,
+              831.5990441478789,
+              766.0309070255607
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 29.207498327070077,
+            "sample_sd": 2.2212203714680805,
+            "min": 26.749838259559702,
+            "max": 31.07174175622111,
+            "values": [
+              26.749838259559702,
+              31.07174175622111,
+              29.800914965429417
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 45199.039948452235,
+            "sample_sd": 1992.9103932487365,
+            "min": 43618.24699845164,
+            "max": 47437.715427111754,
+            "values": [
+              47437.715427111754,
+              44541.15741979331,
+              43618.24699845164
+            ]
+          },
+          "completed_requests": {
+            "mean": 130.33333333333334,
+            "sample_sd": 2.0816659994661326,
+            "min": 128,
+            "max": 132,
+            "values": [
+              132,
+              131,
+              128
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-on-c2-r1",
+          "swe-on-c2-r2",
+          "swe-on-c2-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
+    {
+      "id": "pr173-dev4-20261006-on-c4-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing ON · C4 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "prefix-routing"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 4,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-on-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-on-mean3",
+          "label_en": "Prefix Routing ON (3-run mean)",
+          "label_zh": "Prefix Routing ON（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 142.6511111111111,
+        "output_tps_per_chip": 35.66277777777778,
+        "decode_p90_tps": 44.19291653979049,
+        "ttft_p95_ms": 905.5141290804991,
+        "tpot_p95_ms": 35.2284269167109,
+        "e2e_p95_ms": 58517.479440880255,
+        "completed_requests": 206.33333333333334
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "42659e1bcb7240b8b4c80f5653aec515",
+          "c5c74c39d81b4da9a1699a56d3c7aca1",
+          "5f5c8837823b4260ae21b6f234aed54a"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 142.6511111111111,
+            "sample_sd": 1.2571960767154269,
+            "min": 141.22333333333333,
+            "max": 143.59222222222223,
+            "values": [
+              143.13777777777779,
+              143.59222222222223,
+              141.22333333333333
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 35.66277777777778,
+            "sample_sd": 0.3142990191788567,
+            "min": 35.30583333333333,
+            "max": 35.89805555555556,
+            "values": [
+              35.784444444444446,
+              35.89805555555556,
+              35.30583333333333
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 44.19291653979049,
+            "sample_sd": 0.25465354210854585,
+            "min": 43.92257225646515,
+            "max": 44.42825805233773,
+            "values": [
+              44.22791931056858,
+              44.42825805233773,
+              43.92257225646515
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 905.5141290804991,
+            "sample_sd": 11.421530442669768,
+            "min": 896.4535023551433,
+            "max": 918.3438484556973,
+            "values": [
+              918.3438484556973,
+              896.4535023551433,
+              901.7450364306566
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 35.2284269167109,
+            "sample_sd": 0.19619328564952743,
+            "min": 35.00750147499455,
+            "max": 35.38231505910742,
+            "values": [
+              35.38231505910742,
+              35.00750147499455,
+              35.29546421603074
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 58517.479440880255,
+            "sample_sd": 3882.1229094807454,
+            "min": 56134.8846103996,
+            "max": 62997.136582434054,
+            "values": [
+              56134.8846103996,
+              56420.41712980712,
+              62997.136582434054
+            ]
+          },
+          "completed_requests": {
+            "mean": 206.33333333333334,
+            "sample_sd": 2.8867513459481287,
+            "min": 203,
+            "max": 208,
+            "values": [
+              208,
+              208,
+              203
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-on-c4-r1",
+          "swe-on-c4-r2",
+          "swe-on-c4-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
+    {
+      "id": "pr173-dev4-20261006-on-c8-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing ON · C8 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "prefix-routing"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-on-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-on-mean3",
+          "label_en": "Prefix Routing ON (3-run mean)",
+          "label_zh": "Prefix Routing ON（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 247.19925925925926,
+        "output_tps_per_chip": 61.799814814814816,
+        "decode_p90_tps": 38.63521655055411,
+        "ttft_p95_ms": 973.3579294600833,
+        "tpot_p95_ms": 40.617285018227335,
+        "e2e_p95_ms": 64407.531099176595,
+        "completed_requests": 369.3333333333333
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "65d362972cc348a5a4725a89d8d1f477",
+          "0bede8549ea747098da378ae668781c9",
+          "ee93919c7ff6483db1f1afbdb1807aba"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 247.19925925925926,
+            "sample_sd": 2.4318098562500174,
+            "min": 245.7111111111111,
+            "max": 250.00555555555556,
+            "values": [
+              250.00555555555556,
+              245.88111111111112,
+              245.7111111111111
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 61.799814814814816,
+            "sample_sd": 0.6079524640625044,
+            "min": 61.42777777777778,
+            "max": 62.50138888888889,
+            "values": [
+              62.50138888888889,
+              61.47027777777778,
+              61.42777777777778
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 38.63521655055411,
+            "sample_sd": 0.1469041390817754,
+            "min": 38.496661243986814,
+            "max": 38.78924469850233,
+            "values": [
+              38.496661243986814,
+              38.78924469850233,
+              38.619743709173186
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 973.3579294600833,
+            "sample_sd": 33.50209347202808,
+            "min": 937.705503962934,
+            "max": 1004.1867836378511,
+            "values": [
+              937.705503962934,
+              978.1815007794647,
+              1004.1867836378511
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 40.617285018227335,
+            "sample_sd": 0.8857229736540818,
+            "min": 39.603289922486304,
+            "max": 41.2398924507033,
+            "values": [
+              39.603289922486304,
+              41.00867268149239,
+              41.2398924507033
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 64407.531099176595,
+            "sample_sd": 3334.835848342249,
+            "min": 60749.23255816098,
+            "max": 67277.72262338539,
+            "values": [
+              60749.23255816098,
+              65195.63811598341,
+              67277.72262338539
+            ]
+          },
+          "completed_requests": {
+            "mean": 369.3333333333333,
+            "sample_sd": 5.507570547286102,
+            "min": 363,
+            "max": 373,
+            "values": [
+              373,
+              372,
+              363
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-on-c8-r1",
+          "swe-on-c8-r2",
+          "swe-on-c8-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
+    {
+      "id": "pr173-dev4-20261006-on-c16-mean3",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "Prefix Routing ON · C16 · mean of 3 runs",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "prefix-routing"
+        ],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 4
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "data_parallel_size": 1,
+          "independent_replicas": 2,
+          "expert_parallel": true,
+          "prefix_caching": true,
+          "utility_victim_enabled": false,
+          "mod_version": "0.1.0.dev4",
+          "campaign_identity_sha256": "321174bb896679afe09cf6ddb9091788d707cae2f585dca87a32e850c55153c2",
+          "max_model_len": 262144,
+          "gpu_memory_utilization": 0.65,
+          "max_num_seqs": 16,
+          "block_size": 128,
+          "mamba_cache_mode": "align",
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "pipeline_parallel_size": 1,
+          "total_serving_slots": 32,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_batched_tokens": 8192,
+          "async_scheduling": false,
+          "proxy_connection_policy": "keepalive",
+          "checkpoint_revision": null,
+          "checkpoint_identity_status": "Local file SHA256 manifest retained; canonical upstream equivalence not established",
+          "mod_wheel_sha256": "b94ae4e24db1ee313588514d440fcffacf2068bbe12376188acc2167eb8e30ca"
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "pr173-dev4-20261006-on-mean3",
+        "presentation_group": {
+          "id": "prefix-routing-on-mean3",
+          "label_en": "Prefix Routing ON (3-run mean)",
+          "label_zh": "Prefix Routing ON（三轮均值）"
+        },
+        "repeat_count": 3,
+        "repeats": [
+          1,
+          2,
+          3
+        ]
+      },
+      "metrics": {
+        "output_tps": 349.48962962962963,
+        "output_tps_per_chip": 87.37240740740741,
+        "decode_p90_tps": 29.97352716707436,
+        "ttft_p95_ms": 3726.230456571394,
+        "tpot_p95_ms": 70.2340165954977,
+        "e2e_p95_ms": 94651.21016131401,
+        "completed_requests": 549
+      },
+      "evidence": {
+        "status": "measured",
+        "execution_kind": "real-online",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "run_ids": [
+          "9f2d19721dec48bc83d75ae01ea17a40",
+          "26d1559f82324fd695fda5c610d23f33",
+          "2f041a1782044e35a120698a4c34094c"
+        ],
+        "aggregation": "Unweighted arithmetic mean of the same 3 complete 900s repeats for every coordinate. P90/P95 are means of per-run quantiles, not pooled-request quantiles.",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "prepared_workload_sha256": "4e62e54ef47497fd916a6c2906b220b3af400f87873ea0784740fed3f61e78c8"
+        },
+        "publication_status": "Candidate: canonical checkpoint equivalence and full performance gates remain unverified",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-PREFIX-ROUTING-MEAN.md",
+        "aggregation_kind": "arithmetic-mean-of-runs",
+        "repeat_count": 3,
+        "repeat_statistics": {
+          "output_tps": {
+            "mean": 349.48962962962963,
+            "sample_sd": 6.780729260220588,
+            "min": 344.6333333333333,
+            "max": 357.2366666666667,
+            "values": [
+              346.5988888888889,
+              357.2366666666667,
+              344.6333333333333
+            ]
+          },
+          "output_tps_per_chip": {
+            "mean": 87.37240740740741,
+            "sample_sd": 1.695182315055147,
+            "min": 86.15833333333333,
+            "max": 89.30916666666667,
+            "values": [
+              86.64972222222222,
+              89.30916666666667,
+              86.15833333333333
+            ]
+          },
+          "decode_p90_tps": {
+            "mean": 29.97352716707436,
+            "sample_sd": 0.20663499215894437,
+            "min": 29.735416171111243,
+            "max": 30.1058259722568,
+            "values": [
+              30.079339357855034,
+              29.735416171111243,
+              30.1058259722568
+            ]
+          },
+          "ttft_p95_ms": {
+            "mean": 3726.230456571394,
+            "sample_sd": 407.7690617596129,
+            "min": 3474.3503690697253,
+            "max": 4196.6888944152415,
+            "values": [
+              4196.6888944152415,
+              3474.3503690697253,
+              3507.652106229215
+            ]
+          },
+          "tpot_p95_ms": {
+            "mean": 70.2340165954977,
+            "sample_sd": 3.4374925533439584,
+            "min": 66.82605886316628,
+            "max": 73.70030165676035,
+            "values": [
+              73.70030165676035,
+              66.82605886316628,
+              70.17568926656651
+            ]
+          },
+          "e2e_p95_ms": {
+            "mean": 94651.21016131401,
+            "sample_sd": 1324.4241318496597,
+            "min": 93613.23311440645,
+            "max": 96142.8507389966,
+            "values": [
+              96142.8507389966,
+              94197.54663053897,
+              93613.23311440645
+            ]
+          },
+          "completed_requests": {
+            "mean": 549,
+            "sample_sd": 9.539392014169456,
+            "min": 539,
+            "max": 558,
+            "values": [
+              550,
+              558,
+              539
+            ]
+          }
+        },
+        "source_runs": [
+          "swe-on-c16-r1",
+          "swe-on-c16-r2",
+          "swe-on-c16-r3"
+        ],
+        "local_evidence_limitations": "88 original Prometheus snapshots are empty and fail sealed hashes; native cache rates in imported analysis are reported, not independently verified. Performance request files and completion receipts validated separately. Diagnostic campaign has no local results.",
+        "metric_evidence_file": "data/leaderboard_prefix_routing_mean_evidence.json",
+        "swe_run_evidence_file": "data/leaderboard_frontier_swe_evidence.json"
+      }
+    },
     {
       "id": "qwen35-utility-victim-off-tp2ep-m65-c1-r1-20261003",
       "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
