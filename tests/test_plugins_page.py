@@ -921,6 +921,7 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         assert component["canonical_repository"] == repository["url"]
         promoted_statuses = {
             "quantized-kv-cache-migration": "experimental",
+            "kv-transfer-observability-migration": "experimental",
             "pipeline-microbatch-migration": "verified",
             "scheduler-policy-lab": "source_scaffold",
         }
@@ -1079,7 +1080,6 @@ def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> Non
         "simllm-migration",
         "unified-communication-migration",
         "split-batch-full-graph-migration",
-        "kv-transfer-observability-migration",
         "layered-prefill-migration",
         "activation-sparsity-migration",
         "qos-scheduler-migration",
@@ -1165,7 +1165,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 25
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 26
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1175,7 +1175,6 @@ def test_non_runnable_descriptors_scaffolds_and_legacy_carriers_are_not_publishe
     unpublished = {
         "ascend-adaptive-quantized-kv",
         "ascend-quant-runtime-descriptor",
-        "kv-transfer-observability-migration",
         "dla",
     }
     for component_id in unpublished:
@@ -1314,6 +1313,7 @@ def test_tool_mods_are_grouped_without_performance_placeholders():
         "ascend-quant-toolkit",
         "slicegpt-migration",
         "request-lifecycle-profiler",
+        "kv-transfer-observability-migration",
         "traceloom",
         "clm-lifecycle",
         "tricard-clm-lifecycle",
@@ -1333,6 +1333,12 @@ def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
     assert profiler["compatibility"]["status"] == "experimental"
     assert "7c6155b7" in profiler["compatibility"]["versions"][1]
     assert "actual finish, preemption, or KV-reclaim callback" in profiler["summary_en"]
+
+    kv_observer = by_id("kv-transfer-observability-migration")
+    assert kv_observer["public_surface"] is True
+    assert kv_observer["compatibility"]["status"] == "experimental"
+    assert "529ab282" in kv_observer["compatibility"]["versions"][0]
+    assert "worker-local" in kv_observer["summary_en"]
 
     tricard = by_id("tricard-clm-lifecycle")
     assert tricard["compatibility"]["status"] == "experimental"

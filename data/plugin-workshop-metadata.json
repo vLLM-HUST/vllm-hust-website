@@ -395,6 +395,37 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
+    "kv-transfer-observability-migration": {
+      "repository": "vLLM-HUST/vllm-hust-kv-transfer-observability",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 2
+      },
+      "maintainers": [
+        {
+          "login": "xiehanlong834-gif",
+          "name": "谢汉龙",
+          "profile_url": "https://github.com/xiehanlong834-gif",
+          "avatar_url": "https://avatars.githubusercontent.com/u/292786496?v=4"
+        },
+        {
+          "login": "Remygred",
+          "name": "刘世峰",
+          "profile_url": "https://github.com/Remygred",
+          "avatar_url": "https://avatars.githubusercontent.com/u/153624059?v=4"
+        }
+      ],
+      "advisors": [
+        {
+          "name_zh": "张书豪",
+          "name_en": "Shuhao Zhang",
+          "relationship": "internal"
+        }
+      ],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
     "tricard-clm-lifecycle": {
       "repository": "vLLM-HUST/Tricard",
       "repository_url": "https://github.com/vLLM-HUST/Tricard",

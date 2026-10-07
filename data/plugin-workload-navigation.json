@@ -94,6 +94,7 @@
     "pipeline-microbatch-migration": ["distributed_pipeline", "high_concurrency"],
     "betterscale": ["distributed_pipeline"],
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
+    "kv-transfer-observability-migration": ["lifecycle_control", "memory_kv_pressure"],
     "clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
     "tricard-clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
     "quality-bounded-inference": ["latency_slo", "high_concurrency"],
