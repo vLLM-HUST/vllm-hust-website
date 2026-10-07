@@ -57,6 +57,12 @@ jobs:
 
       - name: Sync snapshot files to website data/
         run: |
+          python scripts/refresh_leadership_target_pin.py \
+            --pin data/leadership_performance_targets.json \
+            --registry _benchmark/leaderboard-data/official-targets.json \
+            --registry-checksum _benchmark/leaderboard-data/official-targets.sha256 \
+            --current-registry data/official_targets.json \
+            --current-registry-checksum data/official_targets.sha256
           python scripts/sync_leaderboard_snapshots.py \
             --source-dir _benchmark/leaderboard-data/snapshots \
             --target-dir data
