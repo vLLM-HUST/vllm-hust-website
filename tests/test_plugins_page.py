@@ -1330,9 +1330,9 @@ def test_tool_mods_are_grouped_without_performance_placeholders():
 
 def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
     profiler = by_id("request-lifecycle-profiler")
-    assert profiler["compatibility"]["status"] == "inspect_only"
-    assert "63af34ef" in profiler["compatibility"]["versions"][1]
-    assert "registers no native event-bus sink" in profiler["summary_en"]
+    assert profiler["compatibility"]["status"] == "experimental"
+    assert "7c6155b7" in profiler["compatibility"]["versions"][1]
+    assert "actual finish, preemption, or KV-reclaim callback" in profiler["summary_en"]
 
     tricard = by_id("tricard-clm-lifecycle")
     assert tricard["compatibility"]["status"] == "experimental"
@@ -1340,14 +1340,14 @@ def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
     assert "external controller remains operator-owned" in tricard["summary_en"]
 
     quality = by_id("quality-bounded-inference")
-    assert quality["compatibility"]["status"] == "inspect_only"
-    assert "3e321aef" in quality["compatibility"]["versions"][1]
-    assert "rejecting activation" in quality["summary_en"]
+    assert quality["compatibility"]["status"] == "experimental"
+    assert "b2ed0136" in quality["compatibility"]["versions"][1]
+    assert "remain fail closed" in quality["summary_en"]
 
     cost = by_id("llm-serving-cost-pricing-model")
     assert cost["compatibility"]["status"] == "inspect_only"
-    assert "0dbebad7" in cost["compatibility"]["versions"][1]
-    assert "load marker" in cost["summary_en"]
+    assert "1559df80" in cost["compatibility"]["versions"][1]
+    assert "removes the misleading in-process load marker" in cost["summary_en"]
 
     assert (
         WORKSHOP_METADATA["plugins"]["tricard-clm-lifecycle"]["repository_url"]
