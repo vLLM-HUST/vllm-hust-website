@@ -27,6 +27,23 @@ const server=http.createServer((req,res)=>{
             await page.goto(`http://127.0.0.1:${server.address().port}/leaderboard-runs.html#frontier`);
             await page.locator(`[data-point="${points[0].id}"]`).waitFor();
             assert.equal(await page.locator('[data-point^="pr173-dev4-20261006-"]').count(),10);
+            const defaults=await page.locator('[data-point]').evaluateAll(ns=>ns.map(n=>n.dataset.point));
+            const choices=await page.locator('[data-filter=mtp]').evaluateAll(ns=>ns.map(n=>n.value));
+            const mtp=p=>{const n=p.configuration.parameters.mtp_draft_tokens;return Number.isFinite(n)&&n>=0?(n>0?'on':'off'):'unknown';};
+            assert(choices.includes('unknown'));
+            for(const setting of [...choices,'all']){
+                for(const choice of choices)await page.locator(`[data-filter=mtp][value=${choice}]`).setChecked(setting==='all'||setting===choice);
+                const expected=snapshot.points.filter(p=>defaults.includes(p.id)&&(setting==='all'||mtp(p)===setting)).map(p=>p.id).sort();
+                const actual=await page.locator('[data-point]').evaluateAll(ns=>ns.map(n=>n.dataset.point).sort());
+                assert.deepEqual(actual,expected,`MTP ${setting}`);
+            }
+            // The mixed MOD/MTP check must also deselect unknown explicitly.
+            const nativeGroups=[...new Set(snapshot.points.filter(p=>defaults.includes(p.id)&&!p.configuration.mods.length).map(p=>p.load.presentation_group?.id||'none'))];
+            for(const group of nativeGroups)await page.locator(`[data-filter=mods][value="${group}"]`).uncheck();
+            for(const choice of choices)await page.locator(`[data-filter=mtp][value=${choice}]`).setChecked(choice==='off');
+            assert.deepEqual(await page.locator('[data-point]').evaluateAll(ns=>ns.map(n=>n.dataset.point).sort()),snapshot.points.filter(p=>defaults.includes(p.id)&&p.configuration.mods.length&&mtp(p)==='off').map(p=>p.id).sort());
+            for(const group of nativeGroups)await page.locator(`[data-filter=mods][value="${group}"]`).check();
+            for(const choice of choices)await page.locator(`[data-filter=mtp][value=${choice}]`).check();
             const lines=await page.locator('.frontier-concurrency-line').evaluateAll(nodes=>nodes.map(n=>JSON.parse(n.dataset.seriesPoints)).filter(ids=>ids.every(id=>id.startsWith('pr173-dev4-20261006-'))));
             assert.equal(lines.length,2);
             for(const ids of lines) assert.deepEqual(ids.map(id=>points.find(p=>p.id===id).load.concurrency),[1,2,4,8,16]);
