@@ -95,6 +95,9 @@
     "betterscale": ["distributed_pipeline"],
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
     "clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
+    "tricard-clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
+    "quality-bounded-inference": ["latency_slo", "high_concurrency"],
+    "llm-serving-cost-pricing-model": ["profiling_analysis"],
     "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"],
     "unified-communication-migration": ["distributed_pipeline"]
   }

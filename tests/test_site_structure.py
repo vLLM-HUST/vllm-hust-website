@@ -1148,10 +1148,10 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
     assert (
-        "Typed runtime contracts. 22 cataloged MODs. Evidence before claims."
+        "Typed runtime contracts. 25 cataloged MODs. Evidence before claims."
         in html_text
     )
-    assert "类型化运行时契约、22 个目录 MOD、证据先于结论。" in html_text
+    assert "类型化运行时契约、25 个目录 MOD、证据先于结论。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text

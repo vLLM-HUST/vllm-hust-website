@@ -764,13 +764,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=plugin-observations-20260930"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecpa-final-20261007"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=plugin-observations-20260930"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=ecpa-final-20261007"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=plugin-observations-20260930"'
+        'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261007"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -791,6 +791,10 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
     repo = "https://github.com/vLLM-HUST/ascend-distributed-metadata"
     assert adm["canonical_repository"] == repo
     assert adm["delivery_model"] == "python_distribution"
+    assert adm["integration_contracts"] == [
+        "vllm_hust.extension_manifest.v0.3-experimental"
+    ]
+    assert "vllm_hust.extension_bundles" in adm["integration_surfaces"]
     assert adm["maturity"] == "experimental"
     assert adm["compatibility"]["status"] == "verified"
     assert any(
@@ -799,6 +803,11 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
     )
     assert "previous published MOD" in adm["public_effect_en"]
     assert "not establish general speedup" in adm["public_effect_en"]
+    assert any(
+        "ECPA 0.3 package 462e0750" in version
+        for version in adm["compatibility"]["versions"]
+    )
+    assert "clean-wheel tested" in adm["compatibility"]["requirements_en"]
     assert WORKLOAD_NAVIGATION["plugins"]["adm"] == ["distributed_pipeline"]
     assert WORKSHOP_METADATA["plugins"]["adm"]["repository_url"] == repo
     assert (
@@ -1156,7 +1165,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 22
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 25
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1236,14 +1245,14 @@ def test_performance_defaults_match_catalog_models_and_evidence_sources() -> Non
 
 
 def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -> None:
-    assert "plugin-performance.js?v=plugin-observations-20260930" in PAGE
-    assert "plugin-performance.json?v=plugin-observations-20260930" in SCRIPT
-    assert "leaderboard_frontier.json?v=plugin-observations-20260930" in SCRIPT
+    assert "plugin-performance.js?v=ecpa-final-20261007" in PAGE
+    assert "plugin-performance.json?v=ecpa-final-20261007" in SCRIPT
+    assert "leaderboard_frontier.json?v=ecpa-final-20261007" in SCRIPT
     assert '{ cache: "no-cache" }' in SCRIPT
     assert "benchmark-settings-20260929" not in SCRIPT
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
-    assert PAGE.count("plugin-observations-20260930") >= 5
+    assert PAGE.count("ecpa-final-20261007") >= 5
 
 
 def test_bidkv_copy_reports_the_new_cell_without_erasing_old_boundaries() -> None:
@@ -1307,6 +1316,9 @@ def test_tool_mods_are_grouped_without_performance_placeholders():
         "request-lifecycle-profiler",
         "traceloom",
         "clm-lifecycle",
+        "tricard-clm-lifecycle",
+        "quality-bounded-inference",
+        "llm-serving-cost-pricing-model",
     }
     assert all(
         by_id(component_id).get("public_surface", True)
@@ -1314,6 +1326,56 @@ def test_tool_mods_are_grouped_without_performance_placeholders():
     )
     assert visible_tools <= set(WORKLOAD_NAVIGATION["plugins"])
     assert by_id("scheduler-policy-lab")["public_surface"] is False
+
+
+def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
+    profiler = by_id("request-lifecycle-profiler")
+    assert profiler["compatibility"]["status"] == "inspect_only"
+    assert "63af34ef" in profiler["compatibility"]["versions"][1]
+    assert "registers no native event-bus sink" in profiler["summary_en"]
+
+    tricard = by_id("tricard-clm-lifecycle")
+    assert tricard["compatibility"]["status"] == "experimental"
+    assert "1d141da1" in tricard["compatibility"]["versions"][1]
+    assert "external controller remains operator-owned" in tricard["summary_en"]
+
+    quality = by_id("quality-bounded-inference")
+    assert quality["compatibility"]["status"] == "inspect_only"
+    assert "3e321aef" in quality["compatibility"]["versions"][1]
+    assert "rejecting activation" in quality["summary_en"]
+
+    cost = by_id("llm-serving-cost-pricing-model")
+    assert cost["compatibility"]["status"] == "inspect_only"
+    assert "0dbebad7" in cost["compatibility"]["versions"][1]
+    assert "load marker" in cost["summary_en"]
+
+    assert (
+        WORKSHOP_METADATA["plugins"]["tricard-clm-lifecycle"]["repository_url"]
+        == tricard["canonical_repository"]
+    )
+    assert (
+        '"request-lifecycle-profiler": "org.vllm-hust.request-lifecycle-profiler"'
+        in SCRIPT
+    )
+    assert (
+        '"quality-bounded-inference": "org.vllm-hust.quality-bounded-inference"'
+        in SCRIPT
+    )
+    assert (
+        '"llm-serving-cost-pricing-model": '
+        '"org.vllm-hust.llm-serving-cost-pricing-model"'
+    ) in SCRIPT
+    assert "extension enable org.vllm-hust.tricard-clm" in SCRIPT
+    assert "extension plan org.vllm-hust.tricard-clm" in SCRIPT
+    assert "external controller remains operator-owned" in SCRIPT
+    assert "extension enable org.vllm-hust.ascend-distributed-metadata" in SCRIPT
+    assert "import or enablement alone is not runtime-effective evidence" in SCRIPT
+    for component_id in (
+        "tricard-clm-lifecycle",
+        "quality-bounded-inference",
+        "llm-serving-cost-pricing-model",
+    ):
+        assert component_id in WORKLOAD_NAVIGATION["plugins"]
 
 
 def test_clm_is_cataloged_as_a_tool_control_plane_without_a_speedup_claim():

@@ -255,6 +255,34 @@ vllm-hust-ext extension inspect org.vllm-hust.clm-lifecycle
 vllm-hust-ext extension check org.vllm-hust.clm-lifecycle
 export VLLM_PLUGINS=ascend,clm_lifecycle`
     },
+    adm: {
+      title_en: "Inspect and stage Ascend Distributed Metadata",
+      title_zh: "检查并暂存昇腾分布式元数据 MOD",
+      action_en: "ECPA staging commands",
+      action_zh: "ECPA 暂存命令",
+      note_en: "This records activation intent only. Launch requires the exact qualified vLLM-HUST and vLLM-Ascend-HUST revisions; import or enablement alone is not runtime-effective evidence and does not broaden the published DP4 result.",
+      note_zh: "这里只记录启用意图。启动仍要求精确匹配已验收的 vLLM-HUST 与 vLLM-Ascend-HUST 提交；仅导入或启用不是 runtime_effective 证据，也不会扩大已发布的 DP4 结果。",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+python -m pip install "git+https://github.com/vLLM-HUST/ascend-distributed-metadata.git@462e0750faf7eea6317b13b692fb3326894d5796"
+vllm-hust-ext extension inspect org.vllm-hust.ascend-distributed-metadata
+vllm-hust-ext extension check org.vllm-hust.ascend-distributed-metadata
+vllm-hust-ext extension enable org.vllm-hust.ascend-distributed-metadata
+vllm-hust-ext extension plan org.vllm-hust.ascend-distributed-metadata`
+    },
+    "tricard-clm-lifecycle": {
+      title_en: "Inspect and stage Tricard CLM Lifecycle",
+      title_zh: "检查并暂存 Tricard CLM 生命周期插件",
+      action_en: "ECPA staging commands",
+      action_zh: "ECPA 暂存命令",
+      note_en: "The external controller remains operator-owned. Enablement records intent; runtime effectiveness still requires an observer receipt owned by the launched host process.",
+      note_zh: "外部 controller 仍由 operator 管理。enable 只记录意图；运行生效仍须由启动后的宿主进程提供其自有 observer receipt。",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+python -m pip install "git+https://github.com/vLLM-HUST/Tricard.git@1d141da1c427a18859643b056b5514f5ebf511ce#subdirectory=plugins/vllm-clm"
+vllm-hust-ext extension inspect org.vllm-hust.tricard-clm
+vllm-hust-ext extension check org.vllm-hust.tricard-clm
+vllm-hust-ext extension enable org.vllm-hust.tricard-clm
+vllm-hust-ext extension plan org.vllm-hust.tricard-clm`
+    },
     betterscale: {
       guide: "./betterscale.html#install-qwen",
       guide_en: "Qwen27 TP2: pip install, launch and request →",
@@ -413,7 +441,10 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
     "pipeline-microbatch-migration": "org.vllm-hust.pipeline-microbatch",
     "qos-scheduler-migration": "org.vllm-hust.qos-scheduler",
     "stateharbor": "org.vllm-hust.stateharbor",
-    "clm-lifecycle": "org.vllm-hust.clm-lifecycle"
+    "clm-lifecycle": "org.vllm-hust.clm-lifecycle",
+    "request-lifecycle-profiler": "org.vllm-hust.request-lifecycle-profiler",
+    "quality-bounded-inference": "org.vllm-hust.quality-bounded-inference",
+    "llm-serving-cost-pricing-model": "org.vllm-hust.llm-serving-cost-pricing-model"
   };
 
   const valueLabel = (value) => String(value).replaceAll("_", " ");
@@ -1107,8 +1138,8 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=plugin-observations-20260930", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=plugin-observations-20260930", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
+      fetch("./data/plugin-performance.json?v=ecpa-final-20261007", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261007", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {
