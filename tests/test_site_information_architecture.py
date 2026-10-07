@@ -150,7 +150,7 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "TRANSITION" in page
     assert "Domain contracts first; bundles second." in page
     assert "former entry-point-based Plugin Standard 1.0" in page
-    assert "Manifest `0.2-experimental`" in standard
+    assert "Manifest `0.3-experimental`" in standard
     assert "One materializer does not prove ecosystem compatibility" in page
     assert "Zero typed providers retain legacy auto-discovery" in page
     assert "explicit victim_selector_plugin must select exactly one" in page
@@ -199,7 +199,7 @@ def test_ecosystem_registry_has_docs_as_its_canonical_owner() -> None:
     assert registry["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
     assert not (ROOT / "data" / "plugins.legacy.json").exists()
     standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
-    assert "Manifest `0.2-experimental`" in standard
+    assert "Manifest `0.3-experimental`" in standard
 
 
 def test_versions_external_links_have_safe_new_tab_contract() -> None:

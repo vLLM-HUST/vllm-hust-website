@@ -236,7 +236,7 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "https://github.com/vLLM-HUST/pegaflow-hust"
     )
     assert pegaflow_connectors["integration_contracts"] == [
-        "vllm_hust.extension_manifest.v0.2-experimental"
+        "vllm_hust.extension_manifest.v0.3-experimental"
     ]
     assert pegaflow_connectors["integration_surfaces"] == [
         "vllm_hust_ext.providers",
@@ -247,6 +247,10 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert (
         "external operator retains service lifecycle"
         in pegaflow_connectors["summary_en"]
+    )
+    assert any(
+        "ECPA Bundle 0.3 @ 14ca1d4" in version
+        for version in pegaflow_connectors["compatibility"]["versions"]
     )
 
     assert "KV connector" in PAGE
@@ -322,7 +326,7 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     assert "19.29%" in diffspec["public_effect_en"]
     assert diffspec["public_effect_status"] == "not-beneficial-in-tested-cell"
     assert vspec["integration_contracts"] == [
-        "vllm_hust.extension_manifest.v0.2-experimental"
+        "vllm_hust.extension_manifest.v0.3-experimental"
     ]
     assert vspec["integration_surfaces"] == [
         "vllm.general_plugins",
@@ -926,7 +930,7 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
 
 
 def test_extension_standard_covers_core_and_host_providers() -> None:
-    assert "Manifest `0.2-experimental`" in LEGACY_STANDARD
+    assert "Manifest `0.3-experimental`" in LEGACY_STANDARD
     assert "Core + Host Provider" in LEGACY_STANDARD
     assert "vllm_hust_ext.providers" in LEGACY_STANDARD
     assert "former entry-point-based Plugin Standard 1.0" in PAGE
