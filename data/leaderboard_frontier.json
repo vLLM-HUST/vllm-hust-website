@@ -75971,7 +75971,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "0cd5def13501424aa2f5a3453fa19e90"
         ],
@@ -75980,7 +75980,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -75989,7 +75989,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
           "point_isolated": false
@@ -76093,7 +76093,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "5c3ea5afd5cd48729dcffba000cff25d"
         ],
@@ -76102,7 +76102,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -76111,7 +76111,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
           "point_isolated": false
@@ -76215,7 +76215,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "8f8cfc1081ee4552aa4f8fc613fabd5d"
         ],
@@ -76224,7 +76224,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -76233,7 +76233,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
           "point_isolated": false
@@ -76337,7 +76337,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "be9d48fb129d4731a5b06a45f4202cd0"
         ],
@@ -76346,7 +76346,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -76355,7 +76355,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
           "point_isolated": false
@@ -76485,7 +76485,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "6a6c157cfbee44d4a7d8217faf35d9a5"
         ],
@@ -76494,7 +76494,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -76503,7 +76503,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_off_sweep.log",
           "point_isolated": false
@@ -76609,7 +76609,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "af36b167a2fb41999c0cb82ced2df82e"
         ],
@@ -76618,7 +76618,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -76627,7 +76627,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
           "point_isolated": false
@@ -76733,7 +76733,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "3d61fa99bf4a44fdb20f29a43779e0b4"
         ],
@@ -76742,7 +76742,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -76751,7 +76751,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
           "point_isolated": false
@@ -76857,7 +76857,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "27928932241c4c33a8a2abe0425d20d6"
         ],
@@ -76866,7 +76866,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -76875,7 +76875,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
           "point_isolated": false
@@ -76981,7 +76981,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "7d805f110c974996bebc0dfa78a0677d"
         ],
@@ -76990,7 +76990,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -76999,7 +76999,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
           "point_isolated": false
@@ -77131,7 +77131,7 @@
         "profile": "formal",
         "measurement_seconds": 900,
         "tuning_complete": false,
-        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/codex/op01-attention-boundary-sweprefix/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
         "run_ids": [
           "95c71387e53d4a25b4e7e6d46fecb695"
         ],
@@ -77140,7 +77140,7 @@
           "protocol_id": "swe-prefix-reuse/v1",
           "campaign": "qwen35-op01-attention-boundary-tp2ep-20261003",
           "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
-          "revision": null,
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
           "prepared_workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
           "tokenizer_fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
           "prepared_workload_equivalence": {
@@ -77149,7 +77149,7 @@
           }
         },
         "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-        "draft_publication_status": "local draft; not submitted",
+        "draft_publication_status": "PR #354 open; not merged",
         "activation_log": {
           "path": "op01-evidence/vllm_qwen35_op01_on_sweep.log",
           "point_isolated": false
