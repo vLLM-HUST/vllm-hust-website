@@ -347,6 +347,8 @@ def main():
         ) == [
             "ascend-quant-toolkit",
             "clm-lifecycle",
+            "llm-serving-cost-pricing-model",
+            "quality-bounded-inference",
             "request-lifecycle-profiler",
             "slicegpt-migration",
             "traceloom",
