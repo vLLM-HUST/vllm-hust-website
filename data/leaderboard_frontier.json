@@ -76579,7 +76579,13 @@
           "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
           "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
         },
-        "mod_sources": []
+        "mod_sources": [
+          {
+            "id": "ascend-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-ascend-attention-boundary",
+            "revision": "3572713e7944ea877b22f2a8a6bb053f348bfd25"
+          }
+        ]
       },
       "load": {
         "concurrency": 1,
@@ -76703,7 +76709,13 @@
           "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
           "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
         },
-        "mod_sources": []
+        "mod_sources": [
+          {
+            "id": "ascend-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-ascend-attention-boundary",
+            "revision": "3572713e7944ea877b22f2a8a6bb053f348bfd25"
+          }
+        ]
       },
       "load": {
         "concurrency": 2,
@@ -76827,7 +76839,13 @@
           "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
           "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
         },
-        "mod_sources": []
+        "mod_sources": [
+          {
+            "id": "ascend-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-ascend-attention-boundary",
+            "revision": "3572713e7944ea877b22f2a8a6bb053f348bfd25"
+          }
+        ]
       },
       "load": {
         "concurrency": 4,
@@ -76951,7 +76969,13 @@
           "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
           "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
         },
-        "mod_sources": []
+        "mod_sources": [
+          {
+            "id": "ascend-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-ascend-attention-boundary",
+            "revision": "3572713e7944ea877b22f2a8a6bb053f348bfd25"
+          }
+        ]
       },
       "load": {
         "concurrency": 8,
@@ -77101,7 +77125,13 @@
           "server_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
           "activation_scope": "Server logs were rotated per restart; retained log is campaign-level, not point-isolated"
         },
-        "mod_sources": []
+        "mod_sources": [
+          {
+            "id": "ascend-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-ascend-attention-boundary",
+            "revision": "3572713e7944ea877b22f2a8a6bb053f348bfd25"
+          }
+        ]
       },
       "load": {
         "concurrency": 16,
