@@ -63,7 +63,9 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                         "document.documentElement.scrollWidth <= window.innerWidth + 1"
                     )
                     page.screenshot(
-                        path=str(output / f"unified-communication-{width}-{language}.png")
+                        path=str(
+                            output / f"unified-communication-{width}-{language}.png"
+                        )
                     )
                     search.fill("")
                     assert page.evaluate(

@@ -362,10 +362,11 @@ def main():
             in clm.locator(".plugin-launch-tooltip").text_content()
         )
         clm.locator(".plugin-launch-icon").click()
-        assert page.locator(".workshop-card").evaluate_all(
-            "cards => cards.slice(0, 10).map(card => card.id)"
-        ) == [
-            "vspec",
+        visible_ids = page.locator(".workshop-card").evaluate_all(
+            "cards => cards.map(card => card.id)"
+        )
+        assert visible_ids[0] == "vspec"
+        assert {
             "betterscale",
             "bidkv",
             "pipeline-microbatch-migration",
@@ -375,7 +376,10 @@ def main():
             "kvcompress-ascend",
             "diffspec",
             "latchmoe",
-        ]
+            "knorm-migration",
+            "kv-tiering-migration",
+            "pyramidkv-ascend-migration",
+        } <= set(visible_ids)
         assert "+42.39%" in page.locator("#betterscale").inner_text()
         assert "+9.78%" in page.locator("#pipeline-microbatch-migration").inner_text()
         assert "+6.34%" in page.locator("#pegaflow-vllm-connectors").inner_text()

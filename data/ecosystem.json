@@ -634,7 +634,7 @@
     },
     {
       "id": "kv-tiering-migration",
-      "public_surface": false,
+      "public_surface": true,
       "name": "KV Tiering",
       "name_en": "KV Tiering",
       "name_zh": "KV 分层",
@@ -660,17 +660,17 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
       "upstream_repository": null,
-      "summary_en": "Experimental device/CPU/filesystem KV tiering. A pinned Ascend carrier is available on the development branch and activates through Extension Manager.",
-      "summary_zh": "实验性的设备、CPU、文件系统 KV 分层；开发分支提供限定版本的 Ascend 实现，通过插件管理器启用。",
+      "summary_en": "Experimental device/CPU/filesystem KV tiering packaged as an ECPA 0.3 custom Provider. The merged package is inspectable; current-host activation and recovery remain separate gates.",
+      "summary_zh": "实验性的设备、CPU、文件系统 KV 分层，已打包为 ECPA 0.3 自定义 Provider。合并后的包可检查；当前宿主激活与恢复仍是独立门槛。",
       "public_effect_en": "Five Qwen3.5 TP2 concurrency points and matched Native controls are measured through Extension Manager. Throughput is 2.33–5.23% lower in these single observations; all windows show cache stores but zero restores, so no reuse benefit is demonstrated.",
       "public_effect_zh": "已通过插件管理器完成 Qwen3.5 TP2 五档并发及匹配 Native 对照。本次单次观测中吞吐低 2.33%–5.23%；所有窗口仅写出缓存、没有回读，未证明复用收益。",
       "public_effect_status": "inconclusive",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-KV-TIERING-20260926.md",
       "compatibility": {
         "status": "experimental",
-        "host": "Pinned vLLM-HUST / vLLM-Ascend runtime capsule",
+        "host": "ECPA 0.3 custom Provider; current host qualification pending",
         "versions": [
-          "Tiering 7ba646a; Host hybrid-prefix fix 49f0827; Manager cf1ea71"
+          "ECPA 0.3 package 03f17227; historical runtime evidence remains pinned to Tiering 7ba646a / Host 49f0827 / Manager cf1ea71"
         ],
         "platforms": [
           "Ascend 910B2 · TP2 · CANN 9.1.0 · graph/APC/MTP2/async"
@@ -678,15 +678,15 @@
         "models": [
           "Qwen3.5-35B-A3B BF16 — pinned setting only"
         ],
-        "requirements_en": "Use the exact runtime receipt and source pins in the experiment report. The development profile is restricted to 0.25.1+frontier.bidkv.empty and requires the Host hybrid-prefix fix; it is not a general release for current main. CPU budget and storage path must be configured before enabling.",
-        "requirements_zh": "须使用实验报告中的运行清单和源码版本。开发配置限定于 0.25.1+frontier.bidkv.empty，并依赖 Host 混合前缀命中修复；不是面向当前 main 的通用发布版。启用前需配置 CPU 预算及存储路径。",
+        "requirements_en": "The merged ECPA 0.3 package and clean-wheel checks restore preview visibility only. Historical measurements retain their exact receipt; current main still requires host-contract, storage-consistency and recovery qualification before activation.",
+        "requirements_zh": "合并后的 ECPA 0.3 包及 clean-wheel 检查仅恢复预览展示。历史测量保留其精确运行清单；当前 main 在激活前仍需完成宿主契约、存储一致性与恢复验收。",
         "followup_url": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering/issues/1"
       },
       "evidence_level": "performance_verified"
     },
     {
       "id": "knorm-migration",
-      "public_surface": false,
+      "public_surface": true,
       "name": "KNorm",
       "name_en": "KNorm",
       "name_zh": "KNorm",
@@ -696,33 +696,34 @@
       "integration_surfaces": ["vllm.kv_compression.provider", "vllm.kv_lifecycle"],
       "execution_planes": ["scheduler", "worker"],
       "deployment_topology": "in_process",
-      "delivery_model": "migration_scaffold",
+      "delivery_model": "plugin_bundle",
       "ownership": "original_contributor_maintained",
       "maintainers": ["kotoriqaq0", "SuccinctPaul"],
       "repository_relationship": "organization_native",
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-knorm",
       "upstream_repository": null,
-      "summary_en": "Owner-led extraction of the legacy KNorm KV-compression method behind a host-owned transactional lifecycle. Repository scaffold only; prefix-cache and mutation-owner conflicts remain release gates.",
-      "summary_zh": "由原贡献者主导，把 legacy KNorm 抽取为宿主事务化 KV 生命周期之后的压缩方法；目前仅为迁移仓库，prefix cache 与 KV 修改所有权冲突仍是发布门槛。",
+      "summary_en": "Owner-led ECPA 0.3 package for the legacy KNorm KV-compression method. The bundle is clean-wheel inspectable; prefix-cache and mutation-owner conflicts remain activation gates.",
+      "summary_zh": "由原贡献者主导的 legacy KNorm KV 压缩方法 ECPA 0.3 包。bundle 已通过 clean-wheel 检查；prefix cache 与 KV 修改所有权冲突仍是激活门槛。",
       "public_effect_en": "Capability preview: extract KNorm as a host-governed KV compression method. The public scaffold makes no performance or quality claim yet.",
       "public_effect_zh": "能力预览：把 KNorm 抽取为由宿主管理的 KV 压缩方法；公开脚手架尚不声明性能或质量结果。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-knorm",
       "compatibility": {
-        "status": "source_scaffold",
+        "status": "inspect_only",
         "host": "Host-owned transactional KV-compression lifecycle pending",
-        "versions": ["No installable or runnable release"],
+        "versions": ["ECPA 0.3 package 563173e1"],
         "platforms": ["Platform support unverified"],
-        "requirements_en": "The repository contains README, provenance, and ownership records only. A package or manifest, implementation, and proof of safe composition with prefix caching and other KV block-table mutation owners are required before installation.",
-        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需 package 或 manifest、实现代码，并证明可与 prefix caching 及其他 KV block-table 修改方安全组合。",
+        "python": [">=3.10"],
+        "requirements_en": "Manifest 0.3 and clean-wheel discovery are verified. Activation remains fail-closed until operator correctness, current-host compatibility, recovery, and safe composition with prefix caching and other KV mutation owners are proven.",
+        "requirements_zh": "Manifest 0.3 与 clean-wheel 发现已验证。算子正确性、当前宿主兼容性、恢复以及与 prefix caching 和其他 KV 修改方的安全组合得到证明前，激活继续 fail closed。",
         "followup_url": "https://github.com/vLLM-HUST/vllm-hust-knorm/issues/1"
       },
-      "evidence_level": "legacy_evidence"
+      "evidence_level": "cpu_smoke"
     },
     {
       "id": "pyramidkv-ascend-migration",
-      "public_surface": false,
+      "public_surface": true,
       "name": "PyramidKV Ascend",
       "name_en": "PyramidKV Ascend",
       "name_zh": "PyramidKV 昇腾版",
@@ -732,7 +733,7 @@
       "integration_surfaces": ["vllm.kv_compression.provider", "vllm-ascend attention"],
       "execution_planes": ["scheduler", "worker", "device"],
       "deployment_topology": "in_process",
-      "delivery_model": "migration_scaffold",
+      "delivery_model": "plugin_bundle",
       "ownership": "original_contributor_maintained",
       "maintainers": ["Irisuko"],
       "maintainer_profiles": [{"login": "Irisuko", "name": "毛潮云"}],
@@ -743,22 +744,23 @@
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust",
       "upstream_repository": null,
-      "summary_en": "Owner-led recovery of the legacy PyramidKV Ascend provider with its fail-closed capability matrix and quality evidence. Repository scaffold only; the closed legacy PR is migration input, not a release.",
-      "summary_zh": "由原贡献者主导恢复 legacy PyramidKV Ascend provider，并保留 fail-closed 能力矩阵与质量证据；目前仅为迁移仓库，已关闭的 legacy PR 不是发行版。",
+      "summary_en": "Owner-led ECPA 0.3 PyramidKV Ascend Provider preserving a fail-closed capability matrix. The package is clean-wheel inspectable; model quality, graph behavior and recovery remain activation gates.",
+      "summary_zh": "由原贡献者主导的 ECPA 0.3 PyramidKV Ascend Provider，保留 fail-closed 能力矩阵。包已通过 clean-wheel 检查；模型质量、graph 行为与恢复仍是激活门槛。",
       "public_effect_en": "Capability preview: an Ascend PyramidKV provider with a fail-closed capability matrix and explicit quality evidence. The migration scaffold is not a released performance result.",
       "public_effect_zh": "能力预览：提供带 fail-closed 能力矩阵和显式质量证据的 Ascend PyramidKV provider；迁移脚手架不等于已发布性能结果。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust",
       "compatibility": {
-        "status": "source_scaffold",
+        "status": "inspect_only",
         "host": "vLLM-HUST + vLLM-Ascend-HUST contract pending",
-        "versions": ["No installable or runnable release"],
+        "versions": ["ECPA 0.3 package 84c7ecb1"],
         "platforms": ["Ascend NPU target; hardware validation pending"],
-        "requirements_en": "The repository contains README, provenance, and ownership records only. A package or manifest, implementation, preserved fail-closed capability matrix, prompt-admission guard, quality evidence, graph/model restrictions, and Ascend validation are required before installation.",
-        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需 package 或 manifest、实现代码，并保留 fail-closed 能力矩阵、prompt-admission guard、质量证据、graph/model 限制并完成昇腾验证。",
+        "python": [">=3.10"],
+        "requirements_en": "Manifest 0.3, Provider isolation and clean-wheel discovery are verified. Activation remains fail-closed until prompt admission, quality, graph/model restrictions, current-host recovery and Ascend runtime evidence are qualified.",
+        "requirements_zh": "Manifest 0.3、Provider 隔离与 clean-wheel 发现已验证。完成 prompt admission、质量、graph/model 限制、当前宿主恢复及昇腾运行证据验收前，激活继续 fail closed。",
         "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust/issues/1"
       },
-      "evidence_level": "legacy_evidence"
+      "evidence_level": "cpu_smoke"
     },
     {
       "id": "slicegpt-migration",
