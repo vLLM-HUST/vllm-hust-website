@@ -251,7 +251,8 @@
             ${storeOnly(point)?`<p class="frontier-popup-load"><strong>${t('storeOnly')}</strong><br>${t('storeOnlyScope')}</p>`:''}
             <p class="frontier-popup-engine">${escape(point.configuration.engine)} ${escape(point.configuration.engine_version)}</p>
             ${point.configuration.mods.length?`<p class="frontier-popup-mod-source">${t('modSource')}: ${modSources(point)}</p>`:''}
-            <p class="frontier-popup-date">${t('sampled')}: ${point.evidence.sampling_date_utc?`${escape(point.evidence.sampling_date_utc)} (UTC)`:t('unknown')}</p>
+            <p class="frontier-popup-date">${t('sampled')}: ${point.evidence.sampling_date_utc?`${escape(point.evidence.sampling_date_utc)}${point.evidence.sampling_date_end_utc && point.evidence.sampling_date_end_utc!==point.evidence.sampling_date_utc?` – ${escape(point.evidence.sampling_date_end_utc)}`:''} (UTC)`:t('unknown')}</p>
+            ${point.evidence.aggregation_kind==='arithmetic-mean-of-runs'?`<p>${lang()==='zh'?'三轮算术平均；P90/P95为各轮分位数的平均。':'Arithmetic mean of three runs; P90/P95 are means of per-run quantiles.'}</p>`:''}
             <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
             <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,axes().x))}</strong><span>${axisLabel(axes().x)}<br>${M.metrics[axes().x].unit}</span></div><div><strong>${fmt(M.value(point,axes().y))}</strong><span>${axisLabel(axes().y)}<br>${M.metrics[axes().y].unit}</span></div></div>
             <p class="frontier-popup-load">${serviceScale(point)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}${params.max_num_seqs!=null?`<br>${t('capacity')}: ${fmt(params.max_num_seqs)}${params.max_num_seqs_per_rank!=null?' / rank':''}`:''}${params.kv_cache_memory_bytes!=null?` · KV ${fmt(params.kv_cache_memory_bytes/1024**3)} GiB/chip`:''}</p>
@@ -310,7 +311,7 @@
     $('view-frontier').addEventListener('click',()=>{updateSettingURL();requestAnimationFrame(render);});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=betterscale-study-only-20261006',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=prefix-routing-mean3-20261007',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});
