@@ -63,12 +63,35 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.match(page, /dataset_validation_index_v1\.json/);
     assert.match(page, /id="validation-model-select"/);
     assert.match(page, /B1 is selected independently per cell/);
-    assert.equal(index.scenarios.length, 3);
+    assert.equal(index.scenarios.length, 4);
     assert.equal(index.scenarios[0].model, 'Qwen2.5-14B-Instruct');
     assert.equal(index.scenarios[0].data_url, './data/dataset_validation_v1.b0.json');
     assert.equal(index.scenarios[1].model, 'Qwen3.5-35B-A3B');
     assert.equal(index.scenarios[1].data_url, './data/dataset_validation_qwen35_tp2_matrix.json');
-    assert.equal(index.scenarios[2].data_url, './data/dataset_validation_qwen35_bidkv.json');
+    assert.equal(index.scenarios[2].data_url, './data/dataset_validation_qwen35_tp2_ep_ctx32k_apcoff_inf_out256.json');
+    assert.equal(index.scenarios[3].data_url, './data/dataset_validation_qwen35_bidkv.json');
+});
+
+test('Qwen3.5 repaired B0 metadata publishes the measured 35B workbook configuration', () => {
+    const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_qwen35_tp2_ep_ctx32k_apcoff_inf_out256.json'), 'utf8'));
+    assert.equal(data.scenario.model, 'Qwen3.5-35B-A3B');
+    assert.equal(data.scenario.tensor_parallel_size, 2);
+    assert.equal(data.scenario.expert_parallel, true);
+    assert.equal(data.scenario.max_model_len, 32768);
+    assert.equal(data.scenario.prefix_caching, false);
+    assert.equal(data.scenario.graph_mode, 'FULL_DECODE_ONLY');
+    assert.equal(data.scenario.request_rate, 'inf');
+    assert.equal(data.scenario.output_length, 256);
+    assert.equal(data.datasets.length, 21);
+    assert.equal(data.metrics.length, 6);
+    assert.equal(data.results.length, 126);
+    assert.ok(data.results.every((cell) => cell.status === 'baseline_only' && cell.baseline_value !== null));
+    const cell = (datasetId, metricId) => data.results.find((item) => item.dataset_id === datasetId && item.metric_id === metricId);
+    assert.equal(cell('jsonschemabench', 'request_throughput').baseline_value, 1.8);
+    assert.equal(cell('jsonschemabench', 'request_success_rate').baseline_value, 99.5);
+    assert.equal(cell('longbench', 'request_throughput').baseline_value, 1.21);
+    assert.equal(cell('longbench-v2', 'request_success_rate').baseline_value, 99);
+    assert.ok(data.results.every((item) => item.provenance.result_json_sha256));
 });
 
 test('Qwen3.5 TP2 matrix separates online and agent applicability', () => {
