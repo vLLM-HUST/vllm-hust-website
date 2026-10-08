@@ -36,7 +36,8 @@
     <section class="page-hero plugin-hero">
 <div class="content-panel">
 <span id="plugins-eyebrow" class="eyebrow">vLLM-HUST MOD catalog</span>
-<h1 id="plugins-title">Extension Workshop</h1>
+<h1 id="plugins-title">MOD Workshop</h1>
+<p id="plugins-lede">Explore runtime extensions and ecosystem tools by workload, platform, and readiness.</p>
 <div class="plugin-hero-facts">
 <span>
 <strong data-plugin-count>—</strong>
@@ -64,10 +65,9 @@
     <section class="content-panel plugin-boundary">
 <div>
 <span id="plugins-boundary-kicker" class="eyebrow">Architecture rule</span>
-<h2 id="plugins-boundary-title">Classify the host and lifecycle owner before the delivery mechanism.</h2>
+<h2 id="plugins-boundary-title">Find the right extension without losing sight of who runs it.</h2>
 </div>
-<p id="plugins-boundary-copy">Extension Manager Core delegates to vLLM, external KV-system, and Production Stack Host Providers.
-A plugin, KV connector, Mooncake service, and control-plane resource retain distinct identities and lifecycle owners.</p>
+<p id="plugins-boundary-copy">The catalog keeps runtime plugins, KV connectors, external services, and control-plane tools distinct, so setup and ownership remain clear.</p>
 </section>
     <nav class="plugin-section-nav" aria-label="Ecosystem page sections">
 <a href="#technical-highlights">
@@ -942,16 +942,16 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
     </section>
     <aside class="mod-catalog-guide" aria-label="Extension catalog reading guide">
       <div>
-        <strong><span class="lang-en">Read it like a MOD catalog</span><span class="lang-zh">像查看 MOD 一样选择扩展</span></strong>
-        <span><span class="lang-en">Match the host version and platform first.</span><span class="lang-zh">先匹配宿主版本和硬件平台。</span></span>
+        <strong><span class="lang-en">Start with your workload</span><span class="lang-zh">从你的 Workload 开始</span></strong>
+        <span><span class="lang-en">Then check the host version, platform, and prerequisites.</span><span class="lang-zh">再确认宿主版本、硬件平台与前置条件。</span></span>
       </div>
       <div>
-        <strong><span class="lang-en">Status is literal</span><span class="lang-zh">状态按字面执行</span></strong>
-        <span><span class="lang-en">“Inspect only” cannot be enabled; “external service” is operated separately.</span><span class="lang-zh">“仅检查”不能启用；“外部服务”需要单独运维。</span></span>
+        <strong><span class="lang-en">Choose by readiness</span><span class="lang-zh">按成熟度选择</span></strong>
+        <span><span class="lang-en">Inspection-only projects are ready to evaluate, while external services keep their own operations lifecycle.</span><span class="lang-zh">“仅检查”项目适合了解与评估；外部服务仍由各自的运维流程管理。</span></span>
       </div>
       <div>
-        <strong><span class="lang-en">Details stay one click away</span><span class="lang-zh">技术细节收进一层展开</span></strong>
-        <span><span class="lang-en">Contracts, execution planes, ownership, and evidence remain visible.</span><span class="lang-zh">契约、执行面、所有权和证据仍完整保留。</span></span>
+        <strong><span class="lang-en">Open a card for details</span><span class="lang-zh">展开卡片查看详情</span></strong>
+        <span><span class="lang-en">Contracts, execution boundaries, maintainers, and evidence are available when you need them.</span><span class="lang-zh">需要时可继续查看契约、执行边界、维护者与验证依据。</span></span>
       </div>
     </aside>
     <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
@@ -1003,22 +1003,11 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
   <footer class="site-footer">
 <strong>vLLM-HUST</strong> · <span id="footer-copy">Portable inference mechanisms for domestic compute.</span>
 </footer>
-  <script>window.vllmHustPageDict={"en":{"title":"Serving Ecosystem Architecture | vLLM-HUST","plugins-eyebrow":"vLLM-HUST serving ecosystem","plugins-title":"Serving Ecosystem Architecture","plugins-lede":"A typed runtime core connected to platform profiles, KV state systems, control planes, runtime components, and an evidence chain—without calling every artifact a plugin.","plugins-fact-items":"classified components","plugins-fact-runtime":"supported components","plugins-fact-review":"incubating components","plugins-fact-publications":"hardware/performance evidence","plugins-fact-adjacent":"external systems","plugins-boundary-kicker":"Architecture rule","plugins-boundary-title":"Classify the role before the delivery mechanism.","plugins-boundary-copy":"A plugin bundle delivers components; a KV connector adapts vLLM to a state system; a control plane makes external decisions through a narrow bridge.","plugins-legend-kicker":"Canonical classification","plugins-legend-title":"What it is, where it runs, and how it is delivered.","plugins-legend-existing":"System role","plugins-legend-existing-copy":"Runtime, platform, policy, KV system, control plane, evidence, or application.","plugins-legend-active":"Integration contract","plugins-legend-active-copy":"The typed boundary used to connect to vLLM.","plugins-legend-prototype":"Execution and topology","plugins-legend-prototype-copy":"The process, device, service, and deployment boundaries.","plugins-legend-roadmap":"Ownership and evidence","plugins-legend-roadmap-copy":"Who maintains it and what level of support is actually verified.","plugins-search-label":"Search","plugins-adjacent-kicker":"Architecture boundaries","plugins-adjacent-title":"Plugin, connector, and control plane are different concepts.","plugins-adjacent-copy":"The catalog separates a component's system role from its integration contract, execution plane, deployment topology, and delivery model.","footer-copy":"A typed, evidence-backed serving ecosystem for domestic compute."},"zh":{"title":"推理生态系统架构 | vLLM-HUST","plugins-eyebrow":"vLLM-HUST 推理生态","plugins-title":"推理生态系统架构","plugins-lede":"以类型化运行时本体连接平台 profile、KV 状态系统、控制面、运行时组件与证据链，不再把所有制品统称为插件。","plugins-fact-items":"个已分类组件","plugins-fact-runtime":"个受支持组件","plugins-fact-review":"个孵化中组件","plugins-fact-publications":"项硬件/性能证据","plugins-fact-adjacent":"个外部系统","plugins-boundary-kicker":"架构原则","plugins-boundary-title":"先区分系统角色，再描述交付方式。","plugins-boundary-copy":"plugin bundle 负责交付组件；KV connector 把 vLLM 接到状态系统；control plane 通过窄 bridge 在外部做决策。","plugins-legend-kicker":"规范分类","plugins-legend-title":"它是什么、在哪里运行、怎样交付。","plugins-legend-existing":"系统角色","plugins-legend-existing-copy":"运行时、平台、策略、KV 系统、控制面、证据或应用。","plugins-legend-active":"集成契约","plugins-legend-active-copy":"连接 vLLM 时使用的类型化边界。","plugins-legend-prototype":"执行面与拓扑","plugins-legend-prototype-copy":"进程、设备、服务与部署边界。","plugins-legend-roadmap":"所有权与证据","plugins-legend-roadmap-copy":"由谁维护，以及实际验证到什么支持等级。","plugins-search-label":"搜索","plugins-adjacent-kicker":"架构边界","plugins-adjacent-title":"插件、connector 与 control plane 是不同概念。","plugins-adjacent-copy":"目录分别展示组件的系统角色、集成契约、执行面、部署拓扑与交付方式。","footer-copy":"面向国产算力、类型化且以证据支撑的推理生态。"}};</script>
-  <script>
-    Object.assign(window.vllmHustPageDict.en, {
-      title: "Extension Workshop | vLLM-HUST",
-      "plugins-eyebrow": "vLLM-HUST MOD catalog",
-      "plugins-title": "Extension Workshop"
-    });
-    Object.assign(window.vllmHustPageDict.zh, {
-      title: "扩展工坊 | vLLM-HUST",
-      "plugins-eyebrow": "vLLM-HUST MOD 目录",
-      "plugins-title": "扩展工坊"
-    });
-  </script>
+  <script>window.vllmHustPageDict={"en":{"title":"MOD Workshop | vLLM-HUST","plugins-eyebrow":"vLLM-HUST MOD catalog","plugins-title":"MOD Workshop","plugins-lede":"Explore runtime extensions and ecosystem tools by workload, platform, and readiness.","plugins-fact-items":"public MODs","plugins-fact-runtime":"compatibility verified","plugins-fact-review":"experimental or inspection-only","plugins-fact-publications":"hardware/performance evidence","plugins-fact-adjacent":"external systems","plugins-boundary-kicker":"How the catalog works","plugins-boundary-title":"Find the right extension without losing sight of who runs it.","plugins-boundary-copy":"The catalog keeps runtime plugins, KV connectors, external services, and control-plane tools distinct, so setup and ownership remain clear.","plugins-legend-kicker":"Catalog details","plugins-legend-title":"See what each project does, where it runs, and how it is delivered.","plugins-legend-existing":"System role","plugins-legend-existing-copy":"Runtime, platform, policy, KV system, control plane, evidence, or application.","plugins-legend-active":"Integration contract","plugins-legend-active-copy":"The versioned interface used to connect to vLLM.","plugins-legend-prototype":"Execution and topology","plugins-legend-prototype-copy":"The process, device, service, and deployment boundaries.","plugins-legend-roadmap":"Maintainers and evidence","plugins-legend-roadmap-copy":"Who maintains the project and how far its support has been verified.","plugins-search-label":"Search","plugins-adjacent-kicker":"Architecture boundaries","plugins-adjacent-title":"Plugins, connectors, and control planes play different roles.","plugins-adjacent-copy":"Each catalog entry shows its role, integration contract, execution boundary, deployment shape, and delivery format.","footer-copy":"A practical serving ecosystem for domestic compute, backed by clear compatibility and evidence."},"zh":{"title":"MOD 工坊 | vLLM-HUST","plugins-eyebrow":"vLLM-HUST MOD 目录","plugins-title":"MOD 工坊","plugins-lede":"按 Workload、平台与成熟度探索运行时扩展和生态工具。","plugins-fact-items":"个公开 MOD","plugins-fact-runtime":"个兼容性已验证","plugins-fact-review":"个实验性或仅检查","plugins-fact-publications":"项硬件或性能证据","plugins-fact-adjacent":"个外部系统","plugins-boundary-kicker":"目录使用方式","plugins-boundary-title":"找到合适的扩展，也看清它由谁运行和维护。","plugins-boundary-copy":"目录分别呈现运行时插件、KV connector、外部服务与控制面工具，让配置方式和生命周期归属保持清晰。","plugins-legend-kicker":"目录详情","plugins-legend-title":"了解每个项目做什么、在哪里运行、如何交付。","plugins-legend-existing":"系统角色","plugins-legend-existing-copy":"运行时、平台、策略、KV 系统、控制面、证据或应用。","plugins-legend-active":"集成契约","plugins-legend-active-copy":"连接 vLLM 时使用的版本化接口。","plugins-legend-prototype":"执行面与拓扑","plugins-legend-prototype-copy":"进程、设备、服务与部署边界。","plugins-legend-roadmap":"维护者与证据","plugins-legend-roadmap-copy":"由谁维护，以及目前验证到什么支持程度。","plugins-search-label":"搜索","plugins-adjacent-kicker":"架构边界","plugins-adjacent-title":"插件、connector 与 control plane 承担不同角色。","plugins-adjacent-copy":"每个条目都会展示系统角色、集成契约、执行边界、部署形态与交付方式。","footer-copy":"面向国产算力的实用推理生态，兼容状态与验证依据清晰可查。"}};</script>
   <script src="./assets/site.js?v=benchmarks-ia-20261003">
 </script>
 <script src="./assets/plugin-performance.js?v=ecpa-final-20261009"></script>
+<script src="./assets/ecosystem-catalog.js?v=mod-catalog-20261008"></script>
 <script src="./assets/plugins-page.js?v=ecpa-final-20261009">
 </script>
 </body>
