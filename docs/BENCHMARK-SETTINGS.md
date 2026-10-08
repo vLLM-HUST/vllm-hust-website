@@ -51,13 +51,14 @@ workload identities; never silently mix them.
   width-matched extensions through C56 belong exclusively in the final residency/cache study,
   following Fletcher's corrected publication placement; neither campaign appears in the first chart.
 - **BetterScale residency and cache studies** references 21 immutable source points through
-  `workload.contract.comparison_point_ids`. Native C1/C2/C4/C8/C16 forms one fixed-configuration
-  reference line. BetterScale has three separate lines: original tuned C1–C32, fixed E36/R36
-  C32/36/37/40, and width-matched C37/40/44/48/52/56. The latter changes E/R with concurrency; it is
-  not a fixed-capacity sweep or causal ablation. All are selected by default. Original
-  residency/cache groups remain independent dots available via their checkboxes. Source points,
-  archived repeats, metrics and provenance are unchanged; downloads include source cohort plus
-  `comparison_cohort`. See [the width-matched boundary](FRONTIER-QWEN35-CONCURRENCY-WIDTH.md).
+  `workload.contract.comparison_point_ids`, but displays only each MOD's Pareto frontier: 8
+  BetterScale points and 5 Native points. Each frontier is connected in increasing P90 decode speed
+  order. BetterScale spans workload-tuned configurations across the three campaigns; this envelope
+  is not a fixed-capacity sweep. Dominated points and unrelated cache-ablation groups are hidden
+  from this chart, not deleted from the snapshot. Filters recompute the frontier. Source points,
+  archived repeats, metrics and provenance are unchanged; downloads include the source cohort plus
+  `comparison_cohort`. The first chart remains unchanged. See
+  [the width-matched boundary](FRONTIER-QWEN35-CONCURRENCY-WIDTH.md).
 - Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
   session concurrency, MTP, request limit, explicit KV budget, UTC sampling date and the two
   coordinate values. `evidence.sampling_date_utc` is a calendar-valid YYYY-MM-DD date, with

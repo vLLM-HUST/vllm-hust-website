@@ -232,3 +232,13 @@ excluded, not a poorer repeat. Two300s cache-observer diagnostics are also not r
 Preserve the corrected endpoint receipts and the distinct source/configuration/card/co-run context
 when importing new observations. Measured C48–C52 TTFT degradation is budget/workload-specific, not
 a hardware limit.
+
+## Residency study frontier-only display (2026-10-08)
+
+Fletcher superseded the October6 four-campaign-line display: the final residency/cache study now
+shows only Pareto vertices, with separate BetterScale and Native envelopes. Of the 21 shared source
+measurements, 8 BetterScale and 5 Native points survive. BetterScale spans configurations, not one
+fixed-capacity sweep. Dominated measurements and unrelated ablation groups stay in the snapshot but
+are not displayed. Main-chart scope and original evidence are unchanged. Run
+`scripts/verify_betterscale_study_browser.cjs` for bounded desktop/mobile EN/ZH, source downloads,
+filters and main-chart exclusion checks; put screenshot output under `/tmp`.

@@ -114,7 +114,8 @@
     function presentationPoints(points, cohort) {
         // Reuse immutable measurements in a study without moving or duplicating source records.
         const shared = new Set(cohort?.workload?.contract?.comparison_point_ids || []);
-        const members = points.filter(point => point.cohort_id === cohort?.id || shared.has(point.id));
+        const members = points.filter(point => shared.size && cohort?.workload?.contract?.presentation === 'configuration-study'
+            ? shared.has(point.id) : point.cohort_id === cohort?.id || shared.has(point.id));
         const series = cohort?.workload?.contract?.display_series_ids;
         if (series) return members.filter(point => series.includes(point.load.concurrency_series));
         const prefix = cohort?.workload?.contract?.display_series_prefix;
@@ -192,20 +193,9 @@
         const shared = cohort?.workload?.contract?.comparison_point_ids;
         if (cohort?.workload?.contract?.presentation === 'configuration-study') {
             const comparison = rows.filter(row => shared?.includes(row.point.id));
-            const native = comparison.filter(row => groupKey(row.point) !== 'betterscale');
-            const better = comparison.filter(row => groupKey(row.point) === 'betterscale');
-            // Never join independent capacity campaigns at overlapping concurrency values.
-            const families = new Map();
-            for (const row of better) {
-                const campaign = row.point.evidence?.benchmark_protocol?.campaign;
-                const key = JSON.stringify([row.point.load.session_rotation_depth,
-                    ['concurrency-knee-20261006', 'concurrency-width-20261006'].includes(campaign) ? campaign : 'original']);
-                if (!families.has(key)) families.set(key, []);
-                families.get(key).push(row);
-            }
-            return [...concurrencySeries(native), ...[...families.values()]
-                .map(line => line.sort((a,b) => a.point.load.concurrency - b.point.load.concurrency))
-                .filter(line => line.length > 1)];
+            // One best-trade-off envelope per MOD and depth, not a fixed-capacity sweep.
+            return groupFrontiers(comparison.map(row => row.point), xKey, yKey)
+                .filter(line => line.length > 1);
         }
         const betterScale = rows.filter(row => groupKey(row.point) === 'betterscale');
         return [...concurrencySeries(rows.filter(row => groupKey(row.point) !== 'betterscale')),
