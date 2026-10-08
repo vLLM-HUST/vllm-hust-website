@@ -5,6 +5,23 @@ This PR (#354) contains ten valid 900-second runs: OFF/ON at C1, C2, C4, C8 and 
 The measured host is vLLM 0.23.0+empty with vLLM-Ascend 0.23.0.post1, matching the operation record.
 Every imported formal summary is valid and has zero failed requests.
 
+## Follow-up measurement status
+
+The ten points currently in this PR are the original `20261003` campaign and
+remain unchanged. A separate `20261008` remeasurement is being run with three
+formal 900-second repeats for each OFF/ON and C1/C2/C4/C8/C16 combination.
+At the time of this update, 8 of the 30 formal windows are complete. The
+follow-up results are not included in the leaderboard data or used for any
+performance claim until all planned windows and their evidence checks are
+complete.
+
+For the follow-up campaign, ON is accepted only when
+`runtime_effective mechanism=ascend_boundary_first_true_search
+phase=formal_request` is present in the isolated formal server log; an
+installation event or a warmup/capture event alone is not sufficient. OFF
+must have no such formal-request event. The follow-up will be submitted as a
+new campaign rather than relabelling the original points.
+
 ## Limitations
 
 - The measured prepared file hash is dff300…; it is added to this local draft as a
