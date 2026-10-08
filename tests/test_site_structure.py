@@ -1150,21 +1150,15 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert (
-        "Typed runtime contracts. 26 cataloged MODs. Evidence before claims."
-        in html_text
-    )
-    assert "类型化运行时契约、26 个目录 MOD、证据先于结论。" in html_text
+    assert "26 MODs for real serving workloads" in html_text
+    assert "26 个 MOD，覆盖真实推理场景" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
-    assert (
-        "22 catalog entries, with activation and performance evidence kept separate."
-        in html_text
-    )
-    assert "22 个目录条目，启用证据与性能证据分开呈现。" in html_text
-    assert "static checks never become runtime or NPU claims" in html_text
-    assert "不把静态检查写成运行时或 NPU 结论" in html_text
+    assert "Explore 26 MODs for scheduling, KV, execution" in html_text
+    assert "探索 26 个 MOD，覆盖调度、KV、执行" in html_text
+    assert "what is available for evaluation" in html_text
+    assert "适合评估" in html_text
 
     expected_repositories = (
         "vllm-hust-bidkv",
