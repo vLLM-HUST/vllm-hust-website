@@ -16,7 +16,8 @@
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', standalone: 'measurements are not on a displayed line', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
-            modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', graphMode: 'Graph mode', stateSeats: 'Execution / resident seats', balancedAttention: 'Balanced attention', cachePolicy: 'State cache', fullCache: 'Full', incrementalCache: 'Incremental', enabled: 'On', disabled: 'Off', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation'
+            modCoverage: '35B MOD coverage', workloadRepo: 'Workload repository', curves: 'Concurrency curves', nearby: 'Nearby configurations', warmup: 'Warmup', sweWarmup: 'Separate check · fresh session KV', primers: 'Snapshot primers', pressure: 'Primers + 10/lane', capacity: 'Server limit', unknown: 'Not recorded', draft: 'MTP draft tokens', graphMode: 'Graph mode', stateSeats: 'Execution / resident seats', balancedAttention: 'Balanced attention', cachePolicy: 'State cache', fullCache: 'Full', incrementalCache: 'Incremental', enabled: 'On', disabled: 'Off', modSource: 'MOD source', staged: 'staged source', localAdaptation: 'local adaptation',
+            viewContract: 'View contract', contractTitle: 'Current setting contract', contractScope: 'Setting identity', contractCurves: 'Enabled curve configurations', contractCurve: 'Curve', contractRuntime: 'Runtime', contractTopology: 'Topology', contractMemory: 'Capacity / memory', contractExecution: 'Execution', contractEvidence: 'Evidence identity', modelRevision: 'Model revision', checkpoint: 'Checkpoint', precision: 'Precision / dtype', window: 'Measured window', protocol: 'Protocol', preparedWorkload: 'Canonical prepared workload', workloadHash: 'Workload', tokenizer: 'Canonical tokenizer fingerprint', dataset: 'Source dataset', seconds: 'seconds', chips: 'chips', perChip: 'per chip', varies: 'varies by curve', noCurves: 'No enabled curve configurations.'
         },
         zh: {
             selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
@@ -29,7 +30,8 @@
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', standalone: '个测量点不在当前连线上', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
-            modCoverage: '35B MOD 补测进度', workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', graphMode: '图模式', stateSeats: '执行 / 驻留槽位', balancedAttention: '均衡 attention', cachePolicy: '状态缓存', fullCache: '全量', incrementalCache: '增量', enabled: '开启', disabled: '关闭', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配'
+            modCoverage: '35B MOD 补测进度', workloadRepo: 'Workload 仓库', curves: '并发曲线', nearby: '附近的配置', warmup: '预热', sweWarmup: '独立校验 · 测量会话冷 KV', primers: '初始上下文填充', pressure: '初始填充 + 每路 10 次', capacity: '服务端上限', unknown: '未记录', draft: 'MTP draft token 数', graphMode: '图模式', stateSeats: '执行 / 驻留槽位', balancedAttention: '均衡 attention', cachePolicy: '状态缓存', fullCache: '全量', incrementalCache: '增量', enabled: '开启', disabled: '关闭', modSource: 'MOD 源码', staged: '部署快照', localAdaptation: '本地适配',
+            viewContract: '查看合同', contractTitle: '当前设定合同', contractScope: '设定身份', contractCurves: '已启用曲线配置', contractCurve: '曲线', contractRuntime: '运行时', contractTopology: '并行拓扑', contractMemory: '容量 / 显存', contractExecution: '执行模式', contractEvidence: '证据身份', modelRevision: '模型 revision', checkpoint: 'Checkpoint', precision: '精度 / dtype', window: '测量窗口', protocol: '协议', preparedWorkload: 'Canonical 预制负载', workloadHash: '负载', tokenizer: 'Canonical tokenizer 指纹', dataset: '源数据集', seconds: '秒', chips: '卡', perChip: '每卡', varies: '随曲线不同', noCurves: '当前没有启用的曲线配置。'
         }
     };
     const lang = () => (document.documentElement.lang || 'en').startsWith('zh') ? 'zh' : 'en';
@@ -87,6 +89,58 @@
         return [['TP',params.tensor_parallel_size],['PP',params.pipeline_parallel_size],['DP',params.data_parallel_size],['EP',params.expert_parallel_size]]
             .filter(([key,value]) => value != null && (key === 'TP' || value > 1)).map(([key,value]) => `${key}${value}`).join(' / ') || t('unknown');
     };
+    const boolLabel = value => value == null ? t('unknown') : t(value ? 'enabled' : 'disabled');
+    const bytesLabel = value => value == null ? t('unknown') : `${fmt(value / 1024 ** 3)} GiB ${t('perChip')} (${fmt(value)} B)`;
+    const contractGroups = () => {
+        const groups = new Map();
+        for (const point of points()) {
+            const key = point.load.concurrency_series || point.id;
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(point);
+        }
+        return [...groups.values()].map(members => ({
+            point: members[0],
+            concurrency: [...new Set(members.map(p => p.load.concurrency).filter(Number.isFinite))].sort((a,b)=>a-b)
+        })).sort((a,b)=>groupLabel(a.point).localeCompare(groupLabel(b.point),lang()));
+    };
+    function openContract() {
+        const current=cohort(), contract=current?.workload.contract || {}, groups=contractGroups();
+        const protocols=[...new Set(points().map(p=>p.evidence.benchmark_protocol?.protocol_id).filter(Boolean))];
+        const depths=[...new Set(points().map(p=>p.load.session_rotation_depth).filter(Number.isInteger))].sort((a,b)=>a-b);
+        const content=$('frontier-contract-content');
+        content.innerHTML=`<header class="frontier-contract-header"><div><h2 id="frontier-contract-title">${t('contractTitle')}</h2><p>${escape(current?.workload.label || t('unknown'))}</p></div></header>
+            <section aria-labelledby="frontier-contract-scope-title"><h3 id="frontier-contract-scope-title">${t('contractScope')}</h3><dl class="frontier-contract-facts">
+                <div><dt>${t('model')}</dt><dd>${escape(current?.model.label || t('unknown'))}</dd></div>
+                <div><dt>${t('modelRevision')}</dt><dd class="frontier-contract-code">${escape(current?.model.revision || t('unknown'))}</dd></div>
+                <div><dt>${t('precision')}</dt><dd>${escape(current?.precision.label || t('unknown'))}</dd></div>
+                <div><dt>${t('window')}</dt><dd>${contract.measurement_seconds == null?t('unknown'):`${fmt(contract.measurement_seconds)} ${t('seconds')}`}</dd></div>
+                <div><dt>${t('protocol')}</dt><dd>${escape(protocols.length===1?protocols[0]:protocols.length?t('varies'):t('unknown'))}</dd></div>
+                <div><dt>${t('concurrency')}</dt><dd>${escape([...new Set(points().map(p=>p.load.concurrency).filter(Number.isFinite))].sort((a,b)=>a-b).map(c=>`C${c}`).join(' / ') || t('unknown'))}${depths.length?` · ${escape(depths.map(rotationLabel).join(' / '))}`:''}</dd></div>
+                <div><dt>${t('preparedWorkload')}</dt><dd class="frontier-contract-code">${escape(contract.prepared_workload_sha256 || t('unknown'))}</dd></div>
+                <div><dt>${t('tokenizer')}</dt><dd class="frontier-contract-code">${escape(contract.tokenizer_fingerprint || t('unknown'))}</dd></div>
+                <div><dt>${t('dataset')}</dt><dd>${escape(contract.source_pool?.dataset || t('unknown'))}${contract.source_pool?.revision?`<br><span class="frontier-contract-code">${escape(contract.source_pool.revision)}</span>`:''}</dd></div>
+            </dl></section>
+            <section aria-labelledby="frontier-contract-curves-title"><h3 id="frontier-contract-curves-title">${t('contractCurves')}</h3>
+                ${groups.length?`<div class="frontier-contract-table-wrap"><table class="frontier-contract-table"><thead><tr><th>${t('contractCurve')}</th><th>${t('contractRuntime')}</th><th>${t('contractTopology')}</th><th>${t('contractMemory')}</th><th>${t('contractExecution')}</th><th>${t('contractEvidence')}</th></tr></thead><tbody>${groups.map(({point,concurrency})=>{
+                    const p=point.configuration.parameters, commits=p.runtime_base_commits || {};
+                    const evidence=point.evidence.benchmark_protocol || {};
+                    const runtimeCommits=[commits.vllm?`vLLM ${escape(commits.vllm)}`:null,(commits['vllm-ascend']||commits.vllm_ascend)?`Ascend ${escape(commits['vllm-ascend']||commits.vllm_ascend)}`:null].filter(Boolean).join('<br>');
+                    const topology=p.attention_ranks!=null&&p.expert_ranks!=null?parallel(point):[
+                        `TP${p.tensor_parallel_size ?? '—'}`,`PP${p.pipeline_parallel_size ?? '—'}`,`DP${p.data_parallel_size ?? '—'}`,`EP ${boolLabel(p.expert_parallel)}`
+                    ].join(' / ');
+                    return `<tr><th scope="row">${escape(groupLabel(point))}<small>${escape(concurrency.map(c=>`C${c}`).join(' / ') || `C${point.load.concurrency ?? '—'}`)}</small></th>
+                        <td>${escape(point.configuration.engine_version)}${runtimeCommits?`<small>${runtimeCommits}</small>`:''}</td>
+                        <td>${escape(point.configuration.hardware.label)} × ${fmt(point.configuration.hardware.accelerator_count)} ${t('chips')}<small>${escape(topology)}</small></td>
+                        <td>KV ${bytesLabel(p.kv_cache_memory_bytes)}<small>max_model_len ${fmt(p.max_model_len)}<br>max_num_seqs ${fmt(p.max_num_seqs)} · batched ${fmt(p.max_num_batched_tokens)}</small></td>
+                        <td>${t('graphMode')}: ${escape(p.graph_mode ?? t('unknown'))}<small>APC ${boolLabel(p.prefix_caching)} · async ${boolLabel(p.async_scheduling)}<br>Mamba ${escape(p.mamba_cache_mode ?? t('unknown'))} · MTP ${fmt(p.mtp_draft_tokens)}<br>thinking ${boolLabel(p.thinking)} · temperature ${fmt(p.generation_temperature)}</small></td>
+                        <td class="frontier-contract-code">${t('checkpoint')}: ${escape(p.checkpoint_revision || t('unknown'))}<br>${t('workloadHash')}: ${escape(evidence.prepared_workload_sha256 || t('unknown'))}<br>Tokenizer: ${escape(evidence.tokenizer_fingerprint || t('unknown'))}</td></tr>`;
+                }).join('')}</tbody></table></div>`:`<p class="frontier-contract-empty">${t('noCurves')}</p>`}
+            </section>`;
+        const dialog=$('frontier-contract-dialog');
+        $('frontier-contract-close').setAttribute('aria-label',t('close'));
+        if(!dialog.open)dialog.showModal();
+        $('frontier-contract-close').focus();
+    }
     function reconcile() {
         if (!state.data.cohorts.some(c => tagKey(c) === state.tag)) state.tag = state.data.cohorts[0] ? tagKey(state.data.cohorts[0]) : '';
         const available = state.data.cohorts.filter(c => tagKey(c) === state.tag);
@@ -123,6 +177,7 @@
                     <div class="frontier-identity">
                         ${tags.length?`<details class="frontier-model-picker" id="frontier-model-picker"><summary id="frontier-model-trigger" aria-label="${t('model')}: ${escape(cohort().model.label)} · ${escape(cohort().precision.label)}">${escape(cohort().model.label)}<span>${escape(cohort().precision.label)}</span><span class="frontier-model-chevron" aria-hidden="true"></span></summary><div class="frontier-model-tags" role="group" aria-label="${t('model')}">${tags.map(c=>`<button type="button" class="frontier-model-tag" data-model-tag="${escape(tagKey(c))}" aria-pressed="${tagKey(c)===state.tag}">${escape(c.model.label)}<span>${escape(c.precision.label)}</span></button>`).join('')}</div></details>`:''}
                         ${choices.length>1?`<label class="frontier-workload">${t('workload')}<select id="frontier-workload">${choices.map(c=>`<option value="${escape(c.id)}" ${c.id===state.cohort?'selected':''}>${escape(c.workload.label)} · ${fmt(c.context_tokens)} ${t('context')}</option>`).join('')}</select></label>`:choices.length?`<span id="frontier-workload-tag" class="frontier-workload-tag" aria-label="${t('workload')}">${escape(choices[0].workload.label)} · ${fmt(choices[0].context_tokens)} ${t('context')}</span>`:''}
+                        <button id="frontier-contract-open" class="frontier-contract-open" type="button" ${state.ready&&cohort()?'':'disabled'}>${t('viewContract')}</button>
                     </div>
 
                 </div>
@@ -146,6 +201,7 @@
             state.tag=button.dataset.modelTag;state.cohort='';state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();updateSettingURL();$('frontier-model-trigger')?.focus();
         }));
         $('frontier-workload')?.addEventListener('change',event=>{state.cohort=event.target.value;state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();updateSettingURL();});
+        $('frontier-contract-open').addEventListener('click',openContract);
         $('frontier-panel').querySelectorAll('[data-filter]').forEach(input=>input.addEventListener('change',()=>{
             const selected=state[input.dataset.filter];
             if(input.checked)selected.add(input.value);else selected.delete(input.value);
@@ -309,6 +365,8 @@
     window.addEventListener('vllm-hust:langchange',shell);
     let resize;window.addEventListener('resize',()=>{cancelAnimationFrame(resize);resize=requestAnimationFrame(render);});
     $('view-frontier').addEventListener('click',()=>{updateSettingURL();requestAnimationFrame(render);});
+    $('frontier-contract-close').addEventListener('click',()=>$('frontier-contract-dialog').close());
+    $('frontier-contract-dialog').addEventListener('click',event=>{if(event.target===$('frontier-contract-dialog'))$('frontier-contract-dialog').close();});
     $('runs-content').hidden=false;shell();
     Promise.all([
         fetch('./data/leaderboard_frontier.json?v=prefix-routing-mean3-20261007',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
