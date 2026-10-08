@@ -79,7 +79,7 @@ const catalog = read('ecosystem.json');
 const attributions = read('leaderboard_mod_attributions.json');
 test('reviewed identities resolve to the workshop catalog without changing evidence or coverage',()=>{
     const before=model.build(realPayload,supplement), after=model.build(realPayload,supplement,catalog,attributions);
-    assert.equal(after.rows.length,356);
+    assert.equal(after.rows.length,358);
     const old=new Map(before.rows.map(r=>[r.id,r]));
     for(const row of after.rows) {
         assert.deepEqual(row.metrics,old.get(row.id).metrics);
@@ -91,7 +91,7 @@ test('reviewed identities resolve to the workshop catalog without changing evide
         }
     }
     const counts={}; for(const r of after.rows) {const key=`${r.mod}:${r.modStatus}`;counts[key]=(counts[key]||0)+1;}
-    assert.deepEqual(counts,{'none:baseline':47,'betterscale:enabled':30,'unknown:unknown':248,
+    assert.deepEqual(counts,{'none:baseline':47,'betterscale:enabled':30,'unknown:unknown':250,
         'simllm-migration:related':26,'kv-tiering-migration:baseline':1,'kv-tiering-migration:related':2,
         'prefix-router-migration:enabled':1,'split-batch-full-graph-migration:baseline':1});
     for(const row of after.rows.filter(r=>r.mod==='betterscale')) {

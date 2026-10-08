@@ -700,24 +700,34 @@ def evaluate_hard_constraints(entry: dict[str, Any]) -> dict[str, Any]:
 
     checks = {
         "effective_utilization_ge_90": (
-            utilization is not None
-            and utilization
+            None
+            if utilization is None
+            else utilization
             >= HARD_CONSTRAINT_THRESHOLDS["single_chip_effective_utilization_pct"]
         ),
         "typical_scene_ge_2x_and_ttft_tpot_reduction_gt_20": (
-            throughput_ratio is not None
-            and throughput_ratio
+            None
+            if None in (throughput_ratio, ttft_reduction, tpot_reduction)
+            else throughput_ratio
             >= HARD_CONSTRAINT_THRESHOLDS["typical_throughput_ratio_vs_baseline"]
-            and ttft_reduction is not None
             and ttft_reduction
             > HARD_CONSTRAINT_THRESHOLDS["typical_ttft_reduction_pct_vs_baseline"]
-            and tpot_reduction is not None
             and tpot_reduction
             > HARD_CONSTRAINT_THRESHOLDS["typical_tpot_reduction_pct_vs_baseline"]
         ),
         "long_context_ge_32k_and_p95_p99_stable": (
-            long_context_length is not None
-            and long_context_length >= HARD_CONSTRAINT_THRESHOLDS["long_context_length"]
+            None
+            if None
+            in (
+                long_context_length,
+                long_context_throughput_stable,
+                long_context_ttft_p95_stable,
+                long_context_ttft_p99_stable,
+                long_context_tpot_p95_stable,
+                long_context_tpot_p99_stable,
+            )
+            else long_context_length
+            >= HARD_CONSTRAINT_THRESHOLDS["long_context_length"]
             and long_context_throughput_stable is True
             and long_context_ttft_p95_stable is True
             and long_context_ttft_p99_stable is True
@@ -725,16 +735,26 @@ def evaluate_hard_constraints(entry: dict[str, Any]) -> dict[str, Any]:
             and long_context_tpot_p99_stable is True
         ),
         "single_business_cost_down_ge_30_and_multi_tenant_high_utilization": (
-            unit_token_cost_reduction is not None
-            and unit_token_cost_reduction
+            None
+            if unit_token_cost_reduction is None
+            or multi_tenant_high_utilization is None
+            else unit_token_cost_reduction
             >= HARD_CONSTRAINT_THRESHOLDS["unit_token_cost_reduction_pct"]
             and multi_tenant_high_utilization is True
         ),
     }
+    overall_status = (
+        "failed"
+        if any(value is False for value in checks.values())
+        else "incomplete"
+        if any(value is None for value in checks.values())
+        else "passed"
+    )
 
     return {
         "checks": checks,
-        "overall_pass": all(checks.values()),
+        "overall_pass": overall_status == "passed",
+        "overall_status": overall_status,
         "metrics": {
             "single_chip_effective_utilization_pct": utilization,
             "typical_throughput_ratio_vs_baseline": throughput_ratio,
@@ -951,6 +971,7 @@ def build_hard_constraint_snapshot(entries: list[dict[str, Any]]) -> dict[str, A
                 "previous": previous_summary,
                 "metric_deltas": metric_deltas,
                 "overall_pass": bool(latest_summary["evaluation"]["overall_pass"]),
+                "overall_status": latest_summary["evaluation"]["overall_status"],
             }
         )
 
@@ -966,13 +987,22 @@ def build_hard_constraint_snapshot(entries: list[dict[str, Any]]) -> dict[str, A
         item["selection_rank"] = index
 
     total = len(scopes_payload)
-    pass_count = sum(1 for item in scopes_payload if item.get("overall_pass"))
+    pass_count = sum(
+        1 for item in scopes_payload if item.get("overall_status") == "passed"
+    )
+    fail_count = sum(
+        1 for item in scopes_payload if item.get("overall_status") == "failed"
+    )
+    incomplete_count = sum(
+        1 for item in scopes_payload if item.get("overall_status") == "incomplete"
+    )
     return {
         "schema_version": HARD_CONSTRAINTS_SCHEMA_VERSION,
         "generated_at": datetime.now(UTC).isoformat(),
         "scope_count": total,
         "pass_count": pass_count,
-        "fail_count": max(total - pass_count, 0),
+        "fail_count": fail_count,
+        "incomplete_count": incomplete_count,
         "best_scope_key": scopes_payload[0]["scope_key"] if scopes_payload else None,
         "scopes": scopes_payload,
     }

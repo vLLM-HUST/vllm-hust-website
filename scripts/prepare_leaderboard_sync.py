@@ -142,8 +142,12 @@ def require_public_entry_contract(
     if metadata.get("verified") is not True:
         errors.append(f"{prefix}: metadata.verified must be true")
 
-    target_id = str(metadata.get("target_id") or "")
-    target_version = str(metadata.get("target_version") or "")
+    target_id = str(
+        metadata.get("target_contract_id") or metadata.get("target_id") or ""
+    )
+    target_version = str(
+        metadata.get("target_contract_version") or metadata.get("target_version") or ""
+    )
     target_registry_sha256 = str(metadata.get("target_registry_sha256") or "")
     if not target_id:
         errors.append(f"{prefix}: metadata.target_id is required")
@@ -257,7 +261,7 @@ def require_historical_unverified_marker(
         return [f"{prefix}: invalid historical-unverified admission marker"]
     if metadata.get("verified") is True:
         errors.append(f"{prefix}: historical-unverified entry cannot be verified")
-    if metadata.get("target_id"):
+    if metadata.get("target_contract_id") or metadata.get("target_id"):
         errors.append(f"{prefix}: historical-unverified entry cannot declare target_id")
     reason = str(metadata.get("official_admission_reason") or "").strip()
     if not reason:

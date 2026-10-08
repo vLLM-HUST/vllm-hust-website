@@ -166,8 +166,8 @@
                     href: 'https://github.com/vLLM-HUST/vllm-hust-benchmark',
                 },
                 {
-                    label: { en: 'Leaderboard', zh: '性能排行榜' },
-                    href: './leaderboard.html',
+                    label: { en: 'Benchmarks', zh: '评测' },
+                    href: './leaderboard-runs.html',
                 },
             ],
         },

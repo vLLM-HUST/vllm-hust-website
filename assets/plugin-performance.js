@@ -53,7 +53,7 @@
     return rows.every(Boolean) ? rows : null;
   }
   function derive(data, frontier) {
-    if (data.schema_version !== 'plugin-performance/v7'
+    if (data.schema_version !== 'plugin-performance/v8'
         || data.metric !== 'output_tps' || data.aggregation !== 'geometric-mean'
         || JSON.stringify(data.concurrencies) !== '[1,2,4,8,16]'
         || !Array.isArray(data.comparison_sets)) throw new Error('Invalid comparison contract');
@@ -101,8 +101,13 @@
           gain: (point.metrics.output_tps / baseline[index].metrics.output_tps - 1) * 100
         })) : [];
         const published = observation.kind === 'published-comparisons' ? observation.comparisons : null;
+        const evidenceUrl = observation.url || entry.url;
+        if (Boolean(observation.setting_label_en) !== Boolean(observation.setting_label_zh)) {
+          throw new Error('Performance observations require bilingual setting labels');
+        }
         if ((observation.kind === 'frontier-series' && (!observation.series_id || !baselineSeriesId))
             || (observation.kind !== 'frontier-series' && observation.kind !== 'published-comparisons')
+            || !String(evidenceUrl || '').startsWith('https://')
             || (published && (!Array.isArray(published) || !published.length
               || published.some(row => row.metric !== data.metric
                 || !Number.isFinite(row.baseline) || row.baseline <= 0
@@ -126,6 +131,13 @@
             ? (comparisons.length ? 'frontier' : published ? 'published-comparison' : null)
             : null };
       });
+      const modelCounts = new Map();
+      observations.forEach(row => modelCounts.set(row.modelLabel,
+        (modelCounts.get(row.modelLabel) || 0) + 1));
+      if (observations.some(row => modelCounts.get(row.modelLabel) > 1
+          && (!row.setting_label_en || !row.setting_label_zh))) {
+        throw new Error('Same-model observations require bilingual setting labels');
+      }
       if (!observations.some(row => row.id === entry.default_observation_id)) {
         throw new Error('Missing default observation');
       }
@@ -137,8 +149,8 @@
       const matches = selectedModel
         ? derived.observations.filter(row => row.modelLabel === selectedModel)
         : derived.observations.filter(row => row.id === derived.entry.default_observation_id);
-      if (matches.length > 1) throw new Error('Ambiguous model observation');
-      const selected = matches[0];
+      const selected = matches.find(row => row.id === derived.entry.default_observation_id)
+        || matches[0];
       const empty = { gain: null, count: 0, comparisons: [], published_comparisons: [],
         baseline_series_id: null, modelLabel: null, cohortId: null, runtimeBase: null, source: null };
       return [id, { ...derived.entry, observations: derived.observations, ...(selected || empty), id }];

@@ -54,9 +54,12 @@ jobs:
           trap 'kill "$server_pid"' EXIT
           python scripts/verify_leaderboard_runs_browser.py
           python scripts/verify_leaderboard_frontier_browser.py
+          python scripts/verify_leaderboard_contract_browser.py
           FRONTIER_QA_URL=http://127.0.0.1:8774 python scripts/verify_leaderboard_frontier_native27_browser.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: leaderboard-runs-review
-          path: output/playwright/leaderboard-runs/
+          path: |
+            output/playwright/leaderboard-runs/
+            output/playwright/leaderboard-contract/

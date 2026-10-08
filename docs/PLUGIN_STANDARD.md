@@ -1,8 +1,8 @@
 # vLLM-HUST Extension Architecture — experimental
 
-> Manifest `0.2-experimental` and the former Bundle v1 prototype are not stable compatibility
-> contracts. Alpha publication is blocked until the vLLM, external-KV-system, and control-plane
-> acceptance gates pass.
+> Manifest `0.3-experimental` is not a stable compatibility contract. Manifest 0.2 remains readable
+> for migration, and the former Bundle v1 prototype remains historical only. Alpha publication is
+> blocked until the vLLM, external-KV-system, and control-plane acceptance gates pass.
 
 ## Product boundary
 
@@ -51,6 +51,11 @@ The static manifest must explicitly distinguish `kind`, `host`, `runtime`, `life
 required services, protocol/host ranges, and implementation carriers. Supported carriers include
 registered Python entry points, unregistered/import-only Python modules, host built-ins, external
 services, OCI images, Helm values, Kubernetes manifests, CRDs, and controllers.
+
+Manifest 0.3 additionally declares `resource_claims` and `requires_extensions`. Exclusive claims and
+missing, disabled, incompatible, or cyclic Bundle dependencies fail before host launch. Dependencies
+are never auto-enabled, and resource claims do not transfer ownership of an external service,
+device, KV data, or cluster to the Manager.
 
 Third-party Provider factories use `vllm_hust_ext.providers`. vLLM-HUST does not create unofficial
 entry-point groups inside `vllm.*`.

@@ -24,8 +24,8 @@ test('every Frontier gain is computed from five points in a declared comparison 
     assert.ok(Math.abs(result.gain - (product ** (1 / 5) - 1) * 100) < 1e-10);
   }
   assert.deepEqual(new Set(measured.map(result => result.id)), new Set([
-    'betterscale', 'pipeline-microbatch-migration', 'bidkv', 'dla', 'kv-tiering-migration',
-    'mooncake-vllm-connectors', 'kvcompress-ascend', 'kv-materialization-arrival-control',
+    'betterscale', 'pipeline-microbatch-migration', 'dla', 'kv-tiering-migration',
+    'kvcompress-ascend', 'kv-materialization-arrival-control',
     'pegaflow-vllm-connectors'
   ]));
   assert.equal(results.get('betterscale').gain.toFixed(2), '42.39');
@@ -33,7 +33,6 @@ test('every Frontier gain is computed from five points in a declared comparison 
   assert.equal(results.get('kvcompress-ascend').gain.toFixed(2), '-3.55');
   assert.equal(results.get('pegaflow-vllm-connectors').gain.toFixed(2), '6.34');
   assert.equal(results.get('betterscale').runtimeBase.vllm.slice(0, 7), '752a3a5');
-  assert.equal(results.get('bidkv').runtimeBase.vllm.slice(0, 7), 'd0f22d2');
   assert.equal(results.get('kvcompress-ascend').cohortId,
     'qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
 });
@@ -42,6 +41,7 @@ test('published paired runs expose both gains and regressions without precompute
   const results = M.summarize(data, frontier);
   const expected = {
     adm: '0.80',
+    bidkv: '13.83',
     vspec: '51.80',
     diffspec: '-70.66',
     latchmoe: '-87.65'
@@ -49,13 +49,13 @@ test('published paired runs expose both gains and regressions without precompute
   for (const [id, gain] of Object.entries(expected)) {
     const result = results.get(id);
     assert.equal(result.source, 'published-comparison');
-    assert.equal(result.count, id === 'adm' ? 3 : 1);
+    assert.equal(result.count, id === 'adm' ? 3 : id === 'bidkv' ? 2 : 1);
     assert.equal(result.gain.toFixed(2), gain);
     assert.ok(result.url.startsWith('https://github.com/vLLM-HUST/'));
     assert.ok(result.published_comparisons.every(row => row.baseline > 0));
     assert.ok(result.published_comparisons.every(row => row.candidate > 0));
   }
-  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 13);
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 12);
 });
 
 test('model-scoped summaries expose and rank only measurements from the selected model', () => {
@@ -70,6 +70,7 @@ test('model-scoped summaries expose and rank only measurements from the selected
   const qwen35 = M.summarize(data, frontier, 'Qwen3.5-35B-A3B');
   assert.equal(qwen35.get('vspec').gain, null);
   assert.equal(qwen35.get('betterscale').gain.toFixed(2), '42.39');
+  assert.equal(qwen35.get('bidkv').gain.toFixed(2), '13.83');
   assert.equal(qwen35.get('kv-materialization-arrival-control').gain.toFixed(2), '7.13');
   assert.equal(qwen35.get('pegaflow-vllm-connectors').gain.toFixed(2), '6.34');
   const qwen25Kvmat = M.summarize(data, frontier, 'Qwen2.5-7B-Instruct')
@@ -170,6 +171,21 @@ test('comparison sets declare baselines centrally and entries cannot supply a ba
   assert.throws(() => M.summarize(duplicate, frontier), /multiple comparison sets/i);
 });
 
+test('BidKV keeps the TP4 KV-pressure pairs separate from its TP2 SWE observation', () => {
+  const entry = data.entries.find(row => row.id === 'bidkv');
+  assert.equal(entry.default_observation_id, 'bidkv:qwen35-tp4-c12-kv-pressure');
+  assert.deepEqual(entry.observations.map(row => row.id), [
+    'bidkv:qwen35-tp4-c12-kv-pressure', 'bidkv:qwen35-frontier'
+  ]);
+  const current = M.summarize(data, frontier).get('bidkv');
+  assert.equal(current.source, 'published-comparison');
+  assert.equal(current.count, 2);
+  assert.equal(current.gain.toFixed(4), '13.8329');
+  assert.match(current.setting_label_en, /TP4 · C12 · 512 MiB/);
+  assert.match(current.aggregation_note_en, /arithmetic mean.*13\.88%/);
+  assert.equal(entry.observations[1].series_id, 'swe-unified-bidkv-20260927');
+});
+
 test('published observations require raw matched values', () => {
   for (const edit of [
     comparison => { comparison.baseline = 0; },
@@ -184,13 +200,21 @@ test('published observations require raw matched values', () => {
   const invalid = structuredClone(data);
   invalid.entries.find(row => row.id === 'vspec').observations[0].kind = 'unknown';
   assert.throws(() => M.summarize(invalid, frontier), /Invalid performance observation/);
+
+  const unversioned = structuredClone(data);
+  unversioned.entries.find(row => row.id === 'vspec').url = './latest-result';
+  assert.throws(() => M.summarize(unversioned, frontier), /Invalid performance observation/);
+
+  const ambiguous = structuredClone(data);
+  delete ambiguous.entries.find(row => row.id === 'bidkv').observations[1].setting_label_zh;
+  assert.throws(() => M.summarize(ambiguous, frontier), /setting labels/);
 });
 
 test('series outside declared comparison sets do not produce percentages', () => {
   const results = M.summarize(data, frontier);
   const selected = new Set([...results.values()]
     .filter(result => Number.isFinite(result.gain)).map(result => result.id));
-  for (const id of ['bidkv', 'dla', 'kv-tiering-migration', 'mooncake-vllm-connectors', 'pipeline-microbatch-migration', 'betterscale', 'kvcompress-ascend']) {
+  for (const id of ['bidkv', 'dla', 'kv-tiering-migration', 'pipeline-microbatch-migration', 'betterscale', 'kvcompress-ascend']) {
     if (selected.has(id)) continue;
     assert.equal(results.get(id).gain, null);
     assert.deepEqual(results.get(id).comparisons, []);
@@ -265,8 +289,8 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const real = M.summarize(data, frontier);
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
-    'vspec', 'betterscale', 'pipeline-microbatch-migration',
-    'kv-materialization-arrival-control', 'pegaflow-vllm-connectors', 'adm', 'bidkv', 'dla', 'mooncake-vllm-connectors', 'kv-tiering-migration',
+    'vspec', 'betterscale', 'bidkv', 'pipeline-microbatch-migration',
+    'kv-materialization-arrival-control', 'pegaflow-vllm-connectors', 'adm', 'dla', 'kv-tiering-migration',
     'kvcompress-ascend', 'diffspec', 'latchmoe'
   ]);
 });
@@ -274,8 +298,7 @@ test('catalog sorts every measured percentage from gain through regression', () 
 test('ECPA evidence is preserved in metadata without becoming a performance claim', () => {
   const result = M.summarize(data, frontier);
   assert.equal(result.get('betterscale').ecpa.launch_acceptance, 'not-reproduced-this-round');
-  const mooncake = result.get('mooncake-vllm-connectors');
-  assert.equal(mooncake.ecpa.launch_acceptance, 'manager-verified');
+  assert.equal(result.has('mooncake-vllm-connectors'), false);
   const pipeline = result.get('pipeline-microbatch-migration');
   assert.equal(pipeline.ecpa.launch_acceptance, 'manager-verified');
   assert.match(pipeline.ecpa.evidence_url, /frontier_pipeline\/ecpa$/);

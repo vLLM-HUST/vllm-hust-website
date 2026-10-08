@@ -1,17 +1,17 @@
 (function () {
     const DEFAULT_DATA_URL = './data/dataset_validation_v1.empty.json';
-    const STATUS_ORDER = ['not_tested', 'queued', 'running', 'passed', 'failed', 'not_applicable'];
+    const STATUS_ORDER = ['not_tested', 'baseline_only', 'queued', 'running', 'passed', 'failed', 'not_applicable'];
     const TREND_ORDER = ['improved', 'regressed', 'unchanged', 'not_comparable'];
     const STATUS_LABELS = {
-        en: { not_tested: 'Not tested', queued: 'Queued', running: 'Running', passed: 'Passed', failed: 'Failed', not_applicable: 'N/A' },
-        zh: { not_tested: '未测试', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
+        en: { not_tested: 'Not tested', baseline_only: 'B0 only', queued: 'Queued', running: 'Running', passed: 'Passed', failed: 'Failed', not_applicable: 'N/A' },
+        zh: { not_tested: '未测试', baseline_only: '仅 B0', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
     };
     const TEXT = {
-        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
-        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
+        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', sourceCellEvidence: 'Cell-level evidence in details', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', reason: 'Reason', note: 'Note', tracking: 'Tracking', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', viewSource: 'View report', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
+        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', sourceCellEvidence: '证据见单元格详情', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', reason: '原因', note: '说明', tracking: '跟踪', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', viewSource: '查看报告', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
     };
 
-    const state = { data: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
+    const state = { data: null, index: null, scenarioId: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
     const $ = (id) => document.getElementById(id);
     const lang = () => window.vllmHustSite?.getCurrentLang?.() || 'en';
     const t = (key) => TEXT[lang()][key] || TEXT.en[key] || key;
@@ -47,6 +47,26 @@
         return { ...data, results };
     }
 
+    function normalizeIndex(data) {
+        if (!data || data.contract_version !== 'dataset-validation-index-v1' || !Array.isArray(data.scenarios) || data.scenarios.length === 0) {
+            throw new Error('Unsupported dataset validation index');
+        }
+        const ids = new Set();
+        data.scenarios.forEach((scenario) => {
+            if (!scenario || typeof scenario.id !== 'string' || !scenario.id || ids.has(scenario.id) || typeof scenario.data_url !== 'string' || !scenario.data_url) {
+                throw new Error('Invalid or duplicate validation scenario');
+            }
+            ids.add(scenario.id);
+        });
+        if (!ids.has(data.default_scenario_id)) throw new Error('Invalid default validation scenario');
+        return data;
+    }
+
+    function selectScenario(index, requestedId) {
+        return index.scenarios.find((scenario) => scenario.id === requestedId)
+            || index.scenarios.find((scenario) => scenario.id === index.default_scenario_id);
+    }
+
     function getCell(dataset, metric) {
         return state.data.results.get(`${dataset.id}:${metric.id}`) || { dataset_id: dataset.id, metric_id: metric.id, status: 'not_tested' };
     }
@@ -80,8 +100,20 @@
         return {
             model: cell.model || data.scenario?.model || t('notProvided'),
             hardware: cell.hardware || data.scenario?.hardware || t('notProvided'),
-            provenance: provenance.job_url || provenance.artifact || data.source?.artifact_url || t('notProvided'),
+            provenance: provenance.job_url || provenance.screenshot || provenance.report_url || provenance.artifact || data.source?.artifact_url || t('notProvided'),
         };
+    }
+
+    function provenanceHtml(value) {
+        try {
+            const url = new URL(value);
+            if (url.protocol === 'https:') return `<a href="${escapeHtml(url.href)}" target="_blank" rel="noopener noreferrer">${t('viewSource')}</a>`;
+        } catch (_) { return escapeHtml(value); }
+        return escapeHtml(value);
+    }
+
+    function detailNote(cell) {
+        return lang() === 'zh' ? cell.note_zh || cell.note : cell.note;
     }
 
     function allCells() {
@@ -106,7 +138,7 @@
         $('validation-stat-total').textContent = cells.length;
         $('validation-stat-passed').textContent = counts.passed;
         $('validation-stat-failed').textContent = counts.failed;
-        $('validation-stat-pending').textContent = counts.not_tested + counts.queued + counts.running;
+        $('validation-stat-pending').textContent = counts.not_tested + counts.baseline_only + counts.queued + counts.running;
     }
 
     function renderMatrix() {
@@ -155,21 +187,79 @@
         $('validation-detail-status').className = `validation-status validation-status--${cell.status}`;
         $('validation-detail-status').textContent = statusLabel(cell.status);
         $('validation-detail-description').textContent = `${dataset.description || ''} - ${metric.unit || ''}`;
-        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.current_value ?? cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd><dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(metadata.model)}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(metadata.hardware)}</dd><dt>${t('provenance')}</dt><dd>${escapeHtml(metadata.provenance)}</dd>`;
+        const reason = cell.reason ? `<dt>${t('reason')}</dt><dd>${escapeHtml(cell.reason)}</dd>` : '';
+        const noteText = detailNote(cell);
+        const note = noteText ? `<dt>${t('note')}</dt><dd>${escapeHtml(noteText)}</dd>` : '';
+        const tracking = cell.tracking_url ? `<dt>${t('tracking')}</dt><dd>${escapeHtml(cell.tracking_url)}</dd>` : '';
+        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.current_value ?? cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd>${reason}${note}${tracking}<dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(metadata.model)}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(metadata.hardware)}</dd><dt>${t('provenance')}</dt><dd>${provenanceHtml(metadata.provenance)}</dd>`;
         panel.hidden = false;
     }
 
     function render() {
         if (!state.data) return;
         const scenario = state.data.scenario || {};
+        const hasResults = state.data.results.size !== 0;
+        const hasCellEvidence = [...state.data.results.values()].some((cell) =>
+            ['baseline_only', 'passed'].includes(cell.status) &&
+            (cell.provenance?.report_url || cell.provenance?.job_url || cell.provenance?.artifact)
+        );
         $('validation-scenario').textContent = scenario.label || scenario.id || t('notProvided');
-        $('validation-source').innerHTML = state.data.source?.commit ? `${escapeHtml(state.data.source.service)} · <strong>${escapeHtml(state.data.source.commit)}</strong>` : t('sourcePending');
+        $('validation-source').innerHTML = state.data.source?.commit
+            ? `${escapeHtml(state.data.source.service)} · <strong>${escapeHtml(state.data.source.commit)}</strong>`
+            : hasCellEvidence ? t('sourceCellEvidence') : t('sourcePending');
         renderFreshness();
-        renderDatasetControls();
-        renderSummary();
-        renderMatrix();
-        renderDetail();
-        $('validation-empty').hidden = state.data.results.size !== 0;
+        for (const selector of ['.validation-summary', '.validation-toolbar', '.validation-legend', '.validation-table-wrap', '.validation-pagination']) {
+            document.querySelector(selector).hidden = !hasResults;
+        }
+        if (hasResults) {
+            renderDatasetControls();
+            renderSummary();
+            renderMatrix();
+            renderDetail();
+        } else {
+            state.selected = null;
+            $('validation-detail').hidden = true;
+        }
+        $('validation-empty').hidden = hasResults;
+    }
+
+    function renderScenarioOptions() {
+        const select = $('validation-model-select');
+        select.innerHTML = state.index.scenarios.map((scenario) => `<option value="${escapeHtml(scenario.id)}">${escapeHtml(scenario.label || scenario.model || scenario.id)}</option>`).join('');
+        select.value = state.scenarioId;
+        select.disabled = false;
+    }
+
+    function fetchJson(url) {
+        return fetch(url).then((response) => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        });
+    }
+
+    function loadScenario(scenario, updateUrl = false) {
+        state.scenarioId = scenario.id;
+        state.data = null;
+        state.selected = null;
+        state.page = 1;
+        $('validation-loading').hidden = false;
+        $('validation-content').hidden = true;
+        $('validation-error').hidden = true;
+        renderScenarioOptions();
+        if (updateUrl) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('model', scenario.id);
+            window.history.replaceState(null, '', url);
+        }
+        return fetchJson(scenario.data_url).then((data) => {
+            const demo = new URLSearchParams(window.location.search).get('demo') === '1';
+            const payload = demo && Array.isArray(data._demo_results) ? { ...data, results: data._demo_results } : data;
+            if (payload.scenario?.id && payload.scenario.id !== scenario.id) throw new Error('Validation scenario identity mismatch');
+            state.data = normalize(payload);
+            $('validation-loading').hidden = true;
+            $('validation-content').hidden = false;
+            render();
+        });
     }
 
     function renderFreshness() {
@@ -208,9 +298,28 @@
         $('validation-dataset-search').addEventListener('input', (event) => { state.query = event.target.value; state.page = 1; render(); });
         $('validation-group-filter').addEventListener('change', (event) => { state.group = event.target.value; state.page = 1; render(); });
         document.addEventListener('click', (event) => { if (event.target.closest('[data-close-detail]')) { state.selected = null; renderDetail(); } });
-        const dataUrl = window.vllmHustDatasetValidationConfig?.dataUrl || DEFAULT_DATA_URL;
-        fetch(dataUrl).then((response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).then((data) => { const demo = new URLSearchParams(window.location.search).get('demo') === '1'; const payload = demo && Array.isArray(data._demo_results) ? { ...data, results: data._demo_results } : data; state.data = normalize(payload); $('validation-loading').hidden = true; $('validation-content').hidden = false; render(); }).catch((error) => { console.error(error); $('validation-loading').hidden = true; $('validation-error').hidden = false; $('validation-error-body').textContent = error.message || 'Unable to load validation artifact'; });
+        $('validation-model-select').addEventListener('change', (event) => {
+            const scenario = selectScenario(state.index, event.target.value);
+            loadScenario(scenario, true).catch(showLoadError);
+        });
+        const config = window.vllmHustDatasetValidationConfig || {};
+        const indexPromise = config.indexUrl
+            ? fetchJson(config.indexUrl).then(normalizeIndex)
+            : Promise.resolve(normalizeIndex({ contract_version: 'dataset-validation-index-v1', default_scenario_id: 'default', scenarios: [{ id: 'default', label: 'Default', data_url: config.dataUrl || DEFAULT_DATA_URL }] }));
+        indexPromise.then((index) => {
+            state.index = index;
+            const requestedId = new URLSearchParams(window.location.search).get('model');
+            return loadScenario(selectScenario(index, requestedId));
+        }).catch(showLoadError);
         window.addEventListener('vllm-hust:langchange', () => { if (state.data) { select.innerHTML = `<option value="all">${t('all')}</option>`; STATUS_ORDER.forEach((status) => { const option = document.createElement('option'); option.value = status; option.textContent = statusLabel(status); select.appendChild(option); }); select.value = state.status; render(); } });
+    }
+
+    function showLoadError(error) {
+        console.error(error);
+        $('validation-loading').hidden = true;
+        $('validation-content').hidden = true;
+        $('validation-error').hidden = false;
+        $('validation-error-body').textContent = error.message || 'Unable to load validation artifact';
     }
 
     document.addEventListener('DOMContentLoaded', init);

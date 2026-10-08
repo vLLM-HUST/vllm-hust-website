@@ -34,7 +34,6 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                     assert page.locator("#layered-prefill-migration").count() == 0
                     assert page.locator("#qos-scheduler-migration").count() == 0
                     assert page.locator("#simllm-migration").count() == 0
-                    assert page.locator("#unified-communication-migration").count() == 0
                     assert page.locator("#ascend-compact-greedy").count() == 0
                     assert (
                         page.locator(
@@ -44,6 +43,31 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                     )
                     assert page.locator("#betterscale").count() == 1
                     assert page.locator("#bidkv .plugin-advisors").count() == 1
+                    search = page.locator("[data-plugin-search]")
+                    search.fill("Unified Communication")
+                    unified = page.locator("#unified-communication-migration")
+                    unified.wait_for(state="visible")
+                    unified.locator("details > summary").first.click()
+                    assert unified.count() == 1
+                    assert (
+                        unified.locator(
+                            "xpath=ancestor::*[contains(@class, "
+                            "'plugin-category-performance')]"
+                        ).count()
+                        == 1
+                    )
+                    assert "#42" in unified.inner_text()
+                    expected_status = "仅检查" if language == "zh" else "inspect only"
+                    assert expected_status in unified.inner_text().lower()
+                    assert page.evaluate(
+                        "document.documentElement.scrollWidth <= window.innerWidth + 1"
+                    )
+                    page.screenshot(
+                        path=str(
+                            output / f"unified-communication-{width}-{language}.png"
+                        )
+                    )
+                    search.fill("")
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= window.innerWidth + 1"
                     )
