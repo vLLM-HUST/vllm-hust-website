@@ -47,17 +47,17 @@ workload identities; never silently mix them.
   [whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), retaining inferior raw evidence.
 - BetterScale uses the short **BetterScale** group/legend label; graph mode, execution/resident
   seats, balanced attention and state-cache policy appear in its popover. The main unified
-  concurrency comparison retains its declared C1–C16 sweeps; C32 stays excluded there.
-- **BetterScale residency and cache studies** additionally references eleven immutable source points
-  through `workload.contract.comparison_point_ids`: the Native vLLM752a3a5 / Ascend9bf964c
-  FULL_AND_PIECEWISE C1/C2/C4/C8/C16 sweep and BetterScale C1/C2/C4/C8/C16/C32. BetterScale connects
-  all six measurements in concurrency order, not just Pareto vertices: C1–C16 uses E16/R20, while
-  C32 uses E36/R36 FULL cache (613.88 output tokens/s/chip). This is a workload-tuned
-  configuration-family comparison, not a fixed-slot sweep or a causal ablation. These two curves are
-  selected by default; the original residency/cache study groups remain available as independent
-  dots via their checkboxes. Shared points retain their original IDs, cohort, metrics, configuration
-  and provenance. Downloads include the source cohort plus `comparison_cohort` for this study; no
-  duplicate measurements or baseline C32 values are fabricated.
+  concurrency comparison retains only its declared C1–C16 sweeps. The October6 fixed-E36 and
+  width-matched extensions through C56 belong exclusively in the final residency/cache study,
+  following Fletcher's corrected publication placement; neither campaign appears in the first chart.
+- **BetterScale residency and cache studies** references 21 immutable source points through
+  `workload.contract.comparison_point_ids`. Native C1/C2/C4/C8/C16 forms one fixed-configuration
+  reference line. BetterScale has three separate lines: original tuned C1–C32, fixed E36/R36
+  C32/36/37/40, and width-matched C37/40/44/48/52/56. The latter changes E/R with concurrency; it is
+  not a fixed-capacity sweep or causal ablation. All are selected by default. Original
+  residency/cache groups remain independent dots available via their checkboxes. Source points,
+  archived repeats, metrics and provenance are unchanged; downloads include source cohort plus
+  `comparison_cohort`. See [the width-matched boundary](FRONTIER-QWEN35-CONCURRENCY-WIDTH.md).
 - Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
   session concurrency, MTP, request limit, explicit KV budget, UTC sampling date and the two
   coordinate values. `evidence.sampling_date_utc` is a calendar-valid YYYY-MM-DD date, with

@@ -4,10 +4,18 @@
 import argparse
 import copy
 import json
+import math
 import time
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
+
+
+def mtp_state(point):
+    tokens = point["configuration"]["parameters"].get("mtp_draft_tokens")
+    if type(tokens) not in (int, float) or not math.isfinite(tokens) or tokens < 0:
+        return "unknown"
+    return "on" if tokens > 0 else "off"
 
 
 def ready(page):
@@ -69,7 +77,20 @@ def assert_concurrency_series(page, points, cohort=None):
             and configuration_comparison
             and point["id"] in shared_ids
         ):
-            key = (point["cohort_id"], point["load"].get("session_rotation_depth"))
+            campaign = (
+                point.get("evidence", {}).get("benchmark_protocol", {}).get("campaign")
+            )
+            family = (
+                campaign
+                if campaign
+                in {"concurrency-knee-20261006", "concurrency-width-20261006"}
+                else "original"
+            )
+            key = (
+                point["cohort_id"],
+                point["load"].get("session_rotation_depth"),
+                family,
+            )
             configuration_groups.setdefault(key, []).append(point)
             continue
         if group == "betterscale":
@@ -466,28 +487,27 @@ def main():
             if curves:
                 assert page.locator("#frontier-curves").get_attribute("href") == curves
             # Real control changes filter points and the derived envelope, not data.
-            for setting in ("on", "off", "all"):
-                page.locator("[data-filter=mtp][value=on]").set_checked(
-                    setting in ("on", "all")
-                )
-                page.locator("[data-filter=mtp][value=off]").set_checked(
-                    setting in ("off", "all")
-                )
+            mtp_choices = page.locator("[data-filter=mtp]").evaluate_all(
+                "nodes => nodes.map(n => n.value)"
+            )
+            for setting in (*mtp_choices, "all"):
+                for choice in mtp_choices:
+                    page.locator(f"[data-filter=mtp][value={choice}]").set_checked(
+                        setting == "all" or setting == choice
+                    )
                 expected = [
                     p
                     for p in default_points
-                    if setting == "all"
-                    or (
-                        p["configuration"]["parameters"].get("mtp_draft_tokens", -1) > 0
-                        if setting == "on"
-                        else p["configuration"]["parameters"].get("mtp_draft_tokens")
-                        == 0
-                    )
+                    if setting == "all" or mtp_state(p) == setting
                 ]
                 ids = page.locator("[data-point]").evaluate_all(
                     "nodes => nodes.map(n => n.dataset.point)"
                 )
-                assert set(ids) == {p["id"] for p in expected}
+                assert set(ids) == {p["id"] for p in expected}, {
+                    "mtp": setting,
+                    "unexpected": sorted(set(ids) - {p["id"] for p in expected}),
+                    "missing": sorted({p["id"] for p in expected} - set(ids)),
+                }
                 assert_concurrency_series(page, expected)
                 page.locator("#frontier-only").check()
                 shown = set(
@@ -527,12 +547,14 @@ def main():
             }
             for group in native_groups:
                 page.locator(f'[data-filter="mods"][value="{group}"]').uncheck()
-            page.locator("[data-filter=mtp][value=on]").uncheck()
+            for choice in mtp_choices:
+                page.locator(f"[data-filter=mtp][value={choice}]").set_checked(
+                    choice == "off"
+                )
             expected = [
                 p
                 for p in default_points
-                if p["configuration"]["mods"]
-                and p["configuration"]["parameters"].get("mtp_draft_tokens") == 0
+                if p["configuration"]["mods"] and mtp_state(p) == "off"
             ]
             assert set(
                 page.locator("[data-point]").evaluate_all(

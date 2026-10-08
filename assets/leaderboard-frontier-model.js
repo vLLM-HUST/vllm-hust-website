@@ -194,10 +194,18 @@
             const comparison = rows.filter(row => shared?.includes(row.point.id));
             const native = comparison.filter(row => groupKey(row.point) !== 'betterscale');
             const better = comparison.filter(row => groupKey(row.point) === 'betterscale');
-            const depths = [...new Set(better.map(row => row.point.load.session_rotation_depth))];
-            return [...concurrencySeries(native), ...depths.map(depth => better
-                .filter(row => row.point.load.session_rotation_depth === depth)
-                .sort((a,b) => a.point.load.concurrency - b.point.load.concurrency)).filter(line => line.length > 1)];
+            // Never join independent capacity campaigns at overlapping concurrency values.
+            const families = new Map();
+            for (const row of better) {
+                const campaign = row.point.evidence?.benchmark_protocol?.campaign;
+                const key = JSON.stringify([row.point.load.session_rotation_depth,
+                    ['concurrency-knee-20261006', 'concurrency-width-20261006'].includes(campaign) ? campaign : 'original']);
+                if (!families.has(key)) families.set(key, []);
+                families.get(key).push(row);
+            }
+            return [...concurrencySeries(native), ...[...families.values()]
+                .map(line => line.sort((a,b) => a.point.load.concurrency - b.point.load.concurrency))
+                .filter(line => line.length > 1)];
         }
         const betterScale = rows.filter(row => groupKey(row.point) === 'betterscale');
         return [...concurrencySeries(rows.filter(row => groupKey(row.point) !== 'betterscale')),
