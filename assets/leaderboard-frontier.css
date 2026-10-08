@@ -64,6 +64,29 @@
 
 .frontier-identity { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0; }
 .frontier-workload-tag { display: inline-block; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--run-accent); background: var(--run-tint); color: var(--run-accent); font-size: 11px; }
+.frontier-contract-open { padding: 9px 12px; border: 1px solid var(--run-border); border-radius: 7px; background: var(--run-bg); color: var(--run-accent); font: inherit; font-size: 12px; font-weight: 650; }
+.frontier-contract-dialog { position: fixed; inset: 0; width: min(1120px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); box-sizing: border-box; margin: auto; padding: 24px; overflow: auto; border: 1px solid var(--run-border); border-radius: 10px; background: var(--run-bg); color: var(--run-ink); box-shadow: 0 18px 60px #0008; }
+.frontier-contract-dialog::backdrop { background: #07101dcc; }
+.frontier-contract-close { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--run-muted); font-size: 25px; line-height: 1; }
+.frontier-contract-header h2 { margin: 0 42px 5px 0; color: var(--run-ink); font-size: 22px; letter-spacing: 0; }
+.frontier-contract-header p { margin: 0; color: var(--run-muted); font-size: 12px; }
+.frontier-contract-dialog section { margin-top: 24px; }
+.frontier-contract-dialog h3 { margin: 0 0 12px; color: var(--run-ink); font-size: 13px; }
+.frontier-contract-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border: 1px solid var(--run-border); border-radius: 8px; overflow: hidden; }
+.frontier-contract-facts div { min-width: 0; padding: 12px 14px; border-right: 1px solid var(--run-border); border-bottom: 1px solid var(--run-border); }
+.frontier-contract-facts div:nth-child(3n) { border-right: 0; }
+.frontier-contract-facts dt { margin-bottom: 5px; color: var(--run-muted); font-size: 10px; font-weight: 700; }
+.frontier-contract-facts dd { margin: 0; overflow-wrap: anywhere; font-size: 12px; line-height: 1.5; }
+.frontier-contract-code { font-family: "Fira Code", monospace; font-size: 10px !important; }
+.frontier-contract-table-wrap { overflow-x: auto; border: 1px solid var(--run-border); border-radius: 8px; }
+.frontier-contract-table { width: 100%; min-width: 1220px; border-collapse: collapse; font-size: 11px; }
+.frontier-contract-table th, .frontier-contract-table td { padding: 12px; border-right: 1px solid var(--run-border); border-bottom: 1px solid var(--run-border); text-align: left; vertical-align: top; line-height: 1.45; }
+.frontier-contract-table thead th { background: var(--run-tint); color: var(--run-muted); font-size: 10px; white-space: nowrap; }
+.frontier-contract-table tbody th { max-width: 210px; color: var(--run-ink); font-weight: 650; }
+.frontier-contract-table tr:last-child > * { border-bottom: 0; }
+.frontier-contract-table tr > *:last-child { border-right: 0; }
+.frontier-contract-table small { display: block; margin-top: 5px; color: var(--run-muted); font-size: 10px; font-weight: 400; overflow-wrap: anywhere; }
+.frontier-contract-empty { color: var(--run-muted); font-size: 12px; }
 .frontier-layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 18px; align-items: start; }
 .frontier-filters { padding: 18px; background: var(--run-bg); color: var(--run-ink); border: 1px solid var(--run-border); border-radius: 12px; }
 .frontier .frontier-filters h2 { margin: 0 0 18px; font-size: 14px; color: var(--run-ink); }
@@ -74,6 +97,12 @@
 .frontier-checks input { margin: 0; width: 15px; height: 15px; accent-color: var(--run-accent); }
 #frontier-filter-count { display: block; border-top: 1px solid var(--run-border); padding-top: 12px; color: var(--run-muted); font-size: 11px; }
 @media (max-width: 900px) { .frontier-layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 650px) {
+  .frontier-contract-dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); padding: 18px 14px; }
+  .frontier-contract-facts { grid-template-columns: 1fr; }
+  .frontier-contract-facts div, .frontier-contract-facts div:nth-child(3n) { border-right: 0; }
+  .frontier-contract-facts div:last-child { border-bottom: 0; }
+}
 
 .frontier-correctness-warning { color: #b91c1c; border-left: 3px solid #dc2626; padding-left: 10px; font-size: 12px; line-height: 1.5; }
 @media (prefers-color-scheme: dark) { .frontier-correctness-warning { color: #fca5a5; } }
