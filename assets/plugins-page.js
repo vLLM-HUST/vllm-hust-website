@@ -443,7 +443,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
     "stateharbor": "org.vllm-hust.stateharbor",
     "clm-lifecycle": "org.vllm-hust.clm-lifecycle",
     "request-lifecycle-profiler": "org.vllm-hust.request-lifecycle-profiler",
-    "quality-bounded-inference": "org.vllm-hust.quality-bounded-inference",
+    "quality-bounded-inference": "org.intellistream.quality-bounded-inference",
     "llm-serving-cost-pricing-model": "org.vllm-hust.llm-serving-cost-pricing-model"
   };
 

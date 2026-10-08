@@ -837,7 +837,7 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 56
+    assert len(PORTFOLIO["repositories"]) == 57
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "extension-manager",
@@ -1364,7 +1364,7 @@ def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
         in SCRIPT
     )
     assert (
-        '"quality-bounded-inference": "org.vllm-hust.quality-bounded-inference"'
+        '"quality-bounded-inference": "org.intellistream.quality-bounded-inference"'
         in SCRIPT
     )
     assert (
