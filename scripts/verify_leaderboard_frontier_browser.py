@@ -689,8 +689,15 @@ def main():
                         == point["configuration"]["mod_sources"]
                     )
 
+                sampling_start = point["evidence"]["sampling_date_utc"]
+                sampling_end = point["evidence"].get("sampling_date_end_utc")
+                sampling_range = (
+                    f"{sampling_start} – {sampling_end}"
+                    if sampling_end and sampling_end != sampling_start
+                    else sampling_start
+                )
                 assert (
-                    f"{point['evidence']['sampling_date_utc']} (UTC)"
+                    f"{sampling_range} (UTC)"
                     in page.locator(".frontier-popup-date").inner_text()
                 )
 
