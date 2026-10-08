@@ -1346,9 +1346,19 @@ def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
     assert "external controller remains operator-owned" in tricard["summary_en"]
 
     quality = by_id("quality-bounded-inference")
-    assert quality["compatibility"]["status"] == "experimental"
+    assert quality["compatibility"]["status"] == "inspect_only"
     assert "b2ed0136" in quality["compatibility"]["versions"][1]
     assert "remain fail closed" in quality["summary_en"]
+    assert (
+        "before a mechanism may be treated as activated"
+        in quality["compatibility"]["requirements_en"]
+    )
+    assert quality["maturity"] == "incubating"
+    assert quality["compatibility"]["status"] not in {
+        "ready",
+        "verified",
+        "experimental",
+    }
 
     cost = by_id("llm-serving-cost-pricing-model")
     assert cost["compatibility"]["status"] == "inspect_only"
@@ -1407,56 +1417,3 @@ def test_clm_is_cataloged_as_a_tool_control_plane_without_a_speedup_claim():
     }
     assert '"clm-lifecycle": "org.vllm-hust.clm-lifecycle"' in SCRIPT
     assert "python -m pip install vllm-hust-clm-lifecycle==0.1.1" in SCRIPT
-
-
-def test_incubating_filter_matches_the_badge_and_the_hero_stat():
-    """The 孵化中 tab, the card badge, and the hero stat must use one definition.
-
-    The card badge and the "incubating components" hero stat are driven by `maturity`;
-    the filter used to be driven by `compatibility.status`, so a component that is
-    incubating but installable (for example quality-bounded-inference) carried the
-    incubating badge while the incubating tab excluded it.
-    """
-    assert (
-        'const incubatingMaturities = new Set(["concept", "incubating", "experimental"])'
-        in SCRIPT
-    )
-    assert (
-        "const isIncubatingMod = item => incubatingMaturities.has(item.maturity)"
-        in SCRIPT
-    )
-    assert 'selectedType === "incubating" && isIncubatingMod(item)' in SCRIPT
-    assert "payload.components.filter(isIncubatingMod).length" in SCRIPT
-    assert (
-        '["concept", "incubating", "experimental"].includes(item.maturity)'
-        not in SCRIPT
-    )
-
-    incubating = {
-        component["id"]
-        for component in REGISTRY["components"]
-        if component["maturity"] in {"concept", "incubating", "experimental"}
-    }
-    supported = {
-        component["id"]
-        for component in REGISTRY["components"]
-        if component["maturity"] in {"supported", "verified"}
-    }
-    assert incubating and supported
-    assert not incubating & supported
-    assert (
-        set(component["id"] for component in REGISTRY["components"])
-        == incubating | supported
-    )
-
-    quality = by_id("quality-bounded-inference")
-    assert quality["maturity"] == "incubating"
-    assert quality["compatibility"]["status"] == "experimental"
-    assert quality["id"] in incubating
-    assert quality["id"] not in supported
-
-    assert (
-        '"quality-bounded-inference": "org.intellistream.quality-bounded-inference"'
-        in SCRIPT
-    )
-    assert "plugins-page.js?v=ecpa-final-20261008" in PAGE

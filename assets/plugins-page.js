@@ -34,14 +34,6 @@
     "telemetry_provider"
   ]);
   const isToolMod = item => toolModRoles.has(item.system_role);
-  const installableStatuses = new Set(["ready", "verified", "experimental"]);
-  const incubatingMaturities = new Set(["concept", "incubating", "experimental"]);
-  const isIncubatingMod = item => incubatingMaturities.has(item.maturity);
-  const isInstallableMod = item => {
-    const statusValue = item.compatibility?.status;
-    if (statusValue) return installableStatuses.has(statusValue);
-    return !isIncubatingMod(item);
-  };
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -494,9 +486,10 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
   }
 
   function matchesSelectedType(item) {
+    const statusValue = item.compatibility?.status || "source_scaffold";
     return selectedType === "extensions"
-      || (selectedType === "installable" && isInstallableMod(item))
-      || (selectedType === "incubating" && isIncubatingMod(item));
+      || (selectedType === "installable" && ["ready", "verified", "experimental"].includes(statusValue))
+      || (selectedType === "incubating" && !["ready", "verified", "experimental"].includes(statusValue));
   }
 
   function itemSearchText(item) {
@@ -1184,7 +1177,7 @@ vllm-hust-ext extension check ${extensionId}`
       search.placeholder = copy().searchPlaceholder;
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
       const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
-      const incubating = payload.components.filter(isIncubatingMod).length;
+      const incubating = payload.components.filter((item) => ["concept", "incubating", "experimental"].includes(item.maturity)).length;
       const evidence = payload.components.filter((item) => ["hardware_verified", "performance_verified", "production_observed"].includes(item.evidence_level)).length;
       const external = payload.components.filter((item) => item.artifact_type === "external_system").length;
       document.querySelectorAll("[data-runtime-count]").forEach((node) => { node.textContent = String(supported).padStart(2, "0"); });
