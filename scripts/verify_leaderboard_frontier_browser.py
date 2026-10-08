@@ -689,10 +689,14 @@ def main():
                         == point["configuration"]["mod_sources"]
                     )
 
-                assert (
-                    f"{point['evidence']['sampling_date_utc']} (UTC)"
-                    in page.locator(".frontier-popup-date").inner_text()
-                )
+                sampling_date_text = page.locator(".frontier-popup-date").inner_text()
+                sampling_date = point["evidence"]["sampling_date_utc"]
+                sampling_date_end = point["evidence"].get("sampling_date_end_utc")
+                assert sampling_date in sampling_date_text
+                if sampling_date_end and sampling_date_end != sampling_date:
+                    assert sampling_date_end in sampling_date_text
+                else:
+                    assert f"{sampling_date} (UTC)" in sampling_date_text
 
                 popup.locator("[data-close]").click()
                 assert popup.is_hidden()

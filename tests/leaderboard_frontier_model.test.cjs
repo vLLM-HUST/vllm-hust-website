@@ -459,8 +459,8 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(params.runtime_versions['vllm-ascend'],'0.23.0.post1');
             assert.equal(params.mod.enable,on);
             assert.equal(params.mod.kill_switch,false);
-            assert.equal(params.model_identity.revision,'712cf74392b05026a6db2bf213d343747d1f6d45');
-            assert.equal(params.model_identity.model_manifest_sha256,'6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6');
+            assert.equal(params.model_identity.revision,'712cf74392b05026a6db2bf213d343747d1f6d45'); // pragma: allowlist secret
+            assert.equal(params.model_identity.model_manifest_sha256,'6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6'); // pragma: allowlist secret
             assert.equal(params.model_identity.checkpoint_identity_verified,true);
             assert.equal(params.tokenizer_identity_independently_verified,true);
             assert.equal(params.tokenizer_fingerprint_recomputed,true);
@@ -477,7 +477,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.validation.mod_catalog_registered,true);
             assert.equal(run.validation.mod_catalog_public_surface,true);
             assert.equal(run.validation.public_raw_evidence_available,true);
-            assert.equal(p.evidence.benchmark_protocol.revision,'695dd8b1ab280145627a108b434f7a54cca05810');
+            assert.equal(p.evidence.benchmark_protocol.revision,'695dd8b1ab280145627a108b434f7a54cca05810'); // pragma: allowlist secret
             assert.equal(p.evidence.benchmark_protocol.duration_seconds,900);
             assert.equal(p.evidence.c8_selection,null);
             assert.ok(p.metrics.tpot_ms>0);
@@ -487,7 +487,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             if(on){
                 assert.equal(p.configuration.mod_sources.length,1);
                 assert.equal(p.configuration.mod_sources[0].id,'core-attention-boundary');
-                assert.equal(p.configuration.mod_sources[0].revision,'8b5ebb1382bc3624b5250ccec53d5554b6c86003');
+                assert.equal(p.configuration.mod_sources[0].revision,'8b5ebb1382bc3624b5250ccec53d5554b6c86003'); // pragma: allowlist secret
                 assert.equal(run.validation.server_log_counts.runtime_effective,2);
             } else {
                 assert.deepEqual(p.configuration.mod_sources,[]);
