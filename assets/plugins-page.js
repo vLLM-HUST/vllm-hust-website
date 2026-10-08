@@ -34,6 +34,14 @@
     "telemetry_provider"
   ]);
   const isToolMod = item => toolModRoles.has(item.system_role);
+  const installableStatuses = new Set(["ready", "verified", "experimental"]);
+  const incubatingMaturities = new Set(["concept", "incubating", "experimental"]);
+  const isIncubatingMod = item => incubatingMaturities.has(item.maturity);
+  const isInstallableMod = item => {
+    const statusValue = item.compatibility?.status;
+    if (statusValue) return installableStatuses.has(statusValue);
+    return !isIncubatingMod(item);
+  };
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -486,10 +494,9 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
   }
 
   function matchesSelectedType(item) {
-    const statusValue = item.compatibility?.status || "source_scaffold";
     return selectedType === "extensions"
-      || (selectedType === "installable" && ["ready", "verified", "experimental"].includes(statusValue))
-      || (selectedType === "incubating" && !["ready", "verified", "experimental"].includes(statusValue));
+      || (selectedType === "installable" && isInstallableMod(item))
+      || (selectedType === "incubating" && isIncubatingMod(item));
   }
 
   function itemSearchText(item) {
@@ -1138,8 +1145,8 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=ecpa-final-20261007", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261007", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
+      fetch("./data/plugin-performance.json?v=ecpa-final-20261008", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261008", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {
@@ -1177,7 +1184,7 @@ vllm-hust-ext extension check ${extensionId}`
       search.placeholder = copy().searchPlaceholder;
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
       const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
-      const incubating = payload.components.filter((item) => ["concept", "incubating", "experimental"].includes(item.maturity)).length;
+      const incubating = payload.components.filter(isIncubatingMod).length;
       const evidence = payload.components.filter((item) => ["hardware_verified", "performance_verified", "production_observed"].includes(item.evidence_level)).length;
       const external = payload.components.filter((item) => item.artifact_type === "external_system").length;
       document.querySelectorAll("[data-runtime-count]").forEach((node) => { node.textContent = String(supported).padStart(2, "0"); });

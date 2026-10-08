@@ -764,13 +764,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecpa-final-20261007"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecpa-final-20261008"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=ecpa-final-20261007"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=ecpa-final-20261008"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261007"'
+        'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261008"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -1244,14 +1244,14 @@ def test_performance_defaults_match_catalog_models_and_evidence_sources() -> Non
 
 
 def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -> None:
-    assert "plugin-performance.js?v=ecpa-final-20261007" in PAGE
-    assert "plugin-performance.json?v=ecpa-final-20261007" in SCRIPT
-    assert "leaderboard_frontier.json?v=ecpa-final-20261007" in SCRIPT
+    assert "plugin-performance.js?v=ecpa-final-20261008" in PAGE
+    assert "plugin-performance.json?v=ecpa-final-20261008" in SCRIPT
+    assert "leaderboard_frontier.json?v=ecpa-final-20261008" in SCRIPT
     assert '{ cache: "no-cache" }' in SCRIPT
     assert "benchmark-settings-20260929" not in SCRIPT
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
-    assert PAGE.count("ecpa-final-20261007") >= 5
+    assert PAGE.count("ecpa-final-20261008") >= 5
 
 
 def test_bidkv_copy_reports_the_new_cell_without_erasing_old_boundaries() -> None:
@@ -1407,3 +1407,56 @@ def test_clm_is_cataloged_as_a_tool_control_plane_without_a_speedup_claim():
     }
     assert '"clm-lifecycle": "org.vllm-hust.clm-lifecycle"' in SCRIPT
     assert "python -m pip install vllm-hust-clm-lifecycle==0.1.1" in SCRIPT
+
+
+def test_incubating_filter_matches_the_badge_and_the_hero_stat():
+    """The 孵化中 tab, the card badge, and the hero stat must use one definition.
+
+    The card badge and the "incubating components" hero stat are driven by `maturity`;
+    the filter used to be driven by `compatibility.status`, so a component that is
+    incubating but installable (for example quality-bounded-inference) carried the
+    incubating badge while the incubating tab excluded it.
+    """
+    assert (
+        'const incubatingMaturities = new Set(["concept", "incubating", "experimental"])'
+        in SCRIPT
+    )
+    assert (
+        "const isIncubatingMod = item => incubatingMaturities.has(item.maturity)"
+        in SCRIPT
+    )
+    assert 'selectedType === "incubating" && isIncubatingMod(item)' in SCRIPT
+    assert "payload.components.filter(isIncubatingMod).length" in SCRIPT
+    assert (
+        '["concept", "incubating", "experimental"].includes(item.maturity)'
+        not in SCRIPT
+    )
+
+    incubating = {
+        component["id"]
+        for component in REGISTRY["components"]
+        if component["maturity"] in {"concept", "incubating", "experimental"}
+    }
+    supported = {
+        component["id"]
+        for component in REGISTRY["components"]
+        if component["maturity"] in {"supported", "verified"}
+    }
+    assert incubating and supported
+    assert not incubating & supported
+    assert (
+        set(component["id"] for component in REGISTRY["components"])
+        == incubating | supported
+    )
+
+    quality = by_id("quality-bounded-inference")
+    assert quality["maturity"] == "incubating"
+    assert quality["compatibility"]["status"] == "experimental"
+    assert quality["id"] in incubating
+    assert quality["id"] not in supported
+
+    assert (
+        '"quality-bounded-inference": "org.intellistream.quality-bounded-inference"'
+        in SCRIPT
+    )
+    assert "plugins-page.js?v=ecpa-final-20261008" in PAGE
