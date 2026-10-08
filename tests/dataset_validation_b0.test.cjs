@@ -64,6 +64,7 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.match(page, /id="validation-model-select"/);
     assert.match(page, /B1 is selected independently per cell/);
     assert.equal(index.scenarios.length, 7);
+    assert.equal(index.default_scenario_id, 'qwen35-35b-a3b-bf16-tp2-pp1-dp1-ep-off-ctx262k-apc-on-mtp2-full-piecewise-sweprefix-900s');
     assert.equal(index.scenarios[0].model, 'Qwen2.5-14B-Instruct');
     assert.equal(index.scenarios[0].data_url, './data/dataset_validation_v1.b0.json');
     assert.equal(index.scenarios[1].model, 'Qwen3.5-35B-A3B');
