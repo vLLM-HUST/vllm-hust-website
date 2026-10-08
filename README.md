@@ -212,3 +212,9 @@ export WEBSITE_PORT=8000
 export WEBSITE_ROOT_DIR=/path/to/vllm-hust-website
 export WEBSITE_SYSTEMD_SERVICE_NAME=vllm-hust-website
 ```
+
+## External Systems Directory
+
+`external-systems.html` 展示 KV 服务、控制面与编译器基础设施，并与扩展工坊互相链接。 系统分类、成熟度和证据等级直接读取 `data/ecosystem.json` 的
+`external_system` 条目； 概念阶段、迁移仓库和没有公开仓库的系统单列展示，不计入可浏览的公开系统数量。 `assets/external-systems.js` 中的
+`profiles` 仅维护双语用途、接入说明及 connector 关联， 新增系统时先更新规范生态目录，再补充展示说明并核对系统仓库文档。

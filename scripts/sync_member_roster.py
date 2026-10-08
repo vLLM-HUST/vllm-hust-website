@@ -87,15 +87,8 @@ def apply_member(item: dict, member: dict, advisor_en: dict[str, str]) -> dict:
         )
     else:
         updated["github_status"] = localized("", "")
-    if member["status"] == "former":
-        updated["former_member"] = True
-        updated["role"] = localized("历史成员", "Former member")
-        updated["profile_status"] = localized(
-            member["status_reason_zh"], member["status_reason_en"]
-        )
-    else:
-        updated.pop("former_member", None)
-        updated.pop("profile_status", None)
+    updated.pop("former_member", None)
+    updated.pop("profile_status", None)
     return updated
 
 
@@ -118,9 +111,16 @@ def dedupe(items: list[dict]) -> list[dict]:
     return result
 
 
+def is_former_member(item: dict) -> bool:
+    return item.get("current_status") == "former"
+
+
 def build_snapshot(snapshot: dict, roster: dict) -> dict:
+    validate_roster(roster)
     result = copy.deepcopy(snapshot)
-    result["updated_at"] = roster["updated_at"]
+    result["updated_at"] = max(
+        roster["updated_at"], str(snapshot.get("contributions_updated_at") or "")
+    )
     result["advisor_profiles"] = [
         {
             **advisor,
@@ -144,31 +144,22 @@ def build_snapshot(snapshot: dict, roster: dict) -> dict:
     )
 
     current_by_name: dict[str, tuple[str, dict]] = {}
-    former_by_name: dict[str, dict] = {}
-    for item in profiles.get("former_members", []):
-        name = profile_name(item)
-        override = members.get(name)
-        if override and override["status"] == "former":
-            former_by_name[name] = apply_member(item, override, advisor_en)
+    profiles.pop("former_members", None)
     for category in category_names:
         for item in profiles.get(category, []):
+            if is_former_member(item):
+                continue
             name = profile_name(item)
             override = members.get(name)
             if override:
                 item = apply_member(item, override, advisor_en)
-                if override["status"] == "former":
-                    former_by_name[name] = item
-                    continue
             current_by_name[name] = (category, item)
 
     for name, member in members.items():
-        if name in current_by_name or name in former_by_name:
+        if name in current_by_name:
             continue
         item = apply_member(new_profile(member, advisor_en), member, advisor_en)
-        if member["status"] == "former":
-            former_by_name[name] = item
-        else:
-            current_by_name[name] = ("participants", item)
+        current_by_name[name] = ("participants", item)
 
     for category in category_names:
         profiles[category] = dedupe(
@@ -178,18 +169,12 @@ def build_snapshot(snapshot: dict, roster: dict) -> dict:
                 if item_category == category
             ]
         )
-    profiles["former_members"] = dedupe(
-        [
-            former_by_name[item["name_zh"]]
-            for item in roster["members"]
-            if item["status"] == "former"
-        ]
-    )
-
     for scope_name in ("all_repos", "core_repos"):
         scope = result.get(scope_name, {})
         rewritten = []
         for item in scope.get("contributors", []):
+            if is_former_member(item):
+                continue
             override = members.get(profile_name(item))
             rewritten.append(
                 apply_member(item, override, advisor_en) if override else item
@@ -203,6 +188,12 @@ def build_snapshot(snapshot: dict, roster: dict) -> dict:
 
 def validate_roster(roster: dict) -> None:
     members = roster["members"]
+    assert all(item["status"] == "current" for item in members), (
+        "public roster must contain only current members"
+    )
+    assert all(
+        not any(key.startswith("status_reason") for key in item) for item in members
+    ), "departure reasons must not be published"
     names = [item["name_zh"] for item in members]
     logins = [
         item["github_login"].casefold() for item in members if item.get("github_login")

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>External Systems | vLLM-HUST</title>
+  <meta name="description" content="Explore PegaFlow, Mooncake and Production Stack: external KV services and control planes connected to vLLM-HUST, with integration boundaries and support status.">
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/external-systems.html">
+  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png">
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
+  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png">
+  <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826">
+  <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901">
+  <link rel="stylesheet" href="./assets/external-systems.css?v=1">
+</head>
+<body data-page="external-systems">
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a>
+      <div class="nav-links">
+        <a class="nav-link" href="./index.html">Home</a>
+        <a class="nav-link" href="./plugins.html">Extension Workshop</a>
+        <a class="nav-link active" href="./external-systems.html" aria-current="page">External Systems</a>
+      </div>
+    </div>
+  </nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+  <main class="site-shell systems-page">
+    <section class="systems-hero" aria-labelledby="systems-title">
+      <div>
+        <span class="eyebrow">vLLM-HUST / CONNECTED SYSTEMS</span>
+        <h1 id="systems-title"><span class="lang-en">External Systems</span><span class="lang-zh">外部系统</span></h1>
+        <p class="systems-lede"><span class="lang-en">Connect inference to shared state and cluster control.</span><span class="lang-zh">让推理连接共享状态与集群控制。</span></p>
+        <p class="systems-intro"><span class="lang-en">Explore KV services, control planes and compiler infrastructure, with integration paths and support recorded for each system.</span><span class="lang-zh">集中了解 KV 服务、控制面与编译器底座，找到适合的系统、接入路径和已记录的支持状态。</span></p>
+        <div class="systems-actions">
+          <a class="systems-button" href="#systems-catalog"><span class="lang-en">Explore systems ↓</span><span class="lang-zh">浏览系统 ↓</span></a>
+          <a href="./plugins.html"><span class="lang-en">Extension Workshop ↗</span><span class="lang-zh">扩展工坊 ↗</span></a>
+        </div>
+      </div>
+      <aside class="systems-map" aria-labelledby="map-title">
+        <span id="map-title" class="systems-map-label"><span class="lang-en">Integration map</span><span class="lang-zh">系统连接示意</span></span>
+        <a href="#vllm-production-stack" class="map-node">Production Stack<small>Kubernetes · Helm · Router</small></a>
+        <span class="map-edge"><span class="lang-en">↓ deployment & routing</span><span class="lang-zh">↓ 部署与路由</span></span>
+        <div class="map-runtime"><strong>vLLM-HUST</strong><small><span class="lang-en">Inference runtime</span><span class="lang-zh">推理运行时</span></small></div>
+        <span class="map-edge">↕ KV connectors</span>
+        <div class="map-stores"><a href="#pegaflow" class="map-node">PegaFlow<small><span class="lang-en">KV state</span><span class="lang-zh">KV 状态管理</span></small></a><a href="#mooncake" class="map-node">Mooncake<small><span class="lang-en">KV store & transfer</span><span class="lang-zh">KV 存储与传输</span></small></a></div>
+        <p><span class="lang-en">Storage options are independent; this is not a required deployment bundle.</span><span class="lang-zh">存储系统可独立选择，图示不代表必须组合部署。</span></p>
+      </aside>
+    </section>
+    <section id="systems-catalog" class="systems-directory" aria-labelledby="catalog-title">
+      <header class="systems-section-head">
+        <div><span class="eyebrow">01 / DIRECTORY</span><h2 id="catalog-title"><span class="lang-en">Find your system</span><span class="lang-zh">选择你的系统</span></h2></div>
+        <p><span class="lang-en">KV services · Control planes · Compilers</span><span class="lang-zh">KV 服务 · 控制面 · 编译器</span></p>
+      </header>
+      <div class="systems-toolbar">
+        <div class="systems-filters" role="group" aria-label="System category">
+          <button type="button" data-system-filter="all" aria-pressed="true"><span class="lang-en">All systems</span><span class="lang-zh">全部系统</span></button>
+          <button type="button" data-system-filter="kv" aria-pressed="false"><span class="lang-en">KV services</span><span class="lang-zh">KV 服务</span></button>
+          <button type="button" data-system-filter="control" aria-pressed="false"><span class="lang-en">Control planes</span><span class="lang-zh">控制面</span></button>
+          <button type="button" data-system-filter="compiler" aria-pressed="false"><span class="lang-en">Compiler &amp; kernels</span><span class="lang-zh">编译器与算子</span></button>
+        </div>
+        <label class="systems-search"><span class="lang-en">Search</span><span class="lang-zh">搜索</span><input id="systems-search" type="search" placeholder="PegaFlow, KV, Kubernetes…" aria-controls="systems-list"></label>
+      </div>
+      <p id="systems-status" role="status" aria-live="polite"><span class="lang-en">Loading systems…</span><span class="lang-zh">正在加载系统…</span></p>
+      <div id="systems-list" class="systems-grid" data-source="./data/ecosystem.json"></div>
+      <button id="systems-reset" class="systems-button" type="button" hidden><span class="lang-en">Clear filters</span><span class="lang-zh">清除筛选</span></button>
+      <p class="systems-source"><span class="lang-en">Support labels follow the </span><span class="lang-zh">支持状态来自</span><a href="./data/ecosystem.json"><span class="lang-en">ecosystem registry</span><span class="lang-zh">生态目录</span></a><span class="lang-en">. Integration notes reviewed on 2026-09-09; check each repository for current deployment requirements.</span><span class="lang-zh">。接入说明核对于 2026-09-09；部署条件以各仓库最新文档为准。</span></p>
+    </section>
+    <section class="systems-roadmap" aria-labelledby="roadmap-title">
+      <header class="systems-section-head"><div><span class="eyebrow">02 / EXPLORATION</span><h2 id="roadmap-title"><span class="lang-en">Concepts & future integrations</span><span class="lang-zh">概念与后续接入</span></h2></div></header>
+      <div id="systems-concepts"></div>
+    </section>
+    <section class="systems-guide" aria-labelledby="guide-title">
+      <div><span class="eyebrow">03 / GET CONNECTED</span><h2 id="guide-title"><span class="lang-en">From system to integration</span><span class="lang-zh">从系统选型到接入</span></h2></div>
+      <ol>
+        <li><strong><span class="lang-en">Choose a service</span><span class="lang-zh">选择服务</span></strong><p><span class="lang-en">Match shared KV storage or cluster routing to your workload and deployment environment.</span><span class="lang-zh">根据工作负载和部署环境，选择共享 KV 存储或集群路由服务。</span></p></li>
+        <li><strong><span class="lang-en">Deploy the system</span><span class="lang-zh">部署系统</span></strong><p><span class="lang-en">Follow its repository guide for service setup, health checks and operations.</span><span class="lang-zh">按系统仓库文档完成服务部署、健康检查与运维配置。</span></p></li>
+        <li><strong><span class="lang-en">Connect the runtime</span><span class="lang-zh">连接运行时</span></strong><p><span class="lang-en">Configure the connector or control-plane interface. Find independently maintained adapters in the </span><span class="lang-zh">配置 connector 或控制面接口。独立维护的适配组件可在</span><a href="./plugins.html#plugin-catalog"><span class="lang-en">Extension Workshop</span><span class="lang-zh">扩展工坊</span></a><span class="lang-zh">查看。</span></p></li>
+      </ol>
+    </section>
+    <noscript><p class="systems-source">Enable JavaScript to view support details and filters. Repository guides: <a href="https://github.com/vLLM-HUST/pegaflow-hust">PegaFlow</a> · <a href="https://github.com/vLLM-HUST/mooncake-hust">Mooncake</a> · <a href="https://github.com/vLLM-HUST/production-stack-hust">Production Stack</a>.</p></noscript>
+  </main>
+  <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="footer-copy">Connected systems for domestic-compute inference.</span></footer>
+  <script src="./assets/external-systems.js?v=1"></script>
+  <script src="./assets/site.js?v=nav-polish-20260826-external-systems-20260909"></script>
+</body>
+</html>

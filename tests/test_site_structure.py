@@ -2337,16 +2337,16 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     snapshot_path = root / "data" / "core_contributors.json"
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
-    assert payload["updated_at"] == "2026-09-01"
-    assert len(payload["all_repos"]["contributors"]) == 32
-    assert len(payload["core_repos"]["contributors"]) == 21
+    assert payload["updated_at"] == "2026-09-27"
+    assert len(payload["all_repos"]["contributors"]) == 34
+    assert len(payload["core_repos"]["contributors"]) == 12
     profiles = payload["member_profiles"]
-    assert len(profiles["core_members"]) == 18
-    assert len(profiles["participants"]) == 55
+    assert len(profiles["core_members"]) == 11
+    assert len(profiles["participants"]) == 63
     assert len(profiles["staff_members"]) == 4
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
-    assert len(profiles["former_members"]) == 3
+    assert "former_members" not in profiles
     assert "vllm-ascend-hust-bidkv" not in payload["all_repos"]["scope_repos"]
     assert "vllm-ascend-hust-bidkv" not in payload["core_repos"]["scope_repos"]
     assert "vllm-ascend-hust-diffspec" in payload["core_repos"]["scope_repos"]
@@ -2421,7 +2421,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         item["display_name"]
         for item in profiles["staff_members"]
         if item["core_repository_contributor"]
-    } == {"程月甲", "张俊辉"}
+    } == {"程月甲"}
 
     people = {
         item["display_name"]: item
@@ -2432,7 +2432,6 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
             + profiles["external_contributors"]
         )
     }
-    former_people = {item["display_name"]: item for item in profiles["former_members"]}
     assert people["张睿诚"]["github_login"] == "KimmoZAG"
     expected_github_ids = {
         "张书豪": "ShuhaoZhangTony",
@@ -2485,7 +2484,6 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     assert people["龙斌"]["role"]["zh"] == "项目/科研助理"
     assert people["龙斌"]["staff_member"] is True
     assert people["龙斌"]["github_status"]["zh"] == "无 GitHub ID"
-    assert former_people["宋功轩"]["github_status"]["zh"] == "GitHub ID 待确认"
     assert people["彭成"]["github_status"]["zh"] == "GitHub ID 待确认"
     assert people["赵建军"]["role"]["zh"] == "已毕业"
     assert people["高西岭"]["research_direction"]["zh"] == "KV 量化"
@@ -2539,7 +2537,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     )
     assert people["冯威"]["role"]["zh"] == "2027 年待入学学生"
     assert people["冯威"]["advisor"]["zh"] == "张书豪"
-    assert people["冯威"]["github_status"]["zh"] == "负责人确认；组织邀请待接受"
+    assert people["冯威"]["github_status"]["zh"] == "已核验为vLLM-HUST组织成员"
     assert people["董君瑶"]["research_direction"]["zh"] == "向量数据库"
     assert (
         people["路庆浩"]["research_direction"]["zh"]
@@ -2549,11 +2547,6 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         people["沈家乐"]["research_direction"]["zh"]
         == "KV Cache 复用；长上下文推理优化；多后端运行时适配"
     )
-    assert set(former_people) == {"李林浩", "宋功轩", "余天成"}
-    assert all(not item["is_current_member"] for item in former_people.values())
-    assert former_people["李林浩"]["profile_status"]["zh"] == "考核淘汰"
-    assert former_people["宋功轩"]["profile_status"]["zh"] == "已请离"
-    assert former_people["余天成"]["profile_status"]["zh"] == "已退出"
     assert people["曹哲"]["github_login"] == "xmdhb"
     assert people["曹哲"]["role"]["zh"] == "学生"
     assert people["曹哲"]["advisor"]["zh"] == "张书豪"
@@ -2626,7 +2619,7 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         if item["person_id"] == "github:sad-and-bad1231"
     ]
     assert len(kuang_rows) == 1
-    assert kuang_rows[0]["commits"] == 17
+    assert kuang_rows[0]["commits"] == 16
 
     canonical_snapshot = (
         root.parent / "vllm-hust-org-profile" / "profile" / "core_contributors.json"

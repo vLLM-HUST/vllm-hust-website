@@ -60,7 +60,6 @@ def test_pending_github_identities_have_no_invented_login_or_link() -> None:
         *profiles["participants"],
         *profiles["staff_members"],
         *profiles["external_contributors"],
-        *profiles["former_members"],
     ]
     by_name = {item["display_name"]: item for item in all_profiles}
     pending = {
@@ -68,7 +67,6 @@ def test_pending_github_identities_have_no_invented_login_or_link() -> None:
         for item in roster["members"]
         if item.get("github_status") == "pending"
     }
-    assert pending == {"宋功轩"}
     for name in pending:
         assert by_name[name]["github_login"] is None
         assert by_name[name]["github_url"] is None
@@ -83,7 +81,6 @@ def test_confirmed_github_identities_are_mapped_without_duplicates() -> None:
         *profiles["participants"],
         *profiles["staff_members"],
         *profiles["external_contributors"],
-        *profiles["former_members"],
     ]
     expected = {
         "江勰东": "jxd1111",
@@ -196,23 +193,55 @@ def test_only_verified_teacher_github_logins_are_published() -> None:
         assert advisors[name]["github_url"] is None
 
 
-def test_former_members_are_separate_and_rendered_as_history() -> None:
-    _, snapshot = load_profiles()
-    profiles = snapshot["member_profiles"]
-    current_names = {
-        item["display_name"]
-        for category in (
-            "core_members",
-            "participants",
-            "staff_members",
-            "external_contributors",
-        )
-        for item in profiles[category]
-    }
-    former = {item["display_name"]: item for item in profiles["former_members"]}
-    assert set(former) == {"李林浩", "宋功轩", "余天成"}
-    assert current_names.isdisjoint(former)
+def test_former_members_are_absent_from_public_data_and_page() -> None:
+    roster, snapshot = load_profiles()
+    assert "former_members" not in snapshot["member_profiles"]
+    assert all(item["status"] == "current" for item in roster["members"])
+    for path in (ROOT / "data").rglob("*.json"):
+        text = path.read_text(encoding="utf-8")
+        for removed in (
+            "李林浩",
+            "宋功轩",
+            "余天成",
+            "Sunshine-llh",
+            "yutiantian0115",
+            "考核淘汰",
+            "已请离",
+            "已退出",
+        ):
+            assert removed not in text, path
     page = (ROOT / "contributors.html").read_text(encoding="utf-8")
     script = (ROOT / "assets" / "contributors-page.js").read_text(encoding="utf-8")
-    assert 'id="contributors-former-list"' in page
-    assert "profiles.former_members" in script
+    assert "contributors-former-list" not in page
+    assert "contributors-profile-former" not in page
+    assert "profiles.former_members" not in script
+
+
+def test_sync_discards_legacy_former_profiles_and_rejects_private_roster() -> None:
+    import copy
+    import runpy
+    import pytest
+
+    sync = runpy.run_path(str(ROOT / "scripts" / "sync_member_roster.py"))
+    roster, snapshot = load_profiles()
+    legacy = {
+        "display_name": "Removed example",
+        "former_member": True,
+        "current_status": "former",
+        "profile_status": {"zh": "Private reason"},
+    }
+    snapshot["member_profiles"]["former_members"] = [legacy]
+    snapshot["member_profiles"]["participants"].append(legacy)
+    snapshot["all_repos"]["contributors"].append(legacy)
+    snapshot["core_repos"]["contributors"].append(legacy)
+    result = sync["build_snapshot"](snapshot, roster)
+    assert "Removed example" not in json.dumps(result)
+    assert "former_members" not in result["member_profiles"]
+    private_roster = copy.deepcopy(roster)
+    private_roster["members"][0]["status"] = "former"
+    with pytest.raises(AssertionError, match="only current members"):
+        sync["build_snapshot"](snapshot, private_roster)
+    private_roster["members"][0]["status"] = "current"
+    private_roster["members"][0]["status_reason_zh"] = "Private reason"
+    with pytest.raises(AssertionError, match="departure reasons"):
+        sync["build_snapshot"](snapshot, private_roster)
