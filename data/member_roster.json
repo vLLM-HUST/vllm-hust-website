@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-01",
+  "updated_at": "2026-09-27",
   "source_priority": [
     "lead_confirmation_or_exit_record",
     "2026-08_weekly_report_direct_entry",
@@ -41,7 +41,7 @@
     {"name_zh": "周升晖", "github_login": "keridone", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "阮宏毅", "github_login": "Lan-Fa", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "张盛翔", "github_login": "zhangshengxiang682", "advisor_zh": "张书豪", "status": "current"},
-    {"name_zh": "冯威", "github_login": "fw1688", "advisor_zh": "张书豪", "status": "current", "github_status_zh": "负责人确认；组织邀请待接受", "github_status_en": "Confirmed by the advisor; organization invitation pending"},
+    {"name_zh": "冯威", "github_login": "fw1688", "advisor_zh": "张书豪", "status": "current", "github_status_zh": "已核验为vLLM-HUST组织成员", "github_status_en": "Verified vLLM-HUST organization member"},
     {"name_zh": "李佳乐", "github_login": "peter17-17", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "郑凌峰", "github_login": "Amber1qq", "advisor_zh": "刘海坤", "status": "current"},
     {"name_zh": "任天宇", "github_login": "Renty-0", "advisor_zh": "王庆刚", "status": "current"},
@@ -60,9 +60,6 @@
     {"name_zh": "雷翔麟", "github_login": "llxler", "advisor_zh": "万瑶", "status": "current"},
     {"name_zh": "张家万", "github_login": "Jiawan23", "advisor_zh": "万瑶", "status": "current"},
     {"name_zh": "郁硕", "github_login": "Yushuo-star", "advisor_zh": "王雄", "status": "current"},
-    {"name_zh": "毛潮云", "github_login": "Irisuko", "advisor_zh": "罗瑞坤", "status": "current"},
-    {"name_zh": "李林浩", "github_login": "Sunshine-llh", "advisor_zh": null, "status": "former", "status_reason_zh": "考核淘汰", "status_reason_en": "Inactive after assessment"},
-    {"name_zh": "宋功轩", "github_login": null, "advisor_zh": null, "status": "former", "github_status": "pending", "status_reason_zh": "已请离", "status_reason_en": "Departed"},
-    {"name_zh": "余天成", "github_login": "yutiantian0115", "advisor_zh": null, "status": "former", "status_reason_zh": "已退出", "status_reason_en": "Withdrawn"}
+    {"name_zh": "毛潮云", "github_login": "Irisuko", "advisor_zh": "罗瑞坤", "status": "current"}
   ]
 }
