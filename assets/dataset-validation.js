@@ -7,8 +7,8 @@
         zh: { not_tested: '未测试', baseline_only: '仅 B0', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
     };
     const TEXT = {
-        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', sourceCellEvidence: 'Cell-level evidence in details', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', reason: 'Reason', note: 'Note', tracking: 'Tracking', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', viewSource: 'View report', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
-        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', sourceCellEvidence: '证据见单元格详情', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', reason: '原因', note: '说明', tracking: '跟踪', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', viewSource: '查看报告', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
+        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', sourceCellEvidence: 'Cell-level evidence in details', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', reason: 'Reason', note: 'Note', tracking: 'Tracking', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', candidates: 'B1 candidates', selected: 'Selected', exercised: 'Exercised', notExercised: 'Not exercised', notRecorded: 'Not recorded', viewSource: 'View report', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
+        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', sourceCellEvidence: '证据见单元格详情', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', reason: '原因', note: '说明', tracking: '跟踪', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', candidates: 'B1 候选', selected: '已选为 B1', exercised: '已执行控制动作', notExercised: '未执行控制动作', notRecorded: '未记录控制动作', viewSource: '查看报告', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
     };
 
     const state = { data: null, index: null, scenarioId: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
@@ -42,6 +42,18 @@
             if (item.comparison?.trend !== undefined && !TREND_ORDER.includes(item.comparison.trend)) throw new Error(`Unsupported comparison trend: ${item.comparison.trend}`);
             const key = `${item.dataset_id}:${item.metric_id}`;
             if (results.has(key)) throw new Error(`Duplicate result cell: ${key}`);
+            if (item.candidate_values !== undefined) {
+                if (!Array.isArray(item.candidate_values) || item.candidate_values.length === 0) throw new Error(`Invalid candidate values: ${key}`);
+                const candidateIds = new Set();
+                item.candidate_values.forEach((candidate) => {
+                    if (!candidate || typeof candidate.candidate_id !== 'string' || !candidate.candidate_id || candidateIds.has(candidate.candidate_id) || !Number.isFinite(Number(candidate.value)) || typeof candidate.provenance?.repository !== 'string' || typeof candidate.provenance?.report_url !== 'string') {
+                        throw new Error(`Invalid or duplicate candidate: ${key}`);
+                    }
+                    candidateIds.add(candidate.candidate_id);
+                });
+                const selected = item.candidate_values.find((candidate) => candidate.candidate_id === item.selected_candidate_id);
+                if (!selected || Number(selected.value) !== Number(item.current_value ?? item.value)) throw new Error(`Selected candidate mismatch: ${key}`);
+            }
             results.set(key, { ...item, status: item.status || 'not_tested' });
         });
         return { ...data, results };
@@ -110,6 +122,19 @@
             if (url.protocol === 'https:') return `<a href="${escapeHtml(url.href)}" target="_blank" rel="noopener noreferrer">${t('viewSource')}</a>`;
         } catch (_) { return escapeHtml(value); }
         return escapeHtml(value);
+    }
+
+    function candidateValuesHtml(cell, metric) {
+        if (!Array.isArray(cell.candidate_values) || cell.candidate_values.length === 0) return '';
+        const effectivenessLabel = (value) => ({ exercised: t('exercised'), 'not-exercised': t('notExercised'), 'not-recorded': t('notRecorded') })[value] || value;
+        const items = cell.candidate_values.map((candidate) => {
+            const selected = candidate.candidate_id === cell.selected_candidate_id;
+            const delta = formatDelta(candidate);
+            const value = formatValue(candidate, metric);
+            const report = candidate.provenance?.report_url ? provenanceHtml(candidate.provenance.report_url) : '';
+            return `<li class="validation-candidate${selected ? ' validation-candidate--selected' : ''}"><div><strong>${escapeHtml(candidate.label)}</strong>${selected ? `<span>${t('selected')}</span>` : ''}</div><div class="validation-candidate-value">${value}${delta ? ` · ${escapeHtml(delta)}` : ''}</div><small>${escapeHtml(effectivenessLabel(candidate.runtime_effectiveness))}${report ? ` · ${report}` : ''}</small></li>`;
+        }).join('');
+        return `<dt>${t('candidates')}</dt><dd><ul class="validation-candidate-list">${items}</ul></dd>`;
     }
 
     function detailNote(cell) {
@@ -191,7 +216,7 @@
         const noteText = detailNote(cell);
         const note = noteText ? `<dt>${t('note')}</dt><dd>${escapeHtml(noteText)}</dd>` : '';
         const tracking = cell.tracking_url ? `<dt>${t('tracking')}</dt><dd>${escapeHtml(cell.tracking_url)}</dd>` : '';
-        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.current_value ?? cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd>${reason}${note}${tracking}<dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(metadata.model)}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(metadata.hardware)}</dd><dt>${t('provenance')}</dt><dd>${provenanceHtml(metadata.provenance)}</dd>`;
+        $('validation-detail-meta').innerHTML = `<dt>${t('baseline')}</dt><dd>${escapeHtml(cell.baseline_value ?? t('notProvided'))}</dd><dt>${t('current')}</dt><dd>${escapeHtml(cell.current_value ?? cell.value ?? t('noValue'))}</dd><dt>${t('delta')}</dt><dd>${escapeHtml(formatDelta(cell) || t('notProvided'))}</dd>${candidateValuesHtml(cell, metric)}${reason}${note}${tracking}<dt>${t('updated')}</dt><dd>${escapeHtml(cell.updated_at || state.data.generated_at || t('notProvided'))}</dd><dt>${t('model')}</dt><dd>${escapeHtml(metadata.model)}</dd><dt>${t('hardware')}</dt><dd>${escapeHtml(metadata.hardware)}</dd><dt>${t('provenance')}</dt><dd>${provenanceHtml(metadata.provenance)}</dd>`;
         panel.hidden = false;
     }
 
