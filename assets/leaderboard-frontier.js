@@ -369,7 +369,7 @@
     $('frontier-contract-dialog').addEventListener('click',event=>{if(event.target===$('frontier-contract-dialog'))$('frontier-contract-dialog').close();});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=prefix-routing-mean3-20261007',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=qwen35-w8a8-900s-20261008',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});
