@@ -11,19 +11,50 @@ HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -> None:
     for label in ("navProducts", "navEngine", "navProjects", "navPlugins"):
         assert label in SITE_JS
-    assert "pages: ['leaderboard', 'leaderboard-v2', 'achievements', 'news']" in SITE_JS
-    assert "['leaderboard-v2', './leaderboard-runs.html', 'navLeaderboard']" in SITE_JS
+    assert (
+        "pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', "
+        "'achievements', 'news']" in SITE_JS
+    )
+    assert (
+        "['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves']"
+        in SITE_JS
+    )
+    assert "['leaderboard', './leaderboard.html', 'navFixedTarget']" in SITE_JS
+    assert (
+        "['dataset-validation', './dataset-validation.html', "
+        "'navDatasetValidation']" in SITE_JS
+    )
     assert "pages: ['members', 'contributors', 'conferences', 'courses']" in SITE_JS
     assert "pages: ['versions', 'issues']" in SITE_JS
     assert '<details class="nav-group"' in SITE_JS
 
 
-def test_empty_dataset_validation_is_not_in_shared_navigation() -> None:
+def test_published_dataset_validation_is_in_shared_navigation() -> None:
     assert (
         'href="./dataset-validation.html" data-i18n-common="navDatasetValidation"'
-        not in SITE_JS
+        in SITE_JS
     )
+    assert "navLeaderboard: 'Benchmarks'" in SITE_JS
+    assert "navLeaderboard: '评测'" in SITE_JS
+    assert "navDatasetValidation: 'Dataset matrix'" in SITE_JS
+    assert "navDatasetValidation: '数据集矩阵'" in SITE_JS
     assert "navLeaderboardV2" not in SITE_JS
+
+
+def test_benchmark_pages_share_plain_language_subnavigation() -> None:
+    pages = {
+        "leaderboard-runs.html": "navPerformanceCurves",
+        "leaderboard.html": "navFixedTarget",
+        "dataset-validation.html": "navDatasetValidation",
+    }
+    for name, active_key in pages.items():
+        text = (ROOT / name).read_text(encoding="utf-8")
+        assert 'class="benchmark-tabs"' in text
+        assert 'href="./leaderboard-runs.html"' in text
+        assert 'href="./leaderboard.html"' in text
+        assert 'href="./dataset-validation.html"' in text
+        assert f'data-i18n-common="{active_key}"' in text
+        assert 'aria-current="page"' in text
 
 
 def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() -> None:
@@ -42,7 +73,7 @@ def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() 
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'id="nav-plugins"' in text, name
         assert 'href="./plugins.html">Ecosystem</a>' in text, name
-        assert "assets/site.js?v=leaderboard-primary-20260927" in text, name
+        assert "assets/site.js?v=benchmarks-ia-20261003" in text, name
     assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
 
@@ -64,12 +95,12 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
 
 
 def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
-    assert "Typed runtime contracts. 18 cataloged MODs. Evidence before claims." in HOME
+    assert "Typed runtime contracts. 26 cataloged MODs. Evidence before claims." in HOME
     assert (
         "every MOD publishes ownership, compatibility, workload fit, and evidence limits"
         in HOME
     )
-    assert "类型化运行时契约、18 个目录 MOD、证据先于结论。" in HOME
+    assert "类型化运行时契约、26 个目录 MOD、证据先于结论。" in HOME
     assert "每个 MOD 明示负责人、兼容性、Workload 与证据边界" in HOME
 
 
@@ -82,8 +113,8 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'data-page="versions"' in versions
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
-    assert "assets/site.css?v=nav-polish-20260826" in versions
-    assert "assets/site.js?v=leaderboard-primary-20260927" in versions
+    assert "assets/site.css?v=benchmarks-ia-20261003" in versions
+    assert "assets/site.js?v=benchmarks-ia-20261003" in versions
     assert "assets/versions.css?v=0.3.7" in versions
 
 
@@ -103,8 +134,8 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     )
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=nav-polish-20260826" in text
-        assert "assets/site.js?v=leaderboard-primary-20260927" in text
+        assert "assets/site.css?v=benchmarks-ia-20261003" in text
+        assert "assets/site.js?v=benchmarks-ia-20261003" in text
         if name not in ("index.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 
@@ -119,7 +150,7 @@ def test_ecosystem_page_marks_entry_point_standard_as_legacy() -> None:
     assert "TRANSITION" in page
     assert "Domain contracts first; bundles second." in page
     assert "former entry-point-based Plugin Standard 1.0" in page
-    assert "Manifest `0.2-experimental`" in standard
+    assert "Manifest `0.3-experimental`" in standard
     assert "One materializer does not prove ecosystem compatibility" in page
     assert "Zero typed providers retain legacy auto-discovery" in page
     assert "explicit victim_selector_plugin must select exactly one" in page
@@ -168,7 +199,7 @@ def test_ecosystem_registry_has_docs_as_its_canonical_owner() -> None:
     assert registry["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
     assert not (ROOT / "data" / "plugins.legacy.json").exists()
     standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
-    assert "Manifest `0.2-experimental`" in standard
+    assert "Manifest `0.3-experimental`" in standard
 
 
 def test_versions_external_links_have_safe_new_tab_contract() -> None:

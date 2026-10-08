@@ -85,10 +85,11 @@ def main():
             assert group.locator('[data-nav-page="leaderboard-v2"]').count() == 1
             assert (
                 page.locator('.site-nav a[href="./dataset-validation.html"]').count()
-                == 0
+                == 1
             )
+            assert page.locator('.site-nav a[href="./leaderboard.html"]').count() == 1
             assert nav.text_content().strip() == (
-                "性能排行榜" if language == "zh" else "Leaderboard"
+                "性能曲线" if language == "zh" else "Performance curves"
             )
             assert nav.get_attribute("href") == "./leaderboard-runs.html"
             assert "active" in nav.get_attribute("class")
@@ -177,7 +178,9 @@ def main():
             page.locator("#column-values input").check()
             page.locator("#column-apply").click()
             assert page.locator(".run-row").count() == min(40, total_runs)
-            assert "Leaderboards" in page.locator("#view-runs").inner_text()
+            assert ("成绩主表" if language == "zh" else "Measurements") in page.locator(
+                "#view-runs"
+            ).inner_text()
             assert "Tasks" in page.locator("#view-tasks").inner_text()
             assert page.locator("#view-runs-count").inner_text() == str(total_runs)
             assert page.locator("#view-tasks-count").inner_text() == "8"

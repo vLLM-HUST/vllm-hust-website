@@ -1337,6 +1337,11 @@ def test_aggregate_results_hard_constraints_only_include_vllm_hust(
     current_entry["metadata"]["idempotency_key"] = (
         "vllm-hust|0.20.1rc1.dev314|short|qwen-qwen2.5-0.5b-instruct|fp16|a100|1|1|single_gpu"
     )
+    current_entry["constraints"]["metrics"]["single_chip_effective_utilization_pct"] = (
+        None
+    )
+    current_entry["constraints"]["metrics"]["unit_token_cost_reduction_pct"] = None
+    current_entry["constraints"]["metrics"]["multi_tenant_high_utilization"] = None
 
     baseline_entry = _valid_entry()
     baseline_entry["entry_id"] = "77777777-7777-7777-7777-777777777777"
@@ -1405,12 +1410,22 @@ def test_aggregate_results_hard_constraints_only_include_vllm_hust(
 
     assert hard_constraints["scope_count"] == 1
     assert hard_constraints["fail_count"] == 0
+    assert hard_constraints["incomplete_count"] == 1
     assert (
         hard_constraints["best_scope_key"] == hard_constraints["scopes"][0]["scope_key"]
     )
     assert hard_constraints["scopes"][0]["selection_rank"] == 1
     assert hard_constraints["scopes"][0]["scope"]["engine"] == "vllm-hust"
     assert hard_constraints["scopes"][0]["latest"]["engine"] == "vllm-hust"
+    evaluation = hard_constraints["scopes"][0]["latest"]["evaluation"]
+    assert evaluation["overall_status"] == "incomplete"
+    assert evaluation["checks"]["effective_utilization_ge_90"] is None
+    assert (
+        evaluation["checks"][
+            "single_business_cost_down_ge_30_and_multi_tenant_high_utilization"
+        ]
+        is None
+    )
 
 
 def test_aggregate_results_hard_constraints_rank_best_scope_first(

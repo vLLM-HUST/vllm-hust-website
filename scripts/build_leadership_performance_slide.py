@@ -438,7 +438,9 @@ def _entry_errors(
     metadata = _dict(entry.get("metadata"))
     same_spec = _dict(entry.get("same_spec"))
     workload = str(_dict(entry.get("workload")).get("name") or "")
-    target_id = str(metadata.get("target_id") or "")
+    target_id = str(
+        metadata.get("target_contract_id") or metadata.get("target_id") or ""
+    )
     target = registry.targets.get(target_id)
 
     if metadata.get("verified") is not True:
@@ -460,7 +462,10 @@ def _entry_errors(
         "public-leaderboard"
     ):
         errors.append(f"{prefix}: target is not active/public")
-    if str(metadata.get("target_version")) != str(target.get("target_version")):
+    target_version = metadata.get("target_contract_version") or metadata.get(
+        "target_version"
+    )
+    if str(target_version) != str(target.get("target_version")):
         errors.append(f"{prefix}: target_version does not match registry")
     if str(metadata.get("profile_id")) != str(target.get("profile")):
         errors.append(f"{prefix}: profile_id does not match registry profile")
@@ -592,9 +597,10 @@ def _compare_group_errors(
                 continue
             metadata = _dict(entry.get("metadata"))
             workload = str(_dict(entry.get("workload")).get("name") or "")
-            if metadata.get("target_id") != target_id or workload != (
-                matching_pin.workload
-            ):
+            member_target_id = metadata.get("target_contract_id") or metadata.get(
+                "target_id"
+            )
+            if member_target_id != target_id or workload != (matching_pin.workload):
                 errors.append(
                     f"{member_prefix}: member target/workload differs from group"
                 )
@@ -692,7 +698,10 @@ def admit_snapshot(
         workload = str(_dict(entry.get("workload")).get("name") or "")
         if workload in pins:
             metadata = _dict(entry.get("metadata"))
-            if metadata.get("target_id") != pins[workload].target_id:
+            entry_target_id = metadata.get("target_contract_id") or metadata.get(
+                "target_id"
+            )
+            if entry_target_id != pins[workload].target_id:
                 errors.append(
                     f"{entry_id}: does not match pinned target for {workload}"
                 )

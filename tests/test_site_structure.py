@@ -54,6 +54,20 @@ def test_leaderboard_names_exact_settings_without_frontier_jargon() -> None:
     assert "Best trade-off points only" in settings_script
     assert "仅显示最佳权衡点" in settings_script
     assert "frontierOnly:false" in settings_script
+    assert (
+        "M.chartSeries(result.measured,axes().x,axes().y,cohort())" in settings_script
+    )
+    assert 'class="frontier-concurrency-line"' in settings_script
+    assert "measurements are not on a displayed line" in settings_script
+    assert (
+        "Fixed-configuration comparison; points are independent measured observations"
+        in settings_script
+    )
+    assert "固定配置对照；各点是独立实测，不表示缺失并发曲线" in settings_script
+    assert "independentStudy()?'':`<div class=\"frontier-checks\"" in settings_script
+    assert "Independent study groups are not connected" in settings_script
+    assert "不同实验组之间不连线" in settings_script
+    assert "M.resolveCohort(state.data.cohorts,requestedSetting)" in settings_script
     assert "Hide non-Frontier points" not in settings_script
     assert "Pareto-efficient points only" not in settings_script
 
@@ -190,12 +204,15 @@ def test_dataset_validation_page_uses_versioned_contract() -> None:
     assert 'data-page="dataset-validation"' in page
     assert "dataset-validation-v1" in page
     assert "dataset-validation-v1" in script
-    assert "Empty cells are intentionally shown" in page
+    assert "The matrix stays hidden until measured results exist" in page
+    assert "document.querySelector(selector).hidden = !hasResults" in script
     assert 'id="nav-dataset-validation"' not in page
     assert "Result references an undeclared dataset or metric" in script
     assert "Duplicate result cell" in script
     assert "Unsupported result status" in script
-    assert "vllmHustDatasetValidationConfig?.dataUrl" in script
+    assert "dataset-validation-index-v1" in script
+    assert "config.indexUrl" in script
+    assert 'id="validation-model-select"' in page
     assert 'id="validation-freshness"' in page
     assert 'id="validation-dataset-search"' in page
     assert 'id="validation-group-filter"' in page
@@ -884,11 +901,16 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
     )
 
     assert "python scripts/sync_leaderboard_snapshots.py" in workflow
+    assert "python scripts/refresh_leadership_target_pin.py" in workflow
+    assert "--pin data/leadership_performance_targets.json" in workflow
+    assert "--current-registry data/official_targets.json" in workflow
     assert "vLLM-HUST/vllm-hust-benchmark" in workflow
     assert "docs/official-baselines" in workflow
     assert "SNAPSHOT_FILES = (" in script
     assert "sanitize_public_payload" in script
     assert "--check" in script
+    assert "leaderboard-data/dataset-validation" in workflow
+    assert "python scripts/sync_dataset_validation_snapshots.py" in workflow
 
 
 def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
@@ -948,7 +970,8 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     text = (root / "index.html").read_text(encoding="utf-8")
 
     assert 'data-page="home"' in text
-    assert 'href="./leaderboard.html"' in text
+    assert 'href="./leaderboard-runs.html"' in text
+    assert 'href="./dataset-validation.html"' in text
     assert 'href="./achievements.html"' in text
     assert 'href="./contributors.html"' in text
     assert 'href="./conferences.html"' in text
@@ -1101,8 +1124,8 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
         "courses.html",
     ):
         text = (root / name).read_text(encoding="utf-8")
-        assert "assets/site.css?v=nav-polish-20260826" in text
-        assert "assets/site.js?v=leaderboard-primary-20260927" in text
+        assert "assets/site.css?v=benchmarks-ia-20261003" in text
+        assert "assets/site.js?v=benchmarks-ia-20261003" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -1128,18 +1151,18 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
     assert (
-        "Typed runtime contracts. 18 cataloged MODs. Evidence before claims."
+        "Typed runtime contracts. 26 cataloged MODs. Evidence before claims."
         in html_text
     )
-    assert "类型化运行时契约、18 个目录 MOD、证据先于结论。" in html_text
+    assert "类型化运行时契约、26 个目录 MOD、证据先于结论。" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
     assert (
-        "18 catalog entries, with activation and performance evidence kept separate."
+        "22 catalog entries, with activation and performance evidence kept separate."
         in html_text
     )
-    assert "18 个目录条目，启用证据与性能证据分开呈现。" in html_text
+    assert "22 个目录条目，启用证据与性能证据分开呈现。" in html_text
     assert "static checks never become runtime or NPU claims" in html_text
     assert "不把静态检查写成运行时或 NPU 结论" in html_text
 
@@ -1165,7 +1188,7 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     proving_ground = html_text.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
     assert "Runtime Contracts" in proving_ground
     assert "Ecosystem Interfaces" in proving_ground
-    assert "Validation Matrix" in proving_ground
+    assert "Dataset Matrix" in proving_ground
     assert "Benchmark Contract" in proving_ground
     assert "vllm-ascend-hust" not in proving_ground
     assert "triton-ascend-hust" not in proving_ground
@@ -1274,8 +1297,8 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "modelHeader.textContent = t('modelColumn');" in js_text
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
-    assert "assets/leaderboard.css?v=model-column-sync-20260724" in html_text
-    assert "assets/leaderboard.js?v=stable-trend-v6-20260825" in html_text
+    assert "assets/leaderboard.css?v=fixed-target-tristate-20261003" in html_text
+    assert "assets/leaderboard.js?v=fixed-target-tristate-20261003" in html_text
     assert ">Stable trend</button>" in html_text
     assert "trendViewCheckpoint: 'Stable trend'" in js_text
     assert "trendViewCheckpoint: '稳定趋势'" in js_text
@@ -1540,7 +1563,7 @@ def test_open_upstream_prs_render_in_repository_accordion() -> None:
     assert ".upstream-pr-details[hidden]" in css_text
     assert "upstream-pr-track" not in css_text
     assert "upstream-pr-card" not in css_text
-    assert "assets/site.css?v=nav-polish-20260826" in html_text
+    assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/achievements-page.js?v=upstream-20260904T022103Z" in html_text
     assert (
         "number: 49017, title: '[Perf] Batch KV scale host conversion', status: 'draft'"
@@ -1889,8 +1912,8 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "stable-trend-v6-20260825" in html_text
-    assert "model-column-sync-20260724" in html_text
+    assert "fixed-target-tristate-20261003" in html_text
+    assert "fixed-target-tristate-20261003" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
     assert 'id="trend-series-list"' in html_text
@@ -2721,7 +2744,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "stable-trend-v6-20260825" in html_text
+    assert "fixed-target-tristate-20261003" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:
@@ -2737,9 +2760,9 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert 'id="issues-error"' in html_text
     assert 'id="issues-content"' in html_text
     assert "assets/issues-page.js?v=" in html_text
-    assert "assets/site.css?v=nav-polish-20260826" in html_text
+    assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=leaderboard-primary-20260927" in html_text
+    assert "assets/site.js?v=benchmarks-ia-20261003" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js

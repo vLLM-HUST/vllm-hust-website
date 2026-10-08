@@ -4,10 +4,18 @@
 import argparse
 import copy
 import json
+import math
 import time
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
+
+
+def mtp_state(point):
+    tokens = point["configuration"]["parameters"].get("mtp_draft_tokens")
+    if type(tokens) not in (int, float) or not math.isfinite(tokens) or tokens < 0:
+        return "unknown"
+    return "on" if tokens > 0 else "off"
 
 
 def ready(page):
@@ -41,60 +49,133 @@ def download_configuration(page, popup, previous_download):
     return download.value, time.monotonic()
 
 
-def assert_group_frontiers(page, points):
-    """Independent per-group Pareto oracle, including line vertices and filters."""
+def assert_concurrency_series(page, points, cohort=None):
+    """BetterScale joins Pareto vertices; other groups retain measured sweeps."""
+    visible = set(
+        page.locator("[data-point]").evaluate_all(
+            "nodes => nodes.map(node => node.dataset.point)"
+        )
+    )
     groups = {}
+    frontiers = {}
+    configuration_groups = {}
+    contract = (cohort or {}).get("workload", {}).get("contract", {})
+    shared_ids = set(contract.get("comparison_point_ids", []))
+    configuration_comparison = contract.get("presentation") == "configuration-study"
     for point in points:
-        if (
-            point["configuration"]["parameters"].get("functional_status") == "failed"
-            or point["metrics"].get("decode_p90_tps") is None
-            or not point["metrics"].get("output_tps")
-        ):
+        if point["id"] not in visible or not point["load"].get("concurrency_series"):
             continue
         group = (
-            point["configuration"].get("experiment_group")
+            point.get("study_group", {}).get("id")
+            or point["load"].get("presentation_group", {}).get("id")
+            or point["configuration"].get("experiment_group")
             or "+".join(sorted(point["configuration"]["mods"]))
             or "none"
         )
-        group = json.dumps(
-            [point["cohort_id"], group, point["load"].get("session_rotation_depth")],
+        if (
+            group == "betterscale"
+            and configuration_comparison
+            and point["id"] in shared_ids
+        ):
+            campaign = (
+                point.get("evidence", {}).get("benchmark_protocol", {}).get("campaign")
+            )
+            family = (
+                campaign
+                if campaign
+                in {"concurrency-knee-20261006", "concurrency-width-20261006"}
+                else "original"
+            )
+            key = (
+                point["cohort_id"],
+                point["load"].get("session_rotation_depth"),
+                family,
+            )
+            configuration_groups.setdefault(key, []).append(point)
+            continue
+        if group == "betterscale":
+            key = json.dumps(
+                [
+                    point["cohort_id"],
+                    group,
+                    point["load"].get("session_rotation_depth"),
+                ],
+                separators=(",", ":"),
+            )
+            if (
+                point["configuration"]["parameters"].get("functional_status")
+                != "failed"
+            ):
+                frontiers.setdefault(key, []).append(point)
+            continue
+        series = json.dumps(
+            [
+                point["cohort_id"],
+                point["load"]["concurrency_series"],
+                point["load"].get("session_rotation_depth"),
+            ],
             separators=(",", ":"),
         )
-        groups.setdefault(group, []).append(point)
+        groups.setdefault(series, []).append(point)
 
-    def xy(p):
+    expected = {
+        series: sorted(members, key=lambda p: p["load"]["concurrency"])
+        for series, members in groups.items()
+        if len(members) > 1
+    }
+    for members in configuration_groups.values():
+        members.sort(key=lambda p: p["load"]["concurrency"])
+        if len(members) < 2:
+            continue
+        first = members[0]
+        series = json.dumps(
+            [
+                first["cohort_id"],
+                first["load"]["concurrency_series"],
+                first["load"].get("session_rotation_depth"),
+            ],
+            separators=(",", ":"),
+        )
+        expected[series] = members
+
+    def coordinates(point):
         return (
-            p["metrics"]["decode_p90_tps"],
-            p["metrics"]["output_tps"]
-            / p["configuration"]["hardware"]["accelerator_count"],
+            point["metrics"]["decode_p90_tps"],
+            point["metrics"]["output_tps"]
+            / point["configuration"]["hardware"]["accelerator_count"],
         )
 
-    expected = {}
-    for group, members in groups.items():
-        front = [
-            p
-            for p in members
-            if not any(
-                xy(q)[0] >= xy(p)[0] and xy(q)[1] >= xy(p)[1] and xy(q) != xy(p)
-                for q in members
-            )
-        ]
-        unique = {}
-        for p in sorted(front, key=lambda p: (xy(p)[0], p["id"])):
-            unique.setdefault(xy(p), p)
-        if len(unique) > 1:
-            expected[group] = list(unique.values())
-    lines = page.locator(".frontier-envelope")
+    for key, members in frontiers.items():
+        vertices = []
+        seen = set()
+        for point in sorted(members, key=lambda p: (coordinates(p)[0], p["id"])):
+            x, y = coordinates(point)
+            if (
+                any(
+                    coordinates(other)[0] >= x
+                    and coordinates(other)[1] >= y
+                    and coordinates(other) != (x, y)
+                    for other in members
+                )
+                or (x, y) in seen
+            ):
+                continue
+            vertices.append(point)
+            seen.add((x, y))
+        if len(vertices) > 1:
+            expected[key] = vertices
+
+    lines = page.locator(".frontier-concurrency-line")
     assert lines.count() == len(expected)
-    assert page.locator(".frontier-concurrency-line").count() == 0
+    assert page.locator(".frontier-envelope").count() == 0
     for line in lines.all():
-        rows = expected[line.get_attribute("data-group")]
+        rows = expected[line.get_attribute("data-series")]
         depth = rows[0]["load"].get("session_rotation_depth")
         assert all(p["load"].get("session_rotation_depth") == depth for p in rows)
         assert line.get_attribute("stroke-dasharray") == (
             "7 4" if depth and depth > 1 else "none"
         )
-        assert json.loads(line.get_attribute("data-frontier-points")) == [
+        assert json.loads(line.get_attribute("data-series-points")) == [
             p["id"] for p in rows
         ]
         vertices = [
@@ -142,7 +223,7 @@ def verify_rotation_choices(browser, url, fixture):
     assert choices.evaluate_all("nodes=>nodes.map(n=>n.value)") == ["1", "4"]
     assert all(choice.is_checked() for choice in choices.all())
     page.locator("#frontier-only").uncheck()
-    assert_group_frontiers(page, data["points"])
+    assert_concurrency_series(page, data["points"])
     page.locator('[data-filter="rotation"][value="1"]').uncheck()
     expected = [p for p in data["points"] if p["load"]["session_rotation_depth"] == 4]
     assert set(
@@ -150,12 +231,12 @@ def verify_rotation_choices(browser, url, fixture):
             "nodes=>nodes.map(n=>n.dataset.point)"
         )
     ) == {p["id"] for p in expected}
-    assert_group_frontiers(page, expected)
+    assert_concurrency_series(page, expected)
     page.locator('[data-filter="rotation"][value="4"]').uncheck()
     assert page.locator("[data-point]").count() == 0
     page.locator('[data-filter="rotation"][value="1"]').check()
     expected = [p for p in data["points"] if p["load"]["session_rotation_depth"] == 1]
-    assert_group_frontiers(page, expected)
+    assert_concurrency_series(page, expected)
     context.close()
 
 
@@ -200,13 +281,34 @@ def main():
     production["points"] = [
         p for p in production["points"] if p["cohort_id"] in visible_ids
     ]
+    default_cohort = production["cohorts"][0]
     default_cohort_points = [
         p
         for p in production["points"]
-        if p["cohort_id"] == production["cohorts"][0]["id"]
+        if p["cohort_id"] == default_cohort["id"]
+        and (
+            not default_cohort["workload"]["contract"].get("display_series_ids")
+            or p["load"].get("concurrency_series")
+            in default_cohort["workload"]["contract"]["display_series_ids"]
+        )
     ]
     default_points = [
         p for p in default_cohort_points if p["load"]["session_rotation_depth"] == 1
+    ]
+    default_groups = set(
+        default_cohort["workload"]["contract"].get("default_groups", [])
+    )
+    initial_points = [
+        p
+        for p in default_points
+        if not default_groups
+        or (
+            p["load"].get("presentation_group", {}).get("id")
+            or p["configuration"].get("experiment_group")
+            or "+".join(sorted(p["configuration"]["mods"]))
+            or "none"
+        )
+        in default_groups
     ]
     tag_keys = list(
         dict.fromkeys(
@@ -216,7 +318,12 @@ def main():
     fixture = json.loads(
         (site / "tests/fixtures/leaderboard_frontier.json").read_text()
     )
-    empty = {"schema_version": "leaderboard-frontier/v1", "cohorts": [], "points": []}
+    empty = {
+        "schema_version": "leaderboard-frontier/v1",
+        "official_baseline": production["official_baseline"],
+        "cohorts": [],
+        "points": [],
+    }
     reports = []
     with sync_playwright() as p:
         browser = p.chromium.launch()
@@ -247,23 +354,31 @@ def main():
                 wait_until="domcontentloaded",
             )
             ready(page)
-            page.locator('[data-filter="rotation"][value="2"]').uncheck()
             assert "AgentX" not in page.locator("#frontier-panel").inner_text()
+            baseline_text = page.locator(".frontier-baseline").inner_text()
+            assert "vLLM 0.18.0 + vLLM-Ascend 0.18.0" in baseline_text
+            assert (
+                "已有该设定的同合同实测"
+                if language == "zh"
+                else "matched measurement available"
+            ) in baseline_text
             assert not page.locator("#frontier-only").is_checked()
             shown = page.locator("[data-point]").evaluate_all(
                 "nodes=>nodes.map(n=>n.dataset.point)"
             )
-            assert set(shown) == {point["id"] for point in default_points}
+            assert set(shown) == {point["id"] for point in initial_points}
             page.locator("#frontier-only").check()
             shown = page.locator("[data-point]").evaluate_all(
                 "nodes=>nodes.map(n=>n.dataset.point)"
             )
             expected_front = page.evaluate(
                 "points => LeaderboardFrontierModel.groupFrontiers(points, 'decode_p90_tps', 'output_tps_per_chip').flat().map(r=>r.point.id)",
-                default_points,
+                initial_points,
             )
             assert set(shown) == set(expected_front)
-            assert_group_frontiers(page, default_points)
+            assert_concurrency_series(
+                page, [p for p in initial_points if p["id"] in shown]
+            )
             page.screenshot(
                 path=str(
                     args.output / f"frontier-only-{width}-{language}-{scheme}.png"
@@ -271,6 +386,8 @@ def main():
                 full_page=True,
             )
             page.locator("#frontier-only").uncheck()
+            page.locator("#frontier-mods-toggle").click()
+            assert page.locator("[data-point]").count() == len(default_points)
 
             pegaflow_points = [
                 point
@@ -288,55 +405,15 @@ def main():
             for point in pegaflow_points:
                 assert page.locator(f'[data-point="{point["id"]}"]').count() == 1
 
-            assert page.locator("[data-filter=rotation]").count() == 2
+            assert page.locator("[data-filter=rotation]").count() == 1
             assert (
                 page.locator("#frontier-rotation-filter .frontier-filter-note").count()
                 == 1
             )
-            click_point(page, page.locator(f'[data-point="{default_points[0]["id"]}"]'))
-            page.locator('[data-filter="rotation"][value="2"]').check()
-            page.locator('[data-filter="rotation"][value="1"]').uncheck()
-            assert page.locator("#frontier-popover").is_hidden()
-            expected_rotation2 = [
-                p
-                for p in default_cohort_points
-                if p["load"]["session_rotation_depth"] == 2
-            ]
-            shown = page.locator("[data-point]").evaluate_all(
-                "nodes=>nodes.map(n=>n.dataset.point)"
-            )
-            assert set(shown) == {p["id"] for p in expected_rotation2}
-            assert (
-                expected_rotation2
-            )  # Membership is checked against the snapshot above.
-            assert_group_frontiers(page, expected_rotation2)
-            assert page.locator("#frontier-curves").is_hidden()
-            assert "D2" in page.locator("#frontier-chart").text_content()
-            assert (
-                "Session rotation depth"
-                not in page.locator("#frontier-legend").inner_text()
-            )
-            page.screenshot(
-                path=str(args.output / f"depth2-{width}-{language}-{scheme}.png"),
-                full_page=True,
-            )
-            for point in expected_rotation2:
-                click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
-                popup = page.locator("#frontier-popover")
-                download, previous_download = download_configuration(
-                    page, popup, previous_download
-                )
-                payload = json.loads(Path(download.path()).read_text())
-                assert payload["point"] == point
-                popup.locator("[data-close]").click()
-            page.locator("#frontier-only").check()
-            assert_group_frontiers(page, expected_rotation2)
+            assert page.locator('[data-filter="rotation"][value="2"]').count() == 0
             page.locator("#langToggle").click()
-            assert page.locator('[data-filter="rotation"][value="2"]').is_checked()
+            assert page.locator('[data-filter="rotation"][value="1"]').is_checked()
             page.locator("#langToggle").click()
-            page.locator('[data-filter="rotation"][value="1"]').check()
-            page.locator('[data-filter="rotation"][value="2"]').uncheck()
-            page.locator("#frontier-only").uncheck()
             assert page.locator(".frontier-point").count() == len(default_points)
 
             assert page.locator("#runs-panel").is_hidden()
@@ -398,12 +475,10 @@ def main():
             else:
                 assert page.locator("#frontier-workload").count() == 0
                 assert page.locator("#frontier-workload-tag").is_visible()
-            expected_status = (
-                "工程测量" if language == "zh" else "Engineering measurement"
-            )
+            expected_status = "实测对比" if language == "zh" else "Measured comparison"
             assert expected_status in page.locator("#frontier-status").inner_text()
             assert page.locator(".frontier-point").count() == len(default_points)
-            assert_group_frontiers(page, default_points)
+            assert_concurrency_series(page, default_points)
             assert page.locator("#frontier-popover").is_hidden()
             curves = production["cohorts"][0]["workload"]["contract"].get(
                 "concurrency_curves_url"
@@ -412,31 +487,37 @@ def main():
             if curves:
                 assert page.locator("#frontier-curves").get_attribute("href") == curves
             # Real control changes filter points and the derived envelope, not data.
-            for setting in ("on", "off", "all"):
-                page.locator("[data-filter=mtp][value=on]").set_checked(
-                    setting in ("on", "all")
-                )
-                page.locator("[data-filter=mtp][value=off]").set_checked(
-                    setting in ("off", "all")
-                )
+            mtp_choices = page.locator("[data-filter=mtp]").evaluate_all(
+                "nodes => nodes.map(n => n.value)"
+            )
+            for setting in (*mtp_choices, "all"):
+                for choice in mtp_choices:
+                    page.locator(f"[data-filter=mtp][value={choice}]").set_checked(
+                        setting == "all" or setting == choice
+                    )
                 expected = [
                     p
                     for p in default_points
-                    if setting == "all"
-                    or (
-                        p["configuration"]["parameters"].get("mtp_draft_tokens", -1) > 0
-                        if setting == "on"
-                        else p["configuration"]["parameters"].get("mtp_draft_tokens")
-                        == 0
-                    )
+                    if setting == "all" or mtp_state(p) == setting
                 ]
                 ids = page.locator("[data-point]").evaluate_all(
                     "nodes => nodes.map(n => n.dataset.point)"
                 )
-                assert set(ids) == {p["id"] for p in expected}
-                assert_group_frontiers(page, expected)
+                assert set(ids) == {p["id"] for p in expected}, {
+                    "mtp": setting,
+                    "unexpected": sorted(set(ids) - {p["id"] for p in expected}),
+                    "missing": sorted({p["id"] for p in expected} - set(ids)),
+                }
+                assert_concurrency_series(page, expected)
                 page.locator("#frontier-only").check()
-                assert_group_frontiers(page, expected)
+                shown = set(
+                    page.locator("[data-point]").evaluate_all(
+                        "nodes=>nodes.map(n=>n.dataset.point)"
+                    )
+                )
+                assert_concurrency_series(
+                    page, [p for p in expected if p["id"] in shown]
+                )
                 shown = page.locator("[data-point]").evaluate_all(
                     "nodes=>nodes.map(n=>n.dataset.point)"
                 )
@@ -459,13 +540,21 @@ def main():
             for checkbox in page.locator("[data-filter=mtp]").all():
                 checkbox.check()
             # MOD union within its row intersects the MTP row; empty means hide all.
-            page.locator("[data-filter=mods][value=none]").uncheck()
-            page.locator("[data-filter=mtp][value=on]").uncheck()
+            native_groups = {
+                p["load"].get("presentation_group", {}).get("id", "none")
+                for p in default_points
+                if not p["configuration"]["mods"]
+            }
+            for group in native_groups:
+                page.locator(f'[data-filter="mods"][value="{group}"]').uncheck()
+            for choice in mtp_choices:
+                page.locator(f"[data-filter=mtp][value={choice}]").set_checked(
+                    choice == "off"
+                )
             expected = [
                 p
                 for p in default_points
-                if p["configuration"]["mods"]
-                and p["configuration"]["parameters"].get("mtp_draft_tokens") == 0
+                if p["configuration"]["mods"] and mtp_state(p) == "off"
             ]
             assert set(
                 page.locator("[data-point]").evaluate_all(
@@ -479,9 +568,8 @@ def main():
             assert page.locator(".frontier-concurrency-line").count() == 0
             for checkbox in page.locator("[data-filter]").all():
                 checkbox.check()
-            # Keep this pass on the default D1 series after restoring the
-            # other filters; D2 has its own checks above.
-            page.locator('[data-filter="rotation"][value="2"]').uncheck()
+            # The public comparison contains only the unified D1 series.
+            assert page.locator('[data-filter="rotation"][value="2"]').count() == 0
             assert (
                 page.locator(
                     '[data-filter=mods][value="betterscale-AEseparation"]'
@@ -601,8 +689,15 @@ def main():
                         == point["configuration"]["mod_sources"]
                     )
 
+                sampling_start = point["evidence"]["sampling_date_utc"]
+                sampling_end = point["evidence"].get("sampling_date_end_utc")
+                sampling_range = (
+                    f"{sampling_start} – {sampling_end}"
+                    if sampling_end and sampling_end != sampling_start
+                    else sampling_start
+                )
                 assert (
-                    f"{point['evidence']['sampling_date_utc']} (UTC)"
+                    f"{sampling_range} (UTC)"
                     in page.locator(".frontier-popup-date").inner_text()
                 )
 
@@ -626,7 +721,14 @@ def main():
             page.locator("#view-tasks").click()
             assert page.locator("#tasks-panel").is_visible()
             page.locator("#view-frontier").click()
-            assert page.locator("table:visible").count() == 0
+            assert page.locator("#runs-panel table:visible").count() == 0
+            assert page.locator("#tasks-panel table:visible").count() == 0
+            assert (
+                page.locator(
+                    "#frontier-agent-qualifications .agent-qualification-table:visible"
+                ).count()
+                == 1
+            )
             page.locator("#langToggle").click()
             assert not page.locator("#frontier-only").is_checked()
             assert page.locator(".frontier-point").count() == len(default_points)
@@ -669,15 +771,64 @@ def main():
                         path=str(args.output / f"dsv4-{width}-{language}-{scheme}.png"),
                         full_page=True,
                     )
-                if "session_rotation" in cohort["workload"]["contract"]:
-                    assert page.locator(
-                        '[data-filter="rotation"][value="1"]'
-                    ).is_checked()
+                contract = cohort["workload"]["contract"]
+                shared_ids = set(contract.get("comparison_point_ids", []))
                 members = [
-                    p for p in production["points"] if p["cohort_id"] == cohort["id"]
+                    p
+                    for p in production["points"]
+                    if p["cohort_id"] == cohort["id"] or p["id"] in shared_ids
                 ]
-                assert page.locator(".frontier-point").count() == len(members)
-                assert_group_frontiers(page, members)
+                if contract.get("display_series_ids"):
+                    members = [
+                        p
+                        for p in members
+                        if p["load"].get("concurrency_series")
+                        in contract["display_series_ids"]
+                    ]
+                if contract.get("display_series_prefix"):
+                    members = [
+                        p
+                        for p in members
+                        if p["load"]
+                        .get("concurrency_series", "")
+                        .startswith(contract["display_series_prefix"])
+                    ]
+                available_depths = sorted(
+                    {
+                        p["load"]["session_rotation_depth"]
+                        for p in members
+                        if isinstance(p["load"].get("session_rotation_depth"), int)
+                    }
+                )
+                default_groups = set(contract.get("default_groups", []))
+                if default_groups:
+                    members = [
+                        p
+                        for p in members
+                        if (
+                            p.get("study_group", {}).get("id")
+                            or p["load"].get("presentation_group", {}).get("id")
+                            or p["configuration"].get("experiment_group")
+                            or "+".join(sorted(p["configuration"]["mods"]))
+                            or "none"
+                        )
+                        in default_groups
+                    ]
+                if "session_rotation" in cohort["workload"]["contract"]:
+                    assert page.locator('[data-filter="rotation"]').count() == len(
+                        available_depths
+                    )
+                    for depth in available_depths:
+                        assert page.locator(
+                            f'[data-filter="rotation"][value="{depth}"]'
+                        ).is_checked()
+                rendered_point_count = page.locator(".frontier-point").count()
+                assert rendered_point_count == len(members), (
+                    cohort["id"],
+                    len(members),
+                    rendered_point_count,
+                )
+                assert_concurrency_series(page, members, cohort)
                 for point in members:
                     click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
                     popup = page.locator("#frontier-popover")
@@ -692,7 +843,17 @@ def main():
                     file = args.output / f"{width}-{language}-{point['id']}.json"
                     download.save_as(file)
                     payload = json.loads(file.read_text())
-                    assert payload["point"] == point and payload["cohort"] == cohort
+                    source_cohort = next(
+                        c
+                        for c in production["cohorts"]
+                        if c["id"] == point["cohort_id"]
+                    )
+                    assert payload["point"] == point
+                    assert payload["cohort"] == source_cohort
+                    if point["id"] in shared_ids:
+                        assert payload["comparison_cohort"] == cohort
+                    else:
+                        assert "comparison_cohort" not in payload
                     popup.locator("[data-close]").click()
             assert not errors, errors
             reports.append(
@@ -733,7 +894,7 @@ def main():
         assert page.locator(".frontier-model-tag").count() == 2
         assert page.locator("#frontier-workload option").count() == 2
         assert page.locator(".frontier-point").count() == 4
-        assert_group_frontiers(page, fixture["points"][:4])
+        assert_concurrency_series(page, fixture["points"][:4])
         assert page.locator("#frontier-curves").is_visible()
         page.locator("[data-filter=mtp][value=unknown]").uncheck()
         assert page.locator(".frontier-point").count() == 0

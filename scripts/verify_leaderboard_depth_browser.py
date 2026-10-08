@@ -7,7 +7,7 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 from verify_leaderboard_frontier_browser import (
-    assert_group_frontiers,
+    assert_concurrency_series,
     click_point,
     ready,
     verify_rotation_choices,
@@ -68,9 +68,16 @@ def main():
                 assert choices.count() == len(depths)
                 assert all(choice.is_checked() for choice in choices.all())
                 assert page.locator(".frontier-concurrency-label").count() == 0
-                assert_group_frontiers(page, members)
+                assert_concurrency_series(page, members)
                 page.locator("#frontier-only").check()
-                assert_group_frontiers(page, members)
+                shown = set(
+                    page.locator("[data-point]").evaluate_all(
+                        "nodes=>nodes.map(n=>n.dataset.point)"
+                    )
+                )
+                assert_concurrency_series(
+                    page, [p for p in members if p["id"] in shown]
+                )
                 page.locator("#frontier-only").uncheck()
                 toggle = page.locator("#frontier-mods-toggle")
                 assert toggle.inner_text() == (
@@ -116,14 +123,21 @@ def main():
                             "nodes=>nodes.map(n=>n.dataset.point)"
                         )
                     ) == {v["id"] for v in expected}
-                    assert_group_frontiers(page, expected)
+                    assert_concurrency_series(page, expected)
                     assert (
                         f"{len(expected)} / {len(expected)}"
                         in page.locator("#frontier-filter-count").inner_text()
                     )
                     assert f"D{depth}" in page.locator("#frontier-chart").text_content()
                     page.locator("#frontier-only").check()
-                    assert_group_frontiers(page, expected)
+                    shown = set(
+                        page.locator("[data-point]").evaluate_all(
+                            "nodes=>nodes.map(n=>n.dataset.point)"
+                        )
+                    )
+                    assert_concurrency_series(
+                        page, [p for p in expected if p["id"] in shown]
+                    )
                     page.locator("#frontier-only").uncheck()
                     click_point(
                         page, page.locator(f'[data-point="{expected[0]["id"]}"]')

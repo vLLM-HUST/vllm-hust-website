@@ -27,13 +27,14 @@ workload identities; never silently mix them.
 - An external right sidebar has checkbox rows for MOD and MTP (on/off; unknown when present). All
   options start checked; choices within a row union and the rows intersect. Unchecking a whole row
   hides all points. **Concurrent service scale** is another checkbox row: observed depths may
-  overlay but retain independent best-trade-off boundaries. All start checked, including a single
-  available depth. Choices survive language changes and reset on model/workload changes.
-  Visible/total counts are scoped to selected scales. MOD / Group offers Select all / Deselect all
-  without changing other rows. Mobile stacks the sidebar below the chart. A single workload is a
-  selected-style static tag; multiple workloads use a selector.
+  overlay but retain independent measurement series. All start checked, including a single available
+  depth. Choices survive language changes and reset on model/workload changes. Visible/total counts
+  are scoped to selected scales. MOD / Group offers Select all / Deselect all without changing other
+  rows. Mobile stacks the sidebar below the chart. A single workload is a selected-style static tag;
+  multiple workloads use a selector.
 - Per-point concurrency/session tags appear in the click popover, not as persistent chart labels.
-  Keep the series legend and accessible point names; leave the plot for dots and frontier lines.
+  Keep the series legend and accessible point names; leave the plot for dots and measured-series
+  lines.
 - Axes are fixed: **X = P90 per-request decode speed (output tokens/s/user)**; **Y = total output
   tokens/s / all allocated chips**. No axis, hardware or MOD filters.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
@@ -43,9 +44,20 @@ workload identities; never silently mix them.
   improves both chart metrics. Slower trade-offs and failed-correctness references are not invalid.
   MOD/MTP filters recompute membership; the preference survives language and cohort changes.
   Identical-configuration BetterScale repeats use the documented
-  [whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), retaining inferior raw evidence. The
-  observed best-trade-off boundary is a visual guide, not a globally optimal or statistically
-  certified curve.
+  [whole-run best-of selection](FRONTIER-REPEAT-SELECTION.md), retaining inferior raw evidence.
+- BetterScale uses the short **BetterScale** group/legend label; graph mode, execution/resident
+  seats, balanced attention and state-cache policy appear in its popover. The main unified
+  concurrency comparison retains only its declared C1–C16 sweeps. The October6 fixed-E36 and
+  width-matched extensions through C56 belong exclusively in the final residency/cache study,
+  following Fletcher's corrected publication placement; neither campaign appears in the first chart.
+- **BetterScale residency and cache studies** references 21 immutable source points through
+  `workload.contract.comparison_point_ids`. Native C1/C2/C4/C8/C16 forms one fixed-configuration
+  reference line. BetterScale has three separate lines: original tuned C1–C32, fixed E36/R36
+  C32/36/37/40, and width-matched C37/40/44/48/52/56. The latter changes E/R with concurrency; it is
+  not a fixed-capacity sweep or causal ablation. All are selected by default. Original
+  residency/cache groups remain independent dots available via their checkboxes. Source points,
+  archived repeats, metrics and provenance are unchanged; downloads include source cohort plus
+  `comparison_cohort`. See [the width-matched boundary](FRONTIER-QWEN35-CONCURRENCY-WIDTH.md).
 - Clicking or keyboard-activating a point opens a small floating card with hardware, parallelism,
   session concurrency, MTP, request limit, explicit KV budget, UTC sampling date and the two
   coordinate values. `evidence.sampling_date_utc` is a calendar-valid YYYY-MM-DD date, with
@@ -56,8 +68,8 @@ workload identities; never silently mix them.
 - **Download configuration** exports a JSON containing the complete point and cohort, including
   original metrics, protocol, configuration and evidence references. The page does not dump JSON,
   show a configuration table, or display lengthy evidence/methodology sections.
-- A compact **15 min smoke** badge identifies the current short-run cohort. Full limitations stay in
-  its download and linked report, not in a large page banner.
+- A compact evidence-status badge distinguishes an engineering measurement from a measured setting.
+  Full limitations stay in its download and linked report, not in a large page banner.
 - A small **Concurrency curves** link opens the current cohort's static diagnostic SVG; it does not
   introduce additional selectors. `workload.contract.concurrency_curves_url` accepts only a local
   `./assets/*.svg` path with an optional version query. Invalid/absent links stay hidden.
@@ -66,20 +78,20 @@ workload identities; never silently mix them.
 
 ## Data handoff
 
-As of2026-09-27 the main chart draws **one observed best-trade-off boundary per baseline/MOD and
-session rotation depth**, within the selected model/precision/workload cohort. Each group
-independently chooses whole records for which no peer improves both metrics across parallel layouts,
-concurrency, capacity and other allowed settings. No other MOD can remove the baseline's line.
-Vertices are ordered by decode speed, not concurrency; this is a best-configuration envelope, not a
-controlled concurrency sweep or a continuous measured performance curve. Filters recompute each
-group's boundary. Equal coordinate ties use one stable point ID for the line while retaining all
-point records; singletons have no line. Failed-correctness references cannot contribute to or
-dominate a boundary. The old global dashed envelope is removed.
+BetterScale connects one Pareto frontier per cohort × MOD/group × session-rotation depth, across
+workload-tuned slot configurations. Vertices are whole measured records, ordered by P90 decode
+speed; dominated observations remain visible but are not line vertices, coordinate ties share one
+vertex, failed-correctness references are excluded, and singletons have no line. A source-only
+comment at checkbox construction explains why E16/R20 and C32 (actually E36/R36) belong to one
+family; no explanatory note is rendered beneath the checkbox. This is a best measured trade-off
+boundary, not a claim of one fixed-slot sweep or an interpolated measurement. Filters recompute that
+boundary.
 
-All measured dots are shown by default and remain inspectable by leaving **Best trade-off points
-only** unchecked. Original `load.concurrency_series` metadata and the linked static diagnostic
-sweeps remain unchanged; they still describe fixed-configuration studies but no longer determine
-main-chart lines.
+Other groups retain one line for each declared `load.concurrency_series` within the selected cohort
+and rotation depth, ordered by client concurrency. Their lines represent actual sweeps; filters can
+shorten or remove them. All measurements remain inspectable by leaving **Best trade-off points
+only** unchecked. The footer reports points that are not on any displayed line. Original series
+metadata and static diagnostics preserve their fixed-configuration meaning.
 
 Fletcher withdrew BetterScale AE separation from display on2026-09-25. Its four then-visible
 AgentX/SWE observations now reside in `archived_points` with `display_withdrawal`; earlier archived

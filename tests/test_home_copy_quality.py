@@ -38,12 +38,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "Typed runtime contracts. 18 cataloged MODs. Evidence before claims.",
+        "Typed runtime contracts. 26 cataloged MODs. Evidence before claims.",
         "every MOD publishes ownership, compatibility, workload fit, and evidence limits.",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "类型化运行时契约、18 个目录 MOD、证据先于结论。",
+        "类型化运行时契约、26 个目录 MOD、证据先于结论。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
@@ -89,6 +89,11 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
         item.get("public_surface", True) is not False
         and (
             item["id"] in measured
+            or (
+                item["artifact_type"] == "bridge"
+                and item.get("compatibility", {}).get("status") == "verified"
+                and item["canonical_repository"].startswith("https://github.com/")
+            )
             or (
                 (
                     item["artifact_type"] in {"runtime_component", "bridge"}

@@ -185,3 +185,50 @@ For depth-control-only changes, use `scripts/verify_leaderboard_depth_browser.py
 responsive/multi-selection/isolation checks. The full Frontier checker downloads every historical
 point in four views and took about20 minutes; do not make that exhaustive traversal the default for
 a small selector edit. Keep the full check for evidence/export changes.
+
+On October1 Fletcher explicitly restored the historical FULL-cache E36/R36 C32 observation
+(`qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928`,613.88tokens/s/chip) from commit `85f6d48`
+to the main SWE comparison. It is not part of the fixed E16/R20 C1–C16 sweep. Fletcher subsequently
+unified C32 and E16/R20 under one **BetterScale** tag/checkbox: slot counts may be tuned for the
+workload and do not create another MOD identity. The group is selected by default; graph mode,
+execution/resident seats, balanced attention and cache policy belong in the popover. The original
+metrics, run ID and configuration were unchanged; the C32 full-cache point moved out of the cache
+study, while its incremental-cache peer remains there.
+
+Fletcher then requested a connected BetterScale frontier: the main chart uses group Pareto vertices
+across workload-tuned slots, within cohort and rotation depth, rather than its fixed-configuration
+concurrency line. Other MODs retain measured-series lines. Fletcher clarified that the rationale
+belongs only in the source comment at checkbox construction, not on the webpage: slot capacity is
+tunable, C32 uses E36/R36, and both are one configuration family. Keep immutable load/configuration
+evidence intact.
+
+On October1 PR#340 excluded C32 again by restricting the main display whitelist to complete C1–C16
+sweeps. Fletcher accepted that main-chart scope and instead requested the six-point BetterScale
+C1–C32 line in **BetterScale residency and cache studies**, alongside only Native vLLM752a3a5 /
+Ascend9bf964c FULL_AND_PIECEWISE C1–C16. The study references the eleven existing records through
+`comparison_point_ids`; do not duplicate or move measurements, resurrect C32 in the main whitelist,
+invent a native C32 value, or connect unrelated cache-ablation dots. All six BetterScale points are
+joined in concurrency order, with E16/R20 versus E36/R36 retained in their original configurations.
+Download the source cohort and the study separately. The bounded browser check is
+`scripts/verify_betterscale_study_browser.cjs`.
+
+On October6 Fletcher corrected publication placement: both new concurrency campaigns belong only in
+the final **BetterScale residency and cache studies**, never the first/main chart. Remove their
+series from the main display whitelist and reuse all ten selected source IDs through the study
+comparison contract, preserving source points and archived repeats. The study has 21 shared points
+and four lines: Native, original tuned BetterScale, fixed E36/R36, and width-matched BetterScale. Do
+not join campaigns at overlapping concurrency values or restore them to the main whitelist. See
+`docs/FRONTIER-QWEN35-CONCURRENCY-KNEE.md`; do not present the C37 overload cliff as physical device
+capacity. The next investigation increases execution and residency together. Metadata-only raw-byte
+replacement of tokenizer path and transformers version exactly reconstructs historical8044561f from
+prepared3879dff; historical client8bb99eb and runtime identity still differ.
+
+The later October6 width extension adds eight valid900s observations/six retained configurations
+through C56; see `docs/FRONTIER-QWEN35-CONCURRENCY-WIDTH.md`. Capacity64 is an explicit source
+patch, not unchanged96cd03a. Keep E/R-specific series IDs even though one BetterScale study group
+spans those capacities; singleton settings do not imply fixed-configuration sweeps. The first C56
+window was contaminated by a parallel retrieval helper retaining another server's port and is
+excluded, not a poorer repeat. Two300s cache-observer diagnostics are also not ranking scores.
+Preserve the corrected endpoint receipts and the distinct source/configuration/card/co-run context
+when importing new observations. Measured C48–C52 TTFT degradation is budget/workload-specific, not
+a hardware limit.
