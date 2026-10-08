@@ -1494,6 +1494,58 @@
         "requirements_en": "Scheduler injection is patch-free. Step/device correlation additionally requires the explicit transport-worker patch and supported profiler evidence. Not an Extension Manager bundle. Different runtime revisions need a source audit; graph/distributed capture coverage and overhead are not qualified.",
         "requirements_zh": "Scheduler 注入无需源码补丁；step/device 关联另需显式 transport-worker 补丁及受支持的 profiler 证据。不是 Extension Manager bundle。其他运行时版本需源代码审计；graph/分布式采集覆盖与记录开销尚未验收。"
       }
+    },
+    {
+      "id": "core-attention-boundary",
+      "public_surface": true,
+      "name": "Core Attention Boundary",
+      "name_en": "Core Attention Boundary",
+      "name_zh": "Core 注意力边界",
+      "artifact_type": "runtime_component",
+      "system_role": "attention_execution_policy",
+      "integration_contracts": [],
+      "integration_surfaces": [
+        "vllm.general_plugins",
+        "core attention decode/extend/prefill boundary"
+      ],
+      "execution_planes": [
+        "worker",
+        "native"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "python_distribution",
+      "ownership": "external_contributor_maintained",
+      "repository_relationship": "external_subsystem",
+      "maturity": "experimental",
+      "canonical_repository": "https://github.com/xmdhb/vllm-hust-core-attention-boundary",
+      "upstream_repository": null,
+      "summary_en": "Public preview of a default-off core attention boundary search component. The canonical Qwen3.5 TP2+EP C1/C2/C4/C8/C16 ON/OFF archive uses the reviewed workload and tokenizer and records startup activation plus runtime-effective events; those events are not isolated to each formal window, so no causal performance attribution is claimed. The measured MOD revision is publicly pinned by tag op02-measured-8b5ebb1.",
+      "summary_zh": "默认关闭的 Core 注意力边界搜索组件，现作为公开 preview 发布。本地 canonical Qwen3.5 TP2+EP C1/C2/C4/C8/C16 ON/OFF 归档使用已核对的 workload 和 tokenizer，并记录了启动激活及 runtime-effective 事件；这些事件尚未隔离到每个正式窗口，因此不宣称性能因果归因。实测 MOD revision 已通过 tag op02-measured-8b5ebb1 公开固定。",
+      "public_effect_en": "The local C1/C2/C4/C8/C16 ON/OFF observations are retained as protocol evidence only. One observation per point does not establish a causal speedup or a general performance result.",
+      "public_effect_zh": "本地 C1/C2/C4/C8/C16 ON/OFF 观测仅作为协议证据保留；每个点只有一次观测，不能证明因果加速或一般性能结果。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+      "compatibility": {
+        "status": "experimental",
+        "host": "vLLM 0.23.0+empty + vLLM-Ascend 0.23.0.post1",
+        "versions": [
+          "vllm-hust-core-attention-boundary 0.1.0.dev0 @ 8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "Extension Manager 0.2.0.dev0 @ 52e96021c8017938b133ddba895795a13f707568"
+        ],
+        "platforms": [
+          "Ascend 910B2 · TP2+EP · FULL_DECODE_ONLY"
+        ],
+        "models": [
+          "Qwen3.5-35B-A3B · local C1/C2/C4/C8/C16 protocol observations"
+        ],
+        "python": [
+          ">=3.10"
+        ],
+        "requirements_en": "Install into the reviewed vLLM/vLLM-Ascend 0.23 deployment and keep the component default-off. The canonical workload and tokenizer identities, public source revision and public raw formal artifacts are available. Runtime-effective evidence is not isolated to each formal window, benchmark-client source linkage remains pending, and no causal performance attribution is claimed.",
+        "requirements_zh": "安装到已核对的 vLLM/vLLM-Ascend 0.23 环境，并保持组件默认关闭。canonical workload、tokenizer、公开源码版本和正式原始数据已经公开。runtime-effective 证据尚未隔离到每个正式窗口，benchmark 客户端源码关联仍待补齐，不宣称性能因果归因。"
+      },
+      "evidence_level": "hardware_verified"
     }
+
   ]
 }

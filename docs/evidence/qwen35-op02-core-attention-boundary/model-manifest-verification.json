@@ -1,0 +1,30 @@
+{
+  "schema": "frontier-local-verification/v1",
+  "verified_at_utc": "2026-10-05",
+  "purpose": "Local receipt for the OP02 server model and tokenizer identity checks; not a public raw-run archive.",
+  "remote_model_path": "/models/Qwen3.5-35B-A3B",
+  "canonical_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+  "canonical_model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+  "expected_manifest": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+  "model_file_check": {
+    "expected_entries": 22,
+    "remote_entries": 22,
+    "missing_entries": 0,
+    "sha256_mismatches": 0,
+    "result": "all 22 remote files match the existing manifest"
+  },
+  "remote_check": {
+    "command": "cd /models/Qwen3.5-35B-A3B && sha256sum model.safetensors-*.safetensors config.json tokenizer.json tokenizer_config.json chat_template.jinja model.safetensors.index.json generation_config.json merges.txt vocab.json",
+    "host": "root@223.92.35.180:31830",
+    "host_label": "coder-user-k8s-569d889654-rzjvj"
+  },
+  "tokenizer_check": {
+    "procedure": "swe-prefix-reuse prepare.py fingerprint: sha256(backend_tokenizer.to_str() + chat_template)",
+    "transformers": "5.18.0",
+    "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+    "chat_template_sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715",
+    "backend_json_sha256": "4d765ac5a92a75f240af39f9358a09a140216dce113e57754c91042ef8b9e4e8",
+    "canonical_fingerprint_equal": false,
+    "interpretation": "The runtime fingerprint and tokenizer files are recorded and verified separately; the runtime fingerprint is not claimed equal to the cohort canonical fingerprint."
+  }
+}

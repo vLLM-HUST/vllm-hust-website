@@ -28427,6 +28427,1959 @@
         "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
         "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
       }
+    },
+    {
+      "run_id": "5f0ead007cb449fd8cc90a365cbf975c",
+      "point_id": "qwen35-op02-core-attention-boundary-off-tp2ep-c1-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 104,
+        "max_prompt_tokens_observed": 41173,
+        "prompt_tokens_p50": 14592,
+        "max_turn_index_reached": 34,
+        "distinct_trajectories_started": 5,
+        "sessions_completed": 4,
+        "requests_completed_in_window": 103,
+        "requests_drained": 1,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 47127,
+        "output_tokens_per_second": 52.36333333333334,
+        "output_tokens_per_second_per_chip": 26.18166666666667,
+        "decode_tokens_per_second_p90": 66.093014062234,
+        "decode_speed_samples": 103,
+        "ttft_seconds_p95": 2.5507555278018113,
+        "client_inflight_seconds": {
+          "0": 0.3784421617165208,
+          "1": 899.6215578382835
+        },
+        "mean_client_inflight": 0.9995795087092039,
+        "full_concurrency_fraction": 0.9995795087092039,
+        "drain_seconds": 5.51573779899627,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 52.36333333333334,
+        "decode_p90_tps": 66.093014062234,
+        "ttft_p95_ms": 2550.7555278018112,
+        "tpot_ms": 16.540027388039423,
+        "tpot_p95_ms": 18.21715686548535,
+        "e2e_p95_ms": 22927.79282554983,
+        "completed_requests": 103
+      },
+      "requests_artifact_sha256": "71d44a441b77087e820ec31e3130615269dff9f45916eaf68df5273d594c212c",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c1-900s/config.json",
+          "sha256": "6ceb90b75adb23c298c8889ef1a80206100889f26cb6f4a27afe7f480e689af5",
+          "bytes": 3946
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c1-900s/summary.json",
+          "sha256": "a851206c553bcce9ae821e01e11bff337e05d99519e7df28e0cb019ecfdb9050",
+          "bytes": 897
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c1-900s/requests.jsonl",
+          "sha256": "71d44a441b77087e820ec31e3130615269dff9f45916eaf68df5273d594c212c",
+          "bytes": 1337068
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "sha256": "eef557d38c6d207afc69114f148ae5e9a0676c4c48246023eacc7d6fe405e951",
+          "bytes": 269887
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": false,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "off_definition": "Manager disabled; VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE=0; VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH=0",
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "5f0ead007cb449fd8cc90a365cbf975c",
+        "started_at_unix": 1791410888.4841218,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "14bc14425db344c7babb17b03f56e0a0",
+      "point_id": "qwen35-op02-core-attention-boundary-off-tp2ep-c2-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 146,
+        "max_prompt_tokens_observed": 50915,
+        "prompt_tokens_p50": 17859,
+        "max_turn_index_reached": 36,
+        "distinct_trajectories_started": 6,
+        "sessions_completed": 4,
+        "requests_completed_in_window": 144,
+        "requests_drained": 2,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 80600,
+        "output_tokens_per_second": 89.55555555555556,
+        "output_tokens_per_second_per_chip": 44.77777777777778,
+        "decode_tokens_per_second_p90": 60.08638206571462,
+        "decode_speed_samples": 144,
+        "ttft_seconds_p95": 3.2660915138199926,
+        "client_inflight_seconds": {
+          "0": 0.00010955147445201874,
+          "1": 0.5744268922135234,
+          "2": 899.425463556312
+        },
+        "mean_client_inflight": 1.9993615044498194,
+        "full_concurrency_fraction": 0.9993616261736801,
+        "drain_seconds": 20.656142484396696,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 89.55555555555556,
+        "decode_p90_tps": 60.08638206571462,
+        "ttft_p95_ms": 3266.0915138199925,
+        "tpot_ms": 19.589497287007635,
+        "tpot_p95_ms": 27.51353673858521,
+        "e2e_p95_ms": 39086.37546864337,
+        "completed_requests": 144
+      },
+      "requests_artifact_sha256": "06d6244b9ec16ae70d476685f628a43b8d27046468a687be9af619f1fc1b2287",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c2-900s/config.json",
+          "sha256": "10740c607e6482a0156254284e33aa79b5358d6315d3218628f9dbcc7a7cfdf0",
+          "bytes": 3946
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c2-900s/summary.json",
+          "sha256": "27a58ee2e4627c978af0c839b4e7b61b536229aaf0bc16d08d7bb0452607d8a0",
+          "bytes": 933
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c2-900s/requests.jsonl",
+          "sha256": "06d6244b9ec16ae70d476685f628a43b8d27046468a687be9af619f1fc1b2287",
+          "bytes": 2283564
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "sha256": "eef557d38c6d207afc69114f148ae5e9a0676c4c48246023eacc7d6fe405e951",
+          "bytes": 269887
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": false,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "off_definition": "Manager disabled; VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE=0; VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH=0",
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "14bc14425db344c7babb17b03f56e0a0",
+        "started_at_unix": 1791411794.6029937,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "25b101bed670404e8cd0f68620481338",
+      "point_id": "qwen35-op02-core-attention-boundary-off-tp2ep-c4-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 208,
+        "max_prompt_tokens_observed": 49883,
+        "prompt_tokens_p50": 19883.5,
+        "max_turn_index_reached": 35,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 4,
+        "requests_completed_in_window": 204,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 123521,
+        "output_tokens_per_second": 137.24555555555557,
+        "output_tokens_per_second_per_chip": 68.62277777777778,
+        "decode_tokens_per_second_p90": 55.75781425392257,
+        "decode_speed_samples": 204,
+        "ttft_seconds_p95": 3.2750906466972083,
+        "client_inflight_seconds": {
+          "0": 0.0001660119742155075,
+          "1": 0.0012361342087388039,
+          "2": 0.0007197577506303787,
+          "3": 0.9279980892315507,
+          "4": 899.0698800068349
+        },
+        "mean_client_inflight": 3.998962433271938,
+        "full_concurrency_fraction": 0.9989665333409277,
+        "drain_seconds": 49.63705284893513,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 137.24555555555557,
+        "decode_p90_tps": 55.75781425392257,
+        "ttft_p95_ms": 3275.0906466972083,
+        "tpot_ms": 25.419675081342547,
+        "tpot_p95_ms": 37.89374614379876,
+        "e2e_p95_ms": 63471.08877073036,
+        "completed_requests": 204
+      },
+      "requests_artifact_sha256": "9c162598d3bef593000e015a4812b1264e80a5e3c0dadad7ef63953dfd1a4aec",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c4-900s/config.json",
+          "sha256": "2e2d5df4c6aafc7ad89342812931f7b2d2b21bd14c49ffe70f37cfa83d78c7e2",
+          "bytes": 3946
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c4-900s/summary.json",
+          "sha256": "9a18ed7a4b02fa72e68228a6c32ae0cf26a9bc4145817e8c6f79c4cd8e222340",
+          "bytes": 997
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c4-900s/requests.jsonl",
+          "sha256": "9c162598d3bef593000e015a4812b1264e80a5e3c0dadad7ef63953dfd1a4aec",
+          "bytes": 3549950
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "sha256": "eef557d38c6d207afc69114f148ae5e9a0676c4c48246023eacc7d6fe405e951",
+          "bytes": 269887
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": false,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "off_definition": "Manager disabled; VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE=0; VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH=0",
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "25b101bed670404e8cd0f68620481338",
+        "started_at_unix": 1791412715.9641387,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "c2611445154949e4ad517a431916dbcb",
+      "point_id": "qwen35-op02-core-attention-boundary-off-tp2ep-c8-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 316,
+        "max_prompt_tokens_observed": 59957,
+        "prompt_tokens_p50": 16104.5,
+        "max_turn_index_reached": 41,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 7,
+        "requests_completed_in_window": 308,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 169275,
+        "output_tokens_per_second": 188.08333333333334,
+        "output_tokens_per_second_per_chip": 94.04166666666667,
+        "decode_tokens_per_second_p90": 41.10988437400869,
+        "decode_speed_samples": 308,
+        "ttft_seconds_p95": 3.2935760873369873,
+        "client_inflight_seconds": {
+          "0": 0.000173141248524189,
+          "1": 0.0010434119030833244,
+          "2": 0.0007313881069421768,
+          "3": 0.0006250571459531784,
+          "4": 0.0006201686337590218,
+          "5": 0.000644276849925518,
+          "6": 0.0009453603997826576,
+          "7": 1.2822316633537412,
+          "8": 898.7129855323583
+        },
+        "mean_client_inflight": 7.998550290536756,
+        "full_concurrency_fraction": 0.9985699839248425,
+        "drain_seconds": 49.21178074926138,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 188.08333333333334,
+        "decode_p90_tps": 41.10988437400869,
+        "ttft_p95_ms": 3293.5760873369873,
+        "tpot_ms": 39.46613828109091,
+        "tpot_p95_ms": 59.91306679970036,
+        "e2e_p95_ms": 76880.33112548287,
+        "completed_requests": 308
+      },
+      "requests_artifact_sha256": "cb3fc398971000b8e3d031f542a824bc60972b1bfa8e572a7ae485b894661c9f",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c8-900s/config.json",
+          "sha256": "8426cd1aaca505157897ec27d5485159ead408a98af9a81ddd6687ce01ef5c77",
+          "bytes": 3944
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c8-900s/summary.json",
+          "sha256": "41ad9b04292ba035778449ae5cf976e73e5192d4b721a6fc6ed35ea08a11c205",
+          "bytes": 1123
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c8-900s/requests.jsonl",
+          "sha256": "cb3fc398971000b8e3d031f542a824bc60972b1bfa8e572a7ae485b894661c9f",
+          "bytes": 4982217
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "sha256": "eef557d38c6d207afc69114f148ae5e9a0676c4c48246023eacc7d6fe405e951",
+          "bytes": 269887
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": false,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "off_definition": "Manager disabled; VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE=0; VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH=0",
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "c2611445154949e4ad517a431916dbcb",
+        "started_at_unix": 1791413666.49298,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "3eca9be473b34e3294106d1e5d8b4a5e",
+      "point_id": "qwen35-op02-core-attention-boundary-off-tp2ep-c16-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 445,
+        "max_prompt_tokens_observed": 50188,
+        "prompt_tokens_p50": 13896,
+        "max_turn_index_reached": 31,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 429,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 240231,
+        "output_tokens_per_second": 266.92333333333335,
+        "output_tokens_per_second_per_chip": 133.46166666666667,
+        "decode_tokens_per_second_p90": 27.61651254041345,
+        "decode_speed_samples": 429,
+        "ttft_seconds_p95": 3.9933288831263725,
+        "client_inflight_seconds": {
+          "0": 0.00020626187324523926,
+          "1": 0.0009748218581080437,
+          "2": 0.0007460275664925575,
+          "3": 0.0006206082180142403,
+          "4": 0.0006215069442987442,
+          "5": 0.0009087603539228439,
+          "6": 0.0006821677088737488,
+          "7": 0.0007050279527902603,
+          "8": 0.0006662076339125633,
+          "9": 0.0006141075864434242,
+          "10": 0.0006147967651486397,
+          "11": 0.0005995268002152443,
+          "12": 0.0008581206202507019,
+          "13": 0.0006857877597212791,
+          "14": 0.0006448579952120781,
+          "15": 1.4202184304594994,
+          "16": 898.5696329819039
+        },
+        "mean_client_inflight": 15.998321812213916,
+        "full_concurrency_fraction": 0.9984107033132265,
+        "drain_seconds": 71.61146533768624,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 266.92333333333335,
+        "decode_p90_tps": 27.61651254041345,
+        "ttft_p95_ms": 3993.3288831263726,
+        "tpot_ms": 58.90621694127593,
+        "tpot_p95_ms": 92.87436597611568,
+        "e2e_p95_ms": 104805.16724176705,
+        "completed_requests": 429
+      },
+      "requests_artifact_sha256": "08866fd5393502c7ded0eeb21b0ef9c86cc3143dfaf3843a80cd1a5f75308720",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c16-900s/config.json",
+          "sha256": "b1c2e09c4a13aea57a188d92faf0377592271ab55869760bc0c7a9636fca713d",
+          "bytes": 3947
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c16-900s/summary.json",
+          "sha256": "d630627bc724a0808fc0465d31c89db0c4527907c504d5c04838d2a0664a0c8b",
+          "bytes": 1392
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/off-c16-900s/requests.jsonl",
+          "sha256": "08866fd5393502c7ded0eeb21b0ef9c86cc3143dfaf3843a80cd1a5f75308720",
+          "bytes": 7146585
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "sha256": "eef557d38c6d207afc69114f148ae5e9a0676c4c48246023eacc7d6fe405e951",
+          "bytes": 269887
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": false,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 0,
+          "runtime_effective": 0
+        },
+        "patch_requested": false,
+        "off_definition": "Manager disabled; VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE=0; VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH=0",
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "3eca9be473b34e3294106d1e5d8b4a5e",
+        "started_at_unix": 1791414616.8355458,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "637029d279a94358b95a59b403e152df",
+      "point_id": "qwen35-op02-core-attention-boundary-on-tp2ep-c1-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 115,
+        "max_prompt_tokens_observed": 41173,
+        "prompt_tokens_p50": 16107,
+        "max_turn_index_reached": 34,
+        "distinct_trajectories_started": 5,
+        "sessions_completed": 4,
+        "requests_completed_in_window": 114,
+        "requests_drained": 1,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 51061,
+        "output_tokens_per_second": 56.73444444444444,
+        "output_tokens_per_second_per_chip": 28.36722222222222,
+        "decode_tokens_per_second_p90": 72.89414522748963,
+        "decode_speed_samples": 114,
+        "ttft_seconds_p95": 2.4697590924799444,
+        "client_inflight_seconds": {
+          "0": 0.4223927818238735,
+          "1": 899.5776072181761
+        },
+        "mean_client_inflight": 0.9995306746868624,
+        "full_concurrency_fraction": 0.9995306746868624,
+        "drain_seconds": 16.553082574158907,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 56.73444444444444,
+        "decode_p90_tps": 72.89414522748963,
+        "ttft_p95_ms": 2469.7590924799442,
+        "tpot_ms": 14.904861635246816,
+        "tpot_p95_ms": 16.7917792483265,
+        "e2e_p95_ms": 22287.49477458185,
+        "completed_requests": 114
+      },
+      "requests_artifact_sha256": "98a5d7e36ec2f1348cacca19aa1ff22a8ef00531f963d81bbf49f4d9ef26e8eb",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c1-900s/config.json",
+          "sha256": "49d1ab7c604dfb359e0958479f3caca9a79c3a69664a80b145399a618bd375c2",
+          "bytes": 3945
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c1-900s/summary.json",
+          "sha256": "9663e4e597f1cce8a4569028a1c73437da8f5eb93788838969ccd0727712c5be",
+          "bytes": 901
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c1-900s/requests.jsonl",
+          "sha256": "98a5d7e36ec2f1348cacca19aa1ff22a8ef00531f963d81bbf49f4d9ef26e8eb",
+          "bytes": 1467373
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "sha256": "68ec059f3810f8aa8074d9823f3ee5f614e28fa93a5c634cb1b6df3947d2c064",
+          "bytes": 266713
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": true,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "off_definition": null,
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "637029d279a94358b95a59b403e152df",
+        "started_at_unix": 1791415973.0172257,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 1,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "5950550a1f034545b488a373779e8f6d",
+      "point_id": "qwen35-op02-core-attention-boundary-on-tp2ep-c2-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 149,
+        "max_prompt_tokens_observed": 52505,
+        "prompt_tokens_p50": 17885,
+        "max_turn_index_reached": 38,
+        "distinct_trajectories_started": 7,
+        "sessions_completed": 5,
+        "requests_completed_in_window": 147,
+        "requests_drained": 2,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 82422,
+        "output_tokens_per_second": 91.58,
+        "output_tokens_per_second_per_chip": 45.79,
+        "decode_tokens_per_second_p90": 62.17201974657671,
+        "decode_speed_samples": 147,
+        "ttft_seconds_p95": 3.305607937835157,
+        "client_inflight_seconds": {
+          "0": 0.00011496059596538544,
+          "1": 0.6400857819244266,
+          "2": 899.3597992574796
+        },
+        "mean_client_inflight": 1.9992885381076484,
+        "full_concurrency_fraction": 0.999288665841644,
+        "drain_seconds": 3.4876792365685105,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 91.58,
+        "decode_p90_tps": 62.17201974657671,
+        "ttft_p95_ms": 3305.607937835157,
+        "tpot_ms": 19.0430834830908,
+        "tpot_p95_ms": 26.97612532112784,
+        "e2e_p95_ms": 38225.047141406656,
+        "completed_requests": 147
+      },
+      "requests_artifact_sha256": "ac6792b392ef471217af8a8684449775a132390c695593b1fc0387f85e22d986",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c2-900s/config.json",
+          "sha256": "a8418a78282c73c7ccc9c952eaefe89dda45af532fcf0c831662343296011d59",
+          "bytes": 3944
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c2-900s/summary.json",
+          "sha256": "65f2c8d0ff5a17630587e2340e3b5abce3f9fd2f5e091f1ef0173ec6de8f0f35",
+          "bytes": 908
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c2-900s/requests.jsonl",
+          "sha256": "ac6792b392ef471217af8a8684449775a132390c695593b1fc0387f85e22d986",
+          "bytes": 2308737
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "sha256": "68ec059f3810f8aa8074d9823f3ee5f614e28fa93a5c634cb1b6df3947d2c064",
+          "bytes": 266713
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": true,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "off_definition": null,
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "5950550a1f034545b488a373779e8f6d",
+        "started_at_unix": 1791416890.198418,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 2,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "6beae74d687544e7964ecb8d68e9c602",
+      "point_id": "qwen35-op02-core-attention-boundary-on-tp2ep-c4-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 206,
+        "max_prompt_tokens_observed": 49428,
+        "prompt_tokens_p50": 19753,
+        "max_turn_index_reached": 34,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 4,
+        "requests_completed_in_window": 202,
+        "requests_drained": 4,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 122949,
+        "output_tokens_per_second": 136.61,
+        "output_tokens_per_second_per_chip": 68.305,
+        "decode_tokens_per_second_p90": 55.148554889914685,
+        "decode_speed_samples": 202,
+        "ttft_seconds_p95": 3.240114422561595,
+        "client_inflight_seconds": {
+          "0": 0.00013449136167764664,
+          "1": 0.0010227020829916,
+          "2": 0.0007428182289004326,
+          "3": 0.9064032640308142,
+          "4": 899.0916967242956
+        },
+        "mean_client_inflight": 3.998987227808684,
+        "full_concurrency_fraction": 0.9989907741381062,
+        "drain_seconds": 50.22435566782951,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 136.61,
+        "decode_p90_tps": 55.148554889914685,
+        "ttft_p95_ms": 3240.1144225615953,
+        "tpot_ms": 25.526459064074885,
+        "tpot_p95_ms": 37.36723162068323,
+        "e2e_p95_ms": 65786.11326827653,
+        "completed_requests": 202
+      },
+      "requests_artifact_sha256": "d417a01d6b609af370f98832d73359799ef593183e096c67e773463028ab9b2f",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c4-900s/config.json",
+          "sha256": "760b0edd003eab203edded5a5b9c2662147cf17b0654395245c2174b62144ed4",
+          "bytes": 3945
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c4-900s/summary.json",
+          "sha256": "03360a6a42bda39e22d18f73daecf78e6bc5884a50671540b6ed8c096835e6d8",
+          "bytes": 972
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c4-900s/requests.jsonl",
+          "sha256": "d417a01d6b609af370f98832d73359799ef593183e096c67e773463028ab9b2f",
+          "bytes": 3537428
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "sha256": "68ec059f3810f8aa8074d9823f3ee5f614e28fa93a5c634cb1b6df3947d2c064",
+          "bytes": 266713
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": true,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "off_definition": null,
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "6beae74d687544e7964ecb8d68e9c602",
+        "started_at_unix": 1791417794.3910437,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 4,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "02c997e6d22c4a18bd8e3cfa2cbdbab0",
+      "point_id": "qwen35-op02-core-attention-boundary-on-tp2ep-c8-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 313,
+        "max_prompt_tokens_observed": 59957,
+        "prompt_tokens_p50": 16102,
+        "max_turn_index_reached": 41,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 7,
+        "requests_completed_in_window": 305,
+        "requests_drained": 8,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 167405,
+        "output_tokens_per_second": 186.00555555555556,
+        "output_tokens_per_second_per_chip": 93.00277777777778,
+        "decode_tokens_per_second_p90": 43.05805548787839,
+        "decode_speed_samples": 305,
+        "ttft_seconds_p95": 3.258041509240866,
+        "client_inflight_seconds": {
+          "0": 0.00016194209456443787,
+          "1": 0.001123722642660141,
+          "2": 0.0007087476551532745,
+          "3": 0.0006574280560016632,
+          "4": 0.0006342269480228424,
+          "5": 0.0006548184901475906,
+          "6": 0.0009528007358312607,
+          "7": 1.253250801935792,
+          "8": 898.7418555114418
+        },
+        "mean_client_inflight": 7.998581823346515,
+        "full_concurrency_fraction": 0.9986020616793798,
+        "drain_seconds": 48.979485536925495,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 186.00555555555556,
+        "decode_p90_tps": 43.05805548787839,
+        "ttft_p95_ms": 3258.0415092408657,
+        "tpot_ms": 40.133073773152766,
+        "tpot_p95_ms": 61.91713926187108,
+        "e2e_p95_ms": 81560.6805587188,
+        "completed_requests": 305
+      },
+      "requests_artifact_sha256": "adb2cb87751a2ce7d71fd253e6bd80253dca2bd2c67a0f896c0c19abb338c32e",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c8-900s/config.json",
+          "sha256": "af8b0d809a840692712c44c872cfa3f0729626731d0b0b6f9e7df102d1fab39f",
+          "bytes": 3945
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c8-900s/summary.json",
+          "sha256": "87214f081e61b7117015336b9468caff6be63a20d0715203782d2ec5e44ab8a7",
+          "bytes": 1124
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c8-900s/requests.jsonl",
+          "sha256": "adb2cb87751a2ce7d71fd253e6bd80253dca2bd2c67a0f896c0c19abb338c32e",
+          "bytes": 4891091
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "sha256": "68ec059f3810f8aa8074d9823f3ee5f614e28fa93a5c634cb1b6df3947d2c064",
+          "bytes": 266713
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": true,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "off_definition": null,
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "02c997e6d22c4a18bd8e3cfa2cbdbab0",
+        "started_at_unix": 1791418745.5126028,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 8,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
+    },
+    {
+      "run_id": "a0f81261b91f43f98839fae72ab7eee6",
+      "point_id": "qwen35-op02-core-attention-boundary-on-tp2ep-c16-20261008",
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900,
+        "requests_started": 442,
+        "max_prompt_tokens_observed": 50188,
+        "prompt_tokens_p50": 13896,
+        "max_turn_index_reached": 31,
+        "distinct_trajectories_started": 8,
+        "sessions_completed": 8,
+        "requests_completed_in_window": 426,
+        "requests_drained": 16,
+        "failed_requests": 0,
+        "observed_output_tokens_in_window": 239197,
+        "output_tokens_per_second": 265.77444444444444,
+        "output_tokens_per_second_per_chip": 132.88722222222222,
+        "decode_tokens_per_second_p90": 27.59100465325964,
+        "decode_speed_samples": 426,
+        "ttft_seconds_p95": 3.7008387714158744,
+        "client_inflight_seconds": {
+          "0": 0.0002032620832324028,
+          "1": 0.0010597221553325653,
+          "2": 0.0008047204464673996,
+          "3": 0.000650026835501194,
+          "4": 0.00064097810536623,
+          "5": 0.0009168796241283417,
+          "6": 0.0006894581019878387,
+          "7": 0.0007022293284535408,
+          "8": 0.0007589180022478104,
+          "9": 0.0006300881505012512,
+          "10": 0.0006262864917516708,
+          "11": 0.0006237169727683067,
+          "12": 0.0008826302364468575,
+          "13": 0.0007419390603899956,
+          "14": 0.0006717881187796593,
+          "15": 1.4193636430427432,
+          "16": 898.5700337132439
+        },
+        "mean_client_inflight": 15.998318135176476,
+        "full_concurrency_fraction": 0.998411148570271,
+        "drain_seconds": 60.416475924663246,
+        "aborted": false,
+        "planned_measurement_seconds": 900
+      },
+      "metrics": {
+        "output_tps": 265.77444444444444,
+        "decode_p90_tps": 27.59100465325964,
+        "ttft_p95_ms": 3700.8387714158744,
+        "tpot_ms": 60.10068522188349,
+        "tpot_p95_ms": 96.79819489854827,
+        "e2e_p95_ms": 106902.64140442014,
+        "completed_requests": 426
+      },
+      "requests_artifact_sha256": "3c5812c174ac03cf515d78707ea11cbc7b749c712d2677f289897550f935bfc8",
+      "artifacts": [
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c16-900s/config.json",
+          "sha256": "aabbd3cd484be8a44b4147f8d7d3abec10dbfbab45fa77dc43fe64ac1228b763",
+          "bytes": 3946
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c16-900s/summary.json",
+          "sha256": "ebfcef29b4294448fac14ad8a20c4c4daf00dc92b8f825702366b8b05dacd20e",
+          "bytes": 1388
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/runs/on-c16-900s/requests.jsonl",
+          "sha256": "3c5812c174ac03cf515d78707ea11cbc7b749c712d2677f289897550f935bfc8",
+          "bytes": 6959545
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "sha256": "68ec059f3810f8aa8074d9823f3ee5f614e28fa93a5c634cb1b6df3947d2c064",
+          "bytes": 266713
+        },
+        {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/audit-canonical.json",
+          "sha256": "e65a40f27158203422a5f4065dc164a728a672160df28cf3f2736878205e1b9e",
+          "bytes": 11911
+        }
+      ],
+      "server": {
+        "engine": {
+          "name": "vllm",
+          "version": "0.23.0+empty",
+          "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+          "backend": {
+            "name": "vllm_ascend",
+            "version": "0.23.0.post1",
+            "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          }
+        },
+        "model": {
+          "served_name": "qwen3.5-35b-a3b",
+          "path": "/models/Qwen3.5-35B-A3B",
+          "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+          "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+          "checkpoint_identity_verified": true,
+          "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json"
+        },
+        "precision": "bfloat16",
+        "tokenizer": {
+          "path": "/root/f01-20261002/canonical-tokenizer-712cf743",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true,
+          "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+        },
+        "hardware": {
+          "chip_model": "910B2",
+          "chip_count": 2
+        },
+        "server": {
+          "host": "127.0.0.1",
+          "port": 18180,
+          "max_model_len": 262144,
+          "tensor_parallel_size": 2,
+          "expert_parallel": true,
+          "environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          },
+          "launch_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+        },
+        "mod": {
+          "name": "vllm-hust-core-attention-boundary",
+          "version": "0.1.0.dev0",
+          "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+          "enable": true,
+          "kill_switch": false,
+          "evidence": true,
+          "source_ref": "op02-measured-8b5ebb1",
+          "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+          "source_public_verified": true
+        },
+        "workload": {
+          "path": "/root/f01-20261002/current-workload-canonical-metadata.json",
+          "sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85"
+        }
+      },
+      "benchmark": {
+        "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+        "protocol": "swe-prefix-reuse/v1",
+        "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+        "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence"
+      },
+      "validation": {
+        "real_online": true,
+        "failed_requests": 0,
+        "raw_metrics_recomputed": true,
+        "request_protocol_valid": true,
+        "prompt_id_echo": true,
+        "output_budgets": true,
+        "usage_and_done_checks": true,
+        "prefix_reuse_protocol": true,
+        "prepared_workload_hash_registered_in_local_draft": true,
+        "tokenizer_identity_independently_verified": true,
+        "tokenizer_fingerprint_recomputed": true,
+        "tokenizer_files_manifest_match_verified": true,
+        "checkpoint_identity_verified": true,
+        "model_manifest_match_verified": true,
+        "mod_source_public_verified": true,
+        "activation_log_point_isolated": false,
+        "performance_attribution_verified": false,
+        "mod_catalog_registered": true,
+        "mod_catalog_public_surface": true,
+        "public_raw_evidence_available": true,
+        "server_log_counts": {
+          "installed": 4,
+          "runtime_effective": 2
+        },
+        "patch_requested": true,
+        "off_definition": null,
+        "canonical_audit_all_checks_passed": true
+      },
+      "client": {
+        "tool_version": "0.2.0.dev0",
+        "schema": "swe-prefix-reuse/v1",
+        "run_id": "a0f81261b91f43f98839fae72ab7eee6",
+        "started_at_unix": 1791419695.5976863,
+        "model": "qwen3.5-35b-a3b",
+        "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+        "tokenizer": {
+          "path": "/workspace/models/Qwen3.5-35B-A3B",
+          "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "transformers": "5.17.0",
+          "enable_thinking": true
+        },
+        "concurrency": 16,
+        "duration": 900,
+        "chips": 2,
+        "seed": 0,
+        "timeout": 1800,
+        "server_max_context": 262144,
+        "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+        "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only"
+      }
     }
+
   ]
 }
