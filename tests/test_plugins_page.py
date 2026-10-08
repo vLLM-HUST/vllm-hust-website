@@ -13,6 +13,7 @@ PORTFOLIO = json.loads(
 )
 PAGE = (ROOT / "plugins.html").read_text(encoding="utf-8")
 SCRIPT = (ROOT / "assets" / "plugins-page.js").read_text(encoding="utf-8")
+CATALOG_SCRIPT = (ROOT / "assets" / "ecosystem-catalog.js").read_text(encoding="utf-8")
 STYLES = (ROOT / "assets" / "plugins.css").read_text(encoding="utf-8")
 WORKSHOP_METADATA = json.loads(
     (ROOT / "data" / "plugin-workshop-metadata.json").read_text(encoding="utf-8")
@@ -464,23 +465,28 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
     assert 'element("details", "plugin-technical-details")' in SCRIPT
     assert 'element("summary", "", copy().details)' in SCRIPT
     assert "copy().installRun" in SCRIPT
-    assert "Read it like a MOD catalog" in PAGE
-    assert "像查看 MOD 一样选择扩展" in PAGE
+    assert "Start with your workload" in PAGE
+    assert "从你的 Workload 开始" in PAGE
     assert ".plugin-compatibility-facts" in STYLES
     assert ".mod-catalog-guide" in STYLES
 
 
 def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert 'let selectedType = "extensions"' in SCRIPT
-    assert "const isWorkshopMod = (item)" in SCRIPT
-    assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
-    assert 'item.repository_relationship === "organization_native"' in SCRIPT
-    assert '"source_toolkit"' in SCRIPT
+    assert (
+        "const isWorkshopMod = item => window.EcosystemCatalog.isWorkshopMod(item)"
+        in SCRIPT
+    )
+    assert (
+        '["runtime_component", "bridge"].includes(item.artifact_type)' in CATALOG_SCRIPT
+    )
+    assert 'item.repository_relationship === "organization_native"' in CATALOG_SCRIPT
+    assert '"source_toolkit"' in CATALOG_SCRIPT
     assert 'element("div", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert "function coverTone(item)" in SCRIPT
     assert ".workshop-tone-lagoon .workshop-cover" in STYLES
-    assert '"plugins-title": zh ? "扩展工坊" : "Extension Workshop"' in SCRIPT
+    assert '"plugins-title": zh ? "MOD 工坊" : "MOD Workshop"' in SCRIPT
     assert 'body[data-page="plugins"] .technical-highlights' in STYLES
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
@@ -548,9 +554,11 @@ def test_workshop_supports_workload_guided_discovery() -> None:
 
 def test_workshop_adds_only_measured_connectors_to_the_mod_catalog() -> None:
     assert "isWorkshopMod(item) && matchesSelectedType(item)" in SCRIPT
-    assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
-    assert "|| isToolMod(item)" in SCRIPT
-    assert '"source_toolkit"' in SCRIPT
+    assert (
+        '["runtime_component", "bridge"].includes(item.artifact_type)' in CATALOG_SCRIPT
+    )
+    assert "|| isToolMod(item)" in CATALOG_SCRIPT
+    assert '"source_toolkit"' in CATALOG_SCRIPT
     assert (
         "Independent vLLM-HUST extensions and manager-tested carriers appear here."
         in PAGE
@@ -752,7 +760,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     ]
     assert remote_sidecar["evidence_level"] == "integration_tested"
     assert local_host["evidence_level"] == "integration_tested"
-    assert "control plane makes external decisions through a narrow bridge" in PAGE
+    assert "control-plane tools distinct" in PAGE
     assert "admission" in PAGE
     assert "local host still owns HMAC, schemas, authorization, replay" in PAGE
     assert "catalog separates three layers" in PAGE
@@ -968,10 +976,10 @@ def test_extension_standard_covers_core_and_host_providers() -> None:
 
 
 def test_public_copy_uses_ecosystem_language() -> None:
-    assert "Serving Ecosystem Architecture" in PAGE
-    assert "推理生态系统架构" in PAGE
-    assert "Classify the role before the delivery mechanism." in PAGE
-    assert "Plugin, connector, and control plane are different concepts." in PAGE
+    assert "MOD Workshop" in PAGE
+    assert "MOD 工坊" in PAGE
+    assert "Find the right extension without losing sight of who runs it." in PAGE
+    assert "插件、connector 与 control plane 承担不同角色。" in PAGE
 
 
 def test_candidate_architecture_links_use_the_published_docs_branch() -> None:
@@ -1197,7 +1205,8 @@ def test_performance_evidence_cannot_override_the_publication_gate():
         "vspec",
     }
     assert "performanceResults.has(item.id)" in SCRIPT
-    assert "if (item.public_surface === false) return false;" in SCRIPT
+    assert "if (!item || item.public_surface === false) return false;" in CATALOG_SCRIPT
+    assert "performanceResults" not in CATALOG_SCRIPT
     assert "Math.max(pageSize, measuredCount)" in SCRIPT
     performance_ids = {item["id"] for item in PLUGIN_PERFORMANCE["entries"]}
     assert measured <= performance_ids
@@ -1275,8 +1284,8 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
     item = by_id("traceloom")
     assert item["artifact_type"] == "runtime_component"
     assert item["system_role"] == "profiling_analysis"
-    assert '"profiling_analysis"' in SCRIPT
-    assert '"telemetry_provider"' in SCRIPT
+    assert '"profiling_analysis"' in CATALOG_SCRIPT
+    assert '"telemetry_provider"' in CATALOG_SCRIPT
     assert item["delivery_model"] == "python_distribution"
     assert item["documentation_url"] == "./traceloom.html"
     assert item["compatibility"]["status"] == "experimental"
@@ -1302,9 +1311,9 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
 def test_tool_mods_are_grouped_without_performance_placeholders():
     profiler = by_id("request-lifecycle-profiler")
     assert profiler["system_role"] == "telemetry_provider"
-    assert '"offline_model_quantization"' in SCRIPT
-    assert '"model_artifact_preparation"' in SCRIPT
-    assert '"lifecycle_control_plane"' in SCRIPT
+    assert '"offline_model_quantization"' in CATALOG_SCRIPT
+    assert '"model_artifact_preparation"' in CATALOG_SCRIPT
+    assert '"lifecycle_control_plane"' in CATALOG_SCRIPT
     assert "if (!isToolMod(item))" in SCRIPT
     assert "appendGroup(copy().performanceMods" in SCRIPT
     assert "appendGroup(copy().toolMods" in SCRIPT

@@ -25,15 +25,7 @@
   let selectedWorkload = "all";
   let expanded = false;
   const pageSize = 9;
-  const toolModRoles = new Set([
-    "lifecycle_control_plane",
-    "model_artifact_preparation",
-    "offline_model_quantization",
-    "profiling_analysis",
-    "scheduler_policy_research",
-    "telemetry_provider"
-  ]);
-  const isToolMod = item => toolModRoles.has(item.system_role);
+  const isToolMod = item => window.EcosystemCatalog.isToolMod(item);
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -175,29 +167,7 @@
     applications_research: { en: "Applications and research", zh: "应用与研究" }
   };
 
-  const isWorkshopMod = (item) => {
-    if (item.public_surface === false) return false;
-    return (
-      performanceResults.has(item.id)
-      || (
-        item.artifact_type === "bridge"
-        && item.compatibility?.status === "verified"
-        && String(item.canonical_repository || "").startsWith("https://github.com/")
-      )
-      || (
-      (
-        ["runtime_component", "bridge"].includes(item.artifact_type)
-        || isToolMod(item)
-      )
-      && item.repository_relationship === "organization_native"
-      && [
-        "plugin_bundle", "python_distribution", "migration_scaffold",
-        "source_patch", "source_toolkit"
-      ].includes(item.delivery_model)
-      && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
-      )
-    );
-  };
+  const isWorkshopMod = item => window.EcosystemCatalog.isWorkshopMod(item);
   const compatibilityLabels = {
     ready: { en: "Ready", zh: "可用" },
     verified: { en: "Verified", zh: "已验证" },
@@ -1110,10 +1080,12 @@ vllm-hust-ext extension check ${extensionId}`
   function renderPageLabels() {
     const zh = language() === "zh";
     const values = {
-      "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
-      "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
-      "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
-      "plugins-fact-runtime": zh ? "个已支持" : "supported"
+      "plugins-eyebrow": zh ? "vLLM-HUST MOD 目录" : "vLLM-HUST MOD catalog",
+      "plugins-title": zh ? "MOD 工坊" : "MOD Workshop",
+      "plugins-fact-items": zh ? "个公开 MOD" : "public MODs",
+      "plugins-fact-runtime": zh ? "个兼容性已验证" : "compatibility verified",
+      "plugins-fact-review": zh ? "个实验性或仅检查" : "experimental or inspection-only",
+      "plugins-fact-publications": zh ? "项硬件或性能证据" : "hardware/performance evidence"
     };
     Object.entries(values).forEach(([id, value]) => {
       const node = document.getElementById(id);
@@ -1175,10 +1147,11 @@ vllm-hust-ext extension check ${extensionId}`
       workloadNavigation = navigation;
       renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
-      document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
-      const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
-      const incubating = payload.components.filter((item) => ["concept", "incubating", "experimental"].includes(item.maturity)).length;
-      const evidence = payload.components.filter((item) => ["hardware_verified", "performance_verified", "production_observed"].includes(item.evidence_level)).length;
+      const catalogSummary = window.EcosystemCatalog.summarize(payload);
+      document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(catalogSummary.total); });
+      const supported = catalogSummary.verified;
+      const incubating = catalogSummary.evaluating;
+      const evidence = catalogSummary.evidenced;
       const external = payload.components.filter((item) => item.artifact_type === "external_system").length;
       document.querySelectorAll("[data-runtime-count]").forEach((node) => { node.textContent = String(supported).padStart(2, "0"); });
       document.querySelectorAll("[data-review-target-count]").forEach((node) => { node.textContent = String(incubating).padStart(2, "0"); });
