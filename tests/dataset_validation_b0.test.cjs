@@ -63,7 +63,7 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.match(page, /dataset_validation_index_v1\.json/);
     assert.match(page, /id="validation-model-select"/);
     assert.match(page, /B1 is selected independently per cell/);
-    assert.equal(index.scenarios.length, 5);
+    assert.equal(index.scenarios.length, 7);
     assert.equal(index.scenarios[0].model, 'Qwen2.5-14B-Instruct');
     assert.equal(index.scenarios[0].data_url, './data/dataset_validation_v1.b0.json');
     assert.equal(index.scenarios[1].model, 'Qwen3.5-35B-A3B');
@@ -71,6 +71,25 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.equal(index.scenarios[2].data_url, './data/dataset_validation_qwen35_tp2_ep_ctx32k_apcoff_inf_out256.json');
     assert.equal(index.scenarios[3].data_url, './data/dataset_validation_qwen35_bidkv.json');
     assert.equal(index.scenarios[4].data_url, './data/dataset_validation_qwen35_frontier_unified_900s.json');
+    assert.equal(index.scenarios[5].data_url, './data/dataset_validation_qwen35_frontier_betterscale_900s.json');
+    assert.equal(index.scenarios[6].data_url, './data/dataset_validation_qwen35_frontier_pipeline_pp2_900s.json');
+});
+
+test('remaining declared Frontier pairs keep their own Native and regressions', () => {
+    const betterscale = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_qwen35_frontier_betterscale_900s.json'), 'utf8'));
+    assert.equal(betterscale.baseline.id, 'swe-capacity16-native');
+    assert.equal(betterscale.scenario.baseline_graph_mode, 'FULL_AND_PIECEWISE');
+    assert.equal(betterscale.scenario.candidate_graph_mode, 'FULL');
+    assert.ok(betterscale.results.every((cell) => cell.selected_candidate_id === 'betterscale'));
+    assert.deepEqual(new Set(betterscale.results.map((cell) => cell.comparison.trend)), new Set(['improved']));
+
+    const pipeline = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_qwen35_frontier_pipeline_pp2_900s.json'), 'utf8'));
+    assert.equal(pipeline.baseline.id, 'swe-k8s-pp2-20260925-nativepp-r1');
+    assert.equal(pipeline.scenario.pipeline_parallel_size, 2);
+    assert.equal(pipeline.scenario.hardware, '4× Ascend 910B2');
+    assert.ok(pipeline.results.every((cell) => cell.selected_candidate_id === 'pipeline-microbatch-migration'));
+    assert.deepEqual(new Set(pipeline.results.map((cell) => cell.comparison.trend)), new Set(['improved', 'regressed']));
+    assert.ok(pipeline.results.every((cell) => cell.candidate_values[0].runtime_effectiveness === 'exercised'));
 });
 
 test('Qwen3.5 unified Frontier scenario publishes all paired MOD candidates', () => {
