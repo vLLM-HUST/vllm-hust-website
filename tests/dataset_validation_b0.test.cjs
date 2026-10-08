@@ -63,13 +63,32 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.match(page, /dataset_validation_index_v1\.json/);
     assert.match(page, /id="validation-model-select"/);
     assert.match(page, /B1 is selected independently per cell/);
-    assert.equal(index.scenarios.length, 4);
+    assert.equal(index.scenarios.length, 5);
     assert.equal(index.scenarios[0].model, 'Qwen2.5-14B-Instruct');
     assert.equal(index.scenarios[0].data_url, './data/dataset_validation_v1.b0.json');
     assert.equal(index.scenarios[1].model, 'Qwen3.5-35B-A3B');
     assert.equal(index.scenarios[1].data_url, './data/dataset_validation_qwen35_tp2_matrix.json');
     assert.equal(index.scenarios[2].data_url, './data/dataset_validation_qwen35_tp2_ep_ctx32k_apcoff_inf_out256.json');
     assert.equal(index.scenarios[3].data_url, './data/dataset_validation_qwen35_bidkv.json');
+    assert.equal(index.scenarios[4].data_url, './data/dataset_validation_qwen35_frontier_unified_900s.json');
+});
+
+test('Qwen3.5 unified Frontier scenario publishes all paired MOD candidates', () => {
+    const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_qwen35_frontier_unified_900s.json'), 'utf8'));
+    assert.equal(data.scenario.expert_parallel, false);
+    assert.equal(data.scenario.max_model_len, 262144);
+    assert.equal(data.scenario.prefix_caching, true);
+    assert.equal(data.scenario.measurement_seconds, 900);
+    assert.equal(data.datasets.length, 5);
+    assert.equal(data.metrics.length, 2);
+    assert.equal(data.results.length, 10);
+    assert.ok(data.results.every((cell) => cell.candidate_values.length === 6));
+    assert.ok(data.results.every((cell) => cell.candidate_values.some((candidate) => candidate.candidate_id === cell.selected_candidate_id && candidate.value === cell.value)));
+    const c1 = data.results.find((cell) => cell.dataset_id === 'swe-prefix-reuse-c1' && cell.metric_id === 'output_token_throughput');
+    assert.equal(c1.selected_candidate_id, 'kvcompress-ascend');
+    const c16 = data.results.find((cell) => cell.dataset_id === 'swe-prefix-reuse-c16' && cell.metric_id === 'output_token_throughput');
+    assert.equal(c16.selected_candidate_id, 'pegaflow-vllm-connectors');
+    assert.deepEqual(new Set(c16.candidate_values.map((candidate) => candidate.candidate_id)), new Set(['bidkv', 'dla', 'kv-materialization-arrival-control', 'kv-tiering-migration', 'kvcompress-ascend', 'pegaflow-vllm-connectors']));
 });
 
 test('Qwen3.5 repaired B0 metadata publishes the measured 35B workbook configuration', () => {
