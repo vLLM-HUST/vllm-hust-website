@@ -12,7 +12,7 @@
             storeOnly: 'No cache restores observed', storeOnlyScope: 'Cache stores were observed, but no cache restores occurred in this window. This point does not establish a tiering benefit.',
             failed: 'Correctness failed · throughput reference only', failureScope: 'C16 retrieval check: 5/16 answers truncated (requests 2, 5, 8, 11, 13); 8/8 serial checks passed. All five red points use this deployment; C1/2/4/8 were not separately correctness-qualified.', title: 'Benchmark setting', subtitle: 'Decode speed × output efficiency', pairedSubtitle: 'Matched offline batch throughput', fixedSubtitle: 'Fixed-configuration measured comparison', studySubtitle: 'Measured configuration study', studyGroup: 'Study group', model: 'Model · precision', workload: 'Workload', filter: 'Filter', all: 'All', mtpOn: 'On', mtpOff: 'Off', noMatch: 'No points match this filter.',
             x: 'P90 decode speed', y: 'Output throughput / chip', batchSize: 'Batch size', outputThroughput: 'Output throughput', native: 'Native configuration', officialBaseline: 'Fixed official baseline', baselinePending: 'matched measurement pending for this setting', baselineMeasured: 'matched measurement available',
-            smoke: 'Measured comparison', formal: 'Measured setting', fixed: 'Fixed comparison', study: 'Configuration study', hint: 'Select a point for configuration', fixedHint: 'Fixed-configuration comparison; points are independent measured observations', studyComparisonHint: 'BetterScale: original C1–C32, fixed E36/R36 C32–C40, and width-matched C37–C56 are separate campaigns. Native C1–C16 is fixed configuration.', studyHint: 'Independent study groups are not connected; compare points only within the same group', lineHint: 'BetterScale lines connect best trade-offs across workload-tuned configurations; other lines follow measured concurrency series', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
+            smoke: 'Measured comparison', formal: 'Measured setting', fixed: 'Fixed comparison', study: 'Configuration study', hint: 'Select a point for configuration', fixedHint: 'Fixed-configuration comparison; points are independent measured observations', studyComparisonHint: 'Only Pareto-frontier points are shown, connected separately for BetterScale and Native. BetterScale spans workload-tuned configurations, not a fixed-capacity sweep.', studyHint: 'Independent study groups are not connected; compare points only within the same group', lineHint: 'BetterScale lines connect best trade-offs across workload-tuned configurations; other lines follow measured concurrency series', frontierOnly: 'Best trade-off points only', sampled: 'Sampling date',
             loading: 'Loading measurements…', empty: 'No measurements yet.', error: 'Measurements unavailable. Reload to retry.',
             missing: 'Missing axis metrics', standalone: 'measurements are not on a displayed line', points: 'points', context: 'context',
             download: 'Download configuration', close: 'Close', parallel: 'Parallelism', concurrency: 'Concurrency',
@@ -26,7 +26,7 @@
             storeOnly: '未观察到缓存恢复', storeOnlyScope: '本窗口观察到了缓存保存，但没有缓存恢复；该点不能证明层级缓存带来的收益。',
             failed: '正确性失败 · 仅吞吐参考', failureScope: 'C16 检索检查：5/16 答案截断（请求 2、5、8、11、13）；串行检查 8/8 通过。五个红点来自同一部署，C1/2/4/8 未分别通过正确性验收。', title: '实验设定', subtitle: '解码速度 × 产出效率', pairedSubtitle: '同配置离线批吞吐对照', fixedSubtitle: '固定配置实测对照', studySubtitle: '配置实测研究', studyGroup: '实验组', model: '模型 · 精度', workload: 'Workload', filter: '筛选', all: '全部', mtpOn: '开启', mtpOff: '关闭', noMatch: '没有符合筛选条件的数据点。',
             x: 'P90 解码速度', y: '每卡输出吞吐', batchSize: 'Batch size', outputThroughput: '总输出吞吐', native: 'Native 配置', officialBaseline: '固定官方基线', baselinePending: '该设定的同合同实测待补', baselineMeasured: '已有该设定的同合同实测',
-            smoke: '实测对比', formal: '实测设定', fixed: '固定配置对照', study: '配置研究', hint: '点击数据点查看配置', fixedHint: '固定配置对照；各点是独立实测，不表示缺失并发曲线', studyComparisonHint: 'BetterScale 分别连接原 C1–C32、固定 E36/R36 的 C32–C40、随并发扩容的 C37–C56 三组实验；Native C1–C16 为固定配置扫描。', studyHint: '不同实验组之间不连线；只在同一实验组内比较', lineHint: 'BetterScale 连线连接不同 workload 调优配置的最佳权衡点；其他连线按实测并发序列连接', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
+            smoke: '实测对比', formal: '实测设定', fixed: '固定配置对照', study: '配置研究', hint: '点击数据点查看配置', fixedHint: '固定配置对照；各点是独立实测，不表示缺失并发曲线', studyComparisonHint: '仅展示并分别连接 BetterScale 与 Native 的 Pareto 前沿点；BetterScale 跨 workload 调优配置，不代表固定容量扫描。', studyHint: '不同实验组之间不连线；只在同一实验组内比较', lineHint: 'BetterScale 连线连接不同 workload 调优配置的最佳权衡点；其他连线按实测并发序列连接', frontierOnly: '仅显示最佳权衡点', sampled: '采样日期',
             loading: '正在读取成绩…', empty: '暂无实测成绩。', error: '暂时无法读取成绩，请刷新重试。',
             missing: '缺少坐标指标', standalone: '个测量点不在当前连线上', points: '个点', context: '上下文',
             download: '下载详细配置', close: '关闭', parallel: '并行规模', concurrency: '并发数',
@@ -59,7 +59,7 @@
     const hasRotation = () => !!cohort()?.workload.contract.session_rotation;
     const depthPoints = () => cohortPoints().filter(p => !hasRotation() || state.rotation?.has(String(p.load.session_rotation_depth)));
     const filteredPoints = () => depthPoints().filter(p => state.mtp?.has(M.mtpState(p)) && state.mods?.has(M.groupKey(p)));
-    const points = () => state.frontierOnly && !independentStudy()
+    const points = () => (configurationStudy() && cohort()?.workload.contract.comparison_point_ids) || (state.frontierOnly && !independentStudy())
         ? M.groupFrontiers(filteredPoints(),axes().x,axes().y).flat().map(row=>row.point) : filteredPoints();
     const groupLabel = p => p.study_group?.[lang()==='zh'?'label_zh':'label_en'] || p.load.presentation_group?.[lang()==='zh'?'label_zh':'label_en'] || cohort()?.workload.contract.display_group_labels?.[M.groupKey(p)]?.[lang()==='zh'?'label_zh':'label_en'] || p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
     const hasOfficialBaseline = () => !!state.data.official_baseline && cohortPoints().some(p => p.configuration.official_baseline_id === state.data.official_baseline.id);
@@ -348,9 +348,9 @@
         const series=M.chartSeries(result.measured,axes().x,axes().y,cohort());
         for(const rows of series){
             const point=rows[0].point;
-            const frontier=M.groupKey(point)==='betterscale'&&!configurationStudy();
+            const frontier=configurationStudy() || M.groupKey(point)==='betterscale';
             const id=frontier?M.frontierKey(point):JSON.stringify([point.cohort_id,point.load.concurrency_series,point.load.session_rotation_depth??null]);
-            svg+=`<polyline class="frontier-concurrency-line" data-line-kind="${configurationStudy()&&M.groupKey(point)==='betterscale'?'configuration-family':frontier?'frontier':'concurrency'}" data-series="${escape(id)}" stroke-dasharray="${point.load.session_rotation_depth>1?'7 4':'none'}" data-series-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
+            svg+=`<polyline class="frontier-concurrency-line" data-line-kind="${frontier?'frontier':'concurrency'}" data-series="${escape(id)}" stroke-dasharray="${point.load.session_rotation_depth>1?'7 4':'none'}" data-series-points="${escape(JSON.stringify(rows.map(row=>row.point.id)))}" stroke="${color(point)}" points="${rows.map(row=>`${x(row.x)},${y(row.y)}`).join(' ')}"/>`;
         }
         for(const row of result.measured){
             const neighbors=result.measured.filter(other=>other!==row).map(other=>Math.hypot(x(row.x)-x(other.x),y(row.y)-y(other.y))/2);
@@ -369,7 +369,7 @@
     $('frontier-contract-dialog').addEventListener('click',event=>{if(event.target===$('frontier-contract-dialog'))$('frontier-contract-dialog').close();});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=qwen35-w8a8-900s-20261008',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=betterscale-study-frontier-20261008',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929').then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});
