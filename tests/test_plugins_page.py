@@ -1364,7 +1364,7 @@ def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
         in SCRIPT
     )
     assert (
-        '"quality-bounded-inference": "org.vllm-hust.quality-bounded-inference"'
+        '"quality-bounded-inference": "org.intellistream.quality-bounded-inference"'
         in SCRIPT
     )
     assert (
