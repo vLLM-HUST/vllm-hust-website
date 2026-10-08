@@ -1229,7 +1229,7 @@
       "name_en": "Quality-Bounded Inference",
       "name_zh": "质量约束推理策略",
       "artifact_type": "runtime_component",
-      "system_role": "control_plane",
+      "system_role": "scheduler_policy_research",
       "integration_contracts": [],
       "integration_surfaces": ["vllm.general_plugins", "vllm.request-pre-action-observer"],
       "execution_planes": ["api"],
