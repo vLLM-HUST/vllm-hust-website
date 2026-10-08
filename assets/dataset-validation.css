@@ -464,6 +464,53 @@ body[data-page="dataset-validation"] main.site-shell {
     overflow-wrap: anywhere;
 }
 
+.validation-candidate-list {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.validation-candidate {
+    min-width: 0;
+    padding: 8px 10px;
+    border-left: 3px solid #cbd5e1;
+    background: #ffffff;
+}
+
+.validation-candidate--selected {
+    border-left-color: #15803d;
+    background: #f0fdf4;
+}
+
+.validation-candidate > div:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.validation-candidate > div:first-child span {
+    color: #166534;
+    font-size: 0.68rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.validation-candidate-value {
+    margin-top: 2px;
+    font-family: "Fira Code", monospace;
+    font-size: 0.76rem;
+}
+
+.validation-candidate small {
+    display: block;
+    margin-top: 2px;
+    color: #64748b;
+    font-size: 0.7rem;
+}
+
 .validation-empty {
     margin-top: 20px;
     padding: 32px 20px;
