@@ -512,6 +512,13 @@
       "maintainer_profiles": [
         {"login": "aly16-k", "name": "王鸿坤"}
       ],
+      "advisors": [
+        {
+          "name_zh": "项翔",
+          "name_en": "Xiang Xiang",
+          "relationship": "internal"
+        }
+      ],
       "repository_relationship": "organization_native",
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-quant-hust",
