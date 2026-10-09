@@ -1,6 +1,6 @@
 {
   "organization": "vLLM-HUST",
-  "verified_at": "2026-09-14",
+  "verified_at": "2026-10-09",
   "source": "GitHub organization membership with lead-confirmed display names",
   "members": [
     {
@@ -291,13 +291,6 @@
       "bio": ""
     },
     {
-      "login": "mynameisczj",
-      "name": "nknow",
-      "avatar_url": "https://avatars.githubusercontent.com/u/141249024?v=4",
-      "profile_url": "https://github.com/mynameisczj",
-      "bio": ""
-    },
-    {
       "login": "oddod",
       "name": "欧丹丹（OuDandan）",
       "avatar_url": "https://avatars.githubusercontent.com/u/162601032?v=4",
@@ -487,5 +480,5 @@
       "bio": ""
     }
   ],
-  "count": 69
+  "count": 68
 }

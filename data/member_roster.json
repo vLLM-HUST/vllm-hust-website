@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-27",
+  "updated_at": "2026-10-09",
   "source_priority": [
     "lead_confirmation_or_exit_record",
     "2026-08_weekly_report_direct_entry",
@@ -27,7 +27,6 @@
     {"name_zh": "陈德斌", "github_login": "pluviophile-chen", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "陈稷", "github_login": "KazzeMaru", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "陈彦博", "github_login": "cybber695", "advisor_zh": "张书豪", "status": "current"},
-    {"name_zh": "陈子嘉", "github_login": "mynameisczj", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "杜雨枫", "github_login": "LuckyWindovo", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "高西岭", "github_login": "XilingGao", "advisor_zh": "张书豪", "status": "current"},
     {"name_zh": "何维", "github_login": "healer-positive", "advisor_zh": "张书豪", "status": "current"},
