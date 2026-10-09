@@ -4,14 +4,16 @@
 .frontier-heading h1 { font-size: 30px; letter-spacing: -.04em; margin: 0 0 6px; color: #edf3ff; }
 .frontier-heading p { color: #aebcd0; font-size: 13px; margin: 0; }
 .frontier-status { color: #c3d1e6; border: 1px solid #3b4962; border-radius: 20px; padding: 7px 12px; font-size: 11px; }
-.frontier-card { background: var(--run-bg); color: var(--run-ink); border: 1px solid var(--run-border); border-radius: 14px; overflow: hidden; }
+.frontier-card { background: var(--run-bg); color: var(--run-ink); border: 1px solid var(--run-border); border-radius: 14px; }
 .frontier-picker { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 24px; border-bottom: 1px solid var(--run-border); }
+.frontier-baseline { margin: 0; padding: 9px 24px; border-bottom: 1px solid var(--run-border); color: var(--run-muted); font-size: 12px; line-height: 1.45; }
+.frontier-baseline[data-state="pending"] { color: #a16207; background: color-mix(in srgb, #f59e0b 8%, transparent); }
 .frontier-model-tags { display: flex; gap: 8px; flex-wrap: wrap; }
 .frontier-model-tag { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 8px; padding: 10px 12px; color: var(--run-ink); font: inherit; font-size: 13px; cursor: pointer; }
 .frontier-model-tag span { font-size: 10px; opacity: .8; }
 .frontier-model-tag[aria-pressed="true"] { background: var(--run-tint); border-color: var(--run-accent); color: var(--run-accent); }
 .frontier-workload { display: grid; gap: 5px; color: var(--run-muted); font-size: 10px; max-width: 100%; }
-.frontier-workload select { max-width: 100%; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 6px; padding: 8px; font: inherit; font-size: 12px; }
+.frontier-workload select { width: 100%; min-width: 0; max-width: 100%; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 6px; padding: 8px; font: inherit; font-size: 12px; }
 .frontier-workload select:disabled { opacity: 1; cursor: default; }
 .frontier-plot { position: relative; padding: 12px 14px 0; }
 .frontier-plot svg { display: block; width: 100%; height: auto; min-height: 260px; max-height: 530px; }
@@ -21,7 +23,7 @@
 .frontier-hit { fill: transparent; }
 .frontier-dot { pointer-events: none; stroke: var(--run-bg); stroke-width: 2px; }
 .frontier-point:hover .frontier-dot, .frontier-point:focus .frontier-dot, .frontier-point.is-selected .frontier-dot { pointer-events: none; stroke: var(--run-ink); stroke-width: 3px; }
-.frontier-envelope { fill: none; stroke: var(--run-accent); stroke-width: 2px; stroke-dasharray: 5 5; opacity: .6; }
+.frontier-concurrency-line { fill: none; stroke-width: 2.25px; stroke-opacity: .72; pointer-events: none; }
 .frontier-blank { position: absolute; inset: 18% 12% 22%; display: grid; place-content: center; text-align: center; pointer-events: none; color: var(--run-muted); font-size: 14px; }
 .frontier-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 16px 24px; border-top: 1px solid var(--run-border); color: var(--run-muted); font-size: 11px; }
 .frontier-footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
@@ -30,7 +32,7 @@
 .frontier-legend { display: flex; flex-wrap: wrap; gap: 18px; }
 .frontier-legend span { display: inline-flex; align-items: center; gap: 7px; }
 .frontier-legend i { width: 9px; height: 9px; border-radius: 50%; }
-.frontier-popover { position: absolute; z-index: 5; box-sizing: border-box; width: 292px; max-width: calc(100% - 24px); padding: 18px; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 12px; box-shadow: 0 12px 40px #0003; }
+.frontier-popover { overflow-y: auto; position: absolute; z-index: 5; box-sizing: border-box; width: 292px; max-width: calc(100% - 24px); padding: 18px; color: var(--run-ink); background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 12px; box-shadow: 0 12px 40px #0003; }
 .frontier .frontier-popover h2 { color: var(--run-ink); font-size: 16px; margin: 0 24px 5px 0; }
 .frontier-popup-close { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; background: transparent; color: var(--run-muted); border: 0; font-size: 24px; cursor: pointer; }
 .frontier-popup-subtitle, .frontier-popup-load { font-size: 11px; color: var(--run-muted); margin: 8px 0 14px; }
@@ -44,6 +46,7 @@
   .frontier-heading h1 { font-size: 26px; }
   .frontier-status { max-width: 45%; font-size: 10px; }
   .frontier-picker { padding: 14px; gap: 14px; }
+  .frontier-baseline { padding: 9px 14px; }
   .frontier-workload { width: 100%; }
   .frontier-model-tag { text-align: left; }
   .frontier-plot { padding: 4px; }
@@ -54,3 +57,99 @@
 }
 
 .frontier-popup-engine { margin: 8px 0; font-size: 11px; line-height: 1.5; color: var(--run-ink); }
+
+.frontier-nearby { display: grid; gap: 4px; margin: 8px 0; font-size: 11px; }
+.frontier-nearby button { padding: 5px; text-align: left; color: var(--run-ink); background: var(--run-tint); border: 1px solid var(--run-border); border-radius: 4px; cursor: pointer; }
+.frontier-nearby button[aria-pressed="true"] { border-color: var(--run-accent); }
+
+.frontier-identity { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0; }
+.frontier-workload-tag { display: inline-block; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--run-accent); background: var(--run-tint); color: var(--run-accent); font-size: 11px; }
+.frontier-contract-open { padding: 9px 12px; border: 1px solid var(--run-border); border-radius: 7px; background: var(--run-bg); color: var(--run-accent); font: inherit; font-size: 12px; font-weight: 650; }
+.frontier-contract-dialog { position: fixed; inset: 0; width: min(1120px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); box-sizing: border-box; margin: auto; padding: 24px; overflow: auto; border: 1px solid var(--run-border); border-radius: 10px; background: var(--run-bg); color: var(--run-ink); box-shadow: 0 18px 60px #0008; }
+.frontier-contract-dialog::backdrop { background: #07101dcc; }
+.frontier-contract-close { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--run-muted); font-size: 25px; line-height: 1; }
+.frontier-contract-header h2 { margin: 0 42px 5px 0; color: var(--run-ink); font-size: 22px; letter-spacing: 0; }
+.frontier-contract-header p { margin: 0; color: var(--run-muted); font-size: 12px; }
+.frontier-contract-dialog section { margin-top: 24px; }
+.frontier-contract-dialog h3 { margin: 0 0 12px; color: var(--run-ink); font-size: 13px; }
+.frontier-contract-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border: 1px solid var(--run-border); border-radius: 8px; overflow: hidden; }
+.frontier-contract-facts div { min-width: 0; padding: 12px 14px; border-right: 1px solid var(--run-border); border-bottom: 1px solid var(--run-border); }
+.frontier-contract-facts div:nth-child(3n) { border-right: 0; }
+.frontier-contract-facts dt { margin-bottom: 5px; color: var(--run-muted); font-size: 10px; font-weight: 700; }
+.frontier-contract-facts dd { margin: 0; overflow-wrap: anywhere; font-size: 12px; line-height: 1.5; }
+.frontier-contract-code { font-family: "Fira Code", monospace; font-size: 10px !important; }
+.frontier-contract-table-wrap { overflow-x: auto; border: 1px solid var(--run-border); border-radius: 8px; }
+.frontier-contract-table { width: 100%; min-width: 1220px; border-collapse: collapse; font-size: 11px; }
+.frontier-contract-table th, .frontier-contract-table td { padding: 12px; border-right: 1px solid var(--run-border); border-bottom: 1px solid var(--run-border); text-align: left; vertical-align: top; line-height: 1.45; }
+.frontier-contract-table thead th { background: var(--run-tint); color: var(--run-muted); font-size: 10px; white-space: nowrap; }
+.frontier-contract-table tbody th { max-width: 210px; color: var(--run-ink); font-weight: 650; }
+.frontier-contract-table tr:last-child > * { border-bottom: 0; }
+.frontier-contract-table tr > *:last-child { border-right: 0; }
+.frontier-contract-table small { display: block; margin-top: 5px; color: var(--run-muted); font-size: 10px; font-weight: 400; overflow-wrap: anywhere; }
+.frontier-contract-empty { color: var(--run-muted); font-size: 12px; }
+.frontier-layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 18px; align-items: start; }
+.frontier-filters { padding: 18px; background: var(--run-bg); color: var(--run-ink); border: 1px solid var(--run-border); border-radius: 12px; }
+.frontier .frontier-filters h2 { margin: 0 0 18px; font-size: 14px; color: var(--run-ink); }
+.frontier-filters fieldset { min-width: 0; margin: 0 0 18px; padding: 0; border: 0; }
+.frontier-filters legend { margin-bottom: 10px; font-size: 11px; font-weight: 600; color: var(--run-muted); }
+.frontier-checks { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+.frontier-checks label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
+.frontier-checks input { margin: 0; width: 15px; height: 15px; accent-color: var(--run-accent); }
+#frontier-filter-count { display: block; border-top: 1px solid var(--run-border); padding-top: 12px; color: var(--run-muted); font-size: 11px; }
+@media (max-width: 900px) { .frontier-layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 650px) {
+  .frontier-contract-dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); padding: 18px 14px; }
+  .frontier-contract-facts { grid-template-columns: 1fr; }
+  .frontier-contract-facts div, .frontier-contract-facts div:nth-child(3n) { border-right: 0; }
+  .frontier-contract-facts div:last-child { border-bottom: 0; }
+}
+
+.frontier-correctness-warning { color: #b91c1c; border-left: 3px solid #dc2626; padding-left: 10px; font-size: 12px; line-height: 1.5; }
+@media (prefers-color-scheme: dark) { .frontier-correctness-warning { color: #fca5a5; } }
+
+.frontier-filter-note { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: var(--run-muted); }
+
+/* A native disclosure keeps model selection compact and keyboard accessible. */
+.frontier-model-picker { position: relative; max-width: 100%; }
+.frontier-model-picker summary { display: flex; gap: 8px; align-items: center; padding: 10px 12px; border: 1px solid var(--run-accent); border-radius: 8px; background: var(--run-tint); color: var(--run-accent); font-size: 13px; cursor: pointer; list-style: none; }
+.frontier-model-picker summary::-webkit-details-marker { display: none; }
+.frontier-model-picker summary span { font-size: 10px; }
+.frontier-model-picker summary:focus-visible { outline: 2px solid var(--run-accent); outline-offset: 2px; }
+.frontier-model-chevron { margin-left: auto; width: 0; height: 0; border: 4px solid transparent; border-top-color: currentColor; transform: translateY(2px); }
+.frontier-model-picker[open] .frontier-model-chevron { transform: translateY(-2px) rotate(180deg); }
+.frontier-model-tags { position: absolute; z-index: 10; top: calc(100% + 6px); left: 0; display: grid; width: max-content; min-width: 100%; max-width: min(360px, calc(100vw - 64px)); box-sizing: border-box; max-height: 300px; overflow-y: auto; padding: 6px; border: 1px solid var(--run-border); border-radius: 10px; background: var(--run-bg); box-shadow: 0 10px 28px #0003; }
+.frontier-model-tag { width: 100%; text-align: left; }
+
+#frontier-mods-toggle { margin-left: 8px; border: 1px solid var(--run-border); border-radius: 5px; padding: 3px 7px; color: var(--run-accent); background: transparent; font: inherit; cursor: pointer; }
+#frontier-mods-toggle:focus-visible { outline: 2px solid var(--run-accent); outline-offset: 2px; }
+
+.frontier-agent-qualifications { margin: 42px 0 20px; padding-top: 26px; border-top: 1px solid #344158; }
+.frontier-agent-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+.frontier-agent-heading span { color: #f0b341; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+.frontier-agent-heading h2 { margin: 5px 0; color: #edf3ff; font-size: 24px; }
+.frontier-agent-heading p { margin: 0; color: #aebcd0; font-size: 13px; }
+.frontier-agent-loading, .frontier-agent-empty { color: #aebcd0; font-size: 13px; }
+.frontier-agent-empty h3 { margin: 0 0 5px; color: #edf3ff; }
+.frontier-agent-empty p { margin: 0; }
+.agent-qualification-table-wrap { overflow-x: auto; border: 1px solid var(--run-border); border-radius: 8px; background: var(--run-bg); }
+.agent-qualification-table { width: 100%; min-width: 880px; border-collapse: collapse; }
+.agent-qualification-table th, .agent-qualification-table td { padding: 14px; border-bottom: 1px solid var(--run-border); text-align: left; vertical-align: top; }
+.agent-qualification-table th { background: var(--run-tint); color: var(--run-muted); font-size: 11px; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
+.agent-qualification-table tr:last-child td { border-bottom: 0; }
+.agent-qualification-name, .agent-qualification-value { display: block; color: var(--run-ink); font-weight: 800; }
+.agent-qualification-meta, .agent-qualification-note { display: block; margin-top: 5px; color: var(--run-muted); font-size: 11px; line-height: 1.45; }
+.agent-qualification-status { display: inline-flex; margin-bottom: 6px; padding: 3px 7px; border: 1px solid #22c55e; border-radius: 999px; background: color-mix(in srgb, #22c55e 12%, var(--run-bg)); color: #15803d; font-size: 10px; font-weight: 900; }
+.agent-qualification-link { color: var(--run-accent); font-weight: 800; }
+.agent-qualification-caveat { margin: 12px 0 0; color: #aebcd0; font-size: 12px; }
+
+@media (prefers-color-scheme: dark) { .agent-qualification-status { color: #86efac; } }
+
+@media (max-width: 520px) {
+  .frontier-agent-heading h2 { font-size: 21px; }
+  .agent-qualification-table { min-width: 0; }
+  .agent-qualification-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .agent-qualification-table tr, .agent-qualification-table td { display: block; width: 100%; }
+  .agent-qualification-table td { padding: 12px 14px; }
+  .agent-qualification-table td::before { display: block; margin-bottom: 4px; color: var(--run-muted); content: attr(data-label); font-size: 10px; font-weight: 900; text-transform: uppercase; }
+  .agent-qualification-name, .agent-qualification-value, .agent-qualification-meta, .agent-qualification-note { overflow-wrap: anywhere; }
+}

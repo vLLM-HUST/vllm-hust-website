@@ -7,6 +7,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- 首页与 MOD 工坊改为从同一份生态目录计算公开 MOD 数量，移除 26、22、19 三套互相冲突的静态口径；目录上架不再依赖性能数据是否成功加载。
+- 精简首页与 MOD 工坊的中英文说明，保留兼容、证据和生命周期边界，同时改成面向选择与使用场景的自然表达。
+- Qwen3.5 设置页固定声明 vLLM 0.18.0 + vLLM-Ascend 0.18.0 官方基线，并补齐带明确 Qwen3.5 兼容回补与有效 PIECEWISE 图模式标记的五点实测。
+- 默认同时展示三条五点 Native 曲线，并按实际 vLLM/vLLM-Ascend 版本、源码 commit 和图模式区分；恢复完整 BetterScale 五点曲线且保留其他统一 MOD 曲线供筛选。
+
+### Tests
+
+- 增加首页与 MOD 工坊共享目录判定、动态数量和性能数据加载失败时目录稳定性的回归覆盖。
+- 增加官方基线 schema、0.18 五点数据导入、显式展示曲线、Native runtime 分组及中英文桌面/移动端基线状态回归。
+
 ## [0.3.7] - 2026-09-03
 
 ### Fixed

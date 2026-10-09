@@ -1,5 +1,12 @@
 {
   "schema_version": "leaderboard-frontier/v1",
+  "official_baseline": {
+    "id": "vllm-0.18.0-vllm-ascend-0.18.0",
+    "engine": "vLLM + vLLM-Ascend",
+    "vllm_version": "0.18.0",
+    "vllm_ascend_version": "0.18.0",
+    "comparison_policy": "Only a matched fixture measurement may represent this baseline."
+  },
   "cohorts": [
     {
       "id": "test-contract",

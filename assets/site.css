@@ -2274,3 +2274,56 @@ h1 {
         font-size: 2.1rem;
     }
 }
+
+.benchmark-tabs {
+    display: flex;
+    gap: 6px;
+    margin: 24px 0 10px;
+    padding: 4px;
+    overflow-x: auto;
+    border: 1px solid rgba(125, 211, 252, 0.2);
+    border-radius: 8px;
+    background: rgba(8, 18, 31, 0.72);
+}
+
+.benchmark-tabs a {
+    flex: 1 0 max-content;
+    min-height: 40px;
+    padding: 9px 14px;
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 0.86rem;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+}
+
+.benchmark-tabs a:hover,
+.benchmark-tabs a:focus-visible {
+    color: var(--text);
+    background: rgba(125, 211, 252, 0.08);
+}
+
+.benchmark-tabs a.active {
+    color: #04111d;
+    background: #7dd3fc;
+}
+
+@media (max-width: 640px) {
+    .benchmark-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin-top: 16px;
+        overflow: visible;
+    }
+
+    .benchmark-tabs a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        min-height: 52px;
+        padding: 7px 6px;
+        white-space: normal;
+    }
+}

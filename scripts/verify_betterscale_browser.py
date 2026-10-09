@@ -20,18 +20,48 @@ def main():
         for key in ("qwen", "dsv4")
     }
     ecosystem = json.loads((root / "data/ecosystem.json").read_text())
+    performance_ids = {
+        entry["id"]
+        for entry in json.loads((root / "data/plugin-performance.json").read_text())[
+            "entries"
+        ]
+    }
+    tool_mod_roles = {
+        "lifecycle_control_plane",
+        "model_artifact_preparation",
+        "offline_model_quantization",
+        "profiling_analysis",
+        "scheduler_policy_research",
+        "telemetry_provider",
+    }
     workshop_mod_count = sum(
-        item["artifact_type"] in {"runtime_component", "bridge"}
-        and item["repository_relationship"] == "organization_native"
-        and item.get("public_surface", True) is not False
-        and item["delivery_model"]
-        in {
-            "plugin_bundle",
-            "python_distribution",
-            "migration_scaffold",
-            "source_patch",
-        }
-        and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        item.get("public_surface", True) is not False
+        and (
+            item["id"] in performance_ids
+            or (
+                item["artifact_type"] == "bridge"
+                and item.get("compatibility", {}).get("status") == "verified"
+                and item["canonical_repository"].startswith("https://github.com/")
+            )
+            or (
+                (
+                    item["artifact_type"] in {"runtime_component", "bridge"}
+                    or item["system_role"] in tool_mod_roles
+                )
+                and item["repository_relationship"] == "organization_native"
+                and item["delivery_model"]
+                in {
+                    "plugin_bundle",
+                    "python_distribution",
+                    "migration_scaffold",
+                    "source_patch",
+                    "source_toolkit",
+                }
+                and item["canonical_repository"].startswith(
+                    "https://github.com/vLLM-HUST/"
+                )
+            )
+        )
         for item in ecosystem["components"]
     )
     output = root / "output/playwright/betterscale"
@@ -308,6 +338,77 @@ def main():
         page.locator("[data-workload-filters] button").first.click()
         page.locator("[data-plugin-more]").click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
+        tool_section = page.locator(".plugin-category-tools")
+        assert (
+            tool_section.locator(".plugin-category-title").inner_text() == "Tool MODs"
+        )
+        assert tool_section.locator(".workshop-card").evaluate_all(
+            "cards => cards.map(card => card.id)"
+        ) == [
+            "ascend-quant-toolkit",
+            "clm-lifecycle",
+            "kv-transfer-observability-migration",
+            "llm-serving-cost-pricing-model",
+            "quality-bounded-inference",
+            "request-lifecycle-profiler",
+            "slicegpt-migration",
+            "traceloom",
+            "tricard-clm-lifecycle",
+        ]
+        assert tool_section.locator(".plugin-performance").count() == 0
+        assert page.locator(".plugin-category-performance #clm-lifecycle").count() == 0
+        clm = tool_section.locator("#clm-lifecycle")
+        assert clm.locator(".plugin-card-footer .withheld").count() == 1
+        assert clm.locator(".plugin-card-footer a").count() == 0
+        clm.locator(".plugin-launch-icon").click()
+        assert (
+            "python -m pip install vllm-hust-clm-lifecycle==0.1.1"
+            in clm.locator(".plugin-launch-tooltip").text_content()
+        )
+        clm.locator(".plugin-launch-icon").click()
+        tricard = tool_section.locator("#tricard-clm-lifecycle")
+        tricard.locator(".plugin-launch-icon").click()
+        tricard_commands = tricard.locator(".plugin-launch-tooltip").text_content()
+        assert "extension enable org.vllm-hust.tricard-clm" in tricard_commands
+        assert "extension plan org.vllm-hust.tricard-clm" in tricard_commands
+        tricard.locator(".plugin-launch-icon").click()
+        for inspect_only_id in (
+            "request-lifecycle-profiler",
+            "quality-bounded-inference",
+            "llm-serving-cost-pricing-model",
+        ):
+            inspect_only = tool_section.locator(f"#{inspect_only_id}")
+            inspect_only.locator(".plugin-launch-icon").click()
+            commands = inspect_only.locator(".plugin-launch-tooltip").text_content()
+            assert "extension inspect" in commands
+            assert "extension check" in commands
+            assert "extension enable" not in commands
+            inspect_only.locator(".plugin-launch-icon").click()
+        visible_ids = page.locator(".workshop-card").evaluate_all(
+            "cards => cards.map(card => card.id)"
+        )
+        assert visible_ids[0] == "vspec"
+        assert {
+            "betterscale",
+            "bidkv",
+            "pipeline-microbatch-migration",
+            "kv-materialization-arrival-control",
+            "pegaflow-vllm-connectors",
+            "adm",
+            "kvcompress-ascend",
+            "diffspec",
+            "latchmoe",
+            "knorm-migration",
+            "kv-tiering-migration",
+            "pyramidkv-ascend-migration",
+        } <= set(visible_ids)
+        assert "+42.39%" in page.locator("#betterscale").inner_text()
+        assert "+9.78%" in page.locator("#pipeline-microbatch-migration").inner_text()
+        assert "+6.34%" in page.locator("#pegaflow-vllm-connectors").inner_text()
+        assert "-3.55%" in page.locator("#kvcompress-ascend").inner_text()
+        page.locator("[data-plugin-model]").select_option("Qwen2.5-Coder-14B")
+        assert "+10.25%" in page.locator("#kvcompress-ascend").inner_text()
+        page.locator("[data-plugin-model]").select_option("")
         assert page.locator("#stateharbor.workshop-card").count() == 0
         page.locator(
             '#betterscale .plugin-card-footer a[href="./betterscale.html"]'

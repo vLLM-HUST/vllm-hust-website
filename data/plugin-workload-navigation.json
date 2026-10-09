@@ -7,6 +7,18 @@
       "description_en": "Understand captured inference structure and correlate scheduling context with supported device evidence.",
       "description_zh": "理解采集到的推理执行结构，将调度上下文与受支持的设备证据关联。"
     },
+    "model_preparation": {
+      "label_en": "Model preparation",
+      "label_zh": "模型制备",
+      "description_en": "Prepare, transform, or validate model artifacts before they enter an inference runtime.",
+      "description_zh": "在模型进入推理运行时之前制备、转换或校验模型产物。"
+    },
+    "lifecycle_control": {
+      "label_en": "Lifecycle control",
+      "label_zh": "生命周期控制",
+      "description_en": "Observe request and KV lifecycle events or report bounded signals to an external control plane.",
+      "description_zh": "观察请求与 KV 生命周期事件，或向外部控制面报告有界信号。"
+    },
     "long_context": {
       "label_en": "Long context",
       "label_zh": "长上下文",
@@ -64,28 +76,31 @@
   },
   "plugins": {
     "traceloom": ["profiling_analysis"],
+    "gdn-state-codec": ["decode_heavy", "repeated_prefix_agent"],
+    "ascend-quant-toolkit": ["model_preparation"],
+    "slicegpt-migration": ["model_preparation"],
+    "adm": ["distributed_pipeline"],
     "bidkv": ["memory_kv_pressure", "high_concurrency"],
-    "dla": ["memory_kv_pressure", "high_concurrency"],
     "diffspec": ["decode_heavy", "latency_slo"],
     "vspec": ["decode_heavy", "latency_slo"],
     "latchmoe": ["moe", "memory_kv_pressure"],
-    "ascend-adaptive-quantized-kv": ["long_context", "memory_kv_pressure"],
-    "ascend-quant-runtime-descriptor": ["memory_kv_pressure"],
     "kvcompress-ascend": ["long_context", "memory_kv_pressure"],
-    "kv-tiering-migration": ["long_context", "memory_kv_pressure"],
     "knorm-migration": ["long_context", "memory_kv_pressure"],
-    "pyramidkv-ascend-migration": ["long_context", "memory_kv_pressure"],
+    "kv-tiering-migration": ["long_context", "memory_kv_pressure"],
+    "mooncake-vllm-connectors": ["repeated_prefix_agent", "distributed_pipeline"],
+    "pegaflow-vllm-connectors": ["repeated_prefix_agent", "memory_kv_pressure"],
     "quantized-kv-cache-migration": ["long_context", "memory_kv_pressure"],
-    "simllm-migration": ["repeated_prefix_agent"],
-    "unified-communication-migration": ["distributed_pipeline", "high_concurrency"],
+    "pyramidkv-ascend-migration": ["long_context", "memory_kv_pressure"],
     "split-batch-full-graph-migration": ["high_concurrency", "prefill_heavy", "decode_heavy"],
-    "kv-transfer-observability-migration": ["distributed_pipeline"],
-    "layered-prefill-migration": ["prefill_heavy", "long_context"],
-    "activation-sparsity-migration": ["decode_heavy"],
     "pipeline-microbatch-migration": ["distributed_pipeline", "high_concurrency"],
-    "qos-scheduler-migration": ["latency_slo", "high_concurrency"],
     "betterscale": ["distributed_pipeline"],
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
-    "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"]
+    "kv-transfer-observability-migration": ["lifecycle_control", "memory_kv_pressure"],
+    "clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
+    "tricard-clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
+    "quality-bounded-inference": ["latency_slo", "high_concurrency"],
+    "llm-serving-cost-pricing-model": ["profiling_analysis"],
+    "kv-materialization-arrival-control": ["repeated_prefix_agent", "memory_kv_pressure"],
+    "unified-communication-migration": ["distributed_pipeline"]
   }
 }

@@ -25,7 +25,7 @@
       "name": "vLLM-HUST Extension Manager",
       "artifact_type": "tool",
       "system_role": "extension_management",
-      "integration_contracts": ["vllm_hust.extension_manifest.v0.2-experimental"],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": ["vllm_hust.extension_bundles", "vllm_hust_ext.providers"],
       "execution_planes": ["management"],
       "deployment_topology": "out_of_process",
@@ -165,8 +165,12 @@
       "maturity": "supported",
       "canonical_repository": "https://github.com/vllm-project/vllm",
       "upstream_repository": "https://github.com/kvcache-ai/Mooncake",
-      "summary_en": "Official vLLM MooncakeStoreConnector validated on Ascend with 9-key save/load and outage/recovery evidence; the non-invasive Host Provider checks NPU transport and operation evidence while Mooncake retains service ownership.",
-      "summary_zh": "官方 vLLM MooncakeStoreConnector 已在 Ascend 完成 9-key save/load 与故障恢复实测；无侵入 Host Provider 检查 NPU transport 和操作证据，Mooncake 仍保留服务所有权。",
+      "summary_en": "Official vLLM MooncakeStoreConnector validated on Ascend with 9-key save/load and outage/recovery evidence; the non-invasive Host Provider checks NPU transport and operation evidence while Mooncake retains service ownership. A separate manager-launched Qwen3.5 benchmark setting tested AscendStoreConnector + Mooncake at five matched points, with throughput 1.02%–2.66% lower; these are not performance results for the official connector.",
+      "summary_zh": "官方 vLLM MooncakeStoreConnector 已在 Ascend 完成 9-key save/load 与故障恢复实测；无侵入 Host Provider 检查 NPU transport 和操作证据，Mooncake 仍保留服务所有权。另一个 Qwen3.5 实验设定通过插件管理器测试 AscendStoreConnector + Mooncake：五档匹配对照吞吐低 1.02%–2.66%，并非官方连接器路径的性能结论。",
+      "public_effect_en": "The official MooncakeStoreConnector has functional save/load and outage/recovery evidence. The separate AscendStoreConnector + Mooncake measurements are deliberately not scored on this card because they did not exercise the official connector.",
+      "public_effect_zh": "官方 MooncakeStoreConnector 已有 save/load 与故障恢复功能证据。另一组 AscendStoreConnector + Mooncake 测量未执行官方 connector，因此不会归入此卡片的性能分数。",
+      "public_effect_status": "validated",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-UNIFIED-MODS.md",
       "compatibility": {
         "status": "verified",
         "host": "vLLM official connector",
@@ -193,16 +197,16 @@
       "maintainer_profiles": [{"login": "mynameisczj", "name": "陈子嘉"}],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
       "upstream_repository": null,
-      "summary_en": "HUST-owned KV state system with storage, transfer, and metadata services.",
-      "summary_zh": "包含存储、传输与元数据服务的 HUST 自有 KV 状态系统。",
-      "evidence_level": "integration_tested"
+      "summary_en": "HUST-owned KV state system with storage, transfer, metadata services, and measured Ascend IPC save/load execution.",
+      "summary_zh": "包含存储、传输与元数据服务的 HUST 自有 KV 状态系统，已实测 Ascend IPC save/load 执行路径。",
+      "evidence_level": "performance_verified"
     },
     {
       "id": "pegaflow-vllm-connectors",
       "name": "PegaFlow vLLM Connectors",
       "artifact_type": "bridge",
       "system_role": "kv_integration",
-      "integration_contracts": ["vllm_hust.extension_manifest.v0.2-experimental"],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": ["vllm_hust_ext.providers", "vllm.general_plugins", "vllm.kv_transfer_config"],
       "execution_planes": ["api", "scheduler", "worker"],
       "deployment_topology": "in_process",
@@ -214,17 +218,65 @@
       "maintainer_profiles": [{"login": "mynameisczj", "name": "陈子嘉"}],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
       "upstream_repository": null,
-      "summary_en": "Non-invasive PegaFlow Host Provider and PegaKVConnector profile. It renders vLLM KV-transfer configuration and health checks, while the external operator retains service lifecycle and stored-data ownership.",
-      "summary_zh": "无侵入 PegaFlow Host Provider 与 PegaKVConnector profile；只生成 vLLM KV-transfer 配置并执行健康检查，服务生命周期和已存 KV 数据仍由外部运维者负责。",
+      "summary_en": "Manifest 0.3 PegaFlow Host Provider and PegaKVConnector profile, with runtime-owned Bundle packaging and fail-closed external-service checks; the external operator retains service lifecycle and stored-data ownership. The pinned Qwen3.5 result remains separate historical performance evidence.",
+      "summary_zh": "Manifest 0.3 PegaFlow Host Provider 与 PegaKVConnector profile 已修正为 runtime distribution 持有 Bundle，并对外部服务执行 fail-closed 检查；服务与数据生命周期仍归外部运维者。固定 Qwen3.5 结果仍作为单独的历史性能证据。",
+      "public_effect_en": "On the exact Qwen3.5-35B BF16 setting, the five-point geometric-mean output-throughput change is +6.34% versus the shared Native series; C1 regresses while C2-C16 improve.",
+      "public_effect_zh": "在完全相同的 Qwen3.5-35B BF16 设定下，相对统一 Native 曲线，五点输出吞吐几何平均变化为 +6.34%；C1 回退，C2-C16 提升。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PEGAFLOW.md",
       "compatibility": {
-        "status": "external_service",
-        "host": "vLLM KV connector",
-        "versions": ["Manifest 0.2 experimental"],
-        "platforms": ["Ascend NPU"],
-        "requirements_en": "PegaFlow must be deployed and operated separately.",
-        "requirements_zh": "PegaFlow 必须单独部署和运维。"
+        "status": "verified",
+        "host": "vLLM-HUST 0.25.1 reference runtime + vLLM-Ascend-HUST",
+        "versions": ["PegaFlow 0.23.3 @ cd64ecc (performance evidence)", "ECPA Bundle 0.3 @ 14ca1d4 (packaging and fail-closed lifecycle)", "Extension Provider 0.2.0.dev0"],
+        "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B · TP2/PP1 · FULL_AND_PIECEWISE"],
+        "python": [">=3.10"],
+        "requirements_en": "PegaFlow remains an external operator-owned service. The measured profile uses a 30 GiB pinned pool, PegaKVConnector read_write mode, APC, async scheduling, Mamba align, and native MTP2.",
+        "requirements_zh": "PegaFlow 仍是由外部运维者管理的服务；实测 profile 使用 30 GiB pinned pool、PegaKVConnector read_write、APC、异步调度、Mamba align 与原生 MTP2。",
+        "models": ["Qwen3.5-35B-A3B — unified BF16 setting verified"]
       },
-      "evidence_level": "integration_tested"
+      "evidence_level": "performance_verified"
+    },
+    {
+      "id": "adm",
+      "name": "ADM",
+      "name_en": "Ascend Distributed Metadata",
+      "name_zh": "昇腾分布式元数据",
+      "artifact_type": "runtime_component",
+      "system_role": "dp_metadata_sync",
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
+      "integration_surfaces": ["vllm_hust.extension_bundles", "vllm.general_plugins", "NPUModelRunner._sync_metadata_across_dp (AST-pinned)"],
+      "execution_planes": ["worker"],
+      "deployment_topology": "in_process",
+      "delivery_model": "python_distribution",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "maintainers": ["sad-and-bad1231"],
+      "maintainer_profiles": [{"login": "sad-and-bad1231", "name": "匡明轩"}],
+      "canonical_repository": "https://github.com/vLLM-HUST/ascend-distributed-metadata",
+      "upstream_repository": null,
+      "summary_en": "Opt-in, version-pinned Ascend DP scheduling-metadata plugin. It preserves the native token vector and graph-mode result while packing DP2 and DP4 rank metadata into one CPU-group all-reduce word.",
+      "summary_zh": "按版本固定、默认关闭的昇腾 DP 调度元数据插件；保持原生 token 向量和图模式结果，将 DP2、DP4 各 rank 元数据打包到一次 CPU 组 all-reduce。",
+      "public_effect_en": "On Qwen3-30B-A3B-W8A8 TP1/DP4, three matched session means favored the new word path by 0.38%, 0.71%, and 1.32% against the previous published MOD; aggregate output throughput was 467.099 vs 463.376 tok/s (+0.80%). Individual rounds varied. This does not establish general speedup or research recovery acceptance.",
+      "public_effect_zh": "Qwen3-30B-A3B-W8A8 TP1/DP4 三组配对会话相对先前已发布 MOD 分别提升 0.38%、0.71%、1.32%；输出吞吐总均值为 467.099 对 463.376 tok/s（+0.80%）。单轮存在波动，不代表普遍提速或研究恢复验收。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/ascend-distributed-metadata/blob/main/qualifications/qwen3moe-dp4-int64-word-20260928.json",
+      "functional_compatibility": {"status": "passed", "scope": "Qwen3-30B-A3B-W8A8 · Ascend 910B2 · TP1/DP4 · FULL_DECODE_ONLY graph"},
+      "effectiveness_qualifications": [
+        {"status": "measured", "scope": "Qwen3-30B-A3B-W8A8 · DP4 · three paired sessions · +0.80% mean output throughput vs previous MOD"},
+        {"status": "inconclusive", "scope": "Qwen3.5-35B-A3B · TP4/DP2 eager · service gain not established"}
+      ],
+      "compatibility": {
+        "status": "verified",
+        "host": "vLLM-HUST + vLLM-Ascend-HUST",
+        "versions": ["Core e1248fa2655fdb8d72f80a5d6c28fa9c75b660c0", "Ascend 367b8e62da799870a7476ce34f5f7658589a8aad", "ADM performance artifact 16362b2d6c229ec1c900b87cdb2c974039db95a6", "ECPA 0.3 package 462e0750faf7eea6317b13b692fb3326894d5796"],
+        "platforms": ["Ascend 910B2 · TP1/DP4 · FULL_DECODE_ONLY graph"],
+        "models": ["Qwen3-30B-A3B-W8A8 — matched DP4 serving qualified", "Qwen3.5-35B-A3B — DP2 functional; throughput benefit unconfirmed"],
+        "python": [">=3.11"],
+        "requirements_en": "The Manifest 0.3 wheel is discoverable and clean-wheel tested. ECPA may express enable intent, but launch still requires the exact runtime-qualification profile; packaging does not widen the published performance result or make ADM a recovery protocol.",
+        "requirements_zh": "Manifest 0.3 wheel 已可发现并通过 clean-wheel 测试。ECPA 可表达启用意图，但启动仍要求精确匹配 runtime-qualification profile；打包不会扩大既有性能结论，也不会把 ADM 变成恢复协议。"
+      },
+      "evidence_level": "performance_verified"
     },
     {
       "id": "bidkv",
@@ -247,26 +299,27 @@
       "maintainers": ["MingqiWang-coder", "cybber695"],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
       "upstream_repository": null,
-      "summary_en": "BidKV ba700cb uses the merged vLLM-HUST preemption-policy API v1 with bounded safe abstention; runtime tree 199e0bd passed Qwen3.8-27B artifact functional qualification on Core a4d6aa0, Ascend 2c8c722 and TP4 graph. Only 5/13 Stage-1 effectiveness cells have real runs, and corrected output gates need a fresh run.",
-      "summary_zh": "BidKV ba700cb 使用已合并的 vLLM-HUST preemption-policy API v1 与有界安全弃权；运行树 199e0bd 已在 Core a4d6aa0、Ascend 2c8c722、Qwen3.8-27B、TP4 graph 上通过制品功能资格验收。Stage-1 效果矩阵仅 5/13 个单元有真实运行，修正后的输出门槛仍需新运行。",
-      "public_effect_en": "All five functional pairs and the cancellation/recovery lane passed with zero policy failures or invalid selections. Ascending mixed is inconclusive because one repeat did not invoke the policy. In interactive c=8 (n=3), throughput was -25.31% and P95 latency +34.57%, so that cell is not beneficial.",
-      "public_effect_zh": "五组功能配对及取消/恢复通道全部通过，策略失败和无效选择均为 0。ascending mixed 因一轮未触发策略而为 inconclusive；interactive c=8（n=3）吞吐 -25.31%、P95 延迟 +34.57%，因此该单元不具收益。",
-      "public_effect_status": "inconclusive",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-bidkv/blob/main/docs/evidence/sage-mate-20260905-bounded-preemption-matrix.md",
-      "functional_compatibility": {"status": "passed", "scope": "Qwen3.8-27B · Ascend TP4 · FULL_DECODE_ONLY graph"},
+      "summary_en": "BidKV uses the merged vLLM-HUST preemption-policy API v1 with bounded safe abstention. The latest Qwen3.5-35B-A3B TP4 KV-pressure campaign preserves two positive C12 pairs, active policy selections, negative tuning trials and shutdown diagnostics; it remains separate from the older TP2/SWE and Qwen3.8 observations.",
+      "summary_zh": "BidKV 使用已合并的 vLLM-HUST preemption-policy API v1 与有界安全弃权。最新 Qwen3.5-35B-A3B TP4 KV-pressure 实验保留两轮 C12 正向配对、真实策略选择、负向调参试验与退出诊断，并与旧 TP2/SWE 和 Qwen3.8 观察严格分开。",
+      "public_effect_en": "In the Qwen3.5 TP4 C12 cell with 512 MiB KV per NPU, two alternating-order pairs improved output throughput by 17.11% and 10.65% (13.83% geometric mean; 13.88% arithmetic mean). BidKV made 10 and 7 active selections with zero policy failures. Other retained cells are negative or not exercised, so this is a tested-cell result, not a general speedup claim.",
+      "public_effect_zh": "在 Qwen3.5 TP4 C12、每 NPU 512 MiB KV 的测试单元中，两轮交替顺序配对的输出吞吐分别提升 17.11% 与 10.65%（几何平均 13.83%，算术平均 13.88%）。BidKV 分别执行 10 与 7 次有效选择，策略失败为 0。其余保留单元为负向或未触发，因此这只是已测单元结果，不代表普遍加速。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-bidkv/blob/main/results/qwen35-evoscientist-20260929/README.md#high-concurrency-kv-pressure-result",
+      "functional_compatibility": {"status": "passed", "scope": "Qwen3.5-35B-A3B · Ascend TP4 · FULL_AND_PIECEWISE graph; Qwen3.8-27B · Ascend TP4 · FULL_DECODE_ONLY graph"},
       "effectiveness_qualifications": [
+        {"status": "beneficial", "scope": "Qwen3.5 TP4 · C12 · 512 MiB KV/NPU · n=2 paired repeats"},
         {"status": "inconclusive", "scope": "ascending mixed · concurrency=4 · n=3"},
         {"status": "not-beneficial-in-tested-cell", "scope": "interactive · concurrency=8 · n=3"}
       ],
       "runtime_state_dimensions": ["installed", "configured", "enabled", "runtimeEffective"],
       "compatibility": {
         "status": "verified",
-        "host": "vLLM-HUST",
-        "versions": ["0.28.1rc1.dev319 @ 762f85b3"],
-        "platforms": ["Ascend NPU · TP4 · graph"],
-        "models": ["Qwen3.8-27B — artifact functional qualified; effectiveness matrix incomplete", "Qwen3-0.6B — historical 0.23 lane", "Qwen2.5-3B — historical 0.23 lane"],
-        "requirements_en": "Organization main ba700cb; qualified runtime tree 199e0bd with Manager 6e9a477. Functional compatibility, per-cell effectiveness, and live installed/configured/enabled/runtime-effective state are separate facts.",
-        "requirements_zh": "组织 main 为 ba700cb；已验证运行树 199e0bd，Manager 6e9a477。功能兼容性、逐测试单元效果与当前实例 installed/configured/enabled/runtime-effective 是彼此独立的事实。"
+        "host": "vLLM-HUST (setting-specific pinned runtimes)",
+        "versions": ["BidKV 0.2.1 measured @ a0cba97", "Qwen3.5 evidence merged @ edb7f09", "Qwen3.8 qualified runtime tree 199e0bd"],
+        "platforms": ["Ascend NPU · TP4 · FULL_AND_PIECEWISE", "Ascend NPU · TP4 · FULL_DECODE_ONLY"],
+        "models": ["Qwen3.5-35B-A3B — TP4 C12 KV-pressure measured; tested-cell benefit", "Qwen3.8-27B — artifact functional qualified; effectiveness matrix incomplete", "Qwen3-0.6B — historical 0.23 lane", "Qwen2.5-3B — historical 0.23 lane"],
+        "requirements_en": "The Qwen3.5 result used Core f18cf803, Ascend 249ac12 plus the recorded build patch, FULL_AND_PIECEWISE graph, C12 and 512 MiB KV/NPU. Do not pool it with the TP2/SWE five-point observation or the older Qwen3.8 matrix. Functional compatibility, per-cell effectiveness, and live runtime-effective state are separate facts.",
+        "requirements_zh": "Qwen3.5 结果使用 Core f18cf803、Ascend 249ac12 加已记录构建补丁、FULL_AND_PIECEWISE graph、C12 与每 NPU 512 MiB KV。不得与 TP2/SWE 五点观察或旧 Qwen3.8 矩阵合并。功能兼容、逐单元效果与当前实例 runtime-effective 状态是不同事实。"
       },
       "evidence_level": "performance_verified"
     },
@@ -319,7 +372,7 @@
       "name_zh": "vSpec 投机解码",
       "artifact_type": "runtime_component",
       "system_role": "decoding_mechanism",
-      "integration_contracts": ["vllm_hust.extension_manifest.v0.2-experimental"],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": [
         "vllm.general_plugins",
         "vllm_hust.extension_bundles",
@@ -375,9 +428,10 @@
         {"login": "pluviophile-chen", "name": "陈德斌"}
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE",
+      "repository_visibility": "private",
       "upstream_repository": null,
-      "summary_en": "LatchMoE is not applicable to dense Qwen3.8-27B. Qwen3-30B-A3B is functionally qualified on Core 762f85b3, Ascend 4e57439e/seam v2, TP4 graph (PIECEWISE), but performance is substantially degraded.",
-      "summary_zh": "LatchMoE 不适用于 dense Qwen3.8-27B。Qwen3-30B-A3B 已在 Core 762f85b3、Ascend 4e57439e/seam v2、TP4 PIECEWISE graph 上通过功能资格验证，但性能明显退化。",
+      "summary_en": "LatchMoE is not applicable to dense Qwen3.8-27B. Version 0.3.0 is now packaged under the Extension Bundle contract with a narrowed TP1 PIECEWISE functional release scope. Its published throughput comparison remains a separate historical Qwen3-30B-A3B TP4 graph artifact and is substantially degraded.",
+      "summary_zh": "LatchMoE 0.3.0 已按 Extension Bundle 合同打包，当前功能发行范围收窄为 TP1 PIECEWISE。公开吞吐对比仍属于独立的历史 Qwen3-30B-A3B TP4 制品，且性能明显退化；dense Qwen3.8-27B 不适用。",
       "public_effect_en": "All four ranks exercised expert mapping, host/device movement and graph replay with 48/48 stable-address checks. Four concurrent outputs, cancellation and exception recovery passed; output throughput was about 2.91 tok/s versus 23.57 tok/s without the plugin.",
       "public_effect_zh": "四个 rank 均实际执行专家映射、主机/设备换入换出与 graph replay，48/48 地址稳定性检查通过；四路并发输出、取消与异常恢复通过，但输出吞吐约 2.91 tok/s，显著低于无插件基线的 23.57 tok/s。",
       "public_effect_status": "not-beneficial-in-tested-cell",
@@ -388,16 +442,17 @@
       "compatibility": {
         "status": "verified",
         "host": "vLLM Ascend HUST",
-        "versions": ["Core 762f85b3 + Ascend 4e57439e/seam-v2"],
-        "platforms": ["Ascend NPU · TP4 · graph"],
-        "models": ["Qwen3-30B-A3B — verified functional, performance degraded", "Qwen3.8-27B — not applicable (dense)", "GLM-4.7-Flash — historical single-NPU lane", "Qwen3-Next-80B-A3B-Instruct — historical single-NPU lane"],
-        "requirements_en": "Qualified artifact 63781f3d on Qwen3-30B-A3B BF16 TP4 PIECEWISE graph, max_num_seqs=4. Functional compatibility does not imply a speedup or production recommendation.",
-        "requirements_zh": "已验证制品 63781f3d：Qwen3-30B-A3B BF16、TP4 PIECEWISE graph、max_num_seqs=4。功能兼容不代表加速效果或生产推荐。"
+        "versions": ["Current package 0.3.0 @ 75b922b", "Historical TP4 performance artifact 63781f3d · Core 762f85b3 + Ascend 4e57439e/seam-v2"],
+        "platforms": ["Current release scope: Ascend NPU · TP1 · PIECEWISE · prefix cache off", "Historical performance scope: Ascend NPU · TP4 · PIECEWISE graph"],
+        "models": ["Qwen3-30B-A3B — current TP1 functional release scope; historical TP4 performance degraded", "Qwen3.8-27B — not applicable (dense)", "GLM-4.7-Flash — historical single-NPU lane", "Qwen3-Next-80B-A3B-Instruct — historical single-NPU lane"],
+        "requirements_en": "The current 0.3.0 package scope and the historical TP4 performance artifact are different qualifications. The -87.65% card result belongs only to artifact 63781f3d on Qwen3-30B-A3B BF16 TP4 PIECEWISE graph with max_num_seqs=4; it must not be transferred to the TP1 release package.",
+        "requirements_zh": "当前 0.3.0 包范围与历史 TP4 性能制品是两项不同资格。卡片中的 -87.65% 仅属于制品 63781f3d 在 Qwen3-30B-A3B BF16、TP4 PIECEWISE、max_num_seqs=4 下的结果，不得转移到 TP1 发行包。"
       },
       "evidence_level": "hardware_verified"
     },
     {
       "id": "ascend-adaptive-quantized-kv",
+      "public_surface": false,
       "name": "Adaptive Quantized KV",
       "artifact_type": "runtime_component",
       "system_role": "kv_quantization_research",
@@ -451,6 +506,7 @@
     },
     {
       "id": "ascend-quant-runtime-descriptor",
+      "public_surface": false,
       "name": "Ascend Quant Runtime Descriptor",
       "name_en": "Ascend Quant Runtime Descriptor",
       "name_zh": "昇腾量化运行时描述器",
@@ -493,40 +549,68 @@
       "artifact_type": "runtime_component",
       "system_role": "kv_state_manager",
       "integration_contracts": [],
-      "integration_surfaces": ["vllm.general_plugins", "vllm.kv_compression.provider", "vllm.kv_lifecycle"],
-      "execution_planes": ["scheduler", "worker", "device"],
+      "integration_surfaces": [
+        "vllm.general_plugins",
+        "vllm.kv_compression.provider",
+        "vllm.kv_lifecycle"
+      ],
+      "execution_planes": [
+        "scheduler",
+        "worker",
+        "device"
+      ],
       "deployment_topology": "in_process",
       "delivery_model": "plugin_bundle",
       "ownership": "hust_owned_subsystem",
       "repository_relationship": "organization_native",
       "maturity": "incubating",
-      "maintainers": ["Jiawan23"],
-      "maintainer_profiles": [{"login": "Jiawan23", "name": "张家万"}],
+      "maintainers": [
+        "Jiawan23"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "Jiawan23",
+          "name": "张家万"
+        }
+      ],
       "advisors": [
-        {"name_zh": "万瑶", "name_en": "Yao Wan", "relationship": "internal"}
+        {
+          "name_zh": "万瑶",
+          "name_en": "Yao Wan",
+          "relationship": "internal"
+        }
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust",
       "upstream_repository": null,
-      "summary_en": "KV transformation and compression provider built on transactional KV lifecycle hooks.",
-      "summary_zh": "建立在事务化 KV 生命周期接口上的状态转换与压缩 provider。",
-      "public_effect_en": "On one Ascend 910B2 with Qwen2.5-Coder-14B, published matched runs report +10.25% long-context throughput, +4.68% under KV pressure, and a 75% physical prompt-KV reduction; the 64-case recall check changed from 64/64 to 63/64.",
-      "public_effect_zh": "单张 Ascend 910B2、Qwen2.5-Coder-14B 的公开配对测试中：长上下文吞吐 +10.25%，KV 压力吞吐 +4.68%，物理 prompt KV 减少 75%；64 例 recall 从 64/64 变为 63/64。",
+      "summary_en": "KV transformation and compression provider for vLLM Ascend. The measured Qwen3.5 artifact supports hybrid cache groups, APC, asynchronous scheduling and MTP2; current main additionally carries method-neutral per-layer physical state and query-observation support for graph replay.",
+      "summary_zh": "vLLM Ascend KV 状态转换与压缩 provider。已测 Qwen3.5 制品支持混合缓存分组、APC、异步调度与 MTP2；当前 main 还加入了面向 graph replay 的方法无关逐层物理状态与 query observation 支持。",
+      "public_effect_en": "On the exact Qwen3.5-35B BF16 setting, the five-point geometric-mean output-throughput change is -3.55% versus the shared Native series.",
+      "public_effect_zh": "在完全相同的 Qwen3.5-35B BF16 设定下，相对统一 Native 曲线，五个并发点的输出吞吐几何平均变化为 -3.55%。",
       "public_effect_status": "measured",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/main/docs/resuts.md",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
       "compatibility": {
         "status": "verified",
         "host": "vLLM-HUST + vLLM-Ascend-HUST",
         "versions": [
-          "vLLM-HUST >=0.23.1,<0.24",
-          "vLLM-Ascend-HUST >=0.19.1,<0.20",
-          "Extension 0.2.0"
+          "vLLM-HUST 0.25.1+frontier.unified",
+          "vLLM-Ascend-HUST 0.25.1rc1",
+          "Measured KVCompress artifact 2ca0f933",
+          "Current compatibility head d5507c2 (per-layer MTP graph replay; no performance transfer)"
         ],
-        "platforms": ["Single Ascend NPU", "Eager or ACL graph"],
-        "python": [">=3.10,<3.15"],
-        "requirements_en": "Use one plain full-attention KV group with block size 128 and separate contiguous BF16/FP16 K/V tensors; disable prefix caching, async scheduling, and the independent KNorm compressor. Multi-device, hybrid/MLA, sliding-window, speculative-decoding, KV-transfer, sparse-layout, and quantized-KV configurations fail closed.",
-        "requirements_zh": "仅支持单一普通 full-attention KV group、block size 128，以及分离且连续的 BF16/FP16 K/V tensor；需关闭 prefix caching、async scheduling 与独立 KNorm compressor。多设备、hybrid/MLA、sliding-window、speculative decoding、KV transfer、稀疏布局和量化 KV 配置均会 fail-closed。"
+        "platforms": [
+          "Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph"
+        ],
+        "python": [
+          ">=3.10,<3.15"
+        ],
+        "requirements_en": "The -3.55% observation is pinned to measured artifact 2ca0f933 and is not a performance claim for current main d5507c2. The measured setting used ECPA, TP2, aligned hybrid KV groups, APC, asynchronous scheduling and native MTP2. Runtime effectiveness requires cache-binding and compression-commit evidence.",
+        "requirements_zh": "-3.55% 观察固定属于实测制品 2ca0f933，不构成当前 main d5507c2 的性能结论。实测设定通过 ECPA 启动，使用 TP2、align 混合 KV 分组、APC、异步调度和原生 MTP2；运行时生效需同时观测缓存绑定与压缩提交。",
+        "models": [
+          "Qwen3.5-35B-A3B — unified BF16 setting verified"
+        ],
+        "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/issues/2"
       },
-      "evidence_level": "hardware_verified"
+      "evidence_level": "performance_verified"
     },
     {
       "id": "prefix-router-migration",
@@ -550,41 +634,59 @@
     },
     {
       "id": "kv-tiering-migration",
+      "public_surface": true,
       "name": "KV Tiering",
       "name_en": "KV Tiering",
       "name_zh": "KV 分层",
       "artifact_type": "runtime_component",
       "system_role": "kv_residency_provider",
       "integration_contracts": [],
-      "integration_surfaces": ["vllm.kv_offload", "vllm.kv_connector"],
-      "execution_planes": ["scheduler", "worker", "external_service"],
+      "integration_surfaces": [
+        "vllm.kv_offload",
+        "vllm.kv_connector"
+      ],
+      "execution_planes": [
+        "scheduler",
+        "worker",
+        "external_service"
+      ],
       "deployment_topology": "mixed",
-      "delivery_model": "migration_scaffold",
+      "delivery_model": "plugin_bundle",
       "ownership": "original_contributor_maintained",
-      "maintainers": ["JieYang2001"],
+      "maintainers": [
+        "JieYang2001"
+      ],
       "repository_relationship": "organization_native",
-      "maturity": "incubating",
+      "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
       "upstream_repository": null,
-      "summary_en": "Owner-led migration of legacy device/CPU/filesystem KV residency and lifecycle management. Repository scaffold only; destructive shared-state operations are outside the manager boundary.",
-      "summary_zh": "由原贡献者主导迁移 legacy 设备、CPU 与文件系统 KV 驻留及生命周期管理；目前仅为迁移仓库，Manager 不负责破坏性共享状态操作。",
-      "public_effect_en": "Capability preview: tier KV residency across device, CPU, and filesystem storage. The public repository is still a migration scaffold and publishes no benchmark claim.",
-      "public_effect_zh": "能力预览：在设备、CPU 与文件系统之间分层管理 KV 驻留；当前仍是迁移脚手架，尚无公开 benchmark 声明。",
-      "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering",
+      "summary_en": "Experimental device/CPU/filesystem KV tiering packaged as an ECPA 0.3 custom Provider. The merged package is inspectable; current-host activation and recovery remain separate gates.",
+      "summary_zh": "实验性的设备、CPU、文件系统 KV 分层，已打包为 ECPA 0.3 自定义 Provider。合并后的包可检查；当前宿主激活与恢复仍是独立门槛。",
+      "public_effect_en": "Five Qwen3.5 TP2 concurrency points and matched Native controls are measured through Extension Manager. Throughput is 2.33–5.23% lower in these single observations; all windows show cache stores but zero restores, so no reuse benefit is demonstrated.",
+      "public_effect_zh": "已通过插件管理器完成 Qwen3.5 TP2 五档并发及匹配 Native 对照。本次单次观测中吞吐低 2.33%–5.23%；所有窗口仅写出缓存、没有回读，未证明复用收益。",
+      "public_effect_status": "inconclusive",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-KV-TIERING-20260926.md",
       "compatibility": {
-        "status": "source_scaffold",
-        "host": "KV residency host contract pending",
-        "versions": ["No installable or runnable release"],
-        "platforms": ["Device / CPU / filesystem tiers are targets only; unverified"],
-        "requirements_en": "The repository contains README, provenance, and ownership records only. A versioned host contract, package or manifest, implementation, and platform validation are all required before installation.",
-        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需版本化宿主合同、package 或 manifest、实现代码与平台验证。",
+        "status": "experimental",
+        "host": "ECPA 0.3 custom Provider; current host qualification pending",
+        "versions": [
+          "ECPA 0.3 package 03f17227; historical runtime evidence remains pinned to Tiering 7ba646a / Host 49f0827 / Manager cf1ea71"
+        ],
+        "platforms": [
+          "Ascend 910B2 · TP2 · CANN 9.1.0 · graph/APC/MTP2/async"
+        ],
+        "models": [
+          "Qwen3.5-35B-A3B BF16 — pinned setting only"
+        ],
+        "requirements_en": "The merged ECPA 0.3 package and clean-wheel checks restore preview visibility only. Historical measurements retain their exact receipt; current main still requires host-contract, storage-consistency and recovery qualification before activation.",
+        "requirements_zh": "合并后的 ECPA 0.3 包及 clean-wheel 检查仅恢复预览展示。历史测量保留其精确运行清单；当前 main 在激活前仍需完成宿主契约、存储一致性与恢复验收。",
         "followup_url": "https://github.com/vLLM-HUST/vllm-hust-kv-tiering/issues/1"
       },
-      "evidence_level": "legacy_evidence"
+      "evidence_level": "performance_verified"
     },
     {
       "id": "knorm-migration",
+      "public_surface": true,
       "name": "KNorm",
       "name_en": "KNorm",
       "name_zh": "KNorm",
@@ -594,32 +696,34 @@
       "integration_surfaces": ["vllm.kv_compression.provider", "vllm.kv_lifecycle"],
       "execution_planes": ["scheduler", "worker"],
       "deployment_topology": "in_process",
-      "delivery_model": "migration_scaffold",
+      "delivery_model": "plugin_bundle",
       "ownership": "original_contributor_maintained",
       "maintainers": ["kotoriqaq0", "SuccinctPaul"],
       "repository_relationship": "organization_native",
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-knorm",
       "upstream_repository": null,
-      "summary_en": "Owner-led extraction of the legacy KNorm KV-compression method behind a host-owned transactional lifecycle. Repository scaffold only; prefix-cache and mutation-owner conflicts remain release gates.",
-      "summary_zh": "由原贡献者主导，把 legacy KNorm 抽取为宿主事务化 KV 生命周期之后的压缩方法；目前仅为迁移仓库，prefix cache 与 KV 修改所有权冲突仍是发布门槛。",
+      "summary_en": "Owner-led ECPA 0.3 package for the legacy KNorm KV-compression method. The bundle is clean-wheel inspectable; prefix-cache and mutation-owner conflicts remain activation gates.",
+      "summary_zh": "由原贡献者主导的 legacy KNorm KV 压缩方法 ECPA 0.3 包。bundle 已通过 clean-wheel 检查；prefix cache 与 KV 修改所有权冲突仍是激活门槛。",
       "public_effect_en": "Capability preview: extract KNorm as a host-governed KV compression method. The public scaffold makes no performance or quality claim yet.",
       "public_effect_zh": "能力预览：把 KNorm 抽取为由宿主管理的 KV 压缩方法；公开脚手架尚不声明性能或质量结果。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-knorm",
       "compatibility": {
-        "status": "source_scaffold",
+        "status": "inspect_only",
         "host": "Host-owned transactional KV-compression lifecycle pending",
-        "versions": ["No installable or runnable release"],
+        "versions": ["ECPA 0.3 package 563173e1"],
         "platforms": ["Platform support unverified"],
-        "requirements_en": "The repository contains README, provenance, and ownership records only. A package or manifest, implementation, and proof of safe composition with prefix caching and other KV block-table mutation owners are required before installation.",
-        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需 package 或 manifest、实现代码，并证明可与 prefix caching 及其他 KV block-table 修改方安全组合。",
+        "python": [">=3.10"],
+        "requirements_en": "Manifest 0.3 and clean-wheel discovery are verified. Activation remains fail-closed until operator correctness, current-host compatibility, recovery, and safe composition with prefix caching and other KV mutation owners are proven.",
+        "requirements_zh": "Manifest 0.3 与 clean-wheel 发现已验证。算子正确性、当前宿主兼容性、恢复以及与 prefix caching 和其他 KV 修改方的安全组合得到证明前，激活继续 fail closed。",
         "followup_url": "https://github.com/vLLM-HUST/vllm-hust-knorm/issues/1"
       },
-      "evidence_level": "legacy_evidence"
+      "evidence_level": "cpu_smoke"
     },
     {
       "id": "pyramidkv-ascend-migration",
+      "public_surface": true,
       "name": "PyramidKV Ascend",
       "name_en": "PyramidKV Ascend",
       "name_zh": "PyramidKV 昇腾版",
@@ -629,7 +733,7 @@
       "integration_surfaces": ["vllm.kv_compression.provider", "vllm-ascend attention"],
       "execution_planes": ["scheduler", "worker", "device"],
       "deployment_topology": "in_process",
-      "delivery_model": "migration_scaffold",
+      "delivery_model": "plugin_bundle",
       "ownership": "original_contributor_maintained",
       "maintainers": ["Irisuko"],
       "maintainer_profiles": [{"login": "Irisuko", "name": "毛潮云"}],
@@ -640,22 +744,23 @@
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust",
       "upstream_repository": null,
-      "summary_en": "Owner-led recovery of the legacy PyramidKV Ascend provider with its fail-closed capability matrix and quality evidence. Repository scaffold only; the closed legacy PR is migration input, not a release.",
-      "summary_zh": "由原贡献者主导恢复 legacy PyramidKV Ascend provider，并保留 fail-closed 能力矩阵与质量证据；目前仅为迁移仓库，已关闭的 legacy PR 不是发行版。",
+      "summary_en": "Owner-led ECPA 0.3 PyramidKV Ascend Provider preserving a fail-closed capability matrix. The package is clean-wheel inspectable; model quality, graph behavior and recovery remain activation gates.",
+      "summary_zh": "由原贡献者主导的 ECPA 0.3 PyramidKV Ascend Provider，保留 fail-closed 能力矩阵。包已通过 clean-wheel 检查；模型质量、graph 行为与恢复仍是激活门槛。",
       "public_effect_en": "Capability preview: an Ascend PyramidKV provider with a fail-closed capability matrix and explicit quality evidence. The migration scaffold is not a released performance result.",
       "public_effect_zh": "能力预览：提供带 fail-closed 能力矩阵和显式质量证据的 Ascend PyramidKV provider；迁移脚手架不等于已发布性能结果。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust",
       "compatibility": {
-        "status": "source_scaffold",
+        "status": "inspect_only",
         "host": "vLLM-HUST + vLLM-Ascend-HUST contract pending",
-        "versions": ["No installable or runnable release"],
+        "versions": ["ECPA 0.3 package 84c7ecb1"],
         "platforms": ["Ascend NPU target; hardware validation pending"],
-        "requirements_en": "The repository contains README, provenance, and ownership records only. A package or manifest, implementation, preserved fail-closed capability matrix, prompt-admission guard, quality evidence, graph/model restrictions, and Ascend validation are required before installation.",
-        "requirements_zh": "仓库目前仅有 README、来源和负责人记录；安装前仍需 package 或 manifest、实现代码，并保留 fail-closed 能力矩阵、prompt-admission guard、质量证据、graph/model 限制并完成昇腾验证。",
+        "python": [">=3.10"],
+        "requirements_en": "Manifest 0.3, Provider isolation and clean-wheel discovery are verified. Activation remains fail-closed until prompt admission, quality, graph/model restrictions, current-host recovery and Ascend runtime evidence are qualified.",
+        "requirements_zh": "Manifest 0.3、Provider 隔离与 clean-wheel 发现已验证。完成 prompt admission、质量、graph/model 限制、当前宿主恢复及昇腾运行证据验收前，激活继续 fail closed。",
         "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust/issues/1"
       },
-      "evidence_level": "legacy_evidence"
+      "evidence_level": "cpu_smoke"
     },
     {
       "id": "slicegpt-migration",
@@ -749,17 +854,18 @@
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust",
       "upstream_repository": null,
-      "summary_en": "Owner-led carrier for INT8, KIVI INT4, and dynamic quantized KV-cache work. It is distinct from offline model quantization and Adaptive Quantized KV.",
-      "summary_zh": "INT8、KIVI INT4 与动态量化 KV cache 的原负责人迁移载体；与离线模型量化和 Adaptive Quantized KV 分开治理。",
-      "public_effect_en": "Capability preview: one owner-led home for INT8, KIVI INT4, and dynamic KV-cache quantization. Public benchmark results remain pending migration.",
-      "public_effect_zh": "能力预览：统一承载 INT8、KIVI INT4 与动态 KV Cache 量化；公开 benchmark 结果仍待迁移。",
-      "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust",
-      "compatibility": {"status": "inspect_only", "host": "vLLM Ascend (attachment contract pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Ascend NPU target; hardware unverified"], "python": [">=3.10"], "requirements_en": "The wheel, fail-closed dtype/layout resolver, and manifest are installable and inspectable; vLLM Ascend attachment, device kernels, and hardware evidence are required before activation.", "requirements_zh": "wheel、fail-closed dtype/layout resolver 与 manifest 可安装、可检查；激活前仍需补齐 vLLM Ascend 接入、设备 kernel 与硬件证据。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/issues/2"},
-      "evidence_level": "cpu_smoke"
+      "summary_en": "Ascend runtime plugin for dynamic per-channel INT8 KV cache; legacy KIVI and packed-format work remains separate migration history.",
+      "summary_zh": "面向昇腾的动态 per-channel INT8 KV Cache 运行时插件；KIVI 与其他 packed 格式仍属于后续迁移范围。",
+      "public_effect_en": "Real Qwen2.5-14B single-card serving, prefill/decode, ACL Graph replay, and three OpenAI API requests are verified. No matched performance comparison has been published.",
+      "public_effect_zh": "已验证 Qwen2.5-14B 单卡真实服务、prefill/decode、ACL Graph 回放及三次 OpenAI API 请求；尚无已发布的配对性能对比。",
+      "public_effect_status": "validated",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/tree/ae7b44bfee695d0ba580040dffd10eb802104485#%E5%B7%B2%E9%AA%8C%E8%AF%81%E7%8E%AF%E5%A2%83",
+      "compatibility": {"status": "experimental", "host": "vLLM Ascend HUST", "versions": ["Plugin 0.2.0.dev0 @ ae7b44b", "Core 8a6655cf62 + Ascend f4f49832"], "platforms": ["Ascend 910B single card · Qwen2.5-14B · 8K"], "python": [">=3.10"], "requirements_en": "Activation requires --kv-cache-dtype int8. TP2, Qwen3.5 hybrid cache, APC, MTP2, asynchronous scheduling, and the current Qwen3.5 graph-mode setting remain unqualified.", "requirements_zh": "启用需传入 --kv-cache-dtype int8；TP2、Qwen3.5 hybrid cache、APC、MTP2、异步调度及当前 Qwen3.5 图模式设定仍未验收。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust/issues/2"},
+      "evidence_level": "hardware_verified"
     },
     {
       "id": "simllm-migration",
+      "public_surface": false,
       "name": "SimLLM",
       "name_en": "SimLLM",
       "name_zh": "SimLLM",
@@ -787,6 +893,7 @@
     },
     {
       "id": "unified-communication-migration",
+      "public_surface": true,
       "name": "Unified Communication",
       "name_en": "Unified Communication",
       "name_zh": "统一通信",
@@ -799,16 +906,17 @@
       "delivery_model": "python_distribution",
       "ownership": "original_contributor_maintained",
       "maintainers": ["machuanhu"],
+      "advisors": [{"name_zh": "王雄", "name_en": "Xiong Wang", "relationship": "internal"}],
       "repository_relationship": "organization_native",
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-unified-comm",
       "upstream_repository": null,
-      "summary_en": "Owner-led carrier for a device-neutral communication library plus a narrow vLLM Host Provider; it is not an import-time scheduler plugin.",
-      "summary_zh": "设备中立通信库及窄 vLLM Host Provider 的原负责人迁移载体；不是 import-time scheduler 插件。",
-      "public_effect_en": "Capability preview: a device-neutral communication backend and narrow vLLM host-provider boundary. Runtime activation and performance evidence remain owner work.",
-      "public_effect_zh": "能力预览：提供设备中立通信后端与窄 vLLM Host Provider 边界；运行时激活和性能证据仍待负责人完成。",
+      "summary_en": "Device-neutral communication MOD with NCCL/HCCL backends, collective operations, transfer planes and communication strategies. Legacy implementations integrated GroupCoordinator and added NCCL multi-NIC bandwidth aggregation; the standalone version is being migrated.",
+      "summary_zh": "设备中立的统一通信 MOD，提供 NCCL/HCCL 后端、集合通信、传输面与通信策略抽象。历史实现已接入 GroupCoordinator，并加入 NCCL 多网卡带宽聚合；独立版本正在迁移接入。",
+      "public_effect_en": "Historical implementations exist: merged core PRs #42 and #168 cover unified communication integration and NCCL multi-NIC support. The standalone package remains inspect-only; this is not a claim of current activation or measured speedup.",
+      "public_effect_zh": "已有历史实现：核心 PR #42 与 #168 均已合并，包含统一通信接入及 NCCL 多网卡支持。当前独立包仍仅可安装与检查，尚不代表新版本可启用或已验证加速。",
       "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-unified-comm",
+      "public_effect_url": "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/42",
       "compatibility": {"status": "inspect_only", "host": "vLLM (collective Host Provider pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Device-neutral target; hardware unverified"], "python": [">=3.10"], "requirements_en": "The device-neutral registry and strategy wheel is installable and inspectable; backend packages, collective delegation, and hardware evidence are required before activation.", "requirements_zh": "设备中立的 registry 与策略 wheel 可安装、可检查；激活前仍需后端包、collective delegation 与硬件证据。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-unified-comm/issues/2"},
       "evidence_level": "cpu_smoke"
     },
@@ -848,33 +956,35 @@
     },
     {
       "id": "kv-transfer-observability-migration",
+      "public_surface": true,
       "name": "KV Transfer Observability",
       "name_en": "KV Transfer Observability",
       "name_zh": "KV 传输可观测性",
       "artifact_type": "runtime_component",
       "system_role": "telemetry_provider",
-      "integration_contracts": [],
-      "integration_surfaces": ["proposed KV transfer receipts", "recovery telemetry", "first-compute receipts"],
-      "execution_planes": ["api", "scheduler", "worker"],
-      "deployment_topology": "mixed",
-      "delivery_model": "python_distribution",
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental", "vllm.kv-transfer.observer.v1"],
+      "integration_surfaces": ["vllm_hust.extension_bundles", "vllm.general_plugins", "worker-local KV transfer callbacks"],
+      "execution_planes": ["worker"],
+      "deployment_topology": "in_process",
+      "delivery_model": "plugin_bundle",
       "ownership": "original_contributor_maintained",
       "maintainers": ["xiehanlong834-gif", "Remygred"],
       "repository_relationship": "organization_native",
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability",
       "upstream_repository": null,
-      "summary_en": "Owner-led observability carrier for identity-bound KV transfer, recovery, descriptor layout, and first-compute receipts; it owns no KV data or service lifecycle.",
-      "summary_zh": "面向身份绑定 KV 传输、恢复、descriptor layout 与首次计算回执的可观测性迁移载体；不拥有 KV 数据或服务生命周期。",
-      "public_effect_en": "Capability preview: auditable receipts for identity-bound KV transfer, recovery, descriptor layout, and first compute. It claims observability, not speedup.",
-      "public_effect_zh": "能力预览：为身份绑定 KV 传输、恢复、descriptor layout 与首次计算生成可审计回执；声明的是可观测性，不是加速。",
+      "summary_en": "Manifest 0.3 KV-transfer observer for bounded worker-local submit, complete, and cancel receipts. Cross-process recovery and descriptor correlation remain fail closed; it owns no KV data or service lifecycle.",
+      "summary_zh": "Manifest 0.3 KV 传输 observer，为 worker 本地 submit、complete 与 cancel 提供有界回执。跨进程恢复与 descriptor 关联继续 fail closed；它不拥有 KV 数据或服务生命周期。",
+      "public_effect_en": "Experimental CPU host-contract evidence: clean-wheel activation, real host callbacks, process-owned runtime-effective evidence, stop, and evidence expiry after process exit pass. No NPU or speedup claim is made.",
+      "public_effect_zh": "实验性 CPU host-contract 证据：clean-wheel 激活、真实宿主回调、进程自有 runtime-effective 证据、停止以及进程退出后的证据失效均通过。不声明 NPU 资格或加速。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability",
-      "compatibility": {"status": "inspect_only", "host": "vLLM (KV-transfer observer attachment pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Host-neutral target; runtime integration unverified"], "python": [">=3.10"], "requirements_en": "Address-free event and descriptor sinks are installable and inspectable; bounded automatic vLLM attachment and runtime receipts are required before integration.", "requirements_zh": "无地址事件与 descriptor sink 可安装、可检查；集成前仍需有界的 vLLM 自动接入与运行回执。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability/issues/2"},
+      "compatibility": {"status": "experimental", "host": "vLLM-HUST >=0.29.1,<0.30 with kv-transfer observer API 1.0", "versions": ["Plugin 0.2.0.dev0 @ 529ab282", "Host contract 115e5f6b0", "ECPA 0.3 Manager 5aa797cdc"], "platforms": ["CPU packaging, current-host callback and lifecycle evidence; NPU qualification incomplete"], "python": [">=3.10"], "requirements_en": "Only worker-local transfer receipts are activation-ready. Recovery/first-compute identity, descriptor ordering, Ascend call sites, device correctness/resource release, overhead and performance remain required.", "requirements_zh": "只有 worker 本地传输回执可激活。恢复/首次计算身份、descriptor 顺序、昇腾调用点、设备正确性与资源释放、开销和性能仍待验收。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability/issues/2"},
       "evidence_level": "cpu_smoke"
     },
     {
       "id": "layered-prefill-migration",
+      "public_surface": false,
       "name": "Layered Prefill",
       "name_en": "Layered Prefill",
       "name_zh": "分层预填充",
@@ -906,6 +1016,7 @@
     },
     {
       "id": "activation-sparsity-migration",
+      "public_surface": false,
       "name": "Activation Sparsity",
       "name_en": "Activation Sparsity",
       "name_zh": "激活稀疏",
@@ -965,15 +1076,16 @@
       "upstream_repository": null,
       "summary_en": "Owner-led calibrated pipeline-parallel microbatch scheduling carrier spanning scheduler, executor, communication, KV, worker, and benchmark boundaries.",
       "summary_zh": "校准式流水并行 microbatch 调度的原负责人研究载体，跨越 scheduler、executor、通信、KV、worker 与评测边界。",
-      "public_effect_en": "Research preview: calibrated pipeline-parallel microbatch scheduling across scheduler, executor, communication, KV, and worker boundaries. Public matched results are pending.",
-      "public_effect_zh": "研究预览：跨 scheduler、executor、通信、KV 与 worker 边界进行校准式流水并行 microbatch 调度；公开配对结果待补。",
-      "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch",
-      "compatibility": {"status": "inspect_only", "host": "vLLM (scheduler/worker attachment pending)", "versions": ["Extension 0.1.0.dev0", "Manifest 0.2-experimental"], "platforms": ["Platform-neutral target; distributed runtime unverified"], "python": [">=3.10"], "requirements_en": "Rank-local cost prediction and deterministic microbatch assignment are installable and inspectable; neutral scheduler, executor, communication, KV attachment, and matched performance evidence are required before activation.", "requirements_zh": "rank-local 成本预测与确定性 microbatch 分配可安装、可检查；激活前仍需中立的 scheduler、executor、通信、KV 接入与匹配性能证据。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch/issues/2"},
-      "evidence_level": "cpu_smoke"
+      "public_effect_en": "Five Qwen3.5 TP2/PP2 concurrency observations and matched Native controls are published, accounting for all four chips. The batch admission policy was exercised; each point is a single observation and does not establish a stable speedup.",
+      "public_effect_zh": "Qwen3.5 TP2/PP2 五档并发及匹配 Native 对照已发布，吞吐按全部四张卡计量。批次准入策略实际执行；每点仍为单次观测，不能据此宣称稳定加速。",
+      "public_effect_status": "inconclusive",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-PIPELINE-K8S.md",
+      "compatibility": {"status": "verified", "host": "vLLM reference scheduler policy", "versions": ["Pipeline a15a229", "vLLM 0.25.1 experimental backport · protocol 1.1"], "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B · TP2/PP2"], "models": ["Qwen3.5-35B-A3B — matched four-chip TP2/PP2 five-point observation"], "python": [">=3.10"], "requirements_en": "ECPA launched the measured APC, MTP2, asynchronous scheduling, Mamba align, and FULL_AND_PIECEWISE configuration. The published curve uses the matched four-chip TP2/PP2 Native control.", "requirements_zh": "ECPA 已启动实测所用的 APC、MTP2、异步调度、Mamba align 与 FULL_AND_PIECEWISE 组合；公开曲线使用匹配的四卡 TP2/PP2 Native 对照。", "followup_url": "https://github.com/vLLM-HUST/vllm-hust-pipeline-microbatch/issues/3"},
+      "evidence_level": "performance_verified"
     },
     {
       "id": "qos-scheduler-migration",
+      "public_surface": false,
       "name": "QoS Scheduler",
       "name_en": "QoS Scheduler",
       "name_zh": "QoS 调度器",
@@ -1061,8 +1173,8 @@
       "name_zh": "请求生命周期因果分析器",
       "artifact_type": "runtime_component",
       "system_role": "telemetry_provider",
-      "integration_contracts": [],
-      "integration_surfaces": ["vllm.general_plugins", "request lifecycle hooks", "KV recovery receipts"],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental", "vllm.request-lifecycle-events.v1"],
+      "integration_surfaces": ["vllm_hust.extension_bundles", "vllm.general_plugins", "request lifecycle hooks", "KV recovery receipts"],
       "execution_planes": ["api", "scheduler", "worker"],
       "deployment_topology": "in_process",
       "delivery_model": "python_distribution",
@@ -1073,13 +1185,139 @@
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-request-lifecycle-profiler",
       "upstream_repository": null,
-      "summary_en": "Default-off request-scoped lifecycle tracing and causal-attribution MOD that joins frontend, scheduler, KV, executor, and response evidence while abstaining when evidence is insufficient.",
-      "summary_zh": "默认关闭的请求级生命周期追踪与因果归因 MOD，关联 frontend、scheduler、KV、executor 与响应证据，并在证据不足时主动弃权。",
-      "public_effect_en": "Research preview: the package exposes a vLLM plugin entry point and CPU-testable trace analysis. Current artifacts are diagnosis evidence; blind attribution remains incomplete and no speedup is claimed.",
-      "public_effect_zh": "研究预览：软件包已提供 vLLM 插件入口及可在 CPU 验证的 trace 分析；当前材料属于诊断证据，盲测归因尚未完成，也不声明加速效果。",
+      "summary_en": "Default-off request-scoped lifecycle tracing and causal-attribution MOD. Version 0.1.1 registers a native vLLM-HUST EventBus v1 sink and reports process-owned runtime evidence only after an actual finish, preemption, or KV-reclaim callback.",
+      "summary_zh": "默认关闭的请求级生命周期追踪与因果归因 MOD。0.1.1 版已注册原生 vLLM-HUST EventBus v1 sink，并且只在真实 finish、preemption 或 KV-reclaim 回调后报告进程自有运行证据。",
+      "public_effect_en": "Experimental CPU host-contract evidence: clean-wheel activation, real EventBus callback evidence, supervised stop, disable and forget pass. Blind attribution, native NPU execution and performance remain unqualified; no speedup is claimed.",
+      "public_effect_zh": "实验性 CPU host-contract 证据：clean-wheel 激活、真实 EventBus 回调证据、受管停止、禁用与忘记均通过。盲测归因、原生 NPU 执行和性能仍未资格化，也不声明加速。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-request-lifecycle-profiler",
-      "compatibility": {"status": "inspect_only", "host": "vLLM", "versions": ["Plugin 0.1.0"], "platforms": ["Ascend NPU target; attribution study incomplete"], "python": [">=3.10"], "requirements_en": "The vllm.general_plugins entry point is available. Runtime hook qualification, blind custody/reveal evaluation, and counterfactual validation remain required before stronger claims.", "requirements_zh": "已提供 vllm.general_plugins 入口；在形成更强结论前，仍需完成 runtime hook 资格验证、盲测 custody/reveal 评测与反事实验证。"},
+      "compatibility": {"status": "experimental", "host": "vLLM-HUST >=0.23,<0.24 with request-lifecycle-events API 1.0", "versions": ["Plugin 0.1.1", "ECPA 0.3 native carrier 7c6155b75840ee046a9547489628ca31df773334"], "platforms": ["CPU packaging, current-host contract, callback evidence and lifecycle; NPU qualification incomplete"], "python": [">=3.10"], "requirements_en": "ECPA enable/plan/render/run and process-owned callback evidence are verified on the pinned CPU host. Native-current NPU execution, blind custody/reveal evaluation, counterfactual validation and performance remain required.", "requirements_zh": "ECPA enable/plan/render/run 与进程自有回调证据已在固定 CPU host 上验证。仍需原生当前版 NPU 执行、盲测 custody/reveal、反事实验证与性能证据。"},
+      "evidence_level": "cpu_smoke"
+    },
+    {
+      "id": "tricard-clm-lifecycle",
+      "name": "Tricard CLM Lifecycle",
+      "name_en": "Tricard CLM Lifecycle",
+      "name_zh": "Tricard CLM 生命周期观察器",
+      "artifact_type": "runtime_component",
+      "system_role": "lifecycle_control_plane",
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental", "vllm.request-lifecycle-events.v1"],
+      "integration_surfaces": ["vllm_hust.extension_bundles", "vllm.general_plugins", "scheduler EventBus", "external CLM controller reporting"],
+      "execution_planes": ["scheduler", "control_plane"],
+      "deployment_topology": "mixed",
+      "delivery_model": "plugin_bundle",
+      "ownership": "original_contributor_maintained",
+      "maintainers": ["xiehanlong834-gif"],
+      "maintainer_profiles": [{"login": "xiehanlong834-gif", "name": "谢汉龙"}],
+      "repository_relationship": "organization_native",
+      "repository_visibility": "private",
+      "maturity": "experimental",
+      "canonical_repository": "https://github.com/vLLM-HUST/Tricard",
+      "upstream_repository": null,
+      "summary_en": "Tricard's default-off CLM sink, now packaged as a Manifest 0.3 Bundle with a collision-free plugin name and a shared request-lifecycle observer claim. The external controller remains operator-owned.",
+      "summary_zh": "Tricard 的默认关闭 CLM sink，现已打包为 Manifest 0.3 Bundle，使用无冲突的插件名并共享 request-lifecycle observer；外部控制器仍由 operator 管理。",
+      "public_effect_en": "Control-plane preview: clean-wheel activation intent and event-sink packaging are verified. No live observer receipt, NPU execution, or throughput benefit is claimed.",
+      "public_effect_zh": "控制面预览：clean-wheel 启用意图和事件 sink 打包已验证；不声明 live observer receipt、NPU 执行或吞吐收益。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/Tricard/pull/2",
+      "compatibility": {"status": "experimental", "host": "vLLM-HUST >=0.29.1,<0.30", "versions": ["Tricard CLM 0.1.0", "ECPA 0.3 package 1d141da1c427a18859643b056b5514f5ebf511ce"], "platforms": ["Host-neutral scheduler/control-plane path"], "python": [">=3.10"], "requirements_en": "The controller is external and operator-owned. Runtime effectiveness requires a process-owned observer receipt; clean-wheel activation and import do not establish it.", "requirements_zh": "controller 是外部 operator-owned 服务。runtime_effective 必须来自进程自有 observer receipt；clean-wheel 启用与 import 不能证明生效。"},
+      "evidence_level": "cpu_smoke"
+    },
+    {
+      "id": "quality-bounded-inference",
+      "name": "Quality-Bounded Inference",
+      "name_en": "Quality-Bounded Inference",
+      "name_zh": "质量约束推理策略",
+      "artifact_type": "runtime_component",
+      "system_role": "scheduler_policy_research",
+      "integration_contracts": [],
+      "integration_surfaces": ["vllm.general_plugins", "vllm.request-pre-action-observer"],
+      "execution_planes": ["api"],
+      "deployment_topology": "in_process",
+      "delivery_model": "plugin_bundle",
+      "ownership": "original_contributor_maintained",
+      "maintainers": ["Tkhkrnx"],
+      "maintainer_profiles": [{"login": "Tkhkrnx", "name": "Pharos Peng"}],
+      "advisors": [{"name_zh": "张书豪", "name_en": "Shuhao Zhang", "relationship": "internal"}],
+      "repository_relationship": "organization_native",
+      "repository_visibility": "private",
+      "maturity": "incubating",
+      "canonical_repository": "https://github.com/vLLM-HUST/quality-bounded-inference-plugin",
+      "upstream_repository": null,
+      "summary_en": "Task-aware control plane delivered as a vLLM-HUST Extension Bundle (manifest 0.2-experimental): it decides, per model invocation, which quality-bounded inference mechanisms to admit and delivers an admitted mechanism as a request-local parameter. Quality-policy research package whose 0.1.1 carrier exposes only a behavior-preserving, full-fidelity request observer on the stable host hook. Adaptive token-budget, admission, and scheduling mechanisms remain fail closed and are not activated by ECPA.",
+      "summary_zh": "以 vLLM-HUST Extension Bundle（manifest 0.2-experimental）交付的任务感知控制面：按每次模型调用决定准入哪些质量约束推理机制，并把已准入机制作为请求级参数投递；宿主未暴露请求入口读取点时 fail closed。质量策略研究包；0.1.1 carrier 只在稳定 host hook 上提供不改变行为的全保真请求 observer。自适应 token budget、准入和调度机制仍保持 fail closed，不会由 ECPA 激活。",
+      "public_effect_en": "Experimental CPU host-contract evidence: 1,069 tests, current-host callback, clean-wheel activation, process-owned runtime evidence and supervised stop pass. This is not model-quality, NPU, adaptive-policy or performance qualification.",
+      "public_effect_zh": "实验性 CPU host-contract 证据：1,069 项测试、当前 host 回调、clean-wheel 激活、进程自有运行证据与受管停止通过。这不是模型质量、NPU、自适应策略或性能资格。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/quality-bounded-inference-plugin/pull/6",
+      "compatibility": {"status": "inspect_only", "host": "vLLM-HUST (vllm 0.19.x detected on the carrier); the earlier 0.1.1 carrier targeted vLLM-HUST 0.23 with request-processing API 1.0", "versions": ["Extension Bundle manifest 0.2-experimental", "ECPA 0.3 observer carrier b2ed0136f0a399fa919287fb334946f71d6a9ac7 (earlier 0.1.1 carrier)"], "platforms": ["CPU host-contract tests", "Ascend 910B2 · engine materialization and request-bound receipt"], "python": [">=3.10"], "requirements_en": "The Extension Bundle installs and its request-entry observer is inspectable on the host hook. Every adaptive quality-bounded mechanism remains fail closed; separate typed host contracts, quality/correctness gates, process-owned effect evidence and rollback qualification are required before a mechanism may be treated as activated.", "requirements_zh": "扩展 bundle 可安装，其请求入口 observer 可在宿主 hook 上检查。所有自适应质量约束机制仍 fail closed；任何机制在被视为已激活前，仍需独立的类型化 host contract、质量/正确性门槛、进程自有效果证据与回滚资格。"},
+      "evidence_level": "integration_tested"
+    },
+    {
+      "id": "llm-serving-cost-pricing-model",
+      "name": "LLM Serving Cost Pricing Model",
+      "name_en": "LLM Serving Cost Pricing Model",
+      "name_zh": "LLM 服务成本定价模型",
+      "artifact_type": "tool",
+      "system_role": "profiling_analysis",
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
+      "integration_surfaces": ["vllm_hust.extension_bundles", "offline CLI", "shared workload reports"],
+      "execution_planes": ["offline"],
+      "deployment_topology": "separate_application",
+      "delivery_model": "plugin_bundle",
+      "ownership": "hust_owned_subsystem",
+      "maintainers": ["ShuhaoZhangTony"],
+      "maintainer_profiles": [{"login": "ShuhaoZhangTony", "name": "Shuhao Zhang"}],
+      "repository_relationship": "organization_native",
+      "repository_visibility": "private",
+      "maturity": "incubating",
+      "canonical_repository": "https://github.com/vLLM-HUST/llm-serving-cost-pricing-model",
+      "upstream_repository": null,
+      "summary_en": "Serving cost/pricing analysis scaffold packaged as an explicit Manifest 0.3 offline CLI. Version 0.1.1 removes the misleading in-process load marker and serving launcher, so ECPA keeps it inspect-only by design.",
+      "summary_zh": "已打包为显式 Manifest 0.3 离线 CLI 的服务成本/定价分析脚手架。0.1.1 移除了误导性的进程内加载标记与 serving launcher，因此 ECPA 按设计保持 inspect-only。",
+      "public_effect_en": "Analysis preview: repository tests, a pinned shared-workload integration, wheel construction, and clean-wheel removal pass. No in-process pricing action or performance claim is made.",
+      "public_effect_zh": "分析预览：仓库测试、固定 shared-workload 集成、wheel 构建与 clean-wheel 移除通过；不声明进程内定价动作或性能收益。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/llm-serving-cost-pricing-model/pull/2",
+      "compatibility": {"status": "inspect_only", "host": "Offline user CLI; no in-process serving carrier", "versions": ["Package 0.1.1", "ECPA 0.3 offline boundary 1559df80e40172299231f7cee381f41738720ce2"], "platforms": ["CPU analysis and packaging tests"], "python": [">=3.10"], "requirements_en": "ECPA rejects runtime enablement by design. Shared-workload and pricing analysis remain user-owned offline tools; installation or CLI execution is not vLLM runtime effectiveness.", "requirements_zh": "ECPA 按设计拒绝运行时启用。shared-workload 与定价分析仍是用户自有离线工具；安装或执行 CLI 不代表 vLLM 运行生效。"},
+      "evidence_level": "cpu_smoke"
+    },
+    {
+      "id": "clm-lifecycle",
+      "name": "CLM Lifecycle",
+      "name_en": "CLM Lifecycle",
+      "name_zh": "CLM 生命周期控制面",
+      "artifact_type": "runtime_component",
+      "system_role": "lifecycle_control_plane",
+      "integration_contracts": ["vllm.request-lifecycle.v1", "vllm-hust Extension Bundle v1"],
+      "integration_surfaces": ["vllm.general_plugins", "scheduler EventBus", "external CLM controller reporting"],
+      "execution_planes": ["scheduler", "control_plane"],
+      "deployment_topology": "mixed",
+      "delivery_model": "python_distribution",
+      "ownership": "original_contributor_maintained",
+      "maintainers": ["xiehanlong834-gif"],
+      "maintainer_profiles": [{"login": "xiehanlong834-gif", "name": "谢汉龙"}],
+      "advisors": [{"name_zh": "张书豪", "name_en": "Shuhao Zhang", "relationship": "internal"}],
+      "repository_relationship": "organization_native",
+      "repository_visibility": "private",
+      "maturity": "experimental",
+      "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-clm-lifecycle",
+      "upstream_repository": null,
+      "summary_en": "Default-off context-lifecycle observer that aggregates request completion, preemption, and actual KV-reclaim events, then reports bounded session-level signals to an external CLM controller without blocking the scheduler.",
+      "summary_zh": "默认关闭的上下文生命周期观察组件，聚合请求完成、抢占与真实 KV 回收事件，以有界、非阻塞方式向外部 CLM 控制器报告会话级信号。",
+      "public_effect_en": "Tool/control-plane capability: version 0.1.1 provides a bounded asynchronous report queue and observable delivery counters. It does not execute an inference optimization and makes no throughput claim.",
+      "public_effect_zh": "工具/控制面能力：0.1.1 提供有界异步报告队列和可观察的投递计数；它不执行推理优化，也不声明吞吐收益。",
+      "public_effect_status": "validated",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-MOD-COVERAGE.md",
+      "compatibility": {
+        "status": "experimental",
+        "host": "vLLM-HUST with request-lifecycle events",
+        "versions": ["vllm-hust-clm-lifecycle 0.1.1", "ECPA manifest 0.3"],
+        "platforms": ["Host-neutral scheduler/control-plane path"],
+        "python": [">=3.10"],
+        "requirements_en": "Requires a host exposing vllm.v1.events and the vllm.request-lifecycle.v1 contract. Empty VLLM_CLM_CONTROLLER keeps the component observation-only; controller delivery is asynchronous and bounded.",
+        "requirements_zh": "要求宿主提供 vllm.v1.events 与 vllm.request-lifecycle.v1 契约。VLLM_CLM_CONTROLLER 为空时仅观察；控制器投递采用有界异步队列。"
+      },
       "evidence_level": "cpu_smoke"
     },
     {
@@ -1101,14 +1339,14 @@
       "maturity": "incubating",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
       "upstream_repository": null,
-      "summary_en": "Arrival-time KV materialization MOD for studying full reuse, block-aligned partial reuse, and recomputation through an out-of-tree vLLM plugin.",
-      "summary_zh": "面向请求到达时刻 KV 物化决策的 MOD，通过 out-of-tree vLLM 插件研究完整复用、块对齐部分复用与重计算。",
-      "public_effect_en": "The live M2 study completed 18 matched lifecycles and found that the controller did not outperform the best fixed policy. The repository publishes this negative boundary result and does not claim a stable performance gain.",
-      "public_effect_zh": "M2 在线研究完成 18 个配对 lifecycle，结果显示 controller 未优于最佳固定策略；仓库公开该负向边界结果，不声明稳定性能收益。",
-      "public_effect_status": "inconclusive",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
-      "compatibility": {"status": "inspect_only", "host": "vLLM", "versions": ["Plugin 0.1.0", "pinned research carrier"], "platforms": ["Ascend NPU research path"], "python": [">=3.10"], "requirements_en": "The vllm.general_plugins entry point and research carrier are available. The current controller direction is stopped by its preregistered negative result; future work requires a materially different mechanism and a new protocol.", "requirements_zh": "已提供 vllm.general_plugins 入口与研究 carrier；当前 controller 方向已依据预注册负向结果停止，后续工作需提出实质不同的机制并重新制定实验协议。"},
-      "evidence_level": "integration_tested"
+      "summary_en": "Arrival-time KV materialization MOD for full reuse, block-aligned partial reuse and recomputation. A unified Qwen3.5 plugin artifact exercised real scheduler decisions; the separate historical M2 study remains a negative mechanism boundary.",
+      "summary_zh": "面向请求到达时刻完整复用、块对齐部分复用与重计算的 KV 物化 MOD。统一 Qwen3.5 插件制品已执行真实 scheduler 决策；独立的历史 M2 研究仍保留为负向机制边界。",
+      "public_effect_en": "The unified Qwen3.5 five-point observation is +7.13% geometric mean versus its exact Native series, with recompute and reuse actions exercised. The separate Qwen2.5 M2 study did not beat the best fixed policy; neither result transfers to the other protocol.",
+      "public_effect_zh": "统一 Qwen3.5 五点观察相对精确 Native 序列的几何平均变化为 +7.13%，且真实执行了 recompute 与 reuse。独立的 Qwen2.5 M2 研究未优于最佳固定策略；两项结果不得跨协议转移。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KV-MATERIALIZATION.md",
+      "compatibility": {"status": "verified", "host": "vLLM-HUST", "versions": ["Measured plugin artifact 53a6b113", "Plugin 0.1.0 research carrier"], "platforms": ["Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph", "Historical Ascend research path"], "models": ["Qwen3.5-35B-A3B — unified BF16 five-point observation", "Qwen2.5-7B-Instruct — historical M2 negative boundary"], "python": [">=3.10"], "requirements_en": "Keep the Qwen3.5 unified observation and historical Qwen2.5 M2 study separate. The Qwen3.5 runtime exercised recompute, partial-reuse and full-reuse decisions; the M2 controller direction stopped after its preregistered negative result.", "requirements_zh": "必须分开 Qwen3.5 统一观察与历史 Qwen2.5 M2 研究。Qwen3.5 运行时执行了 recompute、partial-reuse 与 full-reuse 决策；M2 controller 方向则依据预注册负向结果停止。"},
+      "evidence_level": "performance_verified"
     },
     {
       "id": "vllm-hust-benchmark",
@@ -1199,8 +1437,8 @@
       "repository_visibility": "public",
       "upstream_repository": null,
       "documentation_url": "./betterscale.html",
-      "summary_en": "Less host waiting. More device execution. FULL graphs, ordered replay and device-side metadata preparation shorten cross-step dependencies in DeepSeek V4 Flash.",
-      "summary_zh": "让设备少等调度，多做推理。通过 FULL graph、有序 replay 与 device 侧元数据准备，缩短 DeepSeek V4 Flash 波次之间的依赖与等待。",
+      "summary_en": "Less host waiting. More device execution. BetterScale publishes separate bounded observations for DeepSeek V4 Flash and a Qwen3.5 TP2 small-fish prototype; their models, runtimes and protocols are not pooled.",
+      "summary_zh": "让设备少等调度，多做推理。BetterScale 分别公开 DeepSeek V4 Flash 与 Qwen3.5 TP2 small-fish 原型的有限观察；两者的模型、运行时与协议不会合并。",
       "public_effect_en": "Bounded HTTP output throughput vs respective native baseline: DP8 +39.63%, TP8 +35.17%. 0.3.1 carries the qualified DP startup implementation; results are reused, not remeasured. Retained retrieval: 32/32. No universal latency claim.",
       "public_effect_zh": "有限 HTTP 负载下，相对各自原生基线的输出吞吐：DP8 +39.63%，TP8 +35.17%。0.3.1 收进已验收的 DP 预热实现，沿用既有测量。检索子集 32/32；不声称所有延迟都改善。",
       "public_effect_status": "measured",
@@ -1217,22 +1455,25 @@
           "vllm-betterscale 0.3.2 / betterscale.worker.Worker"
         ],
         "platforms": [
-          "8 × Ascend 910B2 / HCCS · TP8 + EP or TP1 / DP8 / EP8"
+          "8 × Ascend 910B2 / HCCS · TP8 + EP or TP1 / DP8 / EP8",
+          "2 × Ascend 910B2 · TP2 · FULL graph · Qwen3.5 small-fish prototype"
         ],
         "models": [
-          "DeepSeek-V4-Flash-0731-w8a8 · W8A8 / BF16 activations"
+          "DeepSeek-V4-Flash-0731-w8a8 · W8A8 / BF16 activations",
+          "Qwen3.5-35B-A3B — TP2 small-fish five-point smoke observation; shared-host, single observations"
         ],
         "python": [
           ">=3.12"
         ],
-        "requirements_en": "One native Worker entry: DSV4 TP8/DP8 K5 or Qwen27 BF16 TP2 FULL without MTP. vllm-betterscale 0.5.1 includes qualified Linux/aarch64 native libraries; an existing pinned Ascend runtime and model weights are required. No Extension Manager bundle contract. Native third-party license terms and bounded configurations are documented on the project page.",
-        "requirements_zh": "统一原生 Worker：DSV4 TP8／DP8 K5，或 Qwen27 BF16 TP2 FULL、无 MTP。vllm-betterscale 0.5.1 包含已验收 Linux/aarch64 原生库，仍需已有固定 Ascend 运行时和模型权重。不是 Extension Manager bundle；原生第三方许可与配置边界见项目页。"
+        "requirements_en": "The +42.39% Qwen3.5 card result is pinned to source capsule f7598b9 on Core 752a3a5 / Ascend 9bf964c and five shared-host smoke observations; it is not a result for the current package or the DeepSeek configuration. vllm-betterscale 0.5.1 requires an existing pinned Ascend runtime and model weights and is not an Extension Manager bundle.",
+        "requirements_zh": "卡片中的 Qwen3.5 +42.39% 固定属于源码胶囊 f7598b9、Core 752a3a5 / Ascend 9bf964c 与五个共享主机 smoke 单次观察；它不是当前软件包或 DeepSeek 配置的结果。vllm-betterscale 0.5.1 仍需固定 Ascend 运行时和模型权重，且不是 Extension Manager bundle。"
       },
       "evidence_level": "hardware_verified"
     }
 ,
     {
       "id": "dla",
+      "public_surface": false,
       "name": "DLA",
       "name_en": "DLA",
       "name_zh": "DLA（解码长度感知准入/预占）",
@@ -1258,12 +1499,12 @@
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-dla",
       "upstream_repository": null,
-      "summary_en": "DLA predicts each request's decode (output) length and feeds it into the scheduler's admission gate and preemption victim choice: requests carry predicted_length, the full-sequence admission reserve covers prompt + predicted output while prefilling, and preemption picks the request with the largest predicted remaining output. Offline block-pool simulation on a real BurstGPT trace shows JCT p50 -47~-54% and preemptions -81% at pool saturation, robust to prediction error (sigma=1xL still -34%); EGTP length predictor reproduced within +-5% (Qwen2.5-7B x ForeLen, 3 scenarios). No real serving runs yet.",
-      "summary_zh": "DLA 预测每个请求的解码（输出）长度并接入调度器的准入闸门与预占受害者选择：请求携带 predicted_length，预填期完整序列预留覆盖 prompt+预测输出，预占选择预测剩余最长的请求。BurstGPT 真实 trace 块池模拟显示池饱和时 JCT p50 −47~−54%、预占次数 −81%，且对预测误差鲁棒（σ=1×L 仍有 −34%）；EGTP 预测器复现对表 ±5%（Qwen2.5-7B×ForeLen 三场景）。尚无真实 serving 实测。",
-      "public_effect_en": "Offline block-pool simulation (10k real BurstGPT requests, 3 seeds): JCT p50 102s -> 54s (-47%) and preemptions 2183 -> 412 (-81%) vs LIFO baseline at util~0.92; -54% at lower load. Prediction noise sigma=1xL keeps -34~-47%; systematic overestimate has zero effect (order-only use). Simulator-level evidence only; serving experiments pending core alignment.",
-      "public_effect_zh": "离线块池模拟（BurstGPT 真实 1 万请求，3 seeds）：util≈0.92 时 JCT p50 102s→54s（−47%）、预占 2183→412（−81%），低负载仍有 −54%；预测噪声 σ=1×L 仍保 −34~−47%；系统性高估零影响（仅用相对排序）。证据停留在模拟器层，serving 实测待 core 对齐。",
-      "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-dla",
+      "summary_en": "Length-aware admission and preemption. The original prediction work includes offline simulations; the measured reference-setting carrier uses explicitly declared output budgets on a pinned runtime.",
+      "summary_zh": "按输出长度进行准入与抢占。原预测方案包含离线模拟；已实测的基准设定实现使用显式声明的输出预算及限定运行时。",
+      "public_effect_en": "The pinned known-output-budget carrier has five Qwen3.5 TP2/PP1 observations with matched Native controls. Admission checks ran, but no deferral or preemption occurred. These are single observations, not validation of learned length prediction or a stable speedup.",
+      "public_effect_zh": "限定版本的已知输出预算实现已有 Qwen3.5 TP2/PP1 五档并发及匹配 Native 对照。准入检查已执行，但没有延后或抢占；单次观测不能证明稳定加速，也不代表学习型长度预测已验证。",
+      "public_effect_status": "inconclusive",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OUTPUT-BUDGET.md",
       "compatibility": {
         "status": "inspect_only",
         "host": "vLLM-HUST",
@@ -1275,12 +1516,74 @@
           "scheduler logic is device-agnostic"
         ],
         "models": [
+          "Qwen3.5-35B-A3B — pinned known-output-budget carrier measured; no deferral or preemption occurred",
           "Qwen2.5-7B-Instruct — length predictor (EGTP head) reproduced on ForeLen"
         ],
-        "requirements_en": "Core PR vllm-HUST/vllm-hust#8 must merge for the victim-selector group and predicted_length channel to exist in main. Installing the bundle alone changes nothing (explicit two-layer selection).",
-        "requirements_zh": "需 vllm-HUST/vllm-hust#8 合入后 main 才存在 victim-selector 组与 predicted_length 通道。仅安装 Bundle 不改变任何行为（两层显式选择）。"
+        "requirements_en": "The Qwen3.5 card result belongs to a pinned known-output-budget carrier whose admission checks ran but took no control action; it does not qualify the learned predictor. Core PR vllm-HUST/vllm-hust#8 is still required for the legacy victim-selector group and predicted_length channel.",
+        "requirements_zh": "Qwen3.5 卡片结果属于固定版本的已知输出预算 carrier；准入检查执行了，但没有采取控制动作，因此不能验证学习型预测器。旧 victim-selector 组与 predicted_length 通道仍需要 vllm-HUST/vllm-hust#8。"
       },
-      "evidence_level": "cpu_smoke"
+      "evidence_level": "performance_verified"
+    },
+    {
+      "id": "gdn-state-codec",
+      "name": "GDN State Codec",
+      "name_en": "GDN State Codec",
+      "name_zh": "GDN 状态编解码器",
+      "artifact_type": "runtime_component",
+      "system_role": "recurrent_state_compression",
+      "integration_contracts": [],
+      "integration_surfaces": [
+        "StateAxis Qwen GDN provider boundary",
+        "Qwen3.5/Qwen3.8 gated-delta recurrent state",
+        "AscendC state-codec kernels"
+      ],
+      "execution_planes": [
+        "worker",
+        "native",
+        "device"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "source_patch",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "maintainers": [
+        "ShuhaoZhangTony"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "ShuhaoZhangTony",
+          "name": "Shuhao Zhang (Tony)"
+        }
+      ],
+      "advisors": [],
+      "canonical_repository": "https://github.com/vLLM-HUST/gdn-state-codec",
+      "repository_visibility": "public",
+      "upstream_repository": null,
+      "summary_en": "An opt-in Ascend recurrent-state codec for Qwen gated-delta layers. It keeps the historical org.stateaxis.leapquant runtime ID for compatibility, is disabled by default, and is qualified only inside explicitly recorded workload cells.",
+      "summary_zh": "面向 Qwen 门控增量层的可选 Ascend 循环状态编解码器。为兼容既有集成保留历史运行时 ID org.stateaxis.leapquant，默认关闭，且只在明确记录的 workload 单元内具备资格。",
+      "public_effect_en": "In Qwen3.5-35B-A3B TP2 eager on one 649-prompt/128-output AgentX first-turn request, the retained v68 path measured +0.92% median end-to-end in the formal bracket and +1.16% in a clean-main retest, but independent bootstrap intervals overlap zero. The newer p16/r1 component path reduced its bounded component time by 56.2% while its five-run replace-mode online median regressed 6.71%; no general speedup is claimed.",
+      "public_effect_zh": "在 Qwen3.5-35B-A3B、TP2、eager、单个 649 输入/128 输出 token 的 AgentX 首轮请求上，保留的 v68 路径在正式括测和 clean-main 复测中的端到端中位数分别为 +0.92% 与 +1.16%，但独立 bootstrap 区间均跨越零。更新的 p16/r1 路径在有界组件测试中耗时降低 56.2%，五次 replace-mode 在线测试的中位数却回退 6.71%；不据此声称普适加速。",
+      "public_effect_status": "inconclusive",
+      "public_effect_url": "https://github.com/vLLM-HUST/gdn-state-codec/blob/main/evidence/qwen35-agentx-v68/ROUND-RESULTS.md",
+      "compatibility": {
+        "status": "experimental",
+        "host": "StateAxis + vLLM Ascend",
+        "versions": [
+          "GDN State Codec 0.1.0",
+          "compatibility ID org.stateaxis.leapquant"
+        ],
+        "platforms": [
+          "2 × Ascend 910B2 · TP2 · eager"
+        ],
+        "models": [
+          "Qwen3.5-35B-A3B · exact recorded AgentX cell only",
+          "Qwen3.8 GDN family · mechanism only, no performance qualification"
+        ],
+        "requirements_en": "Requires an explicitly matched StateAxis integration, pinned model/runtime revisions, exactness and lifecycle gates, and workload-specific online qualification. Disabled by default. Graph mode, concurrency, memory-capacity benefit, and other model families are not qualified.",
+        "requirements_zh": "需要明确匹配的 StateAxis 集成、固定模型与运行时版本，并通过精确性、生命周期和 workload 专属在线验收。默认关闭；尚未验收图模式、并发、显存容量收益及其他模型家族。"
+      },
+      "evidence_level": "hardware_verified"
     },
     {
       "id": "traceloom",

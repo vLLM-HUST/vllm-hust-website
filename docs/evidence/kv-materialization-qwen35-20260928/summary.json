@@ -1,0 +1,39 @@
+{
+  "schema": "vllm-hust/frontier-evidence/v1",
+  "campaign": "qwen35-kv-materialization-frontier-20260928",
+  "execution_kind": "real-online",
+  "model": {
+    "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+    "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+    "integrity": "all 27 runtime files matched the pinned revision"
+  },
+  "runtime": {
+    "base_vllm": "d0f22d2bda562156e4dbf433ce645e1769b4f804",
+    "measured_vllm_source": "556671b117716300121b2ac78b112443b83d1958",
+    "vllm_ascend": "03766ac696fde5ab1980d80ca0b8543d3580c989",
+    "mod": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+    "extension_manager": "701aa95ae8d5b23b5ea8c8ec475ceaa470393e54"
+  },
+  "workload": {
+    "protocol": "swe-prefix-reuse/v1",
+    "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+    "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+    "session_rotation_depth": 1,
+    "measurement_seconds": 900
+  },
+  "native_series": "swe-unified-native-20260927",
+  "candidate_series": "swe-unified-kv-materialization-arrival-control-20260928",
+  "geometric_mean_gain_percent": 7.1301343328886935,
+  "points": [
+    {"concurrency": 1, "run_id": "ad9925f9329b4f87ad3da5285ebab36b", "output_tokens": 81532, "output_tps": 90.5911111111111, "decode_p90_tps": 107.36876391861011, "completed": 147, "drained": 1, "errors": 0, "controller_calls": 148, "observed": {"full_reuse": 139, "partial_reuse": 3, "recompute": 6}, "effective": {"full_reuse": 142, "recompute": 6}, "realized": {"partial_reuse": 126, "recompute": 22}, "reused_tokens": 2406400, "recomputed_tokens": 564788, "manifest_sha256": "581853b041cfa1bbcaee360b18036436f7ff36a37ce5f1490724b71ecf54e332"},
+    {"concurrency": 2, "run_id": "aa7b91b673fb4b1caf4adbc2134ed65b", "output_tokens": 139256, "output_tps": 154.7288888888889, "decode_p90_tps": 98.92568495208843, "completed": 222, "drained": 2, "errors": 0, "controller_calls": 224, "observed": {"full_reuse": 213, "partial_reuse": 3, "recompute": 8}, "effective": {"full_reuse": 216, "recompute": 8}, "realized": {"partial_reuse": 195, "recompute": 30}, "reused_tokens": 5117952, "recomputed_tokens": 875750, "manifest_sha256": "1ff671ca9a361b7b933e6032de61ce1488a6c7153a8765527be04c977c058634"},
+    {"concurrency": 4, "run_id": "5a723cba6cf146379aee490dc398fc8b", "output_tokens": 213772, "output_tps": 237.52444444444444, "decode_p90_tps": 84.76666140724171, "completed": 349, "drained": 4, "errors": 0, "controller_calls": 353, "observed": {"full_reuse": 335, "partial_reuse": 6, "recompute": 12}, "effective": {"full_reuse": 341, "recompute": 12}, "realized": {"partial_reuse": 311, "recompute": 45}, "reused_tokens": 9091072, "recomputed_tokens": 1377245, "manifest_sha256": "174ec2a32bc1b45160fa3bd58aea2db71801199652047cbec0101a24bce75858"},
+    {"concurrency": 8, "run_id": "5c9cd4af1452439f90d746ee86f4f843", "output_tokens": 293176, "output_tps": 325.75111111111113, "decode_p90_tps": 59.8154350121774, "completed": 474, "drained": 8, "errors": 0, "controller_calls": 482, "observed": {"full_reuse": 458, "partial_reuse": 7, "recompute": 17}, "effective": {"full_reuse": 465, "recompute": 17}, "realized": {"partial_reuse": 424, "recompute": 66}, "reused_tokens": 10987520, "recomputed_tokens": 1905943, "manifest_sha256": "6f10739d9bedd3470ed037eb1dc5a13710a1c18477069720667464ae8af23b21"},
+    {"concurrency": 16, "run_id": "1f9c022d2026433682cffd3d25211cbc", "output_tokens": 372863, "output_tps": 414.2922222222222, "decode_p90_tps": 36.79618457742906, "completed": 622, "drained": 16, "errors": 0, "controller_calls": 638, "observed": {"full_reuse": 600, "partial_reuse": 11, "recompute": 27}, "effective": {"full_reuse": 611, "recompute": 27}, "realized": {"partial_reuse": 577, "recompute": 113}, "reused_tokens": 11280384, "recomputed_tokens": 2775821, "manifest_sha256": "8bd612ed81b81974f3c37623f4792aaef8e09fc9eafa94b0bcb410280af2c796"}
+  ],
+  "acceptance": {
+    "correctness": "prompt-ID echo, usage, DONE and fixed output budget passed at every point",
+    "mechanism_status": "exercised",
+    "release": "service exit, port release, process release and NPU release verified at every point"
+  }
+}

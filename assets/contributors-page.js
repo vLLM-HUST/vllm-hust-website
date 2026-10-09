@@ -84,9 +84,6 @@
                 )
                     ? payload.member_profiles.external_contributors
                     : [],
-                former_members: Array.isArray(payload.member_profiles.former_members)
-                    ? payload.member_profiles.former_members
-                    : [],
             };
         }
         const coreMembers = contributorsFor(payload, 'core_repos');
@@ -99,7 +96,6 @@
             participants,
             staff_members: [],
             external_contributors: [],
-            former_members: [],
             unresolved_contributors: [],
         };
     }
@@ -350,7 +346,6 @@
             profiles.external_contributors,
             'external',
         );
-        renderProfileList('contributors-former-list', profiles.former_members, 'former');
         renderCoreTable(profiles.core_members);
         renderAllTable(contributorsFor(payload, 'all_repos'));
         const loading = document.getElementById('contributors-members-loading');

@@ -1,0 +1,231 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="930" viewBox="0 0 1320 930">
+<rect width="1320" height="930" fill="white"/>
+<style>text{font-family:Arial,sans-serif;fill:#172033;font-size:13px}.title{font-size:22px;font-weight:bold}.sub{fill:#526174}</style>
+<text x="35" y="35" class="title">DeepSeek-V4-Flash | SWE prefix reuse | DSpark K5 | 8 x 910B2</text>
+<text x="35" y="60" class="sub">900 seconds per point; fixed TP 4 seats / DP 16 seats total; one run per point, no error bars.</text>
+<line x1="35" y1="87" x2="60" y2="87" stroke="#64748b" stroke-width="3"/>
+<text x="67" y="92" class="">Baseline TP8</text>
+<line x1="355" y1="87" x2="380" y2="87" stroke="#2563eb" stroke-width="3"/>
+<text x="387" y="92" class="">BetterScale TP8</text>
+<line x1="675" y1="87" x2="700" y2="87" stroke="#b45309" stroke-width="3"/>
+<text x="707" y="92" class="">Baseline DP8EP8</text>
+<line x1="995" y1="87" x2="1020" y2="87" stroke="#16a34a" stroke-width="3"/>
+<text x="1027" y="92" class="">BetterScale DP8EP8</text>
+<text x="70" y="135" class="">Throughput (output tokens/s/chip)</text>
+<line x1="70" y1="420.0" x2="610" y2="420.0" stroke="#e2e8f0"/>
+<text x="32" y="424.0" class="">0</text>
+<line x1="70" y1="367.0" x2="610" y2="367.0" stroke="#e2e8f0"/>
+<text x="32" y="371.0" class="">13</text>
+<line x1="70" y1="314.0" x2="610" y2="314.0" stroke="#e2e8f0"/>
+<text x="32" y="318.0" class="">26</text>
+<line x1="70" y1="261.0" x2="610" y2="261.0" stroke="#e2e8f0"/>
+<text x="32" y="265.0" class="">39</text>
+<line x1="70" y1="208.0" x2="610" y2="208.0" stroke="#e2e8f0"/>
+<text x="32" y="212.0" class="">52</text>
+<line x1="70" y1="155.0" x2="610" y2="155.0" stroke="#e2e8f0"/>
+<text x="32" y="159.0" class="">65</text>
+<text x="65.0" y="442" class="">1</text>
+<text x="173.0" y="442" class="">2</text>
+<text x="281.0" y="442" class="">4</text>
+<text x="389.0" y="442" class="">8</text>
+<text x="497.0" y="442" class="">16</text>
+<text x="605.0" y="442" class="">32</text>
+<text x="220" y="466" class="">Client concurrency (log2 scale)</text>
+<polyline points="70.00,385.17 178.00,351.11 286.00,303.35 394.00,302.83 502.00,303.56 610.00,301.16" fill="none" stroke="#64748b" stroke-width="2"/>
+<circle cx="70.0" cy="385.1745833333333" r="4" fill="#64748b"><title>native-tp C1: 8.542</title></circle>
+<circle cx="178.0" cy="351.10905982905985" r="4" fill="#64748b"><title>native-tp C2: 16.898</title></circle>
+<circle cx="286.0" cy="303.3524358974359" r="4" fill="#64748b"><title>native-tp C4: 28.612</title></circle>
+<circle cx="394.0" cy="302.82639957264956" r="4" fill="#64748b"><title>native-tp C8: 28.741</title></circle>
+<circle cx="502.0" cy="303.5647756410257" r="4" fill="#64748b"><title>native-tp C16: 28.560</title></circle>
+<circle cx="610.0" cy="301.15599358974356" r="4" fill="#64748b"><title>native-tp C32: 29.150</title></circle>
+<polyline points="70.00,368.80 178.00,327.31 286.00,251.73 394.00,245.45 502.00,249.38 610.00,247.99" fill="none" stroke="#2563eb" stroke-width="2"/>
+<circle cx="70.0" cy="368.79837606837606" r="4" fill="#2563eb"><title>better-tp C1: 12.559</title></circle>
+<circle cx="178.0" cy="327.3054914529915" r="4" fill="#2563eb"><title>better-tp C2: 22.736</title></circle>
+<circle cx="286.0" cy="251.72669871794872" r="4" fill="#2563eb"><title>better-tp C4: 41.275</title></circle>
+<circle cx="394.0" cy="245.45050213675214" r="4" fill="#2563eb"><title>better-tp C8: 42.814</title></circle>
+<circle cx="502.0" cy="249.37963675213675" r="4" fill="#2563eb"><title>better-tp C16: 41.850</title></circle>
+<circle cx="610.0" cy="247.99404914529913" r="4" fill="#2563eb"><title>better-tp C32: 42.190</title></circle>
+<polyline points="70.00,386.18 178.00,358.18 286.00,322.12 394.00,275.71 502.00,255.66 610.00,275.51" fill="none" stroke="#b45309" stroke-width="2"/>
+<circle cx="70.0" cy="386.17682692307693" r="4" fill="#b45309"><title>native-dp C1: 8.296</title></circle>
+<circle cx="178.0" cy="358.1757264957265" r="4" fill="#b45309"><title>native-dp C2: 15.164</title></circle>
+<circle cx="286.0" cy="322.1187393162393" r="4" fill="#b45309"><title>native-dp C4: 24.009</title></circle>
+<circle cx="394.0" cy="275.7148611111111" r="4" fill="#b45309"><title>native-dp C8: 35.391</title></circle>
+<circle cx="502.0" cy="255.66206196581197" r="4" fill="#b45309"><title>native-dp C16: 40.309</title></circle>
+<circle cx="610.0" cy="275.5059188034188" r="4" fill="#b45309"><title>native-dp C32: 35.442</title></circle>
+<polyline points="70.00,380.64 178.00,349.53 286.00,309.93 394.00,250.56 502.00,187.20 610.00,219.04" fill="none" stroke="#16a34a" stroke-width="2"/>
+<circle cx="70.0" cy="380.64353632478634" r="4" fill="#16a34a"><title>better-dp C1: 9.653</title></circle>
+<circle cx="178.0" cy="349.5303846153846" r="4" fill="#16a34a"><title>better-dp C2: 17.285</title></circle>
+<circle cx="286.0" cy="309.93383547008546" r="4" fill="#16a34a"><title>better-dp C4: 26.997</title></circle>
+<circle cx="394.0" cy="250.55854700854704" r="4" fill="#16a34a"><title>better-dp C8: 41.561</title></circle>
+<circle cx="502.0" cy="187.20033119658117" r="4" fill="#16a34a"><title>better-dp C16: 57.102</title></circle>
+<circle cx="610.0" cy="219.04166666666669" r="4" fill="#16a34a"><title>better-dp C32: 49.292</title></circle>
+<text x="720" y="135" class="">P95 time to first token (seconds)</text>
+<line x1="720" y1="420.0" x2="1260" y2="420.0" stroke="#e2e8f0"/>
+<text x="682" y="424.0" class="">0</text>
+<line x1="720" y1="367.0" x2="1260" y2="367.0" stroke="#e2e8f0"/>
+<text x="682" y="371.0" class="">36</text>
+<line x1="720" y1="314.0" x2="1260" y2="314.0" stroke="#e2e8f0"/>
+<text x="682" y="318.0" class="">72</text>
+<line x1="720" y1="261.0" x2="1260" y2="261.0" stroke="#e2e8f0"/>
+<text x="682" y="265.0" class="">108</text>
+<line x1="720" y1="208.0" x2="1260" y2="208.0" stroke="#e2e8f0"/>
+<text x="682" y="212.0" class="">144</text>
+<line x1="720" y1="155.0" x2="1260" y2="155.0" stroke="#e2e8f0"/>
+<text x="682" y="159.0" class="">180</text>
+<text x="715.0" y="442" class="">1</text>
+<text x="823.0" y="442" class="">2</text>
+<text x="931.0" y="442" class="">4</text>
+<text x="1039.0" y="442" class="">8</text>
+<text x="1147.0" y="442" class="">16</text>
+<text x="1255.0" y="442" class="">32</text>
+<text x="870" y="466" class="">Client concurrency (log2 scale)</text>
+<polyline points="720.00,418.45 828.00,418.04 936.00,417.63 1044.00,389.03 1152.00,329.25 1260.00,176.87" fill="none" stroke="#64748b" stroke-width="2"/>
+<circle cx="720.0" cy="418.44753108077083" r="4" fill="#64748b"><title>native-tp C1: 1.055</title></circle>
+<circle cx="828.0" cy="418.04410510370946" r="4" fill="#64748b"><title>native-tp C2: 1.329</title></circle>
+<circle cx="936.0" cy="417.62727719002027" r="4" fill="#64748b"><title>native-tp C4: 1.612</title></circle>
+<circle cx="1044.0" cy="389.0291927850202" r="4" fill="#64748b"><title>native-tp C8: 21.037</title></circle>
+<circle cx="1152.0" cy="329.24702971521447" r="4" fill="#64748b"><title>native-tp C16: 61.644</title></circle>
+<circle cx="1260.0" cy="176.86550479960363" r="4" fill="#64748b"><title>native-tp C32: 165.148</title></circle>
+<polyline points="720.00,419.14 828.00,418.88 936.00,418.32 1044.00,396.93 1152.00,363.26 1260.00,268.13" fill="none" stroke="#2563eb" stroke-width="2"/>
+<circle cx="720.0" cy="419.13647485916573" r="4" fill="#2563eb"><title>better-tp C1: 0.587</title></circle>
+<circle cx="828.0" cy="418.882646302793" r="4" fill="#2563eb"><title>better-tp C2: 0.759</title></circle>
+<circle cx="936.0" cy="418.32052477056465" r="4" fill="#2563eb"><title>better-tp C4: 1.141</title></circle>
+<circle cx="1044.0" cy="396.9261015770333" r="4" fill="#2563eb"><title>better-tp C8: 15.673</title></circle>
+<circle cx="1152.0" cy="363.26219595516545" r="4" fill="#2563eb"><title>better-tp C16: 38.539</title></circle>
+<circle cx="1260.0" cy="268.1271207939536" r="4" fill="#2563eb"><title>better-tp C32: 103.159</title></circle>
+<polyline points="720.00,416.64 828.00,416.19 936.00,415.95 1044.00,415.52 1152.00,412.90 1260.00,306.72" fill="none" stroke="#b45309" stroke-width="2"/>
+<circle cx="720.0" cy="416.63714994259254" r="4" fill="#b45309"><title>native-dp C1: 2.284</title></circle>
+<circle cx="828.0" cy="416.18545155364967" r="4" fill="#b45309"><title>native-dp C2: 2.591</title></circle>
+<circle cx="936.0" cy="415.9518020012064" r="4" fill="#b45309"><title>native-dp C4: 2.750</title></circle>
+<circle cx="1044.0" cy="415.523033759981" r="4" fill="#b45309"><title>native-dp C8: 3.041</title></circle>
+<circle cx="1152.0" cy="412.89863387439044" r="4" fill="#b45309"><title>native-dp C16: 4.824</title></circle>
+<circle cx="1260.0" cy="306.7236014772999" r="4" fill="#b45309"><title>native-dp C32: 76.942</title></circle>
+<polyline points="720.00,416.47 828.00,416.07 936.00,416.21 1044.00,415.87 1152.00,415.41 1260.00,330.54" fill="none" stroke="#16a34a" stroke-width="2"/>
+<circle cx="720.0" cy="416.4708146994063" r="4" fill="#16a34a"><title>better-dp C1: 2.397</title></circle>
+<circle cx="828.0" cy="416.0731655962857" r="4" fill="#16a34a"><title>better-dp C2: 2.667</title></circle>
+<circle cx="936.0" cy="416.2078486144207" r="4" fill="#16a34a"><title>better-dp C4: 2.576</title></circle>
+<circle cx="1044.0" cy="415.87252587895716" r="4" fill="#16a34a"><title>better-dp C8: 2.804</title></circle>
+<circle cx="1152.0" cy="415.40878390597663" r="4" fill="#16a34a"><title>better-dp C16: 3.119</title></circle>
+<circle cx="1260.0" cy="330.5392023886836" r="4" fill="#16a34a"><title>better-dp C32: 60.766</title></circle>
+<text x="70" y="515" class="">P90 per-request decode speed (tokens/s)</text>
+<line x1="70" y1="800.0" x2="610" y2="800.0" stroke="#e2e8f0"/>
+<text x="32" y="804.0" class="">0</text>
+<line x1="70" y1="747.0" x2="610" y2="747.0" stroke="#e2e8f0"/>
+<text x="32" y="751.0" class="">26</text>
+<line x1="70" y1="694.0" x2="610" y2="694.0" stroke="#e2e8f0"/>
+<text x="32" y="698.0" class="">52</text>
+<line x1="70" y1="641.0" x2="610" y2="641.0" stroke="#e2e8f0"/>
+<text x="32" y="645.0" class="">78</text>
+<line x1="70" y1="588.0" x2="610" y2="588.0" stroke="#e2e8f0"/>
+<text x="32" y="592.0" class="">104</text>
+<line x1="70" y1="535.0" x2="610" y2="535.0" stroke="#e2e8f0"/>
+<text x="32" y="539.0" class="">130</text>
+<text x="65.0" y="822" class="">1</text>
+<text x="173.0" y="822" class="">2</text>
+<text x="281.0" y="822" class="">4</text>
+<text x="389.0" y="822" class="">8</text>
+<text x="497.0" y="822" class="">16</text>
+<text x="605.0" y="822" class="">32</text>
+<text x="220" y="846" class="">Client concurrency (log2 scale)</text>
+<polyline points="70.00,630.57 178.00,628.81 286.00,640.08 394.00,650.13 502.00,643.94 610.00,644.71" fill="none" stroke="#64748b" stroke-width="2"/>
+<circle cx="70.0" cy="630.5704299612675" r="4" fill="#64748b"><title>native-tp C1: 83.116</title></circle>
+<circle cx="178.0" cy="628.8146164682124" r="4" fill="#64748b"><title>native-tp C2: 83.978</title></circle>
+<circle cx="286.0" cy="640.0779858248249" r="4" fill="#64748b"><title>native-tp C4: 78.452</title></circle>
+<circle cx="394.0" cy="650.1303092422207" r="4" fill="#64748b"><title>native-tp C8: 73.521</title></circle>
+<circle cx="502.0" cy="643.9370236347493" r="4" fill="#64748b"><title>native-tp C16: 76.559</title></circle>
+<circle cx="610.0" cy="644.7073541612664" r="4" fill="#64748b"><title>native-tp C32: 76.181</title></circle>
+<polyline points="70.00,555.48 178.00,577.83 286.00,589.20 394.00,590.99 502.00,596.79 610.00,590.77" fill="none" stroke="#2563eb" stroke-width="2"/>
+<circle cx="70.0" cy="555.4807541348573" r="4" fill="#2563eb"><title>better-tp C1: 119.953</title></circle>
+<circle cx="178.0" cy="577.8329520807977" r="4" fill="#2563eb"><title>better-tp C2: 108.988</title></circle>
+<circle cx="286.0" cy="589.2022106700205" r="4" fill="#2563eb"><title>better-tp C4: 103.410</title></circle>
+<circle cx="394.0" cy="590.9949297857422" r="4" fill="#2563eb"><title>better-tp C8: 102.531</title></circle>
+<circle cx="502.0" cy="596.7920368267039" r="4" fill="#2563eb"><title>better-tp C16: 99.687</title></circle>
+<circle cx="610.0" cy="590.768680347757" r="4" fill="#2563eb"><title>better-tp C32: 102.642</title></circle>
+<polyline points="70.00,607.98 178.00,619.94 286.00,646.41 394.00,677.01 502.00,735.26 610.00,741.73" fill="none" stroke="#b45309" stroke-width="2"/>
+<circle cx="70.0" cy="607.9784527202047" r="4" fill="#b45309"><title>native-dp C1: 94.199</title></circle>
+<circle cx="178.0" cy="619.9372597587741" r="4" fill="#b45309"><title>native-dp C2: 88.333</title></circle>
+<circle cx="286.0" cy="646.4114590965889" r="4" fill="#b45309"><title>native-dp C4: 75.345</title></circle>
+<circle cx="394.0" cy="677.00544329824" r="4" fill="#b45309"><title>native-dp C8: 60.337</title></circle>
+<circle cx="502.0" cy="735.2563135430166" r="4" fill="#b45309"><title>native-dp C16: 31.761</title></circle>
+<circle cx="610.0" cy="741.7332700107147" r="4" fill="#b45309"><title>native-dp C32: 28.584</title></circle>
+<polyline points="70.00,575.05 178.00,596.46 286.00,616.60 394.00,659.02 502.00,710.74 610.00,721.13" fill="none" stroke="#16a34a" stroke-width="2"/>
+<circle cx="70.0" cy="575.0485771234161" r="4" fill="#16a34a"><title>better-dp C1: 110.354</title></circle>
+<circle cx="178.0" cy="596.455942102519" r="4" fill="#16a34a"><title>better-dp C2: 99.852</title></circle>
+<circle cx="286.0" cy="616.595217800414" r="4" fill="#16a34a"><title>better-dp C4: 89.972</title></circle>
+<circle cx="394.0" cy="659.0211925858742" r="4" fill="#16a34a"><title>better-dp C8: 69.159</title></circle>
+<circle cx="502.0" cy="710.7419881869455" r="4" fill="#16a34a"><title>better-dp C16: 43.787</title></circle>
+<circle cx="610.0" cy="721.1293154756247" r="4" fill="#16a34a"><title>better-dp C32: 38.691</title></circle>
+<text x="720" y="515" class="">Frontier: throughput vs P90 decode speed</text>
+<line x1="720" y1="800.0" x2="1260" y2="800.0" stroke="#e2e8f0"/>
+<text x="682" y="804.0" class="">0</text>
+<line x1="720" y1="747.0" x2="1260" y2="747.0" stroke="#e2e8f0"/>
+<text x="682" y="751.0" class="">13</text>
+<line x1="720" y1="694.0" x2="1260" y2="694.0" stroke="#e2e8f0"/>
+<text x="682" y="698.0" class="">26</text>
+<line x1="720" y1="641.0" x2="1260" y2="641.0" stroke="#e2e8f0"/>
+<text x="682" y="645.0" class="">39</text>
+<line x1="720" y1="588.0" x2="1260" y2="588.0" stroke="#e2e8f0"/>
+<text x="682" y="592.0" class="">52</text>
+<line x1="720" y1="535.0" x2="1260" y2="535.0" stroke="#e2e8f0"/>
+<text x="682" y="539.0" class="">65</text>
+<text x="715.0" y="822" class="">0</text>
+<text x="818.8461538461538" y="822" class="">25</text>
+<text x="922.6923076923077" y="822" class="">50</text>
+<text x="1026.5384615384614" y="822" class="">75</text>
+<text x="1130.3846153846155" y="822" class="">100</text>
+<text x="1234.2307692307693" y="822" class="">125</text>
+<text x="870" y="846" class="">P90 decode tokens/s</text>
+<polyline points="1065.25,765.17 1068.83,731.11 1045.88,683.35 1025.39,682.83 1038.02,683.56 1036.45,681.16" fill="none" stroke="#64748b" stroke-width="2"/>
+<circle cx="1065.252708758172" cy="765.1745833333333" r="4" fill="#64748b"><title>native-tp C1: 8.542</title></circle>
+<text x="1070.252708758172" y="760.1745833333333" class="">C1</text>
+<circle cx="1068.8305928572274" cy="731.1090598290598" r="4" fill="#64748b"><title>native-tp C2: 16.898</title></circle>
+<text x="1073.8305928572274" y="726.1090598290598" class="">C2</text>
+<circle cx="1045.8788213380928" cy="683.352435897436" r="4" fill="#64748b"><title>native-tp C4: 28.612</title></circle>
+<text x="1050.8788213380928" y="678.352435897436" class="">C4</text>
+<circle cx="1025.394841544154" cy="682.8263995726496" r="4" fill="#64748b"><title>native-tp C8: 28.741</title></circle>
+<text x="1030.394841544154" y="677.8263995726496" class="">C8</text>
+<circle cx="1038.015121649945" cy="683.5647756410257" r="4" fill="#64748b"><title>native-tp C16: 28.560</title></circle>
+<text x="1043.015121649945" y="678.5647756410257" class="">C16</text>
+<circle cx="1036.4453915204383" cy="681.1559935897436" r="4" fill="#64748b"><title>native-tp C32: 29.150</title></circle>
+<text x="1041.4453915204383" y="676.1559935897436" class="">C32</text>
+<polyline points="1218.27,748.80 1172.72,707.31 1149.55,631.73 1145.90,625.45 1134.08,629.38 1146.36,627.99" fill="none" stroke="#2563eb" stroke-width="2"/>
+<circle cx="1218.265633083687" cy="748.7983760683761" r="4" fill="#2563eb"><title>better-tp C1: 12.559</title></circle>
+<text x="1223.265633083687" y="743.7983760683761" class="">C1</text>
+<circle cx="1172.717758024035" cy="707.3054914529914" r="4" fill="#2563eb"><title>better-tp C2: 22.736</title></circle>
+<text x="1177.717758024035" y="702.3054914529914" class="">C2</text>
+<circle cx="1149.5502122195808" cy="631.7266987179487" r="4" fill="#2563eb"><title>better-tp C4: 41.275</title></circle>
+<text x="1154.5502122195808" y="626.7266987179487" class="">C4</text>
+<circle cx="1145.8971242101857" cy="625.4505021367521" r="4" fill="#2563eb"><title>better-tp C8: 42.814</title></circle>
+<text x="1150.8971242101857" y="620.4505021367521" class="">C8</text>
+<circle cx="1134.0841513719997" cy="629.3796367521368" r="4" fill="#2563eb"><title>better-tp C16: 41.850</title></circle>
+<text x="1139.0841513719997" y="624.3796367521368" class="">C16</text>
+<circle cx="1146.3581608007971" cy="627.9940491452992" r="4" fill="#2563eb"><title>better-tp C32: 42.190</title></circle>
+<text x="1151.3581608007971" y="622.9940491452992" class="">C32</text>
+<polyline points="1111.29,766.18 1086.92,738.18 1032.97,702.12 970.63,655.71 851.93,635.66 838.73,655.51" fill="none" stroke="#b45309" stroke-width="2"/>
+<circle cx="1111.2891906833565" cy="766.1768269230769" r="4" fill="#b45309"><title>native-dp C1: 8.296</title></circle>
+<text x="1116.2891906833565" y="761.1768269230769" class="">C1</text>
+<circle cx="1086.9203008689133" cy="738.1757264957265" r="4" fill="#b45309"><title>native-dp C2: 15.164</title></circle>
+<text x="1091.9203008689133" y="733.1757264957265" class="">C2</text>
+<circle cx="1032.9728758031772" cy="702.1187393162393" r="4" fill="#b45309"><title>native-dp C4: 24.009</title></circle>
+<text x="1037.9728758031772" y="697.1187393162393" class="">C4</text>
+<circle cx="970.6304174300014" cy="655.7148611111111" r="4" fill="#b45309"><title>native-dp C8: 35.391</title></circle>
+<text x="975.6304174300014" y="650.7148611111111" class="">C8</text>
+<circle cx="851.9305308934756" cy="635.662061965812" r="4" fill="#b45309"><title>native-dp C16: 40.309</title></circle>
+<text x="856.9305308934756" y="630.662061965812" class="">C16</text>
+<circle cx="838.7322045064681" cy="655.5059188034188" r="4" fill="#b45309"><title>native-dp C32: 35.442</title></circle>
+<text x="843.7322045064681" y="650.5059188034188" class="">C32</text>
+<polyline points="1178.39,760.64 1134.77,729.53 1093.73,689.93 1007.28,630.56 901.88,567.20 880.72,599.04" fill="none" stroke="#16a34a" stroke-width="2"/>
+<circle cx="1178.391578691907" cy="760.6435363247863" r="4" fill="#16a34a"><title>better-dp C1: 9.653</title></circle>
+<text x="1183.391578691907" y="755.6435363247863" class="">C1</text>
+<circle cx="1134.7690236401502" cy="729.5303846153846" r="4" fill="#16a34a"><title>better-dp C2: 17.285</title></circle>
+<text x="1139.7690236401502" y="724.5303846153846" class="">C2</text>
+<circle cx="1093.7304995765148" cy="689.9338354700855" r="4" fill="#16a34a"><title>better-dp C4: 26.997</title></circle>
+<text x="1098.7304995765148" y="684.9338354700855" class="">C4</text>
+<circle cx="1007.2775698250109" cy="630.5585470085471" r="4" fill="#16a34a"><title>better-dp C8: 41.561</title></circle>
+<text x="1012.2775698250109" y="625.5585470085471" class="">C8</text>
+<circle cx="901.8842504869789" cy="567.2003311965811" r="4" fill="#16a34a"><title>better-dp C16: 57.102</title></circle>
+<text x="906.8842504869789" y="562.2003311965811" class="">C16</text>
+<circle cx="880.7176212949533" cy="599.0416666666667" r="4" fill="#16a34a"><title>better-dp C32: 49.292</title></circle>
+<text x="885.7176212949533" y="594.0416666666667" class="">C32</text>
+<text x="35" y="915" class="sub">All 24 accepted points shown, including plateaus/regressions. C64 omitted after saturation review; not measured.</text>
+</svg>

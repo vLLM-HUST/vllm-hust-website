@@ -278,7 +278,7 @@ def test_same_spec_comparator_matches_benchmark_contract() -> None:
     assert (
         expected["resolved_spec_hash"]
         == (
-            "05e08764f0853bcb19e84c3dc604018d567773fd6d7942d385190266c21a04cb"  # pragma: allowlist secret
+            "236424e8f572a279ffb6bdb612cd47b6df3dcd146d1e661ee7ab17986734cb1c"  # pragma: allowlist secret
         )
     )
 
@@ -339,7 +339,9 @@ def test_official_target_contract_mismatch_fails_closed(
         MODULE.admit_snapshot(snapshot_dir, registry, pins)
 
 
-def test_random_online_known_sample_allows_operational_port_and_model_path() -> None:
+def test_random_online_known_sample_matches_current_contract_and_runtime_paths() -> (
+    None
+):
     benchmark_data = ROOT.parent / "vllm-hust-benchmark" / "leaderboard-data"
     if not benchmark_data.is_dir():
         pytest.skip("benchmark checkout is unavailable")
@@ -364,14 +366,18 @@ def test_random_online_known_sample_allows_operational_port_and_model_path() -> 
             item
             for item in entries
             if (item.get("same_spec") or {}).get("spec_id") == target["target_id"]
+            and (item.get("metadata") or {}).get("target_contract_version")
+            == target["target_version"]
         ),
         None,
     )
     if sample is None:
         pytest.skip("benchmark checkout lacks a random-online sample to verify")
     expected = MODULE.expected_same_spec(target)
-    assert sample["same_spec"]["resolved_server_parameters"]["port"] == 8020
-    assert sample["same_spec"]["resolved_server_parameters"]["model"].startswith("/")
+    assert sample["same_spec"]["resolved_server_parameters"]["port"] == 8000
+    assert sample["same_spec"]["resolved_server_parameters"]["model"].endswith(
+        "/Qwen--Qwen2.5-14B-Instruct"
+    )
     assert (
         MODULE._contract_mismatches(sample["same_spec"], expected, prefix="sample")
         == []
@@ -1341,4 +1347,6 @@ def test_checked_in_snapshot_is_not_formally_admitted() -> None:
     ) as caught:
         MODULE.admit_snapshot(ROOT / "data", registry, pins)
     assert "metadata.verified must be true" in str(caught.value)
-    assert "canonical compare snapshot has no admitted groups" in str(caught.value)
+    assert "canonical compare snapshot requires exactly one admitted group" in str(
+        caught.value
+    )

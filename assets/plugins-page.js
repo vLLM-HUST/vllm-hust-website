@@ -3,6 +3,7 @@
   const status = document.querySelector("[data-plugin-status]");
   const filters = document.querySelector("[data-plugin-filters]");
   const search = document.querySelector("[data-plugin-search]");
+  const modelSelect = document.querySelector("[data-plugin-model]");
   const more = document.querySelector("[data-plugin-more]");
   const workloadNavigationRoot = document.querySelector("[data-workload-navigation]");
   const workloadFilters = document.querySelector("[data-workload-filters]");
@@ -13,6 +14,10 @@
   if (!catalog || !status || !filters || !search) return;
 
   let registry;
+  let performanceResults = new Map();
+  let performanceData;
+  let frontierData;
+  let selectedModel = "";
   let portfolio;
   let workshopMetadata = {};
   let workloadNavigation = { traits: {}, plugins: {} };
@@ -20,6 +25,7 @@
   let selectedWorkload = "all";
   let expanded = false;
   const pageSize = 9;
+  const isToolMod = item => window.EcosystemCatalog.isToolMod(item);
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -74,6 +80,9 @@
     installRun: "安装 / 启动",
     boundaries: "关键边界",
     repositories: "个组织仓库",
+    allModels: "全部模型",
+    performanceMods: "性能型 MOD",
+    toolMods: "工具型 MOD",
     repositoryEmpty: "没有符合当前搜索条件的仓库。",
     artifacts: "规范制品",
     relation: "与运行时关系",
@@ -126,6 +135,9 @@
     installRun: "Install / run",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
+    allModels: "All models",
+    performanceMods: "Performance MODs",
+    toolMods: "Tool MODs",
     repositoryEmpty: "No repositories match the current search.",
     artifacts: "Canonical artifacts",
     relation: "Runtime relation",
@@ -155,13 +167,7 @@
     applications_research: { en: "Applications and research", zh: "应用与研究" }
   };
 
-  const isWorkshopMod = (item) => (
-    ["runtime_component", "bridge"].includes(item.artifact_type)
-    && item.repository_relationship === "organization_native"
-    && item.public_surface !== false
-    && ["plugin_bundle", "python_distribution", "migration_scaffold", "source_patch"].includes(item.delivery_model)
-    && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
-  );
+  const isWorkshopMod = item => window.EcosystemCatalog.isWorkshopMod(item);
   const compatibilityLabels = {
     ready: { en: "Ready", zh: "可用" },
     verified: { en: "Verified", zh: "已验证" },
@@ -180,6 +186,21 @@
     preview: { en: "Preview", zh: "能力预览" }
   };
   const quickStarts = {
+    "kv-tiering-migration": {
+      title_en: "Inspect the pinned KV Tiering candidate",
+      title_zh: "检查固定版本的 KV Tiering 候选实现",
+      action_en: "inspection commands",
+      action_zh: "检查命令",
+      note_en: "Experimental pinned setting only. Requires the pinned Host hybrid-prefix fix, compatible Ascend runtime, and explicit CPU/storage budgets before activation. These commands install and inspect; see PR #3 for qualification and the exact runtime scope.",
+      note_zh: "仅限实验中的固定设定。启用前需要固定版本的 Host 混合前缀修复、配套 Ascend 运行时，并配置 CPU 与存储预算。以下命令用于安装和检查；资格结果及适配范围见 PR #3。",
+      guide: "https://github.com/vLLM-HUST/vllm-hust-kv-tiering/pull/3",
+      guide_en: "Pinned runtime and qualification →",
+      guide_zh: "固定运行时与资格验证 →",
+      command: `python -m pip install --no-deps "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@cf1ea71e3e2cb81ab06267ef05eddb3e580ea20b"
+python -m pip install --no-deps "git+https://github.com/vLLM-HUST/vllm-hust-kv-tiering.git@7ba646a780c3bd0a8906309ea59719f5ccf6187e"
+vllm-hust-ext extension inspect org.vllm-hust.kv-tiering
+vllm-hust-ext extension check org.vllm-hust.kv-tiering`
+    },
     traceloom: {
       title_en: "Install the TraceLoom runtime plugin",
       title_zh: "安装 TraceLoom 运行时插件",
@@ -191,6 +212,46 @@ export TRACELOOM_RUN_ID=inference-study-001
 vllm serve /path/to/model --async-scheduling \
   --scheduler-cls traceloom.vllm.TracingAsyncScheduler \
   --host 127.0.0.1 --port 8000`
+    },
+    "clm-lifecycle": {
+      title_en: "Install and inspect CLM Lifecycle",
+      title_zh: "安装并检查 CLM 生命周期控制面",
+      action_en: "inspection commands",
+      action_zh: "检查命令",
+      note_en: "Requires a host exposing vllm.request-lifecycle.v1. With no controller endpoint configured, the component remains observation-only and claims no throughput benefit.",
+      note_zh: "要求宿主提供 vllm.request-lifecycle.v1；未配置控制器端点时仅进行观察，不声明吞吐收益。",
+      command: `python -m pip install vllm-hust-clm-lifecycle==0.1.1
+vllm-hust-ext extension inspect org.vllm-hust.clm-lifecycle
+vllm-hust-ext extension check org.vllm-hust.clm-lifecycle
+export VLLM_PLUGINS=ascend,clm_lifecycle`
+    },
+    adm: {
+      title_en: "Inspect and stage Ascend Distributed Metadata",
+      title_zh: "检查并暂存昇腾分布式元数据 MOD",
+      action_en: "ECPA staging commands",
+      action_zh: "ECPA 暂存命令",
+      note_en: "This records activation intent only. Launch requires the exact qualified vLLM-HUST and vLLM-Ascend-HUST revisions; import or enablement alone is not runtime-effective evidence and does not broaden the published DP4 result.",
+      note_zh: "这里只记录启用意图。启动仍要求精确匹配已验收的 vLLM-HUST 与 vLLM-Ascend-HUST 提交；仅导入或启用不是 runtime_effective 证据，也不会扩大已发布的 DP4 结果。",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+python -m pip install "git+https://github.com/vLLM-HUST/ascend-distributed-metadata.git@462e0750faf7eea6317b13b692fb3326894d5796"
+vllm-hust-ext extension inspect org.vllm-hust.ascend-distributed-metadata
+vllm-hust-ext extension check org.vllm-hust.ascend-distributed-metadata
+vllm-hust-ext extension enable org.vllm-hust.ascend-distributed-metadata
+vllm-hust-ext extension plan org.vllm-hust.ascend-distributed-metadata`
+    },
+    "tricard-clm-lifecycle": {
+      title_en: "Inspect and stage Tricard CLM Lifecycle",
+      title_zh: "检查并暂存 Tricard CLM 生命周期插件",
+      action_en: "ECPA staging commands",
+      action_zh: "ECPA 暂存命令",
+      note_en: "The external controller remains operator-owned. Enablement records intent; runtime effectiveness still requires an observer receipt owned by the launched host process.",
+      note_zh: "外部 controller 仍由 operator 管理。enable 只记录意图；运行生效仍须由启动后的宿主进程提供其自有 observer receipt。",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+python -m pip install "git+https://github.com/vLLM-HUST/Tricard.git@1d141da1c427a18859643b056b5514f5ebf511ce#subdirectory=plugins/vllm-clm"
+vllm-hust-ext extension inspect org.vllm-hust.tricard-clm
+vllm-hust-ext extension check org.vllm-hust.tricard-clm
+vllm-hust-ext extension enable org.vllm-hust.tricard-clm
+vllm-hust-ext extension plan org.vllm-hust.tricard-clm`
     },
     betterscale: {
       guide: "./betterscale.html#install-qwen",
@@ -315,18 +376,28 @@ vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
     "kvcompress-ascend": {
       title_en: "Install and start Ascend KV Compression",
       title_zh: "安装并启动昇腾 KV 压缩",
-      note_en: "Requires the paired vLLM-HUST and vLLM-Ascend-HUST source lines shown on this card; the full serving configuration remains mandatory.",
-      note_zh: "需要卡片所列的成对 vLLM-HUST 与 vLLM-Ascend-HUST 源码版本；启动时仍须提供完整服务配置。",
-      command: `uv pip install -e /path/to/vllm-ascend-kvcompress-hust
-export VLLM_PLUGINS=ascend_kvcompress
-export VLLM_KNORM_ENABLED=0
-vllm serve /path/to/model \\
-  --no-async-scheduling \\
+      note_en: "ECPA enables the plugin; the compression profile and full serving configuration remain explicit inputs.",
+      note_zh: "ECPA 负责启用插件；压缩 profile 与完整服务配置仍需显式提供。",
+      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+pip install git+https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust.git
+vllm-hust-ext extension check org.vllm-hust.ascend-kvcompress
+vllm-hust-ext extension enable org.vllm-hust.ascend-kvcompress
+export VLLM_ASCEND_KVCOMPRESS_CONFIG=/path/to/qwen35-triattention.json
+export VLLM_ASCEND_KVCOMPRESS_QWEN_GDN_LIST_COMPAT=1
+vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
+  --tensor-parallel-size 2 \\
+  --pipeline-parallel-size 1 \\
+  --dtype bfloat16 \\
+  --kv-cache-dtype auto \\
+  --max-model-len 262144 \\
+  --max-num-seqs 16 \\
+  --max-num-batched-tokens 4096 \\
   --enable-prefix-caching \\
-  --block-size 128 \\
-  --max-model-len 12288 \\
-  --gpu-memory-utilization 0.8 \\
-  --kv-cache-compression-config '{"schema_version":1,"provider":"ascend_kvcompress","provider_config":{"method":"triattention","stats_path":"/path/to/stats.pt","kv_budget":2048,"recompute_window":128,"protected_recent_window":128,"score_aggregation":"mean","layer_aggregation":"mean","score_chunk_size":512,"score_layer_stride":4}}'`
+  --mamba-cache-mode align \\
+  --async-scheduling \\
+  --compilation-config '{"cudagraph_mode":"FULL_AND_PIECEWISE","cudagraph_capture_sizes":[3,6,12,24,48],"max_cudagraph_capture_size":48}' \\
+  --speculative-config '{"method":"mtp","num_speculative_tokens":2}' \\
+  --kv-cache-memory-bytes 26038239232`
     }
   };
   const inspectableBundles = {
@@ -339,7 +410,11 @@ vllm serve /path/to/model \\
     "activation-sparsity-migration": "org.vllm-hust.activation-sparsity",
     "pipeline-microbatch-migration": "org.vllm-hust.pipeline-microbatch",
     "qos-scheduler-migration": "org.vllm-hust.qos-scheduler",
-    "stateharbor": "org.vllm-hust.stateharbor"
+    "stateharbor": "org.vllm-hust.stateharbor",
+    "clm-lifecycle": "org.vllm-hust.clm-lifecycle",
+    "request-lifecycle-profiler": "org.vllm-hust.request-lifecycle-profiler",
+    "quality-bounded-inference": "org.intellistream.quality-bounded-inference",
+    "llm-serving-cost-pricing-model": "org.vllm-hust.llm-serving-cost-pricing-model"
   };
 
   const valueLabel = (value) => String(value).replaceAll("_", " ");
@@ -677,7 +752,44 @@ vllm-hust-ext extension check ${extensionId}`
     return "graphite";
   }
 
+  function performancePanel(result) {
+    const panel = element("div", "plugin-performance");
+    const zh = language() === "zh";
+    const format = value => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+    const measured = result && Number.isFinite(result.gain);
+    const value = measured ? format(result.gain) : (zh ? "缺数据" : "No data");
+    panel.append(element("strong", measured && result.gain < 0 ? "performance-negative" : "", value));
+    if (measured) {
+      panel.append(element("span", "", [
+        result.modelLabel,
+        local(result, "setting_label"),
+        zh ? "输出吞吐" : "Output throughput"
+      ].filter(Boolean).join(" · ")));
+      const aggregationNote = local(result, "aggregation_note");
+      if (aggregationNote) panel.append(element("span", "plugin-performance-aggregation", aggregationNote));
+      if (result.runtimeBase) {
+        const ascend = result.runtimeBase["vllm-ascend"] || result.runtimeBase.vllm_ascend;
+        panel.append(element("span", "plugin-performance-runtime",
+          `vLLM ${result.runtimeBase.vllm.slice(0, 7)} · Ascend ${ascend.slice(0, 7)}`));
+      }
+      const matchedSetting = result.source === "frontier";
+      const link = element("a", "plugin-public-effect-link", matchedSetting ? (zh ? "设定 ↗" : "Setting ↗") : (zh ? "实测 ↗" : "Evidence ↗"));
+      link.href = matchedSetting
+        ? `./leaderboard-runs.html?setting=${encodeURIComponent(result.cohortId)}#settings`
+        : result.url;
+      link.target = matchedSetting ? "" : "_blank";
+      link.rel = matchedSetting ? "" : "noopener noreferrer";
+      link.title = matchedSetting
+        ? (zh ? "C1/2/4/8/16 吞吐比的几何平均。" : "Geometric mean of C1/2/4/8/16 throughput ratios. ")
+          + result.comparisons.map(row => `C${row.concurrency}: ${format(row.gain)}`).join(" · ")
+        : [...new Set(result.published_comparisons.map(row => row.scope))].join(" · ");
+      panel.append(link);
+    }
+    return panel;
+  }
+
   function publicEffectPanel(item) {
+    if (performanceResults.has(item.id)) return null;
     const result = local(item, "public_effect");
     if (!result || !item.public_effect_status || !item.public_effect_url) return null;
     const panel = element("section", `plugin-public-effect effect-${item.public_effect_status}`);
@@ -736,8 +848,9 @@ vllm-hust-ext extension check ${extensionId}`
     card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", local(item, "summary")));
     const traits = workloadTags(item);
     if (traits) card.append(traits);
-    const publicEffect = publicEffectPanel(item);
-    if (publicEffect) card.append(publicEffect);
+    if (!isToolMod(item)) {
+      card.append(performancePanel(performanceResults.get(item.id)));
+    }
     const community = communityPanel(item);
     if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
@@ -747,6 +860,8 @@ vllm-hust-ext extension check ${extensionId}`
     const details = element("details", "plugin-technical-details");
     details.append(element("summary", "", copy().details));
     const detailBody = element("div", "plugin-technical-body");
+    const publicEffect = publicEffectPanel(item);
+    if (publicEffect) detailBody.append(publicEffect);
     const compatibilityDetailsBlock = compatibilityDetails(item);
     if (compatibilityDetailsBlock) detailBody.append(compatibilityDetailsBlock);
     const facts = element("dl", "plugin-component-facts");
@@ -904,25 +1019,42 @@ vllm-hust-ext extension check ${extensionId}`
     const visible = registry.components.filter((item) => {
       const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
       const matchesWorkload = selectedWorkload === "all" || itemWorkloadTraits.includes(selectedWorkload);
-      return isWorkshopMod(item) && matchesSelectedType(item) && matchesWorkload && itemSearchText(item).includes(query);
+      const matchesModel = isToolMod(item) || !selectedModel
+        || (performanceResults.get(item.id)?.modelLabel === selectedModel
+          && Number.isFinite(performanceResults.get(item.id)?.gain));
+      return isWorkshopMod(item) && matchesSelectedType(item) && matchesWorkload
+        && matchesModel && itemSearchText(item).includes(query);
     });
 
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
-    visible.sort((left, right) => {
+    const performanceMods = visible.filter(item => !isToolMod(item));
+    const toolMods = visible.filter(isToolMod);
+    performanceMods.sort((left, right) => {
       const leftRank = priority[left.compatibility?.status] ?? 6;
       const rightRank = priority[right.compatibility?.status] ?? 6;
-      return leftRank - rightRank || left.name.localeCompare(right.name);
+      return (window.PluginPerformance?.compare(left, right, performanceResults) || 0) || leftRank - rightRank || left.name.localeCompare(right.name);
     });
+    toolMods.sort((left, right) => left.name.localeCompare(right.name));
     catalog.replaceChildren();
-    const grid = element("section", "plugin-grid workshop-grid");
-    const visibleLimit = pageSize;
-    const displayed = query || expanded ? visible : visible.slice(0, visibleLimit);
-    displayed.forEach((item) => grid.append(renderCard(item)));
-    catalog.append(grid);
-    status.textContent = visible.length ? `${displayed.length} / ${visible.length} ${copy().entries}` : copy().empty;
+    const measuredCount = performanceMods.filter(item => Number.isFinite(performanceResults.get(item.id)?.gain)).length;
+    const visibleLimit = Math.max(pageSize, measuredCount);
+    const displayedPerformance = query || expanded ? performanceMods : performanceMods.slice(0, visibleLimit);
+    const appendGroup = (title, items, kind) => {
+      if (!items.length) return;
+      const section = element("section", `plugin-category plugin-category-${kind}`);
+      section.append(element("h2", "plugin-category-title", title));
+      const grid = element("div", "plugin-grid workshop-grid");
+      items.forEach(item => grid.append(renderCard(item)));
+      section.append(grid);
+      catalog.append(section);
+    };
+    appendGroup(copy().performanceMods, displayedPerformance, "performance");
+    appendGroup(copy().toolMods, toolMods, "tools");
+    const displayedCount = displayedPerformance.length + toolMods.length;
+    status.textContent = visible.length ? `${displayedCount} / ${visible.length} ${copy().entries}` : copy().empty;
     if (more) {
-      more.hidden = Boolean(query) || expanded || visible.length <= visibleLimit;
-      more.textContent = `${copy().more} (${visible.length})`;
+      more.hidden = Boolean(query) || expanded || performanceMods.length <= visibleLimit;
+      more.textContent = `${copy().more} (${performanceMods.length})`;
     }
   }
 
@@ -933,6 +1065,14 @@ vllm-hust-ext extension check ${extensionId}`
     }
     renderPortfolio();
   });
+  modelSelect?.addEventListener("change", () => {
+    if (!performanceData || !frontierData || !window.PluginPerformance) return;
+    selectedModel = modelSelect.value;
+    performanceResults = PluginPerformance.summarize(performanceData, frontierData, selectedModel || null);
+    expanded = false;
+    renderWorkloadNavigation();
+    renderCatalog();
+  });
   more?.addEventListener("click", () => {
     expanded = true;
     renderCatalog();
@@ -940,35 +1080,41 @@ vllm-hust-ext extension check ${extensionId}`
   function renderPageLabels() {
     const zh = language() === "zh";
     const values = {
-      "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
-      "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
-      "plugins-lede": zh ? "只展示独立维护的 vLLM-HUST MOD，并按宿主版本、平台和成熟度选择。" : "Independent vLLM-HUST MODs, organized by host version, platform, and readiness.",
-      "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
-      "plugins-fact-runtime": zh ? "个已支持" : "supported"
+      "plugins-eyebrow": zh ? "vLLM-HUST MOD 目录" : "vLLM-HUST MOD catalog",
+      "plugins-title": zh ? "MOD 工坊" : "MOD Workshop",
+      "plugins-fact-items": zh ? "个公开 MOD" : "public MODs",
+      "plugins-fact-runtime": zh ? "个兼容性已验证" : "compatibility verified",
+      "plugins-fact-review": zh ? "个实验性或仅检查" : "experimental or inspection-only",
+      "plugins-fact-publications": zh ? "项硬件或性能证据" : "hardware/performance evidence"
     };
     Object.entries(values).forEach(([id, value]) => {
       const node = document.getElementById(id);
       if (node) node.textContent = value;
     });
+    if (modelSelect?.options.length) modelSelect.options[0].textContent = copy().allModels;
   }
   renderPageLabels();
   search.placeholder = copy().searchPlaceholder;
 
   Promise.all([
-    fetch(catalog.dataset.source).then((response) => {
+    fetch(catalog.dataset.source, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
       return response.json();
     }),
-    fetch(catalog.dataset.metadata).then((response) => {
+    fetch(catalog.dataset.metadata, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`Workshop metadata request failed: ${response.status}`);
       return response.json();
     }),
-    fetch(workloadNavigationRoot.dataset.source).then((response) => {
+    fetch(workloadNavigationRoot.dataset.source, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`Workload navigation request failed: ${response.status}`);
       return response.json();
-    })
+    }),
+    Promise.all([
+      fetch("./data/plugin-performance.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
+    ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
-    .then(([payload, metadata, navigation]) => {
+    .then(([payload, metadata, navigation, performance]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
@@ -979,14 +1125,33 @@ vllm-hust-ext extension check ${extensionId}`
         throw new Error("unsupported workload navigation");
       }
       registry = payload;
+      performanceData = performance?.data;
+      frontierData = performance?.frontier;
+      if (performance && window.PluginPerformance) {
+        try {
+          performanceResults = PluginPerformance.summarize(performanceData, frontierData);
+          if (modelSelect) {
+            modelSelect.replaceChildren(new Option(copy().allModels, ""));
+            PluginPerformance.models(performanceData, frontierData).forEach((model) => {
+              modelSelect.append(new Option(model, model));
+            });
+          }
+        } catch (error) {
+          console.warn("Performance metadata unavailable:", error);
+          performanceData = undefined;
+          frontierData = undefined;
+          performanceResults = new Map();
+        }
+      }
       workshopMetadata = metadata.plugins;
       workloadNavigation = navigation;
       renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
-      document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
-      const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
-      const incubating = payload.components.filter((item) => ["concept", "incubating", "experimental"].includes(item.maturity)).length;
-      const evidence = payload.components.filter((item) => ["hardware_verified", "performance_verified", "production_observed"].includes(item.evidence_level)).length;
+      const catalogSummary = window.EcosystemCatalog.summarize(payload);
+      document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(catalogSummary.total); });
+      const supported = catalogSummary.verified;
+      const incubating = catalogSummary.evaluating;
+      const evidence = catalogSummary.evidenced;
       const external = payload.components.filter((item) => item.artifact_type === "external_system").length;
       document.querySelectorAll("[data-runtime-count]").forEach((node) => { node.textContent = String(supported).padStart(2, "0"); });
       document.querySelectorAll("[data-review-target-count]").forEach((node) => { node.textContent = String(incubating).padStart(2, "0"); });
@@ -998,7 +1163,7 @@ vllm-hust-ext extension check ${extensionId}`
       renderBoundaries();
     })
     .catch((error) => {
-      status.textContent = language() === "zh" ? "生态目录加载失败，请检查规范 registry。" : "The ecosystem catalog could not be loaded. Check the canonical registry.";
+      status.textContent = (language() === "zh" ? "生态目录加载失败：" : "The ecosystem catalog could not be loaded: ") + error.message;
       status.title = error.message;
     });
 
