@@ -8,29 +8,133 @@
       name="description"
       content="从实测推理吞吐，到每卡服务产能与 API 等价产值。成本由你定义。"
     />
-    <link rel="stylesheet" href="assets/serving-plan/style.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="./assets/brand/vllm-hust-icon.png"
+    />
+    <link
+      rel="canonical"
+      href="https://vllm-hust.sage.org.ai/serving-plan.html"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
+    <link
+      rel="stylesheet"
+      href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901"
+    />
+    <link
+      rel="stylesheet"
+      href="./assets/serving-plan/style.css?v=site-native-20261009"
+    />
   </head>
-  <body>
-    <header>
-      <a class="brand" href="achievements.html"
-        >← 成果<span> / BetterScale · SERVING PLAN</span></a
-      ><span class="edition">产能账单 · 2026.10</span>
-    </header>
-    <main>
-      <section class="hero">
-        <div class="eyebrow">ENGINEERING → BUSINESS</div>
-        <h1>让每一张卡，<br />交付更多价值<span>。</span></h1>
-        <p>
-          用实测产能回答业务问题。选择服务方案，填入你的成本，<br
-            class="desktop"
-          />看同样的服务量，按 API 价格折合多少钱。
-        </p>
-        <div class="pills">
-          <span>实测产能</span><span>公开价格参考</span
-          ><span>成本由你定义</span>
+  <body data-page="serving-plan">
+    <nav class="site-nav">
+      <div class="site-shell site-nav-inner">
+        <a class="brand-link" href="./index.html"
+          ><span class="brand-mark">V</span
+          ><span class="brand-copy"
+            >vLLM-HUST<small id="brand-tagline"
+              >Domestic-compute inference engine</small
+            ></span
+          ></a
+        >
+        <div class="nav-links">
+          <a
+            id="nav-home"
+            class="nav-link"
+            data-nav-page="home"
+            href="./index.html"
+            >Home</a
+          >
+          <a
+            id="nav-plugins"
+            class="nav-link nav-plugin-link"
+            data-nav-page="plugins"
+            href="./plugins.html"
+            >Ecosystem</a
+          >
+          <a
+            id="nav-leaderboard"
+            class="nav-link"
+            data-nav-page="leaderboard"
+            href="./leaderboard-runs.html"
+            >Benchmarks</a
+          >
+          <a
+            id="nav-achievements"
+            class="nav-link"
+            data-nav-page="achievements"
+            href="./achievements.html"
+            >Achievements</a
+          >
+          <a
+            id="nav-news"
+            class="nav-link"
+            data-nav-page="news"
+            href="./news.html"
+            >News</a
+          >
+          <a
+            id="nav-contributors"
+            class="nav-link"
+            data-nav-page="contributors"
+            href="./contributors.html"
+            >Contributors</a
+          >
+          <a
+            id="nav-conferences"
+            class="nav-link"
+            data-nav-page="conferences"
+            href="./conferences.html"
+            >Conferences</a
+          >
+          <a
+            id="nav-courses"
+            class="nav-link"
+            data-nav-page="courses"
+            href="./courses.html"
+            >Courses</a
+          >
+          <a
+            id="nav-issues"
+            class="nav-link"
+            data-nav-page="issues"
+            href="./issues.html"
+            >Issues</a
+          >
+        </div>
+      </div>
+    </nav>
+    <button
+      id="langToggle"
+      class="lang-toggle"
+      type="button"
+      aria-label="Switch language"
+    >
+      <span id="langToggleText">中 / EN</span>
+    </button>
+
+    <canvas
+      id="cosmic-background"
+      class="cosmic-background"
+      aria-hidden="true"
+    ></canvas>
+
+    <main class="site-shell serving-plan">
+      <section class="page-hero">
+        <div class="content-panel">
+          <span class="eyebrow">BetterScale · Serving Plan</span>
+          <h1 style="margin-top: 16px">服务产能与成本</h1>
+          <p class="hero-lede">
+            从实测推理吞吐，到每卡服务产能与 API 等价产值。成本由你定义。
+          </p>
         </div>
       </section>
-      <section class="workspace">
+      <section class="workspace content-panel">
         <aside class="controls">
           <div class="section-no">01 / 计算条件</div>
           <label for="plan">Serving plan</label
@@ -194,7 +298,7 @@
           </div>
         </div>
       </section>
-      <section class="evidence">
+      <section class="evidence content-panel">
         <div class="section-no">03 / 方案依据</div>
         <div class="evidence-head">
           <h2>产能有出处，假设看得见。</h2>
@@ -237,7 +341,7 @@
           实测结果。修改吞吐无法推断体验、效果或所需卡数。
         </p>
       </section>
-      <section class="notes">
+      <section class="notes content-panel">
         <div>
           <h3>价格参考</h3>
           <p id="price-note">
@@ -260,11 +364,12 @@
           </p>
         </div>
       </section>
-      <footer>
-        <span>BetterScale / More useful work, every moment.</span
-        ><span>成本输入仅在当前浏览器内计算，不上传。</span>
-      </footer>
     </main>
+    <footer class="site-footer">
+      <strong>vllm-hust</strong> ·
+      <span>服务产能与成本 · 输入仅在当前浏览器内计算，不上传。</span>
+    </footer>
+    <script src="./assets/site.js?v=serving-plan-20261009"></script>
     <script type="module" src="assets/serving-plan/app.mjs"></script>
   </body>
 </html>
