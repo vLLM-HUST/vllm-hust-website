@@ -856,7 +856,9 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
 
 def test_gdn_state_codec_publishes_ecpa_activation_and_negative_result() -> None:
     codec = by_id("gdn-state-codec")
-    assert codec["canonical_repository"] == "https://github.com/vLLM-HUST/gdn-state-codec"
+    assert (
+        codec["canonical_repository"] == "https://github.com/vLLM-HUST/gdn-state-codec"
+    )
     assert codec["delivery_model"] == "plugin_bundle"
     assert codec["integration_contracts"] == [
         "vllm_hust.extension_manifest.v0.3-experimental",
@@ -965,10 +967,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert (
-        'data-source="./data/ecosystem.json?v=gdn-ecpa-negative-20261009"'
-        in PAGE
-    )
+    assert 'data-source="./data/ecosystem.json?v=gdn-ecpa-negative-20261009"' in PAGE
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
         'v=ecpa-final-20261009-project-grouping"' in PAGE
