@@ -217,3 +217,13 @@ snapshot sync (including path sanitization) for the mirror. Rendered throughput 
 decimal: 218.268 displays as218.3, not218.27. Preserve source-qualified version/commit evidence even
 when the table shortens a version string. This note records local QA, not proof of public
 deployment.
+
+## Serving Plan business calculator (October 9)
+
+Fletcher explicitly requested a small entry under 成果; this supersedes the older
+no-Achievements-entry instruction for this calculator only. `serving-plan.html` and
+`data/serving-plans.json` own the business translation, not the benchmark chart. Read
+`docs/SERVING-PLAN.md` before adding models or changing billing math. Only the selected C44 Qwen35
+observation is measured; custom plans are assumptions. Input billing volume is unknown and excluded
+by default. Costs are user inputs, not estimated hardware rents. API-equivalent value is neither
+income nor profit.
