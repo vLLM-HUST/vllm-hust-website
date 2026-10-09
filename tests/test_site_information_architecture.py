@@ -13,7 +13,7 @@ def test_primary_navigation_expresses_three_journeys_and_grouped_directories() -
         assert label in SITE_JS
     assert (
         "pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', "
-        "'achievements', 'news']" in SITE_JS
+        "'achievements', 'serving-plan', 'news']" in SITE_JS
     )
     assert (
         "['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves']"

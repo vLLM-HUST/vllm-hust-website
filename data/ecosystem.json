@@ -198,6 +198,9 @@
         {"login": "cybber695", "name": "陈彦博"},
         {"login": "zhangshengxiang682", "name": "张盛翔"}
       ],
+      "advisors": [
+        {"name_zh": "张书豪", "name_en": "Shuhao Zhang", "relationship": "internal"}
+      ],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
       "upstream_repository": null,
       "summary_en": "HUST-owned KV state system with storage, transfer, metadata services, and measured Ascend IPC save/load execution.",
@@ -221,6 +224,9 @@
       "maintainer_profiles": [
         {"login": "cybber695", "name": "陈彦博"},
         {"login": "zhangshengxiang682", "name": "张盛翔"}
+      ],
+      "advisors": [
+        {"name_zh": "张书豪", "name_en": "Shuhao Zhang", "relationship": "internal"}
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
       "upstream_repository": null,
@@ -502,6 +508,10 @@
       "deployment_topology": "separate_application",
       "delivery_model": "source_toolkit",
       "ownership": "hust_owned_subsystem",
+      "maintainers": ["aly16-k"],
+      "maintainer_profiles": [
+        {"login": "aly16-k", "name": "王鸿坤"}
+      ],
       "repository_relationship": "organization_native",
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-quant-hust",
@@ -630,6 +640,15 @@
       "delivery_model": "plugin_bundle",
       "ownership": "original_contributor_maintained",
       "maintainers": ["Amber1qq", "WMASTER123", "Adr1anZheng"],
+      "maintainer_profiles": [
+        {"login": "Amber1qq", "name": "郑凌峰"},
+        {"login": "WMASTER123", "name": "王杰"},
+        {"login": "Adr1anZheng", "name": "Adr1anZheng"}
+      ],
+      "advisors": [
+        {"name_zh": "刘海坤", "name_en": "Haikun Liu", "relationship": "internal"},
+        {"name_zh": "张书豪", "name_en": "Shuhao Zhang", "relationship": "internal"}
+      ],
       "repository_relationship": "organization_native",
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-prefix-router",
@@ -785,6 +804,12 @@
       "delivery_model": "plugin_bundle",
       "ownership": "original_contributor_maintained",
       "maintainers": ["qingfengyuhuoda"],
+      "maintainer_profiles": [
+        {"login": "qingfengyuhuoda", "name": "王晨"}
+      ],
+      "advisors": [
+        {"name_zh": "万瑶", "name_en": "Yao Wan", "relationship": "internal"}
+      ],
       "repository_relationship": "organization_native",
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-slicegpt",
@@ -1286,7 +1311,8 @@
       "delivery_model": "plugin_bundle",
       "ownership": "hust_owned_subsystem",
       "maintainers": ["ShuhaoZhangTony"],
-      "maintainer_profiles": [{"login": "ShuhaoZhangTony", "name": "Shuhao Zhang"}],
+      "maintainer_profiles": [{"login": "ShuhaoZhangTony", "name": "张书豪"}],
+      "advisors": [],
       "repository_relationship": "organization_native",
       "repository_visibility": "private",
       "maturity": "incubating",
