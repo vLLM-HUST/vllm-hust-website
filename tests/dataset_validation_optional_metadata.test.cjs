@@ -9,7 +9,7 @@ const vm = require('node:vm');
 const SCRIPT_PATH = path.join(__dirname, '..', 'assets', 'dataset-validation.js');
 const SOURCE = fs.readFileSync(SCRIPT_PATH, 'utf8').replace(
     /\}\)\(\);\s*$/,
-    'window.__datasetValidationTest = { normalize, normalizeIndex, selectScenario, selectableScenarios, detailMetadata, provenanceHtml, detailNote, candidateValuesHtml };\n})();'
+    'window.__datasetValidationTest = { normalize, normalizeIndex, selectScenario, selectableScenarios, coverageSummary, detailMetadata, provenanceHtml, detailNote, candidateValuesHtml };\n})();'
 );
 
 function loadTestApi(locale = 'en') {
@@ -105,6 +105,26 @@ test('selector hides planning scenarios unless a legacy URL selects one directly
 
     assert.deepEqual(Array.from(api.selectableScenarios(index, 'results'), (scenario) => scenario.id), ['results']);
     assert.deepEqual(Array.from(api.selectableScenarios(index, 'planning'), (scenario) => scenario.id), ['results', 'planning']);
+});
+
+test('coverage summary does not count measured B0-only cells as pending', () => {
+    const api = loadTestApi();
+    const summary = api.coverageSummary([
+        { status: 'baseline_only', baseline_value: 10, value: null },
+        { status: 'passed', baseline_value: 10, value: 12 },
+        { status: 'not_tested', baseline_value: null, value: null },
+        { status: 'not_applicable', baseline_value: null, value: null },
+        { status: 'failed', baseline_value: 10, value: null },
+    ]);
+
+    assert.deepEqual(JSON.parse(JSON.stringify(summary)), {
+        total: 5,
+        baseline: 3,
+        paired: 1,
+        awaiting: 1,
+        failed: 1,
+        notApplicable: 1,
+    });
 });
 
 test('model index rejects duplicate scenarios and missing defaults', () => {

@@ -160,14 +160,28 @@
         });
     }
 
-    function renderSummary() {
-        const cells = allCells();
+    function coverageSummary(cells) {
+        const hasValue = (value) => value !== null && value !== undefined && value !== '';
         const counts = Object.fromEntries(STATUS_ORDER.map((status) => [status, 0]));
         cells.forEach((cell) => { counts[cell.status] += 1; });
-        $('validation-stat-total').textContent = cells.length;
-        $('validation-stat-passed').textContent = counts.passed;
-        $('validation-stat-failed').textContent = counts.failed;
-        $('validation-stat-pending').textContent = counts.not_tested + counts.baseline_only + counts.queued + counts.running;
+        return {
+            total: cells.length,
+            baseline: cells.filter((cell) => hasValue(cell.baseline_value)).length,
+            paired: cells.filter((cell) => hasValue(cell.baseline_value) && hasValue(cell.current_value ?? cell.value)).length,
+            awaiting: counts.not_tested + counts.queued + counts.running,
+            failed: counts.failed,
+            notApplicable: counts.not_applicable,
+        };
+    }
+
+    function renderSummary() {
+        const summary = coverageSummary(allCells());
+        $('validation-stat-total').textContent = summary.total;
+        $('validation-stat-baseline').textContent = summary.baseline;
+        $('validation-stat-paired').textContent = summary.paired;
+        $('validation-stat-awaiting').textContent = summary.awaiting;
+        $('validation-stat-failed').textContent = summary.failed;
+        $('validation-stat-not-applicable').textContent = summary.notApplicable;
     }
 
     function renderMatrix() {
