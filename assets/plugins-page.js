@@ -46,7 +46,7 @@
     external_system: "外部系统",
     retired: "退役归档",
     mod: "MOD",
-    entries: "个分类组件",
+    entries: "个项目",
     empty: "没有符合当前筛选条件的组件。",
     repository: "规范仓库",
     noRepository: "尚无公开主仓库",
@@ -101,6 +101,8 @@
     repositoryRelationship: "仓库关系",
     upstream: "官方上游",
     upstreamOwner: "上游原项目",
+    projectComponents: "项目组件",
+    componentRepository: "组件仓库",
     forkBadge: "上游同步 fork",
     forksTitle: "上游同步 HUST 分支系统",
     forksCopy: "这些仓库跟随官方项目演进，只承载 HUST 必需的窄幅差异。它们是完整系统或平台发行分支，不是插件。"
@@ -114,7 +116,7 @@
     external_system: "External systems",
     retired: "Retired",
     mod: "MOD",
-    entries: "classified components",
+    entries: "projects",
     empty: "No classified components match the current filters.",
     repository: "Canonical repository",
     noRepository: "No public canonical repository",
@@ -169,6 +171,8 @@
     repositoryRelationship: "Repository relationship",
     upstream: "Official upstream",
     upstreamOwner: "Upstream project",
+    projectComponents: "Project components",
+    componentRepository: "Component repository",
     forkBadge: "Upstream-sync fork",
     forksTitle: "Upstream-synchronized HUST forks",
     forksCopy: "These repositories track official projects and carry only narrowly required HUST deltas. They are complete system or platform distributions, not plugins."
@@ -262,6 +266,21 @@
     const kind = taxonomyProfile(item).kind;
     return Boolean(kind) && (item.public_surface !== false || kind === "retired");
   };
+
+  function catalogProjects() {
+    const projects = new Map();
+    registry.components.filter(isWorkshopMod).forEach((item) => {
+      const key = item.catalog_project_id || item.id;
+      if (!projects.has(key)) projects.set(key, []);
+      projects.get(key).push(item);
+    });
+    return [...projects.entries()].map(([id, items]) => {
+      const primaryId = items.find((item) => item.catalog_primary_component)
+        ?.catalog_primary_component;
+      const primary = items.find((item) => item.id === primaryId) || items[0];
+      return { id, items, primary };
+    });
+  }
   const compatibilityLabels = {
     ready: { en: "Ready", zh: "可用" },
     verified: { en: "Verified", zh: "已验证" },
@@ -589,7 +608,9 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       ])
     ].filter(Boolean);
     return [
-      item.id, item.name, item.name_en, item.name_zh, local(item, "summary"), item.artifact_type,
+      item.id, item.name, item.name_en, item.name_zh, local(item, "summary"),
+      local(item, "catalog_project_name"), local(item, "catalog_project_summary"),
+      local(item, "catalog_role"), local(item, "catalog_independent_reason"), item.artifact_type,
       item.system_role, item.delivery_model, item.ownership, item.maturity,
       item.repository_relationship, item.evidence_level, item.execution_planes.join(" "),
       item.integration_contracts.join(" "), (item.integration_surfaces || []).join(" "),
@@ -605,12 +626,11 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
     const query = search.value.trim().toLowerCase();
     options.forEach((traitId) => {
       const isAll = traitId === "all";
-      const count = registry.components.filter((item) => (
-        isWorkshopMod(item)
-        && matchesSelectedType(item)
+      const count = catalogProjects().filter((project) => project.items.some((item) => (
+        matchesSelectedType(item)
         && itemSearchText(item).includes(query)
         && (isAll || (workloadNavigation.plugins[item.id] || []).includes(traitId))
-      )).length;
+      ))).length;
       const button = element(
         "button",
         `workload-filter${selectedWorkload === traitId ? " active" : ""}`
@@ -799,6 +819,34 @@ vllm-hust-ext extension check ${extensionId}`
     return panel;
   }
 
+  function projectComponentsPanel(items) {
+    if (!Array.isArray(items) || items.length < 2) return null;
+    const panel = element("section", "plugin-project-components");
+    panel.append(element("span", "plugin-community-label", copy().projectComponents));
+    const list = element("div", "plugin-project-component-list");
+    items.forEach((component) => {
+      const row = element("div", "plugin-project-component");
+      const heading = element("div", "plugin-project-component-head");
+      heading.append(
+        element("strong", "", local(component, "name")),
+        badge(taxonomyLabel("kind", taxonomyProfile(component).kind), "project-component-kind")
+      );
+      row.append(heading);
+      const role = local(component, "catalog_role") || local(component, "summary");
+      if (role) row.append(element("p", "", role));
+      if (component.canonical_repository) {
+        const repository = element("a", "plugin-project-component-repository", `${copy().componentRepository} ↗`);
+        repository.href = component.canonical_repository;
+        repository.target = "_blank";
+        repository.rel = "noopener noreferrer";
+        row.append(repository);
+      }
+      list.append(row);
+    });
+    panel.append(list);
+    return panel;
+  }
+
   function compatibilityPanel(item) {
     const profile = item.compatibility;
     if (!profile) return null;
@@ -935,7 +983,7 @@ vllm-hust-ext extension check ${extensionId}`
     return panel;
   }
 
-  function renderCard(item) {
+  function renderCard(item, projectItems = [item]) {
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
     const taxonomy = taxonomyProfile(item);
     const card = element(
@@ -943,8 +991,9 @@ vllm-hust-ext extension check ${extensionId}`
       `plugin-card workshop-card workshop-${item.artifact_type} workshop-tone-${coverTone(item)}${isUpstreamFork ? " upstream-fork-card" : ""}`
     );
     card.id = item.id;
+    card.dataset.projectComponentCount = String(projectItems.length);
     const cover = element("div", "workshop-cover");
-    const displayName = local(item, "name");
+    const displayName = local(item, "catalog_project_name") || local(item, "name");
     const initials = displayName.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
     cover.append(
       element("span", "workshop-cover-type", taxonomyLabel("kind", taxonomy.kind)),
@@ -962,7 +1011,10 @@ vllm-hust-ext extension check ${extensionId}`
     if (isUpstreamFork) badges.prepend(badge(copy().forkBadge, "upstream-fork"));
     top.append(badges);
 
-    card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", local(item, "summary")));
+    const summary = local(item, "catalog_project_summary") || local(item, "summary");
+    card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", summary));
+    const projectComponents = projectComponentsPanel(projectItems);
+    if (projectComponents) card.append(projectComponents);
     const traits = workloadTags(item);
     if (traits) card.append(traits);
     if (isPerformanceCandidate(item)) {
@@ -1138,21 +1190,33 @@ vllm-hust-ext extension check ${extensionId}`
 
   function renderCatalog() {
     const query = search.value.trim().toLowerCase();
-    const visible = registry.components.filter((item) => {
-      const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
-      const matchesWorkload = selectedWorkload === "all" || itemWorkloadTraits.includes(selectedWorkload);
+    const visible = catalogProjects().filter((project) => {
+      const matchesComponent = project.items.some((item) => {
+        const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
+        const matchesWorkload = selectedWorkload === "all"
+          || itemWorkloadTraits.includes(selectedWorkload);
+        return matchesSelectedType(item) && matchesWorkload
+          && itemSearchText(item).includes(query);
+      });
+      const item = project.primary;
       const matchesModel = !isPerformanceCandidate(item) || !selectedModel
         || (performanceResults.get(item.id)?.modelLabel === selectedModel
           && Number.isFinite(performanceResults.get(item.id)?.gain));
-      return isWorkshopMod(item) && matchesSelectedType(item) && matchesWorkload
-        && matchesModel && itemSearchText(item).includes(query);
-    });
+      return matchesComponent && matchesModel;
+    }).map((project) => ({
+      ...project,
+      kind: selectedType === "extensions"
+        ? taxonomyProfile(project.primary).kind
+        : selectedType
+    }));
 
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
     catalog.replaceChildren();
     const appendGroup = (title, items, kind) => {
       if (!items.length) return;
-      items.sort((left, right) => {
+      items.sort((leftProject, rightProject) => {
+        const left = leftProject.primary;
+        const right = rightProject.primary;
         if (isPerformanceCandidate(left) && isPerformanceCandidate(right)) {
           const leftRank = priority[left.compatibility?.status] ?? 6;
           const rightRank = priority[right.compatibility?.status] ?? 6;
@@ -1164,7 +1228,7 @@ vllm-hust-ext extension check ${extensionId}`
       const section = element("section", `plugin-category plugin-category-${kind}`);
       section.append(element("h2", "plugin-category-title", title));
       const grid = element("div", "plugin-grid workshop-grid");
-      items.forEach(item => grid.append(renderCard(item)));
+      items.forEach((project) => grid.append(renderCard(project.primary, project.items)));
       section.append(grid);
       catalog.append(section);
     };
@@ -1177,7 +1241,7 @@ vllm-hust-ext extension check ${extensionId}`
       ["retired", copy().retiredItems]
     ];
     groups.forEach(([kind, title]) => {
-      appendGroup(title, visible.filter(item => taxonomyProfile(item).kind === kind), kind);
+      appendGroup(title, visible.filter((project) => project.kind === kind), kind);
     });
     status.textContent = visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
     if (more) {

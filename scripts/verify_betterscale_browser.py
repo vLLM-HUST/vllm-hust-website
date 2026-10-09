@@ -21,13 +21,16 @@ def main():
     }
     ecosystem = json.loads((root / "data/ecosystem.json").read_text())
     taxonomy = json.loads((root / "data/mod-taxonomy.json").read_text())["components"]
-    workshop_mod_count = sum(
-        item["id"] in taxonomy
-        and (
-            item.get("public_surface", True) is not False
-            or taxonomy[item["id"]]["kind"] == "retired"
-        )
-        for item in ecosystem["components"]
+    workshop_mod_count = len(
+        {
+            item.get("catalog_project_id", item["id"])
+            for item in ecosystem["components"]
+            if item["id"] in taxonomy
+            and (
+                item.get("public_surface", True) is not False
+                or taxonomy[item["id"]]["kind"] == "retired"
+            )
+        }
     )
     output = root / "output/playwright/betterscale"
     output.mkdir(parents=True, exist_ok=True)
