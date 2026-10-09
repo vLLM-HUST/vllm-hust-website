@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003">
 <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901">
-<link rel="stylesheet" href="./assets/plugins.css?v=0.3.9">
+<link rel="stylesheet" href="./assets/plugins.css?v=mod-taxonomy-v1">
 </head>
 <body data-page="plugins">
   <nav class="site-nav">
@@ -866,20 +866,20 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 </div>
 <ul>
 <li>
-<strong id="plugins-legend-existing">System role</strong>
-<span id="plugins-legend-existing-copy">Runtime, platform, policy, KV system, control plane, evidence, or application.</span>
+<strong id="plugins-legend-existing">MOD identity</strong>
+<span id="plugins-legend-existing-copy">Runtime MOD, connector MOD, tool MOD, control plane, external system, or retired prototype.</span>
 </li>
 <li>
-<strong id="plugins-legend-active">Integration contract</strong>
-<span id="plugins-legend-active-copy">The typed boundary used to connect to vLLM.</span>
+<strong id="plugins-legend-active">Capability area</strong>
+<span id="plugins-legend-active-copy">Execution, KV, decoding, scheduling, communication, model preparation, or observability.</span>
 </li>
 <li>
-<strong id="plugins-legend-prototype">Execution and topology</strong>
-<span id="plugins-legend-prototype-copy">The process, device, service, and deployment boundaries.</span>
+<strong id="plugins-legend-prototype">Lifecycle and activation</strong>
+<span id="plugins-legend-prototype-copy">Implemented, restricted, pending, research, external, or retired—independent from benchmark outcome.</span>
 </li>
 <li>
-<strong id="plugins-legend-roadmap">Ownership and evidence</strong>
-<span id="plugins-legend-roadmap-copy">Who maintains it and what level of support is actually verified.</span>
+<strong id="plugins-legend-roadmap">Evidence, not identity</strong>
+<span id="plugins-legend-roadmap-copy">Positive, negative, inconclusive, functional-only, or pending evidence never changes what the component is.</span>
 </li>
 </ul>
 </section>
@@ -925,8 +925,8 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 </div>
 </section>
     <p class="workshop-scope-note">
-      <span class="lang-en">Independent vLLM-HUST extensions and manager-tested carriers appear here. Measured throughput changes include both gains and regressions.</span>
-      <span class="lang-zh">这里展示 vLLM-HUST 独立扩展及通过插件管理器实测的载体；吞吐提升与回退均如实列出。</span>
+      <span class="lang-en">The catalog separates runtime MODs, connector MODs, tool MODs, control planes, external systems, and retired prototypes. Only runtime and connector MODs enter performance selection; measured gains and regressions are both retained.</span>
+      <span class="lang-zh">目录分别展示运行时 MOD、连接器 MOD、工具 MOD、控制面、外部系统和退役原型。只有运行时与连接器 MOD 进入性能筛选，提升与回退都如实保留。</span>
     </p>
     <section class="workload-navigation" data-workload-navigation data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009" aria-labelledby="workload-navigation-title">
       <header>
@@ -955,7 +955,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
       </div>
     </aside>
     <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
-    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=ecpa-final-20261009" data-metadata="./data/plugin-workshop-metadata.json?v=ecpa-final-20261009">
+    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=ecpa-final-20261009" data-metadata="./data/plugin-workshop-metadata.json?v=ecpa-final-20261009" data-taxonomy="./data/mod-taxonomy.json?v=mod-taxonomy-v1">
 </div>
     <button class="plugin-more" data-plugin-more type="button" hidden>Show all extensions</button>
     <section id="repository-portfolio" class="content-panel repository-portfolio" aria-labelledby="repository-portfolio-title">
@@ -1004,11 +1004,33 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
 <strong>vLLM-HUST</strong> · <span id="footer-copy">Portable inference mechanisms for domestic compute.</span>
 </footer>
   <script>window.vllmHustPageDict={"en":{"title":"MOD Workshop | vLLM-HUST","plugins-eyebrow":"vLLM-HUST MOD catalog","plugins-title":"MOD Workshop","plugins-lede":"Explore runtime extensions and ecosystem tools by workload, platform, and readiness.","plugins-fact-items":"public MODs","plugins-fact-runtime":"compatibility verified","plugins-fact-review":"experimental or inspection-only","plugins-fact-publications":"hardware/performance evidence","plugins-fact-adjacent":"external systems","plugins-boundary-kicker":"How the catalog works","plugins-boundary-title":"Find the right extension without losing sight of who runs it.","plugins-boundary-copy":"The catalog keeps runtime plugins, KV connectors, external services, and control-plane tools distinct, so setup and ownership remain clear.","plugins-legend-kicker":"Catalog details","plugins-legend-title":"See what each project does, where it runs, and how it is delivered.","plugins-legend-existing":"System role","plugins-legend-existing-copy":"Runtime, platform, policy, KV system, control plane, evidence, or application.","plugins-legend-active":"Integration contract","plugins-legend-active-copy":"The versioned interface used to connect to vLLM.","plugins-legend-prototype":"Execution and topology","plugins-legend-prototype-copy":"The process, device, service, and deployment boundaries.","plugins-legend-roadmap":"Maintainers and evidence","plugins-legend-roadmap-copy":"Who maintains the project and how far its support has been verified.","plugins-search-label":"Search","plugins-adjacent-kicker":"Architecture boundaries","plugins-adjacent-title":"Plugins, connectors, and control planes play different roles.","plugins-adjacent-copy":"Each catalog entry shows its role, integration contract, execution boundary, deployment shape, and delivery format.","footer-copy":"A practical serving ecosystem for domestic compute, backed by clear compatibility and evidence."},"zh":{"title":"MOD 工坊 | vLLM-HUST","plugins-eyebrow":"vLLM-HUST MOD 目录","plugins-title":"MOD 工坊","plugins-lede":"按 Workload、平台与成熟度探索运行时扩展和生态工具。","plugins-fact-items":"个公开 MOD","plugins-fact-runtime":"个兼容性已验证","plugins-fact-review":"个实验性或仅检查","plugins-fact-publications":"项硬件或性能证据","plugins-fact-adjacent":"个外部系统","plugins-boundary-kicker":"目录使用方式","plugins-boundary-title":"找到合适的扩展，也看清它由谁运行和维护。","plugins-boundary-copy":"目录分别呈现运行时插件、KV connector、外部服务与控制面工具，让配置方式和生命周期归属保持清晰。","plugins-legend-kicker":"目录详情","plugins-legend-title":"了解每个项目做什么、在哪里运行、如何交付。","plugins-legend-existing":"系统角色","plugins-legend-existing-copy":"运行时、平台、策略、KV 系统、控制面、证据或应用。","plugins-legend-active":"集成契约","plugins-legend-active-copy":"连接 vLLM 时使用的版本化接口。","plugins-legend-prototype":"执行面与拓扑","plugins-legend-prototype-copy":"进程、设备、服务与部署边界。","plugins-legend-roadmap":"维护者与证据","plugins-legend-roadmap-copy":"由谁维护，以及目前验证到什么支持程度。","plugins-search-label":"搜索","plugins-adjacent-kicker":"架构边界","plugins-adjacent-title":"插件、connector 与 control plane 承担不同角色。","plugins-adjacent-copy":"每个条目都会展示系统角色、集成契约、执行边界、部署形态与交付方式。","footer-copy":"面向国产算力的实用推理生态，兼容状态与验证依据清晰可查。"}};</script>
+  <script>
+    Object.assign(window.vllmHustPageDict.en, {
+      "plugins-legend-existing": "MOD identity",
+      "plugins-legend-existing-copy": "Runtime MOD, connector MOD, tool MOD, control plane, external system, or retired prototype.",
+      "plugins-legend-active": "Capability area",
+      "plugins-legend-active-copy": "Execution, KV, decoding, scheduling, communication, model preparation, or observability.",
+      "plugins-legend-prototype": "Lifecycle and activation",
+      "plugins-legend-prototype-copy": "Implemented, restricted, pending, research, external, or retired—independent from benchmark outcome.",
+      "plugins-legend-roadmap": "Evidence, not identity",
+      "plugins-legend-roadmap-copy": "Positive, negative, inconclusive, functional-only, or pending evidence never changes what the component is."
+    });
+    Object.assign(window.vllmHustPageDict.zh, {
+      "plugins-legend-existing": "MOD 身份",
+      "plugins-legend-existing-copy": "运行时 MOD、连接器 MOD、工具 MOD、控制面、外部系统或退役原型。",
+      "plugins-legend-active": "能力域",
+      "plugins-legend-active-copy": "执行、KV、解码、调度、通信、模型准备或可观测性。",
+      "plugins-legend-prototype": "生命周期与激活",
+      "plugins-legend-prototype-copy": "已实现、条件受限、接入中、研究中、外部运维或已退役，与性能结果相互独立。",
+      "plugins-legend-roadmap": "证据不是身份",
+      "plugins-legend-roadmap-copy": "正向、负向、效果未定、仅功能验证或待验证，都不会改变组件本身的类型。"
+    });
+  </script>
   <script src="./assets/site.js?v=benchmarks-ia-20261003">
 </script>
 <script src="./assets/plugin-performance.js?v=ecpa-final-20261009"></script>
 <script src="./assets/ecosystem-catalog.js?v=mod-catalog-20261008"></script>
-<script src="./assets/plugins-page.js?v=ecpa-final-20261009">
+<script src="./assets/plugins-page.js?v=mod-taxonomy-v1">
 </script>
 </body>
 </html>

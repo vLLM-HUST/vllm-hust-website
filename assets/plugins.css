@@ -121,6 +121,12 @@ html[lang="zh"] .lang-zh { display: inline; }
 .plugin-category { margin-bottom: 28px; border: 1px solid #bfcac6; background: #fff; }
 .plugin-category-title { margin: 0; padding: 14px 18px; color: #fff; background: #101818; font-size: 16px; }
 .plugin-category-tools .plugin-category-title { color: #123b3d; background: #dcefed; }
+.plugin-category-runtime_mod .plugin-category-title { background: #123f3d; }
+.plugin-category-connector_mod .plugin-category-title { background: #574085; }
+.plugin-category-tool_mod .plugin-category-title { color: #123b3d; background: #dcefed; }
+.plugin-category-control_plane .plugin-category-title { background: #315b7a; }
+.plugin-category-external_system .plugin-category-title { background: #52615f; }
+.plugin-category-retired .plugin-category-title { color: #553f3f; background: #eee5e2; }
 .plugin-layer { border: 1px solid #bfcac6; background: #fff; }
 .plugin-layer-head { min-height: 142px; padding: 24px; display: grid; grid-template-columns: minmax(240px,.8fr) minmax(280px,1.2fr) 64px; gap: 30px; align-items: center; color: #fff; background: #101818; }
 .plugin-layer-identity { display: flex; gap: 16px; align-items: baseline; }
@@ -154,6 +160,17 @@ html[lang="zh"] .lang-zh { display: inline; }
 .plugin-badge.publication { color: #fff; background: #176f72; }
 .plugin-badge.status-concept { color: #4e5d5b; background: #e3e9e7; }
 .plugin-badge.status-incubating,.plugin-badge.status-planned { color: #694a05; background: #f4e1ae; }
+.plugin-badge.kind-runtime_mod { color: #fff; background: #176f72; }
+.plugin-badge.kind-connector_mod { color: #fff; background: #6744a5; }
+.plugin-badge.kind-tool_mod { color: #123b3d; background: #dcefed; }
+.plugin-badge.kind-control_plane { color: #fff; background: #3978a8; }
+.plugin-badge.kind-external_system { color: #fff; background: #65716e; }
+.plugin-badge.kind-retired { color: #65433c; background: #eadbd6; }
+.plugin-badge.lifecycle-pending,
+.plugin-badge.lifecycle-qualification_pending,
+.plugin-badge.lifecycle-evidence_reconciliation,
+.plugin-badge.lifecycle-research { color: #694a05; background: #f4e1ae; }
+.plugin-badge.lifecycle-retired { color: #65433c; background: #eadbd6; }
 body[data-page="plugins"] .plugin-card h3 { margin: 26px 0 10px; color: #0c1112; font-size: 22px; line-height: 1.1; }
 .upstream-fork-layer { border-color: #176f72; box-shadow: 0 0 0 3px rgba(23,111,114,.1); }
 .upstream-fork-layer .plugin-layer-head { background: #0d494b; }
