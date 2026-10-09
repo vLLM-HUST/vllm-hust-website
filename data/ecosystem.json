@@ -1516,6 +1516,12 @@
       "maintainers": [
         "xmdhb"
       ],
+      "maintainer_profiles": [
+        {"login": "xmdhb", "name": "曹哲"}
+      ],
+      "advisors": [
+        {"name_zh": "张书豪", "name_en": "Shuhao Zhang", "relationship": "internal"}
+      ],
       "summary_en": "Public preview of a default-off Ascend attention boundary component. The Qwen3.5 TP2+EP archive contains three valid 900-second repeats for OFF/ON at C1/C2/C4/C8/C16 and publishes the pre-declared median-throughput observation for each cell.",
       "summary_zh": "默认关闭的 Ascend 注意力边界组件公开预览。Qwen3.5 TP2+EP 归档在 OFF/ON 的 C1/C2/C4/C8/C16 每个单元均包含三次有效 900 秒重复，并公开预先声明的吞吐中位样本。",
       "public_effect_en": "The repeat-backed ON/OFF observations are published as protocol evidence. Tokenizer identity is not independently proven and the non-selected raw repeats remain local, so no causal speedup or general performance result is claimed.",
@@ -1780,6 +1786,15 @@
       "maturity": "experimental",
       "canonical_repository": "https://github.com/xmdhb/vllm-hust-core-attention-boundary",
       "upstream_repository": null,
+      "maintainers": [
+        "xmdhb"
+      ],
+      "maintainer_profiles": [
+        {"login": "xmdhb", "name": "曹哲"}
+      ],
+      "advisors": [
+        {"name_zh": "张书豪", "name_en": "Shuhao Zhang", "relationship": "internal"}
+      ],
       "summary_en": "Public preview of a default-off core attention boundary search component. The canonical Qwen3.5 TP2+EP C1/C2/C4/C8/C16 ON/OFF archive uses the reviewed workload and tokenizer and records startup activation plus runtime-effective events; those events are not isolated to each formal window, so no causal performance attribution is claimed. The measured MOD revision is publicly pinned by tag op02-measured-8b5ebb1.",
       "summary_zh": "默认关闭的 Core 注意力边界搜索组件，现作为公开 preview 发布。本地 canonical Qwen3.5 TP2+EP C1/C2/C4/C8/C16 ON/OFF 归档使用已核对的 workload 和 tokenizer，并记录了启动激活及 runtime-effective 事件；这些事件尚未隔离到每个正式窗口，因此不宣称性能因果归因。实测 MOD revision 已通过 tag op02-measured-8b5ebb1 公开固定。",
       "public_effect_en": "The local C1/C2/C4/C8/C16 ON/OFF observations are retained as protocol evidence only. One observation per point does not establish a causal speedup or a general performance result.",
