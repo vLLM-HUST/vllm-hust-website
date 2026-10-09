@@ -665,6 +665,10 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         }
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
     }
+    workshop_mods |= {
+        "ascend-attention-boundary",
+        "core-attention-boundary",
+    }
     assert set(WORKSHOP_METADATA["plugins"]) == workshop_mods
     for plugin_id, plugin in WORKSHOP_METADATA["plugins"].items():
         assert plugin["maintainers"]
@@ -855,12 +859,12 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-simllm-advisor"'
+        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-attention-owners"'
         in PAGE
     )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=ecpa-final-20261009-simllm-advisor"' in PAGE
+        'v=ecpa-final-20261009-attention-owners"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009"'
@@ -1145,6 +1149,22 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
             advisor["name_zh"] == advisor_name and advisor["relationship"] == "internal"
             for advisor in metadata["advisors"]
         )
+
+    for component_id in ("ascend-attention-boundary", "core-attention-boundary"):
+        component = by_id(component_id)
+        metadata = WORKSHOP_METADATA["plugins"][component_id]
+        assert component["maintainer_profiles"] == [{"login": "xmdhb", "name": "曹哲"}]
+        assert component["advisors"] == [
+            {
+                "name_zh": "张书豪",
+                "name_en": "Shuhao Zhang",
+                "relationship": "internal",
+            }
+        ]
+        assert [
+            (person["name"], person["login"]) for person in metadata["maintainers"]
+        ] == [("曹哲", "xmdhb")]
+        assert metadata["advisors"] == component["advisors"]
 
     pyramid = by_id("pyramidkv-ascend-migration")
     assert pyramid["public_surface"] is True
