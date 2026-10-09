@@ -28,9 +28,9 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
-    "my-plugin": {
-      "repository": "vLLM-HUST/my-plugin",
-      "repository_url": "https://github.com/vLLM-HUST/my-plugin",
+    "opfuse": {
+      "repository": "vLLM-HUST/vllm-hust-opfuse",
+      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-opfuse",
       "metrics": {
         "stars": null,
         "forks": null,

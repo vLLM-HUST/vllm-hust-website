@@ -85,7 +85,7 @@
     "diffspec": ["decode_heavy", "latency_slo"],
     "vspec": ["decode_heavy", "latency_slo"],
     "latchmoe": ["moe", "memory_kv_pressure"],
-    "my-plugin": ["prefill_heavy", "decode_heavy"],
+    "opfuse": ["prefill_heavy", "decode_heavy"],
     "kvcompress-ascend": ["long_context", "memory_kv_pressure"],
     "knorm-migration": ["long_context", "memory_kv_pressure"],
     "kv-tiering-migration": ["long_context", "memory_kv_pressure"],

@@ -493,10 +493,10 @@
       "evidence_level": "hardware_verified"
     },
     {
-      "id": "my-plugin",
-      "name": "My Plugin",
-      "name_en": "My Plugin (operator fusion, working title)",
-      "name_zh": "My Plugin（算子融合，暂定名）",
+      "id": "opfuse",
+      "name": "OpFuse",
+      "name_en": "OpFuse — Operator Fusion",
+      "name_zh": "OpFuse（算子融合）",
       "artifact_type": "runtime_component",
       "system_role": "operator_fusion",
       "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
@@ -509,15 +509,15 @@
       "maturity": "experimental",
       "maintainers": ["vLLM-HUST"],
       "maintainer_profiles": [{"login": "vLLM-HUST", "name": "vLLM-HUST"}],
-      "canonical_repository": "https://github.com/vLLM-HUST/my-plugin",
+      "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-opfuse",
       "repository_visibility": "private",
       "upstream_repository": null,
-      "summary_en": "Default-off, single-mechanism operator-fusion runtime-patch plugin for vLLM-HUST on Ascend NPU, currently a scaffold from patch-plugin-template; the mechanism target and final name are being decided.",
-      "summary_zh": "面向 vLLM-HUST 昇腾 NPU 的默认关闭、单一机制算子融合运行时补丁插件，当前为 patch-plugin-template 脚手架；融合目标与最终名称确定中。",
-      "public_effect_en": "No performance effect is claimed yet. The repository is a scaffold with differential tests passing; an operator-fusion mechanism has not been implemented or measured online.",
+      "summary_en": "Default-off, single-mechanism operator-fusion runtime-patch plugin for vLLM-HUST on Ascend NPU, currently a scaffold from patch-plugin-template with the fusion mechanism target under design.",
+      "summary_zh": "面向 vLLM-HUST 昇腾 NPU 的默认关闭、单一机制算子融合运行时补丁插件，当前为 patch-plugin-template 脚手架，融合机制目标设计中。",
+      "public_effect_en": "No performance effect is claimed yet. The repository is a scaffold with differential tests passing; the operator-fusion mechanism has not been implemented or measured online.",
       "public_effect_zh": "暂不主张任何性能效果。仓库当前为脚手架（差分测试通过）；算子融合机制尚未实现，也未做在线实测。",
       "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/my-plugin",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-opfuse",
       "functional_compatibility": {"status": "preview", "scope": "scaffold only; not yet qualified on Ascend 910B2"},
       "effectiveness_qualifications": [
         {"status": "preview", "scope": "no online measurement yet; mechanism target pending"}
@@ -529,8 +529,8 @@
         "platforms": ["Ascend 910B2 (target; not yet qualified)"],
         "models": ["Qwen3-0.6B — smoke-test lane only"],
         "python": [">=3.11"],
-        "requirements_en": "Scaffold stage: default-off register(), enable via VLLM_HUST_MY_PLUGIN_ENABLE=1, kill switch wins. Loading through dev-hub optimization profiles is planned via .vllm-hust/optimization.json.",
-        "requirements_zh": "脚手架阶段：默认关闭，需 VLLM_HUST_MY_PLUGIN_ENABLE=1 启用，kill switch 优先。计划通过 dev-hub 的 .vllm-hust/optimization.json 接入优化 profile。"
+        "requirements_en": "Scaffold stage: default-off register(), enable via VLLM_HUST_OPFUSE_ENABLE=1, kill switch wins. Loading through dev-hub optimization profiles is planned via .vllm-hust/optimization.json.",
+        "requirements_zh": "脚手架阶段：默认关闭，需 VLLM_HUST_OPFUSE_ENABLE=1 启用，kill switch 优先。计划通过 dev-hub 的 .vllm-hust/optimization.json 接入优化 profile。"
       },
       "evidence_level": "scaffold_only"
     },
