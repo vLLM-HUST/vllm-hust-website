@@ -614,12 +614,12 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
         "ascend-adaptive-quantized-kv": (
             "inspect_only",
             "vLLM Ascend",
-            ["Host contract pending"],
+            ["Manifest 0.3 @ 9f9844e", "Host contract pending"],
         ),
         "ascend-quant-runtime-descriptor": (
             "inspect_only",
             "vLLM Ascend",
-            ["Loader contract pending"],
+            ["Manifest 0.3 @ 6c035b1", "Loader contract pending"],
         ),
     }
     for component_id, (status, host, versions) in expected.items():
@@ -926,6 +926,9 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     latchmoe = by_id("latchmoe")
 
     assert adaptive["delivery_model"] == "python_distribution"
+    assert adaptive["integration_contracts"] == [
+        "vllm_hust.extension_manifest.v0.3-experimental"
+    ]
     assert "import-only" in adaptive["summary_en"]
     assert "refuses enablement" in adaptive["summary_en"]
     assert toolkit["artifact_type"] == "tool"
@@ -933,6 +936,9 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     assert "not a vLLM plugin" in toolkit["summary_en"]
     assert runtime["artifact_type"] == "runtime_component"
     assert runtime["delivery_model"] == "python_distribution"
+    assert "vllm_hust.extension_manifest.v0.3-experimental" in runtime[
+        "integration_contracts"
+    ]
     assert "Import-only" in runtime["summary_en"]
     assert "owner-approved value allowlist" in runtime["summary_en"]
     assert latchmoe["integration_surfaces"] == [
@@ -1008,7 +1014,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=manifest03-mod-alignment-20261009"'
+        'data-source="./data/ecosystem.json?v=hidden-manifest03-contracts-20261009"'
         in PAGE
     )
     assert (
@@ -1558,7 +1564,7 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
     assert PAGE.count("ecpa-final-20261009") >= 3
-    assert "manifest03-mod-alignment-20261009" in PAGE
+    assert "hidden-manifest03-contracts-20261009" in PAGE
     assert "mod-taxonomy-v1" in PAGE
 
 
