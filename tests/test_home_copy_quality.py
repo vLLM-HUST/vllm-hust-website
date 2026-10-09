@@ -4,6 +4,12 @@ import re
 from pathlib import Path
 
 INDEX = (Path(__file__).resolve().parents[1] / "index.html").read_text(encoding="utf-8")
+CATALOG_SCRIPT = (
+    Path(__file__).resolve().parents[1] / "assets" / "ecosystem-catalog.js"
+).read_text(encoding="utf-8")
+HOME_CATALOG_SCRIPT = (
+    Path(__file__).resolve().parents[1] / "assets" / "home-catalog.js"
+).read_text(encoding="utf-8")
 
 
 def _dictionary(language: str) -> str:
@@ -38,12 +44,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "Typed runtime contracts. 26 cataloged MODs. Evidence before claims.",
-        "every MOD publishes ownership, compatibility, workload fit, and evidence limits.",
+        "28 MODs for real serving workloads, with compatibility and evidence close at hand.",
+        "Explore extensions by workload, platform, and readiness",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "类型化运行时契约、26 个目录 MOD、证据先于结论。",
+        "28 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
@@ -66,10 +72,6 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     ecosystem = json.loads(
         (root / "data" / "ecosystem.json").read_text(encoding="utf-8")
     )
-    performance = json.loads(
-        (root / "data" / "plugin-performance.json").read_text(encoding="utf-8")
-    )
-    measured = {item["id"] for item in performance["entries"]}
     tool_roles = {
         "lifecycle_control_plane",
         "model_artifact_preparation",
@@ -88,8 +90,7 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     mod_count = sum(
         item.get("public_surface", True) is not False
         and (
-            item["id"] in measured
-            or (
+            (
                 item["artifact_type"] == "bridge"
                 and item.get("compatibility", {}).get("status") == "verified"
                 and item["canonical_repository"].startswith("https://github.com/")
@@ -111,8 +112,10 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     assert f"Explore all {mod_count} MODs" in INDEX
     assert f"查看全部 {mod_count} 个 MOD" in INDEX
     assert 'href="./plugins.html#plugin-catalog"' in INDEX
-    assert "inspect-only" in INDEX
-    assert "仅可检查仓库" in INDEX
+    assert "EcosystemCatalog.summarize(registry)" in HOME_CATALOG_SCRIPT
+    assert "performanceResults" not in CATALOG_SCRIPT
+    assert "what is available for evaluation" in INDEX
+    assert "适合评估" in INDEX
 
 
 def test_workstation_visual_uses_capabilities_not_unverified_metrics() -> None:

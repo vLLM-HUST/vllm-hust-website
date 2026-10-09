@@ -9,7 +9,7 @@ const vm = require('node:vm');
 const SCRIPT_PATH = path.join(__dirname, '..', 'assets', 'dataset-validation.js');
 const SOURCE = fs.readFileSync(SCRIPT_PATH, 'utf8').replace(
     /\}\)\(\);\s*$/,
-    'window.__datasetValidationTest = { normalize, normalizeIndex, selectScenario, detailMetadata, provenanceHtml, detailNote };\n})();'
+    'window.__datasetValidationTest = { normalize, normalizeIndex, selectScenario, selectableScenarios, coverageSummary, detailMetadata, provenanceHtml, detailNote, candidateValuesHtml };\n})();'
 );
 
 function loadTestApi(locale = 'en') {
@@ -92,6 +92,41 @@ test('model index selects requested scenarios and falls back to the declared def
     assert.equal(api.selectScenario(index, 'unknown').id, 'qwen25');
 });
 
+test('selector hides planning scenarios unless a legacy URL selects one directly', () => {
+    const api = loadTestApi();
+    const index = api.normalizeIndex({
+        contract_version: 'dataset-validation-index-v1',
+        default_scenario_id: 'results',
+        scenarios: [
+            { id: 'results', label: 'Paired B0/B1', data_url: './results.json' },
+            { id: 'planning', label: 'Coverage planning', data_url: './planning.json', selector_visible: false },
+        ],
+    });
+
+    assert.deepEqual(Array.from(api.selectableScenarios(index, 'results'), (scenario) => scenario.id), ['results']);
+    assert.deepEqual(Array.from(api.selectableScenarios(index, 'planning'), (scenario) => scenario.id), ['results', 'planning']);
+});
+
+test('coverage summary does not count measured B0-only cells as pending', () => {
+    const api = loadTestApi();
+    const summary = api.coverageSummary([
+        { status: 'baseline_only', baseline_value: 10, value: null },
+        { status: 'passed', baseline_value: 10, value: 12 },
+        { status: 'not_tested', baseline_value: null, value: null },
+        { status: 'not_applicable', baseline_value: null, value: null },
+        { status: 'failed', baseline_value: 10, value: null },
+    ]);
+
+    assert.deepEqual(JSON.parse(JSON.stringify(summary)), {
+        total: 5,
+        baseline: 3,
+        paired: 1,
+        awaiting: 1,
+        failed: 1,
+        notApplicable: 1,
+    });
+});
+
 test('model index rejects duplicate scenarios and missing defaults', () => {
     const api = loadTestApi();
     assert.throws(() => api.normalizeIndex({
@@ -104,4 +139,35 @@ test('model index rejects duplicate scenarios and missing defaults', () => {
         default_scenario_id: 'qwen25',
         scenarios: [{ id: 'qwen25', data_url: './one.json' }, { id: 'qwen25', data_url: './two.json' }],
     }), /Invalid or duplicate/);
+});
+
+test('candidate sets are validated and rendered without hiding non-selected MODs', () => {
+    const api = loadTestApi();
+    const artifact = {
+        contract_version: 'dataset-validation-v1',
+        datasets: [{ id: 'swe-c1', label: 'SWE C1' }],
+        metrics: [{ id: 'output', label: 'Output', unit: 'token/s' }],
+        results: [{
+            dataset_id: 'swe-c1',
+            metric_id: 'output',
+            status: 'passed',
+            value: 12,
+            selected_candidate_id: 'second',
+            candidate_values: [
+                { candidate_id: 'first', label: 'First MOD', value: 11, delta_pct: 10, runtime_effectiveness: 'not-recorded', provenance: { repository: 'org/first', report_url: 'https://example.com/first' } },
+                { candidate_id: 'second', label: 'Second MOD', value: 12, delta_pct: 20, runtime_effectiveness: 'exercised', provenance: { repository: 'org/second', report_url: 'https://example.com/second' } },
+            ],
+        }],
+    };
+    const normalized = api.normalize(artifact);
+    const cell = normalized.results.get('swe-c1:output');
+    const html = api.candidateValuesHtml(cell, artifact.metrics[0]);
+    assert.match(html, /First MOD/);
+    assert.match(html, /Second MOD/);
+    assert.match(html, /validation-candidate--selected/);
+    assert.match(html, /Not recorded/);
+    assert.match(html, /Exercised/);
+
+    artifact.results[0].selected_candidate_id = 'missing';
+    assert.throws(() => api.normalize(artifact), /Selected candidate mismatch/);
 });

@@ -63,12 +63,78 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.match(page, /dataset_validation_index_v1\.json/);
     assert.match(page, /id="validation-model-select"/);
     assert.match(page, /B1 is selected independently per cell/);
-    assert.equal(index.scenarios.length, 3);
-    assert.equal(index.scenarios[0].model, 'Qwen2.5-14B-Instruct');
-    assert.equal(index.scenarios[0].data_url, './data/dataset_validation_v1.b0.json');
-    assert.equal(index.scenarios[1].model, 'Qwen3.5-35B-A3B');
-    assert.equal(index.scenarios[1].data_url, './data/dataset_validation_qwen35_tp2_matrix.json');
-    assert.equal(index.scenarios[2].data_url, './data/dataset_validation_qwen35_bidkv.json');
+    assert.equal(index.scenarios.length, 7);
+    assert.equal(index.default_scenario_id, 'qwen35-35b-a3b-bf16-tp2-pp1-dp1-ep-off-ctx262k-apc-on-mtp2-full-piecewise-sweprefix-900s');
+    const visible = index.scenarios.filter((scenario) => scenario.selector_visible !== false);
+    assert.equal(visible.length, 6);
+    assert.deepEqual(visible.slice(0, 4).map((scenario) => scenario.data_url), [
+        './data/dataset_validation_qwen35_frontier_unified_900s.json',
+        './data/dataset_validation_qwen35_frontier_betterscale_900s.json',
+        './data/dataset_validation_qwen35_frontier_pipeline_pp2_900s.json',
+        './data/dataset_validation_qwen35_bidkv.json',
+    ]);
+    assert.ok(visible.slice(0, 4).every((scenario) => scenario.label.startsWith('Paired B0/B1')));
+    assert.ok(visible[4].label.startsWith('B0 only'));
+    assert.ok(visible[5].label.startsWith('Partial B0/B1'));
+    assert.equal(index.scenarios[6].data_url, './data/dataset_validation_qwen35_tp2_matrix.json');
+    assert.equal(index.scenarios[6].selector_visible, false);
+});
+
+test('remaining declared Frontier pairs keep their own Native and regressions', () => {
+    const betterscale = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_qwen35_frontier_betterscale_900s.json'), 'utf8'));
+    assert.equal(betterscale.baseline.id, 'swe-capacity16-native');
+    assert.equal(betterscale.scenario.baseline_graph_mode, 'FULL_AND_PIECEWISE');
+    assert.equal(betterscale.scenario.candidate_graph_mode, 'FULL');
+    assert.ok(betterscale.results.every((cell) => cell.selected_candidate_id === 'betterscale'));
+    assert.deepEqual(new Set(betterscale.results.map((cell) => cell.comparison.trend)), new Set(['improved']));
+
+    const pipeline = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_qwen35_frontier_pipeline_pp2_900s.json'), 'utf8'));
+    assert.equal(pipeline.baseline.id, 'swe-k8s-pp2-20260925-nativepp-r1');
+    assert.equal(pipeline.scenario.pipeline_parallel_size, 2);
+    assert.equal(pipeline.scenario.hardware, '4× Ascend 910B2');
+    assert.ok(pipeline.results.every((cell) => cell.selected_candidate_id === 'pipeline-microbatch-migration'));
+    assert.deepEqual(new Set(pipeline.results.map((cell) => cell.comparison.trend)), new Set(['improved', 'regressed']));
+    assert.ok(pipeline.results.every((cell) => cell.candidate_values[0].runtime_effectiveness === 'exercised'));
+});
+
+test('Qwen3.5 unified Frontier scenario publishes all paired MOD candidates', () => {
+    const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_qwen35_frontier_unified_900s.json'), 'utf8'));
+    assert.equal(data.scenario.expert_parallel, false);
+    assert.equal(data.scenario.max_model_len, 262144);
+    assert.equal(data.scenario.prefix_caching, true);
+    assert.equal(data.scenario.measurement_seconds, 900);
+    assert.equal(data.datasets.length, 5);
+    assert.equal(data.metrics.length, 2);
+    assert.equal(data.results.length, 10);
+    assert.ok(data.results.every((cell) => cell.candidate_values.length === 6));
+    assert.ok(data.results.every((cell) => cell.candidate_values.some((candidate) => candidate.candidate_id === cell.selected_candidate_id && candidate.value === cell.value)));
+    const c1 = data.results.find((cell) => cell.dataset_id === 'swe-prefix-reuse-c1' && cell.metric_id === 'output_token_throughput');
+    assert.equal(c1.selected_candidate_id, 'kvcompress-ascend');
+    const c16 = data.results.find((cell) => cell.dataset_id === 'swe-prefix-reuse-c16' && cell.metric_id === 'output_token_throughput');
+    assert.equal(c16.selected_candidate_id, 'pegaflow-vllm-connectors');
+    assert.deepEqual(new Set(c16.candidate_values.map((candidate) => candidate.candidate_id)), new Set(['bidkv', 'dla', 'kv-materialization-arrival-control', 'kv-tiering-migration', 'kvcompress-ascend', 'pegaflow-vllm-connectors']));
+});
+
+test('Qwen3.5 repaired B0 metadata publishes the measured 35B workbook configuration', () => {
+    const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_qwen35_tp2_ep_ctx32k_apcoff_inf_out256.json'), 'utf8'));
+    assert.equal(data.scenario.model, 'Qwen3.5-35B-A3B');
+    assert.equal(data.scenario.tensor_parallel_size, 2);
+    assert.equal(data.scenario.expert_parallel, true);
+    assert.equal(data.scenario.max_model_len, 32768);
+    assert.equal(data.scenario.prefix_caching, false);
+    assert.equal(data.scenario.graph_mode, 'FULL_DECODE_ONLY');
+    assert.equal(data.scenario.request_rate, 'inf');
+    assert.equal(data.scenario.output_length, 256);
+    assert.equal(data.datasets.length, 21);
+    assert.equal(data.metrics.length, 6);
+    assert.equal(data.results.length, 126);
+    assert.ok(data.results.every((cell) => cell.status === 'baseline_only' && cell.baseline_value !== null));
+    const cell = (datasetId, metricId) => data.results.find((item) => item.dataset_id === datasetId && item.metric_id === metricId);
+    assert.equal(cell('jsonschemabench', 'request_throughput').baseline_value, 1.8);
+    assert.equal(cell('jsonschemabench', 'request_success_rate').baseline_value, 99.5);
+    assert.equal(cell('longbench', 'request_throughput').baseline_value, 1.21);
+    assert.equal(cell('longbench-v2', 'request_success_rate').baseline_value, 99);
+    assert.ok(data.results.every((item) => item.provenance.result_json_sha256));
 });
 
 test('Qwen3.5 TP2 matrix separates online and agent applicability', () => {

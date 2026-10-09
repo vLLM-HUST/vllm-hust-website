@@ -81,7 +81,7 @@ chunks.push(`<text x="${left + 390}" y="${top - 20}" fill="${colors.on}" font-si
 chunks.push(`<text x="${(left + right) / 2}" y="${bottom + 66}" text-anchor="middle" font-size="16">Client concurrency</text>`);
 chunks.push(`<text transform="translate(28 ${(top + bottom) / 2}) rotate(-90)" text-anchor="middle" font-size="16">Output tokens/s/chip</text>`);
 chunks.push('<text x="60" y="610" font-size="13">Lines connect measured C levels; they are not fitted curves or causal speedup estimates.</text>');
-chunks.push('<text x="60" y="632" font-size="13">Local diagnostic asset; public catalog/source and benchmark revision remain unverified.</text>');
+chunks.push('<text x="60" y="632" font-size="13">Public preview; benchmark-client source linkage and point-isolated activation evidence remain incomplete.</text>');
 chunks.push('</g></svg>');
 
 const output = path.join(root, 'assets', 'frontier-qwen35-op02-core-attention-boundary.svg');

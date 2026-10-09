@@ -58,7 +58,6 @@ def assert_concurrency_series(page, points, cohort=None):
     )
     groups = {}
     frontiers = {}
-    configuration_groups = {}
     contract = (cohort or {}).get("workload", {}).get("contract", {})
     shared_ids = set(contract.get("comparison_point_ids", []))
     configuration_comparison = contract.get("presentation") == "configuration-study"
@@ -72,28 +71,9 @@ def assert_concurrency_series(page, points, cohort=None):
             or "+".join(sorted(point["configuration"]["mods"]))
             or "none"
         )
-        if (
-            group == "betterscale"
-            and configuration_comparison
-            and point["id"] in shared_ids
+        if group == "betterscale" or (
+            configuration_comparison and point["id"] in shared_ids
         ):
-            campaign = (
-                point.get("evidence", {}).get("benchmark_protocol", {}).get("campaign")
-            )
-            family = (
-                campaign
-                if campaign
-                in {"concurrency-knee-20261006", "concurrency-width-20261006"}
-                else "original"
-            )
-            key = (
-                point["cohort_id"],
-                point["load"].get("session_rotation_depth"),
-                family,
-            )
-            configuration_groups.setdefault(key, []).append(point)
-            continue
-        if group == "betterscale":
             key = json.dumps(
                 [
                     point["cohort_id"],
@@ -123,20 +103,6 @@ def assert_concurrency_series(page, points, cohort=None):
         for series, members in groups.items()
         if len(members) > 1
     }
-    for members in configuration_groups.values():
-        members.sort(key=lambda p: p["load"]["concurrency"])
-        if len(members) < 2:
-            continue
-        first = members[0]
-        series = json.dumps(
-            [
-                first["cohort_id"],
-                first["load"]["concurrency_series"],
-                first["load"].get("session_rotation_depth"),
-            ],
-            separators=(",", ":"),
-        )
-        expected[series] = members
 
     def coordinates(point):
         return (
@@ -689,14 +655,17 @@ def main():
                         == point["configuration"]["mod_sources"]
                     )
 
-                sampling_date_text = page.locator(".frontier-popup-date").inner_text()
-                sampling_date = point["evidence"]["sampling_date_utc"]
-                sampling_date_end = point["evidence"].get("sampling_date_end_utc")
-                assert sampling_date in sampling_date_text
-                if sampling_date_end and sampling_date_end != sampling_date:
-                    assert sampling_date_end in sampling_date_text
-                else:
-                    assert f"{sampling_date} (UTC)" in sampling_date_text
+                sampling_start = point["evidence"]["sampling_date_utc"]
+                sampling_end = point["evidence"].get("sampling_date_end_utc")
+                sampling_range = (
+                    f"{sampling_start} – {sampling_end}"
+                    if sampling_end and sampling_end != sampling_start
+                    else sampling_start
+                )
+                assert (
+                    f"{sampling_range} (UTC)"
+                    in page.locator(".frontier-popup-date").inner_text()
+                )
 
                 popup.locator("[data-close]").click()
                 assert popup.is_hidden()
@@ -790,6 +759,8 @@ def main():
                         .get("concurrency_series", "")
                         .startswith(contract["display_series_prefix"])
                     ]
+                if contract.get("presentation") == "configuration-study" and shared_ids:
+                    members = [p for p in members if p["id"] in shared_ids]
                 available_depths = sorted(
                     {
                         p["load"]["session_rotation_depth"]
@@ -819,6 +790,35 @@ def main():
                         assert page.locator(
                             f'[data-filter="rotation"][value="{depth}"]'
                         ).is_checked()
+                if contract.get("presentation") == "configuration-study" and shared_ids:
+
+                    def coords(p):
+                        return (
+                            p["metrics"]["decode_p90_tps"],
+                            p["metrics"]["output_tps"]
+                            / p["configuration"]["hardware"]["accelerator_count"],
+                        )
+
+                    def group(p):
+                        return (
+                            p["cohort_id"],
+                            p["load"].get("presentation_group", {}).get("id")
+                            or "+".join(sorted(p["configuration"]["mods"]))
+                            or "none",
+                            p["load"].get("session_rotation_depth"),
+                        )
+
+                    members = [
+                        p
+                        for p in members
+                        if not any(
+                            group(q) == group(p)
+                            and coords(q)[0] >= coords(p)[0]
+                            and coords(q)[1] >= coords(p)[1]
+                            and coords(q) != coords(p)
+                            for q in members
+                        )
+                    ]
                 rendered_point_count = page.locator(".frontier-point").count()
                 assert rendered_point_count == len(members), (
                     cohort["id"],

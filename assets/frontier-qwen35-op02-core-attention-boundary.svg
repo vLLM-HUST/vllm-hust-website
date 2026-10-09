@@ -44,5 +44,5 @@
 <text x="562.5" y="571" text-anchor="middle" font-size="16">Client concurrency</text>
 <text transform="translate(28 305) rotate(-90)" text-anchor="middle" font-size="16">Output tokens/s/chip</text>
 <text x="60" y="610" font-size="13">Lines connect measured C levels; they are not fitted curves or causal speedup estimates.</text>
-<text x="60" y="632" font-size="13">Local diagnostic asset; public catalog/source and benchmark revision remain unverified.</text>
+<text x="60" y="632" font-size="13">Public preview; benchmark-client source linkage and point-isolated activation evidence remain incomplete.</text>
 </g></svg>

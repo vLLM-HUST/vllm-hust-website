@@ -24,6 +24,11 @@ test('concurrency lines connect only declared same-cohort series in C order',()=
         for(const row of rows) assert.deepEqual(fixed(row.point),fixed(first));
         assert.deepEqual(rows.map(row=>row.point.load.concurrency),rows.map(row=>row.point.load.concurrency).sort((a,b)=>a-b));
     }
+    const w8a8=lines.find(rows=>rows[0].point.load.concurrency_series==='swe-w8a8-tp2-20260929-mtp2-r2');
+    assert.ok(w8a8,'W8A8 SWE observations must form one complete concurrency line');
+    assert.deepEqual(w8a8.map(row=>row.point.load.concurrency),[1,2,4,8,16]);
+    assert.ok(w8a8.every(row=>row.point.configuration.parameters.mtp_draft_tokens===2));
+    assert.ok(w8a8.every(row=>row.point.configuration.parameters.max_num_seqs===16));
     assert.equal(model.concurrencySeries(native.slice(0,1)).length,0);
     const other={...native[0],point:{...native[0].point,cohort_id:'other-workload'}};
     assert.equal(model.concurrencySeries([native[0],other]).length,0);
@@ -413,6 +418,33 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.validation.mamba_cache_mode,'align');
             assert.equal(run.validation.controller_status,'exercised');
             assert.equal(run.validation.shared_native_contract_sha256,p.configuration.parameters.unified_native_contract_sha256);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-w8a8-swe-curves-20260929-r2'){
+            const params=p.configuration.parameters;
+            assert.deepEqual(p.configuration.mods,['ascend-mtp-contract-2patch']);
+            assert.deepEqual(params.mods,['ascend-mtp-contract-2patch']);
+            assert.equal(params.quantization,'ascend');
+            assert.ok(String(params.weight_precision).startsWith('int8'));
+            assert.equal(params.mtp_draft_tokens,2);
+            assert.equal(params.max_num_seqs,16);
+            assert.equal(params.gpu_memory_utilization,0.95);
+            assert.equal(params.kv_cache_memory_bytes,26038239232);
+            assert.equal(params.max_num_batched_tokens,4096);
+            assert.equal(params.pipeline_parallel_size,1);
+            assert.equal(p.configuration.hardware.accelerator_count,2);
+            assert.equal(p.load.session_rotation_depth,1);
+            assert.equal(run.client.session_rotation_depth,undefined);
+            assert.equal(p.load.concurrency_series,'swe-w8a8-tp2-20260929-mtp2-r2');
+            assert.equal(params.qualification.concurrency,p.load.concurrency);
+            assert.equal(params.qualification.measurement_seconds,60);
+            assert.equal(run.qualification_run.concurrency,p.load.concurrency);
+            assert.equal(run.qualification_run.duration,60);
+            assert.equal(run.qualification_run.summary.failed_requests,0);
+            assert.equal(run.validation.protocol_qualification_run_id,run.qualification_run.run_id);
+            assert.equal(run.validation.protocol_qualification_passed,true);
+            assert.equal(run.validation.measured_seconds_matches_plan,true);
+            assert.equal(run.validation.prefix_cache_observed,true);
+            assert.equal(run.validation.campaign_finished_ok,true);
+            assert.ok(Object.keys(run.runtime_evidence.prefix_cache_counters).length);
         } else if(p.evidence.benchmark_protocol.campaign==='qwen35-v018-native-text-only-20261001'){
             assert.deepEqual(p.configuration.mods,[]);
             assert.equal(p.configuration.official_baseline_id,data.official_baseline.id);
@@ -975,9 +1007,16 @@ test('retired AgentX cohorts disappear from active choices without deleting hist
 test('Qwen35 unified campaign remains on its series page without losing checkpoint provenance',()=>{
     const data=require('../data/leaderboard_frontier.json');
     const visible=model.visibleData(data);
-    const cohorts=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
+    const allQwen35=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
+    assert.equal(allQwen35.length,5);
+    const cohorts=allQwen35.filter(c=>c.precision.id==='bf16-weights-compute-kv');
     assert.equal(cohorts.length,4);
     assert.equal(cohorts.filter(c=>c.workload.contract.presentation==='configuration-study').length,3);
+    const w8a8=allQwen35.filter(c=>c.precision.id==='w8a8-int8-weights-compute-bf16-kv');
+    assert.equal(w8a8.length,1);
+    assert.equal(w8a8[0].id,'qwen35-35b-a3b-w8a8-tp2-2x910b3-full-decode-only-sweprefix-900s-v1');
+    assert.doesNotMatch(w8a8[0].id,/smoke|historical/i);
+    assert.doesNotMatch(w8a8[0].workload.label,/smoke|historical/i);
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
@@ -1053,26 +1092,26 @@ test('BetterScale cache study reuses exact Native and all selected campaign meas
     const shared=study.workload.contract.comparison_point_ids;
     assert.equal(shared.length,21);
     const points=model.presentationPoints(data.points,study);
-    assert.equal(points.length,data.points.filter(p=>p.cohort_id===study.id).length+21);
+    assert.equal(points.length,21);
     for(const id of shared) assert.equal(points.find(p=>p.id===id),data.points.find(p=>p.id===id));
     const rows=model.project(points,'decode_p90_tps','output_tps_per_chip').measured;
     const lines=model.chartSeries(rows,'decode_p90_tps','output_tps_per_chip',study);
-    assert.equal(lines.length,4);
+    assert.equal(lines.length,2);
     const better=lines.find(line=>model.groupKey(line[0].point)==='betterscale');
     const native=lines.find(line=>model.groupKey(line[0].point)==='native-runtime-752a3a5-9bf964c');
-    assert.deepEqual(better.map(row=>row.point.load.concurrency),[1,2,4,8,16,32]);
-    assert.deepEqual(native.map(row=>row.point.load.concurrency),[1,2,4,8,16]);
-    assert.equal(model.value(better.at(-1).point,'output_tps_per_chip'),613.88);
+    assert.deepEqual(better.map(row=>row.point.load.concurrency),[44,36,32,16,8,4,2,1]);
+    assert.deepEqual(native.map(row=>row.point.load.concurrency),[16,8,4,2,1]);
+    assert.equal(lines.flat().length,13);
     assert.ok(lines.flat().every(row=>shared.includes(row.point.id)));
-    assert.deepEqual(lines.slice(2).map(line=>line.map(r=>r.point.load.concurrency)),[[32,36,37,40],[37,40,44,48,52,56]]);
+    assert.ok(lines.every(line=>line.every((row,i)=>!i || row.x>=line[i-1].x)));
     const newPoints=points.filter(p=>['concurrency-knee-20261006','concurrency-width-20261006'].includes(p.evidence?.benchmark_protocol?.campaign));
     assert.equal(newPoints.length,10);
     assert.ok(newPoints.every(p=>!model.presentationPoints(data.points,main).includes(p)));
-    const c32=better.at(-1).point;
+    const c32=better.find(row=>row.point.load.concurrency===32).point;
     assert.ok(!model.presentationPoints(data.points,main).includes(c32));
     assert.equal(model.chartSeries(rows.filter(row=>row.point===c32),'decode_p90_tps','output_tps_per_chip',study).length,0);
     const withoutNative=model.chartSeries(rows.filter(row=>model.groupKey(row.point)!=='native-runtime-752a3a5-9bf964c'),'decode_p90_tps','output_tps_per_chip',study);
-    assert.equal(withoutNative.length,3);
+    assert.equal(withoutNative.length,1);
     for(const invalid of [[shared[0],shared[0]],['missing-point'],[],[data.points.find(p=>p.cohort_id==='qwen38-27b-bf16-sweprefix-smoke-v1').id]]){
         const fixture=structuredClone(data);
         fixture.cohorts.find(c=>c.id===study.id).workload.contract.comparison_point_ids=invalid;
