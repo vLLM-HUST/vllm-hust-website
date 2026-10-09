@@ -50,13 +50,16 @@ arrays, but reproduces every displayed token rate. Full raw records are retained
 repository in the local campaign archive. Original historical inputs were deleted; never invent
 those inputs or relabel a reconstruction as an exact historical reproduction. Qwen27 uses the newly
 downloaded official Qwen/Qwen3.8-27B checkpoint, identified by the per-file manifest in its
-qualification receipt, not the deleted historical local checkpoint. Run
-`1a775a4fdc2748f0bac20914479da804` completed 437 requests within 900 seconds, zero failures; its
-per-card rates are 366.9661 new input, 5,616.64 cached input and 142.8467 output tok/s. The
-streamed-output-window rate is separately 149.045 tok/s/card. Independent GDN/FIA numerical gates
-and 16 concurrent exact-marker checks passed. The 96cd03a-based dense geometry reconstruction
-preserves FULL/MTP2/4096-query/256K context and uses the existing early mixed capture policy;
-LiveState is not qualified. This is bounded functionality, not a general quality evaluation.
+qualification receipt, not the deleted historical local checkpoint. The current State C16
+observation `1bd9268ee77845f08b16f1c78513b6d1` replaces the earlier96cd03a reconstruction as the
+displayed flagship. It completes 730 requests in900seconds with zero failures: per-card rates are
+327.9461 new input, 8641.2517 cached input and 232.3072 output tok/s. Streamed-window output is
+separately 249.0617 tok/s/card. Current State, streaming incremental backup, partial-priority
+recovery and Q12/KV2 Balanced FlashDecode are enabled; independent operator and forced
+partial-recovery gates pass, as do16 concurrent retrievals before and after each window. The timed
+C16 run observes52 cache loads but no active partial eviction. This is bounded functionality, not a
+general quality evaluation. See [current Dense27 methods](FRONTIER-DENSE27-CURRENT.md). Historical
+reconstruction evidence remains archived, not relabeled.
 
 All three currently displayed plans have complete, same-cohort input/output accounting. They are
 selected deployment observations at different concurrency points, not a controlled same-concurrency

@@ -223,7 +223,8 @@ deployment.
 Fletcher explicitly requested a small entry under 成果; this supersedes the older
 no-Achievements-entry instruction for this calculator only. `serving-plan.html` and
 `data/serving-plans.json` own the business translation, not the benchmark chart. Read
-`docs/SERVING-PLAN.md` before adding models or changing billing math. Only the selected C44 Qwen35
-observation is measured; custom plans are assumptions. Input billing volume is unknown and excluded
-by default. Costs are user inputs, not estimated hardware rents. API-equivalent value is neither
-income nor profit.
+`docs/SERVING-PLAN.md` before adding models or changing billing math. Qwen35 BetterScale, Native and
+current Qwen27 observations have matched completed-request input/cache/output accounting. Read
+`docs/FRONTIER-DENSE27-CURRENT.md` before using the current27B State results; the earlier96cd03a
+reconstruction was not the latest cache/partial-recovery implementation. Costs are user inputs, not
+estimated hardware rents. API-equivalent value is neither income nor profit.
