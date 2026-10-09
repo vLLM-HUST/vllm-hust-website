@@ -1,0 +1,24 @@
+{
+  "measurementSeconds": 900,
+  "chips": 4,
+  "requests": 991,
+  "maxPromptTokens": 108413,
+  "counts": {
+    "prompt": 30638896,
+    "cached": 29902385,
+    "new": 736511,
+    "output": 608014
+  },
+  "tokensPerSecondPerChip": {
+    "prompt": 8510.804444444444,
+    "cached": 8306.218055555555,
+    "new": 204.58638888888888,
+    "output": 168.89277777777778
+  },
+  "accounting": "Successful requests completed within observation window; excludes drain and incomplete-request output. Input and output use the same cohort. Not the leaderboard's streamed-output-window metric.",
+  "sourceRunId": "10f4cd32d5454f81b8724deb44139572",
+  "sourceRawSha256": "93db0ccbe43c922b5e0c8a7f1052862be0077c4d8ea7b68754099505557617d8",
+  "usageProjectionSha256": "cfbe01bbf1752c55c307f4641e34b686e2a58aec8f4ddc2a7790f3ccd89214b3",
+  "projection": "Timing/success and HTTP usage only; full records retained in campaign archive.",
+  "leaderboardOutputTokensPerSecondPerChip": 171.0886111111111
+}
