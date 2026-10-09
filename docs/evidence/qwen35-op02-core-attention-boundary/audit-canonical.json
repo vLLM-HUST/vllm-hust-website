@@ -1,0 +1,324 @@
+{
+  "schema": "op02-canonical-tokenizer-audit/v1",
+  "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+  "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+  "tokenizer_transformers": "5.17.0",
+  "runs": [
+    {
+      "run": "off-c1-900s",
+      "mode": "off",
+      "concurrency": 1,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": false,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 104,
+        "requests_completed_in_window": 103,
+        "output_tokens_per_second": 52.36333333333334
+      },
+      "requests_jsonl_sha256": "71d44a441b77087e820ec31e3130615269dff9f45916eaf68df5273d594c212c",
+      "config_sha256": "6ceb90b75adb23c298c8889ef1a80206100889f26cb6f4a27afe7f480e689af5"
+    },
+    {
+      "run": "off-c2-900s",
+      "mode": "off",
+      "concurrency": 2,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": false,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 146,
+        "requests_completed_in_window": 144,
+        "output_tokens_per_second": 89.55555555555556
+      },
+      "requests_jsonl_sha256": "06d6244b9ec16ae70d476685f628a43b8d27046468a687be9af619f1fc1b2287",
+      "config_sha256": "10740c607e6482a0156254284e33aa79b5358d6315d3218628f9dbcc7a7cfdf0"
+    },
+    {
+      "run": "off-c4-900s",
+      "mode": "off",
+      "concurrency": 4,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": false,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 208,
+        "requests_completed_in_window": 204,
+        "output_tokens_per_second": 137.24555555555557
+      },
+      "requests_jsonl_sha256": "9c162598d3bef593000e015a4812b1264e80a5e3c0dadad7ef63953dfd1a4aec",
+      "config_sha256": "2e2d5df4c6aafc7ad89342812931f7b2d2b21bd14c49ffe70f37cfa83d78c7e2"
+    },
+    {
+      "run": "off-c8-900s",
+      "mode": "off",
+      "concurrency": 8,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": false,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 316,
+        "requests_completed_in_window": 308,
+        "output_tokens_per_second": 188.08333333333334
+      },
+      "requests_jsonl_sha256": "cb3fc398971000b8e3d031f542a824bc60972b1bfa8e572a7ae485b894661c9f",
+      "config_sha256": "8426cd1aaca505157897ec27d5485159ead408a98af9a81ddd6687ce01ef5c77"
+    },
+    {
+      "run": "off-c16-900s",
+      "mode": "off",
+      "concurrency": 16,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": false,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 445,
+        "requests_completed_in_window": 429,
+        "output_tokens_per_second": 266.92333333333335
+      },
+      "requests_jsonl_sha256": "08866fd5393502c7ded0eeb21b0ef9c86cc3143dfaf3843a80cd1a5f75308720",
+      "config_sha256": "b1c2e09c4a13aea57a188d92faf0377592271ab55869760bc0c7a9636fca713d"
+    },
+    {
+      "run": "on-c1-900s",
+      "mode": "on",
+      "concurrency": 1,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": true,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 115,
+        "requests_completed_in_window": 114,
+        "output_tokens_per_second": 56.73444444444444
+      },
+      "requests_jsonl_sha256": "98a5d7e36ec2f1348cacca19aa1ff22a8ef00531f963d81bbf49f4d9ef26e8eb",
+      "config_sha256": "49d1ab7c604dfb359e0958479f3caca9a79c3a69664a80b145399a618bd375c2"
+    },
+    {
+      "run": "on-c2-900s",
+      "mode": "on",
+      "concurrency": 2,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": true,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 149,
+        "requests_completed_in_window": 147,
+        "output_tokens_per_second": 91.58
+      },
+      "requests_jsonl_sha256": "ac6792b392ef471217af8a8684449775a132390c695593b1fc0387f85e22d986",
+      "config_sha256": "a8418a78282c73c7ccc9c952eaefe89dda45af532fcf0c831662343296011d59"
+    },
+    {
+      "run": "on-c4-900s",
+      "mode": "on",
+      "concurrency": 4,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": true,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 206,
+        "requests_completed_in_window": 202,
+        "output_tokens_per_second": 136.61
+      },
+      "requests_jsonl_sha256": "d417a01d6b609af370f98832d73359799ef593183e096c67e773463028ab9b2f",
+      "config_sha256": "760b0edd003eab203edded5a5b9c2662147cf17b0654395245c2174b62144ed4"
+    },
+    {
+      "run": "on-c8-900s",
+      "mode": "on",
+      "concurrency": 8,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": true,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 313,
+        "requests_completed_in_window": 305,
+        "output_tokens_per_second": 186.00555555555556
+      },
+      "requests_jsonl_sha256": "adb2cb87751a2ce7d71fd253e6bd80253dca2bd2c67a0f896c0c19abb338c32e",
+      "config_sha256": "af8b0d809a840692712c44c872cfa3f0729626731d0b0b6f9e7df102d1fab39f"
+    },
+    {
+      "run": "on-c16-900s",
+      "mode": "on",
+      "concurrency": 16,
+      "duration": 900.0,
+      "workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+      "tokenizer": {
+        "path": "/workspace/models/Qwen3.5-35B-A3B",
+        "fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+        "transformers": "5.17.0",
+        "enable_thinking": true
+      },
+      "mod": {
+        "name": "vllm-hust-core-attention-boundary",
+        "version": "0.1.0.dev0",
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "enable": true,
+        "kill_switch": false,
+        "evidence": true
+      },
+      "summary": {
+        "valid": true,
+        "measurement_seconds": 900.0,
+        "failed_requests": 0,
+        "requests_started": 442,
+        "requests_completed_in_window": 426,
+        "output_tokens_per_second": 265.77444444444444
+      },
+      "requests_jsonl_sha256": "3c5812c174ac03cf515d78707ea11cbc7b749c712d2677f289897550f935bfc8",
+      "config_sha256": "aabbd3cd484be8a44b4147f8d7d3abec10dbfbab45fa77dc43fe64ac1228b763"
+    }
+  ],
+  "off_complete": "2026-10-07T23:26:29+00:00",
+  "on_complete": "2026-10-08T00:50:57+00:00",
+  "mod_installed_evidence_count": 4,
+  "mod_runtime_effective_evidence_count": 2,
+  "errors": [],
+  "all_checks_passed": true
+}

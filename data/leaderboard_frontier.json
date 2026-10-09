@@ -2251,7 +2251,7 @@
         "e2e_p95_ms": 58037.11557099995,
         "ttft_p50_ms": 1384.288417,
         "decode_per_user_p50_tps": 67.66998533743899,
-        "completed_requests": 89.0,
+        "completed_requests": 89,
         "decode_p90_tps": 83.99637719488618
       },
       "evidence": {
@@ -2376,7 +2376,7 @@
         "e2e_p95_ms": 52844.168638999996,
         "ttft_p50_ms": 806.407752,
         "decode_per_user_p50_tps": 79.88701077122406,
-        "completed_requests": 111.0,
+        "completed_requests": 111,
         "decode_p90_tps": 97.66183282742962
       },
       "evidence": {
@@ -2512,7 +2512,7 @@
         "e2e_p95_ms": 54556.841590300006,
         "ttft_p50_ms": 940.904988,
         "decode_per_user_p50_tps": 78.89189934866893,
-        "completed_requests": 87.0
+        "completed_requests": 87
       },
       "evidence": {
         "status": "measured",
@@ -2647,7 +2647,7 @@
         "e2e_p95_ms": 48891.07514995,
         "ttft_p50_ms": 684.6812095,
         "decode_per_user_p50_tps": 86.10313726951144,
-        "completed_requests": 130.0
+        "completed_requests": 130
       },
       "evidence": {
         "status": "measured",
@@ -2782,7 +2782,7 @@
         "e2e_p95_ms": 46231.97381789998,
         "ttft_p50_ms": 908.7773609999999,
         "decode_per_user_p50_tps": 77.82581583002087,
-        "completed_requests": 42.0
+        "completed_requests": 42
       },
       "evidence": {
         "status": "measured",
@@ -2917,7 +2917,7 @@
         "e2e_p95_ms": 77453.4359705999,
         "ttft_p50_ms": 1032.630707,
         "decode_per_user_p50_tps": 48.95281955927419,
-        "completed_requests": 145.0
+        "completed_requests": 145
       },
       "evidence": {
         "status": "measured",
@@ -3027,7 +3027,7 @@
         "e2e_p95_ms": 80060.40097129997,
         "ttft_p50_ms": 1607.4109509999998,
         "decode_per_user_p50_tps": 61.20254982063062,
-        "completed_requests": 67.0
+        "completed_requests": 67
       },
       "evidence": {
         "status": "measured",
@@ -3137,7 +3137,7 @@
         "e2e_p95_ms": 56721.04514499999,
         "ttft_p50_ms": 1338.346386,
         "decode_per_user_p50_tps": 69.15518719086998,
-        "completed_requests": 50.0
+        "completed_requests": 50
       },
       "evidence": {
         "status": "measured",
@@ -3247,7 +3247,7 @@
         "e2e_p95_ms": 50430.14301909996,
         "ttft_p50_ms": 1104.7610075,
         "decode_per_user_p50_tps": 74.74421551181078,
-        "completed_requests": 94.0
+        "completed_requests": 94
       },
       "evidence": {
         "status": "measured",
@@ -3357,7 +3357,7 @@
         "e2e_p95_ms": 104886.21217209952,
         "ttft_p50_ms": 1130.0292239999999,
         "decode_per_user_p50_tps": 71.29406225106435,
-        "completed_requests": 35.0
+        "completed_requests": 35
       },
       "evidence": {
         "status": "measured",
@@ -3467,7 +3467,7 @@
         "e2e_p95_ms": 110370.2552225,
         "ttft_p50_ms": 2025.6346015,
         "decode_per_user_p50_tps": 40.87033608405507,
-        "completed_requests": 116.0
+        "completed_requests": 116
       },
       "evidence": {
         "status": "measured",
@@ -3575,7 +3575,7 @@
         "ttft_p99_ms": 97947.0449472,
         "tpot_p95_ms": 386.7652328805688,
         "e2e_p95_ms": 489541.033404,
-        "completed_requests": 111.0
+        "completed_requests": 111
       },
       "evidence": {
         "status": "measured",
@@ -3691,7 +3691,7 @@
         "ttft_p99_ms": 38164.64146680003,
         "tpot_p95_ms": 370.3236175641279,
         "e2e_p95_ms": 271385.71511519986,
-        "completed_requests": 289.0
+        "completed_requests": 289
       },
       "evidence": {
         "status": "measured",
@@ -3807,7 +3807,7 @@
         "ttft_p99_ms": 99822.4462501,
         "tpot_p95_ms": 359.57086350328564,
         "e2e_p95_ms": 485380.255006,
-        "completed_requests": 111.0
+        "completed_requests": 111
       },
       "evidence": {
         "status": "measured",
@@ -11655,7 +11655,7 @@
         "tpot_p95_ms": 8.838432519788041,
         "e2e_p95_ms": 17569.00982079678,
         "completed_requests": 177,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.932460684086125
       },
       "evidence": {
@@ -11844,7 +11844,7 @@
         "tpot_p95_ms": 10.988163853765872,
         "e2e_p95_ms": 21071.406485885364,
         "completed_requests": 287,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9469855815790211
       },
       "evidence": {
@@ -12033,7 +12033,7 @@
         "tpot_p95_ms": 15.369501345583771,
         "e2e_p95_ms": 23753.92593661089,
         "completed_requests": 473,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.949633117638703
       },
       "evidence": {
@@ -12222,7 +12222,7 @@
         "tpot_p95_ms": 20.887824367337576,
         "e2e_p95_ms": 34838.16280968753,
         "completed_requests": 694,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.943906145106821
       },
       "evidence": {
@@ -12411,7 +12411,7 @@
         "tpot_p95_ms": 35.27414072931716,
         "e2e_p95_ms": 44269.909648603054,
         "completed_requests": 1055,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9354728765051404
       },
       "evidence": {
@@ -12602,7 +12602,7 @@
         "tpot_p95_ms": 16.16623289272917,
         "e2e_p95_ms": 23172.64818659166,
         "completed_requests": 117,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.919388679465825
       },
       "evidence": {
@@ -12793,7 +12793,7 @@
         "tpot_p95_ms": 19.58087365037123,
         "e2e_p95_ms": 35776.5559381922,
         "completed_requests": 173,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9303454960865772
       },
       "evidence": {
@@ -12984,7 +12984,7 @@
         "tpot_p95_ms": 24.57915300744814,
         "e2e_p95_ms": 44609.474799811134,
         "completed_requests": 277,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9432973555292513
       },
       "evidence": {
@@ -13175,7 +13175,7 @@
         "tpot_p95_ms": 39.87614033246608,
         "e2e_p95_ms": 56820.99286750599,
         "completed_requests": 431,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.938836404148257
       },
       "evidence": {
@@ -13366,7 +13366,7 @@
         "tpot_p95_ms": 114.46529382069566,
         "e2e_p95_ms": 117968.40494450736,
         "completed_requests": 380,
-        "preemptions_measurement_and_drain": 205.0,
+        "preemptions_measurement_and_drain": 205,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.11472101145359574
       },
       "evidence": {
@@ -14424,7 +14424,7 @@
         "tpot_p95_ms": 18.18763303798245,
         "e2e_p95_ms": 24009.41300964328,
         "completed_requests": 112,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.8192395254205643
       },
       "evidence": {
@@ -14597,7 +14597,7 @@
         "tpot_p95_ms": 22.858574576693982,
         "e2e_p95_ms": 36743.0081838422,
         "completed_requests": 158,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.8427237562193739
       },
       "evidence": {
@@ -14770,7 +14770,7 @@
         "tpot_p95_ms": 34.040869346165415,
         "e2e_p95_ms": 52946.472982765394,
         "completed_requests": 230,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.860353210749614
       },
       "evidence": {
@@ -14943,7 +14943,7 @@
         "tpot_p95_ms": 59.317638809696525,
         "e2e_p95_ms": 63830.99413299351,
         "completed_requests": 361,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.8426195551219773
       },
       "evidence": {
@@ -15116,7 +15116,7 @@
         "tpot_p95_ms": 131.00454873460313,
         "e2e_p95_ms": 105767.06856759847,
         "completed_requests": 357,
-        "preemptions_measurement_and_drain": 52.0,
+        "preemptions_measurement_and_drain": 52,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.29733751901223443
       },
       "evidence": {
@@ -16783,12 +16783,12 @@
           "mod_runtime_effectiveness": {
             "enabled": true,
             "policy": "bidkv.adapters.vllm_hust.selector.BidkvPreemptionPolicy",
-            "calls": 0.0,
-            "selections": 0.0,
-            "failures": 0.0,
-            "abstentions": 0.0,
-            "invalid_selections": 0.0,
-            "preemptions": 0.0,
+            "calls": 0,
+            "selections": 0,
+            "failures": 0,
+            "abstentions": 0,
+            "invalid_selections": 0,
+            "preemptions": 0,
             "status": "not-exercised",
             "scope": "Counter deltas covering measured window and in-flight drain; calls alone do not establish optimization benefit"
           }
@@ -16955,12 +16955,12 @@
           "mod_runtime_effectiveness": {
             "enabled": true,
             "policy": "bidkv.adapters.vllm_hust.selector.BidkvPreemptionPolicy",
-            "calls": 0.0,
-            "selections": 0.0,
-            "failures": 0.0,
-            "abstentions": 0.0,
-            "invalid_selections": 0.0,
-            "preemptions": 0.0,
+            "calls": 0,
+            "selections": 0,
+            "failures": 0,
+            "abstentions": 0,
+            "invalid_selections": 0,
+            "preemptions": 0,
             "status": "not-exercised",
             "scope": "Counter deltas covering measured window and in-flight drain; calls alone do not establish optimization benefit"
           }
@@ -17628,12 +17628,12 @@
                     "passed": true,
                     "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -17646,12 +17646,12 @@
                     "passed": true,
                     "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -17664,12 +17664,12 @@
                     "passed": true,
                     "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -17682,12 +17682,12 @@
                     "passed": true,
                     "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   }
                 ]
@@ -17719,14 +17719,14 @@
             "enabled": true,
             "policy": "vllm_hust_pipeline_microbatch.policy.PipelineMicrobatchPolicy",
             "status": "exercised",
-            "aborts": 0.0,
-            "failures": 0.0,
-            "calls": 13416.0,
-            "completions": 13197.0,
-            "admissions": 13197.0,
-            "abstentions": 219.0,
-            "builtin_fallbacks": 0.0,
-            "invalid_admissions": 0.0,
+            "aborts": 0,
+            "failures": 0,
+            "calls": 13416,
+            "completions": 13197,
+            "admissions": 13197,
+            "abstentions": 219,
+            "builtin_fallbacks": 0,
+            "invalid_admissions": 0,
             "scope": "Actual admissions/completions during measured window and drain; performance delta requires matched native control"
           },
           "calibration": {
@@ -17798,12 +17798,12 @@
                   "passed": true,
                   "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -17816,12 +17816,12 @@
                   "passed": true,
                   "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -17834,12 +17834,12 @@
                   "passed": true,
                   "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -17852,12 +17852,12 @@
                   "passed": true,
                   "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 }
               ]
@@ -18128,12 +18128,12 @@
                     "passed": true,
                     "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -18146,12 +18146,12 @@
                     "passed": true,
                     "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -18164,12 +18164,12 @@
                     "passed": true,
                     "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -18182,12 +18182,12 @@
                     "passed": true,
                     "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   }
                 ]
@@ -18219,14 +18219,14 @@
             "enabled": true,
             "policy": "vllm_hust_pipeline_microbatch.policy.PipelineMicrobatchPolicy",
             "status": "exercised",
-            "aborts": 0.0,
-            "failures": 0.0,
-            "calls": 9781.0,
-            "completions": 9036.0,
-            "admissions": 9036.0,
-            "abstentions": 745.0,
-            "builtin_fallbacks": 0.0,
-            "invalid_admissions": 0.0,
+            "aborts": 0,
+            "failures": 0,
+            "calls": 9781,
+            "completions": 9036,
+            "admissions": 9036,
+            "abstentions": 745,
+            "builtin_fallbacks": 0,
+            "invalid_admissions": 0,
             "scope": "Actual admissions/completions during measured window and drain; performance delta requires matched native control"
           },
           "calibration": {
@@ -18298,12 +18298,12 @@
                   "passed": true,
                   "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -18316,12 +18316,12 @@
                   "passed": true,
                   "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -18334,12 +18334,12 @@
                   "passed": true,
                   "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -18352,12 +18352,12 @@
                   "passed": true,
                   "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 }
               ]
@@ -19255,12 +19255,12 @@
                     "passed": true,
                     "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -19273,12 +19273,12 @@
                     "passed": true,
                     "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -19291,12 +19291,12 @@
                     "passed": true,
                     "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -19309,12 +19309,12 @@
                     "passed": true,
                     "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   }
                 ]
@@ -19355,14 +19355,14 @@
             "enabled": true,
             "policy": "vllm_hust_pipeline_microbatch.policy.PipelineMicrobatchPolicy",
             "status": "exercised",
-            "aborts": 0.0,
-            "admissions": 19268.0,
-            "completions": 19268.0,
-            "invalid_admissions": 0.0,
-            "builtin_fallbacks": 0.0,
-            "calls": 38536.0,
-            "failures": 0.0,
-            "abstentions": 19268.0,
+            "aborts": 0,
+            "admissions": 19268,
+            "completions": 19268,
+            "invalid_admissions": 0,
+            "builtin_fallbacks": 0,
+            "calls": 38536,
+            "failures": 0,
+            "abstentions": 19268,
             "scope": "Actual admissions/completions during measured window and drain; performance delta requires matched native control"
           },
           "calibration": {
@@ -19434,12 +19434,12 @@
                   "passed": true,
                   "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -19452,12 +19452,12 @@
                   "passed": true,
                   "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -19470,12 +19470,12 @@
                   "passed": true,
                   "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -19488,12 +19488,12 @@
                   "passed": true,
                   "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 }
               ]
@@ -19764,12 +19764,12 @@
                     "passed": true,
                     "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -19782,12 +19782,12 @@
                     "passed": true,
                     "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -19800,12 +19800,12 @@
                     "passed": true,
                     "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -19818,12 +19818,12 @@
                     "passed": true,
                     "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   }
                 ]
@@ -19864,14 +19864,14 @@
             "enabled": true,
             "policy": "vllm_hust_pipeline_microbatch.policy.PipelineMicrobatchPolicy",
             "status": "exercised",
-            "aborts": 0.0,
-            "admissions": 19062.0,
-            "completions": 19062.0,
-            "invalid_admissions": 0.0,
-            "builtin_fallbacks": 0.0,
-            "calls": 19679.0,
-            "failures": 0.0,
-            "abstentions": 617.0,
+            "aborts": 0,
+            "admissions": 19062,
+            "completions": 19062,
+            "invalid_admissions": 0,
+            "builtin_fallbacks": 0,
+            "calls": 19679,
+            "failures": 0,
+            "abstentions": 617,
             "scope": "Actual admissions/completions during measured window and drain; performance delta requires matched native control"
           },
           "calibration": {
@@ -19943,12 +19943,12 @@
                   "passed": true,
                   "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -19961,12 +19961,12 @@
                   "passed": true,
                   "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -19979,12 +19979,12 @@
                   "passed": true,
                   "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -19997,12 +19997,12 @@
                   "passed": true,
                   "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 }
               ]
@@ -20273,12 +20273,12 @@
                     "passed": true,
                     "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -20291,12 +20291,12 @@
                     "passed": true,
                     "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -20309,12 +20309,12 @@
                     "passed": true,
                     "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   },
                   {
@@ -20327,12 +20327,12 @@
                     "passed": true,
                     "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                     "request_range": [
-                      1.0,
-                      10.0
+                      1,
+                      10
                     ],
                     "context_sum_range": [
-                      1025.0,
-                      262084.0
+                      1025,
+                      262084
                     ]
                   }
                 ]
@@ -20373,14 +20373,14 @@
             "enabled": true,
             "policy": "vllm_hust_pipeline_microbatch.policy.PipelineMicrobatchPolicy",
             "status": "exercised",
-            "aborts": 0.0,
-            "admissions": 8920.0,
-            "completions": 8920.0,
-            "invalid_admissions": 0.0,
-            "builtin_fallbacks": 0.0,
-            "calls": 9673.0,
-            "failures": 0.0,
-            "abstentions": 753.0,
+            "aborts": 0,
+            "admissions": 8920,
+            "completions": 8920,
+            "invalid_admissions": 0,
+            "builtin_fallbacks": 0,
+            "calls": 9673,
+            "failures": 0,
+            "abstentions": 753,
             "scope": "Actual admissions/completions during measured window and drain; performance delta requires matched native control"
           },
           "calibration": {
@@ -20452,12 +20452,12 @@
                   "passed": true,
                   "sha256": "e28aff064848209e15f9a65f7227bae028588e65c9b26213b9f0aa37bd708cf2",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -20470,12 +20470,12 @@
                   "passed": true,
                   "sha256": "d307edfef63b20e8640f71cfe3b9deffd3d04a8350003ec9f82b3493135fca57",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -20488,12 +20488,12 @@
                   "passed": true,
                   "sha256": "68b29d653a0a8b429720fd8fe6366e4a6714bb23396d0d5598cb729c4dc7138f",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 },
                 {
@@ -20506,12 +20506,12 @@
                   "passed": true,
                   "sha256": "7bb92835c7034c64ff4a23aa916c8e51c360acc93d945a49e285265dd8a083fe",
                   "request_range": [
-                    1.0,
-                    10.0
+                    1,
+                    10
                   ],
                   "context_sum_range": [
-                    1025.0,
-                    262084.0
+                    1025,
+                    262084
                   ]
                 }
               ]
@@ -34459,17 +34459,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 0.0,
-              "extended_checks": 0.0,
-              "deferred": 0.0,
-              "passed": 0.0
+              "checks": 0,
+              "extended_checks": 0,
+              "deferred": 0,
+              "passed": 0
             },
             "admission_status": "not-exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -36815,17 +36815,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 0.0,
-              "extended_checks": 0.0,
-              "deferred": 0.0,
-              "passed": 0.0
+              "checks": 0,
+              "extended_checks": 0,
+              "deferred": 0,
+              "passed": 0
             },
             "admission_status": "not-exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -39171,17 +39171,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 0.0,
-              "extended_checks": 0.0,
-              "deferred": 0.0,
-              "passed": 0.0
+              "checks": 0,
+              "extended_checks": 0,
+              "deferred": 0,
+              "passed": 0
             },
             "admission_status": "not-exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -41527,17 +41527,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 0.0,
-              "extended_checks": 0.0,
-              "deferred": 0.0,
-              "passed": 0.0
+              "checks": 0,
+              "extended_checks": 0,
+              "deferred": 0,
+              "passed": 0
             },
             "admission_status": "not-exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -43883,17 +43883,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 0.0,
-              "extended_checks": 0.0,
-              "deferred": 0.0,
-              "passed": 0.0
+              "checks": 0,
+              "extended_checks": 0,
+              "deferred": 0,
+              "passed": 0
             },
             "admission_status": "not-exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -46239,17 +46239,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 149.0,
-              "extended_checks": 149.0,
-              "deferred": 0.0,
-              "passed": 149.0
+              "checks": 149,
+              "extended_checks": 149,
+              "deferred": 0,
+              "passed": 149
             },
             "admission_status": "exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -48595,17 +48595,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 215.0,
-              "extended_checks": 215.0,
-              "deferred": 0.0,
-              "passed": 215.0
+              "checks": 215,
+              "extended_checks": 215,
+              "deferred": 0,
+              "passed": 215
             },
             "admission_status": "exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -50951,17 +50951,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 324.0,
-              "extended_checks": 324.0,
-              "deferred": 0.0,
-              "passed": 324.0
+              "checks": 324,
+              "extended_checks": 324,
+              "deferred": 0,
+              "passed": 324
             },
             "admission_status": "exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -53307,17 +53307,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 436.0,
-              "extended_checks": 436.0,
-              "deferred": 0.0,
-              "passed": 436.0
+              "checks": 436,
+              "extended_checks": 436,
+              "deferred": 0,
+              "passed": 436
             },
             "admission_status": "exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -55663,17 +55663,17 @@
             "admission_deferral_observed": false,
             "preemption_status": "not-exercised",
             "preemption": {
-              "calls": 0.0,
-              "selections": 0.0,
-              "abstentions": 0.0,
-              "failures": 0.0,
-              "invalid_selections": 0.0
+              "calls": 0,
+              "selections": 0,
+              "abstentions": 0,
+              "failures": 0,
+              "invalid_selections": 0
             },
             "admission": {
-              "checks": 583.0,
-              "extended_checks": 583.0,
-              "deferred": 0.0,
-              "passed": 583.0
+              "checks": 583,
+              "extended_checks": 583,
+              "deferred": 0,
+              "passed": 583
             },
             "admission_status": "exercised",
             "scope": "Real counter deltas including drain. Capacity checks alone do not establish a changed scheduling decision; observed deferrals/selections do not establish a speedup"
@@ -57445,8 +57445,8 @@
             "kv_role": "kv_both"
           },
           "mod_runtime_effectiveness": {
-            "load_bytes": 0.0,
-            "store_bytes": 7801765888.0,
+            "load_bytes": 0,
+            "store_bytes": 7801765888,
             "status": "store-only",
             "scope": "Actual NPU/CPU transfer bytes including drain; does not prove secondary-tier access or a performance improvement"
           }
@@ -57772,8 +57772,8 @@
             "kv_role": "kv_both"
           },
           "mod_runtime_effectiveness": {
-            "load_bytes": 0.0,
-            "store_bytes": 11989090304.0,
+            "load_bytes": 0,
+            "store_bytes": 11989090304,
             "status": "store-only",
             "scope": "Actual NPU/CPU transfer bytes including drain; does not prove secondary-tier access or a performance improvement"
           }
@@ -58099,8 +58099,8 @@
             "kv_role": "kv_both"
           },
           "mod_runtime_effectiveness": {
-            "load_bytes": 0.0,
-            "store_bytes": 17849057280.0,
+            "load_bytes": 0,
+            "store_bytes": 17849057280,
             "status": "store-only",
             "scope": "Actual NPU/CPU transfer bytes including drain; does not prove secondary-tier access or a performance improvement"
           }
@@ -58426,8 +58426,8 @@
             "kv_role": "kv_both"
           },
           "mod_runtime_effectiveness": {
-            "load_bytes": 0.0,
-            "store_bytes": 31637110784.0,
+            "load_bytes": 0,
+            "store_bytes": 31637110784,
             "status": "store-only",
             "scope": "Actual NPU/CPU transfer bytes including drain; does not prove secondary-tier access or a performance improvement"
           }
@@ -58753,8 +58753,8 @@
             "kv_role": "kv_both"
           },
           "mod_runtime_effectiveness": {
-            "load_bytes": 0.0,
-            "store_bytes": 56075223040.0,
+            "load_bytes": 0,
+            "store_bytes": 56075223040,
             "status": "store-only",
             "scope": "Actual NPU/CPU transfer bytes including drain; does not prove secondary-tier access or a performance improvement"
           }
@@ -61835,7 +61835,7 @@
         "tpot_p95_ms": 24.206816691739277,
         "e2e_p95_ms": 39715.31679497855,
         "completed_requests": 1194,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9751569470959748
       },
       "evidence": {
@@ -69111,7 +69111,7 @@
         "tpot_p99_ms": 30.016469674407794,
         "e2e_p95_ms": 37294.30041596642,
         "completed_requests": 1280,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9765300743108307
       },
       "evidence": {
@@ -69946,7 +69946,7 @@
         "tpot_p99_ms": 17.78712239836507,
         "e2e_p95_ms": 26286.99510374281,
         "completed_requests": 876,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9800077586714688
       },
       "evidence": {
@@ -70156,7 +70156,7 @@
         "tpot_p99_ms": 12.06932122762848,
         "e2e_p95_ms": 20452.565976846374,
         "completed_requests": 582,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9804851850029481
       },
       "evidence": {
@@ -70366,7 +70366,7 @@
         "tpot_p99_ms": 9.199832466392408,
         "e2e_p95_ms": 15950.035383240902,
         "completed_requests": 356,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.982283035867643
       },
       "evidence": {
@@ -70576,7 +70576,7 @@
         "tpot_p99_ms": 8.511262096115862,
         "e2e_p95_ms": 15598.349415356639,
         "completed_requests": 198,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9721815994893825
       },
       "evidence": {
@@ -70898,7 +70898,7 @@
         "decode_p90_tps": 59.75578457930757,
         "ttft_p95_ms": 590.9130489453674,
         "completed_requests": 1207,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9754879038442625
       },
       "evidence": {
@@ -71083,7 +71083,7 @@
         "decode_p90_tps": 59.514431972137764,
         "ttft_p95_ms": 627.7611749246716,
         "completed_requests": 1201,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9753785147488304
       },
       "evidence": {
@@ -71268,7 +71268,7 @@
         "decode_p90_tps": 48.23877699742943,
         "ttft_p95_ms": 4606.100736255753,
         "completed_requests": 690,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.15994306868349895
       },
       "evidence": {
@@ -71453,7 +71453,7 @@
         "decode_p90_tps": 61.65573319158112,
         "ttft_p95_ms": 3136.977434856817,
         "completed_requests": 1001,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.7294107060482253
       },
       "evidence": {
@@ -71638,8 +71638,8 @@
         "decode_p90_tps": 37.826971133984166,
         "ttft_p95_ms": 37491.786316991784,
         "completed_requests": 654,
-        "preemptions_measurement_and_drain": 0.0,
-        "prefix_cache_hit_fraction_measurement_and_drain": 0.0
+        "preemptions_measurement_and_drain": 0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0
       },
       "evidence": {
         "status": "measured",
@@ -71823,7 +71823,7 @@
         "decode_p90_tps": 60.520138629347535,
         "ttft_p95_ms": 27369.51413229106,
         "completed_requests": 1169,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9375710459160828
       },
       "evidence": {
@@ -72008,8 +72008,8 @@
         "decode_p90_tps": 44.58700200747615,
         "ttft_p95_ms": 41036.93129946477,
         "completed_requests": 775,
-        "preemptions_measurement_and_drain": 0.0,
-        "prefix_cache_hit_fraction_measurement_and_drain": 0.0
+        "preemptions_measurement_and_drain": 0,
+        "prefix_cache_hit_fraction_measurement_and_drain": 0
       },
       "evidence": {
         "status": "measured",
@@ -72193,7 +72193,7 @@
         "decode_p90_tps": 50.52982214800819,
         "ttft_p95_ms": 44548.71837503739,
         "completed_requests": 879,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.344256942476888
       },
       "evidence": {
@@ -73377,7 +73377,7 @@
         "decode_p90_tps": 62.74426927363197,
         "ttft_p95_ms": 570.9558192989789,
         "completed_requests": 1279,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9764970809989377
       },
       "evidence": {
@@ -73571,7 +73571,7 @@
         "decode_p90_tps": 62.628078846813324,
         "ttft_p95_ms": 520.1857427076899,
         "completed_requests": 1264,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9761030885561852
       },
       "evidence": {
@@ -73765,7 +73765,7 @@
         "decode_p90_tps": 63.16932636878321,
         "ttft_p95_ms": 3157.9954201355577,
         "completed_requests": 1009,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.7270099337602668
       },
       "evidence": {
@@ -73959,7 +73959,7 @@
         "decode_p90_tps": 64.30587253573826,
         "ttft_p95_ms": 3319.003376935143,
         "completed_requests": 1012,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.7347933671349391
       },
       "evidence": {
@@ -74151,7 +74151,7 @@
         "decode_p90_tps": 44.006734854001266,
         "ttft_p95_ms": 729.1832276852801,
         "completed_requests": 1804,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9699063676526867
       },
       "evidence": {
@@ -74348,7 +74348,7 @@
         "decode_p90_tps": 43.77191069818056,
         "ttft_p95_ms": 713.132227025926,
         "completed_requests": 1803,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.969936215443791
       },
       "evidence": {
@@ -75935,7 +75935,7 @@
         "ttft_p50_ms": 1322.6,
         "tpot_ms": 37.25,
         "tpot_p95_ms": 55.53,
-        "e2e_p95_ms": 74158.0
+        "e2e_p95_ms": 74158
       },
       "evidence": {
         "execution_kind": "real-online",
@@ -76136,7 +76136,7 @@
         "decode_p90_tps": 43.87389584687429,
         "ttft_p95_ms": 725.8329468313605,
         "completed_requests": 1806,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9700302323971967,
         "sampled_kv_usage_peak_measurement_and_drain": 0.8445807770961145
       },
@@ -76344,7 +76344,7 @@
         "decode_p90_tps": 41.985232624941474,
         "ttft_p95_ms": 747.4578848108647,
         "completed_requests": 1889,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9651052537114433,
         "sampled_kv_usage_peak_measurement_and_drain": 0.8374233128834356
       },
@@ -76561,7 +76561,7 @@
         "decode_p90_tps": 20.657631718188508,
         "ttft_p95_ms": 18757.755522499792,
         "completed_requests": 786,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.030271701143408186,
         "sampled_kv_usage_peak_measurement_and_drain": 0.4877300613496932
       },
@@ -76778,7 +76778,7 @@
         "decode_p90_tps": 23.277718039634518,
         "ttft_p95_ms": 10665.551519487044,
         "completed_requests": 919,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.324757457971551,
         "sampled_kv_usage_peak_measurement_and_drain": 0.5828220858895705
       },
@@ -76999,9 +76999,9 @@
         "decode_p90_tps": 38.34482279227706,
         "ttft_p95_ms": 784.4359811395406,
         "completed_requests": 1828,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9650141170629409,
-        "sampled_kv_usage_peak_measurement_and_drain": 1.0
+        "sampled_kv_usage_peak_measurement_and_drain": 1
       },
       "evidence": {
         "status": "measured",
@@ -77220,7 +77220,7 @@
         "decode_p90_tps": 36.358791581705475,
         "ttft_p95_ms": 771.1479071062057,
         "completed_requests": 1880,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.964254211431079,
         "sampled_kv_usage_peak_measurement_and_drain": 0.9481481481481482
       },
@@ -77441,9 +77441,9 @@
         "decode_p90_tps": 35.34310298818761,
         "ttft_p95_ms": 820.7225915044545,
         "completed_requests": 2007,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9628992417149537,
-        "sampled_kv_usage_peak_measurement_and_drain": 1.0
+        "sampled_kv_usage_peak_measurement_and_drain": 1
       },
       "evidence": {
         "status": "measured",
@@ -77662,7 +77662,7 @@
         "decode_p90_tps": 34.55237953309005,
         "ttft_p95_ms": 1358.8349622441456,
         "completed_requests": 1864,
-        "preemptions_measurement_and_drain": 40.0,
+        "preemptions_measurement_and_drain": 40,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.8785267231253958,
         "sampled_kv_usage_peak_measurement_and_drain": 0.9989035087719298
       },
@@ -77893,9 +77893,9 @@
         "decode_p90_tps": 32.1487114323254,
         "ttft_p95_ms": 4088.6609218548983,
         "completed_requests": 1703,
-        "preemptions_measurement_and_drain": 72.0,
+        "preemptions_measurement_and_drain": 72,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.8455185853123202,
-        "sampled_kv_usage_peak_measurement_and_drain": 1.0
+        "sampled_kv_usage_peak_measurement_and_drain": 1
       },
       "evidence": {
         "status": "measured",
@@ -78124,9 +78124,9 @@
         "decode_p90_tps": 30.32876045152227,
         "ttft_p95_ms": 7300.538083421998,
         "completed_requests": 1656,
-        "preemptions_measurement_and_drain": 57.0,
+        "preemptions_measurement_and_drain": 57,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.7378771990132669,
-        "sampled_kv_usage_peak_measurement_and_drain": 1.0
+        "sampled_kv_usage_peak_measurement_and_drain": 1
       },
       "evidence": {
         "status": "measured",
@@ -79221,7 +79221,7 @@
           },
           "completed_requests": {
             "mean": 76,
-            "sample_sd": 1.0,
+            "sample_sd": 1,
             "min": 75,
             "max": 77,
             "values": [
@@ -80570,6 +80570,1751 @@
         "sampling_date_utc": "2026-09-29",
         "sampling_date_source": "SWE client.started_at_unix"
       }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-off-tp2ep-c1-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary OFF · TP2+EP · C1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 41173,
+          "completed_sessions": 4,
+          "measured_mean_client_inflight": 0.9995795087092039,
+          "full_client_concurrency_fraction": 0.9995795087092039,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-off-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-off-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界关闭 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 52.36333333333334,
+        "decode_p90_tps": 66.093014062234,
+        "ttft_p95_ms": 2550.7555278018112,
+        "tpot_ms": 16.540027388039423,
+        "tpot_p95_ms": 18.21715686548535,
+        "e2e_p95_ms": 22927.79282554983,
+        "completed_requests": 103
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-07",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "5f0ead007cb449fd8cc90a365cbf975c"
+        ],
+        "aggregation": "One unpooled 900s C1 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 1,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "point_isolated": false,
+          "scope": "Shared OFF service log for all five canonical OFF windows; no runtime_effective events recorded"
+        },
+        "runtime_effective": "not observed; OFF manager-disabled state recorded",
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-off-tp2ep-c2-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary OFF · TP2+EP · C2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 50915,
+          "completed_sessions": 4,
+          "measured_mean_client_inflight": 1.9993615044498194,
+          "full_client_concurrency_fraction": 0.9993616261736801,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-off-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-off-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界关闭 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 89.55555555555556,
+        "decode_p90_tps": 60.08638206571462,
+        "ttft_p95_ms": 3266.0915138199925,
+        "tpot_ms": 19.589497287007635,
+        "tpot_p95_ms": 27.51353673858521,
+        "e2e_p95_ms": 39086.37546864337,
+        "completed_requests": 144
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-07",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "14bc14425db344c7babb17b03f56e0a0"
+        ],
+        "aggregation": "One unpooled 900s C2 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 2,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "point_isolated": false,
+          "scope": "Shared OFF service log for all five canonical OFF windows; no runtime_effective events recorded"
+        },
+        "runtime_effective": "not observed; OFF manager-disabled state recorded",
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-off-tp2ep-c4-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary OFF · TP2+EP · C4",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 49883,
+          "completed_sessions": 4,
+          "measured_mean_client_inflight": 3.998962433271938,
+          "full_client_concurrency_fraction": 0.9989665333409277,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-off-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-off-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界关闭 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 137.24555555555557,
+        "decode_p90_tps": 55.75781425392257,
+        "ttft_p95_ms": 3275.0906466972083,
+        "tpot_ms": 25.419675081342547,
+        "tpot_p95_ms": 37.89374614379876,
+        "e2e_p95_ms": 63471.08877073036,
+        "completed_requests": 204
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-07",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "25b101bed670404e8cd0f68620481338"
+        ],
+        "aggregation": "One unpooled 900s C4 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 4,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "point_isolated": false,
+          "scope": "Shared OFF service log for all five canonical OFF windows; no runtime_effective events recorded"
+        },
+        "runtime_effective": "not observed; OFF manager-disabled state recorded",
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-off-tp2ep-c8-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary OFF · TP2+EP · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 59957,
+          "completed_sessions": 7,
+          "measured_mean_client_inflight": 7.998550290536756,
+          "full_client_concurrency_fraction": 0.9985699839248425,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-off-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-off-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界关闭 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 188.08333333333334,
+        "decode_p90_tps": 41.10988437400869,
+        "ttft_p95_ms": 3293.5760873369873,
+        "tpot_ms": 39.46613828109091,
+        "tpot_p95_ms": 59.91306679970036,
+        "e2e_p95_ms": 76880.33112548287,
+        "completed_requests": 308
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-07",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "c2611445154949e4ad517a431916dbcb"
+        ],
+        "aggregation": "One unpooled 900s C8 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 8,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "point_isolated": false,
+          "scope": "Shared OFF service log for all five canonical OFF windows; no runtime_effective events recorded"
+        },
+        "runtime_effective": "not observed; OFF manager-disabled state recorded",
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-off-tp2ep-c16-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary OFF · TP2+EP · C16",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": false,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 50188,
+          "completed_sessions": 8,
+          "measured_mean_client_inflight": 15.998321812213916,
+          "full_client_concurrency_fraction": 0.9984107033132265,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "0",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": []
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-off-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-off-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary OFF · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界关闭 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 266.92333333333335,
+        "decode_p90_tps": 27.61651254041345,
+        "ttft_p95_ms": 3993.3288831263726,
+        "tpot_ms": 58.90621694127593,
+        "tpot_p95_ms": 92.87436597611568,
+        "e2e_p95_ms": 104805.16724176705,
+        "completed_requests": 429
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-07",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "3eca9be473b34e3294106d1e5d8b4a5e"
+        ],
+        "aggregation": "One unpooled 900s C16 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 16,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-off.log",
+          "point_isolated": false,
+          "scope": "Shared OFF service log for all five canonical OFF windows; no runtime_effective events recorded"
+        },
+        "runtime_effective": "not observed; OFF manager-disabled state recorded",
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-on-tp2ep-c1-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary ON · TP2+EP · C1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "core-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 41173,
+          "completed_sessions": 4,
+          "measured_mean_client_inflight": 0.9995306746868624,
+          "full_client_concurrency_fraction": 0.9995306746868624,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "core-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-core-attention-boundary",
+            "revision": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "visibility_status": "public tag resolves anonymously to the exact measured commit",
+            "source_package": "vllm-hust-core-attention-boundary",
+            "scope": "Core decode/extend/prefill attention-boundary search path exercised by the ON server."
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-on-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-on-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界开启 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 56.73444444444444,
+        "decode_p90_tps": 72.89414522748963,
+        "ttft_p95_ms": 2469.7590924799442,
+        "tpot_ms": 14.904861635246816,
+        "tpot_p95_ms": 16.7917792483265,
+        "e2e_p95_ms": 22287.49477458185,
+        "completed_requests": 114
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-07",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "637029d279a94358b95a59b403e152df"
+        ],
+        "aggregation": "One unpooled 900s C1 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 1,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "point_isolated": false,
+          "scope": "Shared ON service log for all five canonical ON windows; 2 runtime_effective events occur during service startup/graph capture before the first formal ON window"
+        },
+        "runtime_effective": "observed on both TP workers during shared service startup/graph capture; not isolated to a formal point",
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-on-tp2ep-c2-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary ON · TP2+EP · C2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "core-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 52505,
+          "completed_sessions": 5,
+          "measured_mean_client_inflight": 1.9992885381076484,
+          "full_client_concurrency_fraction": 0.999288665841644,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "core-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-core-attention-boundary",
+            "revision": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "visibility_status": "public tag resolves anonymously to the exact measured commit",
+            "source_package": "vllm-hust-core-attention-boundary",
+            "scope": "Core decode/extend/prefill attention-boundary search path exercised by the ON server."
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-on-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-on-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界开启 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 91.58,
+        "decode_p90_tps": 62.17201974657671,
+        "ttft_p95_ms": 3305.607937835157,
+        "tpot_ms": 19.0430834830908,
+        "tpot_p95_ms": 26.97612532112784,
+        "e2e_p95_ms": 38225.047141406656,
+        "completed_requests": 147
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-07",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "5950550a1f034545b488a373779e8f6d"
+        ],
+        "aggregation": "One unpooled 900s C2 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 2,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "point_isolated": false,
+          "scope": "Shared ON service log for all five canonical ON windows; 2 runtime_effective events occur during service startup/graph capture before the first formal ON window"
+        },
+        "runtime_effective": "observed on both TP workers during shared service startup/graph capture; not isolated to a formal point",
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-on-tp2ep-c4-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary ON · TP2+EP · C4",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "core-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 49428,
+          "completed_sessions": 4,
+          "measured_mean_client_inflight": 3.998987227808684,
+          "full_client_concurrency_fraction": 0.9989907741381062,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "core-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-core-attention-boundary",
+            "revision": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "visibility_status": "public tag resolves anonymously to the exact measured commit",
+            "source_package": "vllm-hust-core-attention-boundary",
+            "scope": "Core decode/extend/prefill attention-boundary search path exercised by the ON server."
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-on-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-on-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界开启 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 136.61,
+        "decode_p90_tps": 55.148554889914685,
+        "ttft_p95_ms": 3240.1144225615953,
+        "tpot_ms": 25.526459064074885,
+        "tpot_p95_ms": 37.36723162068323,
+        "e2e_p95_ms": 65786.11326827653,
+        "completed_requests": 202
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-08",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "6beae74d687544e7964ecb8d68e9c602"
+        ],
+        "aggregation": "One unpooled 900s C4 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 4,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "point_isolated": false,
+          "scope": "Shared ON service log for all five canonical ON windows; 2 runtime_effective events occur during service startup/graph capture before the first formal ON window"
+        },
+        "runtime_effective": "observed on both TP workers during shared service startup/graph capture; not isolated to a formal point",
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-on-tp2ep-c8-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary ON · TP2+EP · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "core-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 59957,
+          "completed_sessions": 7,
+          "measured_mean_client_inflight": 7.998581823346515,
+          "full_client_concurrency_fraction": 0.9986020616793798,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "core-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-core-attention-boundary",
+            "revision": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "visibility_status": "public tag resolves anonymously to the exact measured commit",
+            "source_package": "vllm-hust-core-attention-boundary",
+            "scope": "Core decode/extend/prefill attention-boundary search path exercised by the ON server."
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-on-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-on-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界开启 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 186.00555555555556,
+        "decode_p90_tps": 43.05805548787839,
+        "ttft_p95_ms": 3258.0415092408657,
+        "tpot_ms": 40.133073773152766,
+        "tpot_p95_ms": 61.91713926187108,
+        "e2e_p95_ms": 81560.6805587188,
+        "completed_requests": 305
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-08",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "02c997e6d22c4a18bd8e3cfa2cbdbab0"
+        ],
+        "aggregation": "One unpooled 900s C8 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 8,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "point_isolated": false,
+          "scope": "Shared ON service log for all five canonical ON windows; 2 runtime_effective events occur during service startup/graph capture before the first formal ON window"
+        },
+        "runtime_effective": "observed on both TP workers during shared service startup/graph capture; not isolated to a formal point",
+        "c8_selection": null
+      }
+    },
+    {
+      "id": "qwen35-op02-core-attention-boundary-on-tp2ep-c16-20261008",
+      "cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+      "label": "OP02 core attention boundary ON · TP2+EP · C16",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.23.0+empty / 0.23.0.post1",
+        "mods": [
+          "core-attention-boundary"
+        ],
+        "hardware": {
+          "label": "910B2",
+          "accelerator_count": 2
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 2,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": true,
+          "dtype": "bfloat16",
+          "kv_cache_dtype": "auto",
+          "block_size": 128,
+          "max_model_len": 262144,
+          "max_num_seqs": 16,
+          "max_num_batched_tokens": 8192,
+          "gpu_memory_utilization": 0.85,
+          "prefix_caching": false,
+          "chunked_prefill": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "mtp_draft_tokens": 0,
+          "thinking": true,
+          "generation_temperature": 0,
+          "scheduling_policy": "fcfs",
+          "distributed_executor_backend": "mp",
+          "disable_custom_all_reduce": true,
+          "trust_remote_code": false,
+          "load_format": "auto",
+          "enable_log_requests": false,
+          "runtime_versions": {
+            "vllm": "0.23.0+empty",
+            "vllm-ascend": "0.23.0.post1",
+            "benchmark_tool": "0.2.0.dev0"
+          },
+          "runtime_commits": {
+            "vllm": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+            "vllm-ascend": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+          },
+          "model_identity": {
+            "served_name": "qwen3.5-35b-a3b",
+            "path": "/models/Qwen3.5-35B-A3B",
+            "revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+            "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944",
+            "model_manifest_sha256": "6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6",
+            "checkpoint_identity_verified": true,
+            "checkpoint_identity_evidence": "docs/evidence/qwen35-mods-k8s-20260925/model-manifest.json",
+            "status": "22-file manifest matches canonical model revision; publication checks remain separate"
+          },
+          "mod": {
+            "package": "vllm-hust-core-attention-boundary",
+            "version": "0.1.0.dev0",
+            "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "source_ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "source_public_verified": true,
+            "enable": true,
+            "kill_switch": false,
+            "evidence": true,
+            "manager_version": "0.2.0.dev0",
+            "manager_source_commit": "52e96021c8017938b133ddba895795a13f707568"
+          },
+          "mod_catalog_status": "published_public_preview",
+          "mod_catalog_public_surface": true,
+          "workload_file_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "tokenizer_identity_independently_verified": true,
+          "tokenizer_fingerprint_recomputed": true,
+          "tokenizer_files_manifest_match_verified": true,
+          "tokenizer_transformers": "5.17.0",
+          "observed_max_prompt_tokens": 50188,
+          "completed_sessions": 8,
+          "measured_mean_client_inflight": 15.998318135176476,
+          "full_client_concurrency_fraction": 0.998411148570271,
+          "warmup_policy": "Separate 20s protocol probe; formal window uses fresh salts and no primers",
+          "execution_host": "user-provided Kubernetes container",
+          "participating_deployment_chips": 2,
+          "transport": "Client and server on execution-host loopback",
+          "server_command_redacted": "vllm serve <MODEL_PATH> --tokenizer <TOKENIZER_PATH> --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16",
+          "server_environment": {
+            "ASCEND_RT_VISIBLE_DEVICES": "0,1",
+            "VLLM_PLUGINS": "ascend,core_attention_boundary",
+            "VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS": "3000",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_ENABLE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_EVIDENCE": "1",
+            "VLLM_HUST_CORE_ATTENTION_BOUNDARY_KILL_SWITCH": "0"
+          }
+        },
+        "mod_sources": [
+          {
+            "id": "core-attention-boundary",
+            "repository": "https://github.com/xmdhb/vllm-hust-core-attention-boundary",
+            "revision": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+            "ref": "op02-measured-8b5ebb1",
+            "source_url": "https://github.com/xmdhb/vllm-hust-core-attention-boundary/tree/op02-measured-8b5ebb1",
+            "visibility_status": "public tag resolves anonymously to the exact measured commit",
+            "source_package": "vllm-hust-core-attention-boundary",
+            "scope": "Core decode/extend/prefill attention-boundary search path exercised by the ON server."
+          }
+        ]
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-op02-core-attention-boundary-on-tp2ep-20261005",
+        "presentation_group": {
+          "id": "op02-core-attention-boundary-on-tp2ep-20261005",
+          "label_en": "OP02 core attention boundary ON · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 curve",
+          "label_zh": "OP02 Core 注意力边界开启 · vLLM 0.23.0 / Ascend 0.23.0.post1 · TP2+EP · C1/C2/C4/C8/C16 曲线"
+        },
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "output_tps": 265.77444444444444,
+        "decode_p90_tps": 27.59100465325964,
+        "ttft_p95_ms": 3700.8387714158744,
+        "tpot_ms": 60.10068522188349,
+        "tpot_p95_ms": 96.79819489854827,
+        "e2e_p95_ms": 106902.64140442014,
+        "completed_requests": 426
+      },
+      "evidence": {
+        "execution_kind": "real-online",
+        "sampling_date_utc": "2026-10-08",
+        "sampling_date_source": "Recorded SWE client started_at_unix converted to UTC",
+        "status": "measured",
+        "profile": "formal",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP02-CORE-ATTENTION-BOUNDARY.md",
+        "run_ids": [
+          "a0f81261b91f43f98839fae72ab7eee6"
+        ],
+        "aggregation": "One unpooled 900s C16 observation; drain excluded from latency samples; no repeat uncertainty estimate",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "campaign": "qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+          "revision_status": "revision recorded, but linkage from this canonical client process to the public source receipt still needs evidence",
+          "prepared_workload_sha256": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "duration_seconds": 900,
+          "concurrency": 16,
+          "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+          "warmup_policy": "Separate 20s probe; fresh salts and no primers in the formal window",
+          "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+          "acceptance_rule": "valid=true, measurement_seconds=900, failed_requests=0, aborted=false, protocol checks passed",
+          "prepared_workload_equivalence": {
+            "canonical_sha256_after_metadata_normalization": "8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85",
+            "tokenizer_identity_independently_verified": true
+          }
+        },
+        "original_cohort_id": "qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
+        "draft_publication_status": "public preview; formal performance admission remains limited",
+        "candidate_admission_status": "preview published; benchmark client-source linkage is incomplete and runtime_effective is not isolated to each formal window",
+        "activation_log": {
+          "path": "docs/evidence/qwen35-op02-core-attention-boundary/service-on.log",
+          "point_isolated": false,
+          "scope": "Shared ON service log for all five canonical ON windows; 2 runtime_effective events occur during service startup/graph capture before the first formal ON window"
+        },
+        "runtime_effective": "observed on both TP workers during shared service startup/graph capture; not isolated to a formal point",
+        "c8_selection": null
+      }
     }
   ],
   "archived_points": [
@@ -81409,25 +83154,25 @@
               "owner": 0,
               "frames": 354000,
               "waves": 354000,
-              "frames_per_wave": 1.0
+              "frames_per_wave": 1
             },
             {
               "owner": 1,
               "frames": 294960,
               "waves": 294960,
-              "frames_per_wave": 1.0
+              "frames_per_wave": 1
             },
             {
               "owner": 2,
               "frames": 294960,
               "waves": 294960,
-              "frames_per_wave": 1.0
+              "frames_per_wave": 1
             },
             {
               "owner": 3,
               "frames": 294960,
               "waves": 294960,
-              "frames_per_wave": 1.0
+              "frames_per_wave": 1
             }
           ]
         },
@@ -82412,13 +84157,13 @@
               "owner": 0,
               "frames": 960922,
               "waves": 960922,
-              "frames_per_wave": 1.0
+              "frames_per_wave": 1
             },
             {
               "owner": 1,
               "frames": 873500,
               "waves": 873500,
-              "frames_per_wave": 1.0
+              "frames_per_wave": 1
             }
           ]
         },
@@ -82546,7 +84291,7 @@
         "ttft_p99_ms": 96948.64404743993,
         "tpot_p95_ms": 398.16793708131854,
         "e2e_p95_ms": 338889.45981099986,
-        "completed_requests": 237.0
+        "completed_requests": 237
       },
       "evidence": {
         "status": "measured",
@@ -82677,7 +84422,7 @@
         "ttft_p99_ms": 46821.66566060014,
         "tpot_p95_ms": 143.7631495746948,
         "e2e_p95_ms": 178334.971004,
-        "completed_requests": 391.0
+        "completed_requests": 391
       },
       "evidence": {
         "status": "measured",
@@ -83894,7 +85639,7 @@
         "decode_p90_tps": 41.53739321856276,
         "ttft_p95_ms": 766.0580340307205,
         "completed_requests": 1888,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9661294796033465,
         "sampled_kv_usage_peak_measurement_and_drain": 0.8609406952965235
       },
@@ -84106,7 +85851,7 @@
         "decode_p90_tps": 20.057587509922932,
         "ttft_p95_ms": 20453.755428432487,
         "completed_requests": 786,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.036145820891135216,
         "sampled_kv_usage_peak_measurement_and_drain": 0.49488752556237214
       },
@@ -84318,7 +86063,7 @@
         "decode_p90_tps": 21.90097166851735,
         "ttft_p95_ms": 12544.431914156303,
         "completed_requests": 903,
-        "preemptions_measurement_and_drain": 0.0,
+        "preemptions_measurement_and_drain": 0,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.3024111939943357,
         "sampled_kv_usage_peak_measurement_and_drain": 0.5766871165644172
       },
@@ -84534,7 +86279,7 @@
         "decode_p90_tps": 34.96392781024359,
         "ttft_p95_ms": 1094.0500577446053,
         "completed_requests": 1815,
-        "preemptions_measurement_and_drain": 99.0,
+        "preemptions_measurement_and_drain": 99,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.9553710106619865,
         "sampled_kv_usage_peak_measurement_and_drain": 0.9989035087719298
       },
@@ -84760,7 +86505,7 @@
         "decode_p90_tps": 32.15975032173791,
         "ttft_p95_ms": 3493.458051793261,
         "completed_requests": 1679,
-        "preemptions_measurement_and_drain": 59.0,
+        "preemptions_measurement_and_drain": 59,
         "prefix_cache_hit_fraction_measurement_and_drain": 0.8633592820280478,
         "sampled_kv_usage_peak_measurement_and_drain": 0.9988826815642458
       },
