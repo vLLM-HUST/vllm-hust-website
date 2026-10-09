@@ -11,7 +11,7 @@
         zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', sourceCellEvidence: '证据见单元格详情', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', reason: '原因', note: '说明', tracking: '跟踪', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', candidates: 'B1 候选', selected: '已选为 B1', exercised: '已执行控制动作', notExercised: '未执行控制动作', notRecorded: '未记录控制动作', viewSource: '查看报告', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
     };
 
-    const state = { data: null, index: null, scenarioId: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
+    const state = { data: null, index: null, program: null, scenarioId: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
     const $ = (id) => document.getElementById(id);
     const lang = () => window.vllmHustSite?.getCurrentLang?.() || 'en';
     const t = (key) => TEXT[lang()][key] || TEXT.en[key] || key;
@@ -70,8 +70,38 @@
             }
             ids.add(scenario.id);
         });
-        if (!ids.has(data.default_scenario_id)) throw new Error('Invalid default validation scenario');
+        if (!ids.has(data.default_scenario_id) || typeof data.program_url !== 'string' || !data.program_url) throw new Error('Invalid default validation scenario or dataset program');
         return data;
+    }
+
+    function normalizeProgram(data) {
+        const expected = ['mmlu-pro', 'hle-verified', 'swe-bench-pro', 'frontierscience', 'terminal-bench-2.1'];
+        if (!data || data.contract_version !== 'dataset-program-v1' || !Array.isArray(data.primary_datasets) || data.primary_datasets.map((item) => item.id).join('|') !== expected.join('|')) {
+            throw new Error('Unsupported dataset program contract');
+        }
+        if (data.primary_datasets.some((item) => typeof item.primary_metric_zh !== 'string' || !item.primary_metric_zh || typeof item.source_url !== 'string' || !item.source_url.startsWith('https://'))) {
+            throw new Error('Dataset program metadata is incomplete');
+        }
+        return data;
+    }
+
+    function renderProgram() {
+        if (!state.program) return;
+        const statusText = {
+            en: { 'serving-evidence-only': 'Serving evidence only', 'contract-pending': 'Contract pending', ready: 'Ready', running: 'Running', measured: 'Measured' },
+            zh: { 'serving-evidence-only': '仅有服务侧证据', 'contract-pending': '合同待冻结', ready: '可执行', running: '执行中', measured: '已实测' },
+        };
+        const classText = {
+            en: { 'knowledge-reasoning': 'Knowledge & reasoning', 'agentic-engineering': 'Agentic engineering', 'scientific-reasoning': 'Scientific reasoning' },
+            zh: { 'knowledge-reasoning': '知识与推理', 'agentic-engineering': '智能体工程', 'scientific-reasoning': '科学推理' },
+        };
+        $('dataset-program-list').innerHTML = state.program.primary_datasets.map((dataset) => {
+            const note = lang() === 'zh' ? dataset.note_zh : dataset.note;
+            const metric = lang() === 'zh' ? dataset.primary_metric_zh : dataset.primary_metric;
+            return `<article class="dataset-program-item"><div><span>${escapeHtml(classText[lang()][dataset.evaluation_class] || dataset.evaluation_class)}</span><h3><a href="${escapeHtml(dataset.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(dataset.label)}</a></h3><p>${escapeHtml(note)}</p></div><div class="dataset-program-meta"><strong>${escapeHtml(statusText[lang()][dataset.status] || dataset.status)}</strong><small>${escapeHtml(metric)}</small></div></article>`;
+        }).join('');
+        const policy = state.program.supplementary_material;
+        $('dataset-supplementary-copy').textContent = lang() === 'zh' ? policy.rule_zh : policy.rule;
     }
 
     function selectScenario(index, requestedId) {
@@ -351,10 +381,14 @@
             : Promise.resolve(normalizeIndex({ contract_version: 'dataset-validation-index-v1', default_scenario_id: 'default', scenarios: [{ id: 'default', label: 'Default', data_url: config.dataUrl || DEFAULT_DATA_URL }] }));
         indexPromise.then((index) => {
             state.index = index;
+            return fetchJson(index.program_url).then(normalizeProgram);
+        }).then((program) => {
+            state.program = program;
+            renderProgram();
             const requestedId = new URLSearchParams(window.location.search).get('model');
-            return loadScenario(selectScenario(index, requestedId));
+            return loadScenario(selectScenario(state.index, requestedId));
         }).catch(showLoadError);
-        window.addEventListener('vllm-hust:langchange', () => { if (state.data) { select.innerHTML = `<option value="all">${t('all')}</option>`; STATUS_ORDER.forEach((status) => { const option = document.createElement('option'); option.value = status; option.textContent = statusLabel(status); select.appendChild(option); }); select.value = state.status; render(); } });
+        window.addEventListener('vllm-hust:langchange', () => { renderProgram(); if (state.data) { select.innerHTML = `<option value="all">${t('all')}</option>`; STATUS_ORDER.forEach((status) => { const option = document.createElement('option'); option.value = status; option.textContent = statusLabel(status); select.appendChild(option); }); select.value = state.status; render(); } });
     }
 
     function showLoadError(error) {
