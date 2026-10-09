@@ -9,7 +9,7 @@ const vm = require('node:vm');
 const SCRIPT_PATH = path.join(__dirname, '..', 'assets', 'dataset-validation.js');
 const SOURCE = fs.readFileSync(SCRIPT_PATH, 'utf8').replace(
     /\}\)\(\);\s*$/,
-    'window.__datasetValidationTest = { normalize, normalizeIndex, selectScenario, selectableScenarios, coverageSummary, detailMetadata, provenanceHtml, detailNote, candidateValuesHtml };\n})();'
+    'window.__datasetValidationTest = { normalize, normalizeIndex, normalizeProgram, selectScenario, selectableScenarios, coverageSummary, detailMetadata, provenanceHtml, detailNote, candidateValuesHtml };\n})();'
 );
 
 function loadTestApi(locale = 'en') {
@@ -81,6 +81,7 @@ test('model index selects requested scenarios and falls back to the declared def
     const api = loadTestApi();
     const index = api.normalizeIndex({
         contract_version: 'dataset-validation-index-v1',
+        program_url: './dataset_program_v1.json',
         default_scenario_id: 'qwen25',
         scenarios: [
             { id: 'qwen25', label: 'Qwen2.5-14B', data_url: './qwen25.json' },
@@ -96,6 +97,7 @@ test('selector hides planning scenarios unless a legacy URL selects one directly
     const api = loadTestApi();
     const index = api.normalizeIndex({
         contract_version: 'dataset-validation-index-v1',
+        program_url: './dataset_program_v1.json',
         default_scenario_id: 'results',
         scenarios: [
             { id: 'results', label: 'Paired B0/B1', data_url: './results.json' },
@@ -131,14 +133,35 @@ test('model index rejects duplicate scenarios and missing defaults', () => {
     const api = loadTestApi();
     assert.throws(() => api.normalizeIndex({
         contract_version: 'dataset-validation-index-v1',
+        program_url: './dataset_program_v1.json',
         default_scenario_id: 'missing',
         scenarios: [{ id: 'qwen25', data_url: './qwen25.json' }],
     }), /Invalid default/);
     assert.throws(() => api.normalizeIndex({
         contract_version: 'dataset-validation-index-v1',
+        program_url: './dataset_program_v1.json',
         default_scenario_id: 'qwen25',
         scenarios: [{ id: 'qwen25', data_url: './one.json' }, { id: 'qwen25', data_url: './two.json' }],
     }), /Invalid or duplicate/);
+});
+
+test('dataset program accepts exactly the five primary datasets', () => {
+    const api = loadTestApi();
+    const program = api.normalizeProgram({
+        contract_version: 'dataset-program-v1',
+        primary_datasets: [
+            'mmlu-pro',
+            'hle-verified',
+            'swe-bench-pro',
+            'frontierscience',
+            'terminal-bench-2.1',
+        ].map((id) => ({ id, primary_metric_zh: '主指标', source_url: 'https://example.com' })),
+    });
+    assert.equal(program.primary_datasets.length, 5);
+    assert.throws(() => api.normalizeProgram({
+        contract_version: 'dataset-program-v1',
+        primary_datasets: [{ id: 'mmlu-pro' }],
+    }), /Unsupported dataset program/);
 });
 
 test('candidate sets are validated and rendered without hiding non-selected MODs', () => {
