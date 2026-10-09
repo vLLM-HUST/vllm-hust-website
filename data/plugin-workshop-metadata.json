@@ -28,6 +28,25 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
+    "my-plugin": {
+      "repository": "vLLM-HUST/my-plugin",
+      "repository_url": "https://github.com/vLLM-HUST/my-plugin",
+      "metrics": {
+        "stars": null,
+        "forks": null,
+        "open_pull_requests": null
+      },
+      "maintainers": [
+        {
+          "login": "vLLM-HUST",
+          "name": "vLLM-HUST",
+          "profile_url": "https://github.com/vLLM-HUST",
+          "avatar_url": "https://github.com/vLLM-HUST.png"
+        }
+      ],
+      "advisors": [],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
     "bidkv": {
       "repository": "vLLM-HUST/vllm-hust-bidkv",
       "repository_url": "https://github.com/vLLM-HUST/vllm-hust-bidkv",
