@@ -1,8 +1,9 @@
 /* Calculator-only layout; navigation, hero, panels and footer belong to the site. */
 .serving-plan {
-  --plan-output: #1d4ed8;
-  --plan-input: #22d3ee;
-  --plan-cache: #60a5fa;
+  /* Reference screenshot swatches, converted from its embedded ICC profile to sRGB. */
+  --plan-output: #0b71f3;
+  --plan-input: #61b3fe;
+  --plan-cache: #a0ddfd;
   --plan-cost: var(--sub-amber);
 }
 .serving-plan .workspace.content-panel {
