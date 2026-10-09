@@ -73,11 +73,11 @@ def validate_source(source_dir: Path) -> tuple[dict, list[str]]:
         for item in program["primary_datasets"]
     }
     if readiness != {
-        "mmlu-pro": "material-unfrozen",
-        "hle-verified": "missing",
-        "swe-bench-pro": "missing",
-        "frontierscience": "missing",
-        "terminal-bench-2.1": "missing",
+        "mmlu-pro": "asset-frozen",
+        "hle-verified": "asset-frozen",
+        "swe-bench-pro": "asset-frozen",
+        "frontierscience": "asset-frozen",
+        "terminal-bench-2.1": "asset-frozen",
     }:
         raise SystemExit("dataset program readiness audit is missing or changed")
     scenarios = index.get("scenarios")

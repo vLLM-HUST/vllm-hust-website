@@ -52,11 +52,7 @@ def write_publication(root: Path) -> None:
         "primary_datasets": [
             {
                 "id": dataset_id,
-                "readiness": {
-                    "status": (
-                        "material-unfrozen" if dataset_id == "mmlu-pro" else "missing"
-                    )
-                },
+                "readiness": {"status": "asset-frozen"},
             }
             for dataset_id in (
                 "mmlu-pro",
