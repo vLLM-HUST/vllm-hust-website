@@ -1,9 +1,9 @@
 # OP02 core attention boundary · public preview
 
-This document publishes ten measured Frontier points for one matched Qwen3.5-35B-A3B
-workload: ON and OFF at C1, C2, C4, C8, and C16. This is a public preview of the protocol evidence,
-not a causal performance claim. Each point is one unpooled 900-second observation; the drain is
-excluded from latency samples.
+This document publishes ten measured Frontier points for one matched Qwen3.5-35B-A3B workload: ON
+and OFF at C1, C2, C4, C8, and C16. This is a public preview of the protocol evidence, not a causal
+performance claim. Each point is one unpooled 900-second observation; the drain is excluded from
+latency samples.
 
 ## Protocol and identity
 
