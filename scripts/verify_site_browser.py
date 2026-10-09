@@ -137,17 +137,37 @@ def main():
                     )
                 else:
                     page.wait_for_selector(".workload-filter")
+                    if page.locator("html").get_attribute("lang").startswith("zh"):
+                        page.locator("#langToggle").click()
+                        page.wait_for_function(
+                            "document.documentElement.lang.startsWith('en')"
+                        )
                     search = page.locator("[data-plugin-search]")
                     search.fill("PegaFlow")
                     pegaflow = page.locator("#pegaflow-vllm-connectors")
                     pegaflow.wait_for(state="visible")
+                    assert pegaflow.count() == 1
+                    pegaflow_text = pegaflow.inner_text()
+                    assert (
+                        pegaflow.get_attribute("data-project-component-count") == "2"
+                    ), pegaflow_text
+                    assert "PROJECT COMPONENTS" in pegaflow_text, pegaflow_text
+                    assert "PegaFlow vLLM Connectors" in pegaflow.inner_text()
                     assert "+6.34%" in pegaflow.inner_text()
                     performance_link = pegaflow.locator(".plugin-performance a")
                     assert "C1: -28.43%" in performance_link.get_attribute("title")
                     assert "C16: +27.79%" in performance_link.get_attribute("title")
                     page.locator("#langToggle").click()
+                    assert "项目组件" in pegaflow.inner_text()
+                    assert "国产化适配" in pegaflow.inner_text()
                     assert "输出吞吐" in pegaflow.inner_text()
                     page.locator("#langToggle").click()
+                    search.fill("Mooncake")
+                    mooncake = page.locator("#mooncake-vllm-connectors")
+                    mooncake.wait_for(state="visible")
+                    assert mooncake.count() == 1
+                    assert "Mooncake HUST" in mooncake.inner_text()
+                    assert "Mooncake vLLM Connectors" in mooncake.inner_text()
                     search.fill("")
                     filters = page.locator("[data-workload-filters]")
                     assert filters.get_attribute("tabindex") == "0"

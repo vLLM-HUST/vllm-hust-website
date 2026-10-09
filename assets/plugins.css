@@ -180,6 +180,14 @@ body[data-page="plugins"] .plugin-card h3 { margin: 26px 0 10px; color: #0c1112;
 .upstream-fork-links a { color: inherit; text-decoration: none; }
 .upstream-fork-links .adjacent-card { box-shadow: inset 0 4px #39c6ca; }
 .plugin-summary { margin: 0; color: #61706f; font-size: 13px; }
+.plugin-project-components { margin-top: 14px; padding: 12px; border: 1px solid #c9d8d4; background: #f5f9f7; }
+.plugin-project-component-list { margin-top: 8px; display: grid; gap: 8px; }
+.plugin-project-component { padding: 9px 10px; border-left: 3px solid #7eb9b8; background: #fff; }
+.plugin-project-component-head { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+.plugin-project-component-head strong { color: #172321; font-size: 11px; }
+.plugin-project-component p { margin: 5px 0 0; color: #566461; font-size: 10px; line-height: 1.45; }
+.plugin-project-component-repository { display: inline-flex; margin-top: 6px; color: #176f72; font-size: 9px; font-weight: 800; text-underline-offset: 2px; }
+.plugin-badge.project-component-kind { color: #31514e; background: #dfeae7; }
 .plugin-compatibility { margin-top: 12px; padding: 9px 10px; border: 1px solid #bed0cb; border-left: 3px solid #176f72; border-radius: 4px; background: #f2f7f5; }
 .plugin-compatibility.compatibility-experimental { border-left-color: #d69822; background: #fff9e9; }
 .plugin-compatibility.compatibility-inspect_only { border-left-color: #7a65a8; background: #f5f1fb; }
