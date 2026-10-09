@@ -6,7 +6,7 @@
             navPerformanceCurves: 'Performance curves',
             navFixedTarget: 'Fixed-target results',
             navDatasetValidation: 'Dataset matrix',
-            navAchievements: 'Achievements',
+            navAchievements: 'Papers & achievements',
             navServingPlan: 'Serving Plan',
             navNews: 'News',
             navContributors: 'Contributors',
@@ -18,15 +18,20 @@
             navEngine: 'Engine',
             navProjects: 'Projects',
             navPlugins: 'Ecosystem',
-            navEvidence: 'Evidence',
+            navPublications: 'Papers & news',
+            navPerformance: 'Performance data',
             navCommunity: 'Community',
             navResources: 'Resources',
+            navComputeResources: '910B compute clusters',
+            navCluster9443: 'Cluster console · 9443',
+            navCluster9450: 'Cluster console · 9450',
             navVersions: 'Versions',
             navGithub: 'GitHub',
             navMenu: 'Open navigation',
             navMenuClose: 'Close navigation',
             footerBuild: 'Build',
-            footerEvidence: 'Evidence',
+            footerPublications: 'Papers & news',
+            footerPerformance: 'Performance data',
             footerCommunity: 'Community',
             brandSubtitle: 'Domestic-compute inference engine',
             langToggle: 'ZH',
@@ -38,7 +43,7 @@
             navPerformanceCurves: '性能曲线',
             navFixedTarget: '固定目标结果',
             navDatasetValidation: '数据集矩阵',
-            navAchievements: '成果',
+            navAchievements: '论文与成果',
             navServingPlan: '产能与成本',
             navNews: '新闻',
             navContributors: '核心成员',
@@ -50,15 +55,20 @@
             navEngine: '引擎',
             navProjects: '项目',
             navPlugins: '生态架构',
-            navEvidence: '成果',
+            navPublications: '论文与新闻',
+            navPerformance: '性能数据',
             navCommunity: '社区',
             navResources: '资源',
+            navComputeResources: '910B 算力集群',
+            navCluster9443: '集群入口 · 9443',
+            navCluster9450: '集群入口 · 9450',
             navVersions: '版本',
             navGithub: 'GitHub',
             navMenu: '打开导航',
             navMenuClose: '关闭导航',
             footerBuild: '构建',
-            footerEvidence: '成果',
+            footerPublications: '论文与新闻',
+            footerPerformance: '性能数据',
             footerCommunity: '社区',
             brandSubtitle: '面向国产算力的推理引擎',
             langToggle: 'EN',
@@ -125,7 +135,8 @@
         setText('nav-engine', common.navEngine);
         setText('nav-projects', common.navProjects);
         setText('nav-plugins', common.navPlugins);
-        setText('nav-evidence', common.navEvidence);
+        setText('nav-publications', common.navPublications);
+        setText('nav-performance', common.navPerformance);
         setText('nav-community', common.navCommunity);
         setText('nav-resources', common.navResources);
         setText('nav-versions', common.navVersions);
@@ -153,16 +164,23 @@
 
     const NAV_GROUPS = [
         {
-            id: 'evidence',
-            label: 'navEvidence',
-            pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', 'achievements', 'serving-plan', 'news'],
+            id: 'publications',
+            label: 'navPublications',
+            pages: ['achievements', 'news'],
+            links: [
+                ['achievements', './achievements.html', 'navAchievements'],
+                ['news', './news.html', 'navNews'],
+            ],
+        },
+        {
+            id: 'performance',
+            label: 'navPerformance',
+            pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', 'serving-plan'],
             links: [
                 ['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves'],
                 ['leaderboard', './leaderboard.html', 'navFixedTarget'],
                 ['dataset-validation', './dataset-validation.html', 'navDatasetValidation'],
-                ['achievements', './achievements.html', 'navAchievements'],
                 ['serving-plan', './serving-plan.html', 'navServingPlan'],
-                ['news', './news.html', 'navNews'],
             ],
         },
         {
@@ -179,8 +197,11 @@
         {
             id: 'resources',
             label: 'navResources',
-            pages: ['versions', 'issues'],
+            pages: ['resources', 'versions', 'issues'],
             links: [
+                ['resources', './resources.html', 'navComputeResources'],
+                ['', 'https://coder.sage.org.ai:9443/login?redirect=%2Fworkspaces%3Ffilter%3D', 'navCluster9443', true],
+                ['', 'https://coder.sage.org.ai:9450/login?redirect=%2Fworkspaces%3Ffilter%3D', 'navCluster9450', true],
                 ['versions', './versions.html', 'navVersions'],
                 ['issues', './issues.html', 'navIssues'],
                 ['', 'https://github.com/vLLM-HUST', 'navGithub', true],
@@ -289,8 +310,10 @@
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
                     <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
-                    <div><strong data-i18n-common="footerEvidence">Evidence</strong><a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves">Performance curves</a><a href="./leaderboard.html" data-i18n-common="navFixedTarget">Fixed-target results</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset matrix</a><a href="./achievements.html" data-i18n-common="navAchievements">Achievements</a><a href="./news.html" data-i18n-common="navNews">News</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
+                    <div><strong data-i18n-common="footerPerformance">Performance data</strong><a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves">Performance curves</a><a href="./leaderboard.html" data-i18n-common="navFixedTarget">Fixed-target results</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset matrix</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Serving Plan</a></div>
+                    <div><strong data-i18n-common="footerPublications">Papers & news</strong><a href="./achievements.html" data-i18n-common="navAchievements">Papers & achievements</a><a href="./news.html" data-i18n-common="navNews">News</a></div>
                     <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
+                    <div><strong data-i18n-common="navResources">Resources</strong><a href="./resources.html" data-i18n-common="navComputeResources">910B compute clusters</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
                 </nav>
             </div>`;
     }

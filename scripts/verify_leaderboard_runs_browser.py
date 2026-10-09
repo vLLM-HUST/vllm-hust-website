@@ -81,7 +81,7 @@ def main():
 
             nav = page.locator('.site-nav [data-nav-page="leaderboard-v2"]')
             assert nav.count() == 1
-            group = page.locator('.site-nav [data-nav-group="evidence"]')
+            group = page.locator('.site-nav [data-nav-group="performance"]')
             assert group.locator('[data-nav-page="leaderboard-v2"]').count() == 1
             assert (
                 page.locator('.site-nav a[href="./dataset-validation.html"]').count()
