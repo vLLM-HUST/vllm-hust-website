@@ -915,7 +915,7 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
     assert "id: create-pull-request" in workflow
     assert "gh pr merge" in workflow
     assert "--auto" in workflow
-    assert "group: website-data-writers" in workflow
+    assert "group: ${{ github.workflow }}" in workflow
 
 
 def test_scheduled_site_data_refreshes_are_self_healing() -> None:
@@ -933,9 +933,10 @@ def test_scheduled_site_data_refreshes_are_self_healing() -> None:
     assert "contents: write" in status
     assert "tests/test_sync_plugin_workshop_metadata.py" in plugin
     assert "tests/test_plugins_page.py" in plugin
+    assert "python -m pip install -r requirements-dev.txt" in plugin
     assert "bash scripts/check_stale_versions.sh" in versions
     for workflow in (status, plugin, versions):
-        assert "group: website-data-writers" in workflow
+        assert "group: ${{ github.workflow }}" in workflow
         assert "git pull --rebase origin main" in workflow
 
 
@@ -2457,10 +2458,10 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
 
     assert payload["updated_at"] == "2026-10-09"
     assert len(payload["all_repos"]["contributors"]) == 34
-    assert len(payload["core_repos"]["contributors"]) == 12
+    assert len(payload["core_repos"]["contributors"]) == 13
     profiles = payload["member_profiles"]
-    assert len(profiles["core_members"]) == 11
-    assert len(profiles["participants"]) == 62
+    assert len(profiles["core_members"]) == 12
+    assert len(profiles["participants"]) == 61
     assert len(profiles["staff_members"]) == 4
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
