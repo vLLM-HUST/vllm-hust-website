@@ -95,6 +95,8 @@
     "split-batch-full-graph-migration": ["high_concurrency", "prefill_heavy", "decode_heavy"],
     "pipeline-microbatch-migration": ["distributed_pipeline", "high_concurrency"],
     "betterscale": ["distributed_pipeline"],
+    "prefix-router-migration": ["repeated_prefix_agent", "high_concurrency", "latency_slo"],
+    "simllm-migration": ["repeated_prefix_agent", "prefill_heavy", "memory_kv_pressure"],
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
     "kv-transfer-observability-migration": ["lifecycle_control", "memory_kv_pressure"],
     "clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
