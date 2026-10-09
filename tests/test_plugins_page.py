@@ -180,6 +180,71 @@ def test_pegaflow_credits_upstream_and_scopes_local_adaptation_maintainers() -> 
     assert 'item.contribution_scope === "local_adaptation"' in SCRIPT
 
 
+def test_catalog_groups_related_components_without_erasing_contracts() -> None:
+    expected_groups = {
+        "mooncake": {"mooncake", "mooncake-vllm-connectors"},
+        "pegaflow": {"pegaflow", "pegaflow-vllm-connectors"},
+    }
+    for project_id, component_ids in expected_groups.items():
+        components = [
+            item
+            for item in REGISTRY["components"]
+            if item.get("catalog_project_id") == project_id
+        ]
+        assert {item["id"] for item in components} == component_ids
+        primary_ids = {item["catalog_primary_component"] for item in components}
+        assert len(primary_ids) == 1
+        assert primary_ids <= component_ids
+        assert all(
+            item["catalog_role_en"] and item["catalog_role_zh"] for item in components
+        )
+
+    assert "function catalogProjects()" in SCRIPT
+    assert "function projectComponentsPanel(items)" in SCRIPT
+    assert "copy().projectComponents" in SCRIPT
+    assert "renderCard(project.primary, project.items)" in SCRIPT
+    assert "card.dataset.projectComponentCount = String(projectItems.length)" in SCRIPT
+    assert ".plugin-project-components" in STYLES
+    assert 'entries: "个项目"' in SCRIPT
+    assert 'entries: "projects"' in SCRIPT
+
+
+def test_repeated_project_sources_are_grouped_or_explicitly_independent() -> None:
+    public = [
+        item
+        for item in REGISTRY["components"]
+        if item.get("public_surface", True) is not False
+        and item["id"] in MOD_TAXONOMY["components"]
+    ]
+
+    def github_slug(url: str | None) -> str | None:
+        match = re.match(r"https://github\.com/([^/]+/[^/]+)", url or "")
+        return match.group(1).casefold() if match else None
+
+    source_groups: dict[tuple[str, str], list[dict]] = {}
+    for item in public:
+        for source_kind, url in (
+            ("canonical", item.get("canonical_repository")),
+            ("upstream", item.get("upstream_repository")),
+        ):
+            slug = github_slug(url)
+            if slug:
+                source_groups.setdefault((source_kind, slug), []).append(item)
+
+    repeated = [items for items in source_groups.values() if len(items) > 1]
+    assert repeated
+    for items in repeated:
+        project_ids = {item.get("catalog_project_id") for item in items}
+        grouped = len(project_ids) == 1 and None not in project_ids
+        independent = all(
+            item.get("catalog_independent") is True
+            and item.get("catalog_independent_reason_en")
+            and item.get("catalog_independent_reason_zh")
+            for item in items
+        )
+        assert grouped or independent, [item["id"] for item in items]
+
+
 def test_legacy_migration_cards_preserve_original_ownership() -> None:
     expected = {
         "prefix-router-migration": ["Amber1qq", "WMASTER123", "Adr1anZheng"],
@@ -585,7 +650,7 @@ def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
-    assert "visible.filter(item => taxonomyProfile(item).kind === kind)" in SCRIPT
+    assert "visible.filter((project) => project.kind === kind)" in SCRIPT
 
 
 def test_workshop_supports_workload_guided_discovery() -> None:
@@ -652,9 +717,10 @@ def test_workshop_supports_workload_guided_discovery() -> None:
     assert ".plugin-workload-tag" in STYLES
 
 
-def test_workshop_uses_canonical_taxonomy_instead_of_collapsing_connectors() -> None:
-    assert "isWorkshopMod(item) && matchesSelectedType(item)" in SCRIPT
-    assert "taxonomyProfile(item).kind === kind" in SCRIPT
+def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> None:
+    assert "registry.components.filter(isWorkshopMod)" in SCRIPT
+    assert "matchesSelectedType(item) && matchesWorkload" in SCRIPT
+    assert "taxonomyProfile(project.primary).kind" in SCRIPT
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
@@ -825,7 +891,8 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=mod-taxonomy-v1" in PAGE
+    assert "plugins.css?v=project-grouping-20261009" in PAGE
+    assert "plugins-page.js?v=project-grouping-20261009" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -876,12 +943,12 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-pegaflow-attribution"'
+        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-project-grouping"'
         in PAGE
     )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=ecpa-final-20261009-pegaflow-attribution"' in PAGE
+        'v=ecpa-final-20261009-project-grouping"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009"'
