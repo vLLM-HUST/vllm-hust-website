@@ -89,7 +89,7 @@
       "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     }
   ],
-  "updated_at": "2026-10-09T11:23:02Z",
+  "updated_at": "2026-10-09T11:28:05Z",
   "registry": {
     "name": "vllm-hust",
     "version": "0.17.2.post1",
