@@ -1,0 +1,1013 @@
+{
+  "passed": true,
+  "sourceRunId": "a4d90d5088884ef29a90b7550e3ad267",
+  "summary": {
+    "valid": true,
+    "measurement_seconds": 900.0,
+    "requests_started": 671,
+    "max_prompt_tokens_observed": 50226,
+    "prompt_tokens_p50": 14576.0,
+    "max_turn_index_reached": 31,
+    "distinct_trajectories_started": 8,
+    "sessions_completed": 11,
+    "requests_completed_in_window": 647,
+    "requests_drained": 24,
+    "failed_requests": 0,
+    "observed_output_tokens_in_window": 363660,
+    "output_tokens_per_second": 404.06666666666666,
+    "output_tokens_per_second_per_chip": 202.03333333333333,
+    "decode_tokens_per_second_p90": 30.109184516280973,
+    "decode_speed_samples": 647,
+    "ttft_seconds_p95": 6.915010428242385,
+    "client_inflight_seconds": {
+      "0": 0.0003307047300040722,
+      "1": 0.0012613972648978233,
+      "2": 0.0007452508434653282,
+      "3": 0.0006624688394367695,
+      "4": 0.0007027601823210716,
+      "5": 0.0009898138232529163,
+      "6": 0.0007309801876544952,
+      "7": 0.0007256399840116501,
+      "8": 0.0006947098299860954,
+      "9": 0.0006260480731725693,
+      "10": 0.0006656991317868233,
+      "11": 0.0006369086913764477,
+      "12": 0.0009184130467474461,
+      "13": 0.0006560292094945908,
+      "14": 0.0006495187990367413,
+      "15": 0.0006931503303349018,
+      "16": 0.0006849300116300583,
+      "17": 0.0006092279218137264,
+      "18": 0.0006431788206100464,
+      "19": 0.0008505522273480892,
+      "20": 0.0006521088071167469,
+      "21": 0.000655478797852993,
+      "22": 0.0006486591883003712,
+      "23": 2.236165460664779,
+      "24": 897.7474009105936
+    },
+    "mean_client_inflight": 23.99727268708611,
+    "full_concurrency_fraction": 0.9974971121228817,
+    "drain_seconds": 133.3345242086798,
+    "aborted": false,
+    "planned_measurement_seconds": 900.0
+  },
+  "retrieval": {
+    "before": {
+      "passed": 16,
+      "total": 16
+    },
+    "after": {
+      "passed": 16,
+      "total": 16
+    }
+  },
+  "runtime": {
+    "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+    "vllmAscend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95",
+    "cann": "9.0.1",
+    "torchNpu": "2.10.0.post2"
+  },
+  "model": {
+    "upstream_model": "Qwen/Qwen3.8-27B",
+    "download_source": "https://www.modelscope.cn/models/Qwen/Qwen3.8-27B",
+    "upstream_revision": "master (mutable; exact downloaded identity below)",
+    "files": [
+      {
+        "path": "model-00001-of-00018.safetensors",
+        "bytes": 3966730552,
+        "sha256": "ba0ce20aae489ad196733da5064bcdf159a1fe84f53336648196e1ebb7751b1c"
+      },
+      {
+        "path": "model-00002-of-00018.safetensors",
+        "bytes": 3043080328,
+        "sha256": "06a148c01bfbe3faa14a5f184a7ff29a706f7ae1c8b2705d2058e26d17a001fb"
+      },
+      {
+        "path": "model-00003-of-00018.safetensors",
+        "bytes": 2542796952,
+        "sha256": "2e1bf62cbcd406eaa64b60d10353e1f0ef4039d0976e56f05cabe953454f9968"
+      },
+      {
+        "path": "model-00004-of-00018.safetensors",
+        "bytes": 3988973152,
+        "sha256": "511e34063187882659753c4d93f3859f93c019fd438d8813071921c81d9a3f1a"
+      },
+      {
+        "path": "model-00005-of-00018.safetensors",
+        "bytes": 2099339864,
+        "sha256": "635cb53446dc74f219740fc59e18b774f877b803b9722e289ca62575a6efa701"
+      },
+      {
+        "path": "model-00006-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "0bc5214fac607f0e6cc92eec3789d4b8559410ef9fce66621ba8158e8410dae0"
+      },
+      {
+        "path": "model-00007-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "80b0c49033e9a0d5762562aa12f4acdb7f54da586f3d0110f28c48d91cf07892"
+      },
+      {
+        "path": "model-00008-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "7192c5b66185d3592927daabee1cc19e6f6e0ce75988ee20e824b624765fda79"
+      },
+      {
+        "path": "model-00009-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "af3c48cc37af44f3db6ae0579baf019180d48d9c527caa0a1f03ff85813a56d8"
+      },
+      {
+        "path": "model-00010-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "163490a76f3bea3a40855b7efc04ce6d27afaf1a34f0bbde495b9491f76457c9"
+      },
+      {
+        "path": "model-00011-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "5f3ae1b948aeee39da77aec558e8236cd65fe4d7cb7686a76bb007acc563c6d8"
+      },
+      {
+        "path": "model-00012-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "a3de1c7114677a8f5ac5c4892c90e8238ea5c1e2038c80e757dfc87c3902ca55"
+      },
+      {
+        "path": "model-00013-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "06ab79a41f74c9c5cb734816feb0c7fc364104b227165ee7391231e1155aa02a"
+      },
+      {
+        "path": "model-00014-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "4138ed94603065ba884bbcadedb04d7718bb40117e85e6f5c6fc5b9c05b7a85b"
+      },
+      {
+        "path": "model-00015-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "69224e27b9de4e7dbf6fc936c6eaae08447bda3b80a6c31a871ab451173afd22"
+      },
+      {
+        "path": "model-00016-of-00018.safetensors",
+        "bytes": 3979564040,
+        "sha256": "73cb9a1089fb6155cb648609478d6633be8a5c7d9ca5a05bc8925ce8a553cefe"
+      },
+      {
+        "path": "model-00017-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "beb51f01056142ac4984bd800507b0dd0fd18de57f8e9ef6ea41d1a3598983a8"
+      },
+      {
+        "path": "model-00018-of-00018.safetensors",
+        "bytes": 3392197344,
+        "sha256": "1d3479509e21494658f9b64d317f5ea8e55c4025d28c702d6c4d0b356ce8ea06"
+      },
+      {
+        "path": "config.json",
+        "bytes": 4312,
+        "sha256": "191e0af232104ed8b65258cf3fb2b842e288008baca7633c11b82a1ac7203aab"
+      },
+      {
+        "path": "generation_config.json",
+        "bytes": 202,
+        "sha256": "e70c136c1b78ddc1fb0905bac8e733a4dc448d4f852a5dd75143fffc70be550e"
+      },
+      {
+        "path": "tokenizer.json",
+        "bytes": 12809320,
+        "sha256": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 17928,
+        "sha256": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27"
+      },
+      {
+        "path": "chat_template.jinja",
+        "bytes": 8952,
+        "sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041"
+      },
+      {
+        "path": "model.safetensors.index.json",
+        "bytes": 112216,
+        "sha256": "77042094076611b69791a610065f28b7013b8c621795fa86ddccc8bac7d1b9df"
+      }
+    ]
+  },
+  "operators": "Existing Dense27 mixed512/4096 gates plus wide decode96/E32 and Q12/KV2 C24/C32 attention leaf gates; current TP2 cache geometry retains earlier forced-byte-recovery qualification.",
+  "forcedPressure": {
+    "passed": true,
+    "reclaimedAndRestoredPages": 2,
+    "blockTokens": 1536,
+    "wholePreemptions": 0,
+    "resumedComputedTokens": 7607,
+    "byteExactKvTensorsPerRank": 34,
+    "byteExactRestoredBytesPerRank": 106954752,
+    "warmCachedTokens": 8448,
+    "coldCachedTokens": 0,
+    "continuationEqual": true,
+    "scope": "E4/R6/22pages with byte audit; correctness only, separate from timed sweep"
+  },
+  "measuredBehavior": {
+    "run_id": "a4d90d5088884ef29a90b7550e3ad267",
+    "metrics": {
+      "output_tps": 404.06666666666666,
+      "decode_p90_tps": 30.109184516280973,
+      "ttft_p95_ms": 6915.010428242385,
+      "ttft_p50_ms": 641.7656349949539,
+      "tpot_ms": 59.00725327702979,
+      "tpot_p95_ms": 150.76843215333082,
+      "e2e_p95_ms": 98483.17698463796,
+      "completed_requests": 647,
+      "preemptions_measurement_and_drain": 1.0,
+      "prefix_cache_hit_fraction_measurement_and_drain": 0.5681626591968214
+    },
+    "events_all": {
+      "claim": 721,
+      "allocate": 972,
+      "census": 949,
+      "io_queue": 1599,
+      "io_complete": 1598,
+      "finished_resident": 720,
+      "cold_victim": 17,
+      "partial_holes": 100,
+      "partial_reclaimed": 100,
+      "partial_reload": 34,
+      "partial_resumed": 24,
+      "idle_reclaim": 41,
+      "full_preempt": 1
+    },
+    "events_window": {
+      "claim": 670,
+      "allocate": 892,
+      "census": 746,
+      "io_queue": 1430,
+      "io_complete": 1430,
+      "cold_victim": 15,
+      "finished_resident": 647,
+      "partial_holes": 100,
+      "partial_reclaimed": 100,
+      "partial_reload": 32,
+      "partial_resumed": 22,
+      "idle_reclaim": 40,
+      "full_preempt": 1
+    },
+    "io_queued_window": {
+      "store": 57,
+      "seal": 624,
+      "load": 45,
+      "drop": 672,
+      "reload": 32
+    },
+    "io_completed_window": {
+      "store": 57,
+      "seal": 624,
+      "load": 45,
+      "drop": 672,
+      "reload": 32
+    },
+    "steps": {
+      "0": {
+        "counts": {
+          "prefill": 1,
+          "decode": 4801,
+          "mixed": 871
+        },
+        "total": 5673,
+        "query_tokens": 2223811,
+        "prefill_query_tokens": 1827886,
+        "decode_query_tokens": 395925,
+        "graph_shapes": {
+          "1536": 83,
+          "3": 1,
+          "4096": 403,
+          "2048": 56,
+          "80": 4800,
+          "1024": 133,
+          "512": 88,
+          "256": 90,
+          "128": 19
+        },
+        "scope": "Host step dispatch in measurement window, not device duration or PD rank ratio"
+      },
+      "1": {
+        "counts": {
+          "prefill": 1,
+          "decode": 4801,
+          "mixed": 871
+        },
+        "total": 5673,
+        "query_tokens": 2223811,
+        "prefill_query_tokens": 1827886,
+        "decode_query_tokens": 395925,
+        "graph_shapes": {
+          "1536": 83,
+          "3": 1,
+          "4096": 403,
+          "2048": 56,
+          "80": 4800,
+          "1024": 133,
+          "512": 88,
+          "256": 90,
+          "128": 19
+        },
+        "scope": "Host step dispatch in measurement window, not device duration or PD rank ratio"
+      }
+    },
+    "peak_cache_usage_sampled": 1.0,
+    "measurement_start_unix": 1791561197.9993896,
+    "measurement_end_unix": 1791562097.9993896
+  },
+  "lifecycle": {
+    "passed": true,
+    "episodes": [
+      {
+        "request": "cmpl-a02913f4c826ea22-0-9b023542",
+        "seat": 4,
+        "epoch": 5,
+        "computed": 33427,
+        "start": 2958021.294695406,
+        "pages": 1,
+        "loaded": 1,
+        "loads": [
+          {
+            "operation": 1137,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2958022.102933512
+          }
+        ],
+        "census_samples": 0,
+        "stop": 2958022.103232466,
+        "pause_seconds": 0.8085370599292219,
+        "other_request_reused_physical_pages": 1
+      },
+      {
+        "request": "cmpl-a8abcf2047e7607c-0-912a2dc6",
+        "seat": 19,
+        "epoch": 5,
+        "computed": 13967,
+        "start": 2958037.619675489,
+        "pages": 4,
+        "loaded": 4,
+        "loads": [
+          {
+            "operation": 1160,
+            "pages": 4,
+            "bytes_per_rank": {
+              "1": 213909504,
+              "0": 213909504
+            },
+            "quorum_at": 2958042.388555856
+          }
+        ],
+        "census_samples": 5,
+        "stop": 2958042.388662157,
+        "pause_seconds": 4.768986667972058,
+        "other_request_reused_physical_pages": 4
+      },
+      {
+        "request": "cmpl-914218f4f4a56206-0-a88dbde1",
+        "seat": 21,
+        "epoch": 5,
+        "computed": 14050,
+        "start": 2958062.031580738,
+        "pages": 4,
+        "loaded": 4,
+        "loads": [
+          {
+            "operation": 1179,
+            "pages": 4,
+            "bytes_per_rank": {
+              "1": 213909504,
+              "0": 213909504
+            },
+            "quorum_at": 2958067.007021011
+          }
+        ],
+        "census_samples": 5,
+        "stop": 2958067.007108182,
+        "pause_seconds": 4.975527444388717,
+        "other_request_reused_physical_pages": 4
+      },
+      {
+        "request": "cmpl-b4e2722fcb8fa71c-0-ba69876d",
+        "seat": 1,
+        "epoch": 11,
+        "computed": 21401,
+        "start": 2958064.1768914,
+        "pages": 3,
+        "loaded": 3,
+        "loads": [
+          {
+            "operation": 1181,
+            "pages": 3,
+            "bytes_per_rank": {
+              "0": 160432128,
+              "1": 160432128
+            },
+            "quorum_at": 2958067.371136381
+          }
+        ],
+        "census_samples": 3,
+        "stop": 2958067.371425805,
+        "pause_seconds": 3.1945344051346183,
+        "other_request_reused_physical_pages": 3
+      },
+      {
+        "request": "cmpl-b7dd7ecbc3c2fb60-0-9428a9f4",
+        "seat": 5,
+        "epoch": 7,
+        "computed": 50481,
+        "start": 2958080.877073603,
+        "pages": 10,
+        "loaded": 10,
+        "loads": [
+          {
+            "operation": 1192,
+            "pages": 10,
+            "bytes_per_rank": {
+              "0": 534773760,
+              "1": 534773760
+            },
+            "quorum_at": 2958086.85447783
+          }
+        ],
+        "census_samples": 6,
+        "stop": 2958086.854626742,
+        "pause_seconds": 5.977553138975054,
+        "other_request_reused_physical_pages": 10
+      },
+      {
+        "request": "cmpl-a40406176a2afe23-0-bcd16b12",
+        "seat": 2,
+        "epoch": 9,
+        "computed": 12093,
+        "start": 2958095.325963237,
+        "pages": 6,
+        "loaded": 6,
+        "loads": [
+          {
+            "operation": 1204,
+            "pages": 2,
+            "bytes_per_rank": {
+              "1": 106954752,
+              "0": 106954752
+            },
+            "quorum_at": 2958103.142362711
+          },
+          {
+            "operation": 1205,
+            "pages": 3,
+            "bytes_per_rank": {
+              "1": 160432128,
+              "0": 160432128
+            },
+            "quorum_at": 2958103.305475364
+          },
+          {
+            "operation": 1206,
+            "pages": 1,
+            "bytes_per_rank": {
+              "1": 53477376,
+              "0": 53477376
+            },
+            "quorum_at": 2958103.468672087
+          }
+        ],
+        "census_samples": 7,
+        "stop": 2958103.468771799,
+        "pause_seconds": 8.142808562144637,
+        "other_request_reused_physical_pages": 6
+      },
+      {
+        "request": "cmpl-8298cb99dd19ba3d-0-84a19725",
+        "seat": 23,
+        "epoch": 3,
+        "computed": 14711,
+        "start": 2958099.473572696,
+        "pages": 2,
+        "loaded": 2,
+        "loads": [
+          {
+            "operation": 1207,
+            "pages": 2,
+            "bytes_per_rank": {
+              "0": 106954752,
+              "1": 106954752
+            },
+            "quorum_at": 2958105.31239747
+          }
+        ],
+        "census_samples": 5,
+        "stop": 2958105.312509241,
+        "pause_seconds": 5.838936544954777,
+        "other_request_reused_physical_pages": 2
+      },
+      {
+        "request": "cmpl-889af7653c29ab8f-0-872ee74e",
+        "seat": 15,
+        "epoch": 7,
+        "computed": 10723,
+        "start": 2958111.221716117,
+        "pages": 2,
+        "loaded": 2,
+        "loads": [
+          {
+            "operation": 1211,
+            "pages": 2,
+            "bytes_per_rank": {
+              "0": 106954752,
+              "1": 106954752
+            },
+            "quorum_at": 2958113.680797513
+          }
+        ],
+        "census_samples": 3,
+        "stop": 2958113.680964246,
+        "pause_seconds": 2.45924812881276,
+        "other_request_reused_physical_pages": 2
+      },
+      {
+        "request": "cmpl-90a82ef6799507cc-0-a9bc8733",
+        "seat": 16,
+        "epoch": 9,
+        "computed": 40295,
+        "start": 2958138.25831838,
+        "pages": 24,
+        "loaded": 24,
+        "loads": [
+          {
+            "operation": 1242,
+            "pages": 24,
+            "bytes_per_rank": {
+              "0": 1283457024,
+              "1": 1283457024
+            },
+            "quorum_at": 2958152.995312199
+          }
+        ],
+        "census_samples": 13,
+        "stop": 2958152.9954122,
+        "pause_seconds": 14.737093820236623,
+        "other_request_reused_physical_pages": 24
+      },
+      {
+        "request": "cmpl-8674082c4e94114a-0-b7d7f8e2",
+        "seat": 6,
+        "epoch": 7,
+        "computed": 31175,
+        "start": 2958158.273137788,
+        "pages": 3,
+        "loaded": 3,
+        "loads": [
+          {
+            "operation": 1253,
+            "pages": 3,
+            "bytes_per_rank": {
+              "1": 160432128,
+              "0": 160432128
+            },
+            "quorum_at": 2958160.857317897
+          }
+        ],
+        "census_samples": 3,
+        "stop": 2958160.857428259,
+        "pause_seconds": 2.584290471393615,
+        "other_request_reused_physical_pages": 3
+      },
+      {
+        "request": "cmpl-83fee604051839ca-0-89af8a0a",
+        "seat": 4,
+        "epoch": 7,
+        "computed": 22635,
+        "start": 2958172.36785827,
+        "pages": 14,
+        "loaded": 14,
+        "loads": [
+          {
+            "operation": 1276,
+            "pages": 14,
+            "bytes_per_rank": {
+              "1": 748683264,
+              "0": 748683264
+            },
+            "quorum_at": 2958186.919026951
+          }
+        ],
+        "census_samples": 12,
+        "stop": 2958186.919123932,
+        "pause_seconds": 14.551265661604702,
+        "other_request_reused_physical_pages": 14
+      },
+      {
+        "request": "cmpl-88b72c9b825e8cf9-0-8e682c9a",
+        "seat": 11,
+        "epoch": 5,
+        "computed": 23820,
+        "start": 2958178.698902055,
+        "pages": 13,
+        "loaded": 13,
+        "loads": [
+          {
+            "operation": 1278,
+            "pages": 13,
+            "bytes_per_rank": {
+              "1": 695205888,
+              "0": 695205888
+            },
+            "quorum_at": 2958187.166628196
+          }
+        ],
+        "census_samples": 8,
+        "stop": 2958187.166719768,
+        "pause_seconds": 8.467817713040859,
+        "other_request_reused_physical_pages": 13
+      },
+      {
+        "request": "cmpl-af34ddcdffd0b3c4-0-aa885cbb",
+        "seat": 1,
+        "epoch": 15,
+        "computed": 8072,
+        "start": 2958210.912553223,
+        "pages": 5,
+        "loaded": 5,
+        "loads": [
+          {
+            "operation": 1299,
+            "pages": 2,
+            "bytes_per_rank": {
+              "1": 106954752,
+              "0": 106954752
+            },
+            "quorum_at": 2958216.156706511
+          },
+          {
+            "operation": 1300,
+            "pages": 3,
+            "bytes_per_rank": {
+              "1": 160432128,
+              "0": 160432128
+            },
+            "quorum_at": 2958216.320030473
+          }
+        ],
+        "census_samples": 4,
+        "stop": 2958216.320125024,
+        "pause_seconds": 5.407571800984442,
+        "other_request_reused_physical_pages": 5
+      },
+      {
+        "request": "cmpl-b6831ecde17bde20-0-8884fe90",
+        "seat": 2,
+        "epoch": 11,
+        "computed": 30913,
+        "start": 2958215.36130813,
+        "pages": 1,
+        "loaded": 1,
+        "loads": [
+          {
+            "operation": 1302,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2958218.155398366
+          }
+        ],
+        "census_samples": 2,
+        "stop": 2958218.155753171,
+        "pause_seconds": 2.794445041101426,
+        "other_request_reused_physical_pages": 0
+      },
+      {
+        "request": "cmpl-bcb23218817e60cf-0-85d3c709",
+        "seat": 6,
+        "epoch": 9,
+        "computed": 2430,
+        "start": 2958238.164146756,
+        "pages": 1,
+        "loaded": 1,
+        "loads": [
+          {
+            "operation": 1327,
+            "pages": 1,
+            "bytes_per_rank": {
+              "1": 53477376,
+              "0": 53477376
+            },
+            "quorum_at": 2958240.405143232
+          }
+        ],
+        "census_samples": 2,
+        "stop": 2958240.405328985,
+        "pause_seconds": 2.241182229015976,
+        "other_request_reused_physical_pages": 1
+      },
+      {
+        "request": "cmpl-aaa9fcf2d1283bce-0-8184ecf3",
+        "seat": 20,
+        "epoch": 7,
+        "computed": 24423,
+        "start": 2958258.705579417,
+        "pages": 15,
+        "loaded": 15,
+        "loads": [
+          {
+            "operation": 1349,
+            "pages": 15,
+            "bytes_per_rank": {
+              "1": 802160640,
+              "0": 802160640
+            },
+            "quorum_at": 2958272.60318258
+          }
+        ],
+        "census_samples": 12,
+        "stop": 2958272.603396553,
+        "pause_seconds": 13.897817136254162,
+        "other_request_reused_physical_pages": 15
+      },
+      {
+        "request": "cmpl-93fd3f87a245519d-0-ba0d229e",
+        "seat": 9,
+        "epoch": 7,
+        "computed": 35133,
+        "start": 2958267.085256264,
+        "pages": 2,
+        "loaded": 2,
+        "loads": [
+          {
+            "operation": 1352,
+            "pages": 2,
+            "bytes_per_rank": {
+              "1": 106954752,
+              "0": 106954752
+            },
+            "quorum_at": 2958272.846898798
+          }
+        ],
+        "census_samples": 6,
+        "stop": 2958272.847085841,
+        "pause_seconds": 5.761829576920718,
+        "other_request_reused_physical_pages": 2
+      },
+      {
+        "request": "cmpl-927e74c00ccc178d-0-a1d99dc8",
+        "seat": 19,
+        "epoch": 11,
+        "computed": 20499,
+        "start": 2958268.13040719,
+        "pages": 8,
+        "loaded": 8,
+        "loads": [
+          {
+            "operation": 1358,
+            "pages": 8,
+            "bytes_per_rank": {
+              "0": 427819008,
+              "1": 427819008
+            },
+            "quorum_at": 2958273.421510285
+          }
+        ],
+        "census_samples": 5,
+        "stop": 2958273.421801779,
+        "pause_seconds": 5.2913945890031755,
+        "other_request_reused_physical_pages": 8
+      },
+      {
+        "request": "cmpl-857608722f993ddf-0-a20e781e",
+        "seat": 10,
+        "epoch": 5,
+        "computed": 36567,
+        "start": 2958283.759978895,
+        "pages": 20,
+        "loaded": 20,
+        "loads": [
+          {
+            "operation": 1379,
+            "pages": 16,
+            "bytes_per_rank": {
+              "1": 855638016,
+              "0": 855638016
+            },
+            "quorum_at": 2958295.515899359
+          },
+          {
+            "operation": 1381,
+            "pages": 4,
+            "bytes_per_rank": {
+              "0": 213909504,
+              "1": 213909504
+            },
+            "quorum_at": 2958295.676870856
+          }
+        ],
+        "census_samples": 12,
+        "stop": 2958295.677000148,
+        "pause_seconds": 11.917021253146231,
+        "other_request_reused_physical_pages": 20
+      },
+      {
+        "request": "cmpl-ae1cda37ca32b2e6-0-9fe19faa",
+        "seat": 3,
+        "epoch": 13,
+        "computed": 12420,
+        "start": 2958303.477498416,
+        "pages": 7,
+        "loaded": 7,
+        "loads": [
+          {
+            "operation": 1406,
+            "pages": 7,
+            "bytes_per_rank": {
+              "1": 374341632,
+              "0": 374341632
+            },
+            "quorum_at": 2958322.197744612
+          }
+        ],
+        "census_samples": 18,
+        "stop": 2958322.197966275,
+        "pause_seconds": 18.720467858947814,
+        "other_request_reused_physical_pages": 7
+      },
+      {
+        "request": "cmpl-9817bfe985eb2b04-0-b1fe4788",
+        "seat": 12,
+        "epoch": 5,
+        "computed": 32206,
+        "start": 2958306.630317781,
+        "pages": 12,
+        "loaded": 12,
+        "loads": [
+          {
+            "operation": 1408,
+            "pages": 4,
+            "bytes_per_rank": {
+              "1": 213909504,
+              "0": 213909504
+            },
+            "quorum_at": 2958322.447419021
+          },
+          {
+            "operation": 1410,
+            "pages": 8,
+            "bytes_per_rank": {
+              "1": 427819008,
+              "0": 427819008
+            },
+            "quorum_at": 2958322.617328233
+          }
+        ],
+        "census_samples": 15,
+        "stop": 2958322.617595576,
+        "pause_seconds": 15.987277795094997,
+        "other_request_reused_physical_pages": 12
+      },
+      {
+        "request": "cmpl-af34ddcdffd0b3c4-0-aa885cbb",
+        "seat": 1,
+        "epoch": 15,
+        "computed": 32279,
+        "start": 2958313.062618219,
+        "pages": 19,
+        "loaded": 19,
+        "loads": [
+          {
+            "operation": 1418,
+            "pages": 1,
+            "bytes_per_rank": {
+              "1": 53477376,
+              "0": 53477376
+            },
+            "quorum_at": 2958323.551660817
+          },
+          {
+            "operation": 1420,
+            "pages": 5,
+            "bytes_per_rank": {
+              "1": 267386880,
+              "0": 267386880
+            },
+            "quorum_at": 2958323.718335563
+          },
+          {
+            "operation": 1422,
+            "pages": 2,
+            "bytes_per_rank": {
+              "1": 106954752,
+              "0": 106954752
+            },
+            "quorum_at": 2958323.880249392
+          },
+          {
+            "operation": 1423,
+            "pages": 3,
+            "bytes_per_rank": {
+              "1": 160432128,
+              "0": 160432128
+            },
+            "quorum_at": 2958324.043253706
+          },
+          {
+            "operation": 1424,
+            "pages": 6,
+            "bytes_per_rank": {
+              "1": 320864256,
+              "0": 320864256
+            },
+            "quorum_at": 2958324.206277961
+          },
+          {
+            "operation": 1425,
+            "pages": 2,
+            "bytes_per_rank": {
+              "1": 106954752,
+              "0": 106954752
+            },
+            "quorum_at": 2958324.369083403
+          }
+        ],
+        "census_samples": 11,
+        "stop": 2958324.369208205,
+        "pause_seconds": 11.30658998619765,
+        "other_request_reused_physical_pages": 19
+      },
+      {
+        "request": "cmpl-b1e722d9b7ec28b3-0-91d75cc6",
+        "seat": 9,
+        "epoch": 9,
+        "computed": 20141,
+        "start": 2958342.106621882,
+        "pages": 9,
+        "loaded": 9,
+        "loads": [
+          {
+            "operation": 1459,
+            "pages": 9,
+            "bytes_per_rank": {
+              "1": 481296384,
+              "0": 481296384
+            },
+            "quorum_at": 2958358.934156848
+          }
+        ],
+        "census_samples": 14,
+        "stop": 2958358.934378332,
+        "pause_seconds": 16.827756450045854,
+        "other_request_reused_physical_pages": 9
+      },
+      {
+        "request": "cmpl-bc3f883d7e7c1ad1-0-a1aeac74",
+        "seat": 26,
+        "epoch": 11,
+        "computed": 35873,
+        "start": 2958346.460899523,
+        "pages": 20,
+        "loaded": 20,
+        "loads": [
+          {
+            "operation": 1462,
+            "pages": 20,
+            "bytes_per_rank": {
+              "1": 1069547520,
+              "0": 1069547520
+            },
+            "quorum_at": 2958360.218940738
+          }
+        ],
+        "census_samples": 12,
+        "stop": 2958360.219270122,
+        "pause_seconds": 13.758370598778129,
+        "other_request_reused_physical_pages": 20
+      }
+    ],
+    "pages": 205,
+    "scope": "Whole server run including drain; census invariance sampled ~1Hz; source patch_output excludes paused requests on every schedule; no tensor equality claim from this observer."
+  },
+  "validation": {
+    "owned_server_exit_zero": true,
+    "selected_device_guard_exit_zero": true,
+    "selected_devices_released": true,
+    "exact_token_budgets": true,
+    "prefix_cache_observed": true
+  },
+  "source": {
+    "id": "betterscale",
+    "repository": "https://github.com/vLLM-HUST/BetterScale",
+    "revision": "a54e9f6b84fb3e4ef1ffbca37b66650f070b1ee2",
+    "additional_revisions": [],
+    "source_capsule": "dense27-sweep-20261009-frozen-source-v2",
+    "scope": "Frozen E32 Dense27 extension; independent wide decode/attention gates and pre/post retrieval; C24 additionally normalizes donor virtual padding. Not an unchanged base or released wheel.",
+    "local_adaptations": "Dense27 TP2 E32 envelope and C24 virtual-padding fix; same current State/streaming/partial-priority policies",
+    "qualification_archive": "extension-qualification-sofar.tar.gz; local campaign archive retains source-v1/v2 identities",
+    "qualification_archive_sha256": "5f4fd4132adc8de2d1fe52ed08a327e28a7bc2dde87bcc6fb36afa53b74626a1"
+  }
+}

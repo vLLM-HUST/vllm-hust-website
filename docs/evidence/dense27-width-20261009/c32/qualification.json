@@ -1,0 +1,1481 @@
+{
+  "passed": true,
+  "sourceRunId": "eee6304efbc2453a8fb13d9dd9b7325e",
+  "summary": {
+    "valid": true,
+    "measurement_seconds": 900.0,
+    "requests_started": 565,
+    "max_prompt_tokens_observed": 40282,
+    "prompt_tokens_p50": 13124.0,
+    "max_turn_index_reached": 29,
+    "distinct_trajectories_started": 8,
+    "sessions_completed": 7,
+    "requests_completed_in_window": 533,
+    "requests_drained": 32,
+    "failed_requests": 0,
+    "observed_output_tokens_in_window": 257733,
+    "output_tokens_per_second": 286.37,
+    "output_tokens_per_second_per_chip": 143.185,
+    "decode_tokens_per_second_p90": 22.762737919290643,
+    "decode_speed_samples": 533,
+    "ttft_seconds_p95": 32.23239603294056,
+    "client_inflight_seconds": {
+      "0": 0.00030506495386362076,
+      "1": 0.001177676022052765,
+      "2": 0.0007297801785171032,
+      "3": 0.0006745685823261738,
+      "4": 0.0008955220691859722,
+      "5": 0.0006802501156926155,
+      "6": 0.000672448892146349,
+      "7": 0.0007054000161588192,
+      "8": 0.0007125791162252426,
+      "9": 0.0006594290025532246,
+      "10": 0.0006405487656593323,
+      "11": 0.0008779522031545639,
+      "12": 0.0007283501327037811,
+      "13": 0.0006764298304915428,
+      "14": 0.0007042689248919487,
+      "15": 0.0007273498922586441,
+      "16": 0.0006985301151871681,
+      "17": 0.0006340579129755497,
+      "18": 0.0008882032707333565,
+      "19": 0.0006680088117718697,
+      "20": 0.0006729192100465298,
+      "21": 0.0006670989096164703,
+      "22": 0.0006772289052605629,
+      "23": 0.0007099001668393612,
+      "24": 0.000685469713062048,
+      "25": 0.0006336881779134274,
+      "26": 0.005886001046746969,
+      "27": 0.0006595789454877377,
+      "28": 0.0006963098421692848,
+      "29": 0.0006973990239202976,
+      "30": 0.0007233801297843456,
+      "31": 1.532070969697088,
+      "32": 898.4407636374235
+    },
+    "mean_client_inflight": 31.997843495302625,
+    "full_concurrency_fraction": 0.9982675151526927,
+    "drain_seconds": 96.76344209071249,
+    "aborted": false,
+    "planned_measurement_seconds": 900.0
+  },
+  "retrieval": {
+    "before": {
+      "passed": 16,
+      "total": 16
+    },
+    "after": {
+      "passed": 16,
+      "total": 16
+    }
+  },
+  "runtime": {
+    "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+    "vllmAscend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95",
+    "cann": "9.0.1",
+    "torchNpu": "2.10.0.post2"
+  },
+  "model": {
+    "upstream_model": "Qwen/Qwen3.8-27B",
+    "download_source": "https://www.modelscope.cn/models/Qwen/Qwen3.8-27B",
+    "upstream_revision": "master (mutable; exact downloaded identity below)",
+    "files": [
+      {
+        "path": "model-00001-of-00018.safetensors",
+        "bytes": 3966730552,
+        "sha256": "ba0ce20aae489ad196733da5064bcdf159a1fe84f53336648196e1ebb7751b1c"
+      },
+      {
+        "path": "model-00002-of-00018.safetensors",
+        "bytes": 3043080328,
+        "sha256": "06a148c01bfbe3faa14a5f184a7ff29a706f7ae1c8b2705d2058e26d17a001fb"
+      },
+      {
+        "path": "model-00003-of-00018.safetensors",
+        "bytes": 2542796952,
+        "sha256": "2e1bf62cbcd406eaa64b60d10353e1f0ef4039d0976e56f05cabe953454f9968"
+      },
+      {
+        "path": "model-00004-of-00018.safetensors",
+        "bytes": 3988973152,
+        "sha256": "511e34063187882659753c4d93f3859f93c019fd438d8813071921c81d9a3f1a"
+      },
+      {
+        "path": "model-00005-of-00018.safetensors",
+        "bytes": 2099339864,
+        "sha256": "635cb53446dc74f219740fc59e18b774f877b803b9722e289ca62575a6efa701"
+      },
+      {
+        "path": "model-00006-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "0bc5214fac607f0e6cc92eec3789d4b8559410ef9fce66621ba8158e8410dae0"
+      },
+      {
+        "path": "model-00007-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "80b0c49033e9a0d5762562aa12f4acdb7f54da586f3d0110f28c48d91cf07892"
+      },
+      {
+        "path": "model-00008-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "7192c5b66185d3592927daabee1cc19e6f6e0ce75988ee20e824b624765fda79"
+      },
+      {
+        "path": "model-00009-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "af3c48cc37af44f3db6ae0579baf019180d48d9c527caa0a1f03ff85813a56d8"
+      },
+      {
+        "path": "model-00010-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "163490a76f3bea3a40855b7efc04ce6d27afaf1a34f0bbde495b9491f76457c9"
+      },
+      {
+        "path": "model-00011-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "5f3ae1b948aeee39da77aec558e8236cd65fe4d7cb7686a76bb007acc563c6d8"
+      },
+      {
+        "path": "model-00012-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "a3de1c7114677a8f5ac5c4892c90e8238ea5c1e2038c80e757dfc87c3902ca55"
+      },
+      {
+        "path": "model-00013-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "06ab79a41f74c9c5cb734816feb0c7fc364104b227165ee7391231e1155aa02a"
+      },
+      {
+        "path": "model-00014-of-00018.safetensors",
+        "bytes": 3979553696,
+        "sha256": "4138ed94603065ba884bbcadedb04d7718bb40117e85e6f5c6fc5b9c05b7a85b"
+      },
+      {
+        "path": "model-00015-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "69224e27b9de4e7dbf6fc936c6eaae08447bda3b80a6c31a871ab451173afd22"
+      },
+      {
+        "path": "model-00016-of-00018.safetensors",
+        "bytes": 3979564040,
+        "sha256": "73cb9a1089fb6155cb648609478d6633be8a5c7d9ca5a05bc8925ce8a553cefe"
+      },
+      {
+        "path": "model-00017-of-00018.safetensors",
+        "bytes": 2108759344,
+        "sha256": "beb51f01056142ac4984bd800507b0dd0fd18de57f8e9ef6ea41d1a3598983a8"
+      },
+      {
+        "path": "model-00018-of-00018.safetensors",
+        "bytes": 3392197344,
+        "sha256": "1d3479509e21494658f9b64d317f5ea8e55c4025d28c702d6c4d0b356ce8ea06"
+      },
+      {
+        "path": "config.json",
+        "bytes": 4312,
+        "sha256": "191e0af232104ed8b65258cf3fb2b842e288008baca7633c11b82a1ac7203aab"
+      },
+      {
+        "path": "generation_config.json",
+        "bytes": 202,
+        "sha256": "e70c136c1b78ddc1fb0905bac8e733a4dc448d4f852a5dd75143fffc70be550e"
+      },
+      {
+        "path": "tokenizer.json",
+        "bytes": 12809320,
+        "sha256": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 17928,
+        "sha256": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27"
+      },
+      {
+        "path": "chat_template.jinja",
+        "bytes": 8952,
+        "sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041"
+      },
+      {
+        "path": "model.safetensors.index.json",
+        "bytes": 112216,
+        "sha256": "77042094076611b69791a610065f28b7013b8c621795fa86ddccc8bac7d1b9df"
+      }
+    ]
+  },
+  "operators": "Existing Dense27 mixed512/4096 gates plus wide decode96/E32 and Q12/KV2 C24/C32 attention leaf gates; current TP2 cache geometry retains earlier forced-byte-recovery qualification.",
+  "forcedPressure": {
+    "passed": true,
+    "reclaimedAndRestoredPages": 2,
+    "blockTokens": 1536,
+    "wholePreemptions": 0,
+    "resumedComputedTokens": 7607,
+    "byteExactKvTensorsPerRank": 34,
+    "byteExactRestoredBytesPerRank": 106954752,
+    "warmCachedTokens": 8448,
+    "coldCachedTokens": 0,
+    "continuationEqual": true,
+    "scope": "E4/R6/22pages with byte audit; correctness only, separate from timed sweep"
+  },
+  "measuredBehavior": {
+    "run_id": "eee6304efbc2453a8fb13d9dd9b7325e",
+    "metrics": {
+      "output_tps": 286.37,
+      "decode_p90_tps": 22.762737919290643,
+      "ttft_p95_ms": 32232.396032940556,
+      "ttft_p50_ms": 1210.81160614267,
+      "tpot_ms": 98.00919222875874,
+      "tpot_p95_ms": 228.8618120154699,
+      "e2e_p95_ms": 113125.35846577954,
+      "completed_requests": 533,
+      "preemptions_measurement_and_drain": 44.0,
+      "prefix_cache_hit_fraction_measurement_and_drain": 0.35800478052773976
+    },
+    "events_all": {
+      "claim": 658,
+      "allocate": 1142,
+      "census": 858,
+      "io_queue": 2049,
+      "io_complete": 2048,
+      "finished_resident": 614,
+      "cold_victim": 14,
+      "idle_reclaim": 175,
+      "partial_holes": 159,
+      "partial_reclaimed": 159,
+      "partial_reload": 58,
+      "partial_resumed": 40,
+      "full_preempt": 44
+    },
+    "events_window": {
+      "claim": 608,
+      "allocate": 1056,
+      "census": 693,
+      "io_queue": 1872,
+      "io_complete": 1872,
+      "cold_victim": 14,
+      "finished_resident": 533,
+      "idle_reclaim": 175,
+      "partial_holes": 150,
+      "partial_reclaimed": 150,
+      "partial_reload": 51,
+      "partial_resumed": 34,
+      "full_preempt": 44
+    },
+    "io_queued_window": {
+      "seal": 805,
+      "store": 46,
+      "drop": 845,
+      "load": 125,
+      "reload": 51
+    },
+    "io_completed_window": {
+      "seal": 805,
+      "store": 46,
+      "drop": 845,
+      "load": 125,
+      "reload": 51
+    },
+    "steps": {
+      "0": {
+        "counts": {
+          "prefill": 1,
+          "decode": 2391,
+          "mixed": 949
+        },
+        "total": 3341,
+        "query_tokens": 3015330,
+        "prefill_query_tokens": 2724186,
+        "decode_query_tokens": 291144,
+        "graph_shapes": {
+          "1536": 69,
+          "3": 1,
+          "4096": 654,
+          "96": 1820,
+          "1024": 80,
+          "2048": 41,
+          "512": 54,
+          "256": 47,
+          "128": 5,
+          "80": 569,
+          "40": 1
+        },
+        "scope": "Host step dispatch in measurement window, not device duration or PD rank ratio"
+      },
+      "1": {
+        "counts": {
+          "prefill": 1,
+          "decode": 2391,
+          "mixed": 949
+        },
+        "total": 3341,
+        "query_tokens": 3015330,
+        "prefill_query_tokens": 2724186,
+        "decode_query_tokens": 291144,
+        "graph_shapes": {
+          "1536": 69,
+          "3": 1,
+          "4096": 654,
+          "96": 1820,
+          "1024": 80,
+          "2048": 41,
+          "512": 54,
+          "256": 47,
+          "128": 5,
+          "80": 569,
+          "40": 1
+        },
+        "scope": "Host step dispatch in measurement window, not device duration or PD rank ratio"
+      }
+    },
+    "peak_cache_usage_sampled": 1.0,
+    "measurement_start_unix": 1791559041.0335376,
+    "measurement_end_unix": 1791559941.0335376
+  },
+  "lifecycle": {
+    "passed": true,
+    "episodes": [
+      {
+        "request": "cmpl-bb0b6f21bc7a6f6f-0-bcae1838",
+        "seat": 2,
+        "epoch": 3,
+        "computed": 19588,
+        "start": 2955605.139937733,
+        "pages": 4,
+        "loaded": 4,
+        "loads": [
+          {
+            "operation": 1156,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955609.511072641
+          },
+          {
+            "operation": 1157,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955609.689115007
+          },
+          {
+            "operation": 1158,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955609.864650454
+          },
+          {
+            "operation": 1159,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955610.041350158
+          }
+        ],
+        "census_samples": 4,
+        "stop": 2955610.04146103,
+        "pause_seconds": 4.901523297186941,
+        "other_request_reused_physical_pages": 4
+      },
+      {
+        "request": "cmpl-877abe9e8bd0dadc-0-86b5b5e3",
+        "seat": 19,
+        "epoch": 3,
+        "computed": 19892,
+        "start": 2955636.348532264,
+        "pages": 10,
+        "loaded": 10,
+        "loads": [
+          {
+            "operation": 1195,
+            "pages": 10,
+            "bytes_per_rank": {
+              "0": 534773760,
+              "1": 534773760
+            },
+            "quorum_at": 2955643.408120789
+          }
+        ],
+        "census_samples": 5,
+        "stop": 2955643.408247041,
+        "pause_seconds": 7.059714776929468,
+        "other_request_reused_physical_pages": 10
+      },
+      {
+        "request": "cmpl-9468fcafc77b4a0c-0-ab111a6c",
+        "seat": 22,
+        "epoch": 3,
+        "computed": 12548,
+        "start": 2955657.864488855,
+        "pages": 6,
+        "loaded": 6,
+        "loads": [
+          {
+            "operation": 1217,
+            "pages": 6,
+            "bytes_per_rank": {
+              "0": 320864256,
+              "1": 320864256
+            },
+            "quorum_at": 2955662.823747695
+          }
+        ],
+        "census_samples": 4,
+        "stop": 2955662.823857767,
+        "pause_seconds": 4.959368912037462,
+        "other_request_reused_physical_pages": 6
+      },
+      {
+        "request": "cmpl-a1913b4873c7e6d2-0-875e4568",
+        "seat": 5,
+        "epoch": 3,
+        "computed": 41329,
+        "start": 2955670.875436915,
+        "pages": 10,
+        "loaded": 10,
+        "loads": [
+          {
+            "operation": 1237,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955678.082457399
+          },
+          {
+            "operation": 1238,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955678.256537781
+          },
+          {
+            "operation": 1239,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955678.430560941
+          },
+          {
+            "operation": 1240,
+            "pages": 2,
+            "bytes_per_rank": {
+              "1": 106954752,
+              "0": 106954752
+            },
+            "quorum_at": 2955678.547001884
+          },
+          {
+            "operation": 1241,
+            "pages": 1,
+            "bytes_per_rank": {
+              "1": 53477376,
+              "0": 53477376
+            },
+            "quorum_at": 2955678.792594813
+          },
+          {
+            "operation": 1242,
+            "pages": 2,
+            "bytes_per_rank": {
+              "1": 106954752,
+              "0": 106954752
+            },
+            "quorum_at": 2955678.966063205
+          },
+          {
+            "operation": 1243,
+            "pages": 1,
+            "bytes_per_rank": {
+              "1": 53477376,
+              "0": 53477376
+            },
+            "quorum_at": 2955679.136610322
+          },
+          {
+            "operation": 1244,
+            "pages": 1,
+            "bytes_per_rank": {
+              "1": 53477376,
+              "0": 53477376
+            },
+            "quorum_at": 2955679.325370886
+          }
+        ],
+        "census_samples": 7,
+        "stop": 2955679.325514798,
+        "pause_seconds": 8.45007788296789,
+        "other_request_reused_physical_pages": 10
+      },
+      {
+        "request": "cmpl-b3e3e67955af7379-0-865b0566",
+        "seat": 0,
+        "epoch": 5,
+        "computed": 16957,
+        "start": 2955678.519883541,
+        "pages": 2,
+        "loaded": 2,
+        "loads": [
+          {
+            "operation": 1263,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955681.083540381
+          },
+          {
+            "operation": 1264,
+            "pages": 1,
+            "bytes_per_rank": {
+              "1": 53477376,
+              "0": 53477376
+            },
+            "quorum_at": 2955681.242657623
+          }
+        ],
+        "census_samples": 3,
+        "stop": 2955681.242778735,
+        "pause_seconds": 2.7228951938450336,
+        "other_request_reused_physical_pages": 2
+      },
+      {
+        "request": "cmpl-a37cb803b2bb7635-0-bd425d67",
+        "seat": 14,
+        "epoch": 9,
+        "computed": 20661,
+        "start": 2955725.151814865,
+        "pages": 12,
+        "loaded": 12,
+        "loads": [
+          {
+            "operation": 1325,
+            "pages": 12,
+            "bytes_per_rank": {
+              "0": 641728512,
+              "1": 641728512
+            },
+            "quorum_at": 2955738.081169084
+          }
+        ],
+        "census_samples": 10,
+        "stop": 2955738.081387698,
+        "pause_seconds": 12.929572833236307,
+        "other_request_reused_physical_pages": 12
+      },
+      {
+        "request": "cmpl-98158d86f7b256cc-0-b7c660d4",
+        "seat": 1,
+        "epoch": 9,
+        "computed": 20726,
+        "start": 2955731.035434842,
+        "pages": 13,
+        "loaded": 13,
+        "loads": [
+          {
+            "operation": 1342,
+            "pages": 12,
+            "bytes_per_rank": {
+              "0": 641728512,
+              "1": 641728512
+            },
+            "quorum_at": 2955739.855512739
+          },
+          {
+            "operation": 1343,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955740.031548703
+          }
+        ],
+        "census_samples": 7,
+        "stop": 2955740.031649094,
+        "pause_seconds": 8.996214251965284,
+        "other_request_reused_physical_pages": 13
+      },
+      {
+        "request": "cmpl-b8335c1a080254ad-0-88ffd14c",
+        "seat": 30,
+        "epoch": 3,
+        "computed": 18124,
+        "start": 2955737.383941919,
+        "pages": 2,
+        "loaded": 2,
+        "loads": [
+          {
+            "operation": 1344,
+            "pages": 2,
+            "bytes_per_rank": {
+              "0": 106954752,
+              "1": 106954752
+            },
+            "quorum_at": 2955740.296912424
+          }
+        ],
+        "census_samples": 3,
+        "stop": 2955740.296989745,
+        "pause_seconds": 2.9130478259176016,
+        "other_request_reused_physical_pages": 2
+      },
+      {
+        "request": "cmpl-a9574edf2a74bbe9-0-be2acf70",
+        "seat": 27,
+        "epoch": 10,
+        "computed": 23452,
+        "start": 2955759.804994351,
+        "pages": 8,
+        "loaded": 8,
+        "loads": [
+          {
+            "operation": 1367,
+            "pages": 8,
+            "bytes_per_rank": {
+              "0": 427819008,
+              "1": 427819008
+            },
+            "quorum_at": 2955764.671753977
+          }
+        ],
+        "census_samples": 4,
+        "stop": 2955764.671857428,
+        "pause_seconds": 4.8668630765751,
+        "other_request_reused_physical_pages": 8
+      },
+      {
+        "request": "cmpl-8cc61b4717ab271b-0-abe3ac06",
+        "seat": 17,
+        "epoch": 7,
+        "computed": 23557,
+        "start": 2955793.363453628,
+        "pages": 15,
+        "loaded": 15,
+        "loads": [
+          {
+            "operation": 1429,
+            "pages": 15,
+            "bytes_per_rank": {
+              "0": 802160640,
+              "1": 802160640
+            },
+            "quorum_at": 2955825.407606126
+          }
+        ],
+        "census_samples": 27,
+        "stop": 2955825.40782869,
+        "pause_seconds": 32.04437506198883,
+        "other_request_reused_physical_pages": 15
+      },
+      {
+        "request": "cmpl-b1c48a06dc22fc61-0-9d8be47f",
+        "seat": 14,
+        "epoch": 9,
+        "computed": 21070,
+        "start": 2955801.333051835,
+        "pages": 12,
+        "loaded": 12,
+        "loads": [
+          {
+            "operation": 1434,
+            "pages": 12,
+            "bytes_per_rank": {
+              "0": 641728512,
+              "1": 641728512
+            },
+            "quorum_at": 2955826.013261376
+          }
+        ],
+        "census_samples": 22,
+        "stop": 2955826.013337727,
+        "pause_seconds": 24.680285891983658,
+        "other_request_reused_physical_pages": 12
+      },
+      {
+        "request": "cmpl-87e90157738c3fbc-0-a6449f03",
+        "seat": 0,
+        "epoch": 9,
+        "computed": 17986,
+        "start": 2955810.39680088,
+        "pages": 11,
+        "loaded": 11,
+        "loads": [
+          {
+            "operation": 1437,
+            "pages": 11,
+            "bytes_per_rank": {
+              "0": 588251136,
+              "1": 588251136
+            },
+            "quorum_at": 2955826.784376129
+          }
+        ],
+        "census_samples": 15,
+        "stop": 2955826.784482841,
+        "pause_seconds": 16.38768196105957,
+        "other_request_reused_physical_pages": 11
+      },
+      {
+        "request": "cmpl-87c77b104a8a8445-0-9a82b1e0",
+        "seat": 10,
+        "epoch": 13,
+        "computed": 18642,
+        "start": 2955815.339133202,
+        "pages": 11,
+        "loaded": 11,
+        "loads": [
+          {
+            "operation": 1440,
+            "pages": 11,
+            "bytes_per_rank": {
+              "0": 588251136,
+              "1": 588251136
+            },
+            "quorum_at": 2955827.037901014
+          }
+        ],
+        "census_samples": 11,
+        "stop": 2955827.037979555,
+        "pause_seconds": 11.698846352752298,
+        "other_request_reused_physical_pages": 11
+      },
+      {
+        "request": "cmpl-ba00e90c45e16ec6-0-aa3b333d",
+        "seat": 29,
+        "epoch": 10,
+        "computed": 14355,
+        "start": 2955838.255087598,
+        "pages": 9,
+        "loaded": 9,
+        "loads": [
+          {
+            "operation": 1467,
+            "pages": 9,
+            "bytes_per_rank": {
+              "0": 481296384,
+              "1": 481296384
+            },
+            "quorum_at": 2955849.926995822
+          }
+        ],
+        "census_samples": 8,
+        "stop": 2955849.927333417,
+        "pause_seconds": 11.672245818655938,
+        "other_request_reused_physical_pages": 9
+      },
+      {
+        "request": "cmpl-a80e194b0b24894e-0-80972d49",
+        "seat": 7,
+        "epoch": 10,
+        "computed": 5549,
+        "start": 2955841.277511389,
+        "pages": 2,
+        "loaded": 2,
+        "loads": [
+          {
+            "operation": 1472,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955853.369889956
+          },
+          {
+            "operation": 1473,
+            "pages": 1,
+            "bytes_per_rank": {
+              "1": 53477376,
+              "0": 53477376
+            },
+            "quorum_at": 2955853.533712117
+          }
+        ],
+        "census_samples": 9,
+        "stop": 2955853.533797628,
+        "pause_seconds": 12.256286238785833,
+        "other_request_reused_physical_pages": 2
+      },
+      {
+        "request": "cmpl-9aebd86e52a81990-0-b08b3e5c",
+        "seat": 8,
+        "epoch": 10,
+        "computed": 16175,
+        "start": 2955844.175454062,
+        "pages": 2,
+        "loaded": 2,
+        "loads": [
+          {
+            "operation": 1482,
+            "pages": 2,
+            "bytes_per_rank": {
+              "0": 106954752,
+              "1": 106954752
+            },
+            "quorum_at": 2955856.233352742
+          }
+        ],
+        "census_samples": 9,
+        "stop": 2955856.233536605,
+        "pause_seconds": 12.058082542847842,
+        "other_request_reused_physical_pages": 2
+      },
+      {
+        "request": "cmpl-80f78369185c7414-0-9b964bcb",
+        "seat": 21,
+        "epoch": 5,
+        "computed": 13871,
+        "start": 2955846.126881121,
+        "pages": 8,
+        "loaded": 8,
+        "loads": [
+          {
+            "operation": 1485,
+            "pages": 8,
+            "bytes_per_rank": {
+              "0": 427819008,
+              "1": 427819008
+            },
+            "quorum_at": 2955857.623617204
+          }
+        ],
+        "census_samples": 9,
+        "stop": 2955857.623712806,
+        "pause_seconds": 11.49683168483898,
+        "other_request_reused_physical_pages": 8
+      },
+      {
+        "request": "cmpl-830d4d2443ffb5a1-0-88bf3604",
+        "seat": 20,
+        "epoch": 13,
+        "computed": 14384,
+        "start": 2955905.929201358,
+        "pages": 8,
+        "loaded": 8,
+        "loads": [
+          {
+            "operation": 1569,
+            "pages": 8,
+            "bytes_per_rank": {
+              "0": 427819008,
+              "1": 427819008
+            },
+            "quorum_at": 2955928.620865976
+          }
+        ],
+        "census_samples": 20,
+        "stop": 2955928.620995797,
+        "pause_seconds": 22.69179443921894,
+        "other_request_reused_physical_pages": 8
+      },
+      {
+        "request": "cmpl-8465f45d5a16a10e-0-b86e70ef",
+        "seat": 2,
+        "epoch": 12,
+        "computed": 18580,
+        "start": 2955910.957003002,
+        "pages": 12,
+        "loaded": 12,
+        "loads": [
+          {
+            "operation": 1574,
+            "pages": 10,
+            "bytes_per_rank": {
+              "0": 534773760,
+              "1": 534773760
+            },
+            "quorum_at": 2955929.459863477
+          },
+          {
+            "operation": 1575,
+            "pages": 1,
+            "bytes_per_rank": {
+              "1": 53477376,
+              "0": 53477376
+            },
+            "quorum_at": 2955929.625134417
+          },
+          {
+            "operation": 1576,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955929.790182265
+          }
+        ],
+        "census_samples": 17,
+        "stop": 2955929.790308437,
+        "pause_seconds": 18.83330543478951,
+        "other_request_reused_physical_pages": 12
+      },
+      {
+        "request": "cmpl-8f4b0234e070a9b9-0-bf450498",
+        "seat": 9,
+        "epoch": 12,
+        "computed": 10107,
+        "start": 2955917.041793282,
+        "pages": 1,
+        "loaded": 1,
+        "loads": [
+          {
+            "operation": 1577,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2955930.040649809
+          }
+        ],
+        "census_samples": 11,
+        "stop": 2955930.04075661,
+        "pause_seconds": 12.99896332807839,
+        "other_request_reused_physical_pages": 1
+      },
+      {
+        "request": "cmpl-abc4c514c65b6a5c-0-ad284eda",
+        "seat": 10,
+        "epoch": 15,
+        "computed": 21340,
+        "start": 2955919.077047395,
+        "pages": 13,
+        "loaded": 13,
+        "loads": [
+          {
+            "operation": 1581,
+            "pages": 13,
+            "bytes_per_rank": {
+              "0": 695205888,
+              "1": 695205888
+            },
+            "quorum_at": 2955932.164305018
+          }
+        ],
+        "census_samples": 12,
+        "stop": 2955932.1644032,
+        "pause_seconds": 13.087355805095285,
+        "other_request_reused_physical_pages": 13
+      },
+      {
+        "request": "cmpl-875bc20348a8f53b-0-bdaed020",
+        "seat": 7,
+        "epoch": 12,
+        "computed": 21745,
+        "start": 2955925.036335148,
+        "pages": 4,
+        "loaded": 4,
+        "loads": [
+          {
+            "operation": 1582,
+            "pages": 4,
+            "bytes_per_rank": {
+              "0": 213909504,
+              "1": 213909504
+            },
+            "quorum_at": 2955932.419132076
+          }
+        ],
+        "census_samples": 7,
+        "stop": 2955932.419238217,
+        "pause_seconds": 7.382903069257736,
+        "other_request_reused_physical_pages": 4
+      },
+      {
+        "request": "cmpl-9daa83cad4f4d94f-0-b1221b56",
+        "seat": 0,
+        "epoch": 13,
+        "computed": 19312,
+        "start": 2955932.685186077,
+        "pages": 3,
+        "loaded": 3,
+        "loads": [
+          {
+            "operation": 1600,
+            "pages": 3,
+            "bytes_per_rank": {
+              "0": 160432128,
+              "1": 160432128
+            },
+            "quorum_at": 2955935.359440302
+          }
+        ],
+        "census_samples": 3,
+        "stop": 2955935.359620464,
+        "pause_seconds": 2.674434387125075,
+        "other_request_reused_physical_pages": 3
+      },
+      {
+        "request": "cmpl-abcc2e6a4f3a8635-0-ae072c3f",
+        "seat": 29,
+        "epoch": 14,
+        "computed": 14707,
+        "start": 2955966.634623074,
+        "pages": 5,
+        "loaded": 5,
+        "loads": [
+          {
+            "operation": 1646,
+            "pages": 5,
+            "bytes_per_rank": {
+              "0": 267386880,
+              "1": 267386880
+            },
+            "quorum_at": 2955971.141645251
+          }
+        ],
+        "census_samples": 5,
+        "stop": 2955971.141724172,
+        "pause_seconds": 4.507101098075509,
+        "other_request_reused_physical_pages": 5
+      },
+      {
+        "request": "cmpl-bc41eba049c8f8e3-0-bb30ea4e",
+        "seat": 22,
+        "epoch": 13,
+        "computed": 19083,
+        "start": 2956020.530299959,
+        "pages": 12,
+        "loaded": 12,
+        "loads": [
+          {
+            "operation": 1727,
+            "pages": 12,
+            "bytes_per_rank": {
+              "0": 641728512,
+              "1": 641728512
+            },
+            "quorum_at": 2956059.923885877
+          }
+        ],
+        "census_samples": 33,
+        "stop": 2956059.924025139,
+        "pause_seconds": 39.39372518006712,
+        "other_request_reused_physical_pages": 12
+      },
+      {
+        "request": "cmpl-b246e960eabf7063-0-8933bb97",
+        "seat": 15,
+        "epoch": 24,
+        "computed": 14731,
+        "start": 2956028.54111874,
+        "pages": 8,
+        "loaded": 8,
+        "loads": [
+          {
+            "operation": 1730,
+            "pages": 8,
+            "bytes_per_rank": {
+              "0": 427819008,
+              "1": 427819008
+            },
+            "quorum_at": 2956060.935118133
+          }
+        ],
+        "census_samples": 27,
+        "stop": 2956060.935221315,
+        "pause_seconds": 32.39410257479176,
+        "other_request_reused_physical_pages": 8
+      },
+      {
+        "request": "cmpl-81f84ed9be2502ae-0-9a1b7255",
+        "seat": 16,
+        "epoch": 21,
+        "computed": 19827,
+        "start": 2956033.506283716,
+        "pages": 12,
+        "loaded": 12,
+        "loads": [
+          {
+            "operation": 1734,
+            "pages": 12,
+            "bytes_per_rank": {
+              "0": 641728512,
+              "1": 641728512
+            },
+            "quorum_at": 2956063.98298599
+          }
+        ],
+        "census_samples": 25,
+        "stop": 2956063.983137372,
+        "pause_seconds": 30.476853656116873,
+        "other_request_reused_physical_pages": 12
+      },
+      {
+        "request": "cmpl-99dc40cc3b1974ca-0-b1c7505c",
+        "seat": 29,
+        "epoch": 14,
+        "computed": 15110,
+        "start": 2956044.191900386,
+        "pages": 9,
+        "loaded": 9,
+        "loads": [
+          {
+            "operation": 1737,
+            "pages": 9,
+            "bytes_per_rank": {
+              "0": 481296384,
+              "1": 481296384
+            },
+            "quorum_at": 2956065.676497015
+          }
+        ],
+        "census_samples": 20,
+        "stop": 2956065.676636927,
+        "pause_seconds": 21.48473654082045,
+        "other_request_reused_physical_pages": 9
+      },
+      {
+        "request": "cmpl-9afedc99d541d212-0-ac0f477e",
+        "seat": 9,
+        "epoch": 16,
+        "computed": 24869,
+        "start": 2956049.173418209,
+        "pages": 16,
+        "loaded": 16,
+        "loads": [
+          {
+            "operation": 1740,
+            "pages": 15,
+            "bytes_per_rank": {
+              "0": 802160640,
+              "1": 802160640
+            },
+            "quorum_at": 2956066.515707327
+          },
+          {
+            "operation": 1741,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2956066.675202322
+          }
+        ],
+        "census_samples": 17,
+        "stop": 2956066.675305064,
+        "pause_seconds": 17.501886854879558,
+        "other_request_reused_physical_pages": 16
+      },
+      {
+        "request": "cmpl-b106cfd2dd71d7aa-0-9e941d9f",
+        "seat": 2,
+        "epoch": 19,
+        "computed": 12066,
+        "start": 2956098.799695329,
+        "pages": 5,
+        "loaded": 5,
+        "loads": [
+          {
+            "operation": 1790,
+            "pages": 2,
+            "bytes_per_rank": {
+              "0": 106954752,
+              "1": 106954752
+            },
+            "quorum_at": 2956111.65411567
+          },
+          {
+            "operation": 1791,
+            "pages": 3,
+            "bytes_per_rank": {
+              "0": 160432128,
+              "1": 160432128
+            },
+            "quorum_at": 2956111.819188677
+          }
+        ],
+        "census_samples": 10,
+        "stop": 2956111.819293429,
+        "pause_seconds": 13.019598100334406,
+        "other_request_reused_physical_pages": 5
+      },
+      {
+        "request": "cmpl-851d63270082cf15-0-a2b4150c",
+        "seat": 0,
+        "epoch": 21,
+        "computed": 4027,
+        "start": 2956103.522994596,
+        "pages": 1,
+        "loaded": 1,
+        "loads": [
+          {
+            "operation": 1794,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2956114.931597804
+          }
+        ],
+        "census_samples": 10,
+        "stop": 2956114.931742217,
+        "pause_seconds": 11.408747620880604,
+        "other_request_reused_physical_pages": 1
+      },
+      {
+        "request": "cmpl-9332c04f95a82f59-0-80ce4cac",
+        "seat": 1,
+        "epoch": 14,
+        "computed": 20426,
+        "start": 2956106.326297671,
+        "pages": 9,
+        "loaded": 9,
+        "loads": [
+          {
+            "operation": 1797,
+            "pages": 9,
+            "bytes_per_rank": {
+              "0": 481296384,
+              "1": 481296384
+            },
+            "quorum_at": 2956119.471758708
+          }
+        ],
+        "census_samples": 11,
+        "stop": 2956119.471941961,
+        "pause_seconds": 13.145644289907068,
+        "other_request_reused_physical_pages": 9
+      },
+      {
+        "request": "cmpl-81179d38e81edb8c-0-95807b80",
+        "seat": 11,
+        "epoch": 3,
+        "computed": 22879,
+        "start": 2956125.47789099,
+        "pages": 9,
+        "loaded": 9,
+        "loads": [
+          {
+            "operation": 1812,
+            "pages": 9,
+            "bytes_per_rank": {
+              "0": 481296384,
+              "1": 481296384
+            },
+            "quorum_at": 2956133.050695884
+          }
+        ],
+        "census_samples": 7,
+        "stop": 2956133.050834996,
+        "pause_seconds": 7.572944005951285,
+        "other_request_reused_physical_pages": 9
+      },
+      {
+        "request": "cmpl-ae3eb310f4f22af7-0-87bf34a0",
+        "seat": 3,
+        "epoch": 3,
+        "computed": 23109,
+        "start": 2956129.4765432,
+        "pages": 3,
+        "loaded": 3,
+        "loads": [
+          {
+            "operation": 1815,
+            "pages": 3,
+            "bytes_per_rank": {
+              "0": 160432128,
+              "1": 160432128
+            },
+            "quorum_at": 2956133.302125705
+          }
+        ],
+        "census_samples": 4,
+        "stop": 2956133.302560911,
+        "pause_seconds": 3.8260177108459175,
+        "other_request_reused_physical_pages": 3
+      },
+      {
+        "request": "cmpl-bd41e91616fcf8d4-0-839c58f4",
+        "seat": 10,
+        "epoch": 30,
+        "computed": 4033,
+        "start": 2956185.87087034,
+        "pages": 2,
+        "loaded": 2,
+        "loads": [
+          {
+            "operation": 1894,
+            "pages": 2,
+            "bytes_per_rank": {
+              "0": 106954752,
+              "1": 106954752
+            },
+            "quorum_at": 2956205.340300134
+          }
+        ],
+        "census_samples": 17,
+        "stop": 2956205.340445586,
+        "pause_seconds": 19.46957524586469,
+        "other_request_reused_physical_pages": 2
+      },
+      {
+        "request": "cmpl-870304503c74a83c-0-a58d226b",
+        "seat": 7,
+        "epoch": 21,
+        "computed": 20509,
+        "start": 2956188.727684991,
+        "pages": 13,
+        "loaded": 13,
+        "loads": [
+          {
+            "operation": 1906,
+            "pages": 12,
+            "bytes_per_rank": {
+              "0": 641728512,
+              "1": 641728512
+            },
+            "quorum_at": 2956212.173954337
+          },
+          {
+            "operation": 1908,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2956212.330793629
+          }
+        ],
+        "census_samples": 21,
+        "stop": 2956212.330952991,
+        "pause_seconds": 23.603267999831587,
+        "other_request_reused_physical_pages": 13
+      },
+      {
+        "request": "cmpl-9ba440957c075919-0-aa37eaf2",
+        "seat": 20,
+        "epoch": 25,
+        "computed": 24267,
+        "start": 2956196.894963792,
+        "pages": 15,
+        "loaded": 15,
+        "loads": [
+          {
+            "operation": 1914,
+            "pages": 15,
+            "bytes_per_rank": {
+              "0": 802160640,
+              "1": 802160640
+            },
+            "quorum_at": 2956212.945583207
+          }
+        ],
+        "census_samples": 15,
+        "stop": 2956212.945701299,
+        "pause_seconds": 16.050737506709993,
+        "other_request_reused_physical_pages": 15
+      },
+      {
+        "request": "cmpl-a703a8045922edb9-0-9b9f4716",
+        "seat": 8,
+        "epoch": 28,
+        "computed": 1773,
+        "start": 2956207.310478236,
+        "pages": 1,
+        "loaded": 1,
+        "loads": [
+          {
+            "operation": 1916,
+            "pages": 1,
+            "bytes_per_rank": {
+              "0": 53477376,
+              "1": 53477376
+            },
+            "quorum_at": 2956213.176088267
+          }
+        ],
+        "census_samples": 6,
+        "stop": 2956213.176262259,
+        "pause_seconds": 5.865784022957087,
+        "other_request_reused_physical_pages": 1
+      },
+      {
+        "request": "cmpl-83ed03efc65ddffb-0-9200ea4e",
+        "seat": 17,
+        "epoch": 22,
+        "computed": 26039,
+        "start": 2956208.320864109,
+        "pages": 4,
+        "loaded": 4,
+        "loads": [
+          {
+            "operation": 1920,
+            "pages": 4,
+            "bytes_per_rank": {
+              "0": 213909504,
+              "1": 213909504
+            },
+            "quorum_at": 2956213.560860982
+          }
+        ],
+        "census_samples": 5,
+        "stop": 2956213.561109945,
+        "pause_seconds": 5.2402458363212645,
+        "other_request_reused_physical_pages": 4
+      },
+      {
+        "request": "cmpl-a2a5c1883fda6236-0-a3a264fa",
+        "seat": 13,
+        "epoch": 3,
+        "computed": 44877,
+        "start": 2956209.354384554,
+        "pages": 2,
+        "loaded": 2,
+        "loads": [
+          {
+            "operation": 1922,
+            "pages": 2,
+            "bytes_per_rank": {
+              "0": 106954752,
+              "1": 106954752
+            },
+            "quorum_at": 2956213.790309966
+          }
+        ],
+        "census_samples": 5,
+        "stop": 2956213.790428848,
+        "pause_seconds": 4.436044293921441,
+        "other_request_reused_physical_pages": 2
+      }
+    ],
+    "pages": 304,
+    "scope": "Whole server run including drain; census invariance sampled ~1Hz; source patch_output excludes paused requests on every schedule; no tensor equality claim from this observer."
+  },
+  "validation": {
+    "owned_server_exit_zero": true,
+    "selected_device_guard_exit_zero": true,
+    "selected_devices_released": true,
+    "exact_token_budgets": true,
+    "prefix_cache_observed": true
+  },
+  "source": {
+    "id": "betterscale",
+    "repository": "https://github.com/vLLM-HUST/BetterScale",
+    "revision": "a54e9f6b84fb3e4ef1ffbca37b66650f070b1ee2",
+    "additional_revisions": [],
+    "source_capsule": "dense27-sweep-20261009-frozen-source-v1",
+    "scope": "Frozen E32 Dense27 extension; independent wide decode/attention gates and pre/post retrieval; C24 additionally normalizes donor virtual padding. Not an unchanged base or released wheel.",
+    "local_adaptations": "Dense27 TP2 E32 envelope and C24 virtual-padding fix; same current State/streaming/partial-priority policies",
+    "qualification_archive": "extension-qualification-sofar.tar.gz; local campaign archive retains source-v1/v2 identities",
+    "qualification_archive_sha256": "5f4fd4132adc8de2d1fe52ed08a327e28a7bc2dde87bcc6fb36afa53b74626a1"
+  }
+}
