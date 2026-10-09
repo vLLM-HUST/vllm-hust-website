@@ -45,8 +45,19 @@ def write_publication(root: Path) -> None:
     }
     program = {
         "contract_version": "dataset-program-v1",
+        "designation": {
+            "id": "pujiang-specified-dataset-scope",
+            "scope_status": "names-only",
+        },
         "primary_datasets": [
-            {"id": dataset_id}
+            {
+                "id": dataset_id,
+                "readiness": {
+                    "status": (
+                        "material-unfrozen" if dataset_id == "mmlu-pro" else "missing"
+                    )
+                },
+            }
             for dataset_id in (
                 "mmlu-pro",
                 "hle-verified",

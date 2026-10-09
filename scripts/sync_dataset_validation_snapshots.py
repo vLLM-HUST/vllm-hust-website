@@ -52,6 +52,13 @@ def validate_source(source_dir: Path) -> tuple[dict, list[str]]:
     program = load_json(source_dir / PROGRAM_FILE)
     if program.get("contract_version") != "dataset-program-v1":
         raise SystemExit("unsupported dataset program contract")
+    designation = program.get("designation")
+    if (
+        not isinstance(designation, dict)
+        or designation.get("id") != "pujiang-specified-dataset-scope"
+        or designation.get("scope_status") != "names-only"
+    ):
+        raise SystemExit("dataset program lacks the Pujiang designation")
     primary_ids = [item.get("id") for item in program.get("primary_datasets", [])]
     if primary_ids != [
         "mmlu-pro",
@@ -61,6 +68,18 @@ def validate_source(source_dir: Path) -> tuple[dict, list[str]]:
         "terminal-bench-2.1",
     ]:
         raise SystemExit("dataset program does not declare the expected primary set")
+    readiness = {
+        item.get("id"): item.get("readiness", {}).get("status")
+        for item in program["primary_datasets"]
+    }
+    if readiness != {
+        "mmlu-pro": "material-unfrozen",
+        "hle-verified": "missing",
+        "swe-bench-pro": "missing",
+        "frontierscience": "missing",
+        "terminal-bench-2.1": "missing",
+    }:
+        raise SystemExit("dataset program readiness audit is missing or changed")
     scenarios = index.get("scenarios")
     if not isinstance(scenarios, list) or not scenarios:
         raise SystemExit("dataset-validation index has no scenarios")

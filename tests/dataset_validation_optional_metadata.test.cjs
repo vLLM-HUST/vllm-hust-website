@@ -149,19 +149,26 @@ test('dataset program accepts exactly the five primary datasets', () => {
     const api = loadTestApi();
     const program = api.normalizeProgram({
         contract_version: 'dataset-program-v1',
+        designation: {
+            id: 'pujiang-specified-dataset-scope',
+            scope_status: 'names-only',
+        },
         primary_datasets: [
             'mmlu-pro',
             'hle-verified',
             'swe-bench-pro',
             'frontierscience',
             'terminal-bench-2.1',
-        ].map((id) => ({ id, primary_metric_zh: '主指标', source_url: 'https://example.com' })),
+        ].map((id) => ({ id, primary_metric_zh: '主指标', source_url: 'https://example.com', readiness: { status: id === 'mmlu-pro' ? 'material-unfrozen' : 'missing' } })),
     });
     assert.equal(program.primary_datasets.length, 5);
     assert.throws(() => api.normalizeProgram({
         contract_version: 'dataset-program-v1',
         primary_datasets: [{ id: 'mmlu-pro' }],
     }), /Unsupported dataset program/);
+    const wrongDesignation = structuredClone(program);
+    wrongDesignation.designation.id = 'generic-primary-datasets';
+    assert.throws(() => api.normalizeProgram(wrongDesignation), /Pujiang designation/);
 });
 
 test('candidate sets are validated and rendered without hiding non-selected MODs', () => {
