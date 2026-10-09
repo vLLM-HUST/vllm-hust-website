@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Compute resources - vLLM-HUST</title>
-  <meta name="description" content="Private Ascend 910B cluster entry points maintained for vLLM-HUST development and evaluation." />
+  <meta name="description" content="Two private Ascend 910B2 clusters with 48 accelerator cards for vLLM-HUST development and evaluation." />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
@@ -31,8 +31,8 @@
       <div class="site-shell">
         <div class="content-panel">
           <p id="resources-eyebrow" class="eyebrow">Compute resources</p>
-          <h1 id="resources-title">Two private Ascend 910B clusters</h1>
-          <p id="resources-lede" class="hero-lede">Machines from different operators are exposed through separate Coder frontends. The two pools together contain dozens of Ascend 910B accelerator cards.</p>
+          <h1 id="resources-title">Two private Ascend 910B2 clusters</h1>
+          <p id="resources-lede" class="hero-lede">The two RDMA-connected pools contain 48 Ascend 910B2 accelerator cards: port 9443 has 2 eight-card nodes (16 cards), and port 9450 has 4 eight-card nodes (32 cards).</p>
         </div>
       </div>
     </section>
@@ -49,22 +49,22 @@
       <section class="cluster-grid" aria-label="Ascend 910B cluster entrances">
         <article class="content-panel cluster-card">
           <p id="cluster-a-kicker" class="eyebrow">Private cloud cluster A</p>
-          <h2 id="cluster-a-title">910B cluster · port 9443</h2>
-          <p id="cluster-a-copy">Independent Coder frontend and workspace pool. Sign in to view the resources currently assigned to your account.</p>
+          <h2 id="cluster-a-title">910B2 cluster · port 9443</h2>
+          <p id="cluster-a-copy">2 RDMA-connected eight-card nodes, with 16 Ascend 910B2 cards in total. This is an independent Coder frontend and workspace pool.</p>
           <a id="cluster-a-link" class="cluster-link" href="https://coder.sage.org.ai:9443/login?redirect=%2Fworkspaces%3Ffilter%3D" target="_blank" rel="noopener noreferrer">Open the 9443 cluster</a>
         </article>
 
         <article class="content-panel cluster-card">
           <p id="cluster-b-kicker" class="eyebrow">Private cloud cluster B</p>
-          <h2 id="cluster-b-title">910B cluster · port 9450</h2>
-          <p id="cluster-b-copy">Independent Coder frontend and workspace pool. Sign in to view the resources currently assigned to your account.</p>
+          <h2 id="cluster-b-title">910B2 cluster · port 9450</h2>
+          <p id="cluster-b-copy">4 RDMA-connected eight-card nodes, with 32 Ascend 910B2 cards in total. This is an independent Coder frontend and workspace pool.</p>
           <a id="cluster-b-link" class="cluster-link" href="https://coder.sage.org.ai:9450/login?redirect=%2Fworkspaces%3Ffilter%3D" target="_blank" rel="noopener noreferrer">Open the 9450 cluster</a>
         </article>
       </section>
 
       <aside class="resource-note" aria-labelledby="resource-note-title">
-        <strong id="resource-note-title">Capacity note</strong>
-        <span id="resource-note-copy">“Dozens of 910B cards” describes the combined private-cloud inventory, not a guaranteed per-user allocation. Current availability is shown by each cluster frontend after sign-in.</span>
+        <strong id="resource-note-title">Inventory</strong>
+        <span id="resource-note-copy">2 × 8 cards + 4 × 8 cards = 48 Ascend 910B2 cards. This is physical inventory, not a guaranteed per-user allocation; current availability is shown after sign-in.</span>
       </aside>
     </div>
   </main>
@@ -76,45 +76,45 @@
       en: {
         title: 'Compute resources - vLLM-HUST',
         'resources-eyebrow': 'Compute resources',
-        'resources-title': 'Two private Ascend 910B clusters',
-        'resources-lede': 'Machines from different operators are exposed through separate Coder frontends. The two pools together contain dozens of Ascend 910B accelerator cards.',
+        'resources-title': 'Two private Ascend 910B2 clusters',
+        'resources-lede': 'The two RDMA-connected pools contain 48 Ascend 910B2 accelerator cards: port 9443 has 2 eight-card nodes (16 cards), and port 9450 has 4 eight-card nodes (32 cards).',
         'resources-guide-kicker': 'Choose the right entrance',
         'resources-guide-title': 'The port identifies the cluster',
         'resources-guide-copy': '9443 and 9450 are not alternate links to the same service. Each opens a different cluster frontend backed by machines from a different operator. Use the entrance assigned to your workspace or project.',
         'cluster-a-kicker': 'Private cloud cluster A',
-        'cluster-a-title': '910B cluster · port 9443',
-        'cluster-a-copy': 'Independent Coder frontend and workspace pool. Sign in to view the resources currently assigned to your account.',
+        'cluster-a-title': '910B2 cluster · port 9443',
+        'cluster-a-copy': '2 RDMA-connected eight-card nodes, with 16 Ascend 910B2 cards in total. This is an independent Coder frontend and workspace pool.',
         'cluster-a-link': 'Open the 9443 cluster',
         'cluster-b-kicker': 'Private cloud cluster B',
-        'cluster-b-title': '910B cluster · port 9450',
-        'cluster-b-copy': 'Independent Coder frontend and workspace pool. Sign in to view the resources currently assigned to your account.',
+        'cluster-b-title': '910B2 cluster · port 9450',
+        'cluster-b-copy': '4 RDMA-connected eight-card nodes, with 32 Ascend 910B2 cards in total. This is an independent Coder frontend and workspace pool.',
         'cluster-b-link': 'Open the 9450 cluster',
-        'resource-note-title': 'Capacity note',
-        'resource-note-copy': '“Dozens of 910B cards” describes the combined private-cloud inventory, not a guaranteed per-user allocation. Current availability is shown by each cluster frontend after sign-in.',
+        'resource-note-title': 'Inventory',
+        'resource-note-copy': '2 × 8 cards + 4 × 8 cards = 48 Ascend 910B2 cards. This is physical inventory, not a guaranteed per-user allocation; current availability is shown after sign-in.',
         'footer-copy': 'Private compute entrances for development and evaluation.'
       },
       zh: {
         title: '算力资源 - vLLM-HUST',
         'resources-eyebrow': '算力资源',
-        'resources-title': '两个私有云昇腾 910B 集群',
-        'resources-lede': '不同运营商的机器通过两个独立的 Coder 前端对外提供。两个资源池合计包含数十张昇腾 910B 加速卡。',
+        'resources-title': '两个私有云昇腾 910B2 集群',
+        'resources-lede': '两个 RDMA 互联资源池合计 48 张昇腾 910B2：9443 集群为 2 台 8 卡机器（共 16 卡），9450 集群为 4 台 8 卡机器（共 32 卡）。',
         'resources-guide-kicker': '选择正确入口',
         'resources-guide-title': '端口号对应不同集群',
         'resources-guide-copy': '9443 和 9450 不是同一服务的备用链接，而是两个不同集群的前端，背后机器属于不同运营商。请按工作区或项目分配使用对应入口。',
         'cluster-a-kicker': '私有云集群 A',
-        'cluster-a-title': '910B 集群 · 9443 端口',
-        'cluster-a-copy': '独立的 Coder 前端和工作区资源池。登录后可查看当前账号实际分配的资源。',
+        'cluster-a-title': '910B2 集群 · 9443 端口',
+        'cluster-a-copy': '2 台 RDMA 互联的 8 卡机器，合计 16 张昇腾 910B2。该入口对应独立的 Coder 前端和工作区资源池。',
         'cluster-a-link': '打开 9443 集群',
         'cluster-b-kicker': '私有云集群 B',
-        'cluster-b-title': '910B 集群 · 9450 端口',
-        'cluster-b-copy': '独立的 Coder 前端和工作区资源池。登录后可查看当前账号实际分配的资源。',
+        'cluster-b-title': '910B2 集群 · 9450 端口',
+        'cluster-b-copy': '4 台 RDMA 互联的 8 卡机器，合计 32 张昇腾 910B2。该入口对应独立的 Coder 前端和工作区资源池。',
         'cluster-b-link': '打开 9450 集群',
-        'resource-note-title': '容量说明',
-        'resource-note-copy': '“数十张 910B”描述的是两个私有云资源池的总规模，不代表每个用户都能占用这些资源。实时可用量以登录后的集群页面为准。',
+        'resource-note-title': '资源清单',
+        'resource-note-copy': '2 台 × 8 卡 + 4 台 × 8 卡 = 48 张昇腾 910B2。这是物理资源总量，不代表单个用户的保证配额；实时可用量以登录后的集群页面为准。',
         'footer-copy': '用于开发与评测的私有算力入口。'
       }
     };
   </script>
-  <script src="./assets/site.js?v=navigation-20261009"></script>
+  <script src="./assets/site.js?v=cluster-inventory-20261009"></script>
 </body>
 </html>
