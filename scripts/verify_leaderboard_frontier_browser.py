@@ -4,10 +4,18 @@
 import argparse
 import copy
 import json
+import math
 import time
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
+
+
+def mtp_state(point):
+    tokens = point["configuration"]["parameters"].get("mtp_draft_tokens")
+    if type(tokens) not in (int, float) or not math.isfinite(tokens) or tokens < 0:
+        return "unknown"
+    return "on" if tokens > 0 else "off"
 
 
 def ready(page):
@@ -50,7 +58,6 @@ def assert_concurrency_series(page, points, cohort=None):
     )
     groups = {}
     frontiers = {}
-    configuration_groups = {}
     contract = (cohort or {}).get("workload", {}).get("contract", {})
     shared_ids = set(contract.get("comparison_point_ids", []))
     configuration_comparison = contract.get("presentation") == "configuration-study"
@@ -64,15 +71,9 @@ def assert_concurrency_series(page, points, cohort=None):
             or "+".join(sorted(point["configuration"]["mods"]))
             or "none"
         )
-        if (
-            group == "betterscale"
-            and configuration_comparison
-            and point["id"] in shared_ids
+        if group == "betterscale" or (
+            configuration_comparison and point["id"] in shared_ids
         ):
-            key = (point["cohort_id"], point["load"].get("session_rotation_depth"))
-            configuration_groups.setdefault(key, []).append(point)
-            continue
-        if group == "betterscale":
             key = json.dumps(
                 [
                     point["cohort_id"],
@@ -102,20 +103,6 @@ def assert_concurrency_series(page, points, cohort=None):
         for series, members in groups.items()
         if len(members) > 1
     }
-    for members in configuration_groups.values():
-        members.sort(key=lambda p: p["load"]["concurrency"])
-        if len(members) < 2:
-            continue
-        first = members[0]
-        series = json.dumps(
-            [
-                first["cohort_id"],
-                first["load"]["concurrency_series"],
-                first["load"].get("session_rotation_depth"),
-            ],
-            separators=(",", ":"),
-        )
-        expected[series] = members
 
     def coordinates(point):
         return (
@@ -466,28 +453,27 @@ def main():
             if curves:
                 assert page.locator("#frontier-curves").get_attribute("href") == curves
             # Real control changes filter points and the derived envelope, not data.
-            for setting in ("on", "off", "all"):
-                page.locator("[data-filter=mtp][value=on]").set_checked(
-                    setting in ("on", "all")
-                )
-                page.locator("[data-filter=mtp][value=off]").set_checked(
-                    setting in ("off", "all")
-                )
+            mtp_choices = page.locator("[data-filter=mtp]").evaluate_all(
+                "nodes => nodes.map(n => n.value)"
+            )
+            for setting in (*mtp_choices, "all"):
+                for choice in mtp_choices:
+                    page.locator(f"[data-filter=mtp][value={choice}]").set_checked(
+                        setting == "all" or setting == choice
+                    )
                 expected = [
                     p
                     for p in default_points
-                    if setting == "all"
-                    or (
-                        p["configuration"]["parameters"].get("mtp_draft_tokens", -1) > 0
-                        if setting == "on"
-                        else p["configuration"]["parameters"].get("mtp_draft_tokens")
-                        == 0
-                    )
+                    if setting == "all" or mtp_state(p) == setting
                 ]
                 ids = page.locator("[data-point]").evaluate_all(
                     "nodes => nodes.map(n => n.dataset.point)"
                 )
-                assert set(ids) == {p["id"] for p in expected}
+                assert set(ids) == {p["id"] for p in expected}, {
+                    "mtp": setting,
+                    "unexpected": sorted(set(ids) - {p["id"] for p in expected}),
+                    "missing": sorted({p["id"] for p in expected} - set(ids)),
+                }
                 assert_concurrency_series(page, expected)
                 page.locator("#frontier-only").check()
                 shown = set(
@@ -527,12 +513,14 @@ def main():
             }
             for group in native_groups:
                 page.locator(f'[data-filter="mods"][value="{group}"]').uncheck()
-            page.locator("[data-filter=mtp][value=on]").uncheck()
+            for choice in mtp_choices:
+                page.locator(f"[data-filter=mtp][value={choice}]").set_checked(
+                    choice == "off"
+                )
             expected = [
                 p
                 for p in default_points
-                if p["configuration"]["mods"]
-                and p["configuration"]["parameters"].get("mtp_draft_tokens") == 0
+                if p["configuration"]["mods"] and mtp_state(p) == "off"
             ]
             assert set(
                 page.locator("[data-point]").evaluate_all(
@@ -667,8 +655,15 @@ def main():
                         == point["configuration"]["mod_sources"]
                     )
 
+                sampling_start = point["evidence"]["sampling_date_utc"]
+                sampling_end = point["evidence"].get("sampling_date_end_utc")
+                sampling_range = (
+                    f"{sampling_start} – {sampling_end}"
+                    if sampling_end and sampling_end != sampling_start
+                    else sampling_start
+                )
                 assert (
-                    f"{point['evidence']['sampling_date_utc']} (UTC)"
+                    f"{sampling_range} (UTC)"
                     in page.locator(".frontier-popup-date").inner_text()
                 )
 
@@ -764,6 +759,8 @@ def main():
                         .get("concurrency_series", "")
                         .startswith(contract["display_series_prefix"])
                     ]
+                if contract.get("presentation") == "configuration-study" and shared_ids:
+                    members = [p for p in members if p["id"] in shared_ids]
                 available_depths = sorted(
                     {
                         p["load"]["session_rotation_depth"]
@@ -793,6 +790,35 @@ def main():
                         assert page.locator(
                             f'[data-filter="rotation"][value="{depth}"]'
                         ).is_checked()
+                if contract.get("presentation") == "configuration-study" and shared_ids:
+
+                    def coords(p):
+                        return (
+                            p["metrics"]["decode_p90_tps"],
+                            p["metrics"]["output_tps"]
+                            / p["configuration"]["hardware"]["accelerator_count"],
+                        )
+
+                    def group(p):
+                        return (
+                            p["cohort_id"],
+                            p["load"].get("presentation_group", {}).get("id")
+                            or "+".join(sorted(p["configuration"]["mods"]))
+                            or "none",
+                            p["load"].get("session_rotation_depth"),
+                        )
+
+                    members = [
+                        p
+                        for p in members
+                        if not any(
+                            group(q) == group(p)
+                            and coords(q)[0] >= coords(p)[0]
+                            and coords(q)[1] >= coords(p)[1]
+                            and coords(q) != coords(p)
+                            for q in members
+                        )
+                    ]
                 rendered_point_count = page.locator(".frontier-point").count()
                 assert rendered_point_count == len(members), (
                     cohort["id"],

@@ -13,6 +13,7 @@ PORTFOLIO = json.loads(
 )
 PAGE = (ROOT / "plugins.html").read_text(encoding="utf-8")
 SCRIPT = (ROOT / "assets" / "plugins-page.js").read_text(encoding="utf-8")
+CATALOG_SCRIPT = (ROOT / "assets" / "ecosystem-catalog.js").read_text(encoding="utf-8")
 STYLES = (ROOT / "assets" / "plugins.css").read_text(encoding="utf-8")
 WORKSHOP_METADATA = json.loads(
     (ROOT / "data" / "plugin-workshop-metadata.json").read_text(encoding="utf-8")
@@ -87,9 +88,17 @@ def test_legacy_migration_cards_preserve_original_ownership() -> None:
         component = by_id(component_id)
         assert component["ownership"] == "original_contributor_maintained"
         assert component["maintainers"] == maintainers
-        assert component["delivery_model"] == "migration_scaffold"
+        expected_delivery = (
+            "plugin_bundle"
+            if component_id in {"knorm-migration", "pyramidkv-ascend-migration"}
+            else "migration_scaffold"
+        )
+        assert component["delivery_model"] == expected_delivery
         assert component["maturity"] == "incubating"
-        assert "Repository scaffold only" in component["summary_en"]
+        if expected_delivery == "migration_scaffold":
+            assert "Repository scaffold only" in component["summary_en"]
+        else:
+            assert "ECPA 0.3" in component["summary_en"]
 
     assert "Original maintainers" in SCRIPT
     assert "原负责人" in SCRIPT
@@ -228,7 +237,7 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "https://github.com/vLLM-HUST/pegaflow-hust"
     )
     assert pegaflow_connectors["integration_contracts"] == [
-        "vllm_hust.extension_manifest.v0.2-experimental"
+        "vllm_hust.extension_manifest.v0.3-experimental"
     ]
     assert pegaflow_connectors["integration_surfaces"] == [
         "vllm_hust_ext.providers",
@@ -239,6 +248,10 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert (
         "external operator retains service lifecycle"
         in pegaflow_connectors["summary_en"]
+    )
+    assert any(
+        "ECPA Bundle 0.3 @ 14ca1d4" in version
+        for version in pegaflow_connectors["compatibility"]["versions"]
     )
 
     assert "KV connector" in PAGE
@@ -314,7 +327,7 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     assert "19.29%" in diffspec["public_effect_en"]
     assert diffspec["public_effect_status"] == "not-beneficial-in-tested-cell"
     assert vspec["integration_contracts"] == [
-        "vllm_hust.extension_manifest.v0.2-experimental"
+        "vllm_hust.extension_manifest.v0.3-experimental"
     ]
     assert vspec["integration_surfaces"] == [
         "vllm.general_plugins",
@@ -452,23 +465,28 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
     assert 'element("details", "plugin-technical-details")' in SCRIPT
     assert 'element("summary", "", copy().details)' in SCRIPT
     assert "copy().installRun" in SCRIPT
-    assert "Read it like a MOD catalog" in PAGE
-    assert "像查看 MOD 一样选择扩展" in PAGE
+    assert "Start with your workload" in PAGE
+    assert "从你的 Workload 开始" in PAGE
     assert ".plugin-compatibility-facts" in STYLES
     assert ".mod-catalog-guide" in STYLES
 
 
 def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert 'let selectedType = "extensions"' in SCRIPT
-    assert "const isWorkshopMod = (item)" in SCRIPT
-    assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
-    assert 'item.repository_relationship === "organization_native"' in SCRIPT
-    assert '"source_toolkit"' in SCRIPT
+    assert (
+        "const isWorkshopMod = item => window.EcosystemCatalog.isWorkshopMod(item)"
+        in SCRIPT
+    )
+    assert (
+        '["runtime_component", "bridge"].includes(item.artifact_type)' in CATALOG_SCRIPT
+    )
+    assert 'item.repository_relationship === "organization_native"' in CATALOG_SCRIPT
+    assert '"source_toolkit"' in CATALOG_SCRIPT
     assert 'element("div", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert "function coverTone(item)" in SCRIPT
     assert ".workshop-tone-lagoon .workshop-cover" in STYLES
-    assert '"plugins-title": zh ? "扩展工坊" : "Extension Workshop"' in SCRIPT
+    assert '"plugins-title": zh ? "MOD 工坊" : "MOD Workshop"' in SCRIPT
     assert 'body[data-page="plugins"] .technical-highlights' in STYLES
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
@@ -536,9 +554,11 @@ def test_workshop_supports_workload_guided_discovery() -> None:
 
 def test_workshop_adds_only_measured_connectors_to_the_mod_catalog() -> None:
     assert "isWorkshopMod(item) && matchesSelectedType(item)" in SCRIPT
-    assert '["runtime_component", "bridge"].includes(item.artifact_type)' in SCRIPT
-    assert "|| isToolMod(item)" in SCRIPT
-    assert '"source_toolkit"' in SCRIPT
+    assert (
+        '["runtime_component", "bridge"].includes(item.artifact_type)' in CATALOG_SCRIPT
+    )
+    assert "|| isToolMod(item)" in CATALOG_SCRIPT
+    assert '"source_toolkit"' in CATALOG_SCRIPT
     assert (
         "Independent vLLM-HUST extensions and manager-tested carriers appear here."
         in PAGE
@@ -605,7 +625,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
     assert kvcompress["advisors"] == [
         {"name_zh": "万瑶", "name_en": "Yao Wan", "relationship": "internal"}
     ]
-    assert "knorm-migration" not in WORKSHOP_METADATA["plugins"]
+    assert "knorm-migration" in WORKSHOP_METADATA["plugins"]
     assert {
         advisor["name_zh"]
         for advisor in WORKSHOP_METADATA["plugins"]["quantized-kv-cache-migration"][
@@ -740,7 +760,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     ]
     assert remote_sidecar["evidence_level"] == "integration_tested"
     assert local_host["evidence_level"] == "integration_tested"
-    assert "control plane makes external decisions through a narrow bridge" in PAGE
+    assert "control-plane tools distinct" in PAGE
     assert "admission" in PAGE
     assert "local host still owns HMAC, schemas, authorization, replay" in PAGE
     assert "catalog separates three layers" in PAGE
@@ -752,13 +772,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=plugin-observations-20260930"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=ecpa-final-20261009"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=plugin-observations-20260930"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=ecpa-final-20261009"'
         in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=plugin-observations-20260930"'
+        'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009"'
         in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
@@ -779,6 +799,10 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
     repo = "https://github.com/vLLM-HUST/ascend-distributed-metadata"
     assert adm["canonical_repository"] == repo
     assert adm["delivery_model"] == "python_distribution"
+    assert adm["integration_contracts"] == [
+        "vllm_hust.extension_manifest.v0.3-experimental"
+    ]
+    assert "vllm_hust.extension_bundles" in adm["integration_surfaces"]
     assert adm["maturity"] == "experimental"
     assert adm["compatibility"]["status"] == "verified"
     assert any(
@@ -787,6 +811,11 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
     )
     assert "previous published MOD" in adm["public_effect_en"]
     assert "not establish general speedup" in adm["public_effect_en"]
+    assert any(
+        "ECPA 0.3 package 462e0750" in version
+        for version in adm["compatibility"]["versions"]
+    )
+    assert "clean-wheel tested" in adm["compatibility"]["requirements_en"]
     assert WORKLOAD_NAVIGATION["plugins"]["adm"] == ["distributed_pipeline"]
     assert WORKSHOP_METADATA["plugins"]["adm"]["repository_url"] == repo
     assert (
@@ -816,7 +845,7 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 56
+    assert len(PORTFOLIO["repositories"]) == 57
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "extension-manager",
@@ -900,6 +929,7 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         assert component["canonical_repository"] == repository["url"]
         promoted_statuses = {
             "quantized-kv-cache-migration": "experimental",
+            "kv-transfer-observability-migration": "experimental",
             "pipeline-microbatch-migration": "verified",
             "scheduler-policy-lab": "source_scaffold",
         }
@@ -918,7 +948,7 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
 
 
 def test_extension_standard_covers_core_and_host_providers() -> None:
-    assert "Manifest `0.2-experimental`" in LEGACY_STANDARD
+    assert "Manifest `0.3-experimental`" in LEGACY_STANDARD
     assert "Core + Host Provider" in LEGACY_STANDARD
     assert "vllm_hust_ext.providers" in LEGACY_STANDARD
     assert "former entry-point-based Plugin Standard 1.0" in PAGE
@@ -946,10 +976,10 @@ def test_extension_standard_covers_core_and_host_providers() -> None:
 
 
 def test_public_copy_uses_ecosystem_language() -> None:
-    assert "Serving Ecosystem Architecture" in PAGE
-    assert "推理生态系统架构" in PAGE
-    assert "Classify the role before the delivery mechanism." in PAGE
-    assert "Plugin, connector, and control plane are different concepts." in PAGE
+    assert "MOD Workshop" in PAGE
+    assert "MOD 工坊" in PAGE
+    assert "Find the right extension without losing sight of who runs it." in PAGE
+    assert "插件、connector 与 control plane 承担不同角色。" in PAGE
 
 
 def test_candidate_architecture_links_use_the_published_docs_branch() -> None:
@@ -1031,7 +1061,7 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
         )
 
     pyramid = by_id("pyramidkv-ascend-migration")
-    assert pyramid["public_surface"] is False
+    assert pyramid["public_surface"] is True
     assert pyramid["maintainer_profiles"] == [{"login": "Irisuko", "name": "毛潮云"}]
     assert any(
         advisor["name_zh"] == "罗瑞坤" and advisor["relationship"] == "internal"
@@ -1058,7 +1088,6 @@ def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> Non
         "simllm-migration",
         "unified-communication-migration",
         "split-batch-full-graph-migration",
-        "kv-transfer-observability-migration",
         "layered-prefill-migration",
         "activation-sparsity-migration",
         "qos-scheduler-migration",
@@ -1093,7 +1122,7 @@ def test_promoted_runtime_entries_publish_current_hardware_contracts() -> None:
     assert pipeline["compatibility"]["followup_url"].endswith("/issues/3")
 
 
-def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
+def test_compatibility_gaps_follow_current_repository_contracts() -> None:
     kvcompress = by_id("kvcompress-ascend")["compatibility"]
     assert kvcompress["status"] == "verified"
     assert kvcompress["versions"] == [
@@ -1111,8 +1140,8 @@ def test_four_compatibility_gaps_follow_current_repository_contracts() -> None:
         "pyramidkv-ascend-migration",
     ):
         compatibility = by_id(component_id)["compatibility"]
-        assert compatibility["status"] == "source_scaffold"
-        assert compatibility["versions"] == ["No installable or runnable release"]
+        assert compatibility["status"] == "inspect_only"
+        assert compatibility["versions"][0].startswith("ECPA 0.3 package ")
 
 
 def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
@@ -1144,7 +1173,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 18
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 27
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1154,11 +1183,7 @@ def test_non_runnable_descriptors_scaffolds_and_legacy_carriers_are_not_publishe
     unpublished = {
         "ascend-adaptive-quantized-kv",
         "ascend-quant-runtime-descriptor",
-        "knorm-migration",
-        "kv-transfer-observability-migration",
-        "pyramidkv-ascend-migration",
         "dla",
-        "kv-tiering-migration",
     }
     for component_id in unpublished:
         assert by_id(component_id)["public_surface"] is False
@@ -1180,11 +1205,12 @@ def test_performance_evidence_cannot_override_the_publication_gate():
         "vspec",
     }
     assert "performanceResults.has(item.id)" in SCRIPT
-    assert "if (item.public_surface === false) return false;" in SCRIPT
+    assert "if (!item || item.public_surface === false) return false;" in CATALOG_SCRIPT
+    assert "performanceResults" not in CATALOG_SCRIPT
     assert "Math.max(pageSize, measuredCount)" in SCRIPT
     performance_ids = {item["id"] for item in PLUGIN_PERFORMANCE["entries"]}
     assert measured <= performance_ids
-    hidden_measured = {"dla", "kv-tiering-migration"}
+    hidden_measured = {"dla"}
     assert all(
         by_id(component_id)["public_surface"] is False
         for component_id in hidden_measured
@@ -1227,14 +1253,14 @@ def test_performance_defaults_match_catalog_models_and_evidence_sources() -> Non
 
 
 def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -> None:
-    assert "plugin-performance.js?v=plugin-observations-20260930" in PAGE
-    assert "plugin-performance.json?v=plugin-observations-20260930" in SCRIPT
-    assert "leaderboard_frontier.json?v=plugin-observations-20260930" in SCRIPT
+    assert "plugin-performance.js?v=ecpa-final-20261009" in PAGE
+    assert "plugin-performance.json?v=ecpa-final-20261009" in SCRIPT
+    assert "leaderboard_frontier.json?v=ecpa-final-20261009" in SCRIPT
     assert '{ cache: "no-cache" }' in SCRIPT
     assert "benchmark-settings-20260929" not in SCRIPT
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
-    assert PAGE.count("plugin-observations-20260930") >= 5
+    assert PAGE.count("ecpa-final-20261009") >= 5
 
 
 def test_bidkv_copy_reports_the_new_cell_without_erasing_old_boundaries() -> None:
@@ -1258,8 +1284,8 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
     item = by_id("traceloom")
     assert item["artifact_type"] == "runtime_component"
     assert item["system_role"] == "profiling_analysis"
-    assert '"profiling_analysis"' in SCRIPT
-    assert '"telemetry_provider"' in SCRIPT
+    assert '"profiling_analysis"' in CATALOG_SCRIPT
+    assert '"telemetry_provider"' in CATALOG_SCRIPT
     assert item["delivery_model"] == "python_distribution"
     assert item["documentation_url"] == "./traceloom.html"
     assert item["compatibility"]["status"] == "experimental"
@@ -1285,9 +1311,9 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
 def test_tool_mods_are_grouped_without_performance_placeholders():
     profiler = by_id("request-lifecycle-profiler")
     assert profiler["system_role"] == "telemetry_provider"
-    assert '"offline_model_quantization"' in SCRIPT
-    assert '"model_artifact_preparation"' in SCRIPT
-    assert '"lifecycle_control_plane"' in SCRIPT
+    assert '"offline_model_quantization"' in CATALOG_SCRIPT
+    assert '"model_artifact_preparation"' in CATALOG_SCRIPT
+    assert '"lifecycle_control_plane"' in CATALOG_SCRIPT
     assert "if (!isToolMod(item))" in SCRIPT
     assert "appendGroup(copy().performanceMods" in SCRIPT
     assert "appendGroup(copy().toolMods" in SCRIPT
@@ -1296,8 +1322,12 @@ def test_tool_mods_are_grouped_without_performance_placeholders():
         "ascend-quant-toolkit",
         "slicegpt-migration",
         "request-lifecycle-profiler",
+        "kv-transfer-observability-migration",
         "traceloom",
         "clm-lifecycle",
+        "tricard-clm-lifecycle",
+        "quality-bounded-inference",
+        "llm-serving-cost-pricing-model",
     }
     assert all(
         by_id(component_id).get("public_surface", True)
@@ -1305,6 +1335,72 @@ def test_tool_mods_are_grouped_without_performance_placeholders():
     )
     assert visible_tools <= set(WORKLOAD_NAVIGATION["plugins"])
     assert by_id("scheduler-policy-lab")["public_surface"] is False
+
+
+def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
+    profiler = by_id("request-lifecycle-profiler")
+    assert profiler["compatibility"]["status"] == "experimental"
+    assert "7c6155b7" in profiler["compatibility"]["versions"][1]
+    assert "actual finish, preemption, or KV-reclaim callback" in profiler["summary_en"]
+
+    kv_observer = by_id("kv-transfer-observability-migration")
+    assert kv_observer["public_surface"] is True
+    assert kv_observer["compatibility"]["status"] == "experimental"
+    assert "529ab282" in kv_observer["compatibility"]["versions"][0]
+    assert "worker-local" in kv_observer["summary_en"]
+
+    tricard = by_id("tricard-clm-lifecycle")
+    assert tricard["compatibility"]["status"] == "experimental"
+    assert "1d141da1" in tricard["compatibility"]["versions"][1]
+    assert "external controller remains operator-owned" in tricard["summary_en"]
+
+    quality = by_id("quality-bounded-inference")
+    assert quality["compatibility"]["status"] == "inspect_only"
+    assert "b2ed0136" in quality["compatibility"]["versions"][1]
+    assert "remain fail closed" in quality["summary_en"]
+    assert (
+        "before a mechanism may be treated as activated"
+        in quality["compatibility"]["requirements_en"]
+    )
+    assert quality["maturity"] == "incubating"
+    assert quality["compatibility"]["status"] not in {
+        "ready",
+        "verified",
+        "experimental",
+    }
+
+    cost = by_id("llm-serving-cost-pricing-model")
+    assert cost["compatibility"]["status"] == "inspect_only"
+    assert "1559df80" in cost["compatibility"]["versions"][1]
+    assert "removes the misleading in-process load marker" in cost["summary_en"]
+
+    assert (
+        WORKSHOP_METADATA["plugins"]["tricard-clm-lifecycle"]["repository_url"]
+        == tricard["canonical_repository"]
+    )
+    assert (
+        '"request-lifecycle-profiler": "org.vllm-hust.request-lifecycle-profiler"'
+        in SCRIPT
+    )
+    assert (
+        '"quality-bounded-inference": "org.intellistream.quality-bounded-inference"'
+        in SCRIPT
+    )
+    assert (
+        '"llm-serving-cost-pricing-model": '
+        '"org.vllm-hust.llm-serving-cost-pricing-model"'
+    ) in SCRIPT
+    assert "extension enable org.vllm-hust.tricard-clm" in SCRIPT
+    assert "extension plan org.vllm-hust.tricard-clm" in SCRIPT
+    assert "external controller remains operator-owned" in SCRIPT
+    assert "extension enable org.vllm-hust.ascend-distributed-metadata" in SCRIPT
+    assert "import or enablement alone is not runtime-effective evidence" in SCRIPT
+    for component_id in (
+        "tricard-clm-lifecycle",
+        "quality-bounded-inference",
+        "llm-serving-cost-pricing-model",
+    ):
+        assert component_id in WORKLOAD_NAVIGATION["plugins"]
 
 
 def test_clm_is_cataloged_as_a_tool_control_plane_without_a_speedup_claim():

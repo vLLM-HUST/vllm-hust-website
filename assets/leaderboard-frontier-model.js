@@ -114,7 +114,8 @@
     function presentationPoints(points, cohort) {
         // Reuse immutable measurements in a study without moving or duplicating source records.
         const shared = new Set(cohort?.workload?.contract?.comparison_point_ids || []);
-        const members = points.filter(point => point.cohort_id === cohort?.id || shared.has(point.id));
+        const members = points.filter(point => shared.size && cohort?.workload?.contract?.presentation === 'configuration-study'
+            ? shared.has(point.id) : point.cohort_id === cohort?.id || shared.has(point.id));
         const series = cohort?.workload?.contract?.display_series_ids;
         if (series) return members.filter(point => series.includes(point.load.concurrency_series));
         const prefix = cohort?.workload?.contract?.display_series_prefix;
@@ -192,12 +193,9 @@
         const shared = cohort?.workload?.contract?.comparison_point_ids;
         if (cohort?.workload?.contract?.presentation === 'configuration-study') {
             const comparison = rows.filter(row => shared?.includes(row.point.id));
-            const native = comparison.filter(row => groupKey(row.point) !== 'betterscale');
-            const better = comparison.filter(row => groupKey(row.point) === 'betterscale');
-            const depths = [...new Set(better.map(row => row.point.load.session_rotation_depth))];
-            return [...concurrencySeries(native), ...depths.map(depth => better
-                .filter(row => row.point.load.session_rotation_depth === depth)
-                .sort((a,b) => a.point.load.concurrency - b.point.load.concurrency)).filter(line => line.length > 1)];
+            // One best-trade-off envelope per MOD and depth, not a fixed-capacity sweep.
+            return groupFrontiers(comparison.map(row => row.point), xKey, yKey)
+                .filter(line => line.length > 1);
         }
         const betterScale = rows.filter(row => groupKey(row.point) === 'betterscale');
         return [...concurrencySeries(rows.filter(row => groupKey(row.point) !== 'betterscale')),

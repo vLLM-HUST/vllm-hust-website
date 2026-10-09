@@ -25,15 +25,7 @@
   let selectedWorkload = "all";
   let expanded = false;
   const pageSize = 9;
-  const toolModRoles = new Set([
-    "lifecycle_control_plane",
-    "model_artifact_preparation",
-    "offline_model_quantization",
-    "profiling_analysis",
-    "scheduler_policy_research",
-    "telemetry_provider"
-  ]);
-  const isToolMod = item => toolModRoles.has(item.system_role);
+  const isToolMod = item => window.EcosystemCatalog.isToolMod(item);
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -175,29 +167,7 @@
     applications_research: { en: "Applications and research", zh: "应用与研究" }
   };
 
-  const isWorkshopMod = (item) => {
-    if (item.public_surface === false) return false;
-    return (
-      performanceResults.has(item.id)
-      || (
-        item.artifact_type === "bridge"
-        && item.compatibility?.status === "verified"
-        && String(item.canonical_repository || "").startsWith("https://github.com/")
-      )
-      || (
-      (
-        ["runtime_component", "bridge"].includes(item.artifact_type)
-        || isToolMod(item)
-      )
-      && item.repository_relationship === "organization_native"
-      && [
-        "plugin_bundle", "python_distribution", "migration_scaffold",
-        "source_patch", "source_toolkit"
-      ].includes(item.delivery_model)
-      && String(item.canonical_repository || "").startsWith("https://github.com/vLLM-HUST/")
-      )
-    );
-  };
+  const isWorkshopMod = item => window.EcosystemCatalog.isWorkshopMod(item);
   const compatibilityLabels = {
     ready: { en: "Ready", zh: "可用" },
     verified: { en: "Verified", zh: "已验证" },
@@ -254,6 +224,34 @@ vllm serve /path/to/model --async-scheduling \
 vllm-hust-ext extension inspect org.vllm-hust.clm-lifecycle
 vllm-hust-ext extension check org.vllm-hust.clm-lifecycle
 export VLLM_PLUGINS=ascend,clm_lifecycle`
+    },
+    adm: {
+      title_en: "Inspect and stage Ascend Distributed Metadata",
+      title_zh: "检查并暂存昇腾分布式元数据 MOD",
+      action_en: "ECPA staging commands",
+      action_zh: "ECPA 暂存命令",
+      note_en: "This records activation intent only. Launch requires the exact qualified vLLM-HUST and vLLM-Ascend-HUST revisions; import or enablement alone is not runtime-effective evidence and does not broaden the published DP4 result.",
+      note_zh: "这里只记录启用意图。启动仍要求精确匹配已验收的 vLLM-HUST 与 vLLM-Ascend-HUST 提交；仅导入或启用不是 runtime_effective 证据，也不会扩大已发布的 DP4 结果。",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+python -m pip install "git+https://github.com/vLLM-HUST/ascend-distributed-metadata.git@462e0750faf7eea6317b13b692fb3326894d5796"
+vllm-hust-ext extension inspect org.vllm-hust.ascend-distributed-metadata
+vllm-hust-ext extension check org.vllm-hust.ascend-distributed-metadata
+vllm-hust-ext extension enable org.vllm-hust.ascend-distributed-metadata
+vllm-hust-ext extension plan org.vllm-hust.ascend-distributed-metadata`
+    },
+    "tricard-clm-lifecycle": {
+      title_en: "Inspect and stage Tricard CLM Lifecycle",
+      title_zh: "检查并暂存 Tricard CLM 生命周期插件",
+      action_en: "ECPA staging commands",
+      action_zh: "ECPA 暂存命令",
+      note_en: "The external controller remains operator-owned. Enablement records intent; runtime effectiveness still requires an observer receipt owned by the launched host process.",
+      note_zh: "外部 controller 仍由 operator 管理。enable 只记录意图；运行生效仍须由启动后的宿主进程提供其自有 observer receipt。",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+python -m pip install "git+https://github.com/vLLM-HUST/Tricard.git@1d141da1c427a18859643b056b5514f5ebf511ce#subdirectory=plugins/vllm-clm"
+vllm-hust-ext extension inspect org.vllm-hust.tricard-clm
+vllm-hust-ext extension check org.vllm-hust.tricard-clm
+vllm-hust-ext extension enable org.vllm-hust.tricard-clm
+vllm-hust-ext extension plan org.vllm-hust.tricard-clm`
     },
     betterscale: {
       guide: "./betterscale.html#install-qwen",
@@ -413,7 +411,10 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
     "pipeline-microbatch-migration": "org.vllm-hust.pipeline-microbatch",
     "qos-scheduler-migration": "org.vllm-hust.qos-scheduler",
     "stateharbor": "org.vllm-hust.stateharbor",
-    "clm-lifecycle": "org.vllm-hust.clm-lifecycle"
+    "clm-lifecycle": "org.vllm-hust.clm-lifecycle",
+    "request-lifecycle-profiler": "org.vllm-hust.request-lifecycle-profiler",
+    "quality-bounded-inference": "org.intellistream.quality-bounded-inference",
+    "llm-serving-cost-pricing-model": "org.vllm-hust.llm-serving-cost-pricing-model"
   };
 
   const valueLabel = (value) => String(value).replaceAll("_", " ");
@@ -1079,10 +1080,12 @@ vllm-hust-ext extension check ${extensionId}`
   function renderPageLabels() {
     const zh = language() === "zh";
     const values = {
-      "plugins-eyebrow": zh ? "vLLM-HUST 扩展" : "vLLM-HUST Extensions",
-      "plugins-title": zh ? "扩展工坊" : "Extension Workshop",
-      "plugins-fact-items": zh ? "个目录组件" : "catalog entries",
-      "plugins-fact-runtime": zh ? "个已支持" : "supported"
+      "plugins-eyebrow": zh ? "vLLM-HUST MOD 目录" : "vLLM-HUST MOD catalog",
+      "plugins-title": zh ? "MOD 工坊" : "MOD Workshop",
+      "plugins-fact-items": zh ? "个公开 MOD" : "public MODs",
+      "plugins-fact-runtime": zh ? "个兼容性已验证" : "compatibility verified",
+      "plugins-fact-review": zh ? "个实验性或仅检查" : "experimental or inspection-only",
+      "plugins-fact-publications": zh ? "项硬件或性能证据" : "hardware/performance evidence"
     };
     Object.entries(values).forEach(([id, value]) => {
       const node = document.getElementById(id);
@@ -1107,8 +1110,8 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=plugin-observations-20260930", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
-      fetch("./data/leaderboard_frontier.json?v=plugin-observations-20260930", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
+      fetch("./data/plugin-performance.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
     .then(([payload, metadata, navigation, performance]) => {
@@ -1144,10 +1147,11 @@ vllm-hust-ext extension check ${extensionId}`
       workloadNavigation = navigation;
       renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
-      document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(payload.components.length); });
-      const supported = payload.components.filter((item) => ["supported", "verified"].includes(item.maturity)).length;
-      const incubating = payload.components.filter((item) => ["concept", "incubating", "experimental"].includes(item.maturity)).length;
-      const evidence = payload.components.filter((item) => ["hardware_verified", "performance_verified", "production_observed"].includes(item.evidence_level)).length;
+      const catalogSummary = window.EcosystemCatalog.summarize(payload);
+      document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(catalogSummary.total); });
+      const supported = catalogSummary.verified;
+      const incubating = catalogSummary.evaluating;
+      const evidence = catalogSummary.evidenced;
       const external = payload.components.filter((item) => item.artifact_type === "external_system").length;
       document.querySelectorAll("[data-runtime-count]").forEach((node) => { node.textContent = String(supported).padStart(2, "0"); });
       document.querySelectorAll("[data-review-target-count]").forEach((node) => { node.textContent = String(incubating).padStart(2, "0"); });

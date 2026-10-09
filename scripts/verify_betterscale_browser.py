@@ -347,9 +347,13 @@ def main():
         ) == [
             "ascend-quant-toolkit",
             "clm-lifecycle",
+            "kv-transfer-observability-migration",
+            "llm-serving-cost-pricing-model",
+            "quality-bounded-inference",
             "request-lifecycle-profiler",
             "slicegpt-migration",
             "traceloom",
+            "tricard-clm-lifecycle",
         ]
         assert tool_section.locator(".plugin-performance").count() == 0
         assert page.locator(".plugin-category-performance #clm-lifecycle").count() == 0
@@ -362,10 +366,29 @@ def main():
             in clm.locator(".plugin-launch-tooltip").text_content()
         )
         clm.locator(".plugin-launch-icon").click()
-        assert page.locator(".workshop-card").evaluate_all(
-            "cards => cards.slice(0, 10).map(card => card.id)"
-        ) == [
-            "vspec",
+        tricard = tool_section.locator("#tricard-clm-lifecycle")
+        tricard.locator(".plugin-launch-icon").click()
+        tricard_commands = tricard.locator(".plugin-launch-tooltip").text_content()
+        assert "extension enable org.vllm-hust.tricard-clm" in tricard_commands
+        assert "extension plan org.vllm-hust.tricard-clm" in tricard_commands
+        tricard.locator(".plugin-launch-icon").click()
+        for inspect_only_id in (
+            "request-lifecycle-profiler",
+            "quality-bounded-inference",
+            "llm-serving-cost-pricing-model",
+        ):
+            inspect_only = tool_section.locator(f"#{inspect_only_id}")
+            inspect_only.locator(".plugin-launch-icon").click()
+            commands = inspect_only.locator(".plugin-launch-tooltip").text_content()
+            assert "extension inspect" in commands
+            assert "extension check" in commands
+            assert "extension enable" not in commands
+            inspect_only.locator(".plugin-launch-icon").click()
+        visible_ids = page.locator(".workshop-card").evaluate_all(
+            "cards => cards.map(card => card.id)"
+        )
+        assert visible_ids[0] == "vspec"
+        assert {
             "betterscale",
             "bidkv",
             "pipeline-microbatch-migration",
@@ -375,7 +398,10 @@ def main():
             "kvcompress-ascend",
             "diffspec",
             "latchmoe",
-        ]
+            "knorm-migration",
+            "kv-tiering-migration",
+            "pyramidkv-ascend-migration",
+        } <= set(visible_ids)
         assert "+42.39%" in page.locator("#betterscale").inner_text()
         assert "+9.78%" in page.locator("#pipeline-microbatch-migration").inner_text()
         assert "+6.34%" in page.locator("#pegaflow-vllm-connectors").inner_text()
