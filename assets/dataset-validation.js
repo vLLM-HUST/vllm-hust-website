@@ -318,7 +318,7 @@
     }
 
     function fetchJson(url) {
-        return fetch(url).then((response) => {
+        return fetch(url, { cache: 'no-cache' }).then((response) => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         });

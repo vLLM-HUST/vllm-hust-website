@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import http.client
 import importlib.util
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = ROOT / "scripts" / "sync_plugin_workshop_metadata.py"
@@ -11,6 +14,42 @@ SPEC = importlib.util.spec_from_file_location(
 assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
+
+
+def test_github_client_retries_connection_resets(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Response:
+        headers = {}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return b'[{"ok": true}]'
+
+    attempts = iter(
+        [
+            http.client.RemoteDisconnected("reset one"),
+            http.client.RemoteDisconnected("reset two"),
+            Response(),
+        ]
+    )
+
+    def open_once(*_args, **_kwargs):
+        result = next(attempts)
+        if isinstance(result, Exception):
+            raise result
+        return result
+
+    monkeypatch.setattr(MODULE.urllib.request, "urlopen", open_once)
+    monkeypatch.setattr(MODULE.time, "sleep", lambda _seconds: None)
+
+    payload, _ = MODULE.GitHubClient().get_json("/test")
+    assert payload == [{"ok": True}]
 
 
 def test_extract_github_handles_ignores_teams_and_deduplicates() -> None:
@@ -27,27 +66,23 @@ def test_repository_slug_discards_subdirectory_paths() -> None:
     )
 
 
-def test_workshop_filter_accepts_org_bridges_but_excludes_external_systems() -> None:
+def test_workshop_filter_matches_public_catalog_people_cards() -> None:
     base = {
         "artifact_type": "runtime_component",
         "repository_relationship": "organization_native",
         "delivery_model": "plugin_bundle",
         "canonical_repository": "https://github.com/vLLM-HUST/example-mod",
+        "maintainers": ["maintainer"],
     }
     assert MODULE.is_workshop_mod(base)
     assert MODULE.is_workshop_mod({**base, "artifact_type": "bridge"})
-    assert not MODULE.is_workshop_mod(
-        {
-            **base,
-            "artifact_type": "bridge",
-            "repository_relationship": "official_upstream",
-        }
+    assert MODULE.is_workshop_mod({**base, "artifact_type": "external_system"})
+    assert MODULE.is_workshop_mod({**base, "artifact_type": "tool"})
+    assert MODULE.is_workshop_mod(
+        {**base, "canonical_repository": "https://github.com/example/example-mod"}
     )
-    assert not MODULE.is_workshop_mod({**base, "artifact_type": "external_system"})
     assert not MODULE.is_workshop_mod({**base, "public_surface": False})
-    assert not MODULE.is_workshop_mod(
-        {**base, "canonical_repository": "https://github.com/vllm-project/vllm"}
-    )
+    assert not MODULE.is_workshop_mod({**base, "maintainers": []})
 
 
 def test_prune_snapshot_keeps_only_current_public_workshop_mods() -> None:
@@ -56,6 +91,7 @@ def test_prune_snapshot_keeps_only_current_public_workshop_mods() -> None:
         "repository_relationship": "organization_native",
         "delivery_model": "plugin_bundle",
         "canonical_repository": "https://github.com/vLLM-HUST/example-mod",
+        "maintainers": ["maintainer"],
     }
     registry = {
         "components": [

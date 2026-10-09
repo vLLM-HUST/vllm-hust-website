@@ -964,7 +964,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=project-grouping-20261009" in PAGE
-    assert "plugins-page.js?v=project-grouping-20261009" in PAGE
+    assert "plugins-page.js?v=data-freshness-20261009" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1480,7 +1480,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
     assert len(WORKLOAD_NAVIGATION["plugins"]) == 31
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
-    assert by_id("betterscale")["repository_visibility"] == "public"
+    assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
 
 

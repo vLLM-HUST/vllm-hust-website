@@ -1569,7 +1569,7 @@
         }
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/BetterScale",
-      "repository_visibility": "public",
+      "repository_visibility": "private",
       "upstream_repository": null,
       "documentation_url": "./betterscale.html",
       "summary_en": "Less host waiting. More device execution. BetterScale publishes separate bounded observations for DeepSeek V4 Flash and a Qwen3.5 TP2 small-fish prototype; their models, runtimes and protocols are not pooled.",

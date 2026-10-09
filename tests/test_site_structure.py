@@ -912,6 +912,60 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
     assert "--check" in script
     assert "leaderboard-data/dataset-validation" in workflow
     assert "python scripts/sync_dataset_validation_snapshots.py" in workflow
+    assert "id: create-pull-request" in workflow
+    assert "gh pr merge" in workflow
+    assert "--auto" in workflow
+    assert "group: website-data-writers" in workflow
+
+
+def test_scheduled_site_data_refreshes_are_self_healing() -> None:
+    root = Path(__file__).resolve().parents[1]
+    workflows = root / ".github" / "workflows"
+    status = (workflows / "site-status-check.yml").read_text(encoding="utf-8")
+    plugin = (workflows / "sync-plugin-workshop-metadata.yml").read_text(
+        encoding="utf-8"
+    )
+    versions = (workflows / "sync-version-meta.yml").read_text(encoding="utf-8")
+
+    assert "python scripts/refresh_site_status.py --refresh" in status
+    assert "tests/test_site_status_refresh.py" in status
+    assert 'git commit -m "chore: refresh public site snapshots"' in status
+    assert "contents: write" in status
+    assert "tests/test_sync_plugin_workshop_metadata.py" in plugin
+    assert "tests/test_plugins_page.py" in plugin
+    assert "bash scripts/check_stale_versions.sh" in versions
+    for workflow in (status, plugin, versions):
+        assert "group: website-data-writers" in workflow
+        assert "git pull --rebase origin main" in workflow
+
+
+def test_runtime_data_consumers_revalidate_cached_snapshots() -> None:
+    root = Path(__file__).resolve().parents[1]
+    assets = (
+        "agent-dataset-qualifications.js",
+        "dataset-validation.js",
+        "leaderboard.js",
+        "leaderboard-runs.js",
+        "leaderboard-frontier.js",
+        "members-page.js",
+        "news-page.js",
+        "plugins-page.js",
+    )
+    for name in assets:
+        text = (root / "assets" / name).read_text(encoding="utf-8")
+        assert re.search(r"cache\s*:\s*['\"]no-cache", text), name
+
+    pages = (
+        "leaderboard.html",
+        "leaderboard-runs.html",
+        "dataset-validation.html",
+        "members.html",
+        "news.html",
+        "plugins.html",
+    )
+    for name in pages:
+        text = (root / name).read_text(encoding="utf-8")
+        assert "data-freshness-20261009" in text, name
 
 
 def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
@@ -1293,7 +1347,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=fixed-target-tristate-20261003" in html_text
-    assert "assets/leaderboard.js?v=fixed-target-tristate-20261003" in html_text
+    assert "assets/leaderboard.js?v=data-freshness-20261009" in html_text
     assert ">Stable trend</button>" in html_text
     assert "trendViewCheckpoint: 'Stable trend'" in js_text
     assert "trendViewCheckpoint: '稳定趋势'" in js_text
@@ -3637,12 +3691,14 @@ def test_trend_evidence_state_contract() -> None:
     assert "buildTrendSpecDefaults" not in text
     assert "const specDefaults = { server: {}, client: {} };" in text
 
-    # Registry sources share one payload contract (remote first, local fallback).
+    # Registry sources share one payload contract and the newest generation wins.
     assert "function loadEvidenceRegistry()" in text
     assert "requestTimeoutMs: 4500" in text
     assert "async function fetchEvidenceRegistry(url)" in text
+    assert "Promise.allSettled(sources.map" in text
+    assert "compareVersions(" in text
     assert "payload?.targets" in text
-    assert "state.evidenceRegistry = { payload, targets };" in text
+    assert "payload: selected.payload" in text
     assert "state.evidenceRegistry?.targets || []" in text
 
 
