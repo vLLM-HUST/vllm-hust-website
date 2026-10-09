@@ -71,7 +71,6 @@ function render() {
       ? "实测产能 × 价格（含自定义）"
       : "实测产能 × 参考价格";
     $("columns").replaceChildren();
-    $("measured-evidence").replaceChildren();
     const expense = rows[0]?.results.expense ?? null;
     const max =
       Math.max(0.01, expense ?? 0, ...rows.map((r) => r.results.value)) * 1.2;
@@ -99,42 +98,7 @@ function render() {
       }
       col.append(stack, element("b", p.model), element("small", p.provider));
       $("columns").append(col);
-      const evidence = element("details");
-      evidence.append(
-        element("summary", `${p.model} · ${p.provider} · ${p.name}`),
-      );
-      evidence.append(
-        element(
-          "p",
-          `${p.measuredAt} · ${p.chips} 张 ${p.hardware} · ${p.workload}。按全部卡数分摊；不能理解为单卡可独立部署。`,
-        ),
-      );
-      evidence.append(
-        element(
-          "p",
-          `输出 ${fmt(p.outputTpsPerChip)}；新增输入 ${p.inputTpsPerChip === null ? "待补" : fmt(p.inputTpsPerChip)}；缓存命中输入 ${p.cachedInputTpsPerChip === null ? "待补" : fmt(p.cachedInputTpsPerChip)} tok/s/卡。`,
-        ),
-      );
-      evidence.append(
-        element(
-          "p",
-          `P95 首 token ${fmt(p.ttftP95Seconds, 3)} 秒；P90 解码 ${fmt(p.decodeP90TpsPerUser)} tok/s/用户。`,
-        ),
-      );
-      evidence.append(element("p", p.qualification));
-      const link = element("a", "查看测量来源 ↗");
-      link.href = p.source;
-      link.target = "_blank";
-      link.rel = "noreferrer";
-      evidence.append(link);
-      if (p.accountingEvidence) {
-        const ledger = element("a", "查看逐请求计账凭据 ↗");
-        ledger.href = p.accountingEvidence;
-        ledger.target = "_blank";
-        ledger.rel = "noreferrer";
-        evidence.append(element("span", " · "), ledger);
-      }
-      $("measured-evidence").append(evidence);
+
     }
     if (expense !== null) {
       const col = element("div", undefined, "column");
@@ -167,19 +131,28 @@ function initialize() {
   $("plan-options").replaceChildren(element("legend", "旗舰推理方案 · 可多选"));
   for (const p of data.plans) {
     selected.add(p.id);
-    const label = element("label", undefined, "plan-choice");
+    const choice = element("div", undefined, "plan-choice");
     const check = element("input");
     check.type = "checkbox";
+    check.id = `plan-${p.id}`;
     check.checked = true;
     check.value = p.id;
+    check.setAttribute("aria-label", `${p.model} · ${p.provider} ${p.name}`);
     check.addEventListener("change", () => {
       check.checked ? selected.add(p.id) : selected.delete(p.id);
       render();
     });
-    const title = element("span", `${p.model} · ${p.provider}`);
-    title.append(element("small", p.name));
-    label.append(check, title);
-    $("plan-options").append(label);
+    const copy = element("div");
+    const label = element("label", `${p.model} · ${p.provider}`);
+    label.htmlFor = check.id;
+    const source = element("a", `${p.name} ↗`, "plan-source");
+    source.href = p.source;
+    source.target = "_blank";
+    source.rel = "noreferrer";
+    source.title = "查看方案测量来源";
+    copy.append(label, source);
+    choice.append(check, copy);
+    $("plan-options").append(choice);
   }
   for (const [id, p] of Object.entries(data.priceReferences)) {
     const box = element("fieldset");
