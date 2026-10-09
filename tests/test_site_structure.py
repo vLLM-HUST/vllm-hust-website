@@ -23,6 +23,7 @@ def test_required_entry_files_exist() -> None:
         root / "conferences.html",
         root / "courses.html",
         root / "versions.html",
+        root / "resources.html",
         root / "plugins.html",
         root / "README.md",
         root / "CHANGELOG.md",
@@ -1125,7 +1126,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=benchmarks-ia-20261003" in text
+        assert "assets/site.js?v=navigation-20261009" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -2761,7 +2762,7 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert "assets/issues-page.js?v=" in html_text
     assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=benchmarks-ia-20261003" in html_text
+    assert "assets/site.js?v=navigation-20261009" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js
