@@ -23,8 +23,9 @@ cohort = next(
 points = [p for p in data["points"] if p["cohort_id"] == cohort["id"]]
 historical = [
     p
-    for p in points
-    if p["evidence"]["benchmark_protocol"]["campaign"] == "small-fish-tp2-sweep-v1"
+    for p in data["points"] + data.get("archived_points", [])
+    if p["cohort_id"] == cohort["id"]
+    and p["evidence"]["benchmark_protocol"]["campaign"] == "small-fish-tp2-sweep-v1"
 ]
 assert sorted(p["load"]["concurrency"] for p in historical) == [
     1,

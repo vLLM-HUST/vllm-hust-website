@@ -115,3 +115,11 @@ projections omit generated text and token arrays.
 The later C1/C2/C4 raw archives are retained under the local `dense27-sweep-20261009` campaign, with
 transfer-verified identities. C24/C32 and TP4 are not represented by these low-concurrency
 observations; pending or interrupted launches are not scores.
+
+## Display selection
+
+At Fletcher’s request, the five dominated historical BetterScale observations (September24
+C1/C2/C4/C8/C16) are now in `archived_points`, with their complete measurements and dominating point
+IDs preserved. The six current-State points remain visible. Native reference points and other models
+are unchanged; raw run evidence is not deleted. This is display curation across measured
+configurations, not a matched-control speedup claim.
