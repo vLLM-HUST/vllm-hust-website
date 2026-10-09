@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-28",
+  "updated_at": "2026-10-09",
   "all_repos": {
     "scope_repos": [
       "vllm-hust",
@@ -259,8 +259,8 @@
         "core_repository_contributor": false,
         "core_member": false,
         "role": {
-          "zh": "学生",
-          "en": "Student"
+          "zh": "贡献者",
+          "en": "Contributor"
         },
         "research_direction": {
           "zh": "昇腾 NPU 算子级性能调优；PyPTO Tile 编程；算子融合",
@@ -271,16 +271,16 @@
           "en": ""
         },
         "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
+          "zh": "",
+          "en": ""
         },
         "github_status": {
           "zh": "",
           "en": ""
         },
         "contribution_areas": "benchmark, Ascend, CI/CD, tooling",
-        "is_current_member": true,
-        "current_status": "current"
+        "is_current_member": false,
+        "current_status": "contributor"
       },
       {
         "rank": 5,
@@ -5130,53 +5130,6 @@
           "en": ""
         },
         "contribution_areas": "",
-        "is_current_member": true,
-        "current_status": "current"
-      },
-      {
-        "rank": 4,
-        "name": "Zijia Chen",
-        "github_login": "mynameisczj",
-        "github_url": "https://github.com/mynameisczj",
-        "commits": 70,
-        "changed_lines": 203130,
-        "added": 186751,
-        "deleted": 16379,
-        "active_repos": 1,
-        "repos": [
-          "pegaflow-hust"
-        ],
-        "key_contributions": "benchmark, Ascend, CI/CD, tooling",
-        "display_name": "陈子嘉",
-        "chinese_name": "陈子嘉",
-        "english_name": "Zijia Chen",
-        "person_id": "github:mynameisczj",
-        "identity_confirmed": true,
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": false,
-        "core_member": false,
-        "role": {
-          "zh": "学生",
-          "en": "Student"
-        },
-        "research_direction": {
-          "zh": "昇腾 NPU 算子级性能调优；PyPTO Tile 编程；算子融合",
-          "en": "Operator-level performance tuning on Ascend NPUs; PyPTO tile programming; operator fusion"
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
-        },
-        "github_status": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "benchmark, Ascend, CI/CD, tooling",
         "is_current_member": true,
         "current_status": "current"
       },

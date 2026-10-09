@@ -193,8 +193,11 @@
       "ownership": "hust_owned_subsystem",
       "repository_relationship": "external_subsystem",
       "maturity": "incubating",
-      "maintainers": ["mynameisczj"],
-      "maintainer_profiles": [{"login": "mynameisczj", "name": "陈子嘉"}],
+      "maintainers": ["cybber695", "zhangshengxiang682"],
+      "maintainer_profiles": [
+        {"login": "cybber695", "name": "陈彦博"},
+        {"login": "zhangshengxiang682", "name": "张盛翔"}
+      ],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
       "upstream_repository": null,
       "summary_en": "HUST-owned KV state system with storage, transfer, metadata services, and measured Ascend IPC save/load execution.",
@@ -214,8 +217,11 @@
       "ownership": "hust_owned_subsystem",
       "repository_relationship": "external_subsystem",
       "maturity": "incubating",
-      "maintainers": ["mynameisczj"],
-      "maintainer_profiles": [{"login": "mynameisczj", "name": "陈子嘉"}],
+      "maintainers": ["cybber695", "zhangshengxiang682"],
+      "maintainer_profiles": [
+        {"login": "cybber695", "name": "陈彦博"},
+        {"login": "zhangshengxiang682", "name": "张盛翔"}
+      ],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
       "upstream_repository": null,
       "summary_en": "Manifest 0.3 PegaFlow Host Provider and PegaKVConnector profile, with runtime-owned Bundle packaging and fail-closed external-service checks; the external operator retains service lifecycle and stored-data ownership. The pinned Qwen3.5 result remains separate historical performance evidence.",

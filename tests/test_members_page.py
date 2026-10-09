@@ -9,8 +9,8 @@ def test_verified_member_snapshot_is_minimized_and_unique() -> None:
     members = payload["members"]
 
     assert payload["organization"] == "vLLM-HUST"
-    assert payload["verified_at"] == "2026-09-14"
-    assert payload["count"] == len(members) == 69
+    assert payload["verified_at"] == "2026-10-09"
+    assert payload["count"] == len(members) == 68
     assert len({member["login"].lower() for member in members}) == len(members)
     assert all(
         set(member) == {"login", "name", "avatar_url", "profile_url", "bio"}
@@ -21,6 +21,7 @@ def test_verified_member_snapshot_is_minimized_and_unique() -> None:
         for member in members
     )
     by_login = {member["login"]: member for member in members}
+    assert "mynameisczj" not in by_login
     assert {
         login: by_login[login]["name"]
         for login in ("ilnnfover", "Irisuko", "Jiawan23", "llxler", "Yushuo-star")

@@ -151,6 +151,8 @@ def build_snapshot(snapshot: dict, roster: dict) -> dict:
                 continue
             name = profile_name(item)
             override = members.get(name)
+            if item.get("is_current_member") and not override:
+                continue
             if override:
                 item = apply_member(item, override, advisor_en)
             current_by_name[name] = (category, item)
@@ -176,9 +178,15 @@ def build_snapshot(snapshot: dict, roster: dict) -> dict:
             if is_former_member(item):
                 continue
             override = members.get(profile_name(item))
-            rewritten.append(
-                apply_member(item, override, advisor_en) if override else item
-            )
+            if override:
+                item = apply_member(item, override, advisor_en)
+            elif item.get("is_current_member"):
+                item = copy.deepcopy(item)
+                item["is_current_member"] = False
+                item["current_status"] = "contributor"
+                item["role"] = localized("贡献者", "Contributor")
+                item["advisor"] = localized("", "")
+            rewritten.append(item)
         scope["contributors"] = dedupe(rewritten)
         for rank, item in enumerate(scope["contributors"], start=1):
             item["rank"] = rank
