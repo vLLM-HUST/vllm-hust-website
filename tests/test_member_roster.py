@@ -247,3 +247,22 @@ def test_sync_discards_legacy_former_profiles_and_rejects_private_roster() -> No
     private_roster["members"][0]["status_reason_zh"] = "Private reason"
     with pytest.raises(AssertionError, match="departure reasons"):
         sync["build_snapshot"](snapshot, private_roster)
+
+
+def test_betterscale_author_is_a_core_runtime_contributor() -> None:
+    _, snapshot = load_profiles()
+    assert "BetterScale" in snapshot["core_repos"]["scope_repos"]
+    for scope in (
+        snapshot["core_repos"]["contributors"],
+        snapshot["member_profiles"]["core_members"],
+    ):
+        member = next(
+            item for item in scope if item.get("github_login") == "CubeLander"
+        )
+        assert member["display_name"] == "田景远"
+        assert member["core_member"] is True
+        assert "BetterScale" in member["repos"]
+    assert not any(
+        item.get("github_login") == "CubeLander"
+        for item in snapshot["member_profiles"]["participants"]
+    )

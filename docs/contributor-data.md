@@ -23,3 +23,8 @@ python3 -m pytest -q tests/test_refresh_contributor_snapshot.py tests/test_membe
 
 审核合并结果后，将网站 `data/core_contributors.json` 同步到组织资料库
 `profile/core_contributors.json`。本地生成数据不等于发布官网，发布仍需遵循仓库部署流程。
+
+BetterScale 属于运行时核心仓库，不能只计入全仓库统计。2026-10-09 修正了该遗漏，并将田景远（CubeLander）归入核心成员。补入的核心统计沿用已有采集边界
+`852c10663e703f853c81435d6fd89a6c8affdef3`，按采集器相同的非 merge、禁用 rename 检测和单提交 50k
+行过滤规则计算；未混用之后的提交。后续更新采集器的 `INDEPENDENT_OPTIMIZATION_REPOS` 时须包含
+`BetterScale`，避免重新漏掉此运行时；成员测试会阻止该归类回退。
