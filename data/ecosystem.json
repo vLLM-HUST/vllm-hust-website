@@ -1469,6 +1469,59 @@
         "requirements_zh": "卡片中的 Qwen3.5 +42.39% 固定属于源码胶囊 f7598b9、Core 752a3a5 / Ascend 9bf964c 与五个共享主机 smoke 单次观察；它不是当前软件包或 DeepSeek 配置的结果。vllm-betterscale 0.5.1 仍需固定 Ascend 运行时和模型权重，且不是 Extension Manager bundle。"
       },
       "evidence_level": "hardware_verified"
+    },
+    {
+      "id": "ascend-attention-boundary",
+      "public_surface": true,
+      "name": "Ascend Attention Boundary",
+      "name_en": "Ascend Attention Boundary",
+      "name_zh": "Ascend 注意力边界",
+      "artifact_type": "runtime_component",
+      "system_role": "attention_execution_policy",
+      "integration_contracts": [],
+      "integration_surfaces": [
+        "vllm.general_plugins",
+        "Ascend attention first-true search boundary"
+      ],
+      "execution_planes": [
+        "worker",
+        "native"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "python_distribution",
+      "ownership": "external_contributor_maintained",
+      "repository_relationship": "external_subsystem",
+      "maturity": "experimental",
+      "canonical_repository": "https://github.com/xmdhb/vllm-hust-ascend-attention-boundary",
+      "upstream_repository": null,
+      "maintainers": [
+        "xmdhb"
+      ],
+      "summary_en": "Public preview of a default-off Ascend attention boundary component. The Qwen3.5 TP2+EP archive contains three valid 900-second repeats for OFF/ON at C1/C2/C4/C8/C16 and publishes the pre-declared median-throughput observation for each cell.",
+      "summary_zh": "默认关闭的 Ascend 注意力边界组件公开预览。Qwen3.5 TP2+EP 归档在 OFF/ON 的 C1/C2/C4/C8/C16 每个单元均包含三次有效 900 秒重复，并公开预先声明的吞吐中位样本。",
+      "public_effect_en": "The repeat-backed ON/OFF observations are published as protocol evidence. Tokenizer identity is not independently proven and the non-selected raw repeats remain local, so no causal speedup or general performance result is claimed.",
+      "public_effect_zh": "具有重复实验支撑的 ON/OFF 观测作为协议证据发布。Tokenizer 身份尚未独立证明，未选中的重复实验原始文件仍为本地证据，因此不宣称因果加速或一般性能结论。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-OP01-ATTENTION-BOUNDARY.md",
+      "compatibility": {
+        "status": "experimental",
+        "host": "vLLM 0.23.0+empty + vLLM-Ascend 0.23.0.post1",
+        "versions": [
+          "vllm-hust-ascend-attention-boundary @ 4a1843d1e2a81f0415a1cfa5141e9b17b3262835"
+        ],
+        "platforms": [
+          "Ascend 910B2 · TP2+EP · FULL_DECODE_ONLY"
+        ],
+        "models": [
+          "Qwen3.5-35B-A3B · C1/C2/C4/C8/C16 repeat-backed protocol observations"
+        ],
+        "python": [
+          ">=3.10"
+        ],
+        "requirements_en": "Use the pinned runtime and source revision with the component default-off. Formal-request activation is isolated per run, but tokenizer identity and public raw coverage for non-selected repeats remain incomplete. No causal performance attribution is claimed.",
+        "requirements_zh": "使用固定运行时和源码版本，并保持组件默认关闭。每次运行的正式请求阶段激活证据已隔离，但 tokenizer 身份和未选中重复实验的公开原始证据仍不完整，不宣称性能因果归因。"
+      },
+      "evidence_level": "hardware_verified"
     }
 ,
     {
