@@ -305,7 +305,8 @@ def main():
         if more_button.is_visible():
             more_button.click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
-        tool_section = page.locator(".plugin-category-tools")
+        tool_section = page.locator(".plugin-category-tool_mod")
+        control_section = page.locator(".plugin-category-control_plane")
         assert (
             tool_section.locator(".plugin-category-title").inner_text() == "Tool MODs"
         )
@@ -313,18 +314,17 @@ def main():
             "cards => cards.map(card => card.id)"
         ) == [
             "ascend-quant-toolkit",
-            "clm-lifecycle",
             "kv-transfer-observability-migration",
             "llm-serving-cost-pricing-model",
-            "quality-bounded-inference",
             "request-lifecycle-profiler",
             "slicegpt-migration",
             "traceloom",
-            "tricard-clm-lifecycle",
         ]
         assert tool_section.locator(".plugin-performance").count() == 0
-        assert page.locator(".plugin-category-performance #clm-lifecycle").count() == 0
-        clm = tool_section.locator("#clm-lifecycle")
+        assert control_section.locator(".plugin-category-title").inner_text() == (
+            "Control plane"
+        )
+        clm = control_section.locator("#clm-lifecycle")
         assert clm.locator(".plugin-card-footer .withheld").count() == 1
         assert clm.locator(".plugin-card-footer a").count() == 0
         clm.locator(".plugin-launch-icon").click()
@@ -333,18 +333,18 @@ def main():
             in clm.locator(".plugin-launch-tooltip").text_content()
         )
         clm.locator(".plugin-launch-icon").click()
-        tricard = tool_section.locator("#tricard-clm-lifecycle")
+        tricard = control_section.locator("#tricard-clm-lifecycle")
         tricard.locator(".plugin-launch-icon").click()
         tricard_commands = tricard.locator(".plugin-launch-tooltip").text_content()
         assert "extension enable org.vllm-hust.tricard-clm" in tricard_commands
         assert "extension plan org.vllm-hust.tricard-clm" in tricard_commands
         tricard.locator(".plugin-launch-icon").click()
-        for inspect_only_id in (
-            "request-lifecycle-profiler",
-            "quality-bounded-inference",
-            "llm-serving-cost-pricing-model",
+        for section, inspect_only_id in (
+            (tool_section, "request-lifecycle-profiler"),
+            (control_section, "quality-bounded-inference"),
+            (tool_section, "llm-serving-cost-pricing-model"),
         ):
-            inspect_only = tool_section.locator(f"#{inspect_only_id}")
+            inspect_only = section.locator(f"#{inspect_only_id}")
             inspect_only.locator(".plugin-launch-icon").click()
             commands = inspect_only.locator(".plugin-launch-tooltip").text_content()
             assert "extension inspect" in commands
