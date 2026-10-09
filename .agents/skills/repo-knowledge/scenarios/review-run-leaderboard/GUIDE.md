@@ -242,3 +242,12 @@ fixed-capacity sweep. Dominated measurements and unrelated ablation groups stay 
 are not displayed. Main-chart scope and original evidence are unchanged. Run
 `scripts/verify_betterscale_study_browser.cjs` for bounded desktop/mobile EN/ZH, source downloads,
 filters and main-chart exclusion checks; put screenshot output under `/tmp`.
+
+## Optional card-rent axis (October9)
+
+Fletcher authorized a reversible display switch in Settings: per-chip output versus output tok/s per
+CNY10,000 monthly card rent. Only all-910B2 settings with a per-chip Y axis qualify; hardware labels
+`910B2` and `Ascend 910B2` are equivalent, not910B3. The assumed4CNY/card/hour and30-day month
+yield2880CNY/card/month. This constant rescaling changes neither frontier membership nor raw
+evidence. Keep assumptions in the sidebar and JSON export, update popup/accessible labels with the
+axis, and do not label it API value. This supersedes the older fixed-Y-only UI rule.

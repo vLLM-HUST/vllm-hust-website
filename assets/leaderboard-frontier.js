@@ -6,6 +6,7 @@
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const words = {
         en: {
+            rentAxis: 'Normalize by card rent', rentY: 'Output throughput / monthly rent', rentUnit: 'tok/s / CNY 10,000 (monthly card rent)', rentNote: '910B2: CNY 4/card/hour × 24 × 30 = CNY 2,880/card/month. Rent-normalized throughput, not API revenue.',
             selectAll: 'Select all', clearAll: 'Deselect all', rotationDepth: 'Session rotation depth', rotationHelp: 'C1/C2/… is request concurrency; D1/D2 is the number of session states rotated per request lane.', rotationPending: 'Larger rotation depths are under construction.',
             knownBudget: 'Known output budget · no learned predictor', budgetChecksOnly: 'Admission capacity checks ran, but no admission deferrals or preemptions were observed. This point does not demonstrate an optimization benefit.',
             notExercised: 'MOD policy not exercised', notExercisedScope: 'The MOD was enabled, but its optimization mechanism was not exercised during this window. This point does not demonstrate an optimization benefit.',
@@ -20,6 +21,7 @@
             viewContract: 'View contract', contractTitle: 'Current setting contract', contractScope: 'Setting identity', contractCurves: 'Enabled curve configurations', contractCurve: 'Curve', contractRuntime: 'Runtime', contractTopology: 'Topology', contractMemory: 'Capacity / memory', contractExecution: 'Execution', contractEvidence: 'Evidence identity', modelRevision: 'Model revision', checkpoint: 'Checkpoint', precision: 'Precision / dtype', window: 'Measured window', protocol: 'Protocol', preparedWorkload: 'Canonical prepared workload', workloadHash: 'Workload', tokenizer: 'Canonical tokenizer fingerprint', dataset: 'Source dataset', seconds: 'seconds', chips: 'chips', perChip: 'per chip', varies: 'varies by curve', noCurves: 'No enabled curve configurations.'
         },
         zh: {
+            rentAxis: '按卡月租归一化', rentY: '万元卡月租输出吞吐', rentUnit: 'tok/s/万元（卡月租）', rentNote: '910B2：4 元/卡时 × 24 × 30 = 2,880 元/卡月。仅折算卡租，不代表 API 产值。',
             selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
             knownBudget: '已知输出预算 · 未使用学习型预测器', budgetChecksOnly: '准入容量检查已执行，但未观察到准入延后或抢占；该点不构成优化收益证据。',
             notExercised: 'MOD 策略未触发', notExercisedScope: 'MOD 已启用，但本窗口未触发有效的优化动作；该点不构成优化收益证据。',
@@ -44,17 +46,20 @@
         if (!hasRotation()) return `${t('concurrency')}: ${fmt(c)}`;
         return `${t('concurrency')}: C${fmt(c)} · ${t('rotationDepth')}: ${rotationLabel(d)}`;
     };
-    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:'', mtp:null, mods:null, rotation:null, frontierOnly:false};
+    const state = {data:{cohorts:[],points:[]}, catalog:new Map(), ready:false, error:false, tag:'', cohort:'', selected:'', mtp:null, mods:null, rotation:null, frontierOnly:false, rentNormalized:false};
     const requestedSetting = new URLSearchParams(location.search).get('setting') || '';
     const colors = ['#4263eb','#008c78','#ad5c00','#965bd3','#d14469','#177baf'];
     const tagKey = c => JSON.stringify([c.model.id,c.precision.id]);
     const cohort = () => state.data.cohorts.find(c => c.id === state.cohort);
-    const axes = () => cohort()?.workload.contract.frontier_axes || DEFAULT_AXES;
+    const baseAxes = () => cohort()?.workload.contract.frontier_axes || DEFAULT_AXES;
+    const canNormalizeRent = () => baseAxes().y === 'output_tps_per_chip' && cohortPoints().length > 0 && cohortPoints().every(M.supportsRent);
+    const axes = () => state.rentNormalized && canNormalizeRent() ? {...baseAxes(), y:'output_tps_per_10k_rent'} : baseAxes();
+    const axisUnit = key => key === 'output_tps_per_10k_rent' ? t('rentUnit') : M.metrics[key].unit;
     const fixedComparison = () => cohort()?.workload.contract.presentation === 'fixed-comparison';
     const configurationStudy = () => cohort()?.workload.contract.presentation === 'configuration-study';
     const studyComparison = p => cohort()?.workload.contract.comparison_point_ids?.includes(p.id);
     const independentStudy = () => fixedComparison() || configurationStudy();
-    const axisLabel = key => ({batch_size:t('batchSize'),output_tps:t('outputThroughput'),decode_p90_tps:t('x'),output_tps_per_chip:t('y')})[key] || key;
+    const axisLabel = key => ({batch_size:t('batchSize'),output_tps:t('outputThroughput'),decode_p90_tps:t('x'),output_tps_per_chip:t('y'),output_tps_per_10k_rent:t('rentY')})[key] || key;
     const cohortPoints = () => M.presentationPoints(state.data.points,cohort());
     const hasRotation = () => !!cohort()?.workload.contract.session_rotation;
     const depthPoints = () => cohortPoints().filter(p => !hasRotation() || state.rotation?.has(String(p.load.session_rotation_depth)));
@@ -191,6 +196,7 @@
             </div>
             <aside class="frontier-filters" aria-label="${t('filter')}">
                 <h2>${t('filter')}</h2>
+                ${canNormalizeRent()?`<fieldset><legend>${axisLabel(baseAxes().y)}</legend><div class="frontier-checks"><label><input id="frontier-rent-axis" type="checkbox" ${state.rentNormalized?'checked':''}>${t('rentAxis')}</label></div><p class="frontier-filter-note" id="frontier-rent-note" ${state.rentNormalized?'':'hidden'}>${t('rentNote')}</p></fieldset>`:''}
                 <fieldset><legend>${configurationStudy()?t('studyGroup'):'MOD / Group'} <button type="button" id="frontier-mods-toggle"></button></legend><div class="frontier-checks">${mods.map(p=>`<label><input type="checkbox" data-filter="mods" value="${escape(M.groupKey(p))}" ${state.mods.has(M.groupKey(p))?'checked':''}>${escape(groupLabel(p))}</label>`).join('')}</div></fieldset>
                 <fieldset><legend>MTP</legend><div class="frontier-checks">${mtpOptions.map(([key,text])=>`<label><input type="checkbox" data-filter="mtp" value="${key}" ${state.mtp.has(key)?'checked':''}>${text}</label>`).join('')}</div></fieldset>
                 ${hasRotation()?`<fieldset id="frontier-rotation-filter"><legend>${t('rotationDepth')}</legend><div class="frontier-checks">${depths.map(depth=>`<label><input type="checkbox" data-filter="rotation" value="${depth}" ${state.rotation.has(String(depth))?'checked':''}>${rotationLabel(depth)}</label>`).join('')}</div><p class="frontier-filter-note">${t('rotationHelp')}</p>${cohort().workload.contract.session_rotation.status==='under-construction'?`<p class="frontier-filter-note">${t('rotationPending')}</p>`:''}</fieldset>`:''}
@@ -201,6 +207,7 @@
             state.tag=button.dataset.modelTag;state.cohort='';state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();updateSettingURL();$('frontier-model-trigger')?.focus();
         }));
         $('frontier-workload')?.addEventListener('change',event=>{state.cohort=event.target.value;state.selected='';state.mtp=null;state.mods=null;state.rotation=null;shell();updateSettingURL();});
+        $('frontier-rent-axis')?.addEventListener('change',event=>{state.rentNormalized=event.target.checked;state.selected='';$('frontier-rent-note').hidden=!state.rentNormalized;render();});
         $('frontier-contract-open').addEventListener('click',openContract);
         $('frontier-panel').querySelectorAll('[data-filter]').forEach(input=>input.addEventListener('change',()=>{
             const selected=state[input.dataset.filter];
@@ -250,7 +257,7 @@
         if(!point)return;
         const payload={schema_version:'frontier-configuration/v1',cohort:state.data.cohorts.find(c=>c.id===point.cohort_id),point,
             ...(studyComparison(point)?{comparison_cohort:cohort()}:{}),
-            chart:{x:axes().x,y:axes().y,x_unit:M.metrics[axes().x].unit,y_unit:M.metrics[axes().y].unit}};
+            chart:{x:axes().x,y:axes().y,x_unit:M.metrics[axes().x].unit,y_unit:M.metrics[axes().y].unit,...(axes().y==='output_tps_per_10k_rent'?{rent_assumption:M.rentAssumption,y_value:M.value(point,axes().y)}:{})}};
         const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'}));
         const a=document.createElement('a');a.href=url;a.download=`${point.id.replace(/[^a-z0-9_.-]/gi,'_')}.json`;
         document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -310,7 +317,7 @@
             <p class="frontier-popup-date">${t('sampled')}: ${point.evidence.sampling_date_utc?`${escape(point.evidence.sampling_date_utc)}${point.evidence.sampling_date_end_utc && point.evidence.sampling_date_end_utc!==point.evidence.sampling_date_utc?` – ${escape(point.evidence.sampling_date_end_utc)}`:''} (UTC)`:t('unknown')}</p>
             ${point.evidence.aggregation_kind==='arithmetic-mean-of-runs'?`<p>${lang()==='zh'?'三轮算术平均；P90/P95为各轮分位数的平均。':'Arithmetic mean of three runs; P90/P95 are means of per-run quantiles.'}</p>`:''}
             <p class="frontier-popup-subtitle">${escape(point.configuration.hardware.label)} × ${point.configuration.hardware.accelerator_count} · ${escape(parallel(point))}</p>
-            <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,axes().x))}</strong><span>${axisLabel(axes().x)}<br>${M.metrics[axes().x].unit}</span></div><div><strong>${fmt(M.value(point,axes().y))}</strong><span>${axisLabel(axes().y)}<br>${M.metrics[axes().y].unit}</span></div></div>
+            <div class="frontier-popup-metrics"><div><strong>${fmt(M.value(point,axes().x))}</strong><span>${axisLabel(axes().x)}<br>${axisUnit(axes().x)}</span></div><div><strong>${fmt(M.value(point,axes().y))}</strong><span>${axisLabel(axes().y)}<br>${axisUnit(axes().y)}</span></div></div>
             <p class="frontier-popup-load">${serviceScale(point)}${params.mtp_draft_tokens!=null?` · MTP${params.mtp_draft_tokens}`:''}${params.max_num_seqs!=null?`<br>${t('capacity')}: ${fmt(params.max_num_seqs)}${params.max_num_seqs_per_rank!=null?' / rank':''}`:''}${params.kv_cache_memory_bytes!=null?` · KV ${fmt(params.kv_cache_memory_bytes/1024**3)} GiB/chip`:''}</p>
             ${point.configuration.mods.includes('betterscale')?`<p class="frontier-popup-configuration">${[
                 params.graph_mode!=null?`${t('graphMode')}: ${escape(params.graph_mode)}`:null,
@@ -338,13 +345,14 @@
         const bounds=key=>{const values=result.measured.map(p=>p[key]);if(!values.length)return[0,1];const min=Math.min(...values),max=Math.max(...values),pad=(max-min||Math.abs(max)||1)*.18;return[Math.max(0,min-pad),max+pad];};
         const [xmin,xmax]=bounds('x'),[ymin,ymax]=bounds('y');
         const x=v=>left+(v-xmin)/(xmax-xmin)*(width-left-right),y=v=>height-bottom-(v-ymin)/(ymax-ymin)*(height-top-bottom);
-        let svg=`<title>${t('x')} / ${t('y')}</title>`;
+        $('frontier-chart').setAttribute('aria-label',`${axisLabel(axes().x)} × ${axisLabel(axes().y)}`);
+        let svg=`<title>${axisLabel(axes().x)} / ${axisLabel(axes().y)}</title>`;
         for(let i=0;i<=4;i++){
             const xv=xmin+(xmax-xmin)*i/4,yv=ymin+(ymax-ymin)*i/4;
             svg+=`<line class="frontier-grid" x1="${x(xv)}" y1="${top}" x2="${x(xv)}" y2="${height-bottom}"/><line class="frontier-grid" x1="${left}" y1="${y(yv)}" x2="${width-right}" y2="${y(yv)}"/>`;
             if(result.measured.length)svg+=`<text text-anchor="middle" x="${x(xv)}" y="${height-bottom+24}">${fmt(xv)}</text><text text-anchor="end" x="${left-12}" y="${y(yv)+4}">${fmt(yv)}</text>`;
         }
-        svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${axisLabel(axes().x)}<tspan x="${(width+left-right)/2}" dy="16">${M.metrics[axes().x].unit}</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${axisLabel(axes().y)}<tspan x="0" dy="16">${M.metrics[axes().y].unit}</tspan></text>`;
+        svg+=`<text text-anchor="middle" x="${(width+left-right)/2}" y="${height-26}">${axisLabel(axes().x)}<tspan x="${(width+left-right)/2}" dy="16">${axisUnit(axes().x)}</tspan></text><text text-anchor="middle" transform="translate(18 ${(height+top-bottom)/2}) rotate(-90)">${axisLabel(axes().y)}<tspan x="0" dy="16">${axisUnit(axes().y)}</tspan></text>`;
         const series=M.chartSeries(result.measured,axes().x,axes().y,cohort());
         for(const rows of series){
             const point=rows[0].point;

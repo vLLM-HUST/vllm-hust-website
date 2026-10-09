@@ -4,6 +4,8 @@
     const finite = v => typeof v === 'number' && Number.isFinite(v);
     const positive = v => finite(v) && v > 0;
     const object = v => v !== null && typeof v === 'object' && !Array.isArray(v);
+    const rentAssumption = Object.freeze({hardware:'Ascend 910B2',cnyPerChipHour:4,hoursPerDay:24,daysPerMonth:30,cnyPerChipMonth:2880,budgetCny:10000});
+    const supportsRent = point => ['Ascend 910B2','910B2'].includes(point.configuration.hardware.label);
     const metrics = {
         interactivity: { direction: 'max', unit: 'output tok/s/user' },
         decode_p90_tps: { direction: 'max', unit: 'output tok/s/user' },
@@ -13,6 +15,7 @@
         output_tps: { direction: 'max', unit: 'output tok/s' },
         batch_size: { direction: 'max', unit: 'prompts / batch' },
         output_tps_per_chip: { direction: 'max', unit: 'output tok/s/chip' },
+        output_tps_per_10k_rent: { direction: 'max', unit: 'output tok/s / CNY 10,000 monthly rent' },
         cost_per_million: { direction: 'min', unit: 'USD / 1M output tokens' }
     };
     function validate(data) {
@@ -129,6 +132,10 @@
         if (key === 'batch_size') return positive(point.load.batch_size) ? point.load.batch_size : null;
         if (key === 'interactivity') return positive(m.tpot_ms) ? 1000 / m.tpot_ms : null;
         if (key === 'output_tps_per_chip') return positive(m.output_tps) ? m.output_tps / point.configuration.hardware.accelerator_count : null;
+        if (key === 'output_tps_per_10k_rent') {
+            const perChip = value(point, 'output_tps_per_chip');
+            return supportsRent(point) && positive(perChip) ? perChip * rentAssumption.budgetCny / rentAssumption.cnyPerChipMonth : null;
+        }
         if (key === 'cost_per_million') return positive(m.output_tps) && positive(point.cost?.usd_per_hour)
             ? point.cost.usd_per_hour * 1e6 / (3600 * m.output_tps) : null;
         return finite(m[key]) ? m[key] : null;
@@ -201,7 +208,7 @@
         return [...concurrencySeries(rows.filter(row => groupKey(row.point) !== 'betterscale')),
             ...groupFrontiers(betterScale.map(row => row.point), xKey, yKey).filter(line => line.length > 1)];
     }
-    const api = { validate, visibleData, resolveCohort, presentationPoints, metrics, value, modKey, groupKey, frontierKey, project, safeURL, mtpState, concurrencySeries, chartSeries, groupFrontiers, failedCorrectness };
+    const api = { rentAssumption, supportsRent, validate, visibleData, resolveCohort, presentationPoints, metrics, value, modKey, groupKey, frontierKey, project, safeURL, mtpState, concurrencySeries, chartSeries, groupFrontiers, failedCorrectness };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LeaderboardFrontierModel = api;
 })(globalThis);
