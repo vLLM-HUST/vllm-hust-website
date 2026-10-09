@@ -3225,6 +3225,26 @@ def test_official_target_mirror_matches_sha256_sidecar() -> None:
     assert actual == expected
 
 
+def test_official_target_mirror_includes_current_runtime_matrix() -> None:
+    """The Pages mirror must not lag behind the central runtime/config matrix."""
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads(
+        (root / "data" / "official_targets.json").read_text(encoding="utf-8")
+    )
+
+    version = tuple(int(part) for part in data["registry_version"].split("."))
+    assert version >= (1, 3, 11)
+    runtimes = {
+        (
+            target.get("baseline_runtime", {}).get("engine_version"),
+            target.get("baseline_runtime", {}).get("vllm_ascend_ref"),
+        )
+        for target in data["targets"]
+    }
+    assert ("0.18.0", "v0.18.0") in runtimes
+    assert any(engine == "0.23.0" for engine, _ in runtimes)
+
+
 def test_official_target_fail_closed_classification() -> None:
     """The official view is fail-closed: only active + public-leaderboard
     targets are eligible, and 3B perfgate targets must never be promoted into
@@ -3281,6 +3301,8 @@ def test_official_target_js_does_not_hardcode_config() -> None:
     assert "official-targets.json" in js
     assert "intended_use" in js
     assert "public-leaderboard" in js
+    assert "compareRegistryVersions" in js
+    assert "baselineLabel(target)" in js
 
 
 # ---------------------------------------------------------------------------

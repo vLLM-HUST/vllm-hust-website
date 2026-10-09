@@ -4,8 +4,9 @@
  * Consumes the central machine-readable fixed-target registry published by
  * vLLM-HUST/vllm-hust-benchmark (leaderboard-data/official-targets.json). The
  * registry is the single source of truth; this page must never hard-code the
- * target configuration. Remote GitHub raw is preferred, with the repo-hosted
- * mirror (./data/official_targets.json) as a local fallback.
+ * target configuration. The GitHub registry and repo-hosted mirror
+ * (./data/official_targets.json) are checked together; the newest registry
+ * version wins so a stale source cannot hide newly published targets.
  *
  * Display is fail-closed: only `status=active` + `intended_use=public-leaderboard`
  * targets are treated as the official fixed target. Perfgate (3B) and specialty
@@ -43,6 +44,7 @@
             profile: 'Profile',
             workload: 'Workload',
             model: 'Model',
+            runtime: 'Runtime',
             params: 'Resolved parameters',
             specHash: 'Spec SHA256',
             status: 'Status',
@@ -77,6 +79,7 @@
             profile: 'Profile',
             workload: 'Workload',
             model: '模型',
+            runtime: '运行时',
             params: '解析参数',
             specHash: 'Spec SHA256',
             status: '状态',
@@ -151,14 +154,21 @@
     }
 
     async function loadFromGitHub() {
-        const response = await fetch(buildGitHubRawUrl(), {
-            headers: { 'Accept': 'application/json' },
-            cache: 'no-cache',
-        });
-        if (!response.ok) {
-            throw new Error(`GitHub raw error: ${response.status} ${response.statusText}`);
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 5000);
+        try {
+            const response = await fetch(buildGitHubRawUrl(), {
+                headers: { 'Accept': 'application/json' },
+                cache: 'no-cache',
+                signal: controller.signal,
+            });
+            if (!response.ok) {
+                throw new Error(`GitHub raw error: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        } finally {
+            window.clearTimeout(timeout);
         }
-        return response.json();
     }
 
     async function loadFromLocal() {
@@ -169,26 +179,53 @@
         return response.json();
     }
 
-    async function loadRegistry() {
-        // Remote first, local mirror as fallback. Both read the same registry
-        // contract so the displayed data stays consistent.
-        const sources = [
-            { name: 'github', loader: loadFromGitHub },
-            { name: 'local', loader: loadFromLocal },
-        ];
-        let lastError = null;
-        for (const source of sources) {
-            try {
-                const payload = await source.loader();
-                const targets = Array.isArray(payload?.targets) ? payload.targets : [];
-                lastRegistry = { payload, source: source.name, targets };
-                return lastRegistry;
-            } catch (error) {
-                lastError = error;
-                console.warn(`[OfficialTargets] ${source.name} load failed:`, error?.message || error);
+    function compareRegistryVersions(left, right) {
+        const parse = (value) => String(value || '')
+            .split('.')
+            .map((part) => Number.parseInt(part, 10) || 0);
+        const a = parse(left);
+        const b = parse(right);
+        const length = Math.max(a.length, b.length);
+        for (let index = 0; index < length; index += 1) {
+            const difference = (a[index] || 0) - (b[index] || 0);
+            if (difference !== 0) {
+                return difference;
             }
         }
-        throw lastError || new Error('Failed to load fixed-target registry');
+        return 0;
+    }
+
+    async function loadRegistry() {
+        // Fetch both mirrors and select the newest valid generation. Prefer the
+        // deployed local copy on a tie for deterministic Pages rendering.
+        const sources = [
+            { name: 'local', loader: loadFromLocal },
+            { name: 'github', loader: loadFromGitHub },
+        ];
+        const settled = await Promise.allSettled(sources.map((source) => source.loader()));
+        const available = [];
+        settled.forEach((result, index) => {
+            const source = sources[index];
+            if (result.status === 'fulfilled' && Array.isArray(result.value?.targets)) {
+                available.push({
+                    payload: result.value,
+                    source: source.name,
+                    targets: result.value.targets,
+                });
+            } else {
+                const error = result.status === 'rejected' ? result.reason : new Error('invalid registry');
+                console.warn(`[OfficialTargets] ${source.name} load failed:`, error?.message || error);
+            }
+        });
+        if (!available.length) {
+            throw new Error('Failed to load fixed-target registry');
+        }
+        available.sort((left, right) => compareRegistryVersions(
+            right.payload?.registry_version,
+            left.payload?.registry_version,
+        ));
+        [lastRegistry] = available;
+        return lastRegistry;
     }
 
     // --- Rendering helpers ------------------------------------------------
@@ -243,7 +280,9 @@
         const rt = target?.baseline_runtime || {};
         const engine = rt.engine || '';
         const version = rt.engine_version || '';
-        const ascend = rt.vllm_ascend_ref ? ` + vLLM-Ascend ${rt.vllm_ascend_ref}` : '';
+        const rawAscendRef = String(rt.vllm_ascend_ref || '');
+        const ascendRef = /^[0-9a-f]{40}$/i.test(rawAscendRef) ? shortSha(rawAscendRef) : rawAscendRef;
+        const ascend = ascendRef ? ` + vLLM-Ascend ${ascendRef}` : '';
         return `${engine} ${version}${ascend}`.trim();
     }
 
@@ -342,6 +381,7 @@
                         <td>${escapeHtml(profile)}</td>
                         <td>${escapeHtml(target.workload?.name || '')}</td>
                         <td>${escapeHtml(modelLabel(target))}</td>
+                        <td>${escapeHtml(baselineLabel(target))}</td>
                         <td class="official-target-params">${escapeHtml(renderParams(target.workload?.client_parameters))}</td>
                         <td><code title="${escapeHtml(target.source_spec?.sha256 || '')}">${escapeHtml(shortSha(target.source_spec?.sha256))}</code></td>
                         <td>${escapeHtml(t('status' + target.status[0].toUpperCase() + target.status.slice(1)) || target.status)}</td>
@@ -362,6 +402,7 @@
                             <th>${escapeHtml(t('profile'))}</th>
                             <th>${escapeHtml(t('workload'))}</th>
                             <th>${escapeHtml(t('model'))}</th>
+                            <th>${escapeHtml(t('runtime'))}</th>
                             <th>${escapeHtml(t('params'))}</th>
                             <th>${escapeHtml(t('specHash'))}</th>
                             <th>${escapeHtml(t('status'))}</th>
@@ -383,6 +424,7 @@
                 <td>${escapeHtml(target.profile || '')}</td>
                 <td>${escapeHtml(target.workload?.name || '')}</td>
                 <td>${escapeHtml(modelLabel(target))}</td>
+                <td>${escapeHtml(baselineLabel(target))}</td>
                 <td>${escapeHtml(renderParams(target.workload?.client_parameters))}</td>
                 <td><code title="${escapeHtml(target.source_spec?.sha256 || '')}">${escapeHtml(shortSha(target.source_spec?.sha256))}</code></td>
                 <td>${escapeHtml(target.status)}</td>
@@ -397,6 +439,7 @@
                             <th>${escapeHtml(t('profile'))}</th>
                             <th>${escapeHtml(t('workload'))}</th>
                             <th>${escapeHtml(t('model'))}</th>
+                            <th>${escapeHtml(t('runtime'))}</th>
                             <th>${escapeHtml(t('params'))}</th>
                             <th>${escapeHtml(t('specHash'))}</th>
                             <th>${escapeHtml(t('status'))}</th>
@@ -472,5 +515,6 @@
         isOfficialPublic,
         isPerfgate,
         isSpecialty,
+        compareRegistryVersions,
     };
 })();
