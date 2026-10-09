@@ -23,6 +23,7 @@
     "vllm-hust-opset": {"kind":"runtime_mod","capability":"operators_attention","lifecycle":"implemented_restricted","evidence":"measured_beneficial"},
     "core-attention-boundary": {"kind":"runtime_mod","capability":"operators_attention","lifecycle":"implemented_restricted","evidence":"runtime_effective_no_causal_attribution"},
     "adm": {"kind":"runtime_mod","capability":"parallel_communication","lifecycle":"implemented_restricted","evidence":"topology_limited"},
+    "my-plugin": {"kind":"runtime_mod","capability":"execution_optimization","lifecycle":"research","evidence":"host_integration_pending"},
     "gdn-state-codec": {"kind":"runtime_mod","capability":"kv_management","lifecycle":"implemented_restricted","evidence":"measured_inconclusive"},
 
     "mooncake-vllm-connectors": {"kind":"connector_mod","capability":"kv_management","lifecycle":"implemented","evidence":"functionally_validated"},
