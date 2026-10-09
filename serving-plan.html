@@ -28,7 +28,7 @@
     />
     <link
       rel="stylesheet"
-      href="./assets/serving-plan/style.css?v=blue-chart-20261009"
+      href="./assets/serving-plan/style.css?v=blue-links-20261009-1105"
     />
   </head>
   <body data-page="serving-plan">
@@ -176,7 +176,10 @@
             <p class="hint">单位：元 / 百万 token。分别设置新增输入、缓存命中输入、输出的价格；修改后标为用户假设。</p>
             <div id="price-controls"></div>
           </details>
-          <button id="reset" class="subtle">恢复默认条件 ↺</button>
+          <div class="control-actions">
+            <button id="reset" class="subtle">恢复默认条件 ↺</button>
+            <button id="export" class="subtle">导出当前账单 ↓</button>
+          </div>
         </aside>
         <div class="results">
           <div class="result-head">
@@ -201,16 +204,6 @@
           </div>
         </div>
       </section>
-      <section class="evidence content-panel">
-        <div class="section-no">03 / 方案依据</div>
-        <div class="evidence-head">
-          <h2>产能有出处，假设看得见。</h2>
-          <button id="export">导出当前账单 ↓</button>
-        </div>
-        <div id="measured-evidence"></div>
-        <a href="data/serving-plans.json" target="_blank">查看方案数据与完整口径 ↗</a>
-
-      </section>
       <section class="notes content-panel">
         <div>
           <h3>价格参考</h3>
@@ -231,6 +224,6 @@
       <span>服务产能与成本 · 输入仅在当前浏览器内计算，不上传。</span>
     </footer>
     <script src="./assets/site.js?v=cluster-inventory-20261009"></script>
-    <script type="module" src="assets/serving-plan/app.mjs?v=blue-chart-20261009"></script>
+    <script type="module" src="assets/serving-plan/app.mjs?v=blue-links-20261009-1105"></script>
   </body>
 </html>

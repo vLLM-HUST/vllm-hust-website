@@ -6,12 +6,13 @@ hero and footer; calculator styles are scoped under `.serving-plan`. The page re
 engines and models, not a BetterScale-only product page.
 
 Checkboxes select independent measured plans. Each gets its own stacked column, configuration,
-latency facts and accounting scope in expandable evidence. The main result is the chart, without
-repeated per-plan summary cards: deep blue output, cyan new input, blue cached input; costs remain
-visually distinct. Customized prices are flagged beside the chart. Values across models are **not**
-optimization multipliers or quality-equivalence claims. Empty selection means no plans. Export
-includes exactly the selected plans, their source identities, effective model-specific prices, costs
-and calculations. User costs are neither assumed, persisted nor transmitted.
+latency facts and accounting scope through a small source link beneath its checkbox label. Do not
+duplicate detailed metrics in separate cards or an evidence section. The main result is the chart,
+without repeated per-plan summary cards: deep blue output, cyan new input, blue cached input; costs
+remain visually distinct. Customized prices are flagged beside the chart. Values across models are
+**not** optimization multipliers or quality-equivalence claims. Empty selection means no plans.
+Export includes exactly the selected plans, their source identities, effective model-specific
+prices, costs and calculations. User costs are neither assumed, persisted nor transmitted.
 
 ## Token accounting
 
@@ -88,3 +89,8 @@ Run `node --test tests/serving_plan.test.mjs`, the Python accounting tests, and 
 checks. Browser QA covers checkbox selection/empty/reset, per-model pricing, fixed costs, hour/day/
 month conversion, zero utilization, invalid values, export and desktop/mobile overflow. Keep preview
 servers, downloaded models, logs and screenshots outside this repository.
+
+When verifying a deployment, fetch the exact CSS/module URLs referenced by the delivered HTML. A
+separate verification query can miss stale CDN entries at the actual asset URL. Change the asset
+version when styling changes; do not request the new production asset URL until deployment finishes,
+otherwise an old response can populate that new cache key.
