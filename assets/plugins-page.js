@@ -21,11 +21,11 @@
   let portfolio;
   let workshopMetadata = {};
   let workloadNavigation = { traits: {}, plugins: {} };
+  let modTaxonomy = {};
   let selectedType = "extensions";
   let selectedWorkload = "all";
-  let expanded = false;
-  const pageSize = 9;
-  const isToolMod = item => window.EcosystemCatalog.isToolMod(item);
+  const taxonomyProfile = item => modTaxonomy[item.id] || {};
+  const isPerformanceCandidate = item => ["runtime_mod", "connector_mod"].includes(taxonomyProfile(item).kind);
 
   const language = () => document.documentElement.lang.toLowerCase().startsWith("zh") ? "zh" : "en";
   const local = (item, field) => item[`${field}_${language()}`] || item[`${field}_en`] || item[field] || "";
@@ -38,13 +38,16 @@
 
   const copy = () => language() === "zh" ? {
     all: "全部",
-    extensions: "全部 MOD",
-    installable: "可安装",
-    incubating: "孵化中",
+    extensions: "全部分类",
+    runtime_mod: "运行时 MOD",
+    connector_mod: "连接器 MOD",
+    tool_mod: "工具 MOD",
+    control_plane: "控制面",
+    external_system: "外部系统",
+    retired: "退役归档",
     mod: "MOD",
-    more: "显示全部扩展",
-    entries: "个 MOD",
-    empty: "没有符合当前筛选条件的 MOD。",
+    entries: "个分类组件",
+    empty: "没有符合当前筛选条件的组件。",
     repository: "规范仓库",
     noRepository: "尚无公开主仓库",
     searchPlaceholder: "搜索 MOD、宿主、平台或仓库",
@@ -65,6 +68,10 @@
     pullRequests: "开放 PR",
     forks: "Forks",
     publicEffect: "公开效果",
+    identity: "组件身份",
+    capability: "能力域",
+    lifecycle: "生命周期",
+    evidenceState: "证据状态",
     effectSource: "查看依据",
     host: "宿主",
     versions: "适配版本",
@@ -76,13 +83,17 @@
     details: "兼容性与技术详情",
     allWorkloads: "全部 Workload",
     workloadTraits: "适用 Workload",
-    allWorkloadDescription: "展示所有公开 MOD；再结合兼容状态与公开效果判断是否适合生产使用。",
+    allWorkloadDescription: "展示所有已公开分类组件；只有运行时 MOD 与连接器 MOD 进入性能候选，其余类型用于工具、控制与系统边界说明。",
     installRun: "安装 / 启动",
     boundaries: "关键边界",
     repositories: "个组织仓库",
     allModels: "全部模型",
-    performanceMods: "性能型 MOD",
-    toolMods: "工具型 MOD",
+    runtimeMods: "运行时 MOD",
+    connectorMods: "连接器 MOD",
+    toolMods: "工具 MOD",
+    controlPlanes: "控制面",
+    externalSystems: "外部系统",
+    retiredItems: "孵化终止与退役归档",
     repositoryEmpty: "没有符合当前搜索条件的仓库。",
     artifacts: "规范制品",
     relation: "与运行时关系",
@@ -93,13 +104,16 @@
     forksCopy: "这些仓库跟随官方项目演进，只承载 HUST 必需的窄幅差异。它们是完整系统或平台发行分支，不是插件。"
   } : {
     all: "All",
-    extensions: "All MODs",
-    installable: "Installable",
-    incubating: "Incubating",
+    extensions: "All classified",
+    runtime_mod: "Runtime MODs",
+    connector_mod: "Connector MODs",
+    tool_mod: "Tool MODs",
+    control_plane: "Control plane",
+    external_system: "External systems",
+    retired: "Retired",
     mod: "MOD",
-    more: "Show all extensions",
-    entries: "MODs",
-    empty: "No MODs match the current filters.",
+    entries: "classified components",
+    empty: "No classified components match the current filters.",
     repository: "Canonical repository",
     noRepository: "No public canonical repository",
     searchPlaceholder: "Search MOD, host, platform, or repository",
@@ -120,6 +134,10 @@
     pullRequests: "Open PRs",
     forks: "Forks",
     publicEffect: "Public result",
+    identity: "Component identity",
+    capability: "Capability area",
+    lifecycle: "Lifecycle",
+    evidenceState: "Evidence state",
     effectSource: "View evidence",
     host: "Host",
     versions: "Versions",
@@ -131,13 +149,17 @@
     details: "Compatibility & technical details",
     allWorkloads: "All workloads",
     workloadTraits: "Workload fit",
-    allWorkloadDescription: "Show every public MOD; use compatibility status and public results before considering production use.",
+    allWorkloadDescription: "Show every published classified component. Only runtime and connector MODs are performance candidates; other types document tooling, control, and system boundaries.",
     installRun: "Install / run",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
     allModels: "All models",
-    performanceMods: "Performance MODs",
+    runtimeMods: "Runtime MODs",
+    connectorMods: "Connector MODs",
     toolMods: "Tool MODs",
+    controlPlanes: "Control plane",
+    externalSystems: "External systems",
+    retiredItems: "Incubation stopped and retired",
     repositoryEmpty: "No repositories match the current search.",
     artifacts: "Canonical artifacts",
     relation: "Runtime relation",
@@ -157,6 +179,69 @@
     tool: { en: "Engineering and evidence", zh: "工程与证据" },
     application: { en: "Applications", zh: "应用与展示" }
   };
+  const taxonomyLabels = {
+    kind: {
+      runtime_mod: { en: "Runtime MOD", zh: "运行时 MOD" },
+      connector_mod: { en: "Connector MOD", zh: "连接器 MOD" },
+      tool_mod: { en: "Tool MOD", zh: "工具 MOD" },
+      control_plane: { en: "Control plane", zh: "控制面" },
+      external_system: { en: "External system", zh: "外部系统" },
+      retired: { en: "Retired", zh: "退役归档" }
+    },
+    capability: {
+      execution_optimization: { en: "Execution optimization", zh: "执行优化" },
+      decoding: { en: "Decoding", zh: "解码机制" },
+      scheduling_routing: { en: "Scheduling and routing", zh: "调度与路由" },
+      kv_management: { en: "KV management", zh: "KV 管理" },
+      operators_attention: { en: "Operators and attention", zh: "算子与注意力" },
+      parallel_communication: { en: "Parallel communication", zh: "并行与通信" },
+      observability_evaluation: { en: "Observability and evaluation", zh: "可观测与评测" },
+      model_preparation: { en: "Model preparation", zh: "模型准备" },
+      lifecycle_control: { en: "Lifecycle control", zh: "生命周期控制" },
+      policy_research: { en: "Policy research", zh: "策略研究" }
+    },
+    lifecycle: {
+      implemented: { en: "Implemented", zh: "已实现" },
+      implemented_restricted: { en: "Implemented · restricted", zh: "已实现 · 条件受限" },
+      qualification_pending: { en: "Qualification pending", zh: "资格验证中" },
+      evidence_reconciliation: { en: "Evidence reconciliation", zh: "证据对账中" },
+      pending: { en: "Integration pending", zh: "接入中" },
+      research: { en: "Research", zh: "研究中" },
+      external: { en: "External lifecycle", zh: "外部生命周期" },
+      retired: { en: "Retired", zh: "已退役" }
+    },
+    evidence: {
+      measured_beneficial: { en: "Measured · beneficial", zh: "实测 · 有收益" },
+      measured_inconclusive: { en: "Measured · inconclusive", zh: "实测 · 效果未定" },
+      measured_not_beneficial: { en: "Measured · no gain in tested cell", zh: "实测 · 当前单元无收益" },
+      qualified_restricted: { en: "Qualified · restricted", zh: "已验证 · 条件受限" },
+      hardware_validation_pending: { en: "Hardware validation pending", zh: "硬件验证待完成" },
+      activation_pending: { en: "Activation pending", zh: "激活路径待完成" },
+      operator_integration_pending: { en: "Operator integration pending", zh: "算子接入待完成" },
+      catalog_conflict: { en: "Catalog evidence conflict", zh: "目录证据存在冲突" },
+      specialized_workload: { en: "Specialized workload evidence", zh: "特殊负载证据" },
+      scaffold_only: { en: "Scaffold only", zh: "仅有脚手架" },
+      host_integration_pending: { en: "Host integration pending", zh: "宿主接入待完成" },
+      topology_limited: { en: "Topology-limited evidence", zh: "拓扑受限证据" },
+      functionally_validated: { en: "Functionally validated", zh: "功能已验证" },
+      no_performance_claim: { en: "No performance claim", zh: "不声明性能收益" },
+      observer_contract_pending: { en: "Observer contract pending", zh: "观察契约待完成" },
+      offline_tool: { en: "Offline tool", zh: "离线工具" },
+      metadata_validation_only: { en: "Metadata validation only", zh: "仅元数据校验" },
+      functional_only: { en: "Functional evidence only", zh: "仅功能证据" },
+      external_lifecycle: { en: "Externally operated", zh: "外部运维" },
+      bridge_component: { en: "Bridge component", zh: "桥接组件" },
+      integration_tested: { en: "Integration tested", zh: "集成已验证" },
+      no_runtime_implementation: { en: "No runtime implementation", zh: "无运行时实现" },
+      host_integration_missing: { en: "Host integration missing", zh: "缺少宿主接入" },
+      no_activation_entry: { en: "No activation entry", zh: "无激活入口" },
+      operator_integration_missing: { en: "Operator integration missing", zh: "缺少算子接入" },
+      runtime_effective_no_causal_attribution: { en: "Runtime-effective · attribution pending", zh: "运行时已生效 · 因果归因待完成" }
+    }
+  };
+  const taxonomyLabel = (field, value) => (
+    taxonomyLabels[field]?.[value]?.[language()] || valueLabel(value)
+  );
   const domainLabels = {
     runtime_platform: { en: "Runtime and platform", zh: "运行时与平台" },
     kv_state_data_path: { en: "KV state and data path", zh: "KV 状态与数据路径" },
@@ -167,7 +252,10 @@
     applications_research: { en: "Applications and research", zh: "应用与研究" }
   };
 
-  const isWorkshopMod = item => window.EcosystemCatalog.isWorkshopMod(item);
+  const isWorkshopMod = (item) => {
+    const kind = taxonomyProfile(item).kind;
+    return Boolean(kind) && (item.public_surface !== false || kind === "retired");
+  };
   const compatibilityLabels = {
     ready: { en: "Ready", zh: "可用" },
     verified: { en: "Verified", zh: "已验证" },
@@ -438,7 +526,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
 
   function renderFilters() {
     filters.replaceChildren();
-    ["extensions", "installable", "incubating"].forEach((type) => {
+    ["extensions", "runtime_mod", "connector_mod", "tool_mod", "control_plane", "external_system", "retired"].forEach((type) => {
       const title = copy()[type];
       const button = element("button", `plugin-filter${selectedType === type ? " active" : ""}`, title);
       button.type = "button";
@@ -446,7 +534,6 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       button.setAttribute("aria-pressed", String(selectedType === type));
       button.addEventListener("click", () => {
         selectedType = type;
-        expanded = false;
         renderFilters();
         renderWorkloadNavigation();
         renderCatalog();
@@ -469,10 +556,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
   }
 
   function matchesSelectedType(item) {
-    const statusValue = item.compatibility?.status || "source_scaffold";
-    return selectedType === "extensions"
-      || (selectedType === "installable" && ["ready", "verified", "experimental"].includes(statusValue))
-      || (selectedType === "incubating" && !["ready", "verified", "experimental"].includes(statusValue));
+    return selectedType === "extensions" || taxonomyProfile(item).kind === selectedType;
   }
 
   function itemSearchText(item) {
@@ -481,6 +565,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       return [traitId, profile.label_en, profile.label_zh, profile.description_en, profile.description_zh];
     });
     const metadata = workshopMetadata[item.id] || {};
+    const taxonomy = taxonomyProfile(item);
     const peopleText = [
       ...(metadata.maintainers || []).flatMap((person) => [person.name, person.login]),
       ...(metadata.advisors || []).flatMap((advisor) => [
@@ -492,6 +577,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       item.system_role, item.delivery_model, item.ownership, item.maturity,
       item.repository_relationship, item.evidence_level, item.execution_planes.join(" "),
       item.integration_contracts.join(" "), (item.integration_surfaces || []).join(" "),
+      taxonomy.kind, taxonomy.capability, taxonomy.lifecycle, taxonomy.evidence,
       item.canonical_repository || "", item.upstream_repository || "", ...workloadText, ...peopleText
     ].join(" ").toLowerCase();
   }
@@ -522,7 +608,6 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       );
       button.addEventListener("click", () => {
         selectedWorkload = traitId;
-        expanded = false;
         renderWorkloadNavigation();
         renderCatalog();
         workloadFilters.querySelector(`[data-workload="${traitId}"]`)?.focus({ preventScroll: true });
@@ -544,7 +629,6 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       tag.type = "button";
       tag.addEventListener("click", () => {
         selectedWorkload = traitId;
-        expanded = false;
         renderWorkloadNavigation();
         renderCatalog();
       });
@@ -834,6 +918,7 @@ vllm-hust-ext extension check ${extensionId}`
 
   function renderCard(item) {
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
+    const taxonomy = taxonomyProfile(item);
     const card = element(
       "article",
       `plugin-card workshop-card workshop-${item.artifact_type} workshop-tone-${coverTone(item)}${isUpstreamFork ? " upstream-fork-card" : ""}`
@@ -843,7 +928,7 @@ vllm-hust-ext extension check ${extensionId}`
     const displayName = local(item, "name");
     const initials = displayName.split(/\s+/).map((part) => part[0]).join("").slice(0, 3).toUpperCase();
     cover.append(
-      element("span", "workshop-cover-type", copy().mod),
+      element("span", "workshop-cover-type", taxonomyLabel("kind", taxonomy.kind)),
       element("strong", "workshop-cover-mark", initials)
     );
     const top = element("div", "plugin-card-top");
@@ -852,8 +937,8 @@ vllm-hust-ext extension check ${extensionId}`
     if (launcher) top.append(launcher);
     const badges = element("div", "plugin-badges");
     badges.append(
-      badge(copy().mod, "existing"),
-      badge(valueLabel(item.maturity), `status-${item.maturity}`)
+      badge(taxonomyLabel("kind", taxonomy.kind), `taxonomy-kind kind-${taxonomy.kind}`),
+      badge(taxonomyLabel("lifecycle", taxonomy.lifecycle), `taxonomy-lifecycle lifecycle-${taxonomy.lifecycle}`)
     );
     if (isUpstreamFork) badges.prepend(badge(copy().forkBadge, "upstream-fork"));
     top.append(badges);
@@ -861,7 +946,7 @@ vllm-hust-ext extension check ${extensionId}`
     card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", local(item, "summary")));
     const traits = workloadTags(item);
     if (traits) card.append(traits);
-    if (!isToolMod(item)) {
+    if (isPerformanceCandidate(item)) {
       card.append(performancePanel(performanceResults.get(item.id)));
     }
     const community = communityPanel(item);
@@ -879,6 +964,10 @@ vllm-hust-ext extension check ${extensionId}`
     if (compatibilityDetailsBlock) detailBody.append(compatibilityDetailsBlock);
     const facts = element("dl", "plugin-component-facts");
     [
+      [copy().identity, taxonomyLabel("kind", taxonomy.kind)],
+      [copy().capability, taxonomyLabel("capability", taxonomy.capability)],
+      [copy().lifecycle, taxonomyLabel("lifecycle", taxonomy.lifecycle)],
+      [copy().evidenceState, taxonomyLabel("evidence", taxonomy.evidence)],
       [copy().planes, item.execution_planes.map(valueLabel).join(" · ")],
       [copy().delivery, valueLabel(item.delivery_model)],
       [copy().ownership, valueLabel(item.ownership)],
@@ -909,7 +998,7 @@ vllm-hust-ext extension check ${extensionId}`
     card.append(details);
 
     const footer = element("div", "plugin-card-footer");
-    footer.append(element("span", "plugin-kind", valueLabel(item.system_role)));
+    footer.append(element("span", "plugin-kind", taxonomyLabel("capability", taxonomy.capability)));
     if (item.upstream_repository) {
       const upstream = element("a", "plugin-repository upstream", `${copy().upstream} ↗`);
       upstream.href = item.upstream_repository;
@@ -1032,7 +1121,7 @@ vllm-hust-ext extension check ${extensionId}`
     const visible = registry.components.filter((item) => {
       const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
       const matchesWorkload = selectedWorkload === "all" || itemWorkloadTraits.includes(selectedWorkload);
-      const matchesModel = isToolMod(item) || !selectedModel
+      const matchesModel = !isPerformanceCandidate(item) || !selectedModel
         || (performanceResults.get(item.id)?.modelLabel === selectedModel
           && Number.isFinite(performanceResults.get(item.id)?.gain));
       return isWorkshopMod(item) && matchesSelectedType(item) && matchesWorkload
@@ -1040,20 +1129,18 @@ vllm-hust-ext extension check ${extensionId}`
     });
 
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
-    const performanceMods = visible.filter(item => !isToolMod(item));
-    const toolMods = visible.filter(isToolMod);
-    performanceMods.sort((left, right) => {
-      const leftRank = priority[left.compatibility?.status] ?? 6;
-      const rightRank = priority[right.compatibility?.status] ?? 6;
-      return (window.PluginPerformance?.compare(left, right, performanceResults) || 0) || leftRank - rightRank || left.name.localeCompare(right.name);
-    });
-    toolMods.sort((left, right) => left.name.localeCompare(right.name));
     catalog.replaceChildren();
-    const measuredCount = performanceMods.filter(item => Number.isFinite(performanceResults.get(item.id)?.gain)).length;
-    const visibleLimit = Math.max(pageSize, measuredCount);
-    const displayedPerformance = query || expanded ? performanceMods : performanceMods.slice(0, visibleLimit);
     const appendGroup = (title, items, kind) => {
       if (!items.length) return;
+      items.sort((left, right) => {
+        if (isPerformanceCandidate(left) && isPerformanceCandidate(right)) {
+          const leftRank = priority[left.compatibility?.status] ?? 6;
+          const rightRank = priority[right.compatibility?.status] ?? 6;
+          return (window.PluginPerformance?.compare(left, right, performanceResults) || 0)
+            || leftRank - rightRank || left.name.localeCompare(right.name);
+        }
+        return left.name.localeCompare(right.name);
+      });
       const section = element("section", `plugin-category plugin-category-${kind}`);
       section.append(element("h2", "plugin-category-title", title));
       const grid = element("div", "plugin-grid workshop-grid");
@@ -1061,13 +1148,20 @@ vllm-hust-ext extension check ${extensionId}`
       section.append(grid);
       catalog.append(section);
     };
-    appendGroup(copy().performanceMods, displayedPerformance, "performance");
-    appendGroup(copy().toolMods, toolMods, "tools");
-    const displayedCount = displayedPerformance.length + toolMods.length;
-    status.textContent = visible.length ? `${displayedCount} / ${visible.length} ${copy().entries}` : copy().empty;
+    const groups = [
+      ["runtime_mod", copy().runtimeMods],
+      ["connector_mod", copy().connectorMods],
+      ["tool_mod", copy().toolMods],
+      ["control_plane", copy().controlPlanes],
+      ["external_system", copy().externalSystems],
+      ["retired", copy().retiredItems]
+    ];
+    groups.forEach(([kind, title]) => {
+      appendGroup(title, visible.filter(item => taxonomyProfile(item).kind === kind), kind);
+    });
+    status.textContent = visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
     if (more) {
-      more.hidden = Boolean(query) || expanded || performanceMods.length <= visibleLimit;
-      more.textContent = `${copy().more} (${performanceMods.length})`;
+      more.hidden = true;
     }
   }
 
@@ -1082,12 +1176,7 @@ vllm-hust-ext extension check ${extensionId}`
     if (!performanceData || !frontierData || !window.PluginPerformance) return;
     selectedModel = modelSelect.value;
     performanceResults = PluginPerformance.summarize(performanceData, frontierData, selectedModel || null);
-    expanded = false;
     renderWorkloadNavigation();
-    renderCatalog();
-  });
-  more?.addEventListener("click", () => {
-    expanded = true;
     renderCatalog();
   });
   function renderPageLabels() {
@@ -1122,12 +1211,16 @@ vllm-hust-ext extension check ${extensionId}`
       if (!response.ok) throw new Error(`Workload navigation request failed: ${response.status}`);
       return response.json();
     }),
+    fetch(catalog.dataset.taxonomy, { cache: "no-cache" }).then((response) => {
+      if (!response.ok) throw new Error(`MOD taxonomy request failed: ${response.status}`);
+      return response.json();
+    }),
     Promise.all([
       fetch("./data/plugin-performance.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
-    .then(([payload, metadata, navigation, performance]) => {
+    .then(([payload, metadata, navigation, taxonomy, performance]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
@@ -1137,7 +1230,11 @@ vllm-hust-ext extension check ${extensionId}`
       if (navigation.schema_version !== "plugin-workload-navigation/v1" || !navigation.traits || !navigation.plugins) {
         throw new Error("unsupported workload navigation");
       }
+      if (taxonomy.schema_version !== "mod-taxonomy/v1" || !taxonomy.components) {
+        throw new Error("unsupported MOD taxonomy");
+      }
       registry = payload;
+      modTaxonomy = taxonomy.components;
       performanceData = performance?.data;
       frontierData = performance?.frontier;
       if (performance && window.PluginPerformance) {

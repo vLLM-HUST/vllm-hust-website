@@ -21,6 +21,9 @@ WORKSHOP_METADATA = json.loads(
 WORKLOAD_NAVIGATION = json.loads(
     (ROOT / "data" / "plugin-workload-navigation.json").read_text(encoding="utf-8")
 )
+MOD_TAXONOMY = json.loads(
+    (ROOT / "data" / "mod-taxonomy.json").read_text(encoding="utf-8")
+)
 PLUGIN_PERFORMANCE = json.loads(
     (ROOT / "data" / "plugin-performance.json").read_text(encoding="utf-8")
 )
@@ -61,6 +64,28 @@ TOOL_MOD_ROLES = {
 
 def by_id(component_id: str) -> dict:
     return next(item for item in REGISTRY["components"] if item["id"] == component_id)
+
+
+def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
+    assert MOD_TAXONOMY["schema_version"] == "mod-taxonomy/v1"
+    profiles = MOD_TAXONOMY["components"]
+    assert set(profiles) <= {item["id"] for item in REGISTRY["components"]}
+    assert {profile["kind"] for profile in profiles.values()} == {
+        "runtime_mod", "connector_mod", "tool_mod", "control_plane",
+        "external_system", "retired",
+    }
+    assert all(
+        set(profile) == {"kind", "capability", "lifecycle", "evidence"}
+        and all(profile.values())
+        for profile in profiles.values()
+    )
+    assert profiles["betterscale"]["kind"] == "runtime_mod"
+    assert profiles["mooncake"]["kind"] == "external_system"
+    assert profiles["mooncake-vllm-connectors"]["kind"] == "connector_mod"
+    assert profiles["traceloom"]["evidence"] == "no_performance_claim"
+    assert profiles["vllm-hust-opset"]["evidence"] == "measured_beneficial"
+    assert profiles["core-attention-boundary"]["kind"] == "runtime_mod"
+    assert profiles["simllm-migration"]["lifecycle"] == "retired"
 
 
 def test_registry_is_canonical_and_multidimensional() -> None:
@@ -471,17 +496,11 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
     assert ".mod-catalog-guide" in STYLES
 
 
-def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
+def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert 'let selectedType = "extensions"' in SCRIPT
-    assert (
-        "const isWorkshopMod = item => window.EcosystemCatalog.isWorkshopMod(item)"
-        in SCRIPT
-    )
-    assert (
-        '["runtime_component", "bridge"].includes(item.artifact_type)' in CATALOG_SCRIPT
-    )
-    assert 'item.repository_relationship === "organization_native"' in CATALOG_SCRIPT
-    assert '"source_toolkit"' in CATALOG_SCRIPT
+    assert "const isWorkshopMod = (item)" in SCRIPT
+    assert "taxonomyProfile(item).kind" in SCRIPT
+    assert '["extensions", "runtime_mod", "connector_mod", "tool_mod", "control_plane", "external_system", "retired"]' in SCRIPT
     assert 'element("div", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert "function coverTone(item)" in SCRIPT
@@ -491,7 +510,7 @@ def test_workshop_view_opens_on_a_flat_extension_grid() -> None:
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
-    assert "const visibleLimit = Math.max(pageSize, measuredCount);" in SCRIPT
+    assert "visible.filter(item => taxonomyProfile(item).kind === kind)" in SCRIPT
 
 
 def test_workshop_supports_workload_guided_discovery() -> None:
@@ -552,18 +571,13 @@ def test_workshop_supports_workload_guided_discovery() -> None:
     assert ".plugin-workload-tag" in STYLES
 
 
-def test_workshop_adds_only_measured_connectors_to_the_mod_catalog() -> None:
+def test_workshop_uses_canonical_taxonomy_instead_of_collapsing_connectors() -> None:
     assert "isWorkshopMod(item) && matchesSelectedType(item)" in SCRIPT
-    assert (
-        '["runtime_component", "bridge"].includes(item.artifact_type)' in CATALOG_SCRIPT
-    )
-    assert "|| isToolMod(item)" in CATALOG_SCRIPT
-    assert '"source_toolkit"' in CATALOG_SCRIPT
-    assert (
-        "Independent vLLM-HUST extensions and manager-tested carriers appear here."
-        in PAGE
-    )
-    assert "performanceResults.has(item.id)" in SCRIPT
+    assert "taxonomyProfile(item).kind === kind" in SCRIPT
+    assert '"connector_mod"' in SCRIPT
+    assert '"external_system"' in SCRIPT
+    assert "Only runtime and connector MODs enter performance selection" in PAGE
+    assert 'data-taxonomy="./data/mod-taxonomy.json?v=mod-taxonomy-v1"' in PAGE
 
 
 def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> None:
@@ -722,7 +736,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=0.3.9" in PAGE
+    assert "plugins.css?v=mod-taxonomy-v1" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1205,9 +1219,8 @@ def test_performance_evidence_cannot_override_the_publication_gate():
         "vspec",
     }
     assert "performanceResults.has(item.id)" in SCRIPT
-    assert "if (!item || item.public_surface === false) return false;" in CATALOG_SCRIPT
-    assert "performanceResults" not in CATALOG_SCRIPT
-    assert "Math.max(pageSize, measuredCount)" in SCRIPT
+    assert 'item.public_surface !== false || kind === "retired"' in SCRIPT
+    assert "isPerformanceCandidate(item)" in SCRIPT
     performance_ids = {item["id"] for item in PLUGIN_PERFORMANCE["entries"]}
     assert measured <= performance_ids
     hidden_measured = {"dla"}
@@ -1260,7 +1273,8 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "benchmark-settings-20260929" not in SCRIPT
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
-    assert PAGE.count("ecpa-final-20261009") >= 5
+    assert PAGE.count("ecpa-final-20261009") >= 4
+    assert "mod-taxonomy-v1" in PAGE
 
 
 def test_bidkv_copy_reports_the_new_cell_without_erasing_old_boundaries() -> None:
@@ -1284,8 +1298,12 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
     item = by_id("traceloom")
     assert item["artifact_type"] == "runtime_component"
     assert item["system_role"] == "profiling_analysis"
-    assert '"profiling_analysis"' in CATALOG_SCRIPT
-    assert '"telemetry_provider"' in CATALOG_SCRIPT
+    assert MOD_TAXONOMY["components"]["traceloom"] == {
+        "kind": "tool_mod",
+        "capability": "observability_evaluation",
+        "lifecycle": "implemented",
+        "evidence": "no_performance_claim",
+    }
     assert item["delivery_model"] == "python_distribution"
     assert item["documentation_url"] == "./traceloom.html"
     assert item["compatibility"]["status"] == "experimental"
@@ -1311,12 +1329,12 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
 def test_tool_mods_are_grouped_without_performance_placeholders():
     profiler = by_id("request-lifecycle-profiler")
     assert profiler["system_role"] == "telemetry_provider"
-    assert '"offline_model_quantization"' in CATALOG_SCRIPT
-    assert '"model_artifact_preparation"' in CATALOG_SCRIPT
-    assert '"lifecycle_control_plane"' in CATALOG_SCRIPT
-    assert "if (!isToolMod(item))" in SCRIPT
-    assert "appendGroup(copy().performanceMods" in SCRIPT
-    assert "appendGroup(copy().toolMods" in SCRIPT
+    assert MOD_TAXONOMY["components"]["ascend-quant-toolkit"]["kind"] == "tool_mod"
+    assert MOD_TAXONOMY["components"]["slicegpt-migration"]["kind"] == "tool_mod"
+    assert MOD_TAXONOMY["components"]["clm-lifecycle"]["kind"] == "control_plane"
+    assert "if (isPerformanceCandidate(item))" in SCRIPT
+    assert '["tool_mod", copy().toolMods]' in SCRIPT
+    assert "!isPerformanceCandidate(item)" in SCRIPT
 
     visible_tools = {
         "ascend-quant-toolkit",
