@@ -327,7 +327,7 @@
       "name_zh": "BidKV",
       "artifact_type": "runtime_component",
       "system_role": "scheduler_policy",
-      "integration_contracts": ["vllm.preemption_policy.v1"],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental", "vllm.preemption_policy.v1"],
       "integration_surfaces": [
         "vLLM-HUST preemption-policy API v1 (organization PR #11 merged)",
         "vLLM-HUST Extension Manager bundle"
@@ -357,7 +357,7 @@
       "compatibility": {
         "status": "verified",
         "host": "vLLM-HUST (setting-specific pinned runtimes)",
-        "versions": ["BidKV 0.2.1 measured @ a0cba97", "Qwen3.5 evidence merged @ edb7f09", "Qwen3.8 qualified runtime tree 199e0bd"],
+        "versions": ["BidKV 0.2.1 measured @ a0cba97", "Manifest 0.3 @ 6f1fc75", "Qwen3.5 evidence merged @ edb7f09", "Qwen3.8 qualified runtime tree 199e0bd"],
         "platforms": ["Ascend NPU · TP4 · FULL_AND_PIECEWISE", "Ascend NPU · TP4 · FULL_DECODE_ONLY"],
         "models": ["Qwen3.5-35B-A3B — TP4 C12 KV-pressure measured; tested-cell benefit", "Qwen3.8-27B — artifact functional qualified; effectiveness matrix incomplete", "Qwen3-0.6B — historical 0.23 lane", "Qwen2.5-3B — historical 0.23 lane"],
         "requirements_en": "The Qwen3.5 result used Core f18cf803, Ascend 249ac12 plus the recorded build patch, FULL_AND_PIECEWISE graph, C12 and 512 MiB KV/NPU. Do not pool it with the TP2/SWE five-point observation or the older Qwen3.8 matrix. Functional compatibility, per-cell effectiveness, and live runtime-effective state are separate facts.",
@@ -372,7 +372,7 @@
       "name_zh": "DiffSpec",
       "artifact_type": "runtime_component",
       "system_role": "decoding_mechanism",
-      "integration_contracts": [],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": [
         "vllm.general_plugins",
         "vllm.speculative_config",
@@ -399,7 +399,7 @@
       "compatibility": {
         "status": "verified",
         "host": "vLLM Ascend",
-        "versions": ["Core 762f85b3 + Ascend 4e57439e + DiffSpec 9986978"],
+        "versions": ["Core 762f85b3 + Ascend 4e57439e + DiffSpec 9986978", "Manifest 0.3 @ 9d9ddc9"],
         "platforms": ["Ascend NPU · TP4 · FULL_DECODE_ONLY graph"],
         "models": ["Qwen3.8-27B — verified functional, performance degraded", "VirVen/Qwen3.5-27B-EAGLE3-v2 — required draft", "Llama-3.1-8B — historical batch-1 lane only"],
         "requirements_en": "Qualified image sha256:6dec9e68... with the hashed VirVen draft. Installed, configured and enabled are intent states; runtime effective requires four-rank ACLGraph markers and nonzero draft/accepted counters. No acceleration recommendation.",
@@ -456,7 +456,7 @@
       "name_zh": "LatchMoE",
       "artifact_type": "runtime_component",
       "system_role": "operator_runtime",
-      "integration_contracts": ["vllm_hust.extension_manifest.v0.2-experimental"],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": ["vllm.general_plugins", "vllm-ascend-hust MoE offload seam v2 (organization PR #9 merged)", "latchmoe validated launcher"],
       "execution_planes": ["worker", "native", "device"],
       "deployment_topology": "in_process",
@@ -484,7 +484,7 @@
       "compatibility": {
         "status": "verified",
         "host": "vLLM Ascend HUST",
-        "versions": ["Current package 0.3.0 @ 75b922b", "Historical TP4 performance artifact 63781f3d · Core 762f85b3 + Ascend 4e57439e/seam-v2"],
+        "versions": ["Current package 0.3.0 @ 75b922b", "Manifest 0.3 @ f2cc19c", "Historical TP4 performance artifact 63781f3d · Core 762f85b3 + Ascend 4e57439e/seam-v2"],
         "platforms": ["Current release scope: Ascend NPU · TP1 · PIECEWISE · prefix cache off", "Historical performance scope: Ascend NPU · TP4 · PIECEWISE graph"],
         "models": ["Qwen3-30B-A3B — current TP1 functional release scope; historical TP4 performance degraded", "Qwen3.8-27B — not applicable (dense)", "GLM-4.7-Flash — historical single-NPU lane", "Qwen3-Next-80B-A3B-Instruct — historical single-NPU lane"],
         "requirements_en": "The current 0.3.0 package scope and the historical TP4 performance artifact are different qualifications. The -87.65% card result belongs only to artifact 63781f3d on Qwen3-30B-A3B BF16 TP4 PIECEWISE graph with max_num_seqs=4; it must not be transferred to the TP1 release package.",
@@ -555,6 +555,10 @@
       "upstream_repository": null,
       "summary_en": "Offline model-artifact preparation toolkit. It is not a vLLM plugin and remains independently usable; public package publication is blocked pending an owner license declaration.",
       "summary_zh": "离线模型产物制备工具，不是 vLLM 插件，可独立使用；在项目负责人声明许可证前不发布公共包。",
+      "public_effect_en": "Offline artifact preparation only. CPU smoke tests cover versioned metadata generation; no online latency, throughput, quality, or NPU runtime benefit is claimed.",
+      "public_effect_zh": "仅用于离线产物准备。CPU smoke 覆盖版本化元数据生成；不声明在线延迟、吞吐、质量或 NPU 运行时收益。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-quant-hust",
       "evidence_level": "cpu_smoke"
     },
     {
@@ -601,7 +605,7 @@
       "name_zh": "昇腾 KV 压缩",
       "artifact_type": "runtime_component",
       "system_role": "kv_state_manager",
-      "integration_contracts": [],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": [
         "vllm.general_plugins",
         "vllm.kv_compression.provider",
@@ -639,7 +643,7 @@
       "summary_zh": "vLLM Ascend KV 状态转换与压缩 provider。已测 Qwen3.5 制品支持混合缓存分组、APC、异步调度与 MTP2；当前 main 还加入了面向 graph replay 的方法无关逐层物理状态与 query observation 支持。",
       "public_effect_en": "On the exact Qwen3.5-35B BF16 setting, the five-point geometric-mean output-throughput change is -3.55% versus the shared Native series.",
       "public_effect_zh": "在完全相同的 Qwen3.5-35B BF16 设定下，相对统一 Native 曲线，五个并发点的输出吞吐几何平均变化为 -3.55%。",
-      "public_effect_status": "measured",
+      "public_effect_status": "not-beneficial-in-tested-cell",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-KVCOMPRESS.md",
       "compatibility": {
         "status": "verified",
@@ -648,6 +652,7 @@
           "vLLM-HUST 0.25.1+frontier.unified",
           "vLLM-Ascend-HUST 0.25.1rc1",
           "Measured KVCompress artifact 2ca0f933",
+          "Manifest 0.3 @ 784bb0d",
           "Current compatibility head d5507c2 (per-layer MTP graph replay; no performance transfer)"
         ],
         "platforms": [
@@ -707,7 +712,7 @@
       "name_zh": "KV 分层",
       "artifact_type": "runtime_component",
       "system_role": "kv_residency_provider",
-      "integration_contracts": [],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": [
         "vllm.kv_offload",
         "vllm.kv_connector"
@@ -759,7 +764,7 @@
       "name_zh": "KNorm",
       "artifact_type": "runtime_component",
       "system_role": "kv_compression_method",
-      "integration_contracts": [],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": ["vllm.kv_compression.provider", "vllm.kv_lifecycle"],
       "execution_planes": ["scheduler", "worker"],
       "deployment_topology": "in_process",
@@ -955,7 +960,7 @@
       "name_zh": "SimLLM",
       "artifact_type": "runtime_component",
       "system_role": "kv_reuse_policy",
-      "integration_contracts": ["vllm_hust.extension_manifest.v0.2-experimental"],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": ["vllm.general_plugins", "vLLM Ascend NPUModelRunner worker patch", "Extension Manager activation environment"],
       "execution_planes": ["scheduler", "worker"],
       "deployment_topology": "in_process",
@@ -975,7 +980,7 @@
       "public_effect_zh": "两次独立的 5,000 请求 Qwen3.5 W8A8 回放分别记录到 20.39% 与 18.78% 的吞吐提升，同时 TTFT 中位数和 p95 下降。该固定卡、单输出 token 负载主要衡量 prefill，不能推广为长生成收益。",
       "public_effect_status": "beneficial",
       "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust/pull/5",
-      "compatibility": {"status": "experimental", "host": "vLLM Ascend HUST NPUModelRunner", "versions": ["Plugin 0.1.0.dev0", "Merge 1110fe5"], "platforms": ["Ascend 910B3 · Qwen3.5-35B-A3B W8A8 · TP1/TP2 measured"], "models": ["Qwen3.5-35B-A3B W8A8 — fixed-card one-output-token similarity replay"], "python": [">=3.10"], "requirements_en": "Enable explicitly with VLLM_ASCEND_SIMLLM_ENABLED=1 and use the tested host internals, block size, cache, and prefill settings. Approximate reuse is workload-specific; long-generation performance remains unqualified.", "requirements_zh": "需显式设置 VLLM_ASCEND_SIMLLM_ENABLED=1，并匹配已测宿主内部接口、block size、cache 与 prefill 配置。近似复用依赖特定负载，长生成性能尚未验证。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust/issues/2"},
+      "compatibility": {"status": "experimental", "host": "vLLM Ascend HUST NPUModelRunner", "versions": ["Plugin 0.1.0.dev0", "Manifest 0.3 @ d12428f", "Merge 1110fe5"], "platforms": ["Ascend 910B3 · Qwen3.5-35B-A3B W8A8 · TP1/TP2 measured"], "models": ["Qwen3.5-35B-A3B W8A8 — fixed-card one-output-token similarity replay"], "python": [">=3.10"], "requirements_en": "Enable explicitly through Extension Manager with VLLM_ASCEND_SIMLLM_ENABLED=1 and use the tested host internals, block size, cache, and prefill settings. Approximate reuse is workload-specific; long-generation performance remains unqualified.", "requirements_zh": "需通过 Extension Manager 显式启用并设置 VLLM_ASCEND_SIMLLM_ENABLED=1，同时匹配已测宿主内部接口、block size、cache 与 prefill 配置。近似复用依赖特定负载，长生成性能尚未验证。", "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust/issues/2"},
       "evidence_level": "performance_verified"
     },
     {
@@ -1764,7 +1769,7 @@
       "name_zh": "OPset 算子优化集",
       "artifact_type": "runtime_component",
       "system_role": "operator_runtime",
-      "integration_contracts": ["vllm_hust.extension_manifest.v0.2-experimental"],
+      "integration_contracts": ["vllm_hust.extension_manifest.v0.3-experimental"],
       "integration_surfaces": ["vllm_hust.extension_bundles", "vllm.general_plugins", "Ascend batch-invariant Graph/Triton linear path"],
       "execution_planes": ["worker", "device"],
       "deployment_topology": "in_process",
@@ -1785,7 +1790,7 @@
       "compatibility": {
         "status": "verified",
         "host": "vLLM-HUST + vllm-ascend-hust",
-        "versions": ["vllm-hust-opset 0.3.2; fixed source commits in repository compatibility/verified-line.json"],
+        "versions": ["vllm-hust-opset 0.3.2; Manifest 0.3 @ e6f8050; fixed source commits in repository compatibility/verified-line.json"],
         "platforms": ["Ascend 910B2 · CANN 9.1.0-beta.3 · Graph + VLLM_BATCH_INVARIANT=1"],
         "models": ["Qwen2.5-7B-Instruct — matched Graph validation"],
         "python": ["3.11"],
