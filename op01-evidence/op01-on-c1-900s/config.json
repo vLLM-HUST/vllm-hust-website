@@ -1,0 +1,72 @@
+{
+  "tool_version": "0.2.0.dev0",
+  "schema": "swe-prefix-reuse/v1",
+  "run_id": "af36b167a2fb41999c0cb82ced2df82e",
+  "started_at_unix": 1791049489.527897,
+  "endpoint": "http://127.0.0.1:18180/v1/completions",
+  "model": "qwen3.5-35b-a3b",
+  "workload_sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b",
+  "tokenizer": {
+    "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+    "fingerprint": "319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9",
+    "transformers": "5.18.0",
+    "enable_thinking": true
+  },
+  "concurrency": 1,
+  "data_parallel_size": null,
+  "routing_policy": "server/relay managed; X-Correlation-ID per session",
+  "duration": 900.0,
+  "chips": 2,
+  "seed": 0,
+  "timeout": 1800,
+  "server_max_context": 262144,
+  "cache_policy": "unique salt per session play; reused within session; no cross-session reuse",
+  "window_policy": "cold-start fixed duration; count streamed tokens in window; drain in-flight only",
+  "server_metadata": {
+    "engine": {
+      "name": "vllm",
+      "version": "0.23.0+empty",
+      "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+      "backend": {
+        "name": "vllm_ascend",
+        "version": "0.23.0.post1",
+        "commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8"
+      }
+    },
+    "mod": {
+      "name": "vllm-hust-ascend-attention-boundary",
+      "version": "0.1.0.dev0",
+      "source_commit": "f4eacc39cb85ec39024278fbaba1fbc23cbe981f",
+      "enable": true,
+      "kill_switch": false,
+      "evidence": true
+    },
+    "model": {
+      "served_name": "qwen3.5-35b-a3b",
+      "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+      "revision": "local snapshot",
+      "config_sha256": "5e4d7f74fec2f360eb9cfbfcd6ec0c4c76e684d3a11caaed259d9fd9bfbc7944"
+    },
+    "precision": "bfloat16",
+    "tokenizer": {
+      "path": "/models/modelscope_cache/Qwen/Qwen3___5-35B-A3B",
+      "config_sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+    },
+    "hardware": {
+      "chip_model": "910B2",
+      "chip_count": 2
+    },
+    "server": {
+      "host": "127.0.0.1",
+      "port": 18180,
+      "max_model_len": 262144,
+      "tensor_parallel_size": 2,
+      "expert_parallel": true,
+      "launch_command": "vllm serve /models/modelscope_cache/Qwen/Qwen3___5-35B-A3B --served-model-name qwen3.5-35b-a3b --host 127.0.0.1 --port 18180 --dtype bfloat16 --kv-cache-dtype auto --block-size 128 --tensor-parallel-size 2 --enable-expert-parallel --pipeline-parallel-size 1 --data-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.85 --max-num-seqs 16 --max-num-batched-tokens 8192 --no-enable-prefix-caching --enable-chunked-prefill --no-enforce-eager --seed 0 --scheduling-policy fcfs --distributed-executor-backend mp --disable-custom-all-reduce --no-trust-remote-code --load-format auto --no-enable-log-requests --uvicorn-log-level info --compilation-config '{\"mode\":3,\"cudagraph_mode\":\"FULL_DECODE_ONLY\"}' --cudagraph-capture-sizes 1 2 4 8 16"
+    },
+    "workload": {
+      "path": "/root/swe-prefix-reuse/prepared/qwen35.json",
+      "sha256": "dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b"
+    }
+  }
+}
