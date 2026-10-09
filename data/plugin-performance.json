@@ -317,6 +317,40 @@
       ]
     },
     {
+      "id": "simllm-migration",
+      "url": "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust/pull/5",
+      "ecpa": {
+        "launch_acceptance": "repository-verified",
+        "configuration_path": "extension-manager",
+        "analysis_integration": "repository-harness",
+        "note_zh": "引用 SimLLM 仓库两次独立的 5,000 请求固定卡回放；单输出 token 负载主要衡量 prefill，不能推广为长生成收益。",
+        "note_en": "Cites two independent 5,000-request fixed-card replays from the SimLLM repository. The one-output-token workload primarily measures prefill and does not establish long-generation benefit."
+      },
+      "default_observation_id": "simllm:qwen35-published-replays",
+      "observations": [
+        {
+          "id": "simllm:qwen35-published-replays",
+          "kind": "published-comparisons",
+          "comparisons": [
+            {
+              "metric": "output_tps",
+              "baseline": 5.1964,
+              "candidate": 6.2558,
+              "model_label": "Qwen3.5-35B-A3B W8A8",
+              "scope": "5,000 requests · TP2 eager · one output token · fixed baseline card 7 / plugin card 6"
+            },
+            {
+              "metric": "output_tps",
+              "baseline": 5.2563,
+              "candidate": 6.2435,
+              "model_label": "Qwen3.5-35B-A3B W8A8",
+              "scope": "Independent 5,000-request replay · TP2 eager · one output token · fixed baseline card 7 / plugin card 6"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "diffspec",
       "url": "https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec#key-results",
       "ecpa": {
