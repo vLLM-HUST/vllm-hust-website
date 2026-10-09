@@ -171,6 +171,17 @@ def build_snapshot(snapshot: dict, roster: dict) -> dict:
                 if item_category == category
             ]
         )
+    # Member presentation is not a contribution leaderboard. Keep the lead first
+    # and Jingyuan last, independently of refreshed contribution statistics.
+    placement = {"shuhaozhangtony": 0, "cubelander": 2}
+    profiles["core_members"].sort(
+        key=lambda item: placement.get(
+            str(item.get("github_login") or "").casefold(), 1
+        )
+    )
+    for rank, item in enumerate(profiles["core_members"], start=1):
+        item["rank"] = rank
+
     for scope_name in ("all_repos", "core_repos"):
         scope = result.get(scope_name, {})
         rewritten = []

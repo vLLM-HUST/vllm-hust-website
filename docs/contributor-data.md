@@ -28,3 +28,5 @@ BetterScale 属于运行时核心仓库，不能只计入全仓库统计。2026-
 `852c10663e703f853c81435d6fd89a6c8affdef3`，按采集器相同的非 merge、禁用 rename 检测和单提交 50k
 行过滤规则计算；未混用之后的提交。后续更新采集器的 `INDEPENDENT_OPTIMIZATION_REPOS` 时须包含
 `BetterScale`，避免重新漏掉此运行时；成员测试会阻止该归类回退。
+
+核心成员展示不按贡献量排名：张书豪固定首位，田景远固定末位，其余成员保留相对顺序。该规则由 `sync_member_roster.py` 在快照生成时应用，不改变底层贡献统计。
