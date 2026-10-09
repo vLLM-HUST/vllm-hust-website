@@ -36,7 +36,12 @@ workload identities; never silently mix them.
   Keep the series legend and accessible point names; leave the plot for dots and measured-series
   lines.
 - Axes are fixed: **X = P90 per-request decode speed (output tokens/s/user)**; **Y = total output
-  tokens/s / all allocated chips**. No axis, hardware or MOD filters.
+  tokens/s / all allocated chips** by default. A card-rent checkbox switches Y to output tok/s per
+  CNY10,000 of monthly card rent for all-910B2 settings. Assume CNY4/card/hour, 24hours/day
+  and30days/month: CNY2,880/card/month, hence Y = per-chip throughput ×10000/2880. The switch
+  preserves X, raw measurements and point membership; this is a cost normalization, not API revenue.
+  Non-910B2 or non-per-chip axes retain their original display. The displayed assumption is included
+  in point downloads when enabled.
 - Engine, MOD combinations, hardware count, parallelism, batching, graph mode, cache allocation and
   other deployment parameters may differ while satisfying the selected comparison contract.
 - The sidebar’s **Best trade-off points only** checkbox is off by default, so every selected

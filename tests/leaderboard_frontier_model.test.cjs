@@ -1316,3 +1316,23 @@ test('width-matched BetterScale publication keeps six settings, whole-run repeat
         const raw=evidence.points.find(p=>p.id===point.id);assert.deepEqual(point.metrics,raw.metrics);
     }
 });
+
+test('rent axis scales per-chip throughput without changing measured records',()=>{
+    const p=structuredClone(fixture.points[0]);
+    p.configuration.hardware={label:'Ascend 910B2',accelerator_count:2};
+    p.metrics.output_tps=576;
+    const before=JSON.stringify(p);
+    assert.equal(model.value(p,'output_tps_per_chip'),288);
+    assert.equal(model.value(p,'output_tps_per_10k_rent'),1000);
+    assert.equal(JSON.stringify(p),before);
+    assert.equal(model.rentAssumption.cnyPerChipMonth,4*24*30);
+    p.configuration.hardware.label='Ascend 910B3';
+    assert.equal(model.value(p,'output_tps_per_10k_rent'),null);
+});
+
+test('same-rent rescaling preserves frontier membership',()=>{
+    const d=require('../data/leaderboard_frontier.json');
+    const points=d.points.filter(model.supportsRent);
+    const ids=y=>model.groupFrontiers(points,'decode_p90_tps',y).flat().map(r=>r.point.id).sort();
+    assert.deepEqual(ids('output_tps_per_chip'),ids('output_tps_per_10k_rent'));
+});
