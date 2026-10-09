@@ -94,7 +94,7 @@
     function init() {
         renderText();
         const dataUrl = window.vllmHustAgentDatasetConfig?.dataUrl || DEFAULT_DATA_URL;
-        fetch(dataUrl).then((response) => {
+        fetch(dataUrl, { cache: 'no-cache' }).then((response) => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         }).then((data) => {

@@ -68,7 +68,7 @@
     root.dataset.ready = 'true';
   };
 
-  fetch(root.dataset.source)
+  fetch(root.dataset.source, { cache: 'no-cache' })
     .then((response) => {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();

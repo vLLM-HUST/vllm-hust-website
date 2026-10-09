@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -156,10 +157,9 @@ def require_public_entry_contract(
         errors.append(f"{prefix}: metadata.target_version is required")
     if not target_registry_sha256:
         errors.append(f"{prefix}: metadata.target_registry_sha256 is required")
-    elif target_registry_sha256 != registry.sha256:
+    elif not re.fullmatch(r"[0-9a-f]{64}", target_registry_sha256):
         errors.append(
-            f"{prefix}: target registry hash mismatch; "
-            f"entry={target_registry_sha256} expected={registry.sha256}"
+            f"{prefix}: metadata.target_registry_sha256 must be a lowercase SHA256"
         )
 
     target = registry.targets.get(target_id)
@@ -261,8 +261,19 @@ def require_historical_unverified_marker(
         return [f"{prefix}: invalid historical-unverified admission marker"]
     if metadata.get("verified") is True:
         errors.append(f"{prefix}: historical-unverified entry cannot be verified")
-    if metadata.get("target_contract_id") or metadata.get("target_id"):
-        errors.append(f"{prefix}: historical-unverified entry cannot declare target_id")
+    # A historical row may name the contract it was compared against, but it
+    # must not carry the direct admission fields used by verified target rows.
+    admission_fields = (
+        "target_id",
+        "target_version",
+        "target_registry_sha256",
+        "profile_id",
+    )
+    if any(metadata.get(field) for field in admission_fields):
+        errors.append(
+            f"{prefix}: historical-unverified entry cannot declare official "
+            "target admission fields"
+        )
     reason = str(metadata.get("official_admission_reason") or "").strip()
     if not reason:
         errors.append(

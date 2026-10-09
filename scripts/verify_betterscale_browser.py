@@ -282,9 +282,13 @@ def main():
         assert card.locator(
             '.plugin-card-footer a[href="./betterscale.html"]'
         ).is_visible()
-        assert card.locator(
-            '.plugin-card-footer a[href="https://github.com/vLLM-HUST/BetterScale"]'
-        ).is_visible()
+        assert (
+            card.locator(
+                '.plugin-card-footer a[href="https://github.com/vLLM-HUST/BetterScale"]'
+            ).count()
+            == 0
+        )
+        assert card.locator(".plugin-card-footer .withheld").is_visible()
         assert page.locator("#betterscale.bs-feature").count() == 0
         card.locator(".plugin-launch-icon").click()
         tooltip = card.locator(".plugin-launch-tooltip")

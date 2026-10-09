@@ -1,4 +1,4 @@
-name: Public snapshot drift check
+name: Refresh public snapshots
 
 on:
   schedule:
@@ -6,7 +6,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: website-data-writers
+  cancel-in-progress: false
 
 jobs:
   check:
@@ -17,7 +21,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Compare curated public snapshots to GitHub and PyPI
+      - name: Refresh curated public snapshots from GitHub and PyPI
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python scripts/refresh_site_status.py --check
+        run: |
+          python scripts/refresh_site_status.py --refresh
+          python scripts/sync_version_meta.py
+      - name: Validate refreshed snapshots
+        run: |
+          python -m pip install pytest
+          python -m pytest tests/test_site_status_refresh.py -q
+          bash scripts/check_stale_versions.sh
+      - name: Commit refreshed snapshots
+        run: |
+          if git diff --quiet -- data/issues.json data/version_meta.json README.md; then
+            echo "Public snapshots already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/issues.json data/version_meta.json README.md
+          git commit -m "chore: refresh public site snapshots"
+          git pull --rebase origin main
+          git push origin HEAD:main

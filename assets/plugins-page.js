@@ -1362,7 +1362,7 @@ vllm-hust-ext extension check ${extensionId}`
     });
 
   if (repositoryCatalog && repositoryStatus) {
-    fetch(repositoryCatalog.dataset.source)
+    fetch(repositoryCatalog.dataset.source, { cache: "no-cache" })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`repository portfolio request failed: ${response.status}`);

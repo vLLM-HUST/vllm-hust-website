@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import os
 import re
@@ -19,12 +20,6 @@ DEFAULT_IDENTITIES = ROOT / "data" / "core_contributors.json"
 DEFAULT_OUTPUT = ROOT / "data" / "plugin-workshop-metadata.json"
 GITHUB_API = "https://api.github.com"
 CANONICAL_PEOPLE_PATH = "/repos/vLLM-HUST/.github/contents/profile/people.json"
-WORKSHOP_DELIVERY_MODELS = {
-    "plugin_bundle",
-    "python_distribution",
-    "migration_scaffold",
-    "source_patch",
-}
 MAINTAINER_FILES = (
     "MAINTAINERS.md",
     ".github/MAINTAINERS.md",
@@ -60,7 +55,12 @@ class GitHubClient:
                 if error.code < 500:
                     raise
                 last_error = error
-            except urllib.error.URLError as error:
+            except (
+                urllib.error.URLError,
+                TimeoutError,
+                ConnectionError,
+                http.client.HTTPException,
+            ) as error:
                 last_error = error
             if attempt < 2:
                 time.sleep(2**attempt)
@@ -76,7 +76,12 @@ class GitHubClient:
             raise RuntimeError(
                 f"GitHub API {path} returned HTTP {error.code}"
             ) from error
-        except urllib.error.URLError as error:
+        except (
+            urllib.error.URLError,
+            TimeoutError,
+            ConnectionError,
+            http.client.HTTPException,
+        ) as error:
             raise RuntimeError(f"GitHub API {path} is unavailable: {error}") from error
 
     def get_text_if_present(self, path: str) -> str | None:
@@ -90,7 +95,12 @@ class GitHubClient:
             raise RuntimeError(
                 f"GitHub API {path} returned HTTP {error.code}"
             ) from error
-        except urllib.error.URLError as error:
+        except (
+            urllib.error.URLError,
+            TimeoutError,
+            ConnectionError,
+            http.client.HTTPException,
+        ) as error:
             raise RuntimeError(f"GitHub API {path} is unavailable: {error}") from error
 
     def user(self, login: str) -> dict[str, Any]:
@@ -106,11 +116,10 @@ class GitHubClient:
 def is_workshop_mod(item: dict[str, Any]) -> bool:
     repository = str(item.get("canonical_repository") or "")
     return (
-        item.get("artifact_type") in {"runtime_component", "bridge"}
-        and item.get("repository_relationship") == "organization_native"
-        and item.get("public_surface", True) is not False
-        and item.get("delivery_model") in WORKSHOP_DELIVERY_MODELS
-        and repository.startswith("https://github.com/vLLM-HUST/")
+        item.get("public_surface", True) is not False
+        and isinstance(item.get("maintainers"), list)
+        and bool(item["maintainers"])
+        and repository.startswith("https://github.com/")
     )
 
 
