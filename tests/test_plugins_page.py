@@ -124,6 +124,20 @@ def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() ->
         "memory_kv_pressure",
     ]
     assert "simllm-migration" in WORKSHOP_METADATA["plugins"]
+    assert WORKSHOP_METADATA["plugins"]["simllm-migration"]["advisors"] == [
+        {
+            "name_zh": "罗瑞坤",
+            "name_en": "Ruikun Luo",
+            "relationship": "internal",
+        }
+    ]
+    assert component["advisors"] == [
+        {
+            "name_zh": "罗瑞坤",
+            "name_en": "Ruikun Luo",
+            "relationship": "internal",
+        }
+    ]
     assert "VLLM_ASCEND_SIMLLM_ENABLED=1" in SCRIPT
 
 
@@ -841,12 +855,12 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-kv-observer-v2"'
+        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-simllm-advisor"'
         in PAGE
     )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=ecpa-final-20261009-kv-observer-v2"' in PAGE
+        'v=ecpa-final-20261009-simllm-advisor"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009"'
