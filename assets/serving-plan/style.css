@@ -1,8 +1,8 @@
 /* Calculator-only layout; navigation, hero, panels and footer belong to the site. */
 .serving-plan {
-  --plan-output: #176f72;
-  --plan-input: var(--sub-cyan);
-  --plan-cache: #8ea9d7;
+  --plan-output: #1d4ed8;
+  --plan-input: #22d3ee;
+  --plan-cache: #60a5fa;
   --plan-cost: var(--sub-amber);
 }
 .serving-plan .workspace.content-panel {
@@ -158,7 +158,8 @@
   font-size: 11px;
   padding: 5px 10px;
   border-radius: 4px;
-  background: #dfeebf;
+  background: #dbeafe;
+  color: #1e40af;
   white-space: nowrap;
 }
 .serving-plan .coverage {
@@ -214,6 +215,9 @@
 .serving-plan .column strong {
   font-size: 13px;
   margin-bottom: 5px;
+}
+.serving-plan .value-column strong {
+  color: var(--plan-output);
 }
 .serving-plan .bar-stack {
   width: 100%;
@@ -274,35 +278,6 @@
 }
 .serving-plan .legend .cost-key {
   background: var(--plan-cost);
-}
-.serving-plan .plan-results {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
-  gap: 16px;
-}
-.serving-plan .plan-card {
-  border: 1px solid var(--sub-line);
-  border-radius: 6px;
-  padding: 16px;
-  min-width: 0;
-}
-.serving-plan .plan-card h3 {
-  margin: 0;
-  font-size: 15px;
-}
-.serving-plan .plan-card p {
-  font-size: 12px;
-}
-.serving-plan .result-line {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 5px;
-  font-size: 12px;
-  margin-top: 12px;
-}
-.serving-plan .result-line span {
-  color: var(--sub-muted);
 }
 .serving-plan .verdict {
   font-size: 12px;
