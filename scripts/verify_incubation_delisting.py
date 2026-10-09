@@ -73,7 +73,7 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                         == 1
                     )
                     assert "#42" in unified.inner_text()
-                    expected_status = "仅检查" if language == "zh" else "inspect only"
+                    expected_status = "已退役" if language == "zh" else "retired"
                     assert expected_status in unified.inner_text().lower()
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= window.innerWidth + 1"
