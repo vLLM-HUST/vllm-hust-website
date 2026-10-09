@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compute resources - vLLM-HUST</title>
+  <meta name="description" content="Private Ascend 910B cluster entry points maintained for vLLM-HUST development and evaluation." />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
+  <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816" />
+  <link rel="stylesheet" href="./assets/resources.css?v=clusters-20261009" />
+</head>
+<body data-page="resources">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html">
+        <span class="brand-mark"><img src="./assets/brand/vllm-hust-icon.png" alt="" /></span>
+        <span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span>
+      </a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">Ecosystem</a>
+      </div>
+    </div>
+  </nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+
+  <main>
+    <section class="page-hero resources-hero">
+      <div class="site-shell">
+        <div class="content-panel">
+          <p id="resources-eyebrow" class="eyebrow">Compute resources</p>
+          <h1 id="resources-title">Two private Ascend 910B clusters</h1>
+          <p id="resources-lede" class="hero-lede">Machines from different operators are exposed through separate Coder frontends. The two pools together contain dozens of Ascend 910B accelerator cards.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="site-shell resources-layout">
+      <section class="content-panel resources-intro" aria-labelledby="resources-guide-title">
+        <div>
+          <p id="resources-guide-kicker" class="eyebrow">Choose the right entrance</p>
+          <h2 id="resources-guide-title">The port identifies the cluster</h2>
+        </div>
+        <p id="resources-guide-copy">9443 and 9450 are not alternate links to the same service. Each opens a different cluster frontend backed by machines from a different operator. Use the entrance assigned to your workspace or project.</p>
+      </section>
+
+      <section class="cluster-grid" aria-label="Ascend 910B cluster entrances">
+        <article class="content-panel cluster-card">
+          <p id="cluster-a-kicker" class="eyebrow">Private cloud cluster A</p>
+          <h2 id="cluster-a-title">910B cluster · port 9443</h2>
+          <p id="cluster-a-copy">Independent Coder frontend and workspace pool. Sign in to view the resources currently assigned to your account.</p>
+          <a id="cluster-a-link" class="cluster-link" href="https://coder.sage.org.ai:9443/login?redirect=%2Fworkspaces%3Ffilter%3D" target="_blank" rel="noopener noreferrer">Open the 9443 cluster</a>
+        </article>
+
+        <article class="content-panel cluster-card">
+          <p id="cluster-b-kicker" class="eyebrow">Private cloud cluster B</p>
+          <h2 id="cluster-b-title">910B cluster · port 9450</h2>
+          <p id="cluster-b-copy">Independent Coder frontend and workspace pool. Sign in to view the resources currently assigned to your account.</p>
+          <a id="cluster-b-link" class="cluster-link" href="https://coder.sage.org.ai:9450/login?redirect=%2Fworkspaces%3Ffilter%3D" target="_blank" rel="noopener noreferrer">Open the 9450 cluster</a>
+        </article>
+      </section>
+
+      <aside class="resource-note" aria-labelledby="resource-note-title">
+        <strong id="resource-note-title">Capacity note</strong>
+        <span id="resource-note-copy">“Dozens of 910B cards” describes the combined private-cloud inventory, not a guaranteed per-user allocation. Current availability is shown by each cluster frontend after sign-in.</span>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="footer-copy">Private compute entrances for development and evaluation.</span></footer>
+
+  <script>
+    window.vllmHustPageDict = {
+      en: {
+        title: 'Compute resources - vLLM-HUST',
+        'resources-eyebrow': 'Compute resources',
+        'resources-title': 'Two private Ascend 910B clusters',
+        'resources-lede': 'Machines from different operators are exposed through separate Coder frontends. The two pools together contain dozens of Ascend 910B accelerator cards.',
+        'resources-guide-kicker': 'Choose the right entrance',
+        'resources-guide-title': 'The port identifies the cluster',
+        'resources-guide-copy': '9443 and 9450 are not alternate links to the same service. Each opens a different cluster frontend backed by machines from a different operator. Use the entrance assigned to your workspace or project.',
+        'cluster-a-kicker': 'Private cloud cluster A',
+        'cluster-a-title': '910B cluster · port 9443',
+        'cluster-a-copy': 'Independent Coder frontend and workspace pool. Sign in to view the resources currently assigned to your account.',
+        'cluster-a-link': 'Open the 9443 cluster',
+        'cluster-b-kicker': 'Private cloud cluster B',
+        'cluster-b-title': '910B cluster · port 9450',
+        'cluster-b-copy': 'Independent Coder frontend and workspace pool. Sign in to view the resources currently assigned to your account.',
+        'cluster-b-link': 'Open the 9450 cluster',
+        'resource-note-title': 'Capacity note',
+        'resource-note-copy': '“Dozens of 910B cards” describes the combined private-cloud inventory, not a guaranteed per-user allocation. Current availability is shown by each cluster frontend after sign-in.',
+        'footer-copy': 'Private compute entrances for development and evaluation.'
+      },
+      zh: {
+        title: '算力资源 - vLLM-HUST',
+        'resources-eyebrow': '算力资源',
+        'resources-title': '两个私有云昇腾 910B 集群',
+        'resources-lede': '不同运营商的机器通过两个独立的 Coder 前端对外提供。两个资源池合计包含数十张昇腾 910B 加速卡。',
+        'resources-guide-kicker': '选择正确入口',
+        'resources-guide-title': '端口号对应不同集群',
+        'resources-guide-copy': '9443 和 9450 不是同一服务的备用链接，而是两个不同集群的前端，背后机器属于不同运营商。请按工作区或项目分配使用对应入口。',
+        'cluster-a-kicker': '私有云集群 A',
+        'cluster-a-title': '910B 集群 · 9443 端口',
+        'cluster-a-copy': '独立的 Coder 前端和工作区资源池。登录后可查看当前账号实际分配的资源。',
+        'cluster-a-link': '打开 9443 集群',
+        'cluster-b-kicker': '私有云集群 B',
+        'cluster-b-title': '910B 集群 · 9450 端口',
+        'cluster-b-copy': '独立的 Coder 前端和工作区资源池。登录后可查看当前账号实际分配的资源。',
+        'cluster-b-link': '打开 9450 集群',
+        'resource-note-title': '容量说明',
+        'resource-note-copy': '“数十张 910B”描述的是两个私有云资源池的总规模，不代表每个用户都能占用这些资源。实时可用量以登录后的集群页面为准。',
+        'footer-copy': '用于开发与评测的私有算力入口。'
+      }
+    };
+  </script>
+  <script src="./assets/site.js?v=navigation-20261009"></script>
+</body>
+</html>
