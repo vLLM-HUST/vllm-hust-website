@@ -468,7 +468,9 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
         "vllm.platform_plugins",
         "vllm.model_loader",
     ]
-    assert diffspec["integration_contracts"] == []
+    assert diffspec["integration_contracts"] == [
+        "vllm_hust.extension_manifest.v0.3-experimental"
+    ]
     assert diffspec["integration_surfaces"] == [
         "vllm.general_plugins",
         "vllm.speculative_config",
@@ -500,7 +502,9 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     assert vspec["compatibility"]["status"] == "verified"
     assert "1.518x" in vspec["public_effect_en"]
     assert vspec["public_effect_status"] == "measured"
-    assert kvcompress["integration_contracts"] == []
+    assert kvcompress["integration_contracts"] == [
+        "vllm_hust.extension_manifest.v0.3-experimental"
+    ]
     assert kvcompress["integration_surfaces"] == [
         "vllm.general_plugins",
         "vllm.kv_compression.provider",
@@ -585,6 +589,7 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
             "vLLM-HUST (setting-specific pinned runtimes)",
             [
                 "BidKV 0.2.1 measured @ a0cba97",
+                "Manifest 0.3 @ 6f1fc75",
                 "Qwen3.5 evidence merged @ edb7f09",
                 "Qwen3.8 qualified runtime tree 199e0bd",
             ],
@@ -592,13 +597,17 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
         "diffspec": (
             "verified",
             "vLLM Ascend",
-            ["Core 762f85b3 + Ascend 4e57439e + DiffSpec 9986978"],
+            [
+                "Core 762f85b3 + Ascend 4e57439e + DiffSpec 9986978",
+                "Manifest 0.3 @ 9d9ddc9",
+            ],
         ),
         "latchmoe": (
             "verified",
             "vLLM Ascend HUST",
             [
                 "Current package 0.3.0 @ 75b922b",
+                "Manifest 0.3 @ f2cc19c",
                 "Historical TP4 performance artifact 63781f3d · Core 762f85b3 + Ascend 4e57439e/seam-v2",
             ],
         ),
@@ -879,6 +888,37 @@ def test_gdn_state_codec_publishes_ecpa_activation_and_negative_result() -> None
     assert "Qixin-Gaoke" not in json.dumps(codec)
 
 
+def test_visible_ecpa_mods_publish_manifest03_and_scoped_effects() -> None:
+    manifest03_mods = {
+        "bidkv",
+        "diffspec",
+        "latchmoe",
+        "kvcompress-ascend",
+        "kv-tiering-migration",
+        "knorm-migration",
+        "simllm-migration",
+        "gdn-state-codec",
+        "vllm-hust-opset",
+    }
+    for component_id in manifest03_mods:
+        component = by_id(component_id)
+        assert (
+            "vllm_hust.extension_manifest.v0.3-experimental"
+            in component["integration_contracts"]
+        )
+        assert all(
+            "v0.2" not in contract for contract in component["integration_contracts"]
+        )
+
+    kvcompress = by_id("kvcompress-ascend")
+    assert kvcompress["public_effect_status"] == "not-beneficial-in-tested-cell"
+    assert "-3.55%" in kvcompress["public_effect_en"]
+
+    toolkit = by_id("ascend-quant-toolkit")
+    assert toolkit["public_effect_status"] == "preview"
+    assert "no online latency" in toolkit["public_effect_en"]
+
+
 def test_quantization_entries_preserve_runtime_boundaries() -> None:
     adaptive = by_id("ascend-adaptive-quantized-kv")
     toolkit = by_id("ascend-quant-toolkit")
@@ -967,7 +1007,10 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=gdn-ecpa-negative-20261009"' in PAGE
+    assert (
+        'data-source="./data/ecosystem.json?v=manifest03-mod-alignment-20261009"'
+        in PAGE
+    )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
         'v=ecpa-final-20261009-project-grouping"' in PAGE
@@ -1384,6 +1427,7 @@ def test_compatibility_gaps_follow_current_repository_contracts() -> None:
         "vLLM-HUST 0.25.1+frontier.unified",
         "vLLM-Ascend-HUST 0.25.1rc1",
         "Measured KVCompress artifact 2ca0f933",
+        "Manifest 0.3 @ 784bb0d",
         "Current compatibility head d5507c2 (per-layer MTP graph replay; no performance transfer)",
     ]
     assert kvcompress["python"] == [">=3.10,<3.15"]
@@ -1514,7 +1558,7 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
     assert PAGE.count("ecpa-final-20261009") >= 3
-    assert "gdn-ecpa-negative-20261009" in PAGE
+    assert "manifest03-mod-alignment-20261009" in PAGE
     assert "mod-taxonomy-v1" in PAGE
 
 
