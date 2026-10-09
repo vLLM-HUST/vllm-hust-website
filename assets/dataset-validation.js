@@ -79,6 +79,10 @@
             || index.scenarios.find((scenario) => scenario.id === index.default_scenario_id);
     }
 
+    function selectableScenarios(index, currentId) {
+        return index.scenarios.filter((scenario) => scenario.selector_visible !== false || scenario.id === currentId);
+    }
+
     function getCell(dataset, metric) {
         return state.data.results.get(`${dataset.id}:${metric.id}`) || { dataset_id: dataset.id, metric_id: metric.id, status: 'not_tested' };
     }
@@ -250,7 +254,7 @@
 
     function renderScenarioOptions() {
         const select = $('validation-model-select');
-        select.innerHTML = state.index.scenarios.map((scenario) => `<option value="${escapeHtml(scenario.id)}">${escapeHtml(scenario.label || scenario.model || scenario.id)}</option>`).join('');
+        select.innerHTML = selectableScenarios(state.index, state.scenarioId).map((scenario) => `<option value="${escapeHtml(scenario.id)}">${escapeHtml(scenario.label || scenario.model || scenario.id)}</option>`).join('');
         select.value = state.scenarioId;
         select.disabled = false;
     }
