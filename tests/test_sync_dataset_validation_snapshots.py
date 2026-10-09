@@ -23,6 +23,7 @@ SPEC.loader.exec_module(MODULE)
 def write_publication(root: Path) -> None:
     index = {
         "contract_version": "dataset-validation-index-v1",
+        "program_file": MODULE.PROGRAM_FILE,
         "default_scenario_id": "qwen25",
         "scenarios": [
             {
@@ -42,13 +43,30 @@ def write_publication(root: Path) -> None:
         "metrics": [],
         "results": [],
     }
-    for name, payload in ((MODULE.INDEX_FILE, index), ("qwen25.json", artifact)):
+    program = {
+        "contract_version": "dataset-program-v1",
+        "primary_datasets": [
+            {"id": dataset_id}
+            for dataset_id in (
+                "mmlu-pro",
+                "hle-verified",
+                "swe-bench-pro",
+                "frontierscience",
+                "terminal-bench-2.1",
+            )
+        ],
+    }
+    for name, payload in (
+        (MODULE.INDEX_FILE, index),
+        (MODULE.PROGRAM_FILE, program),
+        ("qwen25.json", artifact),
+    ):
         (root / name).write_text(
             json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8",
         )
     lines = []
-    for name in (MODULE.INDEX_FILE, "qwen25.json"):
+    for name in (MODULE.INDEX_FILE, MODULE.PROGRAM_FILE, "qwen25.json"):
         digest = hashlib.sha256((root / name).read_bytes()).hexdigest()
         lines.append(f"{digest}  {name}")
     (root / MODULE.CHECKSUM_FILE).write_text("\n".join(lines) + "\n")
@@ -64,6 +82,8 @@ def test_sync_renders_consumer_urls_and_detects_mirror_drift(tmp_path: Path) -> 
     mirrored = json.loads((target / MODULE.INDEX_FILE).read_text(encoding="utf-8"))
     assert "data_file" not in mirrored["scenarios"][0]
     assert mirrored["scenarios"][0]["data_url"] == "./data/qwen25.json"
+    assert mirrored["program_url"] == f"./data/{MODULE.PROGRAM_FILE}"
+    assert (target / MODULE.PROGRAM_FILE).is_file()
     assert MODULE.sync_publication(source, target, check=True) == 0
 
     (target / "qwen25.json").write_text("{}\n", encoding="utf-8")
