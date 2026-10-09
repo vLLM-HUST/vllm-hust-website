@@ -159,7 +159,7 @@ test('dataset program accepts exactly the five primary datasets', () => {
             'swe-bench-pro',
             'frontierscience',
             'terminal-bench-2.1',
-        ].map((id) => ({ id, primary_metric_zh: '主指标', source_url: 'https://example.com', readiness: { status: id === 'mmlu-pro' ? 'material-unfrozen' : 'missing' } })),
+        ].map((id) => ({ id, primary_metric_zh: '主指标', source_url: 'https://example.com', readiness: { status: 'asset-frozen' } })),
     });
     assert.equal(program.primary_datasets.length, 5);
     assert.throws(() => api.normalizeProgram({

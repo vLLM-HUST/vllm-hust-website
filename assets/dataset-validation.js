@@ -82,7 +82,7 @@
         if (!data.designation || data.designation.id !== 'pujiang-specified-dataset-scope' || data.designation.scope_status !== 'names-only') {
             throw new Error('Dataset program lacks the Pujiang designation');
         }
-        const readiness = new Set(['executable', 'material-unfrozen', 'missing']);
+        const readiness = new Set(['executable', 'asset-frozen', 'material-unfrozen', 'missing']);
         if (data.primary_datasets.some((item) => typeof item.primary_metric_zh !== 'string' || !item.primary_metric_zh || typeof item.source_url !== 'string' || !item.source_url.startsWith('https://') || !item.readiness || !readiness.has(item.readiness.status))) {
             throw new Error('Dataset program metadata is incomplete');
         }
@@ -100,8 +100,8 @@
             zh: { 'knowledge-reasoning': '知识与推理', 'agentic-engineering': '智能体工程', 'scientific-reasoning': '科学推理' },
         };
         const readinessText = {
-            en: { executable: 'Landed and executable', 'material-unfrozen': 'Material exists; version not frozen', missing: 'Missing' },
-            zh: { executable: '已落地且可执行', 'material-unfrozen': '已有材料但版本未冻结', missing: '缺失' },
+            en: { executable: 'Landed and executable', 'asset-frozen': 'Source snapshot frozen; execution contract pending', 'material-unfrozen': 'Material exists; version not frozen', missing: 'Missing' },
+            zh: { executable: '已落地且可执行', 'asset-frozen': '源快照已冻结，执行合同待完成', 'material-unfrozen': '已有材料但版本未冻结', missing: '缺失' },
         };
         const designation = state.program.designation;
         $('dataset-program-kicker').textContent = lang() === 'zh' ? '浦江指定范围' : 'Pujiang-specified scope';

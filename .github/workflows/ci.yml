@@ -23,7 +23,7 @@ jobs:
         env:
           SKIP: ${{ github.ref == 'refs/heads/main' && 'no-commit-to-branch' || '' }}
       - name: Run unit tests
-        run: pytest tests/ -v
+        run: python -m pytest tests/ -v
       - name: Run JS data and Frontier tests
         run: >-
           node --test tests/loader_publication_identity.test.cjs tests/snapshot_status.test.cjs
