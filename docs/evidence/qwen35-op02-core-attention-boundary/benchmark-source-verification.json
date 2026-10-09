@@ -1,0 +1,15 @@
+{
+  "schema": "local-benchmark-source-verification/v1",
+  "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+  "observed_remote_head": "695dd8b1ab280145627a108b434f7a54cca05810",
+  "observed_remote_main": "695dd8b1ab280145627a108b434f7a54cca05810",
+  "installed_package_version": "0.2.0.dev0",
+  "installed_source": "file:///root/swe-prefix-reuse",
+  "installed_source_revision": "695dd8b1ab280145627a108b434f7a54cca05810",
+  "revision_equivalence_verified": true,
+  "verification_method": "Compared the measured editable tree's src/, scripts/, tests/, docs/, pyproject.toml, README.md, MANIFEST.in, LICENSE, NOTICE, and .gitignore against public main at this commit after normalizing CRLF to LF.",
+  "reason": "The installed editable source has no .git metadata, but the measured source tree matches the public main commit after line-ending normalization.",
+  "remote_host": "root@223.92.35.180:31830",
+  "remote_command": "git ls-remote https://github.com/vLLM-HUST/swe-prefix-reuse.git HEAD refs/heads/main refs/heads/master",
+  "checked_at": "2026-10-08"
+}

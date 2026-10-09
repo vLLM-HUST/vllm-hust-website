@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 660" role="img" aria-labelledby="title desc">
+<title id="title">Qwen3.5 OP02 core attention boundary concurrency curve</title>
+<desc id="desc">Measured output tokens per second per accelerator for C1, C2, C4, C8 and C16 under the same TP2 plus expert-parallel workload. Lines connect observations and are not fitted curves.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<g font-family="system-ui,sans-serif" fill="#172033">
+<text x="60" y="42" font-size="24" font-weight="700">Qwen3.5-35B-A3B · OP02 core attention boundary</text>
+<text x="60" y="70" font-size="15">TP2+EP · BF16 · 900-second SWE smoke · one valid observation per point</text>
+<path d="M105 505.00H1020" stroke="#e2e8f0" fill="none"/>
+<text x="93" y="510.00" text-anchor="end" font-size="13">0</text>
+<path d="M105 425.00H1020" stroke="#e2e8f0" fill="none"/>
+<text x="93" y="430.00" text-anchor="end" font-size="13">32</text>
+<path d="M105 345.00H1020" stroke="#e2e8f0" fill="none"/>
+<text x="93" y="350.00" text-anchor="end" font-size="13">64</text>
+<path d="M105 265.00H1020" stroke="#e2e8f0" fill="none"/>
+<text x="93" y="270.00" text-anchor="end" font-size="13">96</text>
+<path d="M105 185.00H1020" stroke="#e2e8f0" fill="none"/>
+<text x="93" y="190.00" text-anchor="end" font-size="13">128</text>
+<path d="M105 105.00H1020" stroke="#e2e8f0" fill="none"/>
+<text x="93" y="110.00" text-anchor="end" font-size="13">160</text>
+<path d="M105.00 105V505" stroke="#f1f5f9" fill="none"/>
+<text x="105.00" y="533" text-anchor="middle" font-size="14">C1</text>
+<path d="M333.75 105V505" stroke="#f1f5f9" fill="none"/>
+<text x="333.75" y="533" text-anchor="middle" font-size="14">C2</text>
+<path d="M562.50 105V505" stroke="#f1f5f9" fill="none"/>
+<text x="562.50" y="533" text-anchor="middle" font-size="14">C4</text>
+<path d="M791.25 105V505" stroke="#f1f5f9" fill="none"/>
+<text x="791.25" y="533" text-anchor="middle" font-size="14">C8</text>
+<path d="M1020.00 105V505" stroke="#f1f5f9" fill="none"/>
+<text x="1020.00" y="533" text-anchor="middle" font-size="14">C16</text>
+<polyline points="105.00,434.08 333.75,390.52 562.50,334.24 791.25,272.49 1020.00,172.78" fill="none" stroke="#2563eb" stroke-width="4"/>
+<circle data-point="qwen35-op02-core-attention-boundary-on-tp2ep-c1-20261008" cx="105.00" cy="434.08" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="2"><title>ON C1: 28.367 output tokens/s/chip; decode P90 72.894 tokens/s</title></circle>
+<circle data-point="qwen35-op02-core-attention-boundary-on-tp2ep-c2-20261008" cx="333.75" cy="390.52" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="2"><title>ON C2: 45.790 output tokens/s/chip; decode P90 62.172 tokens/s</title></circle>
+<circle data-point="qwen35-op02-core-attention-boundary-on-tp2ep-c4-20261008" cx="562.50" cy="334.24" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="2"><title>ON C4: 68.305 output tokens/s/chip; decode P90 55.149 tokens/s</title></circle>
+<circle data-point="qwen35-op02-core-attention-boundary-on-tp2ep-c8-20261008" cx="791.25" cy="272.49" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="2"><title>ON C8: 93.003 output tokens/s/chip; decode P90 43.058 tokens/s</title></circle>
+<circle data-point="qwen35-op02-core-attention-boundary-on-tp2ep-c16-20261008" cx="1020.00" cy="172.78" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="2"><title>ON C16: 132.887 output tokens/s/chip; decode P90 27.591 tokens/s</title></circle>
+<polyline points="105.00,439.55 333.75,393.06 562.50,333.44 791.25,269.90 1020.00,171.35" fill="none" stroke="#ea580c" stroke-width="4" stroke-dasharray="12 8"/>
+<rect data-point="qwen35-op02-core-attention-boundary-off-tp2ep-c1-20261008" x="98.00" y="432.55" width="14" height="14" fill="#ea580c" stroke="#ffffff" stroke-width="2"><title>OFF C1: 26.182 output tokens/s/chip; decode P90 66.093 tokens/s</title></rect>
+<rect data-point="qwen35-op02-core-attention-boundary-off-tp2ep-c2-20261008" x="326.75" y="386.06" width="14" height="14" fill="#ea580c" stroke="#ffffff" stroke-width="2"><title>OFF C2: 44.778 output tokens/s/chip; decode P90 60.086 tokens/s</title></rect>
+<rect data-point="qwen35-op02-core-attention-boundary-off-tp2ep-c4-20261008" x="555.50" y="326.44" width="14" height="14" fill="#ea580c" stroke="#ffffff" stroke-width="2"><title>OFF C4: 68.623 output tokens/s/chip; decode P90 55.758 tokens/s</title></rect>
+<rect data-point="qwen35-op02-core-attention-boundary-off-tp2ep-c8-20261008" x="784.25" y="262.90" width="14" height="14" fill="#ea580c" stroke="#ffffff" stroke-width="2"><title>OFF C8: 94.042 output tokens/s/chip; decode P90 41.110 tokens/s</title></rect>
+<rect data-point="qwen35-op02-core-attention-boundary-off-tp2ep-c16-20261008" x="1013.00" y="164.35" width="14" height="14" fill="#ea580c" stroke="#ffffff" stroke-width="2"><title>OFF C16: 133.462 output tokens/s/chip; decode P90 27.617 tokens/s</title></rect>
+<text x="105" y="85" fill="#ea580c" font-size="15">OP02 OFF · manager disabled / kill switch</text>
+<text x="495" y="85" fill="#2563eb" font-size="15">OP02 ON · core attention boundary</text>
+<text x="562.5" y="571" text-anchor="middle" font-size="16">Client concurrency</text>
+<text transform="translate(28 305) rotate(-90)" text-anchor="middle" font-size="16">Output tokens/s/chip</text>
+<text x="60" y="610" font-size="13">Lines connect measured C levels; they are not fitted curves or causal speedup estimates.</text>
+<text x="60" y="632" font-size="13">Public preview; benchmark-client source linkage and point-isolated activation evidence remain incomplete.</text>
+</g></svg>

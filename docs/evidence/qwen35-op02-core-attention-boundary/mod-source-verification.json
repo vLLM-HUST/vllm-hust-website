@@ -1,0 +1,14 @@
+{
+  "schema": "local-mod-source-verification/v1",
+  "repository": "https://github.com/xmdhb/vllm-hust-core-attention-boundary",
+  "measured_revision": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+  "measured_source_path": "/root/f01-20261002/op02-verify-8b5ebb1/vllm-hust-core-attention-boundary",
+  "measured_source_git_revision_verified": true,
+  "public_main_head_observed": "4831d6c82703fd7859bdd689dc2ee2d46907617b",
+  "measured_revision_publicly_reachable": false,
+  "public_reachability_check": "git fetch origin 8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+  "public_reachability_result": "remote rejected the object as not advertised; public main does not contain the measured revision",
+  "catalog_status": "public_surface=false",
+  "checked_at": "2026-10-08",
+  "next_action": "Publish the measured revision to the canonical public repository, or rerun the benchmark using a publicly reachable revision before changing public_surface to true."
+}
