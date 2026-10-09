@@ -2341,53 +2341,6 @@
     "core_members": [
       {
         "rank": 1,
-        "name": "Jingyuan Tian",
-        "github_login": "CubeLander",
-        "github_url": "https://github.com/CubeLander",
-        "commits": 317,
-        "changed_lines": 184781,
-        "added": 150532,
-        "deleted": 34249,
-        "active_repos": 1,
-        "repos": [
-          "BetterScale"
-        ],
-        "key_contributions": "distributed, storage, profiling, development environment",
-        "display_name": "田景远",
-        "chinese_name": "田景远",
-        "english_name": "Jingyuan Tian",
-        "person_id": "github:cubelander",
-        "identity_confirmed": true,
-        "external_contributor": false,
-        "staff_member": false,
-        "core_repository_contributor": true,
-        "core_member": true,
-        "role": {
-          "zh": "学生",
-          "en": "Student"
-        },
-        "research_direction": {
-          "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
-          "en": "Ascend NPU inference-system optimization; scheduling; communication-computation overlap; multi-device scaling; hardware-software co-design; real workloads"
-        },
-        "participation_direction": {
-          "zh": "",
-          "en": ""
-        },
-        "advisor": {
-          "zh": "张书豪",
-          "en": "Shuhao Zhang"
-        },
-        "github_status": {
-          "zh": "",
-          "en": ""
-        },
-        "contribution_areas": "distributed, storage, profiling, development environment",
-        "is_current_member": true,
-        "current_status": "current"
-      },
-      {
-        "rank": 2,
         "name": "Shuhao Zhang",
         "github_login": "ShuhaoZhangTony",
         "github_url": "https://github.com/ShuhaoZhangTony",
@@ -2451,7 +2404,7 @@
         "contribution_areas": "distributed, features, bugfix, maintenance"
       },
       {
-        "rank": 3,
+        "rank": 2,
         "name": "Jiawan Zhang",
         "github_login": "Jiawan23",
         "github_url": "https://github.com/Jiawan23",
@@ -2498,7 +2451,7 @@
         "current_status": "current"
       },
       {
-        "rank": 4,
+        "rank": 3,
         "name": "Yanbo Chen",
         "github_login": "cybber695",
         "github_url": "https://github.com/cybber695",
@@ -2545,7 +2498,7 @@
         "current_status": "current"
       },
       {
-        "rank": 5,
+        "rank": 4,
         "name": "hustcui",
         "github_login": "hustcui",
         "github_url": "https://github.com/hustcui",
@@ -2590,7 +2543,7 @@
         "contribution_areas": "distributed, Ascend, CI/CD, features"
       },
       {
-        "rank": 6,
+        "rank": 5,
         "name": "Remygred",
         "github_login": "Remygred",
         "github_url": "https://github.com/Remygred",
@@ -2637,7 +2590,7 @@
         "current_status": "current"
       },
       {
-        "rank": 7,
+        "rank": 6,
         "name": "Zhongcheng Du",
         "github_login": "dzcixy",
         "github_url": "https://github.com/dzcixy",
@@ -2682,7 +2635,7 @@
         "contribution_areas": "distributed"
       },
       {
-        "rank": 8,
+        "rank": 7,
         "name": "Irisuko",
         "github_login": "Irisuko",
         "github_url": "https://github.com/Irisuko",
@@ -2729,7 +2682,7 @@
         "current_status": "current"
       },
       {
-        "rank": 9,
+        "rank": 8,
         "name": "aly16-k",
         "github_login": "aly16-k",
         "github_url": "https://github.com/aly16-k",
@@ -2776,7 +2729,7 @@
         "current_status": "current"
       },
       {
-        "rank": 10,
+        "rank": 9,
         "name": "xiehanlong834-gif",
         "github_login": "xiehanlong834-gif",
         "github_url": "https://github.com/xiehanlong834-gif",
@@ -2823,7 +2776,7 @@
         "current_status": "current"
       },
       {
-        "rank": 11,
+        "rank": 10,
         "name": "MingqiWang-coder",
         "github_login": "MingqiWang-coder",
         "github_url": "https://github.com/MingqiWang-coder",
@@ -2870,7 +2823,7 @@
         "current_status": "current"
       },
       {
-        "rank": 12,
+        "rank": 11,
         "name": "Xiang Xiang",
         "github_login": "eglxiang",
         "github_url": "https://github.com/eglxiang",
@@ -2913,6 +2866,53 @@
           "en": ""
         },
         "contribution_areas": "docs"
+      },
+      {
+        "rank": 12,
+        "name": "Jingyuan Tian",
+        "github_login": "CubeLander",
+        "github_url": "https://github.com/CubeLander",
+        "commits": 317,
+        "changed_lines": 184781,
+        "added": 150532,
+        "deleted": 34249,
+        "active_repos": 1,
+        "repos": [
+          "BetterScale"
+        ],
+        "key_contributions": "distributed, storage, profiling, development environment",
+        "display_name": "田景远",
+        "chinese_name": "田景远",
+        "english_name": "Jingyuan Tian",
+        "person_id": "github:cubelander",
+        "identity_confirmed": true,
+        "external_contributor": false,
+        "staff_member": false,
+        "core_repository_contributor": true,
+        "core_member": true,
+        "role": {
+          "zh": "学生",
+          "en": "Student"
+        },
+        "research_direction": {
+          "zh": "昇腾 NPU 推理系统优化；调度优化；通信—计算重叠；多卡扩展；软硬件协同；真实负载",
+          "en": "Ascend NPU inference-system optimization; scheduling; communication-computation overlap; multi-device scaling; hardware-software co-design; real workloads"
+        },
+        "participation_direction": {
+          "zh": "",
+          "en": ""
+        },
+        "advisor": {
+          "zh": "张书豪",
+          "en": "Shuhao Zhang"
+        },
+        "github_status": {
+          "zh": "",
+          "en": ""
+        },
+        "contribution_areas": "distributed, storage, profiling, development environment",
+        "is_current_member": true,
+        "current_status": "current"
       }
     ],
     "participants": [

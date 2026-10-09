@@ -266,3 +266,22 @@ def test_betterscale_author_is_a_core_runtime_contributor() -> None:
         item.get("github_login") == "CubeLander"
         for item in snapshot["member_profiles"]["participants"]
     )
+
+
+def test_core_member_display_order_survives_statistics_refresh() -> None:
+    import copy
+    import runpy
+
+    roster, snapshot = load_profiles()
+    # Even a collector ranked by contribution volume must not override display order.
+    snapshot = copy.deepcopy(snapshot)
+    snapshot["member_profiles"]["core_members"].sort(
+        key=lambda item: item["changed_lines"], reverse=True
+    )
+    build = runpy.run_path(str(ROOT / "scripts/sync_member_roster.py"))[
+        "build_snapshot"
+    ]
+    members = build(snapshot, roster)["member_profiles"]["core_members"]
+    assert members[0]["github_login"] == "ShuhaoZhangTony"
+    assert members[-1]["github_login"] == "CubeLander"
+    assert [item["rank"] for item in members] == list(range(1, len(members) + 1))
