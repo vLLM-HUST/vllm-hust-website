@@ -369,6 +369,31 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.ok(p.evidence.c8_selection);
                 assert.equal(p.evidence.c8_selection.ranked_candidates.length,5);
             }
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-op01-attention-boundary-tp2ep-20261008'){
+            const on=p.id.includes('-on-');
+            const params=p.configuration.parameters;
+            assert.deepEqual(p.configuration.mods,on?['ascend-attention-boundary']:[]);
+            assert.ok([1,2,4,8,16].includes(p.load.concurrency));
+            assert.equal(p.load.session_rotation_depth,1);
+            assert.equal(params.runtime_versions.vllm,'0.23.0+empty');
+            assert.equal(params.runtime_versions['vllm-ascend'],'0.23.0.post1');
+            assert.equal(params.mod.source_commit,'4a1843d1e2a81f0415a1cfa5141e9b17b3262835');
+            assert.equal(params.mod.wheel_sha256,'aac1f8c9e73d7cf58f75eac7ca7d31d47370e55482fd614934ad7f8cf7aa63c6');
+            assert.equal(params.mod.enable,on);
+            assert.equal(run.validation.patch_requested,on);
+            assert.equal(run.validation.failed_requests,0);
+            assert.equal(run.validation.tokenizer_identity_independently_verified,false);
+            assert.equal(run.validation.activation_log_point_isolated,true);
+            assert.equal(run.validation.runtime_effective_formal_request,true);
+            assert.ok(on
+                ? run.validation.server_log_counts.formal_request_runtime_effective>0
+                : run.validation.server_log_counts.formal_request_runtime_effective===0);
+            assert.equal(run.validation.repeat.repeat_count,3);
+            assert.equal(p.evidence.repeat_selection.sample_count,3);
+            assert.ok(['selected_median','candidate_retained_archived'].includes(p.evidence.repeat_role));
+            assert.equal(p.evidence.activation_log.point_isolated,true);
+            assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,'dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b');
+            assert.equal(p.evidence.benchmark_protocol.tokenizer_fingerprint,'319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9');
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -594,7 +619,7 @@ test('one frontier per baseline/MOD crosses configurations, not cohorts; ties ke
 test('AE separation is withdrawn from display, not erased from evidence',()=>{
     const d=require('../data/leaderboard_frontier.json');
     assert.ok(d.points.every(p=>p.configuration.experiment_group!=='betterscale-AEseparation'));
-    const withdrawn=d.archived_points.filter(p=>p.display_withdrawal);
+    const withdrawn=d.archived_points.filter(p=>p.display_withdrawal && p.configuration.experiment_group==='betterscale-AEseparation');
     assert.equal(withdrawn.length,4);
     assert.ok(withdrawn.every(p=>p.configuration.experiment_group==='betterscale-AEseparation'));
 });
