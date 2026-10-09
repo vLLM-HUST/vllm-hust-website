@@ -60,6 +60,7 @@
     surfaces: "现有接入面",
     compatibility: "兼容性",
     maintainers: "负责人",
+    adaptationMaintainers: "国产化适配维护者",
     advisors: "指导老师",
     advisorUnknown: "规范元数据尚未记录指导关系",
     externalAdvisor: "校外指导",
@@ -99,6 +100,7 @@
     relation: "与运行时关系",
     repositoryRelationship: "仓库关系",
     upstream: "官方上游",
+    upstreamOwner: "上游原项目",
     forkBadge: "上游同步 fork",
     forksTitle: "上游同步 HUST 分支系统",
     forksCopy: "这些仓库跟随官方项目演进，只承载 HUST 必需的窄幅差异。它们是完整系统或平台发行分支，不是插件。"
@@ -126,6 +128,7 @@
     surfaces: "Existing surfaces",
     compatibility: "Compatibility",
     maintainers: "Maintainers",
+    adaptationMaintainers: "Localization maintainers",
     advisors: "Advisors",
     advisorUnknown: "No advisor relationship is recorded in canonical metadata",
     externalAdvisor: "External advisor",
@@ -165,6 +168,7 @@
     relation: "Runtime relation",
     repositoryRelationship: "Repository relationship",
     upstream: "Official upstream",
+    upstreamOwner: "Upstream project",
     forkBadge: "Upstream-sync fork",
     forksTitle: "Upstream-synchronized HUST forks",
     forksCopy: "These repositories track official projects and carry only narrowly required HUST deltas. They are complete system or platform distributions, not plugins."
@@ -724,7 +728,10 @@ vllm-hust-ext extension check ${extensionId}`
 
     const panel = element("section", "plugin-community");
     const people = element("div", "plugin-maintainers");
-    people.append(element("span", "plugin-community-label", copy().maintainers));
+    const maintainerLabel = item.contribution_scope === "local_adaptation"
+      ? copy().adaptationMaintainers
+      : copy().maintainers;
+    people.append(element("span", "plugin-community-label", maintainerLabel));
     const list = element("div", "plugin-maintainer-list");
     metadata.maintainers.forEach((maintainer) => {
       const link = element("a", "plugin-maintainer");
@@ -983,7 +990,8 @@ vllm-hust-ext extension check ${extensionId}`
       [copy().planes, item.execution_planes.map(valueLabel).join(" · ")],
       [copy().delivery, valueLabel(item.delivery_model)],
       [copy().ownership, valueLabel(item.ownership)],
-      ...(item.maintainers?.length ? [[copy().maintainers, item.maintainers.map((name) => `@${name}`).join(" · ")]] : []),
+      ...(local(item, "upstream_owner") ? [[copy().upstreamOwner, local(item, "upstream_owner")]] : []),
+      ...(item.maintainers?.length ? [[item.contribution_scope === "local_adaptation" ? copy().adaptationMaintainers : copy().maintainers, item.maintainers.map((name) => `@${name}`).join(" · ")]] : []),
       [copy().repositoryRelationship, valueLabel(item.repository_relationship)],
       [copy().evidence, valueLabel(item.evidence_level)]
     ].forEach(([label, value]) => {

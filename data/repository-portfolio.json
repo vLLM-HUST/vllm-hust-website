@@ -127,10 +127,10 @@
       "name": "pegaflow-hust",
       "url": "https://github.com/vLLM-HUST/pegaflow-hust",
       "portfolio_domain": "kv_state_data_path",
-      "repository_role": "external_subsystem",
-      "relation_to_runtime": "provides_external_subsystem",
+      "repository_role": "upstream_adaptation",
+      "relation_to_runtime": "adapts_external_subsystem_for_ascend",
       "lifecycle": "incubating",
-      "canonical_artifacts": ["KV storage service", "transfer engine", "metadata service", "vLLM connectors"],
+      "canonical_artifacts": ["Ascend/NPU adaptation", "ECPA integration", "adapted vLLM connectors", "HUST validation evidence"],
       "component_ids": ["pegaflow", "pegaflow-vllm-connectors"],
       "public_surface": true
     },

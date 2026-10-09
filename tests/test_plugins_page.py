@@ -155,7 +155,7 @@ def test_registry_is_canonical_and_multidimensional() -> None:
     assert by_id("vllm-production-stack")["maturity"] == "supported"
 
 
-def test_pegaflow_uses_current_repository_maintainers() -> None:
+def test_pegaflow_credits_upstream_and_scopes_local_adaptation_maintainers() -> None:
     expected = ["cybber695", "zhangshengxiang682"]
     expected_profiles = [
         {"login": "cybber695", "name": "陈彦博"},
@@ -165,6 +165,19 @@ def test_pegaflow_uses_current_repository_maintainers() -> None:
         component = by_id(component_id)
         assert component["maintainers"] == expected
         assert component["maintainer_profiles"] == expected_profiles
+        assert component["ownership"] == "hust_maintained_external_integration"
+        assert component["repository_relationship"] == "upstream_adaptation"
+        assert component["contribution_scope"] == "local_adaptation"
+        assert component["upstream_owner_zh"] == "派欧云团队"
+        assert component["upstream_repository"] == (
+            "https://github.com/novitalabs/pegaflow"
+        )
+
+    assert "PegaFlow 原项目由派欧云" in by_id("pegaflow")["summary_zh"]
+    assert "国产化适配" in by_id("pegaflow-vllm-connectors")["summary_zh"]
+    assert 'adaptationMaintainers: "国产化适配维护者"' in SCRIPT
+    assert 'upstreamOwner: "上游原项目"' in SCRIPT
+    assert 'item.contribution_scope === "local_adaptation"' in SCRIPT
 
 
 def test_legacy_migration_cards_preserve_original_ownership() -> None:
@@ -315,7 +328,7 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     assert "0.3.11.post1 Ascend transport" in mooncake["summary_en"]
     assert "9-key save/load" in mooncake_connectors["summary_en"]
     assert "outage/recovery evidence" in mooncake_connectors["summary_en"]
-    assert pegaflow["ownership"] == "hust_owned_subsystem"
+    assert pegaflow["ownership"] == "hust_maintained_external_integration"
     assert pegaflow["integration_contracts"] == []
     assert pegaflow["canonical_repository"] == (
         "https://github.com/vLLM-HUST/pegaflow-hust"
@@ -863,12 +876,12 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-quant-advisor"'
+        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-pegaflow-attribution"'
         in PAGE
     )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=ecpa-final-20261009-quant-advisor"' in PAGE
+        'v=ecpa-final-20261009-pegaflow-attribution"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009"'
@@ -974,7 +987,8 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     pegaflow = next(
         item for item in PORTFOLIO["repositories"] if item["name"] == "pegaflow-hust"
     )
-    assert pegaflow["repository_role"] == "external_subsystem"
+    assert pegaflow["repository_role"] == "upstream_adaptation"
+    assert pegaflow["relation_to_runtime"] == "adapts_external_subsystem_for_ascend"
     assert pegaflow["component_ids"] == [
         "pegaflow",
         "pegaflow-vllm-connectors",
