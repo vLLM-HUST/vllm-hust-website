@@ -79,7 +79,11 @@
         if (!data || data.contract_version !== 'dataset-program-v1' || !Array.isArray(data.primary_datasets) || data.primary_datasets.map((item) => item.id).join('|') !== expected.join('|')) {
             throw new Error('Unsupported dataset program contract');
         }
-        if (data.primary_datasets.some((item) => typeof item.primary_metric_zh !== 'string' || !item.primary_metric_zh || typeof item.source_url !== 'string' || !item.source_url.startsWith('https://'))) {
+        if (!data.designation || data.designation.id !== 'pujiang-specified-dataset-scope' || data.designation.scope_status !== 'names-only') {
+            throw new Error('Dataset program lacks the Pujiang designation');
+        }
+        const readiness = new Set(['executable', 'material-unfrozen', 'missing']);
+        if (data.primary_datasets.some((item) => typeof item.primary_metric_zh !== 'string' || !item.primary_metric_zh || typeof item.source_url !== 'string' || !item.source_url.startsWith('https://') || !item.readiness || !readiness.has(item.readiness.status))) {
             throw new Error('Dataset program metadata is incomplete');
         }
         return data;
@@ -95,10 +99,20 @@
             en: { 'knowledge-reasoning': 'Knowledge & reasoning', 'agentic-engineering': 'Agentic engineering', 'scientific-reasoning': 'Scientific reasoning' },
             zh: { 'knowledge-reasoning': '知识与推理', 'agentic-engineering': '智能体工程', 'scientific-reasoning': '科学推理' },
         };
+        const readinessText = {
+            en: { executable: 'Landed and executable', 'material-unfrozen': 'Material exists; version not frozen', missing: 'Missing' },
+            zh: { executable: '已落地且可执行', 'material-unfrozen': '已有材料但版本未冻结', missing: '缺失' },
+        };
+        const designation = state.program.designation;
+        $('dataset-program-kicker').textContent = lang() === 'zh' ? '浦江指定范围' : 'Pujiang-specified scope';
+        $('dataset-program-title').textContent = lang() === 'zh' ? designation.label_zh : designation.label;
+        $('dataset-program-lede').textContent = lang() === 'zh' ? designation.scope_note_zh : designation.scope_note;
         $('dataset-program-list').innerHTML = state.program.primary_datasets.map((dataset) => {
             const note = lang() === 'zh' ? dataset.note_zh : dataset.note;
             const metric = lang() === 'zh' ? dataset.primary_metric_zh : dataset.primary_metric;
-            return `<article class="dataset-program-item"><div><span>${escapeHtml(classText[lang()][dataset.evaluation_class] || dataset.evaluation_class)}</span><h3><a href="${escapeHtml(dataset.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(dataset.label)}</a></h3><p>${escapeHtml(note)}</p></div><div class="dataset-program-meta"><strong>${escapeHtml(statusText[lang()][dataset.status] || dataset.status)}</strong><small>${escapeHtml(metric)}</small></div></article>`;
+            const contractStatus = statusText[lang()][dataset.status] || dataset.status;
+            const currentReadiness = readinessText[lang()][dataset.readiness.status] || dataset.readiness.status;
+            return `<article class="dataset-program-item"><div><span>${escapeHtml(classText[lang()][dataset.evaluation_class] || dataset.evaluation_class)}</span><h3><a href="${escapeHtml(dataset.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(dataset.label)}</a></h3><p>${escapeHtml(note)}</p></div><div class="dataset-program-meta"><strong>${escapeHtml(currentReadiness)}</strong><small>${escapeHtml(contractStatus)} · ${escapeHtml(metric)}</small></div></article>`;
         }).join('');
         const policy = state.program.supplementary_material;
         $('dataset-supplementary-copy').textContent = lang() === 'zh' ? policy.rule_zh : policy.rule;
