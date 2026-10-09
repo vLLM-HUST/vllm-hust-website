@@ -9,7 +9,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -453,10 +453,41 @@ def build_snapshot(
     return {
         "schema_version": "plugin-workshop-metadata/v1",
         "generated_at": generated_at
-        or datetime.now(UTC).replace(microsecond=0).isoformat(),
+        or datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "source": "GitHub API + canonical ownership and organization identity data",
         "plugins": plugins,
     }
+
+
+def prune_snapshot(
+    registry: dict[str, Any], snapshot: dict[str, Any]
+) -> dict[str, Any]:
+    """Remove metadata for MODs that are no longer on the public surface.
+
+    This mode intentionally performs no network refresh.  It is useful when a
+    public-surface correction must not be coupled to private-repository access
+    or live GitHub API availability.
+    """
+    components = registry.get("components")
+    if not isinstance(components, list):
+        raise TypeError("ecosystem registry is missing a components array")
+    plugins = snapshot.get("plugins")
+    if not isinstance(plugins, dict):
+        raise TypeError("Workshop metadata snapshot is missing a plugins object")
+
+    visible_ids = {
+        str(item["id"])
+        for item in components
+        if isinstance(item, dict) and is_workshop_mod(item)
+    }
+    retained = {
+        plugin_id: metadata
+        for plugin_id, metadata in plugins.items()
+        if plugin_id in visible_ids
+    }
+    if not retained:
+        raise RuntimeError("Pruning would leave no Workshop MOD metadata")
+    return {**snapshot, "plugins": retained}
 
 
 def main() -> None:
@@ -466,9 +497,28 @@ def main() -> None:
     parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     parser.add_argument("--identities", type=Path, default=DEFAULT_IDENTITIES)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--prune-only",
+        action="store_true",
+        help="remove non-public MODs from an existing snapshot without GitHub API access",
+    )
     args = parser.parse_args()
 
     registry = json.loads(args.registry.read_text(encoding="utf-8"))
+    if args.prune_only:
+        if not args.output.exists():
+            raise FileNotFoundError(
+                f"Cannot prune missing Workshop metadata snapshot: {args.output}"
+            )
+        existing = json.loads(args.output.read_text(encoding="utf-8"))
+        snapshot = prune_snapshot(registry, existing)
+        args.output.write_text(
+            json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"Pruned Workshop metadata to {len(snapshot['plugins'])} MODs")
+        return
+
     identity_payload = json.loads(args.identities.read_text(encoding="utf-8"))
     client = GitHubClient(os.environ.get("GITHUB_TOKEN"))
     people_text = client.get_text_if_present(CANONICAL_PEOPLE_PATH)

@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "controller_pid": 367106,
+  "parent_pid": 367105,
+  "arms": [
+    {
+      "arm": "mooncake",
+      "attempt": "mooncake-measured-r1",
+      "passed": true
+    },
+    {
+      "arm": "native",
+      "attempt": "native-measured-r1",
+      "passed": true
+    }
+  ],
+  "active_arm": null
+}

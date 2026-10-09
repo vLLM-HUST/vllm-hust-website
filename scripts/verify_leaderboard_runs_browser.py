@@ -52,6 +52,7 @@ def main():
             (390, "zh", "light"),
             (1440, "zh", "dark"),
             (390, "en", "dark"),
+            (320, "zh", "light"),
         ]:
             context = browser.new_context(
                 viewport={"width": width, "height": 1000}, color_scheme=scheme
@@ -67,10 +68,28 @@ def main():
             )
             assert response.status == 200
             page.locator("#runs-content").wait_for(state="visible", timeout=30000)
+            assert (
+                page.locator(".runs-view-switch button").first.get_attribute("id")
+                == "view-frontier"
+            )
+            assert (
+                page.locator("#view-frontier").get_attribute("aria-pressed") == "true"
+            )
+            assert page.locator("#frontier-panel").is_visible()
+            assert page.locator("#runs-panel").is_hidden()
+            page.locator("#view-runs").click()
+
             nav = page.locator('.site-nav [data-nav-page="leaderboard-v2"]')
             assert nav.count() == 1
-            assert nav.inner_text() == (
-                "排行榜 v2" if language == "zh" else "Leaderboard v2"
+            group = page.locator('.site-nav [data-nav-group="evidence"]')
+            assert group.locator('[data-nav-page="leaderboard-v2"]').count() == 1
+            assert (
+                page.locator('.site-nav a[href="./dataset-validation.html"]').count()
+                == 1
+            )
+            assert page.locator('.site-nav a[href="./leaderboard.html"]').count() == 1
+            assert nav.text_content().strip() == (
+                "性能曲线" if language == "zh" else "Performance curves"
             )
             assert nav.get_attribute("href") == "./leaderboard-runs.html"
             assert "active" in nav.get_attribute("class")
@@ -83,7 +102,9 @@ def main():
                 assert nav.is_visible()
                 page.locator("#navToggle").click()
             else:
+                group.locator("summary").click()
                 assert nav.is_visible()
+                group.locator("summary").click()
 
             assert (
                 page.locator(
@@ -157,7 +178,9 @@ def main():
             page.locator("#column-values input").check()
             page.locator("#column-apply").click()
             assert page.locator(".run-row").count() == min(40, total_runs)
-            assert "Leaderboards" in page.locator("#view-runs").inner_text()
+            assert ("成绩主表" if language == "zh" else "Measurements") in page.locator(
+                "#view-runs"
+            ).inner_text()
             assert "Tasks" in page.locator("#view-tasks").inner_text()
             assert page.locator("#view-runs-count").inner_text() == str(total_runs)
             assert page.locator("#view-tasks-count").inner_text() == "8"
@@ -285,9 +308,25 @@ def main():
             assert page.locator("#view-runs-count").inner_text() == str(len(all_runs))
             page.locator("#runs-next").click()
             assert page.locator("#runs-page").inner_text().startswith("2 /")
-            assert page.evaluate(
-                "document.documentElement.scrollWidth <= window.innerWidth + 1"
+            layout = page.evaluate(
+                """() => ({viewport:innerWidth, width:document.documentElement.scrollWidth,
+                  outside:[...document.querySelectorAll('body *')].filter(n=>{
+                    for(let a=n.parentElement;a&&a!==document.body;a=a.parentElement){
+                      if(['auto','scroll','hidden','clip'].includes(getComputedStyle(a).overflowX))return false;
+                    }
+                    return true;
+                  }).map(n=>{
+                    const r=n.getBoundingClientRect();
+                    return {tag:n.tagName,id:n.id,classes:String(n.className),
+                      left:r.left,right:r.right,width:r.width};
+                  }).filter(r=>r.width>0&&(r.right>innerWidth+1||r.left < -1)).slice(0,20)})"""
             )
+            if layout["width"] > layout["viewport"] + 1:
+                page.screenshot(
+                    path=str(args.output / f"overflow-{width}-{language}-{scheme}.png"),
+                    full_page=True,
+                )
+            assert layout["width"] <= layout["viewport"] + 1, layout
             assert not errors, errors
             reports.append(
                 {
@@ -302,7 +341,9 @@ def main():
         context = browser.new_context()
         page = context.new_page()
         page.route("**/leaderboard_run_observations.json", lambda route: route.abort())
-        page.goto(f"{args.url}/leaderboard-runs.html", wait_until="domcontentloaded")
+        page.goto(
+            f"{args.url}/leaderboard-runs.html#runs", wait_until="domcontentloaded"
+        )
         page.locator("#runs-content").wait_for(state="visible", timeout=30000)
         assert page.locator("#runs-supplement-warning").is_visible()
         assert all(
@@ -314,7 +355,9 @@ def main():
         context = browser.new_context()
         page = context.new_page()
         page.route("**/leaderboard_mod_attributions.json", lambda route: route.abort())
-        page.goto(f"{args.url}/leaderboard-runs.html", wait_until="domcontentloaded")
+        page.goto(
+            f"{args.url}/leaderboard-runs.html#runs", wait_until="domcontentloaded"
+        )
         page.locator("#runs-content").wait_for(state="visible", timeout=30000)
         assert page.locator("#runs-identity-warning").is_visible()
         assert page.locator("#view-runs-count").inner_text() == str(len(all_runs))

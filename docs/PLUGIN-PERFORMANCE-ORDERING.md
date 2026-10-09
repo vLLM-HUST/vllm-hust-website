@@ -1,0 +1,74 @@
+# MOD throughput comparisons
+
+The existing plugin cards show one number: output-throughput change from a published matched
+comparison. Cards sort by this number descending, including negative results. A missing comparison
+is a dash, never zero. No extra results section or qualification status paragraphs are rendered on
+the cards.
+
+`data/plugin-performance.json` stores one or more model-scoped observations for each entry and
+groups complete Frontier observations with the Native series from their published campaign. Each
+entry explicitly names one default observation for the all-model view; a model-filtered view selects
+only the observation for that model. Results from different models are never averaged together.
+`assets/plugin-performance.js` reads actual Frontier throughput values and computes
+`(geometric_mean(candidate_tps / native_tps) - 1) * 100` across C1/2/4/8/16. Every load receives
+equal weight. The Frontier link tooltip exposes the aggregation and per-load percentages. No scores
+are stored in metadata. Current Frontier campaigns bind observation IDs to their Native series
+centrally; older published observations retain one or more raw candidate/baseline throughput pairs
+so the page recomputes their geometric mean rather than storing a percentage.
+
+## Existing BetterScale data
+
+The complete small-fish series and the existing capacity16 Native series have matching model
+revision, runtime base commits, workload/tokenizer fingerprints, hardware topology, explicit 24.25
+GiB/chip KV budget, context, slots, batching, APC, async scheduling and natural MTP2. Both use
+900-second fixed-window streamed-token accounting, excluding drain. Their client revisions differ
+only in repository documentation, as recorded in [the source evidence](FRONTIER-SMALL-FISH.md).
+
+Graph/capture settings, task-queue settings and MOD workers are treatment configuration differences:
+BetterScale uses its FULL graph path while Native uses FULL_AND_PIECEWISE. The reported number is
+observed end-to-end throughput relative to Native, not an isolated kernel ablation. Both curves are
+single smoke observations. The Native C16 retrieval caveat recorded in
+[the original report](FRONTIER-QWEN35-SWE-PREFIX.md) remains; throughput comparisons do not certify
+answer quality or repeatability. No original measurements or caveats are removed.
+
+The five throughput changes are +16.87%, +30.44%, +46.63%, +57.55%, and +66.22%; their geometric
+aggregate is +42.39%. This complete series is selected explicitly, rather than selecting the best
+point independently at each load or substituting the newer single resident-state C16 observation.
+
+## Later unified campaign
+
+BidKV, DLA, Tiering, Mooncake and KVCompression use the single five-point Native curve from their
+later unified campaign. Pipeline's complete TP2/PP2 campaign uses its published five-point Native
+curve. vSpec, DiffSpec, LatchMoE and KV Materialization Arrival Control use raw paired throughput
+values from their linked public reports. The KV Materialization result covers three matched rounds
+on each of two workloads and reports the controller against `always_full_reuse`; its six-pair
+geometric mean is a small regression. The validator excludes incompatible Frontier identities and
+malformed published pairs.
+
+ECPA launch/adapter/analysis metadata remains in the data file. It is not injected into the
+performance card or used to invent a performance score.
+
+## ECPA acceptance evidence
+
+The eleven historical performance entries are not eleven ECPA certifications. The same
+`plugin-performance/v6` record keeps three facts independent: archived performance evidence, ECPA
+launch acceptance, and analysis integration. The 2026-09-27 campaign records are:
+
+| Entries                                                                    | ECPA launch acceptance                                                                                          | Analysis path                |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| KV Tiering                                                                 | Manager-verified                                                                                                | External specialized harness |
+| Ascend KV Compression                                                      | Manager-verified                                                                                                | External specialized harness |
+| AscendStoreConnector + Mooncake                                            | Manager-verified through a supplemental Provider profile; `vLLM-HUST/extension-manager#8` remains an open draft | External specialized harness |
+| BidKV, DLA, Pipeline Microbatch                                            | Performance runs used project-specific scripts; no unified ECPA launch acceptance                               | External specialized harness |
+| BetterScale, vSpec, LatchMoE, DiffSpec, KV Materialization Arrival Control | Existing public results only; not reproduced through ECPA in this round                                         | External/published analysis  |
+
+For all eleven entries, request collection, throughput/latency recomputation, baseline pairing, and
+Frontier import remain outside the manager. `check`, `status`, and `plan` validate configuration and
+state; they are not performance-analysis operations. A manager-launched run therefore does not by
+itself establish an integrated experiment workflow or runtime effectiveness.
+
+The campaign also observed a process-release defect: after the manager exited, API/worker processes
+and device memory could remain until the experiment supervisor cleaned them up. The machine-readable
+boundary keeps this as `known-defect` and links the retained incident record. Do not promote process
+exit or resource release to accepted until signal forwarding, descendant waiting, and device-memory
+release have an independent regression result.

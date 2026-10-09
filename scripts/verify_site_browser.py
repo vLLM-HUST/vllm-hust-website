@@ -137,6 +137,18 @@ def main():
                     )
                 else:
                     page.wait_for_selector(".workload-filter")
+                    search = page.locator("[data-plugin-search]")
+                    search.fill("PegaFlow")
+                    pegaflow = page.locator("#pegaflow-vllm-connectors")
+                    pegaflow.wait_for(state="visible")
+                    assert "+6.34%" in pegaflow.inner_text()
+                    performance_link = pegaflow.locator(".plugin-performance a")
+                    assert "C1: -28.43%" in performance_link.get_attribute("title")
+                    assert "C16: +27.79%" in performance_link.get_attribute("title")
+                    page.locator("#langToggle").click()
+                    assert "输出吞吐" in pegaflow.inner_text()
+                    page.locator("#langToggle").click()
+                    search.fill("")
                     filters = page.locator("[data-workload-filters]")
                     assert filters.get_attribute("tabindex") == "0"
                     filters.focus()
@@ -198,6 +210,28 @@ def main():
                     "language_persistence": "pass",
                     "metadata_error_i18n": "pass",
                 }
+            )
+            context.close()
+        for missing_asset, handler in (
+            (
+                "**/data/plugin-performance.json*",
+                lambda route: route.fulfill(
+                    json={"schema_version": "invalid", "entries": []}
+                ),
+            ),
+            (
+                "**/assets/plugin-performance.js*",
+                lambda route: route.fulfill(status=503, body="unavailable"),
+            ),
+        ):
+            context = browser.new_context()
+            page = context.new_page()
+            page.route(missing_asset, handler)
+            page.goto(f"{args.url.rstrip('/')}/plugins.html")
+            page.wait_for_selector("#adm.workshop-card")
+            assert (
+                "could not be loaded"
+                not in page.locator("[data-plugin-status]").inner_text()
             )
             context.close()
         browser.close()

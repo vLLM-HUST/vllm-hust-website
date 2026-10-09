@@ -14,7 +14,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=nav-polish-20260826" />
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
   <link rel="stylesheet" href="./assets/home.css?v=0.3.7" />
 </head>
 <body data-page="home">
@@ -27,9 +27,8 @@
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
         <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">Ecosystem</a>
-        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard.html">Leaderboard</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard-runs.html">Benchmarks</a>
         <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
-        <a id="nav-dataset-validation" class="nav-link" data-nav-page="dataset-validation" href="./dataset-validation.html">Dataset validation</a>
         <a id="nav-news" class="nav-link" data-nav-page="news" href="./news.html">News</a>
         <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
         <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
@@ -64,15 +63,15 @@
       <div class="execution-hero-copy">
         <p id="home-eyebrow" class="execution-signal"><span></span>Domestic compute · inference engine / 03</p>
         <h1 id="home-title">vLLM-HUST</h1>
-        <p id="home-kicker" class="execution-kicker">Typed runtime contracts. 25 audited MODs. Evidence before claims.</p>
-        <p id="home-lede" class="execution-lede">Typed boundaries connect systems; every MOD publishes ownership, compatibility, workload fit, and evidence limits.</p>
+        <p id="home-kicker" class="execution-kicker">28 MODs for real serving workloads, with compatibility and evidence close at hand.</p>
+        <p id="home-lede" class="execution-lede">Explore extensions by workload, platform, and readiness, with maintainers and results linked from every project.</p>
         <div class="execution-actions">
-          <a id="home-primary-cta" class="execution-button primary" href="./plugins.html#plugin-catalog">Explore all 25 MODs <span aria-hidden="true">→</span></a>
+          <a id="home-primary-cta" class="execution-button primary" href="./plugins.html#plugin-catalog">Explore all 28 MODs →</a>
           <a id="home-github-cta" class="execution-button quiet" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">Open GitHub <span aria-hidden="true">↗</span></a>
         </div>
       </div>
       <dl class="execution-metrics" aria-label="vLLM-HUST overview">
-        <div><dt id="home-fact-1-label">Portfolio</dt><dd id="home-fact-1-value">25 MODs · 9 workloads</dd></div>
+        <div><dt id="home-fact-1-label">Portfolio</dt><dd id="home-fact-1-value">28 MODs · 11 workloads</dd></div>
         <div><dt id="home-fact-2-label">Ownership</dt><dd id="home-fact-2-value">maintainers · advisors · repositories</dd></div>
         <div><dt id="home-fact-3-label">Evidence</dt><dd id="home-fact-3-value">compatibility · effects · follow-ups</dd></div>
       </dl>
@@ -143,19 +142,19 @@
       <div class="stack-grid">
         <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / HOST</span><strong>Runtime Contracts</strong><p id="stack-core-copy">Typed domain boundaries owned by the engine.</p><em>Repository ↗</em></a>
         <a href="./plugins.html"><span>02 / CONNECT</span><strong>Ecosystem Interfaces</strong><p id="stack-ascend-copy">Platform profiles, KV adapters, bridges, and bundles keep distinct roles.</p><em id="stack-catalog-link">Open ecosystem catalog →</em></a>
-        <a href="./leaderboard.html"><span>03 / VALIDATE</span><strong>Validation Matrix</strong><p id="stack-triton-copy">Validate across engines, compilers, and hardware.</p><em id="stack-leaderboard-link">Open leaderboard →</em></a>
+        <a href="./dataset-validation.html"><span>03 / VALIDATE</span><strong>Dataset Matrix</strong><p id="stack-triton-copy">Validate across engines, compilers, and hardware.</p><em id="stack-leaderboard-link">Open dataset matrix →</em></a>
         <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / MEASURE</span><strong>Benchmark Contract</strong><p id="stack-benchmark-copy">Fixed targets and public evidence.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
       </div>
     </section>
 
     <section class="execution-section execution-atlas" id="projects">
       <div class="execution-section-head">
-        <div><p id="atlas-eyebrow" class="execution-eyebrow">Audited MOD portfolio</p><h2 id="atlas-title">25 MODs, with compatibility and evidence made explicit.</h2></div>
-        <p id="atlas-summary">The catalog separates verified, inspect-only, and source-scaffold MODs; static checks never become runtime or NPU claims.</p>
+        <div><p id="atlas-eyebrow" class="execution-eyebrow">MOD portfolio</p><h2 id="atlas-title">Explore 28 MODs for scheduling, KV, execution, model preparation, and observability.</h2></div>
+        <p id="atlas-summary">Each card shows what is ready to use, what is available for evaluation, and what still needs integration work.</p>
       </div>
       <a class="mod-portfolio-brief" href="./plugins.html#plugin-catalog" aria-labelledby="mod-portfolio-title">
-        <span class="mod-portfolio-count" aria-hidden="true">24</span>
-        <span><strong id="mod-portfolio-title">Open the complete MOD catalog</strong><small id="mod-portfolio-copy">Owners, internal or external guidance, host versions, platforms, prerequisites, workload tags, public effects, evidence links, and accountable follow-up issues.</small></span>
+        <span class="mod-portfolio-count" data-home-mod-count aria-hidden="true">26</span>
+        <span><strong id="mod-portfolio-title">Open the complete MOD catalog</strong><small id="mod-portfolio-copy">Compare workload fit, supported platforms, maintainers, setup notes, and published results in one place.</small></span>
         <span class="mod-portfolio-arrow" aria-hidden="true">→</span>
       </a>
       <button class="runtime-disclosure" id="runtime-disclosure" type="button" aria-controls="runtime-list" aria-expanded="true" hidden>Repository directory</button>
@@ -225,7 +224,7 @@
 
   <footer class="execution-footer">
     <div><strong>vLLM-HUST</strong><span id="footer-copy">Inference for domestic compute.</span></div>
-    <nav aria-label="Footer navigation"><a href="./leaderboard.html">Leaderboard</a><a href="./contributors.html">Contributors</a><a href="https://github.com/vLLM-HUST">GitHub</a></nav>
+    <nav aria-label="Footer navigation"><a href="./leaderboard-runs.html">Benchmarks</a><a href="./contributors.html">Contributors</a><a href="https://github.com/vLLM-HUST">GitHub</a></nav>
   </footer>
 
   <script>
@@ -233,11 +232,11 @@
       en: {
         title: 'vLLM-HUST | Inference Engine for Domestic Compute',
         'home-eyebrow': 'Domestic compute · inference engine / 03',
-        'home-kicker': 'Typed runtime contracts. 25 audited MODs. Evidence before claims.',
-        'home-lede': 'Typed boundaries connect systems; every MOD publishes ownership, compatibility, workload fit, and evidence limits.',
-        'home-primary-cta': 'Explore all 25 MODs →', 'home-github-cta': 'Open GitHub ↗',
+        'home-kicker': '28 MODs for real serving workloads, with compatibility and evidence close at hand.',
+        'home-lede': 'Explore extensions by workload, platform, and readiness, with maintainers and results linked from every project.',
+        'home-primary-cta': 'Explore all 28 MODs →', 'home-github-cta': 'Open GitHub ↗',
         'home-fact-1-label': 'Portfolio', 'home-fact-2-label': 'Ownership', 'home-fact-3-label': 'Evidence',
-        'home-fact-1-value': '25 MODs · 9 workloads', 'home-fact-2-value': 'maintainers · advisors · repositories', 'home-fact-3-value': 'compatibility · effects · follow-ups',
+        'home-fact-1-value': '28 MODs · 11 workloads', 'home-fact-2-value': 'maintainers · advisors · repositories', 'home-fact-3-value': 'compatibility · effects · follow-ups',
         'scope-products': 'Products & apps', 'scope-engine': 'Engine', 'scope-projects': 'Projects', 'scope-ecosystem': 'Ecosystem',
         'products-eyebrow': 'Products & applications', 'products-title': 'From inference operations to agent applications.',
         'products-summary': 'Workstation operates vLLM-HUST. Sage Mate is an application built with SAGE and backed by vLLM-HUST.',
@@ -258,12 +257,12 @@
         'stack-core-copy': 'Typed domain boundaries owned by the engine.',
         'stack-ascend-copy': 'Platform profiles, KV adapters, bridges, and bundles keep distinct roles.',
         'stack-triton-copy': 'Validate across engines, compilers, and hardware.',
-        'stack-catalog-link': 'Open ecosystem catalog ↓', 'stack-leaderboard-link': 'Open leaderboard →',
+        'stack-catalog-link': 'Open ecosystem catalog ↓', 'stack-leaderboard-link': 'Open dataset matrix →',
         'stack-benchmark-copy': 'Fixed targets and public evidence.', 'stack-benchmark-link': 'Open benchmark ↗',
-        'atlas-eyebrow': 'Audited MOD portfolio', 'atlas-title': '25 MODs, with compatibility and evidence made explicit.',
-        'atlas-summary': 'The catalog separates verified, inspect-only, and source-scaffold MODs; static checks never become runtime or NPU claims.',
+        'atlas-eyebrow': 'MOD portfolio', 'atlas-title': 'Explore 28 MODs for scheduling, KV, execution, model preparation, and observability.',
+        'atlas-summary': 'Each card shows what is ready to use, what is available for evaluation, and what still needs integration work.',
         'mod-portfolio-title': 'Open the complete MOD catalog',
-        'mod-portfolio-copy': 'Owners, internal or external guidance, host versions, platforms, prerequisites, workload tags, public effects, evidence links, and accountable follow-up issues.',
+        'mod-portfolio-copy': 'Compare workload fit, supported platforms, maintainers, setup notes, and published results in one place.',
         'mechanism-control-title': 'Control & state', 'mechanism-control-copy': 'Admission, scheduling, and KV lifecycle.',
         'mechanism-execution-title': 'Decoding & execution', 'mechanism-execution-copy': 'Decoding, expert placement, and execution.',
         'mechanism-representation-title': 'Model representation', 'mechanism-representation-copy': 'Precision, quantization, and storage.',
@@ -282,11 +281,11 @@
       },
       zh: {
         title: 'vLLM-HUST | 面向国产算力的大模型推理引擎',
-        'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '类型化运行时契约、25 个已审计 MOD、证据先于结论。',
-        'home-lede': '类型化边界连接策略、平台与 KV 系统；每个 MOD 明示负责人、兼容性、Workload 与证据边界。',
-        'home-primary-cta': '查看全部 25 个 MOD →', 'home-github-cta': '打开 GitHub ↗',
+        'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '28 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。',
+        'home-lede': '按 Workload、平台和成熟度选择扩展，每个项目都能继续查看维护者与公开结果。',
+        'home-primary-cta': '查看全部 28 个 MOD →', 'home-github-cta': '打开 GitHub ↗',
         'home-fact-1-label': '项目组合', 'home-fact-2-label': '人员关系', 'home-fact-3-label': '公开证据',
-        'home-fact-1-value': '25 个 MOD · 9 类 Workload', 'home-fact-2-value': '负责人 · 指导关系 · 仓库', 'home-fact-3-value': '兼容性 · 效果 · 跟进项',
+        'home-fact-1-value': '28 个 MOD · 11 类 Workload', 'home-fact-2-value': '负责人 · 指导关系 · 仓库', 'home-fact-3-value': '兼容性 · 效果 · 跟进项',
         'scope-products': '产品与应用', 'scope-engine': '引擎', 'scope-projects': '项目', 'scope-ecosystem': '生态',
         'products-eyebrow': '产品与应用', 'products-title': '从推理运维到智能体应用。',
         'products-summary': 'Workstation 运维推理栈；Sage Mate 基于 SAGE，调用 vLLM-HUST。',
@@ -307,12 +306,12 @@
         'stack-core-copy': '由引擎拥有的类型化领域边界。',
         'stack-ascend-copy': '平台 profile、KV 适配器、bridge 与 bundle 保持不同角色。',
         'stack-triton-copy': '跨引擎、编译栈与硬件验证。',
-        'stack-catalog-link': '查看生态目录 ↓', 'stack-leaderboard-link': '打开排行榜 →',
+        'stack-catalog-link': '查看生态目录 ↓', 'stack-leaderboard-link': '打开数据集矩阵 →',
         'stack-benchmark-copy': '固定靶与公开证据。', 'stack-benchmark-link': '打开 Benchmark ↗',
-        'atlas-eyebrow': '已审计 MOD 项目组合', 'atlas-title': '25 个 MOD，明确展示兼容性与证据边界。',
-        'atlas-summary': '规范目录区分已验证集成、仅可检查仓库与源码脚手架，不把静态检查写成运行时或 NPU 结论。',
+        'atlas-eyebrow': 'MOD 项目组合', 'atlas-title': '探索 28 个 MOD，覆盖调度、KV、执行、模型准备与可观测性。',
+        'atlas-summary': '每张卡片都会说明项目是已经可用、适合评估，还是仍需继续完成集成。',
         'mod-portfolio-title': '打开完整 MOD 目录',
-        'mod-portfolio-copy': '集中查看负责人、内部或校外指导、宿主版本、平台、前置条件、Workload 标签、公开效果、证据链接与责任到人的跟进 Issue。',
+        'mod-portfolio-copy': '在一个页面比较适用 Workload、支持平台、维护者、配置说明与公开结果。',
         'mechanism-control-title': '控制与状态', 'mechanism-control-copy': '请求准入、调度与 KV 生命周期。',
         'mechanism-execution-title': '解码与执行', 'mechanism-execution-copy': '解码、专家放置与执行。',
         'mechanism-representation-title': '模型表示', 'mechanism-representation-copy': '精度、量化与存储。',
@@ -331,7 +330,9 @@
       }
     };
   </script>
-  <script src="./assets/site.js?v=leaderboard-v2-20260922"></script>
+  <script src="./assets/site.js?v=benchmarks-ia-20261003"></script>
+  <script src="./assets/ecosystem-catalog.js?v=mod-catalog-20261008"></script>
+  <script src="./assets/home-catalog.js?v=mod-catalog-20261008"></script>
   <script src="./assets/product-catalog.js?v=0.3.7"></script>
   <script src="./assets/home-disclosure.js?v=0.3.7"></script>
 </body>

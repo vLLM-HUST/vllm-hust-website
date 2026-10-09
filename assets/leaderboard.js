@@ -63,6 +63,7 @@
             hardConstraintsTitle: 'Validation Checks',
             hardConstraintsSubtitle: 'Current validation records from benchmark snapshots, with context from previous submissions.',
             hardConstraintsNoData: 'No validation records under current filters.',
+            notMeasured: 'Not measured',
             hardConstraintsBaselineLabel: 'Performance Baseline',
             hardConstraintsBaselineValue: 'Official vLLM 0.18.0 + vllm-ascend v0.18.0',
             hardConstraintsBestCaseScope: 'Selected scope across visible workloads',
@@ -312,6 +313,7 @@
             hardConstraintsTitle: '验证项',
             hardConstraintsSubtitle: '展示当前 benchmark 快照中的验证记录，并保留与上次提交相关的上下文。',
             hardConstraintsNoData: '当前筛选条件下没有验证记录。',
+            notMeasured: '未测量',
             hardConstraintsBaselineLabel: '性能基线',
             hardConstraintsBaselineValue: 'Official vLLM 0.18.0 + vllm-ascend v0.18.0',
             hardConstraintsBestCaseScope: '当前可见 workload 选择范围',
@@ -5762,7 +5764,8 @@
             overall_pass: checkItems.every((item) => item.passed === true),
             summary_counts: {
                 passed: checkItems.filter((item) => item.passed === true).length,
-                failed: checkItems.filter((item) => item.passed !== true).length,
+                failed: checkItems.filter((item) => item.passed === false).length,
+                incomplete: checkItems.filter((item) => item.passed == null).length,
             },
             check_items: checkItems,
             latest: {
@@ -5841,7 +5844,8 @@
         }
 
         const passCount = bestScope?.summary_counts?.passed ?? displayedScopes.filter((scope) => scope?.overall_pass).length;
-        const failCount = bestScope?.summary_counts?.failed ?? Math.max(displayedScopes.length - passCount, 0);
+        const failCount = bestScope?.summary_counts?.failed ?? displayedScopes.filter((scope) => scope?.overall_status === 'failed').length;
+        const incompleteCount = bestScope?.summary_counts?.incomplete ?? displayedScopes.filter((scope) => scope?.overall_status === 'incomplete').length;
 
         el.innerHTML = `
             <div class="hard-constraints-header">
@@ -5852,6 +5856,7 @@
                 <div class="hard-constraints-summary">
                     <span class="hc-badge pass">${t('pass')}: ${passCount}</span>
                     <span class="hc-badge fail">${t('fail')}: ${failCount}</span>
+                    <span class="hc-badge incomplete">${t('notMeasured')}: ${incompleteCount}</span>
                 </div>
             </div>
             <div class="hard-constraints-baseline">
@@ -5871,10 +5876,13 @@
         const checkItems = buildHardConstraintCheckItems(scope);
         const passedCount = checkItems.filter((item) => item.passed === true).length;
         const failedItems = checkItems.filter((item) => item.passed === false);
-        const statusClass = scope?.overall_pass ? 'pass' : 'fail';
-        const summaryBadges = failedItems.length
+        const incompleteItems = checkItems.filter((item) => item.passed == null);
+        const statusClass = scope?.overall_pass ? 'pass' : (failedItems.length ? 'fail' : 'incomplete');
+        const summaryBadges = failedItems.length || incompleteItems.length
             ? failedItems.map((item) => `<span class="hc-check-badge fail">${item.code}</span>`).join('')
+                + incompleteItems.map((item) => `<span class="hc-check-badge incomplete">${item.code}</span>`).join('')
             : `<span class="hc-check-badge pass">4/4</span>`;
+        const statusLabel = scope?.overall_pass ? t('pass') : (failedItems.length ? t('fail') : t('notMeasured'));
         const scopeLine = scope?.is_best_case_bundle
             ? `${t('scope')}: ${t('hardConstraintsBestCaseScope')}`
             : `${t('scope')}: ${getScopeModelDisplayName(scope?.scope) || '-'} • ${scope?.scope?.hardware || '-'} • ${scope?.scope?.workload || '-'}`;
@@ -5891,7 +5899,7 @@
                     <div class="hard-constraint-summary-main">
                         <div class="hard-constraint-card-head">
                             <strong>${getEngineLabel(latest?.engine || scope?.scope?.engine || 'unknown')}</strong>
-                            <span class="hc-status ${statusClass}">${scope?.overall_pass ? t('pass') : t('fail')}</span>
+                            <span class="hc-status ${statusClass}">${statusLabel}</span>
                         </div>
                         <p class="hard-constraint-scope">${scopeLine}</p>
                         <p class="hard-constraint-scope-meta">
@@ -5914,7 +5922,8 @@
     }
 
     function renderHardConstraintRow(label, passed, currentValue, targetValue, deltaValue, scopeHint = '') {
-        const statusClass = passed ? 'pass' : 'fail';
+        const statusClass = passed === true ? 'pass' : (passed === false ? 'fail' : 'incomplete');
+        const statusLabel = passed === true ? t('pass') : (passed === false ? t('fail') : t('notMeasured'));
         return `
             <div class="hard-constraint-row">
                 <div class="hc-row-title">${label}</div>
@@ -5923,7 +5932,7 @@
                     <span>${t('target')}: ${targetValue}</span>
                     <span>${t('delta')}: ${deltaValue}</span>
                     ${scopeHint ? `<span>${scopeHint}</span>` : ''}
-                    <span class="hc-row-status ${statusClass}">${passed ? t('pass') : t('fail')}</span>
+                    <span class="hc-row-status ${statusClass}">${statusLabel}</span>
                 </div>
             </div>
         `;

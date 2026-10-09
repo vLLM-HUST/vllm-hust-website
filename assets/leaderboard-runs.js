@@ -6,7 +6,7 @@
     const words = {
         en: {
             readingNotes: 'About these measurements', ascending: '↑ Sort ascending', descending: '↓ Sort descending', searchValues: 'Search values', selectAll: 'Select visible', selectNone: 'Deselect visible', clearColumn: 'Clear filter', cancel: 'Cancel', apply: 'Apply', noValues: 'No matching values', filterColumn: 'Filter', filtered: 'filtered',
-            title: 'One workload. Every run.', lede: 'Model × parallel configuration → task → MOD. Real measurements, with the configuration beside each run.',
+            title: 'One workload. Every run.', lede: 'Model × parallel configuration → task → MOD. Real measurements, with the configuration beside each run.', settings: 'Benchmark settings',
             review: 'REVIEW PREVIEW', old: 'Existing leaderboard ↗', model: 'Model / parallel', task: 'Task tag', mod: 'MOD',
             all: 'All', native: 'Native', current: 'Current publication', historical: 'Historical evidence', records: 'Records',
             engine: 'Engine', enabled: 'Enabled', baseline: 'Baseline', related: 'Related experiment · activation unverified', noMod: 'No MOD', identityMissing: 'MOD identity evidence unavailable; unknown identities remain unassigned.', hardware: 'Hardware', unknown: 'Not recorded', results: 'Measurements', tasks: 'Task definitions',
@@ -28,7 +28,7 @@
         },
         zh: {
             readingNotes: '数据口径说明', ascending: '↑ 升序排列', descending: '↓ 降序排列', searchValues: '搜索选项', selectAll: '勾选可见项', selectNone: '取消可见项', clearColumn: '清除此列筛选', cancel: '取消', apply: '应用', noValues: '没有匹配的选项', filterColumn: '筛选', filtered: '已筛选',
-            title: '同一任务，看清每一次运行。', lede: '模型 × 并行配置 → 任务 → MOD。实测成绩与每次运行的配置，放在同一张表里。',
+            title: '同一任务，看清每一次运行。', lede: '模型 × 并行配置 → 任务 → MOD。实测成绩与每次运行的配置，放在同一张表里。', settings: '实验设定',
             review: '评审预览', old: '现有排行榜 ↗', model: '模型 / 并行配置', task: '任务 tag', mod: 'MOD',
             all: '全部', native: '原生', current: '当前发布', historical: '历史证据', records: '记录范围',
             engine: '引擎', enabled: '已启用', baseline: '基线', related: '相关实验 · 启用未核实', noMod: '无 MOD', identityMissing: 'MOD 身份证据暂不可用；未知身份不作归属。', hardware: '硬件', unknown: '未记录', results: '成绩主表', tasks: '任务定义表',
@@ -53,7 +53,7 @@
     const t = key => words[lang()][key] || key;
     const fmt = value => value === null || value === undefined ? '—' : new Intl.NumberFormat(lang(), { maximumFractionDigits: 2 }).format(value);
     const state = { rows: [], tasks: [], page: 0, expanded: new Set(), selectedTask: '', ready: false,
-        view: 'runs', columnFilters: {}, sort: null,
+        view: 'frontier', columnFilters: {}, sort: null,
         filters: { source: '' }, missingSupplement: false };
     const pageSize = 40;
     const link = (url, label) => url ? `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a>` : '';
@@ -68,11 +68,13 @@
     function filteredRows() { return model.selectRows(state.rows.filter(matches), state.columnFilters, state.sort); }
     function setView(view) {
         state.view = view;
-        history.replaceState(null, '', `${location.pathname}${location.search}${view === 'frontier' ? '#frontier' : ''}`);
+        const fragment = view === 'frontier' ? 'settings' : view;
+        history.replaceState(null, '', `${location.pathname}${location.search}#${fragment}`);
         for (const name of ['runs', 'tasks', 'frontier']) {
             $(`${name}-panel`).hidden = view !== name;
             $(`view-${name}`).setAttribute('aria-pressed', String(view === name));
         }
+        $('frontier-agent-qualifications').hidden = view !== 'frontier';
     }
     function renderHeaders() {
         $('runs-headers').innerHTML = columns.map(([key, label, unit]) => {
@@ -254,7 +256,7 @@
     }
     function translate() {
         for (const node of document.querySelectorAll('[data-runs-i18n]')) node.textContent = t(node.dataset.runsI18n);
-        document.title = lang() === 'zh' ? '排行榜 v2 - vLLM-HUST' : 'Leaderboard v2 - vLLM-HUST';
+        document.title = lang() === 'zh' ? '性能曲线 - vLLM-HUST' : 'Performance curves - vLLM-HUST';
         if (state.ready) { renderHeaders(); renderRows(); }
     }
     async function initialize() {
@@ -310,6 +312,6 @@
         }
     });
     window.addEventListener('vllm-hust:langchange', translate);
-    if (location.hash === '#frontier') setView('frontier');
+    setView(['#runs', '#tasks'].includes(location.hash) ? location.hash.slice(1) : 'frontier');
     initialize();
 })();

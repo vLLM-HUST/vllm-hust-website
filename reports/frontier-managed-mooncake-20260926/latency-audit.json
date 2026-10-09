@@ -1,0 +1,106 @@
+{
+  "kind": "derived-artifact",
+  "passed": true,
+  "windows": [
+    {
+      "run_id": "317aba975df24885aa9f353e9268c619",
+      "raw_requests_sha256": "4187e2b7d1e77ae18e07603a532aec8a8612efccc0d4833b1045dcad150441f2",
+      "passed": true,
+      "output_tps": 91.19333333333333,
+      "decode_p90_tps": 106.46816271318905,
+      "ttft_p95_seconds": 1.1273022273555398,
+      "decode_speed_samples": 147,
+      "mean_client_inflight": 0.999339953655791
+    },
+    {
+      "run_id": "9ccc907cd6714f79bb01277e30f58a48",
+      "raw_requests_sha256": "eb054b43ccfdb09426607e2c7c3f356cbae4299336772eca183a043b1594b0e6",
+      "passed": true,
+      "output_tps": 150.93555555555557,
+      "decode_p90_tps": 97.55806873883616,
+      "ttft_p95_seconds": 1.448577737249434,
+      "decode_speed_samples": 208,
+      "mean_client_inflight": 1.9987443871475343
+    },
+    {
+      "run_id": "3dd3ffa435584471a0829ca307ec3d59",
+      "raw_requests_sha256": "e6f091cb997eab4b77d938833fa5ef3dbfb8b2669dbf87e41e61145b41c5bf91",
+      "passed": true,
+      "output_tps": 216.2811111111111,
+      "decode_p90_tps": 78.68991839391656,
+      "ttft_p95_seconds": 1.7620817110873759,
+      "decode_speed_samples": 318,
+      "mean_client_inflight": 3.997918023098674
+    },
+    {
+      "run_id": "beb80910bbda46039a4aa7066b949f1f",
+      "raw_requests_sha256": "0e1d1e83ac319a011da682eeb62238cc38c849b8d175f8dd51a91b2c022149d6",
+      "passed": true,
+      "output_tps": 290.93444444444447,
+      "decode_p90_tps": 56.37029446213708,
+      "ttft_p95_seconds": 2.06851804908365,
+      "decode_speed_samples": 425,
+      "mean_client_inflight": 7.997586986648126
+    },
+    {
+      "run_id": "522f027ca0514a50b84903188b904f43",
+      "raw_requests_sha256": "222abcc1e4caabf7268e2954f450d2c741f485e7f46a5aa10b354b9ee4e2449a",
+      "passed": true,
+      "output_tps": 351.6322222222222,
+      "decode_p90_tps": 34.07206610945321,
+      "ttft_p95_seconds": 2.6013813056517394,
+      "decode_speed_samples": 552,
+      "mean_client_inflight": 15.997494894226806
+    },
+    {
+      "run_id": "9445105346354a8dab4ea0e93306ab4c",
+      "raw_requests_sha256": "eea0ab695336d9f67a6918e6405c09a352298c5eb14b2f94e91be7e748858b61",
+      "passed": true,
+      "output_tps": 92.48444444444445,
+      "decode_p90_tps": 107.39977672186545,
+      "ttft_p95_seconds": 1.0910671505145728,
+      "decode_speed_samples": 148,
+      "mean_client_inflight": 0.9993089459267341
+    },
+    {
+      "run_id": "61dc1cd7a9104944a4fdb09b8d88c243",
+      "raw_requests_sha256": "ed26d82cd47a8f4d8ea0017ac94d383536958f03ae2c6a8c90fc43c7bab1c91c",
+      "passed": true,
+      "output_tps": 153.2788888888889,
+      "decode_p90_tps": 98.51820537099913,
+      "ttft_p95_seconds": 1.345076367817819,
+      "decode_speed_samples": 213,
+      "mean_client_inflight": 1.9986550314414004
+    },
+    {
+      "run_id": "66d0c8a2e13b4b3cadbcf9101c6ed10d",
+      "raw_requests_sha256": "b6d6e36dc310297ae9a7ce41dd2fa32fd8c9ed6b1f46242595e7d409c09280e8",
+      "passed": true,
+      "output_tps": 219.22444444444446,
+      "decode_p90_tps": 78.69416849520032,
+      "ttft_p95_seconds": 1.6353148844558745,
+      "decode_speed_samples": 324,
+      "mean_client_inflight": 3.9977821084142975
+    },
+    {
+      "run_id": "51dbe27ab1784371bcce89955a8df0dd",
+      "raw_requests_sha256": "2ba28386e0fb86865ca0f497a901408f6d7637a729569327c47d9f6363231181",
+      "passed": true,
+      "output_tps": 293.93111111111114,
+      "decode_p90_tps": 58.517212975671775,
+      "ttft_p95_seconds": 2.0998226694762705,
+      "decode_speed_samples": 429,
+      "mean_client_inflight": 7.9974707006901085
+    },
+    {
+      "run_id": "796224b10df84cf3a4062c586d91bbb0",
+      "raw_requests_sha256": "c340586346c3ccaf330ec0cb5aca402782d106aab45b2af4a1eac70f3355ef47",
+      "passed": true,
+      "output_tps": 361.2477777777778,
+      "decode_p90_tps": 33.89532348647167,
+      "ttft_p95_seconds": 3.054770101606846,
+      "decode_speed_samples": 567,
+      "mean_client_inflight": 15.997307224525139
+    }
+  ]
+}

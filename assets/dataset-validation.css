@@ -1,10 +1,50 @@
 .dataset-validation-section {
+    min-width: 0;
+    max-width: 100%;
     margin: 32px 0 48px;
+    overflow: hidden;
+}
+
+body[data-page="dataset-validation"] main.site-shell {
+    min-width: 0;
+    max-width: calc(100vw - 24px);
+}
+
+.validation-scenario-head {
+    align-items: end;
+    gap: 24px;
+}
+
+.validation-model-control {
+    display: grid;
+    flex: 0 1 360px;
+    gap: 6px;
+    min-width: 260px;
+}
+
+.validation-model-control label {
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.validation-model-control select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 42px;
+    padding: 8px 34px 8px 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    font: inherit;
 }
 
 .validation-summary {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
     margin: 20px 0;
 }
@@ -84,6 +124,25 @@
     font: inherit;
 }
 
+@media (max-width: 720px) {
+    .validation-scenario-head {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .validation-model-control {
+        width: 100%;
+        flex-basis: auto;
+        min-width: 0;
+    }
+
+    .validation-scenario-head > div,
+    .validation-scenario-head h2 {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+}
+
 .validation-dataset-count {
     align-self: end;
     padding-bottom: 9px;
@@ -140,8 +199,10 @@
 }
 
 .validation-table-wrap {
+    max-width: 100%;
     margin-top: 20px;
     max-height: 700px;
+    scroll-padding-inline-start: 220px;
     overflow-x: auto;
     overflow-y: auto;
     border: 1px solid #dbe7f3;
@@ -180,17 +241,24 @@
     border-bottom: 0;
 }
 
-.validation-dataset {
+.validation-table .validation-dataset {
     position: sticky;
     left: 0;
     z-index: 2;
+    width: 180px;
     min-width: 180px;
+    max-width: 180px;
     background: #f8fbff;
+    overflow-wrap: anywhere;
+    white-space: normal;
 }
 
 .validation-table thead th:first-child {
     left: 0;
     z-index: 4;
+    width: 180px;
+    min-width: 180px;
+    max-width: 180px;
 }
 
 .validation-dataset strong {
@@ -213,6 +281,7 @@
 .validation-cell-button {
     width: 100%;
     min-height: 52px;
+    scroll-margin-inline-start: 220px;
     padding: 8px;
     border: 1px solid #dbe7f3;
     border-radius: 8px;
@@ -330,6 +399,11 @@
     background: #f1f5f9;
 }
 
+.validation-status--baseline_only {
+    color: #075985;
+    background: #e0f2fe;
+}
+
 .validation-status--running {
     color: #1d4ed8;
     background: #dbeafe;
@@ -388,6 +462,53 @@
     margin: 0;
     color: #0f172a;
     overflow-wrap: anywhere;
+}
+
+.validation-candidate-list {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.validation-candidate {
+    min-width: 0;
+    padding: 8px 10px;
+    border-left: 3px solid #cbd5e1;
+    background: #ffffff;
+}
+
+.validation-candidate--selected {
+    border-left-color: #15803d;
+    background: #f0fdf4;
+}
+
+.validation-candidate > div:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.validation-candidate > div:first-child span {
+    color: #166534;
+    font-size: 0.68rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.validation-candidate-value {
+    margin-top: 2px;
+    font-family: "Fira Code", monospace;
+    font-size: 0.76rem;
+}
+
+.validation-candidate small {
+    display: block;
+    margin-top: 2px;
+    color: #64748b;
+    font-size: 0.7rem;
 }
 
 .validation-empty {

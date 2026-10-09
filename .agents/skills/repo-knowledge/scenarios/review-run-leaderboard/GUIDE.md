@@ -30,12 +30,12 @@ were archived under `intellistream/*-legacy-20260831`; current MOD `PROVENANCE.m
 old PR identities. In particular, PR #49 offload compatibility is not KV Tiering, and the native
 MTP2 arm's BetterScale worker bridge is not evidence that it ran the BetterScale treatment.
 
-For the sibling Frontier view, read
-[the Frontier handoff](../../../../../docs/LEADERBOARD-FRONTIER.md). It consumes a separate
-production snapshot. Fletcher authorized the first native/BetterScale Qwen35 AgentX points as
-explicitly labeled 15-minute smoke results, not formal results. Do not derive Frontier admission,
-prices, or MOD activation from the historical run table. The pure model and browser checks exercise
-the contract without using accelerator capacity.
+For the sibling Benchmark settings view, read
+[the settings handoff](../../../../../docs/BENCHMARK-SETTINGS.md). It consumes a separate production
+snapshot. Fletcher authorized the first native/BetterScale Qwen35 AgentX points as explicitly
+labeled 15-minute smoke results, not formal results. Do not derive settings admission, prices, or
+MOD activation from the historical run table. The pure model and browser checks exercise the
+contract without using accelerator capacity.
 
 AgentX metric import uses the official output throughput field, not a reconstructed token count /
 900 seconds or the separately exported benchmark-duration statistic: native observation/drain
@@ -72,3 +72,173 @@ points, the old18px invisible hit circles intercepted nearby mobile points: adap
 hit circles plus nearest-dot click selection remove SVG paint-order bias, without moving data. Keep
 keyboard access and exact downloaded-point checks; never bypass interception with forced QA clicks.
 Static curves use official metrics, separate P50/P95 TTFT/TPOT, and label excluded coverage.
+
+On 2026-09-24 Fletcher selected one throughput view for accepted-equivalent HF/ModelScope Qwen35
+weights, MTP configurations and warmup variants. Keep one model/cohort visible; each point carries
+its actual checkpoint revision and `evidence.benchmark_protocol`. Historical TP2 uses MTP2/AL2.63
+and pressure10-v1; new eight-chip C64 uses MTP0 and mandatory snapshot primers only (v2). Do not
+claim identical initial cache state or pool these observations as repeats. The popover names warmup
+and MTP; downloads preserve full protocols. The five old eight-chip C16 points were withdrawn and
+must not return. See `docs/FRONTIER-QWEN35-EXPERT-SMOKE.md` for the accepted C64 evidence. Existing
+concurrency curves describe the historical TP2 series only, not the new C64 arms.
+
+The C64 TP8/TP8EP8 points nearly coincide (sub-pixel X separation on mobile). Nearest-dot selection
+alone cannot make both touch targets usable. The popup's nearby-config buttons disambiguate points
+within12 screen pixels without jittering measurements. Browser QA clicks real chart coordinates and
+uses that user-visible chooser when needed, never forced clicks or hidden direct state changes.
+
+Fletcher clarified right-side filtering on 2026-09-24: a separate sidebar outside the white chart
+card, with MOD and MTP checkbox rows. All choices start checked, no “all” option; choices within
+rows union and rows intersect. Empty selection means no points. Unknown remains separate from
+explicit MTP0. Mobile places it below the chart, not inside the top picker. Recompute the envelope
+from visible points, close hidden selections, retain stable series colors and show visible/total
+counts. Single workload is a static selected-style pill, not a disabled select or a long-press-only
+interaction; show the selector only with multiple choices. Filters survive language re-render, reset
+on model/workload changes, and never mutate point evidence. Browser QA exercises real controls,
+point IDs, envelopes, empty/unknown states and the future multiple-workload path.
+
+SWE Prefix Reuse has its own cohort; enter `docs/FRONTIER-QWEN35-SWE-PREFIX.md` for real-token
+continuation and the repaired MTP2 C64 expert matrix. Prepared-file hashes can differ solely through
+tokenizer path/version metadata: only accept the recorded variant after exact comparison of all
+session IDs/deltas/output budgets, policy and tokenizer fingerprint. Preserve the actual per-run
+file hash. The 0.1.0 salt-aware relay and0.1.1 equal-valued correlation header preserve the same
+session affinity; do not relabel a client revision. Native EP is proven across all41 target/draft
+layers, and TP8's32-slot capacity limitation stays explicit.
+
+A publication check on2026-09-24 received HTTP403 for default Python urllib's User-Agent while a
+browser User-Agent returned200 with exact published data. Distinguish transport rejection from stale
+content/deployment delay before waiting on Pages. Confirm Pages status and the versioned HTML/data,
+not merely HTTP access. The same update found existing mdformat drift in three Frontier guides; full
+CI checks all files, unlike a changed-file hook run. Formatting those guides changes no protocol or
+measured values.
+
+Fletcher superseded the fixed-configuration main-chart lines on2026-09-25: show one independent
+Pareto frontier per baseline/MOD, crossing allowed parallel settings and concurrency within the
+selected cohort. Default to frontier vertices only; the right-sidebar checkbox restores all
+dominated dots when unselected and survives language/cohort changes. Choose whole-run vertices,
+never separately best X/Y. No global dashed line; filter changes recompute each group independently.
+Failed-correctness points cannot enter or dominate a boundary, exact coordinate ties share one
+stable line vertex, and singletons have no line. Original concurrency-series metadata and static
+diagnostic sweeps retain their fixed-setting meaning. Browser QA independently checks group
+membership, vertices and filters.
+
+The same instruction withdraws BetterScale AE separation from all Frontier cohorts. Four formerly
+visible points moved to `archived_points` with `display_withdrawal`; existing archives and metric
+extracts stay intact. Future additive importers must not resurrect withdrawn IDs. This is not the
+ordinary co-located BetterScale TP/DP/EP matrix, which remains displayed.
+
+Independent authorized campaigns can add points to the same SWE cohort. Import by point/run ID and
+preserve unrelated points, metric evidence and accepted prepared-file variants; replacing the whole
+cohort with one campaign's local inventory loses published results. Fetch before publication and
+resolve concurrent updates additively. A later interrupted window does not supply a score: preserve
+earlier completed windows only with a verified timing boundary, continuous ownership guard evidence
+and owned cleanup, and record the later interruption separately.
+
+Fletcher's later September24 instruction selects the best complete BetterScale run for identical
+configurations to reduce repeat noise. Before publishing newly imported repeats, use
+`scripts/curate_frontier_repeats.py` and `docs/FRONTIER-REPEAT-SELECTION.md`: highest observed
+throughput/chip chooses one whole run, with compared IDs and inferior complete points preserved in
+`archived_points`. Never combine separately best throughput and P90. Source/configuration, model,
+protocol, measurement window and concurrency stay distinct; existing observed prompt/occupancy
+fields are outcomes, not configuration keys. Native points and other campaigns' unlike settings
+remain intact. This is an explicit repeat-selection exception to displaying every observation, not
+authority to drop a slower configuration or overwrite another campaign's inventory.
+
+A September24 CI review exposed horizontal overflow after switching the mobile run table from
+Chinese to English: document395px versus390px viewport, with `#view-frontier` extending to394.91px.
+Local390px passed, but320px reproduced383px content. The culprit was the nonwrapping three-button
+view switch, not the wide table inside its horizontal scroll container. Let the switch wrap while
+preserving complete labels/counts; do not hide overflow or weaken the document-width assertion. The
+run-browser check now includes320px with the language switch and retains bounded, unclipped layout
+offenders plus a failure screenshot, so a remote-only layout failure carries actionable geometry
+instead of another blind rerun.
+
+Fletcher's latest September27 UI uses **并发服务规模 / Concurrent service scale** checkboxes, not the
+earlier single-choice slider. All observed scales start checked; empty means no points. Allow
+same-chart overlays but keep dominance and tie deduplication within cohort × MOD/group × depth.
+Depth1 is solid/filled, depth2 dashed/hollow; legends name the scale. The popup reports C concurrent
+requests and C×D active sessions, not C×D simultaneous requests. MOD / Group has a Select all /
+Deselect all toggle: partial/empty becomes all, all becomes empty, without changing MTP or scale
+filters. Preserve selections across language changes and reset on model/workload changes. Hide
+depth1 static-curve links unless depth1 alone is checked. Downloads retain actual metadata.
+
+AgentX is retired from active Frontier choices at Fletcher's request. Its cohort-level
+`display_withdrawal` excludes its points from rendered choices/counts without deleting historical
+records or breaking SWE provenance links. Do not resurrect it while importing new data or confuse
+this withdrawal with the separate legacy Runs table.
+
+The same September27 correction merges the unified Native campaign's25 SWE points into the existing
+Qwen35 chart. Do not create another same-named model button merely for its ModelScope checkpoint
+identifier. Preserve actual checkpoint/runtime/tool revisions per point and the original cohort in
+`archived_cohorts`; `evidence.original_cohort_id` records the presentation move. Campaign-native
+matched comparisons remain the authority for MOD speedups, not arbitrary cross-campaign pairing.
+
+For DeepSeek V4 Flash INT8, enter `docs/FRONTIER-DSV4-SWE.md`. Its separate cohort uses the official
+DSV4 encoder and 24 clean DSparkK5 windows, not Qwen tokens or BF16 weights. TP has four total
+seats; DP has16. Preserve plateau/regression points and the explicit C64 omission rather than
+implying a hardware ceiling. The append-only importer and separate metric extract retain existing
+archives. Model/precision choices now live inside a native disclosure on the selected model tag; QA
+must open the trigger before selecting a model, and checks Escape, outside dismissal, mobile bounds
+and exact downloaded DSV4 coordinates.
+
+For depth-control-only changes, use `scripts/verify_leaderboard_depth_browser.py` for bounded
+responsive/multi-selection/isolation checks. The full Frontier checker downloads every historical
+point in four views and took about20 minutes; do not make that exhaustive traversal the default for
+a small selector edit. Keep the full check for evidence/export changes.
+
+On October1 Fletcher explicitly restored the historical FULL-cache E36/R36 C32 observation
+(`qwen35-sweprefix-cache-width-full-tp2-c32-d1-20260928`,613.88tokens/s/chip) from commit `85f6d48`
+to the main SWE comparison. It is not part of the fixed E16/R20 C1–C16 sweep. Fletcher subsequently
+unified C32 and E16/R20 under one **BetterScale** tag/checkbox: slot counts may be tuned for the
+workload and do not create another MOD identity. The group is selected by default; graph mode,
+execution/resident seats, balanced attention and cache policy belong in the popover. The original
+metrics, run ID and configuration were unchanged; the C32 full-cache point moved out of the cache
+study, while its incremental-cache peer remains there.
+
+Fletcher then requested a connected BetterScale frontier: the main chart uses group Pareto vertices
+across workload-tuned slots, within cohort and rotation depth, rather than its fixed-configuration
+concurrency line. Other MODs retain measured-series lines. Fletcher clarified that the rationale
+belongs only in the source comment at checkbox construction, not on the webpage: slot capacity is
+tunable, C32 uses E36/R36, and both are one configuration family. Keep immutable load/configuration
+evidence intact.
+
+On October1 PR#340 excluded C32 again by restricting the main display whitelist to complete C1–C16
+sweeps. Fletcher accepted that main-chart scope and instead requested the six-point BetterScale
+C1–C32 line in **BetterScale residency and cache studies**, alongside only Native vLLM752a3a5 /
+Ascend9bf964c FULL_AND_PIECEWISE C1–C16. The study references the eleven existing records through
+`comparison_point_ids`; do not duplicate or move measurements, resurrect C32 in the main whitelist,
+invent a native C32 value, or connect unrelated cache-ablation dots. All six BetterScale points are
+joined in concurrency order, with E16/R20 versus E36/R36 retained in their original configurations.
+Download the source cohort and the study separately. The bounded browser check is
+`scripts/verify_betterscale_study_browser.cjs`.
+
+On October6 Fletcher corrected publication placement: both new concurrency campaigns belong only in
+the final **BetterScale residency and cache studies**, never the first/main chart. Remove their
+series from the main display whitelist and reuse all ten selected source IDs through the study
+comparison contract, preserving source points and archived repeats. The study has 21 shared points
+and four lines: Native, original tuned BetterScale, fixed E36/R36, and width-matched BetterScale. Do
+not join campaigns at overlapping concurrency values or restore them to the main whitelist. See
+`docs/FRONTIER-QWEN35-CONCURRENCY-KNEE.md`; do not present the C37 overload cliff as physical device
+capacity. The next investigation increases execution and residency together. Metadata-only raw-byte
+replacement of tokenizer path and transformers version exactly reconstructs historical8044561f from
+prepared3879dff; historical client8bb99eb and runtime identity still differ.
+
+The later October6 width extension adds eight valid900s observations/six retained configurations
+through C56; see `docs/FRONTIER-QWEN35-CONCURRENCY-WIDTH.md`. Capacity64 is an explicit source
+patch, not unchanged96cd03a. Keep E/R-specific series IDs even though one BetterScale study group
+spans those capacities; singleton settings do not imply fixed-configuration sweeps. The first C56
+window was contaminated by a parallel retrieval helper retaining another server's port and is
+excluded, not a poorer repeat. Two300s cache-observer diagnostics are also not ranking scores.
+Preserve the corrected endpoint receipts and the distinct source/configuration/card/co-run context
+when importing new observations. Measured C48–C52 TTFT degradation is budget/workload-specific, not
+a hardware limit.
+
+## Residency study frontier-only display (2026-10-08)
+
+Fletcher superseded the October6 four-campaign-line display: the final residency/cache study now
+shows only Pareto vertices, with separate BetterScale and Native envelopes. Of the 21 shared source
+measurements, 8 BetterScale and 5 Native points survive. BetterScale spans configurations, not one
+fixed-capacity sweep. Dominated measurements and unrelated ablation groups stay in the snapshot but
+are not displayed. Main-chart scope and original evidence are unchanged. Run
+`scripts/verify_betterscale_study_browser.cjs` for bounded desktop/mobile EN/ZH, source downloads,
+filters and main-chart exclusion checks; put screenshot output under `/tmp`.
