@@ -1525,6 +1525,67 @@
       "evidence_level": "performance_verified"
     },
     {
+      "id": "gdn-state-codec",
+      "name": "GDN State Codec",
+      "name_en": "GDN State Codec",
+      "name_zh": "GDN 状态编解码器",
+      "artifact_type": "runtime_component",
+      "system_role": "recurrent_state_compression",
+      "integration_contracts": [],
+      "integration_surfaces": [
+        "StateAxis Qwen GDN provider boundary",
+        "Qwen3.5/Qwen3.8 gated-delta recurrent state",
+        "AscendC state-codec kernels"
+      ],
+      "execution_planes": [
+        "worker",
+        "native",
+        "device"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "source_patch",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "maintainers": [
+        "ShuhaoZhangTony"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "ShuhaoZhangTony",
+          "name": "Shuhao Zhang (Tony)"
+        }
+      ],
+      "advisors": [],
+      "canonical_repository": "https://github.com/vLLM-HUST/gdn-state-codec",
+      "repository_visibility": "public",
+      "upstream_repository": null,
+      "summary_en": "An opt-in Ascend recurrent-state codec for Qwen gated-delta layers. It keeps the historical org.stateaxis.leapquant runtime ID for compatibility, is disabled by default, and is qualified only inside explicitly recorded workload cells.",
+      "summary_zh": "面向 Qwen 门控增量层的可选 Ascend 循环状态编解码器。为兼容既有集成保留历史运行时 ID org.stateaxis.leapquant，默认关闭，且只在明确记录的 workload 单元内具备资格。",
+      "public_effect_en": "In Qwen3.5-35B-A3B TP2 eager on one 649-prompt/128-output AgentX first-turn request, the retained v68 path measured +0.92% median end-to-end in the formal bracket and +1.16% in a clean-main retest, but independent bootstrap intervals overlap zero. The newer p16/r1 component path reduced its bounded component time by 56.2% while its five-run replace-mode online median regressed 6.71%; no general speedup is claimed.",
+      "public_effect_zh": "在 Qwen3.5-35B-A3B、TP2、eager、单个 649 输入/128 输出 token 的 AgentX 首轮请求上，保留的 v68 路径在正式括测和 clean-main 复测中的端到端中位数分别为 +0.92% 与 +1.16%，但独立 bootstrap 区间均跨越零。更新的 p16/r1 路径在有界组件测试中耗时降低 56.2%，五次 replace-mode 在线测试的中位数却回退 6.71%；不据此声称普适加速。",
+      "public_effect_status": "inconclusive",
+      "public_effect_url": "https://github.com/vLLM-HUST/gdn-state-codec/blob/main/evidence/qwen35-agentx-v68/ROUND-RESULTS.md",
+      "compatibility": {
+        "status": "experimental",
+        "host": "StateAxis + vLLM Ascend",
+        "versions": [
+          "GDN State Codec 0.1.0",
+          "compatibility ID org.stateaxis.leapquant"
+        ],
+        "platforms": [
+          "2 × Ascend 910B2 · TP2 · eager"
+        ],
+        "models": [
+          "Qwen3.5-35B-A3B · exact recorded AgentX cell only",
+          "Qwen3.8 GDN family · mechanism only, no performance qualification"
+        ],
+        "requirements_en": "Requires an explicitly matched StateAxis integration, pinned model/runtime revisions, exactness and lifecycle gates, and workload-specific online qualification. Disabled by default. Graph mode, concurrency, memory-capacity benefit, and other model families are not qualified.",
+        "requirements_zh": "需要明确匹配的 StateAxis 集成、固定模型与运行时版本，并通过精确性、生命周期和 workload 专属在线验收。默认关闭；尚未验收图模式、并发、显存容量收益及其他模型家族。"
+      },
+      "evidence_level": "hardware_verified"
+    },
+    {
       "id": "traceloom",
       "name": "TraceLoom",
       "artifact_type": "runtime_component",

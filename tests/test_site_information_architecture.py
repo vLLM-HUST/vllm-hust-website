@@ -95,9 +95,9 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
 
 
 def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
-    assert "26 MODs for real serving workloads" in HOME
+    assert "27 MODs for real serving workloads" in HOME
     assert "Explore extensions by workload, platform, and readiness" in HOME
-    assert "26 个 MOD，覆盖真实推理场景" in HOME
+    assert "27 个 MOD，覆盖真实推理场景" in HOME
     assert "按 Workload、平台和成熟度选择扩展" in HOME
 
 
