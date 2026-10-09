@@ -14,3 +14,24 @@ test('current Dense27 sweep joins qualified current State points, not old recons
  const best=points.reduce((a,b)=>a.metrics.output_tps>b.metrics.output_tps?a:b);assert.equal(plan.runId,best.evidence.run_ids[0]);assert.equal(plan.config.state_cache_partial_reclaim,true);
  const proof=require('../docs/evidence/dense27-current-20261009/workload-equivalence.json');assert.equal(proof.passed,true);assert.equal(proof.restored_metadata_sha256,proof.reference_sha256);
 });
+
+test('27B BetterScale display contains only frontier points; dominated history remains archived',()=>{
+ const model=require('../assets/leaderboard-frontier-model.js');
+ const cohort='qwen38-27b-bf16-sweprefix-smoke-v1';
+ const visible=data.points.filter(p=>p.cohort_id===cohort&&p.configuration.mods.includes('betterscale'));
+ const frontier=model.groupFrontiers(visible,'decode_p90_tps','output_tps_per_chip').flat().map(r=>r.point.id);
+ assert.deepEqual(visible.map(p=>p.id).sort(),frontier.sort());
+ const archived=data.archived_points.filter(p=>p.cohort_id===cohort&&p.display_withdrawal?.dominated_by_point_ids);
+ assert.equal(archived.length,5);
+ for(const p of archived){
+  assert.ok(!data.points.some(q=>q.id===p.id));
+  assert.ok(p.evidence.run_ids.length>0);
+  for(const id of p.display_withdrawal.dominated_by_point_ids){
+   const q=data.points.find(q=>q.id===id)||data.archived_points.find(q=>q.id===id);assert.ok(q);
+   assert.equal(model.frontierKey(q),model.frontierKey(p));
+   const x=model.value(q,'decode_p90_tps'),y=model.value(q,'output_tps_per_chip');
+   assert.ok(x>=model.value(p,'decode_p90_tps')&&y>=model.value(p,'output_tps_per_chip'));
+   assert.ok(x>model.value(p,'decode_p90_tps')||y>model.value(p,'output_tps_per_chip'));
+  }
+ }
+});

@@ -251,3 +251,11 @@ CNY10,000 monthly card rent. Only all-910B2 settings with a per-chip Y axis qual
 yield2880CNY/card/month. This constant rescaling changes neither frontier membership nor raw
 evidence. Keep assumptions in the sidebar and JSON export, update popup/accessible labels with the
 axis, and do not label it API value. This supersedes the older fixed-Y-only UI rule.
+
+## Qwen3.8-27B BetterScale frontier curation (October9)
+
+Fletcher requested removal of non-frontier BetterScale dots in the27B SWE cohort. Five historical
+September24 BetterScale points moved to `archived_points`; six current-State observations remain.
+Keep complete evidence and `display_withdrawal.dominated_by_point_ids`, leave Native/other cohorts
+unchanged, and never resurrect these archived IDs when importing more runs. Historical inventory
+checks must include archives; rendered-point checks use active points only.
