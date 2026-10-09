@@ -141,6 +141,18 @@ def test_registry_is_canonical_and_multidimensional() -> None:
     assert by_id("vllm-production-stack")["maturity"] == "supported"
 
 
+def test_pegaflow_uses_current_repository_maintainers() -> None:
+    expected = ["cybber695", "zhangshengxiang682"]
+    expected_profiles = [
+        {"login": "cybber695", "name": "陈彦博"},
+        {"login": "zhangshengxiang682", "name": "张盛翔"},
+    ]
+    for component_id in ("pegaflow", "pegaflow-vllm-connectors"):
+        component = by_id(component_id)
+        assert component["maintainers"] == expected
+        assert component["maintainer_profiles"] == expected_profiles
+
+
 def test_legacy_migration_cards_preserve_original_ownership() -> None:
     expected = {
         "prefix-router-migration": ["Amber1qq", "WMASTER123", "Adr1anZheng"],

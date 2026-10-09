@@ -51,6 +51,8 @@ def test_current_roster_is_unique_and_advisor_mappings_are_current() -> None:
         assert by_name[name]["advisor"]["zh"] == (advisor or "")
         assert by_name[name]["is_current_member"] is True
 
+    assert "mynameisczj" not in logins
+
 
 def test_pending_github_identities_have_no_invented_login_or_link() -> None:
     roster, snapshot = load_profiles()

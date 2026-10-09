@@ -2400,12 +2400,12 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
     snapshot_path = root / "data" / "core_contributors.json"
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
 
-    assert payload["updated_at"] == "2026-09-28"
+    assert payload["updated_at"] == "2026-10-09"
     assert len(payload["all_repos"]["contributors"]) == 34
     assert len(payload["core_repos"]["contributors"]) == 12
     profiles = payload["member_profiles"]
     assert len(profiles["core_members"]) == 11
-    assert len(profiles["participants"]) == 63
+    assert len(profiles["participants"]) == 62
     assert len(profiles["staff_members"]) == 4
     assert len(profiles["external_contributors"]) == 1
     assert len(profiles["unresolved_contributors"]) == 0
@@ -2590,10 +2590,17 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         people["陈德斌"]["research_direction"]["zh"]
         == "MoE 专家卸载优化；控制面优化（与李昶吾协作）"
     )
-    assert (
-        people["陈子嘉"]["research_direction"]["zh"]
-        == "昇腾 NPU 算子级性能调优；PyPTO Tile 编程；算子融合"
+    assert "陈子嘉" not in people
+    historical_pegaflow = next(
+        item
+        for item in payload["all_repos"]["contributors"]
+        if item.get("github_login") == "mynameisczj"
     )
+    assert historical_pegaflow["is_current_member"] is False
+    assert historical_pegaflow["role"] == {
+        "zh": "贡献者",
+        "en": "Contributor",
+    }
     assert (
         people["何维"]["research_direction"]["zh"]
         == "性能优化；算法与硬件调优；方向适应性强"
@@ -2647,7 +2654,6 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
         "刘子墨": "张书豪",
         "欧丹丹": "张书豪",
         "段盈君": "张书豪",
-        "陈子嘉": "张书豪",
         "董君瑶": "张书豪",
         "谢汉龙": "张书豪",
         "姚世文": "张书豪",
@@ -2663,7 +2669,6 @@ def test_contributor_snapshot_has_unique_human_identities() -> None:
             "刘子墨",
             "欧丹丹",
             "段盈君",
-            "陈子嘉",
             "董君瑶",
             "谢汉龙",
             "姚世文",
