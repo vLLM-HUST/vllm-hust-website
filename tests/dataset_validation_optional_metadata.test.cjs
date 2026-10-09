@@ -9,7 +9,7 @@ const vm = require('node:vm');
 const SCRIPT_PATH = path.join(__dirname, '..', 'assets', 'dataset-validation.js');
 const SOURCE = fs.readFileSync(SCRIPT_PATH, 'utf8').replace(
     /\}\)\(\);\s*$/,
-    'window.__datasetValidationTest = { normalize, normalizeIndex, selectScenario, detailMetadata, provenanceHtml, detailNote, candidateValuesHtml };\n})();'
+    'window.__datasetValidationTest = { normalize, normalizeIndex, selectScenario, selectableScenarios, detailMetadata, provenanceHtml, detailNote, candidateValuesHtml };\n})();'
 );
 
 function loadTestApi(locale = 'en') {
@@ -90,6 +90,21 @@ test('model index selects requested scenarios and falls back to the declared def
 
     assert.equal(api.selectScenario(index, 'qwen35').id, 'qwen35');
     assert.equal(api.selectScenario(index, 'unknown').id, 'qwen25');
+});
+
+test('selector hides planning scenarios unless a legacy URL selects one directly', () => {
+    const api = loadTestApi();
+    const index = api.normalizeIndex({
+        contract_version: 'dataset-validation-index-v1',
+        default_scenario_id: 'results',
+        scenarios: [
+            { id: 'results', label: 'Paired B0/B1', data_url: './results.json' },
+            { id: 'planning', label: 'Coverage planning', data_url: './planning.json', selector_visible: false },
+        ],
+    });
+
+    assert.deepEqual(Array.from(api.selectableScenarios(index, 'results'), (scenario) => scenario.id), ['results']);
+    assert.deepEqual(Array.from(api.selectableScenarios(index, 'planning'), (scenario) => scenario.id), ['results', 'planning']);
 });
 
 test('model index rejects duplicate scenarios and missing defaults', () => {
