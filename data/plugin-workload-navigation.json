@@ -75,6 +75,7 @@
     }
   },
   "plugins": {
+    "vllm-hust-opset": ["decode_heavy", "prefill_heavy"],
     "traceloom": ["profiling_analysis"],
     "gdn-state-codec": ["decode_heavy", "repeated_prefix_agent"],
     "ascend-quant-toolkit": ["model_preparation"],
