@@ -61,9 +61,16 @@ C16 run observes52 cache loads but no active partial eviction. This is bounded f
 general quality evaluation. See [current Dense27 methods](FRONTIER-DENSE27-CURRENT.md). Historical
 reconstruction evidence remains archived, not relabeled.
 
-All three currently displayed plans have complete, same-cohort input/output accounting. They are
+All four currently displayed plans have complete, same-cohort input/output accounting. They are
 selected deployment observations at different concurrency points, not a controlled same-concurrency
 optimization A/B or proof of an optimal deployment for every workload.
+
+The additional four-card Qwen27 flagship selects TP4 C48 from ten complete observations. Run
+`b6f90bf6a4ec413b85db3df1000d1376` supplies matched-cohort per-card rates of 424.0411 new input,
+9162.9953 cached input and 274.9417 outputtok/s; streamed-window output is285.9408tok/s/card. The
+TP2 plan remains available as a two-card deployment. TP4 uses4GiB Host cache/rank and a qualified
+pinned-allocation recovery path; no active partial eviction occurs in its measured windows. See
+[TP4 methods and qualifications](FRONTIER-DENSE27-TP4.md).
 
 ## Model-specific API prices
 

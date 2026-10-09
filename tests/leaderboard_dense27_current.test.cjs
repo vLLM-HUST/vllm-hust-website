@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.join(__dirname,'..'),data=require('../data/leaderboard_frontier.json');
 test('current Dense27 sweep joins qualified current State points, not old reconstruction',()=>{
- const points=data.points.filter(p=>p.evidence.benchmark_protocol?.campaign==='dense27-current-state-20261009');
+ const points=[...data.points,...data.archived_points].filter(p=>p.evidence.benchmark_protocol?.campaign==='dense27-current-state-20261009');
  assert.deepEqual(points.map(p=>p.load.concurrency).sort((a,b)=>a-b),[1,2,4,8,12,16]);
  for(const p of points){
   const c=p.configuration.parameters;assert.equal(c.host_kv_budget_gib,8);assert.equal(c.scheduler_block_tokens,1536);assert.equal(c.balanced_decode_attention,true);
@@ -22,7 +22,7 @@ test('27B BetterScale display contains only frontier points; dominated history r
  const frontier=model.groupFrontiers(visible,'decode_p90_tps','output_tps_per_chip').flat().map(r=>r.point.id);
  assert.deepEqual(visible.map(p=>p.id).sort(),frontier.sort());
  const archived=data.archived_points.filter(p=>p.cohort_id===cohort&&p.display_withdrawal?.dominated_by_point_ids);
- assert.equal(archived.length,7);
+ assert.equal(archived.length,13);
  for(const p of archived){
   assert.ok(!data.points.some(q=>q.id===p.id));
   assert.ok(p.evidence.run_ids.length>0);
