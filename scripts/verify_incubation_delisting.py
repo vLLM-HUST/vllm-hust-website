@@ -1,4 +1,4 @@
-"""Verify the incubating sampling project stays off the public MOD catalog."""
+"""Verify retired projects and reactivated MODs are classified honestly."""
 
 from __future__ import annotations
 
@@ -30,10 +30,26 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                         "lang => document.documentElement.lang.startsWith(lang)",
                         arg=language,
                     )
-                    assert page.locator("#activation-sparsity-migration").count() == 0
-                    assert page.locator("#layered-prefill-migration").count() == 0
-                    assert page.locator("#qos-scheduler-migration").count() == 0
-                    assert page.locator("#simllm-migration").count() == 0
+                    for retired_id in (
+                        "activation-sparsity-migration",
+                        "layered-prefill-migration",
+                        "qos-scheduler-migration",
+                    ):
+                        retired = page.locator(f"#{retired_id}")
+                        assert retired.count() == 1
+                        assert (
+                            retired.locator(
+                                "xpath=ancestor::*[contains(@class, "
+                                "'plugin-category-retired')]"
+                            ).count()
+                            == 1
+                        )
+                    assert (
+                        page.locator(
+                            ".plugin-category-runtime_mod #simllm-migration"
+                        ).count()
+                        == 1
+                    )
                     assert page.locator("#ascend-compact-greedy").count() == 0
                     assert (
                         page.locator(
@@ -52,7 +68,7 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                     assert (
                         unified.locator(
                             "xpath=ancestor::*[contains(@class, "
-                            "'plugin-category-performance')]"
+                            "'plugin-category-retired')]"
                         ).count()
                         == 1
                     )

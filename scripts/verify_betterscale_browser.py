@@ -305,7 +305,7 @@ def main():
         if more_button.is_visible():
             more_button.click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
-        tool_section = page.locator(".plugin-category-tools")
+        tool_section = page.locator(".plugin-category-tool_mod")
         assert (
             tool_section.locator(".plugin-category-title").inner_text() == "Tool MODs"
         )
@@ -323,7 +323,7 @@ def main():
             "tricard-clm-lifecycle",
         ]
         assert tool_section.locator(".plugin-performance").count() == 0
-        assert page.locator(".plugin-category-performance #clm-lifecycle").count() == 0
+        assert page.locator(".plugin-category-runtime_mod #clm-lifecycle").count() == 0
         clm = tool_section.locator("#clm-lifecycle")
         assert clm.locator(".plugin-card-footer .withheld").count() == 1
         assert clm.locator(".plugin-card-footer a").count() == 0
