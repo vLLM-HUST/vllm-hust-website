@@ -34,19 +34,19 @@ const REPEAT_SERIES = {
   on: `${DISPLAY_SERIES_PREFIX}on-tp2ep-${CAMPAIGN_DATE}-repeat-evidence`,
 };
 const CANONICAL_WORKLOAD_SHA =
-  '8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85';
+  '8044561ffa1bb430bea8f778ef814d96649321e1a92654b95f64263b996d5e85'; // pragma: allowlist secret
 const MEASURED_WORKLOAD_SHA =
-  'dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b';
+  'dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b'; // pragma: allowlist secret
 const CANONICAL_TOKENIZER_FINGERPRINT =
-  '3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0';
+  '3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0'; // pragma: allowlist secret
 const MEASURED_TOKENIZER_FINGERPRINT =
-  '319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9';
+  '319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9'; // pragma: allowlist secret
 const MOD_REPOSITORY =
   'https://github.com/xmdhb/vllm-hust-ascend-attention-boundary';
-const MOD_REVISION = '4a1843d1e2a81f0415a1cfa5141e9b17b3262835';
+const MOD_REVISION = '4a1843d1e2a81f0415a1cfa5141e9b17b3262835'; // pragma: allowlist secret
 const MOD_WHEEL_SHA256 =
-  'aac1f8c9e73d7cf58f75eac7ca7d31d47370e55482fd614934ad7f8cf7aa63c6';
-const BENCHMARK_REVISION = '695dd8b1ab280145627a108b434f7a54cca05810';
+  'aac1f8c9e73d7cf58f75eac7ca7d31d47370e55482fd614934ad7f8cf7aa63c6'; // pragma: allowlist secret
+const BENCHMARK_REVISION = '695dd8b1ab280145627a108b434f7a54cca05810'; // pragma: allowlist secret
 const BENCHMARK_REPOSITORY =
   'https://github.com/vLLM-HUST/swe-prefix-reuse';
 
@@ -292,7 +292,7 @@ function makePoint(candidate, selection, mode, concurrency) {
       kill_switch: metadata.mod.kill_switch,
       evidence: metadata.mod.evidence,
       manager_version: '0.2.0.dev0',
-      manager_source_commit: '52e96021c8017938b133ddba895795a13f707568',
+      manager_source_commit: '52e96021c8017938b133ddba895795a13f707568', // pragma: allowlist secret
       formal_request_runtime_effective_events:
         activation.formal_request_runtime_effective,
     },
@@ -400,9 +400,9 @@ function makePoint(candidate, selection, mode, concurrency) {
         },
       },
       original_cohort_id: COHORT_ID,
-      draft_publication_status: 'local draft; not submitted',
+      draft_publication_status: 'published public preview',
       candidate_admission_status:
-        'preview: measured source commit and wheel are locally pinned; checkpoint identity, public raw evidence and public source revision remain incomplete',
+        'preview: measured source revision and selected raw artifacts are public; checkpoint and tokenizer identity remain incomplete, and non-selected repeat artifacts remain local',
       activation_log: {
         path: relativeTask(logFile),
         point_isolated: true,
@@ -466,7 +466,8 @@ function makeRun(candidate, point, mode, concurrency, selection) {
       activation_log_point_isolated: true,
       performance_attribution_verified: false,
       mod_catalog_registered: true,
-      public_raw_evidence_available: false,
+      public_raw_evidence_available:
+        candidate.run_id === selection.selected_run_id,
       server_log_counts: {
         installed: activation.installed,
         runtime_effective: activation.runtime_effective,

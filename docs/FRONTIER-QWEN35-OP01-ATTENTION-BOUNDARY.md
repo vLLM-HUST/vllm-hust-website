@@ -29,7 +29,8 @@ submitted as a new campaign rather than relabelling the original points.
   not point-isolated activation logs. Performance attribution to OP01 is therefore not marked
   verified.
 - The new campaign has three valid formal runs in each mode and concurrency. The displayed point
-  selects the median output-throughput run; all other repeats remain local supporting evidence.
+  selects the median output-throughput run. Raw artifacts for the ten selected runs are public in
+  this repository; the other twenty repeats remain local supporting evidence.
 - The benchmark snapshot used by the server matches public swe-prefix-reuse commit
   695dd8b1ab280145627a108b434f7a54cca05810: the remote pyproject, README, package initializer,
   runner, CLI, client and prepare source hashes match that commit.
@@ -37,5 +38,5 @@ submitted as a new campaign rather than relabelling the original points.
   https://github.com/xmdhb/vllm-hust-ascend-attention-boundary, pinned to package commit
   4a1843d1e2a81f0415a1cfa5141e9b17b3262835. The point-level mod_sources field records the MOD
   package repository commit separately.
-- The PR is open and not merged. Raw config/summary/requests artifacts and point-isolated server
-  logs are still local evidence, not yet public HTTPS evidence.
+- Raw config/summary/requests artifacts for the ten selected runs are published with this report.
+  The twenty non-selected repeats remain local evidence and are not marked as public raw evidence.
