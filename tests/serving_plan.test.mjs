@@ -67,3 +67,26 @@ test("selected observation and provenance preserved", () => {
   );
   assert.match(html, /href="\.\/serving-plan.html"/);
 });
+
+test("calculator reuses the website shell rather than a standalone theme", () => {
+  const html = readFileSync(
+    new URL("../serving-plan.html", import.meta.url),
+    "utf8",
+  );
+  for (const contract of [
+    'data-page="serving-plan"',
+    'class="site-nav"',
+    'id="cosmic-background"',
+    'class="site-shell serving-plan"',
+    'class="site-footer"',
+    "./assets/site.css?",
+    "./assets/subpages.css?",
+    "./assets/site.js?",
+  ])
+    assert.ok(html.includes(contract), contract);
+  const navigation = readFileSync(
+    new URL("../assets/site.js", import.meta.url),
+    "utf8",
+  );
+  assert.match(navigation, /pages: \[[^\]]*'serving-plan'/);
+});

@@ -29,3 +29,7 @@ includes both allocated chips in its denominator. TP2 is the minimum deployment 
 Run `node --test tests/serving_plan.test.mjs` and the existing site JS/Python checks. Preview with a
 static server; check default, custom, month conversion, zero utilization, invalid input, export and
 desktop/mobile layout. Keep all preview and screenshot scratch outside the repository.
+
+The calculator is an ordinary website subpage: reuse `site.css`, `subpages.css`, `site.js`, the
+shared navigation, cosmic background, hero and footer. Scope all calculator styles under
+`.serving-plan`; do not introduce another global theme.

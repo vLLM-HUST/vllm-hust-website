@@ -155,7 +155,7 @@
         {
             id: 'evidence',
             label: 'navEvidence',
-            pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', 'achievements', 'news'],
+            pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', 'achievements', 'serving-plan', 'news'],
             links: [
                 ['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves'],
                 ['leaderboard', './leaderboard.html', 'navFixedTarget'],
