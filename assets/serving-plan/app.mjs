@@ -67,9 +67,10 @@ function render() {
       shared.utilization === 100
         ? "满载 API 等价产值"
         : "按利用率折算的 API 等价产值";
-    $("kind").textContent = "实测产能 × 参考价格";
+    $("kind").textContent = rows.some((r) => r.priceSource === "user-assumption")
+      ? "实测产能 × 价格（含自定义）"
+      : "实测产能 × 参考价格";
     $("columns").replaceChildren();
-    $("plan-results").replaceChildren();
     $("measured-evidence").replaceChildren();
     const expense = rows[0]?.results.expense ?? null;
     const max =
@@ -82,7 +83,7 @@ function render() {
       const { plan: p, results: r } = row;
       const complete =
         p.inputTpsPerChip !== null && p.cachedInputTpsPerChip !== null;
-      const col = element("div", undefined, "column");
+      const col = element("div", undefined, "column value-column");
       col.append(element("strong", `¥${fmt(r.value)}${complete ? "" : "*"}`));
       const stack = element("div", undefined, "bar-stack");
       stack.style.height = `${(r.value / max) * 220}px`;
@@ -98,53 +99,6 @@ function render() {
       }
       col.append(stack, element("b", p.model), element("small", p.provider));
       $("columns").append(col);
-      const card = element("article", undefined, "plan-card");
-      card.append(
-        element("h3", `${p.model} · ${p.provider}`),
-        element("p", p.name),
-      );
-      for (const [label, value] of [
-        [
-          "等价产值",
-          `¥${fmt(r.value)} / ${denom}${complete ? "" : "（仅已知输出）"}`,
-        ],
-        [
-          "成本差额",
-          r.difference === null
-            ? "待填成本"
-            : `¥${fmt(r.difference)} / ${denom}`,
-        ],
-        [
-          "覆盖成本所需利用率",
-          r.breakEven === null ? "—" : `${fmt(r.breakEven, 1)}%`,
-        ],
-        [
-          "P95 首 token / P90 解码",
-          `${fmt(p.ttftP95Seconds, 3)} 秒 / ${fmt(p.decodeP90TpsPerUser)} tok/s/用户`,
-        ],
-      ]) {
-        const line = element("div", undefined, "result-line");
-        line.append(element("span", label), element("strong", value));
-        card.append(line);
-      }
-      if (row.priceSource === "user-assumption")
-        card.append(
-          element(
-            "p",
-            "价格已修改：使用你的自定义情景，而非官方报价。",
-            "hint",
-          ),
-        );
-      card.append(
-        element(
-          "p",
-          complete
-            ? "输入与输出已按同一统计口径计入。"
-            : "* 输入数据待补，当前价值与成本覆盖门槛不完整。",
-          "hint",
-        ),
-      );
-      $("plan-results").append(card);
       const evidence = element("details");
       evidence.append(
         element("summary", `${p.model} · ${p.provider} · ${p.name}`),
@@ -159,6 +113,12 @@ function render() {
         element(
           "p",
           `输出 ${fmt(p.outputTpsPerChip)}；新增输入 ${p.inputTpsPerChip === null ? "待补" : fmt(p.inputTpsPerChip)}；缓存命中输入 ${p.cachedInputTpsPerChip === null ? "待补" : fmt(p.cachedInputTpsPerChip)} tok/s/卡。`,
+        ),
+      );
+      evidence.append(
+        element(
+          "p",
+          `P95 首 token ${fmt(p.ttftP95Seconds, 3)} 秒；P90 解码 ${fmt(p.decodeP90TpsPerUser)} tok/s/用户。`,
         ),
       );
       evidence.append(element("p", p.qualification));

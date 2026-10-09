@@ -6,10 +6,12 @@ hero and footer; calculator styles are scoped under `.serving-plan`. The page re
 engines and models, not a BetterScale-only product page.
 
 Checkboxes select independent measured plans. Each gets its own stacked column, configuration,
-latency facts and accounting scope. Values across models are **not** optimization multipliers or
-quality-equivalence claims. Empty selection means no plans. Export includes exactly the selected
-plans, their source identities, effective model-specific prices, costs and calculations. User costs
-are neither assumed, persisted nor transmitted.
+latency facts and accounting scope in expandable evidence. The main result is the chart, without
+repeated per-plan summary cards: deep blue output, cyan new input, blue cached input; costs remain
+visually distinct. Customized prices are flagged beside the chart. Values across models are **not**
+optimization multipliers or quality-equivalence claims. Empty selection means no plans. Export
+includes exactly the selected plans, their source identities, effective model-specific prices, costs
+and calculations. User costs are neither assumed, persisted nor transmitted.
 
 ## Token accounting
 
