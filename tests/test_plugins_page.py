@@ -840,12 +840,12 @@ def test_page_consumes_the_docs_owned_registry() -> None:
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
 
 
-def test_browser_catalog_count_includes_verified_external_bridges() -> None:
+def test_browser_catalog_count_uses_the_same_taxonomy_contract_as_the_page() -> None:
     browser_check = (ROOT / "scripts" / "verify_betterscale_browser.py").read_text(
         encoding="utf-8"
     )
-    assert 'item["artifact_type"] == "bridge"' in browser_check
-    assert 'get("status") == "verified"' in browser_check
+    assert 'root / "data/mod-taxonomy.json"' in browser_check
+    assert 'taxonomy[item["id"]]["kind"] == "retired"' in browser_check
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
 

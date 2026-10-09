@@ -20,47 +20,12 @@ def main():
         for key in ("qwen", "dsv4")
     }
     ecosystem = json.loads((root / "data/ecosystem.json").read_text())
-    performance_ids = {
-        entry["id"]
-        for entry in json.loads((root / "data/plugin-performance.json").read_text())[
-            "entries"
-        ]
-    }
-    tool_mod_roles = {
-        "lifecycle_control_plane",
-        "model_artifact_preparation",
-        "offline_model_quantization",
-        "profiling_analysis",
-        "scheduler_policy_research",
-        "telemetry_provider",
-    }
+    taxonomy = json.loads((root / "data/mod-taxonomy.json").read_text())["components"]
     workshop_mod_count = sum(
-        item.get("public_surface", True) is not False
+        item["id"] in taxonomy
         and (
-            item["id"] in performance_ids
-            or (
-                item["artifact_type"] == "bridge"
-                and item.get("compatibility", {}).get("status") == "verified"
-                and item["canonical_repository"].startswith("https://github.com/")
-            )
-            or (
-                (
-                    item["artifact_type"] in {"runtime_component", "bridge"}
-                    or item["system_role"] in tool_mod_roles
-                )
-                and item["repository_relationship"] == "organization_native"
-                and item["delivery_model"]
-                in {
-                    "plugin_bundle",
-                    "python_distribution",
-                    "migration_scaffold",
-                    "source_patch",
-                    "source_toolkit",
-                }
-                and item["canonical_repository"].startswith(
-                    "https://github.com/vLLM-HUST/"
-                )
-            )
+            item.get("public_surface", True) is not False
+            or taxonomy[item["id"]]["kind"] == "retired"
         )
         for item in ecosystem["components"]
     )
