@@ -863,12 +863,12 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-people-complete"'
+        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-quant-advisor"'
         in PAGE
     )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=ecpa-final-20261009-people-complete"' in PAGE
+        'v=ecpa-final-20261009-quant-advisor"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009"'
@@ -1172,7 +1172,7 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
 
     expected_people = {
         "llm-serving-cost-pricing-model": ([("张书豪", "ShuhaoZhangTony")], []),
-        "ascend-quant-toolkit": ([("王鸿坤", "aly16-k")], []),
+        "ascend-quant-toolkit": ([("王鸿坤", "aly16-k")], ["项翔"]),
         "slicegpt-migration": ([("王晨", "qingfengyuhuoda")], ["万瑶"]),
         "prefix-router-migration": (
             [
@@ -1205,7 +1205,13 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
     assert cost["advisors"] == []
     quant = by_id("ascend-quant-toolkit")
     assert quant["maintainer_profiles"] == [{"login": "aly16-k", "name": "王鸿坤"}]
-    assert "advisors" not in quant
+    assert quant["advisors"] == [
+        {
+            "name_zh": "项翔",
+            "name_en": "Xiang Xiang",
+            "relationship": "internal",
+        }
+    ]
 
     pyramid = by_id("pyramidkv-ascend-migration")
     assert pyramid["public_surface"] is True
