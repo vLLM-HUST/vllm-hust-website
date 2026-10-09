@@ -216,6 +216,8 @@
       measured_not_beneficial: { en: "Measured · no gain in tested cell", zh: "实测 · 当前单元无收益" },
       qualified_restricted: { en: "Qualified · restricted", zh: "已验证 · 条件受限" },
       hardware_validation_pending: { en: "Hardware validation pending", zh: "硬件验证待完成" },
+      runtime_effective_pending: { en: "Runtime-effective evidence pending", zh: "运行时生效证据待完成" },
+      runtime_effective_functional: { en: "Runtime-effective · functional", zh: "运行时已生效 · 功能证据" },
       activation_pending: { en: "Activation pending", zh: "激活路径待完成" },
       operator_integration_pending: { en: "Operator integration pending", zh: "算子接入待完成" },
       catalog_conflict: { en: "Catalog evidence conflict", zh: "目录证据存在冲突" },
@@ -301,6 +303,17 @@ vllm-hust-ext extension enable org.vllm-hust.operator-optimizations`
 python -m pip install --no-deps "git+https://github.com/vLLM-HUST/vllm-hust-kv-tiering.git@7ba646a780c3bd0a8906309ea59719f5ccf6187e"
 vllm-hust-ext extension inspect org.vllm-hust.kv-tiering
 vllm-hust-ext extension check org.vllm-hust.kv-tiering`
+    },
+    "simllm-migration": {
+      title_en: "Install and start SimLLM",
+      title_zh: "安装并启动 SimLLM",
+      note_en: "Use the exact tested vLLM Ascend host and Qwen3.5 settings. The published gain is specific to a fixed-card, one-output-token similarity workload and primarily reflects prefill reuse.",
+      note_zh: "请使用精确匹配的 vLLM Ascend 宿主与 Qwen3.5 配置。已发布收益来自固定卡、单输出 token 的相似任务负载，主要反映 prefill 复用。",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@main"
+python -m pip install "git+https://github.com/vLLM-HUST/vllm-ascend-simllm-hust.git@1110fe5b1a029bcaed3efd8dba0b2801c4287e75"
+vllm-hust-ext extension check org.vllm-hust.simllm
+vllm-hust-ext extension enable org.vllm-hust.simllm
+VLLM_ASCEND_SIMLLM_ENABLED=1 vllm-hust-ext run -- vllm serve /path/to/model --block-size 128`
     },
     traceloom: {
       title_en: "Install the TraceLoom runtime plugin",
@@ -503,7 +516,6 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
   };
   const inspectableBundles = {
     "quantized-kv-cache-migration": "org.vllm-hust.quantized-kv-cache",
-    "simllm-migration": "org.vllm-hust.simllm",
     "unified-communication-migration": "org.vllm-hust.unified-communication",
     "split-batch-full-graph-migration": "org.vllm-hust.split-batch-full-graph",
     "kv-transfer-observability-migration": "org.vllm-hust.kv-transfer-observability",

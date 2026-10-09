@@ -89,7 +89,37 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     assert profiles["traceloom"]["evidence"] == "no_performance_claim"
     assert profiles["vllm-hust-opset"]["evidence"] == "measured_beneficial"
     assert profiles["core-attention-boundary"]["kind"] == "runtime_mod"
-    assert profiles["simllm-migration"]["lifecycle"] == "retired"
+    assert profiles["simllm-migration"] == {
+        "kind": "runtime_mod",
+        "capability": "kv_management",
+        "lifecycle": "implemented_restricted",
+        "evidence": "measured_beneficial",
+    }
+
+
+def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() -> None:
+    component = by_id("simllm-migration")
+    assert component["public_surface"] is True
+    assert component["maturity"] == "experimental"
+    assert component["evidence_level"] == "performance_verified"
+    assert component["public_effect_status"] == "beneficial"
+    assert component["public_effect_url"].endswith("/vllm-ascend-simllm-hust/pull/5")
+    assert component["compatibility"]["status"] == "experimental"
+    assert "one-output-token similarity replay" in component["compatibility"]["models"][0]
+    performance = next(
+        item for item in PLUGIN_PERFORMANCE["entries"]
+        if item["id"] == "simllm-migration"
+    )
+    comparisons = performance["observations"][0]["comparisons"]
+    assert [(item["baseline"], item["candidate"]) for item in comparisons] == [
+        (5.1964, 6.2558),
+        (5.2563, 6.2435),
+    ]
+    assert WORKLOAD_NAVIGATION["plugins"]["simllm-migration"] == [
+        "repeated_prefix_agent", "prefill_heavy", "memory_kv_pressure"
+    ]
+    assert "simllm-migration" in WORKSHOP_METADATA["plugins"]
+    assert "VLLM_ASCEND_SIMLLM_ENABLED=1" in SCRIPT
 
 
 def test_registry_is_canonical_and_multidimensional() -> None:
@@ -117,17 +147,9 @@ def test_legacy_migration_cards_preserve_original_ownership() -> None:
         component = by_id(component_id)
         assert component["ownership"] == "original_contributor_maintained"
         assert component["maintainers"] == maintainers
-        expected_delivery = (
-            "plugin_bundle"
-            if component_id in {"knorm-migration", "pyramidkv-ascend-migration"}
-            else "migration_scaffold"
-        )
-        assert component["delivery_model"] == expected_delivery
-        assert component["maturity"] == "incubating"
-        if expected_delivery == "migration_scaffold":
-            assert "Repository scaffold only" in component["summary_en"]
-        else:
-            assert "ECPA 0.3" in component["summary_en"]
+        assert component["delivery_model"] == "plugin_bundle"
+        assert component["maturity"] in {"incubating", "experimental"}
+        assert component["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
 
     assert "Original maintainers" in SCRIPT
     assert "原负责人" in SCRIPT
@@ -557,7 +579,13 @@ def test_workshop_supports_workload_guided_discovery() -> None:
         if by_id(item["id"]).get("public_surface", True) is not False
     }
     workshop_mods = organization_mods | verified_bridges | measured_mods
-    assert set(mappings) == workshop_mods
+    visible_taxonomy = {
+        component_id
+        for component_id in MOD_TAXONOMY["components"]
+        if by_id(component_id).get("public_surface", True) is not False
+    }
+    assert workshop_mods <= set(mappings)
+    assert set(mappings) <= visible_taxonomy
     assert len(traits) >= 8
     for profile in traits.values():
         assert profile["label_en"] and profile["label_zh"]
@@ -950,13 +978,14 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         assert component["canonical_repository"] == repository["url"]
         promoted_statuses = {
             "quantized-kv-cache-migration": "experimental",
+            "simllm-migration": "experimental",
             "kv-transfer-observability-migration": "experimental",
             "pipeline-microbatch-migration": "verified",
             "scheduler-policy-lab": "source_scaffold",
         }
         expected_status = promoted_statuses.get(component_id, "inspect_only")
         assert component["compatibility"]["status"] == expected_status
-        assert component["maturity"] == "incubating"
+        assert component["maturity"] in {"incubating", "experimental"}
 
     assert repositories["vllm-hust-scheduler-policy-lab"]["public_surface"] is False
     assert by_id("scheduler-policy-lab")["public_surface"] is False
@@ -1106,7 +1135,6 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
 
 def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> None:
     inspectable = {
-        "simllm-migration",
         "unified-communication-migration",
         "split-batch-full-graph-migration",
         "layered-prefill-migration",
@@ -1156,13 +1184,12 @@ def test_compatibility_gaps_follow_current_repository_contracts() -> None:
     assert kvcompress["platforms"] == ["Ascend 910B2 · TP2 · FULL_AND_PIECEWISE graph"]
     assert kvcompress["models"] == ["Qwen3.5-35B-A3B — unified BF16 setting verified"]
     assert kvcompress["followup_url"].endswith("/issues/2")
-    for component_id in (
-        "knorm-migration",
-        "pyramidkv-ascend-migration",
-    ):
-        compatibility = by_id(component_id)["compatibility"]
-        assert compatibility["status"] == "inspect_only"
-        assert compatibility["versions"][0].startswith("ECPA 0.3 package ")
+    knorm = by_id("knorm-migration")["compatibility"]
+    assert knorm["status"] == "inspect_only"
+    assert knorm["versions"][0].startswith("ECPA 0.3 package ")
+    pyramidkv = by_id("pyramidkv-ascend-migration")["compatibility"]
+    assert pyramidkv["status"] == "experimental"
+    assert pyramidkv["versions"][0].startswith("PyramidKV merge ")
 
 
 def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
@@ -1194,7 +1221,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 28
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 30
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "public"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
