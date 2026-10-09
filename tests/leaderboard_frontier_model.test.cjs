@@ -253,7 +253,7 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.ok(p.load.concurrency_series);
         } else if(p.evidence.benchmark_protocol.campaign==='dense27-current-state-20261009'){
             assert.equal(p.cohort_id,'qwen38-27b-bf16-sweprefix-smoke-v1');
-            assert.ok([8,12,16].includes(p.load.concurrency));
+            assert.ok([1,2,4,8,12,16].includes(p.load.concurrency));
             assert.equal(p.configuration.parameters.execution_seats,16);
             assert.equal(p.configuration.parameters.resident_seats,20);
             for(const key of ['using_live_runtime','state_cache_incremental','state_cache_streaming','state_cache_policy','state_cache_partial_reclaim','balanced_decode_attention']) assert.equal(p.configuration.parameters[key],true);
