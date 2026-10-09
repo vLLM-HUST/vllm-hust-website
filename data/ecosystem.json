@@ -860,18 +860,18 @@
       "upstream_repository": null,
       "summary_en": "Active PyramidKV external method for the shared Ascend KV-compression adapter. It supplies query-window scoring and unequal per-layer KV retention under a fail-closed Qwen3.5 capability matrix.",
       "summary_zh": "共享昇腾 KV 压缩适配器的可激活 PyramidKV external method，在 fail-closed 的 Qwen3.5 能力矩阵下提供 query-window 打分和逐层非均匀 KV 保留。",
-      "public_effect_en": "Manager activation, a 60-second Qwen3.5 service qualification, 10 matched scheduler/worker compression acknowledgements per TP rank, rollback, and device release are recorded. No paired baseline, task-quality result, or formal performance claim is available.",
-      "public_effect_zh": "已记录 Manager 激活、60 秒 Qwen3.5 服务资格测试、每个 TP rank 的 10 次 scheduler/worker 压缩回执、回滚和设备释放；尚无匹配基线、任务质量结果或正式性能结论。",
+      "public_effect_en": "Paired Qwen3.5-35B-A3B BF16 TP2 evidence: peak KV-pool usage fell 25.47% relatively; held-out LongBench F1 fell 0.26 points. At 8K/24K, throughput fell 2.6–10.3% and device HBM rose about 0.4 GiB. These results apply only to the pinned graph-slot fix and 1368/beta=2 profile; they do not establish a general speedup.",
+      "public_effect_zh": "Qwen3.5-35B-A3B BF16 TP2 配对证据：峰值 KV 池占用相对下降 25.47%，LongBench 留出集 F1 下降 0.26 个百分点；8K/24K 吞吐下降 2.6–10.3%，设备 HBM 增加约 0.4 GiB。结果仅适用于固定的 graph-slot 修复及 1368/beta=2 配置，不能据此宣称普遍加速。",
       "public_effect_status": "validated",
-      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust/pull/4",
+      "public_effect_url": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust/tree/5ee310696c033bd3160a9264c679dc30d7ccc1df/evidence/current/2026-10-09-paired-evaluation",
       "compatibility": {
         "status": "experimental",
         "host": "vLLM-HUST + vLLM-Ascend-HUST through KVCompress method API v1",
         "versions": ["PyramidKV merge 565077b", "KVCompress >=0.9,<0.10 candidate wheel"],
         "platforms": ["Ascend 910B2 · Qwen3.5-35B-A3B BF16 · TP2"],
         "python": [">=3.10"],
-        "requirements_en": "Requires the qualified CANN 9.1, TP2, APC, MTP2, async, chunked-prefill, FULL_AND_PIECEWISE and Mamba-align profile plus the shared KVCompress 0.9 method API. Published package availability, task quality and matched performance remain separate gates.",
-        "requirements_zh": "要求已验收的 CANN 9.1、TP2、APC、MTP2、async、chunked prefill、FULL_AND_PIECEWISE、Mamba align 配置以及共享 KVCompress 0.9 method API；正式包可用性、任务质量和配对性能仍是独立门槛。",
+        "requirements_en": "Requires the pinned CANN 9.1 / vLLM 0.23.0 source stack, KVCompress graph-slot backport 19f3221, TP2, APC, MTP2, async, chunked-prefill, FULL_AND_PIECEWISE and Mamba-align. The evaluated profile uses max_capacity_prompt=1368, beta=2 and threshold=4096; default 512/beta=20 failed the quality gate. Public package availability and five-dataset qualification remain open; the measured profile is not the official performance baseline.",
+        "requirements_zh": "要求固定的 CANN 9.1 / vLLM 0.23.0 源码栈、KVCompress graph-slot 回移修复 19f3221，以及 TP2、APC、MTP2、async、chunked prefill、FULL_AND_PIECEWISE、Mamba align。通过质量门槛的配置为 max_capacity_prompt=1368、beta=2、threshold=4096；默认 512/beta=20 未通过质量门槛。公开包发布和五数据集验收仍待完成；该实测配置不属于官方性能基线。",
         "followup_url": "https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust/issues/1"
       },
       "evidence_level": "hardware_verified"
