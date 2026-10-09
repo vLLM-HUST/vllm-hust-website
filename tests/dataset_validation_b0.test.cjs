@@ -65,15 +65,19 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.match(page, /B1 is selected independently per cell/);
     assert.equal(index.scenarios.length, 7);
     assert.equal(index.default_scenario_id, 'qwen35-35b-a3b-bf16-tp2-pp1-dp1-ep-off-ctx262k-apc-on-mtp2-full-piecewise-sweprefix-900s');
-    assert.equal(index.scenarios[0].model, 'Qwen2.5-14B-Instruct');
-    assert.equal(index.scenarios[0].data_url, './data/dataset_validation_v1.b0.json');
-    assert.equal(index.scenarios[1].model, 'Qwen3.5-35B-A3B');
-    assert.equal(index.scenarios[1].data_url, './data/dataset_validation_qwen35_tp2_matrix.json');
-    assert.equal(index.scenarios[2].data_url, './data/dataset_validation_qwen35_tp2_ep_ctx32k_apcoff_inf_out256.json');
-    assert.equal(index.scenarios[3].data_url, './data/dataset_validation_qwen35_bidkv.json');
-    assert.equal(index.scenarios[4].data_url, './data/dataset_validation_qwen35_frontier_unified_900s.json');
-    assert.equal(index.scenarios[5].data_url, './data/dataset_validation_qwen35_frontier_betterscale_900s.json');
-    assert.equal(index.scenarios[6].data_url, './data/dataset_validation_qwen35_frontier_pipeline_pp2_900s.json');
+    const visible = index.scenarios.filter((scenario) => scenario.selector_visible !== false);
+    assert.equal(visible.length, 6);
+    assert.deepEqual(visible.slice(0, 4).map((scenario) => scenario.data_url), [
+        './data/dataset_validation_qwen35_frontier_unified_900s.json',
+        './data/dataset_validation_qwen35_frontier_betterscale_900s.json',
+        './data/dataset_validation_qwen35_frontier_pipeline_pp2_900s.json',
+        './data/dataset_validation_qwen35_bidkv.json',
+    ]);
+    assert.ok(visible.slice(0, 4).every((scenario) => scenario.label.startsWith('Paired B0/B1')));
+    assert.ok(visible[4].label.startsWith('B0 only'));
+    assert.ok(visible[5].label.startsWith('Partial B0/B1'));
+    assert.equal(index.scenarios[6].data_url, './data/dataset_validation_qwen35_tp2_matrix.json');
+    assert.equal(index.scenarios[6].selector_visible, false);
 });
 
 test('remaining declared Frontier pairs keep their own Native and regressions', () => {
