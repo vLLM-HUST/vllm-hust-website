@@ -672,10 +672,10 @@
                 // 备用：直接从本地加载
                 console.log('[Leaderboard] HF Loader not available, using local data...');
                 const [singleRes, multiRes, historicalRes, compareRes] = await Promise.all([
-                    fetch('./data/leaderboard_single.json'),
-                    fetch('./data/leaderboard_multi.json'),
-                    fetch('./data/leaderboard_historical.json'),
-                    fetch('./data/leaderboard_compare.json')
+                    fetch('./data/leaderboard_single.json', { cache: 'no-cache' }),
+                    fetch('./data/leaderboard_multi.json', { cache: 'no-cache' }),
+                    fetch('./data/leaderboard_historical.json', { cache: 'no-cache' }),
+                    fetch('./data/leaderboard_compare.json', { cache: 'no-cache' })
                 ]);
 
                 if (!singleRes.ok || !multiRes.ok) {
@@ -1978,30 +1978,46 @@
         }
     }
 
-    // Load the fixed-target registry, remote GitHub first and the repo-hosted
-    // mirror as a local fallback. Both sources use the same registry contract, so
-    // classification is identical regardless of which source wins.
+    // Load both fixed-target mirrors and select the newest valid generation.
+    // Prefer the deployed mirror on a tie so rendering remains deterministic.
     async function loadEvidenceRegistry() {
         const sources = [
-            { name: 'github', url: buildEvidenceRegistryUrl() },
             { name: 'local', url: EVIDENCE_REGISTRY_CONFIG.localPath },
+            { name: 'github', url: buildEvidenceRegistryUrl() },
         ];
-        let lastError = null;
-        for (const source of sources) {
-            try {
-                const response = await fetchEvidenceRegistry(source.url);
-                if (!response.ok) {
-                    throw new Error(`registry ${source.name} error: ${response.status}`);
-                }
-                const payload = await response.json();
-                const targets = Array.isArray(payload?.targets) ? payload.targets : [];
-                state.evidenceRegistry = { payload, targets };
-                state.evidenceRegistrySource = source.name;
-                return state.evidenceRegistry;
-            } catch (error) {
-                lastError = error;
-                console.warn(`[Leaderboard] evidence registry ${source.name} load failed:`, error?.message || error);
+        const settled = await Promise.allSettled(sources.map(async (source) => {
+            const response = await fetchEvidenceRegistry(source.url);
+            if (!response.ok) {
+                throw new Error(`registry ${source.name} error: ${response.status}`);
             }
+            const payload = await response.json();
+            if (!Array.isArray(payload?.targets)) {
+                throw new Error(`registry ${source.name} has no targets array`);
+            }
+            return { source: source.name, payload, targets: payload.targets };
+        }));
+        const available = [];
+        settled.forEach((result, index) => {
+            const source = sources[index];
+            if (result.status === 'fulfilled') {
+                available.push(result.value);
+                return;
+            }
+            const error = result.reason;
+            console.warn(`[Leaderboard] evidence registry ${source.name} load failed:`, error?.message || error);
+        });
+        if (available.length) {
+            available.sort((left, right) => compareVersions(
+                right.payload?.registry_version,
+                left.payload?.registry_version,
+            ));
+            const selected = available[0];
+            state.evidenceRegistry = {
+                payload: selected.payload,
+                targets: selected.targets,
+            };
+            state.evidenceRegistrySource = selected.source;
+            return state.evidenceRegistry;
         }
         // Fail closed: no registry means no record can be proven verified.
         state.evidenceRegistry = { payload: null, targets: [] };

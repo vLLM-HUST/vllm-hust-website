@@ -200,7 +200,48 @@ def test_historical_unverified_marker_rejects_target_claim(tmp_path: Path) -> No
     )
     dump(source / "leaderboard_single.json", payload)
 
-    with pytest.raises(ValueError, match="cannot declare target_id"):
+    with pytest.raises(ValueError, match="cannot declare official target admission"):
+        MODULE.validate_snapshot_set(source, info)
+
+
+def test_historical_unverified_marker_keeps_comparison_contract(tmp_path: Path) -> None:
+    _, _, info = registry(tmp_path)
+    source = snapshot_dir(tmp_path, info)
+    payload = json.loads((source / "leaderboard_single.json").read_text())
+    metadata = payload[0]["metadata"]
+    metadata.update(
+        verified=False,
+        official_admission_status="historical-unverified",
+        official_admission_reason="Runtime differs from the comparison contract.",
+        target_contract_id=metadata.pop("target_id"),
+        target_contract_version=metadata.pop("target_version"),
+    )
+    metadata.pop("target_registry_sha256")
+    dump(source / "leaderboard_single.json", payload)
+
+    assert MODULE.validate_snapshot_set(source, info)["historical_unverified"] == 1
+
+
+def test_prior_registry_generation_remains_valid_for_unchanged_target(
+    tmp_path: Path,
+) -> None:
+    _, _, info = registry(tmp_path)
+    source = snapshot_dir(tmp_path, info)
+    payload = json.loads((source / "leaderboard_single.json").read_text())
+    payload[0]["metadata"]["target_registry_sha256"] = "a" * 64
+    dump(source / "leaderboard_single.json", payload)
+
+    assert MODULE.validate_snapshot_set(source, info)["single"] == 1
+
+
+def test_malformed_registry_generation_hash_fails_closed(tmp_path: Path) -> None:
+    _, _, info = registry(tmp_path)
+    source = snapshot_dir(tmp_path, info)
+    payload = json.loads((source / "leaderboard_single.json").read_text())
+    payload[0]["metadata"]["target_registry_sha256"] = "not-a-sha"
+    dump(source / "leaderboard_single.json", payload)
+
+    with pytest.raises(ValueError, match="lowercase SHA256"):
         MODULE.validate_snapshot_set(source, info)
 
 

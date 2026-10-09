@@ -266,12 +266,12 @@
             // The supplement is optional and only joins by published aggregate ID.
             const [payload, supplement, identityData] = await Promise.all([
                 window.HFDataLoader.loadLeaderboardData(),
-                fetch('./data/leaderboard_run_observations.json').then(response => {
+                fetch('./data/leaderboard_run_observations.json', { cache: 'no-cache' }).then(response => {
                     if (!response.ok) throw new Error('Missing run observations');
                     return response.json();
                 }).catch(() => { state.missingSupplement = true; return {}; }),
                 Promise.all(['ecosystem.json', 'leaderboard_mod_attributions.json'].map(async file => {
-                    const response = await fetch(`./data/${file}`);
+                    const response = await fetch(`./data/${file}`, { cache: 'no-cache' });
                     if (!response.ok) throw new Error('Missing MOD identity evidence');
                     return response.json();
                 })).catch(() => { state.identityMissing = true; return [{}, {}]; })

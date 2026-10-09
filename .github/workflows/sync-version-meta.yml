@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: "0 */6 * * *"
 
+concurrency:
+  group: website-data-writers
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -23,6 +27,9 @@ jobs:
       - name: Sync version metadata
         run: python scripts/sync_version_meta.py
 
+      - name: Validate version metadata
+        run: bash scripts/check_stale_versions.sh
+
       - name: Commit changes
         run: |
           if git diff --quiet -- data/version_meta.json README.md; then
@@ -33,4 +40,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/version_meta.json README.md
           git commit -m "chore: sync version metadata"
-          git push
+          git pull --rebase origin main
+          git push origin HEAD:main
