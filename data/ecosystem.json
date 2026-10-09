@@ -894,6 +894,9 @@
       "delivery_model": "python_distribution",
       "ownership": "original_contributor_maintained",
       "maintainers": ["GuMorming"],
+      "advisors": [
+        {"name_zh": "罗瑞坤", "name_en": "Ruikun Luo", "relationship": "internal"}
+      ],
       "repository_relationship": "organization_native",
       "maturity": "experimental",
       "canonical_repository": "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust",
