@@ -328,7 +328,13 @@
           "avatar_url": "https://avatars.githubusercontent.com/u/73373639?v=4"
         }
       ],
-      "advisors": [],
+      "advisors": [
+        {
+          "name_zh": "罗瑞坤",
+          "name_en": "Ruikun Luo",
+          "relationship": "internal"
+        }
+      ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
     "split-batch-full-graph-migration": {
