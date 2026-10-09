@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "plans": [
     {
       "id": "qwen35-c44",
@@ -7,28 +7,196 @@
       "name": "C44 吞吐方案",
       "chips": 2,
       "hardware": "Ascend 910B2",
-      "outputTpsPerChip": 675.4005555555556,
-      "inputTpsPerChip": null,
+      "outputTpsPerChip": 640.2238888888888,
+      "inputTpsPerChip": 924.8511111111111,
       "ttftP95Seconds": 0.8207225915044545,
       "decodeP90TpsPerUser": 35.34310298818761,
       "measuredAt": "2026-10-06",
       "runId": "5fc2d7346b1042dca87f55bb55df327b",
       "config": "BF16 / TP2 / MTP2 / C44 / E44 / R48; State 24.25 GiB/rank; Host 8 GiB/rank; full checkpoint, incremental disabled",
       "workload": "SWE Prefix Reuse D1 / 900-second smoke",
-      "maxPromptTokens": 68525,
+      "maxPromptTokens": 67162,
       "source": "leaderboard-runs.html?setting=qwen35-35b-a3b-bf16-sweprefix-smoke-v1",
-      "qualification": "Selected highest-throughput observation among eight width-matched observations; not SLA, SLO goodput, isolated ablation, or a measurement of later partial eviction. Input billing volume is missing; exclude unless explicitly supplied."
+      "qualification": "宽度匹配八次观测中选定的吞吐方案；输入与输出按窗口内完成的同一批请求计账。排行榜输出仍采用 chunk 窗口口径，不改动。非 SLO 保证，也不是后续部分驱逐版本。",
+      "provider": "BetterScale",
+      "priceReferenceId": "qwen35",
+      "cachedInputTpsPerChip": 23462.989444444444,
+      "accounting": {
+        "sourceRunId": "5fc2d7346b1042dca87f55bb55df327b",
+        "sourceSha256": "1abc580e28b343d742cc922ffd8ba3d72d5e39e9255ae8db2cc7ca2c1ddf8d2b",
+        "measurementSeconds": 900.0,
+        "chips": 2,
+        "accounting": "Completed successful requests with end <= 900 seconds; input, cached input and output all use the same cohort. Excludes drained requests and their partial output; differs from leaderboard output-chunk window.",
+        "requests": 2007,
+        "counts": {
+          "prompt": 43898113,
+          "cached": 42233381,
+          "new": 1664732,
+          "output": 1152403
+        },
+        "tokensPerSecondPerChip": {
+          "prompt": 24387.840555555555,
+          "cached": 23462.989444444444,
+          "new": 924.8511111111111,
+          "output": 640.2238888888888
+        },
+        "leaderboardOutputTokensPerSecondPerChip": 675.4005555555556
+      },
+      "accountingEvidence": "docs/evidence/serving-plans-20261009/qwen35-c44/accounting.json"
+    },
+    {
+      "id": "native35-dp2-c16-20261009",
+      "model": "Qwen3.5-35B-A3B",
+      "provider": "Native vLLM",
+      "priceReferenceId": "qwen35",
+      "name": "Attention DP2 / Expert TP2 · C16",
+      "chips": 2,
+      "hardware": "Ascend 910B2",
+      "outputTpsPerChip": 209.21666666666667,
+      "inputTpsPerChip": 1426.0394444444444,
+      "cachedInputTpsPerChip": 6098.488888888889,
+      "ttftP95Seconds": 1.941383878490886,
+      "decodeP90TpsPerUser": 38.06680821073047,
+      "measuredAt": "2026-10-09",
+      "runId": "9904a21a7b6b4e8f8c71734e4c97f477",
+      "config": {
+        "tensor_parallel_size": 1,
+        "data_parallel_size": 2,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 4096,
+        "mtp_draft_tokens": 2,
+        "graph_mode": "FULL_AND_PIECEWISE",
+        "runtime_base_commits": {
+          "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+          "vllm-ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+        },
+        "gpu_memory_utilization": 0.95,
+        "async_scheduling": true,
+        "mamba_cache_mode": "align",
+        "correctness_adaptation": "Native donor kernels/graphs/scheduler. SD/V1 Mamba ABI bridge and private accepted-count CPU mailbox correctness bridge. Fresh reconstruction, not exact historical reproduction."
+      },
+      "workload": "SWE Prefix Reuse D1 / 900-second smoke",
+      "maxPromptTokens": 63543,
+      "source": "docs/evidence/serving-plans-20261009/native35-c16/qualification.json",
+      "qualification": "2026-10-09 重新部署测量；16/16 并发检索通过，900 秒零失败。保留 Native 内核、图与调度，仅加入 Mamba ABI 和异步接受长度回传的正确性适配。输入与输出按窗口内完成的同一批请求计账；非历史运行重标记，非 SLO 保证。",
+      "accountingEvidence": "docs/evidence/serving-plans-20261009/native35-c16/accounting.json",
+      "accounting": {
+        "measurementSeconds": 900,
+        "chips": 2,
+        "requests": 652,
+        "maxPromptTokens": 63543,
+        "counts": {
+          "prompt": 13544151,
+          "cached": 10977280,
+          "new": 2566871,
+          "output": 376590
+        },
+        "tokensPerSecondPerChip": {
+          "prompt": 7524.528333333334,
+          "cached": 6098.488888888889,
+          "new": 1426.0394444444444,
+          "output": 209.21666666666667
+        },
+        "accounting": "Successful requests completed within observation window; excludes drain and incomplete-request output. Input and output use the same cohort. Not the leaderboard's streamed-output-window metric.",
+        "sourceRunId": "9904a21a7b6b4e8f8c71734e4c97f477",
+        "sourceRawSha256": "6471f57fe3e1300c99cb7161d1c792fb1a2da4900321ba437cc85b8590513f23",
+        "usageProjectionSha256": "6e4a196cf231d4951ac9a36e12875df3d826f8ef156f77d51a6b90a830a7377d",
+        "projection": "Only timing/success and HTTP token usage retained; no generated text or token arrays. Raw evidence retained in local campaign archive.",
+        "leaderboardOutputTokensPerSecondPerChip": 215.29611111111112
+      }
+    },
+    {
+      "id": "qwen38-tp2-c8-20261009",
+      "model": "Qwen3.8-27B",
+      "provider": "BetterScale",
+      "priceReferenceId": "qwen38",
+      "name": "TP2 / MTP2 · C8",
+      "chips": 2,
+      "hardware": "Ascend 910B2",
+      "outputTpsPerChip": 142.84666666666666,
+      "inputTpsPerChip": 366.9661111111111,
+      "cachedInputTpsPerChip": 5616.64,
+      "ttftP95Seconds": 1.458433414343744,
+      "decodeP90TpsPerUser": 48.00270471631312,
+      "measuredAt": "2026-10-09",
+      "runId": "1a775a4fdc2748f0bac20914479da804",
+      "config": {
+        "tensor_parallel_size": 2,
+        "pipeline_parallel_size": 1,
+        "data_parallel_size": 1,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 4096,
+        "mtp_draft_tokens": 2,
+        "graph_mode": "FULL",
+        "runtime_base_commits": {
+          "vllm": "752a3a504485790a2e8491cacbb35c137339ad34",
+          "vllm_ascend": "9bf964cb4b87c8cd0d6852c41a55b3c29711fa95"
+        },
+        "gpu_memory_utilization": 0.95,
+        "max_model_len": 262144,
+        "mamba_cache_mode": "align",
+        "async_scheduling": true,
+        "worker": "betterscale.qwen35_worker.Worker",
+        "source_base_commit": "96cd03a362b18d68ea1a1b1f7ada5633d9c5e60c",
+        "reconstruction": true
+      },
+      "workload": "SWE Prefix Reuse D1 / 900-second smoke",
+      "maxPromptTokens": 79075,
+      "source": "docs/evidence/serving-plans-20261009/qwen38-c8/qualification.json",
+      "qualification": "官方 Qwen/Qwen3.8-27B 权重重新下载并封存文件身份；重新适配 Dense27 几何。GDN/FIA 独立数值检查与 16/16 并发检索通过，900 秒零失败。输入与输出同批计账；有界功能检查不等于通用质量认证或云端效果等价。",
+      "accountingEvidence": "docs/evidence/serving-plans-20261009/qwen38-c8/accounting.json",
+      "accounting": {
+        "measurementSeconds": 900,
+        "chips": 2,
+        "requests": 437,
+        "maxPromptTokens": 79075,
+        "counts": {
+          "prompt": 10770491,
+          "cached": 10109952,
+          "new": 660539,
+          "output": 257124
+        },
+        "tokensPerSecondPerChip": {
+          "prompt": 5983.606111111111,
+          "cached": 5616.64,
+          "new": 366.9661111111111,
+          "output": 142.84666666666666
+        },
+        "accounting": "Successful requests completed within observation window; excludes drain and incomplete-request output. Input and output use the same cohort. Not the leaderboard's streamed-output-window metric.",
+        "sourceRunId": "1a775a4fdc2748f0bac20914479da804",
+        "sourceRawSha256": "00edc223fdc7e84bdf9ef843fb2a6b81ff7e8a3bf3509f9ad722a1e28706f53d",
+        "usageProjectionSha256": "2b70564a88ab094bc40bd93cbfe7c2303260cef58e4a782ba859ba24ffad29a5",
+        "projection": "Only timing/success and HTTP token usage retained; no generated text or token arrays. Raw evidence retained in local campaign archive.",
+        "leaderboardOutputTokensPerSecondPerChip": 149.045
+      }
     }
   ],
-  "priceReference": {
-    "provider": "阿里云百炼",
-    "region": "华北2（北京）",
-    "model": "qwen3.5-35b-a3b",
-    "inputLimitTokens": 131072,
-    "inputCnyPerMillion": 0.4,
-    "outputCnyPerMillion": 3.2,
-    "checkedAt": "2026-10-09",
-    "url": "https://help.aliyun.com/zh/model-studio/qwen3-5-35b-a3b",
-    "scope": "公开原价，输入≤128K，不含活动折扣；并非效果、吞吐或延迟等价承诺。"
+  "priceReferences": {
+    "qwen35": {
+      "provider": "阿里云百炼",
+      "region": "华北2（北京）",
+      "model": "qwen3.5-35b-a3b",
+      "inputLimitTokens": 131072,
+      "inputCnyPerMillion": 0.4,
+      "outputCnyPerMillion": 3.2,
+      "checkedAt": "2026-10-09",
+      "url": "https://help.aliyun.com/zh/model-studio/qwen3-5-35b-a3b",
+      "scope": "公开原价，输入≤128K，不含活动折扣；并非效果、吞吐或延迟等价承诺。",
+      "cachedInputCnyPerMillion": 0.4,
+      "cacheScope": "百炼该模型不支持上下文缓存折扣；命中与新增输入均按普通输入价计。"
+    },
+    "qwen38": {
+      "provider": "阿里云百炼",
+      "region": "华北2（北京）",
+      "model": "qwen3.8-27b",
+      "inputLimitTokens": 991808,
+      "inputCnyPerMillion": 3,
+      "cachedInputCnyPerMillion": 0.6,
+      "outputCnyPerMillion": 12,
+      "checkedAt": "2026-10-09",
+      "url": "https://help.aliyun.com/zh/model-studio/qwen3-8-27b",
+      "cacheScope": "采用隐式缓存命中价；将实测命中输入映射为参考 API 的可计费命中量是情景假设，不保证云端相同命中率。未使用显式缓存价格。",
+      "scope": "北京公开原价，不含优惠或合同折扣；非云端体验或质量承诺。"
+    }
   }
 }

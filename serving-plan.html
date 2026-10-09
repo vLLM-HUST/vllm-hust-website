@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>BetterScale · Serving Plan</title>
+    <title>Serving Plan · 服务产能与成本</title>
     <meta
       name="description"
       content="从实测推理吞吐，到每卡服务产能与 API 等价产值。成本由你定义。"
@@ -28,7 +28,7 @@
     />
     <link
       rel="stylesheet"
-      href="./assets/serving-plan/style.css?v=site-native-20261009"
+      href="./assets/serving-plan/style.css?v=accounted-plans-20261009"
     />
   </head>
   <body data-page="serving-plan">
@@ -127,7 +127,7 @@
     <main class="site-shell serving-plan">
       <section class="page-hero">
         <div class="content-panel">
-          <span class="eyebrow">BetterScale · Serving Plan</span>
+          <span class="eyebrow">Serving Plan · 服务产能与成本</span>
           <h1 style="margin-top: 16px">服务产能与成本</h1>
           <p class="hero-lede">
             从实测推理吞吐，到每卡服务产能与 API 等价产值。成本由你定义。
@@ -137,24 +137,8 @@
       <section class="workspace content-panel">
         <aside class="controls">
           <div class="section-no">01 / 计算条件</div>
-          <label for="plan">Serving plan</label
-          ><select id="plan">
-            <option value="measured">Qwen3.5-35B-A3B · C44 吞吐方案</option>
-            <option value="custom">自定义模型 / 规划假设</option>
-          </select>
-          <div id="custom-fields" hidden>
-            <label for="model">模型 / 方案名称</label
-            ><input id="model" value="自定义方案" maxlength="60" /><label
-              for="throughput"
-              >输出吞吐 · tok/s/卡</label
-            ><input
-              id="throughput"
-              type="number"
-              min="0"
-              value="675.4"
-              step="0.1"
-            />
-          </div>
+          <fieldset id="plan-options"><legend>旗舰推理方案 · 可多选</legend><p>正在读取方案…</p></fieldset>
+          <p class="hint">按模型与方案并列展示；不是不同模型的效果排名。</p>
           <div class="field-head">
             <label for="utilization">有效利用率</label
             ><output id="util-label">100%</output>
@@ -188,47 +172,9 @@
               </select>
             </div>
           </div>
-          <details>
-            <summary>API 价格与输入计费</summary>
-            <label for="pricing">价格基准</label
-            ><select id="pricing">
-              <option value="beijing">百炼 · 北京 · 输入 ≤128K</option>
-              <option value="custom">自定义合同价格</option>
-            </select>
-            <div class="two">
-              <div>
-                <label for="price-in">输入 · 元/百万 tok</label
-                ><input
-                  id="price-in"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value="0.4"
-                />
-              </div>
-              <div>
-                <label for="price-out">输出 · 元/百万 tok</label
-                ><input
-                  id="price-out"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value="3.2"
-                />
-              </div>
-            </div>
-            <label for="input-tps"
-              >计费输入吞吐 · tok/s/卡 <small>选填</small></label
-            ><input
-              id="input-tps"
-              type="number"
-              min="0"
-              placeholder="待补计费口径数据"
-            />
-            <p class="hint">
-              填写等效计费输入量，不能用未缓存计算量代替 API
-              计费量。填写后作为用户假设计入；输入价格可按缓存命中及折扣折成加权单价。
-            </p>
+          <details><summary>各模型 API 参考价格</summary>
+            <p class="hint">单位：元 / 百万 token。分别设置新增输入、缓存命中输入、输出的价格；修改后标为用户假设。</p>
+            <div id="price-controls"></div>
           </details>
           <button id="reset" class="subtle">恢复默认条件 ↺</button>
         </aside>
@@ -242,59 +188,17 @@
           </div>
           <div id="error" role="alert" hidden></div>
           <div id="computed" aria-live="polite">
-            <div class="headline">
-              <span id="value">—</span
-              ><span class="denom" id="denom">元 / 卡时</span>
-            </div>
-            <p class="coverage" id="coverage">仅计输出价值 · 输入计费量待补</p>
-            <div
-              class="chart"
-              role="img"
-              aria-label="API 等价产值与综合成本比较"
-            >
-              <div class="chart-grid">
-                <span id="axis-top"></span><span id="axis-mid"></span
-                ><span>0</span>
-              </div>
-              <div class="columns">
-                <div class="column">
-                  <strong id="bar-value"></strong>
-                  <div class="bar-stack" id="bar">
-                    <div id="input-bar"></div>
-                    <div id="output-bar"></div>
-                  </div>
-                  <b id="bar-name">Qwen3.5-35B-A3B</b
-                  ><small id="bar-plan">C44 · BetterScale</small>
-                </div>
-                <div class="column cost-column">
-                  <strong id="cost-value">待填写</strong>
-                  <div id="cost-bar"></div>
-                  <b>你的综合成本</b><small>同一时间单位</small>
-                </div>
+            <p class="coverage" id="coverage"></p>
+            <div class="chart-scroll" tabindex="0" aria-label="方案产值柱状图，可横向滚动">
+              <div class="chart" id="chart" role="img" aria-label="各方案 API 等价产值">
+                <div class="chart-grid"><span id="axis-top"></span><span id="axis-mid"></span><span>0</span></div>
+                <div class="columns" id="columns"></div>
               </div>
             </div>
-            <div class="legend">
-              <span><i></i>输出价值</span
-              ><span><i class="input-key"></i>输入价值（如填写）</span
-              ><span><i class="cost-key"></i>综合成本</span>
-            </div>
-            <div class="metrics">
-              <div>
-                <span>按利用率折算的输出</span><strong id="tokens">—</strong
-                ><small id="tokens-unit">百万 token / 卡时</small>
-              </div>
-              <div>
-                <span>API 等价产值 − 成本</span
-                ><strong id="difference">待填成本</strong
-                ><small>成本差额，不等于利润</small>
-              </div>
-              <div>
-                <span>覆盖成本所需利用率</span
-                ><strong id="breakeven">待填成本</strong
-                ><small id="break-note">按当前已计价值计算</small>
-              </div>
-            </div>
-            <p class="verdict" id="verdict"></p>
+            <div class="legend"><span><i></i>输出</span><span><i class="input-key"></i>新增输入</span><span><i class="cache-key"></i>缓存命中输入</span><span><i class="cost-key"></i>成本参考</span></div>
+            <div id="plan-results" class="plan-results"></div>
+            <p class="verdict">API 等价产值不是实际收入或利润。成本由你输入；不同模型、工作负载和价格的柱高，不能解释成优化倍数或效果等价。</p>
+
           </div>
         </div>
       </section>
@@ -304,57 +208,15 @@
           <h2>产能有出处，假设看得见。</h2>
           <button id="export">导出当前账单 ↓</button>
         </div>
-        <div id="measured-evidence">
-          <div class="fact-row">
-            <div>
-              <small>输出吞吐</small><strong>675.40 <em>tok/s/卡</em></strong>
-            </div>
-            <div>
-              <small>首 token 等待 · P95</small
-              ><strong>0.821 <em>秒</em></strong>
-            </div>
-            <div>
-              <small>解码速度 · P90</small
-              ><strong>35.34 <em>tok/s/用户</em></strong>
-            </div>
-            <div>
-              <small>部署粒度</small><strong>2 <em>张 Ascend 910B2</em></strong>
-            </div>
-          </div>
-          <p>
-            Qwen3.5-35B-A3B · BF16 / TP2 / MTP2 · C44 / E44 / R48 · SWE Prefix
-            Reuse D1 · 900 秒 smoke。每卡数值按全部 2
-            张卡分摊，不能作为单卡独立部署能力。当前只收录这一款模型的选定实测方案，不用假数据填满多模型图表。
-          </p>
-          <p>
-            本组 8 次观测中的最高吞吐点；2007 个请求在窗口内完成，失败
-            0。输入长度中位数 19,702 token、最大 68,525 token。P90
-            解码速度不是最低速度承诺，延迟统计不是 SLO 达标率；尚未建立同条件云
-            API 体验对照，也不承诺效果等价。
-          </p>
-          <a href="data/serving-plans.json" target="_blank"
-            >查看数据摘录与来源 ↗</a
-          >
-        </div>
-        <p id="custom-evidence" hidden>
-          当前为用户自定义规划假设，不是 BetterScale
-          实测结果。修改吞吐无法推断体验、效果或所需卡数。
-        </p>
+        <div id="measured-evidence"></div>
+        <a href="data/serving-plans.json" target="_blank">查看方案数据与完整口径 ↗</a>
+
       </section>
       <section class="notes content-panel">
         <div>
           <h3>价格参考</h3>
-          <p id="price-note">
-            百炼北京区域，Qwen3.5-35B-A3B，输入 ≤128K 的公开原价。输入 ¥0.4 /
-            百万 token，输出 ¥3.2 / 百万
-            token。核对日期：2026-10-09；不含促销、合同折扣，服务限流需另行核对。
-          </p>
-          <a
-            href="https://help.aliyun.com/zh/model-studio/qwen3-5-35b-a3b"
-            target="_blank"
-            rel="noreferrer"
-            >阿里云官方价格 ↗</a
-          >
+          <div id="price-note"></div>
+
         </div>
         <div>
           <h3>这张账单回答什么？</h3>
@@ -370,6 +232,6 @@
       <span>服务产能与成本 · 输入仅在当前浏览器内计算，不上传。</span>
     </footer>
     <script src="./assets/site.js?v=cluster-inventory-20261009"></script>
-    <script type="module" src="assets/serving-plan/app.mjs"></script>
+    <script type="module" src="assets/serving-plan/app.mjs?v=accounted-plans-20261009"></script>
   </body>
 </html>
