@@ -71,8 +71,12 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     profiles = MOD_TAXONOMY["components"]
     assert set(profiles) <= {item["id"] for item in REGISTRY["components"]}
     assert {profile["kind"] for profile in profiles.values()} == {
-        "runtime_mod", "connector_mod", "tool_mod", "control_plane",
-        "external_system", "retired",
+        "runtime_mod",
+        "connector_mod",
+        "tool_mod",
+        "control_plane",
+        "external_system",
+        "retired",
     }
     assert all(
         set(profile) == {"kind", "capability", "lifecycle", "evidence"}
@@ -522,7 +526,10 @@ def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert 'let selectedType = "extensions"' in SCRIPT
     assert "const isWorkshopMod = (item)" in SCRIPT
     assert "taxonomyProfile(item).kind" in SCRIPT
-    assert '["extensions", "runtime_mod", "connector_mod", "tool_mod", "control_plane", "external_system", "retired"]' in SCRIPT
+    assert (
+        '["extensions", "runtime_mod", "connector_mod", "tool_mod", "control_plane", "external_system", "retired"]'
+        in SCRIPT
+    )
     assert 'element("div", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert "function coverTone(item)" in SCRIPT

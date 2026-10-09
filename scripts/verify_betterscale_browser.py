@@ -336,7 +336,9 @@ def main():
         assert page.locator(".workshop-card").count() == 0
         page.locator("[data-plugin-search]").fill("")
         page.locator("[data-workload-filters] button").first.click()
-        page.locator("[data-plugin-more]").click()
+        more_button = page.locator("[data-plugin-more]")
+        if more_button.is_visible():
+            more_button.click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
         tool_section = page.locator(".plugin-category-tools")
         assert (
