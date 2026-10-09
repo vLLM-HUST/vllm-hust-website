@@ -854,6 +854,29 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
     assert ".plugin-public-effect" in STYLES
 
 
+def test_gdn_state_codec_publishes_ecpa_activation_and_negative_result() -> None:
+    codec = by_id("gdn-state-codec")
+    assert codec["canonical_repository"] == "https://github.com/vLLM-HUST/gdn-state-codec"
+    assert codec["delivery_model"] == "plugin_bundle"
+    assert codec["integration_contracts"] == [
+        "vllm_hust.extension_manifest.v0.3-experimental",
+        "vllm.general_plugins",
+    ]
+    assert codec["public_effect_status"] == "not-beneficial-in-tested-cell"
+    assert "TTFT regressed in every cell" in codec["public_effect_en"]
+    assert "0/4" in codec["public_effect_en"]
+    assert "concurrency-2" in codec["public_effect_en"]
+    assert codec["functional_compatibility"]["status"] == "passed"
+    assert codec["runtime_state_dimensions"] == [
+        "installed",
+        "configured",
+        "enabled",
+        "runtimeEffective",
+    ]
+    assert codec["evidence_level"] == "performance_verified"
+    assert "Qixin-Gaoke" not in json.dumps(codec)
+
+
 def test_quantization_entries_preserve_runtime_boundaries() -> None:
     adaptive = by_id("ascend-adaptive-quantized-kv")
     toolkit = by_id("ascend-quant-toolkit")
@@ -943,7 +966,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-project-grouping"'
+        'data-source="./data/ecosystem.json?v=gdn-ecpa-negative-20261009"'
         in PAGE
     )
     assert (
@@ -1491,7 +1514,8 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "benchmark-settings-20260929" not in SCRIPT
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
-    assert PAGE.count("ecpa-final-20261009") >= 4
+    assert PAGE.count("ecpa-final-20261009") >= 3
+    assert "gdn-ecpa-negative-20261009" in PAGE
     assert "mod-taxonomy-v1" in PAGE
 
 
