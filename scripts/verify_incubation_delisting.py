@@ -1,4 +1,4 @@
-"""Verify the incubating sampling project stays off the public MOD catalog."""
+"""Verify retired MODs are archived and reactivated MODs stay correctly typed."""
 
 from __future__ import annotations
 
@@ -30,10 +30,19 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                         "lang => document.documentElement.lang.startsWith(lang)",
                         arg=language,
                     )
-                    assert page.locator("#activation-sparsity-migration").count() == 0
-                    assert page.locator("#layered-prefill-migration").count() == 0
-                    assert page.locator("#qos-scheduler-migration").count() == 0
-                    assert page.locator("#simllm-migration").count() == 0
+                    retired = page.locator(".plugin-category-retired")
+                    for retired_id in (
+                        "activation-sparsity-migration",
+                        "layered-prefill-migration",
+                        "qos-scheduler-migration",
+                    ):
+                        assert retired.locator(f"#{retired_id}").count() == 1
+                    assert (
+                        page.locator(
+                            ".plugin-category-runtime_mod #simllm-migration"
+                        ).count()
+                        == 1
+                    )
                     assert page.locator("#ascend-compact-greedy").count() == 0
                     assert (
                         page.locator(
@@ -50,14 +59,10 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                     unified.locator("details > summary").first.click()
                     assert unified.count() == 1
                     assert (
-                        unified.locator(
-                            "xpath=ancestor::*[contains(@class, "
-                            "'plugin-category-performance')]"
-                        ).count()
-                        == 1
+                        retired.locator("#unified-communication-migration").count() == 1
                     )
                     assert "#42" in unified.inner_text()
-                    expected_status = "仅检查" if language == "zh" else "inspect only"
+                    expected_status = "已退役" if language == "zh" else "retired"
                     assert expected_status in unified.inner_text().lower()
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= window.innerWidth + 1"
