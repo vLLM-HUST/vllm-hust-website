@@ -828,10 +828,13 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=ecpa-final-20261009"' in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=ecpa-final-20261009"'
+        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-kv-observer-v2"'
         in PAGE
+    )
+    assert (
+        'data-metadata="./data/plugin-workshop-metadata.json?'
+        'v=ecpa-final-20261009-kv-observer-v2"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009"'
@@ -1405,8 +1408,15 @@ def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
     kv_observer = by_id("kv-transfer-observability-migration")
     assert kv_observer["public_surface"] is True
     assert kv_observer["compatibility"]["status"] == "experimental"
-    assert "529ab282" in kv_observer["compatibility"]["versions"][0]
-    assert "worker-local" in kv_observer["summary_en"]
+    assert "05fcf5cd" in kv_observer["compatibility"]["versions"][0]
+    assert "5a820400" in kv_observer["compatibility"]["versions"][1]
+    assert "vllm.kv-transfer.observer.v2" in kv_observer["integration_contracts"]
+    assert "v2-correlated recovery chains" in kv_observer["summary_en"]
+    assert "not release-level NPU qualification" in kv_observer["public_effect_en"]
+
+    runtime = by_id("vllm-hust-runtime")
+    assert "vllm.kv-transfer.observer.v2" in runtime["integration_contracts"]
+    assert "default-off" in runtime["summary_en"]
 
     tricard = by_id("tricard-clm-lifecycle")
     assert tricard["compatibility"]["status"] == "experimental"
