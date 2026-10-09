@@ -1,175 +1,306 @@
-import { calculate } from "./calc.mjs";
+import { calculate } from "./calc.mjs?v=accounted-plans-20261009";
 const $ = (id) => document.getElementById(id);
 const fmt = (n, d = 2) =>
-  n.toLocaleString("zh-CN", {
-    minimumFractionDigits: d,
-    maximumFractionDigits: d,
-  });
+  n.toLocaleString("zh-CN", { maximumFractionDigits: d });
 let data, last;
-const number = (id, optional = false) => {
+const selected = new Set();
+const prices = new Map();
+function element(tag, text, className) {
+  const el = document.createElement(tag);
+  if (text !== undefined) el.textContent = text;
+  if (className) el.className = className;
+  return el;
+}
+function number(id, optional = false) {
   const s = $(id).value.trim();
   if (!s && optional) return null;
-  if (!s) throw Error("请补全必填数值");
-  const n = Number(s);
-  if (!Number.isFinite(n) || n < 0) throw Error("数值必须为有效的非负数");
-  return n;
-};
+  if (!s || !Number.isFinite(Number(s)) || Number(s) < 0)
+    throw Error("请输入有效的非负数");
+  return Number(s);
+}
 function render() {
   if (!data) return;
-  const custom = $("plan").value === "custom";
-  $("custom-fields").hidden = !custom;
-  $("measured-evidence").hidden = custom;
-  $("custom-evidence").hidden = !custom;
   try {
     const days = number("days"),
-      unit = $("unit").value,
-      hours = unit === "month" ? 24 * days : Number(unit);
-    const params = {
-      output: custom ? number("throughput") : data.plans[0].outputTpsPerChip,
-      input: number("input-tps", true),
-      priceOut: number("price-out"),
-      priceIn: number("price-in"),
-      utilization: number("utilization"),
-      hours,
+      unit = $("unit").value;
+    const shared = {
       days,
+      hours: unit === "month" ? 24 * days : Number(unit),
+      utilization: number("utilization"),
       cost: number("cost", true),
     };
-    const r = calculate(params),
-      denom = unit === "month" ? "卡月" : unit === "24" ? "卡天" : "卡时";
-    $("computed").hidden = false;
+    const denom = unit === "month" ? "卡月" : unit === "24" ? "卡天" : "卡时";
+    $("util-label").textContent = `${shared.utilization}%`;
+    const rows = data.plans
+      .filter((p) => selected.has(p.id))
+      .map((plan) => {
+        const price = prices.get(plan.priceReferenceId);
+        const params = {
+          ...shared,
+          output: plan.outputTpsPerChip,
+          input: plan.inputTpsPerChip,
+          cachedInput: plan.cachedInputTpsPerChip,
+          priceIn: number(price.input),
+          priceCached: number(price.cached),
+          priceOut: number(price.output),
+        };
+        return {
+          plan,
+          parameters: params,
+          results: calculate(params),
+          priceSource: price.changed
+            ? "user-assumption"
+            : data.priceReferences[plan.priceReferenceId],
+        };
+      });
     $("error").hidden = true;
-    $("export").disabled = false;
-    $("util-label").textContent = `${params.utilization}%`;
+    $("computed").hidden = false;
+    $("export").disabled = !rows.length;
+    const incomplete = rows.some(
+      ({ plan }) =>
+        plan.inputTpsPerChip === null || plan.cachedInputTpsPerChip === null,
+    );
+    $("coverage").textContent = rows.length
+      ? `${rows.length} 个方案 · 元 / ${denom} · ${incomplete ? "缺失输入的方案仅显示已知输出价值" : "新增输入、缓存命中与输出完整计账"}`
+      : "请勾选至少一个方案。";
     $("result-title").textContent =
-      params.utilization === 100
+      shared.utilization === 100
         ? "满载 API 等价产值"
         : "按利用率折算的 API 等价产值";
-    $("kind").textContent = custom ? "用户假设" : "实测外推";
-    $("value").textContent = `¥ ${fmt(r.value)}`;
-    $("denom").textContent = `元 / ${denom}`;
-    $("coverage").textContent =
-      params.input === null
-        ? "仅计输出价值 · 输入计费量待补"
-        : "输出 + 输入价值 · 输入吞吐为用户假设";
-    const max = Math.max(r.value, r.expense ?? 0, 0.01) * 1.2,
-      scale = 160 / max;
+    $("kind").textContent = "实测产能 × 参考价格";
+    $("columns").replaceChildren();
+    $("plan-results").replaceChildren();
+    $("measured-evidence").replaceChildren();
+    const expense = rows[0]?.results.expense ?? null;
+    const max =
+      Math.max(0.01, expense ?? 0, ...rows.map((r) => r.results.value)) * 1.2;
     $("axis-top").textContent = fmt(max);
     $("axis-mid").textContent = fmt(max / 2);
-    $("bar").style.height = `${r.value * scale}px`;
-    const total = r.peakIn + r.peakOut;
-    $("input-bar").style.height = `${total ? (r.peakIn / total) * 100 : 0}%`;
-    $("output-bar").style.height = `${total ? (r.peakOut / total) * 100 : 0}%`;
-    $("cost-bar").style.height = `${(r.expense ?? 0) * scale}px`;
-    $("cost-bar").style.opacity = r.expense === null ? 0.25 : 1;
-    $("bar-value").textContent = `¥${fmt(r.value)}`;
-    $("cost-value").textContent =
-      r.expense === null ? "待填写" : `¥${fmt(r.expense)}`;
-    $("bar-name").textContent = custom
-      ? $("model").value || "自定义模型"
-      : data.plans[0].model;
-    $("bar-plan").textContent = custom ? "自定义规划假设" : "C44 · BetterScale";
-    $("tokens").textContent = fmt(r.outputTokens / 1e6);
-    $("tokens-unit").textContent = `百万 token / ${denom}`;
-    $("difference").textContent =
-      r.difference === null
-        ? "待填成本"
-        : `${r.difference >= 0 ? "+" : "−"} ¥${fmt(Math.abs(r.difference))}`;
-    $("breakeven").textContent =
-      r.expense === null
-        ? "待填成本"
-        : r.breakEven === null
-          ? "不适用"
-          : `${fmt(r.breakEven, 1)}%`;
-    $("break-note").textContent =
-      r.breakEven > 100
-        ? "满载时当前已计价值仍不足覆盖成本"
-        : "按当前已计价值计算";
-    $("verdict").textContent =
-      r.expense === null
-        ? "先看这套方案的产能，再填入你的综合成本。我们不替你假定采购价。"
-        : r.difference >= 0
-          ? "当前假设下，已计 API 等价产值覆盖综合成本。差额仅供采购比较，不是实际销售利润。"
-          : "当前假设下，已计 API 等价产值低于综合成本。请结合未计输入价值、真实合同价格与业务体验判断。";
-    $("price-note").textContent =
-      $("pricing").value === "beijing"
-        ? "百炼北京区域，同模型输入 ≤128K 公开原价：输入 ¥0.4 / 百万 token，输出 ¥3.2 / 百万 token。核对日期 2026-10-09，不含促销和合同折扣；服务限流需另行核对。"
-        : "当前采用用户自定义价格，非官方报价。请确认适用模型、区域、长度档位及缓存折扣；链接仅为原始参考。";
+    $("chart").style.minWidth =
+      `${Math.max(300, (rows.length + (expense !== null ? 1 : 0)) * 165 + 48)}px`;
+    for (const row of rows) {
+      const { plan: p, results: r } = row;
+      const complete =
+        p.inputTpsPerChip !== null && p.cachedInputTpsPerChip !== null;
+      const col = element("div", undefined, "column");
+      col.append(element("strong", `¥${fmt(r.value)}${complete ? "" : "*"}`));
+      const stack = element("div", undefined, "bar-stack");
+      stack.style.height = `${(r.value / max) * 220}px`;
+      const total = r.peakOut + r.peakIn + r.peakCached;
+      for (const [value, css] of [
+        [r.peakCached, "cache-bar"],
+        [r.peakIn, "input-bar"],
+        [r.peakOut, "output-bar"],
+      ]) {
+        const segment = element("div", undefined, css);
+        segment.style.height = `${total ? (value / total) * 100 : 0}%`;
+        stack.append(segment);
+      }
+      col.append(stack, element("b", p.model), element("small", p.provider));
+      $("columns").append(col);
+      const card = element("article", undefined, "plan-card");
+      card.append(
+        element("h3", `${p.model} · ${p.provider}`),
+        element("p", p.name),
+      );
+      for (const [label, value] of [
+        [
+          "等价产值",
+          `¥${fmt(r.value)} / ${denom}${complete ? "" : "（仅已知输出）"}`,
+        ],
+        [
+          "成本差额",
+          r.difference === null
+            ? "待填成本"
+            : `¥${fmt(r.difference)} / ${denom}`,
+        ],
+        [
+          "覆盖成本所需利用率",
+          r.breakEven === null ? "—" : `${fmt(r.breakEven, 1)}%`,
+        ],
+        [
+          "P95 首 token / P90 解码",
+          `${fmt(p.ttftP95Seconds, 3)} 秒 / ${fmt(p.decodeP90TpsPerUser)} tok/s/用户`,
+        ],
+      ]) {
+        const line = element("div", undefined, "result-line");
+        line.append(element("span", label), element("strong", value));
+        card.append(line);
+      }
+      if (row.priceSource === "user-assumption")
+        card.append(
+          element(
+            "p",
+            "价格已修改：使用你的自定义情景，而非官方报价。",
+            "hint",
+          ),
+        );
+      card.append(
+        element(
+          "p",
+          complete
+            ? "输入与输出已按同一统计口径计入。"
+            : "* 输入数据待补，当前价值与成本覆盖门槛不完整。",
+          "hint",
+        ),
+      );
+      $("plan-results").append(card);
+      const evidence = element("details");
+      evidence.append(
+        element("summary", `${p.model} · ${p.provider} · ${p.name}`),
+      );
+      evidence.append(
+        element(
+          "p",
+          `${p.measuredAt} · ${p.chips} 张 ${p.hardware} · ${p.workload}。按全部卡数分摊；不能理解为单卡可独立部署。`,
+        ),
+      );
+      evidence.append(
+        element(
+          "p",
+          `输出 ${fmt(p.outputTpsPerChip)}；新增输入 ${p.inputTpsPerChip === null ? "待补" : fmt(p.inputTpsPerChip)}；缓存命中输入 ${p.cachedInputTpsPerChip === null ? "待补" : fmt(p.cachedInputTpsPerChip)} tok/s/卡。`,
+        ),
+      );
+      evidence.append(element("p", p.qualification));
+      const link = element("a", "查看测量来源 ↗");
+      link.href = p.source;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      evidence.append(link);
+      if (p.accountingEvidence) {
+        const ledger = element("a", "查看逐请求计账凭据 ↗");
+        ledger.href = p.accountingEvidence;
+        ledger.target = "_blank";
+        ledger.rel = "noreferrer";
+        evidence.append(element("span", " · "), ledger);
+      }
+      $("measured-evidence").append(evidence);
+    }
+    if (expense !== null) {
+      const col = element("div", undefined, "column");
+      const bar = element("div", undefined, "cost-bar");
+      bar.style.height = `${(expense / max) * 220}px`;
+      col.append(
+        element("strong", `¥${fmt(expense)}`),
+        bar,
+        element("b", "综合成本"),
+        element("small", "用户输入 / 同单位"),
+      );
+      $("columns").append(col);
+    }
     last = {
       generatedAt: new Date().toISOString(),
-      model: $("bar-name").textContent,
-      plan: custom ? "user-assumption" : data.plans[0],
-      parameters: params,
       unit: denom,
-      results: r,
-      priceSource:
-        $("pricing").value === "beijing"
-          ? data.priceReference
-          : "user-assumption",
+      plans: rows,
       caveat:
-        $("coverage").textContent +
-        "；API 等价产值非收入、非利润、非 SLO 保证。",
+        "API 等价产值非收入、非利润、非 SLO 保证；硬件缓存命中映射到 API 缓存价为情景假设。",
     };
   } catch (e) {
+    $("computed").hidden = true;
     $("error").hidden = false;
     $("error").textContent = e.message;
-    $("computed").hidden = true;
     $("export").disabled = true;
     last = null;
   }
 }
-document.querySelectorAll("input,select").forEach((el) =>
-  el.addEventListener("input", () => {
-    if (["price-in", "price-out"].includes(el.id))
-      $("pricing").value = "custom";
-    if (el.id === "plan" && el.value === "custom")
-      $("pricing").value = "custom";
-    if (el.id === "pricing" && el.value === "beijing") {
-      if ($("plan").value === "custom") {
-        $("pricing").value = "custom";
-      } else {
-        $("price-in").value = data.priceReference.inputCnyPerMillion;
-        $("price-out").value = data.priceReference.outputCnyPerMillion;
-      }
+function initialize() {
+  $("plan-options").replaceChildren(element("legend", "旗舰推理方案 · 可多选"));
+  for (const p of data.plans) {
+    selected.add(p.id);
+    const label = element("label", undefined, "plan-choice");
+    const check = element("input");
+    check.type = "checkbox";
+    check.checked = true;
+    check.value = p.id;
+    check.addEventListener("change", () => {
+      check.checked ? selected.add(p.id) : selected.delete(p.id);
+      render();
+    });
+    const title = element("span", `${p.model} · ${p.provider}`);
+    title.append(element("small", p.name));
+    label.append(check, title);
+    $("plan-options").append(label);
+  }
+  for (const [id, p] of Object.entries(data.priceReferences)) {
+    const box = element("fieldset");
+    box.append(element("legend", p.model));
+    const controls = { changed: false };
+    for (const [key, label, value] of [
+      ["input", "新增输入", p.inputCnyPerMillion],
+      ["cached", "缓存命中输入", p.cachedInputCnyPerMillion],
+      ["output", "输出", p.outputCnyPerMillion],
+    ]) {
+      const input = element("input");
+      input.id = `price-${id}-${key}`;
+      input.type = "number";
+      input.min = "0";
+      input.step = "0.01";
+      input.value = value;
+      input.defaultValue = value;
+      const tag = element("label", label);
+      tag.htmlFor = input.id;
+      box.append(tag, input);
+      controls[key] = input.id;
+      input.addEventListener("input", () => {
+        controls.changed = true;
+        render();
+      });
     }
+    box.append(element("p", p.cacheScope, "hint"));
+    prices.set(id, controls);
+    $("price-controls").append(box);
+    const note = element(
+      "p",
+      `${p.model}：新增输入 ¥${p.inputCnyPerMillion}，缓存命中输入 ¥${p.cachedInputCnyPerMillion}，输出 ¥${p.outputCnyPerMillion} / 百万 token。${p.region}；核对日期 ${p.checkedAt}。${p.cacheScope} `,
+    );
+    const link = element("a", "官方价格 ↗");
+    link.href = p.url;
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    note.append(link);
+    $("price-note").append(note);
+  }
+  for (const id of ["utilization", "cost", "days", "unit"])
+    $(id).addEventListener("input", render);
+  $("reset").addEventListener("click", () => {
+    $("utilization").value = 100;
+    $("cost").value = "";
+    $("days").value = 30;
+    $("unit").value = "1";
+    document.querySelectorAll("#plan-options input").forEach((c) => {
+      c.checked = true;
+      selected.add(c.value);
+    });
+    document
+      .querySelectorAll("#price-controls input")
+      .forEach((i) => (i.value = i.defaultValue));
+    prices.forEach((p) => (p.changed = false));
     render();
-  }),
-);
-$("reset").addEventListener("click", () => {
-  for (const [id, value] of Object.entries({
-    plan: "measured",
-    utilization: 100,
-    cost: "",
-    days: 30,
-    unit: "1",
-    pricing: "beijing",
-    "price-in": 0.4,
-    "price-out": 3.2,
-    "input-tps": "",
-    throughput: 675.4,
-    model: "自定义方案",
-  }))
-    $(id).value = value;
+  });
+  $("export").addEventListener("click", () => {
+    if (!last) return;
+    const url = URL.createObjectURL(
+      new Blob([JSON.stringify(last, null, 2)], { type: "application/json" }),
+    );
+    const a = element("a");
+    a.href = url;
+    a.download = "serving-plans.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
   render();
-});
-$("export").addEventListener("click", () => {
-  if (!last) return;
-  const url = URL.createObjectURL(
-    new Blob([JSON.stringify(last, null, 2)], { type: "application/json" }),
-  );
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "serving-plan.json";
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-});
-try {
-  const response = await fetch("data/serving-plans.json");
-  if (!response.ok) throw Error("数据加载失败，请刷新重试");
-  data = await response.json();
-  render();
-} catch (e) {
-  $("error").hidden = false;
-  $("error").textContent = e.message;
-  $("computed").hidden = true;
-  $("export").disabled = true;
 }
+fetch("data/serving-plans.json?v=accounted-plans-20261009", { cache: "no-cache" })
+  .then((r) => {
+    if (!r.ok) throw Error("方案数据读取失败");
+    return r.json();
+  })
+  .then((d) => {
+    data = d;
+    initialize();
+  })
+  .catch((e) => {
+    $("error").hidden = false;
+    $("error").textContent = e.message;
+    $("export").disabled = true;
+  });

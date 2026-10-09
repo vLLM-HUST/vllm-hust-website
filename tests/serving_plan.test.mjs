@@ -56,11 +56,19 @@ test("selected observation and provenance preserved", () => {
   const d = JSON.parse(
     readFileSync(new URL("../data/serving-plans.json", import.meta.url)),
   );
-  assert.equal(d.plans.length, 1);
+  assert.ok(d.plans.length >= 3);
+  assert.ok(d.plans.some((p) => p.provider !== "BetterScale"));
   assert.equal(d.plans[0].chips, 2);
-  assert.equal(d.plans[0].outputTpsPerChip, base.output);
-  assert.equal(d.plans[0].inputTpsPerChip, null);
-  assert.ok(d.plans[0].maxPromptTokens <= d.priceReference.inputLimitTokens);
+  assert.equal(
+    d.plans[0].accounting.leaderboardOutputTokensPerSecondPerChip,
+    base.output,
+  );
+  assert.equal(d.plans[0].outputTpsPerChip, 1152403 / 900 / 2);
+  assert.equal(d.plans[0].inputTpsPerChip, 1664732 / 900 / 2);
+  assert.equal(d.plans[0].cachedInputTpsPerChip, 42233381 / 900 / 2);
+  assert.ok(
+    d.plans[0].maxPromptTokens <= d.priceReferences.qwen35.inputLimitTokens,
+  );
   const html = readFileSync(
     new URL("../achievements.html", import.meta.url),
     "utf8",
@@ -89,4 +97,36 @@ test("calculator reuses the website shell rather than a standalone theme", () =>
     "utf8",
   );
   assert.match(navigation, /pages: \[[^\]]*'serving-plan'/);
+});
+
+test("cached and new input are disjoint billing components", () => {
+  const r = calculate({
+    ...base,
+    output: 100,
+    input: 200,
+    cachedInput: 800,
+    priceIn: 3,
+    priceCached: 0.6,
+    priceOut: 12,
+  });
+  assert.ok(
+    Math.abs(r.value - ((100 * 12 + 200 * 3 + 800 * 0.6) * 3600) / 1e6) < 1e-9,
+  );
+  assert.throws(() => calculate({ ...base, cachedInput: -1 }));
+  assert.throws(() => calculate({ ...base, priceCached: NaN }));
+});
+test("every plan has model-specific reference pricing and source", () => {
+  const d = JSON.parse(
+    readFileSync(new URL("../data/serving-plans.json", import.meta.url)),
+  );
+  for (const p of d.plans) {
+    assert.ok(d.priceReferences[p.priceReferenceId]);
+    assert.ok(p.runId);
+    assert.ok(p.source);
+    assert.ok(p.chips > 0);
+  }
+  assert.equal(
+    d.priceReferences.qwen35.cachedInputCnyPerMillion,
+    d.priceReferences.qwen35.inputCnyPerMillion,
+  );
 });
