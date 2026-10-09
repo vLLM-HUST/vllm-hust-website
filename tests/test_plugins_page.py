@@ -105,9 +105,12 @@ def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() ->
     assert component["public_effect_status"] == "beneficial"
     assert component["public_effect_url"].endswith("/vllm-ascend-simllm-hust/pull/5")
     assert component["compatibility"]["status"] == "experimental"
-    assert "one-output-token similarity replay" in component["compatibility"]["models"][0]
+    assert (
+        "one-output-token similarity replay" in component["compatibility"]["models"][0]
+    )
     performance = next(
-        item for item in PLUGIN_PERFORMANCE["entries"]
+        item
+        for item in PLUGIN_PERFORMANCE["entries"]
         if item["id"] == "simllm-migration"
     )
     comparisons = performance["observations"][0]["comparisons"]
@@ -116,7 +119,9 @@ def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() ->
         (5.2563, 6.2435),
     ]
     assert WORKLOAD_NAVIGATION["plugins"]["simllm-migration"] == [
-        "repeated_prefix_agent", "prefill_heavy", "memory_kv_pressure"
+        "repeated_prefix_agent",
+        "prefill_heavy",
+        "memory_kv_pressure",
     ]
     assert "simllm-migration" in WORKSHOP_METADATA["plugins"]
     assert "VLLM_ASCEND_SIMLLM_ENABLED=1" in SCRIPT
@@ -149,7 +154,9 @@ def test_legacy_migration_cards_preserve_original_ownership() -> None:
         assert component["maintainers"] == maintainers
         assert component["delivery_model"] == "plugin_bundle"
         assert component["maturity"] in {"incubating", "experimental"}
-        assert component["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        assert component["canonical_repository"].startswith(
+            "https://github.com/vLLM-HUST/"
+        )
 
     assert "Original maintainers" in SCRIPT
     assert "原负责人" in SCRIPT
