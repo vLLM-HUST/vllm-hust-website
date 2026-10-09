@@ -650,26 +650,30 @@ def test_workshop_uses_canonical_taxonomy_instead_of_collapsing_connectors() -> 
 
 def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> None:
     assert WORKSHOP_METADATA["schema_version"] == "plugin-workshop-metadata/v1"
-    workshop_mods = {
+    people_cards = {
         item["id"]
         for item in REGISTRY["components"]
-        if item["artifact_type"] in {"runtime_component", "bridge"}
-        and item["repository_relationship"] == "organization_native"
-        and item.get("public_surface", True) is not False
-        and item["delivery_model"]
-        in {
-            "plugin_bundle",
-            "python_distribution",
-            "migration_scaffold",
-            "source_patch",
-        }
-        and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        if item.get("public_surface", True) is not False
+        and item.get("maintainers")
+        and (
+            item["id"] in MOD_TAXONOMY["components"]
+            or item["id"] == "ascend-attention-boundary"
+        )
     }
-    workshop_mods |= {
-        "ascend-attention-boundary",
-        "core-attention-boundary",
+    assert set(WORKSHOP_METADATA["plugins"]) == people_cards
+    public_catalog_ids = {
+        item["id"]
+        for item in REGISTRY["components"]
+        if item.get("public_surface", True) is not False
+        and item["id"] in MOD_TAXONOMY["components"]
     }
-    assert set(WORKSHOP_METADATA["plugins"]) == workshop_mods
+    assert public_catalog_ids - set(WORKSHOP_METADATA["plugins"]) == {
+        "mooncake",
+        "mooncake-vllm-connectors",
+        "ride-control-plane",
+        "vllm-local-control-host",
+        "ride-runtime-bridge",
+    }
     for plugin_id, plugin in WORKSHOP_METADATA["plugins"].items():
         assert plugin["maintainers"]
         assert all(
@@ -859,12 +863,12 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-attention-owners"'
+        'data-source="./data/ecosystem.json?v=ecpa-final-20261009-people-complete"'
         in PAGE
     )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=ecpa-final-20261009-attention-owners"' in PAGE
+        'v=ecpa-final-20261009-people-complete"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009"'
@@ -1165,6 +1169,43 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
             (person["name"], person["login"]) for person in metadata["maintainers"]
         ] == [("曹哲", "xmdhb")]
         assert metadata["advisors"] == component["advisors"]
+
+    expected_people = {
+        "llm-serving-cost-pricing-model": ([("张书豪", "ShuhaoZhangTony")], []),
+        "ascend-quant-toolkit": ([("王鸿坤", "aly16-k")], []),
+        "slicegpt-migration": ([("王晨", "qingfengyuhuoda")], ["万瑶"]),
+        "prefix-router-migration": (
+            [
+                ("郑凌峰", "Amber1qq"),
+                ("王杰", "WMASTER123"),
+                ("Adr1anZheng", "Adr1anZheng"),
+            ],
+            ["刘海坤", "张书豪"],
+        ),
+        "pegaflow": (
+            [("陈彦博", "cybber695"), ("张盛翔", "zhangshengxiang682")],
+            ["张书豪"],
+        ),
+        "pegaflow-vllm-connectors": (
+            [("陈彦博", "cybber695"), ("张盛翔", "zhangshengxiang682")],
+            ["张书豪"],
+        ),
+    }
+    for component_id, (maintainers, advisors) in expected_people.items():
+        metadata = WORKSHOP_METADATA["plugins"][component_id]
+        assert [
+            (person["name"], person["login"]) for person in metadata["maintainers"]
+        ] == maintainers
+        assert [advisor["name_zh"] for advisor in metadata["advisors"]] == advisors
+
+    cost = by_id("llm-serving-cost-pricing-model")
+    assert cost["maintainer_profiles"] == [
+        {"login": "ShuhaoZhangTony", "name": "张书豪"}
+    ]
+    assert cost["advisors"] == []
+    quant = by_id("ascend-quant-toolkit")
+    assert quant["maintainer_profiles"] == [{"login": "aly16-k", "name": "王鸿坤"}]
+    assert "advisors" not in quant
 
     pyramid = by_id("pyramidkv-ascend-migration")
     assert pyramid["public_surface"] is True
