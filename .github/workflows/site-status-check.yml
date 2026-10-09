@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: website-data-writers
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 jobs:
