@@ -9,6 +9,9 @@ preemption; it is not the current implementation and is not imported as this cam
 
 | Concurrency | Output tok/s/card | P90 decode tok/s/user | TTFT P95 (s) | Completed requests |
 | ----------- | ----------------: | --------------------: | -----------: | -----------------: |
+| C1          |             35.39 |                 83.85 |        0.582 |                120 |
+| C2          |             69.08 |                 78.90 |        0.911 |                188 |
+| C4          |            114.43 |                 68.07 |        0.940 |                340 |
 | C8          |            178.72 |                 53.78 |        1.025 |                510 |
 | C12         |            218.27 |                 43.61 |        1.113 |                651 |
 | C16         |            249.06 |                 37.39 |        1.313 |                730 |
@@ -16,8 +19,12 @@ preemption; it is not the current implementation and is not imported as this cam
 Each point is one complete observation, not a pooled repeat or an isolated-feature A/B. TP2 uses two
 Ascend910B2 cards; every allocated card remains in the throughput denominator. E16/R20, MTP2,
 FULL4096, BF16, 262144-token configured context, automatic HBM utilization0.95 and8GiB Host cache
-per rank are fixed across C8/C12/C16. C13/C14 were cancelled and are not scored or displayed. C8 and
-C16 use disjoint physical pairs with partially overlapping execution; C12 reuses C8's released pair.
+per rank are fixed across C1/C2/C4/C8/C12/C16. C13/C14 were cancelled and are not scored or
+displayed. C8 and C16 use disjoint physical pairs with partially overlapping execution; C12 reuses
+C8's released pair. The later C1/C4 windows also overlap on disjoint pairs; C2 follows C1 on its
+released pair. These three additions reuse the same qualified frozen source and native libraries,
+not the in-progress TP4 extension. Balanced attention is enabled, but the single-request native
+dispatch remains intentional; an enable flag does not mean every step uses the balanced kernel.
 
 The client uses the same eight SWE source sessions and model-tokenized budgets, continuous request
 lanes and D1 session rotation. A separate60-second C2 warmup precedes each measured window; measured
@@ -66,6 +73,9 @@ release or CANN9.1 Dense27 qualification is implied.
 
 | Concurrency | Queued seal / store / load | Active partial evictions | Peak sampled KV usage | Mixed / decode steps (rank0) |
 | ----------- | -------------------------: | -----------------------: | --------------------: | ---------------------------: |
+| C1          |                 70 / 5 / 0 |                        0 |                25.15% |                    0 / 22914 |
+| C2          |                 75 / 7 / 0 |                        0 |                39.18% |                  188 / 22555 |
+| C4          |               164 / 12 / 0 |                        0 |                60.62% |                  343 / 18573 |
 | C8          |               637 / 18 / 0 |                        0 |                71.54% |                  510 / 14158 |
 | C12         |               856 / 29 / 6 |                        0 |                73.49% |                  637 / 11256 |
 | C16         |              700 / 72 / 52 |                        0 |                86.74% |                   714 / 9551 |
@@ -85,18 +95,23 @@ ratio.
 
 ## Business accounting and evidence
 
-Serving Plan selects the highest-throughput complete observation among these three settings, not a
+Serving Plan selects the highest-throughput complete observation among these six settings, not a
 global optimum. Its new-input, cached-input and output rates all use the **same successful requests
 completed within900seconds**, excluding drain and incomplete-request output. That business ledger
 intentionally differs from the chart's streamed-output-window rate. Costs remain user inputs; API
 prices are the already documented model-specific scenario assumptions, not realized revenue.
 
 Compact per-run qualification, accounting and reproducible usage-only projections are under
-`docs/evidence/dense27-current-20261009/c8`, `c12` and `c16`. The Frontier snapshot and SWE evidence
-extract preserve complete point/run joins. Historical points and failed-native annotations remain
-unchanged; Pareto filtering decides which whole observations are frontier vertices.
+`docs/evidence/dense27-current-20261009/c1`, `c2`, `c4`, `c8`, `c12` and `c16`. The Frontier
+snapshot and SWE evidence extract preserve complete point/run joins. Historical points and
+failed-native annotations remain unchanged; Pareto filtering decides which whole observations are
+frontier vertices.
 
 Full source/native qualification is retained outside Git as `qualification-evidence.tar.gz`, SHA256
 `d87df056cbd5714edfbe40c28ced2fad124b25a2ee91d763d239e75665217735`. Raw request streams, observers,
 server logs and cleanup receipts are preserved in separate per-concurrency campaign archives. Public
 projections omit generated text and token arrays.
+
+The later C1/C2/C4 raw archives are retained under the local `dense27-sweep-20261009` campaign, with
+transfer-verified identities. C24/C32 and TP4 are not represented by these low-concurrency
+observations; pending or interrupted launches are not scores.

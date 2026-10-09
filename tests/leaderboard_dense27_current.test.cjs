@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),data=require('../data/leaderboard_frontier.json');
 test('current Dense27 sweep joins qualified current State points, not old reconstruction',()=>{
  const points=data.points.filter(p=>p.evidence.benchmark_protocol?.campaign==='dense27-current-state-20261009');
- assert.deepEqual(points.map(p=>p.load.concurrency).sort((a,b)=>a-b),[8,12,16]);
+ assert.deepEqual(points.map(p=>p.load.concurrency).sort((a,b)=>a-b),[1,2,4,8,12,16]);
  for(const p of points){
   const c=p.configuration.parameters;assert.equal(c.host_kv_budget_gib,8);assert.equal(c.scheduler_block_tokens,1536);assert.equal(c.balanced_decode_attention,true);
   const q=JSON.parse(fs.readFileSync(path.join(root,`docs/evidence/dense27-current-20261009/c${p.load.concurrency}/qualification.json`)));
