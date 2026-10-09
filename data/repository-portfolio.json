@@ -515,7 +515,7 @@
       "repository_role": "extension_migration",
       "relation_to_runtime": "provides_kv_transfer_observer",
       "lifecycle": "incubating",
-      "canonical_artifacts": ["Manifest 0.3 KV transfer observer", "bounded event sink", "legacy provenance ledger"],
+      "canonical_artifacts": ["Manifest 0.3 KV transfer observer", "v2-correlated recovery validator", "bounded event sink", "legacy provenance ledger"],
       "component_ids": ["kv-transfer-observability-migration"],
       "public_surface": true
     },
