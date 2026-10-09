@@ -3280,6 +3280,32 @@ def test_official_target_mirror_matches_sha256_sidecar() -> None:
     assert actual == expected
 
 
+def test_leadership_target_pin_matches_official_registry() -> None:
+    root = Path(__file__).resolve().parents[1]
+    import hashlib
+
+    registry_path = root / "data" / "official_targets.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    pin = json.loads(
+        (root / "data" / "leadership_performance_targets.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert pin["registry_version"] == registry["registry_version"]
+    assert (
+        pin["registry_sha256"] == hashlib.sha256(registry_path.read_bytes()).hexdigest()
+    )
+
+    targets = {target["target_id"]: target for target in registry["targets"]}
+    for pinned in pin["targets"]:
+        target = targets[pinned["target_id"]]
+        assert pinned["workload"] == target["workload"]["name"]
+        assert pinned["target_version"] == target["target_version"]
+        assert pinned["profile_id"] == target["profile"]
+        assert target["status"] == "active"
+        assert target["intended_use"] == "public-leaderboard"
+
+
 def test_official_target_mirror_includes_current_runtime_matrix() -> None:
     """The Pages mirror must not lag behind the central runtime/config matrix."""
     root = Path(__file__).resolve().parents[1]
