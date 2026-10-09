@@ -1,0 +1,11 @@
+{
+  "actual_sha256": "40bb6c34c540c0d065b935dca496ae82b45c6d48918261162be5417e06ee4586",
+  "reference_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
+  "restored_metadata_sha256": "662e7183a0b07b5722b41b59fa9dc69c3bf32866ad4eaab60806efb60f2f4f62",
+  "changed_metadata_only": [
+    "tokenizer.path",
+    "tokenizer.transformers"
+  ],
+  "method": "Raw-byte replacement of the two metadata strings, without changing any session/token/output budget.",
+  "passed": true
+}
