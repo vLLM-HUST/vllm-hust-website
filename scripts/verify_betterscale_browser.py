@@ -20,47 +20,12 @@ def main():
         for key in ("qwen", "dsv4")
     }
     ecosystem = json.loads((root / "data/ecosystem.json").read_text())
-    performance_ids = {
-        entry["id"]
-        for entry in json.loads((root / "data/plugin-performance.json").read_text())[
-            "entries"
-        ]
-    }
-    tool_mod_roles = {
-        "lifecycle_control_plane",
-        "model_artifact_preparation",
-        "offline_model_quantization",
-        "profiling_analysis",
-        "scheduler_policy_research",
-        "telemetry_provider",
-    }
+    taxonomy = json.loads((root / "data/mod-taxonomy.json").read_text())["components"]
     workshop_mod_count = sum(
-        item.get("public_surface", True) is not False
+        item["id"] in taxonomy
         and (
-            item["id"] in performance_ids
-            or (
-                item["artifact_type"] == "bridge"
-                and item.get("compatibility", {}).get("status") == "verified"
-                and item["canonical_repository"].startswith("https://github.com/")
-            )
-            or (
-                (
-                    item["artifact_type"] in {"runtime_component", "bridge"}
-                    or item["system_role"] in tool_mod_roles
-                )
-                and item["repository_relationship"] == "organization_native"
-                and item["delivery_model"]
-                in {
-                    "plugin_bundle",
-                    "python_distribution",
-                    "migration_scaffold",
-                    "source_patch",
-                    "source_toolkit",
-                }
-                and item["canonical_repository"].startswith(
-                    "https://github.com/vLLM-HUST/"
-                )
-            )
+            item.get("public_surface", True) is not False
+            or taxonomy[item["id"]]["kind"] == "retired"
         )
         for item in ecosystem["components"]
     )
@@ -336,9 +301,11 @@ def main():
         assert page.locator(".workshop-card").count() == 0
         page.locator("[data-plugin-search]").fill("")
         page.locator("[data-workload-filters] button").first.click()
-        page.locator("[data-plugin-more]").click()
+        more_button = page.locator("[data-plugin-more]")
+        if more_button.is_visible():
+            more_button.click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
-        tool_section = page.locator(".plugin-category-tools")
+        tool_section = page.locator(".plugin-category-tool_mod")
         assert (
             tool_section.locator(".plugin-category-title").inner_text() == "Tool MODs"
         )
@@ -346,18 +313,16 @@ def main():
             "cards => cards.map(card => card.id)"
         ) == [
             "ascend-quant-toolkit",
-            "clm-lifecycle",
             "kv-transfer-observability-migration",
             "llm-serving-cost-pricing-model",
-            "quality-bounded-inference",
             "request-lifecycle-profiler",
             "slicegpt-migration",
             "traceloom",
-            "tricard-clm-lifecycle",
         ]
         assert tool_section.locator(".plugin-performance").count() == 0
-        assert page.locator(".plugin-category-performance #clm-lifecycle").count() == 0
-        clm = tool_section.locator("#clm-lifecycle")
+        assert page.locator(".plugin-category-runtime_mod #clm-lifecycle").count() == 0
+        control_section = page.locator(".plugin-category-control_plane")
+        clm = control_section.locator("#clm-lifecycle")
         assert clm.locator(".plugin-card-footer .withheld").count() == 1
         assert clm.locator(".plugin-card-footer a").count() == 0
         clm.locator(".plugin-launch-icon").click()
@@ -366,7 +331,7 @@ def main():
             in clm.locator(".plugin-launch-tooltip").text_content()
         )
         clm.locator(".plugin-launch-icon").click()
-        tricard = tool_section.locator("#tricard-clm-lifecycle")
+        tricard = control_section.locator("#tricard-clm-lifecycle")
         tricard.locator(".plugin-launch-icon").click()
         tricard_commands = tricard.locator(".plugin-launch-tooltip").text_content()
         assert "extension enable org.vllm-hust.tricard-clm" in tricard_commands
@@ -377,7 +342,7 @@ def main():
             "quality-bounded-inference",
             "llm-serving-cost-pricing-model",
         ):
-            inspect_only = tool_section.locator(f"#{inspect_only_id}")
+            inspect_only = page.locator(f"#{inspect_only_id}")
             inspect_only.locator(".plugin-launch-icon").click()
             commands = inspect_only.locator(".plugin-launch-tooltip").text_content()
             assert "extension inspect" in commands

@@ -61,8 +61,10 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     const page = fs.readFileSync(path.join(ROOT, 'dataset-validation.html'), 'utf8');
     const index = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_index_v1.json'), 'utf8'));
     assert.match(page, /dataset_validation_index_v1\.json/);
+    assert.match(page, /id="dataset-program-list"/);
     assert.match(page, /id="validation-model-select"/);
-    assert.match(page, /B1 is selected independently per cell/);
+    assert.match(page, /Measured scenarios remain available as supplementary material/);
+    assert.equal(index.program_url, './data/dataset_program_v1.json');
     assert.equal(index.scenarios.length, 7);
     assert.equal(index.default_scenario_id, 'qwen35-35b-a3b-bf16-tp2-pp1-dp1-ep-off-ctx262k-apc-on-mtp2-full-piecewise-sweprefix-900s');
     const visible = index.scenarios.filter((scenario) => scenario.selector_visible !== false);

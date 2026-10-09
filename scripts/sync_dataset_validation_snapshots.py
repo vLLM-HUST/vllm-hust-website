@@ -10,6 +10,7 @@ from pathlib import Path
 
 
 INDEX_FILE = "dataset_validation_index_v1.json"
+PROGRAM_FILE = "dataset_program_v1.json"
 CHECKSUM_FILE = "SHA256SUMS"
 
 
@@ -46,6 +47,20 @@ def validate_source(source_dir: Path) -> tuple[dict, list[str]]:
     index = load_json(source_dir / INDEX_FILE)
     if index.get("contract_version") != "dataset-validation-index-v1":
         raise SystemExit("unsupported dataset-validation index contract")
+    if index.get("program_file") != PROGRAM_FILE:
+        raise SystemExit("dataset-validation program is not declared")
+    program = load_json(source_dir / PROGRAM_FILE)
+    if program.get("contract_version") != "dataset-program-v1":
+        raise SystemExit("unsupported dataset program contract")
+    primary_ids = [item.get("id") for item in program.get("primary_datasets", [])]
+    if primary_ids != [
+        "mmlu-pro",
+        "hle-verified",
+        "swe-bench-pro",
+        "frontierscience",
+        "terminal-bench-2.1",
+    ]:
+        raise SystemExit("dataset program does not declare the expected primary set")
     scenarios = index.get("scenarios")
     if not isinstance(scenarios, list) or not scenarios:
         raise SystemExit("dataset-validation index has no scenarios")
@@ -76,7 +91,7 @@ def validate_source(source_dir: Path) -> tuple[dict, list[str]]:
     if index.get("default_scenario_id") not in scenario_ids:
         raise SystemExit("dataset-validation default scenario is not declared")
 
-    expected = {INDEX_FILE, *data_files}
+    expected = {INDEX_FILE, PROGRAM_FILE, *data_files}
     try:
         lines = (source_dir / CHECKSUM_FILE).read_text(encoding="utf-8").splitlines()
     except OSError as exc:
@@ -100,6 +115,8 @@ def validate_source(source_dir: Path) -> tuple[dict, list[str]]:
 
 def render_website_index(index: dict) -> bytes:
     rendered = dict(index)
+    rendered.pop("program_file")
+    rendered["program_url"] = f"./data/{PROGRAM_FILE}"
     rendered["scenarios"] = []
     for source in index["scenarios"]:
         scenario = {key: value for key, value in source.items() if key != "data_file"}
@@ -114,7 +131,10 @@ def sync_publication(source_dir: Path, target_dir: Path, *, check: bool) -> int:
     index, data_files = validate_source(source_dir)
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    projections = {INDEX_FILE: render_website_index(index)}
+    projections = {
+        INDEX_FILE: render_website_index(index),
+        PROGRAM_FILE: (source_dir / PROGRAM_FILE).read_bytes(),
+    }
     projections.update({name: (source_dir / name).read_bytes() for name in data_files})
     changed: list[str] = []
     for name, content in projections.items():

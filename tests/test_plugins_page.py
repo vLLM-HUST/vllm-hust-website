@@ -71,8 +71,12 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     profiles = MOD_TAXONOMY["components"]
     assert set(profiles) <= {item["id"] for item in REGISTRY["components"]}
     assert {profile["kind"] for profile in profiles.values()} == {
-        "runtime_mod", "connector_mod", "tool_mod", "control_plane",
-        "external_system", "retired",
+        "runtime_mod",
+        "connector_mod",
+        "tool_mod",
+        "control_plane",
+        "external_system",
+        "retired",
     }
     assert all(
         set(profile) == {"kind", "capability", "lifecycle", "evidence"}
@@ -101,9 +105,12 @@ def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() ->
     assert component["public_effect_status"] == "beneficial"
     assert component["public_effect_url"].endswith("/vllm-ascend-simllm-hust/pull/5")
     assert component["compatibility"]["status"] == "experimental"
-    assert "one-output-token similarity replay" in component["compatibility"]["models"][0]
+    assert (
+        "one-output-token similarity replay" in component["compatibility"]["models"][0]
+    )
     performance = next(
-        item for item in PLUGIN_PERFORMANCE["entries"]
+        item
+        for item in PLUGIN_PERFORMANCE["entries"]
         if item["id"] == "simllm-migration"
     )
     comparisons = performance["observations"][0]["comparisons"]
@@ -112,7 +119,9 @@ def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() ->
         (5.2563, 6.2435),
     ]
     assert WORKLOAD_NAVIGATION["plugins"]["simllm-migration"] == [
-        "repeated_prefix_agent", "prefill_heavy", "memory_kv_pressure"
+        "repeated_prefix_agent",
+        "prefill_heavy",
+        "memory_kv_pressure",
     ]
     assert "simllm-migration" in WORKSHOP_METADATA["plugins"]
     assert "VLLM_ASCEND_SIMLLM_ENABLED=1" in SCRIPT
@@ -145,7 +154,9 @@ def test_legacy_migration_cards_preserve_original_ownership() -> None:
         assert component["maintainers"] == maintainers
         assert component["delivery_model"] == "plugin_bundle"
         assert component["maturity"] in {"incubating", "experimental"}
-        assert component["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        assert component["canonical_repository"].startswith(
+            "https://github.com/vLLM-HUST/"
+        )
 
     assert "Original maintainers" in SCRIPT
     assert "原负责人" in SCRIPT
@@ -522,7 +533,10 @@ def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert 'let selectedType = "extensions"' in SCRIPT
     assert "const isWorkshopMod = (item)" in SCRIPT
     assert "taxonomyProfile(item).kind" in SCRIPT
-    assert '["extensions", "runtime_mod", "connector_mod", "tool_mod", "control_plane", "external_system", "retired"]' in SCRIPT
+    assert (
+        '["extensions", "runtime_mod", "connector_mod", "tool_mod", "control_plane", "external_system", "retired"]'
+        in SCRIPT
+    )
     assert 'element("div", "plugin-grid workshop-grid")' in SCRIPT
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert "function coverTone(item)" in SCRIPT
@@ -826,12 +840,12 @@ def test_page_consumes_the_docs_owned_registry() -> None:
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
 
 
-def test_browser_catalog_count_includes_verified_external_bridges() -> None:
+def test_browser_catalog_count_follows_the_canonical_mod_taxonomy() -> None:
     browser_check = (ROOT / "scripts" / "verify_betterscale_browser.py").read_text(
         encoding="utf-8"
     )
-    assert 'item["artifact_type"] == "bridge"' in browser_check
-    assert 'get("status") == "verified"' in browser_check
+    assert "data/mod-taxonomy.json" in browser_check
+    assert 'taxonomy[item["id"]]["kind"] == "retired"' in browser_check
     assert "ecosystem registry request failed" in SCRIPT
     assert "data/plugins.json" not in PAGE
 

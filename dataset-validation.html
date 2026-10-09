@@ -9,9 +9,9 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
   <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901" />
-  <link rel="stylesheet" href="./assets/dataset-validation.css?v=dataset-validation-v1-coverage-summary-20261009" />
+  <link rel="stylesheet" href="./assets/dataset-validation.css?v=dataset-program-v1-20261009" />
 </head>
-<body data-page="dataset-validation">
+<body data-page="dataset-validation" data-result-contract="dataset-validation-v1">
   <nav class="site-nav"><div class="site-shell site-nav-inner">
     <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a>
     <div class="nav-links">
@@ -39,8 +39,13 @@
       <h1 id="validation-title" style="margin-top: 16px">Dataset matrix</h1>
       <p id="validation-lede" class="hero-lede">Results published by the fixed-machine validation service, organized as a dataset by metric matrix.</p>
     </div></section>
+    <section class="dataset-program-section" aria-labelledby="dataset-program-title">
+      <div class="section-head"><div><span id="dataset-program-kicker" class="eyebrow">Evaluation program</span><h2 id="dataset-program-title">Primary evaluation set</h2><p id="dataset-program-lede">Five datasets define the primary evaluation program. Registration and planning status are shown separately from measured results.</p></div></div>
+      <div id="dataset-program-list" class="dataset-program-list" aria-live="polite"></div>
+      <div class="dataset-supplementary-note"><strong id="dataset-supplementary-title">Supplementary material</strong><p id="dataset-supplementary-copy">Every other registered or planned dataset remains available as supplementary material. Existing measurements are preserved below.</p></div>
+    </section>
     <section class="content-panel dataset-validation-section" aria-labelledby="validation-title">
-      <div class="section-head validation-scenario-head"><div><span id="validation-scenario-kicker" class="eyebrow">Scenario</span><h2 id="validation-scenario">Loading...</h2><p id="validation-description">B0 is the fixed baseline. B1 is selected independently per cell from the best matching compliant measurement, with its exact version retained.</p></div><div class="validation-model-control"><label id="validation-model-label" for="validation-model-select">Model</label><select id="validation-model-select" disabled><option>Loading...</option></select></div></div>
+      <div class="section-head validation-scenario-head"><div><span id="validation-scenario-kicker" class="eyebrow">Supplementary evidence</span><h2 id="validation-scenario">Loading...</h2><p id="validation-description">Measured scenarios remain available as supplementary material. B0 and B1 retain their exact configuration and evidence.</p></div><div class="validation-model-control"><label id="validation-model-label" for="validation-model-select">Measured configuration</label><select id="validation-model-select" disabled><option>Loading...</option></select></div></div>
       <div id="validation-loading" class="loading-state">Loading validation artifact...</div>
       <div id="validation-error" class="validation-empty" hidden><h3 id="validation-error-title">Validation artifact unavailable</h3><p id="validation-error-body">The result document could not be loaded.</p></div>
       <div id="validation-content" hidden>
@@ -65,12 +70,10 @@
   <script>
     window.vllmHustDatasetValidationConfig = { indexUrl: './data/dataset_validation_index_v1.json' };
     window.vllmHustPageDict = { en: { title: 'Dataset matrix - vllm-hust', 'validation-eyebrow': 'Independent validation', 'validation-title': 'Dataset matrix', 'validation-lede': 'Results published by the fixed-machine validation service, organized as a dataset by metric matrix.', 'validation-scenario-kicker': 'Scenario', 'validation-description': 'B0 and current values remain visible together for auditability.', 'validation-loading': 'Loading validation artifact...', 'validation-error-title': 'Validation artifact unavailable', 'validation-error-body': 'The result document could not be loaded.', 'validation-stat-total-label': 'Matrix cells', 'validation-stat-baseline-label': 'B0 measured', 'validation-stat-paired-label': 'Paired B0/B1', 'validation-stat-awaiting-label': 'Awaiting measurement', 'validation-stat-failed-label': 'Failed', 'validation-stat-not-applicable-label': 'Not applicable', 'validation-status-label': 'Status', 'validation-source-label': 'Source', 'validation-detail-close': 'Close', 'validation-empty-title': 'No dataset results yet', 'validation-empty-body': 'The validation service has not published a result for this scenario. The matrix stays hidden until measured results exist.', 'validation-footer': 'Dataset results are read-only website data.' }, zh: { title: '数据集矩阵 - vllm-hust', 'validation-eyebrow': '独立验证', 'validation-title': '数据集矩阵', 'validation-lede': '展示固定机器验证服务发布的结果，并按数据集与指标组成矩阵。', 'validation-scenario-kicker': '验证场景', 'validation-description': '同时保留 B0 与当前值，便于核查。', 'validation-loading': '正在加载验证产物...', 'validation-error-title': '验证产物不可用', 'validation-error-body': '无法加载结果文档。', 'validation-stat-total-label': '矩阵单元格', 'validation-stat-baseline-label': 'B0 已测', 'validation-stat-paired-label': 'B0/B1 已配对', 'validation-stat-awaiting-label': '等待测量', 'validation-stat-failed-label': '失败', 'validation-stat-not-applicable-label': '不适用', 'validation-status-label': '状态', 'validation-source-label': '来源', 'validation-detail-close': '关闭', 'validation-empty-title': '当前还没有数据集结果', 'validation-empty-body': '验证服务尚未发布该场景的实测结果；在有结果前不展示空矩阵。', 'validation-footer': '数据集结果为网站只读数据。' } };
-    window.vllmHustPageDict.en['validation-description'] = 'B0 is the fixed baseline. B1 is selected independently per cell from the best matching compliant measurement, with its exact version retained.';
-    window.vllmHustPageDict.zh['validation-description'] = 'B0 是固定基线；B1 按单元格分别选择同设定下最好的合规实测，并保留该单元格对应的准确版本。';
-    window.vllmHustPageDict.en['validation-model-label'] = 'Model';
-    window.vllmHustPageDict.zh['validation-model-label'] = '模型';
+    Object.assign(window.vllmHustPageDict.en, { 'dataset-program-kicker': 'Evaluation program', 'dataset-program-title': 'Primary evaluation set', 'dataset-program-lede': 'Five datasets define the primary evaluation program. Registration and planning status are shown separately from measured results.', 'dataset-supplementary-title': 'Supplementary material', 'dataset-supplementary-copy': 'Every other registered or planned dataset remains available as supplementary material. Existing measurements are preserved below.', 'validation-scenario-kicker': 'Supplementary evidence', 'validation-description': 'Measured scenarios remain available as supplementary material. B0 and B1 retain their exact configuration and evidence.', 'validation-model-label': 'Measured configuration' });
+    Object.assign(window.vllmHustPageDict.zh, { 'dataset-program-kicker': '评测计划', 'dataset-program-title': '主评测集', 'dataset-program-lede': '五个数据集构成主评测计划；注册与规划状态和实测结果分开展示。', 'dataset-supplementary-title': '补充材料', 'dataset-supplementary-copy': '其他所有已注册或已规划的数据集均作为补充材料保留，已有实测证据继续在下方展示。', 'validation-scenario-kicker': '补充实测证据', 'validation-description': '各实测场景作为补充材料继续保留；B0、B1 均保留精确配置和证据。', 'validation-model-label': '实测配置' });
   </script>
   <script src="./assets/site.js?v=benchmarks-ia-20261003"></script>
-  <script src="./assets/dataset-validation.js?v=dataset-validation-v1-coverage-summary-20261009"></script>
+  <script src="./assets/dataset-validation.js?v=dataset-program-v1-20261009"></script>
 </body>
 </html>

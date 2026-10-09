@@ -1,26 +1,24 @@
 # Plugin homepage maintenance audit — 2026-09-26
 
-> **2026-10-09 re-audit:** the original snapshot below is historical. SimLLM is no longer
-> delisted: [PR #5](https://github.com/vLLM-HUST/vllm-ascend-simllm-hust/pull/5)
-> added an installable, default-off runtime MOD with worker-side KV reuse, Qwen3.5 hybrid
-> state restoration, runtime activation, and two reproducible 5,000-request matched
-> replays. The website now classifies it as `runtime_mod / implemented_restricted /
-> measured_beneficial`. Unified Communication, Layered Prefill, Activation Sparsity, and
-> QoS Scheduler remain archived because their subsequent merged PRs only standardize or
-> link metadata; none adds the missing host/runtime integration.
+> **2026-10-09 re-audit:** the original snapshot below is historical. SimLLM is no longer delisted:
+> [PR #5](https://github.com/vLLM-HUST/vllm-ascend-simllm-hust/pull/5) added an installable,
+> default-off runtime MOD with worker-side KV reuse, Qwen3.5 hybrid state restoration, runtime
+> activation, and two reproducible 5,000-request matched replays. The website now classifies it as
+> `runtime_mod / implemented_restricted / measured_beneficial`. Unified Communication, Layered
+> Prefill, Activation Sparsity, and QoS Scheduler remain archived because their subsequent merged
+> PRs only standardize or link metadata; none adds the missing host/runtime integration.
 
-The same re-audit promoted the following formerly stale entries without overstating their
-evidence:
+The same re-audit promoted the following formerly stale entries without overstating their evidence:
 
-| Component | Current classification | New primary evidence |
-| --- | --- | --- |
-| Prefix Router | Runtime MOD; implemented with a restricted external-service contract; measured benefit with integrity caveats | [router implementation PR #2](https://github.com/vLLM-HUST/vllm-hust-prefix-router/pull/2), [three-round performance publication](https://github.com/vLLM-HUST/vllm-hust-website/pull/358) |
-| PyramidKV Ascend | Runtime MOD; implemented under a narrow qualified profile; functional hardware evidence | [PR #4](https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust/pull/4) |
-| KNorm | Runtime MOD; packaged and host-patched; hardware qualification pending | [PR #4](https://github.com/vLLM-HUST/vllm-hust-knorm/pull/4) |
-| KV Tiering | Runtime MOD; packaged; runtime-effective qualification pending | [PR #4](https://github.com/vLLM-HUST/vllm-hust-kv-tiering/pull/4) |
-| Request Lifecycle Profiler | Tool MOD; runtime-effective functional observer | [PR #31](https://github.com/vLLM-HUST/vllm-hust-request-lifecycle-profiler/pull/31) |
-| KV Transfer Observability | Tool MOD; runtime-effective functional observer | [PR #10](https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability/pull/10) |
-| SliceGPT | Tool MOD; offline toolkit and runtime bundle implemented; device serving qualification pending | [PR #2](https://github.com/vLLM-HUST/vllm-hust-slicegpt/pull/2) |
+| Component                  | Current classification                                                                                        | New primary evidence                                                                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Prefix Router              | Runtime MOD; implemented with a restricted external-service contract; measured benefit with integrity caveats | [router implementation PR #2](https://github.com/vLLM-HUST/vllm-hust-prefix-router/pull/2), [three-round performance publication](https://github.com/vLLM-HUST/vllm-hust-website/pull/358) |
+| PyramidKV Ascend           | Runtime MOD; implemented under a narrow qualified profile; functional hardware evidence                       | [PR #4](https://github.com/vLLM-HUST/vllm-ascend-pyramidkv-hust/pull/4)                                                                                                                    |
+| KNorm                      | Runtime MOD; packaged and host-patched; hardware qualification pending                                        | [PR #4](https://github.com/vLLM-HUST/vllm-hust-knorm/pull/4)                                                                                                                               |
+| KV Tiering                 | Runtime MOD; packaged; runtime-effective qualification pending                                                | [PR #4](https://github.com/vLLM-HUST/vllm-hust-kv-tiering/pull/4)                                                                                                                          |
+| Request Lifecycle Profiler | Tool MOD; runtime-effective functional observer                                                               | [PR #31](https://github.com/vLLM-HUST/vllm-hust-request-lifecycle-profiler/pull/31)                                                                                                        |
+| KV Transfer Observability  | Tool MOD; runtime-effective functional observer                                                               | [PR #10](https://github.com/vLLM-HUST/vllm-hust-kv-transfer-observability/pull/10)                                                                                                         |
+| SliceGPT                   | Tool MOD; offline toolkit and runtime bundle implemented; device serving qualification pending                | [PR #2](https://github.com/vLLM-HUST/vllm-hust-slicegpt/pull/2)                                                                                                                            |
 
 Five entries are temporarily delisted from the plugin homepage: SimLLM, Unified Communication,
 Layered Prefill, Activation Sparsity, and QoS Scheduler. Their catalog and ownership records remain

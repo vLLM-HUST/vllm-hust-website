@@ -59,5 +59,6 @@
       "selector_visible": false,
       "data_url": "./data/dataset_validation_qwen35_tp2_matrix.json"
     }
-  ]
+  ],
+  "program_url": "./data/dataset_program_v1.json"
 }
