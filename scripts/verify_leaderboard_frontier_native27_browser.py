@@ -8,7 +8,9 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 SITE = Path(__file__).resolve().parents[1]
-ROOT = SITE / "output/playwright/leaderboard-runs"
+ROOT = Path(
+    os.environ.get("PLAYWRIGHT_OUTPUT_DIR", SITE / "output/playwright/leaderboard-runs")
+)
 spec = importlib.util.spec_from_file_location(
     "frontier_qa", SITE / "scripts/verify_leaderboard_frontier_browser.py"
 )
@@ -19,7 +21,12 @@ cohort = next(
     c for c in data["cohorts"] if c["id"] == "qwen38-27b-bf16-sweprefix-smoke-v1"
 )
 points = [p for p in data["points"] if p["cohort_id"] == cohort["id"]]
-assert sorted(p["load"]["concurrency"] for p in points) == [
+historical = [
+    p
+    for p in points
+    if p["evidence"]["benchmark_protocol"]["campaign"] == "small-fish-tp2-sweep-v1"
+]
+assert sorted(p["load"]["concurrency"] for p in historical) == [
     1,
     1,
     2,
