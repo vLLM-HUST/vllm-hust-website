@@ -190,8 +190,11 @@
       "execution_planes": ["native", "device", "external_service"],
       "deployment_topology": "distributed_service",
       "delivery_model": "container_service",
-      "ownership": "hust_owned_subsystem",
-      "repository_relationship": "external_subsystem",
+      "ownership": "hust_maintained_external_integration",
+      "repository_relationship": "upstream_adaptation",
+      "contribution_scope": "local_adaptation",
+      "upstream_owner_en": "PPIO / Novita AI upstream team",
+      "upstream_owner_zh": "派欧云团队",
       "maturity": "incubating",
       "maintainers": ["cybber695", "zhangshengxiang682"],
       "maintainer_profiles": [
@@ -202,9 +205,9 @@
         {"name_zh": "张书豪", "name_en": "Shuhao Zhang", "relationship": "internal"}
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
-      "upstream_repository": null,
-      "summary_en": "HUST-owned KV state system with storage, transfer, metadata services, and measured Ascend IPC save/load execution.",
-      "summary_zh": "包含存储、传输与元数据服务的 HUST 自有 KV 状态系统，已实测 Ascend IPC save/load 执行路径。",
+      "upstream_repository": "https://github.com/novitalabs/pegaflow",
+      "summary_en": "PegaFlow is developed by the upstream PPIO / Novita AI team. The HUST repository carries the Ascend/NPU localization and integration adaptation, including measured Ascend IPC save/load execution; it does not claim authorship of the upstream KV state system.",
+      "summary_zh": "PegaFlow 原项目由派欧云团队开发（上游仓库由 novitalabs 维护）。HUST 仓库负责昇腾/NPU 国产化适配与集成改造，包括已实测的 Ascend IPC save/load 路径，不主张 PegaFlow 上游系统的原创归属。",
       "evidence_level": "performance_verified"
     },
     {
@@ -217,8 +220,11 @@
       "execution_planes": ["api", "scheduler", "worker"],
       "deployment_topology": "in_process",
       "delivery_model": "python_distribution",
-      "ownership": "hust_owned_subsystem",
-      "repository_relationship": "external_subsystem",
+      "ownership": "hust_maintained_external_integration",
+      "repository_relationship": "upstream_adaptation",
+      "contribution_scope": "local_adaptation",
+      "upstream_owner_en": "PPIO / Novita AI upstream team",
+      "upstream_owner_zh": "派欧云团队",
       "maturity": "incubating",
       "maintainers": ["cybber695", "zhangshengxiang682"],
       "maintainer_profiles": [
@@ -229,9 +235,9 @@
         {"name_zh": "张书豪", "name_en": "Shuhao Zhang", "relationship": "internal"}
       ],
       "canonical_repository": "https://github.com/vLLM-HUST/pegaflow-hust",
-      "upstream_repository": null,
-      "summary_en": "Manifest 0.3 PegaFlow Host Provider and PegaKVConnector profile, with runtime-owned Bundle packaging and fail-closed external-service checks; the external operator retains service lifecycle and stored-data ownership. The pinned Qwen3.5 result remains separate historical performance evidence.",
-      "summary_zh": "Manifest 0.3 PegaFlow Host Provider 与 PegaKVConnector profile 已修正为 runtime distribution 持有 Bundle，并对外部服务执行 fail-closed 检查；服务与数据生命周期仍归外部运维者。固定 Qwen3.5 结果仍作为单独的历史性能证据。",
+      "upstream_repository": "https://github.com/novitalabs/pegaflow",
+      "summary_en": "HUST's Ascend/NPU and ECPA adaptation of the PegaFlow vLLM connector developed by the upstream PPIO / Novita AI team. The Manifest 0.3 Host Provider and PegaKVConnector profile use runtime-owned Bundle packaging and fail-closed external-service checks; the external operator retains service lifecycle and stored-data ownership. The pinned Qwen3.5 result remains separate historical performance evidence.",
+      "summary_zh": "派欧云团队开发 PegaFlow 及其 vLLM connector；本组件是 HUST 面向昇腾/NPU 与 ECPA 的国产化适配。Manifest 0.3 Host Provider 与 PegaKVConnector profile 使用 runtime distribution 持有 Bundle，并对外部服务执行 fail-closed 检查；服务与数据生命周期仍归外部运维者。固定 Qwen3.5 结果仍作为单独的历史性能证据。",
       "public_effect_en": "On the exact Qwen3.5-35B BF16 setting, the five-point geometric-mean output-throughput change is +6.34% versus the shared Native series; C1 regresses while C2-C16 improve.",
       "public_effect_zh": "在完全相同的 Qwen3.5-35B BF16 设定下，相对统一 Native 曲线，五点输出吞吐几何平均变化为 +6.34%；C1 回退，C2-C16 提升。",
       "public_effect_status": "measured",
