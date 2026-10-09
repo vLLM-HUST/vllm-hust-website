@@ -22,7 +22,7 @@ test('27B BetterScale display contains only frontier points; dominated history r
  const frontier=model.groupFrontiers(visible,'decode_p90_tps','output_tps_per_chip').flat().map(r=>r.point.id);
  assert.deepEqual(visible.map(p=>p.id).sort(),frontier.sort());
  const archived=data.archived_points.filter(p=>p.cohort_id===cohort&&p.display_withdrawal?.dominated_by_point_ids);
- assert.equal(archived.length,5);
+ assert.equal(archived.length,7);
  for(const p of archived){
   assert.ok(!data.points.some(q=>q.id===p.id));
   assert.ok(p.evidence.run_ids.length>0);

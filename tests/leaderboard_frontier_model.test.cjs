@@ -258,6 +258,13 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(p.configuration.parameters.resident_seats,20);
             for(const key of ['using_live_runtime','state_cache_incremental','state_cache_streaming','state_cache_policy','state_cache_partial_reclaim','balanced_decode_attention']) assert.equal(p.configuration.parameters[key],true);
             for(const key of ['owned_server_exit_zero','selected_device_guard_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
+        } else if(p.evidence.benchmark_protocol.campaign==='dense27-width-state-20261009'){
+            assert.equal(p.cohort_id,'qwen38-27b-bf16-sweprefix-smoke-v1');
+            assert.ok([24,32].includes(p.load.concurrency));
+            assert.equal(p.configuration.parameters.execution_seats,p.load.concurrency);
+            assert.equal(p.configuration.parameters.resident_seats,p.load.concurrency+4);
+            for(const key of ['using_live_runtime','state_cache_incremental','state_cache_streaming','state_cache_policy','state_cache_partial_reclaim','balanced_decode_attention']) assert.equal(p.configuration.parameters[key],true);
+            for(const key of ['owned_server_exit_zero','selected_device_guard_exit_zero','selected_devices_released','exact_token_budgets','prefix_cache_observed']) assert.equal(run.validation[key],true);
         } else if(p.evidence.benchmark_protocol.campaign==='small-fish-tp2-sweep-v1'){
             const params=p.configuration.parameters;
             assert.equal(params.max_num_seqs,16);
