@@ -54,7 +54,7 @@ test('presentation scope keeps the unified comparison readable without deleting 
     const cohort=data.cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-smoke-v1');
     const all=data.points.filter(p=>p.cohort_id===cohort.id);
     const displayed=model.presentationPoints(data.points,cohort);
-    assert.equal(all.length,207);
+    assert.equal(all.length,217);
     assert.equal(displayed.length,85);
     assert.deepEqual(new Set(displayed.map(p=>p.load.concurrency_series)),new Set(cohort.workload.contract.display_series_ids));
     const betterScale=displayed.filter(p=>model.groupKey(p)==='betterscale');
@@ -496,6 +496,51 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
                 assert.ok(p.evidence.c8_selection);
                 assert.equal(p.evidence.c8_selection.ranked_candidates.length,5);
             }
+        } else if(['qwen35-op02-core-attention-boundary-tp2ep-c8-20261005','qwen35-op02-core-attention-boundary-tp2ep-concurrency-20261005'].includes(p.evidence.benchmark_protocol.campaign)){
+            const on=p.id.includes('-on-');
+            const params=p.configuration.parameters;
+            assert.deepEqual(p.configuration.mods,on?['core-attention-boundary']:[]);
+            assert.ok([1,2,4,8,16].includes(p.load.concurrency));
+            assert.equal(p.load.concurrency_series,`swe-op02-core-attention-boundary-${on?'on':'off'}-tp2ep-20261005`);
+            assert.equal(p.load.session_rotation_depth,1);
+            assert.equal(params.runtime_versions.vllm,'0.23.0+empty');
+            assert.equal(params.runtime_versions['vllm-ascend'],'0.23.0.post1');
+            assert.equal(params.mod.enable,on);
+            assert.equal(params.mod.kill_switch,false);
+            assert.equal(params.model_identity.revision,'712cf74392b05026a6db2bf213d343747d1f6d45'); // pragma: allowlist secret
+            assert.equal(params.model_identity.model_manifest_sha256,'6238348a1e071f7802cd6a3e808a6ac36592d83fc765872d3a988368b0b144f6'); // pragma: allowlist secret
+            assert.equal(params.model_identity.checkpoint_identity_verified,true);
+            assert.equal(params.tokenizer_identity_independently_verified,true);
+            assert.equal(params.tokenizer_fingerprint_recomputed,true);
+            assert.equal(params.tokenizer_files_manifest_match_verified,true);
+            assert.equal(params.mod_catalog_status,'published_public_preview');
+            assert.equal(params.mod_catalog_public_surface,true);
+            assert.equal(run.validation.patch_requested,on);
+            assert.equal(run.validation.failed_requests,0);
+            assert.equal(run.validation.raw_metrics_recomputed,true);
+            assert.equal(run.validation.checkpoint_identity_verified,true);
+            assert.equal(run.validation.model_manifest_match_verified,true);
+            assert.equal(run.validation.activation_log_point_isolated,false);
+            assert.equal(run.validation.performance_attribution_verified,false);
+            assert.equal(run.validation.mod_catalog_registered,true);
+            assert.equal(run.validation.mod_catalog_public_surface,true);
+            assert.equal(run.validation.public_raw_evidence_available,true);
+            assert.equal(p.evidence.benchmark_protocol.revision,'695dd8b1ab280145627a108b434f7a54cca05810'); // pragma: allowlist secret
+            assert.equal(p.evidence.benchmark_protocol.duration_seconds,900);
+            assert.equal(p.evidence.c8_selection,null);
+            assert.ok(p.metrics.tpot_ms>0);
+            assert.ok(p.metrics.tpot_p95_ms>0);
+            assert.ok(p.metrics.e2e_p95_ms>0);
+            assert.ok(p.evidence.activation_log.path.startsWith('docs/evidence/qwen35-op02-core-attention-boundary/'));
+            if(on){
+                assert.equal(p.configuration.mod_sources.length,1);
+                assert.equal(p.configuration.mod_sources[0].id,'core-attention-boundary');
+                assert.equal(p.configuration.mod_sources[0].revision,'8b5ebb1382bc3624b5250ccec53d5554b6c86003'); // pragma: allowlist secret
+                assert.equal(run.validation.server_log_counts.runtime_effective,2);
+            } else {
+                assert.deepEqual(p.configuration.mod_sources,[]);
+                assert.equal(run.validation.server_log_counts.runtime_effective,0);
+            }
         } else if(p.evidence.benchmark_protocol.campaign==='qwen35-op01-attention-boundary-tp2ep-20261008'){
             const on=p.id.includes('-on-');
             const params=p.configuration.parameters;
@@ -504,8 +549,8 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(p.load.session_rotation_depth,1);
             assert.equal(params.runtime_versions.vllm,'0.23.0+empty');
             assert.equal(params.runtime_versions['vllm-ascend'],'0.23.0.post1');
-            assert.equal(params.mod.source_commit,'4a1843d1e2a81f0415a1cfa5141e9b17b3262835');
-            assert.equal(params.mod.wheel_sha256,'aac1f8c9e73d7cf58f75eac7ca7d31d47370e55482fd614934ad7f8cf7aa63c6');
+            assert.equal(params.mod.source_commit,'4a1843d1e2a81f0415a1cfa5141e9b17b3262835'); // pragma: allowlist secret
+            assert.equal(params.mod.wheel_sha256,'aac1f8c9e73d7cf58f75eac7ca7d31d47370e55482fd614934ad7f8cf7aa63c6'); // pragma: allowlist secret
             assert.equal(params.mod.enable,on);
             assert.equal(run.validation.patch_requested,on);
             assert.equal(run.validation.failed_requests,0);
@@ -519,8 +564,8 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(p.evidence.repeat_selection.sample_count,3);
             assert.ok(['selected_median','candidate_retained_archived'].includes(p.evidence.repeat_role));
             assert.equal(p.evidence.activation_log.point_isolated,true);
-            assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,'dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b');
-            assert.equal(p.evidence.benchmark_protocol.tokenizer_fingerprint,'319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9');
+            assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,'dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b'); // pragma: allowlist secret
+            assert.equal(p.evidence.benchmark_protocol.tokenizer_fingerprint,'319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9'); // pragma: allowlist secret
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -748,7 +793,8 @@ test('AE separation is withdrawn from display, not erased from evidence',()=>{
     assert.ok(d.points.every(p=>p.configuration.experiment_group!=='betterscale-AEseparation'));
     const withdrawn=d.archived_points.filter(p=>p.display_withdrawal && p.configuration.experiment_group==='betterscale-AEseparation');
     assert.equal(withdrawn.length,4);
-    assert.ok(withdrawn.every(p=>p.configuration.experiment_group==='betterscale-AEseparation'));
+    assert.ok(withdrawn.every(p=>p.display_withdrawal));
+    assert.equal(d.archived_points.filter(p=>p.id.includes('op01-attention-boundary')).length,30);
 });
 
 test('sampling dates are calendar-valid UTC dates taken from recorded run starts',()=>{
