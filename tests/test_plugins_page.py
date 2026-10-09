@@ -936,9 +936,10 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     assert "not a vLLM plugin" in toolkit["summary_en"]
     assert runtime["artifact_type"] == "runtime_component"
     assert runtime["delivery_model"] == "python_distribution"
-    assert "vllm_hust.extension_manifest.v0.3-experimental" in runtime[
-        "integration_contracts"
-    ]
+    assert (
+        "vllm_hust.extension_manifest.v0.3-experimental"
+        in runtime["integration_contracts"]
+    )
     assert "Import-only" in runtime["summary_en"]
     assert "owner-approved value allowlist" in runtime["summary_en"]
     assert latchmoe["integration_surfaces"] == [
