@@ -24,16 +24,18 @@
         },
         localPath: './data/official_targets.json',
     };
+    const ACCEPTANCE_PROGRAM_PATH = './data/dataset_program_v1.json';
 
     const UI = {
         en: {
             cardVersion: 'registry',
             effectiveFrom: 'Effective from',
+            acceptanceTitle: 'Current mandatory acceptance contract',
+            fixedTargetTitle: 'Published version-specific fixed targets',
+            fixedTargetHint: 'These configurations remain valid for their named runtime and workload; they are not the current mandatory model.',
             activeTargets: 'Active configurations',
             baselineStacks: 'Runtime stacks',
             hardwareConfigs: 'Hardware configurations',
-            modelConfigs: 'Model configurations',
-            precisions: 'Precisions',
             profiles: 'Profiles',
             workloads: 'Workloads',
             distinct: 'distinct',
@@ -65,11 +67,12 @@
         zh: {
             cardVersion: 'registry',
             effectiveFrom: '生效日期',
+            acceptanceTitle: '当前必测验收合同',
+            fixedTargetTitle: '已发布的版本化固定目标',
+            fixedTargetHint: '这些配置在各自标明的运行时与 workload 下仍然有效，但不是当前必测模型。',
             activeTargets: 'Active 配置数',
             baselineStacks: '运行时组合',
             hardwareConfigs: '硬件配置',
-            modelConfigs: '模型配置',
-            precisions: '精度集合',
             profiles: 'Profile 数',
             workloads: 'Workload 数',
             distinct: '种',
@@ -117,6 +120,7 @@
     const SPECIALTY_ID = 'official-target-specialty';
 
     let lastRegistry = null;
+    let lastAcceptancePlan = null;
 
     // --- Classification (fail-closed) ------------------------------------
 
@@ -230,6 +234,27 @@
         return lastRegistry;
     }
 
+    function validateAcceptancePlan(payload) {
+        const plan = payload?.test_plan;
+        if (!plan || typeof plan.test_plan_version !== 'string'
+            || typeof plan.contract_url !== 'string' || !plan.contract_url.startsWith('https://')
+            || typeof plan.mandatory_model !== 'string'
+            || typeof plan.formal_precision !== 'string'
+            || !Array.isArray(plan.baseline_roles) || plan.baseline_roles.length === 0) {
+            throw new Error('Invalid mandatory acceptance contract');
+        }
+        return plan;
+    }
+
+    async function loadAcceptancePlan() {
+        const response = await fetch(ACCEPTANCE_PROGRAM_PATH, { cache: 'no-cache' });
+        if (!response.ok) {
+            throw new Error(`Acceptance contract error: ${response.status}`);
+        }
+        lastAcceptancePlan = validateAcceptancePlan(await response.json());
+        return lastAcceptancePlan;
+    }
+
     // --- Rendering helpers ------------------------------------------------
 
     function escapeHtml(value) {
@@ -304,7 +329,7 @@
 
     // --- Card rendering -----------------------------------------------------
 
-    function renderOfficialCard(registry) {
+    function renderOfficialCard(registry, acceptancePlan) {
         const container = document.getElementById(CONTAINER_ID);
         if (!container) {
             return;
@@ -328,16 +353,12 @@
 
         const runtimeStacks = uniqueLabels(official, baselineLabel);
         const hardwareConfigs = uniqueLabels(official, hardwareLabel);
-        const modelConfigs = uniqueLabels(official, modelLabel);
-        const precisions = uniqueLabels(official, (target) => target.model?.precision);
         const profiles = uniqueLabels(official, (target) => target.profile);
         const workloads = uniqueLabels(official, (target) => target.workload?.name);
         const preview = [
             [t('activeTargets'), official.length],
             [t('baselineStacks'), compactList(runtimeStacks)],
             [t('hardwareConfigs'), compactList(hardwareConfigs)],
-            [t('modelConfigs'), compactList(modelConfigs)],
-            [t('precisions'), compactList(precisions)],
             [t('profiles'), profiles.length],
             [t('workloads'), workloads.length],
         ].map(([label, value]) => `
@@ -350,6 +371,14 @@
 
         container.innerHTML = `
             <div class="official-target-body">
+                <div class="official-target-banner official-target-acceptance">
+                    <strong>${escapeHtml(t('acceptanceTitle'))}</strong>
+                    <span><a href="${escapeHtml(acceptancePlan.contract_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(acceptancePlan.test_plan_version)}</a> · ${escapeHtml(acceptancePlan.mandatory_model)} · ${escapeHtml(acceptancePlan.formal_precision)} · ${escapeHtml(acceptancePlan.baseline_roles.join(' + '))}</span>
+                </div>
+                <div class="official-target-matrix-head">
+                    <strong>${escapeHtml(t('fixedTargetTitle'))}</strong>
+                    <span>${escapeHtml(t('fixedTargetHint'))}</span>
+                </div>
                 <div class="official-target-head">
                     <span class="official-target-version">
                         ${escapeHtml(t('cardVersion'))}: ${escapeHtml(registry.payload?.registry_version || '')}
@@ -510,8 +539,11 @@
             return;
         }
         try {
-            const registry = await loadRegistry();
-            renderOfficialCard(registry);
+            const [registry, acceptancePlan] = await Promise.all([
+                loadRegistry(),
+                loadAcceptancePlan(),
+            ]);
+            renderOfficialCard(registry, acceptancePlan);
         } catch (error) {
             console.error('[OfficialTargets] init failed:', error?.message || error);
             renderError(error?.message || '');
@@ -520,8 +552,8 @@
 
     // Re-render in the active language when the user toggles lang.
     window.addEventListener('vllm-hust:langchange', () => {
-        if (lastRegistry) {
-            renderOfficialCard(lastRegistry);
+        if (lastRegistry && lastAcceptancePlan) {
+            renderOfficialCard(lastRegistry, lastAcceptancePlan);
         }
     });
 
@@ -534,6 +566,7 @@
         isPerfgate,
         isSpecialty,
         compareRegistryVersions,
+        validateAcceptancePlan,
         uniqueLabels,
         compactList,
     };
