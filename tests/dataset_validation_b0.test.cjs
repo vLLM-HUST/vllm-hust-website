@@ -62,6 +62,14 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     const index = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_validation_index_v1.json'), 'utf8'));
     assert.match(page, /dataset_validation_index_v1\.json/);
     assert.match(page, /id="dataset-program-list"/);
+    assert.match(page, /id="dataset-program-contract"/);
+    const program = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'dataset_program_v1.json'), 'utf8'));
+    assert.equal(program.test_plan.test_plan_version, 'V5.4');
+    assert.equal(program.test_plan.mandatory_model, 'Qwen\/Qwen3.5-35B-A3B');
+    assert.equal(program.test_plan.formal_precision, 'BF16');
+    assert.deepEqual(program.test_plan.baseline_roles, ['B0', 'B1']);
+    assert.match(program.test_plan.optional_status, /NOT_EXECUTED_OPTIONAL/);
+    assert.match(program.test_plan.evidence_boundary, /BF16/);
     assert.match(page, /id="validation-model-select"/);
     assert.match(page, /Measured scenarios remain available as supplementary material/);
     assert.equal(index.program_url, './data/dataset_program_v1.json');

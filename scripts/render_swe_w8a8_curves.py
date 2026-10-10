@@ -70,6 +70,13 @@ FIXED = (
 )
 
 
+def output_tps_per_chip(point):
+    count = point["configuration"]["hardware"]["accelerator_count"]
+    if not isinstance(count, int) or count <= 0:
+        raise ValueError("accelerator_count must be a positive integer")
+    return point["metrics"]["output_tps"] / count
+
+
 def render(snapshot):
     points = [
         p
@@ -82,7 +89,7 @@ def render(snapshot):
     if not points:
         raise ValueError("No measured W8A8 SWE concurrency observations")
     xmax = math.ceil(max(p["metrics"]["decode_p90_tps"] for p in points) / 20) * 20
-    ymax = math.ceil(max(p["metrics"]["output_tps"] / 2 for p in points) / 40) * 40
+    ymax = math.ceil(max(output_tps_per_chip(p) for p in points) / 40) * 40
 
     def x(value):
         return 90 + value / xmax * 810
@@ -138,8 +145,7 @@ def render(snapshot):
             assert p["configuration"]["hardware"]["accelerator_count"] == 2
             assert p["load"]["session_rotation_depth"] == 1
         coords = [
-            (x(p["metrics"]["decode_p90_tps"]), y(p["metrics"]["output_tps"] / 2))
-            for p in rows
+            (x(p["metrics"]["decode_p90_tps"]), y(output_tps_per_chip(p))) for p in rows
         ]
         positions = " ".join(f"{px:.2f},{py:.2f}" for px, py in coords)
         svg.append(
@@ -147,7 +153,7 @@ def render(snapshot):
         )
         for p, (px, py) in zip(rows, coords):
             description = escape(
-                f"{label} C{p['load']['concurrency']}: P90 {p['metrics']['decode_p90_tps']:.2f} tokens/s; {p['metrics']['output_tps'] / 2:.2f} tokens/s/chip"
+                f"{label} C{p['load']['concurrency']}: P90 {p['metrics']['decode_p90_tps']:.2f} tokens/s; {output_tps_per_chip(p):.2f} tokens/s/chip"
             )
             svg.append(
                 f'<circle data-point="{escape(p["id"])}" cx="{px:.2f}" cy="{py:.2f}" r="5" fill="{color}"><title>{description}</title></circle>'

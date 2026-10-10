@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import importlib.util
 import json
 import re
@@ -3245,6 +3246,52 @@ def test_leaderboard_has_official_target_card_markup() -> None:
         assert not re.search(rf"\b{re.escape(forbidden)}\b", text), (
             f"leaderboard.html must not hard-code target config: {forbidden}"
         )
+
+
+def test_fixed_target_registry_is_plural_and_consistent_sitewide() -> None:
+    """No page may present one registry row as the universal official target."""
+    root = Path(__file__).resolve().parents[1]
+    leaderboard = (root / "leaderboard.html").read_text(encoding="utf-8")
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+    renderer = (root / "assets" / "official-targets.js").read_text(encoding="utf-8")
+
+    active_surface = "\n".join(
+        [leaderboard, site_js, renderer]
+        + [path.read_text(encoding="utf-8") for path in root.glob("*.html")]
+    )
+    assert "Official Fixed Target v1" not in active_surface
+    assert "官方固定靶" not in active_surface
+    assert "Fixed-target results" not in active_surface
+    assert "固定目标结果" not in active_surface
+    assert "Fixed-target registry" in site_js
+    assert "固定目标注册表" in site_js
+    assert "activeTargets" in renderer
+    assert "baselineStacks" in renderer
+    assert "modelConfigs" in renderer
+    assert "representative" not in renderer
+
+
+def test_frontier_scripts_never_assume_two_chips_for_per_chip_metrics() -> None:
+    root = Path(__file__).resolve().parents[1]
+    scripts = [
+        root / "scripts" / "verify_leaderboard_frontier_native27_browser.py",
+        root / "scripts" / "render_swe_frontier_curves.py",
+        root / "scripts" / "render_swe_w8a8_curves.py",
+    ]
+    for script in scripts:
+        text = script.read_text(encoding="utf-8")
+        assert "accelerator_count" in text
+        tree = ast.parse(text)
+        hard_coded = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.BinOp)
+            and isinstance(node.op, ast.Div)
+            and isinstance(node.right, ast.Constant)
+            and node.right.value == 2
+            and "output_tps" in ast.unparse(node.left)
+        ]
+        assert not hard_coded, f"hard-coded two-chip divisor in {script.name}"
 
 
 def test_official_target_data_matches_schema() -> None:

@@ -72,6 +72,8 @@ with sync_playwright() as p:
         page.locator("#frontier-only").uncheck()
         qa.assert_concurrency_series(page, points)
         for point in points:
+            accelerator_count = point["configuration"]["hardware"]["accelerator_count"]
+            assert isinstance(accelerator_count, int) and accelerator_count > 0
             qa.click_point(page, page.locator(f'[data-point="{point["id"]}"]'))
             popup = page.locator("#frontier-popover")
             text = popup.inner_text()
@@ -97,7 +99,7 @@ with sync_playwright() as p:
                 ) in page.locator("#frontier-legend").inner_text()
             for value in (
                 point["metrics"]["decode_p90_tps"],
-                point["metrics"]["output_tps"] / 2,
+                point["metrics"]["output_tps"] / accelerator_count,
             ):
                 expected = page.evaluate(
                     "([n,l])=>new Intl.NumberFormat(l,{maximumFractionDigits:2}).format(n)",

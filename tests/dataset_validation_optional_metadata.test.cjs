@@ -149,6 +149,15 @@ test('dataset program accepts exactly the five primary datasets', () => {
     const api = loadTestApi();
     const program = api.normalizeProgram({
         contract_version: 'dataset-program-v1',
+        test_plan: {
+            test_plan_version: 'V5.4',
+            contract_url: 'https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/docs/ACCEPTANCE_V5_4.md',
+            mandatory_model: 'Qwen/Qwen3.5-35B-A3B',
+            formal_precision: 'BF16',
+            baseline_roles: ['B0', 'B1'],
+            evidence_boundary: 'Existing BF16 evidence is supplementary.',
+            evidence_boundary_zh: '现有 BF16 证据仅作补充材料。',
+        },
         designation: {
             id: 'pujiang-specified-dataset-scope',
             scope_status: 'names-only',
@@ -162,6 +171,7 @@ test('dataset program accepts exactly the five primary datasets', () => {
         ].map((id) => ({ id, primary_metric_zh: '主指标', source_url: 'https://example.com', readiness: { status: 'asset-frozen' } })),
     });
     assert.equal(program.primary_datasets.length, 5);
+    assert.equal(program.test_plan.test_plan_version, 'V5.4');
     assert.throws(() => api.normalizeProgram({
         contract_version: 'dataset-program-v1',
         primary_datasets: [{ id: 'mmlu-pro' }],
