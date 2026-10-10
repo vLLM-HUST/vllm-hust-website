@@ -154,7 +154,10 @@ def test_request_controller_is_an_external_ecpa_control_plane() -> None:
     assert component["delivery_model"] == "plugin_bundle"
     assert component["compatibility"]["status"] == "external_service"
     assert "external operator" in component["compatibility"]["requirements_en"]
-    assert "do not establish runtime effectiveness" in component["compatibility"]["requirements_en"]
+    assert (
+        "do not establish runtime effectiveness"
+        in component["compatibility"]["requirements_en"]
+    )
     assert "one narrow historical cell" in component["public_effect_en"]
     assert component["integration_contracts"] == [
         "vllm_hust.extension_manifest.v0.3",
@@ -165,12 +168,12 @@ def test_request_controller_is_an_external_ecpa_control_plane() -> None:
         "latency_slo",
         "lifecycle_control",
     ]
-    assert WORKSHOP_METADATA["plugins"][component["id"]]["maintainers"][0][
-        "login"
-    ] == "ShuhaoZhangTony"
     assert (
-        '"request-throttling-controller": '
-        '"org.vllm-hust.request-throttling-controller"'
+        WORKSHOP_METADATA["plugins"][component["id"]]["maintainers"][0]["login"]
+        == "ShuhaoZhangTony"
+    )
+    assert (
+        '"request-throttling-controller": "org.vllm-hust.request-throttling-controller"'
     ) in SCRIPT
     assert "ECPA does not start or stop this external service" in SCRIPT
 
