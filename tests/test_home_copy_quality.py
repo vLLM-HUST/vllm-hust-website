@@ -44,12 +44,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "28 MODs for real serving workloads, with compatibility and evidence close at hand.",
+            "33 MODs for real serving workloads, with compatibility and evidence close at hand.",
         "Explore extensions by workload, platform, and readiness",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "28 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。",
+            "33 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
