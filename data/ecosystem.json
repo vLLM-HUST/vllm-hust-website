@@ -1719,6 +1719,219 @@
       "evidence_level": "performance_verified"
     },
     {
+      "id": "stateaxis-automatic-prefix-cache",
+      "name": "StateAxis Automatic Prefix Cache",
+      "name_en": "StateAxis Automatic Prefix Cache",
+      "name_zh": "StateAxis 自动前缀缓存",
+      "artifact_type": "runtime_component",
+      "system_role": "prefix_cache_policy",
+      "integration_contracts": [
+        "vllm_hust.extension_manifest.v0.3-experimental"
+      ],
+      "integration_surfaces": [
+        "vLLM-HUST Extension Manager descriptor",
+        "proposed StateAxis prefix-cache host contract"
+      ],
+      "execution_planes": [
+        "scheduler",
+        "worker"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "python_distribution",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "maintainers": [
+        "ShuhaoZhangTony"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "ShuhaoZhangTony",
+          "name": "Shuhao Zhang (Tony)"
+        }
+      ],
+      "advisors": [],
+      "canonical_repository": "https://github.com/vLLM-HUST/stateaxis-automatic-prefix-cache",
+      "repository_visibility": "public",
+      "upstream_repository": null,
+      "summary_en": "A default-off Manifest 0.3 research MOD for lease-safe, content-addressed prefix reuse with bounded residency. The current repository is inspect-only: Extension Manager must refuse activation until the StateAxis host contract and independent implementation are reviewed.",
+      "summary_zh": "面向租约安全、内容寻址前缀复用与有界驻留的默认关闭 Manifest 0.3 研究 MOD。当前仓库仅供检查；在 StateAxis 宿主合同与独立实现完成评审前，Extension Manager 必须拒绝激活。",
+      "public_effect_en": "Frozen StateAxis source evidence records a positive repeated-prefix cell and 0.0256% measured default-path overhead. This provenance is not inherited as qualification by the split MOD and does not establish a general online gain.",
+      "public_effect_zh": "冻结的 StateAxis 来源证据记录了一个重复前缀正向单元，以及 0.0256% 的默认路径开销。拆分后的 MOD 不自动继承该资格，该结果也不能推广为一般在线收益。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-automatic-prefix-cache/blob/main/evidence/ISSUE95_BOUNDED_APC_CLOSURE_20260815.md",
+      "functional_compatibility": {
+        "status": "inspect_only",
+        "scope": "Manifest 0.3 descriptor; runtime activation intentionally refused"
+      },
+      "effectiveness_qualifications": [
+        {
+          "status": "preview",
+          "scope": "frozen source evidence only; split MOD has no independent ON/OFF qualification"
+        }
+      ],
+      "compatibility": {
+        "status": "inspect_only",
+        "host": "StateAxis through vLLM-HUST Extension Manager",
+        "versions": [
+          "repository main @ 0a5b7099730272332959b6dfc0c85e93c102439f",
+          "Manifest 0.3 experimental",
+          "runtime ID org.vllm-hust.stateaxis-automatic-prefix-cache"
+        ],
+        "platforms": [
+          "Host contract pending; no platform qualification"
+        ],
+        "models": [
+          "Frozen source evidence only; no split-MOD model qualification"
+        ],
+        "requirements_en": "Inspect only. Keep disabled by default; do not interpret descriptor discovery or frozen StateAxis evidence as runtime-effective proof.",
+        "requirements_zh": "仅供检查。必须默认关闭；不得把描述符发现或冻结的 StateAxis 证据解释为运行时生效证明。"
+      },
+      "evidence_level": "source_evidence_only"
+    },
+    {
+      "id": "stateaxis-async-kv-transfer",
+      "name": "StateAxis Async KV Transfer",
+      "name_en": "StateAxis Async KV Transfer",
+      "name_zh": "StateAxis 异步 KV 传输",
+      "artifact_type": "runtime_component",
+      "system_role": "kv_transfer_overlap",
+      "integration_contracts": [
+        "vllm_hust.extension_manifest.v0.3-experimental"
+      ],
+      "integration_surfaces": [
+        "vLLM-HUST Extension Manager descriptor",
+        "proposed StateAxis bounded transfer-lane host contract"
+      ],
+      "execution_planes": [
+        "worker",
+        "device"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "python_distribution",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "maintainers": [
+        "ShuhaoZhangTony"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "ShuhaoZhangTony",
+          "name": "Shuhao Zhang (Tony)"
+        }
+      ],
+      "advisors": [],
+      "canonical_repository": "https://github.com/vLLM-HUST/stateaxis-async-kv-transfer",
+      "repository_visibility": "public",
+      "upstream_repository": null,
+      "summary_en": "A default-off Manifest 0.3 research MOD for bounded, out-of-order device KV-transfer overlap with explicit ownership and drain. The current repository is inspect-only and has no accepted activation path.",
+      "summary_zh": "面向有界乱序设备 KV 传输重叠、显式所有权与 drain 的默认关闭 Manifest 0.3 研究 MOD。当前仓库仅供检查，尚无获准的激活路径。",
+      "public_effect_en": "Frozen StateAxis source evidence records positive bounded device-overlap behavior. That qualification is not inherited by this split MOD and is neither cross-instance tiering evidence nor a KV-capacity claim.",
+      "public_effect_zh": "冻结的 StateAxis 来源证据记录了有界设备重叠的正向表现；它不是拆分后 MOD 的独立资格证明，也不是跨实例分层或 KV 容量收益证据。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-async-kv-transfer/blob/main/evidence/ISSUE76_ASYNC_TRANSFER_LANE_CLOSURE_20260815.md",
+      "functional_compatibility": {
+        "status": "inspect_only",
+        "scope": "Manifest 0.3 descriptor; runtime activation intentionally refused"
+      },
+      "effectiveness_qualifications": [
+        {
+          "status": "preview",
+          "scope": "frozen source evidence only; split MOD has no independent ON/OFF qualification"
+        }
+      ],
+      "compatibility": {
+        "status": "inspect_only",
+        "host": "StateAxis through vLLM-HUST Extension Manager",
+        "versions": [
+          "repository main @ 58ae1035d05be58c390fa60eb1eb9a42ab25a874",
+          "Manifest 0.3 experimental",
+          "runtime ID org.vllm-hust.stateaxis-async-kv-transfer"
+        ],
+        "platforms": [
+          "Host contract pending; no platform qualification"
+        ],
+        "models": [
+          "Frozen source evidence only; no split-MOD model qualification"
+        ],
+        "requirements_en": "Inspect only. Keep disabled by default; ownership, drain, failure recovery, and matched ON/OFF gates remain pending.",
+        "requirements_zh": "仅供检查。必须默认关闭；所有权、drain、失败恢复及 matched ON/OFF 门禁仍待完成。"
+      },
+      "evidence_level": "source_evidence_only"
+    },
+    {
+      "id": "stateaxis-pipelined-weight-loading",
+      "name": "StateAxis Pipelined Weight Loading",
+      "name_en": "StateAxis Pipelined Weight Loading",
+      "name_zh": "StateAxis 流水化权重加载",
+      "artifact_type": "runtime_component",
+      "system_role": "model_weight_loading",
+      "integration_contracts": [
+        "vllm_hust.extension_manifest.v0.3-experimental"
+      ],
+      "integration_surfaces": [
+        "vLLM-HUST Extension Manager descriptor",
+        "proposed StateAxis identity-bound loader host contract"
+      ],
+      "execution_planes": [
+        "worker",
+        "native"
+      ],
+      "deployment_topology": "in_process",
+      "delivery_model": "python_distribution",
+      "ownership": "hust_owned_subsystem",
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "maintainers": [
+        "ShuhaoZhangTony"
+      ],
+      "maintainer_profiles": [
+        {
+          "login": "ShuhaoZhangTony",
+          "name": "Shuhao Zhang (Tony)"
+        }
+      ],
+      "advisors": [],
+      "canonical_repository": "https://github.com/vLLM-HUST/stateaxis-pipelined-weight-loading",
+      "repository_visibility": "public",
+      "upstream_repository": null,
+      "summary_en": "A default-off Manifest 0.3 research MOD for identity-bound staged model loading and cold-readiness optimization. The current repository is inspect-only and must not modify the host until its activation contract is reviewed.",
+      "summary_zh": "面向身份绑定分阶段模型加载与冷启动就绪优化的默认关闭 Manifest 0.3 研究 MOD。当前仓库仅供检查；激活合同评审完成前不得修改宿主。",
+      "public_effect_en": "Frozen StateAxis source evidence records improved cold readiness in bounded Qwen and EP8 cells without a measured warm-path or TPOT regression. The split MOD does not inherit that qualification and has no independent ON/OFF result yet.",
+      "public_effect_zh": "冻结的 StateAxis 来源证据记录了有界 Qwen 与 EP8 单元中的冷启动就绪改善，且未测得 warm 路径或 TPOT 回退。拆分后的 MOD 不继承该资格，当前也没有独立 ON/OFF 结果。",
+      "public_effect_status": "preview",
+      "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-pipelined-weight-loading/blob/main/evidence/ISSUE15_WEIGHT_LOADER_RESULT.md",
+      "functional_compatibility": {
+        "status": "inspect_only",
+        "scope": "Manifest 0.3 descriptor; runtime activation intentionally refused"
+      },
+      "effectiveness_qualifications": [
+        {
+          "status": "preview",
+          "scope": "frozen source evidence only; split MOD has no independent ON/OFF qualification"
+        }
+      ],
+      "compatibility": {
+        "status": "inspect_only",
+        "host": "StateAxis through vLLM-HUST Extension Manager",
+        "versions": [
+          "repository main @ db5d3280a04ae40c5dc839a257c3dac74bdd9011",
+          "Manifest 0.3 experimental",
+          "runtime ID org.vllm-hust.stateaxis-pipelined-weight-loading"
+        ],
+        "platforms": [
+          "Host contract pending; no platform qualification"
+        ],
+        "models": [
+          "Frozen source evidence only; no split-MOD model qualification"
+        ],
+        "requirements_en": "Inspect only. Keep disabled by default; artifact identity, rollback, lifecycle, and matched cold/warm ON/OFF gates remain pending.",
+        "requirements_zh": "仅供检查。必须默认关闭；制品身份、回滚、生命周期以及 matched 冷/热 ON/OFF 门禁仍待完成。"
+      },
+      "evidence_level": "source_evidence_only"
+    },
+    {
       "id": "gdn-state-codec",
       "name": "GDN State Codec",
       "name_en": "GDN State Codec",
