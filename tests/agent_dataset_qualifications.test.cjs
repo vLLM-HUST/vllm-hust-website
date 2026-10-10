@@ -23,26 +23,41 @@ function loadTestApi() {
     return sandbox.window.__agentDatasetQualificationsTest;
 }
 
-test('published qualification is bounded to one of 500 tasks', () => {
+test('complete SZYN campaign is primary and the one-case qualification is retained separately', () => {
     const api = loadTestApi();
     const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
     const normalized = api.normalize(data);
-    const item = normalized.qualifications[0];
+    const campaign = normalized.results[0];
+    const qualification = normalized.results[1];
 
-    assert.strictEqual(item.dataset, 'SZYN-OPENCODE-SWEBENCH-VERIFIED-500');
-    assert.strictEqual(item.owner_zh, '中国移动苏州（苏州云能）');
-    assert.strictEqual(item.executed_tasks, 1);
-    assert.strictEqual(item.total_tasks, 500);
-    assert.strictEqual(item.resolved_tasks, 1);
-    assert.match(item.caveat_en, /remaining 499 tasks have not run/);
+    assert.strictEqual(campaign.dataset, 'SZYN-OPENCODE-SWEBENCH-VERIFIED-500');
+    assert.strictEqual(campaign.owner_zh, '中国移动苏州（苏州云能）');
+    assert.strictEqual(campaign.record_kind, 'campaign');
+    assert.strictEqual(campaign.executed_tasks, 500);
+    assert.strictEqual(campaign.total_tasks, 500);
+    assert.strictEqual(campaign.resolved_tasks, 232);
+    assert.strictEqual(campaign.resolution_rate, 0.464);
+    assert.match(campaign.caveat_en, /Complete 500-task B0 campaign/);
+    assert.strictEqual(qualification.record_kind, 'qualification');
+    assert.strictEqual(qualification.executed_tasks, 1);
+    assert.strictEqual(qualification.superseded_by, campaign.id);
+    assert.match(qualification.caveat_en, /not the current campaign progress/);
 });
 
 test('qualification contract rejects resolved counts above executed counts', () => {
     const api = loadTestApi();
     assert.throws(() => api.normalize({
-        contract_version: 'agent-dataset-qualification-v1',
-        qualifications: [{ id: 'bad', executed_tasks: 1, total_tasks: 500, resolved_tasks: 2 }],
+        contract_version: 'agent-dataset-results-v2',
+        results: [{ id: 'bad', record_kind: 'qualification', executed_tasks: 1, total_tasks: 500, resolved_tasks: 2, resolution_rate: 2 }],
     }), /Invalid resolved task count/);
+});
+
+test('campaign rows must cover the declared denominator', () => {
+    const api = loadTestApi();
+    assert.throws(() => api.normalize({
+        contract_version: 'agent-dataset-results-v2',
+        results: [{ id: 'partial', record_kind: 'campaign', executed_tasks: 499, total_tasks: 500, resolved_tasks: 232, resolution_rate: 232 / 499 }],
+    }), /Incomplete campaign result/);
 });
 
 test('tool and agent qualifications belong to the Frontier settings view only', () => {
