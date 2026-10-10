@@ -1301,6 +1301,27 @@ vllm-hust-ext extension check ${extensionId}`
   renderPageLabels();
   search.placeholder = copy().searchPlaceholder;
 
+  const supportsModTaxonomy = (taxonomy) => (
+    taxonomy?.schema_version === "mod-taxonomy/v1"
+    && taxonomy.components
+    && typeof taxonomy.components === "object"
+  );
+
+  async function fetchModTaxonomy(url) {
+    const request = async (target, cache) => {
+      const response = await fetch(target, { cache });
+      if (!response.ok) throw new Error(`MOD taxonomy request failed: ${response.status}`);
+      return response.json();
+    };
+    let taxonomy = await request(url, "no-cache");
+    if (supportsModTaxonomy(taxonomy)) return taxonomy;
+
+    const refreshUrl = new URL(url, window.location.href);
+    refreshUrl.searchParams.set("refresh", Date.now().toString());
+    taxonomy = await request(refreshUrl, "reload");
+    return taxonomy;
+  }
+
   Promise.all([
     fetch(catalog.dataset.source, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
@@ -1314,10 +1335,7 @@ vllm-hust-ext extension check ${extensionId}`
       if (!response.ok) throw new Error(`Workload navigation request failed: ${response.status}`);
       return response.json();
     }),
-    fetch(catalog.dataset.taxonomy, { cache: "no-cache" }).then((response) => {
-      if (!response.ok) throw new Error(`MOD taxonomy request failed: ${response.status}`);
-      return response.json();
-    }),
+    fetchModTaxonomy(catalog.dataset.taxonomy),
     Promise.all([
       fetch("./data/plugin-performance.json?v=configuration-scope-20261010", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
@@ -1333,8 +1351,10 @@ vllm-hust-ext extension check ${extensionId}`
       if (navigation.schema_version !== "plugin-workload-navigation/v1" || !navigation.traits || !navigation.plugins) {
         throw new Error("unsupported workload navigation");
       }
-      if (taxonomy.schema_version !== "mod-taxonomy/v1" || !taxonomy.components) {
-        throw new Error("unsupported MOD taxonomy");
+      if (!supportsModTaxonomy(taxonomy)) {
+        throw new Error(language() === "zh"
+          ? "MOD 分类数据版本暂不匹配，请刷新页面后重试。"
+          : "The MOD classification data is temporarily out of date. Refresh the page and try again.");
       }
       registry = payload;
       modTaxonomy = taxonomy.components;

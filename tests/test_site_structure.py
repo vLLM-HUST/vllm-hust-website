@@ -975,7 +975,7 @@ def test_runtime_data_consumers_revalidate_cached_snapshots() -> None:
         "dataset-validation.html": "data-freshness-20261009",
         "members.html": "data-freshness-20261009",
         "news.html": "data-freshness-20261009",
-        "plugins.html": "configuration-scope-20261010",
+        "plugins.html": "taxonomy-recovery-20261010",
     }
     for name, cache_key in page_cache_keys.items():
         text = (root / name).read_text(encoding="utf-8")

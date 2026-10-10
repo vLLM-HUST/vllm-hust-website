@@ -774,7 +774,10 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert 'data-taxonomy="./data/mod-taxonomy.json?v=mod-taxonomy-v1"' in PAGE
+    assert 'data-taxonomy="./data/mod-taxonomy.json?v=mod-taxonomy-20261010-49"' in PAGE
+    assert "async function fetchModTaxonomy(url)" in SCRIPT
+    assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
+    assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
 
 
 def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> None:
@@ -1037,7 +1040,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=project-grouping-20261009" in PAGE
-    assert "plugins-page.js?v=configuration-scope-20261010" in PAGE
+    assert "plugins-page.js?v=taxonomy-recovery-20261010" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1652,7 +1655,7 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "workshop-metadata-v17-clm" not in PAGE
     assert PAGE.count("ecpa-final-20261009") >= 3
     assert "hidden-manifest03-contracts-20261009" in PAGE
-    assert "mod-taxonomy-v1" in PAGE
+    assert "mod-taxonomy-20261010-49" in PAGE
 
 
 def test_bidkv_copy_reports_the_new_cell_without_erasing_old_boundaries() -> None:
