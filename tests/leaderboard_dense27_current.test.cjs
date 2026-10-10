@@ -10,8 +10,7 @@ test('current Dense27 sweep joins qualified current State points, not old recons
   assert.equal(q.retrieval.before.passed,16);assert.equal(q.retrieval.after.passed,16);assert.equal(q.summary.valid,true);assert.equal(q.summary.failed_requests,0);
   assert.deepEqual(q.measuredBehavior.metrics,p.metrics);assert.equal(q.lifecycle.passed,true);
  }
- const plan=require('../data/serving-plans.json').plans.find(p=>p.model==='Qwen3.8-27B');
- const best=points.reduce((a,b)=>a.metrics.output_tps>b.metrics.output_tps?a:b);assert.equal(plan.runId,best.evidence.run_ids[0]);assert.equal(plan.config.state_cache_partial_reclaim,true);
+ const best=points.reduce((a,b)=>a.metrics.output_tps>b.metrics.output_tps?a:b);assert.equal(best.load.concurrency,16);
  const proof=require('../docs/evidence/dense27-current-20261009/workload-equivalence.json');assert.equal(proof.passed,true);assert.equal(proof.restored_metadata_sha256,proof.reference_sha256);
 });
 

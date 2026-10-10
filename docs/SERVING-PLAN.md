@@ -51,9 +51,9 @@ repository in the local campaign archive. Original historical inputs were delete
 those inputs or relabel a reconstruction as an exact historical reproduction. Qwen27 uses the newly
 downloaded official Qwen/Qwen3.8-27B checkpoint, identified by the per-file manifest in its
 qualification receipt, not the deleted historical local checkpoint. The current State C16
-observation `1bd9268ee77845f08b16f1c78513b6d1` replaces the earlier96cd03a reconstruction as the
-displayed flagship. It completes 730 requests in900seconds with zero failures: per-card rates are
-327.9461 new input, 8641.2517 cached input and 232.3072 output tok/s. Streamed-window output is
+observation `1bd9268ee77845f08b16f1c78513b6d1` replaced the earlier96cd03a reconstruction as the
+then-displayed flagship. It completes 730 requests in900seconds with zero failures: per-card rates
+are 327.9461 new input, 8641.2517 cached input and 232.3072 output tok/s. Streamed-window output is
 separately 249.0617 tok/s/card. Current State, streaming incremental backup, partial-priority
 recovery and Q12/KV2 Balanced FlashDecode are enabled; independent operator and forced
 partial-recovery gates pass, as do16 concurrent retrievals before and after each window. The timed
@@ -61,14 +61,15 @@ C16 run observes52 cache loads but no active partial eviction. This is bounded f
 general quality evaluation. See [current Dense27 methods](FRONTIER-DENSE27-CURRENT.md). Historical
 reconstruction evidence remains archived, not relabeled.
 
-All four currently displayed plans have complete, same-cohort input/output accounting. They are
+All three currently displayed plans have complete, same-cohort input/output accounting. They are
 selected deployment observations at different concurrency points, not a controlled same-concurrency
 optimization A/B or proof of an optimal deployment for every workload.
 
-The additional four-card Qwen27 flagship selects TP4 C48 from ten complete observations. Run
+The sole displayed Qwen27 flagship selects TP4 C48 from ten complete observations. Run
 `b6f90bf6a4ec413b85db3df1000d1376` supplies matched-cohort per-card rates of 424.0411 new input,
-9162.9953 cached input and 274.9417 outputtok/s; streamed-window output is285.9408tok/s/card. The
-TP2 plan remains available as a two-card deployment. TP4 uses4GiB Host cache/rank and a qualified
+9162.9953 cached input and 274.9417 outputtok/s; streamed-window output is285.9408tok/s/card. At
+Fletcher’s request on October10, the TP2 plan is no longer displayed; its historical measurements
+and accounting evidence remain preserved. TP4 uses4GiB Host cache/rank and a qualified
 pinned-allocation recovery path; no active partial eviction occurs in its measured windows. See
 [TP4 methods and qualifications](FRONTIER-DENSE27-TP4.md).
 

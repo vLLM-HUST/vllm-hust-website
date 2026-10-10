@@ -101,9 +101,10 @@ records rounded allocator-owned memory.
 The TP4 flagship selects C48, the highest streamed-output observation of these ten settings. Its
 matched completed-request ledger uses the same1752 requests for new input, cached input and output,
 with the full900seconds and all four cards in the denominator. The ledger, rather than streamed
-partial output, drives API-equivalent value. The lower-card-count TP2 C16 plan remains a separate
-deployment option. Prices and user-supplied costs are unchanged; values are not revenue, profit or
-guarantees of cloud cache-hit/quality equivalence.
+partial output, drives API-equivalent value. At Fletcher’s October10 request, only TP4 C48 remains
+in the Qwen27 Serving Plan selection; TP2 measurements and accounting evidence remain preserved.
+Prices and user-supplied costs are unchanged; values are not revenue, profit or guarantees of cloud
+cache-hit/quality equivalence.
 
 Compact per-run qualification, accounting and usage-only projections are under
 `docs/evidence/dense27-tp4-20261009/c{1,2,4,8,12,16,24,32,40,48}`. Full request, scheduler,

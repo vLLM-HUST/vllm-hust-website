@@ -95,11 +95,12 @@ ratio.
 
 ## Business accounting and evidence
 
-Serving Plan selects the highest-throughput complete observation among these six settings, not a
-global optimum. Its new-input, cached-input and output rates all use the **same successful requests
-completed within900seconds**, excluding drain and incomplete-request output. That business ledger
-intentionally differs from the chart's streamed-output-window rate. Costs remain user inputs; API
-prices are the already documented model-specific scenario assumptions, not realized revenue.
+The earlier TP2 Serving Plan selected the highest-throughput complete observation among these six
+settings, not a global optimum. Its new-input, cached-input and output rates all use the **same
+successful requests completed within900seconds**, excluding drain and incomplete-request output.
+That business ledger intentionally differs from the chart's streamed-output-window rate. Costs
+remain user inputs; API prices are the already documented model-specific scenario assumptions, not
+realized revenue.
 
 Compact per-run qualification, accounting and reproducible usage-only projections are under
 `docs/evidence/dense27-current-20261009/c1`, `c2`, `c4`, `c8`, `c12` and `c16`. The Frontier
@@ -123,3 +124,6 @@ C1/C2/C4/C8/C16) are now in `archived_points`, with their complete measurements 
 IDs preserved. The six current-State points remain visible. Native reference points and other models
 are unchanged; raw run evidence is not deleted. This is display curation across measured
 configurations, not a matched-control speedup claim.
+
+On October10, Fletcher selected TP4 C48 as the sole displayed Qwen27 Serving Plan. The TP2
+measurements and all accounting evidence above remain historical evidence.

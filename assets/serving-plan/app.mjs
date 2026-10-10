@@ -223,7 +223,7 @@ function initialize() {
   });
   render();
 }
-fetch("data/serving-plans.json?v=dense27-tp4-sweep-20261010", { cache: "no-cache" })
+fetch("data/serving-plans.json?v=dense27-tp4-only-20261010", { cache: "no-cache" })
   .then((r) => {
     if (!r.ok) throw Error("方案数据读取失败");
     return r.json();
