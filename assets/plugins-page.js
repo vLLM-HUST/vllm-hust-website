@@ -362,6 +362,24 @@ vllm-hust-ext extension inspect org.vllm-hust.clm-lifecycle
 vllm-hust-ext extension check org.vllm-hust.clm-lifecycle
 export VLLM_PLUGINS=ascend,clm_lifecycle`
     },
+    "request-throttling-controller": {
+      title_en: "Inspect and render the request controller",
+      title_zh: "检查并渲染请求控制器",
+      action_en: "ECPA plan and operator handoff",
+      action_zh: "ECPA 计划与 operator 交接",
+      note_en: "ECPA records intent, checks the pinned controller identity and rejects a competing program-admission controller. The rendered command is an operator handoff: ECPA does not start or stop this external service, and enablement is not runtime-effective evidence.",
+      note_zh: "ECPA 记录意图、核对固定版本的控制器身份，并拒绝并存的 program-admission 控制器。渲染出的命令用于交给 operator；ECPA 不启动或停止该外部服务，enable 也不等于运行时生效。",
+      guide: "https://github.com/vLLM-HUST/request-throttling-controller#ecpa-%E7%AE%A1%E7%90%86%E8%BE%B9%E7%95%8C",
+      guide_en: "Control boundary and runbook →",
+      guide_zh: "控制边界与运行手册 →",
+      command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@b724e1abb5fa3389e508edac20b762e398298405"
+python -m pip install "git+https://github.com/vLLM-HUST/request-throttling-controller.git@00a92c0d6fab20413cef72fed45ba9cf93062e4b"
+vllm-hust-ext extension inspect org.vllm-hust.request-throttling-controller
+vllm-hust-ext extension check org.vllm-hust.request-throttling-controller
+vllm-hust-ext extension enable org.vllm-hust.request-throttling-controller
+vllm-hust-ext extension plan org.vllm-hust.request-throttling-controller
+vllm-hust-ext extension render org.vllm-hust.request-throttling-controller`
+    },
     adm: {
       title_en: "Inspect and stage Ascend Distributed Metadata",
       title_zh: "检查并暂存昇腾分布式元数据 MOD",
@@ -548,6 +566,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
     "qos-scheduler-migration": "org.vllm-hust.qos-scheduler",
     "stateharbor": "org.vllm-hust.stateharbor",
     "clm-lifecycle": "org.vllm-hust.clm-lifecycle",
+    "request-throttling-controller": "org.vllm-hust.request-throttling-controller",
     "request-lifecycle-profiler": "org.vllm-hust.request-lifecycle-profiler",
     "quality-bounded-inference": "org.intellistream.quality-bounded-inference",
     "llm-serving-cost-pricing-model": "org.vllm-hust.llm-serving-cost-pricing-model"

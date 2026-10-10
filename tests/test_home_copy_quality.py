@@ -44,12 +44,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "37 MODs for real serving workloads, with compatibility and evidence close at hand.",
+        "38 MODs for real serving workloads, with compatibility and evidence close at hand.",
         "Explore extensions by workload, platform, and readiness",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "37 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。",
+        "38 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
@@ -83,7 +83,7 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
         and taxonomy.get(item["id"], {}).get("kind") in active_kinds
     }
     mod_count = len(mod_projects)
-    assert mod_count == 37
+    assert mod_count == 38
     workload_count = len(
         json.loads(
             (root / "data" / "plugin-workload-navigation.json").read_text(

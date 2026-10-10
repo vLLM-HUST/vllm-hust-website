@@ -141,6 +141,40 @@ def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() ->
     assert "VLLM_ASCEND_SIMLLM_ENABLED=1" in SCRIPT
 
 
+def test_request_controller_is_an_external_ecpa_control_plane() -> None:
+    component = by_id("request-throttling-controller")
+    assert MOD_TAXONOMY["components"][component["id"]] == {
+        "kind": "control_plane",
+        "capability": "scheduling_routing",
+        "lifecycle": "implemented_restricted",
+        "evidence": "measured_beneficial",
+    }
+    assert component["artifact_type"] == "bridge"
+    assert component["deployment_topology"] == "separate_application"
+    assert component["delivery_model"] == "plugin_bundle"
+    assert component["compatibility"]["status"] == "external_service"
+    assert "external operator" in component["compatibility"]["requirements_en"]
+    assert "do not establish runtime effectiveness" in component["compatibility"]["requirements_en"]
+    assert "one narrow historical cell" in component["public_effect_en"]
+    assert component["integration_contracts"] == [
+        "vllm_hust.extension_manifest.v0.3",
+        "request-throttling-controller.migration-identity.v1",
+    ]
+    assert WORKLOAD_NAVIGATION["plugins"][component["id"]] == [
+        "high_concurrency",
+        "latency_slo",
+        "lifecycle_control",
+    ]
+    assert WORKSHOP_METADATA["plugins"][component["id"]]["maintainers"][0][
+        "login"
+    ] == "ShuhaoZhangTony"
+    assert (
+        '"request-throttling-controller": '
+        '"org.vllm-hust.request-throttling-controller"'
+    ) in SCRIPT
+    assert "ECPA does not start or stop this external service" in SCRIPT
+
+
 def test_registry_is_canonical_and_multidimensional() -> None:
     assert REGISTRY["schema_version"] == "1.0"
     assert REGISTRY["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
@@ -1510,7 +1544,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 34
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 35
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE

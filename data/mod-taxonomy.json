@@ -41,6 +41,7 @@
     "llm-serving-cost-pricing-model": {"kind":"tool_mod","capability":"observability_evaluation","lifecycle":"implemented","evidence":"offline_tool"},
 
     "clm-lifecycle": {"kind":"control_plane","capability":"lifecycle_control","lifecycle":"implemented","evidence":"functional_only"},
+    "request-throttling-controller": {"kind":"control_plane","capability":"scheduling_routing","lifecycle":"implemented_restricted","evidence":"measured_beneficial"},
     "tricard-clm-lifecycle": {"kind":"control_plane","capability":"lifecycle_control","lifecycle":"implemented_restricted","evidence":"bridge_component"},
     "quality-bounded-inference": {"kind":"control_plane","capability":"policy_research","lifecycle":"research","evidence":"functional_only"},
     "scheduler-policy-lab": {"kind":"control_plane","capability":"policy_research","lifecycle":"pending","evidence":"host_integration_pending"},
