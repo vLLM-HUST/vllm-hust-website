@@ -2138,9 +2138,9 @@
       "deployment_topology": "separate_application",
       "delivery_model": "plugin_bundle",
       "ownership": "organization_maintained",
-      "maintainers": ["ShuhaoZhangTony"],
+      "maintainers": ["yancanmao"],
       "maintainer_profiles": [
-        {"login": "ShuhaoZhangTony", "name": "Shuhao Zhang (Tony)"}
+        {"login": "yancanmao", "name": "Mao Yancan"}
       ],
       "advisors": [],
       "repository_relationship": "organization_native",
