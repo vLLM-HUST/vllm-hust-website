@@ -1,5 +1,5 @@
 /**
- * Official Fixed-Target Card
+ * Published Fixed-Target Registry
  *
  * Consumes the central machine-readable fixed-target registry published by
  * vLLM-HUST/vllm-hust-benchmark (leaderboard-data/official-targets.json). The
@@ -9,8 +9,8 @@
  * version wins so a stale source cannot hide newly published targets.
  *
  * Display is fail-closed: only `status=active` + `intended_use=public-leaderboard`
- * targets are treated as the official fixed target. Perfgate (3B) and specialty
- * targets are shown separately and never promoted into the official view.
+ * targets are treated as active public configurations. Perfgate (3B) and
+ * specialty targets are shown separately and never promoted into that view.
  */
 
 (function () {
@@ -29,13 +29,14 @@
         en: {
             cardVersion: 'registry',
             effectiveFrom: 'Effective from',
-            baseline: 'Baseline',
-            hardware: 'Hardware',
-            mainModel: 'Main text model',
-            precision: 'Precision',
-            gpuMem: 'gpu_memory_utilization',
-            maxLen: 'max_model_len',
-            tensorParallel: 'tensor_parallel_size',
+            activeTargets: 'Active configurations',
+            baselineStacks: 'Runtime stacks',
+            hardwareConfigs: 'Hardware configurations',
+            modelConfigs: 'Model configurations',
+            precisions: 'Precisions',
+            profiles: 'Profiles',
+            workloads: 'Workloads',
+            distinct: 'distinct',
             viewMatrix: 'View full config matrix',
             hideMatrix: 'Hide config matrix',
             machineJson: 'machine-readable JSON',
@@ -49,8 +50,8 @@
             specHash: 'Spec SHA256',
             status: 'Status',
             updated: 'Updated',
-            officialPending: 'Official fixed-target data is being rebuilt.',
-            officialPendingHint: 'No active public fixed target is published yet. Legacy or unverified records are not shown.',
+            officialPending: 'The fixed-target registry is being rebuilt.',
+            officialPendingHint: 'No active public configuration is published yet. Legacy or unverified records are not shown.',
             perfgateTitle: 'Perfgate (CI only, not a public 14B target)',
             specialtyTitle: 'Additional hardware configurations',
             invalidRegistry: 'Fixed-target registry is unavailable.',
@@ -64,13 +65,14 @@
         zh: {
             cardVersion: 'registry',
             effectiveFrom: '生效日期',
-            baseline: '基线',
-            hardware: '硬件',
-            mainModel: '主文本模型',
-            precision: '精度',
-            gpuMem: 'gpu_memory_utilization',
-            maxLen: 'max_model_len',
-            tensorParallel: 'tensor_parallel_size',
+            activeTargets: 'Active 配置数',
+            baselineStacks: '运行时组合',
+            hardwareConfigs: '硬件配置',
+            modelConfigs: '模型配置',
+            precisions: '精度集合',
+            profiles: 'Profile 数',
+            workloads: 'Workload 数',
+            distinct: '种',
             viewMatrix: '查看完整配置矩阵',
             hideMatrix: '收起配置矩阵',
             machineJson: '机器可读 JSON',
@@ -84,8 +86,8 @@
             specHash: 'Spec SHA256',
             status: '状态',
             updated: '更新时间',
-            officialPending: '官方固定靶数据正在重建。',
-            officialPendingHint: '当前尚未发布任何 active 的公开固定靶，不展示 legacy 或未验证记录。',
+            officialPending: '固定目标注册表正在重建。',
+            officialPendingHint: '当前尚未发布任何 active 公开配置，不展示 legacy 或未验证记录。',
             perfgateTitle: 'Perfgate（仅用于 CI，不属于公开 14B 固定靶）',
             specialtyTitle: '其他硬件配置',
             invalidRegistry: '固定靶 registry 不可用。',
@@ -286,6 +288,20 @@
         return `${engine} ${version}${ascend}`.trim();
     }
 
+    function uniqueLabels(targets, formatter) {
+        return [...new Set(targets.map(formatter).filter(Boolean))].sort();
+    }
+
+    function compactList(values) {
+        if (!values.length) {
+            return '—';
+        }
+        if (values.length <= 3) {
+            return values.join(' / ');
+        }
+        return `${values.length} ${t('distinct')}`;
+    }
+
     // --- Card rendering -----------------------------------------------------
 
     function renderOfficialCard(registry) {
@@ -298,10 +314,7 @@
         const perfgate = targets.filter(isPerfgate);
         const specialty = targets.filter(isSpecialty);
 
-        // Representative core-text target carries the shared baseline config.
-        const representative = official.find((item) => item.profile === 'core-text') || official[0];
-
-        if (!representative) {
+        if (!official.length) {
             // Fail closed: never fall back to legacy/unverified points.
             container.innerHTML = `
                 <div class="official-target-body">
@@ -313,15 +326,20 @@
             return;
         }
 
-        const server = representative.server_parameters || {};
+        const runtimeStacks = uniqueLabels(official, baselineLabel);
+        const hardwareConfigs = uniqueLabels(official, hardwareLabel);
+        const modelConfigs = uniqueLabels(official, modelLabel);
+        const precisions = uniqueLabels(official, (target) => target.model?.precision);
+        const profiles = uniqueLabels(official, (target) => target.profile);
+        const workloads = uniqueLabels(official, (target) => target.workload?.name);
         const preview = [
-            [t('baseline'), baselineLabel(representative)],
-            [t('hardware'), hardwareLabel(representative)],
-            [t('mainModel'), modelLabel(representative)],
-            [t('precision'), representative.model?.precision || '—'],
-            [t('gpuMem'), server.gpu_memory_utilization ?? '—'],
-            [t('maxLen'), server.max_model_len ?? '—'],
-            [t('tensorParallel'), server.tensor_parallel_size ?? '—'],
+            [t('activeTargets'), official.length],
+            [t('baselineStacks'), compactList(runtimeStacks)],
+            [t('hardwareConfigs'), compactList(hardwareConfigs)],
+            [t('modelConfigs'), compactList(modelConfigs)],
+            [t('precisions'), compactList(precisions)],
+            [t('profiles'), profiles.length],
+            [t('workloads'), workloads.length],
         ].map(([label, value]) => `
             <div class="official-target-item">
                 <span class="official-target-item-label">${escapeHtml(label)}</span>
@@ -516,5 +534,7 @@
         isPerfgate,
         isSpecialty,
         compareRegistryVersions,
+        uniqueLabels,
+        compactList,
     };
 })();

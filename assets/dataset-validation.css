@@ -8,6 +8,21 @@
     margin-bottom: 16px;
 }
 
+.dataset-program-contract {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: center;
+    margin: 12px 0 0;
+    color: #475569;
+    font-size: 0.82rem;
+}
+
+.dataset-program-contract a {
+    color: #0369a1;
+    font-weight: 800;
+}
+
 .dataset-program-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -94,6 +109,14 @@ body:not([data-page="home"]) .dataset-supplementary-note p {
 }
 
 body:not([data-page="home"]) .dataset-program-meta strong {
+    color: #7dd3fc;
+}
+
+body:not([data-page="home"]) .dataset-program-contract {
+    color: rgba(219, 234, 254, 0.82);
+}
+
+body:not([data-page="home"]) .dataset-program-contract a {
     color: #7dd3fc;
 }
 

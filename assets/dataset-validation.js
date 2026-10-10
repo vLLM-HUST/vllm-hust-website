@@ -82,6 +82,9 @@
         if (!data.designation || data.designation.id !== 'pujiang-specified-dataset-scope' || data.designation.scope_status !== 'names-only') {
             throw new Error('Dataset program lacks the Pujiang designation');
         }
+        if (!data.test_plan || data.test_plan.test_plan_version !== 'V5.4' || data.test_plan.mandatory_model !== 'Qwen/Qwen3.5-35B-A3B' || data.test_plan.formal_precision !== 'BF16' || data.test_plan.baseline_roles?.join('|') !== 'B0|B1' || typeof data.test_plan.contract_url !== 'string' || !data.test_plan.contract_url.startsWith('https://') || typeof data.test_plan.evidence_boundary !== 'string' || typeof data.test_plan.evidence_boundary_zh !== 'string') {
+            throw new Error('Dataset program lacks the V5.4 acceptance contract');
+        }
         const readiness = new Set(['executable', 'asset-frozen', 'material-unfrozen', 'missing']);
         if (data.primary_datasets.some((item) => typeof item.primary_metric_zh !== 'string' || !item.primary_metric_zh || typeof item.source_url !== 'string' || !item.source_url.startsWith('https://') || !item.readiness || !readiness.has(item.readiness.status))) {
             throw new Error('Dataset program metadata is incomplete');
@@ -104,9 +107,11 @@
             zh: { executable: '已落地且可执行', 'asset-frozen': '源快照已冻结，执行合同待完成', 'material-unfrozen': '已有材料但版本未冻结', missing: '缺失' },
         };
         const designation = state.program.designation;
+        const plan = state.program.test_plan;
         $('dataset-program-kicker').textContent = lang() === 'zh' ? '浦江指定范围' : 'Pujiang-specified scope';
         $('dataset-program-title').textContent = lang() === 'zh' ? designation.label_zh : designation.label;
         $('dataset-program-lede').textContent = lang() === 'zh' ? designation.scope_note_zh : designation.scope_note;
+        $('dataset-program-contract').innerHTML = `<a href="${escapeHtml(plan.contract_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(plan.test_plan_version)}</a><span>${escapeHtml(plan.mandatory_model)} · ${escapeHtml(plan.formal_precision)} · ${escapeHtml(plan.baseline_roles.join(' + '))}</span><span>${escapeHtml(lang() === 'zh' ? plan.optional_status_zh : plan.optional_status)}</span><span>${escapeHtml(lang() === 'zh' ? plan.evidence_boundary_zh : plan.evidence_boundary)}</span>`;
         $('dataset-program-list').innerHTML = state.program.primary_datasets.map((dataset) => {
             const note = lang() === 'zh' ? dataset.note_zh : dataset.note;
             const metric = lang() === 'zh' ? dataset.primary_metric_zh : dataset.primary_metric;
