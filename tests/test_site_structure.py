@@ -1219,13 +1219,13 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "33 MODs for real serving workloads" in html_text
-    assert "33 个 MOD，覆盖真实推理场景" in html_text
+    assert "37 MODs for real serving workloads" in html_text
+    assert "37 个 MOD，覆盖真实推理场景" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
-    assert "Explore 33 MODs for scheduling, KV, execution" in html_text
-    assert "探索 33 个 MOD，覆盖调度、KV、执行" in html_text
+    assert "Explore 37 MODs for scheduling, KV, execution" in html_text
+    assert "探索 37 个 MOD，覆盖调度、KV、执行" in html_text
     assert "what is available for evaluation" in html_text
     assert "适合评估" in html_text
 

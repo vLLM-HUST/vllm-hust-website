@@ -3,6 +3,7 @@
 
   const registryUrl = "./data/ecosystem.json?v=mod-catalog-20261008";
   const navigationUrl = "./data/plugin-workload-navigation.json?v=mod-catalog-20261008";
+  const taxonomyUrl = "./data/mod-taxonomy.json?v=mod-taxonomy-20261010";
   let summary;
   let workloadCount;
 
@@ -50,9 +51,13 @@
     fetch(navigationUrl, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`workload navigation request failed: ${response.status}`);
       return response.json();
+    }),
+    fetch(taxonomyUrl, { cache: "no-cache" }).then((response) => {
+      if (!response.ok) throw new Error(`MOD taxonomy request failed: ${response.status}`);
+      return response.json();
     })
-  ]).then(([registry, navigation]) => {
-    summary = window.EcosystemCatalog.summarize(registry);
+  ]).then(([registry, navigation, taxonomy]) => {
+    summary = window.EcosystemCatalog.summarize(registry, taxonomy);
     workloadCount = Object.keys(navigation.traits || {}).length;
     render();
   }).catch((error) => {

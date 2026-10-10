@@ -1341,7 +1341,7 @@ vllm-hust-ext extension check ${extensionId}`
       workloadNavigation = navigation;
       renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
-      const catalogSummary = window.EcosystemCatalog.summarize(payload);
+      const catalogSummary = window.EcosystemCatalog.summarize(payload, taxonomy);
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(catalogSummary.total); });
       const supported = catalogSummary.verified;
       const incubating = catalogSummary.evaluating;

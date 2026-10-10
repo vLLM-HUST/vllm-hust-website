@@ -44,12 +44,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "33 MODs for real serving workloads, with compatibility and evidence close at hand.",
+        "37 MODs for real serving workloads, with compatibility and evidence close at hand.",
         "Explore extensions by workload, platform, and readiness",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "33 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。",
+        "37 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
@@ -72,47 +72,33 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     ecosystem = json.loads(
         (root / "data" / "ecosystem.json").read_text(encoding="utf-8")
     )
-    tool_roles = {
-        "lifecycle_control_plane",
-        "model_artifact_preparation",
-        "offline_model_quantization",
-        "profiling_analysis",
-        "scheduler_policy_research",
-        "telemetry_provider",
-    }
-    deliveries = {
-        "plugin_bundle",
-        "python_distribution",
-        "migration_scaffold",
-        "source_patch",
-        "source_toolkit",
-    }
-    mod_count = sum(
-        item.get("public_surface", True) is not False
-        and (
-            (
-                item["artifact_type"] == "bridge"
-                and item.get("compatibility", {}).get("status") == "verified"
-                and item["canonical_repository"].startswith("https://github.com/")
-            )
-            or (
-                (
-                    item["artifact_type"] in {"runtime_component", "bridge"}
-                    or item["system_role"] in tool_roles
-                )
-                and item["repository_relationship"] == "organization_native"
-                and item["delivery_model"] in deliveries
-                and item["canonical_repository"].startswith(
-                    "https://github.com/vLLM-HUST/"
-                )
-            )
-        )
+    taxonomy = json.loads(
+        (root / "data" / "mod-taxonomy.json").read_text(encoding="utf-8")
+    )["components"]
+    active_kinds = {"runtime_mod", "connector_mod", "tool_mod", "control_plane"}
+    mod_projects = {
+        item.get("catalog_project_id", item["id"])
         for item in ecosystem["components"]
+        if item.get("public_surface", True) is not False
+        and taxonomy.get(item["id"], {}).get("kind") in active_kinds
+    }
+    mod_count = len(mod_projects)
+    assert mod_count == 37
+    workload_count = len(
+        json.loads(
+            (root / "data" / "plugin-workload-navigation.json").read_text(
+                encoding="utf-8"
+            )
+        )["traits"]
     )
+    assert workload_count == 12
     assert f"Explore all {mod_count} MODs" in INDEX
     assert f"查看全部 {mod_count} 个 MOD" in INDEX
+    assert f"{mod_count} MODs · {workload_count} workloads" in INDEX
+    assert f"{mod_count} 个 MOD · {workload_count} 类 Workload" in INDEX
     assert 'href="./plugins.html#plugin-catalog"' in INDEX
-    assert "EcosystemCatalog.summarize(registry)" in HOME_CATALOG_SCRIPT
+    assert "EcosystemCatalog.summarize(registry, taxonomy)" in HOME_CATALOG_SCRIPT
+    assert "mod-taxonomy.json" in HOME_CATALOG_SCRIPT
     assert "performanceResults" not in CATALOG_SCRIPT
     assert "what is available for evaluation" in INDEX
     assert "适合评估" in INDEX
