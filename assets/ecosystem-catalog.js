@@ -1,44 +1,38 @@
 (function (global) {
   "use strict";
 
-  const TOOL_MOD_ROLES = new Set([
-    "lifecycle_control_plane",
-    "model_artifact_preparation",
-    "offline_model_quantization",
-    "profiling_analysis",
-    "scheduler_policy_research",
-    "telemetry_provider"
-  ]);
-  const MOD_DELIVERY_MODELS = new Set([
-    "plugin_bundle",
-    "python_distribution",
-    "migration_scaffold",
-    "source_patch",
-    "source_toolkit"
+  const ACTIVE_MOD_KINDS = new Set([
+    "runtime_mod",
+    "connector_mod",
+    "tool_mod",
+    "control_plane"
   ]);
 
-  function isToolMod(item) {
-    return TOOL_MOD_ROLES.has(item?.system_role);
+  function taxonomyComponents(taxonomy) {
+    if (taxonomy?.schema_version !== "mod-taxonomy/v1" || !taxonomy.components) {
+      throw new Error("unsupported MOD taxonomy");
+    }
+    return taxonomy.components;
   }
 
-  function isWorkshopMod(item) {
+  function isWorkshopMod(item, taxonomy) {
     if (!item || item.public_surface === false) return false;
-    const repository = String(item.canonical_repository || "");
-    const verifiedBridge = item.artifact_type === "bridge"
-      && item.compatibility?.status === "verified"
-      && repository.startsWith("https://github.com/");
-    const organizationMod = (
-      ["runtime_component", "bridge"].includes(item.artifact_type) || isToolMod(item)
-    )
-      && item.repository_relationship === "organization_native"
-      && MOD_DELIVERY_MODELS.has(item.delivery_model)
-      && repository.startsWith("https://github.com/vLLM-HUST/");
-    return verifiedBridge || organizationMod;
+    const profile = taxonomyComponents(taxonomy)[item.id];
+    return Boolean(profile && ACTIVE_MOD_KINDS.has(profile.kind));
   }
 
-  function summarize(payload) {
+  function summarize(payload, taxonomy) {
     const components = Array.isArray(payload?.components) ? payload.components : [];
-    const mods = components.filter(isWorkshopMod);
+    const classified = components.filter((item) => isWorkshopMod(item, taxonomy));
+    const projects = new Map();
+    classified.forEach((item) => {
+      const projectId = item.catalog_project_id || item.id;
+      const current = projects.get(projectId);
+      if (!current || item.catalog_primary_component === item.id) {
+        projects.set(projectId, item);
+      }
+    });
+    const mods = [...projects.values()];
     return {
       mods,
       total: mods.length,
@@ -50,5 +44,5 @@
     };
   }
 
-  global.EcosystemCatalog = Object.freeze({ isToolMod, isWorkshopMod, summarize });
+  global.EcosystemCatalog = Object.freeze({ isWorkshopMod, summarize });
 })(window);
