@@ -1348,7 +1348,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "modelHeader.textContent = t('modelColumn');" in js_text
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
-    assert "assets/leaderboard.css?v=fixed-target-tristate-20261003" in html_text
+    assert "assets/leaderboard.css?v=v54-scope-20261010" in html_text
     assert "assets/leaderboard.js?v=data-freshness-20261009" in html_text
     assert ">Stable trend</button>" in html_text
     assert "trendViewCheckpoint: 'Stable trend'" in js_text
@@ -1963,8 +1963,7 @@ def test_leaderboard_renders_interactive_trend_chart() -> None:
     assert 'data-trend-axis="auto"' in html_text
     assert 'data-trend-axis="log"' in html_text
     assert 'data-trend-axis="linear"' in html_text
-    assert "fixed-target-tristate-20261003" in html_text
-    assert "fixed-target-tristate-20261003" in html_text
+    assert "v54-scope-20261010" in html_text
     assert 'id="toggle-trend-series"' in html_text
     assert 'id="trend-series-search"' in html_text
     assert 'id="trend-series-list"' in html_text
@@ -2800,7 +2799,7 @@ def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     assert "formatMetricState(variant, 'peak_mem_mb')" in js_text
     assert "metricMissing: '未采集'" in js_text
     assert "metricNotApplicable: '不适用'" in js_text
-    assert "fixed-target-tristate-20261003" in html_text
+    assert "v54-scope-20261010" in html_text
 
 
 def test_issues_page_exists_and_has_nav() -> None:
@@ -3254,6 +3253,7 @@ def test_fixed_target_registry_is_plural_and_consistent_sitewide() -> None:
     leaderboard = (root / "leaderboard.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
     renderer = (root / "assets" / "official-targets.js").read_text(encoding="utf-8")
+    styles = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
 
     active_surface = "\n".join(
         [leaderboard, site_js, renderer]
@@ -3267,8 +3267,27 @@ def test_fixed_target_registry_is_plural_and_consistent_sitewide() -> None:
     assert "固定目标注册表" in site_js
     assert "activeTargets" in renderer
     assert "baselineStacks" in renderer
-    assert "modelConfigs" in renderer
+    assert "dataset_program_v1.json" in renderer
+    assert "acceptanceTitle" in renderer
+    assert "modelConfigs" not in renderer
     assert "representative" not in renderer
+    assert 'body[data-page="leaderboard"] main .official-target-card-panel {' in styles
+    assert ".official-target-acceptance a {" in styles
+
+    program = json.loads(
+        (root / "data" / "dataset_program_v1.json").read_text(encoding="utf-8")
+    )
+    assert program["test_plan"] == {
+        "test_plan_version": "V5.4",
+        "contract_url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/docs/ACCEPTANCE_V5_4.md",
+        "mandatory_model": "Qwen/Qwen3.5-35B-A3B",
+        "formal_precision": "BF16",
+        "baseline_roles": ["B0", "B1"],
+        "optional_status": "E1, E2-G and E2-D are inactive (NOT_EXECUTED_OPTIONAL)",
+        "optional_status_zh": "E1、E2-G、E2-D 本版均不启用（NOT_EXECUTED_OPTIONAL）",
+        "evidence_boundary": "BF16 matches the measured B0 and Frontier precision. Formal V5.4 admission still requires the missing signed runtime identity and complete execution receipts.",
+        "evidence_boundary_zh": "BF16 已与 B0 和 Frontier 实测精度对齐；正式纳入 V5.4 仍须补齐签名运行时身份和完整执行回执。",
+    }
 
 
 def test_frontier_scripts_never_assume_two_chips_for_per_chip_metrics() -> None:
