@@ -774,10 +774,7 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert (
-        'data-taxonomy="./data/mod-taxonomy.json?v=mod-taxonomy-20261010-49"'
-        in PAGE
-    )
+    assert 'data-taxonomy="./data/mod-taxonomy.json?v=mod-taxonomy-20261010-49"' in PAGE
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
