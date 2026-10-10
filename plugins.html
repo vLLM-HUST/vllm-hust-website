@@ -669,7 +669,7 @@ It renders <code>PegaKVConnector</code> configuration and checks the operator-su
 <span class="lang-zh">一个 materializer 不代表生态兼容已经完成</span>
 </strong>
 <p>
-<span class="lang-en">The historical core-owned Bundle prototype validated and snapshotted descriptors before implementation imports.
+<span class="lang-en">The earlier core-owned Bundle prototype validated and snapshotted descriptors before implementation imports.
 The first experimental materializer supports one exclusive scheduler victim-selector provider.
 Zero typed providers retain legacy auto-discovery; an explicit victim_selector_plugin must select exactly one legacy provider, and its discovery, load, factory, or protocol failures fail closed.
 Typed ambiguity and typed import or protocol failures also fail closed.
@@ -686,7 +686,7 @@ Typed stat loggers fan out with distinct legacy providers and deduplicate a clas
 Their selected import, type, and initialization failures fail closed.
 The typed KV paths remain experimental until real Mooncake and PegaFlow equivalence and rollback gates pass.
 Platform, operator, and model-runner materializers remain pending.</span>
-<span class="lang-zh">历史 core-owned Bundle 原型曾在实现 import 前校验并冻结 descriptor。
+<span class="lang-zh">早期 core-owned Bundle 原型曾在实现 import 前校验并冻结 descriptor。
 首个实验性 materializer 支持一个独占的 scheduler victim-selector provider。
 没有 typed provider 时保留 legacy 自动发现；显式 victim_selector_plugin 必须唯一选择一个 legacy provider，其发现、加载、工厂或协议失败均 fail closed；typed 歧义、import 或协议失败同样 fail closed。
 KV 领域会在不 import 实现的前提下校验精确的 scheduler、worker 与 API-plane telemetry 组件、显式有序组合，以及声明的 HMA、piecewise 与 cache-layout 能力。
