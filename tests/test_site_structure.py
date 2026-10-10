@@ -956,7 +956,7 @@ def test_scheduled_site_data_refreshes_are_self_healing() -> None:
 def test_runtime_data_consumers_revalidate_cached_snapshots() -> None:
     root = Path(__file__).resolve().parents[1]
     assets = (
-        "agent-dataset-qualifications.js",
+        "agent-dataset-results.js",
         "dataset-validation.js",
         "leaderboard.js",
         "leaderboard-runs.js",
