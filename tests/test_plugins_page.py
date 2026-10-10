@@ -168,9 +168,13 @@ def test_request_controller_is_an_external_ecpa_control_plane() -> None:
         "latency_slo",
         "lifecycle_control",
     ]
+    assert component["maintainers"] == ["yancanmao"]
+    assert component["maintainer_profiles"] == [
+        {"login": "yancanmao", "name": "Mao Yancan"}
+    ]
     assert (
         WORKSHOP_METADATA["plugins"][component["id"]]["maintainers"][0]["login"]
-        == "ShuhaoZhangTony"
+        == "yancanmao"
     )
     assert (
         '"request-throttling-controller": "org.vllm-hust.request-throttling-controller"'
