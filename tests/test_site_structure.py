@@ -3247,6 +3247,29 @@ def test_leaderboard_has_official_target_card_markup() -> None:
         )
 
 
+def test_fixed_target_registry_is_plural_and_consistent_sitewide() -> None:
+    """No page may present one registry row as the universal official target."""
+    root = Path(__file__).resolve().parents[1]
+    leaderboard = (root / "leaderboard.html").read_text(encoding="utf-8")
+    site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
+    renderer = (root / "assets" / "official-targets.js").read_text(encoding="utf-8")
+
+    active_surface = "\n".join(
+        [leaderboard, site_js, renderer]
+        + [path.read_text(encoding="utf-8") for path in root.glob("*.html")]
+    )
+    assert "Official Fixed Target v1" not in active_surface
+    assert "官方固定靶" not in active_surface
+    assert "Fixed-target results" not in active_surface
+    assert "固定目标结果" not in active_surface
+    assert "Fixed-target registry" in site_js
+    assert "固定目标注册表" in site_js
+    assert "activeTargets" in renderer
+    assert "baselineStacks" in renderer
+    assert "modelConfigs" in renderer
+    assert "representative" not in renderer
+
+
 def test_official_target_data_matches_schema() -> None:
     root = Path(__file__).resolve().parents[1]
     data = json.loads(
