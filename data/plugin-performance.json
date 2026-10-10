@@ -121,8 +121,8 @@
         "launch_acceptance": "manager-verified",
         "configuration_path": "manager-standard",
         "analysis_integration": "external-harness",
-        "note_zh": "Qwen3.5 统一配置已通过 ECPA 启动验收；历史 Qwen2.5 结果继续保留。",
-        "note_en": "The unified Qwen3.5 configuration passed ECPA launch acceptance; the historical Qwen2.5 result remains available."
+        "note_zh": "Qwen3.5 统一配置已通过 ECPA 启动验收；Qwen2.5-7B-Instruct M2 controller 配置结果单独保留。",
+        "note_en": "The unified Qwen3.5 configuration passed ECPA launch acceptance; the Qwen2.5-7B-Instruct M2 controller result remains available under its own configuration."
       },
       "default_observation_id": "kv-materialization-arrival-control:qwen35-frontier",
       "observations": [
@@ -132,7 +132,7 @@
           "series_id": "swe-unified-kv-materialization-arrival-control-20260928"
         },
         {
-          "id": "kv-materialization-arrival-control:qwen25-historical",
+          "id": "kv-materialization-arrival-control:qwen25-7b-m2-controller",
           "kind": "published-comparisons",
           "comparisons": [
         {
@@ -244,8 +244,8 @@
         "launch_acceptance": "manager-verified",
         "configuration_path": "manager-standard",
         "analysis_integration": "external-harness",
-        "note_zh": "Qwen3.5 统一配置已通过 ECPA 启动验收；历史 Qwen2.5-Coder 公开结果继续保留。",
-        "note_en": "The unified Qwen3.5 configuration passed ECPA launch acceptance; the historical Qwen2.5-Coder public result remains available."
+        "note_zh": "Qwen3.5 统一配置已通过 ECPA 启动验收；Qwen2.5-Coder-14B 长上下文 Ascend 910B2 配置结果单独保留。",
+        "note_en": "The unified Qwen3.5 configuration passed ECPA launch acceptance; the Qwen2.5-Coder-14B long-context Ascend 910B2 result remains available under its own configuration."
       },
       "default_observation_id": "kvcompress-ascend:qwen35-frontier",
       "observations": [
@@ -255,7 +255,7 @@
           "series_id": "swe-unified-kvcompress-ascend-20260928"
         },
         {
-          "id": "kvcompress-ascend:qwen25-coder-historical",
+          "id": "kvcompress-ascend:qwen25-coder-14b-long-context-910b2",
           "kind": "published-comparisons",
           "url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust/blob/e4a4864/docs/resuts.md",
           "comparisons": [

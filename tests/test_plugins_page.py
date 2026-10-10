@@ -964,7 +964,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=project-grouping-20261009" in PAGE
-    assert "plugins-page.js?v=data-freshness-20261009" in PAGE
+    assert "plugins-page.js?v=configuration-scope-20261010" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1555,10 +1555,23 @@ def test_performance_defaults_match_catalog_models_and_evidence_sources() -> Non
     assert "not scored on this card" in mooncake["public_effect_en"]
     assert "不会归入此卡片的性能分数" in mooncake["public_effect_zh"]
 
+    observation_ids = {
+        observation["id"]
+        for entry in PLUGIN_PERFORMANCE["entries"]
+        for observation in entry["observations"]
+    }
+    assert (
+        "kv-materialization-arrival-control:qwen25-7b-m2-controller" in observation_ids
+    )
+    assert "kvcompress-ascend:qwen25-coder-14b-long-context-910b2" in observation_ids
+    assert not any(
+        observation_id.endswith("-historical") for observation_id in observation_ids
+    )
+
 
 def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -> None:
     assert "plugin-performance.js?v=ecpa-final-20261009" in PAGE
-    assert "plugin-performance.json?v=ecpa-final-20261009" in SCRIPT
+    assert "plugin-performance.json?v=configuration-scope-20261010" in SCRIPT
     assert "leaderboard_frontier.json?v=ecpa-final-20261009" in SCRIPT
     assert '{ cache: "no-cache" }' in SCRIPT
     assert "benchmark-settings-20260929" not in SCRIPT

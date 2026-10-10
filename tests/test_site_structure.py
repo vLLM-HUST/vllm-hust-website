@@ -53,6 +53,15 @@ def test_leaderboard_names_exact_settings_without_frontier_jargon() -> None:
     assert 'aria-label="Benchmark settings"' in page
     assert "Benchmark settings" in runs_script
     assert "实验设定" in runs_script
+    assert "Preserved evidence" in runs_script
+    assert "保留证据" in runs_script
+    assert "Historical evidence" not in runs_script
+    assert "preserved-evidence-20261010" in page
+    assert "Setting-specific matched baseline" in settings_script
+    assert "当前设定同配置基线" in settings_script
+    assert "Fixed official baseline" not in settings_script
+    assert "固定官方基线" not in settings_script
+    assert "setting-baseline-scope-20261010" in page
     assert "Best trade-off points only" in settings_script
     assert "仅显示最佳权衡点" in settings_script
     assert "frontierOnly:false" in settings_script
@@ -715,6 +724,9 @@ def test_hard_constraints_baseline_block_is_rendered() -> None:
 
     assert "hardConstraintsBaselineLabel" in js_text
     assert "hardConstraintsBaselineValue" in js_text
+    assert "Version-specific vLLM 0.18.0 + vLLM-Ascend v0.18.0" in js_text
+    assert "版本化 vLLM 0.18.0 + vLLM-Ascend v0.18.0" in js_text
+    assert "Official vLLM 0.18.0 + vllm-ascend v0.18.0" not in js_text
     assert '<div class="hard-constraints-baseline">' in js_text
     assert ".hard-constraints-baseline {" in css_text
 
@@ -957,17 +969,17 @@ def test_runtime_data_consumers_revalidate_cached_snapshots() -> None:
         text = (root / "assets" / name).read_text(encoding="utf-8")
         assert re.search(r"cache\s*:\s*['\"]no-cache", text), name
 
-    pages = (
-        "leaderboard.html",
-        "leaderboard-runs.html",
-        "dataset-validation.html",
-        "members.html",
-        "news.html",
-        "plugins.html",
-    )
-    for name in pages:
+    page_cache_keys = {
+        "leaderboard.html": "version-scoped-baseline-20261010",
+        "leaderboard-runs.html": "preserved-evidence-20261010",
+        "dataset-validation.html": "data-freshness-20261009",
+        "members.html": "data-freshness-20261009",
+        "news.html": "data-freshness-20261009",
+        "plugins.html": "configuration-scope-20261010",
+    }
+    for name, cache_key in page_cache_keys.items():
         text = (root / name).read_text(encoding="utf-8")
-        assert "data-freshness-20261009" in text, name
+        assert cache_key in text, name
 
 
 def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
@@ -1349,7 +1361,7 @@ def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> Non
     assert "./data/last_updated.json?v=" in js_text
     assert "timestamp = await window.HFDataLoader.getLastUpdated();" in js_text
     assert "assets/leaderboard.css?v=v54-scope-20261010" in html_text
-    assert "assets/leaderboard.js?v=data-freshness-20261009" in html_text
+    assert "assets/leaderboard.js?v=version-scoped-baseline-20261010" in html_text
     assert ">Stable trend</button>" in html_text
     assert "trendViewCheckpoint: 'Stable trend'" in js_text
     assert "trendViewCheckpoint: '稳定趋势'" in js_text
@@ -3288,6 +3300,11 @@ def test_fixed_target_registry_is_plural_and_consistent_sitewide() -> None:
         "evidence_boundary": "BF16 matches the measured B0 and Frontier precision. Formal V5.4 admission still requires the missing signed runtime identity and complete execution receipts.",
         "evidence_boundary_zh": "BF16 已与 B0 和 Frontier 实测精度对齐；正式纳入 V5.4 仍须补齐签名运行时身份和完整执行回执。",
     }
+    assert all(
+        not material["path"].startswith("/")
+        for dataset in program["primary_datasets"]
+        for material in dataset["readiness"]["observed_materials"]
+    )
 
 
 def test_frontier_scripts_never_assume_two_chips_for_per_chip_metrics() -> None:
