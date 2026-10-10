@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import importlib.util
 import json
 import re
@@ -3268,6 +3269,29 @@ def test_fixed_target_registry_is_plural_and_consistent_sitewide() -> None:
     assert "baselineStacks" in renderer
     assert "modelConfigs" in renderer
     assert "representative" not in renderer
+
+
+def test_frontier_scripts_never_assume_two_chips_for_per_chip_metrics() -> None:
+    root = Path(__file__).resolve().parents[1]
+    scripts = [
+        root / "scripts" / "verify_leaderboard_frontier_native27_browser.py",
+        root / "scripts" / "render_swe_frontier_curves.py",
+        root / "scripts" / "render_swe_w8a8_curves.py",
+    ]
+    for script in scripts:
+        text = script.read_text(encoding="utf-8")
+        assert "accelerator_count" in text
+        tree = ast.parse(text)
+        hard_coded = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.BinOp)
+            and isinstance(node.op, ast.Div)
+            and isinstance(node.right, ast.Constant)
+            and node.right.value == 2
+            and "output_tps" in ast.unparse(node.left)
+        ]
+        assert not hard_coded, f"hard-coded two-chip divisor in {script.name}"
 
 
 def test_official_target_data_matches_schema() -> None:
