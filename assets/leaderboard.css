@@ -2640,6 +2640,17 @@ body[data-page="leaderboard"] .summary-metric strong {
     color: #78350f;
 }
 
+.official-target-acceptance {
+    border-radius: 8px;
+}
+
+.official-target-acceptance a {
+    color: inherit;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .official-target-banner strong {
     font-size: 0.98rem;
 }
@@ -2671,7 +2682,7 @@ body[data-page="leaderboard"] .summary-metric strong {
 }
 
 /* Dark-mode / contrast overrides for the fixed-target card */
-body[data-page="leaderboard"] .official-target-card-panel {
+body[data-page="leaderboard"] main .official-target-card-panel {
     border-color: rgba(125, 211, 252, 0.34);
     background:
         radial-gradient(circle at 12% 0%, rgba(129, 140, 248, 0.28), transparent 30%),
@@ -2680,11 +2691,11 @@ body[data-page="leaderboard"] .official-target-card-panel {
     box-shadow: 0 18px 54px rgba(0, 0, 0, 0.34);
 }
 
-body[data-page="leaderboard"] .official-target-card-panel h2 {
+body[data-page="leaderboard"] main .official-target-card-panel h2 {
     color: #f8fbff;
 }
 
-body[data-page="leaderboard"] .official-target-desc {
+body[data-page="leaderboard"] main .official-target-card-panel .official-target-desc {
     color: rgba(226, 242, 255, 0.82);
 }
 
