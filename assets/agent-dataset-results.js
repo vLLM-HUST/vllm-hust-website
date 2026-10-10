@@ -1,10 +1,10 @@
 (function () {
-    const DEFAULT_DATA_URL = './data/agent_dataset_qualifications.json';
+    const DEFAULT_DATA_URL = './data/agent_dataset_results.json';
     const TEXT = {
         en: {
             kicker: 'Tool / Agent datasets',
             title: 'Agent dataset results',
-            description: 'Complete campaigns are shown first; early path qualifications remain separately identified.',
+            description: 'Complete campaigns with aggregate dataset scores and immutable evidence.',
             loading: 'Loading agent dataset results...',
             unavailable: 'Agent dataset results unavailable',
             loadError: 'The result document could not be loaded.',
@@ -13,17 +13,16 @@
             progress: 'Progress',
             result: 'Result',
             evidence: 'Evidence',
-            passed: 'Single-case qualification passed',
             completed: 'Complete campaign',
             executed: 'tasks executed',
             resolved: 'resolved among executed',
             viewEvidence: 'View evidence',
-            caveat: 'Complete campaigns are the current dataset results. Qualification rows are retained startup evidence, not current progress or aggregate scores.',
+            caveat: 'Superseded startup checks are excluded from this current-results table.',
         },
         zh: {
             kicker: '工具 / Agent 数据集',
             title: 'Agent 数据集结果',
-            description: '完整 campaign 优先展示；早期链路 qualification 单独标明。',
+            description: '展示完整 campaign、数据集聚合成绩与不可变证据。',
             loading: '正在加载 Agent 数据集结果...',
             unavailable: 'Agent 数据集结果不可用',
             loadError: '无法加载结果文档。',
@@ -32,12 +31,11 @@
             progress: '进度',
             result: '结果',
             evidence: '证据',
-            passed: '单题 qualification 通过',
             completed: '完整 campaign',
             executed: '题已执行',
             resolved: '已执行题中解决',
             viewEvidence: '查看证据',
-            caveat: '完整 campaign 是当前数据集结果；qualification 行仅保留为启动证据，不代表当前进度或聚合成绩。',
+            caveat: '已被取代的启动检查不进入当前结果表。',
         },
     };
 
@@ -52,23 +50,18 @@
     }
 
     function normalize(data) {
-        if (!data || data.contract_version !== 'agent-dataset-results-v2' || !Array.isArray(data.results)) {
+        if (!data || data.contract_version !== 'agent-dataset-results-v1' || !Array.isArray(data.campaigns)) {
             throw new Error('Unsupported agent dataset results contract');
         }
         const ids = new Set();
-        data.results.forEach((item) => {
+        data.campaigns.forEach((item) => {
             if (!item || typeof item.id !== 'string' || !item.id || ids.has(item.id)) throw new Error('Invalid or duplicate result id');
-            if (!['campaign', 'qualification'].includes(item.record_kind)) throw new Error('Invalid result kind');
             if (!Number.isInteger(item.executed_tasks) || !Number.isInteger(item.total_tasks) || item.executed_tasks < 0 || item.executed_tasks > item.total_tasks) throw new Error('Invalid result progress');
             if (!Number.isInteger(item.resolved_tasks) || item.resolved_tasks < 0 || item.resolved_tasks > item.executed_tasks) throw new Error('Invalid resolved task count');
-            if (item.record_kind === 'campaign' && item.executed_tasks !== item.total_tasks) throw new Error('Incomplete campaign result');
+            if (item.executed_tasks !== item.total_tasks) throw new Error('Incomplete campaign result');
             const expectedRate = item.executed_tasks ? item.resolved_tasks / item.executed_tasks : 0;
             if (typeof item.resolution_rate !== 'number' || Math.abs(item.resolution_rate - expectedRate) > 1e-12) throw new Error('Invalid resolution rate');
             ids.add(item.id);
-        });
-        const campaignIds = new Set(data.results.filter((item) => item.record_kind === 'campaign').map((item) => item.id));
-        data.results.forEach((item) => {
-            if (item.superseded_by && !campaignIds.has(item.superseded_by)) throw new Error('Invalid superseding campaign');
         });
         return data;
     }
@@ -91,12 +84,12 @@
     function render() {
         renderText();
         if (!state) return;
-        $('agent-qualification-body').innerHTML = state.results.map((item) => `
+        $('agent-qualification-body').innerHTML = state.campaigns.map((item) => `
             <tr>
                 <td data-label="${escapeHtml(t('dataset'))}"><span class="agent-qualification-name">${escapeHtml(item.dataset)}</span><span class="agent-qualification-meta">${escapeHtml(localized(item, 'owner'))}</span></td>
                 <td data-label="${escapeHtml(t('configuration'))}"><span class="agent-qualification-value">${escapeHtml(item.model)}</span><span class="agent-qualification-meta">${escapeHtml(item.configuration)}</span></td>
                 <td data-label="${escapeHtml(t('progress'))}"><span class="agent-qualification-value">${escapeHtml(`${item.executed_tasks} / ${item.total_tasks}`)}</span><span class="agent-qualification-note">${escapeHtml(`${item.executed_tasks} ${t('executed')}`)}</span></td>
-                <td data-label="${escapeHtml(t('result'))}"><span class="agent-qualification-status">${escapeHtml(t(item.record_kind === 'campaign' ? 'completed' : 'passed'))}</span><span class="agent-qualification-value">${escapeHtml(`${item.resolved_tasks} / ${item.executed_tasks}${item.record_kind === 'campaign' ? ` (${(item.resolution_rate * 100).toFixed(1)}%)` : ''}`)}</span><span class="agent-qualification-note">${escapeHtml(localized(item, 'caveat'))}</span></td>
+                <td data-label="${escapeHtml(t('result'))}"><span class="agent-qualification-status">${escapeHtml(t('completed'))}</span><span class="agent-qualification-value">${escapeHtml(`${item.resolved_tasks} / ${item.executed_tasks} (${(item.resolution_rate * 100).toFixed(1)}%)`)}</span><span class="agent-qualification-note">${escapeHtml(localized(item, 'caveat'))}</span></td>
                 <td data-label="${escapeHtml(t('evidence'))}"><a class="agent-qualification-link" href="${escapeHtml(item.evidence_url)}">${escapeHtml(t('viewEvidence'))}</a><span class="agent-qualification-meta">${escapeHtml(item.evidence_label)}</span></td>
             </tr>`).join('');
     }
@@ -121,6 +114,6 @@
         window.addEventListener('vllm-hust:langchange', render);
     }
 
-    window.__agentDatasetQualificationsTest = { normalize };
+    window.__agentDatasetResultsTest = { normalize };
     document.addEventListener('DOMContentLoaded', init);
 })();
