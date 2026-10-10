@@ -24,6 +24,9 @@
     "core-attention-boundary": {"kind":"runtime_mod","capability":"operators_attention","lifecycle":"implemented_restricted","evidence":"runtime_effective_no_causal_attribution"},
     "adm": {"kind":"runtime_mod","capability":"parallel_communication","lifecycle":"implemented_restricted","evidence":"topology_limited"},
     "opfuse": {"kind":"runtime_mod","capability":"execution_optimization","lifecycle":"research","evidence":"host_integration_pending"},
+    "stateaxis-automatic-prefix-cache": {"kind":"runtime_mod","capability":"kv_management","lifecycle":"qualification_pending","evidence":"activation_pending"},
+    "stateaxis-async-kv-transfer": {"kind":"runtime_mod","capability":"kv_management","lifecycle":"qualification_pending","evidence":"activation_pending"},
+    "stateaxis-pipelined-weight-loading": {"kind":"runtime_mod","capability":"execution_optimization","lifecycle":"qualification_pending","evidence":"activation_pending"},
     "gdn-state-codec": {"kind":"runtime_mod","capability":"kv_management","lifecycle":"implemented_restricted","evidence":"measured_inconclusive"},
 
     "mooncake-vllm-connectors": {"kind":"connector_mod","capability":"kv_management","lifecycle":"implemented","evidence":"functionally_validated"},

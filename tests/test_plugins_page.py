@@ -888,6 +888,38 @@ def test_gdn_state_codec_publishes_ecpa_activation_and_negative_result() -> None
     assert "Qixin-Gaoke" not in json.dumps(codec)
 
 
+def test_public_stateaxis_mod_repositories_are_visible_with_scoped_evidence() -> None:
+    inspect_only_ids = {
+        "stateaxis-automatic-prefix-cache",
+        "stateaxis-async-kv-transfer",
+        "stateaxis-pipelined-weight-loading",
+    }
+    visible_ids = inspect_only_ids | {"gdn-state-codec"}
+    portfolio_by_name = {item["name"]: item for item in PORTFOLIO["repositories"]}
+
+    for component_id in visible_ids:
+        component = by_id(component_id)
+        assert component.get("public_surface", True) is not False
+        assert component["canonical_repository"] == (
+            f"https://github.com/vLLM-HUST/{component_id}"
+        )
+        assert component["advisors"] == []
+        assert component_id in MOD_TAXONOMY["components"]
+        assert component_id in WORKSHOP_METADATA["plugins"]
+        assert component_id in WORKLOAD_NAVIGATION["plugins"]
+        assert portfolio_by_name[component_id]["component_ids"] == [component_id]
+        assert "Qixin-Gaoke" not in json.dumps(component)
+
+    for component_id in inspect_only_ids:
+        component = by_id(component_id)
+        assert component["compatibility"]["status"] == "inspect_only"
+        assert component["public_effect_status"] == "preview"
+        assert component["evidence_level"] == "source_evidence_only"
+        assert "not inherited" in component["public_effect_en"] or (
+            "does not inherit" in component["public_effect_en"]
+        )
+
+
 def test_visible_ecpa_mods_publish_manifest03_and_scoped_effects() -> None:
     manifest03_mods = {
         "bidkv",
@@ -1090,7 +1122,7 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 57
+    assert len(PORTFOLIO["repositories"]) == 61
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "extension-manager",
@@ -1478,7 +1510,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 31
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 34
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE

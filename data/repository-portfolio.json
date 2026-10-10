@@ -91,6 +91,17 @@
       "public_surface": true
     },
     {
+      "name": "gdn-state-codec",
+      "url": "https://github.com/vLLM-HUST/gdn-state-codec",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "runtime_component",
+      "relation_to_runtime": "extends_runtime_behavior",
+      "lifecycle": "experimental",
+      "canonical_artifacts": ["Manifest 0.3 GDN state-codec MOD", "Qwen3.5 AgentX negative evidence"],
+      "component_ids": ["gdn-state-codec"],
+      "public_surface": true
+    },
+    {
       "name": "fcs-domestic-chip-llm-recsys",
       "url": "https://github.com/vLLM-HUST/fcs-domestic-chip-llm-recsys",
       "portfolio_domain": "applications_research",
@@ -627,6 +638,39 @@
       "lifecycle": "incubating",
       "canonical_artifacts": ["Metal platform profile", "Apple Silicon native runtime integration"],
       "component_ids": ["vllm-metal-hust"],
+      "public_surface": true
+    },
+    {
+      "name": "stateaxis-automatic-prefix-cache",
+      "url": "https://github.com/vLLM-HUST/stateaxis-automatic-prefix-cache",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "runtime_component",
+      "relation_to_runtime": "extends_runtime_behavior",
+      "lifecycle": "experimental",
+      "canonical_artifacts": ["Manifest 0.3 import-only MOD descriptor", "frozen prefix-cache source evidence"],
+      "component_ids": ["stateaxis-automatic-prefix-cache"],
+      "public_surface": true
+    },
+    {
+      "name": "stateaxis-async-kv-transfer",
+      "url": "https://github.com/vLLM-HUST/stateaxis-async-kv-transfer",
+      "portfolio_domain": "kv_state_data_path",
+      "repository_role": "runtime_component",
+      "relation_to_runtime": "extends_runtime_behavior",
+      "lifecycle": "experimental",
+      "canonical_artifacts": ["Manifest 0.3 import-only MOD descriptor", "frozen asynchronous-transfer source evidence"],
+      "component_ids": ["stateaxis-async-kv-transfer"],
+      "public_surface": true
+    },
+    {
+      "name": "stateaxis-pipelined-weight-loading",
+      "url": "https://github.com/vLLM-HUST/stateaxis-pipelined-weight-loading",
+      "portfolio_domain": "runtime_platform",
+      "repository_role": "runtime_component",
+      "relation_to_runtime": "extends_runtime_behavior",
+      "lifecycle": "experimental",
+      "canonical_artifacts": ["Manifest 0.3 import-only MOD descriptor", "frozen pipelined-loading source evidence"],
+      "component_ids": ["stateaxis-pipelined-weight-loading"],
       "public_surface": true
     },
     {
