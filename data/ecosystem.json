@@ -2117,6 +2117,61 @@
       }
     },
     {
+      "id": "request-throttling-controller",
+      "public_surface": true,
+      "name": "Request Throttling Controller",
+      "name_en": "Request Throttling Controller",
+      "name_zh": "请求节流控制器",
+      "artifact_type": "bridge",
+      "system_role": "request_admission_control_plane",
+      "integration_contracts": [
+        "vllm_hust.extension_manifest.v0.3",
+        "request-throttling-controller.migration-identity.v1"
+      ],
+      "integration_surfaces": [
+        "vllm_hust.extension_bundles",
+        "vllm_hust_ext.providers",
+        "OpenAI-compatible HTTP backend",
+        "/migration-identity"
+      ],
+      "execution_planes": ["api", "control_plane"],
+      "deployment_topology": "separate_application",
+      "delivery_model": "plugin_bundle",
+      "ownership": "organization_maintained",
+      "maintainers": ["ShuhaoZhangTony"],
+      "maintainer_profiles": [
+        {"login": "ShuhaoZhangTony", "name": "Shuhao Zhang (Tony)"}
+      ],
+      "advisors": [],
+      "repository_relationship": "organization_native",
+      "maturity": "experimental",
+      "canonical_repository": "https://github.com/vLLM-HUST/request-throttling-controller",
+      "upstream_repository": "https://github.com/ThunderAgent-org/ThunderAgent",
+      "summary_en": "External Router/Controller for program-aware admission and request scheduling. Its stable Manifest 0.3 Bundle lets ECPA discover and validate the service, record enablement intent, reject another exclusive program-admission controller, and render an operator-owned launch plan without pretending to patch vLLM in process.",
+      "summary_zh": "面向 program-aware 准入与请求调度的外部 Router/Controller。稳定的 Manifest 0.3 Bundle 允许 ECPA 发现和检查服务、记录启用意图、拒绝另一个独占 program-admission 控制器，并渲染由 operator 执行的启动计划；它不会伪装成进程内 vLLM patch。",
+      "public_effect_en": "A pinned 192-concurrency, no-keepalive run reported 86.025 steps/min for the thin adapter versus 65.625 for plain vLLM (1.31x) and 91.05 for the official path (94.5%), with zero recorded errors. This is one narrow historical cell, not a general performance guarantee or current-host ECPA NPU qualification.",
+      "public_effect_zh": "固定版本的 192 并发、no-keepalive 单点实验记录为：薄适配 86.025 steps/min，普通 vLLM 65.625（1.31 倍），官方路径 91.05（达到 94.5%），且记录错误数为零。这只是一个窄范围历史实验单元，不代表普遍性能保证，也不等同于当前宿主上的 ECPA NPU 资格。",
+      "public_effect_status": "beneficial",
+      "public_effect_url": "https://github.com/vLLM-HUST/request-throttling-controller/blob/00a92c0d6fab20413cef72fed45ba9cf93062e4b/docs/THIN_PERFORMANCE_PASS_20261010.md",
+      "compatibility": {
+        "status": "external_service",
+        "host": "OpenAI-compatible vLLM backend plus an external operator",
+        "versions": [
+          "Controller 0.1.0 @ 00a92c0d6fab20413cef72fed45ba9cf93062e4b",
+          "ECPA Manifest 0.3 / Manager @ b724e1abb5fa3389e508edac20b762e398298405",
+          "ThunderAgent source identity @ 7ddc8610270e56d3b109eed8796b3a4360fc67c9"
+        ],
+        "platforms": [
+          "CPU clean-wheel and ECPA lifecycle contract",
+          "Ascend historical single-cell controller evidence; current native ECPA NPU qualification pending"
+        ],
+        "python": [">=3.11"],
+        "requirements_en": "An external operator owns service start, stop, upgrade and rollback. The current controller accepts exactly one backend. ECPA enablement, a rendered plan, environment variables or a successful health check do not establish runtime effectiveness; live effectiveness requires evidence from the running controller, and current-host native NPU qualification remains pending.",
+        "requirements_zh": "服务启动、停止、升级和回滚由外部 operator 负责；当前控制器只接受一个后端。ECPA enable、渲染计划、环境变量或健康检查成功都不能证明 runtime_effective；运行生效必须由实际控制器提供证据，当前宿主的原生 NPU 资格仍待完成。"
+      },
+      "evidence_level": "integration_tested"
+    },
+    {
       "id": "core-attention-boundary",
       "public_surface": true,
       "name": "Core Attention Boundary",

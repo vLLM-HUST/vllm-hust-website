@@ -104,6 +104,7 @@
     "request-lifecycle-profiler": ["latency_slo", "high_concurrency"],
     "kv-transfer-observability-migration": ["lifecycle_control", "memory_kv_pressure"],
     "clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
+    "request-throttling-controller": ["high_concurrency", "latency_slo", "lifecycle_control"],
     "tricard-clm-lifecycle": ["lifecycle_control", "repeated_prefix_agent"],
     "quality-bounded-inference": ["latency_slo", "high_concurrency"],
     "llm-serving-cost-pricing-model": ["profiling_analysis"],
