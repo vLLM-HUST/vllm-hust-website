@@ -5,7 +5,7 @@
     "engine": "vLLM + vLLM-Ascend",
     "vllm_version": "0.18.0",
     "vllm_ascend_version": "0.18.0",
-    "comparison_policy": "Only a matched model, workload, hardware, and runtime-contract measurement may represent this baseline. Other Native configurations remain visible but are not the official baseline.",
+    "comparison_policy": "Only a matched model, workload, hardware, and runtime-contract measurement may represent this setting-specific baseline. Other Native configurations remain visible under their own settings.",
     "measurement_note": "Qwen3.5 requires the disclosed text-only compatibility backports on the 0.18 release line. The measured baseline uses effective PIECEWISE ACL Graph mode and the runtime's available 23.37 GiB/chip KV capacity; it is a visible runtime reference, not a matched comparator for the separate 0.25 Native configurations."
   },
   "cohorts": [
