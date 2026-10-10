@@ -6,7 +6,7 @@
   },
   "quickstart": {
     "title_zh": "Quick Start",
-    "description_zh": "请勿用历史 PyPI 包安装当前服务栈；先查阅维护中的部署指南，选择经过验证的 core/plugin/镜像组合。",
+    "description_zh": "请勿用下方 PyPI 包安装当前服务栈，它属于不同的版本组合；先查阅维护中的部署指南，选择经过验证的 core/plugin/镜像组合。",
     "install_command": "git clone https://github.com/vLLM-HUST/vllm-hust-dev-hub.git",
     "runbook_url": "https://github.com/vLLM-HUST/vllm-hust-dev-hub/blob/main/docs/sage-mate-production-runtime.md"
   },
