@@ -300,7 +300,7 @@ def main():
             page.locator("#column-cancel").click()
             assert page.locator(".run-row").count() > 0
             assert all(
-                ("Historical" in text or "历史" in text)
+                ("Preserved" in text or "保留" in text)
                 for text in page.locator(".run-id").all_text_contents()
             )
             page.locator("#runs-reset").click()
