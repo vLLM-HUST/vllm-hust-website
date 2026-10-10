@@ -268,9 +268,9 @@ current-State TP2 points have also become dominated and are archived with their 
 All thirteen archived27B BetterScale observations retain strict dominance witnesses. Do not
 resurrect them during an additive import. Fixed-configuration `concurrency_series` still
 distinguishes E/R and source-v2/v4, although the visible MOD frontier crosses configurations. The
-TP2 C16 Serving Plan remains a smaller two-card option; TP4 C48 is added, not assembled from
-separately best metrics. Its business ledger counts all four cards and matched completed requests,
-not the chart's streamed partial output. Zero timed active partial evictions is not a
-partial-recovery speedup claim. The separate forced four-rank byte gate and excluded pinned-host
-failures remain explicit. Source-v4 adds bounded unused-host-slab reclamation on allocation OOM;
-never relabel earlier v2 observations as v4 reruns.
+October10 follow-up removes the TP2 C16 Serving Plan from display while preserving its evidence; TP4
+C48 is the sole27B plan, not assembled from separately best metrics. Its business ledger counts all
+four cards and matched completed requests, not the chart's streamed partial output. Zero timed
+active partial evictions is not a partial-recovery speedup claim. The separate forced four-rank byte
+gate and excluded pinned-host failures remain explicit. Source-v4 adds bounded unused-host-slab
+reclamation on allocation OOM; never relabel earlier v2 observations as v4 reruns.

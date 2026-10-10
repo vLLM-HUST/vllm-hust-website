@@ -14,7 +14,8 @@ test('Dense27 TP4 sweeps all requested shapes with whole-run qualification and a
   assert.deepEqual(evidence.runs.find(r=>r.point_id===p.id).configuration,p.configuration);
  }
  const best=points.reduce((a,b)=>a.metrics.output_tps>b.metrics.output_tps?a:b);
- const plan=require('../data/serving-plans.json').plans.find(p=>p.model==='Qwen3.8-27B'&&p.chips===4);
+ const modelPlans=require('../data/serving-plans.json').plans.filter(p=>p.model==='Qwen3.8-27B');
+ assert.equal(modelPlans.length,1);const plan=modelPlans[0];assert.equal(plan.chips,4);
  assert.equal(plan.runId,best.evidence.run_ids[0]);assert.equal(plan.config.tensor_parallel_size,4);
  const accounting=JSON.parse(fs.readFileSync(path.join(root,plan.accountingEvidence)));
  assert.equal(accounting.chips,4);assert.deepEqual(plan.accounting,accounting);
