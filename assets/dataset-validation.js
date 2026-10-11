@@ -82,8 +82,12 @@
         if (!data.designation || data.designation.id !== 'pujiang-specified-dataset-scope' || data.designation.scope_status !== 'names-only') {
             throw new Error('Dataset program lacks the Pujiang designation');
         }
-        if (!data.test_plan || data.test_plan.test_plan_version !== 'V5.4' || data.test_plan.mandatory_model !== 'Qwen/Qwen3.5-35B-A3B' || data.test_plan.formal_precision !== 'BF16' || data.test_plan.baseline_roles?.join('|') !== 'B0|B1' || typeof data.test_plan.contract_url !== 'string' || !data.test_plan.contract_url.startsWith('https://') || typeof data.test_plan.evidence_boundary !== 'string' || typeof data.test_plan.evidence_boundary_zh !== 'string') {
-            throw new Error('Dataset program lacks the V5.4 acceptance contract');
+        if (!data.test_plan || data.test_plan.test_plan_version !== 'V5.5' || data.test_plan.mandatory_model !== 'Qwen/Qwen3.5-35B-A3B' || data.test_plan.formal_precision !== 'BF16' || data.test_plan.baseline_roles?.join('|') !== 'B0|B1' || typeof data.test_plan.contract_url !== 'string' || !data.test_plan.contract_url.startsWith('https://') || typeof data.test_plan.evidence_boundary !== 'string' || typeof data.test_plan.evidence_boundary_zh !== 'string') {
+            throw new Error('Dataset program lacks the V5.5 acceptance contract');
+        }
+        const receiptGate = data.test_plan.b0_receipt_gate;
+        if (!receiptGate || receiptGate.owner !== 'release-and-evaluation-engineering' || receiptGate.producer !== 'release-and-evaluation-engineering-process' || receiptGate.value_source !== 'actual-release-artifacts-and-actual-runtime' || receiptGate.prefill_actual_values !== false || receiptGate.infer_actual_values !== false || receiptGate.required_materials?.join('|') !== 'signed_release_manifest|b0_oci_repo_digest|b1_oci_repo_digest|complete_server_argv|complete_client_contract|effective_runtime_receipt|startup_receipt') {
+            throw new Error('Dataset program lacks the V5.5 B0 receipt gate');
         }
         const readiness = new Set(['executable', 'asset-frozen', 'material-unfrozen', 'missing']);
         if (data.primary_datasets.some((item) => typeof item.primary_metric_zh !== 'string' || !item.primary_metric_zh || typeof item.source_url !== 'string' || !item.source_url.startsWith('https://') || !item.readiness || !readiness.has(item.readiness.status))) {
@@ -108,10 +112,14 @@
         };
         const designation = state.program.designation;
         const plan = state.program.test_plan;
+        const receiptGate = plan.b0_receipt_gate;
+        const receiptSummary = lang() === 'zh'
+            ? `B0 配置与来源回执：${receiptGate.owner_zh} · 实际发布工件与实际运行`
+            : 'B0 configuration and provenance receipt: release and evaluation engineering · actual release artifacts and runs';
         $('dataset-program-kicker').textContent = lang() === 'zh' ? '浦江指定范围' : 'Pujiang-specified scope';
         $('dataset-program-title').textContent = lang() === 'zh' ? designation.label_zh : designation.label;
         $('dataset-program-lede').textContent = lang() === 'zh' ? designation.scope_note_zh : designation.scope_note;
-        $('dataset-program-contract').innerHTML = `<a href="${escapeHtml(plan.contract_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(plan.test_plan_version)}</a><span>${escapeHtml(plan.mandatory_model)} · ${escapeHtml(plan.formal_precision)} · ${escapeHtml(plan.baseline_roles.join(' + '))}</span><span>${escapeHtml(lang() === 'zh' ? plan.optional_status_zh : plan.optional_status)}</span><span>${escapeHtml(lang() === 'zh' ? plan.evidence_boundary_zh : plan.evidence_boundary)}</span>`;
+        $('dataset-program-contract').innerHTML = `<a href="${escapeHtml(plan.contract_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(plan.test_plan_version)}</a><span>${escapeHtml(plan.mandatory_model)} · ${escapeHtml(plan.formal_precision)} · ${escapeHtml(plan.baseline_roles.join(' + '))}</span><span>${escapeHtml(lang() === 'zh' ? plan.optional_status_zh : plan.optional_status)}</span><span>${escapeHtml(lang() === 'zh' ? plan.evidence_boundary_zh : plan.evidence_boundary)}</span><span>${escapeHtml(receiptSummary)}</span>`;
         $('dataset-program-list').innerHTML = state.program.primary_datasets.map((dataset) => {
             const note = lang() === 'zh' ? dataset.note_zh : dataset.note;
             const metric = lang() === 'zh' ? dataset.primary_metric_zh : dataset.primary_metric;
