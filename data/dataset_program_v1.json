@@ -1,6 +1,6 @@
 {
   "contract_version": "dataset-program-v1",
-  "updated_at": "2026-10-11",
+  "updated_at": "2026-10-10",
   "test_plan": {
     "test_plan_version": "V5.5",
     "contract_url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/docs/ACCEPTANCE_V5_5.md",
