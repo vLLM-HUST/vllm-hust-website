@@ -1271,24 +1271,26 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
 
 
 def test_extension_standard_covers_core_and_host_providers() -> None:
-    assert "Manifest `0.3-experimental`" in LEGACY_STANDARD
+    assert "Manifest `0.3`" in LEGACY_STANDARD
+    assert "`0.3-experimental` remain readable migration inputs" in LEGACY_STANDARD
     assert "Core + Host Provider" in LEGACY_STANDARD
     assert "vllm_hust_ext.providers" in LEGACY_STANDARD
     assert "former entry-point-based Plugin Standard 1.0" in PAGE
     assert "Domain contracts first; bundles second." in PAGE
     assert "先定义领域契约，再定义 bundle 交付。" in PAGE
     assert (
-        'uv pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"'
-        in PAGE
+        'uv pip install "https://github.com/vLLM-HUST/extension-manager/releases/download/'
+        'v0.3.0/vllm_hust_ext-0.3.0-py3-none-any.whl"' in PAGE
     )
-    assert "No public vllm-hust-ext PyPI alpha exists yet" in PAGE
+    assert "Install the pinned ECPA 0.3.0 GitHub Release wheel" in PAGE
     assert "activation_ready=false" in PAGE
     assert "vllm-hust-ext extension enable org.example.kv-adapter" in PAGE
     assert "vllm-hust-ext extension plan org.example.kv-adapter" in PAGE
     assert "vllm-hust-ext extension check org.example.kv-adapter" in PAGE
     assert "vllm-hust-ext run -- vllm serve MODEL" in PAGE
     assert "Only explicit <code>vllm-hust-ext</code> extension commands" in PAGE
-    assert "Release freeze: Core + Host Provider validation first" in PAGE
+    assert "ECPA 0.3 release boundary" in PAGE
+    assert "Manager stability is not universal MOD qualification" in PAGE
     assert "Historical prototype evidence (superseded)" in PAGE
     assert "Normal vLLM import and startup never invoke the manager" in PAGE
     assert "external services and clusters remain operator-owned" in PAGE.lower()
