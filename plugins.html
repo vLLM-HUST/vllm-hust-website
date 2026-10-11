@@ -575,8 +575,8 @@ A component graduates after domain behavior, failure, shutdown, and rollback tes
 </strong>
 </div>
 <pre>
-<code># No public vllm-hust-ext PyPI alpha exists yet; install the current source.
-uv pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+<code># Install the pinned ECPA 0.3.0 GitHub Release wheel.
+uv pip install "https://github.com/vLLM-HUST/extension-manager/releases/download/v0.3.0/vllm_hust_ext-0.3.0-py3-none-any.whl"
 uv pip install example-kv-adapter
 vllm-hust-ext extension list
 vllm-hust-ext extension inspect org.example.kv-adapter
@@ -620,17 +620,17 @@ vllm-hust-ext run -- vllm serve MODEL
 
       <aside class="plugin-runtime-note">
 <strong>
-<span class="lang-en">Release freeze: Core + Host Provider validation first</span>
-<span class="lang-zh">发布冻结：先验证 Core + Host Provider</span>
+<span class="lang-en">ECPA 0.3 release boundary: Manager stability is not universal MOD qualification</span>
+<span class="lang-zh">ECPA 0.3 发布边界：Manager 稳定不等于所有 MOD 自动合格</span>
 </strong>
 <p>
-<span class="lang-en">The former single Python Bundle v1 design is frozen as an unstable experiment.
-Manifest 0.3 retains the 0.2 fields and adds explicit extension dependencies and resource claims so incomplete or conflicting activation graphs fail before host launch. Manifest 0.2 remains readable for migration, not as a current composition claim.
+<span class="lang-en">ECPA 0.3.0 freezes the Manager's Manifest 0.3, saved-intent, composition, conflict-rejection, supervised-run, and process-owned observer semantics. The former single Python Bundle v1 design remains an unstable historical experiment.
+Manifest 0.3 retains the 0.2 fields and adds explicit extension dependencies and resource claims so incomplete or conflicting activation graphs fail before host launch. Manifest 0.2 remains readable for migration, not as a current composition claim. Each MOD and Provider keeps its own compatibility, rollback, device, and performance qualification.
 MooncakeStoreConnector has passed a real Ascend save/load and outage/recovery gate.
 Production Stack has passed controller reconciliation, metrics-backed scaling, and a real GLM Router 500-to-200 recovery without restarting vLLM. Its arm64 carrier was published by GitHub-hosted runners, then pulled and entrypoint-tested in an arm64 validation environment; amd64 and self-hosted infrastructure are not required.
 BidKV's newer Qwen3.5 TP4 campaign completed two alternating-order C12 pairs with identical output-token totals, active policy selections and zero policy failures. Its positive KV-pressure cell, retained negative tuning trials, and post-result shutdown diagnostic are published together. The older Qwen3.8 TP4 matrix still has eight of thirteen Stage-1 cells pending. The generic scheduler contract is merged in vLLM-HUST organization PR #11; every qualification remains model-, artifact-, setting-, and workload-specific.</span>
-<span class="lang-zh">原单一 Python Bundle v1 设计已冻结为不稳定实验。
-Manifest 0.3 保留 0.2 字段，并新增显式扩展依赖与资源声明，使不完整或冲突的激活图在宿主启动前失败；Manifest 0.2 仅为迁移保持可读，不代表当前组合能力。
+<span class="lang-zh">ECPA 0.3.0 冻结的是 Manager 的 Manifest 0.3、保存的启用意图、组合与冲突拒绝、受监管运行及进程自有 observer 语义；原单一 Python Bundle v1 设计仍属于不稳定的历史实验。
+Manifest 0.3 保留 0.2 字段，并新增显式扩展依赖与资源声明，使不完整或冲突的激活图在宿主启动前失败；Manifest 0.2 仅为迁移保持可读，不代表当前组合能力。每个 MOD 与 Provider 仍分别保留自己的兼容性、回滚、设备和性能资格。
 MooncakeStoreConnector 已通过真实 Ascend save/load 与中断/恢复门禁。
 Production Stack 已通过 controller 调谐、Metrics 扩容，以及不重启 vLLM 的真实 GLM Router 500→200 恢复；arm64 载体已由 GitHub-hosted runner 发布，并在 arm64 验证环境完成拉取与入口验收，不要求 amd64 或 self-hosted 基础设施。
 BidKV 新增的 Qwen3.5 TP4 实验完成两轮交替顺序 C12 配对，各臂输出 token 总数一致，策略真实执行且失败为 0；正向 KV-pressure 单元、负向调参试验与结果保存后的退出诊断一并公开。旧 Qwen3.8 TP4 矩阵仍有十三个 Stage-1 单元中的八个待测。通用 scheduler 契约已通过 vLLM-HUST 组织 PR #11 合并；资格仍按模型、制品、设定与 workload 单独判定。

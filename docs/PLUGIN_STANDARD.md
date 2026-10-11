@@ -1,8 +1,10 @@
-# vLLM-HUST Extension Architecture — experimental
+# vLLM-HUST Extension Architecture — ECPA 0.3
 
-> Manifest `0.3-experimental` is not a stable compatibility contract. Manifest 0.2 remains readable
-> for migration, and the former Bundle v1 prototype remains historical only. Alpha publication is
-> blocked until the vLLM, external-KV-system, and control-plane acceptance gates pass.
+> Manifest `0.3`, saved-config schema 2, explicit enable intent, composition conflict rejection,
+> supervised launch, and process-owned runtime evidence are the stable ECPA 0.3 Manager surface.
+> Manifest 0.2 and `0.3-experimental` remain readable migration inputs, while the former Bundle v1
+> prototype remains historical only. Each MOD and Provider still requires its own compatibility,
+> rollback, device, and performance qualification.
 
 ## Product boundary
 
@@ -63,7 +65,7 @@ entry-point groups inside `vllm.*`.
 ## Current commands
 
 ```bash
-uv pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
+uv pip install "https://github.com/vLLM-HUST/extension-manager/releases/download/v0.3.0/vllm_hust_ext-0.3.0-py3-none-any.whl"
 uv pip install example-extension
 
 vllm-hust-ext extension list
@@ -76,10 +78,10 @@ vllm-hust-ext extension render org.example.extension
 vllm-hust-ext extension check org.example.extension
 ```
 
-There is no public `vllm-hust-ext` PyPI alpha yet. Descriptors whose only implementation is
-`import_only` or `legacy_unregistered` are inspectable but not activatable: Manager reports the
-blocker and refuses `extension enable`. A new `run` also fails closed while a non-optional required
-service is not healthy.
+ECPA 0.3.0 is distributed as pinned GitHub Release wheel and source archives; no PyPI publication is
+claimed. Descriptors whose only implementation is `import_only` or `legacy_unregistered` are
+inspectable but not activatable: Manager reports the blocker and refuses `extension enable`. A new
+`run` also fails closed while a non-optional required service is not healthy.
 
 For a vLLM-owned extension only, the manager can generate the launch command:
 
