@@ -1219,15 +1219,15 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "58 MODs for real serving workloads" in html_text
-    assert "58 个 MOD，覆盖真实推理场景" in html_text
+    assert "58 public MODs across 8 lifecycle phases" in html_text
+    assert "58 个公开 MOD，覆盖 8 个推理生命周期阶段" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text
-    assert "Explore 58 MODs for scheduling, KV, execution" in html_text
-    assert "探索 58 个 MOD，覆盖调度、KV、执行" in html_text
-    assert "what is available for evaluation" in html_text
-    assert "适合评估" in html_text
+    assert "offline preparation and service startup" in html_text
+    assert "离线准备、服务启动" in html_text
+    assert "activation evidence, and performance evidence" in html_text
+    assert "启用依据与性能证据" in html_text
 
     expected_repositories = (
         "vllm-hust-bidkv",
