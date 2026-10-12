@@ -578,18 +578,6 @@ pip install git+https://github.com/vLLM-HUST/vllm-ascend-adaptive-quantized-kv-h
 vllm-hust-ext extension inspect org.vllm-hust.ascend-adaptive-quantized-kv
 vllm-hust-ext extension check org.vllm-hust.ascend-adaptive-quantized-kv`
     },
-    "ascend-quant-runtime-descriptor": {
-      title_en: "Install and inspect Ascend Quant Runtime",
-      title_zh: "安装并检查 Ascend Quant Runtime",
-      action_en: "inspection commands",
-      action_zh: "检查命令",
-      note_en: "Import-only validator: no model loading, kernel selection, or runtime activation.",
-      note_zh: "当前为 import-only 校验器：不加载模型、不选择内核、不激活运行时。",
-      command: `pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git"
-pip install "git+https://github.com/vLLM-HUST/vllm-ascend-quant-hust.git#subdirectory=runtime-extension"
-vllm-hust-ext extension inspect org.vllm-hust.ascend-quant-runtime
-vllm-hust-ext extension check org.vllm-hust.ascend-quant-runtime`
-    },
     "kvcompress-ascend": {
       title_en: "Install and start Ascend KV Compression",
       title_zh: "安装并启动昇腾 KV 压缩",
