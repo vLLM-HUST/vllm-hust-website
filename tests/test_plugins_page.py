@@ -89,6 +89,9 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     assert profiles["traceloom"]["evidence"] == "no_performance_claim"
     assert profiles["vllm-hust-opset"]["evidence"] == "measured_beneficial"
     assert profiles["core-attention-boundary"]["kind"] == "runtime_mod"
+    assert profiles["stateaxis-pipelined-weight-loading"]["capability"] == (
+        "startup_deployment"
+    )
     assert profiles["simllm-migration"] == {
         "kind": "runtime_mod",
         "capability": "kv_management",
@@ -707,6 +710,8 @@ def test_workshop_supports_workload_guided_discovery() -> None:
     assert WORKLOAD_NAVIGATION["schema_version"] == "plugin-workload-navigation/v1"
     traits = WORKLOAD_NAVIGATION["traits"]
     mappings = WORKLOAD_NAVIGATION["plugins"]
+    assert traits["cold_start_recovery"]["label_zh"] == "冷启动 / 恢复"
+    assert mappings["stateaxis-pipelined-weight-loading"] == ["cold_start_recovery"]
     organization_mods = {
         item["id"]
         for item in REGISTRY["components"]
@@ -774,7 +779,9 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert 'data-taxonomy="./data/mod-taxonomy.json?v=mod-taxonomy-20261010-49"' in PAGE
+    assert (
+        'data-taxonomy="./data/mod-taxonomy.json?v=startup-deployment-20261012"' in PAGE
+    )
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
@@ -958,10 +965,25 @@ def test_public_stateaxis_mod_repositories_are_visible_with_scoped_evidence() ->
         component = by_id(component_id)
         assert component["compatibility"]["status"] == "inspect_only"
         assert component["public_effect_status"] == "preview"
-        assert component["evidence_level"] == "source_evidence_only"
+
+    assert by_id("stateaxis-automatic-prefix-cache")["evidence_level"] == (
+        "source_evidence_only"
+    )
+    assert by_id("stateaxis-async-kv-transfer")["evidence_level"] == (
+        "source_evidence_only"
+    )
+    for component_id in {
+        "stateaxis-automatic-prefix-cache",
+        "stateaxis-async-kv-transfer",
+    }:
+        component = by_id(component_id)
         assert "not inherited" in component["public_effect_en"] or (
             "does not inherit" in component["public_effect_en"]
         )
+    loader = by_id("stateaxis-pipelined-weight-loading")
+    assert loader["evidence_level"] == "hardware_startup_diagnostic"
+    assert "10.68%" in loader["public_effect_en"]
+    assert "not a steady-state throughput claim" in loader["public_effect_en"]
 
 
 def test_visible_ecpa_mods_publish_manifest03_and_scoped_effects() -> None:
@@ -1090,17 +1112,14 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert (
-        'data-source="./data/ecosystem.json?v=hidden-manifest03-contracts-20261009"'
-        in PAGE
-    )
+    assert 'data-source="./data/ecosystem.json?v=startup-deployment-20261012"' in PAGE
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
         'v=ecpa-final-20261009-project-grouping"' in PAGE
     )
     assert (
-        'data-source="./data/plugin-workload-navigation.json?v=ecpa-final-20261009"'
-        in PAGE
+        'data-source="./data/plugin-workload-navigation.json?'
+        'v=startup-deployment-20261012"' in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
 
@@ -1655,9 +1674,8 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "benchmark-settings-20260929" not in SCRIPT
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
-    assert PAGE.count("ecpa-final-20261009") >= 3
-    assert "hidden-manifest03-contracts-20261009" in PAGE
-    assert "mod-taxonomy-20261010-49" in PAGE
+    assert PAGE.count("ecpa-final-20261009") >= 2
+    assert "startup-deployment-20261012" in PAGE
 
 
 def test_bidkv_copy_reports_the_new_cell_without_erasing_old_boundaries() -> None:

@@ -3,7 +3,7 @@
 
   const registryUrl = "./data/ecosystem.json?v=mod-catalog-20261008";
   const navigationUrl = "./data/plugin-workload-navigation.json?v=mod-catalog-20261008";
-  const taxonomyUrl = "./data/mod-taxonomy.json?v=mod-taxonomy-20261010";
+  const taxonomyUrl = "./data/mod-taxonomy.json?v=startup-deployment-20261012";
   let summary;
   let workloadCount;
 

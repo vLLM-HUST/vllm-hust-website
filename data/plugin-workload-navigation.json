@@ -19,6 +19,12 @@
       "description_en": "Observe request and KV lifecycle events or report bounded signals to an external control plane.",
       "description_zh": "观察请求与 KV 生命周期事件，或向外部控制面报告有界信号。"
     },
+    "cold_start_recovery": {
+      "label_en": "Cold start / Recovery",
+      "label_zh": "冷启动 / 恢复",
+      "description_en": "Model loading, instance readiness, elastic scale-out, rolling replacement, or failure recovery is the limiting phase.",
+      "description_zh": "模型加载、实例就绪、弹性扩容、滚动替换或故障恢复是主要受限阶段。"
+    },
     "long_context": {
       "label_en": "Long context",
       "label_zh": "长上下文",
@@ -80,7 +86,7 @@
     "gdn-state-codec": ["decode_heavy", "repeated_prefix_agent"],
     "stateaxis-automatic-prefix-cache": ["repeated_prefix_agent", "memory_kv_pressure"],
     "stateaxis-async-kv-transfer": ["distributed_pipeline", "memory_kv_pressure"],
-    "stateaxis-pipelined-weight-loading": ["latency_slo"],
+    "stateaxis-pipelined-weight-loading": ["cold_start_recovery"],
     "ascend-quant-toolkit": ["model_preparation"],
     "slicegpt-migration": ["model_preparation"],
     "adm": ["distributed_pipeline"],

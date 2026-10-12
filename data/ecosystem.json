@@ -1898,10 +1898,10 @@
       "upstream_repository": null,
       "summary_en": "A default-off Manifest 0.3 research MOD for identity-bound staged model loading and cold-readiness optimization. The current repository is inspect-only and must not modify the host until its activation contract is reviewed.",
       "summary_zh": "面向身份绑定分阶段模型加载与冷启动就绪优化的默认关闭 Manifest 0.3 研究 MOD。当前仓库仅供检查；激活合同评审完成前不得修改宿主。",
-      "public_effect_en": "Frozen StateAxis source evidence records improved cold readiness in bounded Qwen and EP8 cells without a measured warm-path or TPOT regression. The split MOD does not inherit that qualification and has no independent ON/OFF result yet.",
-      "public_effect_zh": "冻结的 StateAxis 来源证据记录了有界 Qwen 与 EP8 单元中的冷启动就绪改善，且未测得 warm 路径或 TPOT 回退。拆分后的 MOD 不继承该资格，当前也没有独立 ON/OFF 结果。",
+      "public_effect_en": "A matched 3+3 real-NPU carrier diagnostic on Qwen3.5-35B-A3B BF16 TP2 reduced median process-to-Ready time from 337.70 s to 301.62 s (10.68%) and median weight iteration from 166.20 s to 107.15 s (35.53%). This is startup evidence, not a steady-state throughput claim or a formal ECPA ON/OFF qualification.",
+      "public_effect_zh": "Qwen3.5-35B-A3B BF16 TP2 的 3+3 次真实 NPU 配对载体诊断中，进程到 Ready 的中位时间由 337.70 秒降至 301.62 秒（10.68%），权重迭代中位时间由 166.20 秒降至 107.15 秒（35.53%）。这是启动阶段证据，不代表稳态吞吐提升，也不是正式 ECPA ON/OFF 资格结果。",
       "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-pipelined-weight-loading/blob/main/evidence/ISSUE15_WEIGHT_LOADER_RESULT.md",
+      "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-pipelined-weight-loading/blob/main/evidence/qwen35-loader-sharded-qualification-20261012/RESULT.json",
       "functional_compatibility": {
         "status": "inspect_only",
         "scope": "Manifest 0.3 descriptor; runtime activation intentionally refused"
@@ -1909,27 +1909,27 @@
       "effectiveness_qualifications": [
         {
           "status": "preview",
-          "scope": "frozen source evidence only; split MOD has no independent ON/OFF qualification"
+          "scope": "matched-real-npu-carrier-diagnostic-not-mod-performance; formal ECPA ON/OFF qualification remains pending"
         }
       ],
       "compatibility": {
         "status": "inspect_only",
         "host": "StateAxis through vLLM-HUST Extension Manager",
         "versions": [
-          "repository main @ db5d3280a04ae40c5dc839a257c3dac74bdd9011",
+          "repository main @ ac648fff8f7c8556ffa098824d7cc2179887d77c",
           "Manifest 0.3 experimental",
           "runtime ID org.vllm-hust.stateaxis-pipelined-weight-loading"
         ],
         "platforms": [
-          "Host contract pending; no platform qualification"
+          "2 x Ascend 910B2 startup carrier diagnostic; formal ECPA platform qualification pending"
         ],
         "models": [
-          "Frozen source evidence only; no split-MOD model qualification"
+          "Qwen3.5-35B-A3B BF16 TP2 startup carrier diagnostic; steady-state throughput unclaimed"
         ],
-        "requirements_en": "Inspect only. Keep disabled by default; artifact identity, rollback, lifecycle, and matched cold/warm ON/OFF gates remain pending.",
-        "requirements_zh": "仅供检查。必须默认关闭；制品身份、回滚、生命周期以及 matched 冷/热 ON/OFF 门禁仍待完成。"
+        "requirements_en": "Inspect only. Keep disabled by default. The published 10.68% result measures startup readiness for a pre-sharded carrier; artifact identity, rollback, lifecycle, cache control, and formal ECPA ON/OFF gates remain pending.",
+        "requirements_zh": "仅供检查，且必须默认关闭。公开的 10.68% 结果衡量预分片载体的启动就绪时间；制品身份、回滚、生命周期、缓存控制及正式 ECPA ON/OFF 门禁仍待完成。"
       },
-      "evidence_level": "source_evidence_only"
+      "evidence_level": "hardware_startup_diagnostic"
     },
     {
       "id": "gdn-state-codec",

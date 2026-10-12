@@ -91,7 +91,7 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
             )
         )["traits"]
     )
-    assert workload_count == 12
+    assert workload_count == 13
     assert f"Explore all {mod_count} MODs" in INDEX
     assert f"查看全部 {mod_count} 个 MOD" in INDEX
     assert f"{mod_count} MODs · {workload_count} workloads" in INDEX
