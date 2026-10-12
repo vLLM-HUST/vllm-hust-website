@@ -711,9 +711,7 @@ def test_workshop_supports_workload_guided_discovery() -> None:
     traits = WORKLOAD_NAVIGATION["traits"]
     mappings = WORKLOAD_NAVIGATION["plugins"]
     assert traits["cold_start_recovery"]["label_zh"] == "冷启动 / 恢复"
-    assert mappings["stateaxis-pipelined-weight-loading"] == [
-        "cold_start_recovery"
-    ]
+    assert mappings["stateaxis-pipelined-weight-loading"] == ["cold_start_recovery"]
     organization_mods = {
         item["id"]
         for item in REGISTRY["components"]
@@ -781,7 +779,9 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert 'data-taxonomy="./data/mod-taxonomy.json?v=startup-deployment-20261012"' in PAGE
+    assert (
+        'data-taxonomy="./data/mod-taxonomy.json?v=startup-deployment-20261012"' in PAGE
+    )
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
@@ -1112,18 +1112,14 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert (
-        'data-source="./data/ecosystem.json?v=startup-deployment-20261012"'
-        in PAGE
-    )
+    assert 'data-source="./data/ecosystem.json?v=startup-deployment-20261012"' in PAGE
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
         'v=ecpa-final-20261009-project-grouping"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?'
-        'v=startup-deployment-20261012"'
-        in PAGE
+        'v=startup-deployment-20261012"' in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
 
