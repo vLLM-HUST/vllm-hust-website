@@ -15,10 +15,10 @@
       "name": "vllm-hust",
       "repo": "https://github.com/vLLM-HUST/vllm-hust",
       "group": "core",
-      "version": "main@fa6f7d29",
+      "version": "main@4f61604b",
       "source_branch": "main",
-      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/fa6f7d29db99d5350e1b2b9c2742c9b621b22b25",
-      "source_updated_at": "2026-10-10T21:42:39Z",
+      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/4f61604bea01ce56afc320e0f0566166fd79a562",
+      "source_updated_at": "2026-10-11T21:56:53Z",
       "version_display_label": "Repository snapshot; not a production compatibility approval",
       "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     },
@@ -89,7 +89,7 @@
       "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     }
   ],
-  "updated_at": "2026-10-11T09:05:08Z",
+  "updated_at": "2026-10-12T09:27:46Z",
   "registry": {
     "name": "vllm-hust",
     "version": "0.17.2.post1",
