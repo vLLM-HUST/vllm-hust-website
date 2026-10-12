@@ -56,7 +56,6 @@
     "request-lifecycle-profiler": {"kind":"tool_mod","capability":"observability_evaluation","phases":["observability"],"lifecycle":"implemented","evidence":"runtime_effective_functional"},
     "kv-transfer-observability-migration": {"kind":"tool_mod","capability":"observability_evaluation","phases":["observability","state_lifecycle"],"lifecycle":"implemented","evidence":"runtime_effective_functional"},
     "ascend-quant-toolkit": {"kind":"tool_mod","capability":"model_preparation","phases":["offline_preparation"],"lifecycle":"implemented","evidence":"offline_tool"},
-    "ascend-quant-runtime-descriptor": {"kind":"tool_mod","capability":"model_preparation","phases":["offline_preparation","service_startup"],"lifecycle":"implemented","evidence":"metadata_validation_only"},
     "slicegpt-migration": {"kind":"tool_mod","capability":"model_preparation","phases":["offline_preparation","service_startup"],"lifecycle":"implemented_restricted","evidence":"hardware_validation_pending"},
     "llm-serving-cost-pricing-model": {"kind":"tool_mod","capability":"observability_evaluation","phases":["offline_preparation","observability"],"lifecycle":"implemented","evidence":"offline_tool"},
 
@@ -64,7 +63,6 @@
     "request-throttling-controller": {"kind":"control_plane","capability":"scheduling_routing","phases":["request_admission"],"lifecycle":"implemented_restricted","evidence":"measured_beneficial"},
     "tricard-clm-lifecycle": {"kind":"control_plane","capability":"lifecycle_control","phases":["service_lifecycle","observability"],"lifecycle":"implemented_restricted","evidence":"bridge_component"},
     "quality-bounded-inference": {"kind":"control_plane","capability":"policy_research","phases":["request_admission"],"lifecycle":"research","evidence":"functional_only"},
-    "scheduler-policy-lab": {"kind":"control_plane","capability":"policy_research","phases":["offline_preparation","observability"],"lifecycle":"pending","evidence":"host_integration_pending"},
     "ride-control-plane": {"kind":"control_plane","capability":"lifecycle_control","phases":["service_lifecycle"],"lifecycle":"external","evidence":"external_lifecycle"},
     "vllm-local-control-host": {"kind":"control_plane","capability":"lifecycle_control","phases":["service_lifecycle"],"lifecycle":"implemented","evidence":"bridge_component"},
     "ride-runtime-bridge": {"kind":"control_plane","capability":"lifecycle_control","phases":["service_lifecycle"],"lifecycle":"implemented","evidence":"bridge_component"},

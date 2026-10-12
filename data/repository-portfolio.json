@@ -264,7 +264,7 @@
       "relation_to_runtime": "extends_runtime_behavior",
       "lifecycle": "incubating",
       "canonical_artifacts": ["offline Ascend post-training quantization workflow", "import-only runtime artifact validator"],
-      "component_ids": ["ascend-quant-toolkit", "ascend-quant-runtime-descriptor"],
+      "component_ids": ["ascend-quant-toolkit"],
       "public_surface": true
     },
     {
@@ -582,7 +582,7 @@
       "relation_to_runtime": "compares_scheduler_policies",
       "lifecycle": "incubating",
       "canonical_artifacts": ["scheduler policy comparison workspace", "legacy provenance ledger"],
-      "component_ids": ["scheduler-policy-lab"],
+      "component_ids": [],
       "public_surface": false
     },
     {

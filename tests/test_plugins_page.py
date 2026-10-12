@@ -647,8 +647,6 @@ def test_standardized_extensions_expose_honest_accessible_tooltips() -> None:
     assert '"ascend-adaptive-quantized-kv": {' in SCRIPT
     assert "inspection is supported, enablement is intentionally refused" in SCRIPT
     assert 'action_zh: "检查命令"' in SCRIPT
-    assert '"ascend-quant-runtime-descriptor": {' in SCRIPT
-    assert "no model loading, kernel selection, or runtime activation" in SCRIPT
     assert 'trigger.setAttribute("aria-label", `${item.name} ${action}`)' in SCRIPT
     assert 'element("button", "plugin-launch-icon")' in SCRIPT
     assert 'element("span", "plugin-launch-glyph", ">_")' in SCRIPT
@@ -693,11 +691,6 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
             "inspect_only",
             "vLLM Ascend",
             ["Manifest 0.3 @ 9f9844e", "Host contract pending"],
-        ),
-        "ascend-quant-runtime-descriptor": (
-            "inspect_only",
-            "vLLM Ascend",
-            ["Manifest 0.3 @ 6c035b1", "Loader contract pending"],
         ),
     }
     for component_id, (status, host, versions) in expected.items():
@@ -1093,7 +1086,6 @@ def test_visible_ecpa_mods_publish_manifest03_and_scoped_effects() -> None:
 def test_quantization_entries_preserve_runtime_boundaries() -> None:
     adaptive = by_id("ascend-adaptive-quantized-kv")
     toolkit = by_id("ascend-quant-toolkit")
-    runtime = by_id("ascend-quant-runtime-descriptor")
     latchmoe = by_id("latchmoe")
 
     assert adaptive["delivery_model"] == "python_distribution"
@@ -1104,15 +1096,8 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     assert "refuses enablement" in adaptive["summary_en"]
     assert toolkit["artifact_type"] == "tool"
     assert toolkit["system_role"] == "offline_model_quantization"
-    assert "not a vLLM plugin" in toolkit["summary_en"]
-    assert runtime["artifact_type"] == "runtime_component"
-    assert runtime["delivery_model"] == "python_distribution"
-    assert (
-        "vllm_hust.extension_manifest.v0.3-experimental"
-        in runtime["integration_contracts"]
-    )
-    assert "Import-only" in runtime["summary_en"]
-    assert "owner-approved value allowlist" in runtime["summary_en"]
+    assert "bundled fail-closed artifact validator" in toolkit["summary_en"]
+    assert "not a second runtime MOD" in toolkit["summary_en"]
     assert latchmoe["integration_surfaces"] == [
         "vllm.general_plugins",
         "vllm-ascend-hust MoE offload seam v2 (organization PR #9 merged)",
@@ -1337,7 +1322,6 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         "vllm-hust-activation-sparsity": "activation-sparsity-migration",
         "vllm-hust-pipeline-microbatch": "pipeline-microbatch-migration",
         "vllm-hust-qos-scheduler": "qos-scheduler-migration",
-        "vllm-hust-scheduler-policy-lab": "scheduler-policy-lab",
     }
     repositories = {item["name"]: item for item in PORTFOLIO["repositories"]}
     for repository_name, component_id in expected.items():
@@ -1351,14 +1335,15 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
             "simllm-migration": "experimental",
             "kv-transfer-observability-migration": "experimental",
             "pipeline-microbatch-migration": "verified",
-            "scheduler-policy-lab": "source_scaffold",
         }
         expected_status = promoted_statuses.get(component_id, "inspect_only")
         assert component["compatibility"]["status"] == expected_status
         assert component["maturity"] in {"incubating", "experimental"}
 
-    assert repositories["vllm-hust-scheduler-policy-lab"]["public_surface"] is False
-    assert by_id("scheduler-policy-lab")["public_surface"] is False
+    scheduler_lab = repositories["vllm-hust-scheduler-policy-lab"]
+    assert scheduler_lab["public_surface"] is False
+    assert scheduler_lab["repository_role"] == "research_workspace"
+    assert scheduler_lab["component_ids"] == []
 
     assert "intellistream/vllm-hust-legacy" not in PAGE
     assert "intellistream/vllm-ascend-hust-legacy" not in PAGE
@@ -1421,7 +1406,7 @@ def test_graduation_followups_and_external_advisors_are_visible() -> None:
         for item in REGISTRY["components"]
         if item.get("compatibility", {}).get("followup_url")
     ]
-    assert len(followups) == 14
+    assert len(followups) == 13
     assert all(url.startswith("https://github.com/vLLM-HUST/") for url in followups)
     assert "profile.followup_url" in SCRIPT
     assert "plugin-compatibility-followup" in SCRIPT
@@ -1658,7 +1643,6 @@ def test_betterscale_uses_the_shared_mod_catalog():
 def test_non_runnable_descriptors_scaffolds_and_legacy_carriers_are_not_published():
     unpublished = {
         "ascend-adaptive-quantized-kv",
-        "ascend-quant-runtime-descriptor",
         "dla",
     }
     for component_id in unpublished:
@@ -1828,7 +1812,7 @@ def test_tool_mods_are_grouped_without_performance_placeholders():
         for component_id in visible_tools
     )
     assert visible_tools <= set(WORKLOAD_NAVIGATION["plugins"])
-    assert by_id("scheduler-policy-lab")["public_surface"] is False
+    assert "scheduler-policy-lab" not in MOD_TAXONOMY["components"]
 
 
 def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
