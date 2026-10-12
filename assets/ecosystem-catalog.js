@@ -9,7 +9,7 @@
   ]);
 
   function taxonomyComponents(taxonomy) {
-    if (taxonomy?.schema_version !== "mod-taxonomy/v1" || !taxonomy.components) {
+    if (taxonomy?.schema_version !== "mod-taxonomy/v2" || !taxonomy.components) {
       throw new Error("unsupported MOD taxonomy");
     }
     return taxonomy.components;

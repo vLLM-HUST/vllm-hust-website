@@ -8,6 +8,10 @@ from jsonschema import Draft7Validator
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = json.loads((ROOT / "data" / "ecosystem.json").read_text(encoding="utf-8"))
+STATEAXIS_CATALOG = json.loads(
+    (ROOT / "data" / "stateaxis-topic-mods.json").read_text(encoding="utf-8")
+)
+REGISTRY["components"].extend(STATEAXIS_CATALOG["components"])
 PORTFOLIO = json.loads(
     (ROOT / "data" / "repository-portfolio.json").read_text(encoding="utf-8")
 )
@@ -67,7 +71,13 @@ def by_id(component_id: str) -> dict:
 
 
 def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
-    assert MOD_TAXONOMY["schema_version"] == "mod-taxonomy/v1"
+    schema = json.loads(
+        (ROOT / "data" / "schemas" / "mod_taxonomy_v2.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    Draft7Validator(schema).validate(MOD_TAXONOMY)
+    assert MOD_TAXONOMY["schema_version"] == "mod-taxonomy/v2"
     profiles = MOD_TAXONOMY["components"]
     assert set(profiles) <= {item["id"] for item in REGISTRY["components"]}
     assert {profile["kind"] for profile in profiles.values()} == {
@@ -79,8 +89,10 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
         "retired",
     }
     assert all(
-        set(profile) == {"kind", "capability", "lifecycle", "evidence"}
+        set(profile) == {"kind", "capability", "phases", "lifecycle", "evidence"}
         and all(profile.values())
+        and isinstance(profile["phases"], list)
+        and len(profile["phases"]) == len(set(profile["phases"]))
         for profile in profiles.values()
     )
     assert profiles["betterscale"]["kind"] == "runtime_mod"
@@ -95,9 +107,30 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     assert profiles["simllm-migration"] == {
         "kind": "runtime_mod",
         "capability": "kv_management",
+        "phases": ["prefill", "state_lifecycle"],
         "lifecycle": "implemented_restricted",
         "evidence": "measured_beneficial",
     }
+
+
+def test_stateaxis_topic_catalog_is_complete_and_public() -> None:
+    component_schema = json.loads(
+        (ROOT / "data" / "schemas" / "ecosystem_v1.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )["definitions"]["component"]
+    validator = Draft7Validator(component_schema)
+    assert STATEAXIS_CATALOG["schema_version"] == "stateaxis-topic-mod-catalog/v1"
+    assert len(STATEAXIS_CATALOG["components"]) == 20
+    for component in STATEAXIS_CATALOG["components"]:
+        validator.validate(component)
+        assert component["canonical_repository"].startswith(
+            "https://github.com/intellistream/"
+        )
+        assert component["maintainers"] == ["ShuhaoZhangTony"]
+        assert component["advisors"] == []
+        assert component["id"] in MOD_TAXONOMY["components"]
+        assert component["id"] in WORKLOAD_NAVIGATION["plugins"]
 
 
 def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() -> None:
@@ -149,6 +182,7 @@ def test_request_controller_is_an_external_ecpa_control_plane() -> None:
     assert MOD_TAXONOMY["components"][component["id"]] == {
         "kind": "control_plane",
         "capability": "scheduling_routing",
+        "phases": ["request_admission"],
         "lifecycle": "implemented_restricted",
         "evidence": "measured_beneficial",
     }
@@ -710,8 +744,8 @@ def test_workshop_supports_workload_guided_discovery() -> None:
     assert WORKLOAD_NAVIGATION["schema_version"] == "plugin-workload-navigation/v1"
     traits = WORKLOAD_NAVIGATION["traits"]
     mappings = WORKLOAD_NAVIGATION["plugins"]
-    assert traits["cold_start_recovery"]["label_zh"] == "冷启动 / 恢复"
-    assert mappings["stateaxis-pipelined-weight-loading"] == ["cold_start_recovery"]
+    assert traits["service_cold_start"]["label_zh"] == "服务冷启动"
+    assert mappings["stateaxis-pipelined-weight-loading"] == ["service_cold_start"]
     organization_mods = {
         item["id"]
         for item in REGISTRY["components"]
@@ -760,7 +794,7 @@ def test_workshop_supports_workload_guided_discovery() -> None:
         assert plugin_traits
         assert set(plugin_traits) <= set(traits)
 
-    assert "按 Workload 找 MOD" in PAGE
+    assert "按负载或场景找 MOD" in PAGE
     assert "This is capability matching, not a performance guarantee." in PAGE
     assert 'data-source="./data/plugin-workload-navigation.json?v=' in PAGE
     assert "function renderWorkloadNavigation()" in SCRIPT
@@ -779,9 +813,7 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert (
-        'data-taxonomy="./data/mod-taxonomy.json?v=startup-deployment-20261012"' in PAGE
-    )
+    assert 'data-taxonomy="./data/mod-taxonomy.json?v=taxonomy-v2-20261012"' in PAGE
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
@@ -794,11 +826,15 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         for item in REGISTRY["components"]
         if item.get("public_surface", True) is not False
         and item.get("maintainers")
+        and item.get("canonical_repository", "").startswith(
+            "https://github.com/vLLM-HUST/"
+        )
         and (
             item["id"] in MOD_TAXONOMY["components"]
             or item["id"] == "ascend-attention-boundary"
         )
     }
+    people_cards |= {"core-attention-boundary", "ascend-attention-boundary"}
     assert set(WORKSHOP_METADATA["plugins"]) == people_cards
     public_catalog_ids = {
         item["id"]
@@ -806,13 +842,22 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         if item.get("public_surface", True) is not False
         and item["id"] in MOD_TAXONOMY["components"]
     }
-    assert public_catalog_ids - set(WORKSHOP_METADATA["plugins"]) == {
+    without_metrics = public_catalog_ids - set(WORKSHOP_METADATA["plugins"])
+    system_boundaries = {
         "mooncake",
         "mooncake-vllm-connectors",
         "ride-control-plane",
         "vllm-local-control-host",
         "ride-runtime-bridge",
     }
+    assert all(
+        component_id in system_boundaries
+        or not by_id(component_id).get("maintainers")
+        or not by_id(component_id)
+        .get("canonical_repository", "")
+        .startswith("https://github.com/vLLM-HUST/")
+        for component_id in without_metrics
+    )
     for plugin_id, plugin in WORKSHOP_METADATA["plugins"].items():
         assert plugin["maintainers"]
         assert all(
@@ -940,12 +985,12 @@ def test_gdn_state_codec_publishes_ecpa_activation_and_negative_result() -> None
 
 
 def test_public_stateaxis_mod_repositories_are_visible_with_scoped_evidence() -> None:
-    inspect_only_ids = {
+    experimental_ids = {
         "stateaxis-automatic-prefix-cache",
         "stateaxis-async-kv-transfer",
         "stateaxis-pipelined-weight-loading",
     }
-    visible_ids = inspect_only_ids | {"gdn-state-codec"}
+    visible_ids = experimental_ids | {"gdn-state-codec"}
     portfolio_by_name = {item["name"]: item for item in PORTFOLIO["repositories"]}
 
     for component_id in visible_ids:
@@ -961,16 +1006,16 @@ def test_public_stateaxis_mod_repositories_are_visible_with_scoped_evidence() ->
         assert portfolio_by_name[component_id]["component_ids"] == [component_id]
         assert "Qixin-Gaoke" not in json.dumps(component)
 
-    for component_id in inspect_only_ids:
+    for component_id in experimental_ids:
         component = by_id(component_id)
-        assert component["compatibility"]["status"] == "inspect_only"
+        assert component["compatibility"]["status"] == "experimental"
         assert component["public_effect_status"] == "preview"
 
     assert by_id("stateaxis-automatic-prefix-cache")["evidence_level"] == (
-        "source_evidence_only"
+        "runtime_activation_verified_performance_unqualified"
     )
     assert by_id("stateaxis-async-kv-transfer")["evidence_level"] == (
-        "source_evidence_only"
+        "runtime_activation_verified_historical_performance_only"
     )
     for component_id in {
         "stateaxis-automatic-prefix-cache",
@@ -1062,7 +1107,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=project-grouping-20261009" in PAGE
-    assert "plugins-page.js?v=taxonomy-recovery-20261010" in PAGE
+    assert "plugins-page.js?v=taxonomy-v2-20261012" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1112,14 +1157,18 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=startup-deployment-20261012"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=taxonomy-v2-20261012"' in PAGE
+    assert (
+        'data-stateaxis="./data/stateaxis-topic-mods.json?v=taxonomy-v2-20261012"'
+        in PAGE
+    )
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
         'v=ecpa-final-20261009-project-grouping"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?'
-        'v=startup-deployment-20261012"' in PAGE
+        'v=taxonomy-v2-20261012"' in PAGE
     )
     assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
 
@@ -1575,7 +1624,7 @@ def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
     assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 35
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 59
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1675,7 +1724,7 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
     assert PAGE.count("ecpa-final-20261009") >= 2
-    assert "startup-deployment-20261012" in PAGE
+    assert "taxonomy-v2-20261012" in PAGE
 
 
 def test_bidkv_copy_reports_the_new_cell_without_erasing_old_boundaries() -> None:
@@ -1702,6 +1751,7 @@ def test_traceloom_is_a_peer_runtime_mod_with_an_offline_python_interface():
     assert MOD_TAXONOMY["components"]["traceloom"] == {
         "kind": "tool_mod",
         "capability": "observability_evaluation",
+        "phases": ["observability"],
         "lifecycle": "implemented",
         "evidence": "no_performance_claim",
     }

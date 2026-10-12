@@ -1754,15 +1754,15 @@
       "canonical_repository": "https://github.com/vLLM-HUST/stateaxis-automatic-prefix-cache",
       "repository_visibility": "public",
       "upstream_repository": null,
-      "summary_en": "A default-off Manifest 0.3 research MOD for lease-safe, content-addressed prefix reuse with bounded residency. The current repository is inspect-only: Extension Manager must refuse activation until the StateAxis host contract and independent implementation are reviewed.",
-      "summary_zh": "面向租约安全、内容寻址前缀复用与有界驻留的默认关闭 Manifest 0.3 研究 MOD。当前仓库仅供检查；在 StateAxis 宿主合同与独立实现完成评审前，Extension Manager 必须拒绝激活。",
+      "summary_en": "A default-off Manifest 0.3 MOD for lease-safe, content-addressed prefix reuse with bounded residency. Extension Manager is the sole activation path; activation support does not imply a performance gain.",
+      "summary_zh": "面向租约安全、内容寻址前缀复用与有界驻留的默认关闭 Manifest 0.3 MOD。Extension Manager 是唯一激活路径；可激活不代表已有性能收益。",
       "public_effect_en": "Frozen StateAxis source evidence records a positive repeated-prefix cell and 0.0256% measured default-path overhead. This provenance is not inherited as qualification by the split MOD and does not establish a general online gain.",
       "public_effect_zh": "冻结的 StateAxis 来源证据记录了一个重复前缀正向单元，以及 0.0256% 的默认路径开销。拆分后的 MOD 不自动继承该资格，该结果也不能推广为一般在线收益。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-automatic-prefix-cache/blob/main/evidence/ISSUE95_BOUNDED_APC_CLOSURE_20260815.md",
       "functional_compatibility": {
-        "status": "inspect_only",
-        "scope": "Manifest 0.3 descriptor; runtime activation intentionally refused"
+        "status": "passed",
+        "scope": "Manifest 0.3 hash-bound experimental activation contract; performance qualification remains separate"
       },
       "effectiveness_qualifications": [
         {
@@ -1771,23 +1771,23 @@
         }
       ],
       "compatibility": {
-        "status": "inspect_only",
+        "status": "experimental",
         "host": "StateAxis through vLLM-HUST Extension Manager",
         "versions": [
-          "repository main @ 0a5b7099730272332959b6dfc0c85e93c102439f",
+          "repository main @ 77a2124ad4ed58c4cf8bb6990418656ddb3b761a",
           "Manifest 0.3 experimental",
           "runtime ID org.vllm-hust.stateaxis-automatic-prefix-cache"
         ],
         "platforms": [
-          "Host contract pending; no platform qualification"
+          "ECPA activation contract verified; useful cache-hit hardware qualification pending"
         ],
         "models": [
           "Frozen source evidence only; no split-MOD model qualification"
         ],
-        "requirements_en": "Inspect only. Keep disabled by default; do not interpret descriptor discovery or frozen StateAxis evidence as runtime-effective proof.",
-        "requirements_zh": "仅供检查。必须默认关闭；不得把描述符发现或冻结的 StateAxis 证据解释为运行时生效证明。"
+        "requirements_en": "Keep disabled by default. Runtime activation is available only through Extension Manager; the recorded matched process exercised zero cache hits and does not establish a gain.",
+        "requirements_zh": "必须默认关闭且只能通过 Extension Manager 激活；现有配对进程未产生 cache hit，不能据此声明收益。"
       },
-      "evidence_level": "source_evidence_only"
+      "evidence_level": "runtime_activation_verified_performance_unqualified"
     },
     {
       "id": "stateaxis-async-kv-transfer",
@@ -1825,15 +1825,15 @@
       "canonical_repository": "https://github.com/vLLM-HUST/stateaxis-async-kv-transfer",
       "repository_visibility": "public",
       "upstream_repository": null,
-      "summary_en": "A default-off Manifest 0.3 research MOD for bounded, out-of-order device KV-transfer overlap with explicit ownership and drain. The current repository is inspect-only and has no accepted activation path.",
-      "summary_zh": "面向有界乱序设备 KV 传输重叠、显式所有权与 drain 的默认关闭 Manifest 0.3 研究 MOD。当前仓库仅供检查，尚无获准的激活路径。",
+      "summary_en": "A default-off Manifest 0.3 MOD for bounded, out-of-order device KV-transfer overlap with explicit ownership and drain. Extension Manager provides the accepted experimental activation path; fresh version-bound performance qualification remains pending.",
+      "summary_zh": "面向有界乱序设备 KV 传输重叠、显式所有权与 drain 的默认关闭 Manifest 0.3 MOD。Extension Manager 已提供实验性激活路径；当前版本绑定的性能资格仍待补测。",
       "public_effect_en": "Frozen StateAxis source evidence records positive bounded device-overlap behavior. That qualification is not inherited by this split MOD and is neither cross-instance tiering evidence nor a KV-capacity claim.",
       "public_effect_zh": "冻结的 StateAxis 来源证据记录了有界设备重叠的正向表现；它不是拆分后 MOD 的独立资格证明，也不是跨实例分层或 KV 容量收益证据。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-async-kv-transfer/blob/main/evidence/ISSUE76_ASYNC_TRANSFER_LANE_CLOSURE_20260815.md",
       "functional_compatibility": {
-        "status": "inspect_only",
-        "scope": "Manifest 0.3 descriptor; runtime activation intentionally refused"
+        "status": "passed",
+        "scope": "Manifest 0.3 ECPA-only bounded transfer contract; fresh version-bound performance qualification pending"
       },
       "effectiveness_qualifications": [
         {
@@ -1842,23 +1842,23 @@
         }
       ],
       "compatibility": {
-        "status": "inspect_only",
+        "status": "experimental",
         "host": "StateAxis through vLLM-HUST Extension Manager",
         "versions": [
-          "repository main @ 58ae1035d05be58c390fa60eb1eb9a42ab25a874",
+          "repository main @ fab17ad57c63ef33fce29a508c660b19dd3e6293",
           "Manifest 0.3 experimental",
           "runtime ID org.vllm-hust.stateaxis-async-kv-transfer"
         ],
         "platforms": [
-          "Host contract pending; no platform qualification"
+          "Experimental ECPA activation contract; current-version NPU qualification pending"
         ],
         "models": [
           "Frozen source evidence only; no split-MOD model qualification"
         ],
-        "requirements_en": "Inspect only. Keep disabled by default; ownership, drain, failure recovery, and matched ON/OFF gates remain pending.",
-        "requirements_zh": "仅供检查。必须默认关闭；所有权、drain、失败恢复及 matched ON/OFF 门禁仍待完成。"
+        "requirements_en": "Keep disabled by default and activate only through Extension Manager. Historical overlap evidence does not qualify the current revision; fresh ownership, drain, failure-recovery and matched ON/OFF gates remain required.",
+        "requirements_zh": "必须默认关闭且只能通过 Extension Manager 激活。历史重叠证据不能为当前版本授予资格；仍需重新通过所有权、drain、失败恢复及 matched ON/OFF 门禁。"
       },
-      "evidence_level": "source_evidence_only"
+      "evidence_level": "runtime_activation_verified_historical_performance_only"
     },
     {
       "id": "stateaxis-pipelined-weight-loading",
@@ -1896,15 +1896,15 @@
       "canonical_repository": "https://github.com/vLLM-HUST/stateaxis-pipelined-weight-loading",
       "repository_visibility": "public",
       "upstream_repository": null,
-      "summary_en": "A default-off Manifest 0.3 research MOD for identity-bound staged model loading and cold-readiness optimization. The current repository is inspect-only and must not modify the host until its activation contract is reviewed.",
-      "summary_zh": "面向身份绑定分阶段模型加载与冷启动就绪优化的默认关闭 Manifest 0.3 研究 MOD。当前仓库仅供检查；激活合同评审完成前不得修改宿主。",
+      "summary_en": "A default-off Manifest 0.3 MOD for identity-bound staged model loading and cold-readiness optimization. Extension Manager verifies the bounded activation contract; formal ECPA ON/OFF performance qualification remains pending.",
+      "summary_zh": "面向身份绑定分阶段模型加载与冷启动就绪优化的默认关闭 Manifest 0.3 MOD。Extension Manager 校验有界激活合同；正式 ECPA ON/OFF 性能资格仍待完成。",
       "public_effect_en": "A matched 3+3 real-NPU carrier diagnostic on Qwen3.5-35B-A3B BF16 TP2 reduced median process-to-Ready time from 337.70 s to 301.62 s (10.68%) and median weight iteration from 166.20 s to 107.15 s (35.53%). This is startup evidence, not a steady-state throughput claim or a formal ECPA ON/OFF qualification.",
       "public_effect_zh": "Qwen3.5-35B-A3B BF16 TP2 的 3+3 次真实 NPU 配对载体诊断中，进程到 Ready 的中位时间由 337.70 秒降至 301.62 秒（10.68%），权重迭代中位时间由 166.20 秒降至 107.15 秒（35.53%）。这是启动阶段证据，不代表稳态吞吐提升，也不是正式 ECPA ON/OFF 资格结果。",
       "public_effect_status": "preview",
       "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-pipelined-weight-loading/blob/main/evidence/qwen35-loader-sharded-qualification-20261012/RESULT.json",
       "functional_compatibility": {
-        "status": "inspect_only",
-        "scope": "Manifest 0.3 descriptor; runtime activation intentionally refused"
+        "status": "passed",
+        "scope": "Manifest 0.3 identity-bound activation contract; formal matched performance qualification remains separate"
       },
       "effectiveness_qualifications": [
         {
@@ -1913,7 +1913,7 @@
         }
       ],
       "compatibility": {
-        "status": "inspect_only",
+        "status": "experimental",
         "host": "StateAxis through vLLM-HUST Extension Manager",
         "versions": [
           "repository main @ ac648fff8f7c8556ffa098824d7cc2179887d77c",
@@ -1926,8 +1926,8 @@
         "models": [
           "Qwen3.5-35B-A3B BF16 TP2 startup carrier diagnostic; steady-state throughput unclaimed"
         ],
-        "requirements_en": "Inspect only. Keep disabled by default. The published 10.68% result measures startup readiness for a pre-sharded carrier; artifact identity, rollback, lifecycle, cache control, and formal ECPA ON/OFF gates remain pending.",
-        "requirements_zh": "仅供检查，且必须默认关闭。公开的 10.68% 结果衡量预分片载体的启动就绪时间；制品身份、回滚、生命周期、缓存控制及正式 ECPA ON/OFF 门禁仍待完成。"
+        "requirements_en": "Keep disabled by default and activate only through Extension Manager. The published 10.68% result measures startup readiness for a pre-sharded carrier; cache control and formal ECPA ON/OFF gates remain pending.",
+        "requirements_zh": "必须默认关闭且只能通过 Extension Manager 激活。公开的 10.68% 结果衡量预分片载体的启动就绪时间；缓存控制及正式 ECPA ON/OFF 门禁仍待完成。"
       },
       "evidence_level": "hardware_startup_diagnostic"
     },

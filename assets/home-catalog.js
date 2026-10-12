@@ -1,9 +1,10 @@
 (() => {
   "use strict";
 
-  const registryUrl = "./data/ecosystem.json?v=mod-catalog-20261008";
-  const navigationUrl = "./data/plugin-workload-navigation.json?v=mod-catalog-20261008";
-  const taxonomyUrl = "./data/mod-taxonomy.json?v=startup-deployment-20261012";
+  const registryUrl = "./data/ecosystem.json?v=taxonomy-v2-20261012";
+  const stateaxisUrl = "./data/stateaxis-topic-mods.json?v=taxonomy-v2-20261012";
+  const navigationUrl = "./data/plugin-workload-navigation.json?v=taxonomy-v2-20261012";
+  const taxonomyUrl = "./data/mod-taxonomy.json?v=taxonomy-v2-20261012";
   let summary;
   let workloadCount;
 
@@ -15,12 +16,12 @@
     return lang === "zh" ? {
       kicker: `${modCount} 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。`,
       cta: `查看全部 ${modCount} 个 MOD →`,
-      fact: `${modCount} 个 MOD · ${workloads} 类 Workload`,
+      fact: `${modCount} 个 MOD · ${workloads} 类场景`,
       atlas: `探索 ${modCount} 个 MOD，覆盖调度、KV、执行、模型准备与可观测性。`
     } : {
       kicker: `${modCount} MODs for real serving workloads, with compatibility and evidence close at hand.`,
       cta: `Explore all ${modCount} MODs →`,
-      fact: `${modCount} MODs · ${workloads} workloads`,
+      fact: `${modCount} MODs · ${workloads} scenarios`,
       atlas: `Explore ${modCount} MODs for scheduling, KV, execution, model preparation, and observability.`
     };
   }
@@ -48,6 +49,10 @@
       if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
       return response.json();
     }),
+    fetch(stateaxisUrl, { cache: "no-cache" }).then((response) => {
+      if (!response.ok) throw new Error(`StateAxis MOD catalog request failed: ${response.status}`);
+      return response.json();
+    }),
     fetch(navigationUrl, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`workload navigation request failed: ${response.status}`);
       return response.json();
@@ -56,8 +61,9 @@
       if (!response.ok) throw new Error(`MOD taxonomy request failed: ${response.status}`);
       return response.json();
     })
-  ]).then(([registry, navigation, taxonomy]) => {
-    summary = window.EcosystemCatalog.summarize(registry, taxonomy);
+  ]).then(([registry, stateaxis, navigation, taxonomy]) => {
+    const combined = { ...registry, components: [...registry.components, ...stateaxis.components] };
+    summary = window.EcosystemCatalog.summarize(combined, taxonomy);
     workloadCount = Object.keys(navigation.traits || {}).length;
     render();
   }).catch((error) => {

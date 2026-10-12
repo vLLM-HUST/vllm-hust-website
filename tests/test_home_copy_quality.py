@@ -44,12 +44,12 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "38 MODs for real serving workloads, with compatibility and evidence close at hand.",
+        "58 MODs for real serving workloads, with compatibility and evidence close at hand.",
         "Explore extensions by workload, platform, and readiness",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "38 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。",
+        "58 个 MOD，覆盖真实推理场景，兼容状态与验证依据清晰可查。",
         "从推理运维到智能体应用。",
     ):
         assert phrase in INDEX
@@ -72,6 +72,10 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     ecosystem = json.loads(
         (root / "data" / "ecosystem.json").read_text(encoding="utf-8")
     )
+    stateaxis = json.loads(
+        (root / "data" / "stateaxis-topic-mods.json").read_text(encoding="utf-8")
+    )
+    ecosystem["components"].extend(stateaxis["components"])
     taxonomy = json.loads(
         (root / "data" / "mod-taxonomy.json").read_text(encoding="utf-8")
     )["components"]
@@ -83,7 +87,7 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
         and taxonomy.get(item["id"], {}).get("kind") in active_kinds
     }
     mod_count = len(mod_projects)
-    assert mod_count == 38
+    assert mod_count == 58
     workload_count = len(
         json.loads(
             (root / "data" / "plugin-workload-navigation.json").read_text(
@@ -91,13 +95,13 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
             )
         )["traits"]
     )
-    assert workload_count == 13
+    assert workload_count == 16
     assert f"Explore all {mod_count} MODs" in INDEX
     assert f"查看全部 {mod_count} 个 MOD" in INDEX
-    assert f"{mod_count} MODs · {workload_count} workloads" in INDEX
-    assert f"{mod_count} 个 MOD · {workload_count} 类 Workload" in INDEX
+    assert f"{mod_count} MODs · {workload_count} scenarios" in INDEX
+    assert f"{mod_count} 个 MOD · {workload_count} 类场景" in INDEX
     assert 'href="./plugins.html#plugin-catalog"' in INDEX
-    assert "EcosystemCatalog.summarize(registry, taxonomy)" in HOME_CATALOG_SCRIPT
+    assert "EcosystemCatalog.summarize(combined, taxonomy)" in HOME_CATALOG_SCRIPT
     assert "mod-taxonomy.json" in HOME_CATALOG_SCRIPT
     assert "performanceResults" not in CATALOG_SCRIPT
     assert "what is available for evaluation" in INDEX

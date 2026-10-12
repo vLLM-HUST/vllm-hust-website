@@ -71,6 +71,7 @@
     publicEffect: "公开效果",
     identity: "组件身份",
     capability: "能力域",
+    phases: "作用阶段",
     lifecycle: "生命周期",
     evidenceState: "证据状态",
     effectSource: "查看依据",
@@ -82,8 +83,8 @@
     requirements: "前置条件",
     followup: "负责人跟进 Issue",
     details: "兼容性与技术详情",
-    allWorkloads: "全部 Workload",
-    workloadTraits: "适用 Workload",
+    allWorkloads: "全部负载与场景",
+    workloadTraits: "适用负载 / 场景",
     allWorkloadDescription: "展示所有已公开分类组件；只有运行时 MOD 与连接器 MOD 进入性能候选，其余类型用于工具、控制与系统边界说明。",
     installRun: "安装 / 启动",
     boundaries: "关键边界",
@@ -141,6 +142,7 @@
     publicEffect: "Public result",
     identity: "Component identity",
     capability: "Capability area",
+    phases: "Execution phases",
     lifecycle: "Lifecycle",
     evidenceState: "Evidence state",
     effectSource: "View evidence",
@@ -152,8 +154,8 @@
     requirements: "Requirements",
     followup: "Owner follow-up issue",
     details: "Compatibility & technical details",
-    allWorkloads: "All workloads",
-    workloadTraits: "Workload fit",
+    allWorkloads: "All workloads and use cases",
+    workloadTraits: "Workload / use-case fit",
     allWorkloadDescription: "Show every published classified component. Only runtime and connector MODs are performance candidates; other types document tooling, control, and system boundaries.",
     installRun: "Install / run",
     boundaries: "Key boundaries",
@@ -206,8 +208,24 @@
       observability_evaluation: { en: "Observability and evaluation", zh: "可观测与评测" },
       model_preparation: { en: "Model preparation", zh: "模型准备" },
       startup_deployment: { en: "Startup and deployment", zh: "启动与部署" },
+      state_compression: { en: "State compression", zh: "状态压缩" },
+      state_residency: { en: "State residency", zh: "状态驻留" },
+      model_residency: { en: "Model and adapter residency", zh: "模型与适配器驻留" },
+      prefill_optimization: { en: "Prefill optimization", zh: "Prefill 优化" },
+      sampling: { en: "Sampling", zh: "采样" },
+      request_recovery: { en: "Request recovery", zh: "请求恢复" },
       lifecycle_control: { en: "Lifecycle control", zh: "生命周期控制" },
       policy_research: { en: "Policy research", zh: "策略研究" }
+    },
+    phases: {
+      offline_preparation: { en: "Offline preparation", zh: "离线制备" },
+      service_startup: { en: "Service startup", zh: "服务启动" },
+      request_admission: { en: "Request admission", zh: "请求准入" },
+      prefill: { en: "Prefill", zh: "Prefill" },
+      decode: { en: "Decode", zh: "Decode" },
+      state_lifecycle: { en: "State lifecycle", zh: "状态生命周期" },
+      service_lifecycle: { en: "Service lifecycle", zh: "服务生命周期" },
+      observability: { en: "Observability", zh: "可观测" }
     },
     lifecycle: {
       implemented: { en: "Implemented", zh: "已实现" },
@@ -1057,6 +1075,7 @@ vllm-hust-ext extension check ${extensionId}`
     [
       [copy().identity, taxonomyLabel("kind", taxonomy.kind)],
       [copy().capability, taxonomyLabel("capability", taxonomy.capability)],
+      [copy().phases, (taxonomy.phases || []).map((phase) => taxonomyLabel("phases", phase)).join(" · ")],
       [copy().lifecycle, taxonomyLabel("lifecycle", taxonomy.lifecycle)],
       [copy().evidenceState, taxonomyLabel("evidence", taxonomy.evidence)],
       [copy().planes, item.execution_planes.map(valueLabel).join(" · ")],
@@ -1303,7 +1322,7 @@ vllm-hust-ext extension check ${extensionId}`
   search.placeholder = copy().searchPlaceholder;
 
   const supportsModTaxonomy = (taxonomy) => (
-    taxonomy?.schema_version === "mod-taxonomy/v1"
+    taxonomy?.schema_version === "mod-taxonomy/v2"
     && taxonomy.components
     && typeof taxonomy.components === "object"
   );
@@ -1328,6 +1347,10 @@ vllm-hust-ext extension check ${extensionId}`
       if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
       return response.json();
     }),
+    fetch(catalog.dataset.stateaxis, { cache: "no-cache" }).then((response) => {
+      if (!response.ok) throw new Error(`StateAxis MOD catalog request failed: ${response.status}`);
+      return response.json();
+    }),
     fetch(catalog.dataset.metadata, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`Workshop metadata request failed: ${response.status}`);
       return response.json();
@@ -1342,12 +1365,15 @@ vllm-hust-ext extension check ${extensionId}`
       fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
-    .then(([payload, metadata, navigation, taxonomy, performance]) => {
+    .then(([payload, stateaxis, metadata, navigation, taxonomy, performance]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
       if (metadata.schema_version !== "plugin-workshop-metadata/v1" || !metadata.plugins) {
         throw new Error("unsupported Workshop metadata");
+      }
+      if (stateaxis.schema_version !== "stateaxis-topic-mod-catalog/v1" || !Array.isArray(stateaxis.components)) {
+        throw new Error("unsupported StateAxis MOD catalog");
       }
       if (navigation.schema_version !== "plugin-workload-navigation/v1" || !navigation.traits || !navigation.plugins) {
         throw new Error("unsupported workload navigation");
@@ -1357,7 +1383,10 @@ vllm-hust-ext extension check ${extensionId}`
           ? "MOD 分类数据版本暂不匹配，请刷新页面后重试。"
           : "The MOD classification data is temporarily out of date. Refresh the page and try again.");
       }
-      registry = payload;
+      const existingIds = new Set(payload.components.map((item) => item.id));
+      const duplicateIds = stateaxis.components.filter((item) => existingIds.has(item.id));
+      if (duplicateIds.length) throw new Error("duplicate StateAxis MOD catalog identity");
+      registry = { ...payload, components: [...payload.components, ...stateaxis.components] };
       modTaxonomy = taxonomy.components;
       performanceData = performance?.data;
       frontierData = performance?.frontier;
