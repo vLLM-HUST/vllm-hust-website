@@ -714,8 +714,8 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
     assert 'element("details", "plugin-technical-details")' in SCRIPT
     assert 'element("summary", "", copy().details)' in SCRIPT
     assert "copy().installRun" in SCRIPT
-    assert "Start with your workload" in PAGE
-    assert "从你的 Workload 开始" in PAGE
+    assert "Start with the intervention point" in PAGE
+    assert "先定位介入阶段" in PAGE
     assert ".plugin-compatibility-facts" in STYLES
     assert ".mod-catalog-guide" in STYLES
 
@@ -740,7 +740,7 @@ def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert "visible.filter((project) => project.kind === kind)" in SCRIPT
 
 
-def test_workshop_supports_workload_guided_discovery() -> None:
+def test_workshop_supports_phase_first_scenario_discovery() -> None:
     assert WORKLOAD_NAVIGATION["schema_version"] == "plugin-workload-navigation/v1"
     traits = WORKLOAD_NAVIGATION["traits"]
     mappings = WORKLOAD_NAVIGATION["plugins"]
@@ -794,21 +794,49 @@ def test_workshop_supports_workload_guided_discovery() -> None:
         assert plugin_traits
         assert set(plugin_traits) <= set(traits)
 
-    assert "按负载或场景找 MOD" in PAGE
-    assert "This is capability matching, not a performance guarantee." in PAGE
+    expected_phases = {
+        "offline_preparation",
+        "service_startup",
+        "request_admission",
+        "prefill",
+        "decode",
+        "state_lifecycle",
+        "service_lifecycle",
+        "observability",
+    }
+    visible_profiles = {
+        component_id: profile
+        for component_id, profile in MOD_TAXONOMY["components"].items()
+        if by_id(component_id).get("public_surface", True) is not False
+    }
+    assert {
+        phase for profile in visible_profiles.values() for phase in profile["phases"]
+    } == expected_phases
+    assert all(profile["phases"] for profile in visible_profiles.values())
+
+    assert "按介入阶段或场景找 MOD" in PAGE
+    assert "你想介入推理生命周期的哪个阶段？" in PAGE
+    assert "仅在确实适用时再叠加场景或用例特征" in PAGE
+    assert "Catalog matching is not a performance guarantee." in PAGE
+    assert "data-phase-filters" in PAGE
+    assert "data-phase-description" in PAGE
     assert 'data-source="./data/plugin-workload-navigation.json?v=' in PAGE
-    assert "function renderWorkloadNavigation()" in SCRIPT
-    assert "function workloadTags(item)" in SCRIPT
+    assert "function renderDiscoveryNavigation()" in SCRIPT
+    assert "function phaseTags(item)" in SCRIPT
+    assert "function scenarioTags(item)" in SCRIPT
     assert "function matchesSelectedType(item)" in SCRIPT
-    assert "renderWorkloadNavigation();\n        renderCatalog();" in SCRIPT
-    assert 'selectedWorkload === "all"' in SCRIPT
+    assert "renderDiscoveryNavigation();\n        renderCatalog();" in SCRIPT
+    assert 'selectedPhase === "all"' in SCRIPT
+    assert 'selectedScenario === "all"' in SCRIPT
+    assert "taxonomyProfile(item).phases || []" in SCRIPT
     assert ".workload-filter.active" in STYLES
+    assert ".plugin-phase-tag" in STYLES
     assert ".plugin-workload-tag" in STYLES
 
 
 def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> None:
     assert "registry.components.filter(isWorkshopMod)" in SCRIPT
-    assert "matchesSelectedType(item) && matchesWorkload" in SCRIPT
+    assert "matchesSelectedType(item) && matchesPhase && matchesScenario" in SCRIPT
     assert "taxonomyProfile(project.primary).kind" in SCRIPT
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
@@ -1106,8 +1134,8 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=project-grouping-20261009" in PAGE
-    assert "plugins-page.js?v=taxonomy-v2-20261012" in PAGE
+    assert "plugins.css?v=phase-scenario-navigation-20261012" in PAGE
+    assert "plugins-page.js?v=phase-scenario-navigation-20261012" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1180,6 +1208,8 @@ def test_browser_catalog_count_follows_the_canonical_mod_taxonomy() -> None:
     assert "data/mod-taxonomy.json" in browser_check
     assert 'taxonomy[item["id"]]["kind"] == "retired"' in browser_check
     assert "ecosystem registry request failed" in SCRIPT
+    assert "EcosystemCatalog.summarize(registry, taxonomy)" in SCRIPT
+    assert "EcosystemCatalog.summarize(payload, taxonomy)" not in SCRIPT
     assert "data/plugins.json" not in PAGE
 
 
