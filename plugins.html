@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003">
 <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901">
-<link rel="stylesheet" href="./assets/plugins.css?v=project-grouping-20261009">
+<link rel="stylesheet" href="./assets/plugins.css?v=phase-scenario-navigation-20261012">
 </head>
 <body data-page="plugins">
   <nav class="site-nav">
@@ -37,7 +37,7 @@
 <div class="content-panel">
 <span id="plugins-eyebrow" class="eyebrow">vLLM-HUST MOD catalog</span>
 <h1 id="plugins-title">MOD Workshop</h1>
-<p id="plugins-lede">Explore runtime extensions and ecosystem tools by workload, platform, and readiness.</p>
+<p id="plugins-lede">Explore runtime extensions and ecosystem tools by lifecycle phase, scenario, platform, and readiness.</p>
 <div class="plugin-hero-facts">
 <span>
 <strong data-plugin-count>—</strong>
@@ -931,27 +931,35 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
     <section class="workload-navigation" data-workload-navigation data-source="./data/plugin-workload-navigation.json?v=taxonomy-v2-20261012" aria-labelledby="workload-navigation-title">
       <header>
         <div>
-          <span class="workload-navigation-kicker"><span class="lang-en">Find by workload or use case</span><span class="lang-zh">按负载或场景找 MOD</span></span>
-          <h2 id="workload-navigation-title"><span class="lang-en">What does your serving workload look like?</span><span class="lang-zh">你的推理负载有什么特征？</span></h2>
+          <span class="workload-navigation-kicker"><span class="lang-en">Find by intervention point or scenario</span><span class="lang-zh">按介入阶段或场景找 MOD</span></span>
+          <h2 id="workload-navigation-title"><span class="lang-en">Where do you want to intervene in the inference lifecycle?</span><span class="lang-zh">你想介入推理生命周期的哪个阶段？</span></h2>
         </div>
-        <p><span class="lang-en">Choose one dominant trait. This is capability matching, not a performance guarantee.</span><span class="lang-zh">选择一个最主要的特征。这是能力匹配，不代表性能效果已经验证。</span></p>
+        <p><span class="lang-en">Start with a lifecycle phase. Add a scenario or use-case trait only when it applies. Catalog matching is not a performance guarantee.</span><span class="lang-zh">先选择生命周期阶段；仅在确实适用时再叠加场景或用例特征。目录匹配不代表性能效果已经验证。</span></p>
       </header>
-      <p id="workload-scroll-hint" class="workload-filter-description"><span class="lang-en">Swipe horizontally or focus this row and use arrow keys; Tab selects a filter.</span><span class="lang-zh">可横向滑动；键盘聚焦此行后用方向键滚动，Tab 选择筛选项。</span></p>
-      <div class="workload-filter-list" data-workload-filters tabindex="0" role="group" aria-labelledby="workload-navigation-title" aria-describedby="workload-scroll-hint"></div>
-      <p class="workload-filter-description" data-workload-description aria-live="polite"></p>
+      <div class="discovery-axis">
+        <strong><span class="lang-en">Lifecycle phase</span><span class="lang-zh">生命周期阶段</span></strong>
+        <div class="workload-filter-list" data-phase-filters tabindex="0" role="group" aria-label="Lifecycle phase"></div>
+        <p class="workload-filter-description" data-phase-description aria-live="polite"></p>
+      </div>
+      <div class="discovery-axis">
+        <strong><span class="lang-en">Scenario / use case (optional)</span><span class="lang-zh">场景 / 用例（可选）</span></strong>
+        <p id="workload-scroll-hint" class="workload-filter-description"><span class="lang-en">Use this second axis only when it describes the deployment or request pattern.</span><span class="lang-zh">只有当这些标签确实描述部署方式或请求模式时，才使用第二个维度。</span></p>
+        <div class="workload-filter-list" data-workload-filters tabindex="0" role="group" aria-label="Scenario or use case" aria-describedby="workload-scroll-hint"></div>
+        <p class="workload-filter-description" data-workload-description aria-live="polite"></p>
+      </div>
     </section>
     <aside class="mod-catalog-guide" aria-label="Extension catalog reading guide">
       <div>
-        <strong><span class="lang-en">Start with your workload</span><span class="lang-zh">从你的 Workload 开始</span></strong>
-        <span><span class="lang-en">Then check the host version, platform, and prerequisites.</span><span class="lang-zh">再确认宿主版本、硬件平台与前置条件。</span></span>
+        <strong><span class="lang-en">Start with the intervention point</span><span class="lang-zh">先定位介入阶段</span></strong>
+        <span><span class="lang-en">Choose offline preparation, startup, admission, prefill, decode, state/service lifecycle, or observability.</span><span class="lang-zh">从离线准备、启动、准入、Prefill、Decode、状态/服务生命周期或可观测性开始。</span></span>
       </div>
       <div>
-        <strong><span class="lang-en">Choose by readiness</span><span class="lang-zh">按成熟度选择</span></strong>
-        <span><span class="lang-en">Inspection-only projects are ready to evaluate, while external services keep their own operations lifecycle.</span><span class="lang-zh">“仅检查”项目适合了解与评估；外部服务仍由各自的运维流程管理。</span></span>
+        <strong><span class="lang-en">Narrow by scenario when relevant</span><span class="lang-zh">按需叠加场景</span></strong>
+        <span><span class="lang-en">Scenario traits are optional; tools, control planes, recovery, and observability MODs need not imply a workload shape.</span><span class="lang-zh">场景特征是可选项；工具、控制面、恢复与可观测 MOD 不必对应某种负载形态。</span></span>
       </div>
       <div>
-        <strong><span class="lang-en">Open a card for details</span><span class="lang-zh">展开卡片查看详情</span></strong>
-        <span><span class="lang-en">Contracts, execution boundaries, maintainers, and evidence are available when you need them.</span><span class="lang-zh">需要时可继续查看契约、执行边界、维护者与验证依据。</span></span>
+        <strong><span class="lang-en">Then check readiness and evidence</span><span class="lang-zh">再核对成熟度与证据</span></strong>
+        <span><span class="lang-en">Confirm host, platform, prerequisites, activation evidence, and scoped performance evidence separately.</span><span class="lang-zh">分别核对宿主、平台、前置条件、启用证据与有边界的性能证据。</span></span>
       </div>
     </aside>
     <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
@@ -1003,7 +1011,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
   <footer class="site-footer">
 <strong>vLLM-HUST</strong> · <span id="footer-copy">Portable inference mechanisms for domestic compute.</span>
 </footer>
-  <script>window.vllmHustPageDict={"en":{"title":"MOD Workshop | vLLM-HUST","plugins-eyebrow":"vLLM-HUST MOD catalog","plugins-title":"MOD Workshop","plugins-lede":"Explore runtime extensions and ecosystem tools by workload, platform, and readiness.","plugins-fact-items":"public MODs","plugins-fact-runtime":"compatibility verified","plugins-fact-review":"experimental or inspection-only","plugins-fact-publications":"hardware/performance evidence","plugins-fact-adjacent":"external systems","plugins-boundary-kicker":"How the catalog works","plugins-boundary-title":"Find the right extension without losing sight of who runs it.","plugins-boundary-copy":"The catalog keeps runtime plugins, KV connectors, external services, and control-plane tools distinct, so setup and ownership remain clear.","plugins-legend-kicker":"Catalog details","plugins-legend-title":"See what each project does, where it runs, and how it is delivered.","plugins-legend-existing":"System role","plugins-legend-existing-copy":"Runtime, platform, policy, KV system, control plane, evidence, or application.","plugins-legend-active":"Integration contract","plugins-legend-active-copy":"The versioned interface used to connect to vLLM.","plugins-legend-prototype":"Execution and topology","plugins-legend-prototype-copy":"The process, device, service, and deployment boundaries.","plugins-legend-roadmap":"Maintainers and evidence","plugins-legend-roadmap-copy":"Who maintains the project and how far its support has been verified.","plugins-search-label":"Search","plugins-adjacent-kicker":"Architecture boundaries","plugins-adjacent-title":"Plugins, connectors, and control planes play different roles.","plugins-adjacent-copy":"Each catalog entry shows its role, integration contract, execution boundary, deployment shape, and delivery format.","footer-copy":"A practical serving ecosystem for domestic compute, backed by clear compatibility and evidence."},"zh":{"title":"MOD 工坊 | vLLM-HUST","plugins-eyebrow":"vLLM-HUST MOD 目录","plugins-title":"MOD 工坊","plugins-lede":"按 Workload、平台与成熟度探索运行时扩展和生态工具。","plugins-fact-items":"个公开 MOD","plugins-fact-runtime":"个兼容性已验证","plugins-fact-review":"个实验性或仅检查","plugins-fact-publications":"项硬件或性能证据","plugins-fact-adjacent":"个外部系统","plugins-boundary-kicker":"目录使用方式","plugins-boundary-title":"找到合适的扩展，也看清它由谁运行和维护。","plugins-boundary-copy":"目录分别呈现运行时插件、KV connector、外部服务与控制面工具，让配置方式和生命周期归属保持清晰。","plugins-legend-kicker":"目录详情","plugins-legend-title":"了解每个项目做什么、在哪里运行、如何交付。","plugins-legend-existing":"系统角色","plugins-legend-existing-copy":"运行时、平台、策略、KV 系统、控制面、证据或应用。","plugins-legend-active":"集成契约","plugins-legend-active-copy":"连接 vLLM 时使用的版本化接口。","plugins-legend-prototype":"执行面与拓扑","plugins-legend-prototype-copy":"进程、设备、服务与部署边界。","plugins-legend-roadmap":"维护者与证据","plugins-legend-roadmap-copy":"由谁维护，以及目前验证到什么支持程度。","plugins-search-label":"搜索","plugins-adjacent-kicker":"架构边界","plugins-adjacent-title":"插件、connector 与 control plane 承担不同角色。","plugins-adjacent-copy":"每个条目都会展示系统角色、集成契约、执行边界、部署形态与交付方式。","footer-copy":"面向国产算力的实用推理生态，兼容状态与验证依据清晰可查。"}};</script>
+  <script>window.vllmHustPageDict={"en":{"title":"MOD Workshop | vLLM-HUST","plugins-eyebrow":"vLLM-HUST MOD catalog","plugins-title":"MOD Workshop","plugins-lede":"Explore runtime extensions and ecosystem tools by lifecycle phase, scenario, platform, and readiness.","plugins-fact-items":"public MODs","plugins-fact-runtime":"compatibility verified","plugins-fact-review":"experimental or inspection-only","plugins-fact-publications":"hardware/performance evidence","plugins-fact-adjacent":"external systems","plugins-boundary-kicker":"How the catalog works","plugins-boundary-title":"Find the right extension without losing sight of who runs it.","plugins-boundary-copy":"The catalog keeps runtime plugins, KV connectors, external services, and control-plane tools distinct, so setup and ownership remain clear.","plugins-legend-kicker":"Catalog details","plugins-legend-title":"See what each project does, where it runs, and how it is delivered.","plugins-legend-existing":"System role","plugins-legend-existing-copy":"Runtime, platform, policy, KV system, control plane, evidence, or application.","plugins-legend-active":"Integration contract","plugins-legend-active-copy":"The versioned interface used to connect to vLLM.","plugins-legend-prototype":"Execution and topology","plugins-legend-prototype-copy":"The process, device, service, and deployment boundaries.","plugins-legend-roadmap":"Maintainers and evidence","plugins-legend-roadmap-copy":"Who maintains the project and how far its support has been verified.","plugins-search-label":"Search","plugins-adjacent-kicker":"Architecture boundaries","plugins-adjacent-title":"Plugins, connectors, and control planes play different roles.","plugins-adjacent-copy":"Each catalog entry shows its role, integration contract, execution boundary, deployment shape, and delivery format.","footer-copy":"A practical serving ecosystem for domestic compute, backed by clear compatibility and evidence."},"zh":{"title":"MOD 工坊 | vLLM-HUST","plugins-eyebrow":"vLLM-HUST MOD 目录","plugins-title":"MOD 工坊","plugins-lede":"按生命周期阶段、场景、平台与成熟度探索运行时扩展和生态工具。","plugins-fact-items":"个公开 MOD","plugins-fact-runtime":"个兼容性已验证","plugins-fact-review":"个实验性或仅检查","plugins-fact-publications":"项硬件或性能证据","plugins-fact-adjacent":"个外部系统","plugins-boundary-kicker":"目录使用方式","plugins-boundary-title":"找到合适的扩展，也看清它由谁运行和维护。","plugins-boundary-copy":"目录分别呈现运行时插件、KV connector、外部服务与控制面工具，让配置方式和生命周期归属保持清晰。","plugins-legend-kicker":"目录详情","plugins-legend-title":"了解每个项目做什么、在哪里运行、如何交付。","plugins-legend-existing":"系统角色","plugins-legend-existing-copy":"运行时、平台、策略、KV 系统、控制面、证据或应用。","plugins-legend-active":"集成契约","plugins-legend-active-copy":"连接 vLLM 时使用的版本化接口。","plugins-legend-prototype":"执行面与拓扑","plugins-legend-prototype-copy":"进程、设备、服务与部署边界。","plugins-legend-roadmap":"维护者与证据","plugins-legend-roadmap-copy":"由谁维护，以及目前验证到什么支持程度。","plugins-search-label":"搜索","plugins-adjacent-kicker":"架构边界","plugins-adjacent-title":"插件、connector 与 control plane 承担不同角色。","plugins-adjacent-copy":"每个条目都会展示系统角色、集成契约、执行边界、部署形态与交付方式。","footer-copy":"面向国产算力的实用推理生态，兼容状态与验证依据清晰可查。"}};</script>
   <script>
     Object.assign(window.vllmHustPageDict.en, {
       "plugins-legend-existing": "MOD identity",
@@ -1030,7 +1038,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
 </script>
 <script src="./assets/plugin-performance.js?v=ecpa-final-20261009"></script>
 <script src="./assets/ecosystem-catalog.js?v=mod-count-20261010"></script>
-<script src="./assets/plugins-page.js?v=taxonomy-v2-20261012">
+<script src="./assets/plugins-page.js?v=phase-scenario-navigation-20261012">
 </script>
 </body>
 </html>

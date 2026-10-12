@@ -313,6 +313,12 @@ def main():
         if more_button.is_visible():
             more_button.click()
         assert page.locator(".workshop-card").count() == workshop_mod_count
+        assert page.locator("[data-phase-filters] button").count() == 9
+        assert page.locator("[data-workload-filters] button").count() == 17
+        page.locator('[data-phase="observability"]').click()
+        assert page.locator("#traceloom").is_visible()
+        assert page.locator("#vspec").count() == 0
+        page.locator('[data-phase="all"]').click()
         tool_section = page.locator(".plugin-category-tool_mod")
         assert (
             tool_section.locator(".plugin-category-title").inner_text() == "Tool MODs"

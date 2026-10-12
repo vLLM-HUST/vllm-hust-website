@@ -6,6 +6,8 @@
   const modelSelect = document.querySelector("[data-plugin-model]");
   const more = document.querySelector("[data-plugin-more]");
   const workloadNavigationRoot = document.querySelector("[data-workload-navigation]");
+  const phaseFilters = document.querySelector("[data-phase-filters]");
+  const phaseDescription = document.querySelector("[data-phase-description]");
   const workloadFilters = document.querySelector("[data-workload-filters]");
   const workloadDescription = document.querySelector("[data-workload-description]");
   const adjacent = document.querySelector("[data-adjacent-assets]");
@@ -23,7 +25,8 @@
   let workloadNavigation = { traits: {}, plugins: {} };
   let modTaxonomy = {};
   let selectedType = "extensions";
-  let selectedWorkload = "all";
+  let selectedPhase = "all";
+  let selectedScenario = "all";
   const taxonomyProfile = item => modTaxonomy[item.id] || {};
   const isPerformanceCandidate = item => ["runtime_mod", "connector_mod"].includes(taxonomyProfile(item).kind);
 
@@ -83,9 +86,12 @@
     requirements: "前置条件",
     followup: "负责人跟进 Issue",
     details: "兼容性与技术详情",
-    allWorkloads: "全部负载与场景",
-    workloadTraits: "适用负载 / 场景",
-    allWorkloadDescription: "展示所有已公开分类组件；只有运行时 MOD 与连接器 MOD 进入性能候选，其余类型用于工具、控制与系统边界说明。",
+    allPhases: "全部阶段",
+    allScenarios: "全部场景 / 用例",
+    phaseAxis: "生命周期阶段",
+    scenarioTraits: "适用场景 / 用例",
+    allPhaseDescription: "生命周期阶段是所有 MOD 的主导航维度，包括离线工具、控制面、恢复与可观测组件。",
+    allScenarioDescription: "场景与用例是可选的第二维度；不要求每个 MOD 对应一种负载形态。",
     installRun: "安装 / 启动",
     boundaries: "关键边界",
     repositories: "个组织仓库",
@@ -154,9 +160,12 @@
     requirements: "Requirements",
     followup: "Owner follow-up issue",
     details: "Compatibility & technical details",
-    allWorkloads: "All workloads and use cases",
-    workloadTraits: "Workload / use-case fit",
-    allWorkloadDescription: "Show every published classified component. Only runtime and connector MODs are performance candidates; other types document tooling, control, and system boundaries.",
+    allPhases: "All phases",
+    allScenarios: "All scenarios / use cases",
+    phaseAxis: "Lifecycle phase",
+    scenarioTraits: "Scenario / use-case fit",
+    allPhaseDescription: "Lifecycle phase is the primary axis for every MOD, including offline tools, control planes, recovery, and observability components.",
+    allScenarioDescription: "Scenario and use case are an optional second axis; not every MOD implies a workload shape.",
     installRun: "Install / run",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
@@ -271,6 +280,40 @@
   const taxonomyLabel = (field, value) => (
     taxonomyLabels[field]?.[value]?.[language()] || valueLabel(value)
   );
+  const phaseDescriptions = {
+    offline_preparation: {
+      en: "Prepare, transform, inspect, or validate artifacts before a serving process starts.",
+      zh: "在推理服务启动前制备、转换、检查或验证制品。"
+    },
+    service_startup: {
+      en: "Load models and adapters, initialize workers, and reach service readiness.",
+      zh: "加载模型与适配器、初始化 worker，并使服务进入就绪状态。"
+    },
+    request_admission: {
+      en: "Admit, route, queue, throttle, or recover requests before execution.",
+      zh: "在执行前完成请求准入、路由、排队、限流或恢复。"
+    },
+    prefill: {
+      en: "Intervene while prompts are ingested and initial state is materialized.",
+      zh: "在提示词摄入和初始状态物化阶段介入。"
+    },
+    decode: {
+      en: "Intervene in token generation, sampling, operators, or decode scheduling.",
+      zh: "在逐 token 生成、采样、算子或 Decode 调度阶段介入。"
+    },
+    state_lifecycle: {
+      en: "Manage KV, session, adapter, or workflow state across its lifecycle.",
+      zh: "管理 KV、会话、适配器或工作流状态的完整生命周期。"
+    },
+    service_lifecycle: {
+      en: "Operate service suspension, wake-up, scaling, control, or teardown.",
+      zh: "处理服务挂起、唤醒、伸缩、控制或销毁。"
+    },
+    observability: {
+      en: "Observe, profile, evaluate, or price behavior without implying a serving optimization.",
+      zh: "观测、剖析、评测或计价，不暗示它本身是推理性能优化。"
+    }
+  };
   const domainLabels = {
     runtime_platform: { en: "Runtime and platform", zh: "运行时与平台" },
     kv_state_data_path: { en: "KV state and data path", zh: "KV 状态与数据路径" },
@@ -608,7 +651,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       button.addEventListener("click", () => {
         selectedType = type;
         renderFilters();
-        renderWorkloadNavigation();
+        renderDiscoveryNavigation();
         renderCatalog();
       });
       filters.append(button);
@@ -652,58 +695,116 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       item.system_role, item.delivery_model, item.ownership, item.maturity,
       item.repository_relationship, item.evidence_level, item.execution_planes.join(" "),
       item.integration_contracts.join(" "), (item.integration_surfaces || []).join(" "),
-      taxonomy.kind, taxonomy.capability, taxonomy.lifecycle, taxonomy.evidence,
+      taxonomy.kind, taxonomy.capability, (taxonomy.phases || []).join(" "),
+      taxonomy.lifecycle, taxonomy.evidence,
       item.canonical_repository || "", item.upstream_repository || "", ...workloadText, ...peopleText
     ].join(" ").toLowerCase();
   }
 
-  function renderWorkloadNavigation() {
-    if (!workloadFilters || !workloadDescription || !registry) return;
+  function renderDiscoveryNavigation() {
+    if (!phaseFilters || !phaseDescription || !workloadFilters || !workloadDescription || !registry) return;
+    phaseFilters.replaceChildren();
     workloadFilters.replaceChildren();
-    const options = ["all", ...Object.keys(workloadNavigation.traits)];
     const query = search.value.trim().toLowerCase();
-    options.forEach((traitId) => {
+    const matchesScenario = (item, scenarioId = selectedScenario) => (
+      scenarioId === "all" || (workloadNavigation.plugins[item.id] || []).includes(scenarioId)
+    );
+    const matchesPhase = (item, phaseId = selectedPhase) => (
+      phaseId === "all" || (taxonomyProfile(item).phases || []).includes(phaseId)
+    );
+
+    ["all", ...Object.keys(taxonomyLabels.phases)].forEach((phaseId) => {
+      const isAll = phaseId === "all";
+      const count = catalogProjects().filter((project) => project.items.some((item) => (
+        matchesSelectedType(item)
+        && itemSearchText(item).includes(query)
+        && matchesScenario(item)
+        && matchesPhase(item, phaseId)
+      ))).length;
+      const button = element(
+        "button",
+        `workload-filter${selectedPhase === phaseId ? " active" : ""}`
+      );
+      button.type = "button";
+      button.dataset.phase = phaseId;
+      button.setAttribute("aria-pressed", String(selectedPhase === phaseId));
+      button.append(
+        element("span", "", isAll ? copy().allPhases : taxonomyLabel("phases", phaseId)),
+        element("strong", "", String(count))
+      );
+      button.addEventListener("click", () => {
+        selectedPhase = phaseId;
+        renderDiscoveryNavigation();
+        renderCatalog();
+        phaseFilters.querySelector(`[data-phase="${phaseId}"]`)?.focus({ preventScroll: true });
+      });
+      phaseFilters.append(button);
+    });
+    phaseDescription.textContent = selectedPhase === "all"
+      ? copy().allPhaseDescription
+      : phaseDescriptions[selectedPhase]?.[language()] || taxonomyLabel("phases", selectedPhase);
+
+    ["all", ...Object.keys(workloadNavigation.traits)].forEach((traitId) => {
       const isAll = traitId === "all";
       const count = catalogProjects().filter((project) => project.items.some((item) => (
         matchesSelectedType(item)
         && itemSearchText(item).includes(query)
-        && (isAll || (workloadNavigation.plugins[item.id] || []).includes(traitId))
+        && matchesPhase(item)
+        && matchesScenario(item, traitId)
       ))).length;
       const button = element(
         "button",
-        `workload-filter${selectedWorkload === traitId ? " active" : ""}`
+        `workload-filter${selectedScenario === traitId ? " active" : ""}`
       );
       button.type = "button";
-      button.dataset.workload = traitId;
-      button.setAttribute("aria-pressed", String(selectedWorkload === traitId));
+      button.dataset.scenario = traitId;
+      button.setAttribute("aria-pressed", String(selectedScenario === traitId));
       button.append(
-        element("span", "", isAll ? copy().allWorkloads : traitLabel(traitId)),
+        element("span", "", isAll ? copy().allScenarios : traitLabel(traitId)),
         element("strong", "", String(count))
       );
       button.addEventListener("click", () => {
-        selectedWorkload = traitId;
-        renderWorkloadNavigation();
+        selectedScenario = traitId;
+        renderDiscoveryNavigation();
         renderCatalog();
-        workloadFilters.querySelector(`[data-workload="${traitId}"]`)?.focus({ preventScroll: true });
+        workloadFilters.querySelector(`[data-scenario="${traitId}"]`)?.focus({ preventScroll: true });
       });
       workloadFilters.append(button);
     });
-    workloadDescription.textContent = selectedWorkload === "all"
-      ? copy().allWorkloadDescription
-      : local(traitProfile(selectedWorkload), "description");
+    workloadDescription.textContent = selectedScenario === "all"
+      ? copy().allScenarioDescription
+      : local(traitProfile(selectedScenario), "description");
   }
 
-  function workloadTags(item) {
+  function phaseTags(item) {
+    const phases = taxonomyProfile(item).phases || [];
+    if (!phases.length) return null;
+    const panel = element("div", "plugin-phase-tags");
+    panel.append(element("span", "plugin-workload-label", copy().phaseAxis));
+    phases.forEach((phaseId) => {
+      const tag = element("button", "plugin-phase-tag", taxonomyLabel("phases", phaseId));
+      tag.type = "button";
+      tag.addEventListener("click", () => {
+        selectedPhase = phaseId;
+        renderDiscoveryNavigation();
+        renderCatalog();
+      });
+      panel.append(tag);
+    });
+    return panel;
+  }
+
+  function scenarioTags(item) {
     const traits = workloadNavigation.plugins[item.id] || [];
     if (!traits.length) return null;
     const panel = element("div", "plugin-workload-tags");
-    panel.append(element("span", "plugin-workload-label", copy().workloadTraits));
+    panel.append(element("span", "plugin-workload-label", copy().scenarioTraits));
     traits.forEach((traitId) => {
       const tag = element("button", "plugin-workload-tag", traitLabel(traitId));
       tag.type = "button";
       tag.addEventListener("click", () => {
-        selectedWorkload = traitId;
-        renderWorkloadNavigation();
+        selectedScenario = traitId;
+        renderDiscoveryNavigation();
         renderCatalog();
       });
       panel.append(tag);
@@ -1053,8 +1154,10 @@ vllm-hust-ext extension check ${extensionId}`
     card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", summary));
     const projectComponents = projectComponentsPanel(projectItems);
     if (projectComponents) card.append(projectComponents);
-    const traits = workloadTags(item);
-    if (traits) card.append(traits);
+    const phases = phaseTags(item);
+    if (phases) card.append(phases);
+    const scenarios = scenarioTags(item);
+    if (scenarios) card.append(scenarios);
     if (isPerformanceCandidate(item)) {
       card.append(performancePanel(performanceResults.get(item.id)));
     }
@@ -1231,10 +1334,12 @@ vllm-hust-ext extension check ${extensionId}`
     const query = search.value.trim().toLowerCase();
     const visible = catalogProjects().filter((project) => {
       const matchesComponent = project.items.some((item) => {
-        const itemWorkloadTraits = workloadNavigation.plugins[item.id] || [];
-        const matchesWorkload = selectedWorkload === "all"
-          || itemWorkloadTraits.includes(selectedWorkload);
-        return matchesSelectedType(item) && matchesWorkload
+        const itemScenarios = workloadNavigation.plugins[item.id] || [];
+        const matchesPhase = selectedPhase === "all"
+          || (taxonomyProfile(item).phases || []).includes(selectedPhase);
+        const matchesScenario = selectedScenario === "all"
+          || itemScenarios.includes(selectedScenario);
+        return matchesSelectedType(item) && matchesPhase && matchesScenario
           && itemSearchText(item).includes(query);
       });
       const item = project.primary;
@@ -1290,7 +1395,7 @@ vllm-hust-ext extension check ${extensionId}`
 
   search.addEventListener("input", () => {
     if (registry) {
-      renderWorkloadNavigation();
+      renderDiscoveryNavigation();
       renderCatalog();
     }
     renderPortfolio();
@@ -1299,7 +1404,7 @@ vllm-hust-ext extension check ${extensionId}`
     if (!performanceData || !frontierData || !window.PluginPerformance) return;
     selectedModel = modelSelect.value;
     performanceResults = PluginPerformance.summarize(performanceData, frontierData, selectedModel || null);
-    renderWorkloadNavigation();
+    renderDiscoveryNavigation();
     renderCatalog();
   });
   function renderPageLabels() {
@@ -1410,7 +1515,7 @@ vllm-hust-ext extension check ${extensionId}`
       workloadNavigation = navigation;
       renderPageLabels();
       search.placeholder = copy().searchPlaceholder;
-      const catalogSummary = window.EcosystemCatalog.summarize(payload, taxonomy);
+      const catalogSummary = window.EcosystemCatalog.summarize(registry, taxonomy);
       document.querySelectorAll("[data-plugin-count]").forEach((node) => { node.textContent = String(catalogSummary.total); });
       const supported = catalogSummary.verified;
       const incubating = catalogSummary.evaluating;
@@ -1421,7 +1526,7 @@ vllm-hust-ext extension check ${extensionId}`
       document.querySelectorAll("[data-publication-count]").forEach((node) => { node.textContent = String(evidence).padStart(2, "0"); });
       document.querySelectorAll("[data-adjacent-count]").forEach((node) => { node.textContent = String(external).padStart(2, "0"); });
       renderFilters();
-      renderWorkloadNavigation();
+      renderDiscoveryNavigation();
       renderCatalog();
       renderBoundaries();
     })
@@ -1463,7 +1568,7 @@ vllm-hust-ext extension check ${extensionId}`
     if (!registry) return;
     search.placeholder = copy().searchPlaceholder;
     renderFilters();
-    renderWorkloadNavigation();
+    renderDiscoveryNavigation();
     renderCatalog();
     renderBoundaries();
     renderPortfolio();
