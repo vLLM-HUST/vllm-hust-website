@@ -1017,10 +1017,10 @@ def test_public_stateaxis_mod_repositories_are_visible_with_scoped_evidence() ->
     assert by_id("stateaxis-async-kv-transfer")["evidence_level"] == (
         "runtime_activation_verified_historical_performance_only"
     )
-    for component_id in {
+    for component_id in (
         "stateaxis-automatic-prefix-cache",
         "stateaxis-async-kv-transfer",
-    }:
+    ):
         component = by_id(component_id)
         assert "not inherited" in component["public_effect_en"] or (
             "does not inherit" in component["public_effect_en"]
