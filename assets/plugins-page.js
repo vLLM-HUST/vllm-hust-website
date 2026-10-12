@@ -205,6 +205,7 @@
       parallel_communication: { en: "Parallel communication", zh: "并行与通信" },
       observability_evaluation: { en: "Observability and evaluation", zh: "可观测与评测" },
       model_preparation: { en: "Model preparation", zh: "模型准备" },
+      startup_deployment: { en: "Startup and deployment", zh: "启动与部署" },
       lifecycle_control: { en: "Lifecycle control", zh: "生命周期控制" },
       policy_research: { en: "Policy research", zh: "策略研究" }
     },
