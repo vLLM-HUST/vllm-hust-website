@@ -626,7 +626,6 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
     "activation-sparsity-migration": "org.vllm-hust.activation-sparsity",
     "pipeline-microbatch-migration": "org.vllm-hust.pipeline-microbatch",
     "qos-scheduler-migration": "org.vllm-hust.qos-scheduler",
-    "stateharbor": "org.vllm-hust.stateharbor",
     "clm-lifecycle": "org.vllm-hust.clm-lifecycle",
     "request-throttling-controller": "org.vllm-hust.request-throttling-controller",
     "request-lifecycle-profiler": "org.vllm-hust.request-lifecycle-profiler",

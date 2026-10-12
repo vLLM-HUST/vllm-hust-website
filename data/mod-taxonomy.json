@@ -18,7 +18,6 @@
     "kv-tiering-migration": {"kind":"runtime_mod","capability":"kv_management","phases":["state_lifecycle"],"lifecycle":"qualification_pending","evidence":"runtime_effective_pending"},
     "knorm-migration": {"kind":"runtime_mod","capability":"kv_management","phases":["prefill","decode","state_lifecycle"],"lifecycle":"qualification_pending","evidence":"hardware_validation_pending"},
     "pyramidkv-ascend-migration": {"kind":"runtime_mod","capability":"kv_management","phases":["prefill","decode","state_lifecycle"],"lifecycle":"implemented_restricted","evidence":"functionally_validated"},
-    "stateharbor": {"kind":"runtime_mod","capability":"kv_management","phases":["state_lifecycle"],"lifecycle":"research","evidence":"host_integration_pending"},
     "latchmoe": {"kind":"runtime_mod","capability":"operators_attention","phases":["prefill","decode"],"lifecycle":"implemented_restricted","evidence":"qualified_restricted"},
     "vllm-hust-opset": {"kind":"runtime_mod","capability":"operators_attention","phases":["prefill","decode"],"lifecycle":"implemented_restricted","evidence":"measured_beneficial"},
     "core-attention-boundary": {"kind":"runtime_mod","capability":"operators_attention","phases":["prefill","decode"],"lifecycle":"implemented_restricted","evidence":"runtime_effective_no_causal_attribution"},

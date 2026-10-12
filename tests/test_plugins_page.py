@@ -1264,7 +1264,7 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 61
+    assert len(PORTFOLIO["repositories"]) == 60
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "extension-manager",
@@ -1337,7 +1337,6 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         "vllm-hust-activation-sparsity": "activation-sparsity-migration",
         "vllm-hust-pipeline-microbatch": "pipeline-microbatch-migration",
         "vllm-hust-qos-scheduler": "qos-scheduler-migration",
-        "vllm-hust-stateharbor": "stateharbor",
         "vllm-hust-scheduler-policy-lab": "scheduler-policy-lab",
     }
     repositories = {item["name"]: item for item in PORTFOLIO["repositories"]}
@@ -1422,7 +1421,7 @@ def test_graduation_followups_and_external_advisors_are_visible() -> None:
         for item in REGISTRY["components"]
         if item.get("compatibility", {}).get("followup_url")
     ]
-    assert len(followups) == 15
+    assert len(followups) == 14
     assert all(url.startswith("https://github.com/vLLM-HUST/") for url in followups)
     assert "profile.followup_url" in SCRIPT
     assert "plugin-compatibility-followup" in SCRIPT
@@ -1572,7 +1571,6 @@ def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> Non
         "layered-prefill-migration",
         "activation-sparsity-migration",
         "qos-scheduler-migration",
-        "stateharbor",
     }
     for component_id in inspectable:
         compatibility = by_id(component_id)["compatibility"]
@@ -1648,10 +1646,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
     assert "--no-async-scheduling" not in SCRIPT
 
 
-def test_betterscale_replaces_stateharbor_in_the_shared_mod_catalog():
-    assert by_id("stateharbor")["public_surface"] is False
-    assert "stateharbor" not in WORKLOAD_NAVIGATION["plugins"]
-    assert "stateharbor" not in WORKSHOP_METADATA["plugins"]
+def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
     assert len(WORKLOAD_NAVIGATION["plugins"]) == 59

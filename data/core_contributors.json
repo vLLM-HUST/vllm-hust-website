@@ -44,7 +44,6 @@
       "vllm-hust-request-lifecycle-profiler",
       "vllm-hust-scheduler-policy-lab",
       "vllm-hust-slicegpt",
-      "vllm-hust-stateharbor",
       "vllm-hust-unified-comm",
       "vllm-hust-vSpec",
       "vllm-hust.github.io"
@@ -59,7 +58,7 @@
         "changed_lines": 1498948,
         "added": 1019636,
         "deleted": 479312,
-        "active_repos": 39,
+        "active_repos": 38,
         "repos": [
           ".github",
           "ascend-runtime-manager",
@@ -95,7 +94,6 @@
           "vllm-hust-request-lifecycle-profiler",
           "vllm-hust-scheduler-policy-lab",
           "vllm-hust-slicegpt",
-          "vllm-hust-stateharbor",
           "vllm-hust-unified-comm",
           "vllm-hust-website",
           "vllm-hust-workstation",
@@ -1711,7 +1709,6 @@
       "vllm-hust-kv-transfer-observability",
       "vllm-hust-pipeline-microbatch",
       "vllm-hust-qos-scheduler",
-      "vllm-hust-stateharbor",
       "vllm-hust-unified-comm"
     ],
     "contributors": [
@@ -1771,7 +1768,7 @@
         "changed_lines": 153394,
         "added": 145813,
         "deleted": 7581,
-        "active_repos": 20,
+        "active_repos": 19,
         "repos": [
           "vllm-ascend-hust",
           "vllm-ascend-hust-diffspec",
@@ -1791,7 +1788,6 @@
           "vllm-hust-kv-transfer-observability",
           "vllm-hust-pipeline-microbatch",
           "vllm-hust-qos-scheduler",
-          "vllm-hust-stateharbor",
           "vllm-hust-unified-comm"
         ],
         "key_contributions": "distributed, features, bugfix, maintenance",
@@ -2348,7 +2344,7 @@
         "changed_lines": 153394,
         "added": 145813,
         "deleted": 7581,
-        "active_repos": 20,
+        "active_repos": 19,
         "repos": [
           "vllm-ascend-hust",
           "vllm-ascend-hust-diffspec",
@@ -2368,7 +2364,6 @@
           "vllm-hust-kv-transfer-observability",
           "vllm-hust-pipeline-microbatch",
           "vllm-hust-qos-scheduler",
-          "vllm-hust-stateharbor",
           "vllm-hust-unified-comm"
         ],
         "key_contributions": "distributed, features, bugfix, maintenance",
@@ -5867,7 +5862,6 @@
       "vllm-hust-kv-transfer-observability",
       "vllm-hust-pipeline-microbatch",
       "vllm-hust-qos-scheduler",
-      "vllm-hust-stateharbor",
       "vllm-hust-unified-comm"
     ],
     "unresolved_contributors": []
@@ -6086,11 +6080,6 @@
         "repository": "vllm-hust-slicegpt",
         "branch": "main",
         "commit_url": "https://github.com/vLLM-HUST/vllm-hust-slicegpt/commit/6acf19d9cbb3ed6caa3f5e6341b1da41941f9f2e"
-      },
-      {
-        "repository": "vllm-hust-stateharbor",
-        "branch": "main",
-        "commit_url": "https://github.com/vLLM-HUST/vllm-hust-stateharbor/commit/e1366f3c33f384437201e70ad482b84fdb1dcf60"
       },
       {
         "repository": "vllm-hust-unified-comm",

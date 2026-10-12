@@ -305,8 +305,6 @@ def main():
         assert page.locator(".workshop-card").count() == 1
         card.locator(".plugin-workload-tag").click()
         assert card.is_visible()
-        page.locator("[data-plugin-search]").fill("StateHarbor")
-        assert page.locator(".workshop-card").count() == 0
         page.locator("[data-plugin-search]").fill("")
         page.locator("[data-workload-filters] button").first.click()
         more_button = page.locator("[data-plugin-more]")
@@ -390,7 +388,6 @@ def main():
         page.locator("[data-plugin-model]").select_option("Qwen2.5-Coder-14B")
         assert "+10.25%" in page.locator("#kvcompress-ascend").inner_text()
         page.locator("[data-plugin-model]").select_option("")
-        assert page.locator("#stateharbor.workshop-card").count() == 0
         page.locator(
             '#betterscale .plugin-card-footer a[href="./betterscale.html"]'
         ).click()
