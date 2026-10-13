@@ -372,6 +372,3 @@
     break-inside: avoid;
   }
 }
-
-.serving-plan #performance table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-.serving-plan #performance th, .serving-plan #performance td { padding: .65rem; text-align: left; border-bottom: 1px solid #ccd4df; }

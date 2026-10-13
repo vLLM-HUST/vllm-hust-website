@@ -132,12 +132,14 @@ test("every plan has model-specific reference pricing and source", () => {
 });
 
 
-test("DSV4 retains measured capacity without inventing a selling price", () => {
+test("DSV4 uses explicit V4.1 reference pricing without relabeling the checkpoint", () => {
   const d = JSON.parse(readFileSync(new URL("../data/serving-plans.json", import.meta.url)));
   const p = d.priceReferences["dsv4-user"];
-  assert.equal(p.userDefined, true);
-  for (const key of ["inputCnyPerMillion", "cachedInputCnyPerMillion", "outputCnyPerMillion"])
-    assert.equal(p[key], null);
+  assert.equal(p.userDefined, false);
+  assert.equal(p.inputCnyPerMillion, 1);
+  assert.equal(p.cachedInputCnyPerMillion, 0.02);
+  assert.equal(p.outputCnyPerMillion, 4);
+  assert.match(p.cacheScope, /不是同一 checkpoint/);
   const plans = d.plans.filter(p => p.priceReferenceId === "dsv4-user");
   assert.equal(plans.length, 2);
   for (const p of plans) {

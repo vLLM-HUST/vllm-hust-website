@@ -55,19 +55,6 @@ function render() {
         };
       });
     const valuedRows = rows.filter((r) => r.results !== null);
-    $("performance").replaceChildren();
-    const table = element("table");
-    const header = element("tr");
-    for (const label of ["实测方案", "输出 tok/s/卡", "P95 TTFT / 秒", "价格状态"])
-      header.append(element("th", label));
-    table.append(header);
-    for (const {plan: p, results} of rows) {
-      const tr = element("tr");
-      for (const text of [`${p.model} · ${p.name}`, fmt(p.accounting.leaderboardOutputTokensPerSecondPerChip), fmt(p.ttftP95Seconds), results ? "已填写" : "待输入售价"])
-        tr.append(element("td", text));
-      table.append(tr);
-    }
-    $("performance").append(table);
     $("error").hidden = true;
     $("computed").hidden = false;
     $("export").disabled = !rows.length;
@@ -243,7 +230,7 @@ function initialize() {
   });
   render();
 }
-fetch("data/serving-plans.json?v=native-dsv4-20261013", { cache: "no-cache" })
+fetch("data/serving-plans.json?v=native-dsv4-price-20261013", { cache: "no-cache" })
   .then((r) => {
     if (!r.ok) throw Error("方案数据读取失败");
     return r.json();

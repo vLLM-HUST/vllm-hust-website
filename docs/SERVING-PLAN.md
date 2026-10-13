@@ -114,7 +114,8 @@ TTFT; C48 offers greater output throughput with more queueing. Both count all ei
 This is a complete-plan comparison, not a same-quality model comparison or an isolated software
 speedup.
 
-At Fletcher's direction, this checkpoint has **no default selling price**. Users enter all three
-token prices; blank is unknown, not zero. Its measured performance remains visible and exportable
-before prices are entered, while valuation stays null. The current official Flash API serves V4.1,
-not0731, so its price is not silently assigned to this checkpoint.
+At Fletcher’s subsequent direction, use the current **V4.1 Flash off-peak reference prices**: CNY1/M
+new input,0.02/M cached input and4/M output, checked October13 against the official DeepSeek pricing
+page. Peak prices are twice these values. The source note explicitly distinguishes this
+reference-price scenario from the measured0731 checkpoint. All prices remain editable. The top
+performance table was removed at Fletcher’s request; the original valuation columns remain.

@@ -44,6 +44,6 @@ observations; downloads were paused during measurement. No BetterScale treatment
 - This is not an exact reproduction of the September runtime/prepared artifact. Preserve the
   historical Frontier data separately. Cross-model comparisons use model-specific
   serialization/tokenization and do not establish quality equivalence.
-- Current official DeepSeek pricing refers to V4.1 Flash, not this0731 checkpoint. No current
-  same-model API price or profit claim is attached; serving-plan price assumptions remain to be
-  agreed.
+- Current official DeepSeek pricing refers to V4.1 Flash, not this0731 checkpoint. At Fletcher’s
+  request the calculator uses V4.1 off-peak pricing as an explicit editable reference-price scenario
+  (CNY1/0.02/4 per million new/cached/output tokens), not a same-checkpoint official quote.

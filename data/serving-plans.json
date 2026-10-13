@@ -298,7 +298,7 @@
       "workload": "SWE Prefix Reuse D1 / 900-second smoke",
       "maxPromptTokens": 51651,
       "source": "docs/evidence/dsv4-native-20261013/README.md",
-      "qualification": "原生八卡方案；八rank检索通过，900秒零失败。C32与C48分别展示吞吐/时延取舍；非质量等价或SLO承诺。售价由用户输入。",
+      "qualification": "原生八卡方案；八rank检索通过，900秒零失败。C32与C48分别展示吞吐/时延取舍；非质量等价或SLO承诺。按现行 V4.1 Flash 参考价测算，用户可修改。",
       "accountingEvidence": "docs/evidence/dsv4-native-20261013/dsv4-dp8-s4-kv8-20261013/c32/accounting.json",
       "accounting": {
         "measurementSeconds": 900.0,
@@ -343,7 +343,7 @@
       "workload": "SWE Prefix Reuse D1 / 900-second smoke",
       "maxPromptTokens": 42048,
       "source": "docs/evidence/dsv4-native-20261013/README.md",
-      "qualification": "原生八卡方案；八rank检索通过，900秒零失败。C32与C48分别展示吞吐/时延取舍；非质量等价或SLO承诺。售价由用户输入。",
+      "qualification": "原生八卡方案；八rank检索通过，900秒零失败。C32与C48分别展示吞吐/时延取舍；非质量等价或SLO承诺。按现行 V4.1 Flash 参考价测算，用户可修改。",
       "accountingEvidence": "docs/evidence/dsv4-native-20261013/dsv4-dp8-s4-highc-20261013/c48/accounting.json",
       "accounting": {
         "measurementSeconds": 900.0,
@@ -398,12 +398,17 @@
       "scope": "北京公开原价，不含优惠或合同折扣；非云端体验或质量承诺。"
     },
     "dsv4-user": {
-      "model": "DeepSeek-V4-Flash-0731",
-      "userDefined": true,
-      "inputCnyPerMillion": null,
-      "cachedInputCnyPerMillion": null,
-      "outputCnyPerMillion": null,
-      "cacheScope": "用户自设售卖价格；未填写时只展示性能，不计算产值。"
+      "model": "DeepSeek-V4.1-Flash（V4-0731 方案参考定价）",
+      "userDefined": false,
+      "inputCnyPerMillion": 1,
+      "cachedInputCnyPerMillion": 0.02,
+      "outputCnyPerMillion": 4,
+      "cacheScope": "采用现行 V4.1 Flash 空闲时段报价作为 V4-0731 部署方案的参考售价，可自行调整；不是同一 checkpoint 的官方报价。",
+      "provider": "DeepSeek",
+      "region": "空闲时段公开价；高峰时段为两倍",
+      "checkedAt": "2026-10-13",
+      "url": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+      "scope": "参考定价，不代表模型质量或云端性能等价。"
     }
   }
 }

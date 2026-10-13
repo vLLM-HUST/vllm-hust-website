@@ -28,7 +28,7 @@
     />
     <link
       rel="stylesheet"
-      href="./assets/serving-plan/style.css?v=native-dsv4-20261013"
+      href="./assets/serving-plan/style.css?v=native-dsv4-price-20261013"
     />
   </head>
   <body data-page="serving-plan">
@@ -192,8 +192,6 @@
           <div id="error" role="alert" hidden></div>
           <div id="computed" aria-live="polite">
             <p class="coverage" id="coverage"></p>
-            <div id="performance" class="chart-scroll" aria-label="实测性能"></div>
-            <p class="hint">性能采用流式输出窗口口径；产值采用同一批已完成请求的输入与输出计账。未填写售价的方案不参与产值计算。</p>
             <div class="chart-scroll" tabindex="0" aria-label="方案产值柱状图，可横向滚动">
               <div class="chart" id="chart" role="img" aria-label="各方案 API 等价产值">
                 <div class="chart-grid"><span id="axis-top"></span><span id="axis-mid"></span><span>0</span></div>
@@ -226,6 +224,6 @@
       <span>服务产能与成本 · 输入仅在当前浏览器内计算，不上传。</span>
     </footer>
     <script src="./assets/site.js?v=cluster-inventory-20261009"></script>
-    <script type="module" src="assets/serving-plan/app.mjs?v=native-dsv4-20261013"></script>
+    <script type="module" src="assets/serving-plan/app.mjs?v=native-dsv4-price-20261013"></script>
   </body>
 </html>
