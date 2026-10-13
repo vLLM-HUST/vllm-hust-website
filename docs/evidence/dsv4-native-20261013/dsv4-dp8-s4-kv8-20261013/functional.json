@@ -1,0 +1,138 @@
+[
+  {
+    "rank": 0,
+    "expected": "cobalt-12340-zircon",
+    "answer": "cobalt-12340-zircon",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 829,
+      "total_tokens": 838,
+      "completion_tokens": 9,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": null,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": null
+    }
+  },
+  {
+    "rank": 1,
+    "expected": "cobalt-12341-zircon",
+    "answer": "cobalt-12341-zircon",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 869,
+      "total_tokens": 878,
+      "completion_tokens": 9,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": null,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": null
+    }
+  },
+  {
+    "rank": 2,
+    "expected": "cobalt-12342-zircon",
+    "answer": "cobalt-12342-zircon",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 909,
+      "total_tokens": 918,
+      "completion_tokens": 9,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": null,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": null
+    }
+  },
+  {
+    "rank": 3,
+    "expected": "cobalt-12343-zircon",
+    "answer": "cobalt-12343-zircon",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 949,
+      "total_tokens": 958,
+      "completion_tokens": 9,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": null,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": null
+    }
+  },
+  {
+    "rank": 4,
+    "expected": "cobalt-12344-zircon",
+    "answer": "cobalt-12344-zircon",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 989,
+      "total_tokens": 998,
+      "completion_tokens": 9,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": null,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": null
+    }
+  },
+  {
+    "rank": 5,
+    "expected": "cobalt-12345-zircon",
+    "answer": "cobalt-12345-zircon",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 1029,
+      "total_tokens": 1038,
+      "completion_tokens": 9,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": null,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": null
+    }
+  },
+  {
+    "rank": 6,
+    "expected": "cobalt-12346-zircon",
+    "answer": "cobalt-12346-zircon",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 1069,
+      "total_tokens": 1078,
+      "completion_tokens": 9,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": null,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": null
+    }
+  },
+  {
+    "rank": 7,
+    "expected": "cobalt-12347-zircon",
+    "answer": "cobalt-12347-zircon",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 1109,
+      "total_tokens": 1118,
+      "completion_tokens": 9,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": null,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": null
+    }
+  }
+]

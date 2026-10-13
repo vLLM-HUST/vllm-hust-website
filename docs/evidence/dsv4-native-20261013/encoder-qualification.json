@@ -1,0 +1,11 @@
+{
+  "new_schema_adapted": {
+    "output_tokens": 248398,
+    "max_context": 143448
+  },
+  "checkpoint_official": {
+    "output_tokens": 248398,
+    "max_context": 143448
+  },
+  "identical_sessions": true
+}

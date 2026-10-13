@@ -1,0 +1,20 @@
+{
+  "model": "DeepSeek-V4-Flash-0731-w8a8",
+  "chips": 8,
+  "hardware": "Ascend910B2",
+  "precision": "W8A8",
+  "activation_dtype": "bfloat16",
+  "tensor_parallel_size": 1,
+  "data_parallel_size": 8,
+  "expert_parallel_size": 8,
+  "engine_seats_per_rank": 2,
+  "max_model_len": 262144,
+  "kv_bytes_per_rank": 7516192768,
+  "vllm_commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+  "ascend_commit": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+  "cann": "9.1.0",
+  "draft": "DSpark K5 natural rejection",
+  "graph": "FULL_DECODE_ONLY",
+  "reproduction": false,
+  "note": "Fresh complete-plan observations; not exact reproduction of September runtime"
+}

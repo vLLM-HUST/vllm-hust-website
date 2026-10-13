@@ -28,7 +28,7 @@
     />
     <link
       rel="stylesheet"
-      href="./assets/serving-plan/style.css?v=deepseek-palette-20261009"
+      href="./assets/serving-plan/style.css?v=native-dsv4-20261013"
     />
   </head>
   <body data-page="serving-plan">
@@ -172,7 +172,7 @@
               </select>
             </div>
           </div>
-          <details><summary>各模型 API 参考价格</summary>
+          <details><summary>各模型售价 / API 参考价</summary>
             <p class="hint">单位：元 / 百万 token。分别设置新增输入、缓存命中输入、输出的价格；修改后标为用户假设。</p>
             <div id="price-controls"></div>
           </details>
@@ -192,6 +192,8 @@
           <div id="error" role="alert" hidden></div>
           <div id="computed" aria-live="polite">
             <p class="coverage" id="coverage"></p>
+            <div id="performance" class="chart-scroll" aria-label="实测性能"></div>
+            <p class="hint">性能采用流式输出窗口口径；产值采用同一批已完成请求的输入与输出计账。未填写售价的方案不参与产值计算。</p>
             <div class="chart-scroll" tabindex="0" aria-label="方案产值柱状图，可横向滚动">
               <div class="chart" id="chart" role="img" aria-label="各方案 API 等价产值">
                 <div class="chart-grid"><span id="axis-top"></span><span id="axis-mid"></span><span>0</span></div>
@@ -224,6 +226,6 @@
       <span>服务产能与成本 · 输入仅在当前浏览器内计算，不上传。</span>
     </footer>
     <script src="./assets/site.js?v=cluster-inventory-20261009"></script>
-    <script type="module" src="assets/serving-plan/app.mjs?v=dense27-tp4-only-20261010"></script>
+    <script type="module" src="assets/serving-plan/app.mjs?v=native-dsv4-20261013"></script>
   </body>
 </html>

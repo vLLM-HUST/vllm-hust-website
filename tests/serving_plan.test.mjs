@@ -130,3 +130,19 @@ test("every plan has model-specific reference pricing and source", () => {
     d.priceReferences.qwen35.inputCnyPerMillion,
   );
 });
+
+
+test("DSV4 retains measured capacity without inventing a selling price", () => {
+  const d = JSON.parse(readFileSync(new URL("../data/serving-plans.json", import.meta.url)));
+  const p = d.priceReferences["dsv4-user"];
+  assert.equal(p.userDefined, true);
+  for (const key of ["inputCnyPerMillion", "cachedInputCnyPerMillion", "outputCnyPerMillion"])
+    assert.equal(p[key], null);
+  const plans = d.plans.filter(p => p.priceReferenceId === "dsv4-user");
+  assert.equal(plans.length, 2);
+  for (const p of plans) {
+    assert.equal(p.chips, 8);
+    assert.equal(p.outputTpsPerChip, p.accounting.counts.output / 900 / 8);
+    assert.ok(p.accounting.leaderboardOutputTokensPerSecondPerChip > 0);
+  }
+});

@@ -40,19 +40,34 @@ function render() {
           output: plan.outputTpsPerChip,
           input: plan.inputTpsPerChip,
           cachedInput: plan.cachedInputTpsPerChip,
-          priceIn: number(price.input),
-          priceCached: number(price.cached),
-          priceOut: number(price.output),
+          priceIn: number(price.input, true),
+          priceCached: number(price.cached, true),
+          priceOut: number(price.output, true),
         };
         return {
           plan,
           parameters: params,
-          results: calculate(params),
-          priceSource: price.changed
+          results: [params.priceIn, params.priceCached, params.priceOut].includes(null)
+            ? null : calculate(params),
+          priceSource: price.changed || data.priceReferences[plan.priceReferenceId].userDefined
             ? "user-assumption"
             : data.priceReferences[plan.priceReferenceId],
         };
       });
+    const valuedRows = rows.filter((r) => r.results !== null);
+    $("performance").replaceChildren();
+    const table = element("table");
+    const header = element("tr");
+    for (const label of ["实测方案", "输出 tok/s/卡", "P95 TTFT / 秒", "价格状态"])
+      header.append(element("th", label));
+    table.append(header);
+    for (const {plan: p, results} of rows) {
+      const tr = element("tr");
+      for (const text of [`${p.model} · ${p.name}`, fmt(p.accounting.leaderboardOutputTokensPerSecondPerChip), fmt(p.ttftP95Seconds), results ? "已填写" : "待输入售价"])
+        tr.append(element("td", text));
+      table.append(tr);
+    }
+    $("performance").append(table);
     $("error").hidden = true;
     $("computed").hidden = false;
     $("export").disabled = !rows.length;
@@ -61,24 +76,24 @@ function render() {
         plan.inputTpsPerChip === null || plan.cachedInputTpsPerChip === null,
     );
     $("coverage").textContent = rows.length
-      ? `${rows.length} 个方案 · 元 / ${denom} · ${incomplete ? "缺失输入的方案仅显示已知输出价值" : "新增输入、缓存命中与输出完整计账"}`
+      ? `${rows.length} 个方案 · ${rows.length - valuedRows.length} 个待输入售价 · 元 / ${denom} · ${incomplete ? "缺失输入的方案仅显示已知输出价值" : "新增输入、缓存命中与输出完整计账"}`
       : "请勾选至少一个方案。";
     $("result-title").textContent =
       shared.utilization === 100
         ? "满载 API 等价产值"
         : "按利用率折算的 API 等价产值";
-    $("kind").textContent = rows.some((r) => r.priceSource === "user-assumption")
+    $("kind").textContent = valuedRows.some((r) => r.priceSource === "user-assumption")
       ? "实测产能 × 价格（含自定义）"
       : "实测产能 × 参考价格";
     $("columns").replaceChildren();
-    const expense = rows[0]?.results.expense ?? null;
+    const expense = valuedRows[0]?.results.expense ?? null;
     const max =
-      Math.max(0.01, expense ?? 0, ...rows.map((r) => r.results.value)) * 1.2;
+      Math.max(0.01, expense ?? 0, ...valuedRows.map((r) => r.results.value)) * 1.2;
     $("axis-top").textContent = fmt(max);
     $("axis-mid").textContent = fmt(max / 2);
     $("chart").style.minWidth =
-      `${Math.max(300, (rows.length + (expense !== null ? 1 : 0)) * 165 + 48)}px`;
-    for (const row of rows) {
+      `${Math.max(300, (valuedRows.length + (expense !== null ? 1 : 0)) * 165 + 48)}px`;
+    for (const row of valuedRows) {
       const { plan: p, results: r } = row;
       const complete =
         p.inputTpsPerChip !== null && p.cachedInputTpsPerChip !== null;
@@ -168,8 +183,9 @@ function initialize() {
       input.type = "number";
       input.min = "0";
       input.step = "0.01";
-      input.value = value;
-      input.defaultValue = value;
+      input.value = value ?? "";
+      input.placeholder = "请输入售价";
+      input.defaultValue = value ?? "";
       const tag = element("label", label);
       tag.htmlFor = input.id;
       box.append(tag, input);
@@ -182,6 +198,10 @@ function initialize() {
     box.append(element("p", p.cacheScope, "hint"));
     prices.set(id, controls);
     $("price-controls").append(box);
+    if (p.userDefined) {
+      $("price-note").append(element("p", `${p.model}：售价由用户输入，不预设参考价格；未填写时仅展示实测性能，不计算产值。`));
+      continue;
+    }
     const note = element(
       "p",
       `${p.model}：新增输入 ¥${p.inputCnyPerMillion}，缓存命中输入 ¥${p.cachedInputCnyPerMillion}，输出 ¥${p.outputCnyPerMillion} / 百万 token。${p.region}；核对日期 ${p.checkedAt}。${p.cacheScope} `,
@@ -223,7 +243,7 @@ function initialize() {
   });
   render();
 }
-fetch("data/serving-plans.json?v=dense27-tp4-only-20261010", { cache: "no-cache" })
+fetch("data/serving-plans.json?v=native-dsv4-20261013", { cache: "no-cache" })
   .then((r) => {
     if (!r.ok) throw Error("方案数据读取失败");
     return r.json();

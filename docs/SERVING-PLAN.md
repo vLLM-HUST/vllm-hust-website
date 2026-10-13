@@ -105,3 +105,16 @@ When verifying a deployment, fetch the exact CSS/module URLs referenced by the d
 separate verification query can miss stale CDN entries at the actual asset URL. Change the asset
 version when styling changes; do not request the new production asset URL until deployment finishes,
 otherwise an old response can populate that new cache key.
+
+## Native DSV4 observations (October13)
+
+The0731 W8A8 native DP8 campaign adds C32 and C48 plans with their complete matched ledgers. See
+[all eleven measurements and curves](evidence/dsv4-native-20261013/README.md). C32 retains lower
+TTFT; C48 offers greater output throughput with more queueing. Both count all eight allocated cards.
+This is a complete-plan comparison, not a same-quality model comparison or an isolated software
+speedup.
+
+At Fletcher's direction, this checkpoint has **no default selling price**. Users enter all three
+token prices; blank is unknown, not zero. Its measured performance remains visible and exportable
+before prices are entered, while valuation stays null. The current official Flash API serves V4.1,
+not0731, so its price is not silently assigned to this checkpoint.
