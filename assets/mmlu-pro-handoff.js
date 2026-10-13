@@ -6,6 +6,41 @@
     const num = (value, digits = 2) => Number(value).toLocaleString('en-US', { maximumFractionDigits: digits, minimumFractionDigits: digits });
     const count = (value) => num(value, 0);
 
+    function renderRuntime(runtime, language) {
+        const zh = language === 'zh';
+        const labels = {
+            dtype: ['计算精度', 'Compute precision'],
+            tensor_parallel_size: ['张量并行 TP', 'Tensor parallel TP'],
+            pipeline_parallel_size: ['流水线并行 PP', 'Pipeline parallel PP'],
+            data_parallel_size: ['数据并行 DP', 'Data parallel DP'],
+            enable_expert_parallel: ['专家并行 EP', 'Expert parallel EP'],
+            decode_context_parallel_size: ['解码上下文并行 DCP', 'Decode context parallel DCP'],
+            max_model_len: ['上下文上限', 'Context limit'],
+            max_num_seqs: ['最大并发序列数', 'Maximum sequences'],
+            max_num_batched_tokens: ['每批 token 上限', 'Maximum batched tokens'],
+            gpu_memory_utilization: ['显存使用比例', 'Memory utilization'],
+            enable_prefix_caching: ['前缀缓存 APC', 'Prefix caching APC'],
+            enable_chunked_prefill: ['分块预填充', 'Chunked prefill'],
+            compilation_mode: ['编译模式', 'Compilation mode'],
+            cudagraph_mode: ['图执行模式', 'Graph execution mode'],
+            cudagraph_capture_sizes: ['图捕获尺寸', 'Graph capture sizes'],
+            enforce_eager: ['强制 Eager', 'Enforce eager'],
+            disable_custom_all_reduce: ['禁用自定义 All-reduce', 'Disable custom all-reduce'],
+            speculative_config: ['推测解码配置', 'Speculative decoding config'],
+        };
+        const fields = Object.entries(labels).filter(([key]) => runtime.fields[key]?.status === 'verified');
+        const format = (value) => {
+            if (value === null) return zh ? '无 (None)' : 'None';
+            if (typeof value === 'boolean') return value ? (zh ? '是 / true' : 'Yes / true') : (zh ? '否 / false' : 'No / false');
+            return escape(Array.isArray(value) ? value.join(', ') : value);
+        };
+        return `<section class="mmlu-runtime" aria-labelledby="mmlu-runtime-title">
+          <div class="mmlu-runtime-heading"><div><span class="mmlu-runtime-badge">${zh ? '运行回执已确认' : 'Confirmed by runtime receipt'}</span><h3 id="mmlu-runtime-title">${zh ? '已确认运行配置' : 'Confirmed runtime configuration'}</h3></div><a href="${BASE}runtime.json" download>${zh ? '下载配置 JSON ↓' : 'Download configuration JSON ↓'}</a></div>
+          <p>${zh ? '以下为本次 B0 启动日志中确认的实际值；由保存的启动回执事后重新解析，仅展示 verified 字段。' : 'Actual values confirmed in this B0 startup log, obtained by a later reparse of the saved receipt. Only verified fields are shown.'}</p>
+          <dl class="mmlu-runtime-grid">${fields.map(([key, label]) => `<div><dt>${label[zh ? 0 : 1]}</dt><dd>${format(runtime.fields[key].value)}</dd><small>${key}</small></div>`).join('')}</dl>
+        </section>`;
+    }
+
     function validate(data) {
         const { accuracy: a, performance: p, report: r, manifest: m } = data;
         if (m.source_kind !== 'operator-supplied-summary-handoff' || m.formal_acceptance !== false || m.paired_b1 !== null) throw new Error('Invalid handoff boundary');
@@ -13,6 +48,7 @@
         const categories = Object.values(r.per_category);
         if (categories.reduce((s, c) => s + c.n, 0) !== a.cases || categories.reduce((s, c) => s + c.correct, 0) !== a.correct || r.accuracy.correct !== a.correct) throw new Error('Category totals disagree');
         if (p.num_prompts !== p.completed + p.failed || ![p.output_throughput, p.mean_ttft_ms, p.mean_tpot_ms].every((x) => Number.isFinite(x) && x >= 0)) throw new Error('Invalid performance summary');
+        if (!data.runtime || data.runtime.run_id !== m.run_id || !data.runtime.fields || Object.values(data.runtime.fields).some((field) => field.status !== 'verified' || !Object.hasOwn(field, 'value'))) throw new Error('Invalid confirmed runtime receipt');
         return data;
     }
 
@@ -35,6 +71,7 @@
             ${card(t('平均 TTFT · 性能压测', 'Mean TTFT · load test'), `${num(p.mean_ttft_ms / 1000)} s`, 'request-rate = inf')}
             ${card(t('平均 TPOT · 性能压测', 'Mean TPOT · load test'), `${num(p.mean_tpot_ms)} ms`, `${p.completed}/${p.num_prompts} ${t('请求成功', 'requests completed')}`)}
           </div>
+          ${renderRuntime(data.runtime, language)}
           <p class="mmlu-muted">${t('准确率与性能来自两次独立测试；性能压测的 53 秒 TTFT 不能与准确率客户端的 0.593 秒混用。暂无 B1 和重复运行统计，提升幅度不适用。', 'Accuracy and performance come from separate tests: the load-test 53-second TTFT is not interchangeable with the accuracy-client 0.593-second TTFT. No B1 or repeat statistics; improvement is unavailable.')}</p>
           <details><summary>${t('14 个学科的准确率', 'Accuracy across 14 subjects')}</summary><p class="mmlu-muted">${t('按准确率排序；总准确率按题数加权。', 'Sorted by accuracy; the overall score is weighted by question count.')}</p><div class="mmlu-table-wrap"><table><thead><tr><th>${t('学科', 'Subject')}</th><th>${t('分布', 'Distribution')}</th><th>${t('准确率', 'Accuracy')}</th><th>${t('正确 / 总数', 'Correct / Total')}</th></tr></thead><tbody>${categoryRows}</tbody></table></div></details>
           <details><summary>${t('输出质量与测试条件', 'Output quality and test conditions')}</summary><div class="mmlu-table-wrap"><table><tbody>
@@ -61,7 +98,7 @@
         };
         window.addEventListener('vllm-hust:langchange', update);
         try {
-            const entries = await Promise.all(['manifest', 'accuracy', 'performance', 'report'].map(async (key) => {
+            const entries = await Promise.all(['manifest', 'accuracy', 'performance', 'report', 'runtime'].map(async (key) => {
                 const response = await fetch(`${BASE}${key}.json`);
                 if (!response.ok) throw new Error(`Cannot load ${key}`);
                 return [key, await response.json()];

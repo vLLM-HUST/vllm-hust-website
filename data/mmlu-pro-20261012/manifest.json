@@ -22,6 +22,11 @@
       "source_relative_path": "summary.report.json",
       "source_sha256": "6019941f2fc84a2cfb9b08727edf0da2b3e8ce69d5ec16160876953d51da57e2",
       "published_sha256": "7b0a955d6554b891685bdfb332fa72ca05564a4acf35e47ba3732a29682aff54"
+    },
+    "runtime.json": {
+      "source_relative_path": "receipt/effective.reparse.json",
+      "source_sha256": "113df317c6b836732599d1eeb7d070a29c17abb0f58d57f6fb2962c8274c0eb8",
+      "published_sha256": "21f361a4b395522e77c1650619bd3d2f401c5f598c6dab34e2c57fa478f6b453"
     }
   }
 }
