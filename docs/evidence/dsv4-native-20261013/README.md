@@ -4,7 +4,7 @@ Eight Ascend 910B2 cards; TP1/DP8/EP8, W8A8, DSpark K5, APC and native async sch
 `ced6857` / vLLM-Ascend `5f828ad`; CANN 9.1.0. All points are 900-second SWE Prefix Reuse D1
 observations; downloads were paused during measurement. No BetterScale treatment is installed.
 
-![Measured concurrency curves](concurrency.svg)
+![Measured concurrency curves](../../../assets/frontier-dsv4-native-20261013.svg)
 
 ## Observations
 

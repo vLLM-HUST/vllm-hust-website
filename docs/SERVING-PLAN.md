@@ -119,3 +119,11 @@ new input,0.02/M cached input and4/M output, checked October13 against the offic
 page. Peak prices are twice these values. The source note explicitly distinguishes this
 reference-price scenario from the measured0731 checkpoint. All prices remain editable. The top
 performance table was removed at Fletcher’s request; the original valuation columns remain.
+
+## GLM-5.3 Flash native plans
+
+October13 adds wide TP8/EP8 C16 and C32 from ten completed observations, with full accounting
+projections under `docs/evidence/glm-native-20261013`. Both count eight allocated cards. Official
+BigModel prices checked October13 are CNY0.8/M new input,0.23/M cache-hit input and2.8/M output,
+editable in the calculator. See [the native campaign](FRONTIER-NATIVE-20261013.md) for both full
+configuration curves and qualification scope. No top performance table is reintroduced.

@@ -67,9 +67,10 @@
     const points = () => (configurationStudy() && cohort()?.workload.contract.comparison_point_ids) || (state.frontierOnly && !independentStudy())
         ? M.groupFrontiers(filteredPoints(),axes().x,axes().y).flat().map(row=>row.point) : filteredPoints();
     const groupLabel = p => p.study_group?.[lang()==='zh'?'label_zh':'label_en'] || p.load.presentation_group?.[lang()==='zh'?'label_zh':'label_en'] || cohort()?.workload.contract.display_group_labels?.[M.groupKey(p)]?.[lang()==='zh'?'label_zh':'label_en'] || p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
-    const hasOfficialBaseline = () => !!state.data.official_baseline && cohortPoints().some(p => p.configuration.official_baseline_id === state.data.official_baseline.id);
+    const officialBaseline = () => cohort()?.official_baseline || state.data.official_baseline;
+    const hasOfficialBaseline = () => !!officialBaseline() && cohortPoints().some(p => p.configuration.official_baseline_id === officialBaseline().id);
     const officialBaselineText = () => {
-        const baseline=state.data.official_baseline;
+        const baseline=officialBaseline();
         if(!baseline)return '';
         return `${t('officialBaseline')} · vLLM ${baseline.vllm_version} + vLLM-Ascend ${baseline.vllm_ascend_version} · ${t(hasOfficialBaseline()?'baselineMeasured':'baselinePending')}`;
     };
@@ -186,7 +187,7 @@
                     </div>
 
                 </div>
-                ${state.data.official_baseline?`<p class="frontier-baseline" data-state="${hasOfficialBaseline()?'measured':'pending'}">${escape(officialBaselineText())}</p>`:''}
+                ${officialBaseline()?`<p class="frontier-baseline" data-state="${hasOfficialBaseline()?'measured':'pending'}">${escape(officialBaselineText())}</p>`:''}
                 <div class="frontier-plot" id="frontier-plot">
                     <svg id="frontier-chart" viewBox="0 0 1000 480" role="group" aria-label="${axisLabel(axes().x)} × ${axisLabel(axes().y)}"></svg>
                     <div id="frontier-blank" class="frontier-blank" role="status"></div>
@@ -377,7 +378,7 @@
     $('frontier-contract-dialog').addEventListener('click',event=>{if(event.target===$('frontier-contract-dialog'))$('frontier-contract-dialog').close();});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=dense27-tp4-sweep-20261010',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=native-campaign-20261013',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929',{cache:'no-cache'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});

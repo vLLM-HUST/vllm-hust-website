@@ -297,7 +297,7 @@
       "config": "W8A8 / DP8 / EP8 / DSpark K5; max_num_seqs4/rank; token budget2052/rank; KV8GiB/rank; captures[6,12,24]; vLLM ced6857 / Ascend5f828ad / CANN9.1",
       "workload": "SWE Prefix Reuse D1 / 900-second smoke",
       "maxPromptTokens": 51651,
-      "source": "docs/evidence/dsv4-native-20261013/README.md",
+      "source": "leaderboard-runs.html?setting=dsv4-native-w8a8-sweprefix-20261013#settings",
       "qualification": "原生八卡方案；八rank检索通过，900秒零失败。C32与C48分别展示吞吐/时延取舍；非质量等价或SLO承诺。按现行 V4.1 Flash 参考价测算，用户可修改。",
       "accountingEvidence": "docs/evidence/dsv4-native-20261013/dsv4-dp8-s4-kv8-20261013/c32/accounting.json",
       "accounting": {
@@ -342,7 +342,7 @@
       "config": "W8A8 / DP8 / EP8 / DSpark K5; max_num_seqs4/rank; token budget2052/rank; KV8GiB/rank; captures[6,12,24]; vLLM ced6857 / Ascend5f828ad / CANN9.1",
       "workload": "SWE Prefix Reuse D1 / 900-second smoke",
       "maxPromptTokens": 42048,
-      "source": "docs/evidence/dsv4-native-20261013/README.md",
+      "source": "leaderboard-runs.html?setting=dsv4-native-w8a8-sweprefix-20261013#settings",
       "qualification": "原生八卡方案；八rank检索通过，900秒零失败。C32与C48分别展示吞吐/时延取舍；非质量等价或SLO承诺。按现行 V4.1 Flash 参考价测算，用户可修改。",
       "accountingEvidence": "docs/evidence/dsv4-native-20261013/dsv4-dp8-s4-highc-20261013/c48/accounting.json",
       "accounting": {
@@ -367,6 +367,96 @@
         "usageProjectionSha256": "3ee77678a2ee1b0e59015c2a2cc7602e1cc3d5b91282515983f236beadd03d9c",
         "leaderboardOutputTokensPerSecondPerChip": 71.71069444444444,
         "sourceRunId": "dsv4-dp8-s4-highc-20261013-c48"
+      }
+    },
+    {
+      "id": "glm53flash-c16-20261013",
+      "model": "GLM-5.3-Flash",
+      "provider": "Native vLLM-Ascend",
+      "priceReferenceId": "glm53flash",
+      "name": "TP8 / EP8 · C16",
+      "chips": 8,
+      "hardware": "Ascend 910B2",
+      "outputTpsPerChip": 32.72013888888889,
+      "inputTpsPerChip": 76.75569444444444,
+      "cachedInputTpsPerChip": 954.6666666666666,
+      "ttftP95Seconds": 2.9895152767887336,
+      "decodeP90TpsPerUser": 24.910492588708138,
+      "measuredAt": "2026-10-13",
+      "runId": "glm-tp8-wide1-c16",
+      "config": "Eco-Tech W8A8 / TP8 / EP8 / MTP3; max_num_seqs32; token budget4096; memory utilization0.90; FULL_DECODE_ONLY; vLLM ced6857 / Ascend5f828ad / CANN9.1",
+      "workload": "SWE Prefix Reuse D1 / 900-second smoke",
+      "maxPromptTokens": 52204,
+      "source": "leaderboard-runs.html?setting=glm-native-w8a8-sweprefix-20261013#settings",
+      "qualification": "八请求检索通过；10个900秒观测均无失败，保留两套配置完整曲线。C16与C32展示吞吐/时延取舍，非SLO或质量等价承诺。",
+      "accountingEvidence": "docs/evidence/glm-native-20261013/glm-tp8-wide1/c16/accounting.json",
+      "accounting": {
+        "measurementSeconds": 900.0,
+        "chips": 8,
+        "requests": 484,
+        "maxPromptTokens": 52204,
+        "counts": {
+          "prompt": 7426241,
+          "cached": 6873600,
+          "new": 552641,
+          "output": 235585
+        },
+        "tokensPerSecondPerChip": {
+          "prompt": 1031.422361111111,
+          "cached": 954.6666666666666,
+          "new": 76.75569444444444,
+          "output": 32.72013888888889
+        },
+        "accounting": "Successful requests completed within observation window; excludes drain and incomplete-request output. Input and output use the same cohort. Not the leaderboard's streamed-output-window metric.",
+        "sourceRawSha256": "291cc86375b3834bf3ae60511e554d7af2739bd40a56cd1260ea4552e9a91452",
+        "usageProjectionSha256": "27d1ad334cb15b3ae4702016aa8a04ec362d79a1048f22f9d3ca0fb7acca4288",
+        "sourceRunId": "glm-tp8-wide1-c16",
+        "leaderboardOutputTokensPerSecondPerChip": 34.66222222222222
+      }
+    },
+    {
+      "id": "glm53flash-c32-20261013",
+      "model": "GLM-5.3-Flash",
+      "provider": "Native vLLM-Ascend",
+      "priceReferenceId": "glm53flash",
+      "name": "TP8 / EP8 · C32",
+      "chips": 8,
+      "hardware": "Ascend 910B2",
+      "outputTpsPerChip": 31.856805555555557,
+      "inputTpsPerChip": 112.58777777777777,
+      "cachedInputTpsPerChip": 1003.3777777777777,
+      "ttftP95Seconds": 9.495385933853655,
+      "decodeP90TpsPerUser": 14.993145125861703,
+      "measuredAt": "2026-10-13",
+      "runId": "glm-tp8-wide1-c32",
+      "config": "Eco-Tech W8A8 / TP8 / EP8 / MTP3; max_num_seqs32; token budget4096; memory utilization0.90; FULL_DECODE_ONLY; vLLM ced6857 / Ascend5f828ad / CANN9.1",
+      "workload": "SWE Prefix Reuse D1 / 900-second smoke",
+      "maxPromptTokens": 38203,
+      "source": "leaderboard-runs.html?setting=glm-native-w8a8-sweprefix-20261013#settings",
+      "qualification": "八请求检索通过；10个900秒观测均无失败，保留两套配置完整曲线。C16与C32展示吞吐/时延取舍，非SLO或质量等价承诺。",
+      "accountingEvidence": "docs/evidence/glm-native-20261013/glm-tp8-wide1/c32/accounting.json",
+      "accounting": {
+        "measurementSeconds": 900.0,
+        "chips": 8,
+        "requests": 645,
+        "maxPromptTokens": 38203,
+        "counts": {
+          "prompt": 8034952,
+          "cached": 7224320,
+          "new": 810632,
+          "output": 229369
+        },
+        "tokensPerSecondPerChip": {
+          "prompt": 1115.9655555555555,
+          "cached": 1003.3777777777777,
+          "new": 112.58777777777777,
+          "output": 31.856805555555557
+        },
+        "accounting": "Successful requests completed within observation window; excludes drain and incomplete-request output. Input and output use the same cohort. Not the leaderboard's streamed-output-window metric.",
+        "sourceRawSha256": "ad453e9f2074097609462053ab36074896fcc33b0de66f5342c62c042c8ca7dc",
+        "usageProjectionSha256": "a54f151176bcc64b2e88e010b68e6e0148bbf6a8ff66bf7d2e5df6f632e1ec19",
+        "sourceRunId": "glm-tp8-wide1-c32",
+        "leaderboardOutputTokensPerSecondPerChip": 38.16875
       }
     }
   ],
@@ -409,6 +499,18 @@
       "checkedAt": "2026-10-13",
       "url": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
       "scope": "参考定价，不代表模型质量或云端性能等价。"
+    },
+    "glm53flash": {
+      "model": "GLM-5.3-Flash",
+      "provider": "智谱 BigModel",
+      "region": "中国公开刊例价",
+      "checkedAt": "2026-10-13",
+      "url": "https://open.bigmodel.cn/pricing",
+      "inputCnyPerMillion": 0.8,
+      "cachedInputCnyPerMillion": 0.23,
+      "outputCnyPerMillion": 2.8,
+      "cacheScope": "采用官方缓存命中价作参考；实测硬件缓存量映射到API计费量是情景假设，不保证云端相同命中率。",
+      "scope": "参考API价格，不含优惠或合同折扣；非质量或云端性能等价承诺。"
     }
   }
 }

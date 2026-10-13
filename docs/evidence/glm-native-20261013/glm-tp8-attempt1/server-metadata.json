@@ -1,0 +1,30 @@
+{
+  "model": "GLM-5.3-Flash-w8a8",
+  "checkpoint_revision": "9e55cbc8e2b19e20c63b08b916d2582f25a22504",
+  "chips": 8,
+  "hardware": "Ascend910B2",
+  "precision": "W8A8",
+  "activation_dtype": "bfloat16",
+  "tensor_parallel_size": 8,
+  "data_parallel_size": 1,
+  "expert_parallel_size": 8,
+  "max_num_seqs": 16,
+  "max_num_batched_tokens": 2048,
+  "max_model_len": 147456,
+  "gpu_memory_utilization": 0.9,
+  "vllm_commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+  "ascend_commit": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+  "cann": "9.1.0",
+  "draft": "deepseek_mtp K3 eager draft",
+  "graph": "FULL_DECODE_ONLY",
+  "capture_sizes": [
+    4,
+    8,
+    16,
+    32,
+    64
+  ],
+  "download_interference": "HY3 completed before measurement",
+  "benchmark_revision": "36b5685",
+  "note": "Native eight-card feasibility and performance; not vendor16-card reproduction"
+}

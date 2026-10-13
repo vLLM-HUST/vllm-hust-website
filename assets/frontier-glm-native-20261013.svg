@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="470" viewBox="0 0 1100 470"><rect width="1100" height="470" fill="white"/><g font-family="sans-serif" fill="#172f48"><text x="40" y="35" font-size="22">Native GLM-5.3 Flash · TP8 / EP8 · 8 × Ascend 910B2</text><text x="40" y="61" font-size="14">W8A8 · MTP K3 · SWE Prefix Reuse D1 · 900s per point · October 13, 2026</text>
+<text x="75" y="100" font-size="17">Output tokens/s/card (streamed window)</text>
+<path d="M75 355.0h420" stroke="#dce3eb"/><text x="63" y="360.0" text-anchor="end" font-size="13">0</text>
+<path d="M75 298.6h420" stroke="#dce3eb"/><text x="63" y="303.6" text-anchor="end" font-size="13">12</text>
+<path d="M75 242.2h420" stroke="#dce3eb"/><text x="63" y="247.2" text-anchor="end" font-size="13">24</text>
+<path d="M75 185.8h420" stroke="#dce3eb"/><text x="63" y="190.8" text-anchor="end" font-size="13">36</text>
+<path d="M75 129.4h420" stroke="#dce3eb"/><text x="63" y="134.4" text-anchor="end" font-size="13">48</text>
+<text x="75.0" y="378" text-anchor="middle" font-size="13">1</text>
+<text x="121.66666666666666" y="378" text-anchor="middle" font-size="13">8</text>
+<text x="175.0" y="378" text-anchor="middle" font-size="13">16</text>
+<text x="281.66666666666663" y="378" text-anchor="middle" font-size="13">32</text>
+<text x="388.3333333333333" y="378" text-anchor="middle" font-size="13">48</text>
+<text x="495.0" y="378" text-anchor="middle" font-size="13">64</text>
+<text x="245" y="400" font-size="14">Client concurrency</text>
+<polyline fill="none" stroke="#8b9caf" stroke-width="2.5" points="75.0,325.6654722222222 81.66666666666667,303.012125 95.0,282.6911527777778 121.66666666666666,226.2056388888889 175.0,201.30738888888888 281.66666666666663,201.7519305555556"/>
+<circle cx="75.0" cy="325.6654722222222" r="4.5" fill="#8b9caf"/>
+<circle cx="81.66666666666667" cy="303.012125" r="4.5" fill="#8b9caf"/>
+<circle cx="95.0" cy="282.6911527777778" r="4.5" fill="#8b9caf"/>
+<circle cx="121.66666666666666" cy="226.2056388888889" r="4.5" fill="#8b9caf"/>
+<circle cx="175.0" cy="201.30738888888888" r="4.5" fill="#8b9caf"/>
+<circle cx="281.66666666666663" cy="201.7519305555556" r="4.5" fill="#8b9caf"/>
+<polyline fill="none" stroke="#1367cb" stroke-width="2.5" points="121.66666666666666,214.0561388888889 175.0,192.08755555555558 281.66666666666663,175.606875 388.3333333333333,207.94418055555556"/>
+<circle cx="121.66666666666666" cy="214.0561388888889" r="4.5" fill="#1367cb"/>
+<circle cx="175.0" cy="192.08755555555558" r="4.5" fill="#1367cb"/>
+<circle cx="281.66666666666663" cy="175.606875" r="4.5" fill="#1367cb"/>
+<circle cx="388.3333333333333" cy="207.94418055555556" r="4.5" fill="#1367cb"/>
+<text x="620" y="100" font-size="17">P95 TTFT (seconds)</text>
+<path d="M620 355.0h420" stroke="#dce3eb"/><text x="608" y="360.0" text-anchor="end" font-size="13">0</text>
+<path d="M620 296.25h420" stroke="#dce3eb"/><text x="608" y="301.25" text-anchor="end" font-size="13">20</text>
+<path d="M620 237.5h420" stroke="#dce3eb"/><text x="608" y="242.5" text-anchor="end" font-size="13">40</text>
+<path d="M620 178.75h420" stroke="#dce3eb"/><text x="608" y="183.75" text-anchor="end" font-size="13">60</text>
+<path d="M620 120.0h420" stroke="#dce3eb"/><text x="608" y="125.0" text-anchor="end" font-size="13">80</text>
+<text x="620.0" y="378" text-anchor="middle" font-size="13">1</text>
+<text x="666.6666666666666" y="378" text-anchor="middle" font-size="13">8</text>
+<text x="720.0" y="378" text-anchor="middle" font-size="13">16</text>
+<text x="826.6666666666666" y="378" text-anchor="middle" font-size="13">32</text>
+<text x="933.3333333333333" y="378" text-anchor="middle" font-size="13">48</text>
+<text x="1040.0" y="378" text-anchor="middle" font-size="13">64</text>
+<text x="790" y="400" font-size="14">Client concurrency</text>
+<polyline fill="none" stroke="#8b9caf" stroke-width="2.5" points="620.0,351.6221897077485 626.6666666666666,350.6614653620927 640.0,348.2660090666439 666.6666666666666,346.89690751666785 720.0,344.4813363662324 826.6666666666666,196.74919157075348"/>
+<circle cx="620.0" cy="351.6221897077485" r="4.5" fill="#8b9caf"/>
+<circle cx="626.6666666666666" cy="350.6614653620927" r="4.5" fill="#8b9caf"/>
+<circle cx="640.0" cy="348.2660090666439" r="4.5" fill="#8b9caf"/>
+<circle cx="666.6666666666666" cy="346.89690751666785" r="4.5" fill="#8b9caf"/>
+<circle cx="720.0" cy="344.4813363662324" r="4.5" fill="#8b9caf"/>
+<circle cx="826.6666666666666" cy="196.74919157075348" r="4.5" fill="#8b9caf"/>
+<polyline fill="none" stroke="#1367cb" stroke-width="2.5" points="666.6666666666666,349.27364962339925 720.0,346.2182988744331 826.6666666666666,327.1073038193049 933.3333333333333,174.56203141106383"/>
+<circle cx="666.6666666666666" cy="349.27364962339925" r="4.5" fill="#1367cb"/>
+<circle cx="720.0" cy="346.2182988744331" r="4.5" fill="#1367cb"/>
+<circle cx="826.6666666666666" cy="327.1073038193049" r="4.5" fill="#1367cb"/>
+<circle cx="933.3333333333333" cy="174.56203141106383" r="4.5" fill="#1367cb"/>
+<text x="75" y="442" font-size="14" fill="#637487">16 requests · token budget2048 · memory0.90</text><text x="620" y="442" font-size="14" fill="#1367cb">32 requests · token budget4096 · memory0.90</text></g></svg>

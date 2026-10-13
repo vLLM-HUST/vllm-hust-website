@@ -230,7 +230,7 @@ function initialize() {
   });
   render();
 }
-fetch("data/serving-plans.json?v=native-dsv4-price-20261013", { cache: "no-cache" })
+fetch("data/serving-plans.json?v=native-glm-20261013", { cache: "no-cache" })
   .then((r) => {
     if (!r.ok) throw Error("方案数据读取失败");
     return r.json();

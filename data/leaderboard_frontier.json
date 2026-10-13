@@ -696,6 +696,114 @@
           "display_scope": "W8A8 cohort 自有曲线: 单条 real-MTP2 线 (C1..C16), 五点在同一个服务实例内串行测得。不与 BF16 cohort 的曲线混画: 精度口径不同, 且比较会引入非 MOD 变量。"
         }
       }
+    },
+    {
+      "id": "dsv4-native-w8a8-sweprefix-20261013",
+      "model": {
+        "id": "deepseek-v4-flash-0731-w8a8",
+        "label": "DeepSeek V4 Flash",
+        "revision": "DeepSeek-V4-Flash-0731-w8a8-local-checkpoint"
+      },
+      "precision": {
+        "id": "int8-w8a8-bf16-activations",
+        "label": "INT8",
+        "contract": "Ascend W8A8 quantized checkpoint; BF16 activation dtype; not BF16 weights. Weight artifact revision not independently attested."
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-dsv4-native-20261013",
+        "label": "SWE prefix reuse · Native v0.30 · Oct13",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b"
+          },
+          "chat_template": "Official0731 Python encoder; reasoning/tool-argument schema adapters qualified against v0.30 encoder",
+          "history": "Append actual generated IDs then next source delta; no history rerendering or generated-text retokenization",
+          "output_policy": "Source-derived output budgets; native greedy speculative decoding; exact token-ID continuation",
+          "arrival": "Closed-loop C sequential lanes; whole-session replacement; no original tool/human delays",
+          "cache": "Session-unique salt; native DP affinity when DP>1",
+          "warmup": "8 concurrent exact-marker retrievals, then separate60s C2; fresh measured session salts",
+          "aggregation": "One 900s observation per point; count only outputs received inside window; drain in-flight work without post-window token credit",
+          "x_axis": "P90 in-window-complete request (N-1)/(last-first token time); grouped SSE arrival timestamps",
+          "y_axis": "In-window output tokens / 900 seconds / 8 allocated chips",
+          "acceptance": "Exact prompt-ID echo, output count/usage/length/DONE, zero request errors, positive APC and DSpark counters, clean exit and owned release. Not SWE answer accuracy or numerical equivalence.",
+          "context_scope": "262144 configured context; observed max prompts recorded per point",
+          "limitations": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "Depth1 only; each lane advances one session consecutively before replacement"
+          },
+          "concurrency_curves_url": "./assets/frontier-dsv4-native-20261013.svg"
+        }
+      },
+      "official_baseline": {
+        "id": "native-030-20261013",
+        "vllm_version": "0.30.0",
+        "vllm_ascend_version": "0.30.0rc1"
+      }
+    },
+    {
+      "id": "glm-native-w8a8-sweprefix-20261013",
+      "model": {
+        "id": "glm-5.3-flash-w8a8",
+        "label": "GLM-5.3 Flash",
+        "revision": "9e55cbc8e2b19e20c63b08b916d2582f25a22504"
+      },
+      "precision": {
+        "id": "int8-w8a8-bf16-activations",
+        "label": "INT8",
+        "contract": "Eco-Tech W8A8 checkpoint; bfloat16 activation dtype; immutable revision recorded."
+      },
+      "context_tokens": 147456,
+      "workload": {
+        "id": "sweprefix-glm-native-20261013",
+        "label": "SWE prefix reuse · Native v0.30 · Oct13",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b"
+          },
+          "chat_template": "Checkpoint GLM Jinja template, thinking retained; clear_thinking=false",
+          "history": "Append actual generated IDs then next source delta; no history rerendering or generated-text retokenization",
+          "output_policy": "Source-derived output budgets; native greedy speculative decoding; exact token-ID continuation",
+          "arrival": "Closed-loop C sequential lanes; whole-session replacement; no original tool/human delays",
+          "cache": "Session-unique salt; native DP affinity when DP>1",
+          "warmup": "8 concurrent exact-marker retrievals, then separate60s C2; fresh measured session salts",
+          "aggregation": "One 900s observation per point; count only outputs received inside window; drain in-flight work without post-window token credit",
+          "x_axis": "P90 in-window-complete request (N-1)/(last-first token time); grouped SSE arrival timestamps",
+          "y_axis": "In-window output tokens / 900 seconds / 8 allocated chips",
+          "acceptance": "Exact prompt-ID echo, output count/usage/length/DONE, zero request errors, positive APC and DSpark counters, clean exit and owned release. Not SWE answer accuracy or numerical equivalence.",
+          "context_scope": "147456 configured context; observed max prompts recorded per point",
+          "limitations": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "Depth1 only; each lane advances one session consecutively before replacement"
+          },
+          "concurrency_curves_url": "./assets/frontier-glm-native-20261013.svg"
+        }
+      },
+      "official_baseline": {
+        "id": "native-030-20261013",
+        "vllm_version": "0.30.0",
+        "vllm_ascend_version": "0.30.0rc1"
+      }
     }
   ],
   "points": [
@@ -85310,6 +85418,1578 @@
         },
         "sampling_date_utc": "2026-10-09",
         "sampling_date_source": "SWE client.started_at_unix"
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s2-b1026-20261013-c1",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S2/rank · C1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 40529,
+          "full_client_concurrency_fraction": 0.9995365706153421,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 7516192768
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 1,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s2-b1026-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 85.74282081870092,
+        "output_tps": 60.12555555555556,
+        "ttft_p95_ms": 2699.378724070266
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s2-b1026-20261013-c1"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s2-b1026-20261013-c2",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S2/rank · C2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 52246,
+          "full_client_concurrency_fraction": 0.9991206679110312,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 7516192768
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 2,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s2-b1026-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 77.14220854927207,
+        "output_tps": 104.92888888888889,
+        "ttft_p95_ms": 2890.8653656952088
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s2-b1026-20261013-c2"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s2-b1026-20261013-c4",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S2/rank · C4",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 59798,
+          "full_client_concurrency_fraction": 0.9984526915227373,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 7516192768
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 4,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s2-b1026-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 69.33155336661177,
+        "output_tps": 174.56444444444443,
+        "ttft_p95_ms": 3044.5303248241544
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s2-b1026-20261013-c4"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s2-b1026-20261013-c8",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S2/rank · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 70957,
+          "full_client_concurrency_fraction": 0.9979489549363239,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 7516192768
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s2-b1026-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 54.39958239247967,
+        "output_tps": 252.37555555555556,
+        "ttft_p95_ms": 3250.390642648564
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s2-b1026-20261013-c8"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s2-b1026-20261013-c16",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S2/rank · C16",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 52126,
+          "full_client_concurrency_fraction": 0.998347762515251,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 7516192768
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s2-b1026-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 24.695320686883637,
+        "output_tps": 267.57444444444445,
+        "ttft_p95_ms": 4836.866198433562
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s2-b1026-20261013-c16"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s2-b1026-20261013-c32",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S2/rank · C32",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 2,
+          "max_num_seqs_per_rank": 2,
+          "global_seats": 16,
+          "max_num_batched_tokens": 1026,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 42048,
+          "full_client_concurrency_fraction": 0.9984930932133769,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 7516192768
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s2-b1026-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 22.554654049599968,
+        "output_tps": 226.90555555555557,
+        "ttft_p95_ms": 87864.24940219148
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s2-b1026-20261013-c32"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s4-b2052-20261013-c8",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S4/rank · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 32,
+          "max_num_batched_tokens": 2052,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12,
+            24
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 84959,
+          "full_client_concurrency_fraction": 0.9965965312765911,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 8589934592
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s4-b2052-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 63.07757743247227,
+        "output_tps": 334.79333333333335,
+        "ttft_p95_ms": 2159.4845413928847
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s4-b2052-20261013-c8"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s4-b2052-20261013-c16",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S4/rank · C16",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 32,
+          "max_num_batched_tokens": 2052,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12,
+            24
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 62304,
+          "full_client_concurrency_fraction": 0.997385411906677,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 8589934592
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s4-b2052-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 30.75108166141251,
+        "output_tps": 352.01222222222225,
+        "ttft_p95_ms": 2967.5449686590578
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s4-b2052-20261013-c16"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s4-b2052-20261013-c32",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S4/rank · C32",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 32,
+          "max_num_batched_tokens": 2052,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12,
+            24
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 52126,
+          "full_client_concurrency_fraction": 0.9970058972052195,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 8589934592
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s4-b2052-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 21.693402916544283,
+        "output_tps": 487.4222222222222,
+        "ttft_p95_ms": 3744.078172952868
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s4-b2052-20261013-c32"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s4-b2052-20261013-c48",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S4/rank · C48",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 32,
+          "max_num_batched_tokens": 2052,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12,
+            24
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 51651,
+          "full_client_concurrency_fraction": 0.9964006598785312,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 8589934592
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 48,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s4-b2052-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 25.133043746017194,
+        "output_tps": 573.6855555555555,
+        "ttft_p95_ms": 31534.568318282254
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s4-b2052-20261013-c48"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "dsv4-native-tp1-dp8-s4-b2052-20261013-c64",
+      "cohort_id": "dsv4-native-w8a8-sweprefix-20261013",
+      "label": "Native TP1/DP8 · S4/rank · C64",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "data_parallel_size": 8,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 4,
+          "max_num_seqs_per_rank": 4,
+          "global_seats": 32,
+          "max_num_batched_tokens": 2052,
+          "mtp_draft_tokens": 5,
+          "speculative_method": "dspark",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            6,
+            12,
+            24
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 42048,
+          "full_client_concurrency_fraction": 0.9964575477741244,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "kv_cache_memory_bytes": 8589934592
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 64,
+        "session_rotation_depth": 1,
+        "concurrency_series": "dsv4-native-tp1-dp8-s4-b2052-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 26.15170282352244,
+        "output_tps": 571.2044444444444,
+        "ttft_p95_ms": 68724.53314650337
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "dsv4-native-tp1-dp8-s4-b2052-20261013-c64"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s16-b2048-20261013-c1",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S16/rank · C1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 16,
+          "max_num_seqs_per_rank": 16,
+          "global_seats": 16,
+          "max_num_batched_tokens": 2048,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 37336,
+          "full_client_concurrency_fraction": 0.9995852692228638,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 1,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s16-b2048-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 64.30063567242628,
+        "output_tps": 49.931111111111115,
+        "ttft_p95_ms": 1149.8928654473275
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s16-b2048-20261013-c1"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s16-b2048-20261013-c2",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S16/rank · C2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 16,
+          "max_num_seqs_per_rank": 16,
+          "global_seats": 16,
+          "max_num_batched_tokens": 2048,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 47514,
+          "full_client_concurrency_fraction": 0.999267544830218,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 2,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s16-b2048-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 61.40422347046563,
+        "output_tps": 88.49,
+        "ttft_p95_ms": 1476.9479618407786
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s16-b2048-20261013-c2"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s16-b2048-20261013-c4",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S16/rank · C4",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 16,
+          "max_num_seqs_per_rank": 16,
+          "global_seats": 16,
+          "max_num_batched_tokens": 2048,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 43661,
+          "full_client_concurrency_fraction": 0.9990547438679884,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 4,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s16-b2048-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 47.62804114446915,
+        "output_tps": 123.07888888888888,
+        "ttft_p95_ms": 2292.4224453978236
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s16-b2048-20261013-c4"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s16-b2048-20261013-c8",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S16/rank · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 16,
+          "max_num_seqs_per_rank": 16,
+          "global_seats": 16,
+          "max_num_batched_tokens": 2048,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 64043,
+          "full_client_concurrency_fraction": 0.9981589954843124,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s16-b2048-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 50.22221067210819,
+        "output_tps": 219.22444444444446,
+        "ttft_p95_ms": 2758.4995687939227
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s16-b2048-20261013-c8"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s16-b2048-20261013-c16",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S16/rank · C16",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 16,
+          "max_num_seqs_per_rank": 16,
+          "global_seats": 16,
+          "max_num_batched_tokens": 2048,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 50085,
+          "full_client_concurrency_fraction": 0.9982720946049731,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s16-b2048-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 26.07504168351141,
+        "output_tps": 261.6044444444444,
+        "ttft_p95_ms": 3580.821662559174
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s16-b2048-20261013-c16"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s16-b2048-20261013-c32",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S16/rank · C32",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 16,
+          "max_num_seqs_per_rank": 16,
+          "global_seats": 16,
+          "max_num_batched_tokens": 2048,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 32633,
+          "full_client_concurrency_fraction": 0.998246107665408,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s16-b2048-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 25.130969568144256,
+        "output_tps": 260.84777777777776,
+        "ttft_p95_ms": 53872.61563548818
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s16-b2048-20261013-c32"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s32-b4096-20261013-c8",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S32/rank · C8",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "global_seats": 32,
+          "max_num_batched_tokens": 4096,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64,
+            128
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 66951,
+          "full_client_concurrency_fraction": 0.997773053271489,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 8,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s32-b4096-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 48.595899262368626,
+        "output_tps": 239.90444444444444,
+        "ttft_p95_ms": 1949.3958728853613
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s32-b4096-20261013-c8"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s32-b4096-20261013-c16",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S32/rank · C16",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "global_seats": 32,
+          "max_num_batched_tokens": 4096,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64,
+            128
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 52960,
+          "full_client_concurrency_fraction": 0.9980258958729812,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 16,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s32-b4096-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 24.910492588708138,
+        "output_tps": 277.29777777777775,
+        "ttft_p95_ms": 2989.5152767887334
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s32-b4096-20261013-c16"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s32-b4096-20261013-c32",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S32/rank · C32",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "global_seats": 32,
+          "max_num_batched_tokens": 4096,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64,
+            128
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 38445,
+          "full_client_concurrency_fraction": 0.9978852045106598,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 32,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s32-b4096-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 14.993145125861703,
+        "output_tps": 305.35,
+        "ttft_p95_ms": 9495.385933853655
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s32-b4096-20261013-c32"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
+      }
+    },
+    {
+      "id": "glm-native-tp8-dp1-s32-b4096-20261013-c48",
+      "cohort_id": "glm-native-w8a8-sweprefix-20261013",
+      "label": "Native TP8/DP1 · S32/rank · C48",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.30.0 / 0.30.0rc1",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910B2",
+          "accelerator_count": 8
+        },
+        "context_capacity_tokens": 147456,
+        "parameters": {
+          "tensor_parallel_size": 8,
+          "data_parallel_size": 1,
+          "expert_parallel_size": 8,
+          "pipeline_parallel_size": 1,
+          "max_num_seqs": 32,
+          "max_num_seqs_per_rank": 32,
+          "global_seats": 32,
+          "max_num_batched_tokens": 4096,
+          "mtp_draft_tokens": 3,
+          "speculative_method": "deepseek_mtp",
+          "quantization": "ascend W8A8",
+          "dtype": "bfloat16",
+          "prefix_caching": true,
+          "async_scheduling": true,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "graph_capture_sizes": [
+            4,
+            8,
+            16,
+            32,
+            64,
+            128
+          ],
+          "benchmark_revision": "36b5685",
+          "runtime_pins": {
+            "vllm": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+            "vllm_ascend": "5f828ad638ee4f9b12db87f9d5481f29076d37f9",
+            "cann": "9.1.0"
+          },
+          "observed_max_prompt_tokens": 27559,
+          "full_client_concurrency_fraction": 0.9985398731215133,
+          "comparison_scope": "Individually tuned native configurations. Single900s points, not controlled same-quality cross-model A/B or a hardware limit. Historical September runtime/prepared artifacts are distinct.",
+          "gpu_memory_utilization": 0.9
+        },
+        "official_baseline_id": "native-030-20261013"
+      },
+      "load": {
+        "concurrency": 48,
+        "session_rotation_depth": 1,
+        "concurrency_series": "glm-native-tp8-dp1-s32-b4096-20261013"
+      },
+      "metrics": {
+        "decode_p90_tps": 12.846451889812506,
+        "output_tps": 250.30777777777777,
+        "ttft_p95_ms": 61425.69143453146
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-NATIVE-20261013.md",
+        "run_ids": [
+          "glm-native-tp8-dp1-s32-b4096-20261013-c48"
+        ],
+        "sampling_date_utc": "2026-10-13",
+        "sampling_date_source": "Server and measurement receipts, UTC",
+        "aggregation": "One complete900s window; all allocated chips counted",
+        "metric_extract": "./data/leaderboard_frontier_native_20261013_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "client_revision": "36b5685",
+          "measurement_seconds": 900
+        }
       }
     }
   ],
