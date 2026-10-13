@@ -121,11 +121,15 @@
         $('dataset-program-lede').textContent = lang() === 'zh' ? designation.scope_note_zh : designation.scope_note;
         $('dataset-program-contract').innerHTML = `<a href="${escapeHtml(plan.contract_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(plan.test_plan_version)}</a><span>${escapeHtml(plan.mandatory_model)} · ${escapeHtml(plan.formal_precision)} · ${escapeHtml(plan.baseline_roles.join(' + '))}</span><span>${escapeHtml(lang() === 'zh' ? plan.optional_status_zh : plan.optional_status)}</span><span>${escapeHtml(lang() === 'zh' ? plan.evidence_boundary_zh : plan.evidence_boundary)}</span><span>${escapeHtml(receiptSummary)}</span>`;
         $('dataset-program-list').innerHTML = state.program.primary_datasets.map((dataset) => {
-            const note = lang() === 'zh' ? dataset.note_zh : dataset.note;
+            let note = lang() === 'zh' ? dataset.note_zh : dataset.note;
+            const handoff = dataset.id === 'mmlu-pro'
+                ? `<p><a href="#mmlu-pro-handoff">${lang() === 'zh' ? '查看 10 月 12 日新增准确率与性能实测（非正式验收）' : 'View October 12 accuracy and performance measurements (not formal acceptance)'}</a></p>`
+                : '';
+            if (handoff) note = (lang() === 'zh' ? '正式计划登记状态（不含下方新增实测）：' : 'Formal program record (excluding the new handoff below): ') + note;
             const metric = lang() === 'zh' ? dataset.primary_metric_zh : dataset.primary_metric;
             const contractStatus = statusText[lang()][dataset.status] || dataset.status;
             const currentReadiness = readinessText[lang()][dataset.readiness.status] || dataset.readiness.status;
-            return `<article class="dataset-program-item"><div><span>${escapeHtml(classText[lang()][dataset.evaluation_class] || dataset.evaluation_class)}</span><h3><a href="${escapeHtml(dataset.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(dataset.label)}</a></h3><p>${escapeHtml(note)}</p></div><div class="dataset-program-meta"><strong>${escapeHtml(currentReadiness)}</strong><small>${escapeHtml(contractStatus)} · ${escapeHtml(metric)}</small></div></article>`;
+            return `<article class="dataset-program-item"><div><span>${escapeHtml(classText[lang()][dataset.evaluation_class] || dataset.evaluation_class)}</span><h3><a href="${escapeHtml(dataset.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(dataset.label)}</a></h3><p>${escapeHtml(note)}</p>${handoff}</div><div class="dataset-program-meta"><strong>${escapeHtml(currentReadiness)}</strong><small>${escapeHtml(contractStatus)} · ${escapeHtml(metric)}</small></div></article>`;
         }).join('');
         const policy = state.program.supplementary_material;
         $('dataset-supplementary-copy').textContent = lang() === 'zh' ? policy.rule_zh : policy.rule;

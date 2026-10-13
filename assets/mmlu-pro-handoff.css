@@ -1,0 +1,24 @@
+.mmlu-handoff { margin: 24px 0; }
+.mmlu-handoff .mmlu-muted { color: #475569; font-size: .88rem; }
+.mmlu-handoff .mmlu-boundary { background: #fffbeb; border-left: 3px solid #b7791f; padding: 12px 16px; color: #713f12; }
+.mmlu-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.mmlu-card { border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; }
+.mmlu-card strong { display: block; font-size: 1.65rem; color: #0f172a; margin: 8px 0; }
+.mmlu-card small { display: block; color: #475569; }
+.mmlu-handoff details { border-top: 1px solid #cbd5e1; padding: 14px 0; }
+.mmlu-handoff summary { cursor: pointer; font-weight: 700; }
+.mmlu-handoff .mmlu-table-wrap { overflow-x: auto; margin: 16px 0; }
+.mmlu-handoff table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.mmlu-handoff th, .mmlu-handoff td { padding: 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+.mmlu-handoff th { color: #475569; }
+.mmlu-handoff meter { width: 100%; min-width: 70px; accent-color: #0369a1; }
+.mmlu-handoff code { overflow-wrap: anywhere; }
+.mmlu-handoff .mmlu-links { display: flex; flex-wrap: wrap; gap: 10px 20px; }
+@media (max-width: 760px) {
+    .mmlu-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mmlu-card { padding: 12px; }
+    .mmlu-card strong { font-size: 1.35rem; }
+}
+@media (max-width: 380px) {
+    .mmlu-cards { grid-template-columns: 1fr; }
+}
