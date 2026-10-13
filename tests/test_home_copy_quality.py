@@ -44,13 +44,13 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "58 public MODs across 8 lifecycle phases, with scope and evidence explicit.",
+        "38 public MODs across 8 lifecycle phases, with scope and evidence explicit.",
         "Explore by phase, scenario, platform, and readiness",
         "activation and performance evidence stay separate",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "58 个公开 MOD，覆盖 8 个推理生命周期阶段，范围与证据边界明确。",
+        "38 个公开 MOD，覆盖 8 个推理生命周期阶段，范围与证据边界明确。",
         "启用证据与性能证据分开呈现",
         "从推理运维到智能体应用。",
     ):
@@ -74,10 +74,6 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     ecosystem = json.loads(
         (root / "data" / "ecosystem.json").read_text(encoding="utf-8")
     )
-    stateaxis = json.loads(
-        (root / "data" / "stateaxis-topic-mods.json").read_text(encoding="utf-8")
-    )
-    ecosystem["components"].extend(stateaxis["components"])
     taxonomy = json.loads(
         (root / "data" / "mod-taxonomy.json").read_text(encoding="utf-8")
     )["components"]
@@ -89,7 +85,7 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
         and taxonomy.get(item["id"], {}).get("kind") in active_kinds
     }
     mod_count = len(mod_projects)
-    assert mod_count == 58
+    assert mod_count == 38
     scenario_count = len(
         json.loads(
             (root / "data" / "plugin-workload-navigation.json").read_text(
@@ -114,9 +110,10 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     assert f"{mod_count} 个公开 MOD" in INDEX
     assert f"{phase_count} phases · {scenario_count} scenarios" in INDEX
     assert f"{phase_count} 个阶段 · {scenario_count} 类场景" in INDEX
-    assert ">58</span>" in INDEX
+    assert ">38</span>" in INDEX
     assert 'href="./plugins.html#plugin-catalog"' in INDEX
-    assert "EcosystemCatalog.summarize(combined, taxonomy)" in HOME_CATALOG_SCRIPT
+    assert "EcosystemCatalog.summarize(registry, taxonomy)" in HOME_CATALOG_SCRIPT
+    assert "stateaxis-topic-mods.json" not in HOME_CATALOG_SCRIPT
     assert "summary.mods.flatMap" in HOME_CATALOG_SCRIPT
     assert "phaseCount" in HOME_CATALOG_SCRIPT
     assert "scenarioCount" in HOME_CATALOG_SCRIPT
@@ -139,6 +136,7 @@ def test_homepage_uses_lifecycle_and_evidence_language() -> None:
         assert phrase in INDEX
 
     for stale_phrase in (
+        "40 MODs for real serving workloads",
         "58 MODs for real serving workloads",
         "maintainers and results linked from every project",
         "Compare workload fit",

@@ -2,7 +2,6 @@
   "use strict";
 
   const registryUrl = "./data/ecosystem.json?v=taxonomy-v2-20261012";
-  const stateaxisUrl = "./data/stateaxis-topic-mods.json?v=taxonomy-v2-20261012";
   const navigationUrl = "./data/plugin-workload-navigation.json?v=taxonomy-v2-20261012";
   const taxonomyUrl = "./data/mod-taxonomy.json?v=taxonomy-v2-20261012";
   let summary;
@@ -65,10 +64,6 @@
       if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
       return response.json();
     }),
-    fetch(stateaxisUrl, { cache: "no-cache" }).then((response) => {
-      if (!response.ok) throw new Error(`StateAxis MOD catalog request failed: ${response.status}`);
-      return response.json();
-    }),
     fetch(navigationUrl, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`workload navigation request failed: ${response.status}`);
       return response.json();
@@ -77,9 +72,8 @@
       if (!response.ok) throw new Error(`MOD taxonomy request failed: ${response.status}`);
       return response.json();
     })
-  ]).then(([registry, stateaxis, navigation, taxonomy]) => {
-    const combined = { ...registry, components: [...registry.components, ...stateaxis.components] };
-    summary = window.EcosystemCatalog.summarize(combined, taxonomy);
+  ]).then(([registry, navigation, taxonomy]) => {
+    summary = window.EcosystemCatalog.summarize(registry, taxonomy);
     phaseCount = new Set(summary.mods.flatMap((item) => (
       taxonomy.components[item.id]?.phases || []
     ))).size;
