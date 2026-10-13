@@ -38,6 +38,27 @@ def main():
             "source_sha256": hashlib.sha256(raw).hexdigest(),
             "published_sha256": hashlib.sha256(published).hexdigest(),
         }
+    relative = "receipt/effective.reparse.json"
+    raw = (args.run_dir / relative).read_bytes()
+    receipt = json.loads(raw)
+    runtime = {
+        "run_id": args.run_dir.name,
+        "source_kind": "post-hoc-startup-receipt-reparse",
+        "generated_utc": receipt["post_hoc"]["generated_utc"],
+        "startup_log_sha256": receipt["post_hoc"]["startup_log_sha256"],
+        "fields": {
+            key: {"value": field["log"], "status": "verified"}
+            for key, field in receipt["fields"].items()
+            if field.get("status") == "verified" and "log" in field
+        },
+    }
+    published = (json.dumps(runtime, indent=2) + "\n").encode("utf-8")
+    (destination / "runtime.json").write_bytes(published)
+    hashes["runtime.json"] = {
+        "source_relative_path": relative,
+        "source_sha256": hashlib.sha256(raw).hexdigest(),
+        "published_sha256": hashlib.sha256(published).hexdigest(),
+    }
     manifest = {
         "schema_version": 1,
         "source_kind": "operator-supplied-summary-handoff",

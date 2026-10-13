@@ -5,6 +5,14 @@ program and the validation-service matrix. Four overview cards distinguish full-
 load-test output throughput, mean TTFT and mean TPOT. Expandable details contain all 14 subjects,
 output termination diagnostics, request contracts and downloadable summaries.
 
+An always-expanded blue configuration panel immediately below the result cards displays the 18
+actual values marked `verified` in `receipt/effective.reparse.json`. The public `runtime.json`
+projects only each field's log-derived value and verification status; it omits expected values,
+command arguments, API model paths and raw log snippets. This receipt was produced by a later
+reparse of the saved startup log, not by a new measurement. The panel says so explicitly. The
+manifest records the source receipt hash and the projected JSON hash; the projection also retains
+the startup log hash and receipt timestamp. Unconfirmed fields are never presented as actual values.
+
 This is an operator-supplied measurement, not a canonical validation-service publication or V5.5
 admission. The generated scenario index, dataset program and historical matrix remain unchanged.
 Their existing readiness statements describe the formal program; this handoff does not upgrade it.

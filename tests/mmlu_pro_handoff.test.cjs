@@ -8,12 +8,33 @@ const test = require('node:test');
 const vm = require('node:vm');
 const root = path.join(__dirname, '..');
 const base = path.join(root, 'data/mmlu-pro-20261012');
-const data = Object.fromEntries(['manifest', 'accuracy', 'performance', 'report'].map((key) => [key, JSON.parse(fs.readFileSync(path.join(base, `${key}.json`), 'utf8'))]));
+const data = Object.fromEntries(['manifest', 'accuracy', 'performance', 'report', 'runtime'].map((key) => [key, JSON.parse(fs.readFileSync(path.join(base, `${key}.json`), 'utf8'))]));
 const source = fs.readFileSync(path.join(root, 'assets/mmlu-pro-handoff.js'), 'utf8').replace(/\}\)\(\);\s*$/, 'window.api = { validate, render }; })();');
 const sandbox = { window: {}, document: { addEventListener() {} } };
 vm.createContext(sandbox);
 vm.runInContext(source, sandbox);
 const { validate, render } = sandbox.window.api;
+
+test('runtime panel is expanded, bilingual and contains only confirmed actual values', () => {
+    assert.equal(data.runtime.fields.max_model_len.value, 32768);
+    assert.equal(data.runtime.fields.tensor_parallel_size.value, 2);
+    assert.equal(data.runtime.fields.enable_prefix_caching.value, false);
+    assert.equal(data.runtime.fields.speculative_config.value, null);
+    assert.doesNotMatch(JSON.stringify(data.runtime), /expected|argv|log_snippet/);
+    for (const locale of ['en', 'zh']) {
+        const html = render(data, locale);
+        const start = html.indexOf('<section class="mmlu-runtime"');
+        const end = html.indexOf('</section>', start);
+        const panel = html.slice(start, end);
+        assert.ok(start > 0 && start < html.indexOf('<details>'));
+        assert.doesNotMatch(panel, /<details|<summary/);
+        for (const value of ['bfloat16', '32768', '8192', 'FULL_DECODE_ONLY', '1, 2, 4, 8, 16']) assert.ok(panel.includes(value));
+        assert.equal((panel.match(/<dt>/g) || []).length, 18);
+    }
+    const invalid = structuredClone(data);
+    invalid.runtime.fields.dtype.status = 'argv_only';
+    assert.throws(() => validate(invalid), /Invalid confirmed runtime receipt/);
+});
 
 test('published summaries match the manifest and full-test category totals', () => {
     for (const [name, evidence] of Object.entries(data.manifest.files)) {
