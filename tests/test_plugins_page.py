@@ -8,10 +8,6 @@ from jsonschema import Draft7Validator
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = json.loads((ROOT / "data" / "ecosystem.json").read_text(encoding="utf-8"))
-STATEAXIS_CATALOG = json.loads(
-    (ROOT / "data" / "stateaxis-topic-mods.json").read_text(encoding="utf-8")
-)
-REGISTRY["components"].extend(STATEAXIS_CATALOG["components"])
 PORTFOLIO = json.loads(
     (ROOT / "data" / "repository-portfolio.json").read_text(encoding="utf-8")
 )
@@ -113,52 +109,16 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     }
 
 
-def test_stateaxis_topic_catalog_is_complete_and_public() -> None:
-    component_schema = json.loads(
-        (ROOT / "data" / "schemas" / "ecosystem_v1.schema.json").read_text(
-            encoding="utf-8"
-        )
-    )["definitions"]["component"]
-    validator = Draft7Validator(component_schema)
-    assert STATEAXIS_CATALOG["schema_version"] == "stateaxis-topic-mod-catalog/v1"
-    assert len(STATEAXIS_CATALOG["components"]) == 20
-    for component in STATEAXIS_CATALOG["components"]:
-        validator.validate(component)
-        assert component["canonical_repository"].startswith(
-            "https://github.com/intellistream/"
-        )
-        assert component["maintainers"] == ["ShuhaoZhangTony"]
-        assert component["advisors"] == []
-        assert component["id"] in MOD_TAXONOMY["components"]
-        assert component["id"] in WORKLOAD_NAVIGATION["plugins"]
-
-
-def test_all_stateaxis_mods_publish_current_scoped_results() -> None:
+def test_mod_page_excludes_intellistream_repositories() -> None:
     expected_commit_prefixes = {
-        "stateaxis-aclgraph-dispatcher": "42d45972e",
         "stateaxis-async-kv-transfer": "2f8660474",
         "stateaxis-automatic-prefix-cache": "77a2124ad",
-        "stateaxis-chunked-prefill": "f927339aa",
-        "stateaxis-device-metadata-delta": "db43c9699",
-        "stateaxis-dynamic-microbatch": "0ce954d10",
-        "stateaxis-host-tier-residency": "517858409",
-        "stateaxis-identity-bound-int8-kv": "c437a0339",
-        "stateaxis-incremental-eviction": "895c8e014",
-        "stateaxis-launch-fusion": "315a3d171",
-        "stateaxis-length-aware-queue": "e3d4b3734",
-        "stateaxis-multi-lora-residency": "619e8ffb6",
-        "stateaxis-on-device-sampling": "579d5ecaa",
-        "stateaxis-one-step-scheduling": "ff7be80d1",
         "stateaxis-pipelined-weight-loading": "ac648fff8",
-        "stateaxis-preemption-recompute": "2533ade71",
-        "stateaxis-program-aware-scheduling": "389a11e28",
-        "stateaxis-session-lifecycle": "62cbc90c1",
-        "stateaxis-shared-prefix-attention": "c7ce5bbc9",
-        "stateaxis-sleep-wake": "2f901d100",
-        "stateaxis-speculative-decoding": "9b79499ad",
-        "stateaxis-typed-hybrid-state-groups": "9b498b553",
-        "stateaxis-workflow-disaggregated-residency": "9f1782781",
     }
+    assert all(
+        "github.com/intellistream/" not in (component.get("canonical_repository") or "")
+        for component in REGISTRY["components"]
+    )
     stateaxis_components = {
         component["id"]: component
         for component in REGISTRY["components"]
@@ -168,13 +128,11 @@ def test_all_stateaxis_mods_publish_current_scoped_results() -> None:
 
     for component_id, commit_prefix in expected_commit_prefixes.items():
         component = stateaxis_components[component_id]
-        source_commit = component.get("source_commit")
-        if source_commit is None:
-            source_commit = next(
-                version.removeprefix("repository main @ ")
-                for version in component["compatibility"]["versions"]
-                if version.startswith("repository main @ ")
-            )
+        source_commit = next(
+            version.removeprefix("repository main @ ")
+            for version in component["compatibility"]["versions"]
+            if version.startswith("repository main @ ")
+        )
         assert source_commit.startswith(commit_prefix)
         assert component["qualification"]
         assert component["latest_result"]
@@ -1184,7 +1142,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=phase-scenario-navigation-20261012" in PAGE
-    assert "plugins-page.js?v=phase-scenario-navigation-20261012" in PAGE
+    assert "plugins-page.js?v=org-boundary-20261013" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1235,10 +1193,8 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert 'data-source="./data/ecosystem.json?v=taxonomy-v2-20261012"' in PAGE
-    assert (
-        'data-stateaxis="./data/stateaxis-topic-mods.json?v=taxonomy-v2-20261012"'
-        in PAGE
-    )
+    assert "data-stateaxis=" not in PAGE
+    assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
         'v=ecpa-final-20261009-project-grouping"' in PAGE
@@ -1698,7 +1654,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 59
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 39
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE

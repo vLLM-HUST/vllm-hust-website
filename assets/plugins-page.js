@@ -1439,10 +1439,6 @@ vllm-hust-ext extension check ${extensionId}`
       if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
       return response.json();
     }),
-    fetch(catalog.dataset.stateaxis, { cache: "no-cache" }).then((response) => {
-      if (!response.ok) throw new Error(`StateAxis MOD catalog request failed: ${response.status}`);
-      return response.json();
-    }),
     fetch(catalog.dataset.metadata, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`Workshop metadata request failed: ${response.status}`);
       return response.json();
@@ -1457,15 +1453,12 @@ vllm-hust-ext extension check ${extensionId}`
       fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
-    .then(([payload, stateaxis, metadata, navigation, taxonomy, performance]) => {
+    .then(([payload, metadata, navigation, taxonomy, performance]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
       if (metadata.schema_version !== "plugin-workshop-metadata/v1" || !metadata.plugins) {
         throw new Error("unsupported Workshop metadata");
-      }
-      if (stateaxis.schema_version !== "stateaxis-topic-mod-catalog/v1" || !Array.isArray(stateaxis.components)) {
-        throw new Error("unsupported StateAxis MOD catalog");
       }
       if (navigation.schema_version !== "plugin-workload-navigation/v1" || !navigation.traits || !navigation.plugins) {
         throw new Error("unsupported workload navigation");
@@ -1475,10 +1468,7 @@ vllm-hust-ext extension check ${extensionId}`
           ? "MOD 分类数据版本暂不匹配，请刷新页面后重试。"
           : "The MOD classification data is temporarily out of date. Refresh the page and try again.");
       }
-      const existingIds = new Set(payload.components.map((item) => item.id));
-      const duplicateIds = stateaxis.components.filter((item) => existingIds.has(item.id));
-      if (duplicateIds.length) throw new Error("duplicate StateAxis MOD catalog identity");
-      registry = { ...payload, components: [...payload.components, ...stateaxis.components] };
+      registry = payload;
       modTaxonomy = taxonomy.components;
       performanceData = performance?.data;
       frontierData = performance?.frontier;

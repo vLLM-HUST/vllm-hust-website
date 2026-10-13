@@ -20,12 +20,11 @@ def main():
         for key in ("qwen", "dsv4")
     }
     ecosystem = json.loads((root / "data/ecosystem.json").read_text())
-    stateaxis_topics = json.loads((root / "data/stateaxis-topic-mods.json").read_text())
     taxonomy = json.loads((root / "data/mod-taxonomy.json").read_text())["components"]
     workshop_mod_count = len(
         {
             item.get("catalog_project_id", item["id"])
-            for item in ecosystem["components"] + stateaxis_topics["components"]
+            for item in ecosystem["components"]
             if item["id"] in taxonomy
             and (
                 item.get("public_surface", True) is not False
