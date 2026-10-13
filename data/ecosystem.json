@@ -1668,10 +1668,10 @@
       "upstream_repository": null,
       "summary_en": "A default-off Manifest 0.3 MOD for lease-safe, content-addressed prefix reuse with bounded residency. Extension Manager is the sole activation path; activation support does not imply a performance gain.",
       "summary_zh": "面向租约安全、内容寻址前缀复用与有界驻留的默认关闭 Manifest 0.3 MOD。Extension Manager 是唯一激活路径；可激活不代表已有性能收益。",
-      "public_effect_en": "Frozen StateAxis source evidence records a positive repeated-prefix cell and 0.0256% measured default-path overhead. This provenance is not inherited as qualification by the split MOD and does not establish a general online gain.",
-      "public_effect_zh": "冻结的 StateAxis 来源证据记录了一个重复前缀正向单元，以及 0.0256% 的默认路径开销。拆分后的 MOD 不自动继承该资格，该结果也不能推广为一般在线收益。",
+      "public_effect_en": "The latest matched process was exact and lifecycle-clean with 0.0256% throughput overhead, but exercised zero cache hits. It establishes a no-harm boundary only; it does not qualify an online gain.",
+      "public_effect_zh": "最新配对进程保持精确且生命周期闭合，吞吐开销为 0.0256%，但 cache hit 为零。该结果只建立 no-harm 边界，不授予在线收益资格。",
       "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-automatic-prefix-cache/blob/main/evidence/ISSUE95_BOUNDED_APC_CLOSURE_20260815.md",
+      "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-automatic-prefix-cache/blob/main/evidence/ecpa-matched-process-20261010/SUMMARY.json",
       "functional_compatibility": {
         "status": "passed",
         "scope": "Manifest 0.3 hash-bound experimental activation contract; performance qualification remains separate"
@@ -1699,7 +1699,9 @@
         "requirements_en": "Keep disabled by default. Runtime activation is available only through Extension Manager; the recorded matched process exercised zero cache hits and does not establish a gain.",
         "requirements_zh": "必须默认关闭且只能通过 Extension Manager 激活；现有配对进程未产生 cache hit，不能据此声明收益。"
       },
-      "evidence_level": "runtime_activation_verified_performance_unqualified"
+      "evidence_level": "runtime_activation_verified_performance_unqualified",
+      "qualification": "historical-matched-real-online-no-harm-scoped",
+      "latest_result": "evidence/ecpa-matched-process-20261010/SUMMARY.json"
     },
     {
       "id": "stateaxis-async-kv-transfer",
@@ -1739,10 +1741,10 @@
       "upstream_repository": null,
       "summary_en": "A default-off Manifest 0.3 MOD for bounded, out-of-order device KV-transfer overlap with explicit ownership and drain. Extension Manager provides the accepted experimental activation path; fresh version-bound performance qualification remains pending.",
       "summary_zh": "面向有界乱序设备 KV 传输重叠、显式所有权与 drain 的默认关闭 Manifest 0.3 MOD。Extension Manager 已提供实验性激活路径；当前版本绑定的性能资格仍待补测。",
-      "public_effect_en": "Frozen StateAxis source evidence records positive bounded device-overlap behavior. That qualification is not inherited by this split MOD and is neither cross-instance tiering evidence nor a KV-capacity claim.",
-      "public_effect_zh": "冻结的 StateAxis 来源证据记录了有界设备重叠的正向表现；它不是拆分后 MOD 的独立资格证明，也不是跨实例分层或 KV 容量收益证据。",
-      "public_effect_status": "preview",
-      "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-async-kv-transfer/blob/main/evidence/ISSUE76_ASYNC_TRANSFER_LANE_CLOSURE_20260815.md",
+      "public_effect_en": "Historical Qwen2.5-14B matched component runs were exact and lifecycle-clean. Host-tier-hit P50 improved from 592.597 ms to 333.716 ms (-43.686%) and pair throughput from 3.291 to 5.626 ops/s, with overlap proven in 3/3 candidate runs. This does not qualify active version 0.2.0 or general serving throughput.",
+      "public_effect_zh": "历史 Qwen2.5-14B 配对组件运行保持精确且生命周期闭合。host-tier-hit P50 由 592.597 ms 改善至 333.716 ms（-43.686%），配对吞吐由 3.291 提升至 5.626 ops/s，3/3 次候选运行均证明发生重叠。该结果不授予当前 0.2.0 版本或通用服务吞吐资格。",
+      "public_effect_status": "measured",
+      "public_effect_url": "https://github.com/vLLM-HUST/stateaxis-async-kv-transfer/blob/main/evidence/issue76-async-transfer-20260815-r5/result.json",
       "functional_compatibility": {
         "status": "passed",
         "scope": "Manifest 0.3 ECPA-only bounded transfer contract; fresh version-bound performance qualification pending"
@@ -1757,7 +1759,7 @@
         "status": "experimental",
         "host": "StateAxis through vLLM-HUST Extension Manager",
         "versions": [
-          "repository main @ fab17ad57c63ef33fce29a508c660b19dd3e6293",
+          "repository main @ 2f8660474d49fa35246d879a5ba971d32534f03e",
           "Manifest 0.3 experimental",
           "runtime ID org.vllm-hust.stateaxis-async-kv-transfer"
         ],
@@ -1770,7 +1772,9 @@
         "requirements_en": "Keep disabled by default and activate only through Extension Manager. Historical overlap evidence does not qualify the current revision; fresh ownership, drain, failure-recovery and matched ON/OFF gates remain required.",
         "requirements_zh": "必须默认关闭且只能通过 Extension Manager 激活。历史重叠证据不能为当前版本授予资格；仍需重新通过所有权、drain、失败恢复及 matched ON/OFF 门禁。"
       },
-      "evidence_level": "runtime_activation_verified_historical_performance_only"
+      "evidence_level": "runtime_activation_verified_historical_performance_only",
+      "qualification": "historical_matched_real_npu_component_positive_active_version_performance_unqualified",
+      "latest_result": "evidence/issue76-async-transfer-20260815-r5/result.json"
     },
     {
       "id": "stateaxis-pipelined-weight-loading",
@@ -1841,7 +1845,9 @@
         "requirements_en": "Keep disabled by default and activate only through Extension Manager. The published 10.68% result measures startup readiness for a pre-sharded carrier; cache control and formal ECPA ON/OFF gates remain pending.",
         "requirements_zh": "必须默认关闭且只能通过 Extension Manager 激活。公开的 10.68% 结果衡量预分片载体的启动就绪时间；缓存控制及正式 ECPA ON/OFF 门禁仍待完成。"
       },
-      "evidence_level": "hardware_startup_diagnostic"
+      "evidence_level": "hardware_startup_diagnostic",
+      "qualification": "matched-real-npu-qwen-cold-warm-scoped-positive",
+      "latest_result": "evidence/qwen35-loader-sharded-qualification-20261012/RESULT.json"
     },
     {
       "id": "gdn-state-codec",

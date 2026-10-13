@@ -133,6 +133,64 @@ def test_stateaxis_topic_catalog_is_complete_and_public() -> None:
         assert component["id"] in WORKLOAD_NAVIGATION["plugins"]
 
 
+def test_all_stateaxis_mods_publish_current_scoped_results() -> None:
+    expected_commit_prefixes = {
+        "stateaxis-aclgraph-dispatcher": "42d45972e",
+        "stateaxis-async-kv-transfer": "2f8660474",
+        "stateaxis-automatic-prefix-cache": "77a2124ad",
+        "stateaxis-chunked-prefill": "f927339aa",
+        "stateaxis-device-metadata-delta": "db43c9699",
+        "stateaxis-dynamic-microbatch": "0ce954d10",
+        "stateaxis-host-tier-residency": "517858409",
+        "stateaxis-identity-bound-int8-kv": "c437a0339",
+        "stateaxis-incremental-eviction": "895c8e014",
+        "stateaxis-launch-fusion": "315a3d171",
+        "stateaxis-length-aware-queue": "e3d4b3734",
+        "stateaxis-multi-lora-residency": "619e8ffb6",
+        "stateaxis-on-device-sampling": "579d5ecaa",
+        "stateaxis-one-step-scheduling": "ff7be80d1",
+        "stateaxis-pipelined-weight-loading": "ac648fff8",
+        "stateaxis-preemption-recompute": "2533ade71",
+        "stateaxis-program-aware-scheduling": "389a11e28",
+        "stateaxis-session-lifecycle": "62cbc90c1",
+        "stateaxis-shared-prefix-attention": "c7ce5bbc9",
+        "stateaxis-sleep-wake": "2f901d100",
+        "stateaxis-speculative-decoding": "9b79499ad",
+        "stateaxis-typed-hybrid-state-groups": "9b498b553",
+        "stateaxis-workflow-disaggregated-residency": "9f1782781",
+    }
+    stateaxis_components = {
+        component["id"]: component
+        for component in REGISTRY["components"]
+        if component["id"].startswith("stateaxis-")
+    }
+    assert set(stateaxis_components) == set(expected_commit_prefixes)
+
+    for component_id, commit_prefix in expected_commit_prefixes.items():
+        component = stateaxis_components[component_id]
+        source_commit = component.get("source_commit")
+        if source_commit is None:
+            source_commit = next(
+                version.removeprefix("repository main @ ")
+                for version in component["compatibility"]["versions"]
+                if version.startswith("repository main @ ")
+            )
+        assert source_commit.startswith(commit_prefix)
+        assert component["qualification"]
+        assert component["latest_result"]
+        assert component["public_effect_en"]
+        assert component["public_effect_zh"]
+        assert component["public_effect_status"] in {
+            "measured",
+            "validated",
+            "inconclusive",
+            "not-beneficial-in-tested-cell",
+            "beneficial",
+            "preview",
+        }
+        assert component["latest_result"] in component["public_effect_url"]
+
+
 def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() -> None:
     component = by_id("simllm-migration")
     assert component["public_surface"] is True
@@ -1030,7 +1088,13 @@ def test_public_stateaxis_mod_repositories_are_visible_with_scoped_evidence() ->
     for component_id in experimental_ids:
         component = by_id(component_id)
         assert component["compatibility"]["status"] == "experimental"
-        assert component["public_effect_status"] == "preview"
+    assert by_id("stateaxis-automatic-prefix-cache")["public_effect_status"] == (
+        "preview"
+    )
+    assert by_id("stateaxis-async-kv-transfer")["public_effect_status"] == "measured"
+    assert by_id("stateaxis-pipelined-weight-loading")["public_effect_status"] == (
+        "preview"
+    )
 
     assert by_id("stateaxis-automatic-prefix-cache")["evidence_level"] == (
         "runtime_activation_verified_performance_unqualified"
@@ -1038,14 +1102,14 @@ def test_public_stateaxis_mod_repositories_are_visible_with_scoped_evidence() ->
     assert by_id("stateaxis-async-kv-transfer")["evidence_level"] == (
         "runtime_activation_verified_historical_performance_only"
     )
-    for component_id in (
-        "stateaxis-automatic-prefix-cache",
-        "stateaxis-async-kv-transfer",
-    ):
-        component = by_id(component_id)
-        assert "not inherited" in component["public_effect_en"] or (
-            "does not inherit" in component["public_effect_en"]
-        )
+    assert (
+        "does not qualify an online gain"
+        in by_id("stateaxis-automatic-prefix-cache")["public_effect_en"]
+    )
+    assert (
+        "does not qualify active version 0.2.0"
+        in by_id("stateaxis-async-kv-transfer")["public_effect_en"]
+    )
     loader = by_id("stateaxis-pipelined-weight-loading")
     assert loader["evidence_level"] == "hardware_startup_diagnostic"
     assert "10.68%" in loader["public_effect_en"]
