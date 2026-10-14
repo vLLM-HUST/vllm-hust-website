@@ -16,15 +16,16 @@ the startup log hash and receipt timestamp. Unconfirmed fields are never present
 This is an operator-supplied measurement, not a canonical validation-service publication or V5.5
 admission. The generated scenario index, dataset program and historical matrix remain unchanged.
 Their existing readiness statements describe the formal program; this handoff does not upgrade it.
-The independent same-origin loader allows these results to display if the matrix source is unavailable.
+The independent same-origin loader allows these results to display if the matrix source is
+unavailable.
 
 ## Data and provenance
 
 Run: `mmlu-pro-b0-35b-v1-20261012T064318`, Qwen3.5-35B-A3B, B0, single lifecycle.
 
 - Full test: 9,609 correct out of 12,032, or 79.86203457446809%.
-- Performance: 200 completed requests, 442.8152399013184 output tokens/s,
-  53,476.45447229035 ms mean TTFT, 31.91726063188239 ms mean TPOT.
+- Performance: 200 completed requests, 442.8152399013184 output tokens/s, 53,476.45447229035 ms mean
+  TTFT, 31.91726063188239 ms mean TPOT.
 - No paired B1 or repeat distribution; no improvement claim.
 
 `data/mmlu-pro-20261012/manifest.json` records the source-relative filenames, original byte hashes,
