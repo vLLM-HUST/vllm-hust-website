@@ -124,7 +124,9 @@
             let note = lang() === 'zh' ? dataset.note_zh : dataset.note;
             const handoff = dataset.id === 'mmlu-pro'
                 ? `<p><a href="#mmlu-pro-handoff">${lang() === 'zh' ? '查看 10 月 12 日新增准确率与性能实测（非正式验收）' : 'View October 12 accuracy and performance measurements (not formal acceptance)'}</a></p>`
-                : '';
+                : dataset.id === 'frontierscience'
+                    ? '<p><a href="#frontierscience-handoff">' + (lang() === 'zh' ? '查看 10 月 13 日 Olympiad、Research 与性能实测（非正式验收）' : 'View October 13 Olympiad, Research and performance measurements (not formal acceptance)') + '</a></p>'
+                    : '';
             if (handoff) note = (lang() === 'zh' ? '正式计划登记状态（不含下方新增实测）：' : 'Formal program record (excluding the new handoff below): ') + note;
             const metric = lang() === 'zh' ? dataset.primary_metric_zh : dataset.primary_metric;
             const contractStatus = statusText[lang()][dataset.status] || dataset.status;
