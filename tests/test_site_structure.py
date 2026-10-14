@@ -61,7 +61,7 @@ def test_leaderboard_names_exact_settings_without_frontier_jargon() -> None:
     assert "当前设定同配置基线" in settings_script
     assert "Fixed official baseline" not in settings_script
     assert "固定官方基线" not in settings_script
-    assert "setting-baseline-scope-20261010" in page
+    assert re.search(r'src="\./assets/leaderboard-frontier\.js\?v=[^"\s]+"', page)
     assert "Best trade-off points only" in settings_script
     assert "仅显示最佳权衡点" in settings_script
     assert "frontierOnly:false" in settings_script
