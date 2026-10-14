@@ -87030,92 +87030,6 @@
       }
     },
     {
-      "id": "910c-native-dsv4-flash-w8a8-random8k1k-20261014-host06-c1",
-      "cohort_id": "910c-native-dsv4-flash-w8a8-random8k1k-20261014",
-      "label": "Native 910C · host06 · C1",
-      "configuration": {
-        "engine": "vLLM + vLLM-Ascend",
-        "engine_version": "0.25.1 /0.25.1rc1 A3",
-        "mods": [],
-        "hardware": {
-          "label": "Ascend 910C (logical die)",
-          "accelerator_count": 16
-        },
-        "context_capacity_tokens": 32768,
-        "parameters": {
-          "tp": 4,
-          "dp": 4,
-          "ep": 16,
-          "api_servers": 4,
-          "dspark_tokens": 7,
-          "target_graph": "FULL_DECODE_ONLY",
-          "draft_enforce_eager": true,
-          "indexer_cache_dtype": "BF16 (default)",
-          "prefix_cache": false,
-          "max_model_len": 32768,
-          "max_num_batched_tokens": 10240,
-          "max_num_seqs_per_dp": 64,
-          "tensor_parallel_size": 4,
-          "data_parallel_size": 4,
-          "expert_parallel_size": 16,
-          "pipeline_parallel_size": 1,
-          "mtp_draft_tokens": 7,
-          "graph_mode": "FULL_DECODE_ONLY",
-          "max_num_seqs": 64,
-          "global_seats": 256,
-          "execution_host": "host06",
-          "physical_packages": 8,
-          "logical_dies": 16,
-          "checkpoint_revision": "5012d242bcbfb2686702c3fe0c1bfea83cc7d3fb",
-          "runtime_pins": {
-            "vllm": "0.25.1",
-            "vllm_commit": null,
-            "vllm_ascend": "0.25.1rc1",
-            "vllm_ascend_wheel_commit": "g9bf964cb4",
-            "variant": "A3",
-            "torch": "2.10.0",
-            "torch_npu": "2.10.0",
-            "cann": "9.0.0"
-          },
-          "comparison_scope": "Random-token diagnostic. Target FULL_DECODE_ONLY graph; DSpark K7 eager draft. Not natural-language capacity or an official baseline. Hosts are separate groups; no pooling or causal cross-host claim."
-        }
-      },
-      "load": {
-        "concurrency": 1,
-        "concurrency_series": "910c-native-host06-20261014",
-        "presentation_group": {
-          "id": "910c-native-host06",
-          "label_en": "Native vLLM · host06",
-          "label_zh": "Native vLLM · host06"
-        }
-      },
-      "metrics": {
-        "decode_p90_tps": 20.151076501169282,
-        "output_tps": 18.778525640349823,
-        "tpot_ms": 52.41553415004857,
-        "ttft_p95_ms": 924.1498318529921,
-        "tpot_p95_ms": 53.91924615449621
-      },
-      "evidence": {
-        "status": "measured",
-        "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/d2fee2579f34723c3e0bac40a744a9dcc5caceb5/reports/deepseek-v4-flash-910c-20261014",
-        "run_ids": [
-          "host06-c1"
-        ],
-        "sampling_date_utc": "2026-10-14",
-        "sampling_date_source": "Recorded client started_unix timestamp, UTC",
-        "aggregation": "One complete run; host identities preserved; no best-of selection",
-        "metric_extract": "./data/leaderboard_910c_native_evidence.json",
-        "benchmark_protocol": {
-          "protocol_id": "910c-native-dsv4-flash-w8a8-random8k1k-20261014",
-          "measurement_seconds": 436.2429807800072,
-          "requests": 8,
-          "source_result_index": "raw/host06-c1/result-index.json",
-          "warmup_requests": 8
-        }
-      }
-    },
-    {
       "id": "910c-native-dsv4-flash-w8a8-random8k1k-20261014-host06-c2",
       "cohort_id": "910c-native-dsv4-flash-w8a8-random8k1k-20261014",
       "label": "Native 910C · host06 · C2",
@@ -100177,6 +100091,97 @@
           "qwen27-sweprefix-current-state-tp4-c16-20261009",
           "qwen27-sweprefix-current-state-tp4-c12-20261009"
         ]
+      }
+    },
+    {
+      "id": "910c-native-dsv4-flash-w8a8-random8k1k-20261014-host06-c1",
+      "cohort_id": "910c-native-dsv4-flash-w8a8-random8k1k-20261014",
+      "label": "Native 910C · host06 · C1",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.25.1 /0.25.1rc1 A3",
+        "mods": [],
+        "hardware": {
+          "label": "Ascend 910C (logical die)",
+          "accelerator_count": 16
+        },
+        "context_capacity_tokens": 32768,
+        "parameters": {
+          "tp": 4,
+          "dp": 4,
+          "ep": 16,
+          "api_servers": 4,
+          "dspark_tokens": 7,
+          "target_graph": "FULL_DECODE_ONLY",
+          "draft_enforce_eager": true,
+          "indexer_cache_dtype": "BF16 (default)",
+          "prefix_cache": false,
+          "max_model_len": 32768,
+          "max_num_batched_tokens": 10240,
+          "max_num_seqs_per_dp": 64,
+          "tensor_parallel_size": 4,
+          "data_parallel_size": 4,
+          "expert_parallel_size": 16,
+          "pipeline_parallel_size": 1,
+          "mtp_draft_tokens": 7,
+          "graph_mode": "FULL_DECODE_ONLY",
+          "max_num_seqs": 64,
+          "global_seats": 256,
+          "execution_host": "host06",
+          "physical_packages": 8,
+          "logical_dies": 16,
+          "checkpoint_revision": "5012d242bcbfb2686702c3fe0c1bfea83cc7d3fb",
+          "runtime_pins": {
+            "vllm": "0.25.1",
+            "vllm_commit": null,
+            "vllm_ascend": "0.25.1rc1",
+            "vllm_ascend_wheel_commit": "g9bf964cb4",
+            "variant": "A3",
+            "torch": "2.10.0",
+            "torch_npu": "2.10.0",
+            "cann": "9.0.0"
+          },
+          "comparison_scope": "Random-token diagnostic. Target FULL_DECODE_ONLY graph; DSpark K7 eager draft. Not natural-language capacity or an official baseline. Hosts are separate groups; no pooling or causal cross-host claim."
+        }
+      },
+      "load": {
+        "concurrency": 1,
+        "concurrency_series": "910c-native-host06-20261014",
+        "presentation_group": {
+          "id": "910c-native-host06",
+          "label_en": "Native vLLM · host06",
+          "label_zh": "Native vLLM · host06"
+        }
+      },
+      "metrics": {
+        "decode_p90_tps": 20.151076501169282,
+        "output_tps": 18.778525640349823,
+        "tpot_ms": 52.41553415004857,
+        "ttft_p95_ms": 924.1498318529921,
+        "tpot_p95_ms": 53.91924615449621
+      },
+      "evidence": {
+        "status": "measured",
+        "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/d2fee2579f34723c3e0bac40a744a9dcc5caceb5/reports/deepseek-v4-flash-910c-20261014",
+        "run_ids": [
+          "host06-c1"
+        ],
+        "sampling_date_utc": "2026-10-14",
+        "sampling_date_source": "Recorded client started_unix timestamp, UTC",
+        "aggregation": "One complete run; host identities preserved; no best-of selection",
+        "metric_extract": "./data/leaderboard_910c_native_evidence.json",
+        "benchmark_protocol": {
+          "protocol_id": "910c-native-dsv4-flash-w8a8-random8k1k-20261014",
+          "measurement_seconds": 436.2429807800072,
+          "requests": 8,
+          "source_result_index": "raw/host06-c1/result-index.json",
+          "warmup_requests": 8
+        }
+      },
+      "display_withdrawal": {
+        "reason": "User requested hiding C1 from the presentation curve; measurement remains valid",
+        "date": "2026-10-14",
+        "policy": "Display-only withdrawal; preserve original metrics and source evidence"
       }
     }
   ],

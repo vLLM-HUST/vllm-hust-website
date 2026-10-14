@@ -13,7 +13,10 @@ errors, exact token counts and reconstructed mean TPOT before deriving the chart
 
 All 11 observations are retained: host06 C1/2/4/8/16/32/64/128/256 and host07 C32/512. Each host has
 its own group and concurrency line; do not pool the two C32 observations or join hosts into a
-fixed-configuration sweep. Existing chart controls can reveal all points or just trade-off vertices.
+fixed-configuration sweep. At Fletcher's request on October14, host06 C1 is hidden from the
+presentation curve and preserved in `archived_points` with a display-only withdrawal. The remaining
+10 observations are displayed; this is not an invalidation of C1. The importer preserves this choice
+on rebuild. Existing chart controls can reveal all displayed points or just trade-off vertices.
 
 X is the linear P90 quantile of per-request `(output_tokens - 1) / sum(ITLs)`, not inverse P90 TPOT,
 inverse mean TPOT, or the percentile of individual streamed chunks. SSE chunks can contain several

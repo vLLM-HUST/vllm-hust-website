@@ -170,6 +170,15 @@ def main(source):
                 "result_identity": json.loads((source / row["raw_result"]).read_text()),
             }
         )
+    # Preserve the explicit presentation withdrawal when rebuilding this cohort.
+    withdrawn = next(p for p in data["points"] if p["id"] == f"{COHORT}-host06-c1")
+    withdrawn["display_withdrawal"] = {
+        "reason": "User requested hiding C1 from the presentation curve; measurement remains valid",
+        "date": "2026-10-14",
+        "policy": "Display-only withdrawal; preserve original metrics and source evidence",
+    }
+    data["points"].remove(withdrawn)
+    data.setdefault("archived_points", []).append(withdrawn)
     snapshot.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
     (ROOT / "data/leaderboard_910c_native_evidence.json").write_text(
         json.dumps(

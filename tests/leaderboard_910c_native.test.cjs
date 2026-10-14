@@ -9,10 +9,15 @@ test('910C engineering observations preserve hosts, die accounting and raw-deriv
  const cohort=data.cohorts.find(c=>c.id===id);
  assert.match(cohort.workload.label,/910C.*Native vLLM Performance/);
  const points=data.points.filter(p=>p.cohort_id===id);
- assert.equal(points.length,11);
+ assert.equal(points.length,10);
+ const archived=data.archived_points.filter(p=>p.cohort_id===id);
+ assert.equal(archived.length,1);
+ assert.equal(archived[0].id,id+'-host06-c1');
+ assert.match(archived[0].display_withdrawal.policy,/Display-only/);
+ assert.equal(evidence.points.length,11);
  assert.equal(new Set(points.map(M.groupKey)).size,2);
  assert.equal(M.concurrencySeries(M.project(points,'decode_p90_tps','output_tps_per_chip').measured).length,2);
- for(const p of points){
+ for(const p of [...points,...archived]){
   const e=evidence.points.find(x=>x.id===p.id);
   assert.equal(p.metrics.decode_p90_tps,e.decode_p90_tps);
   assert.equal(p.metrics.output_tps,e.summary.output_tok_s);
