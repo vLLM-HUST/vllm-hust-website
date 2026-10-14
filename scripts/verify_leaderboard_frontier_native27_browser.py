@@ -115,6 +115,8 @@ with sync_playwright() as p:
             payload = json.loads(path.read_text())
             assert payload["point"] == point and payload["cohort"] == cohort
             popup.locator("[data-close]").click()
+            # Chromium limits rapid download bursts; pace independent export checks.
+            page.wait_for_timeout(1100)
         page.locator('[data-filter="mods"][value="betterscale"]').uncheck()
         assert page.locator(".frontier-point").count() == 5
         assert page.locator(".frontier-concurrency-line").count() == 1
