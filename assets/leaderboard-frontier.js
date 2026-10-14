@@ -6,6 +6,7 @@
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const words = {
         en: {
+            engineering: 'Engineering measurement', dieY: 'Output throughput / logical die',
             rentAxis: 'Normalize by card rent', rentY: 'Output throughput / monthly rent', rentUnit: 'tok/s / CNY 10,000 (monthly card rent)', rentNote: '910B2: CNY 4/card/hour × 24 × 30 = CNY 2,880/card/month. Rent-normalized throughput, not API revenue.',
             selectAll: 'Select all', clearAll: 'Deselect all', rotationDepth: 'Session rotation depth', rotationHelp: 'C1/C2/… is request concurrency; D1/D2 is the number of session states rotated per request lane.', rotationPending: 'Larger rotation depths are under construction.',
             knownBudget: 'Known output budget · no learned predictor', budgetChecksOnly: 'Admission capacity checks ran, but no admission deferrals or preemptions were observed. This point does not demonstrate an optimization benefit.',
@@ -21,6 +22,7 @@
             viewContract: 'View contract', contractTitle: 'Current setting contract', contractScope: 'Setting identity', contractCurves: 'Enabled curve configurations', contractCurve: 'Curve', contractRuntime: 'Runtime', contractTopology: 'Topology', contractMemory: 'Capacity / memory', contractExecution: 'Execution', contractEvidence: 'Evidence identity', modelRevision: 'Model revision', checkpoint: 'Checkpoint', precision: 'Precision / dtype', window: 'Measured window', protocol: 'Protocol', preparedWorkload: 'Canonical prepared workload', workloadHash: 'Workload', tokenizer: 'Canonical tokenizer fingerprint', dataset: 'Source dataset', seconds: 'seconds', chips: 'chips', perChip: 'per chip', varies: 'varies by curve', noCurves: 'No enabled curve configurations.'
         },
         zh: {
+            engineering: '工程测量', dieY: '每逻辑 die 输出吞吐',
             rentAxis: '按卡月租归一化', rentY: '万元卡月租输出吞吐', rentUnit: 'tok/s/万元（卡月租）', rentNote: '910B2：4 元/卡时 × 24 × 30 = 2,880 元/卡月。仅折算卡租，不代表 API 产值。',
             selectAll: '全选', clearAll: '全不选', rotationDepth: '会话轮转深度', rotationHelp: 'C1/C2/… 是请求并发数；D1/D2 是每条并发通道轮转的会话状态数。', rotationPending: '更大轮转深度的测试正在施工。',
             knownBudget: '已知输出预算 · 未使用学习型预测器', budgetChecksOnly: '准入容量检查已执行，但未观察到准入延后或抢占；该点不构成优化收益证据。',
@@ -54,12 +56,14 @@
     const baseAxes = () => cohort()?.workload.contract.frontier_axes || DEFAULT_AXES;
     const canNormalizeRent = () => baseAxes().y === 'output_tps_per_chip' && cohortPoints().length > 0 && cohortPoints().every(M.supportsRent);
     const axes = () => state.rentNormalized && canNormalizeRent() ? {...baseAxes(), y:'output_tps_per_10k_rent'} : baseAxes();
-    const axisUnit = key => key === 'output_tps_per_10k_rent' ? t('rentUnit') : M.metrics[key].unit;
+    const engineeringMeasurement = () => cohort()?.workload.contract.measurement_scope === 'engineering-measurement';
+    const logicalDie = () => cohort()?.workload.contract.hardware_unit === 'logical-die';
+    const axisUnit = key => logicalDie() && key === 'output_tps_per_chip' ? 'output tok/s/die' : key === 'output_tps_per_10k_rent' ? t('rentUnit') : M.metrics[key].unit;
     const fixedComparison = () => cohort()?.workload.contract.presentation === 'fixed-comparison';
     const configurationStudy = () => cohort()?.workload.contract.presentation === 'configuration-study';
     const studyComparison = p => cohort()?.workload.contract.comparison_point_ids?.includes(p.id);
     const independentStudy = () => fixedComparison() || configurationStudy();
-    const axisLabel = key => ({batch_size:t('batchSize'),output_tps:t('outputThroughput'),decode_p90_tps:t('x'),output_tps_per_chip:t('y'),output_tps_per_10k_rent:t('rentY')})[key] || key;
+    const axisLabel = key => ({batch_size:t('batchSize'),output_tps:t('outputThroughput'),decode_p90_tps:t('x'),output_tps_per_chip:t(logicalDie()?'dieY':'y'),output_tps_per_10k_rent:t('rentY')})[key] || key;
     const cohortPoints = () => M.presentationPoints(state.data.points,cohort());
     const hasRotation = () => !!cohort()?.workload.contract.session_rotation;
     const depthPoints = () => cohortPoints().filter(p => !hasRotation() || state.rotation?.has(String(p.load.session_rotation_depth)));
@@ -67,7 +71,7 @@
     const points = () => (configurationStudy() && cohort()?.workload.contract.comparison_point_ids) || (state.frontierOnly && !independentStudy())
         ? M.groupFrontiers(filteredPoints(),axes().x,axes().y).flat().map(row=>row.point) : filteredPoints();
     const groupLabel = p => p.study_group?.[lang()==='zh'?'label_zh':'label_en'] || p.load.presentation_group?.[lang()==='zh'?'label_zh':'label_en'] || cohort()?.workload.contract.display_group_labels?.[M.groupKey(p)]?.[lang()==='zh'?'label_zh':'label_en'] || p.configuration.experiment_group || (p.configuration.mods.length ? p.configuration.mods.map(id => state.catalog.get(id)?.name || id).join(' + ') : t('native'));
-    const officialBaseline = () => cohort()?.official_baseline || state.data.official_baseline;
+    const officialBaseline = () => engineeringMeasurement() ? null : cohort()?.official_baseline || state.data.official_baseline;
     const hasOfficialBaseline = () => !!officialBaseline() && cohortPoints().some(p => p.configuration.official_baseline_id === officialBaseline().id);
     const officialBaselineText = () => {
         const baseline=officialBaseline();
@@ -187,6 +191,7 @@
                     </div>
 
                 </div>
+                ${engineeringMeasurement()?`<p class="frontier-baseline" data-state="engineering">${escape(cohort()?.workload.contract.measurement_note?.[lang()==='zh'?'label_zh':'label_en'] || t('engineering'))}</p>`:''}
                 ${officialBaseline()?`<p class="frontier-baseline" data-state="${hasOfficialBaseline()?'measured':'pending'}">${escape(officialBaselineText())}</p>`:''}
                 <div class="frontier-plot" id="frontier-plot">
                     <svg id="frontier-chart" viewBox="0 0 1000 480" role="group" aria-label="${axisLabel(axes().x)} × ${axisLabel(axes().y)}"></svg>
@@ -269,7 +274,7 @@
         $('frontier-mods-toggle').disabled=cohortPoints().length===0;
         $('view-frontier-count').textContent=state.data.points.length;
         const status=$('frontier-status');status.dataset.state=state.error?'error':state.ready?'ready':'loading';
-        status.textContent=state.error?t('error'):!state.ready?t('loading'):configurationStudy()?t('study'):fixedComparison()?t('fixed'):current?.workload.contract.profile==='smoke'?t('smoke'):t('formal');
+        status.textContent=state.error?t('error'):!state.ready?t('loading'):engineeringMeasurement()?t('engineering'):configurationStudy()?t('study'):fixedComparison()?t('fixed'):current?.workload.contract.profile==='smoke'?t('smoke'):t('formal');
         const blank=$('frontier-blank');blank.hidden=measured.measured.length>0;
         blank.textContent=state.error?t('error'):!state.ready?t('loading'):cohortPoints().length?t('noMatch'):t('empty');
         $('frontier-filter-count').textContent=`${points().length} / ${depthPoints().length} ${t('points')}`;
@@ -326,7 +331,7 @@
                 params.balanced_decode_attention!=null?`${t('balancedAttention')}: ${t(params.balanced_decode_attention?'enabled':'disabled')}`:null,
                 params.state_cache_policy!=null?`${t('cachePolicy')}: ${t(!params.state_cache_policy?'disabled':params.state_cache_incremental?'incrementalCache':'fullCache')}`:null
             ].filter(Boolean).join('<br>')}</p>`:''}
-            <p class="frontier-popup-load">${t('warmup')}: ${t(warmupKey)}</p>
+            <p class="frontier-popup-load">${t('warmup')}: ${Number.isInteger(point.evidence.benchmark_protocol?.warmup_requests)?`${point.evidence.benchmark_protocol.warmup_requests} ${lang()==='zh'?'个请求（不计入测量）':'requests (excluded)'}`:t(warmupKey)}</p>
             ${nearby.length>1?`<div class="frontier-nearby"><span>${t('nearby')}</span>${nearby.map(p=>`<button type="button" data-nearby="${escape(p.id)}" aria-pressed="${p.id===point.id}">${escape(parallel(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''} · C${fmt(p.load.concurrency)} · MTP${p.configuration.parameters.mtp_draft_tokens??'—'} · ${fmt(p.configuration.parameters.max_num_seqs)}</button>`).join('')}</div>`:''}
             <button type="button" class="frontier-download" data-download>${t('download')} ↓</button>`;
         const anchor=$('frontier-chart').querySelector(`[data-point="${CSS.escape(point.id)}"]`);
@@ -378,7 +383,7 @@
     $('frontier-contract-dialog').addEventListener('click',event=>{if(event.target===$('frontier-contract-dialog'))$('frontier-contract-dialog').close();});
     $('runs-content').hidden=false;shell();
     Promise.all([
-        fetch('./data/leaderboard_frontier.json?v=native-campaign-20261013',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
+        fetch('./data/leaderboard_frontier.json?v=native-910c-20261014',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Snapshot unavailable');return r.json();}).then(M.validate),
         fetch('./data/ecosystem.json?v=benchmark-settings-20260929',{cache:'no-cache'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([data,catalog])=>{state.data=M.visibleData(data);const requested=M.resolveCohort(state.data.cohorts,requestedSetting);if(requested){state.cohort=requested.id;state.tag=tagKey(requested);}state.mods=null;state.mtp=null;state.rotation=null;state.catalog=new Map((catalog.components||[]).map(c=>[c.id,c]));state.ready=true;shell();updateSettingURL();})
         .catch(error=>{state.error=true;state.ready=true;shell();console.error('[Benchmark settings]',error.message);});
