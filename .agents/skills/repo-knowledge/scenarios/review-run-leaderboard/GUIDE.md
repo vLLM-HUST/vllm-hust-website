@@ -274,3 +274,12 @@ four cards and matched completed requests, not the chart's streamed partial outp
 active partial evictions is not a partial-recovery speedup claim. The separate forced four-rank byte
 gate and excluded pinned-host failures remain explicit. Source-v4 adds bounded unused-host-slab
 reclamation on allocation OOM; never relabel earlier v2 observations as v4 reruns.
+
+## Dataset quality → serving performance (October15)
+
+The additive `dataset-matrix-v1.html` shares the result-table CSS and pure sorter, not the main
+controller. Enter `docs/DATASET-MATRIX-V1.md` before importing dataset measurements or changing this
+two-level view. The canonical sync excludes benchmark `reports/`; run the explicit projection
+builder after public report imports. FrontierScience's two quality tracks share one combined load
+test; HLE modality load tests must stay separate. Missing BetterScale HLE is not zero.
+`verify_dataset_matrix_browser.py` is the bounded desktop/mobile interaction check.

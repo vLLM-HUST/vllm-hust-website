@@ -1,0 +1,1502 @@
+{
+  "schema": 1,
+  "cohort": {
+    "model": "Qwen3.5-35B-A3B",
+    "precision": "BF16",
+    "hardware": "Ascend 910B2",
+    "parallel": "TP2"
+  },
+  "solutions": [
+    {
+      "id": "native",
+      "name": "Native vLLM · Ascend"
+    },
+    {
+      "id": "betterscale",
+      "name": "BetterScale"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "mmlu-pro",
+      "name": "MMLU-Pro",
+      "parts": [
+        {
+          "id": "test",
+          "name": "Test",
+          "metric": "accuracy",
+          "scores": {
+            "native": {
+              "label": "Test",
+              "correct": 9609,
+              "total": 12032,
+              "value": 0.7986203457446809,
+              "audit": {
+                "cases": 12032,
+                "correct": 9609,
+                "accuracy": 0.7986203457446809,
+                "invalid_answers": 56,
+                "transport_failures": 0,
+                "length_limited": 1533,
+                "length_limited_but_correct": 426,
+                "finish_reasons": {
+                  "length": 1533,
+                  "stop": 10499
+                }
+              }
+            },
+            "betterscale": {
+              "label": "Test",
+              "correct": 9611,
+              "total": 12032,
+              "value": 0.7987865691489362,
+              "audit": {
+                "cases": 12032,
+                "correct": 9611,
+                "accuracy": 0.7987865691489362,
+                "invalid_answers": 65,
+                "transport_failures": 0,
+                "length_limited": 1548,
+                "wall_seconds_this_invocation": 9259.440616141073,
+                "mean_ttft_s": 0.24528011316354598,
+                "mean_e2e_s": 12.299382534087544,
+                "smoke_only": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "frontierscience",
+      "name": "FrontierScience",
+      "parts": [
+        {
+          "id": "olympiad",
+          "name": "Olympiad",
+          "metric": "success",
+          "scores": {
+            "native": {
+              "label": "Olympiad",
+              "correct": 57,
+              "total": 100,
+              "value": 0.57,
+              "audit": {
+                "total": 100,
+                "graded": 97,
+                "successes": 57,
+                "solver_failures": 0,
+                "judge_unresolved": 3,
+                "judge_invalid": 3,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 2,
+                "judge_audit_flagged": 2,
+                "solver_truncated": 33,
+                "judge_truncated": 4,
+                "success_rate": 0.57,
+                "observed_success_lower_bound": 0.57,
+                "mean_research_score_valid_only": null
+              }
+            },
+            "betterscale": {
+              "label": "Olympiad",
+              "correct": 63,
+              "total": 100,
+              "value": 0.63,
+              "audit": {
+                "total": 100,
+                "graded": 96,
+                "successes": 63,
+                "solver_failures": 0,
+                "judge_unresolved": 4,
+                "judge_invalid": 4,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 4,
+                "judge_audit_flagged": 4,
+                "solver_truncated": 27,
+                "judge_truncated": 8,
+                "success_rate": 0.63,
+                "observed_success_lower_bound": 0.63,
+                "mean_research_score_valid_only": null
+              }
+            }
+          }
+        },
+        {
+          "id": "research",
+          "name": "Research",
+          "metric": "score7",
+          "scores": {
+            "native": {
+              "label": "Research",
+              "correct": 5,
+              "total": 60,
+              "value": 0.08333333333333333,
+              "audit": {
+                "total": 60,
+                "graded": 57,
+                "successes": 5,
+                "solver_failures": 0,
+                "judge_unresolved": 3,
+                "judge_invalid": 3,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 4,
+                "judge_audit_flagged": 5,
+                "solver_truncated": 6,
+                "judge_truncated": 7,
+                "success_rate": 0.08333333333333333,
+                "observed_success_lower_bound": 0.08333333333333333,
+                "mean_research_score_valid_only": 2.530877192982456
+              }
+            },
+            "betterscale": {
+              "label": "Research",
+              "correct": 2,
+              "total": 60,
+              "value": 0.03333333333333333,
+              "audit": {
+                "total": 60,
+                "graded": 57,
+                "successes": 2,
+                "solver_failures": 0,
+                "judge_unresolved": 3,
+                "judge_invalid": 3,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 6,
+                "judge_audit_flagged": 8,
+                "solver_truncated": 9,
+                "judge_truncated": 9,
+                "success_rate": 0.03333333333333333,
+                "observed_success_lower_bound": 0.03333333333333333,
+                "mean_research_score_valid_only": 2.620350877192983
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "hle-verified",
+      "name": "HLE-Verified",
+      "parts": [
+        {
+          "id": "gold",
+          "name": "Gold",
+          "metric": "accuracy",
+          "scores": {
+            "native": {
+              "label": "Gold",
+              "correct": 156,
+              "total": 668,
+              "value": 0.23353293413173654,
+              "audit": {
+                "total": 668,
+                "graded": 636,
+                "successes": 156,
+                "accuracy": 0.23353293413173654,
+                "unresolved": 32,
+                "complete_grading": false,
+                "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+                "wald_95_half_width": 0.03208401105484693,
+                "solver_failures": 0,
+                "judge_invalid": 32,
+                "judge_transport_failures": 0,
+                "solver_truncated": 383,
+                "judge_truncated": 32
+              }
+            }
+          }
+        },
+        {
+          "id": "revision",
+          "name": "Revision",
+          "metric": "accuracy",
+          "scores": {
+            "native": {
+              "label": "Revision",
+              "correct": 313,
+              "total": 1143,
+              "value": 0.27384076990376205,
+              "audit": {
+                "total": 1143,
+                "graded": 1103,
+                "successes": 313,
+                "accuracy": 0.27384076990376205,
+                "unresolved": 40,
+                "complete_grading": false,
+                "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+                "wald_95_half_width": 0.025852225812960747,
+                "solver_failures": 0,
+                "judge_invalid": 40,
+                "judge_transport_failures": 0,
+                "solver_truncated": 688,
+                "judge_truncated": 40
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "mmlu-pro-native-test-200",
+      "dataset": "mmlu-pro",
+      "solution": "native",
+      "scope": "test-200",
+      "quality": [
+        {
+          "label": "Test",
+          "correct": 9609,
+          "total": 12032,
+          "value": 0.7986203457446809,
+          "audit": {
+            "cases": 12032,
+            "correct": 9609,
+            "accuracy": 0.7986203457446809,
+            "invalid_answers": 56,
+            "transport_failures": 0,
+            "length_limited": 1533,
+            "length_limited_but_correct": 426,
+            "finish_reasons": {
+              "length": 1533,
+              "stop": 10499
+            }
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261012-125257",
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 115.62384350504726,
+        "request_throughput": 1.729747030864525,
+        "output_throughput": 442.8152399013184,
+        "total_token_throughput": 2884.0504682361943,
+        "mean_ttft_ms": 53476.45447229035,
+        "mean_tpot_ms": 31.91726063188239
+      },
+      "configuration": {
+        "run_id": "mmlu-pro-b0-35b-v1-20261012T064318",
+        "source_kind": "post-hoc-startup-receipt-reparse",
+        "generated_utc": "2026-10-12T06:50:05.256036+00:00",
+        "startup_log_sha256": "302d6948d62dd171191e4901e6301b5f5c2ba68b514ade4c36dc95eeb0ef73b0",
+        "fields": {
+          "dtype": {
+            "value": "bfloat16",
+            "status": "verified"
+          },
+          "tensor_parallel_size": {
+            "value": 2,
+            "status": "verified"
+          },
+          "pipeline_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "data_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "enable_expert_parallel": {
+            "value": true,
+            "status": "verified"
+          },
+          "decode_context_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "disable_custom_all_reduce": {
+            "value": true,
+            "status": "verified"
+          },
+          "gpu_memory_utilization": {
+            "value": 0.85,
+            "status": "verified"
+          },
+          "max_model_len": {
+            "value": 32768,
+            "status": "verified"
+          },
+          "max_num_seqs": {
+            "value": 16,
+            "status": "verified"
+          },
+          "max_num_batched_tokens": {
+            "value": 8192,
+            "status": "verified"
+          },
+          "enable_prefix_caching": {
+            "value": false,
+            "status": "verified"
+          },
+          "enable_chunked_prefill": {
+            "value": true,
+            "status": "verified"
+          },
+          "speculative_config": {
+            "value": null,
+            "status": "verified"
+          },
+          "enforce_eager": {
+            "value": false,
+            "status": "verified"
+          },
+          "compilation_mode": {
+            "value": 3,
+            "status": "verified"
+          },
+          "cudagraph_mode": {
+            "value": "FULL_DECODE_ONLY",
+            "status": "verified"
+          },
+          "cudagraph_capture_sizes": {
+            "value": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "status": "verified"
+          }
+        }
+      },
+      "report": "data/mmlu-pro-20261012/report.json",
+      "protocol": {
+        "accuracy": {
+          "shots": 5,
+          "input": "token IDs via completions",
+          "concurrency": 16,
+          "max_tokens": 2048,
+          "thinking": false,
+          "temperature": 0,
+          "seed": 17,
+          "retries": 0
+        },
+        "load_test": "200 prompts; output cap 256; request-rate inf; temperature 0; seed 0; default server chat template"
+      },
+      "limitations": [
+        "Single run; legacy extraction; accuracy and load test are separate."
+      ]
+    },
+    {
+      "id": "frontierscience-native-full-160",
+      "dataset": "frontierscience",
+      "solution": "native",
+      "scope": "full-160",
+      "quality": [
+        {
+          "label": "Olympiad",
+          "correct": 57,
+          "total": 100,
+          "value": 0.57,
+          "audit": {
+            "total": 100,
+            "graded": 97,
+            "successes": 57,
+            "solver_failures": 0,
+            "judge_unresolved": 3,
+            "judge_invalid": 3,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 2,
+            "judge_audit_flagged": 2,
+            "solver_truncated": 33,
+            "judge_truncated": 4,
+            "success_rate": 0.57,
+            "observed_success_lower_bound": 0.57,
+            "mean_research_score_valid_only": null
+          }
+        },
+        {
+          "label": "Research",
+          "correct": 5,
+          "total": 60,
+          "value": 0.08333333333333333,
+          "audit": {
+            "total": 60,
+            "graded": 57,
+            "successes": 5,
+            "solver_failures": 0,
+            "judge_unresolved": 3,
+            "judge_invalid": 3,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 4,
+            "judge_audit_flagged": 5,
+            "solver_truncated": 6,
+            "judge_truncated": 7,
+            "success_rate": 0.08333333333333333,
+            "observed_success_lower_bound": 0.08333333333333333,
+            "mean_research_score_valid_only": 2.530877192982456
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261013-171100",
+        "num_prompts": 160,
+        "completed": 160,
+        "failed": 0,
+        "duration": 73.71363537106663,
+        "request_throughput": 2.170561785408859,
+        "output_throughput": 555.6638170646679,
+        "total_token_throughput": 1404.5027012822786,
+        "mean_ttft_ms": 33954.69977196772,
+        "mean_tpot_ms": 26.662729527052566
+      },
+      "configuration": {
+        "run_id": "fs-qwen35-full8192-20261013T094756Z",
+        "fields": {
+          "dtype": {
+            "value": "bfloat16",
+            "status": "verified"
+          },
+          "tensor_parallel_size": {
+            "value": 2,
+            "status": "verified"
+          },
+          "pipeline_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "data_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "enable_expert_parallel": {
+            "value": true,
+            "status": "verified"
+          },
+          "decode_context_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "disable_custom_all_reduce": {
+            "value": true,
+            "status": "verified"
+          },
+          "gpu_memory_utilization": {
+            "value": 0.85,
+            "status": "verified"
+          },
+          "max_model_len": {
+            "value": 32768,
+            "status": "verified"
+          },
+          "max_num_seqs": {
+            "value": 16,
+            "status": "verified"
+          },
+          "max_num_batched_tokens": {
+            "value": 8192,
+            "status": "verified"
+          },
+          "enable_prefix_caching": {
+            "value": false,
+            "status": "verified"
+          },
+          "enable_chunked_prefill": {
+            "value": true,
+            "status": "verified"
+          },
+          "speculative_config": {
+            "value": null,
+            "status": "verified"
+          },
+          "enforce_eager": {
+            "value": false,
+            "status": "verified"
+          },
+          "compilation_mode": {
+            "value": 3,
+            "status": "verified"
+          },
+          "cudagraph_mode": {
+            "value": "FULL_DECODE_ONLY",
+            "status": "verified"
+          },
+          "cudagraph_capture_sizes": {
+            "value": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "status": "verified"
+          }
+        },
+        "effective_sha256": "b5c1ffb2457cc16b9df7fc82a0e53f370b2eb49cc9e857fad6c9933679af06a3",
+        "startup_log_sha256": "1c3c5cdf4aa38b02b6dd4c393655cc455b2d5742f995cc911648d040972fcdc9",
+        "service_origin": "Reused continuously running service from fs-qwen35-v02-20261013T081932Z; actual process arguments rechecked; no new startup claimed."
+      },
+      "report": "data/frontierscience-20261013/report.json",
+      "protocol": {
+        "generation": {
+          "solver": {
+            "concurrency": 1,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 16384,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          },
+          "judge": {
+            "concurrency": 1,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 8192,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        },
+        "scoring": "hust-qwen-judge-v3; Appendix B prompts; Qwen substitute; single trial; scoring_policy=mmlu_extract_first; not official replication",
+        "load_test": "160 prompts (both tracks together); output cap 256; request-rate inf; temperature 0; seed 0; default server chat template"
+      },
+      "limitations": [
+        "Official Appendix B prompts; Qwen judge replaces official judge; one trial, local extraction; not official leaderboard replication.",
+        "First complete explicit VERDICT is used, including length-ended replies; invalid judges remain in denominator as nonsuccess.",
+        "Invalid judge means unresolved evaluation, not proof of a scientifically incorrect solver answer.",
+        "Audit flags are heuristic, nonexhaustive and do not change scores; human review remains required.",
+        "Research mean uses 57 valid scores; missing grades are not assigned zero numeric points.",
+        "Solver and judge use the same served model; no independent expert validation.",
+        "Bench is separate: 160 prompts, max output 256, request-rate inf, temperature 0, seed 0, default server chat template.",
+        "Single service lifecycle reused after smoke; not a cold-start run or three-repeat V5.5 acceptance. No B1 or improvement claims.",
+        "Full weight shards were not hashed; image digest not captured. Only 11 small artifact files were hashed."
+      ]
+    },
+    {
+      "id": "mmlu-pro-betterscale-test-200",
+      "dataset": "mmlu-pro",
+      "solution": "betterscale",
+      "scope": "test-200",
+      "quality": [
+        {
+          "label": "Test",
+          "correct": 9611,
+          "total": 12032,
+          "value": 0.7987865691489362,
+          "audit": {
+            "cases": 12032,
+            "correct": 9611,
+            "accuracy": 0.7987865691489362,
+            "invalid_answers": 65,
+            "transport_failures": 0,
+            "length_limited": 1548,
+            "wall_seconds_this_invocation": 9259.440616141073,
+            "mean_ttft_s": 0.24528011316354598,
+            "mean_e2e_s": 12.299382534087544,
+            "smoke_only": false
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261015-074058",
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 81.9430637517944,
+        "request_throughput": 2.440719090096511,
+        "output_throughput": 624.8240870647068,
+        "total_token_throughput": 4069.471956895165,
+        "mean_ttft_ms": 40626.99726256542,
+        "mean_tpot_ms": 23.61731110082245,
+        "total_input_tokens": 282265,
+        "total_output_tokens": 51200
+      },
+      "configuration": {
+        "source_commit": "31fe12b2ddff70209f78d9dab287aedac9dd4bbd",
+        "dtype": "bfloat16",
+        "tensor_parallel_size": 2,
+        "speculative_tokens": 2,
+        "cudagraph_mode": "FULL",
+        "execution_seats": 16,
+        "resident_seats": 36,
+        "state_bytes_per_rank": 21474836480,
+        "host_bytes_per_rank": 8589934592,
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 4096,
+        "prefix_caching": true
+      },
+      "report": "data/betterscale-dataset-validation-20261015/report.json",
+      "protocol": {
+        "accuracy": {
+          "shots": 5,
+          "input": "token IDs via completions",
+          "concurrency": 16,
+          "max_tokens": 2048,
+          "thinking": false,
+          "temperature": 0,
+          "seed": 17,
+          "retries": 0
+        },
+        "load_test": "200 prompts; output cap 256; request-rate inf; temperature 0; seed 0; default server chat template"
+      },
+      "limitations": [
+        "Single run; engine and donor settings differ from web baseline.",
+        "MMLU bench overlapped Frontier judging; Frontier bench ran after MMLU release.",
+        "Same Qwen solver/judge; invalid grades retained as nonsuccess; no retries.",
+        "HLE deferred by user; multimodal patch not merged or evaluated."
+      ]
+    },
+    {
+      "id": "frontierscience-betterscale-full-160",
+      "dataset": "frontierscience",
+      "solution": "betterscale",
+      "scope": "full-160",
+      "quality": [
+        {
+          "label": "Olympiad",
+          "correct": 63,
+          "total": 100,
+          "value": 0.63,
+          "audit": {
+            "total": 100,
+            "graded": 96,
+            "successes": 63,
+            "solver_failures": 0,
+            "judge_unresolved": 4,
+            "judge_invalid": 4,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 4,
+            "judge_audit_flagged": 4,
+            "solver_truncated": 27,
+            "judge_truncated": 8,
+            "success_rate": 0.63,
+            "observed_success_lower_bound": 0.63,
+            "mean_research_score_valid_only": null
+          }
+        },
+        {
+          "label": "Research",
+          "correct": 2,
+          "total": 60,
+          "value": 0.03333333333333333,
+          "audit": {
+            "total": 60,
+            "graded": 57,
+            "successes": 2,
+            "solver_failures": 0,
+            "judge_unresolved": 3,
+            "judge_invalid": 3,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 6,
+            "judge_audit_flagged": 8,
+            "solver_truncated": 9,
+            "judge_truncated": 9,
+            "success_rate": 0.03333333333333333,
+            "observed_success_lower_bound": 0.03333333333333333,
+            "mean_research_score_valid_only": 2.620350877192983
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261015-083544",
+        "num_prompts": 160,
+        "completed": 160,
+        "failed": 0,
+        "duration": 44.4029835453257,
+        "request_throughput": 3.603361468642645,
+        "output_throughput": 922.4605359725172,
+        "total_token_throughput": 2331.6226013127603,
+        "mean_ttft_ms": 20375.039425608702,
+        "mean_tpot_ms": 16.20724046050443,
+        "total_input_tokens": 62571,
+        "total_output_tokens": 40960
+      },
+      "configuration": {
+        "source_commit": "31fe12b2ddff70209f78d9dab287aedac9dd4bbd",
+        "dtype": "bfloat16",
+        "tensor_parallel_size": 2,
+        "speculative_tokens": 2,
+        "cudagraph_mode": "FULL",
+        "execution_seats": 16,
+        "resident_seats": 36,
+        "state_bytes_per_rank": 21474836480,
+        "host_bytes_per_rank": 8589934592,
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 4096,
+        "prefix_caching": true
+      },
+      "report": "data/betterscale-dataset-validation-20261015/report.json",
+      "protocol": {
+        "generation": {
+          "solver": {
+            "concurrency": 1,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 16384,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          },
+          "judge": {
+            "concurrency": 1,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 8192,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        },
+        "scoring": "hust-qwen-judge-v3; Appendix B prompts; Qwen substitute; single trial; scoring_policy=mmlu_extract_first; not official replication",
+        "load_test": "160 prompts (both tracks together); output cap 256; request-rate inf; temperature 0; seed 0; default server chat template"
+      },
+      "limitations": [
+        "Single run; engine and donor settings differ from web baseline.",
+        "MMLU bench overlapped Frontier judging; Frontier bench ran after MMLU release.",
+        "Same Qwen solver/judge; invalid grades retained as nonsuccess; no retries.",
+        "HLE deferred by user; multimodal patch not merged or evaluated."
+      ]
+    },
+    {
+      "id": "hle-verified-native-gold-text",
+      "dataset": "hle-verified",
+      "solution": "native",
+      "scope": "gold-text",
+      "quality": [
+        {
+          "label": "Gold · text",
+          "correct": 137,
+          "total": 575,
+          "value": 0.2382608695652174,
+          "audit": {
+            "total": 575,
+            "graded": 546,
+            "successes": 137,
+            "accuracy": 0.2382608695652174,
+            "unresolved": 29,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.03482183418452217,
+            "solver_failures": 0,
+            "judge_invalid": 29,
+            "judge_transport_failures": 0,
+            "solver_truncated": 374,
+            "judge_truncated": 29
+          }
+        }
+      ],
+      "performance": {
+        "completed": 200,
+        "failed": 0,
+        "duration": 127.83905478846282,
+        "request_throughput": 1.5644671366738667,
+        "output_throughput": 381.3232198928883,
+        "total_token_throughput": 787.7170256509753,
+        "mean_ttft_ms": 57848.60939637758,
+        "mean_tpot_ms": 38.7843622130921,
+        "total_input_tokens": 51953,
+        "total_output_tokens": 48748,
+        "n": 200,
+        "modality": "text",
+        "input_tokens_verified": true,
+        "result_sha256": "4138f9c3d988a5f90248a3429c1f64f8c3f8109def31041d7dca601a5c2e46bc"
+      },
+      "configuration": {
+        "fields": {
+          "dtype": {
+            "value": "bfloat16",
+            "status": "verified"
+          },
+          "tensor_parallel_size": {
+            "value": 2,
+            "status": "verified"
+          },
+          "pipeline_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "data_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "enable_expert_parallel": {
+            "value": true,
+            "status": "verified"
+          },
+          "decode_context_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "disable_custom_all_reduce": {
+            "value": true,
+            "status": "verified"
+          },
+          "gpu_memory_utilization": {
+            "value": 0.85,
+            "status": "verified"
+          },
+          "max_model_len": {
+            "value": 65536,
+            "status": "verified"
+          },
+          "max_num_seqs": {
+            "value": 16,
+            "status": "verified"
+          },
+          "max_num_batched_tokens": {
+            "value": 8192,
+            "status": "verified"
+          },
+          "enable_prefix_caching": {
+            "value": false,
+            "status": "verified"
+          },
+          "enable_chunked_prefill": {
+            "value": true,
+            "status": "verified"
+          },
+          "speculative_config": {
+            "value": null,
+            "status": "verified"
+          },
+          "enforce_eager": {
+            "value": false,
+            "status": "verified"
+          },
+          "compilation_mode": {
+            "value": 3,
+            "status": "verified"
+          },
+          "cudagraph_mode": {
+            "value": "FULL_DECODE_ONLY",
+            "status": "verified"
+          },
+          "cudagraph_capture_sizes": {
+            "value": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "status": "verified"
+          },
+          "structured_outputs_backend": {
+            "value": "xgrammar",
+            "status": "verified"
+          },
+          "structured_outputs_disable_any_whitespace": {
+            "value": true,
+            "status": "verified"
+          }
+        },
+        "effective_sha256": "a8e9f014d3a089298e618acea723482b55d46747d8f11f76db97b118935bf3f6",
+        "startup_log_sha256": "bec0e3d7cea0047538b4782f251a8139988ac3d80ccf47fc002de67ee10b0a90"
+      },
+      "report": "data/hle-verified-20261015/report.json",
+      "protocol": {
+        "generation": {
+          "solver": {
+            "concurrency": 16,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 16384,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          },
+          "judge": {
+            "concurrency": 16,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 8192,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Author HLE-Verified Gold 668 and Revision 1143; Uncertain 689 excluded. Not the original unmodified HLE dataset.",
+        "Original HLE system/judge prompts and schema; same Qwen solver and substitute judge, one trial. Not official leaderboard replication or V5.5 acceptance.",
+        "Strict JSON grading requires normal completion; all 72 length-ended judges remain unresolved in the full denominator. No partial JSON rescue or retry.",
+        "Solver length-ended outputs are sent to judge, not automatically marked incorrect. Gold 383 and Revision 688 solver truncations materially limit interpretation.",
+        "Bench: raw user question plus real images; no accuracy system prompt; template once, thinking=false, max output256, temperature0, request seed0, EOS allowed, rate inf, no client concurrency cap; server max_num_seqs16.",
+        "Text selection floor(i*N/200) from frozen modality-filtered order; images all93/all118, no repetitions. No correctness-based selection.",
+        "Per-request input token counts match same-server /tokenize including images. No separate visual token count claimed. TTFT includes burst queueing.",
+        "Reused service after accuracy, request validation and tokenization preflight; not a cold-cache run, not paired B1 and not three-repeat acceptance.",
+        "Full weights were inventoried but not hashed; model small files matched. Image digest and verified local model revision are unavailable.",
+        "Public evidence omits question/image/answer payloads and environment dumps. Original raw records remain private and cannot be independently regraded from this package."
+      ]
+    },
+    {
+      "id": "hle-verified-native-revision-text",
+      "dataset": "hle-verified",
+      "solution": "native",
+      "scope": "revision-text",
+      "quality": [
+        {
+          "label": "Revision · text",
+          "correct": 292,
+          "total": 1025,
+          "value": 0.2848780487804878,
+          "audit": {
+            "total": 1025,
+            "graded": 986,
+            "successes": 292,
+            "accuracy": 0.2848780487804878,
+            "unresolved": 39,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.027632086917668795,
+            "solver_failures": 0,
+            "judge_invalid": 39,
+            "judge_transport_failures": 0,
+            "solver_truncated": 674,
+            "judge_truncated": 39
+          }
+        }
+      ],
+      "performance": {
+        "completed": 200,
+        "failed": 0,
+        "duration": 118.67140726279467,
+        "request_throughput": 1.685325931604614,
+        "output_throughput": 422.8988360175458,
+        "total_token_throughput": 1021.4929004048727,
+        "mean_ttft_ms": 52608.90130646527,
+        "mean_tpot_ms": 36.82196080541311,
+        "total_input_tokens": 71036,
+        "total_output_tokens": 50186,
+        "n": 200,
+        "modality": "text",
+        "input_tokens_verified": true,
+        "result_sha256": "2b9f4977abc3fedec0e94c3b1a1968eef0a127fae572b81718e27144e6ec7dfd"
+      },
+      "configuration": {
+        "fields": {
+          "dtype": {
+            "value": "bfloat16",
+            "status": "verified"
+          },
+          "tensor_parallel_size": {
+            "value": 2,
+            "status": "verified"
+          },
+          "pipeline_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "data_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "enable_expert_parallel": {
+            "value": true,
+            "status": "verified"
+          },
+          "decode_context_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "disable_custom_all_reduce": {
+            "value": true,
+            "status": "verified"
+          },
+          "gpu_memory_utilization": {
+            "value": 0.85,
+            "status": "verified"
+          },
+          "max_model_len": {
+            "value": 65536,
+            "status": "verified"
+          },
+          "max_num_seqs": {
+            "value": 16,
+            "status": "verified"
+          },
+          "max_num_batched_tokens": {
+            "value": 8192,
+            "status": "verified"
+          },
+          "enable_prefix_caching": {
+            "value": false,
+            "status": "verified"
+          },
+          "enable_chunked_prefill": {
+            "value": true,
+            "status": "verified"
+          },
+          "speculative_config": {
+            "value": null,
+            "status": "verified"
+          },
+          "enforce_eager": {
+            "value": false,
+            "status": "verified"
+          },
+          "compilation_mode": {
+            "value": 3,
+            "status": "verified"
+          },
+          "cudagraph_mode": {
+            "value": "FULL_DECODE_ONLY",
+            "status": "verified"
+          },
+          "cudagraph_capture_sizes": {
+            "value": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "status": "verified"
+          },
+          "structured_outputs_backend": {
+            "value": "xgrammar",
+            "status": "verified"
+          },
+          "structured_outputs_disable_any_whitespace": {
+            "value": true,
+            "status": "verified"
+          }
+        },
+        "effective_sha256": "a8e9f014d3a089298e618acea723482b55d46747d8f11f76db97b118935bf3f6",
+        "startup_log_sha256": "bec0e3d7cea0047538b4782f251a8139988ac3d80ccf47fc002de67ee10b0a90"
+      },
+      "report": "data/hle-verified-20261015/report.json",
+      "protocol": {
+        "generation": {
+          "solver": {
+            "concurrency": 16,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 16384,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          },
+          "judge": {
+            "concurrency": 16,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 8192,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Author HLE-Verified Gold 668 and Revision 1143; Uncertain 689 excluded. Not the original unmodified HLE dataset.",
+        "Original HLE system/judge prompts and schema; same Qwen solver and substitute judge, one trial. Not official leaderboard replication or V5.5 acceptance.",
+        "Strict JSON grading requires normal completion; all 72 length-ended judges remain unresolved in the full denominator. No partial JSON rescue or retry.",
+        "Solver length-ended outputs are sent to judge, not automatically marked incorrect. Gold 383 and Revision 688 solver truncations materially limit interpretation.",
+        "Bench: raw user question plus real images; no accuracy system prompt; template once, thinking=false, max output256, temperature0, request seed0, EOS allowed, rate inf, no client concurrency cap; server max_num_seqs16.",
+        "Text selection floor(i*N/200) from frozen modality-filtered order; images all93/all118, no repetitions. No correctness-based selection.",
+        "Per-request input token counts match same-server /tokenize including images. No separate visual token count claimed. TTFT includes burst queueing.",
+        "Reused service after accuracy, request validation and tokenization preflight; not a cold-cache run, not paired B1 and not three-repeat acceptance.",
+        "Full weights were inventoried but not hashed; model small files matched. Image digest and verified local model revision are unavailable.",
+        "Public evidence omits question/image/answer payloads and environment dumps. Original raw records remain private and cannot be independently regraded from this package."
+      ]
+    },
+    {
+      "id": "hle-verified-native-gold-image",
+      "dataset": "hle-verified",
+      "solution": "native",
+      "scope": "gold-image",
+      "quality": [
+        {
+          "label": "Gold · image",
+          "correct": 19,
+          "total": 93,
+          "value": 0.20430107526881722,
+          "audit": {
+            "total": 93,
+            "graded": 90,
+            "successes": 19,
+            "accuracy": 0.20430107526881722,
+            "unresolved": 3,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.08194534893600774,
+            "solver_failures": 0,
+            "judge_invalid": 3,
+            "judge_transport_failures": 0,
+            "solver_truncated": 9,
+            "judge_truncated": 3
+          }
+        }
+      ],
+      "performance": {
+        "completed": 93,
+        "failed": 0,
+        "duration": 71.14836968295276,
+        "request_throughput": 1.3071276322201226,
+        "output_throughput": 314.48366420349726,
+        "total_token_throughput": 1700.4324981600762,
+        "mean_ttft_ms": 28900.694059228066,
+        "mean_tpot_ms": 52.212642470770064,
+        "total_input_tokens": 98608,
+        "total_output_tokens": 22375,
+        "n": 93,
+        "modality": "image",
+        "input_tokens_verified": true,
+        "result_sha256": "3b97e5756e888af23331d5771a703584c7b64950717379fc30209514c5d0f441"
+      },
+      "configuration": {
+        "fields": {
+          "dtype": {
+            "value": "bfloat16",
+            "status": "verified"
+          },
+          "tensor_parallel_size": {
+            "value": 2,
+            "status": "verified"
+          },
+          "pipeline_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "data_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "enable_expert_parallel": {
+            "value": true,
+            "status": "verified"
+          },
+          "decode_context_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "disable_custom_all_reduce": {
+            "value": true,
+            "status": "verified"
+          },
+          "gpu_memory_utilization": {
+            "value": 0.85,
+            "status": "verified"
+          },
+          "max_model_len": {
+            "value": 65536,
+            "status": "verified"
+          },
+          "max_num_seqs": {
+            "value": 16,
+            "status": "verified"
+          },
+          "max_num_batched_tokens": {
+            "value": 8192,
+            "status": "verified"
+          },
+          "enable_prefix_caching": {
+            "value": false,
+            "status": "verified"
+          },
+          "enable_chunked_prefill": {
+            "value": true,
+            "status": "verified"
+          },
+          "speculative_config": {
+            "value": null,
+            "status": "verified"
+          },
+          "enforce_eager": {
+            "value": false,
+            "status": "verified"
+          },
+          "compilation_mode": {
+            "value": 3,
+            "status": "verified"
+          },
+          "cudagraph_mode": {
+            "value": "FULL_DECODE_ONLY",
+            "status": "verified"
+          },
+          "cudagraph_capture_sizes": {
+            "value": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "status": "verified"
+          },
+          "structured_outputs_backend": {
+            "value": "xgrammar",
+            "status": "verified"
+          },
+          "structured_outputs_disable_any_whitespace": {
+            "value": true,
+            "status": "verified"
+          }
+        },
+        "effective_sha256": "a8e9f014d3a089298e618acea723482b55d46747d8f11f76db97b118935bf3f6",
+        "startup_log_sha256": "bec0e3d7cea0047538b4782f251a8139988ac3d80ccf47fc002de67ee10b0a90"
+      },
+      "report": "data/hle-verified-20261015/report.json",
+      "protocol": {
+        "generation": {
+          "solver": {
+            "concurrency": 16,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 16384,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          },
+          "judge": {
+            "concurrency": 16,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 8192,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Author HLE-Verified Gold 668 and Revision 1143; Uncertain 689 excluded. Not the original unmodified HLE dataset.",
+        "Original HLE system/judge prompts and schema; same Qwen solver and substitute judge, one trial. Not official leaderboard replication or V5.5 acceptance.",
+        "Strict JSON grading requires normal completion; all 72 length-ended judges remain unresolved in the full denominator. No partial JSON rescue or retry.",
+        "Solver length-ended outputs are sent to judge, not automatically marked incorrect. Gold 383 and Revision 688 solver truncations materially limit interpretation.",
+        "Bench: raw user question plus real images; no accuracy system prompt; template once, thinking=false, max output256, temperature0, request seed0, EOS allowed, rate inf, no client concurrency cap; server max_num_seqs16.",
+        "Text selection floor(i*N/200) from frozen modality-filtered order; images all93/all118, no repetitions. No correctness-based selection.",
+        "Per-request input token counts match same-server /tokenize including images. No separate visual token count claimed. TTFT includes burst queueing.",
+        "Reused service after accuracy, request validation and tokenization preflight; not a cold-cache run, not paired B1 and not three-repeat acceptance.",
+        "Full weights were inventoried but not hashed; model small files matched. Image digest and verified local model revision are unavailable.",
+        "Public evidence omits question/image/answer payloads and environment dumps. Original raw records remain private and cannot be independently regraded from this package."
+      ]
+    },
+    {
+      "id": "hle-verified-native-revision-image",
+      "dataset": "hle-verified",
+      "solution": "native",
+      "scope": "revision-image",
+      "quality": [
+        {
+          "label": "Revision · image",
+          "correct": 21,
+          "total": 118,
+          "value": 0.17796610169491525,
+          "audit": {
+            "total": 118,
+            "graded": 117,
+            "successes": 21,
+            "accuracy": 0.17796610169491525,
+            "unresolved": 1,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.0690126294695939,
+            "solver_failures": 0,
+            "judge_invalid": 1,
+            "judge_transport_failures": 0,
+            "solver_truncated": 14,
+            "judge_truncated": 1
+          }
+        }
+      ],
+      "performance": {
+        "completed": 118,
+        "failed": 0,
+        "duration": 89.24074667040259,
+        "request_throughput": 1.3222659424378802,
+        "output_throughput": 330.82421541180963,
+        "total_token_throughput": 1913.3524356383527,
+        "mean_ttft_ms": 34361.77829950574,
+        "mean_tpot_ms": 42.60500427644276,
+        "total_input_tokens": 141226,
+        "total_output_tokens": 29523,
+        "n": 118,
+        "modality": "image",
+        "input_tokens_verified": true,
+        "result_sha256": "173dc3a8f31c4368a4f7b90d8d6b3701311c175dfe587d198fbb83edd8d9ca20"
+      },
+      "configuration": {
+        "fields": {
+          "dtype": {
+            "value": "bfloat16",
+            "status": "verified"
+          },
+          "tensor_parallel_size": {
+            "value": 2,
+            "status": "verified"
+          },
+          "pipeline_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "data_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "enable_expert_parallel": {
+            "value": true,
+            "status": "verified"
+          },
+          "decode_context_parallel_size": {
+            "value": 1,
+            "status": "verified"
+          },
+          "disable_custom_all_reduce": {
+            "value": true,
+            "status": "verified"
+          },
+          "gpu_memory_utilization": {
+            "value": 0.85,
+            "status": "verified"
+          },
+          "max_model_len": {
+            "value": 65536,
+            "status": "verified"
+          },
+          "max_num_seqs": {
+            "value": 16,
+            "status": "verified"
+          },
+          "max_num_batched_tokens": {
+            "value": 8192,
+            "status": "verified"
+          },
+          "enable_prefix_caching": {
+            "value": false,
+            "status": "verified"
+          },
+          "enable_chunked_prefill": {
+            "value": true,
+            "status": "verified"
+          },
+          "speculative_config": {
+            "value": null,
+            "status": "verified"
+          },
+          "enforce_eager": {
+            "value": false,
+            "status": "verified"
+          },
+          "compilation_mode": {
+            "value": 3,
+            "status": "verified"
+          },
+          "cudagraph_mode": {
+            "value": "FULL_DECODE_ONLY",
+            "status": "verified"
+          },
+          "cudagraph_capture_sizes": {
+            "value": [
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "status": "verified"
+          },
+          "structured_outputs_backend": {
+            "value": "xgrammar",
+            "status": "verified"
+          },
+          "structured_outputs_disable_any_whitespace": {
+            "value": true,
+            "status": "verified"
+          }
+        },
+        "effective_sha256": "a8e9f014d3a089298e618acea723482b55d46747d8f11f76db97b118935bf3f6",
+        "startup_log_sha256": "bec0e3d7cea0047538b4782f251a8139988ac3d80ccf47fc002de67ee10b0a90"
+      },
+      "report": "data/hle-verified-20261015/report.json",
+      "protocol": {
+        "generation": {
+          "solver": {
+            "concurrency": 16,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 16384,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          },
+          "judge": {
+            "concurrency": 16,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 8192,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Author HLE-Verified Gold 668 and Revision 1143; Uncertain 689 excluded. Not the original unmodified HLE dataset.",
+        "Original HLE system/judge prompts and schema; same Qwen solver and substitute judge, one trial. Not official leaderboard replication or V5.5 acceptance.",
+        "Strict JSON grading requires normal completion; all 72 length-ended judges remain unresolved in the full denominator. No partial JSON rescue or retry.",
+        "Solver length-ended outputs are sent to judge, not automatically marked incorrect. Gold 383 and Revision 688 solver truncations materially limit interpretation.",
+        "Bench: raw user question plus real images; no accuracy system prompt; template once, thinking=false, max output256, temperature0, request seed0, EOS allowed, rate inf, no client concurrency cap; server max_num_seqs16.",
+        "Text selection floor(i*N/200) from frozen modality-filtered order; images all93/all118, no repetitions. No correctness-based selection.",
+        "Per-request input token counts match same-server /tokenize including images. No separate visual token count claimed. TTFT includes burst queueing.",
+        "Reused service after accuracy, request validation and tokenization preflight; not a cold-cache run, not paired B1 and not three-repeat acceptance.",
+        "Full weights were inventoried but not hashed; model small files matched. Image digest and verified local model revision are unavailable.",
+        "Public evidence omits question/image/answer payloads and environment dumps. Original raw records remain private and cannot be independently regraded from this package."
+      ]
+    }
+  ],
+  "source_files_sha256": {
+    "data/mmlu-pro-20261012/report.json": "7b0a955d6554b891685bdfb332fa72ca05564a4acf35e47ba3732a29682aff54",
+    "data/mmlu-pro-20261012/performance.json": "8b8834363cb651d5da34fd88d23fe6f27b88f5748751d294a4535f4d41c41b43",
+    "data/mmlu-pro-20261012/runtime.json": "21f361a4b395522e77c1650619bd3d2f401c5f598c6dab34e2c57fa478f6b453",
+    "data/frontierscience-20261013/report.json": "d40cb9dd3c46a3438b3b8846a2d44eef509317dfba84fe87c86c0b1d2708147f",
+    "data/hle-verified-20261015/report.json": "eece0c0f2c2d7759dfe6d5629139ce24b272a259d9936533477b229957186d9b",
+    "data/betterscale-dataset-validation-20261015/report.json": "d90c31ca03e1ed6c55571a6f4748228cd7d7e4c702906e880c1de68383818e6c"
+  },
+  "betterscale_publication": {
+    "commit": "5714be9e9b032f9aaef13df229aaa96dc8ef7c3b",
+    "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/5714be9e9b032f9aaef13df229aaa96dc8ef7c3b/reports/betterscale-dataset-validation-20261015"
+  },
+  "formal_acceptance": false,
+  "repeats": 1
+}
