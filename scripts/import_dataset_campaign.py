@@ -1,4 +1,4 @@
-"""Project completed campaign MMLU receipts without publishing task payloads."""
+"""Project completed campaign receipts without publishing task payloads."""
 
 import argparse
 import hashlib
@@ -125,7 +125,94 @@ def import_mmlu(archive):
     destination.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
 
 
+def import_frontier(archive):
+    destination = ROOT / REPORT
+    report = json.loads(destination.read_text())
+    solution = "core-attention-boundary"
+    bindings = {}
+    with tarfile.open(archive) as capsule:
+
+        def read(relative, raw=False):
+            data = capsule.extractfile(f"runs/{solution}-frontier/{relative}").read()
+            bindings[relative] = hashlib.sha256(data).hexdigest()
+            return data if raw else json.loads(data)
+
+        read("frontier/completed.json")
+        assert read("finished.json")["server_exit"] == 0
+        config = read("configuration.json")
+        assert b"runtime_effective" in read("server.log", raw=True)
+        summary = read("frontier/report/summary.json")
+        perf = read("frontier/bench/outputs/frontierscience.summary.json")
+        assert perf["num_prompts"] == perf["completed"] + perf["failed"] == 160
+        quality = []
+        for track, total in [("olympiad", 100), ("research", 60)]:
+            raw = summary["tracks"][track]
+            assert raw["total"] == total
+            score = {
+                "label": track.title(),
+                "correct": raw["successes"],
+                "total": total,
+                "value": raw["successes"] / total,
+                "audit": raw,
+            }
+            quality.append(score)
+            report.setdefault("quality_results", []).append(
+                {
+                    "dataset": "frontierscience",
+                    "part": track,
+                    "solution": solution,
+                    "score": score,
+                }
+            )
+        reference = next(
+            r for r in report["results"] if r["id"] == f"mmlu-pro-{solution}-test-200"
+        )
+        runtime = {
+            **reference["configuration"],
+            "source_commit": config["source_commit"],
+            "vllm_ascend": "0.23.0",
+            "ascend_commit": "5cb98caaadeff42b5b62b996e34bb2aaa29d20fd",  # pragma: allowlist secret
+            "co_location": "Frontier TP2 shared a host with HLE TP2 on independent same-NUMA pairs; CPU/memory resources shared.",
+        }
+        row = {
+            "id": f"frontierscience-{solution}-full-160",
+            "dataset": "frontierscience",
+            "solution": solution,
+            "scope": "full-160",
+            "quality": quality,
+            "performance": perf,
+            "configuration": runtime,
+            "report": REPORT,
+            "protocol": {
+                "generation": {
+                    "solver_concurrency": 1,
+                    "judge_concurrency": 1,
+                    "solver_max_tokens": 16384,
+                    "judge_max_tokens": 8192,
+                    "temperature": 0,
+                    "seed": 17,
+                    "enable_thinking": False,
+                    "retries": 0,
+                },
+                "scoring": summary["protocol"],
+                "load_test": "Combined 160 prompts; output cap 256; request-rate inf; temperature 0; seed 0; separate from solver/judge timing",
+            },
+            "limitations": [
+                "Single run, same-model Qwen judge; not official replication or SLO-qualified goodput.",
+                "Two unresolved judges per track retained as nonsuccess in the full denominator; not confirmed incorrect answers. No repair, regrading or retry.",
+                "Frontier runtime is Ascend 0.23.0, unlike this solution's MMLU 0.23.0.post1 host. BetterScale also differs in runtime, MTP and cache configuration; not an isolated mechanism comparison.",
+                "Native load-test token accounting; per-request server tokenization verification not captured. HLE judging was running on the other TP2 pair.",
+            ],
+            "evidence": {"source_files_sha256": bindings, "summary": summary},
+        }
+        assert not any(r["id"] == row["id"] for r in report["results"])
+        report["results"].append(row)
+    destination.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("archive", type=Path)
-    import_mmlu(parser.parse_args().archive)
+    parser.add_argument("--task", choices=["mmlu", "frontier"], default="mmlu")
+    args = parser.parse_args()
+    {"mmlu": import_mmlu, "frontier": import_frontier}[args.task](args.archive)

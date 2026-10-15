@@ -100,7 +100,7 @@ def main():
                 == "ascending"
             )
             page.locator('.matrix-dataset[href="#frontierscience"]').first.click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(2)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
             assert "922.46" in page.locator(".matrix-detail").inner_text()
             page.go_back()
             page.locator(".matrix-overview").wait_for()

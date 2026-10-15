@@ -31,7 +31,7 @@ def test_scope_and_metrics():
     assert all("betterscale" in p["scores"] for p in datasets["hle-verified"]["parts"])
     rows = data["records"]
     frontier = [r for r in rows if r["dataset"] == "frontierscience"]
-    assert len(frontier) == 2  # One combined benchmark per solution, not per track.
+    assert len(frontier) == 3  # One combined benchmark per solution, not per track.
     assert all(r["performance"]["num_prompts"] == 160 for r in frontier)
     assert all(len(r["quality"]) == 2 for r in frontier)
     hle = [r for r in rows if r["dataset"] == "hle-verified"]

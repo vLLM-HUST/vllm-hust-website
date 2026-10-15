@@ -439,6 +439,268 @@
           "mmlu/bench/outputs/mmlu-pro.json": "1420e393d30effd33670165ee4d5803ff03b22e5decafbca47d0f69c995747b9"
         }
       }
+    },
+    {
+      "id": "frontierscience-core-attention-boundary-full-160",
+      "dataset": "frontierscience",
+      "solution": "core-attention-boundary",
+      "scope": "full-160",
+      "quality": [
+        {
+          "label": "Olympiad",
+          "correct": 62,
+          "total": 100,
+          "value": 0.62,
+          "audit": {
+            "total": 100,
+            "graded": 98,
+            "successes": 62,
+            "solver_failures": 0,
+            "judge_unresolved": 2,
+            "judge_invalid": 2,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 6,
+            "judge_audit_flagged": 6,
+            "solver_truncated": 32,
+            "judge_truncated": 8,
+            "success_rate": 0.62,
+            "observed_success_lower_bound": 0.62,
+            "mean_research_score_valid_only": null
+          }
+        },
+        {
+          "label": "Research",
+          "correct": 4,
+          "total": 60,
+          "value": 0.06666666666666667,
+          "audit": {
+            "total": 60,
+            "graded": 58,
+            "successes": 4,
+            "solver_failures": 0,
+            "judge_unresolved": 2,
+            "judge_invalid": 2,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 6,
+            "judge_audit_flagged": 6,
+            "solver_truncated": 9,
+            "judge_truncated": 8,
+            "success_rate": 0.06666666666666667,
+            "observed_success_lower_bound": 0.06666666666666667,
+            "mean_research_score_valid_only": 2.565086206896552
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261015-230212",
+        "num_prompts": 160,
+        "completed": 160,
+        "failed": 0,
+        "duration": 86.00426760409027,
+        "request_throughput": 1.860372798435302,
+        "output_throughput": 476.2554363994373,
+        "total_token_throughput": 1203.7891012175328,
+        "mean_ttft_ms": 41573.9034504164,
+        "mean_tpot_ms": 26.458783129700368
+      },
+      "configuration": {
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "hardware": "2 x Ascend 910B2",
+        "tensor_parallel_size": 2,
+        "expert_parallel": true,
+        "mtp": 0,
+        "prefix_caching": false,
+        "graph_mode": "FULL_DECODE_ONLY",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "gpu_memory_utilization": 0.85,
+        "block_size": 128,
+        "vllm": "0.23.0+empty",
+        "vllm_ascend": "0.23.0",
+        "vllm_commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+        "ascend_commit": "5cb98caaadeff42b5b62b996e34bb2aaa29d20fd",
+        "cann": "9.1",
+        "activation": "installed and runtime_effective observed",
+        "co_location": "Frontier TP2 shared a host with HLE TP2 on independent same-NUMA pairs; CPU/memory resources shared."
+      },
+      "report": "data/dataset-matrix-campaign-20261016/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 1,
+          "judge_concurrency": 1,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "retries": 0
+        },
+        "scoring": "hust-qwen-judge-v3; Appendix B prompts; Qwen substitute; single trial; scoring_policy=mmlu_extract_first; not official replication",
+        "load_test": "Combined 160 prompts; output cap 256; request-rate inf; temperature 0; seed 0; separate from solver/judge timing"
+      },
+      "limitations": [
+        "Single run, same-model Qwen judge; not official replication or SLO-qualified goodput.",
+        "Two unresolved judges per track retained as nonsuccess in the full denominator; not confirmed incorrect answers. No repair, regrading or retry.",
+        "Frontier runtime is Ascend 0.23.0, unlike this solution's MMLU 0.23.0.post1 host. BetterScale also differs in runtime, MTP and cache configuration; not an isolated mechanism comparison.",
+        "Native load-test token accounting; per-request server tokenization verification not captured. HLE judging was running on the other TP2 pair."
+      ],
+      "evidence": {
+        "source_files_sha256": {
+          "frontier/completed.json": "06223b957e34be46687059a6e6e437f7be1b4a54ac56175fde6066393b34ffdb",
+          "finished.json": "61952d37a2dfcee07fc3b67318f5673f8f94d36b36c2ac8f6209dcfb51b69c78",
+          "configuration.json": "eadec8b5cfcf574c6fad8897b1d5fc5131bc29b04a91e8a16ba08b95608d67bc",
+          "server.log": "8c9bf5c065b0d9ceefaa5248678b29dd8c6b4acab66daddce80939c97961d00e",
+          "frontier/report/summary.json": "4cc6efeeff6f313b1ad8bd73a0282998f91404bd195078693770dedfb03e5588",
+          "frontier/bench/outputs/frontierscience.summary.json": "fa282cc38cb0b70d6636c155c7cec24bd1444826721111842600dd25811a85a6"
+        },
+        "summary": {
+          "protocol": "hust-qwen-judge-v3; Appendix B prompts; Qwen substitute; single trial; scoring_policy=mmlu_extract_first; not official replication",
+          "scoring_policy": "mmlu_extract_first",
+          "denominator_policy": "all_cases_invalid_as_nonsuccess",
+          "judge_model": "qwen3.5-35b",
+          "solver_model": "qwen3.5-35b",
+          "same_model_name": true,
+          "scope": "full_gold",
+          "contract_sha256": "94f8b5eed5b11d1b839296bfcf533ef5f0d21790b39cfa9923d787037d591069",
+          "solver_index_sha256": "34931f6c5613398b7bdd667d15c4cb5a751526777433a63120498911af5e82b7",
+          "judge_index_sha256": "6d6c713fcd4eae43f682b60b9f5a95e375846546f7302ba4c5c39290ea5364ee",
+          "tracks": {
+            "olympiad": {
+              "total": 100,
+              "graded": 98,
+              "successes": 62,
+              "solver_failures": 0,
+              "judge_unresolved": 2,
+              "judge_invalid": 2,
+              "judge_transport_failures": 0,
+              "judge_truncated_with_grade": 6,
+              "judge_audit_flagged": 6,
+              "solver_truncated": 32,
+              "judge_truncated": 8,
+              "success_rate": 0.62,
+              "observed_success_lower_bound": 0.62,
+              "mean_research_score_valid_only": null
+            },
+            "research": {
+              "total": 60,
+              "graded": 58,
+              "successes": 4,
+              "solver_failures": 0,
+              "judge_unresolved": 2,
+              "judge_invalid": 2,
+              "judge_transport_failures": 0,
+              "judge_truncated_with_grade": 6,
+              "judge_audit_flagged": 6,
+              "solver_truncated": 9,
+              "judge_truncated": 8,
+              "success_rate": 0.06666666666666667,
+              "observed_success_lower_bound": 0.06666666666666667,
+              "mean_research_score_valid_only": 2.565086206896552
+            }
+          },
+          "subjects": {
+            "olympiad/biology": {
+              "total": 10,
+              "graded": 10,
+              "successes": 2,
+              "solver_failures": 0,
+              "judge_unresolved": 0,
+              "judge_invalid": 0,
+              "judge_transport_failures": 0,
+              "judge_truncated_with_grade": 0,
+              "judge_audit_flagged": 0,
+              "solver_truncated": 4,
+              "judge_truncated": 0,
+              "success_rate": 0.2,
+              "observed_success_lower_bound": 0.2,
+              "mean_research_score_valid_only": null
+            },
+            "olympiad/chemistry": {
+              "total": 40,
+              "graded": 39,
+              "successes": 27,
+              "solver_failures": 0,
+              "judge_unresolved": 1,
+              "judge_invalid": 1,
+              "judge_transport_failures": 0,
+              "judge_truncated_with_grade": 0,
+              "judge_audit_flagged": 0,
+              "solver_truncated": 13,
+              "judge_truncated": 1,
+              "success_rate": 0.675,
+              "observed_success_lower_bound": 0.675,
+              "mean_research_score_valid_only": null
+            },
+            "olympiad/physics": {
+              "total": 50,
+              "graded": 49,
+              "successes": 33,
+              "solver_failures": 0,
+              "judge_unresolved": 1,
+              "judge_invalid": 1,
+              "judge_transport_failures": 0,
+              "judge_truncated_with_grade": 6,
+              "judge_audit_flagged": 6,
+              "solver_truncated": 15,
+              "judge_truncated": 7,
+              "success_rate": 0.66,
+              "observed_success_lower_bound": 0.66,
+              "mean_research_score_valid_only": null
+            },
+            "research/biology": {
+              "total": 20,
+              "graded": 19,
+              "successes": 1,
+              "solver_failures": 0,
+              "judge_unresolved": 1,
+              "judge_invalid": 1,
+              "judge_transport_failures": 0,
+              "judge_truncated_with_grade": 1,
+              "judge_audit_flagged": 1,
+              "solver_truncated": 3,
+              "judge_truncated": 2,
+              "success_rate": 0.05,
+              "observed_success_lower_bound": 0.05,
+              "mean_research_score_valid_only": 2.7039473684210527
+            },
+            "research/chemistry": {
+              "total": 20,
+              "graded": 19,
+              "successes": 2,
+              "solver_failures": 0,
+              "judge_unresolved": 1,
+              "judge_invalid": 1,
+              "judge_transport_failures": 0,
+              "judge_truncated_with_grade": 2,
+              "judge_audit_flagged": 2,
+              "solver_truncated": 3,
+              "judge_truncated": 3,
+              "success_rate": 0.1,
+              "observed_success_lower_bound": 0.1,
+              "mean_research_score_valid_only": 3.155263157894737
+            },
+            "research/physics": {
+              "total": 20,
+              "graded": 20,
+              "successes": 1,
+              "solver_failures": 0,
+              "judge_unresolved": 0,
+              "judge_invalid": 0,
+              "judge_transport_failures": 0,
+              "judge_truncated_with_grade": 3,
+              "judge_audit_flagged": 3,
+              "solver_truncated": 3,
+              "judge_truncated": 3,
+              "success_rate": 0.05,
+              "observed_success_lower_bound": 0.05,
+              "mean_research_score_valid_only": 1.8725
+            }
+          }
+        }
+      }
     }
   ],
   "quality_results": [
@@ -485,6 +747,60 @@
           "mean_ttft_s": 0.6387931657064133,
           "mean_e2e_s": 26.828634242624485,
           "smoke_only": false
+        }
+      }
+    },
+    {
+      "dataset": "frontierscience",
+      "part": "olympiad",
+      "solution": "core-attention-boundary",
+      "score": {
+        "label": "Olympiad",
+        "correct": 62,
+        "total": 100,
+        "value": 0.62,
+        "audit": {
+          "total": 100,
+          "graded": 98,
+          "successes": 62,
+          "solver_failures": 0,
+          "judge_unresolved": 2,
+          "judge_invalid": 2,
+          "judge_transport_failures": 0,
+          "judge_truncated_with_grade": 6,
+          "judge_audit_flagged": 6,
+          "solver_truncated": 32,
+          "judge_truncated": 8,
+          "success_rate": 0.62,
+          "observed_success_lower_bound": 0.62,
+          "mean_research_score_valid_only": null
+        }
+      }
+    },
+    {
+      "dataset": "frontierscience",
+      "part": "research",
+      "solution": "core-attention-boundary",
+      "score": {
+        "label": "Research",
+        "correct": 4,
+        "total": 60,
+        "value": 0.06666666666666667,
+        "audit": {
+          "total": 60,
+          "graded": 58,
+          "successes": 4,
+          "solver_failures": 0,
+          "judge_unresolved": 2,
+          "judge_invalid": 2,
+          "judge_transport_failures": 0,
+          "judge_truncated_with_grade": 6,
+          "judge_audit_flagged": 6,
+          "solver_truncated": 9,
+          "judge_truncated": 8,
+          "success_rate": 0.06666666666666667,
+          "observed_success_lower_bound": 0.06666666666666667,
+          "mean_research_score_valid_only": 2.565086206896552
         }
       }
     }
