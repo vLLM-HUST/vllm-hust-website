@@ -9,7 +9,7 @@
     const sorts = new Map(), selected = new Map(), expanded = new Set();
     const dataset = () => data.datasets.find(d => `#${d.id}` === location.hash);
     const quality = s => s ? `<strong>${fmt(s.value * 100)}%</strong><small>${fmt(s.correct, 0)} / ${fmt(s.total, 0)}</small>` : `<span class="matrix-missing">—<small>${t('尚未测量', 'Not measured')}</small></span>`;
-    const statusLabel = key => ({ 'host-incompatible': t('环境不兼容', 'Host incompatible'), 'startup-failed': t('启动失败', 'Startup failed'), 'activation-failed': t('未能启用', 'Activation failed'), 'evaluation-failed': t('评测中断', 'Evaluation failed') })[key] || key;
+    const statusLabel = key => ({ 'host-incompatible': t('环境不兼容', 'Host incompatible'), 'startup-failed': t('启动失败', 'Startup failed'), 'activation-failed': t('未能启用', 'Activation failed'), 'build-failed': t('构建失败', 'Build failed'), 'artifact-unavailable': t('缺少运行材料', 'Artifact unavailable'), 'evaluation-failed': t('评测中断', 'Evaluation failed') })[key] || key;
     const cell = (score, status) => score ? quality(score) : status ? `<span class="matrix-status" title="${escape(status.note)}">${escape(statusLabel(status.status))}<small>${t('无成绩，不记为零分', 'No score, not zero')}</small></span>` : quality(null);
     const metricLabel = key => ({ accuracy: t('准确率', 'Accuracy'), success: t('成功率', 'Success rate'), score7: t('得分 ≥ 7 的比例', 'Score ≥ 7 rate') })[key];
     const names = () => Object.fromEntries(data.solutions.map(s => [s.id, s.name]));
@@ -81,5 +81,5 @@
     });
     window.addEventListener('hashchange', () => { render(); $('matrix-breadcrumb').focus({ preventScroll: true }); });
     window.addEventListener('vllm-hust:langchange', render);
-    fetch('./data/dataset-matrix-v1.json?v=20261016-campaign-1', { cache: 'no-cache' }).then(response => { if (!response.ok) throw new Error('Snapshot unavailable'); return response.json(); }).then(snapshot => { data = snapshot; $('matrix-loading').hidden = true; $('matrix-content').hidden = false; render(); }).catch(() => { $('matrix-loading').textContent = t('数据暂时无法加载，请刷新重试。', 'Data could not be loaded. Please refresh to retry.'); });
+    fetch('./data/dataset-matrix-v1.json?v=20261016-campaign-2', { cache: 'no-cache' }).then(response => { if (!response.ok) throw new Error('Snapshot unavailable'); return response.json(); }).then(snapshot => { data = snapshot; $('matrix-loading').hidden = true; $('matrix-content').hidden = false; render(); }).catch(() => { $('matrix-loading').textContent = t('数据暂时无法加载，请刷新重试。', 'Data could not be loaded. Please refresh to retry.'); });
 })();

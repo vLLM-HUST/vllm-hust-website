@@ -33,8 +33,25 @@ def main():
             page.locator(".matrix-overview").wait_for()
             expect(page.locator(".matrix-overview tbody tr")).to_have_count(5)
             assert "79.88%" in page.locator(".matrix-overview").inner_text()
-            expect(page.locator(".matrix-missing")).to_have_count(1)
-            expect(page.locator(".matrix-status")).to_have_count(29)
+            snapshot = page.request.get(
+                args.url + "/data/dataset-matrix-v1.json"
+            ).json()
+            cells = [
+                (part, solution["id"])
+                for dataset in snapshot["datasets"]
+                for part in dataset["parts"]
+                for solution in snapshot["solutions"]
+            ]
+            statuses = sum(
+                sid not in part["scores"] and sid in part.get("statuses", {})
+                for part, sid in cells
+            )
+            missing = sum(
+                sid not in part["scores"] and sid not in part.get("statuses", {})
+                for part, sid in cells
+            )
+            expect(page.locator(".matrix-missing")).to_have_count(missing)
+            expect(page.locator(".matrix-status")).to_have_count(statuses)
             expect(page.locator('[data-nav-page="dataset-matrix-v1"]')).to_have_count(1)
             page.screenshot(
                 path=str(args.output / f"overview-{width}-{lang}.png"), full_page=True

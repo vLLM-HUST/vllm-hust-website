@@ -38,6 +38,30 @@
     {
       "id": "ascend-attention-boundary",
       "name": "Ascend Attention Boundary"
+    },
+    {
+      "id": "mooncake-vllm-connectors",
+      "name": "Mooncake"
+    },
+    {
+      "id": "pegaflow-vllm-connectors",
+      "name": "PegaFlow"
+    },
+    {
+      "id": "pipeline-microbatch-migration",
+      "name": "Pipeline Microbatch"
+    },
+    {
+      "id": "utility-victim",
+      "name": "Utility Victim"
+    },
+    {
+      "id": "a2a-buffer-reuse",
+      "name": "A2A Buffer Reuse"
+    },
+    {
+      "id": "prefix-routing",
+      "name": "Prefix Routing"
     }
   ],
   "datasets": [
@@ -176,6 +200,110 @@
               "measurements": null,
               "retry_count": 0,
               "log_sha256": "5823517e9d86e5cea4565465054bf6a819c2d21fbe17d8b609857beeab87eaf6",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "mooncake-vllm-connectors": {
+              "solution": "mooncake-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "KV cache registration",
+              "date": "2026-10-16",
+              "source_commit": "bundled vLLM 0.23.0+empty; mooncake-transfer-engine-npu 0.3.11.post1",
+              "note": "The installed native MooncakeStoreConnector initialized its embedded store but failed while registering the hybrid model KV caches. This is not the historical patched 0.25 capsule. No repair or retry.",
+              "error": "AssertionError: cache_config.num_gpu_blocks is not None",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "d289a99e7e6e5619c297f7e8301c1a82cc055613573f6a88d9629fa06627240a",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pegaflow-vllm-connectors": {
+              "solution": "pegaflow-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "build-failed",
+              "stage": "Original Ascend wheel build",
+              "date": "2026-10-16",
+              "source_commit": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+              "note": "The original Ascend-feature wheel build stopped before installation because protoc was unavailable. No NPU deployment or dataset requests; no build repair or retry.",
+              "error": "pegaflow-proto custom build: Could not find protoc",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "0407132f17e1c3c69ad0836941f53917193cd0fff3cb638f88e4f21b6aed1a5f",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pipeline-microbatch-migration": {
+              "solution": "pipeline-microbatch-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "a15a22961a0e4858da74a0ab806575c82cb254e6",
+              "note": "The pinned policy requires the batch-admission-policy host API, absent from the available 0.23 and 0.25 scheduler configurations. Its qualified deployment is PP2+TP2, not the TP2 matrix cohort. No host patch or substitute implementation.",
+              "error": "batch_admission_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "utility-victim": {
+              "solution": "utility-victim",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published curve evidence describes a locally modified scheduler and utility-victim 0.1.0.dev2, but does not identify a retrievable source revision or original wheel. The historical result is preserved; no replacement plugin was invented.",
+              "error": "Pinned runnable plugin and modified-host artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "a2a-buffer-reuse": {
+              "solution": "a2a-buffer-reuse",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes a standalone local plugin 0.1.0.dev0 without a publicly pinned runnable source artifact. No substitute implementation or Native fallback measurement.",
+              "error": "Pinned runnable plugin artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "prefix-routing": {
+              "solution": "prefix-routing",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes two TP2+EP replicas behind a routing proxy. A pinned runnable proxy artifact is not supplied by the curve provenance; this four-card deployment is also distinct from the TP2 cohort. No replacement router was invented.",
+              "error": "Pinned runnable routing deployment unavailable",
+              "measurements": null,
+              "retry_count": 0,
               "report": "data/dataset-matrix-campaign-20261016/report.json"
             }
           }
@@ -341,6 +469,110 @@
               "measurements": null,
               "retry_count": 0,
               "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "mooncake-vllm-connectors": {
+              "solution": "mooncake-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "KV cache registration",
+              "date": "2026-10-16",
+              "source_commit": "bundled vLLM 0.23.0+empty; mooncake-transfer-engine-npu 0.3.11.post1",
+              "note": "The installed native MooncakeStoreConnector initialized its embedded store but failed while registering the hybrid model KV caches. This is not the historical patched 0.25 capsule. No repair or retry.",
+              "error": "AssertionError: cache_config.num_gpu_blocks is not None",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "d289a99e7e6e5619c297f7e8301c1a82cc055613573f6a88d9629fa06627240a",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pegaflow-vllm-connectors": {
+              "solution": "pegaflow-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "build-failed",
+              "stage": "Original Ascend wheel build",
+              "date": "2026-10-16",
+              "source_commit": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+              "note": "The original Ascend-feature wheel build stopped before installation because protoc was unavailable. No NPU deployment or dataset requests; no build repair or retry.",
+              "error": "pegaflow-proto custom build: Could not find protoc",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "0407132f17e1c3c69ad0836941f53917193cd0fff3cb638f88e4f21b6aed1a5f",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pipeline-microbatch-migration": {
+              "solution": "pipeline-microbatch-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "a15a22961a0e4858da74a0ab806575c82cb254e6",
+              "note": "The pinned policy requires the batch-admission-policy host API, absent from the available 0.23 and 0.25 scheduler configurations. Its qualified deployment is PP2+TP2, not the TP2 matrix cohort. No host patch or substitute implementation.",
+              "error": "batch_admission_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "utility-victim": {
+              "solution": "utility-victim",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published curve evidence describes a locally modified scheduler and utility-victim 0.1.0.dev2, but does not identify a retrievable source revision or original wheel. The historical result is preserved; no replacement plugin was invented.",
+              "error": "Pinned runnable plugin and modified-host artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "a2a-buffer-reuse": {
+              "solution": "a2a-buffer-reuse",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes a standalone local plugin 0.1.0.dev0 without a publicly pinned runnable source artifact. No substitute implementation or Native fallback measurement.",
+              "error": "Pinned runnable plugin artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "prefix-routing": {
+              "solution": "prefix-routing",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes two TP2+EP replicas behind a routing proxy. A pinned runnable proxy artifact is not supplied by the curve provenance; this four-card deployment is also distinct from the TP2 cohort. No replacement router was invented.",
+              "error": "Pinned runnable routing deployment unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
             }
           }
         },
@@ -496,6 +728,110 @@
               "source_commit": "3572713e7944ea877b22f2a8a6bb053f348bfd25",
               "note": "The separate FrontierScience and HLE deployments rejected the available Ascend host commit. Both were stopped without bypassing the guard or changing host code. MMLU is running on the supported host and is not marked failed.",
               "error": "RuntimeError: Ascend boundary host commit is unsupported: 5cb98caaadeff42b5b62b996e34bb2aaa29d20fd; supported=['1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8']",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "mooncake-vllm-connectors": {
+              "solution": "mooncake-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "KV cache registration",
+              "date": "2026-10-16",
+              "source_commit": "bundled vLLM 0.23.0+empty; mooncake-transfer-engine-npu 0.3.11.post1",
+              "note": "The installed native MooncakeStoreConnector initialized its embedded store but failed while registering the hybrid model KV caches. This is not the historical patched 0.25 capsule. No repair or retry.",
+              "error": "AssertionError: cache_config.num_gpu_blocks is not None",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "d289a99e7e6e5619c297f7e8301c1a82cc055613573f6a88d9629fa06627240a",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pegaflow-vllm-connectors": {
+              "solution": "pegaflow-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "build-failed",
+              "stage": "Original Ascend wheel build",
+              "date": "2026-10-16",
+              "source_commit": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+              "note": "The original Ascend-feature wheel build stopped before installation because protoc was unavailable. No NPU deployment or dataset requests; no build repair or retry.",
+              "error": "pegaflow-proto custom build: Could not find protoc",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "0407132f17e1c3c69ad0836941f53917193cd0fff3cb638f88e4f21b6aed1a5f",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pipeline-microbatch-migration": {
+              "solution": "pipeline-microbatch-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "a15a22961a0e4858da74a0ab806575c82cb254e6",
+              "note": "The pinned policy requires the batch-admission-policy host API, absent from the available 0.23 and 0.25 scheduler configurations. Its qualified deployment is PP2+TP2, not the TP2 matrix cohort. No host patch or substitute implementation.",
+              "error": "batch_admission_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "utility-victim": {
+              "solution": "utility-victim",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published curve evidence describes a locally modified scheduler and utility-victim 0.1.0.dev2, but does not identify a retrievable source revision or original wheel. The historical result is preserved; no replacement plugin was invented.",
+              "error": "Pinned runnable plugin and modified-host artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "a2a-buffer-reuse": {
+              "solution": "a2a-buffer-reuse",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes a standalone local plugin 0.1.0.dev0 without a publicly pinned runnable source artifact. No substitute implementation or Native fallback measurement.",
+              "error": "Pinned runnable plugin artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "prefix-routing": {
+              "solution": "prefix-routing",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes two TP2+EP replicas behind a routing proxy. A pinned runnable proxy artifact is not supplied by the curve provenance; this four-card deployment is also distinct from the TP2 cohort. No replacement router was invented.",
+              "error": "Pinned runnable routing deployment unavailable",
               "measurements": null,
               "retry_count": 0,
               "report": "data/dataset-matrix-campaign-20261016/report.json"
@@ -661,6 +997,110 @@
               "measurements": null,
               "retry_count": 0,
               "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "mooncake-vllm-connectors": {
+              "solution": "mooncake-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "KV cache registration",
+              "date": "2026-10-16",
+              "source_commit": "bundled vLLM 0.23.0+empty; mooncake-transfer-engine-npu 0.3.11.post1",
+              "note": "The installed native MooncakeStoreConnector initialized its embedded store but failed while registering the hybrid model KV caches. This is not the historical patched 0.25 capsule. No repair or retry.",
+              "error": "AssertionError: cache_config.num_gpu_blocks is not None",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "d289a99e7e6e5619c297f7e8301c1a82cc055613573f6a88d9629fa06627240a",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pegaflow-vllm-connectors": {
+              "solution": "pegaflow-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "build-failed",
+              "stage": "Original Ascend wheel build",
+              "date": "2026-10-16",
+              "source_commit": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+              "note": "The original Ascend-feature wheel build stopped before installation because protoc was unavailable. No NPU deployment or dataset requests; no build repair or retry.",
+              "error": "pegaflow-proto custom build: Could not find protoc",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "0407132f17e1c3c69ad0836941f53917193cd0fff3cb638f88e4f21b6aed1a5f",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pipeline-microbatch-migration": {
+              "solution": "pipeline-microbatch-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "a15a22961a0e4858da74a0ab806575c82cb254e6",
+              "note": "The pinned policy requires the batch-admission-policy host API, absent from the available 0.23 and 0.25 scheduler configurations. Its qualified deployment is PP2+TP2, not the TP2 matrix cohort. No host patch or substitute implementation.",
+              "error": "batch_admission_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "utility-victim": {
+              "solution": "utility-victim",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published curve evidence describes a locally modified scheduler and utility-victim 0.1.0.dev2, but does not identify a retrievable source revision or original wheel. The historical result is preserved; no replacement plugin was invented.",
+              "error": "Pinned runnable plugin and modified-host artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "a2a-buffer-reuse": {
+              "solution": "a2a-buffer-reuse",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes a standalone local plugin 0.1.0.dev0 without a publicly pinned runnable source artifact. No substitute implementation or Native fallback measurement.",
+              "error": "Pinned runnable plugin artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "prefix-routing": {
+              "solution": "prefix-routing",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes two TP2+EP replicas behind a routing proxy. A pinned runnable proxy artifact is not supplied by the curve provenance; this four-card deployment is also distinct from the TP2 cohort. No replacement router was invented.",
+              "error": "Pinned runnable routing deployment unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
             }
           }
         },
@@ -814,6 +1254,110 @@
               "source_commit": "3572713e7944ea877b22f2a8a6bb053f348bfd25",
               "note": "The separate FrontierScience and HLE deployments rejected the available Ascend host commit. Both were stopped without bypassing the guard or changing host code. MMLU is running on the supported host and is not marked failed.",
               "error": "RuntimeError: Ascend boundary host commit is unsupported: 5cb98caaadeff42b5b62b996e34bb2aaa29d20fd; supported=['1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8']",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "mooncake-vllm-connectors": {
+              "solution": "mooncake-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "KV cache registration",
+              "date": "2026-10-16",
+              "source_commit": "bundled vLLM 0.23.0+empty; mooncake-transfer-engine-npu 0.3.11.post1",
+              "note": "The installed native MooncakeStoreConnector initialized its embedded store but failed while registering the hybrid model KV caches. This is not the historical patched 0.25 capsule. No repair or retry.",
+              "error": "AssertionError: cache_config.num_gpu_blocks is not None",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "d289a99e7e6e5619c297f7e8301c1a82cc055613573f6a88d9629fa06627240a",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pegaflow-vllm-connectors": {
+              "solution": "pegaflow-vllm-connectors",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "build-failed",
+              "stage": "Original Ascend wheel build",
+              "date": "2026-10-16",
+              "source_commit": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+              "note": "The original Ascend-feature wheel build stopped before installation because protoc was unavailable. No NPU deployment or dataset requests; no build repair or retry.",
+              "error": "pegaflow-proto custom build: Could not find protoc",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "0407132f17e1c3c69ad0836941f53917193cd0fff3cb638f88e4f21b6aed1a5f",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "pipeline-microbatch-migration": {
+              "solution": "pipeline-microbatch-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "a15a22961a0e4858da74a0ab806575c82cb254e6",
+              "note": "The pinned policy requires the batch-admission-policy host API, absent from the available 0.23 and 0.25 scheduler configurations. Its qualified deployment is PP2+TP2, not the TP2 matrix cohort. No host patch or substitute implementation.",
+              "error": "batch_admission_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "utility-victim": {
+              "solution": "utility-victim",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published curve evidence describes a locally modified scheduler and utility-victim 0.1.0.dev2, but does not identify a retrievable source revision or original wheel. The historical result is preserved; no replacement plugin was invented.",
+              "error": "Pinned runnable plugin and modified-host artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "a2a-buffer-reuse": {
+              "solution": "a2a-buffer-reuse",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes a standalone local plugin 0.1.0.dev0 without a publicly pinned runnable source artifact. No substitute implementation or Native fallback measurement.",
+              "error": "Pinned runnable plugin artifact unavailable",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "prefix-routing": {
+              "solution": "prefix-routing",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "artifact-unavailable",
+              "stage": "Runnable artifact admission",
+              "date": "2026-10-16",
+              "source_commit": null,
+              "note": "Published evidence describes two TP2+EP replicas behind a routing proxy. A pinned runnable proxy artifact is not supplied by the curve provenance; this four-card deployment is also distinct from the TP2 cohort. No replacement router was invented.",
+              "error": "Pinned runnable routing deployment unavailable",
               "measurements": null,
               "retry_count": 0,
               "report": "data/dataset-matrix-campaign-20261016/report.json"
@@ -2523,6 +3067,110 @@
       "measurements": null,
       "retry_count": 0,
       "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "mooncake-vllm-connectors",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "startup-failed",
+      "stage": "KV cache registration",
+      "date": "2026-10-16",
+      "source_commit": "bundled vLLM 0.23.0+empty; mooncake-transfer-engine-npu 0.3.11.post1",
+      "note": "The installed native MooncakeStoreConnector initialized its embedded store but failed while registering the hybrid model KV caches. This is not the historical patched 0.25 capsule. No repair or retry.",
+      "error": "AssertionError: cache_config.num_gpu_blocks is not None",
+      "measurements": null,
+      "retry_count": 0,
+      "log_sha256": "d289a99e7e6e5619c297f7e8301c1a82cc055613573f6a88d9629fa06627240a",
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "pegaflow-vllm-connectors",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "build-failed",
+      "stage": "Original Ascend wheel build",
+      "date": "2026-10-16",
+      "source_commit": "cd64ecc283ff856a44437a9a25659929ef3a0653",
+      "note": "The original Ascend-feature wheel build stopped before installation because protoc was unavailable. No NPU deployment or dataset requests; no build repair or retry.",
+      "error": "pegaflow-proto custom build: Could not find protoc",
+      "measurements": null,
+      "retry_count": 0,
+      "log_sha256": "0407132f17e1c3c69ad0836941f53917193cd0fff3cb638f88e4f21b6aed1a5f",
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "pipeline-microbatch-migration",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "host-incompatible",
+      "stage": "Host interface inspection",
+      "date": "2026-10-16",
+      "source_commit": "a15a22961a0e4858da74a0ab806575c82cb254e6",
+      "note": "The pinned policy requires the batch-admission-policy host API, absent from the available 0.23 and 0.25 scheduler configurations. Its qualified deployment is PP2+TP2, not the TP2 matrix cohort. No host patch or substitute implementation.",
+      "error": "batch_admission_policy absent in available scheduler configurations",
+      "measurements": null,
+      "retry_count": 0,
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "utility-victim",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "artifact-unavailable",
+      "stage": "Runnable artifact admission",
+      "date": "2026-10-16",
+      "source_commit": null,
+      "note": "Published curve evidence describes a locally modified scheduler and utility-victim 0.1.0.dev2, but does not identify a retrievable source revision or original wheel. The historical result is preserved; no replacement plugin was invented.",
+      "error": "Pinned runnable plugin and modified-host artifact unavailable",
+      "measurements": null,
+      "retry_count": 0,
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "a2a-buffer-reuse",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "artifact-unavailable",
+      "stage": "Runnable artifact admission",
+      "date": "2026-10-16",
+      "source_commit": null,
+      "note": "Published evidence describes a standalone local plugin 0.1.0.dev0 without a publicly pinned runnable source artifact. No substitute implementation or Native fallback measurement.",
+      "error": "Pinned runnable plugin artifact unavailable",
+      "measurements": null,
+      "retry_count": 0,
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "prefix-routing",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "artifact-unavailable",
+      "stage": "Runnable artifact admission",
+      "date": "2026-10-16",
+      "source_commit": null,
+      "note": "Published evidence describes two TP2+EP replicas behind a routing proxy. A pinned runnable proxy artifact is not supplied by the curve provenance; this four-card deployment is also distinct from the TP2 cohort. No replacement router was invented.",
+      "error": "Pinned runnable routing deployment unavailable",
+      "measurements": null,
+      "retry_count": 0,
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
     }
   ],
   "source_files_sha256": {
@@ -2533,7 +3181,7 @@
     "data/hle-verified-20261015/report.json": "eece0c0f2c2d7759dfe6d5629139ce24b272a259d9936533477b229957186d9b",
     "data/betterscale-dataset-validation-20261015/report.json": "d90c31ca03e1ed6c55571a6f4748228cd7d7e4c702906e880c1de68383818e6c",
     "data/betterscale-hle-20261015/report.json": "7acc1ef79a759bd58656e0674fefee22d79918352de24bd0ee5471e9aa7ae57f",
-    "data/dataset-matrix-campaign-20261016/report.json": "07128e423f2c46fee21456dddb44dfe6c55b1959521b627bf5da2d4ab513b464"
+    "data/dataset-matrix-campaign-20261016/report.json": "6cc48f37e68d3c1327880276558eb2c8ab223b604cbe1bded1b6cd7ff194729a"
   },
   "betterscale_publication": {
     "commit": "5714be9e9b032f9aaef13df229aaa96dc8ef7c3b",
