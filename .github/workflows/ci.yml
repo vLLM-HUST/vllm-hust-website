@@ -57,6 +57,7 @@ jobs:
           python -m http.server 8769 --bind 127.0.0.1 > /tmp/website-browser-server.log 2>&1 &
           website_server_pid=$!
           trap 'kill "$website_server_pid"' EXIT
+          python scripts/verify_dataset_matrix_browser.py --url http://127.0.0.1:8769
           python scripts/verify_site_browser.py --url http://127.0.0.1:8769
           python scripts/verify_betterscale_browser.py --url http://127.0.0.1:8769
           python scripts/verify_traceloom_browser.py --url http://127.0.0.1:8769
@@ -66,6 +67,7 @@ jobs:
         with:
           name: website-browser-evidence
           path: |
+            output/playwright/dataset-matrix/
             output/playwright/site-repair/
             output/playwright/betterscale/
             output/playwright/traceloom/
