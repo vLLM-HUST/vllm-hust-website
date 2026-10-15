@@ -28,16 +28,24 @@ def test_scope_and_metrics():
         "Gold",
         "Revision",
     ]
-    assert all(
-        "betterscale" not in p["scores"] for p in datasets["hle-verified"]["parts"]
-    )
+    assert all("betterscale" in p["scores"] for p in datasets["hle-verified"]["parts"])
     rows = data["records"]
     frontier = [r for r in rows if r["dataset"] == "frontierscience"]
     assert len(frontier) == 2  # One combined benchmark per solution, not per track.
     assert all(r["performance"]["num_prompts"] == 160 for r in frontier)
     assert all(len(r["quality"]) == 2 for r in frontier)
     hle = [r for r in rows if r["dataset"] == "hle-verified"]
-    assert len(hle) == 4 and all(r["solution"] == "native" for r in hle)
+    assert len(hle) == 8
+    bs_hle = [r for r in hle if r["solution"] == "betterscale"]
+    assert len(bs_hle) == 4
+    assert all(r["performance"]["input_token_accounting_verified"] for r in bs_hle)
+    assert [
+        p["scores"]["betterscale"]["correct"] for p in datasets["hle-verified"]["parts"]
+    ] == [168, 320]
+    assert [
+        p["scores"]["betterscale"]["audit"]["unresolved"]
+        for p in datasets["hle-verified"]["parts"]
+    ] == [20, 27]
     bs = next(r for r in rows if r["id"] == "mmlu-pro-betterscale-test-200")
     assert bs["quality"][0]["correct"] == 9611
     assert bs["performance"]["output_throughput"] == 624.8240870647068

@@ -28,6 +28,7 @@ def build(root=ROOT):
     f = read("data/frontierscience-20261013/report.json")
     h = read("data/hle-verified-20261015/report.json")
     b = read(f"data/{BS}/report.json")
+    bh = read("data/betterscale-hle-20261015/report.json")
     solutions = [
         {"id": "native", "name": "Native vLLM · Ascend"},
         {"id": "betterscale", "name": "BetterScale"},
@@ -86,7 +87,12 @@ def build(root=ROOT):
                     "name": key.title(),
                     "metric": "accuracy",
                     "scores": {
-                        "native": score(h["summaries"][key]["tracks"][key], key.title())
+                        "native": score(
+                            h["summaries"][key]["tracks"][key], key.title()
+                        ),
+                        "betterscale": score(
+                            bh["summaries"][key]["tracks"][key], key.title()
+                        ),
                     },
                 }
                 for key in ("gold", "revision")
@@ -166,28 +172,32 @@ def build(root=ROOT):
             f_protocol,
             f["limitations"] if solution == "native" else b["limits"],
         )
-    for scope, perf in h["performance"].items():
-        subset, modality = scope.split("-")
-        add(
-            "hle-verified",
-            "native",
-            scope,
-            [
-                score(
-                    h["summaries"][subset]["groups"][f"{subset}/{modality}"],
-                    f"{subset.title()} · {modality}",
-                )
-            ],
-            perf,
-            h["runtime"],
-            "data/hle-verified-20261015/report.json",
-            {
-                "generation": h["generation"],
-                "scoring": h["summaries"][subset]["protocol"],
-                "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0",
-            },
-            h["limitations"],
-        )
+    for solution, report, path in (
+        ("native", h, "data/hle-verified-20261015/report.json"),
+        ("betterscale", bh, "data/betterscale-hle-20261015/report.json"),
+    ):
+        for scope, perf in report["performance"].items():
+            subset, modality = scope.split("-")
+            add(
+                "hle-verified",
+                solution,
+                scope,
+                [
+                    score(
+                        report["summaries"][subset]["groups"][f"{subset}/{modality}"],
+                        f"{subset.title()} · {modality}",
+                    )
+                ],
+                perf,
+                report["runtime"],
+                path,
+                {
+                    "generation": report["generation"],
+                    "scoring": report["summaries"][subset]["protocol"],
+                    "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0",
+                },
+                report["limitations"],
+            )
     return {
         "schema": 1,
         "cohort": {

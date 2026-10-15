@@ -204,6 +204,27 @@
                 "solver_truncated": 383,
                 "judge_truncated": 32
               }
+            },
+            "betterscale": {
+              "label": "Gold",
+              "correct": 168,
+              "total": 668,
+              "value": 0.25149700598802394,
+              "audit": {
+                "total": 668,
+                "graded": 648,
+                "successes": 168,
+                "accuracy": 0.25149700598802394,
+                "unresolved": 20,
+                "complete_grading": false,
+                "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+                "wald_95_half_width": 0.03290266083130002,
+                "solver_failures": 0,
+                "judge_invalid": 20,
+                "judge_transport_failures": 0,
+                "solver_truncated": 371,
+                "judge_truncated": 20
+              }
             }
           }
         },
@@ -231,6 +252,27 @@
                 "judge_transport_failures": 0,
                 "solver_truncated": 688,
                 "judge_truncated": 40
+              }
+            },
+            "betterscale": {
+              "label": "Revision",
+              "correct": 320,
+              "total": 1143,
+              "value": 0.2799650043744532,
+              "audit": {
+                "total": 1143,
+                "graded": 1116,
+                "successes": 320,
+                "accuracy": 0.2799650043744532,
+                "unresolved": 27,
+                "complete_grading": false,
+                "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+                "wald_95_half_width": 0.026029248674709748,
+                "solver_failures": 0,
+                "judge_invalid": 27,
+                "judge_transport_failures": 0,
+                "solver_truncated": 680,
+                "judge_truncated": 27
               }
             }
           }
@@ -1483,6 +1525,354 @@
         "Full weights were inventoried but not hashed; model small files matched. Image digest and verified local model revision are unavailable.",
         "Public evidence omits question/image/answer payloads and environment dumps. Original raw records remain private and cannot be independently regraded from this package."
       ]
+    },
+    {
+      "id": "hle-verified-betterscale-gold-text",
+      "dataset": "hle-verified",
+      "solution": "betterscale",
+      "scope": "gold-text",
+      "quality": [
+        {
+          "label": "Gold · text",
+          "correct": 152,
+          "total": 575,
+          "value": 0.2643478260869565,
+          "audit": {
+            "total": 575,
+            "graded": 555,
+            "successes": 152,
+            "accuracy": 0.2643478260869565,
+            "unresolved": 20,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.03604510392214794,
+            "solver_failures": 0,
+            "judge_invalid": 20,
+            "judge_transport_failures": 0,
+            "solver_truncated": 361,
+            "judge_truncated": 20
+          }
+        }
+      ],
+      "performance": {
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 52.8319353479892,
+        "request_throughput": 3.7855891267782615,
+        "output_throughput": 916.3964878648476,
+        "total_token_throughput": 1899.7600473824027,
+        "mean_ttft_ms": 24057.54630882293,
+        "mean_tpot_ms": 16.937476885363775,
+        "total_input_tokens": 51953,
+        "total_output_tokens": 48415,
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "33ccc94da6ed5035aafaebb1d0a982a4de6b3c2f",
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "hardware": "2 x Ascend 910B2",
+        "vllm": "0.25.1",
+        "cann": "9.1",
+        "engine": "BetterScale main TP2 MTP2 FULL E16/R20",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 4096,
+        "state_bytes_per_rank": 21474836480,
+        "prefix_caching": true,
+        "async_scheduling": true,
+        "image_limit": 4,
+        "host_memory_bytes": 68719476736,
+        "cpu_quota_cores": 8
+      },
+      "report": "data/betterscale-hle-20261015/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0,
+          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Single trial; same-model Qwen judge, not official leaderboard replication or formal acceptance.",
+        "Gold/Revision unresolved judges: 20/27, all length-ended. Retained in denominator as nonsuccess, not confirmed incorrect; no retries.",
+        "Client prompts/schema match the website protocol; engine versions, MTP, graph mode, hardware allocation and cache settings differ. Not an isolated optimization ablation.",
+        "HLE uses BetterScale main 33ccc94; MMLU-Pro/FrontierScience use the earlier 31fe12b deployment.",
+        "Text load tests select 200 tasks by floor(i*N/200); image tests include all 93/118 tasks. Output cap 256, EOS allowed, request-rate inf, temperature 0, seed 0, thinking disabled, no system prompt.",
+        "Service reused after smoke and accuracy, not cold cache. Zero warmups; vLLM initial test request outside measured N. TTFT includes burst queueing.",
+        "Recovered published HLE pipeline/prompts/bench client, with reused frozen hash/seal helpers; not the original full client checkout. Raw prompts, images and responses remain private."
+      ]
+    },
+    {
+      "id": "hle-verified-betterscale-revision-text",
+      "dataset": "hle-verified",
+      "solution": "betterscale",
+      "scope": "revision-text",
+      "quality": [
+        {
+          "label": "Revision · text",
+          "correct": 300,
+          "total": 1025,
+          "value": 0.2926829268292683,
+          "audit": {
+            "total": 1025,
+            "graded": 998,
+            "successes": 300,
+            "accuracy": 0.2926829268292683,
+            "unresolved": 27,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.027854790980999553,
+            "solver_failures": 0,
+            "judge_invalid": 27,
+            "judge_transport_failures": 0,
+            "solver_truncated": 667,
+            "judge_truncated": 27
+          }
+        }
+      ],
+      "performance": {
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 54.63460737653077,
+        "request_throughput": 3.660683394714271,
+        "output_throughput": 918.6301944865727,
+        "total_token_throughput": 2218.8317226211875,
+        "mean_ttft_ms": 25225.365957031026,
+        "mean_tpot_ms": 16.400009223113894,
+        "total_input_tokens": 71036,
+        "total_output_tokens": 50189,
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "33ccc94da6ed5035aafaebb1d0a982a4de6b3c2f",
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "hardware": "2 x Ascend 910B2",
+        "vllm": "0.25.1",
+        "cann": "9.1",
+        "engine": "BetterScale main TP2 MTP2 FULL E16/R20",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 4096,
+        "state_bytes_per_rank": 21474836480,
+        "prefix_caching": true,
+        "async_scheduling": true,
+        "image_limit": 4,
+        "host_memory_bytes": 68719476736,
+        "cpu_quota_cores": 8
+      },
+      "report": "data/betterscale-hle-20261015/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0,
+          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Single trial; same-model Qwen judge, not official leaderboard replication or formal acceptance.",
+        "Gold/Revision unresolved judges: 20/27, all length-ended. Retained in denominator as nonsuccess, not confirmed incorrect; no retries.",
+        "Client prompts/schema match the website protocol; engine versions, MTP, graph mode, hardware allocation and cache settings differ. Not an isolated optimization ablation.",
+        "HLE uses BetterScale main 33ccc94; MMLU-Pro/FrontierScience use the earlier 31fe12b deployment.",
+        "Text load tests select 200 tasks by floor(i*N/200); image tests include all 93/118 tasks. Output cap 256, EOS allowed, request-rate inf, temperature 0, seed 0, thinking disabled, no system prompt.",
+        "Service reused after smoke and accuracy, not cold cache. Zero warmups; vLLM initial test request outside measured N. TTFT includes burst queueing.",
+        "Recovered published HLE pipeline/prompts/bench client, with reused frozen hash/seal helpers; not the original full client checkout. Raw prompts, images and responses remain private."
+      ]
+    },
+    {
+      "id": "hle-verified-betterscale-gold-image",
+      "dataset": "hle-verified",
+      "solution": "betterscale",
+      "scope": "gold-image",
+      "quality": [
+        {
+          "label": "Gold · image",
+          "correct": 16,
+          "total": 93,
+          "value": 0.17204301075268819,
+          "audit": {
+            "total": 93,
+            "graded": 93,
+            "successes": 16,
+            "accuracy": 0.17204301075268819,
+            "unresolved": 0,
+            "complete_grading": true,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.07670735405463468,
+            "solver_failures": 0,
+            "judge_invalid": 0,
+            "judge_transport_failures": 0,
+            "solver_truncated": 10,
+            "judge_truncated": 0
+          }
+        }
+      ],
+      "performance": {
+        "num_prompts": 93,
+        "completed": 93,
+        "failed": 0,
+        "duration": 44.43928250670433,
+        "request_throughput": 2.09274305871094,
+        "output_throughput": 504.1035484004568,
+        "total_token_throughput": 2723.04126381302,
+        "mean_ttft_ms": 18657.533058215693,
+        "mean_tpot_ms": 30.242454539351595,
+        "total_input_tokens": 98608,
+        "total_output_tokens": 22402,
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "33ccc94da6ed5035aafaebb1d0a982a4de6b3c2f",
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "hardware": "2 x Ascend 910B2",
+        "vllm": "0.25.1",
+        "cann": "9.1",
+        "engine": "BetterScale main TP2 MTP2 FULL E16/R20",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 4096,
+        "state_bytes_per_rank": 21474836480,
+        "prefix_caching": true,
+        "async_scheduling": true,
+        "image_limit": 4,
+        "host_memory_bytes": 68719476736,
+        "cpu_quota_cores": 8
+      },
+      "report": "data/betterscale-hle-20261015/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0,
+          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Single trial; same-model Qwen judge, not official leaderboard replication or formal acceptance.",
+        "Gold/Revision unresolved judges: 20/27, all length-ended. Retained in denominator as nonsuccess, not confirmed incorrect; no retries.",
+        "Client prompts/schema match the website protocol; engine versions, MTP, graph mode, hardware allocation and cache settings differ. Not an isolated optimization ablation.",
+        "HLE uses BetterScale main 33ccc94; MMLU-Pro/FrontierScience use the earlier 31fe12b deployment.",
+        "Text load tests select 200 tasks by floor(i*N/200); image tests include all 93/118 tasks. Output cap 256, EOS allowed, request-rate inf, temperature 0, seed 0, thinking disabled, no system prompt.",
+        "Service reused after smoke and accuracy, not cold cache. Zero warmups; vLLM initial test request outside measured N. TTFT includes burst queueing.",
+        "Recovered published HLE pipeline/prompts/bench client, with reused frozen hash/seal helpers; not the original full client checkout. Raw prompts, images and responses remain private."
+      ]
+    },
+    {
+      "id": "hle-verified-betterscale-revision-image",
+      "dataset": "hle-verified",
+      "solution": "betterscale",
+      "scope": "revision-image",
+      "quality": [
+        {
+          "label": "Revision · image",
+          "correct": 20,
+          "total": 118,
+          "value": 0.1694915254237288,
+          "audit": {
+            "total": 118,
+            "graded": 118,
+            "successes": 20,
+            "accuracy": 0.1694915254237288,
+            "unresolved": 0,
+            "complete_grading": true,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.06769570197989037,
+            "solver_failures": 0,
+            "judge_invalid": 0,
+            "judge_transport_failures": 0,
+            "solver_truncated": 13,
+            "judge_truncated": 0
+          }
+        }
+      ],
+      "performance": {
+        "num_prompts": 118,
+        "completed": 118,
+        "failed": 0,
+        "duration": 64.13588764704764,
+        "request_throughput": 1.8398435623028582,
+        "output_throughput": 460.17917710005554,
+        "total_token_throughput": 2662.160083284661,
+        "mean_ttft_ms": 31414.264878210754,
+        "mean_tpot_ms": 30.298138887874245,
+        "total_input_tokens": 141226,
+        "total_output_tokens": 29514,
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "33ccc94da6ed5035aafaebb1d0a982a4de6b3c2f",
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "hardware": "2 x Ascend 910B2",
+        "vllm": "0.25.1",
+        "cann": "9.1",
+        "engine": "BetterScale main TP2 MTP2 FULL E16/R20",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 4096,
+        "state_bytes_per_rank": 21474836480,
+        "prefix_caching": true,
+        "async_scheduling": true,
+        "image_limit": 4,
+        "host_memory_bytes": 68719476736,
+        "cpu_quota_cores": 8
+      },
+      "report": "data/betterscale-hle-20261015/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0,
+          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Single trial; same-model Qwen judge, not official leaderboard replication or formal acceptance.",
+        "Gold/Revision unresolved judges: 20/27, all length-ended. Retained in denominator as nonsuccess, not confirmed incorrect; no retries.",
+        "Client prompts/schema match the website protocol; engine versions, MTP, graph mode, hardware allocation and cache settings differ. Not an isolated optimization ablation.",
+        "HLE uses BetterScale main 33ccc94; MMLU-Pro/FrontierScience use the earlier 31fe12b deployment.",
+        "Text load tests select 200 tasks by floor(i*N/200); image tests include all 93/118 tasks. Output cap 256, EOS allowed, request-rate inf, temperature 0, seed 0, thinking disabled, no system prompt.",
+        "Service reused after smoke and accuracy, not cold cache. Zero warmups; vLLM initial test request outside measured N. TTFT includes burst queueing.",
+        "Recovered published HLE pipeline/prompts/bench client, with reused frozen hash/seal helpers; not the original full client checkout. Raw prompts, images and responses remain private."
+      ]
     }
   ],
   "source_files_sha256": {
@@ -1491,7 +1881,8 @@
     "data/mmlu-pro-20261012/runtime.json": "21f361a4b395522e77c1650619bd3d2f401c5f598c6dab34e2c57fa478f6b453",
     "data/frontierscience-20261013/report.json": "d40cb9dd3c46a3438b3b8846a2d44eef509317dfba84fe87c86c0b1d2708147f",
     "data/hle-verified-20261015/report.json": "eece0c0f2c2d7759dfe6d5629139ce24b272a259d9936533477b229957186d9b",
-    "data/betterscale-dataset-validation-20261015/report.json": "d90c31ca03e1ed6c55571a6f4748228cd7d7e4c702906e880c1de68383818e6c"
+    "data/betterscale-dataset-validation-20261015/report.json": "d90c31ca03e1ed6c55571a6f4748228cd7d7e4c702906e880c1de68383818e6c",
+    "data/betterscale-hle-20261015/report.json": "7acc1ef79a759bd58656e0674fefee22d79918352de24bd0ee5471e9aa7ae57f"
   },
   "betterscale_publication": {
     "commit": "5714be9e9b032f9aaef13df229aaa96dc8ef7c3b",

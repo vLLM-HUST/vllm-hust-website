@@ -224,3 +224,17 @@ current Qwen27 observations have matched completed-request input/cache/output ac
 `docs/FRONTIER-DENSE27-CURRENT.md` before using the current27B State results; the earlier96cd03a
 reconstruction was not the latest cache/partial-recovery implementation. Costs are user inputs, not
 estimated hardware rents. API-equivalent value is neither income nor profit.
+
+## Dataset matrix v1: HLE multimodal results
+
+`dataset-matrix-v1.html` is an additive quality overview with per-modality performance drill-down;
+`scripts/build_dataset_matrix.py` derives its JSON from archived public reports. Do not hand-edit
+the matrix snapshot. BetterScale HLE uses main33ccc94, not the earlier31fe12b MMLU/Frontier
+deployment. `scripts/import_betterscale_hle.py` projects aggregate summaries, independent load tests
+and source hash bindings from the private completed capsule, without publishing questions, images or
+responses. Rebuild the matrix after importing; run `tests/test_dataset_matrix.py` and
+`scripts/verify_dataset_matrix_browser.py` (desktop/mobile, EN/ZH). Include both modalities and
+retain unresolved judges in the overall denominator. Verify every benchmark input token count
+against server tokenization before accepting total-token throughput. HLE's report source is linked
+per row; the older benchmark publication link only covers MMLU/Frontier. No fixed-target admission
+is implied.

@@ -28,23 +28,19 @@ def main():
             context.add_init_script(f"localStorage.setItem('vllm-hust_lang', '{lang}')")
             page = context.new_page()
             errors = []
-            page.on("pageerror", lambda error: errors.append(str(error)))
+            page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.url + "/dataset-matrix-v1.html")
             page.locator(".matrix-overview").wait_for()
             expect(page.locator(".matrix-overview tbody tr")).to_have_count(5)
             assert "79.88%" in page.locator(".matrix-overview").inner_text()
-            expect(page.locator(".matrix-missing")).to_have_count(2)
+            expect(page.locator(".matrix-missing")).to_have_count(0)
             expect(page.locator('[data-nav-page="dataset-matrix-v1"]')).to_have_count(1)
             page.screenshot(
                 path=str(args.output / f"overview-{width}-{lang}.png"), full_page=True
             )
             page.locator('[data-sort="betterscale"]').click()
-            assert (
-                page.locator(".matrix-overview tbody tr")
-                .last.locator(".matrix-dataset")
-                .inner_text()
-                .startswith("HLE")
-            )
+            assert "25.15%" in page.locator(".matrix-overview").inner_text()
+            assert "28.00%" in page.locator(".matrix-overview").inner_text()
             page.locator('.matrix-dataset[href="#mmlu-pro"]').click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(2)
             assert "624.82" in page.locator(".matrix-detail").inner_text()
@@ -91,12 +87,17 @@ def main():
             page.go_back()
             page.locator(".matrix-overview").wait_for()
             page.locator('.matrix-dataset[href="#hle-verified"]').first.click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(8)
             page.locator('[data-solution="native"]').uncheck()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(0)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
+            assert "916.40" in page.locator(".matrix-detail").inner_text()
+            assert "460.18" in page.locator(".matrix-detail").inner_text()
+            page.screenshot(
+                path=str(args.output / f"hle-{width}-{lang}.png"), full_page=True
+            )
             page.reload()
             page.locator(".matrix-detail").wait_for()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(8)
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= innerWidth + 1"
             )
