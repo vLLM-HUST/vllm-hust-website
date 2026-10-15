@@ -870,18 +870,7 @@ vllm-hust-ext extension check ${extensionId}`
 
   function communityPanel(item) {
     const metadata = workshopMetadata[item.id];
-    const maintainers = Array.isArray(metadata?.maintainers)
-      ? metadata.maintainers
-      : (item.maintainers || []).map((login) => {
-        const profile = (item.maintainer_profiles || []).find((person) => person.login === login);
-        return {
-          login,
-          name: profile?.name || login,
-          profile_url: `https://github.com/${encodeURIComponent(login)}`,
-          avatar_url: `https://github.com/${encodeURIComponent(login)}.png?size=56`
-        };
-      });
-    if (!maintainers.length) return null;
+    if (!metadata || !Array.isArray(metadata.maintainers) || !metadata.metrics) return null;
 
     const panel = element("section", "plugin-community");
     const people = element("div", "plugin-maintainers");
@@ -890,7 +879,7 @@ vllm-hust-ext extension check ${extensionId}`
       : copy().maintainers;
     people.append(element("span", "plugin-community-label", maintainerLabel));
     const list = element("div", "plugin-maintainer-list");
-    maintainers.forEach((maintainer) => {
+    metadata.maintainers.forEach((maintainer) => {
       const link = element("a", "plugin-maintainer");
       link.href = maintainer.profile_url;
       link.target = "_blank";
@@ -911,9 +900,7 @@ vllm-hust-ext extension check ${extensionId}`
     });
     people.append(list);
     const noAdvisor = Array.isArray(item.advisors) && item.advisors.length === 0;
-    const advisorRecords = Array.isArray(item.advisors)
-      ? item.advisors
-      : (Array.isArray(metadata?.advisors) ? metadata.advisors : []);
+    const advisorRecords = noAdvisor ? [] : (Array.isArray(metadata.advisors) ? metadata.advisors : []);
     const internalAdvisors = advisorRecords.filter((advisor) => advisor.relationship !== "external_contributor");
     const externalAdvisors = advisorRecords.filter((advisor) => advisor.relationship === "external_contributor");
     const advisors = element("div", "plugin-advisors");
@@ -938,25 +925,23 @@ vllm-hust-ext extension check ${extensionId}`
       externalRelationships.append(relationship);
     });
 
+    const metrics = element("div", "plugin-repo-metrics");
+    [
+      [copy().stars, metadata.metrics.stars, `${metadata.repository_url}/stargazers`],
+      [copy().pullRequests, metadata.metrics.open_pull_requests, `${metadata.repository_url}/pulls`],
+      [copy().forks, metadata.metrics.forks, `${metadata.repository_url}/forks`]
+    ].forEach(([label, value, href]) => {
+      const link = element(value == null ? "span" : "a", "plugin-repo-metric");
+      if (value != null) link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.append(element("strong", "", value == null ? "—" : String(value)), element("span", "", label));
+      metrics.append(link);
+    });
     panel.append(people);
     if (!noAdvisor && (internalAdvisors.length || !externalAdvisors.length)) panel.append(advisors);
     if (externalAdvisors.length) panel.append(externalRelationships);
-    if (metadata?.metrics) {
-      const metrics = element("div", "plugin-repo-metrics");
-      [
-        [copy().stars, metadata.metrics.stars, `${metadata.repository_url}/stargazers`],
-        [copy().pullRequests, metadata.metrics.open_pull_requests, `${metadata.repository_url}/pulls`],
-        [copy().forks, metadata.metrics.forks, `${metadata.repository_url}/forks`]
-      ].forEach(([label, value, href]) => {
-        const link = element(value == null ? "span" : "a", "plugin-repo-metric");
-        if (value != null) link.href = href;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.append(element("strong", "", value == null ? "—" : String(value)), element("span", "", label));
-        metrics.append(link);
-      });
-      panel.append(metrics);
-    }
+    panel.append(metrics);
     return panel;
   }
 
@@ -1163,7 +1148,8 @@ vllm-hust-ext extension check ${extensionId}`
     if (isPerformanceCandidate(item)) {
       card.append(performancePanel(performanceResults.get(item.id)));
     }
-    const community = communityPanel(item);
+    const community = communityPanel(item)
+      || document.getElementById(`community-${item.id}`)?.content.firstElementChild.cloneNode(true);
     if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
     if (compatibility) card.append(compatibility);

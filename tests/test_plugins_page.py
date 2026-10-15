@@ -949,7 +949,7 @@ def test_workshop_renders_synced_metadata_without_hardcoded_counts() -> None:
     assert 'data-metadata="./data/plugin-workshop-metadata.json?v=' in PAGE
     assert 'fetch(catalog.dataset.metadata, { cache: "no-cache" })' in SCRIPT
     assert "function communityPanel(item)" in SCRIPT
-    assert "maintainers.forEach" in SCRIPT
+    assert "metadata.maintainers.forEach" in SCRIPT
     assert "metadata.metrics.stars" in SCRIPT
     assert "metadata.metrics.open_pull_requests" in SCRIPT
     assert "metadata.metrics.forks" in SCRIPT
