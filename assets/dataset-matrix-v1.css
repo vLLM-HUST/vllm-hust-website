@@ -44,3 +44,11 @@
     .matrix-overview .metric strong { font-size: 16px; }
     .matrix-overview small { font-size: 9px; white-space: normal; }
 }
+
+.matrix-overview th:first-child { width: 200px; min-width: 160px; }
+.matrix-overview th:not(:first-child) { width: 160px; min-width: 140px; }
+.matrix-status { color: var(--run-muted); font-size: 13px; }
+.matrix-attempt { margin-top: 12px; padding: 12px 16px; background: #152036; color: #d5e0f2; border-radius: 8px; font-size: 12px; }
+.matrix-attempt summary { cursor: pointer; }
+.matrix-attempt pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.matrix-attempt a { color: #9cb4ff; }

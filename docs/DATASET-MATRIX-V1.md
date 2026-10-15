@@ -41,7 +41,8 @@ versions on publication. This is a measured-results view, not formal V5.5 accept
   measurements.
 - HLE Gold and Revision retain all selected questions in the denominator. Text/image performance
   tests remain separate; do not pool throughput or match full-subset accuracy to a modality score.
-  BetterScale has no HLE result in this publication. Missing is not zero. Uncertain is unmeasured.
+  BetterScale now includes full Gold/Revision results and four modality load tests. Missing is not
+  zero. Uncertain is unmeasured.
 - Same-model Qwen judging is not official leaderboard judging. Unresolved grades are nonsuccess in
   the displayed denominator, not confirmed incorrect responses.
 - Configurations/donor runtimes differ; these single runs do not isolate a single optimization.
@@ -59,3 +60,16 @@ python scripts/verify_dataset_matrix_browser.py --url http://127.0.0.1:8786
 The browser check uses actual bundled reports, desktop/mobile EN/ZH, light/dark palettes, hash
 navigation, numeric sorting, missing values, solution filters, evidence expansion, downloads and
 viewport containment. Screenshots belong in local QA output, not published site assets.
+
+## Additive campaign attempts (October 16)
+
+`data/dataset-matrix-campaign-20261016/report.json` carries new solution columns and measured or
+blocked attempts. Host incompatibility, missing calibration dependencies and activation failures are
+explicitly separate from dataset quality. They never create a zero score or a performance row. The
+detail view preserves the stage and error. A plugin that fails to load and falls back to Native must
+not be measured as an enabled solution. Public projections exclude prompts, answers, images and
+machine-specific paths; private raw logs remain archived.
+
+The owner's policy for this campaign is no candidate bug fixes or failed-run retries. Invalid
+launcher setup is recorded separately rather than blamed on a candidate. Preserve runtime/source
+differences and do not relabel the historical patched Frontier capsule as a new unchanged build.

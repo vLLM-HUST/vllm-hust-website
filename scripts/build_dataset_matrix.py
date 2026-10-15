@@ -198,6 +198,16 @@ def build(root=ROOT):
                 },
                 report["limitations"],
             )
+    campaign_path = "data/dataset-matrix-campaign-20261016/report.json"
+    campaign = read(campaign_path)
+    solutions.extend(campaign["solutions"])
+    attempts = [{**a, "report": campaign_path} for a in campaign["attempts"]]
+    for d in datasets:
+        for part in d["parts"]:
+            part["statuses"] = {
+                a["solution"]: a for a in attempts if d["id"] in a["datasets"]
+            }
+    records.extend(campaign["results"])
     return {
         "schema": 1,
         "cohort": {
@@ -209,6 +219,7 @@ def build(root=ROOT):
         "solutions": solutions,
         "datasets": datasets,
         "records": records,
+        "attempts": attempts,
         "source_files_sha256": sources,
         "betterscale_publication": {
             "commit": COMMIT,

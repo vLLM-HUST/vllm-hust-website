@@ -57,3 +57,16 @@ def test_scope_and_metrics():
         for p in d["parts"]:
             for s in p["scores"].values():
                 assert s["value"] == s["correct"] / s["total"]
+
+
+def test_failed_admission_is_not_a_zero_score_or_performance_row():
+    data = module.build()
+    failed = {a["solution"] for a in data["attempts"]}
+    assert {"bidkv", "kvcompress-ascend"} <= failed
+    for dataset in data["datasets"]:
+        for part in dataset["parts"]:
+            for solution in failed:
+                assert solution not in part["scores"]
+                if solution in part["statuses"]:
+                    assert part["statuses"][solution]["measurements"] is None
+    assert not any(row["solution"] in failed for row in data["records"])

@@ -14,6 +14,30 @@
     {
       "id": "betterscale",
       "name": "BetterScale"
+    },
+    {
+      "id": "bidkv",
+      "name": "BidKV"
+    },
+    {
+      "id": "dla",
+      "name": "DLA"
+    },
+    {
+      "id": "kv-tiering-migration",
+      "name": "KV Tiering"
+    },
+    {
+      "id": "kvcompress-ascend",
+      "name": "KVCompress"
+    },
+    {
+      "id": "kv-materialization-arrival-control",
+      "name": "KV Materialization"
+    },
+    {
+      "id": "ascend-attention-boundary",
+      "name": "Ascend Attention Boundary"
     }
   ],
   "datasets": [
@@ -62,6 +86,97 @@
                 "mean_e2e_s": 12.299382534087544,
                 "smoke_only": false
               }
+            }
+          },
+          "statuses": {
+            "bidkv": {
+              "solution": "bidkv",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "a0cba97d9abdc99908e46616db622f0e0099127f",
+              "note": "The installed host is vLLM 0.23.0+empty; this pinned package requires >=0.28.1rc1.dev319,<0.29. No host or policy patch was applied.",
+              "error": "host version 0.23.0+empty is outside >=0.28.1rc1.dev319,<0.29",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "1cfe4f43eed9a01a7e5343984a8c9b6827e82c59608185791f2d03de0573da99",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "dla": {
+              "solution": "dla",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+              "note": "The declared-budget policy requires the preemption-policy host interface, which is absent from the available 0.23 and 0.25 scheduler configurations. Natural stopping tasks also cannot use the exact-output-budget assumption. Not launched.",
+              "error": "preemption_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-tiering-migration": {
+              "solution": "kv-tiering-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+              "note": "The pinned provider could not load against the available host. No compatibility repair was attempted.",
+              "error": "ImportError: cannot import name 'LookupResult' from 'vllm.v1.kv_offload.base'",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "f5d996290a1c654c2a4ee61b6f7f7c489ddbc704cfc469a78bd7df77cd9676fb",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kvcompress-ascend": {
+              "solution": "kvcompress-ascend",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "Calibration startup",
+              "date": "2026-10-16",
+              "source_commit": "2ca0f9335399a698342285870df1514e9c519bd4",
+              "note": "Automatic distributed calibration stopped because its Accelerate dependency was not installed in this capsule. No retries or dependency repair after this failure.",
+              "error": "RuntimeError: distributed calibration requires Accelerate",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "77805cb081d0c733da3ca6c43d56590db4b7808ddae731fcda0ec545a30be496",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-materialization-arrival-control": {
+              "solution": "kv-materialization-arrival-control",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "activation-failed",
+              "stage": "Plugin activation",
+              "date": "2026-10-16",
+              "source_commit": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+              "note": "The plugin could not import its workload dependency. Native fallback was stopped rather than measured under the plugin label. No repair or retry.",
+              "error": "RuntimeError: llm-serving-workloads is required for workload-driven runs",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "5823517e9d86e5cea4565465054bf6a819c2d21fbe17d8b609857beeab87eaf6",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
             }
           }
         }
@@ -120,6 +235,113 @@
                 "mean_research_score_valid_only": null
               }
             }
+          },
+          "statuses": {
+            "bidkv": {
+              "solution": "bidkv",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "a0cba97d9abdc99908e46616db622f0e0099127f",
+              "note": "The installed host is vLLM 0.23.0+empty; this pinned package requires >=0.28.1rc1.dev319,<0.29. No host or policy patch was applied.",
+              "error": "host version 0.23.0+empty is outside >=0.28.1rc1.dev319,<0.29",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "1cfe4f43eed9a01a7e5343984a8c9b6827e82c59608185791f2d03de0573da99",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "dla": {
+              "solution": "dla",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+              "note": "The declared-budget policy requires the preemption-policy host interface, which is absent from the available 0.23 and 0.25 scheduler configurations. Natural stopping tasks also cannot use the exact-output-budget assumption. Not launched.",
+              "error": "preemption_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-tiering-migration": {
+              "solution": "kv-tiering-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+              "note": "The pinned provider could not load against the available host. No compatibility repair was attempted.",
+              "error": "ImportError: cannot import name 'LookupResult' from 'vllm.v1.kv_offload.base'",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "f5d996290a1c654c2a4ee61b6f7f7c489ddbc704cfc469a78bd7df77cd9676fb",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kvcompress-ascend": {
+              "solution": "kvcompress-ascend",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "Calibration startup",
+              "date": "2026-10-16",
+              "source_commit": "2ca0f9335399a698342285870df1514e9c519bd4",
+              "note": "Automatic distributed calibration stopped because its Accelerate dependency was not installed in this capsule. No retries or dependency repair after this failure.",
+              "error": "RuntimeError: distributed calibration requires Accelerate",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "77805cb081d0c733da3ca6c43d56590db4b7808ddae731fcda0ec545a30be496",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-materialization-arrival-control": {
+              "solution": "kv-materialization-arrival-control",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "activation-failed",
+              "stage": "Plugin activation",
+              "date": "2026-10-16",
+              "source_commit": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+              "note": "The plugin could not import its workload dependency. Native fallback was stopped rather than measured under the plugin label. No repair or retry.",
+              "error": "RuntimeError: llm-serving-workloads is required for workload-driven runs",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "5823517e9d86e5cea4565465054bf6a819c2d21fbe17d8b609857beeab87eaf6",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "ascend-attention-boundary": {
+              "solution": "ascend-attention-boundary",
+              "datasets": [
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Plugin host commit admission",
+              "date": "2026-10-16",
+              "source_commit": "3572713e7944ea877b22f2a8a6bb053f348bfd25",
+              "note": "The separate FrontierScience and HLE deployments rejected the available Ascend host commit. Both were stopped without bypassing the guard or changing host code. MMLU is running on the supported host and is not marked failed.",
+              "error": "RuntimeError: Ascend boundary host commit is unsupported: 5cb98caaadeff42b5b62b996e34bb2aaa29d20fd; supported=['1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8']",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            }
           }
         },
         {
@@ -170,6 +392,113 @@
                 "observed_success_lower_bound": 0.03333333333333333,
                 "mean_research_score_valid_only": 2.620350877192983
               }
+            }
+          },
+          "statuses": {
+            "bidkv": {
+              "solution": "bidkv",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "a0cba97d9abdc99908e46616db622f0e0099127f",
+              "note": "The installed host is vLLM 0.23.0+empty; this pinned package requires >=0.28.1rc1.dev319,<0.29. No host or policy patch was applied.",
+              "error": "host version 0.23.0+empty is outside >=0.28.1rc1.dev319,<0.29",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "1cfe4f43eed9a01a7e5343984a8c9b6827e82c59608185791f2d03de0573da99",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "dla": {
+              "solution": "dla",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+              "note": "The declared-budget policy requires the preemption-policy host interface, which is absent from the available 0.23 and 0.25 scheduler configurations. Natural stopping tasks also cannot use the exact-output-budget assumption. Not launched.",
+              "error": "preemption_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-tiering-migration": {
+              "solution": "kv-tiering-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+              "note": "The pinned provider could not load against the available host. No compatibility repair was attempted.",
+              "error": "ImportError: cannot import name 'LookupResult' from 'vllm.v1.kv_offload.base'",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "f5d996290a1c654c2a4ee61b6f7f7c489ddbc704cfc469a78bd7df77cd9676fb",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kvcompress-ascend": {
+              "solution": "kvcompress-ascend",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "Calibration startup",
+              "date": "2026-10-16",
+              "source_commit": "2ca0f9335399a698342285870df1514e9c519bd4",
+              "note": "Automatic distributed calibration stopped because its Accelerate dependency was not installed in this capsule. No retries or dependency repair after this failure.",
+              "error": "RuntimeError: distributed calibration requires Accelerate",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "77805cb081d0c733da3ca6c43d56590db4b7808ddae731fcda0ec545a30be496",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-materialization-arrival-control": {
+              "solution": "kv-materialization-arrival-control",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "activation-failed",
+              "stage": "Plugin activation",
+              "date": "2026-10-16",
+              "source_commit": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+              "note": "The plugin could not import its workload dependency. Native fallback was stopped rather than measured under the plugin label. No repair or retry.",
+              "error": "RuntimeError: llm-serving-workloads is required for workload-driven runs",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "5823517e9d86e5cea4565465054bf6a819c2d21fbe17d8b609857beeab87eaf6",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "ascend-attention-boundary": {
+              "solution": "ascend-attention-boundary",
+              "datasets": [
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Plugin host commit admission",
+              "date": "2026-10-16",
+              "source_commit": "3572713e7944ea877b22f2a8a6bb053f348bfd25",
+              "note": "The separate FrontierScience and HLE deployments rejected the available Ascend host commit. Both were stopped without bypassing the guard or changing host code. MMLU is running on the supported host and is not marked failed.",
+              "error": "RuntimeError: Ascend boundary host commit is unsupported: 5cb98caaadeff42b5b62b996e34bb2aaa29d20fd; supported=['1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8']",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
             }
           }
         }
@@ -226,6 +555,113 @@
                 "judge_truncated": 20
               }
             }
+          },
+          "statuses": {
+            "bidkv": {
+              "solution": "bidkv",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "a0cba97d9abdc99908e46616db622f0e0099127f",
+              "note": "The installed host is vLLM 0.23.0+empty; this pinned package requires >=0.28.1rc1.dev319,<0.29. No host or policy patch was applied.",
+              "error": "host version 0.23.0+empty is outside >=0.28.1rc1.dev319,<0.29",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "1cfe4f43eed9a01a7e5343984a8c9b6827e82c59608185791f2d03de0573da99",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "dla": {
+              "solution": "dla",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+              "note": "The declared-budget policy requires the preemption-policy host interface, which is absent from the available 0.23 and 0.25 scheduler configurations. Natural stopping tasks also cannot use the exact-output-budget assumption. Not launched.",
+              "error": "preemption_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-tiering-migration": {
+              "solution": "kv-tiering-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+              "note": "The pinned provider could not load against the available host. No compatibility repair was attempted.",
+              "error": "ImportError: cannot import name 'LookupResult' from 'vllm.v1.kv_offload.base'",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "f5d996290a1c654c2a4ee61b6f7f7c489ddbc704cfc469a78bd7df77cd9676fb",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kvcompress-ascend": {
+              "solution": "kvcompress-ascend",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "Calibration startup",
+              "date": "2026-10-16",
+              "source_commit": "2ca0f9335399a698342285870df1514e9c519bd4",
+              "note": "Automatic distributed calibration stopped because its Accelerate dependency was not installed in this capsule. No retries or dependency repair after this failure.",
+              "error": "RuntimeError: distributed calibration requires Accelerate",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "77805cb081d0c733da3ca6c43d56590db4b7808ddae731fcda0ec545a30be496",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-materialization-arrival-control": {
+              "solution": "kv-materialization-arrival-control",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "activation-failed",
+              "stage": "Plugin activation",
+              "date": "2026-10-16",
+              "source_commit": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+              "note": "The plugin could not import its workload dependency. Native fallback was stopped rather than measured under the plugin label. No repair or retry.",
+              "error": "RuntimeError: llm-serving-workloads is required for workload-driven runs",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "5823517e9d86e5cea4565465054bf6a819c2d21fbe17d8b609857beeab87eaf6",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "ascend-attention-boundary": {
+              "solution": "ascend-attention-boundary",
+              "datasets": [
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Plugin host commit admission",
+              "date": "2026-10-16",
+              "source_commit": "3572713e7944ea877b22f2a8a6bb053f348bfd25",
+              "note": "The separate FrontierScience and HLE deployments rejected the available Ascend host commit. Both were stopped without bypassing the guard or changing host code. MMLU is running on the supported host and is not marked failed.",
+              "error": "RuntimeError: Ascend boundary host commit is unsupported: 5cb98caaadeff42b5b62b996e34bb2aaa29d20fd; supported=['1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8']",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            }
           }
         },
         {
@@ -274,6 +710,113 @@
                 "solver_truncated": 680,
                 "judge_truncated": 27
               }
+            }
+          },
+          "statuses": {
+            "bidkv": {
+              "solution": "bidkv",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "a0cba97d9abdc99908e46616db622f0e0099127f",
+              "note": "The installed host is vLLM 0.23.0+empty; this pinned package requires >=0.28.1rc1.dev319,<0.29. No host or policy patch was applied.",
+              "error": "host version 0.23.0+empty is outside >=0.28.1rc1.dev319,<0.29",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "1cfe4f43eed9a01a7e5343984a8c9b6827e82c59608185791f2d03de0573da99",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "dla": {
+              "solution": "dla",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host interface inspection",
+              "date": "2026-10-16",
+              "source_commit": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+              "note": "The declared-budget policy requires the preemption-policy host interface, which is absent from the available 0.23 and 0.25 scheduler configurations. Natural stopping tasks also cannot use the exact-output-budget assumption. Not launched.",
+              "error": "preemption_policy absent in available scheduler configurations",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-tiering-migration": {
+              "solution": "kv-tiering-migration",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Host admission",
+              "date": "2026-10-16",
+              "source_commit": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+              "note": "The pinned provider could not load against the available host. No compatibility repair was attempted.",
+              "error": "ImportError: cannot import name 'LookupResult' from 'vllm.v1.kv_offload.base'",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "f5d996290a1c654c2a4ee61b6f7f7c489ddbc704cfc469a78bd7df77cd9676fb",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kvcompress-ascend": {
+              "solution": "kvcompress-ascend",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "startup-failed",
+              "stage": "Calibration startup",
+              "date": "2026-10-16",
+              "source_commit": "2ca0f9335399a698342285870df1514e9c519bd4",
+              "note": "Automatic distributed calibration stopped because its Accelerate dependency was not installed in this capsule. No retries or dependency repair after this failure.",
+              "error": "RuntimeError: distributed calibration requires Accelerate",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "77805cb081d0c733da3ca6c43d56590db4b7808ddae731fcda0ec545a30be496",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "kv-materialization-arrival-control": {
+              "solution": "kv-materialization-arrival-control",
+              "datasets": [
+                "mmlu-pro",
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "activation-failed",
+              "stage": "Plugin activation",
+              "date": "2026-10-16",
+              "source_commit": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+              "note": "The plugin could not import its workload dependency. Native fallback was stopped rather than measured under the plugin label. No repair or retry.",
+              "error": "RuntimeError: llm-serving-workloads is required for workload-driven runs",
+              "measurements": null,
+              "retry_count": 0,
+              "log_sha256": "5823517e9d86e5cea4565465054bf6a819c2d21fbe17d8b609857beeab87eaf6",
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
+            },
+            "ascend-attention-boundary": {
+              "solution": "ascend-attention-boundary",
+              "datasets": [
+                "frontierscience",
+                "hle-verified"
+              ],
+              "status": "host-incompatible",
+              "stage": "Plugin host commit admission",
+              "date": "2026-10-16",
+              "source_commit": "3572713e7944ea877b22f2a8a6bb053f348bfd25",
+              "note": "The separate FrontierScience and HLE deployments rejected the available Ascend host commit. Both were stopped without bypassing the guard or changing host code. MMLU is running on the supported host and is not marked failed.",
+              "error": "RuntimeError: Ascend boundary host commit is unsupported: 5cb98caaadeff42b5b62b996e34bb2aaa29d20fd; supported=['1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8']",
+              "measurements": null,
+              "retry_count": 0,
+              "report": "data/dataset-matrix-campaign-20261016/report.json"
             }
           }
         }
@@ -1875,6 +2418,113 @@
       ]
     }
   ],
+  "attempts": [
+    {
+      "solution": "bidkv",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "host-incompatible",
+      "stage": "Host admission",
+      "date": "2026-10-16",
+      "source_commit": "a0cba97d9abdc99908e46616db622f0e0099127f",
+      "note": "The installed host is vLLM 0.23.0+empty; this pinned package requires >=0.28.1rc1.dev319,<0.29. No host or policy patch was applied.",
+      "error": "host version 0.23.0+empty is outside >=0.28.1rc1.dev319,<0.29",
+      "measurements": null,
+      "retry_count": 0,
+      "log_sha256": "1cfe4f43eed9a01a7e5343984a8c9b6827e82c59608185791f2d03de0573da99",
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "dla",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "host-incompatible",
+      "stage": "Host interface inspection",
+      "date": "2026-10-16",
+      "source_commit": "dc20d0f8ea8d09106f77571e1947b9a2f8702545",
+      "note": "The declared-budget policy requires the preemption-policy host interface, which is absent from the available 0.23 and 0.25 scheduler configurations. Natural stopping tasks also cannot use the exact-output-budget assumption. Not launched.",
+      "error": "preemption_policy absent in available scheduler configurations",
+      "measurements": null,
+      "retry_count": 0,
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "kv-tiering-migration",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "host-incompatible",
+      "stage": "Host admission",
+      "date": "2026-10-16",
+      "source_commit": "7ba646a780c3bd0a8906309ea59719f5ccf6187e",
+      "note": "The pinned provider could not load against the available host. No compatibility repair was attempted.",
+      "error": "ImportError: cannot import name 'LookupResult' from 'vllm.v1.kv_offload.base'",
+      "measurements": null,
+      "retry_count": 0,
+      "log_sha256": "f5d996290a1c654c2a4ee61b6f7f7c489ddbc704cfc469a78bd7df77cd9676fb",
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "kvcompress-ascend",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "startup-failed",
+      "stage": "Calibration startup",
+      "date": "2026-10-16",
+      "source_commit": "2ca0f9335399a698342285870df1514e9c519bd4",
+      "note": "Automatic distributed calibration stopped because its Accelerate dependency was not installed in this capsule. No retries or dependency repair after this failure.",
+      "error": "RuntimeError: distributed calibration requires Accelerate",
+      "measurements": null,
+      "retry_count": 0,
+      "log_sha256": "77805cb081d0c733da3ca6c43d56590db4b7808ddae731fcda0ec545a30be496",
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "kv-materialization-arrival-control",
+      "datasets": [
+        "mmlu-pro",
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "activation-failed",
+      "stage": "Plugin activation",
+      "date": "2026-10-16",
+      "source_commit": "53a6b1130cbff58925782eb62d7e88cd37e4e20a",
+      "note": "The plugin could not import its workload dependency. Native fallback was stopped rather than measured under the plugin label. No repair or retry.",
+      "error": "RuntimeError: llm-serving-workloads is required for workload-driven runs",
+      "measurements": null,
+      "retry_count": 0,
+      "log_sha256": "5823517e9d86e5cea4565465054bf6a819c2d21fbe17d8b609857beeab87eaf6",
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    },
+    {
+      "solution": "ascend-attention-boundary",
+      "datasets": [
+        "frontierscience",
+        "hle-verified"
+      ],
+      "status": "host-incompatible",
+      "stage": "Plugin host commit admission",
+      "date": "2026-10-16",
+      "source_commit": "3572713e7944ea877b22f2a8a6bb053f348bfd25",
+      "note": "The separate FrontierScience and HLE deployments rejected the available Ascend host commit. Both were stopped without bypassing the guard or changing host code. MMLU is running on the supported host and is not marked failed.",
+      "error": "RuntimeError: Ascend boundary host commit is unsupported: 5cb98caaadeff42b5b62b996e34bb2aaa29d20fd; supported=['1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8']",
+      "measurements": null,
+      "retry_count": 0,
+      "report": "data/dataset-matrix-campaign-20261016/report.json"
+    }
+  ],
   "source_files_sha256": {
     "data/mmlu-pro-20261012/report.json": "7b0a955d6554b891685bdfb332fa72ca05564a4acf35e47ba3732a29682aff54",
     "data/mmlu-pro-20261012/performance.json": "8b8834363cb651d5da34fd88d23fe6f27b88f5748751d294a4535f4d41c41b43",
@@ -1882,7 +2532,8 @@
     "data/frontierscience-20261013/report.json": "d40cb9dd3c46a3438b3b8846a2d44eef509317dfba84fe87c86c0b1d2708147f",
     "data/hle-verified-20261015/report.json": "eece0c0f2c2d7759dfe6d5629139ce24b272a259d9936533477b229957186d9b",
     "data/betterscale-dataset-validation-20261015/report.json": "d90c31ca03e1ed6c55571a6f4748228cd7d7e4c702906e880c1de68383818e6c",
-    "data/betterscale-hle-20261015/report.json": "7acc1ef79a759bd58656e0674fefee22d79918352de24bd0ee5471e9aa7ae57f"
+    "data/betterscale-hle-20261015/report.json": "7acc1ef79a759bd58656e0674fefee22d79918352de24bd0ee5471e9aa7ae57f",
+    "data/dataset-matrix-campaign-20261016/report.json": "07128e423f2c46fee21456dddb44dfe6c55b1959521b627bf5da2d4ab513b464"
   },
   "betterscale_publication": {
     "commit": "5714be9e9b032f9aaef13df229aaa96dc8ef7c3b",
