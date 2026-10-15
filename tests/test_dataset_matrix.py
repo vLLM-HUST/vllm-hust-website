@@ -65,8 +65,28 @@ def test_failed_admission_is_not_a_zero_score_or_performance_row():
     assert {"bidkv", "kvcompress-ascend"} <= failed
     for dataset in data["datasets"]:
         for part in dataset["parts"]:
-            for solution in failed:
+            for solution, attempt in part["statuses"].items():
                 assert solution not in part["scores"]
-                if solution in part["statuses"]:
-                    assert part["statuses"][solution]["measurements"] is None
-    assert not any(row["solution"] in failed for row in data["records"])
+                assert attempt["measurements"] is None
+                assert not any(
+                    row["solution"] == solution and row["dataset"] == dataset["id"]
+                    for row in data["records"]
+                )
+
+
+def test_campaign_mmlu_completed_scores_and_separate_load_tests():
+    data = module.build()
+    part = next(d for d in data["datasets"] if d["id"] == "mmlu-pro")["parts"][0]
+    for solution, correct in [
+        ("core-attention-boundary", 9619),
+        ("ascend-attention-boundary", 9582),
+    ]:
+        assert part["scores"][solution]["correct"] == correct
+        assert part["scores"][solution]["total"] == 12032
+        row = next(
+            r for r in data["records"] if r["id"] == f"mmlu-pro-{solution}-test-200"
+        )
+        assert row["performance"]["completed"] == 200
+        assert row["performance"]["failed"] == 0
+        assert row["configuration"]["mtp"] == 0
+        assert row["quality"] == [part["scores"][solution]]

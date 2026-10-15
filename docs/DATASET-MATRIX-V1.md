@@ -73,3 +73,11 @@ machine-specific paths; private raw logs remain archived.
 The owner's policy for this campaign is no candidate bug fixes or failed-run retries. Invalid
 launcher setup is recorded separately rather than blamed on a candidate. Preserve runtime/source
 differences and do not relabel the historical patched Frontier capsule as a new unchanged build.
+
+Completed campaign MMLU receipts are projected with `scripts/import_dataset_campaign.py` from a
+private archive. It verifies full-case and benchmark counts, completion and activation receipts,
+then publishes only aggregate scores, timing, sanitized configuration and evidence bindings.
+`quality_results` feeds the overview independently of performance rows. Failure status is scoped to
+the dataset: Ascend Attention Boundary's unsupported Frontier/HLE host must not hide its completed
+MMLU result. The two MMLU engines overlapped on separate TP2 pairs of one host; their runtime, MTP
+and cache configuration differ from BetterScale. No isolated speedup attribution is implied.

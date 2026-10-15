@@ -50,6 +50,10 @@
     {
       "id": "prefix-routing",
       "name": "Prefix Routing"
+    },
+    {
+      "id": "core-attention-boundary",
+      "name": "Core Attention Boundary"
     }
   ],
   "attempts": [
@@ -251,5 +255,238 @@
       "retry_count": 0
     }
   ],
-  "results": []
+  "results": [
+    {
+      "id": "mmlu-pro-core-attention-boundary-test-200",
+      "dataset": "mmlu-pro",
+      "solution": "core-attention-boundary",
+      "scope": "test-200",
+      "quality": [
+        {
+          "label": "Test",
+          "correct": 9619,
+          "total": 12032,
+          "value": 0.7994514627659575,
+          "audit": {
+            "cases": 12032,
+            "correct": 9619,
+            "accuracy": 0.7994514627659575,
+            "invalid_answers": 51,
+            "transport_failures": 0,
+            "length_limited": 1532,
+            "wall_seconds_this_invocation": 19986.62586674746,
+            "mean_ttft_s": 0.6500791938696181,
+            "mean_e2e_s": 26.560784062922547,
+            "smoke_only": false
+          }
+        }
+      ],
+      "performance": {
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 206.20171502511948,
+        "request_throughput": 0.9699240376135378,
+        "output_throughput": 248.3005536290657,
+        "total_token_throughput": 1617.1785960139919,
+        "mean_ttft_ms": 101713.99213972036,
+        "mean_tpot_ms": 46.15730865526141,
+        "total_input_tokens": 282265,
+        "total_output_tokens": 51200
+      },
+      "configuration": {
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "hardware": "2 x Ascend 910B2",
+        "tensor_parallel_size": 2,
+        "expert_parallel": true,
+        "mtp": 0,
+        "prefix_caching": false,
+        "graph_mode": "FULL_DECODE_ONLY",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "gpu_memory_utilization": 0.85,
+        "block_size": 128,
+        "vllm": "0.23.0+empty",
+        "vllm_ascend": "0.23.0.post1",
+        "vllm_commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+        "ascend_commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8",
+        "cann": "9.1",
+        "activation": "installed and runtime_effective observed",
+        "co_location": "Two TP2 services shared one four-card host; runs overlapped. Independent chip sets, shared CPU/memory resources."
+      },
+      "report": "data/dataset-matrix-campaign-20261016/report.json",
+      "protocol": {
+        "accuracy": {
+          "shots": 5,
+          "input": "token IDs via completions",
+          "concurrency": 16,
+          "max_tokens": 2048,
+          "thinking": false,
+          "temperature": 0,
+          "seed": 17,
+          "retries": 0
+        },
+        "load_test": "Original 200 frozen prompts; output cap 256; request-rate inf; temperature 0; seed 0; default server chat template; separate from accuracy timing"
+      },
+      "limitations": [
+        "Single run; different runtime, MTP and cache configuration from BetterScale. Not an isolated optimization comparison or SLO-qualified goodput.",
+        "Core uses measured public source; Ascend uses current public head because the historical curve commit was unavailable. Exact revisions retained.",
+        "No candidate repair, rerun or regrading. Invalid and length-limited answers remain in the original denominator.",
+        "Total-input accounting is the original benchmark client's value; per-request server tokenization verification was not captured for these runs."
+      ],
+      "evidence": {
+        "source_files_sha256": {
+          "mmlu/completed.json": "98b03411d8715c26f5948c89019b136648a39b1608ef11e7ff3c58aa0310f1da",
+          "finished.json": "61b51eca64a401ba52183e87b083879e737726490f1d79d77eec747ffb5fe9ec",
+          "configuration.json": "a2f5d0db2235759abcf2ea721fdd18f6aef207f8affecc19a646aa48365fcb21",
+          "server.log": "527c00f67aa191b61c96d64ce3d6564180f28e17006f9872f25ac49a37d0e5cc",
+          "mmlu/full/summary.json": "95539e45e6dcb627d852f86147dc35bf6b3caf7f21f068bd60158197151a2aa3",
+          "mmlu/bench/outputs/mmlu-pro.json": "b80eafd9bbaeae2d7c68a192154663efefe3a4967c11a3413c63514ef9737bb8"
+        }
+      }
+    },
+    {
+      "id": "mmlu-pro-ascend-attention-boundary-test-200",
+      "dataset": "mmlu-pro",
+      "solution": "ascend-attention-boundary",
+      "scope": "test-200",
+      "quality": [
+        {
+          "label": "Test",
+          "correct": 9582,
+          "total": 12032,
+          "value": 0.796376329787234,
+          "audit": {
+            "cases": 12032,
+            "correct": 9582,
+            "accuracy": 0.796376329787234,
+            "invalid_answers": 57,
+            "transport_failures": 0,
+            "length_limited": 1518,
+            "wall_seconds_this_invocation": 20194.479384713806,
+            "mean_ttft_s": 0.6387931657064133,
+            "mean_e2e_s": 26.828634242624485,
+            "smoke_only": false
+          }
+        }
+      ],
+      "performance": {
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 169.26316222641617,
+        "request_throughput": 1.1815920095624142,
+        "output_throughput": 302.487554447978,
+        "total_token_throughput": 1970.0978973436522,
+        "mean_ttft_ms": 79488.3906702511,
+        "mean_tpot_ms": 40.8221689857652,
+        "total_input_tokens": 282265,
+        "total_output_tokens": 51200
+      },
+      "configuration": {
+        "source_commit": "3572713e7944ea877b22f2a8a6bb053f348bfd25",
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "hardware": "2 x Ascend 910B2",
+        "tensor_parallel_size": 2,
+        "expert_parallel": true,
+        "mtp": 0,
+        "prefix_caching": false,
+        "graph_mode": "FULL_DECODE_ONLY",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "gpu_memory_utilization": 0.85,
+        "block_size": 128,
+        "vllm": "0.23.0+empty",
+        "vllm_ascend": "0.23.0.post1",
+        "vllm_commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+        "ascend_commit": "1cdb8c4db6e50f36f1fb3283b3e3dd618f6821e8",
+        "cann": "9.1",
+        "activation": "installed and runtime_effective observed",
+        "co_location": "Two TP2 services shared one four-card host; runs overlapped. Independent chip sets, shared CPU/memory resources."
+      },
+      "report": "data/dataset-matrix-campaign-20261016/report.json",
+      "protocol": {
+        "accuracy": {
+          "shots": 5,
+          "input": "token IDs via completions",
+          "concurrency": 16,
+          "max_tokens": 2048,
+          "thinking": false,
+          "temperature": 0,
+          "seed": 17,
+          "retries": 0
+        },
+        "load_test": "Original 200 frozen prompts; output cap 256; request-rate inf; temperature 0; seed 0; default server chat template; separate from accuracy timing"
+      },
+      "limitations": [
+        "Single run; different runtime, MTP and cache configuration from BetterScale. Not an isolated optimization comparison or SLO-qualified goodput.",
+        "Core uses measured public source; Ascend uses current public head because the historical curve commit was unavailable. Exact revisions retained.",
+        "No candidate repair, rerun or regrading. Invalid and length-limited answers remain in the original denominator.",
+        "Total-input accounting is the original benchmark client's value; per-request server tokenization verification was not captured for these runs."
+      ],
+      "evidence": {
+        "source_files_sha256": {
+          "mmlu/completed.json": "9414acde6626ed0cb932378d295c8db9498469ba7c7c60c1fc2a0264cb7557a2",
+          "finished.json": "b489097d5350623310e8f88e02bdac71a819943fbc01a72415d32b55fd4457aa",
+          "configuration.json": "213e143c7023a826781b7f552605f681a771011544a313d09dc81b4d414e7973",
+          "server.log": "34a0b33fc82a3e29608e5ca074ea4892969dc7c974ad4aa03db3294d0771fa75",
+          "mmlu/full/summary.json": "02dd9e825d558f2c28c1f300bf74196aa5e03a0497c7f866f9e41246c5f18ddd",
+          "mmlu/bench/outputs/mmlu-pro.json": "1420e393d30effd33670165ee4d5803ff03b22e5decafbca47d0f69c995747b9"
+        }
+      }
+    }
+  ],
+  "quality_results": [
+    {
+      "dataset": "mmlu-pro",
+      "part": "test",
+      "solution": "core-attention-boundary",
+      "score": {
+        "label": "Test",
+        "correct": 9619,
+        "total": 12032,
+        "value": 0.7994514627659575,
+        "audit": {
+          "cases": 12032,
+          "correct": 9619,
+          "accuracy": 0.7994514627659575,
+          "invalid_answers": 51,
+          "transport_failures": 0,
+          "length_limited": 1532,
+          "wall_seconds_this_invocation": 19986.62586674746,
+          "mean_ttft_s": 0.6500791938696181,
+          "mean_e2e_s": 26.560784062922547,
+          "smoke_only": false
+        }
+      }
+    },
+    {
+      "dataset": "mmlu-pro",
+      "part": "test",
+      "solution": "ascend-attention-boundary",
+      "score": {
+        "label": "Test",
+        "correct": 9582,
+        "total": 12032,
+        "value": 0.796376329787234,
+        "audit": {
+          "cases": 12032,
+          "correct": 9582,
+          "accuracy": 0.796376329787234,
+          "invalid_answers": 57,
+          "transport_failures": 0,
+          "length_limited": 1518,
+          "wall_seconds_this_invocation": 20194.479384713806,
+          "mean_ttft_s": 0.6387931657064133,
+          "mean_e2e_s": 26.828634242624485,
+          "smoke_only": false
+        }
+      }
+    }
+  ]
 }

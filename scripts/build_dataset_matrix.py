@@ -207,6 +207,14 @@ def build(root=ROOT):
             part["statuses"] = {
                 a["solution"]: a for a in attempts if d["id"] in a["datasets"]
             }
+    for observation in campaign.get("quality_results", []):
+        dataset = next(d for d in datasets if d["id"] == observation["dataset"])
+        part = next(p for p in dataset["parts"] if p["id"] == observation["part"])
+        solution = observation["solution"]
+        assert solution not in part["scores"], "Duplicate quality observation"
+        measured = observation["score"]
+        assert measured["value"] == measured["correct"] / measured["total"]
+        part["scores"][solution] = measured
     records.extend(campaign["results"])
     return {
         "schema": 1,

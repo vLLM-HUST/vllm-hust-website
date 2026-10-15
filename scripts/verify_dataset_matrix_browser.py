@@ -60,7 +60,7 @@ def main():
             assert "25.15%" in page.locator(".matrix-overview").inner_text()
             assert "28.00%" in page.locator(".matrix-overview").inner_text()
             page.locator('.matrix-dataset[href="#mmlu-pro"]').click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(2)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
             assert "624.82" in page.locator(".matrix-detail").inner_text()
             page.locator('[data-sort="throughput"]').click()
             page.locator('[data-sort="throughput"]').click()
@@ -83,11 +83,11 @@ def main():
             )
             toggle.click()
             page.locator('[data-solution="native"]').uncheck()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(1)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
             page.locator("#langToggle").click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(1)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
             page.locator("#matrix-reset").click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(2)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
             page.screenshot(
                 path=str(args.output / f"detail-{width}-{lang}.png"), full_page=True
             )
