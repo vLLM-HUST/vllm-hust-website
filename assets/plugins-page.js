@@ -1148,7 +1148,8 @@ vllm-hust-ext extension check ${extensionId}`
     if (isPerformanceCandidate(item)) {
       card.append(performancePanel(performanceResults.get(item.id)));
     }
-    const community = communityPanel(item);
+    const community = communityPanel(item)
+      || document.getElementById(`community-${item.id}`)?.content.firstElementChild.cloneNode(true);
     if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
     if (compatibility) card.append(compatibility);
