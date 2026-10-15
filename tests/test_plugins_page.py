@@ -111,9 +111,9 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
 
 def test_mod_page_excludes_intellistream_repositories() -> None:
     expected_commit_prefixes = {
-        "stateaxis-async-kv-transfer": "2f8660474",
-        "stateaxis-automatic-prefix-cache": "77a2124ad",
-        "stateaxis-pipelined-weight-loading": "ac648fff8",
+        "stateaxis-async-kv-transfer": "d8d8dd6cb",
+        "stateaxis-automatic-prefix-cache": "9b0962232",
+        "stateaxis-pipelined-weight-loading": "f5f4ffc30",
     }
     assert all(
         "github.com/intellistream/" not in (component.get("canonical_repository") or "")

@@ -1686,7 +1686,7 @@
         "status": "experimental",
         "host": "StateAxis through vLLM-HUST Extension Manager",
         "versions": [
-          "repository main @ 77a2124ad4ed58c4cf8bb6990418656ddb3b761a",
+          "repository main @ 9b0962232c7601f66100c83a3394ad73a2113ce8",
           "Manifest 0.3 experimental",
           "runtime ID org.vllm-hust.stateaxis-automatic-prefix-cache"
         ],
@@ -1759,7 +1759,7 @@
         "status": "experimental",
         "host": "StateAxis through vLLM-HUST Extension Manager",
         "versions": [
-          "repository main @ 2f8660474d49fa35246d879a5ba971d32534f03e",
+          "repository main @ d8d8dd6cbba8b60c1bdf2bcc70db898884e0ed38",
           "Manifest 0.3 experimental",
           "runtime ID org.vllm-hust.stateaxis-async-kv-transfer"
         ],
@@ -1832,7 +1832,7 @@
         "status": "experimental",
         "host": "StateAxis through vLLM-HUST Extension Manager",
         "versions": [
-          "repository main @ ac648fff8f7c8556ffa098824d7cc2179887d77c",
+          "repository main @ f5f4ffc30c9754d525017aa15191ca9fa3dc4c2e",
           "Manifest 0.3 experimental",
           "runtime ID org.vllm-hust.stateaxis-pipelined-weight-loading"
         ],
