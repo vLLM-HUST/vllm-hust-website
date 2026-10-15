@@ -1,0 +1,46 @@
+/* Reuse the result table's palette, borders, metric cells and configuration rows. */
+.matrix-shell { padding-top: 28px; }
+.matrix-heading { margin: 30px 0 24px; }
+.matrix-heading h1 { font-size: clamp(24px, 4vw, 34px); margin: 0 0 8px; color: #f1f5ff; }
+.matrix-heading p { color: #b4c2d6; margin: 0 0 18px; font-size: 14px; }
+.matrix-cohort { display: inline-block; border: 1px solid #344158; border-radius: 8px; padding: 10px 14px; color: #d5e0f2; background: #152036; font-size: 13px; line-height: 1.8; }
+.matrix-breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; color: #e5edf9; font-size: 14px; margin: 30px 0 8px; }
+.matrix-breadcrumb a { color: #9cb4ff; text-decoration: none; }
+.matrix-breadcrumb span { color: #aebcd0; font-size: 12px; }
+.matrix-overview { min-width: 540px; }
+.matrix-overview th:first-child { width: 44%; }
+.matrix-overview th:not(:first-child) { width: 28%; }
+.matrix-overview thead th:not(:first-child) .column-title { justify-content: flex-end; }
+.matrix-overview tbody th, .matrix-detail tbody th { background: transparent; white-space: normal; color: var(--run-ink); font-weight: 600; }
+.matrix-overview tbody th, .matrix-overview td { padding: 22px 20px; }
+.matrix-overview .metric strong { font-size: 19px; font-weight: 650; }
+.matrix-dataset { color: var(--run-accent); text-decoration: none; font-size: 14px; }
+.matrix-dataset span { margin-left: 6px; opacity: .6; }
+.matrix-dataset:hover { text-decoration: underline; }
+.matrix-missing { color: var(--run-muted); }
+.matrix-detail { min-width: 980px; }
+.matrix-detail td:nth-child(3) { max-width: 220px; }
+.matrix-score + .matrix-score { margin-top: 10px; }
+.matrix-score > small:first-child { margin: 0 0 4px; }
+.matrix-tools { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 20px; color: #b4c2d6; }
+.matrix-tools fieldset { border: 0; margin: 0; padding: 0; display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; }
+.matrix-tools legend { font-size: 11px; padding: 0 0 8px; }
+.matrix-tools input { accent-color: #6689ee; margin-right: 7px; }
+.matrix-shell .run-config-grid { max-width: none; }
+.matrix-shell .run-detail a { margin: 0 12px 0 0; }
+.matrix-methods { margin-top: 24px; font-size: 12px; color: #b4c2d6; line-height: 1.8; }
+.matrix-methods summary { cursor: pointer; }
+.matrix-methods a { color: #9cb4ff; }
+.matrix-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 600px) { .matrix-heading { margin-top: 22px; } .matrix-cohort { font-size: 12px; } .matrix-overview tbody th, .matrix-overview td { padding: 18px 12px; } }
+@media (max-width: 600px) {
+    .matrix-overview { min-width: 0; table-layout: fixed; }
+    .matrix-overview th:first-child { width: 42%; }
+    .matrix-overview th:not(:first-child) { width: 29%; }
+    .matrix-overview tbody th, .matrix-overview td { padding: 18px 6px; }
+    .matrix-overview thead th { white-space: normal; padding: 12px 6px; }
+    .matrix-overview .column-title { padding: 12px 4px; font-size: 10px; gap: 2px; }
+    .matrix-overview .matrix-dataset { font-size: 12px; overflow-wrap: anywhere; }
+    .matrix-overview .metric strong { font-size: 16px; }
+    .matrix-overview small { font-size: 9px; white-space: normal; }
+}
