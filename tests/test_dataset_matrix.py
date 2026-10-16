@@ -41,14 +41,14 @@ def test_scope_and_metrics():
     assert all(r["performance"]["input_token_accounting_verified"] for r in bs_hle)
     assert [
         p["scores"]["betterscale"]["correct"] for p in datasets["hle-verified"]["parts"]
-    ] == [168, 320]
+    ] == [173, 316]
     assert [
         p["scores"]["betterscale"]["audit"]["unresolved"]
         for p in datasets["hle-verified"]["parts"]
-    ] == [20, 27]
+    ] == [18, 28]
     bs = next(r for r in rows if r["id"] == "mmlu-pro-betterscale-test-200")
-    assert bs["quality"][0]["correct"] == 9611
-    assert bs["performance"]["output_throughput"] == 624.8240870647068
+    assert bs["quality"][0]["correct"] == 9589
+    assert bs["performance"]["output_throughput"] == 631.588934632666
     assert (
         bs["performance"]["mean_ttft_ms"]
         != bs["quality"][0]["audit"]["mean_ttft_s"] * 1000
@@ -106,3 +106,39 @@ def test_campaign_gold_keeps_unresolved_and_cancelled_revision_unscored():
     ]
     assert {r["scope"] for r in rows} == {"gold-text", "gold-image"}
     assert all(r["performance"]["input_token_accounting_verified"] for r in rows)
+
+
+def test_latest_betterscale_replaces_default_and_is_complete():
+    data = module.build()
+    sid = "betterscale"
+    assert next(s for s in data["solutions"] if s["id"] == sid)["name"] == "BetterScale"
+    scores = [
+        part["scores"][sid] for dataset in data["datasets"] for part in dataset["parts"]
+    ]
+    assert [(s["correct"], s["total"]) for s in scores] == [
+        (9589, 12032),
+        (60, 100),
+        (3, 60),
+        (173, 668),
+        (316, 1143),
+    ]
+    rows = [r for r in data["records"] if r["solution"] == sid]
+    assert len(rows) == 6
+    assert all(r["performance"]["failed"] == 0 for r in rows)
+    assert all(r["configuration"]["source_tag"] == "v1" for r in rows)
+    assert all(
+        r["configuration"]["mtp"] == 2 and r["configuration"]["graph"] == "FULL"
+        for r in rows
+    )
+    assert all(
+        r["performance"]["input_token_accounting_verified"]
+        for r in rows
+        if r["dataset"] == "hle-verified"
+    )
+    assert [s["audit"]["unresolved"] for s in scores[-2:]] == [18, 28]
+
+
+def test_previous_betterscale_reports_remain_archived():
+    previous = json.loads((ROOT / f"data/{module.BS}/report.json").read_text())
+    assert previous["mmlu"]["correct"] == 9611
+    assert not any(s["id"] == "betterscale-school" for s in module.build()["solutions"])

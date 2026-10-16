@@ -32,7 +32,7 @@ def main():
             page.goto(args.url + "/dataset-matrix-v1.html")
             page.locator(".matrix-overview").wait_for()
             expect(page.locator(".matrix-overview tbody tr")).to_have_count(5)
-            assert "79.88%" in page.locator(".matrix-overview").inner_text()
+            assert "79.70%" in page.locator(".matrix-overview").inner_text()
             snapshot = page.request.get(
                 args.url + "/data/dataset-matrix-v1.json"
             ).json()
@@ -57,11 +57,11 @@ def main():
                 path=str(args.output / f"overview-{width}-{lang}.png"), full_page=True
             )
             page.locator('[data-sort="betterscale"]').click()
-            assert "25.15%" in page.locator(".matrix-overview").inner_text()
-            assert "28.00%" in page.locator(".matrix-overview").inner_text()
+            assert "25.90%" in page.locator(".matrix-overview").inner_text()
+            assert "27.65%" in page.locator(".matrix-overview").inner_text()
             page.locator('.matrix-dataset[href="#mmlu-pro"]').click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
-            assert "624.82" in page.locator(".matrix-detail").inner_text()
+            assert "631.59" in page.locator(".matrix-detail").inner_text()
             page.locator('[data-sort="throughput"]').click()
             page.locator('[data-sort="throughput"]').click()
             assert (
@@ -79,7 +79,7 @@ def main():
                 json.loads(saved.read_text())["record"]["performance"][
                     "output_throughput"
                 ]
-                == 624.8240870647068
+                == 631.588934632666
             )
             toggle.click()
             page.locator('[data-solution="native"]').uncheck()
@@ -101,15 +101,15 @@ def main():
             )
             page.locator('.matrix-dataset[href="#frontierscience"]').first.click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
-            assert "922.46" in page.locator(".matrix-detail").inner_text()
+            assert "906.25" in page.locator(".matrix-detail").inner_text()
             page.go_back()
             page.locator(".matrix-overview").wait_for()
             page.locator('.matrix-dataset[href="#hle-verified"]').first.click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(10)
             page.locator('[data-solution="native"]').uncheck()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
-            assert "916.40" in page.locator(".matrix-detail").inner_text()
-            assert "460.18" in page.locator(".matrix-detail").inner_text()
+            assert "875.67" in page.locator(".matrix-detail").inner_text()
+            assert "466.19" in page.locator(".matrix-detail").inner_text()
             page.screenshot(
                 path=str(args.output / f"hle-{width}-{lang}.png"), full_page=True
             )

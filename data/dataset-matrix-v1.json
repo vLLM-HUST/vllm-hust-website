@@ -99,19 +99,19 @@
             },
             "betterscale": {
               "label": "Test",
-              "correct": 9611,
+              "correct": 9589,
               "total": 12032,
-              "value": 0.7987865691489362,
+              "value": 0.7969581117021277,
               "audit": {
                 "cases": 12032,
-                "correct": 9611,
-                "accuracy": 0.7987865691489362,
-                "invalid_answers": 65,
+                "correct": 9589,
+                "accuracy": 0.7969581117021277,
+                "invalid_answers": 57,
                 "transport_failures": 0,
-                "length_limited": 1548,
-                "wall_seconds_this_invocation": 9259.440616141073,
-                "mean_ttft_s": 0.24528011316354598,
-                "mean_e2e_s": 12.299382534087544,
+                "length_limited": 1523,
+                "wall_seconds_this_invocation": 9333.749879706651,
+                "mean_ttft_s": 0.25057767139747117,
+                "mean_e2e_s": 12.399422423773819,
                 "smoke_only": false
               }
             },
@@ -383,23 +383,23 @@
             },
             "betterscale": {
               "label": "Olympiad",
-              "correct": 63,
+              "correct": 60,
               "total": 100,
-              "value": 0.63,
+              "value": 0.6,
               "audit": {
                 "total": 100,
-                "graded": 96,
-                "successes": 63,
+                "graded": 97,
+                "successes": 60,
                 "solver_failures": 0,
-                "judge_unresolved": 4,
-                "judge_invalid": 4,
+                "judge_unresolved": 3,
+                "judge_invalid": 3,
                 "judge_transport_failures": 0,
-                "judge_truncated_with_grade": 4,
-                "judge_audit_flagged": 4,
-                "solver_truncated": 27,
-                "judge_truncated": 8,
-                "success_rate": 0.63,
-                "observed_success_lower_bound": 0.63,
+                "judge_truncated_with_grade": 3,
+                "judge_audit_flagged": 3,
+                "solver_truncated": 32,
+                "judge_truncated": 5,
+                "success_rate": 0.6,
+                "observed_success_lower_bound": 0.6,
                 "mean_research_score_valid_only": null
               }
             },
@@ -667,24 +667,24 @@
             },
             "betterscale": {
               "label": "Research",
-              "correct": 2,
+              "correct": 3,
               "total": 60,
-              "value": 0.03333333333333333,
+              "value": 0.05,
               "audit": {
                 "total": 60,
                 "graded": 57,
-                "successes": 2,
+                "successes": 3,
                 "solver_failures": 0,
                 "judge_unresolved": 3,
                 "judge_invalid": 3,
                 "judge_transport_failures": 0,
                 "judge_truncated_with_grade": 6,
-                "judge_audit_flagged": 8,
-                "solver_truncated": 9,
+                "judge_audit_flagged": 6,
+                "solver_truncated": 7,
                 "judge_truncated": 9,
-                "success_rate": 0.03333333333333333,
-                "observed_success_lower_bound": 0.03333333333333333,
-                "mean_research_score_valid_only": 2.620350877192983
+                "success_rate": 0.05,
+                "observed_success_lower_bound": 0.05,
+                "mean_research_score_valid_only": 2.5179824561403508
               }
             },
             "core-attention-boundary": {
@@ -956,23 +956,23 @@
             },
             "betterscale": {
               "label": "Gold",
-              "correct": 168,
+              "correct": 173,
               "total": 668,
-              "value": 0.25149700598802394,
+              "value": 0.25898203592814373,
               "audit": {
                 "total": 668,
-                "graded": 648,
-                "successes": 168,
-                "accuracy": 0.25149700598802394,
-                "unresolved": 20,
+                "graded": 650,
+                "successes": 173,
+                "accuracy": 0.25898203592814373,
+                "unresolved": 18,
                 "complete_grading": false,
                 "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
-                "wald_95_half_width": 0.03290266083130002,
+                "wald_95_half_width": 0.03322133102807682,
                 "solver_failures": 0,
-                "judge_invalid": 20,
+                "judge_invalid": 18,
                 "judge_transport_failures": 0,
-                "solver_truncated": 371,
-                "judge_truncated": 20
+                "solver_truncated": 380,
+                "judge_truncated": 18
               }
             },
             "core-attention-boundary": {
@@ -1237,23 +1237,23 @@
             },
             "betterscale": {
               "label": "Revision",
-              "correct": 320,
+              "correct": 316,
               "total": 1143,
-              "value": 0.2799650043744532,
+              "value": 0.2764654418197725,
               "audit": {
                 "total": 1143,
-                "graded": 1116,
-                "successes": 320,
-                "accuracy": 0.2799650043744532,
-                "unresolved": 27,
+                "graded": 1115,
+                "successes": 316,
+                "accuracy": 0.2764654418197725,
+                "unresolved": 28,
                 "complete_grading": false,
                 "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
-                "wald_95_half_width": 0.026029248674709748,
+                "wald_95_half_width": 0.025928836061797907,
                 "solver_failures": 0,
-                "judge_invalid": 27,
+                "judge_invalid": 28,
                 "judge_transport_failures": 0,
-                "solver_truncated": 680,
-                "judge_truncated": 27
+                "solver_truncated": 674,
+                "judge_truncated": 28
               }
             }
           },
@@ -1805,197 +1805,6 @@
         "Bench is separate: 160 prompts, max output 256, request-rate inf, temperature 0, seed 0, default server chat template.",
         "Single service lifecycle reused after smoke; not a cold-start run or three-repeat V5.5 acceptance. No B1 or improvement claims.",
         "Full weight shards were not hashed; image digest not captured. Only 11 small artifact files were hashed."
-      ]
-    },
-    {
-      "id": "mmlu-pro-betterscale-test-200",
-      "dataset": "mmlu-pro",
-      "solution": "betterscale",
-      "scope": "test-200",
-      "quality": [
-        {
-          "label": "Test",
-          "correct": 9611,
-          "total": 12032,
-          "value": 0.7987865691489362,
-          "audit": {
-            "cases": 12032,
-            "correct": 9611,
-            "accuracy": 0.7987865691489362,
-            "invalid_answers": 65,
-            "transport_failures": 0,
-            "length_limited": 1548,
-            "wall_seconds_this_invocation": 9259.440616141073,
-            "mean_ttft_s": 0.24528011316354598,
-            "mean_e2e_s": 12.299382534087544,
-            "smoke_only": false
-          }
-        }
-      ],
-      "performance": {
-        "date": "20261015-074058",
-        "num_prompts": 200,
-        "completed": 200,
-        "failed": 0,
-        "duration": 81.9430637517944,
-        "request_throughput": 2.440719090096511,
-        "output_throughput": 624.8240870647068,
-        "total_token_throughput": 4069.471956895165,
-        "mean_ttft_ms": 40626.99726256542,
-        "mean_tpot_ms": 23.61731110082245,
-        "total_input_tokens": 282265,
-        "total_output_tokens": 51200
-      },
-      "configuration": {
-        "source_commit": "31fe12b2ddff70209f78d9dab287aedac9dd4bbd",
-        "dtype": "bfloat16",
-        "tensor_parallel_size": 2,
-        "speculative_tokens": 2,
-        "cudagraph_mode": "FULL",
-        "execution_seats": 16,
-        "resident_seats": 36,
-        "state_bytes_per_rank": 21474836480,
-        "host_bytes_per_rank": 8589934592,
-        "max_model_len": 65536,
-        "max_num_batched_tokens": 4096,
-        "prefix_caching": true
-      },
-      "report": "data/betterscale-dataset-validation-20261015/report.json",
-      "protocol": {
-        "accuracy": {
-          "shots": 5,
-          "input": "token IDs via completions",
-          "concurrency": 16,
-          "max_tokens": 2048,
-          "thinking": false,
-          "temperature": 0,
-          "seed": 17,
-          "retries": 0
-        },
-        "load_test": "200 prompts; output cap 256; request-rate inf; temperature 0; seed 0; default server chat template"
-      },
-      "limitations": [
-        "Single run; engine and donor settings differ from web baseline.",
-        "MMLU bench overlapped Frontier judging; Frontier bench ran after MMLU release.",
-        "Same Qwen solver/judge; invalid grades retained as nonsuccess; no retries.",
-        "HLE deferred by user; multimodal patch not merged or evaluated."
-      ]
-    },
-    {
-      "id": "frontierscience-betterscale-full-160",
-      "dataset": "frontierscience",
-      "solution": "betterscale",
-      "scope": "full-160",
-      "quality": [
-        {
-          "label": "Olympiad",
-          "correct": 63,
-          "total": 100,
-          "value": 0.63,
-          "audit": {
-            "total": 100,
-            "graded": 96,
-            "successes": 63,
-            "solver_failures": 0,
-            "judge_unresolved": 4,
-            "judge_invalid": 4,
-            "judge_transport_failures": 0,
-            "judge_truncated_with_grade": 4,
-            "judge_audit_flagged": 4,
-            "solver_truncated": 27,
-            "judge_truncated": 8,
-            "success_rate": 0.63,
-            "observed_success_lower_bound": 0.63,
-            "mean_research_score_valid_only": null
-          }
-        },
-        {
-          "label": "Research",
-          "correct": 2,
-          "total": 60,
-          "value": 0.03333333333333333,
-          "audit": {
-            "total": 60,
-            "graded": 57,
-            "successes": 2,
-            "solver_failures": 0,
-            "judge_unresolved": 3,
-            "judge_invalid": 3,
-            "judge_transport_failures": 0,
-            "judge_truncated_with_grade": 6,
-            "judge_audit_flagged": 8,
-            "solver_truncated": 9,
-            "judge_truncated": 9,
-            "success_rate": 0.03333333333333333,
-            "observed_success_lower_bound": 0.03333333333333333,
-            "mean_research_score_valid_only": 2.620350877192983
-          }
-        }
-      ],
-      "performance": {
-        "date": "20261015-083544",
-        "num_prompts": 160,
-        "completed": 160,
-        "failed": 0,
-        "duration": 44.4029835453257,
-        "request_throughput": 3.603361468642645,
-        "output_throughput": 922.4605359725172,
-        "total_token_throughput": 2331.6226013127603,
-        "mean_ttft_ms": 20375.039425608702,
-        "mean_tpot_ms": 16.20724046050443,
-        "total_input_tokens": 62571,
-        "total_output_tokens": 40960
-      },
-      "configuration": {
-        "source_commit": "31fe12b2ddff70209f78d9dab287aedac9dd4bbd",
-        "dtype": "bfloat16",
-        "tensor_parallel_size": 2,
-        "speculative_tokens": 2,
-        "cudagraph_mode": "FULL",
-        "execution_seats": 16,
-        "resident_seats": 36,
-        "state_bytes_per_rank": 21474836480,
-        "host_bytes_per_rank": 8589934592,
-        "max_model_len": 65536,
-        "max_num_batched_tokens": 4096,
-        "prefix_caching": true
-      },
-      "report": "data/betterscale-dataset-validation-20261015/report.json",
-      "protocol": {
-        "generation": {
-          "solver": {
-            "concurrency": 1,
-            "timeout": 1800,
-            "request": {
-              "temperature": 0,
-              "seed": 17,
-              "max_tokens": 16384,
-              "chat_template_kwargs": {
-                "enable_thinking": false
-              }
-            }
-          },
-          "judge": {
-            "concurrency": 1,
-            "timeout": 1800,
-            "request": {
-              "temperature": 0,
-              "seed": 17,
-              "max_tokens": 8192,
-              "chat_template_kwargs": {
-                "enable_thinking": false
-              }
-            }
-          }
-        },
-        "scoring": "hust-qwen-judge-v3; Appendix B prompts; Qwen substitute; single trial; scoring_policy=mmlu_extract_first; not official replication",
-        "load_test": "160 prompts (both tracks together); output cap 256; request-rate inf; temperature 0; seed 0; default server chat template"
-      },
-      "limitations": [
-        "Single run; engine and donor settings differ from web baseline.",
-        "MMLU bench overlapped Frontier judging; Frontier bench ran after MMLU release.",
-        "Same Qwen solver/judge; invalid grades retained as nonsuccess; no retries.",
-        "HLE deferred by user; multimodal patch not merged or evaluated."
       ]
     },
     {
@@ -2716,354 +2525,6 @@
         "Reused service after accuracy, request validation and tokenization preflight; not a cold-cache run, not paired B1 and not three-repeat acceptance.",
         "Full weights were inventoried but not hashed; model small files matched. Image digest and verified local model revision are unavailable.",
         "Public evidence omits question/image/answer payloads and environment dumps. Original raw records remain private and cannot be independently regraded from this package."
-      ]
-    },
-    {
-      "id": "hle-verified-betterscale-gold-text",
-      "dataset": "hle-verified",
-      "solution": "betterscale",
-      "scope": "gold-text",
-      "quality": [
-        {
-          "label": "Gold · text",
-          "correct": 152,
-          "total": 575,
-          "value": 0.2643478260869565,
-          "audit": {
-            "total": 575,
-            "graded": 555,
-            "successes": 152,
-            "accuracy": 0.2643478260869565,
-            "unresolved": 20,
-            "complete_grading": false,
-            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
-            "wald_95_half_width": 0.03604510392214794,
-            "solver_failures": 0,
-            "judge_invalid": 20,
-            "judge_transport_failures": 0,
-            "solver_truncated": 361,
-            "judge_truncated": 20
-          }
-        }
-      ],
-      "performance": {
-        "num_prompts": 200,
-        "completed": 200,
-        "failed": 0,
-        "duration": 52.8319353479892,
-        "request_throughput": 3.7855891267782615,
-        "output_throughput": 916.3964878648476,
-        "total_token_throughput": 1899.7600473824027,
-        "mean_ttft_ms": 24057.54630882293,
-        "mean_tpot_ms": 16.937476885363775,
-        "total_input_tokens": 51953,
-        "total_output_tokens": 48415,
-        "input_token_accounting_verified": true
-      },
-      "configuration": {
-        "source_commit": "33ccc94da6ed5035aafaebb1d0a982a4de6b3c2f",
-        "model": "Qwen3.5-35B-A3B",
-        "dtype": "BF16",
-        "hardware": "2 x Ascend 910B2",
-        "vllm": "0.25.1",
-        "cann": "9.1",
-        "engine": "BetterScale main TP2 MTP2 FULL E16/R20",
-        "max_model_len": 65536,
-        "max_num_seqs": 16,
-        "max_num_batched_tokens": 4096,
-        "state_bytes_per_rank": 21474836480,
-        "prefix_caching": true,
-        "async_scheduling": true,
-        "image_limit": 4,
-        "host_memory_bytes": 68719476736,
-        "cpu_quota_cores": 8
-      },
-      "report": "data/betterscale-hle-20261015/report.json",
-      "protocol": {
-        "generation": {
-          "solver_concurrency": 16,
-          "judge_concurrency": 16,
-          "solver_max_tokens": 16384,
-          "judge_max_tokens": 8192,
-          "temperature": 0,
-          "seed": 17,
-          "enable_thinking": false,
-          "scoring_policy": "strict_json",
-          "retries": 0,
-          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
-        },
-        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
-        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
-      },
-      "limitations": [
-        "Single trial; same-model Qwen judge, not official leaderboard replication or formal acceptance.",
-        "Gold/Revision unresolved judges: 20/27, all length-ended. Retained in denominator as nonsuccess, not confirmed incorrect; no retries.",
-        "Client prompts/schema match the website protocol; engine versions, MTP, graph mode, hardware allocation and cache settings differ. Not an isolated optimization ablation.",
-        "HLE uses BetterScale main 33ccc94; MMLU-Pro/FrontierScience use the earlier 31fe12b deployment.",
-        "Text load tests select 200 tasks by floor(i*N/200); image tests include all 93/118 tasks. Output cap 256, EOS allowed, request-rate inf, temperature 0, seed 0, thinking disabled, no system prompt.",
-        "Service reused after smoke and accuracy, not cold cache. Zero warmups; vLLM initial test request outside measured N. TTFT includes burst queueing.",
-        "Recovered published HLE pipeline/prompts/bench client, with reused frozen hash/seal helpers; not the original full client checkout. Raw prompts, images and responses remain private."
-      ]
-    },
-    {
-      "id": "hle-verified-betterscale-revision-text",
-      "dataset": "hle-verified",
-      "solution": "betterscale",
-      "scope": "revision-text",
-      "quality": [
-        {
-          "label": "Revision · text",
-          "correct": 300,
-          "total": 1025,
-          "value": 0.2926829268292683,
-          "audit": {
-            "total": 1025,
-            "graded": 998,
-            "successes": 300,
-            "accuracy": 0.2926829268292683,
-            "unresolved": 27,
-            "complete_grading": false,
-            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
-            "wald_95_half_width": 0.027854790980999553,
-            "solver_failures": 0,
-            "judge_invalid": 27,
-            "judge_transport_failures": 0,
-            "solver_truncated": 667,
-            "judge_truncated": 27
-          }
-        }
-      ],
-      "performance": {
-        "num_prompts": 200,
-        "completed": 200,
-        "failed": 0,
-        "duration": 54.63460737653077,
-        "request_throughput": 3.660683394714271,
-        "output_throughput": 918.6301944865727,
-        "total_token_throughput": 2218.8317226211875,
-        "mean_ttft_ms": 25225.365957031026,
-        "mean_tpot_ms": 16.400009223113894,
-        "total_input_tokens": 71036,
-        "total_output_tokens": 50189,
-        "input_token_accounting_verified": true
-      },
-      "configuration": {
-        "source_commit": "33ccc94da6ed5035aafaebb1d0a982a4de6b3c2f",
-        "model": "Qwen3.5-35B-A3B",
-        "dtype": "BF16",
-        "hardware": "2 x Ascend 910B2",
-        "vllm": "0.25.1",
-        "cann": "9.1",
-        "engine": "BetterScale main TP2 MTP2 FULL E16/R20",
-        "max_model_len": 65536,
-        "max_num_seqs": 16,
-        "max_num_batched_tokens": 4096,
-        "state_bytes_per_rank": 21474836480,
-        "prefix_caching": true,
-        "async_scheduling": true,
-        "image_limit": 4,
-        "host_memory_bytes": 68719476736,
-        "cpu_quota_cores": 8
-      },
-      "report": "data/betterscale-hle-20261015/report.json",
-      "protocol": {
-        "generation": {
-          "solver_concurrency": 16,
-          "judge_concurrency": 16,
-          "solver_max_tokens": 16384,
-          "judge_max_tokens": 8192,
-          "temperature": 0,
-          "seed": 17,
-          "enable_thinking": false,
-          "scoring_policy": "strict_json",
-          "retries": 0,
-          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
-        },
-        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
-        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
-      },
-      "limitations": [
-        "Single trial; same-model Qwen judge, not official leaderboard replication or formal acceptance.",
-        "Gold/Revision unresolved judges: 20/27, all length-ended. Retained in denominator as nonsuccess, not confirmed incorrect; no retries.",
-        "Client prompts/schema match the website protocol; engine versions, MTP, graph mode, hardware allocation and cache settings differ. Not an isolated optimization ablation.",
-        "HLE uses BetterScale main 33ccc94; MMLU-Pro/FrontierScience use the earlier 31fe12b deployment.",
-        "Text load tests select 200 tasks by floor(i*N/200); image tests include all 93/118 tasks. Output cap 256, EOS allowed, request-rate inf, temperature 0, seed 0, thinking disabled, no system prompt.",
-        "Service reused after smoke and accuracy, not cold cache. Zero warmups; vLLM initial test request outside measured N. TTFT includes burst queueing.",
-        "Recovered published HLE pipeline/prompts/bench client, with reused frozen hash/seal helpers; not the original full client checkout. Raw prompts, images and responses remain private."
-      ]
-    },
-    {
-      "id": "hle-verified-betterscale-gold-image",
-      "dataset": "hle-verified",
-      "solution": "betterscale",
-      "scope": "gold-image",
-      "quality": [
-        {
-          "label": "Gold · image",
-          "correct": 16,
-          "total": 93,
-          "value": 0.17204301075268819,
-          "audit": {
-            "total": 93,
-            "graded": 93,
-            "successes": 16,
-            "accuracy": 0.17204301075268819,
-            "unresolved": 0,
-            "complete_grading": true,
-            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
-            "wald_95_half_width": 0.07670735405463468,
-            "solver_failures": 0,
-            "judge_invalid": 0,
-            "judge_transport_failures": 0,
-            "solver_truncated": 10,
-            "judge_truncated": 0
-          }
-        }
-      ],
-      "performance": {
-        "num_prompts": 93,
-        "completed": 93,
-        "failed": 0,
-        "duration": 44.43928250670433,
-        "request_throughput": 2.09274305871094,
-        "output_throughput": 504.1035484004568,
-        "total_token_throughput": 2723.04126381302,
-        "mean_ttft_ms": 18657.533058215693,
-        "mean_tpot_ms": 30.242454539351595,
-        "total_input_tokens": 98608,
-        "total_output_tokens": 22402,
-        "input_token_accounting_verified": true
-      },
-      "configuration": {
-        "source_commit": "33ccc94da6ed5035aafaebb1d0a982a4de6b3c2f",
-        "model": "Qwen3.5-35B-A3B",
-        "dtype": "BF16",
-        "hardware": "2 x Ascend 910B2",
-        "vllm": "0.25.1",
-        "cann": "9.1",
-        "engine": "BetterScale main TP2 MTP2 FULL E16/R20",
-        "max_model_len": 65536,
-        "max_num_seqs": 16,
-        "max_num_batched_tokens": 4096,
-        "state_bytes_per_rank": 21474836480,
-        "prefix_caching": true,
-        "async_scheduling": true,
-        "image_limit": 4,
-        "host_memory_bytes": 68719476736,
-        "cpu_quota_cores": 8
-      },
-      "report": "data/betterscale-hle-20261015/report.json",
-      "protocol": {
-        "generation": {
-          "solver_concurrency": 16,
-          "judge_concurrency": 16,
-          "solver_max_tokens": 16384,
-          "judge_max_tokens": 8192,
-          "temperature": 0,
-          "seed": 17,
-          "enable_thinking": false,
-          "scoring_policy": "strict_json",
-          "retries": 0,
-          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
-        },
-        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
-        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
-      },
-      "limitations": [
-        "Single trial; same-model Qwen judge, not official leaderboard replication or formal acceptance.",
-        "Gold/Revision unresolved judges: 20/27, all length-ended. Retained in denominator as nonsuccess, not confirmed incorrect; no retries.",
-        "Client prompts/schema match the website protocol; engine versions, MTP, graph mode, hardware allocation and cache settings differ. Not an isolated optimization ablation.",
-        "HLE uses BetterScale main 33ccc94; MMLU-Pro/FrontierScience use the earlier 31fe12b deployment.",
-        "Text load tests select 200 tasks by floor(i*N/200); image tests include all 93/118 tasks. Output cap 256, EOS allowed, request-rate inf, temperature 0, seed 0, thinking disabled, no system prompt.",
-        "Service reused after smoke and accuracy, not cold cache. Zero warmups; vLLM initial test request outside measured N. TTFT includes burst queueing.",
-        "Recovered published HLE pipeline/prompts/bench client, with reused frozen hash/seal helpers; not the original full client checkout. Raw prompts, images and responses remain private."
-      ]
-    },
-    {
-      "id": "hle-verified-betterscale-revision-image",
-      "dataset": "hle-verified",
-      "solution": "betterscale",
-      "scope": "revision-image",
-      "quality": [
-        {
-          "label": "Revision · image",
-          "correct": 20,
-          "total": 118,
-          "value": 0.1694915254237288,
-          "audit": {
-            "total": 118,
-            "graded": 118,
-            "successes": 20,
-            "accuracy": 0.1694915254237288,
-            "unresolved": 0,
-            "complete_grading": true,
-            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
-            "wald_95_half_width": 0.06769570197989037,
-            "solver_failures": 0,
-            "judge_invalid": 0,
-            "judge_transport_failures": 0,
-            "solver_truncated": 13,
-            "judge_truncated": 0
-          }
-        }
-      ],
-      "performance": {
-        "num_prompts": 118,
-        "completed": 118,
-        "failed": 0,
-        "duration": 64.13588764704764,
-        "request_throughput": 1.8398435623028582,
-        "output_throughput": 460.17917710005554,
-        "total_token_throughput": 2662.160083284661,
-        "mean_ttft_ms": 31414.264878210754,
-        "mean_tpot_ms": 30.298138887874245,
-        "total_input_tokens": 141226,
-        "total_output_tokens": 29514,
-        "input_token_accounting_verified": true
-      },
-      "configuration": {
-        "source_commit": "33ccc94da6ed5035aafaebb1d0a982a4de6b3c2f",
-        "model": "Qwen3.5-35B-A3B",
-        "dtype": "BF16",
-        "hardware": "2 x Ascend 910B2",
-        "vllm": "0.25.1",
-        "cann": "9.1",
-        "engine": "BetterScale main TP2 MTP2 FULL E16/R20",
-        "max_model_len": 65536,
-        "max_num_seqs": 16,
-        "max_num_batched_tokens": 4096,
-        "state_bytes_per_rank": 21474836480,
-        "prefix_caching": true,
-        "async_scheduling": true,
-        "image_limit": 4,
-        "host_memory_bytes": 68719476736,
-        "cpu_quota_cores": 8
-      },
-      "report": "data/betterscale-hle-20261015/report.json",
-      "protocol": {
-        "generation": {
-          "solver_concurrency": 16,
-          "judge_concurrency": 16,
-          "solver_max_tokens": 16384,
-          "judge_max_tokens": 8192,
-          "temperature": 0,
-          "seed": 17,
-          "enable_thinking": false,
-          "scoring_policy": "strict_json",
-          "retries": 0,
-          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
-        },
-        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
-        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
-      },
-      "limitations": [
-        "Single trial; same-model Qwen judge, not official leaderboard replication or formal acceptance.",
-        "Gold/Revision unresolved judges: 20/27, all length-ended. Retained in denominator as nonsuccess, not confirmed incorrect; no retries.",
-        "Client prompts/schema match the website protocol; engine versions, MTP, graph mode, hardware allocation and cache settings differ. Not an isolated optimization ablation.",
-        "HLE uses BetterScale main 33ccc94; MMLU-Pro/FrontierScience use the earlier 31fe12b deployment.",
-        "Text load tests select 200 tasks by floor(i*N/200); image tests include all 93/118 tasks. Output cap 256, EOS allowed, request-rate inf, temperature 0, seed 0, thinking disabled, no system prompt.",
-        "Service reused after smoke and accuracy, not cold cache. Zero warmups; vLLM initial test request outside measured N. TTFT includes burst queueing.",
-        "Recovered published HLE pipeline/prompts/bench client, with reused frozen hash/seal helpers; not the original full client checkout. Raw prompts, images and responses remain private."
       ]
     },
     {
@@ -4095,6 +3556,687 @@
           "calibration_note": "not implemented: pinned upstream binning omits final bin and crashes below 100 grades; raw confidence preserved; no silent replacement metric"
         }
       }
+    },
+    {
+      "id": "mmlu-pro-betterscale-test-200",
+      "dataset": "mmlu-pro",
+      "solution": "betterscale",
+      "scope": "test-200",
+      "quality": [
+        {
+          "label": "Test",
+          "correct": 9589,
+          "total": 12032,
+          "value": 0.7969581117021277,
+          "audit": {
+            "cases": 12032,
+            "correct": 9589,
+            "accuracy": 0.7969581117021277,
+            "invalid_answers": 57,
+            "transport_failures": 0,
+            "length_limited": 1523,
+            "wall_seconds_this_invocation": 9333.749879706651,
+            "mean_ttft_s": 0.25057767139747117,
+            "mean_e2e_s": 12.399422423773819,
+            "smoke_only": false
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261016-095112",
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 81.06538476608694,
+        "request_throughput": 2.4671442759088515,
+        "output_throughput": 631.588934632666,
+        "total_token_throughput": 4113.531329829726,
+        "mean_ttft_ms": 40134.015915002674,
+        "mean_tpot_ms": 23.232456540615832,
+        "total_input_tokens": 282265,
+        "total_output_tokens": 51200
+      },
+      "configuration": {
+        "source_commit": "2c07ddd5eb04f2afeb77123ce066a3a70662a94c",
+        "source_tag": "v1",
+        "tested_base_commit": "7740df9ab5670e1dc26067efca7d61a51f566783",
+        "release_delta": "Documentation, version and qualification metadata only",
+        "model": "Qwen3.5-35B-A3B",
+        "hardware": "Ascend 910B2; two concurrent TP2 lanes on four devices",
+        "packages": {
+          "vllm": "0.28.1.post1.dev143+gf18cf803c.empty",
+          "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27.d20260909",
+          "torch": "2.13.0+cpu",
+          "torch-npu": "2.13.0rc1",
+          "transformers": "5.14.1"
+        },
+        "python": "3.12.13",
+        "precision": "BF16",
+        "tp": 2,
+        "mtp": 2,
+        "graph": "FULL",
+        "state_bytes_per_rank": 21474836480,
+        "host_cache_bytes_per_rank": 8589934592,
+        "cann": "9.1.0",
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 4096,
+        "lanes": {
+          "hle": {
+            "execution_seats": 16,
+            "resident_seats": 20,
+            "images": 4
+          },
+          "text": {
+            "execution_seats": 16,
+            "resident_seats": 36,
+            "images": 0
+          }
+        },
+        "validation": "23/23 basic smoke; full dataset scopes and six separate load tests completed"
+      },
+      "report": "data/betterscale-school-runtime-20261016/report.json",
+      "protocol": {
+        "accuracy": {
+          "shots": 5,
+          "input": "token IDs via completions",
+          "concurrency": 16,
+          "max_tokens": 2048,
+          "thinking": false,
+          "temperature": 0,
+          "seed": 17,
+          "retries": 0
+        },
+        "load_test": "200 prompts; output cap 256; request-rate inf; temperature 0; seed 0; default server chat template"
+      },
+      "limitations": [
+        "Single run; same evaluation inputs/prompts/scoring as the referenced website, not an isolated runtime ablation.",
+        "Qwen same-model judge; invalid and length-ended unresolved grades retained in denominators; no retries.",
+        "Two TP2 services ran concurrently; no attribution study for small performance/quality differences.",
+        "HLE full text plus image; performance is separate capped-output burst testing, not SLO goodput.",
+        "School-runtime compatibility acceptance, not formal fixed-target leaderboard admission.",
+        "Aggregate-only public projection; independent regrading requires private raw responses.",
+        "HLE unresolved judges: Gold 18, Revision 28; Frontier 3 per track. Retained as nonsuccess, not confirmed incorrect."
+      ]
+    },
+    {
+      "id": "frontierscience-betterscale-full-160",
+      "dataset": "frontierscience",
+      "solution": "betterscale",
+      "scope": "full-160",
+      "quality": [
+        {
+          "label": "Olympiad",
+          "correct": 60,
+          "total": 100,
+          "value": 0.6,
+          "audit": {
+            "total": 100,
+            "graded": 97,
+            "successes": 60,
+            "solver_failures": 0,
+            "judge_unresolved": 3,
+            "judge_invalid": 3,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 3,
+            "judge_audit_flagged": 3,
+            "solver_truncated": 32,
+            "judge_truncated": 5,
+            "success_rate": 0.6,
+            "observed_success_lower_bound": 0.6,
+            "mean_research_score_valid_only": null
+          }
+        },
+        {
+          "label": "Research",
+          "correct": 3,
+          "total": 60,
+          "value": 0.05,
+          "audit": {
+            "total": 60,
+            "graded": 57,
+            "successes": 3,
+            "solver_failures": 0,
+            "judge_unresolved": 3,
+            "judge_invalid": 3,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 6,
+            "judge_audit_flagged": 6,
+            "solver_truncated": 7,
+            "judge_truncated": 9,
+            "success_rate": 0.05,
+            "observed_success_lower_bound": 0.05,
+            "mean_research_score_valid_only": 2.5179824561403508
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261016-130610",
+        "num_prompts": 160,
+        "completed": 160,
+        "failed": 0,
+        "duration": 45.19730825908482,
+        "request_throughput": 3.5400338242010116,
+        "output_throughput": 906.248658995459,
+        "total_token_throughput": 2290.6452615834683,
+        "mean_ttft_ms": 20838.252780551556,
+        "mean_tpot_ms": 16.50159075618813,
+        "total_input_tokens": 62571,
+        "total_output_tokens": 40960
+      },
+      "configuration": {
+        "source_commit": "2c07ddd5eb04f2afeb77123ce066a3a70662a94c",
+        "source_tag": "v1",
+        "tested_base_commit": "7740df9ab5670e1dc26067efca7d61a51f566783",
+        "release_delta": "Documentation, version and qualification metadata only",
+        "model": "Qwen3.5-35B-A3B",
+        "hardware": "Ascend 910B2; two concurrent TP2 lanes on four devices",
+        "packages": {
+          "vllm": "0.28.1.post1.dev143+gf18cf803c.empty",
+          "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27.d20260909",
+          "torch": "2.13.0+cpu",
+          "torch-npu": "2.13.0rc1",
+          "transformers": "5.14.1"
+        },
+        "python": "3.12.13",
+        "precision": "BF16",
+        "tp": 2,
+        "mtp": 2,
+        "graph": "FULL",
+        "state_bytes_per_rank": 21474836480,
+        "host_cache_bytes_per_rank": 8589934592,
+        "cann": "9.1.0",
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 4096,
+        "lanes": {
+          "hle": {
+            "execution_seats": 16,
+            "resident_seats": 20,
+            "images": 4
+          },
+          "text": {
+            "execution_seats": 16,
+            "resident_seats": 36,
+            "images": 0
+          }
+        },
+        "validation": "23/23 basic smoke; full dataset scopes and six separate load tests completed"
+      },
+      "report": "data/betterscale-school-runtime-20261016/report.json",
+      "protocol": {
+        "generation": {
+          "solver": {
+            "concurrency": 1,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 16384,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          },
+          "judge": {
+            "concurrency": 1,
+            "timeout": 1800,
+            "request": {
+              "temperature": 0,
+              "seed": 17,
+              "max_tokens": 8192,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        },
+        "scoring": "hust-qwen-judge-v3; Appendix B prompts; Qwen substitute; single trial; scoring_policy=mmlu_extract_first; not official replication",
+        "load_test": "160 prompts (both tracks together); output cap 256; request-rate inf; temperature 0; seed 0; default server chat template"
+      },
+      "limitations": [
+        "Single run; same evaluation inputs/prompts/scoring as the referenced website, not an isolated runtime ablation.",
+        "Qwen same-model judge; invalid and length-ended unresolved grades retained in denominators; no retries.",
+        "Two TP2 services ran concurrently; no attribution study for small performance/quality differences.",
+        "HLE full text plus image; performance is separate capped-output burst testing, not SLO goodput.",
+        "School-runtime compatibility acceptance, not formal fixed-target leaderboard admission.",
+        "Aggregate-only public projection; independent regrading requires private raw responses.",
+        "HLE unresolved judges: Gold 18, Revision 28; Frontier 3 per track. Retained as nonsuccess, not confirmed incorrect."
+      ]
+    },
+    {
+      "id": "hle-verified-betterscale-gold-text",
+      "dataset": "hle-verified",
+      "solution": "betterscale",
+      "scope": "gold-text",
+      "quality": [
+        {
+          "label": "Gold · text",
+          "correct": 150,
+          "total": 575,
+          "value": 0.2608695652173913,
+          "audit": {
+            "total": 575,
+            "graded": 559,
+            "successes": 150,
+            "accuracy": 0.2608695652173913,
+            "unresolved": 16,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.03589173056346642,
+            "solver_failures": 0,
+            "judge_invalid": 16,
+            "judge_transport_failures": 0,
+            "solver_truncated": 370,
+            "judge_truncated": 16
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261016-131451",
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 55.710363909602165,
+        "request_throughput": 3.5899962944871064,
+        "output_throughput": 875.671896151295,
+        "total_token_throughput": 1808.2272835887381,
+        "mean_ttft_ms": 25685.524741839617,
+        "mean_tpot_ms": 17.83700128523965,
+        "total_input_tokens": 51953,
+        "total_output_tokens": 48784,
+        "input_token_accounting": "Verified against server /tokenize",
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "2c07ddd5eb04f2afeb77123ce066a3a70662a94c",
+        "source_tag": "v1",
+        "tested_base_commit": "7740df9ab5670e1dc26067efca7d61a51f566783",
+        "release_delta": "Documentation, version and qualification metadata only",
+        "model": "Qwen3.5-35B-A3B",
+        "hardware": "Ascend 910B2; two concurrent TP2 lanes on four devices",
+        "packages": {
+          "vllm": "0.28.1.post1.dev143+gf18cf803c.empty",
+          "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27.d20260909",
+          "torch": "2.13.0+cpu",
+          "torch-npu": "2.13.0rc1",
+          "transformers": "5.14.1"
+        },
+        "python": "3.12.13",
+        "precision": "BF16",
+        "tp": 2,
+        "mtp": 2,
+        "graph": "FULL",
+        "state_bytes_per_rank": 21474836480,
+        "host_cache_bytes_per_rank": 8589934592,
+        "cann": "9.1.0",
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 4096,
+        "lanes": {
+          "hle": {
+            "execution_seats": 16,
+            "resident_seats": 20,
+            "images": 4
+          },
+          "text": {
+            "execution_seats": 16,
+            "resident_seats": 36,
+            "images": 0
+          }
+        },
+        "validation": "23/23 basic smoke; full dataset scopes and six separate load tests completed"
+      },
+      "report": "data/betterscale-school-runtime-20261016/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0,
+          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Single run; same evaluation inputs/prompts/scoring as the referenced website, not an isolated runtime ablation.",
+        "Qwen same-model judge; invalid and length-ended unresolved grades retained in denominators; no retries.",
+        "Two TP2 services ran concurrently; no attribution study for small performance/quality differences.",
+        "HLE full text plus image; performance is separate capped-output burst testing, not SLO goodput.",
+        "School-runtime compatibility acceptance, not formal fixed-target leaderboard admission.",
+        "Aggregate-only public projection; independent regrading requires private raw responses.",
+        "HLE unresolved judges: Gold 18, Revision 28; Frontier 3 per track. Retained as nonsuccess, not confirmed incorrect."
+      ]
+    },
+    {
+      "id": "hle-verified-betterscale-revision-text",
+      "dataset": "hle-verified",
+      "solution": "betterscale",
+      "scope": "revision-text",
+      "quality": [
+        {
+          "label": "Revision · text",
+          "correct": 299,
+          "total": 1025,
+          "value": 0.2917073170731707,
+          "audit": {
+            "total": 1025,
+            "graded": 1001,
+            "successes": 299,
+            "accuracy": 0.2917073170731707,
+            "unresolved": 24,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.027827499125890862,
+            "solver_failures": 0,
+            "judge_invalid": 24,
+            "judge_transport_failures": 0,
+            "solver_truncated": 654,
+            "judge_truncated": 24
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261016-131618",
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 57.589660396799445,
+        "request_throughput": 3.4728456223213815,
+        "output_throughput": 871.632158518332,
+        "total_token_throughput": 2105.1174666544402,
+        "mean_ttft_ms": 26611.385431410745,
+        "mean_tpot_ms": 17.216561991547913,
+        "total_input_tokens": 71036,
+        "total_output_tokens": 50197,
+        "input_token_accounting": "Verified against server /tokenize",
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "2c07ddd5eb04f2afeb77123ce066a3a70662a94c",
+        "source_tag": "v1",
+        "tested_base_commit": "7740df9ab5670e1dc26067efca7d61a51f566783",
+        "release_delta": "Documentation, version and qualification metadata only",
+        "model": "Qwen3.5-35B-A3B",
+        "hardware": "Ascend 910B2; two concurrent TP2 lanes on four devices",
+        "packages": {
+          "vllm": "0.28.1.post1.dev143+gf18cf803c.empty",
+          "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27.d20260909",
+          "torch": "2.13.0+cpu",
+          "torch-npu": "2.13.0rc1",
+          "transformers": "5.14.1"
+        },
+        "python": "3.12.13",
+        "precision": "BF16",
+        "tp": 2,
+        "mtp": 2,
+        "graph": "FULL",
+        "state_bytes_per_rank": 21474836480,
+        "host_cache_bytes_per_rank": 8589934592,
+        "cann": "9.1.0",
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 4096,
+        "lanes": {
+          "hle": {
+            "execution_seats": 16,
+            "resident_seats": 20,
+            "images": 4
+          },
+          "text": {
+            "execution_seats": 16,
+            "resident_seats": 36,
+            "images": 0
+          }
+        },
+        "validation": "23/23 basic smoke; full dataset scopes and six separate load tests completed"
+      },
+      "report": "data/betterscale-school-runtime-20261016/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0,
+          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Single run; same evaluation inputs/prompts/scoring as the referenced website, not an isolated runtime ablation.",
+        "Qwen same-model judge; invalid and length-ended unresolved grades retained in denominators; no retries.",
+        "Two TP2 services ran concurrently; no attribution study for small performance/quality differences.",
+        "HLE full text plus image; performance is separate capped-output burst testing, not SLO goodput.",
+        "School-runtime compatibility acceptance, not formal fixed-target leaderboard admission.",
+        "Aggregate-only public projection; independent regrading requires private raw responses.",
+        "HLE unresolved judges: Gold 18, Revision 28; Frontier 3 per track. Retained as nonsuccess, not confirmed incorrect."
+      ]
+    },
+    {
+      "id": "hle-verified-betterscale-gold-image",
+      "dataset": "hle-verified",
+      "solution": "betterscale",
+      "scope": "gold-image",
+      "quality": [
+        {
+          "label": "Gold · image",
+          "correct": 23,
+          "total": 93,
+          "value": 0.24731182795698925,
+          "audit": {
+            "total": 93,
+            "graded": 91,
+            "successes": 23,
+            "accuracy": 0.24731182795698925,
+            "unresolved": 2,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.08768889280610007,
+            "solver_failures": 0,
+            "judge_invalid": 2,
+            "judge_transport_failures": 0,
+            "solver_truncated": 10,
+            "judge_truncated": 2
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261016-131733",
+        "num_prompts": 93,
+        "completed": 93,
+        "failed": 0,
+        "duration": 45.97675083950162,
+        "request_throughput": 2.0227614675219208,
+        "output_throughput": 489.9432776064386,
+        "total_token_throughput": 2634.679436632262,
+        "mean_ttft_ms": 19678.646023915982,
+        "mean_tpot_ms": 29.073741518453595,
+        "total_input_tokens": 98608,
+        "total_output_tokens": 22526,
+        "input_token_accounting": "Verified against server /tokenize",
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "2c07ddd5eb04f2afeb77123ce066a3a70662a94c",
+        "source_tag": "v1",
+        "tested_base_commit": "7740df9ab5670e1dc26067efca7d61a51f566783",
+        "release_delta": "Documentation, version and qualification metadata only",
+        "model": "Qwen3.5-35B-A3B",
+        "hardware": "Ascend 910B2; two concurrent TP2 lanes on four devices",
+        "packages": {
+          "vllm": "0.28.1.post1.dev143+gf18cf803c.empty",
+          "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27.d20260909",
+          "torch": "2.13.0+cpu",
+          "torch-npu": "2.13.0rc1",
+          "transformers": "5.14.1"
+        },
+        "python": "3.12.13",
+        "precision": "BF16",
+        "tp": 2,
+        "mtp": 2,
+        "graph": "FULL",
+        "state_bytes_per_rank": 21474836480,
+        "host_cache_bytes_per_rank": 8589934592,
+        "cann": "9.1.0",
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 4096,
+        "lanes": {
+          "hle": {
+            "execution_seats": 16,
+            "resident_seats": 20,
+            "images": 4
+          },
+          "text": {
+            "execution_seats": 16,
+            "resident_seats": 36,
+            "images": 0
+          }
+        },
+        "validation": "23/23 basic smoke; full dataset scopes and six separate load tests completed"
+      },
+      "report": "data/betterscale-school-runtime-20261016/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0,
+          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Single run; same evaluation inputs/prompts/scoring as the referenced website, not an isolated runtime ablation.",
+        "Qwen same-model judge; invalid and length-ended unresolved grades retained in denominators; no retries.",
+        "Two TP2 services ran concurrently; no attribution study for small performance/quality differences.",
+        "HLE full text plus image; performance is separate capped-output burst testing, not SLO goodput.",
+        "School-runtime compatibility acceptance, not formal fixed-target leaderboard admission.",
+        "Aggregate-only public projection; independent regrading requires private raw responses.",
+        "HLE unresolved judges: Gold 18, Revision 28; Frontier 3 per track. Retained as nonsuccess, not confirmed incorrect."
+      ]
+    },
+    {
+      "id": "hle-verified-betterscale-revision-image",
+      "dataset": "hle-verified",
+      "solution": "betterscale",
+      "scope": "revision-image",
+      "quality": [
+        {
+          "label": "Revision · image",
+          "correct": 17,
+          "total": 118,
+          "value": 0.1440677966101695,
+          "audit": {
+            "total": 118,
+            "graded": 114,
+            "successes": 17,
+            "accuracy": 0.1440677966101695,
+            "unresolved": 4,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.06336044342452424,
+            "solver_failures": 0,
+            "judge_invalid": 4,
+            "judge_transport_failures": 0,
+            "solver_truncated": 20,
+            "judge_truncated": 4
+          }
+        }
+      ],
+      "performance": {
+        "date": "20261016-131913",
+        "num_prompts": 118,
+        "completed": 118,
+        "failed": 0,
+        "duration": 63.352001110091805,
+        "request_throughput": 1.8626088826293272,
+        "output_throughput": 466.1889045726657,
+        "total_token_throughput": 2695.416040659186,
+        "mean_ttft_ms": 29466.019731804223,
+        "mean_tpot_ms": 29.97952101206801,
+        "total_input_tokens": 141226,
+        "total_output_tokens": 29534,
+        "input_token_accounting": "Verified against server /tokenize",
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "2c07ddd5eb04f2afeb77123ce066a3a70662a94c",
+        "source_tag": "v1",
+        "tested_base_commit": "7740df9ab5670e1dc26067efca7d61a51f566783",
+        "release_delta": "Documentation, version and qualification metadata only",
+        "model": "Qwen3.5-35B-A3B",
+        "hardware": "Ascend 910B2; two concurrent TP2 lanes on four devices",
+        "packages": {
+          "vllm": "0.28.1.post1.dev143+gf18cf803c.empty",
+          "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27.d20260909",
+          "torch": "2.13.0+cpu",
+          "torch-npu": "2.13.0rc1",
+          "transformers": "5.14.1"
+        },
+        "python": "3.12.13",
+        "precision": "BF16",
+        "tp": 2,
+        "mtp": 2,
+        "graph": "FULL",
+        "state_bytes_per_rank": 21474836480,
+        "host_cache_bytes_per_rank": 8589934592,
+        "cann": "9.1.0",
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 4096,
+        "lanes": {
+          "hle": {
+            "execution_seats": 16,
+            "resident_seats": 20,
+            "images": 4
+          },
+          "text": {
+            "execution_seats": 16,
+            "resident_seats": 36,
+            "images": 0
+          }
+        },
+        "validation": "23/23 basic smoke; full dataset scopes and six separate load tests completed"
+      },
+      "report": "data/betterscale-school-runtime-20261016/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0,
+          "dataset_revision": "b705e0fb541c025a1532ce0d60d70ae2f53b00e0"
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0"
+      },
+      "limitations": [
+        "Single run; same evaluation inputs/prompts/scoring as the referenced website, not an isolated runtime ablation.",
+        "Qwen same-model judge; invalid and length-ended unresolved grades retained in denominators; no retries.",
+        "Two TP2 services ran concurrently; no attribution study for small performance/quality differences.",
+        "HLE full text plus image; performance is separate capped-output burst testing, not SLO goodput.",
+        "School-runtime compatibility acceptance, not formal fixed-target leaderboard admission.",
+        "Aggregate-only public projection; independent regrading requires private raw responses.",
+        "HLE unresolved judges: Gold 18, Revision 28; Frontier 3 per track. Retained as nonsuccess, not confirmed incorrect."
+      ]
     }
   ],
   "attempts": [
@@ -4316,11 +4458,12 @@
     "data/hle-verified-20261015/report.json": "eece0c0f2c2d7759dfe6d5629139ce24b272a259d9936533477b229957186d9b",
     "data/betterscale-dataset-validation-20261015/report.json": "d90c31ca03e1ed6c55571a6f4748228cd7d7e4c702906e880c1de68383818e6c",
     "data/betterscale-hle-20261015/report.json": "7acc1ef79a759bd58656e0674fefee22d79918352de24bd0ee5471e9aa7ae57f",
-    "data/dataset-matrix-campaign-20261016/report.json": "b0a9743ea92e912828891164fa8b67560aee47615b7797df8ee5a35a9a3675c2"
+    "data/dataset-matrix-campaign-20261016/report.json": "b0a9743ea92e912828891164fa8b67560aee47615b7797df8ee5a35a9a3675c2",
+    "data/betterscale-school-runtime-20261016/report.json": "63acbf2f8efd2d4c3488d7a4738f2f9e0c811d8211a528a9f27e04b63f35a07d"
   },
   "betterscale_publication": {
-    "commit": "5714be9e9b032f9aaef13df229aaa96dc8ef7c3b",
-    "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/5714be9e9b032f9aaef13df229aaa96dc8ef7c3b/reports/betterscale-dataset-validation-20261015"
+    "commit": "2d90b460cf92645214bd6bc325bff0562c395ba6",
+    "url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/2d90b460cf92645214bd6bc325bff0562c395ba6/reports/betterscale-school-runtime-20261016"
   },
   "formal_acceptance": false,
   "repeats": 1
