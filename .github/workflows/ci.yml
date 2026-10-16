@@ -58,6 +58,7 @@ jobs:
           website_server_pid=$!
           trap 'kill "$website_server_pid"' EXIT
           python scripts/verify_dataset_matrix_browser.py --url http://127.0.0.1:8769
+          python scripts/verify_capability_coverage_browser.py --url http://127.0.0.1:8769
           python scripts/verify_site_browser.py --url http://127.0.0.1:8769
           python scripts/verify_betterscale_browser.py --url http://127.0.0.1:8769
           python scripts/verify_traceloom_browser.py --url http://127.0.0.1:8769
