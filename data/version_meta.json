@@ -37,10 +37,10 @@
       "name": "triton-ascend-hust",
       "repo": "https://github.com/vLLM-HUST/triton-ascend-hust",
       "group": "core",
-      "version": "main@1d6a07a6",
+      "version": "main@80713f6f",
       "source_branch": "main",
-      "source_commit_url": "https://github.com/vLLM-HUST/triton-ascend-hust/commit/1d6a07a6287214933858fcf3cf45096114fbee30",
-      "source_updated_at": "2026-10-14T21:54:30Z",
+      "source_commit_url": "https://github.com/vLLM-HUST/triton-ascend-hust/commit/80713f6fb098ecc7fff7b937f7e1d7a06608bb69",
+      "source_updated_at": "2026-10-15T21:42:15Z",
       "version_display_label": "Repository snapshot; not a production compatibility approval",
       "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     },
@@ -81,15 +81,15 @@
       "name": "vllm-hust-benchmark",
       "repo": "https://github.com/vLLM-HUST/vllm-hust-benchmark",
       "group": "infrastructure",
-      "version": "main@a47d8118",
+      "version": "main@5714be9e",
       "source_branch": "main",
-      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/commit/a47d81185ddab948b06037e28f38e365d8a832a3",
-      "source_updated_at": "2026-10-15T02:46:43Z",
+      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/commit/5714be9e9b032f9aaef13df229aaa96dc8ef7c3b",
+      "source_updated_at": "2026-10-15T09:07:56Z",
       "version_display_label": "Repository snapshot; not a production compatibility approval",
       "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     }
   ],
-  "updated_at": "2026-10-15T07:35:07Z",
+  "updated_at": "2026-10-16T07:21:28Z",
   "registry": {
     "name": "vllm-hust",
     "version": "0.17.2.post1",
