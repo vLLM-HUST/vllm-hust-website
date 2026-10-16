@@ -105,9 +105,9 @@ def main():
             page.go_back()
             page.locator(".matrix-overview").wait_for()
             page.locator('.matrix-dataset[href="#hle-verified"]').first.click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(8)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(10)
             page.locator('[data-solution="native"]').uncheck()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
             assert "916.40" in page.locator(".matrix-detail").inner_text()
             assert "460.18" in page.locator(".matrix-detail").inner_text()
             page.screenshot(
@@ -115,7 +115,7 @@ def main():
             )
             page.reload()
             page.locator(".matrix-detail").wait_for()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(8)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(10)
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= innerWidth + 1"
             )

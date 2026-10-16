@@ -210,9 +210,136 @@ def import_frontier(archive):
     destination.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
 
 
+def import_gold(archive):
+    destination = ROOT / REPORT
+    report = json.loads(destination.read_text())
+    solution = "core-attention-boundary"
+    bindings = {}
+    with tarfile.open(archive) as capsule:
+
+        def read(relative, raw=False):
+            data = capsule.extractfile(f"runs/{solution}-hle/{relative}").read()
+            bindings[relative] = hashlib.sha256(data).hexdigest()
+            return data if raw else json.loads(data)
+
+        read("hle-gold/completed.json")
+        assert read("finished.json")["server_exit"] == 0
+        stop = read("owner-stop-after-gold.json")
+        assert stop["completed_scope"] == "hle-gold"
+        config = read("configuration.json")
+        assert b"runtime_effective" in read("server.log", raw=True)
+        summary = read("hle-gold/report/summary.json")
+
+        def quality(raw, label):
+            return {
+                "label": label,
+                "correct": raw["successes"],
+                "total": raw["total"],
+                "value": raw["successes"] / raw["total"],
+                "audit": raw,
+            }
+
+        gold = summary["tracks"]["gold"]
+        assert gold["total"] == 668
+        report.setdefault("quality_results", []).append(
+            {
+                "dataset": "hle-verified",
+                "part": "gold",
+                "solution": solution,
+                "score": quality(gold, "Gold"),
+            }
+        )
+        reference = next(
+            r
+            for r in report["results"]
+            if r["id"] == f"frontierscience-{solution}-full-160"
+        )
+        for modality, n in [("text", 200), ("image", 93)]:
+            scope = f"gold-{modality}"
+            raw = read(f"hle-gold/bench-{modality}/measurement/outputs/{scope}.json")
+            accounting = read(f"hle-gold/bench-{modality}/token-accounting.json")
+            assert (
+                accounting["exact_match"]
+                and accounting["tokenize_counts"] == raw["input_lens"]
+            )
+            assert raw["num_prompts"] == raw["completed"] + raw["failed"] == n
+            perf = {
+                k: raw[k]
+                for k in (
+                    "num_prompts",
+                    "completed",
+                    "failed",
+                    "duration",
+                    "request_throughput",
+                    "output_throughput",
+                    "total_token_throughput",
+                    "mean_ttft_ms",
+                    "mean_tpot_ms",
+                    "total_input_tokens",
+                    "total_output_tokens",
+                )
+            }
+            perf["input_token_accounting_verified"] = True
+            row = {
+                "id": f"hle-verified-{solution}-{scope}",
+                "dataset": "hle-verified",
+                "solution": solution,
+                "scope": scope,
+                "quality": [
+                    quality(summary["groups"][f"gold/{modality}"], f"Gold · {modality}")
+                ],
+                "performance": perf,
+                "configuration": {
+                    **reference["configuration"],
+                    "source_commit": config["source_commit"],
+                    "co_location": "Gold solver/judge overlapped Frontier TP2 on the same host; modality load tests ran after Frontier had released its pair.",
+                },
+                "report": REPORT,
+                "protocol": {
+                    "generation": {
+                        "solver_concurrency": 16,
+                        "judge_concurrency": 16,
+                        "solver_max_tokens": 16384,
+                        "judge_max_tokens": 8192,
+                        "temperature": 0,
+                        "seed": 17,
+                        "enable_thinking": False,
+                        "scoring_policy": "strict_json",
+                        "retries": 0,
+                    },
+                    "scoring": summary["protocol"],
+                    "load_test": "Text 200 selected by floor(i*N/200); all 93 image tasks. Output cap 256, EOS allowed, temperature 0, seed 0, thinking false, no system prompt, request-rate inf; zero explicit warmups; original initial test outside measured N.",
+                },
+                "limitations": [
+                    "Gold only. Owner stopped the campaign after this result; queued Revision was cancelled, and its partial transition receipts do not supply a score.",
+                    "333 of 668 Gold judges reached 8192 tokens and are unresolved. All remain nonsuccess in the denominator, not confirmed incorrect answers. This is a lower-bound observed score, not fully resolved accuracy.",
+                    "Single trial, same-model Qwen judge; no repair, regrading or retry; not official leaderboard replication.",
+                    "Runtime, MTP, cache settings and shared-host conditions differ from BetterScale. No isolated causal optimization comparison.",
+                    "Text/image load tests are separate from full Gold quality and from one another; server tokenization matches every input length.",
+                ],
+                "evidence": {"source_files_sha256": dict(bindings), "summary": summary},
+            }
+            assert not any(r["id"] == row["id"] for r in report["results"])
+            report["results"].append(row)
+        report["campaign_completion"] = {
+            "status": "completed_at_owner_requested_boundary",
+            "date": "2026-10-16",
+            "cancelled": {
+                "solution": solution,
+                "dataset": "hle-verified",
+                "part": "revision",
+                "note": "Stopped during the queue transition after Gold; partial receipts are private and supply no score. No more runs.",
+            },
+            "owned_accelerator_services": "all stopped; selected-device release checks passed",
+        }
+    destination.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("archive", type=Path)
-    parser.add_argument("--task", choices=["mmlu", "frontier"], default="mmlu")
+    parser.add_argument("--task", choices=["mmlu", "frontier", "gold"], default="mmlu")
     args = parser.parse_args()
-    {"mmlu": import_mmlu, "frontier": import_frontier}[args.task](args.archive)
+    {"mmlu": import_mmlu, "frontier": import_frontier, "gold": import_gold}[args.task](
+        args.archive
+    )

@@ -701,6 +701,590 @@
           }
         }
       }
+    },
+    {
+      "id": "hle-verified-core-attention-boundary-gold-text",
+      "dataset": "hle-verified",
+      "solution": "core-attention-boundary",
+      "scope": "gold-text",
+      "quality": [
+        {
+          "label": "Gold · text",
+          "correct": 70,
+          "total": 575,
+          "value": 0.12173913043478261,
+          "audit": {
+            "total": 575,
+            "graded": 278,
+            "successes": 70,
+            "accuracy": 0.12173913043478261,
+            "unresolved": 297,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.02672692613427203,
+            "solver_failures": 0,
+            "judge_invalid": 297,
+            "judge_transport_failures": 0,
+            "solver_truncated": 379,
+            "judge_truncated": 297
+          }
+        }
+      ],
+      "performance": {
+        "num_prompts": 200,
+        "completed": 200,
+        "failed": 0,
+        "duration": 129.8206874942407,
+        "request_throughput": 1.5405865109817163,
+        "output_throughput": 375.82607935398966,
+        "total_token_throughput": 776.0165343791551,
+        "mean_ttft_ms": 59181.44344239961,
+        "mean_tpot_ms": 40.207409106129965,
+        "total_input_tokens": 51953,
+        "total_output_tokens": 48790,
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "hardware": "2 x Ascend 910B2",
+        "tensor_parallel_size": 2,
+        "expert_parallel": true,
+        "mtp": 0,
+        "prefix_caching": false,
+        "graph_mode": "FULL_DECODE_ONLY",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "gpu_memory_utilization": 0.85,
+        "block_size": 128,
+        "vllm": "0.23.0+empty",
+        "vllm_ascend": "0.23.0",
+        "vllm_commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+        "ascend_commit": "5cb98caaadeff42b5b62b996e34bb2aaa29d20fd",
+        "cann": "9.1",
+        "activation": "installed and runtime_effective observed",
+        "co_location": "Gold solver/judge overlapped Frontier TP2 on the same host; modality load tests ran after Frontier had released its pair."
+      },
+      "report": "data/dataset-matrix-campaign-20261016/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Text 200 selected by floor(i*N/200); all 93 image tasks. Output cap 256, EOS allowed, temperature 0, seed 0, thinking false, no system prompt, request-rate inf; zero explicit warmups; original initial test outside measured N."
+      },
+      "limitations": [
+        "Gold only. Owner stopped the campaign after this result; queued Revision was cancelled, and its partial transition receipts do not supply a score.",
+        "333 of 668 Gold judges reached 8192 tokens and are unresolved. All remain nonsuccess in the denominator, not confirmed incorrect answers. This is a lower-bound observed score, not fully resolved accuracy.",
+        "Single trial, same-model Qwen judge; no repair, regrading or retry; not official leaderboard replication.",
+        "Runtime, MTP, cache settings and shared-host conditions differ from BetterScale. No isolated causal optimization comparison.",
+        "Text/image load tests are separate from full Gold quality and from one another; server tokenization matches every input length."
+      ],
+      "evidence": {
+        "source_files_sha256": {
+          "hle-gold/completed.json": "7bb0865725d9b53873af36579d5ae6b9f3f2be2fecff4c553ced318a0fa03138",
+          "finished.json": "ae090bb504e4911a6b4d24579d19fbd4359e33445d570f546bd452cce7d2e7fa",
+          "owner-stop-after-gold.json": "ffd5bbdb781568566e74d8ce48cb690001b31b9fc7562ff65db87bc187010f07",
+          "configuration.json": "6d4890ea96ebbeb13b7c35b7c9eb4af277a7b00d16c3f6c5b65683ecd43793e0",
+          "server.log": "adc0def2e5e159089b5286b8fb9dfa3e05d74c0625dce646f172ce9c8f60a4fb",
+          "hle-gold/report/summary.json": "6791c32e43c35a77c511dea2abd97e6711421f4f14620a7afd2a7ad840b10139",
+          "hle-gold/bench-text/measurement/outputs/gold-text.json": "c95dda2a6222ad1f74aeb32717d22a79792821f3b67525801c6a9590d1f2116c",
+          "hle-gold/bench-text/token-accounting.json": "77869efd972e8171f41a9c10d43b6ddcd8848c68c2fc1fa4fa47caef44352a7d"
+        },
+        "summary": {
+          "protocol": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+          "scoring_policy": "strict_json",
+          "selection": {
+            "subsets": [
+              "gold"
+            ],
+            "modality": "all",
+            "excluded": 0
+          },
+          "scope": "complete_selected_plan",
+          "judge_model": "qwen3.5-35b",
+          "solver_model": "qwen3.5-35b",
+          "contract_sha256": "2fe56a89c75a693d9ce9860e0124a95e36ed33cab3a5213ff06ed6be3e878041",
+          "solver_index_sha256": "8dc4f9208f5fa94740e0d34ceab58908ad78631f3882c03c2c0f18b82dcc3c89",
+          "judge_index_sha256": "23b327175eb2acdd26cec32e6a1b4125363644e11498c090ec12a54d458b73fc",
+          "tracks": {
+            "gold": {
+              "total": 668,
+              "graded": 335,
+              "successes": 77,
+              "accuracy": 0.11526946107784432,
+              "unresolved": 333,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.024217565368716963,
+              "solver_failures": 0,
+              "judge_invalid": 333,
+              "judge_transport_failures": 0,
+              "solver_truncated": 388,
+              "judge_truncated": 333
+            }
+          },
+          "groups": {
+            "gold/text": {
+              "total": 575,
+              "graded": 278,
+              "successes": 70,
+              "accuracy": 0.12173913043478261,
+              "unresolved": 297,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.02672692613427203,
+              "solver_failures": 0,
+              "judge_invalid": 297,
+              "judge_transport_failures": 0,
+              "solver_truncated": 379,
+              "judge_truncated": 297
+            },
+            "gold/image": {
+              "total": 93,
+              "graded": 57,
+              "successes": 7,
+              "accuracy": 0.07526881720430108,
+              "unresolved": 36,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.053620380828891624,
+              "solver_failures": 0,
+              "judge_invalid": 36,
+              "judge_transport_failures": 0,
+              "solver_truncated": 9,
+              "judge_truncated": 36
+            }
+          },
+          "subjects": {
+            "gold/Biology/Medicine": {
+              "total": 97,
+              "graded": 57,
+              "successes": 8,
+              "accuracy": 0.08247422680412371,
+              "unresolved": 40,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.05474424451600599,
+              "solver_failures": 0,
+              "judge_invalid": 40,
+              "judge_transport_failures": 0,
+              "solver_truncated": 20,
+              "judge_truncated": 40
+            },
+            "gold/Chemistry": {
+              "total": 20,
+              "graded": 11,
+              "successes": 1,
+              "accuracy": 0.05,
+              "unresolved": 9,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.09551858457912785,
+              "solver_failures": 0,
+              "judge_invalid": 9,
+              "judge_transport_failures": 0,
+              "solver_truncated": 8,
+              "judge_truncated": 9
+            },
+            "gold/Computer Science/AI": {
+              "total": 86,
+              "graded": 51,
+              "successes": 9,
+              "accuracy": 0.10465116279069768,
+              "unresolved": 35,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.06469563975075528,
+              "solver_failures": 0,
+              "judge_invalid": 35,
+              "judge_transport_failures": 0,
+              "solver_truncated": 48,
+              "judge_truncated": 35
+            },
+            "gold/Engineering": {
+              "total": 25,
+              "graded": 13,
+              "successes": 3,
+              "accuracy": 0.12,
+              "unresolved": 12,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.12738492218469186,
+              "solver_failures": 0,
+              "judge_invalid": 12,
+              "judge_transport_failures": 0,
+              "solver_truncated": 11,
+              "judge_truncated": 12
+            },
+            "gold/Humanities/Social Science": {
+              "total": 57,
+              "graded": 31,
+              "successes": 9,
+              "accuracy": 0.15789473684210525,
+              "unresolved": 26,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.09466417650237915,
+              "solver_failures": 0,
+              "judge_invalid": 26,
+              "judge_transport_failures": 0,
+              "solver_truncated": 20,
+              "judge_truncated": 26
+            },
+            "gold/Math": {
+              "total": 271,
+              "graded": 111,
+              "successes": 38,
+              "accuracy": 0.14022140221402213,
+              "unresolved": 160,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.04134013531833733,
+              "solver_failures": 0,
+              "judge_invalid": 160,
+              "judge_transport_failures": 0,
+              "solver_truncated": 215,
+              "judge_truncated": 160
+            },
+            "gold/Other": {
+              "total": 62,
+              "graded": 34,
+              "successes": 3,
+              "accuracy": 0.04838709677419355,
+              "unresolved": 28,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.05341400838889341,
+              "solver_failures": 0,
+              "judge_invalid": 28,
+              "judge_transport_failures": 0,
+              "solver_truncated": 36,
+              "judge_truncated": 28
+            },
+            "gold/Physics": {
+              "total": 50,
+              "graded": 27,
+              "successes": 6,
+              "accuracy": 0.12,
+              "unresolved": 23,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.0900747422977163,
+              "solver_failures": 0,
+              "judge_invalid": 23,
+              "judge_transport_failures": 0,
+              "solver_truncated": 30,
+              "judge_truncated": 23
+            }
+          },
+          "calibration_error": null,
+          "calibration_note": "not implemented: pinned upstream binning omits final bin and crashes below 100 grades; raw confidence preserved; no silent replacement metric"
+        }
+      }
+    },
+    {
+      "id": "hle-verified-core-attention-boundary-gold-image",
+      "dataset": "hle-verified",
+      "solution": "core-attention-boundary",
+      "scope": "gold-image",
+      "quality": [
+        {
+          "label": "Gold · image",
+          "correct": 7,
+          "total": 93,
+          "value": 0.07526881720430108,
+          "audit": {
+            "total": 93,
+            "graded": 57,
+            "successes": 7,
+            "accuracy": 0.07526881720430108,
+            "unresolved": 36,
+            "complete_grading": false,
+            "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+            "wald_95_half_width": 0.053620380828891624,
+            "solver_failures": 0,
+            "judge_invalid": 36,
+            "judge_transport_failures": 0,
+            "solver_truncated": 9,
+            "judge_truncated": 36
+          }
+        }
+      ],
+      "performance": {
+        "num_prompts": 93,
+        "completed": 93,
+        "failed": 0,
+        "duration": 80.71105458121747,
+        "request_throughput": 1.1522585162905594,
+        "output_throughput": 278.9828495840272,
+        "total_token_throughput": 1500.7237933945594,
+        "mean_ttft_ms": 35330.15739587286,
+        "mean_tpot_ms": 45.47771183129269,
+        "total_input_tokens": 98608,
+        "total_output_tokens": 22517,
+        "input_token_accounting_verified": true
+      },
+      "configuration": {
+        "source_commit": "8b5ebb1382bc3624b5250ccec53d5554b6c86003",
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "hardware": "2 x Ascend 910B2",
+        "tensor_parallel_size": 2,
+        "expert_parallel": true,
+        "mtp": 0,
+        "prefix_caching": false,
+        "graph_mode": "FULL_DECODE_ONLY",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "gpu_memory_utilization": 0.85,
+        "block_size": 128,
+        "vllm": "0.23.0+empty",
+        "vllm_ascend": "0.23.0",
+        "vllm_commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+        "ascend_commit": "5cb98caaadeff42b5b62b996e34bb2aaa29d20fd",
+        "cann": "9.1",
+        "activation": "installed and runtime_effective observed",
+        "co_location": "Gold solver/judge overlapped Frontier TP2 on the same host; modality load tests ran after Frontier had released its pair."
+      },
+      "report": "data/dataset-matrix-campaign-20261016/report.json",
+      "protocol": {
+        "generation": {
+          "solver_concurrency": 16,
+          "judge_concurrency": 16,
+          "solver_max_tokens": 16384,
+          "judge_max_tokens": 8192,
+          "temperature": 0,
+          "seed": 17,
+          "enable_thinking": false,
+          "scoring_policy": "strict_json",
+          "retries": 0
+        },
+        "scoring": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+        "load_test": "Text 200 selected by floor(i*N/200); all 93 image tasks. Output cap 256, EOS allowed, temperature 0, seed 0, thinking false, no system prompt, request-rate inf; zero explicit warmups; original initial test outside measured N."
+      },
+      "limitations": [
+        "Gold only. Owner stopped the campaign after this result; queued Revision was cancelled, and its partial transition receipts do not supply a score.",
+        "333 of 668 Gold judges reached 8192 tokens and are unresolved. All remain nonsuccess in the denominator, not confirmed incorrect answers. This is a lower-bound observed score, not fully resolved accuracy.",
+        "Single trial, same-model Qwen judge; no repair, regrading or retry; not official leaderboard replication.",
+        "Runtime, MTP, cache settings and shared-host conditions differ from BetterScale. No isolated causal optimization comparison.",
+        "Text/image load tests are separate from full Gold quality and from one another; server tokenization matches every input length."
+      ],
+      "evidence": {
+        "source_files_sha256": {
+          "hle-gold/completed.json": "7bb0865725d9b53873af36579d5ae6b9f3f2be2fecff4c553ced318a0fa03138",
+          "finished.json": "ae090bb504e4911a6b4d24579d19fbd4359e33445d570f546bd452cce7d2e7fa",
+          "owner-stop-after-gold.json": "ffd5bbdb781568566e74d8ce48cb690001b31b9fc7562ff65db87bc187010f07",
+          "configuration.json": "6d4890ea96ebbeb13b7c35b7c9eb4af277a7b00d16c3f6c5b65683ecd43793e0",
+          "server.log": "adc0def2e5e159089b5286b8fb9dfa3e05d74c0625dce646f172ce9c8f60a4fb",
+          "hle-gold/report/summary.json": "6791c32e43c35a77c511dea2abd97e6711421f4f14620a7afd2a7ad840b10139",
+          "hle-gold/bench-text/measurement/outputs/gold-text.json": "c95dda2a6222ad1f74aeb32717d22a79792821f3b67525801c6a9590d1f2116c",
+          "hle-gold/bench-text/token-accounting.json": "77869efd972e8171f41a9c10d43b6ddcd8848c68c2fc1fa4fa47caef44352a7d",
+          "hle-gold/bench-image/measurement/outputs/gold-image.json": "c135f2450b1db8c6dba3fcbcefe924c4a740d9b4e212d1080535e184e16dc5e9",
+          "hle-gold/bench-image/token-accounting.json": "2435af94fc3a374d56170ac438d28ae0dec8059998869f7594ecebe838b688af"
+        },
+        "summary": {
+          "protocol": "HLE original evaluation prompts/schema on HLE-Verified; Qwen substitute; single trial; not official leaderboard replication",
+          "scoring_policy": "strict_json",
+          "selection": {
+            "subsets": [
+              "gold"
+            ],
+            "modality": "all",
+            "excluded": 0
+          },
+          "scope": "complete_selected_plan",
+          "judge_model": "qwen3.5-35b",
+          "solver_model": "qwen3.5-35b",
+          "contract_sha256": "2fe56a89c75a693d9ce9860e0124a95e36ed33cab3a5213ff06ed6be3e878041",
+          "solver_index_sha256": "8dc4f9208f5fa94740e0d34ceab58908ad78631f3882c03c2c0f18b82dcc3c89",
+          "judge_index_sha256": "23b327175eb2acdd26cec32e6a1b4125363644e11498c090ec12a54d458b73fc",
+          "tracks": {
+            "gold": {
+              "total": 668,
+              "graded": 335,
+              "successes": 77,
+              "accuracy": 0.11526946107784432,
+              "unresolved": 333,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.024217565368716963,
+              "solver_failures": 0,
+              "judge_invalid": 333,
+              "judge_transport_failures": 0,
+              "solver_truncated": 388,
+              "judge_truncated": 333
+            }
+          },
+          "groups": {
+            "gold/text": {
+              "total": 575,
+              "graded": 278,
+              "successes": 70,
+              "accuracy": 0.12173913043478261,
+              "unresolved": 297,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.02672692613427203,
+              "solver_failures": 0,
+              "judge_invalid": 297,
+              "judge_transport_failures": 0,
+              "solver_truncated": 379,
+              "judge_truncated": 297
+            },
+            "gold/image": {
+              "total": 93,
+              "graded": 57,
+              "successes": 7,
+              "accuracy": 0.07526881720430108,
+              "unresolved": 36,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.053620380828891624,
+              "solver_failures": 0,
+              "judge_invalid": 36,
+              "judge_transport_failures": 0,
+              "solver_truncated": 9,
+              "judge_truncated": 36
+            }
+          },
+          "subjects": {
+            "gold/Biology/Medicine": {
+              "total": 97,
+              "graded": 57,
+              "successes": 8,
+              "accuracy": 0.08247422680412371,
+              "unresolved": 40,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.05474424451600599,
+              "solver_failures": 0,
+              "judge_invalid": 40,
+              "judge_transport_failures": 0,
+              "solver_truncated": 20,
+              "judge_truncated": 40
+            },
+            "gold/Chemistry": {
+              "total": 20,
+              "graded": 11,
+              "successes": 1,
+              "accuracy": 0.05,
+              "unresolved": 9,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.09551858457912785,
+              "solver_failures": 0,
+              "judge_invalid": 9,
+              "judge_transport_failures": 0,
+              "solver_truncated": 8,
+              "judge_truncated": 9
+            },
+            "gold/Computer Science/AI": {
+              "total": 86,
+              "graded": 51,
+              "successes": 9,
+              "accuracy": 0.10465116279069768,
+              "unresolved": 35,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.06469563975075528,
+              "solver_failures": 0,
+              "judge_invalid": 35,
+              "judge_transport_failures": 0,
+              "solver_truncated": 48,
+              "judge_truncated": 35
+            },
+            "gold/Engineering": {
+              "total": 25,
+              "graded": 13,
+              "successes": 3,
+              "accuracy": 0.12,
+              "unresolved": 12,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.12738492218469186,
+              "solver_failures": 0,
+              "judge_invalid": 12,
+              "judge_transport_failures": 0,
+              "solver_truncated": 11,
+              "judge_truncated": 12
+            },
+            "gold/Humanities/Social Science": {
+              "total": 57,
+              "graded": 31,
+              "successes": 9,
+              "accuracy": 0.15789473684210525,
+              "unresolved": 26,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.09466417650237915,
+              "solver_failures": 0,
+              "judge_invalid": 26,
+              "judge_transport_failures": 0,
+              "solver_truncated": 20,
+              "judge_truncated": 26
+            },
+            "gold/Math": {
+              "total": 271,
+              "graded": 111,
+              "successes": 38,
+              "accuracy": 0.14022140221402213,
+              "unresolved": 160,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.04134013531833733,
+              "solver_failures": 0,
+              "judge_invalid": 160,
+              "judge_transport_failures": 0,
+              "solver_truncated": 215,
+              "judge_truncated": 160
+            },
+            "gold/Other": {
+              "total": 62,
+              "graded": 34,
+              "successes": 3,
+              "accuracy": 0.04838709677419355,
+              "unresolved": 28,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.05341400838889341,
+              "solver_failures": 0,
+              "judge_invalid": 28,
+              "judge_transport_failures": 0,
+              "solver_truncated": 36,
+              "judge_truncated": 28
+            },
+            "gold/Physics": {
+              "total": 50,
+              "graded": 27,
+              "successes": 6,
+              "accuracy": 0.12,
+              "unresolved": 23,
+              "complete_grading": false,
+              "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+              "wald_95_half_width": 0.0900747422977163,
+              "solver_failures": 0,
+              "judge_invalid": 23,
+              "judge_transport_failures": 0,
+              "solver_truncated": 30,
+              "judge_truncated": 23
+            }
+          },
+          "calibration_error": null,
+          "calibration_note": "not implemented: pinned upstream binning omits final bin and crashes below 100 grades; raw confidence preserved; no silent replacement metric"
+        }
+      }
     }
   ],
   "quality_results": [
@@ -803,6 +1387,43 @@
           "mean_research_score_valid_only": 2.565086206896552
         }
       }
+    },
+    {
+      "dataset": "hle-verified",
+      "part": "gold",
+      "solution": "core-attention-boundary",
+      "score": {
+        "label": "Gold",
+        "correct": 77,
+        "total": 668,
+        "value": 0.11526946107784432,
+        "audit": {
+          "total": 668,
+          "graded": 335,
+          "successes": 77,
+          "accuracy": 0.11526946107784432,
+          "unresolved": 333,
+          "complete_grading": false,
+          "accuracy_note": "all selected cases in denominator; unresolved are nonsuccess, not confirmed incorrect",
+          "wald_95_half_width": 0.024217565368716963,
+          "solver_failures": 0,
+          "judge_invalid": 333,
+          "judge_transport_failures": 0,
+          "solver_truncated": 388,
+          "judge_truncated": 333
+        }
+      }
     }
-  ]
+  ],
+  "campaign_completion": {
+    "status": "completed_at_owner_requested_boundary",
+    "date": "2026-10-16",
+    "cancelled": {
+      "solution": "core-attention-boundary",
+      "dataset": "hle-verified",
+      "part": "revision",
+      "note": "Stopped during the queue transition after Gold; partial receipts are private and supply no score. No more runs."
+    },
+    "owned_accelerator_services": "all stopped; selected-device release checks passed"
+  }
 }

@@ -35,7 +35,7 @@ def test_scope_and_metrics():
     assert all(r["performance"]["num_prompts"] == 160 for r in frontier)
     assert all(len(r["quality"]) == 2 for r in frontier)
     hle = [r for r in rows if r["dataset"] == "hle-verified"]
-    assert len(hle) == 8
+    assert len(hle) == 10
     bs_hle = [r for r in hle if r["solution"] == "betterscale"]
     assert len(bs_hle) == 4
     assert all(r["performance"]["input_token_accounting_verified"] for r in bs_hle)
@@ -90,3 +90,19 @@ def test_campaign_mmlu_completed_scores_and_separate_load_tests():
         assert row["performance"]["failed"] == 0
         assert row["configuration"]["mtp"] == 0
         assert row["quality"] == [part["scores"][solution]]
+
+
+def test_campaign_gold_keeps_unresolved_and_cancelled_revision_unscored():
+    data = module.build()
+    parts = next(d for d in data["datasets"] if d["id"] == "hle-verified")["parts"]
+    gold = parts[0]["scores"]["core-attention-boundary"]
+    assert gold["correct"] == 77 and gold["total"] == 668
+    assert gold["audit"]["unresolved"] == 333
+    assert "core-attention-boundary" not in parts[1]["scores"]
+    rows = [
+        r
+        for r in data["records"]
+        if r["dataset"] == "hle-verified" and r["solution"] == "core-attention-boundary"
+    ]
+    assert {r["scope"] for r in rows} == {"gold-text", "gold-image"}
+    assert all(r["performance"]["input_token_accounting_verified"] for r in rows)

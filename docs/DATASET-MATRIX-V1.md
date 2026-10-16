@@ -81,3 +81,10 @@ then publishes only aggregate scores, timing, sanitized configuration and eviden
 the dataset: Ascend Attention Boundary's unsupported Frontier/HLE host must not hide its completed
 MMLU result. The two MMLU engines overlapped on separate TP2 pairs of one host; their runtime, MTP
 and cache configuration differ from BetterScale. No isolated speedup attribution is implied.
+
+The October16 campaign ended at the owner's requested cost boundary after Core Attention Boundary
+HLE Gold. Gold's 333 unresolved, length-ended judges remain in the 668-case denominator; its 77
+successes are an observed lower-bound score, not 591 confirmed wrong answers. The overview displays
+unresolved counts next to scores. Text/image performance has independently verified server input
+counts. Revision was cancelled during the queue transition; partial receipts are archived privately
+and do not populate a score or performance row. All owned accelerator services have been stopped.
