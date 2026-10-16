@@ -11,7 +11,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BS = "betterscale-dataset-validation-20261015"
-COMMIT = "5714be9e9b032f9aaef13df229aaa96dc8ef7c3b"  # pragma: allowlist secret
+CURRENT = "betterscale-school-runtime-20261016"
+COMMIT = "2d90b460cf92645214bd6bc325bff0562c395ba6"  # pragma: allowlist secret
 
 
 def build(root=ROOT):
@@ -216,6 +217,60 @@ def build(root=ROOT):
         assert measured["value"] == measured["correct"] / measured["total"]
         part["scores"][solution] = measured
     records.extend(campaign["results"])
+    # The latest accepted run replaces the default BetterScale observations.
+    # Original reports remain archived, not displayed as a second solution.
+    school_path = f"data/{CURRENT}/report.json"
+    school = read(school_path)
+    sid = "betterscale"
+    records = [record for record in records if record["solution"] != sid]
+    accuracy = school["accuracy"]
+    for dataset in datasets:
+        for part in dataset["parts"]:
+            raw = (
+                accuracy["mmlu"]
+                if dataset["id"] == "mmlu-pro"
+                else accuracy["frontier"]["tracks"][part["id"]]
+                if dataset["id"] == "frontierscience"
+                else accuracy[part["id"]]["tracks"][part["id"]]
+            )
+            part["scores"][sid] = score(raw, part["name"])
+    for dataset, key, scope, protocol in (
+        (datasets[0], "mmlu", "test-200", m_protocol),
+        (datasets[1], "frontier", "full-160", f_protocol),
+    ):
+        add(
+            dataset["id"],
+            sid,
+            scope,
+            [part["scores"][sid] for part in dataset["parts"]],
+            school["performance"][key],
+            school["runtime"],
+            school_path,
+            protocol,
+            school["limitations"],
+        )
+    for scope in ("gold-text", "revision-text", "gold-image", "revision-image"):
+        subset, modality = scope.split("-")
+        add(
+            "hle-verified",
+            sid,
+            scope,
+            [
+                score(
+                    accuracy[subset]["groups"][f"{subset}/{modality}"],
+                    f"{subset.title()} · {modality}",
+                )
+            ],
+            school["performance"][scope],
+            school["runtime"],
+            school_path,
+            {
+                "generation": bh["generation"],
+                "scoring": accuracy[subset]["protocol"],
+                "load_test": "Separate text/image tests; output cap 256; request-rate inf; temperature 0; seed 0",
+            },
+            school["limitations"],
+        )
     return {
         "schema": 1,
         "cohort": {
@@ -231,7 +286,7 @@ def build(root=ROOT):
         "source_files_sha256": sources,
         "betterscale_publication": {
             "commit": COMMIT,
-            "url": f"https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/{COMMIT}/reports/{BS}",
+            "url": f"https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/{COMMIT}/reports/{CURRENT}",
         },
         "formal_acceptance": False,
         "repeats": 1,
@@ -247,14 +302,14 @@ def main():
     )
     args = parser.parse_args()
     if args.benchmark:
-        source = args.benchmark / "reports" / BS
+        source = args.benchmark / "reports" / CURRENT
         raw = (source / "report.json").read_bytes()
         checksums = {
             line.split()[1]: line.split()[0]
             for line in (source / "SHA256SUMS").read_text().splitlines()
         }
         assert hashlib.sha256(raw).hexdigest() == checksums["report.json"]
-        out = ROOT / "data" / BS
+        out = ROOT / "data" / CURRENT
         out.mkdir(exist_ok=True)
         (out / "report.json").write_bytes(raw)
     (ROOT / "data/dataset-matrix-v1.json").write_text(
