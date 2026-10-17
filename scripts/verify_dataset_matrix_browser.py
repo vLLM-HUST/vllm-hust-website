@@ -119,16 +119,32 @@ def main():
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= innerWidth + 1"
             )
-            page.goto(args.url + "/dataset-matrix-v1.html#swe-smith-tranjactory-offline-window")
-            page.locator(".matrix-detail").wait_for()
-            expect(page.locator(".matrix-detail tbody > tr:not(.run-detail)")).to_have_count(8)
+            page.goto(
+                args.url
+                + "/dataset-matrix-v1.html#swe-smith-tranjactory-offline-window"
+            )
+            page.locator(
+                '[data-expand="offline-window-request-throttling-controller-short-20261017-r18-on"]'
+            ).wait_for()
+            expect(
+                page.locator(".matrix-detail tbody > tr:not(.run-detail)")
+            ).to_have_count(8)
             assert "30.28" in page.locator(".matrix-detail").inner_text()
             assert "512MiB" in page.locator(".runs-note").first.inner_text()
             assert "180" in page.locator(".runs-note").first.inner_text()
-            page.locator('[data-expand="offline-window-request-throttling-controller-short-20261017-r18-on"]').click()
-            assert page.locator("#evidence-offline-window-request-throttling-controller-short-20261017-r18-on").is_visible()
-            page.screenshot(path=str(args.output / f"offline-window-{width}-{lang}.png"), full_page=True)
-            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+            page.locator(
+                '[data-expand="offline-window-request-throttling-controller-short-20261017-r18-on"]'
+            ).click()
+            assert page.locator(
+                "#evidence-offline-window-request-throttling-controller-short-20261017-r18-on"
+            ).is_visible()
+            page.screenshot(
+                path=str(args.output / f"offline-window-{width}-{lang}.png"),
+                full_page=True,
+            )
+            assert page.evaluate(
+                "document.documentElement.scrollWidth <= innerWidth + 1"
+            )
             assert not errors, errors
             context.close()
         browser.close()
