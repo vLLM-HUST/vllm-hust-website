@@ -1222,7 +1222,7 @@ def test_page_consumes_the_docs_owned_registry() -> None:
     assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=ecpa-final-20261009-project-grouping"' in PAGE
+        'v=state-scheduler-020-20261017"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?'
