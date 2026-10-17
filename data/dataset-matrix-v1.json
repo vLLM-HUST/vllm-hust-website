@@ -1509,6 +1509,120 @@
           "statuses": {}
         }
       ]
+    },
+    {
+      "id": "frontierscience-controller-20261018",
+      "name": "FrontierScience",
+      "runtime_profile": {
+        "id": "controller-core023-fullkv-20261018",
+        "label": "Core / Ascend 0.23.0 · APC off · Full KV · Context 65536"
+      },
+      "parts": [
+        {
+          "id": "olympiad",
+          "name": "Olympiad",
+          "metric": "success",
+          "scores": {
+            "native": {
+              "label": "Olympiad",
+              "correct": 60,
+              "total": 100,
+              "value": 0.6,
+              "audit": {
+                "total": 100,
+                "graded": 98,
+                "successes": 60,
+                "solver_failures": 0,
+                "judge_unresolved": 2,
+                "judge_invalid": 2,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 3,
+                "judge_audit_flagged": 3,
+                "solver_truncated": 30,
+                "judge_truncated": 5,
+                "success_rate": 0.6,
+                "observed_success_lower_bound": 0.6,
+                "mean_research_score_valid_only": null
+              }
+            },
+            "request-throttling-controller": {
+              "label": "Olympiad",
+              "correct": 58,
+              "total": 100,
+              "value": 0.58,
+              "audit": {
+                "total": 100,
+                "graded": 98,
+                "successes": 58,
+                "solver_failures": 0,
+                "judge_unresolved": 2,
+                "judge_invalid": 2,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 4,
+                "judge_audit_flagged": 4,
+                "solver_truncated": 27,
+                "judge_truncated": 6,
+                "success_rate": 0.58,
+                "observed_success_lower_bound": 0.58,
+                "mean_research_score_valid_only": null
+              }
+            }
+          },
+          "statuses": {}
+        },
+        {
+          "id": "research",
+          "name": "Research",
+          "metric": "score7",
+          "scores": {
+            "native": {
+              "label": "Research",
+              "correct": 5,
+              "total": 60,
+              "value": 0.08333333333333333,
+              "audit": {
+                "total": 60,
+                "graded": 59,
+                "successes": 5,
+                "solver_failures": 0,
+                "judge_unresolved": 1,
+                "judge_invalid": 1,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 2,
+                "judge_audit_flagged": 4,
+                "solver_truncated": 11,
+                "judge_truncated": 3,
+                "success_rate": 0.08333333333333333,
+                "observed_success_lower_bound": 0.08333333333333333,
+                "mean_research_score_valid_only": 2.505508474576271
+              }
+            },
+            "request-throttling-controller": {
+              "label": "Research",
+              "correct": 4,
+              "total": 60,
+              "value": 0.06666666666666667,
+              "audit": {
+                "total": 60,
+                "graded": 59,
+                "successes": 4,
+                "solver_failures": 0,
+                "judge_unresolved": 1,
+                "judge_invalid": 1,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 9,
+                "judge_audit_flagged": 12,
+                "solver_truncated": 9,
+                "judge_truncated": 10,
+                "success_rate": 0.06666666666666667,
+                "observed_success_lower_bound": 0.06666666666666667,
+                "mean_research_score_valid_only": 2.250084745762712
+              }
+            }
+          },
+          "statuses": {}
+        }
+      ]
     }
   ],
   "records": [
@@ -4884,6 +4998,338 @@
         "Runtime profile must be read alongside the attached deployment evidence; original matrix qualification is false.",
         "Order repeat is separate and excluded from the primary seed median."
       ]
+    },
+    {
+      "id": "frontierscience-controller-20261018-native",
+      "dataset": "frontierscience-controller-20261018",
+      "solution": "native",
+      "scope": "full-160",
+      "measured_at": "2026-10-18",
+      "quality": [
+        {
+          "label": "Olympiad",
+          "correct": 60,
+          "total": 100,
+          "value": 0.6,
+          "audit": {
+            "total": 100,
+            "graded": 98,
+            "successes": 60,
+            "solver_failures": 0,
+            "judge_unresolved": 2,
+            "judge_invalid": 2,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 3,
+            "judge_audit_flagged": 3,
+            "solver_truncated": 30,
+            "judge_truncated": 5,
+            "success_rate": 0.6,
+            "observed_success_lower_bound": 0.6,
+            "mean_research_score_valid_only": null
+          }
+        },
+        {
+          "label": "Research",
+          "correct": 5,
+          "total": 60,
+          "value": 0.08333333333333333,
+          "audit": {
+            "total": 60,
+            "graded": 59,
+            "successes": 5,
+            "solver_failures": 0,
+            "judge_unresolved": 1,
+            "judge_invalid": 1,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 2,
+            "judge_audit_flagged": 4,
+            "solver_truncated": 11,
+            "judge_truncated": 3,
+            "success_rate": 0.08333333333333333,
+            "observed_success_lower_bound": 0.08333333333333333,
+            "mean_research_score_valid_only": 2.505508474576271
+          }
+        }
+      ],
+      "performance": {
+        "output_throughput": 474.1267825741728,
+        "mean_ttft_ms": 40900.88085792377,
+        "mean_tpot_ms": 29.93137634706263,
+        "completed": 160,
+        "failed": 0,
+        "num_prompts": 160,
+        "repetitions": 3,
+        "aggregation": "median of three formal values per metric",
+        "formal_runs": [
+          {
+            "completed": 160,
+            "failed": 0,
+            "duration": 92.90921424608678,
+            "total_input_tokens": 62571,
+            "total_output_tokens": 40960,
+            "request_throughput": 1.722111216829487,
+            "output_throughput": 440.86047150834867,
+            "total_token_throughput": 1114.324352434835,
+            "mean_ttft_ms": 40900.88085792377,
+            "median_ttft_ms": 37564.645781647414,
+            "p99_ttft_ms": 85754.22079965472,
+            "mean_tpot_ms": 30.01527566227642,
+            "median_tpot_ms": 29.496179897265108,
+            "p99_tpot_ms": 39.975635862379626,
+            "stage": "bench-frontier-native-1",
+            "arm": "native",
+            "repetition": 1,
+            "input_sha256": "028207ab98f0a26c3337b090dce3d5b7349135afc91e661390eef103b4f97053",
+            "raw_sha256": "34f5ff492d6bc7059a3594292e6c80fe9cffb3f56b423c663cf09fe1b1af62c7",
+            "stage_wall_seconds": 118.76556921005249
+          },
+          {
+            "completed": 160,
+            "failed": 0,
+            "duration": 86.3903949437663,
+            "total_input_tokens": 62571,
+            "total_output_tokens": 40960,
+            "request_throughput": 1.8520577444303625,
+            "output_throughput": 474.1267825741728,
+            "total_token_throughput": 1198.4086896163742,
+            "mean_ttft_ms": 41431.47675439832,
+            "median_ttft_ms": 42643.02069041878,
+            "p99_ttft_ms": 79461.71569048427,
+            "mean_tpot_ms": 29.252824947151222,
+            "median_tpot_ms": 29.355427924105353,
+            "p99_tpot_ms": 29.9560258747535,
+            "stage": "bench-frontier-native-2",
+            "arm": "native",
+            "repetition": 2,
+            "input_sha256": "028207ab98f0a26c3337b090dce3d5b7349135afc91e661390eef103b4f97053",
+            "raw_sha256": "fff7d9b62930677ea839971473c015866a2e7d434a1ad64b940c061e5140b3ed",
+            "stage_wall_seconds": 112.74696898460388
+          },
+          {
+            "completed": 160,
+            "failed": 0,
+            "duration": 83.92873088270426,
+            "total_input_tokens": 62571,
+            "total_output_tokens": 40960,
+            "request_throughput": 1.9063793568332421,
+            "output_throughput": 488.03311534931,
+            "total_token_throughput": 1233.55850745189,
+            "mean_ttft_ms": 38182.37304157228,
+            "median_ttft_ms": 37518.22384400293,
+            "p99_ttft_ms": 77011.02329752408,
+            "mean_tpot_ms": 29.93137634706263,
+            "median_tpot_ms": 29.28923589049601,
+            "p99_tpot_ms": 33.33843598533057,
+            "stage": "bench-frontier-native-3",
+            "arm": "native",
+            "repetition": 3,
+            "input_sha256": "028207ab98f0a26c3337b090dce3d5b7349135afc91e661390eef103b4f97053",
+            "raw_sha256": "dc73c6e6cff154cb58794c18eb9316f8441cbc2dc0ad6f4447ba3ebf296f18b3",
+            "stage_wall_seconds": 110.24482107162476
+          }
+        ]
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "precision": "BF16",
+        "hardware": "Ascend 910B2",
+        "parallel": "TP2",
+        "backend_count": 1,
+        "core_version": "0.23.0",
+        "ascend_version": "0.23.0",
+        "prefix_caching": false,
+        "kv": "full automatic",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "quality_client_concurrency": 16
+      },
+      "report": "data/request-throttling-dataset-matrix-20261018/frontierscience.json",
+      "protocol": {
+        "quality": "One full task pass; Qwen substitute judge; unresolved retained in full denominator",
+        "performance": "160 fixed prompts; output cap256; natural EOS; temperature0; request seed0; all arrive together; no client cap; one warmup plus three formal runs per arm",
+        "source": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/0ca30f4/reports/request-throttling-controller/dataset-matrix-20261018-r2/frontierscience",
+        "quality_budget": {
+          "native_score_retained_minimum": 0.99,
+          "observed": {
+            "olympiad": 0.9666666666666667,
+            "research": 0.8
+          },
+          "passed": false
+        }
+      },
+      "limitations": [
+        "Single quality trial per arm; not official leaderboard replication; Qwen substitute judge.",
+        "All unresolved and truncated cases retained in full denominators.",
+        "Different runtime from historical matrix; use matching new Native only.",
+        "Performance mean latency is from vllm client aggregate reports; per-request timing records were not retained.",
+        "All six formal performance runs complete; entire multi-dataset queue still running."
+      ]
+    },
+    {
+      "id": "frontierscience-controller-20261018-request-throttling-controller",
+      "dataset": "frontierscience-controller-20261018",
+      "solution": "request-throttling-controller",
+      "scope": "full-160",
+      "measured_at": "2026-10-18",
+      "quality": [
+        {
+          "label": "Olympiad",
+          "correct": 58,
+          "total": 100,
+          "value": 0.58,
+          "audit": {
+            "total": 100,
+            "graded": 98,
+            "successes": 58,
+            "solver_failures": 0,
+            "judge_unresolved": 2,
+            "judge_invalid": 2,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 4,
+            "judge_audit_flagged": 4,
+            "solver_truncated": 27,
+            "judge_truncated": 6,
+            "success_rate": 0.58,
+            "observed_success_lower_bound": 0.58,
+            "mean_research_score_valid_only": null
+          }
+        },
+        {
+          "label": "Research",
+          "correct": 4,
+          "total": 60,
+          "value": 0.06666666666666667,
+          "audit": {
+            "total": 60,
+            "graded": 59,
+            "successes": 4,
+            "solver_failures": 0,
+            "judge_unresolved": 1,
+            "judge_invalid": 1,
+            "judge_transport_failures": 0,
+            "judge_truncated_with_grade": 9,
+            "judge_audit_flagged": 12,
+            "solver_truncated": 9,
+            "judge_truncated": 10,
+            "success_rate": 0.06666666666666667,
+            "observed_success_lower_bound": 0.06666666666666667,
+            "mean_research_score_valid_only": 2.250084745762712
+          }
+        }
+      ],
+      "performance": {
+        "output_throughput": 432.14307817800534,
+        "mean_ttft_ms": 44799.13205864141,
+        "mean_tpot_ms": 31.887937570766855,
+        "completed": 160,
+        "failed": 0,
+        "num_prompts": 160,
+        "repetitions": 3,
+        "aggregation": "median of three formal values per metric",
+        "formal_runs": [
+          {
+            "completed": 160,
+            "failed": 0,
+            "duration": 94.78342259395868,
+            "total_input_tokens": 62571,
+            "total_output_tokens": 40960,
+            "request_throughput": 1.6880588991328334,
+            "output_throughput": 432.14307817800534,
+            "total_token_throughput": 1092.2901617882585,
+            "mean_ttft_ms": 44799.13205864141,
+            "median_ttft_ms": 44274.86201003194,
+            "p99_ttft_ms": 87927.58798058145,
+            "mean_tpot_ms": 31.837675071129688,
+            "median_tpot_ms": 32.09170758103331,
+            "p99_tpot_ms": 35.13991169521913,
+            "stage": "bench-frontier-controller-1",
+            "arm": "controller",
+            "repetition": 1,
+            "input_sha256": "028207ab98f0a26c3337b090dce3d5b7349135afc91e661390eef103b4f97053",
+            "raw_sha256": "c3629640574317d5e35fe3481815505f2928bb4d7b6c898c02e3a810d19d6c33",
+            "stage_wall_seconds": 120.66410994529724
+          },
+          {
+            "completed": 160,
+            "failed": 0,
+            "duration": 95.68560835532844,
+            "total_input_tokens": 62571,
+            "total_output_tokens": 40960,
+            "request_throughput": 1.6721427887654756,
+            "output_throughput": 428.06855392396176,
+            "total_token_throughput": 1081.9913441479905,
+            "mean_ttft_ms": 43644.66836482752,
+            "median_ttft_ms": 40988.69053646922,
+            "p99_ttft_ms": 88031.33235785179,
+            "mean_tpot_ms": 32.84204198337416,
+            "median_tpot_ms": 32.39194040606712,
+            "p99_tpot_ms": 52.50057479629622,
+            "stage": "bench-frontier-controller-2",
+            "arm": "controller",
+            "repetition": 2,
+            "input_sha256": "028207ab98f0a26c3337b090dce3d5b7349135afc91e661390eef103b4f97053",
+            "raw_sha256": "718a1acd2e8c1f7c68b2b36d44e3a8ee6e5e4edb4f7c6f724af21db2f78f0c26",
+            "stage_wall_seconds": 121.08447766304016
+          },
+          {
+            "completed": 160,
+            "failed": 0,
+            "duration": 93.23716610576957,
+            "total_input_tokens": 62571,
+            "total_output_tokens": 40960,
+            "request_throughput": 1.716053872964068,
+            "output_throughput": 439.3097914788014,
+            "total_token_throughput": 1110.4048345115182,
+            "mean_ttft_ms": 45783.70311774197,
+            "median_ttft_ms": 45714.48594331741,
+            "p99_ttft_ms": 86388.668455109,
+            "mean_tpot_ms": 31.887937570766855,
+            "median_tpot_ms": 32.0567047406061,
+            "p99_tpot_ms": 49.2642117280367,
+            "stage": "bench-frontier-controller-3",
+            "arm": "controller",
+            "repetition": 3,
+            "input_sha256": "028207ab98f0a26c3337b090dce3d5b7349135afc91e661390eef103b4f97053",
+            "raw_sha256": "a5c8e93f666ecc33b813ab8c6003d6aad6395e0d1dc116a4307a5bd8521b501d",
+            "stage_wall_seconds": 119.2542028427124
+          }
+        ]
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "precision": "BF16",
+        "hardware": "Ascend 910B2",
+        "parallel": "TP2",
+        "backend_count": 1,
+        "core_version": "0.23.0",
+        "ascend_version": "0.23.0",
+        "prefix_caching": false,
+        "kv": "full automatic",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "quality_client_concurrency": 16
+      },
+      "report": "data/request-throttling-dataset-matrix-20261018/frontierscience.json",
+      "protocol": {
+        "quality": "One full task pass; Qwen substitute judge; unresolved retained in full denominator",
+        "performance": "160 fixed prompts; output cap256; natural EOS; temperature0; request seed0; all arrive together; no client cap; one warmup plus three formal runs per arm",
+        "source": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/0ca30f4/reports/request-throttling-controller/dataset-matrix-20261018-r2/frontierscience",
+        "quality_budget": {
+          "native_score_retained_minimum": 0.99,
+          "observed": {
+            "olympiad": 0.9666666666666667,
+            "research": 0.8
+          },
+          "passed": false
+        }
+      },
+      "limitations": [
+        "Single quality trial per arm; not official leaderboard replication; Qwen substitute judge.",
+        "All unresolved and truncated cases retained in full denominators.",
+        "Different runtime from historical matrix; use matching new Native only.",
+        "Performance mean latency is from vllm client aggregate reports; per-request timing records were not retained.",
+        "All six formal performance runs complete; entire multi-dataset queue still running."
+      ]
     }
   ],
   "attempts": [
@@ -5107,7 +5553,8 @@
     "data/betterscale-hle-20261015/report.json": "7acc1ef79a759bd58656e0674fefee22d79918352de24bd0ee5471e9aa7ae57f",
     "data/dataset-matrix-campaign-20261016/report.json": "b0a9743ea92e912828891164fa8b67560aee47615b7797df8ee5a35a9a3675c2",
     "data/betterscale-school-runtime-20261016/report.json": "63acbf2f8efd2d4c3488d7a4738f2f9e0c811d8211a528a9f27e04b63f35a07d",
-    "data/request-throttling-offline-window-20261017/report.json": "929af1be958f8845b654bcf6722251c0fc6bfa8b26cd47ede31467d61892e5aa"
+    "data/request-throttling-offline-window-20261017/report.json": "929af1be958f8845b654bcf6722251c0fc6bfa8b26cd47ede31467d61892e5aa",
+    "data/request-throttling-dataset-matrix-20261018/frontierscience.json": "79adab6c4415f064424c5369417066d7cabb50d105632d375b14cc8e5267663e"
   },
   "betterscale_publication": {
     "commit": "2d90b460cf92645214bd6bc325bff0562c395ba6",

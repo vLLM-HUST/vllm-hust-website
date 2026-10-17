@@ -192,6 +192,98 @@ def append_offline_window(root, solutions, datasets, records, sources):
             )
 
 
+def append_controller_dataset_profiles(root, solutions, datasets, records, sources):
+    """Matched new runtime observations, never overwrite historical Native."""
+    path = "data/request-throttling-dataset-matrix-20261018/frontierscience.json"
+    if not (root / path).exists():
+        return
+    raw = (root / path).read_bytes()
+    report = json.loads(raw)
+    assert report["status"] == "DATASET_PAIR_COMPLETE"
+    performance = report["performance"]
+    assert performance["state"] == "THREE_REPEAT_PERFORMANCE_COMPLETE"
+    sources[path] = hashlib.sha256(raw).hexdigest()
+    dataset_id = "frontierscience-controller-20261018"
+    profile = {
+        "id": "controller-core023-fullkv-20261018",
+        "label": "Core / Ascend 0.23.0 · APC off · Full KV · Context 65536",
+    }
+    parts = []
+    for track, metric in [("olympiad", "success"), ("research", "score7")]:
+        scores = {}
+        for arm, sid in [
+            ("native", "native"),
+            ("controller", "request-throttling-controller"),
+        ]:
+            audit = report["quality_pair"]["arms"][arm]["summary"]["tracks"][track]
+            scores[sid] = {
+                "label": track.title(),
+                "correct": audit["successes"],
+                "total": audit["total"],
+                "value": audit["successes"] / audit["total"],
+                "audit": audit,
+            }
+        parts.append(
+            {
+                "id": track,
+                "name": track.title(),
+                "metric": metric,
+                "scores": scores,
+                "statuses": {},
+            }
+        )
+    datasets.append(
+        {
+            "id": dataset_id,
+            "name": "FrontierScience",
+            "runtime_profile": profile,
+            "parts": parts,
+        }
+    )
+    for arm, sid in [
+        ("native", "native"),
+        ("controller", "request-throttling-controller"),
+    ]:
+        points = [
+            r
+            for r in performance["records"]
+            if r["arm"] == arm and r["repetition"] != "warmup"
+        ]
+        assert len(points) == 3 and {r["repetition"] for r in points} == {1, 2, 3}
+        assert all(r["completed"] == 160 and r["failed"] == 0 for r in points)
+        aggregate = performance["aggregate"][arm]
+        for key, value in aggregate.items():
+            assert statistics.median(r[key] for r in points) == value
+        records.append(
+            {
+                "id": f"{dataset_id}-{sid}",
+                "dataset": dataset_id,
+                "solution": sid,
+                "scope": "full-160",
+                "measured_at": "2026-10-18",
+                "quality": [p["scores"][sid] for p in parts],
+                "performance": dict(
+                    aggregate,
+                    completed=160,
+                    failed=0,
+                    num_prompts=160,
+                    repetitions=3,
+                    aggregation="median of three formal values per metric",
+                    formal_runs=points,
+                ),
+                "configuration": report["configuration"],
+                "report": path,
+                "protocol": {
+                    "quality": "One full task pass; Qwen substitute judge; unresolved retained in full denominator",
+                    "performance": "160 fixed prompts; output cap256; natural EOS; temperature0; request seed0; all arrive together; no client cap; one warmup plus three formal runs per arm",
+                    "source": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/0ca30f4/reports/request-throttling-controller/dataset-matrix-20261018-r2/frontierscience",
+                    "quality_budget": report["quality_budget"],
+                },
+                "limitations": report["limitations"],
+            }
+        )
+
+
 def build(root=ROOT):
     sources = {}
 
@@ -450,6 +542,7 @@ def build(root=ROOT):
         )
     append_trajectory(root, solutions, datasets, records, sources)
     append_offline_window(root, solutions, datasets, records, sources)
+    append_controller_dataset_profiles(root, solutions, datasets, records, sources)
     return {
         "schema": 1,
         "cohort": {
