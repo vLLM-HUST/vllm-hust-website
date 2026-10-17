@@ -59,3 +59,8 @@
 .matrix-replay-overview tbody th, .matrix-replay-overview td { padding: 22px 20px; }
 .matrix-replay-overview tbody th { white-space: normal; color: var(--run-ink); }
 .matrix-replay-overview .metric strong { font-size: 19px; font-weight: 650; }
+
+.matrix-profile-overview { min-width: 540px; }
+.matrix-profile-overview tbody th, .matrix-profile-overview td { padding: 22px 20px; }
+.matrix-profile-overview tbody th { white-space: normal; background: transparent; color: var(--run-ink); }
+.matrix-profile-overview .metric strong { font-size: 19px; font-weight: 650; }
