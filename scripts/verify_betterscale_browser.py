@@ -328,9 +328,19 @@ def main():
             "llm-serving-cost-pricing-model",
             "request-lifecycle-profiler",
             "slicegpt-migration",
+            "state-scheduler",
             "traceloom",
         ]
         assert tool_section.locator(".plugin-performance").count() == 0
+        research = tool_section.locator("#state-scheduler")
+        assert research.count() == 1
+        assert "M0" in research.inner_text()
+        research.locator(".plugin-launch-icon").click()
+        assert (
+            "vllm-state-scheduler-mod status"
+            in research.locator(".plugin-launch-tooltip").inner_text()
+        )
+        research.locator(".plugin-launch-icon").click()
         control_section = page.locator(".plugin-category-control_plane")
         assert control_section.locator(".plugin-category-title").inner_text() == (
             "Control plane"
