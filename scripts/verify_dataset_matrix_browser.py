@@ -130,8 +130,8 @@ def main():
                 page.locator(".matrix-detail tbody > tr:not(.run-detail)")
             ).to_have_count(8)
             assert "30.28" in page.locator(".matrix-detail").inner_text()
-            assert "512MiB" in page.locator(".runs-note").first.inner_text()
-            assert "180" in page.locator(".runs-note").first.inner_text()
+            assert "512MiB" in page.locator("#matrix-table > p.runs-note").inner_text()
+            assert "180" in page.locator("#matrix-table > p.runs-note").inner_text()
             page.locator(
                 '[data-expand="offline-window-request-throttling-controller-short-20261017-r18-on"]'
             ).click()
