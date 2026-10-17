@@ -7,12 +7,183 @@ checkout. No private archives, prompts or model answers are consumed.
 import argparse
 import hashlib
 import json
+import statistics
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BS = "betterscale-dataset-validation-20261015"
 CURRENT = "betterscale-school-runtime-20261016"
 COMMIT = "2d90b460cf92645214bd6bc325bff0562c395ba6"  # pragma: allowlist secret
+
+
+def append_trajectory(root, solutions, datasets, records, sources):
+    """Optional complete finite-program receipts, distinct from task accuracy."""
+    path = "data/swe-smith-qwen35-tp2/report.json"
+    if not (root / path).exists():
+        return
+    raw = (root / path).read_bytes()
+    report = json.loads(raw)
+    expected = {
+        "model": "Qwen3.5-35B-A3B",
+        "precision": "BF16",
+        "hardware": "Ascend 910B2",
+        "parallel": "TP2",
+    }
+    if (
+        report["status"] != "PASS"
+        or report["cohort"] != expected
+        or report["quality"] is not None
+    ):
+        raise ValueError(
+            "Trajectory report must be a verified current-cohort performance result"
+        )
+    sources[path] = hashlib.sha256(raw).hexdigest()
+    solution = "request-throttling-controller"
+    solutions.append({"id": solution, "name": solution})
+    dataset = {
+        "id": "swe-smith-tranjactory",
+        "name": "SWE-smith-tranjactory",
+        "evidence_type": "replay",
+        "parts": [],
+    }
+    for aggregate in report["aggregate"]:
+        concurrency = aggregate["concurrency"]
+        selected = [r for r in report["records"] if r["concurrency"] == concurrency]
+        scores = {}
+        for strategy, sid in (("vllm", "native"), ("Our-Controller", solution)):
+            points = [r for r in selected if r["strategy"] == strategy]
+            if len(points) != aggregate["repetitions"] or not points:
+                raise ValueError("Missing paired trajectory repetitions")
+            scores[sid] = {
+                "value": statistics.median(r["programs_per_minute"] for r in points),
+                "unit": "programs/min",
+                "repetitions": len(points),
+                "speedup": 1
+                if sid == "native"
+                else aggregate["median_completion_rate_ratio"],
+            }
+        dataset["parts"].append(
+            {
+                "id": f"concurrency-{concurrency}",
+                "name": f"Concurrency {concurrency}",
+                "metric": "programs_per_minute",
+                "scores": scores,
+                "statuses": {},
+            }
+        )
+        for record in selected:
+            sid = "native" if record["strategy"] == "vllm" else solution
+            pair = next(
+                p
+                for p in report["paired_comparisons"]
+                if p["concurrency"] == concurrency and p["seed"] == record["seed"]
+            )
+            records.append(
+                {
+                    "id": f"swe-smith-{sid}-c{concurrency}-seed{record['seed']}",
+                    "dataset": dataset["id"],
+                    "solution": sid,
+                    "scope": f"c{concurrency}-seed{record['seed']}",
+                    "scope_label": f"{record['programs']} programs · C={concurrency} · seed={record['seed']}",
+                    "quality": [],
+                    "performance": record
+                    | {
+                        "completion_rate_ratio": 1
+                        if sid == "native"
+                        else pair["completion_rate_ratio"]
+                    },
+                    "configuration": report["cohort"]
+                    | {"packages": report["packages"], "backend_count": 1},
+                    "report": path,
+                    "protocol": {
+                        "evidence_type": "replay",
+                        "plan_sha256": report["plan_sha256"],
+                    },
+                    "limitations": report["limitations"],
+                }
+            )
+    datasets.append(dataset)
+
+
+def append_offline_window(root, solutions, datasets, records, sources):
+    path = "data/request-throttling-offline-window-20261017/report.json"
+    if not (root / path).exists():
+        return
+    raw = (root / path).read_bytes()
+    report = json.loads(raw)
+    assert report["status"] == "VERIFIED_WINDOW_PAIRS"
+    assert report["finite_makespan_claim"] is False and report["quality"] is None
+    assert report["protocol"]["arrival_mode"] == "offline-burst"
+    assert report["protocol"]["client_concurrency_limit"] is None
+    primary = [r for r in report["records"] if not r["order_repeat"]]
+    assert len(primary) == 3 and len({r["seed"] for r in primary}) == 3
+    ratio = statistics.median(
+        r["on"]["engine_output_tokens_per_second"]
+        / r["off"]["engine_output_tokens_per_second"]
+        for r in primary
+    )
+    assert ratio == report["aggregate"]["median_paired_output_rate_ratio"]
+    sources[path] = hashlib.sha256(raw).hexdigest()
+    on_id = "request-throttling-controller"
+    off_id = "request-throttling-off"
+    for sid, name in [
+        (off_id, "Controller · 调度关闭"),
+        (on_id, "request-throttling-controller"),
+    ]:
+        if not any(s["id"] == sid for s in solutions):
+            solutions.append({"id": sid, "name": name})
+    scores = {}
+    for key, sid in [("off", off_id), ("on", on_id)]:
+        scores[sid] = {
+            "value": statistics.median(
+                r[key]["engine_output_tokens_per_second"] for r in primary
+            ),
+            "unit": "tokens/s",
+            "repetitions": 3,
+            "speedup": 1 if key == "off" else ratio,
+        }
+    dataset_id = "swe-smith-tranjactory-offline-window"
+    datasets.append(
+        {
+            "id": dataset_id,
+            "name": "SWE-smith-tranjactory",
+            "evidence_type": "fixed-window-replay",
+            "parts": [
+                {
+                    "id": "offline96-180s-apc512m",
+                    "name": "离线96条 · 180秒窗口 · APC · KV512MiB",
+                    "metric": "engine_output_tokens_per_second",
+                    "scores": scores,
+                    "statuses": {},
+                }
+            ],
+        }
+    )
+    for record in report["records"]:
+        for key, sid in [("off", off_id), ("on", on_id)]:
+            point = record[key]
+            records.append(
+                {
+                    "id": f"offline-window-{record['run']}-{key}",
+                    "dataset": dataset_id,
+                    "solution": sid,
+                    "scope": "offline-window",
+                    "scope_label": f"seed{record['seed']} · 180s"
+                    + (" · 顺序复测" if record["order_repeat"] else ""),
+                    "quality": [],
+                    "performance": point,
+                    "configuration": report["runtime_profile"],
+                    "report": path,
+                    "protocol": report["protocol"]
+                    | {
+                        "seed": record["seed"],
+                        "order": record["order"],
+                        "order_repeat": record["order_repeat"],
+                        "finite_makespan_claim": False,
+                    },
+                    "limitations": report["limitations"],
+                }
+            )
 
 
 def build(root=ROOT):
@@ -271,6 +442,8 @@ def build(root=ROOT):
             },
             school["limitations"],
         )
+    append_trajectory(root, solutions, datasets, records, sources)
+    append_offline_window(root, solutions, datasets, records, sources)
     return {
         "schema": 1,
         "cohort": {

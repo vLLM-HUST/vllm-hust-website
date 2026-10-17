@@ -56,7 +56,60 @@ def test_scope_and_metrics():
     for d in data["datasets"]:
         for p in d["parts"]:
             for s in p["scores"].values():
-                assert s["value"] == s["correct"] / s["total"]
+                if p["metric"] == "programs_per_minute":
+                    assert s["value"] > 0 and s["unit"] == "programs/min"
+                elif p["metric"] == "engine_output_tokens_per_second":
+                    assert s["value"] > 0 and s["unit"] == "tokens/s"
+                else:
+                    assert s["value"] == s["correct"] / s["total"]
+
+
+def test_trajectory_receipt_uses_completion_rate_without_accuracy(tmp_path):
+    import pytest
+
+    path = tmp_path / "data/swe-smith-qwen35-tp2/report.json"
+    path.parent.mkdir(parents=True)
+    value = {
+        "status": "PASS",
+        "quality": None,
+        "cohort": {
+            "model": "Qwen3.5-35B-A3B",
+            "precision": "BF16",
+            "hardware": "Ascend 910B2",
+            "parallel": "TP2",
+        },
+        "aggregate": [
+            {"concurrency": 32, "repetitions": 1, "median_completion_rate_ratio": 1.25}
+        ],
+        "records": [
+            {
+                "strategy": strategy,
+                "seed": 11,
+                "concurrency": 32,
+                "programs": 2,
+                "programs_per_minute": rate,
+            }
+            for strategy, rate in (("vllm", 1.2), ("Our-Controller", 1.5))
+        ],
+        "paired_comparisons": [
+            {"concurrency": 32, "seed": 11, "completion_rate_ratio": 1.25}
+        ],
+        "packages": {},
+        "plan_sha256": "test-only",
+        "limitations": ["test fixture"],
+    }
+    path.write_text(json.dumps(value))
+    solutions, datasets, records, sources = [], [], [], {}
+    module.append_trajectory(tmp_path, solutions, datasets, records, sources)
+    assert datasets[0]["name"] == "SWE-smith-tranjactory"
+    score = datasets[0]["parts"][0]["scores"]["request-throttling-controller"]
+    assert score["value"] == 1.5 and score["speedup"] == 1.25
+    assert "correct" not in score
+    assert len(records) == 2 and all(r["quality"] == [] for r in records)
+    value["status"] = "FAIL"
+    path.write_text(json.dumps(value))
+    with pytest.raises(ValueError, match="verified"):
+        module.append_trajectory(tmp_path, [], [], [], {})
 
 
 def test_failed_admission_is_not_a_zero_score_or_performance_row():
@@ -113,7 +166,10 @@ def test_latest_betterscale_replaces_default_and_is_complete():
     sid = "betterscale"
     assert next(s for s in data["solutions"] if s["id"] == sid)["name"] == "BetterScale"
     scores = [
-        part["scores"][sid] for dataset in data["datasets"] for part in dataset["parts"]
+        part["scores"][sid]
+        for dataset in data["datasets"]
+        for part in dataset["parts"]
+        if sid in part["scores"]
     ]
     assert [(s["correct"], s["total"]) for s in scores] == [
         (9589, 12032),
@@ -142,3 +198,71 @@ def test_previous_betterscale_reports_remain_archived():
     previous = json.loads((ROOT / f"data/{module.BS}/report.json").read_text())
     assert previous["mmlu"]["correct"] == 9611
     assert not any(s["id"] == "betterscale-school" for s in module.build()["solutions"])
+
+
+def test_offline_window_has_explicit_profile_and_paired_seed_median():
+    import statistics
+
+    data = module.build()
+    dataset = next(
+        d for d in data["datasets"] if d["id"] == "swe-smith-tranjactory-offline-window"
+    )
+    assert dataset["evidence_type"] == "fixed-window-replay"
+    part = dataset["parts"][0]
+    assert part["metric"] == "engine_output_tokens_per_second"
+    assert "native" not in part["scores"]
+    assert part["scores"]["request-throttling-controller"]["repetitions"] == 3
+    raw = json.loads(
+        (
+            ROOT / "data/request-throttling-offline-window-20261017/report.json"
+        ).read_text()
+    )
+    primary = [r for r in raw["records"] if not r["order_repeat"]]
+    ratio = statistics.median(
+        r["on"]["engine_output_tokens_per_second"]
+        / r["off"]["engine_output_tokens_per_second"]
+        for r in primary
+    )
+    assert part["scores"]["request-throttling-controller"]["speedup"] == ratio
+    rows = [r for r in data["records"] if r["dataset"] == dataset["id"]]
+    assert len(rows) == 8
+    assert all(
+        r["protocol"]["client_concurrency_limit"] is None
+        and r["protocol"]["finite_makespan_claim"] is False
+        for r in rows
+    )
+    assert all(
+        r["configuration"]["configured_kv_cache_memory_bytes"] == 536870912
+        for r in rows
+    )
+    assert all(r["quality"] == [] for r in rows)
+
+
+def test_offline_window_report_contains_only_public_evidence():
+    import re
+
+    path = ROOT / "data/request-throttling-offline-window-20261017/report.json"
+    body = path.read_text()
+    assert not re.search(r"10\.244\.|192\.168\.|Bearer\s", body)
+    forbidden = {
+        "api_key",
+        "access_token",
+        "authorization",
+        "prompt_token_ids",
+        "output_token_ids",
+        "endpoint",
+        "backend",
+    }
+
+    def check(value):
+        if isinstance(value, dict):
+            assert not forbidden.intersection(value)
+            for key, child in value.items():
+                if key.endswith("sha256"):
+                    assert re.fullmatch("[a-f0-9]{64}", child)
+                check(child)
+        elif isinstance(value, list):
+            for child in value:
+                check(child)
+
+    check(json.loads(body))

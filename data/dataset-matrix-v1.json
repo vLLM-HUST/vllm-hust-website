@@ -66,6 +66,14 @@
     {
       "id": "core-attention-boundary",
       "name": "Core Attention Boundary"
+    },
+    {
+      "id": "request-throttling-off",
+      "name": "Controller · 调度关闭"
+    },
+    {
+      "id": "request-throttling-controller",
+      "name": "request-throttling-controller"
     }
   ],
   "datasets": [
@@ -1468,6 +1476,33 @@
               "report": "data/dataset-matrix-campaign-20261016/report.json"
             }
           }
+        }
+      ]
+    },
+    {
+      "id": "swe-smith-tranjactory-offline-window",
+      "name": "SWE-smith-tranjactory",
+      "evidence_type": "fixed-window-replay",
+      "parts": [
+        {
+          "id": "offline96-180s-apc512m",
+          "name": "离线96条 · 180秒窗口 · APC · KV512MiB",
+          "metric": "engine_output_tokens_per_second",
+          "scores": {
+            "request-throttling-off": {
+              "value": 15.782803611007207,
+              "unit": "tokens/s",
+              "repetitions": 3,
+              "speedup": 1
+            },
+            "request-throttling-controller": {
+              "value": 30.282824915263657,
+              "unit": "tokens/s",
+              "repetitions": 3,
+              "speedup": 1.9168612754488277
+            }
+          },
+          "statuses": {}
         }
       ]
     }
@@ -4237,6 +4272,598 @@
         "Aggregate-only public projection; independent regrading requires private raw responses.",
         "HLE unresolved judges: Gold 18, Revision 28; Frontier 3 per track. Retained as nonsuccess, not confirmed incorrect."
       ]
+    },
+    {
+      "id": "offline-window-request-throttling-controller-short-20261017-r15-off",
+      "dataset": "swe-smith-tranjactory-offline-window",
+      "solution": "request-throttling-off",
+      "scope": "offline-window",
+      "scope_label": "seed11 · 180s",
+      "quality": [],
+      "performance": {
+        "label": "scheduler-off-offline-burst",
+        "status": "MEASURED_WINDOW",
+        "scheduling_enabled": false,
+        "concurrency": 0,
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "submitted_programs": 96,
+        "max_waiting": 0,
+        "max_paused": 0,
+        "latest_replay_seconds": 179.978,
+        "completed_calls_so_far": 48,
+        "programs_fully_completed_within_window": 0,
+        "completed_calls": 48,
+        "request_errors": 0,
+        "completed_output_tokens": 2702,
+        "kv_peak_percent": 100.0,
+        "engine_counter_interval_seconds": 179.976,
+        "actual_input_rounds": 2318,
+        "finite_makespan_claim": false,
+        "engine_output_tokens_per_second": 15.657643241321065,
+        "engine_input_tokens_per_second": 260.90145352713694,
+        "preemptions": 246.0,
+        "cache_hit_tokens": 0.0,
+        "completed_output_tokens_per_second": 15.011111111111111,
+        "job_wall_seconds_including_initialization_and_cleanup": 202.0580461854115
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "device": "Ascend910B2",
+        "tensor_parallel_size": 2,
+        "backend_count": 1,
+        "enable_prefix_caching": true,
+        "configured_kv_cache_memory_bytes": 536870912,
+        "max_model_len": 16384,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "scheduler_interval_seconds": 0.5,
+        "controller_capacity_tokens": 49152,
+        "controller_per_program_buffer_tokens": 14335,
+        "original_matrix_configuration": false
+      },
+      "report": "data/request-throttling-offline-window-20261017/report.json",
+      "protocol": {
+        "name": "SWE-smith-tranjactory",
+        "model": "Qwen3.5-35B-A3B",
+        "programs": 96,
+        "concurrency": 0,
+        "window_seconds": 180,
+        "expected_sessions_sha256": "0d95fa124751067178645e561e5ec99b9442908242ded8da680c383f8bbdc256",
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "seed": 11,
+        "order": [
+          "OFF",
+          "ON"
+        ],
+        "order_repeat": false,
+        "finite_makespan_claim": false
+      },
+      "limitations": [
+        "Fixed windows do not establish complete-batch makespan or task repair accuracy.",
+        "Runtime profile must be read alongside the attached deployment evidence; original matrix qualification is false.",
+        "Order repeat is separate and excluded from the primary seed median."
+      ]
+    },
+    {
+      "id": "offline-window-request-throttling-controller-short-20261017-r15-on",
+      "dataset": "swe-smith-tranjactory-offline-window",
+      "solution": "request-throttling-controller",
+      "scope": "offline-window",
+      "scope_label": "seed11 · 180s",
+      "quality": [],
+      "performance": {
+        "label": "scheduler-on-offline-burst",
+        "status": "MEASURED_WINDOW",
+        "scheduling_enabled": true,
+        "concurrency": 0,
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "submitted_programs": 96,
+        "max_waiting": 94,
+        "max_paused": 94,
+        "latest_replay_seconds": 179.992,
+        "completed_calls_so_far": 72,
+        "programs_fully_completed_within_window": 2,
+        "completed_calls": 72,
+        "request_errors": 0,
+        "completed_output_tokens": 4990,
+        "kv_peak_percent": 75.0,
+        "engine_counter_interval_seconds": 179.988,
+        "actual_input_rounds": 2318,
+        "finite_makespan_claim": false,
+        "engine_output_tokens_per_second": 27.72407049358846,
+        "engine_input_tokens_per_second": 1806.6537769184613,
+        "preemptions": 0.0,
+        "cache_hit_tokens": 176128.0,
+        "completed_output_tokens_per_second": 27.72222222222222,
+        "job_wall_seconds_including_initialization_and_cleanup": 200.66685154568404
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "device": "Ascend910B2",
+        "tensor_parallel_size": 2,
+        "backend_count": 1,
+        "enable_prefix_caching": true,
+        "configured_kv_cache_memory_bytes": 536870912,
+        "max_model_len": 16384,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "scheduler_interval_seconds": 0.5,
+        "controller_capacity_tokens": 49152,
+        "controller_per_program_buffer_tokens": 14335,
+        "original_matrix_configuration": false
+      },
+      "report": "data/request-throttling-offline-window-20261017/report.json",
+      "protocol": {
+        "name": "SWE-smith-tranjactory",
+        "model": "Qwen3.5-35B-A3B",
+        "programs": 96,
+        "concurrency": 0,
+        "window_seconds": 180,
+        "expected_sessions_sha256": "0d95fa124751067178645e561e5ec99b9442908242ded8da680c383f8bbdc256",
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "seed": 11,
+        "order": [
+          "OFF",
+          "ON"
+        ],
+        "order_repeat": false,
+        "finite_makespan_claim": false
+      },
+      "limitations": [
+        "Fixed windows do not establish complete-batch makespan or task repair accuracy.",
+        "Runtime profile must be read alongside the attached deployment evidence; original matrix qualification is false.",
+        "Order repeat is separate and excluded from the primary seed median."
+      ]
+    },
+    {
+      "id": "offline-window-request-throttling-controller-short-20261017-r17-off",
+      "dataset": "swe-smith-tranjactory-offline-window",
+      "solution": "request-throttling-off",
+      "scope": "offline-window",
+      "scope_label": "seed17 · 180s",
+      "quality": [],
+      "performance": {
+        "label": "scheduler-off-offline-burst",
+        "status": "MEASURED_WINDOW",
+        "scheduling_enabled": false,
+        "concurrency": 0,
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "submitted_programs": 96,
+        "max_waiting": 0,
+        "max_paused": 0,
+        "latest_replay_seconds": 179.96,
+        "completed_calls_so_far": 49,
+        "programs_fully_completed_within_window": 0,
+        "completed_calls": 49,
+        "request_errors": 0,
+        "completed_output_tokens": 2744,
+        "kv_peak_percent": 100.0,
+        "engine_counter_interval_seconds": 179.958,
+        "actual_input_rounds": 2318,
+        "finite_makespan_claim": false,
+        "engine_output_tokens_per_second": 15.798130674935264,
+        "engine_input_tokens_per_second": 266.1232065259672,
+        "preemptions": 250.0,
+        "cache_hit_tokens": 0.0,
+        "completed_output_tokens_per_second": 15.244444444444444,
+        "job_wall_seconds_including_initialization_and_cleanup": 201.99601726606488
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "device": "Ascend910B2",
+        "tensor_parallel_size": 2,
+        "backend_count": 1,
+        "enable_prefix_caching": true,
+        "configured_kv_cache_memory_bytes": 536870912,
+        "max_model_len": 16384,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "scheduler_interval_seconds": 0.5,
+        "controller_capacity_tokens": 49152,
+        "controller_per_program_buffer_tokens": 14335,
+        "original_matrix_configuration": false
+      },
+      "report": "data/request-throttling-offline-window-20261017/report.json",
+      "protocol": {
+        "name": "SWE-smith-tranjactory",
+        "model": "Qwen3.5-35B-A3B",
+        "programs": 96,
+        "concurrency": 0,
+        "window_seconds": 180,
+        "expected_sessions_sha256": "0d95fa124751067178645e561e5ec99b9442908242ded8da680c383f8bbdc256",
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "seed": 17,
+        "order": [
+          "OFF",
+          "ON"
+        ],
+        "order_repeat": false,
+        "finite_makespan_claim": false
+      },
+      "limitations": [
+        "Fixed windows do not establish complete-batch makespan or task repair accuracy.",
+        "Runtime profile must be read alongside the attached deployment evidence; original matrix qualification is false.",
+        "Order repeat is separate and excluded from the primary seed median."
+      ]
+    },
+    {
+      "id": "offline-window-request-throttling-controller-short-20261017-r17-on",
+      "dataset": "swe-smith-tranjactory-offline-window",
+      "solution": "request-throttling-controller",
+      "scope": "offline-window",
+      "scope_label": "seed17 · 180s",
+      "quality": [],
+      "performance": {
+        "label": "scheduler-on-offline-burst",
+        "status": "MEASURED_WINDOW",
+        "scheduling_enabled": true,
+        "concurrency": 0,
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "submitted_programs": 96,
+        "max_waiting": 94,
+        "max_paused": 94,
+        "latest_replay_seconds": 179.975,
+        "completed_calls_so_far": 80,
+        "programs_fully_completed_within_window": 2,
+        "completed_calls": 80,
+        "request_errors": 0,
+        "completed_output_tokens": 5450,
+        "kv_peak_percent": 75.0,
+        "engine_counter_interval_seconds": 179.97,
+        "actual_input_rounds": 2318,
+        "finite_makespan_claim": false,
+        "engine_output_tokens_per_second": 30.282824915263657,
+        "engine_input_tokens_per_second": 2026.8655887092293,
+        "preemptions": 0.0,
+        "cache_hit_tokens": 229376.0,
+        "completed_output_tokens_per_second": 30.27777777777778,
+        "job_wall_seconds_including_initialization_and_cleanup": 202.2285697152838
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "device": "Ascend910B2",
+        "tensor_parallel_size": 2,
+        "backend_count": 1,
+        "enable_prefix_caching": true,
+        "configured_kv_cache_memory_bytes": 536870912,
+        "max_model_len": 16384,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "scheduler_interval_seconds": 0.5,
+        "controller_capacity_tokens": 49152,
+        "controller_per_program_buffer_tokens": 14335,
+        "original_matrix_configuration": false
+      },
+      "report": "data/request-throttling-offline-window-20261017/report.json",
+      "protocol": {
+        "name": "SWE-smith-tranjactory",
+        "model": "Qwen3.5-35B-A3B",
+        "programs": 96,
+        "concurrency": 0,
+        "window_seconds": 180,
+        "expected_sessions_sha256": "0d95fa124751067178645e561e5ec99b9442908242ded8da680c383f8bbdc256",
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "seed": 17,
+        "order": [
+          "OFF",
+          "ON"
+        ],
+        "order_repeat": false,
+        "finite_makespan_claim": false
+      },
+      "limitations": [
+        "Fixed windows do not establish complete-batch makespan or task repair accuracy.",
+        "Runtime profile must be read alongside the attached deployment evidence; original matrix qualification is false.",
+        "Order repeat is separate and excluded from the primary seed median."
+      ]
+    },
+    {
+      "id": "offline-window-request-throttling-controller-short-20261017-r18-off",
+      "dataset": "swe-smith-tranjactory-offline-window",
+      "solution": "request-throttling-off",
+      "scope": "offline-window",
+      "scope_label": "seed23 · 180s",
+      "quality": [],
+      "performance": {
+        "label": "scheduler-off-offline-burst",
+        "status": "MEASURED_WINDOW",
+        "scheduling_enabled": false,
+        "concurrency": 0,
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "submitted_programs": 96,
+        "max_waiting": 0,
+        "max_paused": 0,
+        "latest_replay_seconds": 179.124,
+        "completed_calls_so_far": 47,
+        "programs_fully_completed_within_window": 0,
+        "completed_calls": 47,
+        "request_errors": 0,
+        "completed_output_tokens": 2646,
+        "kv_peak_percent": 100.0,
+        "engine_counter_interval_seconds": 179.119,
+        "actual_input_rounds": 2318,
+        "finite_makespan_claim": false,
+        "engine_output_tokens_per_second": 15.782803611007207,
+        "engine_input_tokens_per_second": 267.38090319843235,
+        "preemptions": 248.0,
+        "cache_hit_tokens": 0.0,
+        "completed_output_tokens_per_second": 14.7,
+        "job_wall_seconds_including_initialization_and_cleanup": 202.15273474063724
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "device": "Ascend910B2",
+        "tensor_parallel_size": 2,
+        "backend_count": 1,
+        "enable_prefix_caching": true,
+        "configured_kv_cache_memory_bytes": 536870912,
+        "max_model_len": 16384,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "scheduler_interval_seconds": 0.5,
+        "controller_capacity_tokens": 49152,
+        "controller_per_program_buffer_tokens": 14335,
+        "original_matrix_configuration": false
+      },
+      "report": "data/request-throttling-offline-window-20261017/report.json",
+      "protocol": {
+        "name": "SWE-smith-tranjactory",
+        "model": "Qwen3.5-35B-A3B",
+        "programs": 96,
+        "concurrency": 0,
+        "window_seconds": 180,
+        "expected_sessions_sha256": "0d95fa124751067178645e561e5ec99b9442908242ded8da680c383f8bbdc256",
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "seed": 23,
+        "order": [
+          "ON",
+          "OFF"
+        ],
+        "order_repeat": false,
+        "finite_makespan_claim": false
+      },
+      "limitations": [
+        "Fixed windows do not establish complete-batch makespan or task repair accuracy.",
+        "Runtime profile must be read alongside the attached deployment evidence; original matrix qualification is false.",
+        "Order repeat is separate and excluded from the primary seed median."
+      ]
+    },
+    {
+      "id": "offline-window-request-throttling-controller-short-20261017-r18-on",
+      "dataset": "swe-smith-tranjactory-offline-window",
+      "solution": "request-throttling-controller",
+      "scope": "offline-window",
+      "scope_label": "seed23 · 180s",
+      "quality": [],
+      "performance": {
+        "label": "scheduler-on-offline-burst",
+        "status": "MEASURED_WINDOW",
+        "scheduling_enabled": true,
+        "concurrency": 0,
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "submitted_programs": 96,
+        "max_waiting": 96,
+        "max_paused": 96,
+        "latest_replay_seconds": 179.022,
+        "completed_calls_so_far": 68,
+        "programs_fully_completed_within_window": 2,
+        "completed_calls": 68,
+        "request_errors": 0,
+        "completed_output_tokens": 6248,
+        "kv_peak_percent": 75.0,
+        "engine_counter_interval_seconds": 178.976,
+        "actual_input_rounds": 2318,
+        "finite_makespan_claim": false,
+        "engine_output_tokens_per_second": 34.90970856427678,
+        "engine_input_tokens_per_second": 1701.1498748435545,
+        "preemptions": 0.0,
+        "cache_hit_tokens": 174080.0,
+        "completed_output_tokens_per_second": 34.71111111111111,
+        "job_wall_seconds_including_initialization_and_cleanup": 201.14586659893394
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "device": "Ascend910B2",
+        "tensor_parallel_size": 2,
+        "backend_count": 1,
+        "enable_prefix_caching": true,
+        "configured_kv_cache_memory_bytes": 536870912,
+        "max_model_len": 16384,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "scheduler_interval_seconds": 0.5,
+        "controller_capacity_tokens": 49152,
+        "controller_per_program_buffer_tokens": 14335,
+        "original_matrix_configuration": false
+      },
+      "report": "data/request-throttling-offline-window-20261017/report.json",
+      "protocol": {
+        "name": "SWE-smith-tranjactory",
+        "model": "Qwen3.5-35B-A3B",
+        "programs": 96,
+        "concurrency": 0,
+        "window_seconds": 180,
+        "expected_sessions_sha256": "0d95fa124751067178645e561e5ec99b9442908242ded8da680c383f8bbdc256",
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "seed": 23,
+        "order": [
+          "ON",
+          "OFF"
+        ],
+        "order_repeat": false,
+        "finite_makespan_claim": false
+      },
+      "limitations": [
+        "Fixed windows do not establish complete-batch makespan or task repair accuracy.",
+        "Runtime profile must be read alongside the attached deployment evidence; original matrix qualification is false.",
+        "Order repeat is separate and excluded from the primary seed median."
+      ]
+    },
+    {
+      "id": "offline-window-request-throttling-controller-short-20261017-r16-off",
+      "dataset": "swe-smith-tranjactory-offline-window",
+      "solution": "request-throttling-off",
+      "scope": "offline-window",
+      "scope_label": "seed11 · 180s · 顺序复测",
+      "quality": [],
+      "performance": {
+        "label": "scheduler-off-offline-burst",
+        "status": "MEASURED_WINDOW",
+        "scheduling_enabled": false,
+        "concurrency": 0,
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "submitted_programs": 96,
+        "max_waiting": 0,
+        "max_paused": 0,
+        "latest_replay_seconds": 179.908,
+        "completed_calls_so_far": 48,
+        "programs_fully_completed_within_window": 0,
+        "completed_calls": 48,
+        "request_errors": 0,
+        "completed_output_tokens": 2702,
+        "kv_peak_percent": 100.0,
+        "engine_counter_interval_seconds": 179.903,
+        "actual_input_rounds": 2318,
+        "finite_makespan_claim": false,
+        "engine_output_tokens_per_second": 15.780726280273258,
+        "engine_input_tokens_per_second": 266.79377219946304,
+        "preemptions": 249.0,
+        "cache_hit_tokens": 0.0,
+        "completed_output_tokens_per_second": 15.011111111111111,
+        "job_wall_seconds_including_initialization_and_cleanup": 202.48873709421605
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "device": "Ascend910B2",
+        "tensor_parallel_size": 2,
+        "backend_count": 1,
+        "enable_prefix_caching": true,
+        "configured_kv_cache_memory_bytes": 536870912,
+        "max_model_len": 16384,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "scheduler_interval_seconds": 0.5,
+        "controller_capacity_tokens": 49152,
+        "controller_per_program_buffer_tokens": 14335,
+        "original_matrix_configuration": false
+      },
+      "report": "data/request-throttling-offline-window-20261017/report.json",
+      "protocol": {
+        "name": "SWE-smith-tranjactory",
+        "model": "Qwen3.5-35B-A3B",
+        "programs": 96,
+        "concurrency": 0,
+        "window_seconds": 180,
+        "expected_sessions_sha256": "0d95fa124751067178645e561e5ec99b9442908242ded8da680c383f8bbdc256",
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "seed": 11,
+        "order": [
+          "ON",
+          "OFF"
+        ],
+        "order_repeat": true,
+        "finite_makespan_claim": false
+      },
+      "limitations": [
+        "Fixed windows do not establish complete-batch makespan or task repair accuracy.",
+        "Runtime profile must be read alongside the attached deployment evidence; original matrix qualification is false.",
+        "Order repeat is separate and excluded from the primary seed median."
+      ]
+    },
+    {
+      "id": "offline-window-request-throttling-controller-short-20261017-r16-on",
+      "dataset": "swe-smith-tranjactory-offline-window",
+      "solution": "request-throttling-controller",
+      "scope": "offline-window",
+      "scope_label": "seed11 · 180s · 顺序复测",
+      "quality": [],
+      "performance": {
+        "label": "scheduler-on-offline-burst",
+        "status": "MEASURED_WINDOW",
+        "scheduling_enabled": true,
+        "concurrency": 0,
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "submitted_programs": 96,
+        "max_waiting": 94,
+        "max_paused": 94,
+        "latest_replay_seconds": 179.026,
+        "completed_calls_so_far": 83,
+        "programs_fully_completed_within_window": 2,
+        "completed_calls": 83,
+        "request_errors": 0,
+        "completed_output_tokens": 5073,
+        "kv_peak_percent": 75.0,
+        "engine_counter_interval_seconds": 179.019,
+        "actual_input_rounds": 2318,
+        "finite_makespan_claim": false,
+        "engine_output_tokens_per_second": 28.337774202738256,
+        "engine_input_tokens_per_second": 2073.422374161402,
+        "preemptions": 0.0,
+        "cache_hit_tokens": 227328.0,
+        "completed_output_tokens_per_second": 28.183333333333334,
+        "job_wall_seconds_including_initialization_and_cleanup": 202.70972041599452
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "dtype": "BF16",
+        "device": "Ascend910B2",
+        "tensor_parallel_size": 2,
+        "backend_count": 1,
+        "enable_prefix_caching": true,
+        "configured_kv_cache_memory_bytes": 536870912,
+        "max_model_len": 16384,
+        "max_num_seqs": 16,
+        "max_num_batched_tokens": 8192,
+        "scheduler_interval_seconds": 0.5,
+        "controller_capacity_tokens": 49152,
+        "controller_per_program_buffer_tokens": 14335,
+        "original_matrix_configuration": false
+      },
+      "report": "data/request-throttling-offline-window-20261017/report.json",
+      "protocol": {
+        "name": "SWE-smith-tranjactory",
+        "model": "Qwen3.5-35B-A3B",
+        "programs": 96,
+        "concurrency": 0,
+        "window_seconds": 180,
+        "expected_sessions_sha256": "0d95fa124751067178645e561e5ec99b9442908242ded8da680c383f8bbdc256",
+        "arrival_mode": "offline-burst",
+        "client_concurrency_limit": null,
+        "seed": 11,
+        "order": [
+          "ON",
+          "OFF"
+        ],
+        "order_repeat": true,
+        "finite_makespan_claim": false
+      },
+      "limitations": [
+        "Fixed windows do not establish complete-batch makespan or task repair accuracy.",
+        "Runtime profile must be read alongside the attached deployment evidence; original matrix qualification is false.",
+        "Order repeat is separate and excluded from the primary seed median."
+      ]
     }
   ],
   "attempts": [
@@ -4459,7 +5086,8 @@
     "data/betterscale-dataset-validation-20261015/report.json": "d90c31ca03e1ed6c55571a6f4748228cd7d7e4c702906e880c1de68383818e6c",
     "data/betterscale-hle-20261015/report.json": "7acc1ef79a759bd58656e0674fefee22d79918352de24bd0ee5471e9aa7ae57f",
     "data/dataset-matrix-campaign-20261016/report.json": "b0a9743ea92e912828891164fa8b67560aee47615b7797df8ee5a35a9a3675c2",
-    "data/betterscale-school-runtime-20261016/report.json": "63acbf2f8efd2d4c3488d7a4738f2f9e0c811d8211a528a9f27e04b63f35a07d"
+    "data/betterscale-school-runtime-20261016/report.json": "63acbf2f8efd2d4c3488d7a4738f2f9e0c811d8211a528a9f27e04b63f35a07d",
+    "data/request-throttling-offline-window-20261017/report.json": "929af1be958f8845b654bcf6722251c0fc6bfa8b26cd47ede31467d61892e5aa"
   },
   "betterscale_publication": {
     "commit": "2d90b460cf92645214bd6bc325bff0562c395ba6",

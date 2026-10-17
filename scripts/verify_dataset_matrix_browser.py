@@ -31,7 +31,7 @@ def main():
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.url + "/dataset-matrix-v1.html")
             page.locator(".matrix-overview").wait_for()
-            expect(page.locator(".matrix-overview tbody tr")).to_have_count(5)
+            expect(page.locator(".matrix-overview tbody tr")).to_have_count(6)
             assert "79.70%" in page.locator(".matrix-overview").inner_text()
             snapshot = page.request.get(
                 args.url + "/data/dataset-matrix-v1.json"
@@ -116,6 +116,32 @@ def main():
             page.reload()
             page.locator(".matrix-detail").wait_for()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(10)
+            assert page.evaluate(
+                "document.documentElement.scrollWidth <= innerWidth + 1"
+            )
+            page.goto(
+                args.url
+                + "/dataset-matrix-v1.html#swe-smith-tranjactory-offline-window"
+            )
+            page.locator(
+                '[data-expand="offline-window-request-throttling-controller-short-20261017-r18-on"]'
+            ).wait_for()
+            expect(
+                page.locator(".matrix-detail tbody > tr:not(.run-detail)")
+            ).to_have_count(8)
+            assert "30.28" in page.locator(".matrix-detail").inner_text()
+            assert "512MiB" in page.locator("#matrix-table > p.runs-note").inner_text()
+            assert "180" in page.locator("#matrix-table > p.runs-note").inner_text()
+            page.locator(
+                '[data-expand="offline-window-request-throttling-controller-short-20261017-r18-on"]'
+            ).click()
+            assert page.locator(
+                "#evidence-offline-window-request-throttling-controller-short-20261017-r18-on"
+            ).is_visible()
+            page.screenshot(
+                path=str(args.output / f"offline-window-{width}-{lang}.png"),
+                full_page=True,
+            )
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= innerWidth + 1"
             )
