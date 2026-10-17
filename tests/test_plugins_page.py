@@ -66,6 +66,28 @@ def by_id(component_id: str) -> dict:
     return next(item for item in REGISTRY["components"] if item["id"] == component_id)
 
 
+def test_state_scheduler_public_m0_release_does_not_claim_runtime_benefit() -> None:
+    component = by_id("state-scheduler")
+    assert component["canonical_repository"] == (
+        "https://example.invalid/private-source"
+    )
+    assert component["repository_visibility"] == "private"
+    assert component["compatibility"]["status"] == "inspect_only"
+    assert (
+        "execution_selector_available=false"
+        in (component["compatibility"]["requirements_en"])
+    )
+    assert "Compilation Control" in component["summary_en"]
+    assert component["evidence_level"] == "cpu_smoke"
+    assert MOD_TAXONOMY["components"]["state-scheduler"]["kind"] == "tool_mod"
+    assert component["public_effect_url"].endswith("/state-scheduler-v0.2.0")
+    assert "releases/download/state-scheduler-v0.2.0/" in SCRIPT
+    assert "vllm-state-scheduler-mod status" in SCRIPT
+    assert "state-scheduler" not in {
+        item["id"] for item in PLUGIN_PERFORMANCE["entries"]
+    }
+
+
 def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     schema = json.loads(
         (ROOT / "data" / "schemas" / "mod_taxonomy_v2.schema.json").read_text(
@@ -850,7 +872,10 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert 'data-taxonomy="./data/mod-taxonomy.json?v=taxonomy-v2-20261012"' in PAGE
+    assert (
+        'data-taxonomy="./data/mod-taxonomy.json?v=state-scheduler-020-20261017"'
+        in PAGE
+    )
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
@@ -864,7 +889,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         if item.get("public_surface", True) is not False
         and item.get("maintainers")
         and item.get("canonical_repository", "").startswith(
-            "https://github.com/vLLM-HUST/"
+            ("https://github.com/vLLM-HUST/", "https://example.invalid/private-source/")
         )
         and (
             item["id"] in MOD_TAXONOMY["components"]
@@ -1142,7 +1167,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=phase-scenario-navigation-20261012" in PAGE
-    assert "plugins-page.js?v=org-boundary-20261013" in PAGE
+    assert "plugins-page.js?v=state-scheduler-020-20261017" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1192,7 +1217,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=taxonomy-v2-20261012"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=state-scheduler-020-20261017"' in PAGE
     assert "data-stateaxis=" not in PAGE
     assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
@@ -1654,7 +1679,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 39
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 40
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1752,7 +1777,10 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "benchmark-settings-20260929" not in SCRIPT
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
-    assert PAGE.count("ecpa-final-20261009") >= 2
+    assert (
+        'data-metadata="./data/plugin-workshop-metadata.json?v=state-scheduler-020-20261017"'
+        in PAGE
+    )
     assert "taxonomy-v2-20261012" in PAGE
 
 
