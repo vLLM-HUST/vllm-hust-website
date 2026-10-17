@@ -52,15 +52,3 @@
 .matrix-attempt summary { cursor: pointer; }
 .matrix-attempt pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .matrix-attempt a { color: #9cb4ff; }
-
-.matrix-replay-section, .matrix-profile-section { margin-top: 32px; }
-.matrix-replay-section h2, .matrix-profile-section h2 { color: #e5edf9; font-size: 20px; margin-bottom: 8px; }
-.matrix-replay-overview { min-width: 540px; }
-.matrix-replay-overview tbody th, .matrix-replay-overview td { padding: 22px 20px; }
-.matrix-replay-overview tbody th { white-space: normal; color: var(--run-ink); }
-.matrix-replay-overview .metric strong { font-size: 19px; font-weight: 650; }
-
-.matrix-profile-overview { min-width: 540px; }
-.matrix-profile-overview tbody th, .matrix-profile-overview td { padding: 22px 20px; }
-.matrix-profile-overview tbody th { white-space: normal; background: transparent; color: var(--run-ink); }
-.matrix-profile-overview .metric strong { font-size: 19px; font-weight: 650; }
