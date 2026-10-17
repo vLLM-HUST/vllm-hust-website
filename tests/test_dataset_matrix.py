@@ -31,7 +31,7 @@ def test_scope_and_metrics():
     assert all("betterscale" in p["scores"] for p in datasets["hle-verified"]["parts"])
     rows = data["records"]
     frontier = [r for r in rows if r["dataset"] == "frontierscience"]
-    assert len(frontier) == 3  # One combined benchmark per solution, not per track.
+    assert len(frontier) == 5  # Historical records plus the dated matched pair.
     assert all(r["performance"]["num_prompts"] == 160 for r in frontier)
     assert all(len(r["quality"]) == 2 for r in frontier)
     hle = [r for r in rows if r["dataset"] == "hle-verified"]
@@ -275,24 +275,26 @@ def test_offline_window_report_contains_only_public_evidence():
     check(json.loads(body))
 
 
-def test_controller_profile_keeps_historical_native_and_negative_results():
+def test_controller_uses_existing_dataset_rows_and_preserves_matching_baseline():
     data = module.build()
-    historical = next(d for d in data["datasets"] if d["id"] == "frontierscience")
-    matched = next(
-        d for d in data["datasets"] if d["id"] == "frontierscience-controller-20261018"
-    )
-    assert "runtime_profile" not in historical
-    assert matched["runtime_profile"]["id"] == "controller-core023-fullkv-20261018"
+    assert len(data["datasets"]) == 4
+    assert not any(d.get("runtime_profile") for d in data["datasets"])
+    frontier = next(d for d in data["datasets"] if d["id"] == "frontierscience")
     assert [
         (
             p["scores"]["native"]["correct"],
             p["scores"]["request-throttling-controller"]["correct"],
         )
-        for p in matched["parts"]
-    ] == [(60, 58), (5, 4)]
-    rows = [r for r in data["records"] if r["dataset"] == matched["id"]]
+        for p in frontier["parts"]
+    ] == [(57, 58), (5, 4)]
+    rows = [
+        r
+        for r in data["records"]
+        if r["id"].startswith("frontierscience-controller-20261018-")
+    ]
     assert len(rows) == 2
     for row in rows:
+        assert row["dataset"] == "frontierscience"
         assert row["performance"]["repetitions"] == 3
         assert {r["repetition"] for r in row["performance"]["formal_runs"]} == {1, 2, 3}
         assert row["protocol"]["quality_budget"]["passed"] is False
@@ -301,7 +303,9 @@ def test_controller_profile_keeps_historical_native_and_negative_results():
     controller = next(
         r for r in rows if r["solution"] == "request-throttling-controller"
     )
+    assert [q["correct"] for q in native["quality"]] == [60, 5]
     assert (
         controller["performance"]["output_throughput"]
         < native["performance"]["output_throughput"]
     )
+    assert native["configuration_label"] == "本轮配对基线"

@@ -31,21 +31,21 @@ def main():
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.url + "/dataset-matrix-v1.html")
             page.locator(".matrix-overview").wait_for()
-            expect(page.locator(".matrix-overview tbody tr")).to_have_count(5)
-            expect(page.locator(".matrix-replay-overview tbody tr")).to_have_count(1)
-            assert "+91.7%" in page.locator(".matrix-replay-overview").inner_text()
+            expect(page.locator(".matrix-overview tbody tr")).to_have_count(6)
+            expect(page.locator("#matrix-table table")).to_have_count(1)
+            assert "+91.7%" in page.locator(".matrix-overview").inner_text()
             assert "79.70%" in page.locator(".matrix-overview").inner_text()
-            expect(page.locator(".matrix-profile-overview tbody tr")).to_have_count(2)
-            for value in ["60.00%", "58.00%", "8.33%", "6.67%"]:
-                assert value in page.locator(".matrix-profile-overview").inner_text()
+            expect(
+                page.locator(".matrix-profile-section, .matrix-replay-section")
+            ).to_have_count(0)
+            for value in ["57.00%", "58.00%", "8.33%", "6.67%"]:
+                assert value in page.locator(".matrix-overview").inner_text()
             snapshot = page.request.get(
                 args.url + "/data/dataset-matrix-v1.json"
             ).json()
             cells = [
                 (part, solution["id"])
                 for dataset in snapshot["datasets"]
-                if dataset.get("evidence_type") not in ["replay", "fixed-window-replay"]
-                and not dataset.get("runtime_profile")
                 for part in dataset["parts"]
                 for solution in snapshot["solutions"]
             ]
@@ -107,7 +107,7 @@ def main():
                 == "ascending"
             )
             page.locator('.matrix-dataset[href="#frontierscience"]').first.click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(5)
             assert "906.25" in page.locator(".matrix-detail").inner_text()
             page.go_back()
             page.locator(".matrix-overview").wait_for()
@@ -159,8 +159,7 @@ def main():
             page.goto(
                 args.url + "/dataset-matrix-v1.html#frontierscience-controller-20261018"
             )
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(2)
-            expect(page.locator("[data-solution]")).to_have_count(2)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(5)
             for value in ["474.13", "432.14", "58.00%", "6.67%", "2026-10-18"]:
                 assert value in page.locator(".matrix-detail").inner_text()
             toggle = page.locator(

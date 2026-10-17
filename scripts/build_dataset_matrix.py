@@ -193,7 +193,7 @@ def append_offline_window(root, solutions, datasets, records, sources):
 
 
 def append_controller_dataset_profiles(root, solutions, datasets, records, sources):
-    """Matched new runtime observations, never overwrite historical Native."""
+    """Add the MOD to existing dataset rows; preserve each baseline receipt."""
     path = "data/request-throttling-dataset-matrix-20261018/frontierscience.json"
     if not (root / path).exists():
         return
@@ -203,11 +203,7 @@ def append_controller_dataset_profiles(root, solutions, datasets, records, sourc
     performance = report["performance"]
     assert performance["state"] == "THREE_REPEAT_PERFORMANCE_COMPLETE"
     sources[path] = hashlib.sha256(raw).hexdigest()
-    dataset_id = "frontierscience-controller-20261018"
-    profile = {
-        "id": "controller-core023-fullkv-20261018",
-        "label": "Core / Ascend 0.23.0 · APC off · Full KV · Context 65536",
-    }
+    dataset_id = "frontierscience"
     parts = []
     for track, metric in [("olympiad", "success"), ("research", "score7")]:
         scores = {}
@@ -232,14 +228,15 @@ def append_controller_dataset_profiles(root, solutions, datasets, records, sourc
                 "statuses": {},
             }
         )
-    datasets.append(
-        {
-            "id": dataset_id,
-            "name": "FrontierScience",
-            "runtime_profile": profile,
-            "parts": parts,
-        }
-    )
+    existing = next(d for d in datasets if d["id"] == dataset_id)
+    for part in parts:
+        target = next(p for p in existing["parts"] if p["id"] == part["id"])
+        assert "request-throttling-controller" not in target["scores"]
+        target["scores"]["request-throttling-controller"] = part["scores"][
+            "request-throttling-controller"
+        ]
+    # Historical Native stays in the overview. The new matching Native remains
+    # a dated detail record so readers can inspect the actual paired baseline.
     for arm, sid in [
         ("native", "native"),
         ("controller", "request-throttling-controller"),
@@ -256,11 +253,17 @@ def append_controller_dataset_profiles(root, solutions, datasets, records, sourc
             assert statistics.median(r[key] for r in points) == value
         records.append(
             {
-                "id": f"{dataset_id}-{sid}",
+                "id": f"frontierscience-controller-20261018-{sid}",
                 "dataset": dataset_id,
                 "solution": sid,
                 "scope": "full-160",
                 "measured_at": "2026-10-18",
+                "configuration_label": "本轮配对基线"
+                if arm == "native"
+                else "本轮评测",
+                "configuration_label_en": "Matched baseline"
+                if arm == "native"
+                else "Current evaluation",
                 "quality": [p["scores"][sid] for p in parts],
                 "performance": dict(
                     aggregate,
