@@ -160,6 +160,7 @@ def main():
                 args.url + "/dataset-matrix-v1.html#frontierscience-controller-20261018"
             )
             expect(page.locator(".matrix-detail .run-row")).to_have_count(2)
+            expect(page.locator("[data-solution]")).to_have_count(2)
             for value in ["474.13", "432.14", "58.00%", "6.67%", "2026-10-18"]:
                 assert value in page.locator(".matrix-detail").inner_text()
             toggle = page.locator(
@@ -171,6 +172,7 @@ def main():
             ).is_visible()
             assert "0.23.0" in page.locator(".run-detail:not([hidden])").inner_text()
             toggle.click()
+            page.locator(".runs-table-scroll").evaluate("e => e.scrollLeft = 0")
             page.screenshot(
                 path=str(args.output / f"controller-frontier-{width}-{lang}.png"),
                 full_page=True,
