@@ -31,7 +31,9 @@ def main():
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.url + "/dataset-matrix-v1.html")
             page.locator(".matrix-overview").wait_for()
-            expect(page.locator(".matrix-overview tbody tr")).to_have_count(6)
+            expect(page.locator(".matrix-overview tbody tr")).to_have_count(5)
+            expect(page.locator(".matrix-replay-overview tbody tr")).to_have_count(1)
+            assert "+91.7%" in page.locator(".matrix-replay-overview").inner_text()
             assert "79.70%" in page.locator(".matrix-overview").inner_text()
             snapshot = page.request.get(
                 args.url + "/data/dataset-matrix-v1.json"
@@ -39,6 +41,7 @@ def main():
             cells = [
                 (part, solution["id"])
                 for dataset in snapshot["datasets"]
+                if dataset.get("evidence_type") not in ["replay", "fixed-window-replay"]
                 for part in dataset["parts"]
                 for solution in snapshot["solutions"]
             ]
@@ -130,8 +133,12 @@ def main():
                 page.locator(".matrix-detail tbody > tr:not(.run-detail)")
             ).to_have_count(8)
             assert "30.28" in page.locator(".matrix-detail").inner_text()
-            assert "512MiB" in page.locator("#matrix-table > p.runs-note").inner_text()
-            assert "180" in page.locator("#matrix-table > p.runs-note").inner_text()
+            notes = " ".join(
+                page.locator("#matrix-table > p.runs-note").all_text_contents()
+            )
+            assert "512MiB" in notes and "+91.7%" in notes
+            assert "seed" not in page.locator(".matrix-detail").inner_text()
+            expect(page.locator(".matrix-detail thead th")).to_have_count(7)
             page.locator(
                 '[data-expand="offline-window-request-throttling-controller-short-20261017-r18-on"]'
             ).click()
