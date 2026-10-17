@@ -272,8 +272,9 @@ def test_registry_is_canonical_and_multidimensional() -> None:
 
 
 def test_pegaflow_credits_upstream_and_scopes_local_adaptation_maintainers() -> None:
-    expected = ["cybber695", "zhangshengxiang682"]
+    expected = ["mynameisczj", "cybber695", "zhangshengxiang682"]
     expected_profiles = [
+        {"login": "mynameisczj", "name": "陈子嘉"},
         {"login": "cybber695", "name": "陈彦博"},
         {"login": "zhangshengxiang682", "name": "张盛翔"},
     ]
@@ -289,8 +290,13 @@ def test_pegaflow_credits_upstream_and_scopes_local_adaptation_maintainers() -> 
             "https://github.com/novitalabs/pegaflow"
         )
 
-    assert "PegaFlow 原项目由派欧云" in by_id("pegaflow")["summary_zh"]
-    assert "国产化适配" in by_id("pegaflow-vllm-connectors")["summary_zh"]
+    assert "外部 KV 状态服务" in by_id("pegaflow")["summary_zh"]
+    assert "其他模型、设备、并行拓扑与服务容量尚未完成资格验证" in by_id("pegaflow")["summary_zh"]
+    connector_summary = by_id("pegaflow-vllm-connectors")["summary_zh"]
+    assert "KV save/load" in connector_summary
+    assert "fail-closed" in connector_summary
+    assert "不负责启动、扩缩或修复" in connector_summary
+    assert "尚不能外推到其他模型、设备或拓扑" in connector_summary
     assert 'adaptationMaintainers: "国产化适配维护者"' in SCRIPT
     assert 'upstreamOwner: "上游原项目"' in SCRIPT
     assert 'item.contribution_scope === "local_adaptation"' in SCRIPT
@@ -523,10 +529,8 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "vllm.kv_transfer_config",
     ]
     assert pegaflow_connectors["execution_planes"] == ["api", "scheduler", "worker"]
-    assert (
-        "external operator retains service lifecycle"
-        in pegaflow_connectors["summary_en"]
-    )
+    assert "does not start, scale, or repair that service" in pegaflow_connectors["summary_en"]
+    assert "does not own stored-data lifecycle" in pegaflow_connectors["summary_en"]
     assert any(
         "ECPA Bundle 0.3 @ 14ca1d4" in version
         for version in pegaflow_connectors["compatibility"]["versions"]
@@ -1541,11 +1545,19 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
             ["刘海坤", "张书豪"],
         ),
         "pegaflow": (
-            [("陈彦博", "cybber695"), ("张盛翔", "zhangshengxiang682")],
+            [
+                ("陈子嘉", "mynameisczj"),
+                ("陈彦博", "cybber695"),
+                ("张盛翔", "zhangshengxiang682"),
+            ],
             ["张书豪"],
         ),
         "pegaflow-vllm-connectors": (
-            [("陈彦博", "cybber695"), ("张盛翔", "zhangshengxiang682")],
+            [
+                ("陈子嘉", "mynameisczj"),
+                ("陈彦博", "cybber695"),
+                ("张盛翔", "zhangshengxiang682"),
+            ],
             ["张书豪"],
         ),
     }
