@@ -29,6 +29,14 @@ test('concurrency lines connect only declared same-cohort series in C order',()=
     assert.deepEqual(w8a8.map(row=>row.point.load.concurrency),[1,2,4,8,16]);
     assert.ok(w8a8.every(row=>row.point.configuration.parameters.mtp_draft_tokens===2));
     assert.ok(w8a8.every(row=>row.point.configuration.parameters.max_num_seqs===16));
+    const w8a8gdn=lines.find(rows=>rows[0].point.load.concurrency_series==='swe-w8a8-gdn-tp2-20261016-mtp2');
+    assert.ok(w8a8gdn,'new-recipe W8A8-GDN SWE observations must form one complete concurrency line');
+    assert.deepEqual(w8a8gdn.map(row=>row.point.load.concurrency),[1,2,4,8,16]);
+    assert.ok(w8a8gdn.every(row=>row.point.cohort_id==='qwen35-35b-a3b-w8a8-gdn-tp2-2x910b3-full-decode-only-sweprefix-900s-v1')); // pragma: allowlist secret (public cohort id)
+    assert.ok(w8a8gdn.every(row=>row.point.configuration.hardware.accelerator_count===2));
+    assert.ok(w8a8gdn.every(row=>row.point.configuration.parameters.mtp_draft_tokens===2));
+    // 新配方曲线与已发布 W8A8 曲线是两个 cohort, 即使 workload 相同也不能被合并成一条线。
+    assert.notEqual(w8a8gdn[0].point.cohort_id,w8a8[0].point.cohort_id);
     assert.equal(model.concurrencySeries(native.slice(0,1)).length,0);
     const other={...native[0],point:{...native[0].point,cohort_id:'other-workload'}};
     assert.equal(model.concurrencySeries([native[0],other]).length,0);
@@ -467,6 +475,39 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.validation.prefix_cache_observed,true);
             assert.equal(run.validation.campaign_finished_ok,true);
             assert.ok(Object.keys(run.runtime_evidence.prefix_cache_counters).length);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-w8a8-gdn-tp2-swe-curves-20261016'){
+            const params=p.configuration.parameters;
+            assert.equal(p.cohort_id,'qwen35-35b-a3b-w8a8-gdn-tp2-2x910b3-full-decode-only-sweprefix-900s-v1'); // pragma: allowlist secret (public cohort id)
+            assert.deepEqual(p.configuration.mods,['ascend-mtp-contract-2patch+npugraph-ex-w8a16-shim']);
+            assert.deepEqual(params.mods,['ascend-mtp-contract-2patch+npugraph-ex-w8a16-shim']);
+            assert.equal(params.quantization,'ascend');
+            // 主配方仍是 int8; 差别只在 GDN linear_attn 三个投影走 W8A16。
+            assert.ok(String(params.weight_precision).startsWith('int8'));
+            assert.match(params.weight_precision,/W8A16/);
+            assert.match(String(params.activation_precision),/W8A16/);
+            assert.match(String(params.kv_cache_dtype),/^auto \(bf16/);
+            assert.equal(params.mtp_draft_tokens,2);
+            assert.equal(params.max_num_seqs,16);
+            assert.equal(params.gpu_memory_utilization,0.95);
+            assert.equal(params.kv_cache_memory_bytes,26038239232);
+            assert.equal(params.max_num_batched_tokens,4096);
+            assert.equal(params.pipeline_parallel_size,1);
+            assert.equal(params.tensor_parallel_size,2);
+            assert.equal(p.configuration.hardware.accelerator_count,2);
+            assert.equal(p.load.session_rotation_depth,1);
+            assert.equal(p.load.concurrency_series,'swe-w8a8-gdn-tp2-20261016-mtp2');
+            assert.equal(params.qualification.concurrency,p.load.concurrency);
+            assert.equal(params.qualification.measurement_seconds,60);
+            assert.equal(run.qualification_run.concurrency,p.load.concurrency);
+            assert.equal(run.qualification_run.duration,60);
+            assert.equal(run.qualification_run.summary.failed_requests,0);
+            assert.equal(run.validation.protocol_qualification_run_id,run.qualification_run.run_id);
+            assert.equal(run.validation.protocol_qualification_passed,true);
+            assert.equal(run.validation.measured_seconds_matches_plan,true);
+            assert.equal(run.validation.prefix_cache_observed,true);
+            assert.equal(run.validation.campaign_finished_ok,true);
+            assert.ok(Object.keys(run.runtime_evidence.prefix_cache_counters).length);
+            assert.equal(run.client.chips,2);
         } else if(p.evidence.benchmark_protocol.campaign==='qwen35-v018-native-text-only-20261001'){
             assert.deepEqual(p.configuration.mods,[]);
             assert.equal(p.configuration.official_baseline_id,data.official_baseline.id);
@@ -1072,7 +1113,7 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     const data=require('../data/leaderboard_frontier.json');
     const visible=model.visibleData(data);
     const allQwen35=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
-    assert.equal(allQwen35.length,5);
+    assert.equal(allQwen35.length,6);
     const cohorts=allQwen35.filter(c=>c.precision.id==='bf16-weights-compute-kv');
     assert.equal(cohorts.length,4);
     assert.equal(cohorts.filter(c=>c.workload.contract.presentation==='configuration-study').length,3);
@@ -1081,6 +1122,17 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     assert.equal(w8a8[0].id,'qwen35-35b-a3b-w8a8-tp2-2x910b3-full-decode-only-sweprefix-900s-v1');
     assert.doesNotMatch(w8a8[0].id,/smoke|historical/i);
     assert.doesNotMatch(w8a8[0].workload.label,/smoke|historical/i);
+    // 新配方 (GDN linear_attn W8A16) 是第三个精度身份, 与上面对 BF16/W8A8 的计数并列。
+    const w8a8gdn=allQwen35.filter(c=>c.precision.id==='w8a8-int8-weights-compute-linearattn-w8a16-bf16-kv');
+    assert.equal(w8a8gdn.length,1);
+    assert.equal(w8a8gdn[0].id,'qwen35-35b-a3b-w8a8-gdn-tp2-2x910b3-full-decode-only-sweprefix-900s-v1'); // pragma: allowlist secret (public cohort id)
+    assert.doesNotMatch(w8a8gdn[0].id,/smoke|historical/i);
+    assert.match(w8a8gdn[0].precision.label,/W8A16/);
+    // 与已发布 W8A8 cohort 共用同一 workload 与同一 prepared workload, 只换配方。
+    assert.equal(w8a8gdn[0].workload.id,w8a8[0].workload.id);
+    assert.equal(w8a8gdn[0].workload.contract.prepared_workload_sha256,w8a8[0].workload.contract.prepared_workload_sha256);
+    assert.equal(w8a8gdn[0].context_tokens,w8a8[0].context_tokens);
+    assert.notEqual(w8a8gdn[0].precision.id,w8a8[0].precision.id);
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
