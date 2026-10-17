@@ -44,7 +44,7 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "38 public MODs across 8 lifecycle phases, with scope and evidence explicit.",
+        "39 public MODs across 8 lifecycle phases, with scope and evidence explicit.",
         "Explore by phase, scenario, platform, and readiness",
         "activation and performance evidence stay separate",
         "From inference operations to agent applications.",
