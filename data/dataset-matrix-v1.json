@@ -428,6 +428,28 @@
                 "observed_success_lower_bound": 0.62,
                 "mean_research_score_valid_only": null
               }
+            },
+            "request-throttling-controller": {
+              "label": "Olympiad",
+              "correct": 58,
+              "total": 100,
+              "value": 0.58,
+              "audit": {
+                "total": 100,
+                "graded": 98,
+                "successes": 58,
+                "solver_failures": 0,
+                "judge_unresolved": 2,
+                "judge_invalid": 2,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 4,
+                "judge_audit_flagged": 4,
+                "solver_truncated": 27,
+                "judge_truncated": 6,
+                "success_rate": 0.58,
+                "observed_success_lower_bound": 0.58,
+                "mean_research_score_valid_only": null
+              }
             }
           },
           "statuses": {
@@ -711,6 +733,28 @@
                 "success_rate": 0.06666666666666667,
                 "observed_success_lower_bound": 0.06666666666666667,
                 "mean_research_score_valid_only": 2.565086206896552
+              }
+            },
+            "request-throttling-controller": {
+              "label": "Research",
+              "correct": 4,
+              "total": 60,
+              "value": 0.06666666666666667,
+              "audit": {
+                "total": 60,
+                "graded": 59,
+                "successes": 4,
+                "solver_failures": 0,
+                "judge_unresolved": 1,
+                "judge_invalid": 1,
+                "judge_transport_failures": 0,
+                "judge_truncated_with_grade": 9,
+                "judge_audit_flagged": 12,
+                "solver_truncated": 9,
+                "judge_truncated": 10,
+                "success_rate": 0.06666666666666667,
+                "observed_success_lower_bound": 0.06666666666666667,
+                "mean_research_score_valid_only": 2.250084745762712
               }
             }
           },
@@ -1504,120 +1548,6 @@
               "output_tokens_per_second": 30.282824915263657,
               "repetitions": 3,
               "speedup": 1.9168612754488277
-            }
-          },
-          "statuses": {}
-        }
-      ]
-    },
-    {
-      "id": "frontierscience-controller-20261018",
-      "name": "FrontierScience",
-      "runtime_profile": {
-        "id": "controller-core023-fullkv-20261018",
-        "label": "Core / Ascend 0.23.0 · APC off · Full KV · Context 65536"
-      },
-      "parts": [
-        {
-          "id": "olympiad",
-          "name": "Olympiad",
-          "metric": "success",
-          "scores": {
-            "native": {
-              "label": "Olympiad",
-              "correct": 60,
-              "total": 100,
-              "value": 0.6,
-              "audit": {
-                "total": 100,
-                "graded": 98,
-                "successes": 60,
-                "solver_failures": 0,
-                "judge_unresolved": 2,
-                "judge_invalid": 2,
-                "judge_transport_failures": 0,
-                "judge_truncated_with_grade": 3,
-                "judge_audit_flagged": 3,
-                "solver_truncated": 30,
-                "judge_truncated": 5,
-                "success_rate": 0.6,
-                "observed_success_lower_bound": 0.6,
-                "mean_research_score_valid_only": null
-              }
-            },
-            "request-throttling-controller": {
-              "label": "Olympiad",
-              "correct": 58,
-              "total": 100,
-              "value": 0.58,
-              "audit": {
-                "total": 100,
-                "graded": 98,
-                "successes": 58,
-                "solver_failures": 0,
-                "judge_unresolved": 2,
-                "judge_invalid": 2,
-                "judge_transport_failures": 0,
-                "judge_truncated_with_grade": 4,
-                "judge_audit_flagged": 4,
-                "solver_truncated": 27,
-                "judge_truncated": 6,
-                "success_rate": 0.58,
-                "observed_success_lower_bound": 0.58,
-                "mean_research_score_valid_only": null
-              }
-            }
-          },
-          "statuses": {}
-        },
-        {
-          "id": "research",
-          "name": "Research",
-          "metric": "score7",
-          "scores": {
-            "native": {
-              "label": "Research",
-              "correct": 5,
-              "total": 60,
-              "value": 0.08333333333333333,
-              "audit": {
-                "total": 60,
-                "graded": 59,
-                "successes": 5,
-                "solver_failures": 0,
-                "judge_unresolved": 1,
-                "judge_invalid": 1,
-                "judge_transport_failures": 0,
-                "judge_truncated_with_grade": 2,
-                "judge_audit_flagged": 4,
-                "solver_truncated": 11,
-                "judge_truncated": 3,
-                "success_rate": 0.08333333333333333,
-                "observed_success_lower_bound": 0.08333333333333333,
-                "mean_research_score_valid_only": 2.505508474576271
-              }
-            },
-            "request-throttling-controller": {
-              "label": "Research",
-              "correct": 4,
-              "total": 60,
-              "value": 0.06666666666666667,
-              "audit": {
-                "total": 60,
-                "graded": 59,
-                "successes": 4,
-                "solver_failures": 0,
-                "judge_unresolved": 1,
-                "judge_invalid": 1,
-                "judge_transport_failures": 0,
-                "judge_truncated_with_grade": 9,
-                "judge_audit_flagged": 12,
-                "solver_truncated": 9,
-                "judge_truncated": 10,
-                "success_rate": 0.06666666666666667,
-                "observed_success_lower_bound": 0.06666666666666667,
-                "mean_research_score_valid_only": 2.250084745762712
-              }
             }
           },
           "statuses": {}
@@ -5001,10 +4931,12 @@
     },
     {
       "id": "frontierscience-controller-20261018-native",
-      "dataset": "frontierscience-controller-20261018",
+      "dataset": "frontierscience",
       "solution": "native",
       "scope": "full-160",
       "measured_at": "2026-10-18",
+      "configuration_label": "本轮配对基线",
+      "configuration_label_en": "Matched baseline",
       "quality": [
         {
           "label": "Olympiad",
@@ -5167,10 +5099,12 @@
     },
     {
       "id": "frontierscience-controller-20261018-request-throttling-controller",
-      "dataset": "frontierscience-controller-20261018",
+      "dataset": "frontierscience",
       "solution": "request-throttling-controller",
       "scope": "full-160",
       "measured_at": "2026-10-18",
+      "configuration_label": "本轮评测",
+      "configuration_label_en": "Current evaluation",
       "quality": [
         {
           "label": "Olympiad",
