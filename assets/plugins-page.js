@@ -362,12 +362,12 @@
   };
   const quickStarts = {
     "state-scheduler": {
-      title_en: "Install and inspect the M0 research MOD",
-      title_zh: "安装并检查 M0 研究 MOD",
+      title_en: "Inspect the archived research tools",
+      title_zh: "复查已归档研究工具",
       action_en: "public wheel and status",
       action_zh: "公开 wheel 与状态检查",
-      note_en: "Use a dedicated environment. This installs research tools only; do not enable a serving component. No adaptive execution selector or performance qualification is included. Full archive, checksums and build evidence are on the release page.",
-      note_zh: "请使用专用环境。这里只安装研究工具，不启用 serving 组件；尚无自适应执行选择器或性能验收。完整归档、校验和与构建证据见发布页。",
+      note_en: "Performance positioning is withdrawn and current action sets are stopped. Use only for historical inspection in a dedicated environment; do not enable a serving component. The unchanged 0.2.0 package has no qualified speedup and does not contain the later P2 prototype. See the archive note for negative results; original package checksums remain on the release page.",
+      note_zh: "已撤下性能定位，当前动作集停止。仅在专用环境复查历史工具，不启用 serving 组件。原 0.2.0 制品保持不变，无已验收提速，也不含后续 P2 原型。负结果见归档说明，原制品校验和仍在发布页。",
       command: `python -m pip install --no-deps https://github.com/vLLM-HUST/vllm-hust-website/releases/download/state-scheduler-v0.2.0/vllm_state_scheduler_plugin-0.2.0-py3-none-any.whl
 vllm-state-scheduler-mod status
 vllm-state-scheduler-trace-audit --help

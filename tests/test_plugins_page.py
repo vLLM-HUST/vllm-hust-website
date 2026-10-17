@@ -88,6 +88,27 @@ def test_state_scheduler_public_m0_release_does_not_claim_runtime_benefit() -> N
     }
 
 
+def test_state_scheduler_is_archived_not_a_performance_mod() -> None:
+    component = by_id("state-scheduler")
+    taxonomy = MOD_TAXONOMY["components"]["state-scheduler"]
+    assert taxonomy["kind"] == "tool_mod"
+    assert taxonomy["capability"] == "observability_evaluation"
+    assert taxonomy["lifecycle"] == "retired"
+    assert taxonomy["evidence"] == "no_performance_claim"
+    assert component["public_effect_status"] == "inconclusive"
+    assert "Performance MOD positioning withdrawn" in component["summary_en"]
+    assert "当前动作集停止" in component["summary_zh"]
+    assert "AB/BA was not run" in component["public_effect_en"]
+    assert "native/native" in component["public_effect_en"]
+    assert "原生/原生" in component["public_effect_zh"]
+    note_path = component["documentation_url"].removeprefix("./")
+    note = (ROOT / note_path).read_text(encoding="utf-8")
+    assert "没有已验证的推理提速" in note
+    assert "不包含后续 P2 原型" in note
+    assert "do not enable a serving component" in SCRIPT
+    assert "Performance positioning is withdrawn" in SCRIPT
+
+
 def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     schema = json.loads(
         (ROOT / "data" / "schemas" / "mod_taxonomy_v2.schema.json").read_text(
@@ -883,7 +904,7 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
     assert (
-        'data-taxonomy="./data/mod-taxonomy.json?v=state-scheduler-020-20261017"'
+        'data-taxonomy="./data/mod-taxonomy.json?v=state-scheduler-archive-20261018"'
         in PAGE
     )
     assert "async function fetchModTaxonomy(url)" in SCRIPT
@@ -1177,7 +1198,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=phase-scenario-navigation-20261012" in PAGE
-    assert "plugins-page.js?v=state-scheduler-020-20261017" in PAGE
+    assert "plugins-page.js?v=state-scheduler-archive-20261018" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1227,12 +1248,14 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=state-scheduler-020-20261017"' in PAGE
+    assert (
+        'data-source="./data/ecosystem.json?v=state-scheduler-archive-20261018"' in PAGE
+    )
     assert "data-stateaxis=" not in PAGE
     assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=state-scheduler-020-20261017"' in PAGE
+        'v=state-scheduler-archive-20261018"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?'
@@ -1796,7 +1819,7 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=state-scheduler-020-20261017"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=state-scheduler-archive-20261018"'
         in PAGE
     )
     assert "taxonomy-v2-20261012" in PAGE

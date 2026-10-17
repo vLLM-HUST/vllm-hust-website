@@ -9,6 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- State Scheduler 撤下性能 MOD 定位，改列为已归档的研究与观测工具；公开 FULL/PIECEWISE、P1、P2 的停止原因。保留原代码、负结果和 0.2.0 下载制品及其校验和，不推荐用于 serving 加速。
 - MOD 工坊将 Extension Manager 更新为 ECPA 0.3.0 正式 GitHub Release：中央安装示例固定到发布 wheel，并明确 Manager 稳定边界不等于所有 MOD、Provider 或性能结论自动合格。
 - 首页与 MOD 工坊改为从同一份生态目录计算公开 MOD 数量，移除 26、22、19 三套互相冲突的静态口径；目录上架不再依赖性能数据是否成功加载。
 - 精简首页与 MOD 工坊的中英文说明，保留兼容、证据和生命周期边界，同时改成面向选择与使用场景的自然表达。
