@@ -66,6 +66,28 @@ def by_id(component_id: str) -> dict:
     return next(item for item in REGISTRY["components"] if item["id"] == component_id)
 
 
+def test_state_scheduler_public_m0_release_does_not_claim_runtime_benefit() -> None:
+    component = by_id("state-scheduler")
+    assert component["canonical_repository"] == (
+        "https://github.com/Qixin-Gaoke/state-scheduler-plugin"
+    )
+    assert component["repository_visibility"] == "private"
+    assert component["compatibility"]["status"] == "inspect_only"
+    assert (
+        "execution_selector_available=false"
+        in (component["compatibility"]["requirements_en"])
+    )
+    assert "Compilation Control" in component["summary_en"]
+    assert component["evidence_level"] == "cpu_smoke"
+    assert MOD_TAXONOMY["components"]["state-scheduler"]["kind"] == "tool_mod"
+    assert component["public_effect_url"].endswith("/state-scheduler-v0.2.0")
+    assert "releases/download/state-scheduler-v0.2.0/" in SCRIPT
+    assert "vllm-state-scheduler-mod status" in SCRIPT
+    assert "state-scheduler" not in {
+        item["id"] for item in PLUGIN_PERFORMANCE["entries"]
+    }
+
+
 def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     schema = json.loads(
         (ROOT / "data" / "schemas" / "mod_taxonomy_v2.schema.json").read_text(
@@ -250,8 +272,9 @@ def test_registry_is_canonical_and_multidimensional() -> None:
 
 
 def test_pegaflow_credits_upstream_and_scopes_local_adaptation_maintainers() -> None:
-    expected = ["cybber695", "zhangshengxiang682"]
+    expected = ["mynameisczj", "cybber695", "zhangshengxiang682"]
     expected_profiles = [
+        {"login": "mynameisczj", "name": "陈子嘉"},
         {"login": "cybber695", "name": "陈彦博"},
         {"login": "zhangshengxiang682", "name": "张盛翔"},
     ]
@@ -267,8 +290,16 @@ def test_pegaflow_credits_upstream_and_scopes_local_adaptation_maintainers() -> 
             "https://github.com/novitalabs/pegaflow"
         )
 
-    assert "PegaFlow 原项目由派欧云" in by_id("pegaflow")["summary_zh"]
-    assert "国产化适配" in by_id("pegaflow-vllm-connectors")["summary_zh"]
+    assert "外部 KV 状态服务" in by_id("pegaflow")["summary_zh"]
+    assert (
+        "其他模型、设备、并行拓扑与服务容量尚未完成资格验证"
+        in by_id("pegaflow")["summary_zh"]
+    )
+    connector_summary = by_id("pegaflow-vllm-connectors")["summary_zh"]
+    assert "KV save/load" in connector_summary
+    assert "fail-closed" in connector_summary
+    assert "不负责启动、扩缩或修复" in connector_summary
+    assert "尚不能外推到其他模型、设备或拓扑" in connector_summary
     assert 'adaptationMaintainers: "国产化适配维护者"' in SCRIPT
     assert 'upstreamOwner: "上游原项目"' in SCRIPT
     assert 'item.contribution_scope === "local_adaptation"' in SCRIPT
@@ -502,9 +533,10 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
     ]
     assert pegaflow_connectors["execution_planes"] == ["api", "scheduler", "worker"]
     assert (
-        "external operator retains service lifecycle"
+        "does not start, scale, or repair that service"
         in pegaflow_connectors["summary_en"]
     )
+    assert "does not own stored-data lifecycle" in pegaflow_connectors["summary_en"]
     assert any(
         "ECPA Bundle 0.3 @ 14ca1d4" in version
         for version in pegaflow_connectors["compatibility"]["versions"]
@@ -850,7 +882,10 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert 'data-taxonomy="./data/mod-taxonomy.json?v=taxonomy-v2-20261012"' in PAGE
+    assert (
+        'data-taxonomy="./data/mod-taxonomy.json?v=state-scheduler-020-20261017"'
+        in PAGE
+    )
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
@@ -864,7 +899,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         if item.get("public_surface", True) is not False
         and item.get("maintainers")
         and item.get("canonical_repository", "").startswith(
-            "https://github.com/vLLM-HUST/"
+            ("https://github.com/vLLM-HUST/", "https://github.com/Qixin-Gaoke/")
         )
         and (
             item["id"] in MOD_TAXONOMY["components"]
@@ -1142,7 +1177,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=phase-scenario-navigation-20261012" in PAGE
-    assert "plugins-page.js?v=org-boundary-20261013" in PAGE
+    assert "plugins-page.js?v=state-scheduler-020-20261017" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1192,12 +1227,12 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=taxonomy-v2-20261012"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=state-scheduler-020-20261017"' in PAGE
     assert "data-stateaxis=" not in PAGE
     assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=ecpa-final-20261009-project-grouping"' in PAGE
+        'v=state-scheduler-020-20261017"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?'
@@ -1516,11 +1551,19 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
             ["刘海坤", "张书豪"],
         ),
         "pegaflow": (
-            [("陈彦博", "cybber695"), ("张盛翔", "zhangshengxiang682")],
+            [
+                ("陈子嘉", "mynameisczj"),
+                ("陈彦博", "cybber695"),
+                ("张盛翔", "zhangshengxiang682"),
+            ],
             ["张书豪"],
         ),
         "pegaflow-vllm-connectors": (
-            [("陈彦博", "cybber695"), ("张盛翔", "zhangshengxiang682")],
+            [
+                ("陈子嘉", "mynameisczj"),
+                ("陈彦博", "cybber695"),
+                ("张盛翔", "zhangshengxiang682"),
+            ],
             ["张书豪"],
         ),
     }
@@ -1654,7 +1697,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 39
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 40
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1752,7 +1795,10 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "benchmark-settings-20260929" not in SCRIPT
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
-    assert PAGE.count("ecpa-final-20261009") >= 2
+    assert (
+        'data-metadata="./data/plugin-workshop-metadata.json?v=state-scheduler-020-20261017"'
+        in PAGE
+    )
     assert "taxonomy-v2-20261012" in PAGE
 
 
