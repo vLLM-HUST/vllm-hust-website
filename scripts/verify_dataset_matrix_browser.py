@@ -35,6 +35,9 @@ def main():
             expect(page.locator(".matrix-replay-overview tbody tr")).to_have_count(1)
             assert "+91.7%" in page.locator(".matrix-replay-overview").inner_text()
             assert "79.70%" in page.locator(".matrix-overview").inner_text()
+            expect(page.locator(".matrix-profile-overview tbody tr")).to_have_count(2)
+            for value in ["60.00%", "58.00%", "8.33%", "6.67%"]:
+                assert value in page.locator(".matrix-profile-overview").inner_text()
             snapshot = page.request.get(
                 args.url + "/data/dataset-matrix-v1.json"
             ).json()
@@ -42,6 +45,7 @@ def main():
                 (part, solution["id"])
                 for dataset in snapshot["datasets"]
                 if dataset.get("evidence_type") not in ["replay", "fixed-window-replay"]
+                and not dataset.get("runtime_profile")
                 for part in dataset["parts"]
                 for solution in snapshot["solutions"]
             ]
@@ -147,6 +151,30 @@ def main():
             ).is_visible()
             page.screenshot(
                 path=str(args.output / f"offline-window-{width}-{lang}.png"),
+                full_page=True,
+            )
+            assert page.evaluate(
+                "document.documentElement.scrollWidth <= innerWidth + 1"
+            )
+            page.goto(
+                args.url + "/dataset-matrix-v1.html#frontierscience-controller-20261018"
+            )
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(2)
+            expect(page.locator("[data-solution]")).to_have_count(2)
+            for value in ["474.13", "432.14", "58.00%", "6.67%", "2026-10-18"]:
+                assert value in page.locator(".matrix-detail").inner_text()
+            toggle = page.locator(
+                '[data-expand="frontierscience-controller-20261018-request-throttling-controller"]'
+            )
+            toggle.click()
+            assert page.locator(
+                "#evidence-frontierscience-controller-20261018-request-throttling-controller"
+            ).is_visible()
+            assert "0.23.0" in page.locator(".run-detail:not([hidden])").inner_text()
+            toggle.click()
+            page.locator(".runs-table-scroll").evaluate("e => e.scrollLeft = 0")
+            page.screenshot(
+                path=str(args.output / f"controller-frontier-{width}-{lang}.png"),
                 full_page=True,
             )
             assert page.evaluate(

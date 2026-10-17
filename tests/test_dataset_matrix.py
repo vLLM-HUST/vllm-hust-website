@@ -273,3 +273,35 @@ def test_offline_window_report_contains_only_public_evidence():
                 check(child)
 
     check(json.loads(body))
+
+
+def test_controller_profile_keeps_historical_native_and_negative_results():
+    data = module.build()
+    historical = next(d for d in data["datasets"] if d["id"] == "frontierscience")
+    matched = next(
+        d for d in data["datasets"] if d["id"] == "frontierscience-controller-20261018"
+    )
+    assert "runtime_profile" not in historical
+    assert matched["runtime_profile"]["id"] == "controller-core023-fullkv-20261018"
+    assert [
+        (
+            p["scores"]["native"]["correct"],
+            p["scores"]["request-throttling-controller"]["correct"],
+        )
+        for p in matched["parts"]
+    ] == [(60, 58), (5, 4)]
+    rows = [r for r in data["records"] if r["dataset"] == matched["id"]]
+    assert len(rows) == 2
+    for row in rows:
+        assert row["performance"]["repetitions"] == 3
+        assert {r["repetition"] for r in row["performance"]["formal_runs"]} == {1, 2, 3}
+        assert row["protocol"]["quality_budget"]["passed"] is False
+        assert row["configuration"]["core_version"] == "0.23.0"
+    native = next(r for r in rows if r["solution"] == "native")
+    controller = next(
+        r for r in rows if r["solution"] == "request-throttling-controller"
+    )
+    assert (
+        controller["performance"]["output_throughput"]
+        < native["performance"]["output_throughput"]
+    )
