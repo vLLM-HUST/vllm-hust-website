@@ -68,10 +68,6 @@
       "name": "Core Attention Boundary"
     },
     {
-      "id": "request-throttling-off",
-      "name": "Controller · 调度关闭"
-    },
-    {
       "id": "request-throttling-controller",
       "name": "request-throttling-controller"
     }
@@ -1483,21 +1479,29 @@
       "id": "swe-smith-tranjactory-offline-window",
       "name": "SWE-smith-tranjactory",
       "evidence_type": "fixed-window-replay",
+      "paired_gains": [
+        0.7706413453350167,
+        0.9168612754488277,
+        1.2118825922620062
+      ],
       "parts": [
         {
           "id": "offline96-180s-apc512m",
-          "name": "离线96条 · 180秒窗口 · APC · KV512MiB",
-          "metric": "engine_output_tokens_per_second",
+          "name": "离线批量回放",
+          "name_en": "Offline batch replay",
+          "metric": "output_throughput_gain",
           "scores": {
-            "request-throttling-off": {
-              "value": 15.782803611007207,
-              "unit": "tokens/s",
+            "native": {
+              "value": 0,
+              "unit": "relative_gain",
+              "output_tokens_per_second": 15.782803611007207,
               "repetitions": 3,
               "speedup": 1
             },
             "request-throttling-controller": {
-              "value": 30.282824915263657,
-              "unit": "tokens/s",
+              "value": 0.9168612754488277,
+              "unit": "relative_gain",
+              "output_tokens_per_second": 30.282824915263657,
               "repetitions": 3,
               "speedup": 1.9168612754488277
             }
@@ -4276,9 +4280,9 @@
     {
       "id": "offline-window-request-throttling-controller-short-20261017-r15-off",
       "dataset": "swe-smith-tranjactory-offline-window",
-      "solution": "request-throttling-off",
+      "solution": "native",
       "scope": "offline-window",
-      "scope_label": "seed11 · 180s",
+      "scope_label": "重复1 · 3分钟",
       "quality": [],
       "performance": {
         "label": "scheduler-off-offline-burst",
@@ -4334,6 +4338,8 @@
         "arrival_mode": "offline-burst",
         "client_concurrency_limit": null,
         "seed": 11,
+        "repeat_index": 1,
+        "comparison_baseline": "Native vLLM through the same transport, scheduling disabled",
         "order": [
           "OFF",
           "ON"
@@ -4352,7 +4358,7 @@
       "dataset": "swe-smith-tranjactory-offline-window",
       "solution": "request-throttling-controller",
       "scope": "offline-window",
-      "scope_label": "seed11 · 180s",
+      "scope_label": "重复1 · 3分钟",
       "quality": [],
       "performance": {
         "label": "scheduler-on-offline-burst",
@@ -4408,6 +4414,8 @@
         "arrival_mode": "offline-burst",
         "client_concurrency_limit": null,
         "seed": 11,
+        "repeat_index": 1,
+        "comparison_baseline": "Native vLLM through the same transport, scheduling disabled",
         "order": [
           "OFF",
           "ON"
@@ -4424,9 +4432,9 @@
     {
       "id": "offline-window-request-throttling-controller-short-20261017-r17-off",
       "dataset": "swe-smith-tranjactory-offline-window",
-      "solution": "request-throttling-off",
+      "solution": "native",
       "scope": "offline-window",
-      "scope_label": "seed17 · 180s",
+      "scope_label": "重复2 · 3分钟",
       "quality": [],
       "performance": {
         "label": "scheduler-off-offline-burst",
@@ -4482,6 +4490,8 @@
         "arrival_mode": "offline-burst",
         "client_concurrency_limit": null,
         "seed": 17,
+        "repeat_index": 2,
+        "comparison_baseline": "Native vLLM through the same transport, scheduling disabled",
         "order": [
           "OFF",
           "ON"
@@ -4500,7 +4510,7 @@
       "dataset": "swe-smith-tranjactory-offline-window",
       "solution": "request-throttling-controller",
       "scope": "offline-window",
-      "scope_label": "seed17 · 180s",
+      "scope_label": "重复2 · 3分钟",
       "quality": [],
       "performance": {
         "label": "scheduler-on-offline-burst",
@@ -4556,6 +4566,8 @@
         "arrival_mode": "offline-burst",
         "client_concurrency_limit": null,
         "seed": 17,
+        "repeat_index": 2,
+        "comparison_baseline": "Native vLLM through the same transport, scheduling disabled",
         "order": [
           "OFF",
           "ON"
@@ -4572,9 +4584,9 @@
     {
       "id": "offline-window-request-throttling-controller-short-20261017-r18-off",
       "dataset": "swe-smith-tranjactory-offline-window",
-      "solution": "request-throttling-off",
+      "solution": "native",
       "scope": "offline-window",
-      "scope_label": "seed23 · 180s",
+      "scope_label": "重复3 · 3分钟",
       "quality": [],
       "performance": {
         "label": "scheduler-off-offline-burst",
@@ -4630,6 +4642,8 @@
         "arrival_mode": "offline-burst",
         "client_concurrency_limit": null,
         "seed": 23,
+        "repeat_index": 3,
+        "comparison_baseline": "Native vLLM through the same transport, scheduling disabled",
         "order": [
           "ON",
           "OFF"
@@ -4648,7 +4662,7 @@
       "dataset": "swe-smith-tranjactory-offline-window",
       "solution": "request-throttling-controller",
       "scope": "offline-window",
-      "scope_label": "seed23 · 180s",
+      "scope_label": "重复3 · 3分钟",
       "quality": [],
       "performance": {
         "label": "scheduler-on-offline-burst",
@@ -4704,6 +4718,8 @@
         "arrival_mode": "offline-burst",
         "client_concurrency_limit": null,
         "seed": 23,
+        "repeat_index": 3,
+        "comparison_baseline": "Native vLLM through the same transport, scheduling disabled",
         "order": [
           "ON",
           "OFF"
@@ -4720,9 +4736,9 @@
     {
       "id": "offline-window-request-throttling-controller-short-20261017-r16-off",
       "dataset": "swe-smith-tranjactory-offline-window",
-      "solution": "request-throttling-off",
+      "solution": "native",
       "scope": "offline-window",
-      "scope_label": "seed11 · 180s · 顺序复测",
+      "scope_label": "重复1 · 3分钟 · 顺序复核",
       "quality": [],
       "performance": {
         "label": "scheduler-off-offline-burst",
@@ -4778,6 +4794,8 @@
         "arrival_mode": "offline-burst",
         "client_concurrency_limit": null,
         "seed": 11,
+        "repeat_index": 1,
+        "comparison_baseline": "Native vLLM through the same transport, scheduling disabled",
         "order": [
           "ON",
           "OFF"
@@ -4796,7 +4814,7 @@
       "dataset": "swe-smith-tranjactory-offline-window",
       "solution": "request-throttling-controller",
       "scope": "offline-window",
-      "scope_label": "seed11 · 180s · 顺序复测",
+      "scope_label": "重复1 · 3分钟 · 顺序复核",
       "quality": [],
       "performance": {
         "label": "scheduler-on-offline-burst",
@@ -4852,6 +4870,8 @@
         "arrival_mode": "offline-burst",
         "client_concurrency_limit": null,
         "seed": 11,
+        "repeat_index": 1,
+        "comparison_baseline": "Native vLLM through the same transport, scheduling disabled",
         "order": [
           "ON",
           "OFF"

@@ -125,9 +125,9 @@ def append_offline_window(root, solutions, datasets, records, sources):
     assert ratio == report["aggregate"]["median_paired_output_rate_ratio"]
     sources[path] = hashlib.sha256(raw).hexdigest()
     on_id = "request-throttling-controller"
-    off_id = "request-throttling-off"
+    off_id = "native"
     for sid, name in [
-        (off_id, "Controller · 调度关闭"),
+        (off_id, "Native vLLM · Ascend"),
         (on_id, "request-throttling-controller"),
     ]:
         if not any(s["id"] == sid for s in solutions):
@@ -135,10 +135,11 @@ def append_offline_window(root, solutions, datasets, records, sources):
     scores = {}
     for key, sid in [("off", off_id), ("on", on_id)]:
         scores[sid] = {
-            "value": statistics.median(
+            "value": 0 if key == "off" else ratio - 1,
+            "unit": "relative_gain",
+            "output_tokens_per_second": statistics.median(
                 r[key]["engine_output_tokens_per_second"] for r in primary
             ),
-            "unit": "tokens/s",
             "repetitions": 3,
             "speedup": 1 if key == "off" else ratio,
         }
@@ -148,17 +149,20 @@ def append_offline_window(root, solutions, datasets, records, sources):
             "id": dataset_id,
             "name": "SWE-smith-tranjactory",
             "evidence_type": "fixed-window-replay",
+            "paired_gains": [r["paired_output_rate_ratio"] - 1 for r in primary],
             "parts": [
                 {
                     "id": "offline96-180s-apc512m",
-                    "name": "离线96条 · 180秒窗口 · APC · KV512MiB",
-                    "metric": "engine_output_tokens_per_second",
+                    "name": "离线批量回放",
+                    "name_en": "Offline batch replay",
+                    "metric": "output_throughput_gain",
                     "scores": scores,
                     "statuses": {},
                 }
             ],
         }
     )
+    repeat_numbers = {r["seed"]: index + 1 for index, r in enumerate(primary)}
     for record in report["records"]:
         for key, sid in [("off", off_id), ("on", on_id)]:
             point = record[key]
@@ -168,8 +172,8 @@ def append_offline_window(root, solutions, datasets, records, sources):
                     "dataset": dataset_id,
                     "solution": sid,
                     "scope": "offline-window",
-                    "scope_label": f"seed{record['seed']} · 180s"
-                    + (" · 顺序复测" if record["order_repeat"] else ""),
+                    "scope_label": f"重复{repeat_numbers[record['seed']]} · 3分钟"
+                    + (" · 顺序复核" if record["order_repeat"] else ""),
                     "quality": [],
                     "performance": point,
                     "configuration": report["runtime_profile"],
@@ -177,6 +181,8 @@ def append_offline_window(root, solutions, datasets, records, sources):
                     "protocol": report["protocol"]
                     | {
                         "seed": record["seed"],
+                        "repeat_index": repeat_numbers[record["seed"]],
+                        "comparison_baseline": "Native vLLM through the same transport, scheduling disabled",
                         "order": record["order"],
                         "order_repeat": record["order_repeat"],
                         "finite_makespan_claim": False,
