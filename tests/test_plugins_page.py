@@ -291,7 +291,10 @@ def test_pegaflow_credits_upstream_and_scopes_local_adaptation_maintainers() -> 
         )
 
     assert "外部 KV 状态服务" in by_id("pegaflow")["summary_zh"]
-    assert "其他模型、设备、并行拓扑与服务容量尚未完成资格验证" in by_id("pegaflow")["summary_zh"]
+    assert (
+        "其他模型、设备、并行拓扑与服务容量尚未完成资格验证"
+        in by_id("pegaflow")["summary_zh"]
+    )
     connector_summary = by_id("pegaflow-vllm-connectors")["summary_zh"]
     assert "KV save/load" in connector_summary
     assert "fail-closed" in connector_summary
@@ -529,7 +532,10 @@ def test_kv_systems_and_connectors_are_not_collapsed_into_plugins() -> None:
         "vllm.kv_transfer_config",
     ]
     assert pegaflow_connectors["execution_planes"] == ["api", "scheduler", "worker"]
-    assert "does not start, scale, or repair that service" in pegaflow_connectors["summary_en"]
+    assert (
+        "does not start, scale, or repair that service"
+        in pegaflow_connectors["summary_en"]
+    )
     assert "does not own stored-data lifecycle" in pegaflow_connectors["summary_en"]
     assert any(
         "ECPA Bundle 0.3 @ 14ca1d4" in version
