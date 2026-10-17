@@ -58,8 +58,8 @@ def test_scope_and_metrics():
             for s in p["scores"].values():
                 if p["metric"] == "programs_per_minute":
                     assert s["value"] > 0 and s["unit"] == "programs/min"
-                elif p["metric"] == "engine_output_tokens_per_second":
-                    assert s["value"] > 0 and s["unit"] == "tokens/s"
+                elif p["metric"] == "output_throughput_gain":
+                    assert s["value"] >= 0 and s["unit"] == "relative_gain"
                 else:
                     assert s["value"] == s["correct"] / s["total"]
 
@@ -209,8 +209,8 @@ def test_offline_window_has_explicit_profile_and_paired_seed_median():
     )
     assert dataset["evidence_type"] == "fixed-window-replay"
     part = dataset["parts"][0]
-    assert part["metric"] == "engine_output_tokens_per_second"
-    assert "native" not in part["scores"]
+    assert part["metric"] == "output_throughput_gain"
+    assert part["scores"]["native"]["value"] == 0
     assert part["scores"]["request-throttling-controller"]["repetitions"] == 3
     raw = json.loads(
         (
@@ -224,6 +224,13 @@ def test_offline_window_has_explicit_profile_and_paired_seed_median():
         for r in primary
     )
     assert part["scores"]["request-throttling-controller"]["speedup"] == ratio
+    assert part["scores"]["request-throttling-controller"]["value"] == ratio - 1
+    assert "request-throttling-off" not in {s["id"] for s in data["solutions"]}
+    assert all(
+        "seed" not in r["scope_label"]
+        for r in data["records"]
+        if r["dataset"] == dataset["id"]
+    )
     rows = [r for r in data["records"] if r["dataset"] == dataset["id"]]
     assert len(rows) == 8
     assert all(
