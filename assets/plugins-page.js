@@ -361,6 +361,18 @@
     preview: { en: "Preview", zh: "能力预览" }
   };
   const quickStarts = {
+    "state-scheduler": {
+      title_en: "Install and inspect the M0 research MOD",
+      title_zh: "安装并检查 M0 研究 MOD",
+      action_en: "public wheel and status",
+      action_zh: "公开 wheel 与状态检查",
+      note_en: "Use a dedicated environment. This installs research tools only; do not enable a serving component. No adaptive execution selector or performance qualification is included. Full archive, checksums and build evidence are on the release page.",
+      note_zh: "请使用专用环境。这里只安装研究工具，不启用 serving 组件；尚无自适应执行选择器或性能验收。完整归档、校验和与构建证据见发布页。",
+      command: `python -m pip install --no-deps https://github.com/vLLM-HUST/vllm-hust-website/releases/download/state-scheduler-v0.2.0/vllm_state_scheduler_plugin-0.2.0-py3-none-any.whl
+vllm-state-scheduler-mod status
+vllm-state-scheduler-trace-audit --help
+vllm-state-scheduler-correctness-probe --help`
+    },
     "vllm-hust-opset": {
       title_en: "Install and check OPset",
       title_zh: "安装并检查 OPset",
