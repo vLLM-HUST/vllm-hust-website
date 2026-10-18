@@ -365,3 +365,28 @@ def test_controller_gold_public_report_has_no_private_payload():
         r'10\.244\.|192\.168\.|Bearer\s|"(?:base_url|raw_response|prompt_token_ids)"\s*:',
         body,
     )
+
+
+def test_controller_mmlu_preserves_original_row_and_matching_baseline():
+    import statistics
+
+    data = module.build()
+    assert len(data["datasets"]) == 4
+    part = next(d for d in data["datasets"] if d["id"] == "mmlu-pro")["parts"][0]
+    assert part["scores"]["native"]["correct"] == 9609
+    measured = part["scores"]["request-throttling-controller"]
+    assert (measured["correct"], measured["total"]) == (9599, 12032)
+    assert measured["audit"]["invalid_answers"] == 66
+    rows = [
+        r
+        for r in data["records"]
+        if r["id"].startswith("mmlu-pro-controller-20261018-")
+    ]
+    assert len(rows) == 2
+    assert {r["quality"][0]["correct"] for r in rows} == {9632, 9599}
+    for row in rows:
+        assert row["performance"]["repetitions"] == 3
+        for key in ["output_throughput", "mean_ttft_ms", "mean_tpot_ms"]:
+            assert row["performance"][key] == statistics.median(
+                r[key] for r in row["performance"]["formal_runs"]
+            )

@@ -38,7 +38,7 @@ def main():
             expect(
                 page.locator(".matrix-profile-section, .matrix-replay-section")
             ).to_have_count(0)
-            for value in ["57.00%", "58.00%", "8.33%", "6.67%", "23.80%"]:
+            for value in ["57.00%", "58.00%", "8.33%", "6.67%", "23.80%", "79.78%"]:
                 assert value in page.locator(".matrix-overview").inner_text()
             snapshot = page.request.get(
                 args.url + "/data/dataset-matrix-v1.json"
@@ -67,8 +67,10 @@ def main():
             assert "25.90%" in page.locator(".matrix-overview").inner_text()
             assert "27.65%" in page.locator(".matrix-overview").inner_text()
             page.locator('.matrix-dataset[href="#mmlu-pro"]').click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
             assert "631.59" in page.locator(".matrix-detail").inner_text()
+            for value in ["360.53", "337.20", "2026-10-18"]:
+                assert value in page.locator(".matrix-detail").inner_text()
             page.locator('[data-sort="throughput"]').click()
             page.locator('[data-sort="throughput"]').click()
             assert (
@@ -90,11 +92,11 @@ def main():
             )
             toggle.click()
             page.locator('[data-solution="native"]').uncheck()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
-            page.locator("#langToggle").click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
-            page.locator("#matrix-reset").click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
+            page.locator("#langToggle").click()
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
+            page.locator("#matrix-reset").click()
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
             page.screenshot(
                 path=str(args.output / f"detail-{width}-{lang}.png"), full_page=True
             )
