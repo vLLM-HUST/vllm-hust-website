@@ -154,6 +154,24 @@
                 "mean_e2e_s": 26.828634242624485,
                 "smoke_only": false
               }
+            },
+            "request-throttling-controller": {
+              "label": "Test",
+              "correct": 9599,
+              "total": 12032,
+              "value": 0.7977892287234043,
+              "audit": {
+                "cases": 12032,
+                "correct": 9599,
+                "accuracy": 0.7977892287234043,
+                "invalid_answers": 66,
+                "transport_failures": 0,
+                "length_limited": 1536,
+                "wall_seconds_this_invocation": 23372.755430921912,
+                "mean_ttft_s": 0.7452685288230219,
+                "mean_e2e_s": 31.056554580021103,
+                "smoke_only": false
+              }
             }
           },
           "statuses": {
@@ -5873,6 +5891,280 @@
         "Independent max256 performance is separate from complete task solving; ordinary forwarding has no demonstrated throttle action.",
         "TTFT/TPOT are original vllm aggregate metrics; no per-request timing for independent mean recomputation."
       ]
+    },
+    {
+      "id": "mmlu-pro-controller-20261018-native",
+      "dataset": "mmlu-pro",
+      "solution": "native",
+      "scope": "test-200",
+      "measured_at": "2026-10-18",
+      "configuration_label": "本轮配对基线",
+      "configuration_label_en": "Matched baseline",
+      "quality": [
+        {
+          "label": "Test",
+          "correct": 9632,
+          "total": 12032,
+          "value": 0.800531914893617,
+          "audit": {
+            "cases": 12032,
+            "correct": 9632,
+            "accuracy": 0.800531914893617,
+            "invalid_answers": 62,
+            "transport_failures": 0,
+            "length_limited": 1520,
+            "wall_seconds_this_invocation": 23828.67192309769,
+            "mean_ttft_s": 0.7931139659728054,
+            "mean_e2e_s": 31.65954308515296,
+            "smoke_only": false
+          }
+        }
+      ],
+      "performance": {
+        "output_throughput": 337.20093123338836,
+        "mean_ttft_ms": 69299.43217964843,
+        "mean_tpot_ms": 39.68019268487343,
+        "completed": 200,
+        "failed": 0,
+        "num_prompts": 200,
+        "repetitions": 3,
+        "aggregation": "median of three formal values per metric",
+        "formal_runs": [
+          {
+            "completed": 200,
+            "failed": 0,
+            "duration": 176.48402310488746,
+            "total_input_tokens": 282265,
+            "total_output_tokens": 51200,
+            "request_throughput": 1.1332470581834855,
+            "output_throughput": 290.1112468949723,
+            "total_token_throughput": 1889.49115128578,
+            "mean_ttft_ms": 84027.2050520638,
+            "median_ttft_ms": 94252.22728797235,
+            "p99_ttft_ms": 169855.86148639675,
+            "mean_tpot_ms": 44.464068552223495,
+            "median_tpot_ms": 39.47464309395382,
+            "p99_tpot_ms": 76.42753117604582,
+            "stage": "bench-mmlu-native-1",
+            "arm": "native",
+            "repetition": 1,
+            "input_sha256": "fb79b6fa98f232282a948e4a17f404f80c03dc2bae05af57b95b9cc0651b3506",
+            "raw_sha256": "6204aa19d6e24b184c465e37756ad136ba2bb7c6293954ef9804bb35898bbb41",
+            "stage_wall_seconds": 203.46091032028198
+          },
+          {
+            "completed": 200,
+            "failed": 0,
+            "duration": 143.969462598674,
+            "total_input_tokens": 282265,
+            "total_output_tokens": 51200,
+            "request_throughput": 1.3891834864836263,
+            "output_throughput": 355.63097253980834,
+            "total_token_throughput": 2316.2203566013122,
+            "mean_ttft_ms": 69299.43217964843,
+            "median_ttft_ms": 73817.30870413594,
+            "p99_ttft_ms": 137288.88482233044,
+            "mean_tpot_ms": 37.734753771274185,
+            "median_tpot_ms": 36.26654880103089,
+            "p99_tpot_ms": 56.14895096074278,
+            "stage": "bench-mmlu-native-2",
+            "arm": "native",
+            "repetition": 2,
+            "input_sha256": "fb79b6fa98f232282a948e4a17f404f80c03dc2bae05af57b95b9cc0651b3506",
+            "raw_sha256": "70102e3c74969791e3d110e550de72a5ca6d6331dda5e0eb500dfb90b4a0be5e",
+            "stage_wall_seconds": 170.57901787757874
+          },
+          {
+            "completed": 200,
+            "failed": 0,
+            "duration": 151.83825208526105,
+            "total_input_tokens": 282265,
+            "total_output_tokens": 51200,
+            "request_throughput": 1.3171911376304233,
+            "output_throughput": 337.20093123338836,
+            "total_token_throughput": 2196.1857135496457,
+            "mean_ttft_ms": 68041.72048739158,
+            "median_ttft_ms": 69352.2431307938,
+            "p99_ttft_ms": 145145.05746224895,
+            "mean_tpot_ms": 39.68019268487343,
+            "median_tpot_ms": 38.15320228847364,
+            "p99_tpot_ms": 59.23349865584397,
+            "stage": "bench-mmlu-native-3",
+            "arm": "native",
+            "repetition": 3,
+            "input_sha256": "fb79b6fa98f232282a948e4a17f404f80c03dc2bae05af57b95b9cc0651b3506",
+            "raw_sha256": "5cff42a0fe023c995c65a47eb5979114acdafd0d355a7afc6ef8bc6de9ad8563",
+            "stage_wall_seconds": 178.2532148361206
+          }
+        ]
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "precision": "BF16",
+        "hardware": "Ascend 910B2",
+        "parallel": "TP2",
+        "backend_count": 1,
+        "core_version": "0.23.0",
+        "ascend_version": "0.23.0",
+        "prefix_caching": false,
+        "kv": "full automatic",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "quality_client_concurrency": 16
+      },
+      "report": "data/request-throttling-dataset-matrix-20261018/mmlu-pro.json",
+      "protocol": {
+        "quality": "One complete12032 pass;5shot/max2048/client16; invalid answers and truncations retained",
+        "performance": "Separate200 prompts; outputcap256/naturalEOS/temp0/seed0/rateinf/no client cap; one warmup plus three formal runs each arm",
+        "source": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/4b3f318/reports/request-throttling-controller/dataset-matrix-20261018-r3/mmlu-pro",
+        "quality_retention": 0.9965739202657807,
+        "quality_retention_budget": 0.99
+      },
+      "limitations": [
+        "Single quality pass; not statistical significance.",
+        "Fixedclient16 quality profile; independent rateinf200request short performance.",
+        "No raw SSE/actual HTTP bodies retained by quality client; assembled records only.",
+        "Aggregate TTFT/TPOT only; no independent per-request latency reconstruction.",
+        "Ordinary single-turn forwarding; no program-level scheduling causal claim.",
+        "Short outputcap256 performance is not full-solution cost."
+      ]
+    },
+    {
+      "id": "mmlu-pro-controller-20261018-request-throttling-controller",
+      "dataset": "mmlu-pro",
+      "solution": "request-throttling-controller",
+      "scope": "test-200",
+      "measured_at": "2026-10-18",
+      "configuration_label": "本轮评测",
+      "configuration_label_en": "Current evaluation",
+      "quality": [
+        {
+          "label": "Test",
+          "correct": 9599,
+          "total": 12032,
+          "value": 0.7977892287234043,
+          "audit": {
+            "cases": 12032,
+            "correct": 9599,
+            "accuracy": 0.7977892287234043,
+            "invalid_answers": 66,
+            "transport_failures": 0,
+            "length_limited": 1536,
+            "wall_seconds_this_invocation": 23372.755430921912,
+            "mean_ttft_s": 0.7452685288230219,
+            "mean_e2e_s": 31.056554580021103,
+            "smoke_only": false
+          }
+        }
+      ],
+      "performance": {
+        "output_throughput": 360.52515225829103,
+        "mean_ttft_ms": 66989.81309164083,
+        "mean_tpot_ms": 37.906217852013874,
+        "completed": 200,
+        "failed": 0,
+        "num_prompts": 200,
+        "repetitions": 3,
+        "aggregation": "median of three formal values per metric",
+        "formal_runs": [
+          {
+            "completed": 200,
+            "failed": 0,
+            "duration": 176.07368657784536,
+            "total_input_tokens": 282265,
+            "total_output_tokens": 51200,
+            "request_throughput": 1.1358880698597538,
+            "output_throughput": 290.78734588409696,
+            "total_token_throughput": 1893.8945760789138,
+            "mean_ttft_ms": 82959.85190273961,
+            "median_ttft_ms": 83502.08771112375,
+            "p99_ttft_ms": 169552.78502545785,
+            "mean_tpot_ms": 45.06215466902244,
+            "median_tpot_ms": 37.87634734009557,
+            "p99_tpot_ms": 75.7136933306305,
+            "stage": "bench-mmlu-controller-1",
+            "arm": "controller",
+            "repetition": 1,
+            "input_sha256": "fb79b6fa98f232282a948e4a17f404f80c03dc2bae05af57b95b9cc0651b3506",
+            "raw_sha256": "b7282248c844f93abb3471c4ef8d5ee2a788758bc22c2800a855da2b961588cd",
+            "stage_wall_seconds": 202.89167046546936
+          },
+          {
+            "completed": 200,
+            "failed": 0,
+            "duration": 137.79555824026465,
+            "total_input_tokens": 282265,
+            "total_output_tokens": 51200,
+            "request_throughput": 1.4514255942217944,
+            "output_throughput": 371.56495212077937,
+            "total_token_throughput": 2419.998178885853,
+            "mean_ttft_ms": 65401.78846850759,
+            "median_ttft_ms": 67810.66664517857,
+            "p99_ttft_ms": 131679.11426978186,
+            "mean_tpot_ms": 37.49183951311873,
+            "median_tpot_ms": 36.46405027430578,
+            "p99_tpot_ms": 56.53781504003222,
+            "stage": "bench-mmlu-controller-2",
+            "arm": "controller",
+            "repetition": 2,
+            "input_sha256": "fb79b6fa98f232282a948e4a17f404f80c03dc2bae05af57b95b9cc0651b3506",
+            "raw_sha256": "c4ed83092aa220d2f0497f4a8993d5f44282c52119c7227f4166e364e51af7fd",
+            "stage_wall_seconds": 164.35793828964233
+          },
+          {
+            "completed": 200,
+            "failed": 0,
+            "duration": 142.01505686715245,
+            "total_input_tokens": 282265,
+            "total_output_tokens": 51200,
+            "request_throughput": 1.4083013760089493,
+            "output_throughput": 360.52515225829103,
+            "total_token_throughput": 2348.0960917541215,
+            "mean_ttft_ms": 66989.81309164083,
+            "median_ttft_ms": 69083.01619347185,
+            "p99_ttft_ms": 135358.7210551696,
+            "mean_tpot_ms": 37.906217852013874,
+            "median_tpot_ms": 37.440958470288734,
+            "p99_tpot_ms": 57.35300285774558,
+            "stage": "bench-mmlu-controller-3",
+            "arm": "controller",
+            "repetition": 3,
+            "input_sha256": "fb79b6fa98f232282a948e4a17f404f80c03dc2bae05af57b95b9cc0651b3506",
+            "raw_sha256": "0f44b7bbd4d019736786f1b69d797b6fd127d74ad85a7d073a6c72e6b35f5418",
+            "stage_wall_seconds": 168.69757509231567
+          }
+        ]
+      },
+      "configuration": {
+        "model": "Qwen3.5-35B-A3B",
+        "precision": "BF16",
+        "hardware": "Ascend 910B2",
+        "parallel": "TP2",
+        "backend_count": 1,
+        "core_version": "0.23.0",
+        "ascend_version": "0.23.0",
+        "prefix_caching": false,
+        "kv": "full automatic",
+        "max_model_len": 65536,
+        "max_num_seqs": 16,
+        "quality_client_concurrency": 16
+      },
+      "report": "data/request-throttling-dataset-matrix-20261018/mmlu-pro.json",
+      "protocol": {
+        "quality": "One complete12032 pass;5shot/max2048/client16; invalid answers and truncations retained",
+        "performance": "Separate200 prompts; outputcap256/naturalEOS/temp0/seed0/rateinf/no client cap; one warmup plus three formal runs each arm",
+        "source": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/4b3f318/reports/request-throttling-controller/dataset-matrix-20261018-r3/mmlu-pro",
+        "quality_retention": 0.9965739202657807,
+        "quality_retention_budget": 0.99
+      },
+      "limitations": [
+        "Single quality pass; not statistical significance.",
+        "Fixedclient16 quality profile; independent rateinf200request short performance.",
+        "No raw SSE/actual HTTP bodies retained by quality client; assembled records only.",
+        "Aggregate TTFT/TPOT only; no independent per-request latency reconstruction.",
+        "Ordinary single-turn forwarding; no program-level scheduling causal claim.",
+        "Short outputcap256 performance is not full-solution cost."
+      ]
     }
   ],
   "attempts": [
@@ -6098,7 +6390,8 @@
     "data/betterscale-school-runtime-20261016/report.json": "63acbf2f8efd2d4c3488d7a4738f2f9e0c811d8211a528a9f27e04b63f35a07d",
     "data/request-throttling-offline-window-20261017/report.json": "929af1be958f8845b654bcf6722251c0fc6bfa8b26cd47ede31467d61892e5aa",
     "data/request-throttling-dataset-matrix-20261018/frontierscience.json": "79adab6c4415f064424c5369417066d7cabb50d105632d375b14cc8e5267663e",
-    "data/request-throttling-dataset-matrix-20261018/hle-gold.json": "126dcfeb5b9b382f9ecac3e42695a53430d8c98e647d86f7af0da5e8a59d5a44"
+    "data/request-throttling-dataset-matrix-20261018/hle-gold.json": "126dcfeb5b9b382f9ecac3e42695a53430d8c98e647d86f7af0da5e8a59d5a44",
+    "data/request-throttling-dataset-matrix-20261018/mmlu-pro.json": "4ef952c00b5fb31dd99ec5ca1937f6f8c64d2bcb1d7dbdd27f1b8985058b4493"
   },
   "betterscale_publication": {
     "commit": "2d90b460cf92645214bd6bc325bff0562c395ba6",

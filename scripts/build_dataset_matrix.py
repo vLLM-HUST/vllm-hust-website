@@ -378,6 +378,88 @@ def append_controller_gold_profile(root, datasets, records, sources):
             )
 
 
+def append_controller_mmlu_profile(root, datasets, records, sources):
+    """Append the dated matched pair to the existing MMLU row and details."""
+    path = "data/request-throttling-dataset-matrix-20261018/mmlu-pro.json"
+    if not (root / path).exists():
+        return
+    raw = (root / path).read_bytes()
+    report = json.loads(raw)
+    assert report["status"] == "DATASET_PAIR_COMPLETE"
+    pair = report["quality_pair"]
+    assert all(pair["pair_input_check"].values())
+    sources[path] = hashlib.sha256(raw).hexdigest()
+    dataset = next(d for d in datasets if d["id"] == "mmlu-pro")
+    part = next(p for p in dataset["parts"] if p["id"] == "test")
+    audit = pair["arms"]["controller"]["summary"]
+    assert (
+        audit["cases"] == 12032
+        and "request-throttling-controller" not in part["scores"]
+    )
+
+    def quality(value):
+        return {
+            "label": "Test",
+            "correct": value["correct"],
+            "total": value["cases"],
+            "value": value["accuracy"],
+            "audit": value,
+        }
+
+    part["scores"]["request-throttling-controller"] = quality(audit)
+    performance = report["performance"]
+    assert performance["state"] == "THREE_REPEAT_PERFORMANCE_COMPLETE"
+    for arm, sid in [
+        ("native", "native"),
+        ("controller", "request-throttling-controller"),
+    ]:
+        points = [
+            r
+            for r in performance["records"]
+            if r["arm"] == arm and r["repetition"] != "warmup"
+        ]
+        assert len(points) == 3 and {r["repetition"] for r in points} == {1, 2, 3}
+        assert all(r["completed"] == 200 and r["failed"] == 0 for r in points)
+        aggregate = performance["aggregate"][arm]
+        for key, value in aggregate.items():
+            assert statistics.median(r[key] for r in points) == value
+        records.append(
+            {
+                "id": f"mmlu-pro-controller-20261018-{sid}",
+                "dataset": "mmlu-pro",
+                "solution": sid,
+                "scope": "test-200",
+                "measured_at": "2026-10-18",
+                "configuration_label": "本轮配对基线"
+                if arm == "native"
+                else "本轮评测",
+                "configuration_label_en": "Matched baseline"
+                if arm == "native"
+                else "Current evaluation",
+                "quality": [quality(pair["arms"][arm]["summary"])],
+                "performance": dict(
+                    aggregate,
+                    completed=200,
+                    failed=0,
+                    num_prompts=200,
+                    repetitions=3,
+                    aggregation="median of three formal values per metric",
+                    formal_runs=points,
+                ),
+                "configuration": report["configuration"],
+                "report": path,
+                "protocol": {
+                    "quality": "One complete12032 pass;5shot/max2048/client16; invalid answers and truncations retained",
+                    "performance": "Separate200 prompts; outputcap256/naturalEOS/temp0/seed0/rateinf/no client cap; one warmup plus three formal runs each arm",
+                    "source": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/4b3f318/reports/request-throttling-controller/dataset-matrix-20261018-r3/mmlu-pro",
+                    "quality_retention": pair["quality_retention"],
+                    "quality_retention_budget": pair["quality_retention_budget"],
+                },
+                "limitations": report["boundaries"],
+            }
+        )
+
+
 def build(root=ROOT):
     sources = {}
 
@@ -638,6 +720,7 @@ def build(root=ROOT):
     append_offline_window(root, solutions, datasets, records, sources)
     append_controller_dataset_profiles(root, solutions, datasets, records, sources)
     append_controller_gold_profile(root, datasets, records, sources)
+    append_controller_mmlu_profile(root, datasets, records, sources)
     return {
         "schema": 1,
         "cohort": {
