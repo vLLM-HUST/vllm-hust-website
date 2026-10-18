@@ -378,6 +378,100 @@ def append_controller_gold_profile(root, datasets, records, sources):
             )
 
 
+def append_controller_revision_profile(root, datasets, records, sources):
+    """Use the existing Revision row and text/image detail format."""
+    path = "data/request-throttling-dataset-matrix-20261018/hle-revision.json"
+    if not (root / path).exists():
+        return
+    raw = (root / path).read_bytes()
+    report = json.loads(raw)
+    assert report["status"] == "DATASET_PAIR_COMPLETE"
+    assert report["quality_pair"]["pair_input_check"][
+        "all_contract_fields_equal_except_solver_base_url"
+    ]
+    sources[path] = hashlib.sha256(raw).hexdigest()
+    dataset = next(d for d in datasets if d["id"] == "hle-verified")
+    revision = next(p for p in dataset["parts"] if p["id"] == "revision")
+    audit = report["quality_pair"]["arms"]["controller"]["summary"]["tracks"][
+        "revision"
+    ]
+    assert (
+        audit["total"] == 1143
+        and "request-throttling-controller" not in revision["scores"]
+    )
+    revision["scores"]["request-throttling-controller"] = {
+        "label": "Revision",
+        "correct": audit["successes"],
+        "total": audit["total"],
+        "value": audit["accuracy"],
+        "audit": audit,
+    }
+    performance = report["performance"]
+    assert performance["state"] == "THREE_REPEAT_PERFORMANCE_COMPLETE"
+    for arm, sid in [
+        ("native", "native"),
+        ("controller", "request-throttling-controller"),
+    ]:
+        for modality, count in [("text", 200), ("image", 118)]:
+            points = [
+                r
+                for r in performance["records"]
+                if r["arm"] == arm
+                and r["modality"] == modality
+                and r["repetition"] != "warmup"
+            ]
+            assert len(points) == 3 and {r["repetition"] for r in points} == {1, 2, 3}
+            assert all(r["completed"] == count and r["failed"] == 0 for r in points)
+            aggregate = performance["aggregate"][modality][arm]
+            for key, value in aggregate.items():
+                assert statistics.median(r[key] for r in points) == value
+            quality = report["quality_pair"]["arms"][arm]["summary"]["groups"][
+                f"revision/{modality}"
+            ]
+            records.append(
+                {
+                    "id": f"hle-revision-controller-20261018-{sid}-{modality}",
+                    "dataset": "hle-verified",
+                    "solution": sid,
+                    "scope": f"revision-{modality}",
+                    "measured_at": "2026-10-18",
+                    "configuration_label": "本轮配对基线"
+                    if arm == "native"
+                    else "本轮评测",
+                    "configuration_label_en": "Matched baseline"
+                    if arm == "native"
+                    else "Current evaluation",
+                    "quality": [
+                        {
+                            "label": f"Revision · {modality}",
+                            "correct": quality["successes"],
+                            "total": quality["total"],
+                            "value": quality["accuracy"],
+                            "audit": quality,
+                        }
+                    ],
+                    "performance": dict(
+                        aggregate,
+                        completed=count,
+                        failed=0,
+                        num_prompts=count,
+                        repetitions=3,
+                        aggregation="median of three formal values per metric",
+                        formal_runs=points,
+                    ),
+                    "configuration": report["configuration"],
+                    "report": path,
+                    "protocol": {
+                        "quality": "One complete Revision1143 pass; strict JSON Qwen substitute judge; all unresolved retained",
+                        "performance": f"Separate {modality} test: {count} prompts; output cap256; natural EOS; temperature0; seed0; rate inf; no client cap; one warmup plus three formal runs per arm",
+                        "source": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/36fc645/reports/request-throttling-controller/dataset-matrix-20261018-r3/hle-revision",
+                        "quality_budget": report["quality_budget"],
+                    },
+                    "limitations": report["limitations"],
+                }
+            )
+
+
 def append_controller_mmlu_profile(root, datasets, records, sources):
     """Append the dated matched pair to the existing MMLU row and details."""
     path = "data/request-throttling-dataset-matrix-20261018/mmlu-pro.json"
@@ -721,6 +815,7 @@ def build(root=ROOT):
     append_controller_dataset_profiles(root, solutions, datasets, records, sources)
     append_controller_gold_profile(root, datasets, records, sources)
     append_controller_mmlu_profile(root, datasets, records, sources)
+    append_controller_revision_profile(root, datasets, records, sources)
     return {
         "schema": 1,
         "cohort": {
