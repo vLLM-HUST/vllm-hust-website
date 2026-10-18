@@ -15,10 +15,10 @@
       "name": "vllm-hust",
       "repo": "https://github.com/vLLM-HUST/vllm-hust",
       "group": "core",
-      "version": "main@c8c82889",
+      "version": "main@55c7f0ab",
       "source_branch": "main",
-      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/c8c828896f5d2f3f2d0cc8067d7261be1f945d7e",
-      "source_updated_at": "2026-10-17T00:51:16Z",
+      "source_commit_url": "https://github.com/vLLM-HUST/vllm-hust/commit/55c7f0abab836e65ded403d109a47065741f2774",
+      "source_updated_at": "2026-10-17T20:35:14Z",
       "version_display_label": "Repository snapshot; not a production compatibility approval",
       "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     },
@@ -26,10 +26,10 @@
       "name": "vllm-ascend-hust",
       "repo": "https://github.com/vLLM-HUST/vllm-ascend-hust",
       "group": "core",
-      "version": "main@d09a3ca1",
+      "version": "main@81582937",
       "source_branch": "main",
-      "source_commit_url": "https://github.com/vLLM-HUST/vllm-ascend-hust/commit/d09a3ca1beeb00dc5201c766a498047a56ffdb55",
-      "source_updated_at": "2026-10-17T02:13:05Z",
+      "source_commit_url": "https://github.com/vLLM-HUST/vllm-ascend-hust/commit/815829378c748a36dbfca335dc531868f2bad2a8",
+      "source_updated_at": "2026-10-17T20:40:04Z",
       "version_display_label": "Repository snapshot; not a production compatibility approval",
       "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     },
@@ -37,10 +37,10 @@
       "name": "triton-ascend-hust",
       "repo": "https://github.com/vLLM-HUST/triton-ascend-hust",
       "group": "core",
-      "version": "main@0bd8dd35",
+      "version": "main@db659651",
       "source_branch": "main",
-      "source_commit_url": "https://github.com/vLLM-HUST/triton-ascend-hust/commit/0bd8dd35d475d937c5be1e2b9e19f902b995b3ce",
-      "source_updated_at": "2026-10-16T21:37:51Z",
+      "source_commit_url": "https://github.com/vLLM-HUST/triton-ascend-hust/commit/db659651f9d38e8c5c8a59d89f035a53ceb7d4a6",
+      "source_updated_at": "2026-10-17T20:53:24Z",
       "version_display_label": "Repository snapshot; not a production compatibility approval",
       "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     },
@@ -89,7 +89,7 @@
       "version_note_zh": "仓库 main 快照；不代表该组合已通过生产兼容性验证。"
     }
   ],
-  "updated_at": "2026-10-17T07:03:51Z",
+  "updated_at": "2026-10-18T07:18:29Z",
   "registry": {
     "name": "vllm-hust",
     "version": "0.17.2.post1",
