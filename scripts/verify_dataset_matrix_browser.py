@@ -38,7 +38,15 @@ def main():
             expect(
                 page.locator(".matrix-profile-section, .matrix-replay-section")
             ).to_have_count(0)
-            for value in ["57.00%", "58.00%", "8.33%", "6.67%", "23.80%", "79.78%"]:
+            for value in [
+                "57.00%",
+                "58.00%",
+                "8.33%",
+                "6.67%",
+                "23.80%",
+                "79.78%",
+                "26.95%",
+            ]:
                 assert value in page.locator(".matrix-overview").inner_text()
             snapshot = page.request.get(
                 args.url + "/data/dataset-matrix-v1.json"
@@ -114,15 +122,18 @@ def main():
             page.go_back()
             page.locator(".matrix-overview").wait_for()
             page.locator('.matrix-dataset[href="#hle-verified"]').first.click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(14)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(18)
             page.locator('[data-solution="native"]').uncheck()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(8)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(10)
             assert "875.67" in page.locator(".matrix-detail").inner_text()
             assert "466.19" in page.locator(".matrix-detail").inner_text()
-            for value in ["327.04", "277.11", "2026-10-18"]:
+            for value in ["327.04", "277.11", "368.90", "294.30", "2026-10-18"]:
                 assert value in page.locator(".matrix-detail").inner_text()
             page.locator(
                 '[data-expand="hle-gold-controller-20261018-request-throttling-controller-text"]'
+            ).click()
+            page.locator(
+                '[data-expand="hle-revision-controller-20261018-request-throttling-controller-text"]'
             ).click()
             expect(page.locator(".matrix-detail thead th")).to_have_count(7)
 
@@ -131,7 +142,7 @@ def main():
             )
             page.reload()
             page.locator(".matrix-detail").wait_for()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(14)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(18)
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= innerWidth + 1"
             )
