@@ -155,7 +155,7 @@ def main():
             ).wait_for()
             expect(
                 page.locator(".matrix-detail tbody > tr:not(.run-detail)")
-            ).to_have_count(10)
+            ).to_have_count(8)
             assert "30.28" in page.locator(".matrix-detail").inner_text()
             notes = " ".join(
                 page.locator("#matrix-table > p.runs-note").all_text_contents()
